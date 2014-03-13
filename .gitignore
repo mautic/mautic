@@ -1,0 +1,11 @@
+.*
+!.gitignore
+!.htaccess
+/mautic/app/bootstrap*
+/mautic/app/cache/*
+/mautic/app/logs/*
+/mautic/app/config/local.php
+/mautic/vendor/*
+/mautic/bin/*
+/mautic/composer.phar
+/mautic/composer.lock
