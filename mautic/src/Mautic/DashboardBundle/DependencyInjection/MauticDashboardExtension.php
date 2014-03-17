@@ -1,4 +1,11 @@
 <?php
+/**
+ * @package     Mautic
+ * @copyright   2014 Mautic, NP. All rights reserved.
+ * @author      Mautic
+ * @link        http://mautic.com
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
 
 namespace Mautic\DashboardBundle\DependencyInjection;
 
@@ -8,14 +15,18 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader;
 
 /**
+ * Class MauticDashboardExtension
  * This is the class that loads and manages your bundle configuration
- *
  * To learn more see {@link http://symfony.com/doc/current/cookbook/bundles/extension.html}
+ *
+ * @package Mautic\DashboardBundle\DependencyInjection
  */
 class MauticDashboardExtension extends Extension
 {
+
     /**
-     * {@inheritDoc}
+     * @param array            $configs
+     * @param ContainerBuilder $container
      */
     public function load(array $configs, ContainerBuilder $container)
     {
