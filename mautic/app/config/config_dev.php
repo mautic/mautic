@@ -43,10 +43,6 @@ $container->loadFromExtension("monolog", array(
     )
 ));
 
-$container->loadFromExtension("assetic", array(
-    "use_controller" => true
-));
-
 /*
 $container->loadFromExtension("swiftmailer", array(
     "delivery_address" => "me@example.com"

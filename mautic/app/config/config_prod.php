@@ -1,7 +1,5 @@
 <?php
-
 $loader->import("config.php");
-
 /*
 $container->loadFromExtension("framework", array(
     "validation" => array(

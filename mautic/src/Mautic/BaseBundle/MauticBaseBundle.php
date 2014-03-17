@@ -7,6 +7,16 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-$container->loadFromExtension("security", array(
+namespace Mautic\BaseBundle;
 
-));
+use Symfony\Component\HttpKernel\Bundle\Bundle;
+
+/**
+ * Class MauticBaseBundle
+ *
+ * @package Mautic\BaseBundle
+ */
+class MauticBaseBundle extends Bundle
+{
+
+}

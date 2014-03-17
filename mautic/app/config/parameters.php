@@ -8,7 +8,7 @@
  */
 
 //load parameters array from local configuration
-include_once "local.php";
+include "local.php";
 
 foreach ($parameters as $k => $v) {
     $container->setParameter($k, $v);
