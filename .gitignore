@@ -5,7 +5,13 @@
 /mautic/app/cache/*
 /mautic/app/logs/*
 /mautic/app/config/local.php
+/mautic/app/Resources/SensioGeneratorBundle
+/mautic/web
 /mautic/vendor/*
 /mautic/bin/*
 /mautic/composer.phar
 /mautic/composer.lock
+/bundles
+/media/assetic
+/media/css
+/media/js
