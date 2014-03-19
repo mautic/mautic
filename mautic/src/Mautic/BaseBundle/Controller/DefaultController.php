@@ -28,6 +28,6 @@ class DefaultController extends Controller implements EventsController
      */
     public function indexAction(Request $request)
     {
-        return $this->render('MauticDashboardBundle:Default:index.html.php');
+        return $this->render('MauticBaseBundle:Default:index.html.php');
     }
 }

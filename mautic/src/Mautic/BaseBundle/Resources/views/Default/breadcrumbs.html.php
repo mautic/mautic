@@ -8,8 +8,6 @@
  */
 ?>
 
-<?php echo $view['knp_menu']->render('main', array("")); ?>
-
-<!--<ul class="side-panel-nav">
-    <li><a href="#"><span class="glyphicon glyphicon-home"></span>Dashboard</a></li>
-</ul>-->
+<ol class="breadcrumb">
+    <li><a href="<?php echo $view['router']->generate("mautic_base_index"); ?>">Home</a></li>
+</ol>

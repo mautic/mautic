@@ -11,24 +11,29 @@ namespace Mautic\BaseBundle\Routing;
 
 use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\DependencyInjection\Container;
 
 /**
- * Class MauticLoader
+ * Class RouteLoader
  *
  * @package Mautic\BaseBundle\Routing
  */
 
-class MauticLoader extends Loader
+class RouteLoader extends Loader
 {
-    private $loaded = false;
-    protected $bundles = array();
+    private   $loaded    = false;
+    protected $bundles   = array();
+    protected $container;
 
     /**
-     * @param $bundles
+     * @param Container $container
+     * @param array     $bundles
      */
-    public function __construct($bundles)
+    public function __construct(Container $container, array $bundles)
     {
-        $this->bundles = array_keys($bundles);
+        $this->container = $container;
+        //just need bundle names
+        $this->bundles   = $bundles;
     }
 
     /**
@@ -46,8 +51,12 @@ class MauticLoader extends Loader
         $collection = new RouteCollection();
 
         foreach($this->bundles as $bundle) {
-            $bundleRoutes = $this->import("@{$bundle}/Resources/config/routing.php", 'php');
-            $collection->addCollection($bundleRoutes);
+            //Load bundle routing if routing.php exists
+            $parts = explode("\\", $bundle);
+            $path = __DIR__ . "/../../" . $parts[1] . "/Resources/config/routing.php";
+            if (file_exists($path)) {
+                $collection->addCollection($this->import($path));
+            }
         }
 
         $this->loaded = true;

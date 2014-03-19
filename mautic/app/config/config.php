@@ -10,7 +10,6 @@ $container->setParameter("mautic.bundles", $mauticbundles);
 
 $loader->import("parameters.php");
 $loader->import("security.php");
-$loader->import("services.php");
 
 $container->loadFromExtension("framework", array(
     "secret"               => "%secret%",
@@ -19,7 +18,7 @@ $container->loadFromExtension("framework", array(
         "strict_requirements" => null,
     ),
     "form"                 => null,
-    "csrf_protection"      => null,
+    "csrf_protection"      => true,
     "validation"           => array(
         "enable_annotations" => true
     ),
@@ -28,14 +27,19 @@ $container->loadFromExtension("framework", array(
             "twig",
             "php"
         ),
+        /*
         "assets_base_urls" => array(
-            "http" => array("media/"),
-            "ssl"  => array("media/")
+            "http" => array("/media/"),
+            "ssl"  => array("/media/")
         )
+        */
     ),
     "default_locale"       => "%locale%",
-    "trusted_hosts"        => null,
-    "trusted_proxies"      => null,
+    "translator"           => array(
+        "fallback" => "en"
+    ),
+    "trusted_hosts"        => "%trusted_hosts%",
+    "trusted_proxies"      => "%trusted_proxies%",
     "session"              => array( //handler_id set to null will use default session handler from php.ini
         "handler_id" => null
     ),
@@ -86,7 +90,7 @@ $container->loadFromExtension("swiftmailer", array(
 
 //Assetic does not allow variables when loading resources in templates because it renders the media at compilation time and thus
 //the appropriate variables are not populated.  In order to not have to manually add each bundles' media files to
-//MauticBaseBundle's base.html.php file, we are doing the following.
+//MauticBaseBundle's base.html.php file, we are doing the following which works because of Symfony's caching.
 
 //For production, you must dump the assets via php app/console assetic:dump --env=prod
 
@@ -120,8 +124,8 @@ foreach ($mauticbundles as $bundle => $namespace) {
 $container->loadFromExtension("assetic", array(
     "debug"          => "%kernel.debug%",
     "use_controller" => "%kernel.debug%",
-    "read_from"      => "%kernel.root_dir%/../../media/",
-    "write_to"       => "%kernel.root_dir%/../../media/",
+    "read_from"      => "%kernel.root_dir%/../../",
+    "write_to"       => "%kernel.root_dir%/../../",
     "filters"        => array(
         "cssrewrite" => array(
             "apply_to" => "\\.css$"
@@ -143,4 +147,11 @@ $container->loadFromExtension("assetic", array(
             )
         )
     )
+));
+
+//KnpMenu Configuration
+$container->loadFromExtension("knp_menu", array(
+    "twig" => false,
+    "templating" => true,
+    "default_renderer" => "mautic"
 ));

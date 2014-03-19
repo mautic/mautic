@@ -19,12 +19,4 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 class MauticDashboardBundle extends Bundle
 {
 
-    /**
-     * Associate this bundle with the parent bundle Base
-     * @return string
-     */
-    public function getParent()
-    {
-        return "MauticBaseBundle";
-    }
 }

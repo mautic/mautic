@@ -16,10 +16,10 @@ class AppKernel extends Kernel
             new Doctrine\Bundle\DoctrineBundle\DoctrineBundle(),
             new Symfony\Bundle\AsseticBundle\AsseticBundle(),
             new Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle(),
+            new Knp\Bundle\MenuBundle\KnpMenuBundle(),
 
             new Mautic\BaseBundle\MauticBaseBundle(),
             new Mautic\DashboardBundle\MauticDashboardBundle()
-
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {

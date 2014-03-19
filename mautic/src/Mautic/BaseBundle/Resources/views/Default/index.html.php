@@ -13,12 +13,13 @@
     <head>
         <meta charset="UTF-8" />
         <title>Mautic<?php ($view['slots']->has('title')) ? $view['slots']->output('title') : ""; ?></title>
-        <link rel="icon" type="image/x-icon" href="<?php echo $view['assets']->getUrl('favicon.ico') ?>" />
+        <link rel="icon" type="image/x-icon" href="<?php echo $view['assets']->getUrl('media/images/favicon.ico') ?>" />
+        <link rel="apple-touch-icon" href="<?php echo $view['assets']->getUrl('media/images/apple-touch-icon.png') ?>" />
 
         <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
 
         <?php
-        foreach ($view['assetic']->stylesheets(array('@mautic_stylesheets'), array(), array('output' => 'css/mautic.css')) as $url): ?>
+        foreach ($view['assetic']->stylesheets(array('@mautic_stylesheets'), array(), array('output' => 'media/css/mautic.css')) as $url): ?>
         <link rel="stylesheet" href="<?php echo $view->escape($url) ?>" />
         <?php endforeach; ?>
     </head>
@@ -35,9 +36,7 @@
 
             <div id="main-panel">
                 <div id="main-panel-breadcrumbs">
-                    <ol class="breadcrumb">
-                        <li><a href="/">Home</a></li>
-                    </ol>
+                    <?php echo $view->render('MauticBaseBundle:Default:breadcrumbs.html.php'); ?>
                 </div>
                 <?php if ($view['slots']->has('title')): ?>
                 <div id="main-panel-header">
@@ -49,14 +48,11 @@
                     <?php $view['slots']->output('_content'); ?>
                 </div>
             </div>
-
-
-            <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-            <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
-
-            <?php foreach ($view['assetic']->javascripts(array("@mautic_javascripts"), array(), array('output' => 'js/mautic.js')) as $url): ?>
-            <script type="text/javascript" src="<?php echo $view->escape($url) ?>"></script>
-            <?php endforeach; ?>
         </div>
+
+        <?php foreach ($view['assetic']->javascripts(array("@mautic_javascripts"), array(), array('combine' => true, 'output' => 'media/js/mautic.js')) as $url): ?>
+            <script type="text/javascript" src="<?php echo $view->escape($url) ?>"></script>
+        <?php endforeach; ?>
+        <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
     </body>
 </html>

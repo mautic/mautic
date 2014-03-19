@@ -11,7 +11,7 @@
 /mautic/bin/*
 /mautic/composer.phar
 /mautic/composer.lock
+/assetic
 /bundles
-/media/assetic
 /media/css
 /media/js

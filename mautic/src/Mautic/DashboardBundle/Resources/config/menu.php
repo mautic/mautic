@@ -6,10 +6,10 @@
  * @link        http://mautic.com
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-?>
 
-<?php echo $view['knp_menu']->render('main', array("")); ?>
-
-<!--<ul class="side-panel-nav">
-    <li><a href="#"><span class="glyphicon glyphicon-home"></span>Dashboard</a></li>
-</ul>-->
+$items = array(
+    'Home' => array(
+        'route' => 'mautic_dashboard_index',
+        'extras'=> array("icon" => 'home')
+    )
+);

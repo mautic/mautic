@@ -8,9 +8,11 @@
  */
 
 //load base template
-$view->extend('MauticBaseBundle:Default:base.html.php');
+$view->extend('MauticBaseBundle:Default:index.html.php');
 
 //set page title
 $view['slots']->set("title", "Dashboard");
 
 ?>
+
+<h5>Dashboard content</h5>
