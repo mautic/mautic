@@ -13,8 +13,8 @@ $lastCrumb = count($crumbs) - 1;
 <ol class="breadcrumb">
     <?php
     foreach ($crumbs as $crumbCount => $crumb):
-        $label = ($crumb["label"] == "root") ? "mautic.menu.base.index" : $crumb["label"];
-        $route = ($crumb["label"] == "root") ? $view['router']->generate("mautic_base_index") : $crumb["uri"];
+        $label = ($crumb["label"] == "root") ? "mautic.menu.core.index" : $crumb["label"];
+        $route = ($crumb["label"] == "root") ? $view['router']->generate("mautic_core_index") : $crumb["uri"];
         ?>
         <li>
             <?php if ($lastCrumb === $crumbCount): ?>

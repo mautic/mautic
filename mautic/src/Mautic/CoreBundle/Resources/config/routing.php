@@ -12,7 +12,7 @@ use Symfony\Component\Routing\Route;
 
 $collection = new RouteCollection();
 
-$collection->add('mautic_base_index', new Route('/', array(
+$collection->add('mautic_core_index', new Route('/', array(
     //@TODO Change to a different landing page
     '_controller' => 'MauticCoreBundle:Default:index'
 )));

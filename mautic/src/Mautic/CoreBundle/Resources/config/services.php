@@ -21,7 +21,7 @@ $listener->addTag("kernel.event_listener", array(
 $container->setDefinition("mautic.events.action_listener", $listener);
 
 //Register Mautic's custom routing
-$container->setDefinition ("mautic_base.routing_loader",
+$container->setDefinition ("mautic_core.routing_loader",
     new Definition(
         "Mautic\CoreBundle\Routing\RouteLoader",
         array(
@@ -32,7 +32,7 @@ $container->setDefinition ("mautic_base.routing_loader",
 )->addTag("routing.loader");
 
 //Register Mautic's menu renderer
-$container->setDefinition("mautic_base.menu_renderer",
+$container->setDefinition("mautic_core.menu_renderer",
     new Definition(
         "Mautic\CoreBundle\Menu\MenuRenderer",
         array(
@@ -46,7 +46,7 @@ $container->setDefinition("mautic_base.menu_renderer",
 ->addTag("knp_menu.renderer", array("alias" => "mautic"));
 
 //Register Mautic's MenuBuilder class
-$container->setDefinition("mautic_base.menu_builder",
+$container->setDefinition("mautic_core.menu_builder",
     new Definition(
         "Mautic\CoreBundle\Menu\MenuBuilder",
         array(
@@ -61,14 +61,14 @@ $container->setDefinition("mautic_base.menu_builder",
 ));
 
 //Register Mautic's MenuHelper class
-$container->setDefinition("mautic_base.menuhelper",
+$container->setDefinition("mautic_core.menuhelper",
     new Definition(
         "Mautic\CoreBundle\Menu\MenuHelper"
     )
 )->addTag("templating.helper", array("alias" => "menu_helper"));
 
 //Register Mautic's main menu
-$container->setDefinition("mautic_base.menu.main",
+$container->setDefinition("mautic_core.menu.main",
     new Definition(
         "Knp\Menu\MenuItem",
         array(
@@ -76,13 +76,13 @@ $container->setDefinition("mautic_base.menu.main",
         )
     )
 )
-    ->setFactoryService("mautic_base.menu_builder")
+    ->setFactoryService("mautic_core.menu_builder")
     ->setFactoryMethod("mainMenu")
     ->setScope("request")
     ->addTag("knp_menu.menu", array("alias" => "main"));
 
 //Register Mautic's breacrumbs menu
-$container->setDefinition("mautic_base.menu.breadcrumbs",
+$container->setDefinition("mautic_core.menu.breadcrumbs",
     new Definition(
         "Knp\Menu\MenuItem",
         array(
@@ -90,7 +90,7 @@ $container->setDefinition("mautic_base.menu.breadcrumbs",
         )
     )
 )
-    ->setFactoryService("mautic_base.menu_builder")
+    ->setFactoryService("mautic_core.menu_builder")
     ->setFactoryMethod("breadcrumbsMenu")
     ->setScope("request")
     ->addTag("knp_menu.menu", array("alias" => "breadcrumbs"));
