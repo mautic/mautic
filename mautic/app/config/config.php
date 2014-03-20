@@ -36,6 +36,7 @@ $container->loadFromExtension("framework", array(
     ),
     "default_locale"       => "%locale%",
     "translator"           => array(
+        "enabled"  => true,
         "fallback" => "en"
     ),
     "trusted_hosts"        => "%trusted_hosts%",

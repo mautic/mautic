@@ -8,7 +8,7 @@
  */
 
 $items = array(
-    "Dashboard" => array(
+    "mautic.menu.dashboard.index" => array(
         "options" => array(
             "route"    => "mautic_dashboard_index",
             "uri"      => "javascript: void(0)",

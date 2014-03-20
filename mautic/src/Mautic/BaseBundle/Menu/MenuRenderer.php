@@ -44,7 +44,7 @@ class MenuRenderer implements RendererInterface {
             'ancestorClass'     => 'current_ancestor',
             'firstClass'        => 'first',
             'lastClass'         => 'last',
-            'template'          => "menu.main.html.php",
+            'template'          => "MauticBaseBundle:Menu:main.html.php",
             'compressed'        => false,
             'allow_safe_labels' => false,
             'clear_matcher'     => true,
@@ -66,12 +66,12 @@ class MenuRenderer implements RendererInterface {
         }
         $manipulator = new MenuManipulator();
         if ($options["menu"] == "breadcrumbs") {
-            $html = $this->engine->render("MauticBaseBundle:Default:menu.breadcrumbs.html.php", array(
+            $html = $this->engine->render("MauticBaseBundle:Menu:breadcrumbs.html.php", array(
                 "crumbs"  => $manipulator->getBreadcrumbsArray($item)
             ));
         } else {
             //render html
-            $html = $this->engine->render("MauticBaseBundle:Default:menu.main.html.php", array(
+            $html = $this->engine->render("MauticBaseBundle:Menu:main.html.php", array(
                 "item"    => $item,
                 "options" => $options,
                 "matcher" => $this->matcher

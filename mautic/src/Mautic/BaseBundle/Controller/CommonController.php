@@ -20,7 +20,10 @@ use Symfony\Component\HttpFoundation\Request;
  * @package Mautic\BaseBundle\Controller
  */
 class CommonController extends Controller implements EventsController {
-
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function ajaxAction(Request $request) {
         $bundle   = $request->get("bundle");
 
