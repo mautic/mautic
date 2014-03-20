@@ -7,31 +7,28 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\DashboardBundle\Controller;
+namespace Mautic\CoreBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
-use Mautic\CoreBundle\Controller\CommonController;
-
 
 /**
  * Class DefaultController
+ * Almost all other Mautic Bundle controllers extend this default controller
  *
- * @package Mautic\DashboardBundle\Controller
+ * @package Mautic\CoreBundle\Controller
  */
 class DefaultController extends CommonController
 {
 
     /**
-     * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\Response|void
      */
     public function indexAction(Request $request)
     {
         if ($request->isXmlHttpRequest()) {
             return $this->ajaxAction($request);
         } else {
-            return $this->render('MauticDashboardBundle:Default:index.html.php');
+            return $this->render('MauticCoreBundle:Default:index.html.php');
         }
     }
 }

@@ -8,13 +8,8 @@
  */
 
 if (!$app->getRequest()->isXmlHttpRequest()):
-//load base template
-$view->extend('MauticCoreBundle:Default:base.html.php');
+    //load base template
+    $view->extend('MauticCoreBundle:Default:base.html.php');
 endif;
 ?>
-<div id="main-panel-header">
-    <h1>Dashboard</h1>
-</div>
-
-
-<h5>Dashboard content</h5>
+<p>Base index (to be replaced)</p>

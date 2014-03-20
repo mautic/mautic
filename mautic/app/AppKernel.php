@@ -18,12 +18,14 @@ class AppKernel extends Kernel
             new Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle(),
             new Knp\Bundle\MenuBundle\KnpMenuBundle(),
 
-            new Mautic\BaseBundle\MauticBaseBundle(),
-            new Mautic\DashboardBundle\MauticDashboardBundle()
+            new Mautic\CoreBundle\MauticCoreBundle(),
+            new Mautic\DashboardBundle\MauticDashboardBundle(),
+            new Mautic\UserBundle\MauticUserBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {
             $bundles[] = new Symfony\Bundle\WebProfilerBundle\WebProfilerBundle();
+            $bundles[] = new Sensio\Bundle\DistributionBundle\SensioDistributionBundle();
             $bundles[] = new Sensio\Bundle\GeneratorBundle\SensioGeneratorBundle();
         }
 
