@@ -11,7 +11,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Parameter;
 
-//Setup a listener to prepopulate information such as bundle name, action name, template name, etc into the request
+//Listener to prepopulate information such as bundle name, action name, template name, etc into the request
 //attributes for use in the templates
 $listener = new Definition("Mautic\CoreBundle\EventListener\MauticListener");
 $listener->addTag("kernel.event_listener", array(
@@ -20,7 +20,7 @@ $listener->addTag("kernel.event_listener", array(
 ));
 $container->setDefinition("mautic.events.action_listener", $listener);
 
-//Register Mautic's custom routing
+//Mautic's custom routing
 $container->setDefinition ("mautic_core.routing_loader",
     new Definition(
         "Mautic\CoreBundle\Routing\RouteLoader",
@@ -31,7 +31,7 @@ $container->setDefinition ("mautic_core.routing_loader",
     )
 )->addTag("routing.loader");
 
-//Register Mautic's menu renderer
+//Mautic's menu renderer
 $container->setDefinition("mautic_core.menu_renderer",
     new Definition(
         "Mautic\CoreBundle\Menu\MenuRenderer",
@@ -45,7 +45,7 @@ $container->setDefinition("mautic_core.menu_renderer",
 )
 ->addTag("knp_menu.renderer", array("alias" => "mautic"));
 
-//Register Mautic's MenuBuilder class
+//Mautic's MenuBuilder class
 $container->setDefinition("mautic_core.menu_builder",
     new Definition(
         "Mautic\CoreBundle\Menu\MenuBuilder",
@@ -60,14 +60,14 @@ $container->setDefinition("mautic_core.menu_builder",
     new Reference("service_container")
 ));
 
-//Register Mautic's MenuHelper class
+//Mautic's MenuHelper class
 $container->setDefinition("mautic_core.menuhelper",
     new Definition(
         "Mautic\CoreBundle\Menu\MenuHelper"
     )
 )->addTag("templating.helper", array("alias" => "menu_helper"));
 
-//Register Mautic's main menu
+//Mautic's main menu
 $container->setDefinition("mautic_core.menu.main",
     new Definition(
         "Knp\Menu\MenuItem",
@@ -81,7 +81,7 @@ $container->setDefinition("mautic_core.menu.main",
     ->setScope("request")
     ->addTag("knp_menu.menu", array("alias" => "main"));
 
-//Register Mautic's breacrumbs menu
+//Mautic's breacrumbs menu
 $container->setDefinition("mautic_core.menu.breadcrumbs",
     new Definition(
         "Knp\Menu\MenuItem",
@@ -94,3 +94,14 @@ $container->setDefinition("mautic_core.menu.breadcrumbs",
     ->setFactoryMethod("breadcrumbsMenu")
     ->setScope("request")
     ->addTag("knp_menu.menu", array("alias" => "breadcrumbs"));
+
+//Database table prefix
+$container->setDefinition ("mautic_core.tblprefix_subscriber",
+    new Definition(
+        "Mautic\CoreBundle\Subscriber\TablePrefixSubscriber",
+        array(
+            "%db_table_prefix%",
+            "%mautic.bundles%"
+        )
+    )
+)->addTag("doctrine.event_subscriber");
