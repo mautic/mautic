@@ -13,8 +13,7 @@ use Symfony\Component\Routing\Route;
 $collection = new RouteCollection();
 
 $collection->add('mautic_dashboard_index', new Route('/dashboard', array(
-    '_controller' => 'MauticDashboardBundle:Default:index',
-    array("bundle" => "dashboard")
+    '_controller' => 'MauticDashboardBundle:Default:index'
 )));
 
 return $collection;

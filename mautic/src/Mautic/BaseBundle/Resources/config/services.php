@@ -13,63 +13,84 @@ use Symfony\Component\DependencyInjection\Parameter;
 
 //Setup a listener to prepopulate information such as bundle name, action name, template name, etc into the request
 //attributes for use in the templates
-$listener = new Definition('Mautic\BaseBundle\EventListener\MauticListener');
-$listener->addTag('kernel.event_listener', array(
-    'event'  => 'kernel.controller',
-    'method' => 'onKernelController'
+$listener = new Definition("Mautic\BaseBundle\EventListener\MauticListener");
+$listener->addTag("kernel.event_listener", array(
+    "event"  => "kernel.controller",
+    "method" => "onKernelController"
 ));
-$container->setDefinition('mautic.events.action_listener', $listener);
+$container->setDefinition("mautic.events.action_listener", $listener);
 
-//Register Mautic's custom routing
-$container->setDefinition ('mautic_base.routing_loader',
+//Register Mautic"s custom routing
+$container->setDefinition ("mautic_base.routing_loader",
     new Definition(
-        'Mautic\BaseBundle\Routing\RouteLoader',
+        "Mautic\BaseBundle\Routing\RouteLoader",
         array(
             new Reference("service_container"),
-            '%mautic.bundles%'
+            "%mautic.bundles%"
         )
     )
-)->addTag('routing.loader');
+)->addTag("routing.loader");
 
-//Register Mautic's menu renderer
-$container->setDefinition('mautic_base.menu_renderer',
+//Register Mautic"s menu renderer
+$container->setDefinition("mautic_base.menu_renderer",
     new Definition(
-        'Mautic\BaseBundle\Menu\MenuRenderer',
+        "Mautic\BaseBundle\Menu\MenuRenderer",
         array(
             new Reference("templating"),
             new Reference("knp_menu.matcher"),
             //"%knp_menu.renderer.list.options%",
-            "%kernel.charset%",
-            array(
-                "template" => "MauticBaseBundle:Default:menu.html.php"
-            )
+            "%kernel.charset%"
         )
     )
 )
-->addTag('knp_menu.renderer', array('alias' => 'mautic'));
+->addTag("knp_menu.renderer", array("alias" => "mautic"));
 
-//Register Mautic's menu builder
-$container->setDefinition('mautic_base.menu_builder',
+//Register Mautic"s MenuBuilder class
+$container->setDefinition("mautic_base.menu_builder",
     new Definition(
-        'Mautic\BaseBundle\Menu\MenuBuilder',
+        "Mautic\BaseBundle\Menu\MenuBuilder",
         array(
             new Reference("knp_menu.factory"),
-            '%mautic.bundles%'
+            new Reference("knp_menu.matcher"),
+            "%mautic.bundles%"
         )
     )
 )
-->addMethodCall('setContainer', array(
-    new Reference('service_container')
+->addMethodCall("setContainer", array(
+    new Reference("service_container")
 ));
 
-//Register Mautic's main menu
-$container->setDefinition('mautic_base.menu.main',
+//Register Mautic"s MenuHelper class
+$container->setDefinition("mautic_base.menuhelper",
     new Definition(
-        'Knp\Menu\MenuItem',
-        array(new Reference('request'))
+        "Mautic\BaseBundle\Menu\MenuHelper"
+    )
+)->addTag("templating.helper", array("alias" => "menu_helper"));
+
+//Register Mautic"s main menu
+$container->setDefinition("mautic_base.menu.main",
+    new Definition(
+        "Knp\Menu\MenuItem",
+        array(
+            new Reference("request")
+        )
     )
 )
-->setFactoryService('mautic_base.menu_builder')
-->setFactoryMethod('mainMenu')
-->setScope('request')
-->addTag('knp_menu.menu', array('alias' => 'main'));
+    ->setFactoryService("mautic_base.menu_builder")
+    ->setFactoryMethod("mainMenu")
+    ->setScope("request")
+    ->addTag("knp_menu.menu", array("alias" => "main"));
+
+//Register Mautic"s breacrumbs menu
+$container->setDefinition("mautic_base.menu.breadcrumbs",
+    new Definition(
+        "Knp\Menu\MenuItem",
+        array(
+            new Reference("request")
+        )
+    )
+)
+    ->setFactoryService("mautic_base.menu_builder")
+    ->setFactoryMethod("breadcrumbsMenu")
+    ->setScope("request")
+    ->addTag("knp_menu.menu", array("alias" => "breadcrumbs"));

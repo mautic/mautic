@@ -25,7 +25,6 @@
 #main-panel-header {
     height: 65px;
     line-height: 65px;
-    padding-left: 10px;
 }
 
 #main-panel-header h1 {
@@ -63,6 +62,7 @@
 .side-panel-nav li {
     line-height: 40px;
     text-indent: 5px;
+    overflow: hidden;
 }
 
 .side-panel-nav li a {
@@ -70,11 +70,16 @@
     display: block;
     text-decoration: none;
     font-size: 1.1em;
+    postion: relative;
+}
+
+.side-panel-nav li.current>a:first-child  {
+    color: #fff;
+    text-decoration: none;
 }
 
 .side-panel-nav li a:hover {
     color: #fff;
-    background: rgba(255,255,255,0.2);
     text-decoration: none;
 }
 
@@ -83,7 +88,46 @@
     text-decoration: none;
 }
 
-.side-panel-nav li .glyphicon {
-    margin-right: 10px;
+.side-panel-nav li .nav-item-name {
+    display: inline-block;
 }
+
+.side-panel-nav li .glyphicon {
+    margin-right: 5px;
+    display: inline-block;
+}
+
+.side-panel-nav li .subnav-toggle {
+    position: absolute !important;
+    top: 0;
+    right: 3px;
+}
+
+.side-panel-nav ul.subnav-closed {
+    display: none;
+}
+
+.side-panel-nav ul.subnav-open {
+    display: block;
+}
+
+.side-panel-nav ul.nav-level {
+    margin-left: 0;
+    padding-left: 0;
+    background: #404040;
+}
+
+.side-panel-nav ul.nav-level a:before {
+    content: " ";
+    background: url("images/submenuindicator.png") no-repeat;
+    position: absolute;
+    left: 5px;
+    height: 40px;
+    width: 20px;
+}
+
+.side-panel-nav ul.nav-level a {
+    text-indent: 40px;
+}
+
 

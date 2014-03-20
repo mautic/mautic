@@ -94,8 +94,8 @@ $container->loadFromExtension("swiftmailer", array(
 
 //For production, you must dump the assets via php app/console assetic:dump --env=prod
 
-$css = array();
-$js  = array();
+$css    = array();
+$js     = array();
 foreach ($mauticbundles as $bundle => $namespace) {
     //parse the namespace into a filepath
     $namespaceParts = explode("\\", $namespace);
@@ -108,7 +108,7 @@ foreach ($mauticbundles as $bundle => $namespace) {
         //get files within the directory
         $iterator = new FilesystemIterator($typeDir);
         //filter out inappropriate files
-        $filter   = new RegexIterator($iterator, "/.$type$/");
+        $filter = new RegexIterator($iterator, "/.$type$/");
         if (iterator_count($filter)) {
             foreach ($filter as $file) {
                 //add the file to be loaded
@@ -123,12 +123,12 @@ foreach ($mauticbundles as $bundle => $namespace) {
 
 $container->loadFromExtension("assetic", array(
     "debug"          => "%kernel.debug%",
-    "use_controller" => "%kernel.debug%",
+    "use_controller" => false,
     "read_from"      => "%kernel.root_dir%/../../",
     "write_to"       => "%kernel.root_dir%/../../",
     "filters"        => array(
         "cssrewrite" => array(
-            "apply_to" => "\\.css$"
+            'apply_to' => '\.css$',
         )
     ),
     "assets"         => array(

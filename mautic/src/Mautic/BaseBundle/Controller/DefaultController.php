@@ -9,9 +9,7 @@
 
 namespace Mautic\BaseBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
-use Mautic\BaseBundle\Controller\EventsController;
 
 /**
  * Class DefaultController
@@ -19,15 +17,18 @@ use Mautic\BaseBundle\Controller\EventsController;
  *
  * @package Mautic\BaseBundle\Controller
  */
-class DefaultController extends Controller implements EventsController
+class DefaultController extends CommonController
 {
 
     /**
-     * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response|void
      */
     public function indexAction(Request $request)
     {
-        return $this->render('MauticBaseBundle:Default:index.html.php');
+        if ($request->isXmlHttpRequest()) {
+            return $this->ajaxAction($request);
+        } else {
+            return $this->render('MauticBaseBundle:Default:index.html.php');
+        }
     }
 }

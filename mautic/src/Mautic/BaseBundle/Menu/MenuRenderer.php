@@ -12,6 +12,7 @@ namespace Mautic\BaseBundle\Menu;
 use Knp\Menu\ItemInterface;
 use Knp\Menu\Matcher\MatcherInterface;
 use Knp\Menu\Renderer\RendererInterface;
+use Knp\Menu\Util\MenuManipulator;
 use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
 
 /**
@@ -43,7 +44,7 @@ class MenuRenderer implements RendererInterface {
             'ancestorClass'     => 'current_ancestor',
             'firstClass'        => 'first',
             'lastClass'         => 'last',
-            'template'          => "menu.html.php",
+            'template'          => "menu.main.html.php",
             'compressed'        => false,
             'allow_safe_labels' => false,
             'clear_matcher'     => true,
@@ -60,41 +61,21 @@ class MenuRenderer implements RendererInterface {
     {
         $options = array_merge($this->defaultOptions, $options);
 
-        $template = $options['template'] ?: "MauticBaseBunde:Default:menu.html.php";
-
-        //functions to pass in for parsing
-        $parseAttributes = function($attributes) {
-            if (!is_array($attributes) || empty ($attributes)) return '';
-            $string = "";
-            foreach ($attributes as $name => $value) {
-                if ($name == $value) $string .= " $name";
-                else $string .= " $name=\"$value\"";
-            }
-            return $string;
-        };
-
-        //function to build item class
-        $buildClasses = function(ItemInterface &$item, MatcherInterface &$matcher) use ($options) {
-            $class    = $item->getAttribute("class");
-            $classes  = ($class) ? " {$class}" : "";
-            $classes .= ($matcher->isCurrent($item)) ? " {$options["currentClass"]}" : "";
-            $classes .= ($matcher->isAncestor($item, $options["matchingDepth"])) ? " {$options["ancestorClass"]}" : "";
-            $classes .= ($item->actsLikeFirst()) ? " {$options["firstClass"]}" : "";
-            $classes .= ($item->actsLikeLast()) ? " {$options["lastClass"]}" : "";
-            $item->setAttribute("class", $classes);
-        };
-
-        //render html
-        $html = $this->engine->render($template, array(
-            "item"             => $item,
-            "options"          => $options,
-            "matcher"          => $this->matcher,
-            "parseAttributes"  => $parseAttributes,
-            "buildClasses"     => $buildClasses
-        ));
-
         if ($options['clear_matcher']) {
             $this->matcher->clear();
+        }
+        $manipulator = new MenuManipulator();
+        if ($options["menu"] == "breadcrumbs") {
+            $html = $this->engine->render("MauticBaseBundle:Default:menu.breadcrumbs.html.php", array(
+                "crumbs"  => $manipulator->getBreadcrumbsArray($item)
+            ));
+        } else {
+            //render html
+            $html = $this->engine->render("MauticBaseBundle:Default:menu.main.html.php", array(
+                "item"    => $item,
+                "options" => $options,
+                "matcher" => $this->matcher
+            ));
         }
 
         return $html;

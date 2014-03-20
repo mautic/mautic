@@ -8,6 +8,4 @@
  */
 ?>
 
-<ol class="breadcrumb">
-    <li><a href="<?php echo $view['router']->generate("mautic_base_index"); ?>">Home</a></li>
-</ol>
+<?php echo $view['knp_menu']->render('breadcrumbs', array("menu" => "breadcrumbs")); ?>

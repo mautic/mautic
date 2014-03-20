@@ -9,24 +9,29 @@
 
 namespace Mautic\DashboardBundle\Controller;
 
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Mautic\BaseBundle\Controller\EventsController;
+use Symfony\Component\HttpFoundation\Request;
+use Mautic\BaseBundle\Controller\CommonController;
+
 
 /**
  * Class DefaultController
  *
  * @package Mautic\DashboardBundle\Controller
  */
-class DefaultController extends Controller implements EventsController
+class DefaultController extends CommonController
 {
 
     /**
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\Response|void
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function indexAction(Request $request)
     {
-        return $this->render('MauticDashboardBundle:Default:index.html.php');
+        if ($request->isXmlHttpRequest()) {
+            return $this->ajaxAction($request);
+        } else {
+            return $this->render('MauticDashboardBundle:Default:index.html.php');
+        }
     }
 }

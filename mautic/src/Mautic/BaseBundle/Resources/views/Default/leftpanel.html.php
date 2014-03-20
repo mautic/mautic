@@ -8,8 +8,4 @@
  */
 ?>
 
-<?php echo $view['knp_menu']->render('main', array("")); ?>
-
-<!--<ul class="side-panel-nav">
-    <li><a href="#"><span class="glyphicon glyphicon-home"></span>Dashboard</a></li>
-</ul>-->
+<?php echo $view['knp_menu']->render('main', array("menu" => "main")); ?>

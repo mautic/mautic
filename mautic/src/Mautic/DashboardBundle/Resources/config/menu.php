@@ -8,8 +8,19 @@
  */
 
 $items = array(
-    'Home' => array(
-        'route' => 'mautic_dashboard_index',
-        'extras'=> array("icon" => 'home')
+    "Dashboard" => array(
+        "options" => array(
+            "route"    => "mautic_dashboard_index",
+            "uri"      => "javascript: void(0)",
+            "linkAttributes" => array(
+                "onclick" =>
+                    "loadMauticContent('" . $this->container->get("router")->generate("mautic_dashboard_index") . "', this);"
+            ),
+            "labelAttributes" => array(
+                "class"   => "nav-item-name"
+            ),
+            "extras"=> array("icon" => "th")
+
+        )
     )
 );

@@ -13,9 +13,8 @@ use Symfony\Component\Routing\Route;
 $collection = new RouteCollection();
 
 $collection->add('mautic_base_index', new Route('/', array(
-    //default to the dashboard for now
-    '_controller' => 'MauticDashboardBundle:Default:index',
-    array("bundle" => "dashboard")
+    //@TODO Change to a different landing page
+    '_controller' => 'MauticBaseBundle:Default:index'
 )));
 
 return $collection;
