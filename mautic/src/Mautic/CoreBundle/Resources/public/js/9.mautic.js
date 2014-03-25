@@ -23,6 +23,9 @@ function loadMauticContent(route, link) {
 
                 //add current_ancestor classes
                 $(parent).parentsUntil("#side-panel-nav", "li").addClass("current_ancestor")
+
+                //clear flashes
+                $("#main-panel-flash-msgs").html('');
             }
         },
         error: function(request, textStatus, errorThrown) {

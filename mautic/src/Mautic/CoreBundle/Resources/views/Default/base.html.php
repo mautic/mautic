@@ -38,6 +38,9 @@
                 <div id="main-panel-breadcrumbs">
                     <?php echo $view->render('MauticCoreBundle:Default:breadcrumbs.html.php'); ?>
                 </div>
+                <div id="main-panel-flash-msgs">
+                    <?php echo $view->render('MauticCoreBundle:Default:flashes.html.php'); ?>
+                </div>
                 <div id="main-panel-content">
                     <?php $view['slots']->output('_content'); ?>
                 </div>

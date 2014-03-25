@@ -7,7 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\BaseBundle\DependencyInjection;
+namespace Mautic\UserBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
@@ -15,14 +15,13 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader;
 
 /**
- * Class MauticBaseExtension
+ * Class MauticUserExtension
  * This is the class that loads and manages your bundle configuration
  * To learn more see {@link http://symfony.com/doc/current/cookbook/bundles/extension.html}
  *
- * @package Mautic\BaseBundle\DependencyInjection
+ * @package Mautic\UserBundle\DependencyInjection
  */
-
-class MauticBaseExtension extends Extension
+class MauticUserExtension extends Extension
 {
 
     /**

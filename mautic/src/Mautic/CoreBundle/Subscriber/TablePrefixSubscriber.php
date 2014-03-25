@@ -28,7 +28,7 @@ class TablePrefixSubscriber implements \Doctrine\Common\EventSubscriber
      */
     public function __construct($prefix)
     {
-        $this->prefix = (string) $prefix;
+        $this->prefix  = (string) $prefix;
     }
 
     /**
@@ -51,7 +51,7 @@ class TablePrefixSubscriber implements \Doctrine\Common\EventSubscriber
             return;
         }
 
-        if (FALSE !== strpos($classMetadata->namespace, 'CoreBundle')) {
+        if (FALSE !== strpos($classMetadata->namespace, 'Mautic')) {
             $classMetadata->setPrimaryTable(array('name' => $this->prefix . $classMetadata->getTableName()));
 
             foreach ($classMetadata->getAssociationMappings() as $fieldName => $mapping) {

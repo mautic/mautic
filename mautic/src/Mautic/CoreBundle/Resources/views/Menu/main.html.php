@@ -54,7 +54,7 @@
                     endif;
                     //set the class
                     $child->setChildrenAttribute("class", $levelClass);
-                    echo $view->render('MauticCoreBundle:Default:menu.main.html.php',
+                    echo $view->render('MauticCoreBundle:Menu:main.html.php',
                         array( "item"             => $child,
                                "options"          => $options,
                                "matcher"          => $matcher

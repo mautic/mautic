@@ -70,7 +70,7 @@
     display: block;
     text-decoration: none;
     font-size: 1.1em;
-    postion: relative;
+    position: relative;
 }
 
 .side-panel-nav li.current>a:first-child  {
@@ -127,7 +127,7 @@
 }
 
 .side-panel-nav ul.nav-level a {
-    text-indent: 40px;
+   padding-left: 20px;
 }
 
 

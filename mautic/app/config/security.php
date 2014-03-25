@@ -7,6 +7,51 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-$container->loadFromExtension("security", array(
-
+$container->loadFromExtension('security', array(
+    'providers' => array(
+        'user_db' => array(
+            'entity' => array(
+                'class' => 'Mautic\UserBundle\Entity\User',
+                'property' => 'username',
+            ),
+        ),
+    ),
+    'encoders' => array(
+        'Symfony\Component\Security\Core\User\User' => array(
+            'algorithm'         => 'bcrypt',
+            'iterations'        => 12,
+        ),
+        'Mautic\UserBundle\Entity\User' => array(
+            'algorithm'         => 'bcrypt',
+            'iterations'        => 12,
+        ),
+    ),
+    'firewalls' => array(
+        /*
+        //for now don't block anything
+        'general' => array(
+            'pattern'   => '^/',
+            'anonymous' => array(),
+        ),*/
+        'dev' => array(
+            'pattern' => '^/(_(profiler|wdt)|css|images|js)/',
+            'security' => true,
+            'anonymous' => array()
+        ),
+        'login' => array(
+            'pattern'   => '^/login$',
+            'anonymous' => array()
+        ),
+        'main' => array(
+            'pattern' => "^/",
+            'form_login' => array(),
+            'logout' => array(),
+            'remember_me' => array(
+                'key'      => '%secret%',
+                'lifetime' => 31536000, // 365 days in seconds
+                'path'     => '/',
+                'domain'   => '', // Defaults to the current domain from $_SERVER
+            ),
+        ),
+    )
 ));

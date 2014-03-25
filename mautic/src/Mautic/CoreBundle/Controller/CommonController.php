@@ -24,12 +24,12 @@ class CommonController extends Controller implements EventsController {
      * @param Request $request
      * @return JsonResponse
      */
-    public function ajaxAction(Request $request) {
+    public function ajaxAction(Request $request, array $parameters = array(), $contentTemplate = "Default:index.html.php") {
         $bundle   = $request->get("bundle");
 
         //Ajax call so respond with json
-        $newContent  = $this->renderView("Mautic{$bundle}Bundle:Default:index.html.php");
-        $breadcrumbs = $this->renderView("MauticCoreBundle:Default:breadcrumbs.html.php");
+        $newContent  = $this->renderView("Mautic{$bundle}Bundle:$contentTemplate", $parameters);
+        $breadcrumbs = $this->renderView("MauticCoreBundle:Default:breadcrumbs.html.php", $parameters);
         $response = new JsonResponse();
         $response->setData(array(
             'newContent'  => $newContent,

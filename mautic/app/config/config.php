@@ -27,6 +27,11 @@ $container->loadFromExtension("framework", array(
             "twig",
             "php"
         ),
+        'form' => array(
+            'resources' => array(
+                'MauticCoreBundle:Form',
+            ),
+        ),
         /*
         "assets_base_urls" => array(
             "http" => array("/media/"),
@@ -57,16 +62,16 @@ $container->loadFromExtension("twig", array(
 //Doctrine Configuration
 $container->loadFromExtension("doctrine", array(
     "dbal" => array(
-        "driver"   => "%database_driver%",
-        "host"     => "%database_host%",
-        "port"     => "%database_port%",
-        "dbname"   => "%database_name%",
-        "user"     => "%database_user%",
-        "password" => "%database_password%",
+        "driver"   => "%db_driver%",
+        "host"     => "%db_host%",
+        "port"     => "%db_port%",
+        "dbname"   => "%db_name%",
+        "user"     => "%db_user%",
+        "password" => "%db_password%",
         "charset"  => "UTF8",
         //if using pdo_sqlite as your database driver, add the path in parameters.php
         //e.g. "database_path" => "%kernel.root_dir%/data/data.db3"
-        //"path"    => "%database_path%"
+        //"path"    => "%db_path%"
     ),
 
     "orm"  => array(
