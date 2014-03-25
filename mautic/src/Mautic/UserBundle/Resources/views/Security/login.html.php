@@ -54,7 +54,7 @@
 
         <input type="checkbox" id="remember_me" name="_remember_me" checked />
         <label for="remember_me"><?php echo $view['translator']->trans('mautic.user.form.rememberme'); ?></label>
-
+        <input type="hidden" name="_csrf_token" value="<?php echo $view['form']->csrfToken('authenticate') ?>" />
         <button class="btn btn-lg btn-primary btn-block" type="submit"><?php echo $view['translator']->trans('mautic.user.form.loginbtn'); ?></button>
     </form>
 </div>

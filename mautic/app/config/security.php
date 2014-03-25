@@ -44,7 +44,9 @@ $container->loadFromExtension('security', array(
         ),
         'main' => array(
             'pattern' => "^/",
-            'form_login' => array(),
+            'form_login' => array(
+                'csrf_provider' => 'form.csrf_provider'
+            ),
             'logout' => array(),
             'remember_me' => array(
                 'key'      => '%secret%',
