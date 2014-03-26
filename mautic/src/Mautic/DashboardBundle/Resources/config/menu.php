@@ -19,7 +19,7 @@ $items = array(
             "labelAttributes" => array(
                 "class"   => "nav-item-name"
             ),
-            "extras"=> array("icon" => "th")
+            "extras"=> array("iconClass" => "fa-th-large fa-lg")
 
         )
     )

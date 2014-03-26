@@ -15,4 +15,5 @@
 /bundles
 /media/css
 /media/js
-/media/images
+/media/font-awesome/less
+/media/font-awesome/scss

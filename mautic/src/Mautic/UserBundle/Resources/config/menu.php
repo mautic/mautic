@@ -8,31 +8,32 @@
  */
 
 $items = array(
-    "mautic.menu.user.index" => array(
-        "options" => array(
-            "route"    => "mautic_user_index",
-            "uri"      => "javascript: void(0)",
-            "linkAttributes" => array(
-                "onclick" =>
-                    "toggleSubMenu(this);"
+    'mautic.menu.user.index' => array(
+        'options' => array(
+            'route'    => 'mautic_user_index',
+            'uri'      => 'javascript: void(0)',
+            'linkAttributes' => array(
+                'onclick' =>
+                    'loadMauticContent(\'' . $this->container->get('router')->generate('mautic_user_index') . '\', this, true);'
             ),
-            "labelAttributes" => array(
-                "class"   => "nav-item-name"
+            'labelAttributes' => array(
+                'class'   => 'nav-item-name'
             ),
-            "extras"=> array("icon" => "user")
+            'extras'=> array('iconClass' => 'fa-users fa-lg')
         ),
-        "children" => array(
-            "mautic.menu.user.new" => array(
-                "options" => array(
-                    "route"    => "mautic_user_new",
-                    "uri"      => "javascript: void(0)",
-                    "linkAttributes" => array(
-                        "onclick" =>
-                            "loadMauticContent('" . $this->container->get("router")->generate("mautic_user_new") . "', this);"
+        'children' => array(
+            'mautic.menu.user.new' => array(
+                'options' => array(
+                    'route'    => 'mautic_user_new',
+                    'uri'      => 'javascript: void(0)',
+                    'linkAttributes' => array(
+                        'onclick' =>
+                            'loadMauticContent(\'' . $this->container->get('router')->generate('mautic_user_new') . '\', this);'
                     ),
-                    "labelAttributes" => array(
-                        "class"   => "nav-item-name"
-                    )
+                    'labelAttributes' => array(
+                        'class'   => 'nav-item-name'
+                    ),
+                    'extras' => array('iconClass' => 'fa-user')
                 )
             )
         )

@@ -20,8 +20,8 @@
                 <a href="<?php echo $child->getUri(); ?>"<?php echo $view["menu_helper"]->parseAttributes($child->getLinkAttributes()); ?>>
                 <?php endif; ?>
 
-                    <?php if ($icon = ($child->getExtra("icon"))): ?>
-                    <i class="glyphicon glyphicon-<?php echo $icon; ?>"></i>
+                    <?php if ($icon = ($child->getExtra("iconClass"))): ?>
+                    <i class="fa <?php echo $icon; ?>"></i>
                     <?php endif; ?>
 
                     <span<?php echo $view["menu_helper"]->parseAttributes($child->getLabelAttributes()); ?>>
@@ -30,9 +30,9 @@
 
                     <?php if ($showChildren = ($child->hasChildren() && $child->getDisplayChildren())): ?>
                     <?php if ($isAncestor   = $matcher->isAncestor($child, $options["matchingDepth"])): ?>
-                    <span class="subnav-toggle"><i class="glyphicon glyphicon-minus "></i></span>
+                    <span class="subnav-toggle"><i class="fa fa-toggle-down"></i></span>
                     <?php else: ?>
-                    <span class="subnav-toggle"><i class="glyphicon glyphicon-plus "></i></span>
+                    <span class="subnav-toggle"><i class="fa fa-toggle-left"></i></span>
                     <?php endif; ?>
                     <?php endif; ?>
 

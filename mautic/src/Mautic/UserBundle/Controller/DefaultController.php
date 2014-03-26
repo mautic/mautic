@@ -27,12 +27,18 @@ class DefaultController extends CommonController
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction(Request $request)
+    public function indexAction(Request $request, $page)
     {
+        $start = ($page === 1) ? 0 : (($page-1) * 30);
+
+        $users = $this->getDoctrine()
+            ->getRepository('MauticUserBundle:User')
+            ->getAllUsers($start);
+
         if ($request->isXmlHttpRequest()) {
-            return $this->ajaxAction($request);
+            return $this->ajaxAction($request, array("users" => $users));
         } else {
-            return $this->render('MauticUserBundle:Default:index.html.php');
+            return $this->render('MauticUserBundle:Default:index.html.php', array("users" => $users));
         }
     }
 }

@@ -7,10 +7,9 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-if (!$app->getRequest()->isXmlHttpRequest()):
-    //load base template
-    $view->extend('MauticCoreBundle:Default:base.html.php');
-endif;
+$view->extend('MauticCoreBundle:Default:content.html.php');
+$view["slots"]->set("headerTitle", "Users");
 ?>
+
 
 <?php echo $view['form']->form($form); ?>

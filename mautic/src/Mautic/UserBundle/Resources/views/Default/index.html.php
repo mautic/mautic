@@ -12,8 +12,31 @@ if (!$app->getRequest()->isXmlHttpRequest()):
     $view->extend('MauticCoreBundle:Default:base.html.php');
 endif;
 ?>
-<div id="main-panel-header">
-    <h1>Users</h1>
+<div class="main-panel-header">
+    <h1><?php echo $view['translator']->trans('mautic.users.page.header'); ?></h1>
 </div>
 
-<h5>User content</h5>
+<div class="table-responsive white-background">
+    <table class="table table-hover table-striped">
+        <thead>
+            <tr>
+                <th><?php echo $view['translator']->trans('mautic.users.thead.name'); ?></th>
+                <th><?php echo $view['translator']->trans('mautic.users.thead.username'); ?></th>
+                <th><?php echo $view['translator']->trans('mautic.users.thead.email'); ?></th>
+                <th><?php echo $view['translator']->trans('mautic.users.thead.role'); ?></th>
+                <th><?php echo $view['translator']->trans('mautic.users.thead.id'); ?></th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($users as $u): ?>
+            <tr>
+                <td><?php echo $u->getFullName(true); ?></td>
+                <td><?php echo $u->getUsername(); ?></td>
+                <td><?php echo $u->getEmail(); ?></td>
+                <td></td>
+                <td><?php echo $u->getId(); ?></td>
+            </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+</div>

@@ -1,4 +1,4 @@
-function loadMauticContent(route, link) {
+function loadMauticContent(route, link, toggleMenu) {
     $.ajax({
         url: route,
         type: "GET",
@@ -8,8 +8,8 @@ function loadMauticContent(route, link) {
                 //update URL in address bar
                 History.pushState(null, "Mautic", route);
                 //get content
-                $("#main-panel-content").html(response.newContent);
-                $("#main-panel-breadcrumbs").html(response.breadcrumbs);
+                $(".main-panel-content").html(response.newContent);
+                $(".main-panel-breadcrumbs").html(response.breadcrumbs);
 
                 //remove current classes from menu items
                 $(".side-panel-nav").find(".current").removeClass("current");
@@ -22,10 +22,23 @@ function loadMauticContent(route, link) {
                 $(parent).addClass("current");
 
                 //add current_ancestor classes
-                $(parent).parentsUntil("#side-panel-nav", "li").addClass("current_ancestor")
+                $(parent).parentsUntil(".side-panel-nav", "li").addClass("current_ancestor");
 
                 //clear flashes
-                $("#main-panel-flash-msgs").html('');
+                $(".main-panel-flash-msgs").html('');
+
+                if (toggleMenu) {
+                    //toggle submenu
+                    toggleSubMenu(link);
+                } else {
+                    //close any submenus not part of the current tree
+                    $(".side-panel-nav").find(".subnav-open:not(:has(li.current) )").each(
+                        function( index, element ) {
+                            var link = $(this).parent().find('a').first();
+                            toggleSubMenu($(link));
+                        }
+                    );
+                }
             }
         },
         error: function(request, textStatus, errorThrown) {
@@ -48,11 +61,11 @@ function toggleSubMenu(link) {
             if (child.hasClass("subnav-closed")) {
                 //open the submenu
                 child.removeClass("subnav-closed").addClass("subnav-open");
-                toggle.removeClass("glyphicon-plus").addClass("glyphicon-minus");
-            } else {
+                toggle.removeClass("fa-toggle-left").addClass("fa-toggle-down");
+            } else if (child.hasClass("subnav-open")) {
                 //close the submenu
                 child.removeClass("subnav-open").addClass("subnav-closed");
-                toggle.removeClass("glyphicon-minus").addClass("glyphicon-plus");
+                toggle.removeClass("fa-toggle-down").addClass("fa-toggle-left");
             }
         }
 

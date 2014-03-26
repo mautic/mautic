@@ -19,9 +19,19 @@ $collection->add('login', new Route('/login', array(
 $collection->add('login_check', new Route('/login_check', array()));
 $collection->add('logout', new Route('/logout', array()));
 
-$collection->add('mautic_user_index', new Route('/users', array(
+//Because /users/{page} has an optional param, /users/ will now not work so have to specify it specifically
+$collection->add('mautic_user_index', new Route('/users/', array(
     '_controller' => 'MauticUserBundle:Default:index'
 )));
+
+$collection->add('mautic_user_index', new Route('/users/{page}',
+    array(
+        '_controller' => 'MauticUserBundle:Default:index',
+        'page'        => 1
+    ), array(
+        'page' => '\d+',
+    )
+));
 
 $collection->add('mautic_user_new', new Route('/users/new', array(
     '_controller' => 'MauticUserBundle:Form:new'

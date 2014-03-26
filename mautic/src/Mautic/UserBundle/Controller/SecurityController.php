@@ -12,7 +12,7 @@ namespace Mautic\UserBundle\Controller;
 use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\SecurityContext;
-
+use Symfony\Component\Security\Core\Exception as Exception;
 /**
  * Class DefaultController
  *
@@ -25,14 +25,25 @@ class SecurityController extends CommonController
 
         // get the login error if there is one
         if ($request->attributes->has(SecurityContext::AUTHENTICATION_ERROR)) {
-            $this->get('session')->getFlashBag()->add(
-                'error',
-                $request->attributes->get(SecurityContext::AUTHENTICATION_ERROR)
-            );
+            $error = $request->attributes->get(SecurityContext::AUTHENTICATION_ERROR);
         } else {
             $error = $session->get(SecurityContext::AUTHENTICATION_ERROR);
             $session->remove(SecurityContext::AUTHENTICATION_ERROR);
         }
+        if (!empty($error)) {
+            if (($error instanceof Exception\BadCredentialsException)) {
+                $msg = "mautic.user.error.invalidlogin";
+            } else {
+                $msg = $error->getMessage();
+            }
+
+            $this->get('session')->getFlashBag()->add(
+                'error',
+                $this->get("translator")->trans($msg, array(), 'flashes')
+            );
+        }
+
+
 
         return $this->render(
             'MauticUserBundle:Security:login.html.php',

@@ -7,14 +7,9 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-if (!$app->getRequest()->isXmlHttpRequest()):
-//load base template
-$view->extend('MauticCoreBundle:Default:base.html.php');
-endif;
+$view->extend('MauticCoreBundle:Default:content.html.php');
+$view['slots']->set("headerTitle", "Dashboard");
 ?>
-<div id="main-panel-header">
-    <h1>Dashboard</h1>
-</div>
 
 
 <h5>Dashboard content</h5>

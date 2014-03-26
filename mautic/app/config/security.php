@@ -9,10 +9,9 @@
 
 $container->loadFromExtension('security', array(
     'providers' => array(
-        'user_db' => array(
+        'administrator' => array(
             'entity' => array(
-                'class' => 'Mautic\UserBundle\Entity\User',
-                'property' => 'username',
+                'class' => 'MauticUserBundle:User',
             ),
         ),
     ),

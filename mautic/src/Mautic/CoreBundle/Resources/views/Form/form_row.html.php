@@ -11,7 +11,7 @@ $feedbackClass = ($app->getRequest()->getMethod() == 'POST' && !empty($errors)) 
 ?>
 
 <div class="row">
-    <div class="form-group col-xs-12 col-md-8 col-lg-3<?php echo $feedbackClass; ?>">
+    <div class="form-group col-xs-12 col-md-8 col-lg-4<?php echo $feedbackClass; ?>">
         <?php echo $view['form']->label($form, $label) ?>
         <?php echo $view['form']->widget($form) ?>
         <?php echo $view['form']->errors($form) ?>
