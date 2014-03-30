@@ -13,10 +13,7 @@
         <img class="pull-left" src="<?php echo $view['assets']->getUrl('media/images/mautic_circle.png'); ?>" />
         <span>Mautic</span>
     </div>
-    <div class="side-panel-nav-outer-wrapper">
-        <div class="side-panel-nav-inner-wrapper">
-            <?php echo $view['knp_menu']->render('main', array("menu" => "main")); ?>
-        </div>
-        <div class="clearfix"></div>
+    <div class="side-panel-nav-wrapper">
+        <?php echo $view['knp_menu']->render('main', array("menu" => "main")); ?>
     </div>
 </div>

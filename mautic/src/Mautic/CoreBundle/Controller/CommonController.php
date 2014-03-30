@@ -20,22 +20,133 @@ use Symfony\Component\HttpFoundation\Request;
  * @package Mautic\CoreBundle\Controller
  */
 class CommonController extends Controller implements EventsController {
+
     /**
      * @param Request $request
+     * @param         $returnUrl
+     * @param null    $parameters
+     * @param null    $contentTemplate
+     * @param null    $passthrough
+     * @param null    $overrideBundle
+     */
+    public function postAction(Request $request,
+                                    $returnUrl,
+                                    $parameters = null,
+                                    $contentTemplate = null,
+                                    $passthrough = null,
+                                    $overrideBundle = null) {
+
+        if (!$request->isXmlHttpRequest()) {
+            return $this->redirect($returnUrl);
+        } else {
+            //load by ajax
+            return $this->ajaxAction(
+                $request,
+                $parameters,
+                $contentTemplate,
+                $passthrough,
+                $overrideBundle
+            );
+        }
+    }
+
+    /**
+     * @param Request $request
+     * @param array   $parameters
+     * @param string  $contentTemplate
+     * @param array   $passthrough
+     * @param bool    $forward
+     * @param bool    $overrideBundle
      * @return JsonResponse
      */
-    public function ajaxAction(Request $request, array $parameters = array(), $contentTemplate = "Default:index.html.php") {
-        $bundle   = $request->get("bundle");
+    public function ajaxAction(Request $request,
+                               array $parameters = array(),
+                               $contentTemplate  = "Default:index.html.php",
+                               $passthrough      = array(),
+                               $forward          = false,
+                               $overrideBundle   = false
+    ) {
+        $bundle   = ($overrideBundle) ?: $request->get("bundle");
 
         //Ajax call so respond with json
-        $newContent  = $this->renderView("Mautic{$bundle}Bundle:$contentTemplate", $parameters);
+        if ($forward) {
+            //the content is from another controller so we must retrieve the response from it
+            $query = array("ignoreAjax" => true);
+            $newContentResponse = $this->forward("Mautic{$bundle}Bundle:$contentTemplate", $parameters, $query);
+            $newContent         = $newContentResponse->getContent();
+        } else {
+            $newContent  = $this->renderView("Mautic{$bundle}Bundle:$contentTemplate", $parameters);
+        }
+
         $breadcrumbs = $this->renderView("MauticCoreBundle:Default:breadcrumbs.html.php", $parameters);
-        $response = new JsonResponse();
-        $response->setData(array(
-            'newContent'  => $newContent,
-            'breadcrumbs' => $breadcrumbs
-        ));
+        $flashes     = $this->renderView("MauticCoreBundle:Default:flashes.html.php", $parameters);
+
+        $response  = new JsonResponse();
+        $dataArray = array_merge(
+            array(
+                'newContent'  => $newContent,
+                'breadcrumbs' => $breadcrumbs,
+                'flashes'     => $flashes
+            ),
+            $passthrough
+        );
+        $response->setData($dataArray);
 
         return $response;
+    }
+
+    /**
+     * @param Requets $request
+     */
+    protected function executeAjaxActions(Request $request) {
+        //process ajax actions
+        $success         = 0;
+        $securityContext = $this->container->get('security.context');
+        $action          = $request->get("ajaxAction");
+        if( $securityContext->isGranted('IS_AUTHENTICATED_REMEMBERED') ) {
+            switch ($action) {
+                case "togglepanel":
+                    $panel     = $request->get("panel", "left");
+                    $status    = $this->get("session")->get("{$panel}-panel", 1);
+                    $newStatus = ($status) ? 0 : 1;
+                    $this->get("session")->set("{$panel}-panel", $newStatus);
+                    $success = 1;
+                    break;
+                case "setorderby":
+                    $name    = $request->get("name");
+                    $orderBy = $request->get("orderby");
+                    if (!empty($name) && !empty($orderBy)) {
+                        $dir = $this->get("session")->get("$name.orderbydir", "ASC");
+                        $dir = ($dir == "ASC") ? "DESC" : "ASC";
+                        $this->get("session")->set("$name.orderby", $orderBy);
+                        $this->get("session")->set("$name.orderbydir", $dir);
+                        $success = 1;
+                    }
+                    break;
+                default:
+                    //ignore
+                    break;
+            }
+        }
+        $response  = new JsonResponse();
+        $dataArray = array("success" => $success);
+        $response->setData($dataArray);
+
+        return $response;
+    }
+
+    /**
+     * @param     $objectAction
+     * @param int $objectId
+     * @return Response
+     */
+    public function executeAction(Request $request, $objectAction, $objectId = 0) {
+        if (method_exists($this, "{$objectAction}Action")) {
+            return $this->{"{$objectAction}Action"}($objectId, $request);
+        } else {
+            $response = new Response();
+            $response->setContent($this->get("translator")->trans("mautic.security.accessdenied"));
+            return $response;
+        }
     }
 }

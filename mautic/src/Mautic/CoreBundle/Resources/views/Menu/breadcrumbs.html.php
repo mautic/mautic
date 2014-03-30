@@ -20,7 +20,7 @@ $lastCrumb = count($crumbs) - 1;
             <?php if ($lastCrumb === $crumbCount): ?>
                 <?php echo $view['translator']->trans($label); ?>
             <?php else: ?>
-                <a href="javascript: void(0);" onclick="loadMauticContent('<?php echo $route; ?>', this);"><?php echo $view['translator']->trans($label); ?></a>
+                <a href="javascript: void(0);" onclick="Mautic.loadMauticContent('<?php echo $route; ?>', this);"><?php echo $view['translator']->trans($label); ?></a>
             <?php endif; ?>
         </li>
     <?php endforeach; ?>

@@ -47,7 +47,12 @@ class MenuBuilder extends ContainerAware
         static $menu;
 
         if (empty($menu)) {
-            $menu = $this->factory->createItem('root', array('childrenAttributes' => array("class" => "side-panel-nav")));
+            $menu = $this->factory->createItem('root', array('childrenAttributes' =>
+                    array(
+                        "class" => "side-panel-nav",
+                        "role"  => "navigation"
+                    )
+            ));
 
             foreach ($this->bundles as $bundle) {
                 //Load bundle menu.php if menu.php exists
