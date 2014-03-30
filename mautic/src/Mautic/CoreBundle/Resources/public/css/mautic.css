@@ -12,6 +12,7 @@ body {
   position: relative;
   height: 100%;
   width: 100%;
+  left: 0;
   margin-left: 230px;
   -webkit-transition: all 0.3s ease-in-out;
   -moz-transition: all 0.3s ease-in-out;
@@ -127,6 +128,7 @@ h3,
   -moz-transition: all 0.3s ease-in-out;
   -o-transition: all 0.3s ease-in-out;
   transition: all 0.3s ease-in-out 0s;
+  margin-left: 0;
 }
 .left-panel {
   position: fixed;
