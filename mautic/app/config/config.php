@@ -111,14 +111,16 @@ foreach ($mauticbundles as $bundle => $namespace) {
     $getFiles = function ($type) use ($bundleDir, &$css, &$js) {
         $typeDir = "$bundleDir/Resources/public/$type/";
 
-        //get files within the directory
-        $iterator = new FilesystemIterator($typeDir);
-        //filter out inappropriate files
-        $filter = new RegexIterator($iterator, "/.$type$/");
-        if (iterator_count($filter)) {
-            foreach ($filter as $file) {
-                //add the file to be loaded
-                ${$type}[] = $file->getPathname();
+        if (file_exists($typeDir)) {
+            //get files within the directory
+            $iterator = new FilesystemIterator($typeDir);
+            //filter out inappropriate files
+            $filter = new RegexIterator($iterator, "/.$type$/");
+            if (iterator_count($filter)) {
+                foreach ($filter as $file) {
+                    //add the file to be loaded
+                    ${$type}[] = $file->getPathname();
+                }
             }
         }
     };
