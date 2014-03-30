@@ -28,7 +28,7 @@ class DefaultController extends CommonController
      */
     public function indexAction(Request $request)
     {
-        if ($request->isXmlHttpRequest()) {
+        if ($request->isXmlHttpRequest() && !$request->get("ignoreAjax", false)) {
             return $this->ajaxAction($request);
         } else {
             return $this->render('MauticDashboardBundle:Default:index.html.php');

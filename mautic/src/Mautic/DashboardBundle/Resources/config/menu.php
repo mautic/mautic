@@ -14,7 +14,10 @@ $items = array(
             "uri"      => "javascript: void(0)",
             "linkAttributes" => array(
                 "onclick" =>
-                    "loadMauticContent('" . $this->container->get("router")->generate("mautic_dashboard_index") . "', this);"
+                    "return Mautic.loadMauticContent('"
+                    . $this->container->get("router")->generate("mautic_dashboard_index")
+                    . "', '#mautic_dashboard_index');",
+                'id'      => 'mautic_dashboard_index'
             ),
             "labelAttributes" => array(
                 "class"   => "nav-item-name"
