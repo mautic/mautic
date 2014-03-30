@@ -6,9 +6,14 @@
  * @link        http://mautic.com
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
+$pinned = ($app->getSession()->get("left-panel", 'default') == 'unpinned') ? ' unpinned' : '';
 ?>
 
 <div class="left-panel-inner-wrapper">
+    <div class="side-bar-pin left-side-bar-pin">
+        <i class="fa fa-thumb-tack<?php echo $pinned; ?>" onclick="Mautic.stickSidePanel('left');"></i>
+    </div>
     <div class="left-panel-header">
         <img class="pull-left" src="<?php echo $view['assets']->getUrl('media/images/mautic_circle.png'); ?>" />
         <span>Mautic</span>

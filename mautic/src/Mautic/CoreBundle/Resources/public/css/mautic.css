@@ -55,25 +55,25 @@ h3,
 }
 .panel-toggle a {
   color: #513b49;
+  font-size: 0.9em;
 }
 .panel-toggle a:hover {
   color: #8c667e;
 }
-.account-menu {
+.account-menu .dropdown {
   font-size: 1.2em;
 }
 .left-panel-toggle {
   border-right: #e8e8e8 1px solid;
   margin-right: 5px;
-  padding: 10px 2px 0 0 !important;
+  padding: 12px 2px 0 0 !important;
 }
 .right-panel-toggle {
   border-left: #e8e8e8 1px solid;
   margin-left: 5px;
 }
 .right-panel-toggle a {
-  font-size: 14px !important;
-  padding: 2px 0 3px 5px !important;
+  padding: 4px 0 3px 5px !important;
 }
 .main-panel-wrapper {
   background-color: #e8e8e8;
@@ -171,15 +171,32 @@ h3,
 .left-panel-header {
   height: 50px;
   color: #ffffff;
+  margin: 12px 3px 5px 3px;
 }
 .left-panel-header span {
-  margin: 10px 0;
-  display: block;
   font-size: 25px;
 }
 .left-panel-header img {
   margin-right: 10px;
   margin-left: 10px;
+}
+.left-side-bar-pin {
+  position: fixed;
+  right: 0;
+  color: #ffffff;
+  left: 210px;
+  top: 55px;
+  width: 20px;
+}
+.left-side-bar-pin i {
+  transform: rotate(0);
+  -ms-transform: rotate(0);
+  -webkit-transform: rotate(0);
+}
+.left-side-bar-pin i.unpinned {
+  transform: rotate(90deg);
+  -ms-transform: rotate(90deg);
+  -webkit-transform: rotate(90deg);
 }
 .page-wrapper.hide-left {
   margin-left: 0;
@@ -322,6 +339,9 @@ h3,
   .page-wrapper .main-panel-breadcrumbs {
     margin-left: 0;
     left: 0;
+  }
+  .left-side-bar-pin i {
+    display: none;
   }
   .page-wrapper.right-active .top-panel {
     margin-left: -230px;

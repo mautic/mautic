@@ -127,6 +127,11 @@ var Mautic = {
                 }
             }
 
+            //close sidebar if necessary
+            if ($(".left-side-bar-pin i").hasClass("unpinned") && !$(".page-wrapper").hasClass("hide-left")) {
+                $(".page-wrapper").addClass("hide-left");
+            }
+
             //ajaxify any forms noted
             if (response.ajaxForms) {
                 Mautic.ajaxifyForms(response.ajaxForms);
@@ -168,10 +173,6 @@ var Mautic = {
                 return false;
             });
         });
-    },
-
-    initSidePanel: function () {
-
     },
 
     /**
@@ -225,6 +226,37 @@ var Mautic = {
             data: query,
             dataType: "json"
         });
+
+        if (position == "left") {
+            $(".left-side-bar-pin i").toggleClass("unpinned");
+
+            //auto collapse the left side panel
+            if ($(".left-side-bar-pin i").hasClass("unpinned")) {
+                //prevent firing event multiple times if directly toggling the panel
+                $(".main-panel-wrapper").off("click");
+                $(".main-panel-wrapper").click(function (e) {
+                    e.preventDefault();
+                    if (!$(".page-wrapper").hasClass("hide-left")) {
+                        $(".page-wrapper").addClass("hide-left");
+                    }
+                    //prevent firing event multiple times
+                    $(".main-panel-wrapper").off("click");
+                });
+
+                $(".top-panel").off("click");
+                $(".top-panel").click(function (e) {
+                    if (!$(e.target).parents('.panel-toggle').length) {
+                        //dismiss the panel if clickng anywhere in the top panel except the toggle button
+                        e.preventDefault();
+                        if (!$(".page-wrapper").hasClass("hide-left")) {
+                            $(".page-wrapper").addClass("hide-left");
+                        }
+                        //prevent firing event multiple times
+                        $(".top-panel").off("click");
+                    }
+                });
+            }
+        }
     },
 
     /**

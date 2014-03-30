@@ -128,8 +128,8 @@ class CommonController extends Controller implements EventsController {
             switch ($action) {
                 case "togglepanel":
                     $panel     = $request->get("panel", "left");
-                    $status    = $this->get("session")->get("{$panel}-panel", 1);
-                    $newStatus = ($status) ? 0 : 1;
+                    $status    = $this->get("session")->get("{$panel}-panel", "default");
+                    $newStatus = ($status == "unpinned") ? "default" : "unpinned";
                     $this->get("session")->set("{$panel}-panel", $newStatus);
                     $success = 1;
                     break;

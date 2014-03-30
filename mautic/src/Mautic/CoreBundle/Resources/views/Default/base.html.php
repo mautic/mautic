@@ -6,6 +6,8 @@
  * @link        http://mautic.com
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
+$activePanelClasses  = ($app->getSession()->get('left-panel', 'default') == 'unpinned') ? ' hide-left' : "";
 ?>
 <!DOCTYPE html>
 <html>
@@ -22,7 +24,7 @@
         <link rel="stylesheet" href="<?php echo $view['assets']->getUrl('media/font-awesome/css/font-awesome.min.css'); ?>" />
     </head>
     <body>
-        <div class="page-wrapper">
+        <div class="page-wrapper<?php echo $activePanelClasses; ?>">
             <div class="main-panel-wrapper"">
                 <div class="main-panel-breadcrumbs">
                     <?php echo $view->render('MauticCoreBundle:Default:breadcrumbs.html.php'); ?>
