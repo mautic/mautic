@@ -16,13 +16,8 @@ $collection->add('login', new Route('/login', array(
     '_controller' => 'MauticUserBundle:Security:login',
 )));
 
-$collection->add('login_check', new Route('/login_check', array()));
-$collection->add('logout', new Route('/logout', array()));
-
-//Because /users/{page} has an optional param, /users/ will now not work so have to specify it specifically
-$collection->add('mautic_user_index', new Route('/users/', array(
-    '_controller' => 'MauticUserBundle:Default:index'
-)));
+$collection->add('mautic_user_logincheck', new Route('/login_check', array()));
+$collection->add('mautic_user_logout', new Route('/logout', array()));
 
 $collection->add('mautic_user_index', new Route('/users/{page}',
     array(
@@ -33,12 +28,11 @@ $collection->add('mautic_user_index', new Route('/users/{page}',
     )
 ));
 
-$collection->add('mautic_user_new', new Route('/users/new', array(
-    '_controller' => 'MauticUserBundle:Form:new'
-)));
-
-$collection->add('mautic_user_edit', new Route('/users/edit/{userId}', array(
-    '_controller' => 'MauticUserBundle:Form:edit'
-)));
+$collection->add('mautic_user_action', new Route('/users/{objectAction}/{objectId}',
+    array(
+        '_controller' => 'MauticUserBundle:Form:execute',
+        "objectId"      => 0
+    )
+));
 
 return $collection;

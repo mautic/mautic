@@ -74,7 +74,15 @@ class UserType extends AbstractType
             ->add('reset', 'reset', array(
                 'label' => 'mautic.form.reset',
                 'attr'  => array('class' => 'btn btn-danger'),
+            ))
+            ->add('cancel', 'submit', array(
+                'label' => 'mautic.form.cancel',
+                'attr'  => array('class'   => 'btn btn-warning')
             ));
+
+        if (!empty($options["action"])) {
+            $builder->setAction($options["action"]);
+        }
     }
 
 
@@ -88,7 +96,7 @@ class UserType extends AbstractType
             'validation_groups' => array(
                 'Mautic\UserBundle\Entity\User',
                 'determineValidationGroups',
-            ),
+            )
         ));
     }
 

@@ -24,23 +24,23 @@
 <body>
 <div class="login-container">
     <div class="container-fluid">
-        <form class="form-login" action="<?php echo $view['router']->generate('login_check') ?>" method="post">
+        <form class="form-login" action="<?php echo $view['router']->generate('mautic_user_logincheck') ?>" method="post">
             <img src="<?php echo $view['assets']->getUrl('media/images/mautic_logo.png') ?>" />
             <h1 class="user-login-heading"><?php echo $view['translator']->trans('mautic.user.login.heading'); ?></h1>
             <div id="main-panel-flash-msgs">
                 <?php echo $view->render('MauticCoreBundle:Default:flashes.html.php'); ?>
             </div>
             <div class="margin-10">
-                <label for="username" class="sr-only"><?php echo $view['translator']->trans('mautic.user.form.username'); ?></label>
+                <label for="username" class="sr-only"><?php echo $view['translator']->trans('mautic.user.form.loginusername'); ?></label>
                 <input type="text" id="username" name="_username"
                        class="form-control input-lg" value="<?php echo $last_username ?>" required autofocus
-                       placeholder='<?php echo $view['translator']->trans('mautic.user.form.username'); ?>' />
+                       placeholder='<?php echo $view['translator']->trans('mautic.user.form.loginusername'); ?>' />
             </div>
             <div class="margin-10">
-                <label for="password" class="sr-only"><?php echo $view['translator']->trans('mautic.user.form.password'); ?>:</label>
+                <label for="password" class="sr-only"><?php echo $view['translator']->trans('mautic.user.form.loginpw'); ?>:</label>
                 <input type="password" id="password" name="_password"
                        class="form-control input-lg" required
-                       placeholder='<?php echo $view['translator']->trans('mautic.user.form.password'); ?>' />
+                       placeholder='<?php echo $view['translator']->trans('mautic.user.form.loginpw'); ?>' />
             </div>
             <div class="margin-10">
                 <input type="checkbox" id="remember_me" name="_remember_me" checked />

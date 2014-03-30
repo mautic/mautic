@@ -3,9 +3,10 @@
 namespace Mautic\UserBundle\Entity;
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Tools\Pagination\Paginator;
+use Doctrine\ORM\NoResultException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
-use Doctrine\ORM\NoResultException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
@@ -94,13 +95,14 @@ class UserRepository extends EntityRepository implements UserProviderInterface
      * @param string $orderBy
      * @return array
      */
-    public function getAllUsers($start = 0, $limit = 30, $orderBy = 'u.lastName, u.firstName') {
+    public function getUsers($start = 0, $limit = 30, $orderBy = 'u.lastName, u.firstName, u.username', $orderByDir = "ASC") {
         $q = $this
             ->createQueryBuilder('u')
-            ->orderBy($orderBy)
+            ->orderBy($orderBy, $orderByDir)
             ->setFirstResult($start)
             ->setMaxResults($limit)
             ->getQuery();
-        return $q->getResult();
+        $result = new Paginator($q);
+        return $result;
     }
 }
