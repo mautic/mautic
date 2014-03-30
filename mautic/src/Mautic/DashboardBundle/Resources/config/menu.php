@@ -8,22 +8,24 @@
  */
 
 $items = array(
-    "mautic.menu.dashboard.index" => array(
-        "options" => array(
-            "route"    => "mautic_dashboard_index",
-            "uri"      => "javascript: void(0)",
-            "linkAttributes" => array(
-                "onclick" =>
-                    "return Mautic.loadMauticContent('"
-                    . $this->container->get("router")->generate("mautic_dashboard_index")
-                    . "', '#mautic_dashboard_index');",
+    'mautic.menu.dashboard.index' => array(
+        'options' => array(
+            'route'    => 'mautic_dashboard_index',
+            'uri'      => 'javascript: void(0)',
+            'linkAttributes' => array(
+                'onclick' =>
+                    'return Mautic.loadMauticContent(\''
+                    . $this->container->get('router')->generate('mautic_dashboard_index')
+                    . '\', \'#mautic_dashboard_index\');',
                 'id'      => 'mautic_dashboard_index'
             ),
-            "labelAttributes" => array(
-                "class"   => "nav-item-name"
+            'labelAttributes' => array(
+                'class'   => 'nav-item-name'
             ),
-            "extras"=> array("iconClass" => "fa-th-large fa-lg")
-
+            'extras'=> array(
+                'iconClass' => 'fa-th-large fa-lg',
+                'routeName' => 'mautic_dashboard_index'
+            )
         )
     )
 );

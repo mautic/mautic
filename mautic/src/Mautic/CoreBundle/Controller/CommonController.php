@@ -68,6 +68,27 @@ class CommonController extends Controller implements EventsController {
     ) {
         $bundle   = ($overrideBundle) ?: $request->get("bundle");
 
+        if (!empty($passthrough["route"])) {
+            //breadcrumbs may fail as it will retrieve the crumb path for currently loaded URI so we must override
+            $request->query->set("overrideRouteUri", $passthrough["route"]);
+
+            //if the URL has a query built into it, breadcrumbs may fail matching
+            //so let's try to find it by the route name which will be the extras["routeName"] of the menu item
+            $baseUrl = $request->getBaseUrl();
+            $routePath = str_replace($baseUrl, '', $passthrough["route"]);
+            try {
+                $routeParams = $this->get('router')->match($routePath);
+                $routeName   = $routeParams["_route"];
+                if (isset($routeParams["objectAction"])) {
+                    //action urls share same route name so tack on the action to differentiate
+                    $routeName .= "|{$routeParams["objectAction"]}";
+                }
+                $request->query->set("overrideRouteName", $routeName);
+            } catch (Exception $e) {
+                //do nothing
+            }
+        }
+
         //Ajax call so respond with json
         if ($forward) {
             //the content is from another controller so we must retrieve the response from it

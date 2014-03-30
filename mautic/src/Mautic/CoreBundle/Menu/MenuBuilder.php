@@ -97,7 +97,11 @@ class MenuBuilder extends ContainerAware
      */
     public function breadcrumbsMenu(Request $request) {
         $menu = $this->mainMenu($request);
-        $current = $this->getCurrentMenuItem($menu);
+
+        //check for overrideRoute in request from an ajax content request
+        $forRouteUri  = $request->get("overrideRouteUri", "current");
+        $forRouteName = $request->get("overrideRouteName", '');
+        $current     = $this->getCurrentMenuItem($menu, $forRouteUri, $forRouteName);
 
         if (empty($current)) {
             //current is root
@@ -110,14 +114,22 @@ class MenuBuilder extends ContainerAware
      * @param $menu
      * @return null
      */
-    public function getCurrentMenuItem($menu)
+    public function getCurrentMenuItem($menu, $forRouteUri, $forRouteName)
     {
         foreach ($menu as $item) {
-            if ($this->matcher->isCurrent($item)) {
+            if ($forRouteUri == "current" && $this->matcher->isCurrent($item)) {
+                //current match
+                return $item;
+            } else if ($forRouteUri != "current" && $item->getUri() == $forRouteUri) {
+                //route uri match
+                return $item;
+            } else if (!empty($forRouteName) && $forRouteName == $item->getExtra("routeName")) {
+                //route name match
                 return $item;
             }
 
-            if ($item->getChildren() && $current_child = $this->getCurrentMenuItem($item)) {
+            if ($item->getChildren()
+                && $current_child = $this->getCurrentMenuItem($item, $forRouteUri, $forRouteName)) {
                 return $current_child;
             }
         }

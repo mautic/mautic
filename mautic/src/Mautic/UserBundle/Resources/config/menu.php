@@ -22,48 +22,29 @@ $items = array(
             'labelAttributes' => array(
                 'class'   => 'nav-item-name'
             ),
-            'extras'=> array('iconClass' => 'fa-users fa-lg')
+            'extras'=> array(
+                'iconClass' => 'fa-users fa-lg',
+                'routeName' => 'mautic_user_index'
+            ),
+            'displayChildren' => false
         ),
+        //needed to properly populate the breadcrumbs
         'children' => array(
             'mautic.menu.user.new' => array(
                 'options' => array(
                     'route'    => 'mautic_user_action',
-                    'routeParameters' =>
-                        array(
-                            "objectAction"  => "new"
-                        ),
-                    'uri'      => 'javascript: void(0)',
-                    'linkAttributes' => array(
-                        'onclick' =>
-                            'return Mautic.loadMauticContent(\'' .
-                                $this->container->get('router')->generate('mautic_user_action',
-                                    array("objectAction" => "new"))
-                            . '\', \'#mautic_user_new\');',
-                        'id'      => 'mautic_user_new'
-                    ),
-                    'labelAttributes' => array(
-                        'class'   => 'nav-item-name'
-                    ),
-                    'extras' => array('iconClass' => 'fa-user')
-                )
+                    'routeParameters' => array("objectAction"  => "new"),
+                    'extras'  => array(
+                        'routeName' => 'mautic_user_action|new'
+                    )
+                ),
             ),
-            //needed to properly populate the breadcrumbs
             'mautic.menu.user.edit' => array(
                 'options' => array(
                     'route'           => 'mautic_user_action',
-                    'routeParameters' =>
-                        array(
-                            "objectAction"  => "edit"
-                        ),
-                    'uri'             => '#',
-                    'attributes'      => array(
-                        "class" => "hide"
-                    ),
-                    'linkAttributes'  => array(
-                        'id' => 'mautic_user_action'
-                    ),
-                    'labelAttributes'  => array(
-                        'class' => 'nav-item-name'
+                    'routeParameters' => array("objectAction"  => "edit"),
+                    'extras'  => array(
+                        'routeName' => 'mautic_user_action|edit'
                     )
                 )
             )
