@@ -49,7 +49,16 @@ class FormController extends CommonController
 
             //redirect if the cancel button was clicked
             if ($form->get('cancel')->isClicked()) {
-                return $this->redirect($returnUrl);
+                return $this->postAction($request,
+                    $returnUrl,
+                    array("page" => $page),
+                    "Default:index",
+                    array(
+                        'activeLink'    => '#mautic_user_index',
+                        'route'         => $returnUrl
+                    ),
+                    true
+                );
             }
 
             //validate the data

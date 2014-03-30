@@ -24,9 +24,8 @@
                     <i class="fa <?php echo $icon; ?>"></i>
                     <?php endif; ?>
 
-                    <span<?php echo $view["menu_helper"]->parseAttributes($child->getLabelAttributes()); ?>>
-                    <?php echo $view['translator']->trans($child->getLabel());?>
-                    </span>
+                    <span<?php echo $view["menu_helper"]->parseAttributes($child->getLabelAttributes()); ?>><?php
+                        echo $view['translator']->trans($child->getLabel());?></span>
 
                     <?php if ($showChildren = ($child->hasChildren() && $child->getDisplayChildren())): ?>
                     <?php if ($isAncestor   = $matcher->isAncestor($child, $options["matchingDepth"])): ?>

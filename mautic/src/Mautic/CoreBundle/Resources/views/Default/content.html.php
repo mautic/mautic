@@ -14,7 +14,13 @@ endif;
 ?>
 <?php if ($view["slots"]->has("headerTitle")): ?>
 <div class="main-panel-header">
-    <h1><?php $view["slots"]->output("headerTitle"); ?></h1>
+    <h1 class="pull-left"><?php $view["slots"]->output("headerTitle"); ?></h1>
+    <?php if ($view["slots"]->has("buttons")): ?>
+    <div class="pull-right action-buttons">
+        <?php $view["slots"]->output("buttons"); ?>
+    </div>
+    <?php endif; ?>
+    <div class="clearfix"></div>
 </div>
 <?php endif; ?>
 

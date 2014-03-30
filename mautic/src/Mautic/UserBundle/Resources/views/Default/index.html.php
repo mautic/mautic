@@ -9,8 +9,15 @@
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view["slots"]->set("headerTitle", $view['translator']->trans('mautic.users.header'));
-$currentUrl = $app->getRequest()->getRequestUri();
 ?>
+<?php $view["slots"]->start("buttons"); ?>
+<button class="btn btn-primary"
+    onclick="return Mautic.loadMauticContent('<?php echo $this->container->get('router')->generate(
+        'mautic_user_action', array("objectAction" => "new")); ?>', '#mautic_user_index');">
+    <?php echo $view["translator"]->trans("mautic.menu.user.new"); ?>
+</button>
+<?php $view["slots"]->stop(); ?>
+
 <div class="table-responsive white-background">
     <table class="table table-hover table-striped">
         <thead>

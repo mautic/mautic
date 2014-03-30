@@ -307,6 +307,9 @@ h3,
   text-align: center;
   z-index: 10000;
 }
+.action-buttons {
+  padding: 10px 0 10px 10px;
+}
 @media (max-width: 767px) {
   .left-panel {
     left: 0 ;
