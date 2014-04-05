@@ -23,13 +23,15 @@ class DefaultController extends CommonController
 {
 
     /**
-     * @param Request $request
+     * Generates the default view
+     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction(Request $request)
+    public function indexAction()
     {
+        $request = $this->get('request');
         if ($request->isXmlHttpRequest() && !$request->get("ignoreAjax", false)) {
-            return $this->ajaxAction($request);
+            return $this->ajaxAction();
         } else {
             return $this->render('MauticDashboardBundle:Default:index.html.php');
         }

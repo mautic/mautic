@@ -9,8 +9,6 @@
 
 namespace Mautic\CoreBundle\Controller;
 
-use Symfony\Component\HttpFoundation\Request;
-
 /**
  * Class DefaultController
  * Almost all other Mautic Bundle controllers extend this default controller
@@ -21,14 +19,17 @@ class DefaultController extends CommonController
 {
 
     /**
+     * Generates default index.php
+     *
      * @return \Symfony\Component\HttpFoundation\Response|void
      */
-    public function indexAction(Request $request)
+    public function indexAction()
     {
+        $request = $this->get('request');
         if ($request->isXmlHttpRequest() && $request->request->has("ajaxAction")) {
             return $this->executeAjaxActions($request);
         } else if ($request->isXmlHttpRequest() && !$request->get("ignoreAjax", false)) {
-            return $this->ajaxAction($request);
+            return $this->ajaxAction();
         } else {
             return $this->render('MauticCoreBundle:Default:index.html.php');
         }

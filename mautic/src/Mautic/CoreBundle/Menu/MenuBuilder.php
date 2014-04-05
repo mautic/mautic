@@ -11,6 +11,7 @@ namespace Mautic\CoreBundle\Menu;
 
 use Knp\Menu\FactoryInterface;
 use Knp\Menu\Matcher\MatcherInterface;
+use Knp\Menu\Loader\ArrayLoader;
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
@@ -30,7 +31,7 @@ class MenuBuilder extends ContainerAware
      * @param MatcherInterface $matcher
      * @param                  $bundles
      */
-    public function __construct(FactoryInterface $factory, MatcherInterface $matcher, $bundles)
+    public function __construct(FactoryInterface $factory, MatcherInterface $matcher, array $bundles)
     {
         $this->factory   = $factory;
         $this->matcher   = $matcher;
@@ -39,6 +40,8 @@ class MenuBuilder extends ContainerAware
     }
 
     /**
+     * Generate menu navigation object
+     *
      * @param Request $request
      * @return \Knp\Menu\ItemInterface
      */
@@ -47,52 +50,33 @@ class MenuBuilder extends ContainerAware
         static $menu;
 
         if (empty($menu)) {
-            $menu = $this->factory->createItem('root', array('childrenAttributes' =>
-                    array(
-                        "class" => "side-panel-nav",
-                        "role"  => "navigation"
-                    )
-            ));
+            $loader = new ArrayLoader($this->factory);
 
+            $menuItems = array();
             foreach ($this->bundles as $bundle) {
                 //Load bundle menu.php if menu.php exists
                 $parts = explode("\\", $bundle);
                 $path  = __DIR__ . "/../../" . $parts[1] . "/Resources/config/menu.php";
-                $items = array();
                 if (file_exists($path)) {
-                    //menu.php should just be $items = array("name" => array("options" => $options, "children" => array(...);
-                    include_once $path;
-                    $this->addMenuItems($menu, $items);
+                    include $path;
+
+                    if ($parts[1] == "CoreBundle") {
+                        //this means that core bundle must be loaded before other bundles as it has the root menu setup
+                        $menuItems = $items;
+                    } else {
+                        $menuItems['children'] = array_merge($menuItems['children'], $items);
+                    }
                 }
             }
-        }
 
+            $menu = $loader->load($menuItems);
+        }
         return $menu;
     }
 
-
     /**
-     * @param        $menu
-     * @param        $items
-     * @param string $parent
-     */
-    private function addMenuItems(&$menu, &$items, $parent = "") {
-        foreach ($items as $name => $item) {
-            if (empty($parent)) {
-                //parent item so add it at the parent level
-                $menu->addChild($name, $item["options"]);
-            } else {
-                //child item so add it to the parent
-                $menu[$parent]->addChild($name, $item["options"]);
-            }
-
-            if (!empty($item["children"])) {
-                $this->addMenuItems($menu, $item["children"], $name);
-            }
-        }
-    }
-
-    /**
+     * Converts navigation object into breadcrumbs
+     *
      * @param Request $request
      */
     public function breadcrumbsMenu(Request $request) {
@@ -111,6 +95,8 @@ class MenuBuilder extends ContainerAware
     }
 
     /**
+     * Used by breadcrumbs to determine active link
+     *
      * @param $menu
      * @return null
      */

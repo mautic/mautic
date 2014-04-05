@@ -27,6 +27,8 @@ class MenuHelper extends Helper {
     }
 
     /**
+     * Parses attributes for the menu view
+     *
      * @param $attributes
      * @return string
      */
@@ -45,6 +47,8 @@ class MenuHelper extends Helper {
     }
 
     /**
+     * Concats the appropriate classes for menu links
+     *
      * @param ItemInterface    $item
      * @param MatcherInterface $matcher
      * @param                  $options

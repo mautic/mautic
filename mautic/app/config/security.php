@@ -26,12 +26,6 @@ $container->loadFromExtension('security', array(
         ),
     ),
     'firewalls' => array(
-        /*
-        //for now don't block anything
-        'general' => array(
-            'pattern'   => '^/',
-            'anonymous' => array(),
-        ),*/
         'dev' => array(
             'pattern' => '^/(_(profiler|wdt)|css|images|js)/',
             'security' => true,

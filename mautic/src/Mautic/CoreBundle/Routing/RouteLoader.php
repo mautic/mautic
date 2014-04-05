@@ -37,6 +37,8 @@ class RouteLoader extends Loader
     }
 
     /**
+     * Load each bundles routing.php file
+     *
      * @param mixed $resource
      * @param null  $type
      * @return RouteCollection

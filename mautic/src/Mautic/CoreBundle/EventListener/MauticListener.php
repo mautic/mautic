@@ -24,6 +24,8 @@ class MauticListener
 {
 
     /**
+     * Populates namespace, bundle, controller, and action into request to be used throughout application
+     *
      * @param FilterControllerEvent $event
      */
     public function onKernelController(FilterControllerEvent $event)

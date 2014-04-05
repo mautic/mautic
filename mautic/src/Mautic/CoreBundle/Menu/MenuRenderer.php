@@ -53,6 +53,8 @@ class MenuRenderer implements RendererInterface {
     }
 
     /**
+     * Renders menu
+     *
      * @param ItemInterface $item
      * @param array         $options
      * @return string

@@ -12,7 +12,6 @@ namespace Mautic\CoreBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class CommonController
@@ -22,36 +21,52 @@ use Symfony\Component\HttpFoundation\Request;
 class CommonController extends Controller implements EventsController {
 
     /**
-     * @param Request $request
+     * Redirects controller if not ajax or retrieves html output for ajax request
+     *
      * @param         $returnUrl
      * @param null    $parameters
      * @param null    $contentTemplate
      * @param null    $passthrough
      * @param null    $overrideBundle
      */
-    public function postAction(Request $request,
+    public function postActionRedirect(
                                     $returnUrl,
-                                    $parameters = null,
+                                    $parameters      = null,
                                     $contentTemplate = null,
-                                    $passthrough = null,
-                                    $overrideBundle = null) {
+                                    $passthrough     = null,
+                                    $flashes         = array(),
+                                    $forward         = true) {
+        $request = $this->get('request');
+
+        if (!empty($flashes)) {
+            foreach ($flashes as $flash) {
+                $this->get('session')->getFlashBag()->add(
+                    $flash['type'],
+                    $this->get('translator')->trans(
+                        $flash['msg'],
+                        (!empty($flash['msgVars']) ? $flash['msgVars'] : array()),
+                        'flashes'
+                    )
+                );
+            }
+        }
 
         if (!$request->isXmlHttpRequest()) {
             return $this->redirect($returnUrl);
         } else {
             //load by ajax
             return $this->ajaxAction(
-                $request,
                 $parameters,
                 $contentTemplate,
                 $passthrough,
-                $overrideBundle
+                $forward
             );
         }
     }
 
     /**
-     * @param Request $request
+     * Generates html for ajax request
+     *
      * @param array   $parameters
      * @param string  $contentTemplate
      * @param array   $passthrough
@@ -59,14 +74,17 @@ class CommonController extends Controller implements EventsController {
      * @param bool    $overrideBundle
      * @return JsonResponse
      */
-    public function ajaxAction(Request $request,
+    public function ajaxAction(
                                array $parameters = array(),
-                               $contentTemplate  = "Default:index.html.php",
+                               $contentTemplate  = "",
                                $passthrough      = array(),
-                               $forward          = false,
-                               $overrideBundle   = false
+                               $forward          = false
     ) {
-        $bundle   = ($overrideBundle) ?: $request->get("bundle");
+        $request = $this->get('request');
+
+        if (empty($contentTemplate)) {
+            $contentTemplate = 'Mautic'. $request->get('bundle') . 'Bundle:Default:index.html.php';
+        }
 
         if (!empty($passthrough["route"])) {
             //breadcrumbs may fail as it will retrieve the crumb path for currently loaded URI so we must override
@@ -84,19 +102,20 @@ class CommonController extends Controller implements EventsController {
                     $routeName .= "|{$routeParams["objectAction"]}";
                 }
                 $request->query->set("overrideRouteName", $routeName);
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 //do nothing
             }
         }
 
         //Ajax call so respond with json
         if ($forward) {
-            //the content is from another controller so we must retrieve the response from it
+            //the content is from another controller action so we must retrieve the response from it instead of the
+            //directly parsing the template
             $query = array("ignoreAjax" => true);
-            $newContentResponse = $this->forward("Mautic{$bundle}Bundle:$contentTemplate", $parameters, $query);
+            $newContentResponse = $this->forward($contentTemplate, $parameters, $query);
             $newContent         = $newContentResponse->getContent();
         } else {
-            $newContent  = $this->renderView("Mautic{$bundle}Bundle:$contentTemplate", $parameters);
+            $newContent  = $this->renderView($contentTemplate, $parameters);
         }
 
         $breadcrumbs = $this->renderView("MauticCoreBundle:Default:breadcrumbs.html.php", $parameters);
@@ -117,9 +136,12 @@ class CommonController extends Controller implements EventsController {
     }
 
     /**
-     * @param Requets $request
+     * Executes an action requested via ajax
+     *
      */
-    protected function executeAjaxActions(Request $request) {
+    protected function executeAjaxActions() {
+        $request = $this->get('request');
+
         //process ajax actions
         $success         = 0;
         $securityContext = $this->container->get('security.context');
@@ -137,10 +159,10 @@ class CommonController extends Controller implements EventsController {
                     $name    = $request->get("name");
                     $orderBy = $request->get("orderby");
                     if (!empty($name) && !empty($orderBy)) {
-                        $dir = $this->get("session")->get("$name.orderbydir", "ASC");
+                        $dir = $this->get("session")->get("mautic.$name.orderbydir", "ASC");
                         $dir = ($dir == "ASC") ? "DESC" : "ASC";
-                        $this->get("session")->set("$name.orderby", $orderBy);
-                        $this->get("session")->set("$name.orderbydir", $dir);
+                        $this->get("session")->set("mautic.$name.orderby", $orderBy);
+                        $this->get("session")->set("mautic.$name.orderbydir", $dir);
                         $success = 1;
                     }
                     break;
@@ -157,17 +179,40 @@ class CommonController extends Controller implements EventsController {
     }
 
     /**
+     * Executes an action defined in route
+     *
      * @param     $objectAction
      * @param int $objectId
      * @return Response
      */
-    public function executeAction(Request $request, $objectAction, $objectId = 0) {
+    public function executeAction($objectAction, $objectId = 0) {
         if (method_exists($this, "{$objectAction}Action")) {
-            return $this->{"{$objectAction}Action"}($objectId, $request);
+            return $this->{"{$objectAction}Action"}($objectId);
         } else {
-            $response = new Response();
-            $response->setContent($this->get("translator")->trans("mautic.security.accessdenied"));
-            return $response;
+            return $this->accessDenied();
         }
+    }
+
+    /**
+     * Generates access denied message
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function accessDenied()
+    {
+        return $this->postActionRedirect(
+            $this->generateUrl('mautic_core_index'),
+            array(''),
+            'MauticCoreBundle:Default:index',
+            array(
+                'activeLink'    => '#mautic_core_index',
+                'route'         => $this->generateUrl('mautic_core_index')
+            ),
+            array(array(
+                'type' => 'error',
+                'msg'  => 'mautic.user.core.error.accessdenied'
+            )),
+            true
+        );
     }
 }

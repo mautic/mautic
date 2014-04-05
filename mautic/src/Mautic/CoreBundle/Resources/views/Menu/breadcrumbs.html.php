@@ -14,7 +14,7 @@ $lastCrumb = count($crumbs) - 1;
     <?php
     foreach ($crumbs as $crumbCount => $crumb):
         $id    = ($crumb["label"] == "root") ? "mautic_core_index" : $crumb["item"]->getLinkAttribute("id");
-        $label = ($crumb["label"] == "root") ? "mautic.menu.core.index" : $crumb["label"];
+        $label = ($crumb["label"] == "root") ? "mautic.core.menu.index" : $crumb["label"];
         $route = ($crumb["label"] == "root") ? $view['router']->generate("mautic_core_index") : $crumb["uri"];
         ?>
         <li>
