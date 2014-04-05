@@ -26,29 +26,29 @@
     <div class="container-fluid">
         <form class="form-login" action="<?php echo $view['router']->generate('mautic_user_logincheck') ?>" method="post">
             <img src="<?php echo $view['assets']->getUrl('media/images/mautic_logo.png') ?>" />
-            <h1 class="user-login-heading"><?php echo $view['translator']->trans('mautic.user.login.heading'); ?></h1>
+            <h1 class="user-login-heading"><?php echo $view['translator']->trans('mautic.user.auth.header'); ?></h1>
             <div id="main-panel-flash-msgs">
                 <?php echo $view->render('MauticCoreBundle:Default:flashes.html.php'); ?>
             </div>
             <div class="margin-10">
-                <label for="username" class="sr-only"><?php echo $view['translator']->trans('mautic.user.form.loginusername'); ?></label>
+                <label for="username" class="sr-only"><?php echo $view['translator']->trans('mautic.user.auth.form.loginusername'); ?></label>
                 <input type="text" id="username" name="_username"
                        class="form-control input-lg" value="<?php echo $last_username ?>" required autofocus
-                       placeholder='<?php echo $view['translator']->trans('mautic.user.form.loginusername'); ?>' />
+                       placeholder='<?php echo $view['translator']->trans('mautic.user.auth.form.loginusername'); ?>' />
             </div>
             <div class="margin-10">
-                <label for="password" class="sr-only"><?php echo $view['translator']->trans('mautic.user.form.loginpw'); ?>:</label>
+                <label for="password" class="sr-only"><?php echo $view['translator']->trans('mautic.user.auth.form.loginpw'); ?>:</label>
                 <input type="password" id="password" name="_password"
                        class="form-control input-lg" required
-                       placeholder='<?php echo $view['translator']->trans('mautic.user.form.loginpw'); ?>' />
+                       placeholder='<?php echo $view['translator']->trans('mautic.user.auth.form.loginpw'); ?>' />
             </div>
             <div class="margin-10">
-                <input type="checkbox" id="remember_me" name="_remember_me" checked />
-                <label for="remember_me"><?php echo $view['translator']->trans('mautic.user.form.rememberme'); ?></label>
+                <input type="checkbox" id="remember_me" name="_remember_me" />
+                <label for="remember_me"><?php echo $view['translator']->trans('mautic.user.auth.form.rememberme'); ?></label>
             </div>
 
             <input type="hidden" name="_csrf_token" value="<?php echo $view['form']->csrfToken('authenticate') ?>" />
-            <button class="btn btn-lg btn-primary btn-block" type="submit"><?php echo $view['translator']->trans('mautic.user.form.loginbtn'); ?></button>
+            <button class="btn btn-lg btn-primary btn-block" type="submit"><?php echo $view['translator']->trans('mautic.user.auth.form.loginbtn'); ?></button>
         </form>
     </div>
 </div>

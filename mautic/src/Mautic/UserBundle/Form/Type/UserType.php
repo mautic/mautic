@@ -13,6 +13,8 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\ORM\EntityRepository;
+use Symfony\Component\DependencyInjection\Container;
 
 /**
  * Class UserType
@@ -22,63 +24,87 @@ use Symfony\Component\Validator\Constraints as Assert;
 class UserType extends AbstractType
 {
 
+    private $bundles;
+    private $container;
+
+    /**
+     * @param Container        $container
+     * @param array            $bundles
+     */
+    public function __construct(Container $container, array $bundles) {
+        $this->container = $container;
+        $this->bundles   = array_keys($bundles);
+    }
+
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        $builder
-            ->add('username', 'text', array(
-                'label'      => 'mautic.user.form.username',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control')
+        $builder->add('username', 'text', array(
+            'label'      => 'mautic.user.user.form.username',
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array('class' => 'form-control')
+        ));
 
-            ))
-            ->add('firstName', 'text', array(
-                'label'      => 'mautic.user.form.firstname',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control')
+        $builder->add('firstName', 'text', array(
+            'label'      => 'mautic.user.user.form.firstname',
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array('class' => 'form-control')
+        ));
 
-            ))
-            ->add('lastName',  'text', array(
-                'label'      => 'mautic.user.form.lastname',
+        $builder->add('lastName',  'text', array(
+            'label'      => 'mautic.user.user.form.lastname',
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array('class' => 'form-control')
+        ));
+
+        $builder->add('email', 'email', array(
+            'label'      => 'mautic.user.user.form.email',
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array('class' => 'form-control')
+        ));
+
+        $builder->add('role', 'entity', array(
+            'label'         => 'mautic.user.user.form.role',
+            'label_attr'    => array('class' => 'control-label'),
+            'attr'          => array('class' => 'form-control'),
+            'class'         => 'MauticUserBundle:Role',
+            'property'      => 'name',
+            'empty_value'   => 'mautic.core.form.chooseone',
+            'query_builder' => function(EntityRepository $er) {
+                return $er->createQueryBuilder('r')
+                    ->orderBy('r.name', 'ASC');
+            },
+        ));
+
+        $builder->add('password', 'repeated', array(
+            'first_name'        => 'password',
+            'first_options'     => array(
+                'label'      => 'mautic.user.user.form.password',
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array('class' => 'form-control')
-            ))
-            ->add('email',     'email', array(
-                'label'      => 'mautic.user.form.email',
+            ),
+            'second_name'       => 'confirm',
+            'second_options'    => array(
+                'label'      => 'mautic.user.user.form.passwordconfirm',
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array('class' => 'form-control')
-            ))
-            ->add('password', 'repeated', array(
-                'first_name'        => 'password',
-                'first_options'     => array(
-                    'label'      => 'mautic.user.form.password',
-                    'label_attr' => array('class' => 'control-label'),
-                    'attr'       => array('class' => 'form-control')
-                ),
-                'second_name'       => 'confirm',
-                'second_options'    => array(
-                    'label'      => 'mautic.user.form.passwordconfirm',
-                    'label_attr' => array('class' => 'control-label'),
-                    'attr'       => array('class' => 'form-control')
-                ),
-                'type'              => 'password',
-                'invalid_message'   => 'mautic.user.password.mismatch'
-            ))
-            ->add('save', 'submit', array(
-                'label' => 'mautic.form.save',
-                'attr'  => array('class' => 'btn btn-primary'),
-            ))
-            ->add('reset', 'reset', array(
-                'label' => 'mautic.form.reset',
-                'attr'  => array('class' => 'btn btn-danger'),
-            ))
-            ->add('cancel', 'submit', array(
-                'label' => 'mautic.form.cancel',
-                'attr'  => array('class'   => 'btn btn-warning')
-            ));
+            ),
+            'type'              => 'password',
+            'invalid_message'   => 'mautic.user.password.mismatch'
+        ));
+
+        $builder->add('save', 'submit', array(
+            'label' => 'mautic.core.form.save',
+            'attr'  => array('class' => 'btn btn-primary'),
+        ));
+
+        $builder->add('cancel', 'submit', array(
+            'label' => 'mautic.core.form.cancel',
+            'attr'  => array('class'   => 'btn btn-danger')
+        ));
 
         if (!empty($options["action"])) {
             $builder->setAction($options["action"]);

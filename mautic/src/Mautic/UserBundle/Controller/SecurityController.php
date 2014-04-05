@@ -10,7 +10,6 @@
 namespace Mautic\UserBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Component\Security\Core\Exception as Exception;
 /**
@@ -20,7 +19,14 @@ use Symfony\Component\Security\Core\Exception as Exception;
  */
 class SecurityController extends CommonController
 {
-    public function loginAction(Request $request) {
+
+    /**
+     * Generates login form and processes login
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function loginAction() {
+        $request = $this->get('request');
         $session = $request->getSession();
 
         // get the login error if there is one
@@ -32,7 +38,7 @@ class SecurityController extends CommonController
         }
         if (!empty($error)) {
             if (($error instanceof Exception\BadCredentialsException)) {
-                $msg = "mautic.user.error.invalidlogin";
+                $msg = "mautic.user.auth.error.invalidlogin";
             } else {
                 $msg = $error->getMessage();
             }
@@ -42,8 +48,6 @@ class SecurityController extends CommonController
                 $this->get("translator")->trans($msg, array(), 'flashes')
             );
         }
-
-
 
         return $this->render(
             'MauticUserBundle:Security:login.html.php',

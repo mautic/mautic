@@ -32,42 +32,54 @@ class User implements AdvancedUserInterface, \Serializable
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
+    protected $id;
 
     /**
      * @ORM\Column(type="string", length=25, unique=true)
      */
-    private $username;
+    protected $username;
 
     /**
      * @ORM\Column(type="string", length=64)
      */
-    private $password;
+    protected $password;
 
     /**
      * @ORM\Column(type="string", length=50)
      */
-    private $firstName;
+    protected $firstName;
 
     /**
      * @ORM\Column(type="string", length=50)
      */
-    private $lastName;
+    protected $lastName;
 
     /**
      * @ORM\Column(type="string", length=60, unique=true)
      */
-    private $email;
+    protected $email;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Role", inversedBy="users")
+     * @ORM\JoinColumn(name="role_id", referencedColumnName="id")
+     */
+    protected $role;
 
     /**
      * @ORM\Column(name="is_active", type="boolean")
      */
-    private $isActive;
+    protected $isActive;
 
     /**
      * @ORM\Column(name="date_added", type="datetime")
      */
     protected $dateAdded;
+
+    /**
+     * Stores active role permissions
+     * @var
+     */
+    protected $activePermissions;
 
     public function __construct()
     {
@@ -80,32 +92,32 @@ class User implements AdvancedUserInterface, \Serializable
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('username', new Assert\NotBlank(
-            array('message' => 'mautic.user.username.notblank')
+            array('message' => 'mautic.user.user.username.notblank')
         ));
 
         $metadata->addConstraint(new UniqueEntity(
             array(
                 'fields'  => array('username'),
-                'message' => 'mautic.user.username.unique',
+                'message' => 'mautic.user.user.username.unique',
                 'repositoryMethod' => 'findByUsernameOrMatchEmail'
             )
         ));
 
         $metadata->addPropertyConstraint('firstName', new Assert\NotBlank(
-            array('message' => 'mautic.user.firstname.notblank')
+            array('message' => 'mautic.user.user.firstname.notblank')
         ));
 
         $metadata->addPropertyConstraint('lastName',  new Assert\NotBlank(
-            array('message' => 'mautic.user.lastname.notblank')
+            array('message' => 'mautic.user.user.lastname.notblank')
         ));
 
         $metadata->addPropertyConstraint('email',  new Assert\NotBlank(
-            array('message' => 'mautic.user.email.valid')
+            array('message' => 'mautic.user.user.email.valid')
         ));
 
         $metadata->addPropertyConstraint('email',     new Assert\Email(
             array(
-                'message' => 'mautic.user.email.valid',
+                'message' => 'mautic.user.user.email.valid',
                 'groups'  => array('SecondPass')
             )
 
@@ -114,13 +126,17 @@ class User implements AdvancedUserInterface, \Serializable
         $metadata->addConstraint(new UniqueEntity(
             array(
                 'fields'  => 'email',
-                'message' => 'mautic.user.email.unique'
+                'message' => 'mautic.user.user.email.unique'
             )
+        ));
+
+        $metadata->addPropertyConstraint('role',  new Assert\NotBlank(
+            array('message' => 'mautic.user.user.role.notblank')
         ));
 
         $metadata->addPropertyConstraint('password',  new Assert\NotBlank(
             array(
-                'message' => 'mautic.user.password.notblank',
+                'message' => 'mautic.user.user.password.notblank',
                 'groups'  => array('CheckPassword')
             )
         ));
@@ -128,7 +144,7 @@ class User implements AdvancedUserInterface, \Serializable
         $metadata->addPropertyConstraint('password',  new Assert\Length(
             array(
                 'min'        => 6,
-                'minMessage' => 'mautic.user.password.minlength',
+                'minMessage' => 'mautic.user.user.password.minlength',
                 'groups'     => array('CheckPassword')
             )
         ));
@@ -164,6 +180,7 @@ class User implements AdvancedUserInterface, \Serializable
      */
     public function getSalt()
     {
+        //bcrypt generates its own salt
         return null;
     }
 
@@ -176,6 +193,7 @@ class User implements AdvancedUserInterface, \Serializable
     }
 
     /**
+     * Not used but required by interface
      * @return array|\Symfony\Component\Security\Core\Role\Role[]
      */
     public function getRoles()
@@ -197,6 +215,7 @@ class User implements AdvancedUserInterface, \Serializable
             $this->id,
             $this->username,
             $this->password,
+            $this->role,
             $this->isActive
         ));
     }
@@ -210,6 +229,7 @@ class User implements AdvancedUserInterface, \Serializable
             $this->id,
             $this->username,
             $this->password,
+            $this->role,
             $this->isActive
         ) = unserialize($serialized);
     }
@@ -302,7 +322,7 @@ class User implements AdvancedUserInterface, \Serializable
      * @param bool $lastFirst
      * @return string
      */
-    public function getFullName($lastFirst = false)
+    public function getName($lastFirst = false)
     {
         $fullName = ($lastFirst) ? $this->lastName . ", " . $this->firstName : $this->firstName . " " . $this->lastName;
         return $fullName;
@@ -408,5 +428,47 @@ class User implements AdvancedUserInterface, \Serializable
     public function isEnabled()
     {
         return $this->isActive;
+    }
+
+    /**
+     * Set role
+     *
+     * @param \Mautic\UserBundle\Entity\Role $role
+     * @return User
+     */
+    public function setRole(\Mautic\UserBundle\Entity\Role $role = null)
+    {
+        $this->role = $role;
+
+        return $this;
+    }
+
+    /**
+     * Get role
+     *
+     * @return \Mautic\UserBundle\Entity\Role
+     */
+    public function getRole()
+    {
+        return $this->role;
+    }
+
+    /**
+     * Set active permissions
+     *
+     * @param array $permissions
+     */
+    public function setActivePermissions(array $permissions) {
+        $this->activePermissions = $permissions;
+        return $this;
+    }
+
+    /**
+     * Get active permissions
+     *
+     * @return mixed
+     */
+    public function getActivePermissions() {
+        return $this->activePermissions;
     }
 }

@@ -18,12 +18,12 @@
     <ul class="nav nav-pills navbar-right" role="navigation">
         <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                <?php echo $app->getUser()->getFullName();?><span class="caret"></span>
+                <?php echo $app->getUser()->getName();?><span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
                 <li>
                     <a href="<?php echo $view['router']->generate("mautic_user_logout"); ?>">
-                        <i class="fa fa-sign-out fa-lg"></i><span><?php echo $view["translator"]->trans("mautic.user.account.logout"); ?></span>
+                        <i class="fa fa-sign-out fa-lg"></i><span><?php echo $view["translator"]->trans("mautic.user.auth.logout"); ?></span>
                     </a>
                 </li>
             </ul>

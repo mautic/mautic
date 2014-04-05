@@ -12,6 +12,7 @@ use Symfony\Component\Routing\Route;
 
 $collection = new RouteCollection();
 
+//authentication
 $collection->add('login', new Route('/login', array(
     '_controller' => 'MauticUserBundle:Security:login',
 )));
@@ -19,9 +20,10 @@ $collection->add('login', new Route('/login', array(
 $collection->add('mautic_user_logincheck', new Route('/login_check', array()));
 $collection->add('mautic_user_logout', new Route('/logout', array()));
 
+//users
 $collection->add('mautic_user_index', new Route('/users/{page}',
     array(
-        '_controller' => 'MauticUserBundle:Default:index',
+        '_controller' => 'MauticUserBundle:User:index',
         'page'        => 1
     ), array(
         'page' => '\d+',
@@ -30,7 +32,24 @@ $collection->add('mautic_user_index', new Route('/users/{page}',
 
 $collection->add('mautic_user_action', new Route('/users/{objectAction}/{objectId}',
     array(
-        '_controller' => 'MauticUserBundle:Form:execute',
+        '_controller' => 'MauticUserBundle:User:execute',
+        "objectId"      => 0
+    )
+));
+
+//roles
+$collection->add('mautic_role_index', new Route('/roles/{page}',
+    array(
+        '_controller' => 'MauticUserBundle:Role:index',
+        'page'        => 1
+    ), array(
+        'page' => '\d+',
+    )
+));
+
+$collection->add('mautic_role_action', new Route('/roles/{objectAction}/{objectId}',
+    array(
+        '_controller' => 'MauticUserBundle:Role:execute',
         "objectId"      => 0
     )
 ));

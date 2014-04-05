@@ -1,0 +1,1 @@
+<div class="panel-group<?php echo $form->vars['attr']['class']; ?>" id="<?php echo $form->vars['attr']['id']; ?>">

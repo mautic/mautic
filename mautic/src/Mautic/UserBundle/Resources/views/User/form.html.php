@@ -10,10 +10,10 @@
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $userId = $form->vars['data']->getId();
 if (!empty($userId)) {
-    $user   = $form->vars['data']->getFullName();
-    $header = $view['translator']->trans('mautic.users.header.edit', array("%user%" => $user));
+    $user   = $form->vars['data']->getName();
+    $header = $view['translator']->trans('mautic.user.user.header.edit', array("%name%" => $user));
 } else {
-    $header = $view['translator']->trans('mautic.users.header.new');
+    $header = $view['translator']->trans('mautic.user.user.header.new');
 }
 $view["slots"]->set("headerTitle", $header);
 //populate JS functions only required for page refreshes
