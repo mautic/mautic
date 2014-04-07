@@ -100,9 +100,9 @@ class RoleController extends FormController
      */
     public function newAction ()
     {
-        if (!$this->get('mautic_core.permissions')->isGranted('user:roles:create')) {
-            return $this->accessDenied();
-        }
+if (!$this->get('mautic_core.permissions')->isGranted('user:roles:create')) {
+    return $this->accessDenied();
+}
 
         $request     = $this->get('request');
 

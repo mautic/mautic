@@ -67,7 +67,7 @@ $items = array(
                         'extras'  => array(
                             'routeName' => 'mautic_role_action|new'
                         ),
-                        'display' => false
+                        'display' => false //only used for breadcrumb generation
                     ),
                     'mautic.user.role.menu.edit' => array(
                         'route'           => 'mautic_role_action',
@@ -75,7 +75,7 @@ $items = array(
                         'extras'  => array(
                             'routeName' => 'mautic_role_action|edit'
                         ),
-                        'display' => false
+                        'display' => false //only used for breadcrumb generation
                     )
                 )
             ),
@@ -85,7 +85,7 @@ $items = array(
                 'extras'  => array(
                     'routeName' => 'mautic_user_action|new'
                 ),
-                'display' => false
+                'display' => false //only used for breadcrumb generation
             ),
             'mautic.user.user.menu.edit' => array(
                 'route'           => 'mautic_user_action',
@@ -93,7 +93,7 @@ $items = array(
                 'extras'  => array(
                     'routeName' => 'mautic_user_action|edit'
                 ),
-                'display' => false
+                'display' => false //only used for breadcrumb generation
             )
         )
     )

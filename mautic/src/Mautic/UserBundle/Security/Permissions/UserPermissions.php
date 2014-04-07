@@ -31,22 +31,22 @@ class UserPermissions extends CommonPermissions
     public function __construct(Container $container, EntityManager $em)
     {
         parent::__construct($container, $em);
-        $this->permissions = array(
-            'users' => array(
-                'view'          => 1,
-                'editother'     => 4,
-                'create'        => 8,
-                'deleteother'   => 32,
-                'full'          => 1024
-            ),
-            'roles' => array(
-                'view'          => 1,
-                'editother'     => 4,
-                'create'        => 8,
-                'deleteother'   => 32,
-                'full'          => 1024
-            )
-        );
+            $this->permissions = array(
+                'users' => array(
+                    'view'          => 1,
+                    'editother'     => 4,
+                    'create'        => 8,
+                    'deleteother'   => 32,
+                    'full'          => 1024
+                ),
+                'roles' => array(
+                    'view'          => 1,
+                    'editother'     => 4,
+                    'create'        => 8,
+                    'deleteother'   => 32,
+                    'full'          => 1024
+                )
+            );
     }
 
     /**

@@ -6,6 +6,8 @@ var Mautic = {
      * @param toggleMenu
      */
     loadMauticContent: function (route, link, toggleMenu, mainContentOnly) {
+        $("body").addClass("loading-content");
+
         $.ajax({
             url: route,
             type: "GET",
@@ -32,6 +34,7 @@ var Mautic = {
             },
             error: function(request, textStatus, errorThrown) {
                 alert(errorThrown);
+                $("body").removeClass("loading-content");
             }
         });
 
@@ -74,6 +77,7 @@ var Mautic = {
      * @param callback
      */
      postForm: function (form, callback) {
+        $("body").addClass("loading-content");
         $.ajax({
             type: form.attr('method'),
             url: form.attr('action'),
@@ -81,6 +85,10 @@ var Mautic = {
             dataType: "json",
             success: function (data) {
                 callback(data);
+            },
+            error: function(request, textStatus, errorThrown) {
+                alert(errorThrown);
+                $("body").removeClass("loading-content");
             }
         });
     },
@@ -147,6 +155,7 @@ var Mautic = {
                 scrollTop: 0
             }, 0);
         }
+        $("body").removeClass("loading-content");
     },
 
     /**
@@ -397,6 +406,4 @@ var Mautic = {
             }
         },10);
     }
-
-
 };
