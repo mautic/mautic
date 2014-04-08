@@ -10,15 +10,31 @@
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view["slots"]->set("headerTitle", $view['translator']->trans('mautic.user.role.header.index'));
 ?>
+
+
 <?php if ($permissions['create']): ?>
-<?php $view["slots"]->start("buttons"); ?>
-<button class="btn btn-primary"
-    onclick="return Mautic.loadMauticContent('<?php echo $this->container->get('router')->generate(
-        'mautic_role_action', array("objectAction" => "new")); ?>', '#mautic_role_index');">
-    <?php echo $view["translator"]->trans("mautic.user.role.menu.new"); ?>
-</button>
-<?php $view["slots"]->stop(); ?>
+    <?php $view["slots"]->start("actions"); ?>
+    <li><a href="javacript: void(0);"
+           onclick="return Mautic.loadMauticContent('<?php echo $this->container->get('router')->generate(
+               'mautic_role_action', array("objectAction" => "new")); ?>', '#mautic_role_index'); ">
+            <?php echo $view["translator"]->trans("mautic.user.role.menu.new"); ?>
+        </a>
+    </li>
+    <?php $view["slots"]->stop(); ?>
 <?php endif; ?>
+
+<?php
+$view["slots"]->set("filterInput",
+    $view->render('MauticCoreBundle:Form:filter.html.php',
+        array(
+            'filterUri'    => $this->container->get('router')->generate('mautic_role_index'),
+            'filterName'   => 'filter-role',
+            'filterValue'  => $filterValue
+        )
+    )
+);
+?>
+
 <div class="table-responsive white-background">
     <table class="table table-hover table-striped table-bordered">
         <thead>

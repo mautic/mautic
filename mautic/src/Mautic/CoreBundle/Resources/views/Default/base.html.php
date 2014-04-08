@@ -26,7 +26,7 @@ $activePanelClasses  = ($app->getSession()->get('left-panel', 'default') == 'unp
     <body>
         <div class="loading-bar"></div>
         <div class="page-wrapper<?php echo $activePanelClasses; ?>">
-            <div class="main-panel-wrapper"">
+            <div class="main-panel-wrapper">
                 <div class="main-panel-breadcrumbs">
                     <?php echo $view->render('MauticCoreBundle:Default:breadcrumbs.html.php'); ?>
                 </div>

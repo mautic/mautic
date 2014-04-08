@@ -405,5 +405,35 @@ var Mautic = {
                 }
             }
         },10);
+    },
+
+    /**
+     * Filters list based on search contents
+     */
+    filterList: function(e,  route) {
+        if ($('#list-filter').length && (e.keyCode == 13 || e.which == 13 || $(e.target).hasClass('fa-search'))){
+            $("body").addClass("loading-content");
+            $.ajax({
+                url: route,
+                type: "POST",
+                data: $('#list-filter').attr('name') + "=" + $('#list-filter').val(),
+                dataType: "json",
+                success: function (response) {
+                    Mautic.processContent(response);
+                }
+            });
+        }
+    },
+
+    showFilterInput: function () {
+        if ($('#list-filter').length) {
+            $('#list-filter').addClass('show-filter').removeClass('hide-filter');
+        }
+    },
+
+    hideFilterInput: function () {
+        if ($('#list-filter').length  && !$('#list-filter').val() && !$('#list-filter').is(":focus")) {
+            $('#list-filter').addClass('hide-filter').removeClass('show-filter');
+        }
     }
 };

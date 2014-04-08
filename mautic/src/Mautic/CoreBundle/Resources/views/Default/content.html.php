@@ -12,16 +12,46 @@ if (!$app->getRequest()->isXmlHttpRequest()):
     $view->extend('MauticCoreBundle:Default:base.html.php');
 endif;
 ?>
-<?php if ($view["slots"]->has("headerTitle")): ?>
 <div class="main-panel-header">
-    <h1 class="pull-left"><?php $view["slots"]->output("headerTitle"); ?></h1>
-    <?php if ($view["slots"]->has("buttons")): ?>
+    <?php if ($view["slots"]->has("headerTitle")): ?>
+        <div  class="pull-left">
+    <h1><?php $view["slots"]->output("headerTitle"); ?></h1>
+        </div>
+    <?php endif; ?>
+
+    <?php if ($view["slots"]->has("actions") || $view["slots"]->has("filterInput")): ?>
     <div class="pull-right action-buttons">
-        <?php $view["slots"]->output("buttons"); ?>
+        <div class="input-group">
+            <?php $view["slots"]->output("filterInput", ""); ?>
+            <?php if ($view["slots"]->has("actions")): ?>
+            <div class="input-group-btn">
+                <?php if ($view["slots"]->has("filterInput")): ?>
+                <button class="btn btn-default btn-search"
+                        onclick="Mautic.filterList(event, '<?php echo $app->getRequest()->getUri(); ?>');"
+                        onmouseover="Mautic.showFilterInput();"
+                        onmouseout="Mautic.hideFilterInput()">
+                    <i class="fa fa-search fa-fw"></i>
+                </button>
+                <?php endif; ?>
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                    <span><?php echo $view['translator']->trans('mautic.core.form.actions'); ?></span>
+                    <span class="caret"></span>
+                </button>
+
+                <ul class="dropdown-menu pull-right">
+                    <?php $view['slots']->output('actions', ''); ?>
+                </ul>
+            </div>
+            <?php elseif ($view["slots"]->has("filterInput")): ?>
+            <button class="btn btn-default btn-search"
+                    onclick="Mautic.filterList(event, '<?php echo $app->getRequest()->getUri(); ?>');">
+                <i class="fa fa-search fa-fw"></i>
+            </button>
+            <?php endif; ?>
+        </div>
     </div>
     <?php endif; ?>
     <div class="clearfix"></div>
 </div>
-<?php endif; ?>
 
 <?php $view['slots']->output('_content'); ?>

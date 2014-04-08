@@ -44,20 +44,27 @@ class RoleController extends FormController
 
         $orderBy    = $this->get('session')->get('mautic.role.orderby', 'r.name');
         $orderByDir = $this->get('session')->get('mautic.role.orderbydir', 'ASC');
+        $filter     = $this->request->request->get('filter-role', $this->get('session')->get('mautic.role.filter', ''));
+        $this->get('session')->set('mautic.role.filter', $filter);
 
         $items = $this->getDoctrine()
             ->getRepository('MauticUserBundle:Role')
-            ->getRoles($start, $limit, $orderBy, $orderByDir);
+            ->getRoles($start, $limit, $filter, $orderBy, $orderByDir);
 
         $count = count($items);
         if ($count && $count < ($start + 1)) {
-            //the number of users are now less then the current page so redirect to the last page
-            $lastPage = (floor($limit / $count)) ?: 1;
+            //the number of entities are now less then the current page so redirect to the last page
+            if ($count === 1) {
+                $lastPage = 1;
+            } else {
+                $lastPage = (floor($limit / $count)) ? : 1;
+            }
             $this->get('session')->set('mautic.role.page', $lastPage);
             $returnUrl   = $this->generateUrl('mautic_role_index', array('page' => $lastPage));
+
             return $this->postActionRedirect(
                 $returnUrl,
-                array('page' => $page),
+                array('page' => $lastPage),
                 'MauticUserBundle:Role:index',
                 array(
                     'activeLink'    => '#mautic_role_index',
@@ -78,6 +85,7 @@ class RoleController extends FormController
         );
 
         $parameters = array(
+            'filterValue' => $filter,
             'items'       => $items,
             'page'        => $page,
             'limit'       => $limit,
@@ -85,7 +93,11 @@ class RoleController extends FormController
         );
 
         if ($this->request->isXmlHttpRequest() && !$this->request->get('ignoreAjax', false)) {
-            return $this->ajaxAction($parameters, 'MauticUserBundle:Role:index.html.php');
+            return $this->ajaxAction(
+                $parameters,
+                'MauticUserBundle:Role:index.html.php',
+                array('route' => $this->generateUrl('mautic_role_index', array('page' => $page)))
+            );
         } else {
             return $this->render('MauticUserBundle:Role:index.html.php', $parameters);
         }

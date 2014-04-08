@@ -12,14 +12,27 @@ $view["slots"]->set("headerTitle", $view['translator']->trans('mautic.user.user.
 ?>
 
 <?php if ($permissions['create']): ?>
-<?php $view["slots"]->start("buttons"); ?>
-<button class="btn btn-primary"
-    onclick="return Mautic.loadMauticContent('<?php echo $this->container->get('router')->generate(
-        'mautic_user_action', array("objectAction" => "new")); ?>', '#mautic_user_index');">
-    <?php echo $view["translator"]->trans("mautic.user.user.menu.new"); ?>
-</button>
+<?php $view["slots"]->start("actions"); ?>
+<li><a href="javacript: void(0);"
+       onclick="return Mautic.loadMauticContent('<?php echo $this->container->get('router')->generate(
+        'mautic_user_action', array("objectAction" => "new")); ?>', '#mautic_user_index'); ">
+        <?php echo $view["translator"]->trans("mautic.user.user.menu.new"); ?>
+    </a>
+</li>
 <?php $view["slots"]->stop(); ?>
 <?php endif; ?>
+
+<?php
+$view["slots"]->set("filterInput",
+    $view->render('MauticCoreBundle:Form:filter.html.php',
+        array(
+            'filterUri'    => $this->container->get('router')->generate('mautic_user_index'),
+            'filterName'   => 'filter-user',
+            'filterValue'  => $filterValue
+        )
+    )
+);
+?>
 
 <div class="table-responsive white-background">
     <table class="table table-hover table-striped table-bordered">

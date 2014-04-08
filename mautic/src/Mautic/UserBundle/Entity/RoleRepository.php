@@ -18,18 +18,25 @@ class RoleRepository extends CommonRepository
      *
      * @param int    $start
      * @param int    $limit
+     * @param string $filter
      * @param string $orderBy
      * @param string $orderByDir
      * @return Paginator
      */
-    public function getRoles($start = 0, $limit = 30, $orderBy = 'r.name', $orderByDir = "ASC") {
+    public function getRoles($start = 0, $limit = 30, $filter = '', $orderBy = 'r.name', $orderByDir = "ASC") {
         $q = $this
             ->createQueryBuilder('r')
             ->orderBy($orderBy, $orderByDir)
             ->setFirstResult($start)
-            ->setMaxResults($limit)
-            ->getQuery();
-        $result = new Paginator($q);
+            ->setMaxResults($limit);
+
+        if (!empty($filter)) {
+            $q->where('r.name LIKE :filter')
+                ->orWhere('r.description LIKE :filter')
+                ->setParameter(':filter', '%'.$filter.'%');
+        }
+        $query = $q->getQuery();
+        $result = new Paginator($query);
         return $result;
     }
 }

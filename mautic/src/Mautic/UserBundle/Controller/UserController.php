@@ -43,20 +43,26 @@ class UserController extends FormController
 
         $orderBy    = $this->get('session')->get('mautic.user.orderby', 'u.lastName, u.firstName, u.username');
         $orderByDir = $this->get('session')->get('mautic.user.orderbydir', 'ASC');
+        $filter     = $this->request->request->get('filter-user', $this->get('session')->get('mautic.user.filter', ''));
+        $this->get('session')->set('mautic.user.filter', $filter);
 
         $users = $this->getDoctrine()
             ->getRepository('MauticUserBundle:User')
-            ->getUsers($start, $limit, $orderBy, $orderByDir);
+            ->getUsers($start, $limit, $filter, $orderBy, $orderByDir);
 
         $count = count($users);
         if ($count && $count < ($start + 1)) {
-            //the number of users are now less then the current page so redirect to the last page
-            $lastPage = (floor($limit / $count)) ?: 1;
+            //the number of entities are now less then the current page so redirect to the last page
+            if ($count === 1) {
+                $lastPage = 1;
+            } else {
+                $lastPage = (floor($limit / $count)) ? : 1;
+            }
             $this->get('session')->set('mautic.user.page', $lastPage);
             $returnUrl   = $this->generateUrl('mautic_user_index', array('page' => $lastPage));
             return $this->postActionRedirect(
                 $returnUrl,
-                array('page' => $page),
+                array('page' => $lastPage),
                 'MauticUserBundle:User:index',
                 array(
                     'activeLink'    => '#mautic_user_index',
@@ -77,6 +83,7 @@ class UserController extends FormController
         );
 
         $parameters = array(
+            'filterValue' => $filter,
             'items'       => $users,
             'page'        => $page,
             'limit'       => $limit,
@@ -84,7 +91,11 @@ class UserController extends FormController
         );
 
         if ($this->request->isXmlHttpRequest() && !$this->request->get('ignoreAjax', false)) {
-            return $this->ajaxAction($parameters, 'MauticUserBundle:User:index.html.php');
+            return $this->ajaxAction(
+                $parameters,
+                'MauticUserBundle:User:index.html.php',
+                array('route' => $this->generateUrl('mautic_user_index', array('page' => $page)))
+                );
         } else {
             return $this->render('MauticUserBundle:User:index.html.php', $parameters);
         }

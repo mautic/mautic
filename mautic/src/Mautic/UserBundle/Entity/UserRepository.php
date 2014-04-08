@@ -137,20 +137,29 @@ class UserRepository extends CommonRepository implements UserProviderInterface
      *
      * @param int    $start
      * @param int    $limit
+     * @param string $filter
      * @param string $orderBy
      * @param string $orderByDir
      * @return Paginator
      */
-    public function getUsers($start = 0, $limit = 30, $orderBy = 'u.lastName, u.firstName, u.username', $orderByDir = "ASC") {
+    public function getUsers($start = 0, $limit = 30, $filter = '', $orderBy = 'u.lastName, u.firstName, u.username', $orderByDir = "ASC") {
         $q = $this
             ->createQueryBuilder('u')
             ->select('u, r')
             ->leftJoin('u.role', 'r')
             ->orderBy($orderBy, $orderByDir)
             ->setFirstResult($start)
-            ->setMaxResults($limit)
-            ->getQuery();
-        $result = new Paginator($q);
+            ->setMaxResults($limit);
+
+        if (!empty($filter)) {
+            $q->where('u.username LIKE :filter')
+                ->orWhere('u.email LIKE :filter')
+                ->orWhere('u.firstName LIKE :filter')
+                ->orWhere('u.lastName LIKE :filter')
+                ->setParameter(':filter', '%'.$filter.'%');
+        }
+        $query = $q->getQuery();
+        $result = new Paginator($query);
         return $result;
     }
 }

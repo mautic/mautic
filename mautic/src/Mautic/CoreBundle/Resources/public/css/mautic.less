@@ -372,16 +372,39 @@ body {
 
 .action-buttons {
   padding:10px 0 10px 10px;
+  margin-right: 5px;
+  width: 300px;
+}
+
+.filter {
+  position: relative;
+  right: 0;
+  float: right !important;
+  -webkit-transition: all 1s ease-in-out;
+  -moz-transition: all 1s ease-in-out;
+  -o-transition: all 1s ease-in-out;
+  transition: all 1s ease-in-out;
+}
+
+.hide-filter {
+  width: 0 !important;
+  padding: 0;
+}
+
+.show-filter {
+  width: 150px !important;
+  margin-left: 0px;
+  padding: 6px 12px;
 }
 
 .loading-content .loading-bar
 {
   display: block;
-  -webkit-animation: shift-rightwards 1s ease-in-out infinite;
-  -moz-animation: shift-rightwards 1s ease-in-out infinite;
-  -ms-animation: shift-rightwards 1s ease-in-out infinite;
-  -o-animation: shift-rightwards 1s ease-in-out infinite;
-  animation: shift-rightwards 1s ease-in-out infinite;
+  -webkit-animation: shift-rightwards 3s ease-in-out infinite;
+  -moz-animation: shift-rightwards 3s ease-in-out infinite;
+  -ms-animation: shift-rightwards 3s ease-in-out infinite;
+  -o-animation: shift-rightwards 3s ease-in-out infinite;
+  animation: shift-rightwards 3s ease-in-out infinite;
   -webkit-animation-delay: .4s;
   -moz-animation-delay: .4s;
   -o-animation-delay: .4s;
