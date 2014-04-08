@@ -26,12 +26,11 @@ class SecurityController extends CommonController
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function loginAction() {
-        $request = $this->get('request');
-        $session = $request->getSession();
+        $session = $this->request->getSession();
 
         // get the login error if there is one
-        if ($request->attributes->has(SecurityContext::AUTHENTICATION_ERROR)) {
-            $error = $request->attributes->get(SecurityContext::AUTHENTICATION_ERROR);
+        if ($this->request->attributes->has(SecurityContext::AUTHENTICATION_ERROR)) {
+            $error = $this->request->attributes->get(SecurityContext::AUTHENTICATION_ERROR);
         } else {
             $error = $session->get(SecurityContext::AUTHENTICATION_ERROR);
             $session->remove(SecurityContext::AUTHENTICATION_ERROR);

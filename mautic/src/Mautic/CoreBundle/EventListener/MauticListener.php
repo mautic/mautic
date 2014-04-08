@@ -39,10 +39,10 @@ class MauticListener
         //only affect Mautic controllers
         if ($controller[0] instanceof EventsController) {
             //populate request attributes with  namespace, bundle, controller, and action names for use in bundle controllers and templates
-            $request    = $event->getRequest();
-            $matches    = array();
-            $controller = $request->attributes->get('_controller');
-            preg_match('/(.*)\\\(.*)Bundle\\\Controller\\\(.*)Controller::(.*)Action/', $controller, $matches);
+            $request        = $event->getRequest();
+            $matches        = array();
+            $controllerName = $request->attributes->get('_controller');
+            preg_match('/(.*)\\\(.*)Bundle\\\Controller\\\(.*)Controller::(.*)Action/', $controllerName, $matches);
 
             if (!empty($matches)) {
                 $request->attributes->set('namespace', $matches[1]);
@@ -50,7 +50,7 @@ class MauticListener
                 $request->attributes->set('controller', $matches[3]);
                 $request->attributes->set('action', $matches[4]);
             } else {
-                preg_match('/Mautic(.*)Bundle:(.*):(.*)/', $controller, $matches);
+                preg_match('/Mautic(.*)Bundle:(.*):(.*)/', $controllerName, $matches);
                 if (!empty($matches)) {
                     $request->attributes->set('namespace', 'Mautic');
                     $request->attributes->set('bundle', $matches[1]);
@@ -58,6 +58,9 @@ class MauticListener
                     $request->attributes->set('action', $matches[3]);
                 }
             }
+
+            //also set the request for easy access throughout controllers
+            $controller[0]->setRequest($request);
         }
     }
 }

@@ -13,8 +13,9 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints as Assert;
-use Doctrine\ORM\EntityRepository;
 use Symfony\Component\DependencyInjection\Container;
+use Doctrine\ORM\EntityRepository;
+use Mautic\CoreBundle\Form\DataTransformer\CleanTransformer;
 
 /**
  * Class UserType
@@ -42,23 +43,30 @@ class UserType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        $builder->add('username', 'text', array(
-            'label'      => 'mautic.user.user.form.username',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
-        ));
+        $transformer = new CleanTransformer();
+        $builder->add(
+            $builder->create('username', 'text', array(
+                'label'      => 'mautic.user.user.form.username',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array('class' => 'form-control')
+            ))->addViewTransformer($transformer)
+        );
 
-        $builder->add('firstName', 'text', array(
-            'label'      => 'mautic.user.user.form.firstname',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
-        ));
+        $builder->add(
+            $builder->create('firstName', 'text', array(
+                'label'      => 'mautic.user.user.form.firstname',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array('class' => 'form-control')
+            ))->addViewTransformer($transformer)
+        );
 
-        $builder->add('lastName',  'text', array(
-            'label'      => 'mautic.user.user.form.lastname',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
-        ));
+        $builder->add(
+            $builder->create('lastName',  'text', array(
+                'label'      => 'mautic.user.user.form.lastname',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array('class' => 'form-control')
+            ))->addViewTransformer($transformer)
+        );
 
         $builder->add('email', 'email', array(
             'label'      => 'mautic.user.user.form.email',
@@ -93,7 +101,7 @@ class UserType extends AbstractType
                 'attr'       => array('class' => 'form-control')
             ),
             'type'              => 'password',
-            'invalid_message'   => 'mautic.user.password.mismatch'
+            'invalid_message'   => 'mautic.user.user.password.mismatch'
         ));
 
         $builder->add('save', 'submit', array(

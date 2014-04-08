@@ -153,6 +153,14 @@ class User implements AdvancedUserInterface, \Serializable
     }
 
     /**
+     * @param $value
+     * @return string
+     */
+    public function cleanData($value) {
+        return trim(strip_tags($value));
+    }
+
+    /**
      * @param Form $form
      * @return array
      */
@@ -252,7 +260,7 @@ class User implements AdvancedUserInterface, \Serializable
      */
     public function setUsername($username)
     {
-        $this->username = $username;
+        $this->username = $this->cleanData($username);
 
         return $this;
     }
@@ -278,7 +286,7 @@ class User implements AdvancedUserInterface, \Serializable
      */
     public function setFirstName($firstName)
     {
-        $this->firstName = $firstName;
+        $this->firstName = $this->cleanData($firstName);
 
         return $this;
     }
@@ -301,7 +309,7 @@ class User implements AdvancedUserInterface, \Serializable
      */
     public function setLastName($lastName)
     {
-        $this->lastName = $lastName;
+        $this->lastName = $this->cleanData($lastName);
 
         return $this;
     }
@@ -337,7 +345,7 @@ class User implements AdvancedUserInterface, \Serializable
      */
     public function setEmail($email)
     {
-        $this->email = $email;
+        $this->email = $this->cleanData($email);
 
         return $this;
     }

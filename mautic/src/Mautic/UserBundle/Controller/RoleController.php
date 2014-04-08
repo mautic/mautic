@@ -26,7 +26,7 @@ class RoleController extends FormController
     /**
      * Generate's default role list view
      *
-     * @param Request $request
+     * @param Request $this->request
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function indexAction($page = 1)
@@ -34,8 +34,6 @@ class RoleController extends FormController
         if (!$this->get('mautic_core.permissions')->isGranted('user:roles:view')) {
             return $this->accessDenied();
         }
-
-        $request = $this->get('request');
 
         //set limits
         $limit = $this->container->getParameter('default_pagelimit');
@@ -86,7 +84,7 @@ class RoleController extends FormController
             'permissions' => $permissions
         );
 
-        if ($request->isXmlHttpRequest() && !$request->get('ignoreAjax', false)) {
+        if ($this->request->isXmlHttpRequest() && !$this->request->get('ignoreAjax', false)) {
             return $this->ajaxAction($parameters, 'MauticUserBundle:Role:index.html.php');
         } else {
             return $this->render('MauticUserBundle:Role:index.html.php', $parameters);
@@ -100,11 +98,9 @@ class RoleController extends FormController
      */
     public function newAction ()
     {
-if (!$this->get('mautic_core.permissions')->isGranted('user:roles:create')) {
-    return $this->accessDenied();
-}
-
-        $request     = $this->get('request');
+        if (!$this->get('mautic_core.permissions')->isGranted('user:roles:create')) {
+            return $this->accessDenied();
+        }
 
         //retrieve the entity
         $entity      = new Entity\Role();
@@ -119,7 +115,7 @@ if (!$this->get('mautic_core.permissions')->isGranted('user:roles:create')) {
         $form       = $this->get('form.factory')->create('role', $entity, array('action' => $action));
 
         ///Check for a submitted form and process it
-        if ($request->getMethod() == 'POST') {
+        if ($this->request->getMethod() == 'POST') {
             $valid = $this->checkFormValidity($form);
 
             if ($valid === 1) {
@@ -147,7 +143,7 @@ if (!$this->get('mautic_core.permissions')->isGranted('user:roles:create')) {
             }
         }
 
-        if ($request->isXmlHttpRequest() && !$request->get('ignoreAjax', false)) {
+        if ($this->request->isXmlHttpRequest() && !$this->request->get('ignoreAjax', false)) {
             return $this->ajaxAction(
                 array('form' => $form->createView()),
                 'MauticUserBundle:Role:form.html.php',
@@ -177,7 +173,6 @@ if (!$this->get('mautic_core.permissions')->isGranted('user:roles:create')) {
             return $this->accessDenied();
         }
 
-        $request = $this->get('request');
         $em      = $this->getDoctrine()->getManager();
         $entity  = $em->getRepository('MauticUserBundle:Role')->find($objectId);
 
@@ -214,7 +209,7 @@ if (!$this->get('mautic_core.permissions')->isGranted('user:roles:create')) {
         $form       = $this->get('form.factory')->create('role', $entity, array('action' => $action));
 
         ///Check for a submitted form and process it
-        if ($request->getMethod() == 'POST') {
+        if ($this->request->getMethod() == 'POST') {
             $valid = $this->checkFormValidity($form);
 
             if ($valid === 1) {
@@ -242,7 +237,7 @@ if (!$this->get('mautic_core.permissions')->isGranted('user:roles:create')) {
             }
         }
 
-        if ($request->isXmlHttpRequest() && !$request->get('ignoreAjax', false)) {
+        if ($this->request->isXmlHttpRequest() && !$this->request->get('ignoreAjax', false)) {
             return $this->ajaxAction(
                 array('form' => $form->createView()),
                 'MauticUserBundle:Role:form.html.php',
@@ -272,12 +267,11 @@ if (!$this->get('mautic_core.permissions')->isGranted('user:roles:create')) {
             return $this->accessDenied();
         }
 
-        $request     = $this->get('request');
         $page        = $this->get('session')->get('mautic.role.page', 1);
         $returnUrl   = $this->generateUrl('mautic_role_index', array('page' => $page));
         $success     = 0;
         $flashes     = array();
-        if ($request->getMethod() == 'POST') {
+        if ($this->request->getMethod() == 'POST') {
             $result = $this->container->get('mautic_user.model.role')->deleteEntity($objectId);
             $name   = $result->getName();
 

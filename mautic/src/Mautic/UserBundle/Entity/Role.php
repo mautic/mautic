@@ -75,6 +75,14 @@ class Role implements RoleInterface
     }
 
     /**
+     * @param $value
+     * @return string
+     */
+    public function cleanData($value) {
+        return trim(strip_tags($value));
+    }
+
+    /**
      * @see RoleInterface
      */
     public function getRole()
@@ -100,7 +108,7 @@ class Role implements RoleInterface
      */
     public function setName($name)
     {
-        $this->name = $name;
+        $this->name = $this->cleanData($name);
 
         return $this;
     }
@@ -191,7 +199,7 @@ class Role implements RoleInterface
      */
     public function setDescription($description)
     {
-        $this->description = $description;
+        $this->description = $this->cleanData($description);
 
         return $this;
     }

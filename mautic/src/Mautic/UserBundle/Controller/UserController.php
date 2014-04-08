@@ -34,8 +34,6 @@ class UserController extends FormController
             return $this->accessDenied();
         }
 
-        $request = $this->get('request');
-
         //set limits
         $limit = $this->container->getParameter('default_pagelimit');
         $start = ($page === 1) ? 0 : (($page-1) * $limit);
@@ -85,7 +83,7 @@ class UserController extends FormController
             'permissions' => $permissions
         );
 
-        if ($request->isXmlHttpRequest() && !$request->get('ignoreAjax', false)) {
+        if ($this->request->isXmlHttpRequest() && !$this->request->get('ignoreAjax', false)) {
             return $this->ajaxAction($parameters, 'MauticUserBundle:User:index.html.php');
         } else {
             return $this->render('MauticUserBundle:User:index.html.php', $parameters);
@@ -103,8 +101,6 @@ class UserController extends FormController
             return $this->accessDenied();
         }
 
-        $request    = $this->get('request');
-
         //retrieve the user entity
         $user       = new Entity\User();
         //set action URL
@@ -117,7 +113,7 @@ class UserController extends FormController
         $form       = $this->get('form.factory')->create('user', $user, array('action' => $action));
 
         ///Check for a submitted form and process it
-        if ($request->getMethod() == 'POST') {
+        if ($this->request->getMethod() == 'POST') {
             $valid = $this->checkFormValidity($form);
 
             if ($valid === 1) {
@@ -145,7 +141,7 @@ class UserController extends FormController
             }
         }
 
-        if ($request->isXmlHttpRequest() && !$request->get('ignoreAjax', false)) {
+        if ($this->request->isXmlHttpRequest() && !$this->request->get('ignoreAjax', false)) {
             return $this->ajaxAction(
                 array('form' => $form->createView()),
                 'MauticUserBundle:User:form.html.php',
@@ -175,7 +171,6 @@ class UserController extends FormController
             return $this->accessDenied();
         }
 
-        $request = $this->get('request');
         $em      = $this->getDoctrine()->getManager();
         $user    = $em->getRepository('MauticUserBundle:User')->find($objectId);
         //set the page we came from
@@ -211,12 +206,12 @@ class UserController extends FormController
         $form       = $this->get('form.factory')->create('user', $user, array('action' => $action));
 
         ///Check for a submitted form and process it
-        if ($request->getMethod() == 'POST') {
+        if ($this->request->getMethod() == 'POST') {
             $valid = $this->checkFormValidity($form);
 
             if ($valid === 1) {
                 //form is valid so process the data
-                $result = $this->container->get('mautic_user.model.user')->saveEntity($user, true);
+                $result = $this->container->get('mautic_user.model.user')->saveEntity($user);
             }
 
             if (!empty($valid)) { //cancelled or success
@@ -239,7 +234,7 @@ class UserController extends FormController
             }
         }
 
-        if ($request->isXmlHttpRequest() && !$request->get('ignoreAjax', false)) {
+        if ($this->request->isXmlHttpRequest() && !$this->request->get('ignoreAjax', false)) {
             return $this->ajaxAction(
                 array('form' => $form->createView()),
                 'MauticUserBundle:User:form.html.php',
@@ -269,13 +264,12 @@ class UserController extends FormController
             return $this->accessDenied();
         }
 
-        $request     = $this->get('request');
         $currentUser = $this->get('security.context')->getToken()->getUser();
         $page        = $this->get('session')->get('mautic.user.page', 1);
         $returnUrl   = $this->generateUrl('mautic_user_index', array('page' => $page));
         $success     = 0;
         $flashes     = array();
-        if ($request->getMethod() == 'POST') {
+        if ($this->request->getMethod() == 'POST') {
             //ensure the user logged in is not getting deleted
             if ((int) $currentUser->getId() !== (int) $objectId) {
                 $result = $this->container->get('mautic_user.model.user')->deleteEntity($objectId);

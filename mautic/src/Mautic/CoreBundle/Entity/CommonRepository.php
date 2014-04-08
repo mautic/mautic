@@ -29,12 +29,11 @@ class CommonRepository extends EntityRepository
         try {
             $this->_em->persist($entity);
             $this->_em->flush();
+            return 1;
         } catch (\Doctrine\ORM\ORMException $e) {
             //@TODO add error message
             return 0;
         }
-
-        return 1;
     }
 
     /**
@@ -49,11 +48,10 @@ class CommonRepository extends EntityRepository
             //delete entity
             $this->_em->remove($entity);
             $this->_em->flush();
+            return 1;
         } catch (\Exception $e) {
             //@TODO add error message
             return 0;
         }
-
-        return 1;
     }
 }

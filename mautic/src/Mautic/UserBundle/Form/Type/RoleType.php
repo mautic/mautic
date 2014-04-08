@@ -17,6 +17,7 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\DependencyInjection\Container;
+use Mautic\CoreBundle\Form\DataTransformer\CleanTransformer;
 
 /**
  * Class RoleType
@@ -45,17 +46,23 @@ class RoleType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        $builder->add('name', 'text', array(
-            'label'      => 'mautic.user.role.form.name',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
-        ));
+        $transformer = new CleanTransformer();
 
-        $builder->add('description', 'text', array(
-            'label'      => 'mautic.user.role.form.description',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
-        ));
+        $builder->add(
+            $builder->create('name', 'text', array(
+                'label'      => 'mautic.user.role.form.name',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array('class' => 'form-control')
+            ))->addViewTransformer($transformer)
+        );
+
+        $builder->add(
+            $builder->create('description', 'text', array(
+                'label'      => 'mautic.user.role.form.description',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array('class' => 'form-control')
+            ))->addViewTransformer($transformer)
+        );
 
         $builder->add('isAdmin', 'choice', array(
             'choices'   => array(

@@ -15,7 +15,7 @@ use Mautic\UserBundle\Entity\Role;
 /**
  * Class RoleModel
  * {@inheritdoc}
- * @package Mautic\UserBundle\Model\FormModel
+ * @package Mautic\CoreBundle\Model\FormModel
  */
 class RoleModel extends FormModel
 {

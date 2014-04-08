@@ -15,7 +15,7 @@ use Mautic\UserBundle\Entity\User;
 /**
  * Class UserModel
  * {@inheritdoc}
- * @package Mautic\UserBundle\Model
+ * @package Mautic\CoreBundle\Model
  */
 class UserModel extends FormModel
 {

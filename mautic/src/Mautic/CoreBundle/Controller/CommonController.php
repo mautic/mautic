@@ -10,6 +10,7 @@
 namespace Mautic\CoreBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -19,6 +20,17 @@ use Symfony\Component\HttpFoundation\JsonResponse;
  * @package Mautic\CoreBundle\Controller
  */
 class CommonController extends Controller implements EventsController {
+    /**
+     * @var \Symfony\Component\HttpFoundation\Request
+     */
+    protected $request;
+
+    /**
+     * @param Request $request
+     */
+    public function setRequest(Request $request) {
+        $this->request = $request;
+    }
 
     /**
      * Redirects controller if not ajax or retrieves html output for ajax request
@@ -36,8 +48,6 @@ class CommonController extends Controller implements EventsController {
                                     $passthrough     = null,
                                     $flashes         = array(),
                                     $forward         = true) {
-        $request = $this->get('request');
-
         if (!empty($flashes)) {
             foreach ($flashes as $flash) {
                 $this->get('session')->getFlashBag()->add(
@@ -51,7 +61,7 @@ class CommonController extends Controller implements EventsController {
             }
         }
 
-        if (!$request->isXmlHttpRequest()) {
+        if (!$this->request->isXmlHttpRequest()) {
             return $this->redirect($returnUrl);
         } else {
             //load by ajax
@@ -80,19 +90,18 @@ class CommonController extends Controller implements EventsController {
                                $passthrough      = array(),
                                $forward          = false
     ) {
-        $request = $this->get('request');
 
         if (empty($contentTemplate)) {
-            $contentTemplate = 'Mautic'. $request->get('bundle') . 'Bundle:Default:index.html.php';
+            $contentTemplate = 'Mautic'. $this->request->get('bundle') . 'Bundle:Default:index.html.php';
         }
 
         if (!empty($passthrough["route"])) {
             //breadcrumbs may fail as it will retrieve the crumb path for currently loaded URI so we must override
-            $request->query->set("overrideRouteUri", $passthrough["route"]);
+            $this->request->query->set("overrideRouteUri", $passthrough["route"]);
 
             //if the URL has a query built into it, breadcrumbs may fail matching
             //so let's try to find it by the route name which will be the extras["routeName"] of the menu item
-            $baseUrl = $request->getBaseUrl();
+            $baseUrl = $this->request->getBaseUrl();
             $routePath = str_replace($baseUrl, '', $passthrough["route"]);
             try {
                 $routeParams = $this->get('router')->match($routePath);
@@ -101,7 +110,7 @@ class CommonController extends Controller implements EventsController {
                     //action urls share same route name so tack on the action to differentiate
                     $routeName .= "|{$routeParams["objectAction"]}";
                 }
-                $request->query->set("overrideRouteName", $routeName);
+                $this->request->query->set("overrideRouteName", $routeName);
             } catch (\Exception $e) {
                 //do nothing
             }
@@ -140,24 +149,22 @@ class CommonController extends Controller implements EventsController {
      *
      */
     protected function executeAjaxActions() {
-        $request = $this->get('request');
-
         //process ajax actions
         $success         = 0;
         $securityContext = $this->container->get('security.context');
-        $action          = $request->get("ajaxAction");
+        $action          = $this->request->request->get("ajaxAction");
         if( $securityContext->isGranted('IS_AUTHENTICATED_REMEMBERED') ) {
             switch ($action) {
                 case "togglepanel":
-                    $panel     = $request->get("panel", "left");
+                    $panel     = $this->request->request->get("panel", "left");
                     $status    = $this->get("session")->get("{$panel}-panel", "default");
                     $newStatus = ($status == "unpinned") ? "default" : "unpinned";
                     $this->get("session")->set("{$panel}-panel", $newStatus);
                     $success = 1;
                     break;
                 case "setorderby":
-                    $name    = $request->get("name");
-                    $orderBy = $request->get("orderby");
+                    $name    = $this->request->request->get("name");
+                    $orderBy = $this->request->request->get("orderby");
                     if (!empty($name) && !empty($orderBy)) {
                         $dir = $this->get("session")->get("mautic.$name.orderbydir", "ASC");
                         $dir = ($dir == "ASC") ? "DESC" : "ASC";
