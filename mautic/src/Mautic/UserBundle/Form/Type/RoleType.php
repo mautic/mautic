@@ -60,21 +60,24 @@ class RoleType extends AbstractType
             $builder->create('description', 'text', array(
                 'label'      => 'mautic.user.role.form.description',
                 'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control')
+                'attr'       => array('class' => 'form-control'),
+                'required' => false
             ))->addViewTransformer($transformer)
         );
 
         $builder->add('isAdmin', 'choice', array(
-            'choices'   => array(
+            'choices'       => array(
                 '0'   => 'mautic.core.form.no',
                 '1'   => 'mautic.core.form.yes',
             ),
-            'expanded'  => true,
-            'multiple'  => false,
-            'label'     => 'matuic.user.role.form.isadmin',
-            'attr'      => array(
+            'expanded'      => true,
+            'multiple'      => false,
+            'label'         => 'matuic.user.role.form.isadmin',
+            'attr'          => array(
                 'onclick' => 'Mautic.togglePermissionVisibility();'
-            )
+            ),
+            'empty_value'   => false,
+            'required'      => false
         ));
 
         // add a normal text field, but add your transformer to it
@@ -101,12 +104,18 @@ class RoleType extends AbstractType
 
         $builder->add('save', 'submit', array(
             'label' => 'mautic.core.form.save',
-            'attr'  => array('class' => 'btn btn-primary')
+            'attr'  => array(
+                'class' => 'btn btn-primary',
+                'icon'  => 'fa fa-check padding-sm-right'
+            ),
         ));
 
         $builder->add('cancel', 'submit', array(
             'label' => 'mautic.core.form.cancel',
-            'attr'  => array('class'   => 'btn btn-danger')
+            'attr'  => array(
+                'class'   => 'btn btn-danger',
+                'icon'    => 'fa fa-times padding-sm-right'
+            )
         ));
 
         if (!empty($options["action"])) {
@@ -122,7 +131,7 @@ class RoleType extends AbstractType
     {
         $resolver->setDefaults(array(
             'data_class'         => 'Mautic\UserBundle\Entity\Role',
-            'cascade_validation' => true,
+            'cascade_validation' => true
         ));
     }
 

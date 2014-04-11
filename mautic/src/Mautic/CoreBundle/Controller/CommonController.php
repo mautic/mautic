@@ -35,19 +35,15 @@ class CommonController extends Controller implements EventsController {
     /**
      * Redirects controller if not ajax or retrieves html output for ajax request
      *
-     * @param         $returnUrl
-     * @param null    $parameters
-     * @param null    $contentTemplate
-     * @param null    $passthrough
-     * @param null    $overrideBundle
+     * @param array $args [returnUrl, viewParameters, contentTemplate, passthroughVars, flashes, forwardController]
      */
-    public function postActionRedirect(
-                                    $returnUrl,
-                                    $parameters      = null,
-                                    $contentTemplate = null,
-                                    $passthrough     = null,
-                                    $flashes         = array(),
-                                    $forward         = true) {
+    public function postActionRedirect($args = array()) {
+        $returnUrl = array_key_exists('returnUrl', $args) ? $args['returnUrl'] : $this->generateUrl('mautic_core_index');
+        $flashes   = array_key_exists('flashes', $args) ? $args['flashes'] : array();
+
+        //forward the controller by default
+        $args['forwardController'] = (array_key_exists('forwardController', $args)) ? $args['forwardController'] : true;
+
         if (!empty($flashes)) {
             foreach ($flashes as $flash) {
                 $this->get('session')->getFlashBag()->add(
@@ -65,31 +61,21 @@ class CommonController extends Controller implements EventsController {
             return $this->redirect($returnUrl);
         } else {
             //load by ajax
-            return $this->ajaxAction(
-                $parameters,
-                $contentTemplate,
-                $passthrough,
-                $forward
-            );
+            return $this->ajaxAction($args);
         }
     }
 
     /**
      * Generates html for ajax request
      *
-     * @param array   $parameters
-     * @param string  $contentTemplate
-     * @param array   $passthrough
-     * @param bool    $forward
-     * @param bool    $overrideBundle
+     * @param array $args [parameters, contentTemplate, passthroughVars, forwardController]
      * @return JsonResponse
      */
-    public function ajaxAction(
-                               array $parameters = array(),
-                               $contentTemplate  = "",
-                               $passthrough      = array(),
-                               $forward          = false
-    ) {
+    public function ajaxAction($args = array()) {
+        $parameters      = array_key_exists('viewParameters', $args) ? $args['viewParameters'] : array();
+        $contentTemplate = array_key_exists('contentTemplate', $args) ? $args['contentTemplate'] : '';
+        $passthrough     = array_key_exists('passthroughVars', $args) ? $args['passthroughVars'] : array();
+        $forward         = array_key_exists('forwardController', $args) ? $args['forwardController'] : false;
 
         if (empty($contentTemplate)) {
             $contentTemplate = 'Mautic'. $this->request->get('bundle') . 'Bundle:Default:index.html.php';
@@ -207,19 +193,17 @@ class CommonController extends Controller implements EventsController {
      */
     public function accessDenied()
     {
-        return $this->postActionRedirect(
-            $this->generateUrl('mautic_core_index'),
-            array(''),
-            'MauticCoreBundle:Default:index',
-            array(
-                'activeLink'    => '#mautic_core_index',
-                'route'         => $this->generateUrl('mautic_core_index')
+        return $this->postActionRedirect( array(
+            'returnUrl'       => $this->generateUrl('mautic_core_index'),
+            'contentTemplate' => 'MauticCoreBundle:Default:index',
+            'passthroughVars'     =>    array(
+                'activeLink' => '#mautic_core_index',
+                'route'      => $this->generateUrl('mautic_core_index')
             ),
-            array(array(
+            'flashes'         => array(array(
                 'type' => 'error',
                 'msg'  => 'mautic.user.core.error.accessdenied'
-            )),
-            true
-        );
+            ))
+        ));
     }
 }

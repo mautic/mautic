@@ -25,10 +25,10 @@ class FormController extends CommonController {
      */
     protected function checkFormValidity(Form &$form) {
         //bind request to the form
-        $form->submit($this->request);
+        $form->handleRequest($this->request);
 
         //redirect if the cancel button was clicked
-        if ($form->get('cancel')->isClicked()) {
+        if ($form->has('cancel') && $form->get('cancel')->isClicked()) {
             return -1;
         } elseif ($form->isValid()) {
             return 1;

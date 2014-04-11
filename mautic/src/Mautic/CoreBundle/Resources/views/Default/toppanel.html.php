@@ -22,6 +22,12 @@
             </a>
             <ul class="dropdown-menu">
                 <li>
+                    <a href="javascript:void(0);"
+                       onclick="Mautic.loadContent('<?php echo $view['router']->generate("mautic_user_account"); ?>');">
+                        <i class="fa fa-cog fa-lg"></i><span><?php echo $view["translator"]->trans("mautic.user.account.settings"); ?></span>
+                    </a>
+                </li>
+                <li>
                     <a href="<?php echo $view['router']->generate("mautic_user_logout"); ?>">
                         <i class="fa fa-sign-out fa-lg"></i><span><?php echo $view["translator"]->trans("mautic.user.auth.logout"); ?></span>
                     </a>

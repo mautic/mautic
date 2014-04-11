@@ -41,7 +41,7 @@ class PermissionsType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        $permissionObjects = $this->container->get("mautic_core.permissions")->getPermissionObjects();
+        $permissionObjects = $this->container->get("mautic.security")->getPermissionObjects();
 
         $builder->add("permissions-panel-wrapper-start", 'panel_wrapper_start', array(
             'attr' => array(
@@ -50,18 +50,20 @@ class PermissionsType extends AbstractType
         ));
 
         foreach ($permissionObjects as $object) {
-            $bundle      = $object->getName();
-            $label       = "mautic.{$bundle}.permissions.header";
-            $builder->add("{$bundle}-panel-start", 'panel_start', array(
-                'label' => $label,
-                'attr'  => array(
-                    'data-parent' => "permissions-panel",
-                    'id'          => "{$bundle}-panel"
-                )
-            ));
-            $object->buildForm($builder, $options);
+            if ($object->isEnabled()) {
+                $bundle = $object->getName();
+                $label  = "mautic.{$bundle}.permissions.header";
+                $builder->add("{$bundle}-panel-start", 'panel_start', array(
+                    'label' => $label,
+                    'attr'  => array(
+                        'data-parent' => "permissions-panel",
+                        'id'          => "{$bundle}-panel"
+                    )
+                ));
+                $object->buildForm($builder, $options);
 
-            $builder->add("{$bundle}-panel-end", 'panel_end');
+                $builder->add("{$bundle}-panel-end", 'panel_end');
+            }
         }
 
         $builder->add("permissions-panel-wrapper-end", 'panel_wrapper_end');

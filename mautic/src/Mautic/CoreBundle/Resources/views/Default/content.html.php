@@ -15,7 +15,7 @@ endif;
 <div class="main-panel-header">
     <?php if ($view["slots"]->has("headerTitle")): ?>
         <div  class="pull-left">
-    <h1><?php $view["slots"]->output("headerTitle"); ?></h1>
+    <h2><?php $view["slots"]->output("headerTitle"); ?></h2>
         </div>
     <?php endif; ?>
 

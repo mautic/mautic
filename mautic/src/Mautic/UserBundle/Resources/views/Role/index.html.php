@@ -15,7 +15,7 @@ $view["slots"]->set("headerTitle", $view['translator']->trans('mautic.user.role.
 <?php if ($permissions['create']): ?>
     <?php $view["slots"]->start("actions"); ?>
     <li><a href="javacript: void(0);"
-           onclick="return Mautic.loadMauticContent('<?php echo $this->container->get('router')->generate(
+           onclick="return Mautic.loadContent('<?php echo $this->container->get('router')->generate(
                'mautic_role_action', array("objectAction" => "new")); ?>', '#mautic_role_index'); ">
             <?php echo $view["translator"]->trans("mautic.user.role.menu.new"); ?>
         </a>
@@ -35,7 +35,7 @@ $view["slots"]->set("filterInput",
 );
 ?>
 
-<div class="table-responsive white-background">
+<div class="table-responsive body-white padding-sm">
     <table class="table table-hover table-striped table-bordered">
         <thead>
             <tr>
@@ -71,28 +71,14 @@ $view["slots"]->set("filterInput",
                 <td>
                     <?php if ($permissions['edit']): ?>
                     <button class="btn btn-primary btn-xs"
-                            onclick="Mautic.loadMauticContent('<?php echo $view['router']->generate('mautic_role_action',
+                            onclick="Mautic.loadContent('<?php echo $view['router']->generate('mautic_role_action',
                                 array("objectAction" => "edit", "objectId" => $item->getId())); ?>', '#mautic_role_index');">
                         <i class="fa fa-pencil-square-o"></i>
                     </button>
                     <?php endif; ?>
                     <?php if ($permissions['delete']): ?>
                     <button class="btn btn-danger btn-xs"
-                            onclick="Mautic.showConfirmation(
-                                '<?php echo $view["translator"]->trans("mautic.user.role.form.confirmdelete",
-                                    array("%name%" => $item->getName() . " (" . $item->getId() . ")")
-                                ); ?>',
-                                '<?php echo $view["translator"]->trans("mautic.core.form.delete"); ?>',
-                                'executeAction',
-                                [
-                                    '<?php echo $view['router']->generate('mautic_role_action',
-                                        array("objectAction" => "delete", "objectId" => $item->getId())); ?>',
-                                    '#mautic_role_index'
-                                ],
-                                '<?php echo $view["translator"]->trans("mautic.core.form.cancel"); ?>',
-                                '',
-                                []
-                            );">
+                            onclick="Mautic.showConfirmation('<?php echo $view->escape($view["translator"]->trans("mautic.user.role.form.confirmdelete", array("%name%" => $item->getName() . " (" . $item->getId() . ")")), 'js'); ?>','<?php echo $view->escape($view["translator"]->trans("mautic.core.form.delete"), 'js'); ?>','executeAction',['<?php echo $view['router']->generate('mautic_role_action',array("objectAction" => "delete", "objectId" => $item->getId())); ?>','#mautic_role_index'],'<?php echo $view->escape($view["translator"]->trans("mautic.core.form.cancel"), 'js'); ?>','',[]);">
                         <i class="fa fa-trash-o"></i>
                     </button>
                     <?php endif; ?>

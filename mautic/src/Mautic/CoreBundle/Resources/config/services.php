@@ -13,15 +13,17 @@ use Symfony\Component\DependencyInjection\Parameter;
 
 //Listener to prepopulate information such as bundle name, action name, template name, etc into the request
 //attributes for use in the templates
-$listener = new Definition('Mautic\CoreBundle\EventListener\MauticListener');
-$listener->addTag('kernel.event_listener', array(
-    'event'  => 'kernel.controller',
-    'method' => 'onKernelController'
-));
-$container->setDefinition('mautic_events_action_listener', $listener);
+$container->setDefinition(
+    'mautic.event_listener',
+    new Definition('Mautic\CoreBundle\EventListener\MauticListener')
+)
+    ->addTag('kernel.event_listener', array(
+        'event'  => 'kernel.controller',
+        'method' => 'onKernelController'
+    ));
 
 //Routing
-$container->setDefinition ('mautic_core_routing_loader',
+$container->setDefinition ('mautic.route_loader',
     new Definition(
         'Mautic\CoreBundle\Routing\RouteLoader',
         array(
@@ -29,10 +31,11 @@ $container->setDefinition ('mautic_core_routing_loader',
             '%mautic.bundles%'
         )
     )
-)->addTag('routing.loader');
+)
+    ->addTag('routing.loader');
 
 //Menu renderer
-$container->setDefinition('mautic_core.menu_renderer',
+$container->setDefinition('mautic.menu_renderer',
     new Definition(
         'Mautic\CoreBundle\Menu\MenuRenderer',
         array(
@@ -43,32 +46,35 @@ $container->setDefinition('mautic_core.menu_renderer',
         )
     )
 )
-->addTag('knp_menu.renderer', array('alias' => 'mautic'));
+    ->addTag('knp_menu.renderer', array('alias' => 'mautic'));
 
 //MenuBuilder class
-$container->setDefinition('mautic_core.menu_builder',
+$container->setDefinition('mautic.menu_builder',
     new Definition(
         'Mautic\CoreBundle\Menu\MenuBuilder',
         array(
             new Reference('knp_menu.factory'),
             new Reference('knp_menu.matcher'),
+            new Reference('security.context'),
+            new Reference('mautic.security'),
             '%mautic.bundles%'
         )
     )
 )
-->addMethodCall('setContainer', array(
-    new Reference('service_container')
-));
+    ->addMethodCall('setContainer', array(
+        new Reference('service_container')
+    ));
 
 //MenuHelper class
-$container->setDefinition('mautic_core.menuhelper',
+$container->setDefinition('mautic.menuhelper',
     new Definition(
         'Mautic\CoreBundle\Menu\MenuHelper'
     )
-)->addTag('templating.helper', array('alias' => 'menu_helper'));
+)
+    ->addTag('templating.helper', array('alias' => 'menu_helper'));
 
 //Main menu
-$container->setDefinition('mautic_core.menu_main',
+$container->setDefinition('mautic.menu_main',
     new Definition(
         'Knp\Menu\MenuItem',
         array(
@@ -76,13 +82,13 @@ $container->setDefinition('mautic_core.menu_main',
         )
     )
 )
-    ->setFactoryService('mautic_core.menu_builder')
+    ->setFactoryService('mautic.menu_builder')
     ->setFactoryMethod('mainMenu')
     ->setScope('request')
     ->addTag('knp_menu.menu', array('alias' => 'main'));
 
 //Breacrumbs menu
-$container->setDefinition('mautic_core.menu_breadcrumbs',
+$container->setDefinition('mautic.menu_breadcrumbs',
     new Definition(
         'Knp\Menu\MenuItem',
         array(
@@ -90,24 +96,24 @@ $container->setDefinition('mautic_core.menu_breadcrumbs',
         )
     )
 )
-    ->setFactoryService('mautic_core.menu_builder')
+    ->setFactoryService('mautic.menu_builder')
     ->setFactoryMethod('breadcrumbsMenu')
     ->setScope('request')
     ->addTag('knp_menu.menu', array('alias' => 'breadcrumbs'));
 
 //Database table prefix
-$container->setDefinition ('mautic_core.tblprefix_subscriber',
+$container->setDefinition ('mautic.tblprefix_subscriber',
     new Definition(
         'Mautic\CoreBundle\Subscriber\TablePrefixSubscriber',
         array(
-            '%db_table_prefix%',
+            '%mautic.db_table_prefix%',
             '%mautic.bundles%'
         )
     )
 )->addTag('doctrine.event_subscriber');
 
 //Core permissions class
-$container->setDefinition ('mautic_core.permissions',
+$container->setDefinition ('mautic.security',
     new Definition(
         'Mautic\CoreBundle\Security\Permissions\CorePermissions',
         array(
@@ -119,37 +125,37 @@ $container->setDefinition ('mautic_core.permissions',
 );
 
 //Custom form widgets
-$container->setDefinition('mautic_core.form.type.spacer', new Definition(
+$container->setDefinition('mautic.form.type.spacer', new Definition(
     'Mautic\CoreBundle\Form\Type\SpacerType'
 ))
-->addTag('form.type', array(
-    'alias' => 'spacer',
-));
+    ->addTag('form.type', array(
+        'alias' => 'spacer',
+    ));
 
-$container->setDefinition('mautic_core.form.type.panel_start', new Definition(
+$container->setDefinition('mautic.form.type.panel_start', new Definition(
     'Mautic\CoreBundle\Form\Type\PanelStartType'
 ))
     ->addTag('form.type', array(
         'alias' => 'panel_start',
     ));
 
-$container->setDefinition('mautic_core.form.type.panel_end', new Definition(
+$container->setDefinition('mautic.form.type.panel_end', new Definition(
     'Mautic\CoreBundle\Form\Type\PanelEndType'
 ))
     ->addTag('form.type', array(
         'alias' => 'panel_end',
     ));
 
-$container->setDefinition('mautic_core.form.type.panel_wrapper_start', new Definition(
+$container->setDefinition('mautic.form.type.panel_wrapper_start', new Definition(
     'Mautic\CoreBundle\Form\Type\PanelWrapperStartType'
 ))
-->addTag('form.type', array(
-    'alias' => 'panel_wrapper_start',
-));
+    ->addTag('form.type', array(
+        'alias' => 'panel_wrapper_start',
+    ));
 
-$container->setDefinition('mautic_core.form.type.panel_wrapper_end', new Definition(
+$container->setDefinition('mautic.form.type.panel_wrapper_end', new Definition(
     'Mautic\CoreBundle\Form\Type\PanelWrapperEndType'
 ))
-->addTag('form.type', array(
-    'alias' => 'panel_wrapper_end',
-));
+    ->addTag('form.type', array(
+        'alias' => 'panel_wrapper_end',
+    ));

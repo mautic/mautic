@@ -20,9 +20,9 @@ use Doctrine\ORM\EntityManager;
  */
 class CommonPermissions {
 
-    protected   $permissions = array();
-    protected     $em;
-    protected     $container;
+    protected  $permissions = array();
+    protected  $em;
+    protected  $container;
 
     public function __construct(Container $container, EntityManager $em) {
         $this->container = $container;
@@ -56,6 +56,15 @@ class CommonPermissions {
             return isset($this->permissions[$name][$level]);
         }
 
+    }
+
+    /**
+     * Allows permission classes to be disabled if criteria is not met (such as bundle is disabled)
+     *
+     * @return bool
+     */
+    public function isEnabled() {
+        return true;
     }
 
     /**
@@ -104,21 +113,23 @@ class CommonPermissions {
         if (!in_array($bundle, $permissionLevels)) {
             $permissionLevels[$bundle] = array();
             if (isset($permissions[$bundle])) {
-                foreach ($permissions[$bundle] as $permId => $details) {
-                    $permName    = $details['name'];
-                    $permBitwise = $details['bitwise'];
-                    //ensure the permission still exists
-                    if ($this->isSupported($permName)) {
-                        $levels = $this->permissions[$permName];
-                        //ensure that at least keys exist
-                        $permissionLevels[$bundle][$permName] = array();
-                        $permissionLevels[$bundle][$permName]["$bundle:$permName"] = $permId;
-                        foreach ($levels as $levelName => $levelBit) {
-                            //compare bit against levels to see if it is a match
-                            if ($levelBit & $permBitwise) {
-                                //bitwise compares so add the level
-                                $permissionLevels[$bundle][$permName][] = $levelName;
-                                continue;
+                if ($this->isEnabled()) {
+                    foreach ($permissions[$bundle] as $permId => $details) {
+                        $permName    = $details['name'];
+                        $permBitwise = $details['bitwise'];
+                        //ensure the permission still exists
+                        if ($this->isSupported($permName)) {
+                            $levels = $this->permissions[$permName];
+                            //ensure that at least keys exist
+                            $permissionLevels[$bundle][$permName]                      = array();
+                            $permissionLevels[$bundle][$permName]["$bundle:$permName"] = $permId;
+                            foreach ($levels as $levelName => $levelBit) {
+                                //compare bit against levels to see if it is a match
+                                if ($levelBit & $permBitwise) {
+                                    //bitwise compares so add the level
+                                    $permissionLevels[$bundle][$permName][] = $levelName;
+                                    continue;
+                                }
                             }
                         }
                     }

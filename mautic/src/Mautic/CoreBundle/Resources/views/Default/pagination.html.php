@@ -36,17 +36,17 @@ if ((int) $page === 1) {
     <ul class="pagination pull-right ">
         <li<?php echo $prevClass;?>>
             <a href="javascript: void(0);"
-               onclick="Mautic.loadMauticContent('<?php echo $prevUrl; ?>', '#mautic_user_index', false);">&laquo;</a>
+               onclick="Mautic.loadContent('<?php echo $prevUrl; ?>', '#mautic_user_index', false);">&laquo;</a>
         </li>
         <?php for ($i=1; $i<=$totalPages; $i++): ?>
         <li<?php echo ((int) $page === $i) ? ' class="active"' : ''; ?>>
             <a href="javascript: void(0);"
-               onclick="Mautic.loadMauticContent('<?php echo $baseUrl . "/" . $i;; ?>', '#mautic_user_index', false);"><?php echo $i; ?></a>
+               onclick="Mautic.loadContent('<?php echo $baseUrl . "/" . $i;; ?>', '#mautic_user_index', false);"><?php echo $i; ?></a>
         </li>
         <?php endfor; ?>
         <li<?php echo $nextClass; ?>>
             <a href="javascript: void(0);"
-               onclick="Mautic.loadMauticContent('<?php echo $nextUrl; ?>', '#mautic_user_index', false);">&raquo;</a>
+               onclick="Mautic.loadContent('<?php echo $nextUrl; ?>', '#mautic_user_index', false);">&raquo;</a>
         </li>
     </ul>
     <div class="clearfix"></div>

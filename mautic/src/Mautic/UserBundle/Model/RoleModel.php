@@ -32,10 +32,11 @@ class RoleModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param Role $entity
-     * @param bool $isNew
+     * @param Role  $entity
+     * @param bool  $isNew
+     * @param array $overrides
      */
-    public function saveEntity($entity, $isNew = false)
+    public function saveEntity($entity, $isNew = false, $overrides = array())
     {
         if (!$entity instanceof Role) {
             //@TODO add error message
@@ -43,7 +44,7 @@ class RoleModel extends FormModel
         }
 
         $permissionNeeded = ($isNew) ? "create" : "editother";
-        if (!$this->container->get('mautic_core.permissions')->isGranted('user:roles:'. $permissionNeeded)) {
+        if (!$this->container->get('mautic.security')->isGranted('user:roles:'. $permissionNeeded)) {
             //@TODO add error message
             return 0;
         }
@@ -57,13 +58,13 @@ class RoleModel extends FormModel
         $formPermissionData = $this->request->request->get('role[permissions]', null, true);
         //set permissions if applicable and if the user is not an admin
         $permissions = (!empty($formPermissionData) && !$this->request->request->get('role[isAdmin]', 0, true)) ?
-            $this->container->get('mautic_core.permissions')->generatePermissions($formPermissionData) :
+            $this->container->get('mautic.security')->generatePermissions($formPermissionData) :
             array();
 
         foreach ($permissions as $permissionEntity) {
             $entity->addPermission($permissionEntity);
         }
 
-        return parent::saveEntity($entity, $isNew);
+        return parent::saveEntity($entity, $isNew, $overrides);
     }
 }

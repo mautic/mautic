@@ -30,12 +30,12 @@ class UserController extends FormController
      */
     public function indexAction($page = 1)
     {
-        if (!$this->get('mautic_core.permissions')->isGranted('user:users:view')) {
+        if (!$this->get('mautic.security')->isGranted('user:users:view')) {
             return $this->accessDenied();
         }
 
         //set limits
-        $limit = $this->container->getParameter('default_pagelimit');
+        $limit = $this->container->getParameter('mautic.default_pagelimit');
         $start = ($page === 1) ? 0 : (($page-1) * $limit);
         if ($start < 0) {
             $start = 0;
@@ -48,7 +48,13 @@ class UserController extends FormController
 
         $users = $this->getDoctrine()
             ->getRepository('MauticUserBundle:User')
-            ->getUsers($start, $limit, $filter, $orderBy, $orderByDir);
+            ->getUsers(array(
+                'start'      => $start,
+                'limit'      => $limit,
+                'filter'     => $filter,
+                'orderBy'    => $orderBy,
+                'orderByDir' => $orderByDir
+            ));
 
         $count = count($users);
         if ($count && $count < ($start + 1)) {
@@ -60,16 +66,16 @@ class UserController extends FormController
             }
             $this->get('session')->set('mautic.user.page', $lastPage);
             $returnUrl   = $this->generateUrl('mautic_user_index', array('page' => $lastPage));
-            return $this->postActionRedirect(
-                $returnUrl,
-                array('page' => $lastPage),
-                'MauticUserBundle:User:index',
-                array(
+
+            return $this->postActionRedirect(array(
+                'returnUrl'       => $returnUrl,
+                'viewParameters'  => array('page' => $lastPage),
+                'contentTemplate' => 'MauticUserBundle:User:index',
+                'passthroughVars' => array(
                     'activeLink'    => '#mautic_user_index',
-                    'route'         => $returnUrl
-                ),
-                array()
-            );
+                    'route'         => $returnUrl,
+                )
+            ));
         }
 
         //set what page currently on so that we can return here after form submission/cancellation
@@ -77,9 +83,9 @@ class UserController extends FormController
 
         //set some permissions
         $permissions = array(
-            'create' => $this->get('mautic_core.permissions')->isGranted('user:users:create'),
-            'edit'   => $this->get('mautic_core.permissions')->isGranted('user:users:editother'),
-            'delete' => $this->get('mautic_core.permissions')->isGranted('user:users:deleteother'),
+            'create' => $this->get('mautic.security')->isGranted('user:users:create'),
+            'edit'   => $this->get('mautic.security')->isGranted('user:users:editother'),
+            'delete' => $this->get('mautic.security')->isGranted('user:users:deleteother'),
         );
 
         $parameters = array(
@@ -91,11 +97,11 @@ class UserController extends FormController
         );
 
         if ($this->request->isXmlHttpRequest() && !$this->request->get('ignoreAjax', false)) {
-            return $this->ajaxAction(
-                $parameters,
-                'MauticUserBundle:User:index.html.php',
-                array('route' => $this->generateUrl('mautic_user_index', array('page' => $page)))
-                );
+            return $this->ajaxAction(array(
+                'viewParameters'  => $parameters,
+                'contentTemplate' => 'MauticUserBundle:User:index.html.php',
+                'passthroughVars' => array('route' => $this->generateUrl('mautic_user_index', array('page' => $page)))
+            ));
         } else {
             return $this->render('MauticUserBundle:User:index.html.php', $parameters);
         }
@@ -108,7 +114,7 @@ class UserController extends FormController
      */
     public function newAction ()
     {
-        if (!$this->get('mautic_core.permissions')->isGranted('user:users:create')) {
+        if (!$this->get('mautic.security')->isGranted('user:users:create')) {
             return $this->accessDenied();
         }
 
@@ -129,39 +135,41 @@ class UserController extends FormController
 
             if ($valid === 1) {
                 //form is valid so process the data
-                $result = $this->container->get('mautic_user.model.user')->saveEntity($user, true);
+                $result = $this->container->get('mautic.model.user')->saveEntity($user, true);
             }
 
             if (!empty($valid)) { //cancelled or success
-                return $this->postActionRedirect(
-                    $returnUrl,
-                    array('page' => $page),
-                    'MauticUserBundle:User:index',
-                    array(
-                        'activeLink' => '#mautic_user_index',
-                        'route'      => $returnUrl
+
+                return $this->postActionRedirect(array(
+                    'returnUrl'       => $returnUrl,
+                    'viewParameters'  => array('page' => $page),
+                    'contentTemplate' => 'MauticUserBundle:User:index',
+                    'passthroughVars' => array(
+                        'activeLink'    => '#mautic_user_index',
+                        'route'         => $returnUrl,
                     ),
-                    (!empty($result) && $result === 1) ? array( //success
-                        array(
-                            'type' => 'notice',
-                            'msg'  => 'mautic.user.user.notice.created',
-                            'msgVars' => array('%name%' => $user->getName())
-                        )
-                    ) : array()
-                );
+                    'flashes'         =>
+                        (!empty($result) && $result === 1) ? array( //success
+                            array(
+                                'type' => 'notice',
+                                'msg'  => 'mautic.user.user.notice.created',
+                                'msgVars' => array('%name%' => $user->getName())
+                            )
+                        ) : array()
+                ));
             }
         }
 
         if ($this->request->isXmlHttpRequest() && !$this->request->get('ignoreAjax', false)) {
-            return $this->ajaxAction(
-                array('form' => $form->createView()),
-                'MauticUserBundle:User:form.html.php',
-                array(
+            return $this->ajaxAction(array(
+                'viewParameters'  => array('form' => $form->createView()),
+                'contentTemplate' => 'MauticUserBundle:User:form.html.php',
+                'passthroughVars' => array(
                     'ajaxForms'  => array('user'),
                     'activeLink' => '#mautic_user_new',
                     'route'      => $action
                 )
-            );
+            ));
         } else {
             return $this->render('MauticUserBundle:User:form.html.php',
                 array(
@@ -178,7 +186,7 @@ class UserController extends FormController
      */
     public function editAction ($objectId)
     {
-        if (!$this->get('mautic_core.permissions')->isGranted('user:users:editother')) {
+        if (!$this->get('mautic.security')->isGranted('user:users:editother')) {
             return $this->accessDenied();
         }
 
@@ -191,22 +199,22 @@ class UserController extends FormController
 
         //user not found
         if (empty($user)) {
-            return $this->postActionRedirect(
-                $returnUrl,
-                array('page' => $page),
-                'MauticUserBundle:User:index',
-                array(
+            return $this->postActionRedirect(array(
+                'returnUrl'       => $returnUrl,
+                'viewParameters'  => array('page' => $page),
+                'contentTemplate' => 'MauticUserBundle:User:index',
+                'passthroughVars' => array(
                     'activeLink'    => '#mautic_user_index',
-                    'route'         => $returnUrl
+                    'route'         => $returnUrl,
                 ),
-                array(
+                'flashes'         =>array(
                     array(
                         'type' => 'error',
                         'msg'  => 'mautic.user.user.error.notfound',
                         'msgVars' => array('%id%' => $objectId)
                     )
                 )
-            );
+            ));
         }
 
         //set action URL
@@ -218,43 +226,53 @@ class UserController extends FormController
 
         ///Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
+            $model = $this->container->get('mautic.model.user');
+            //check to see if the password needs to be rehashed
+            $overrides             = array();
+            $overrides['password'] = $model->checkNewPassword(
+                $user,
+                $this->request,
+                $this->container
+            );
             $valid = $this->checkFormValidity($form);
 
             if ($valid === 1) {
                 //form is valid so process the data
-                $result = $this->container->get('mautic_user.model.user')->saveEntity($user);
+                $result = $model->saveEntity($user, false, $overrides);
             }
 
             if (!empty($valid)) { //cancelled or success
-                return $this->postActionRedirect(
-                    $returnUrl,
-                    array('page' => $page),
-                    'MauticUserBundle:User:index',
-                    array(
-                        'activeLink' => '#mautic_user_index',
-                        'route'      => $returnUrl
+
+                return $this->postActionRedirect(array(
+                    'returnUrl'       => $returnUrl,
+                    'viewParameters'  => array('page' => $page),
+                    'contentTemplate' => 'MauticUserBundle:User:index',
+                    'passthroughVars' => array(
+                        'activeLink'    => '#mautic_user_index',
+                        'route'         => $returnUrl,
                     ),
-                    (!empty($result) && $result === 1) ? array( //success
-                        array(
-                            'type' => 'notice',
-                            'msg'  => 'mautic.user.user.notice.updated',
-                            'msgVars' => array('%name%' => $user->getName())
-                        )
-                    ) : array()
-                );
+                    'flashes'         =>
+                        (!empty($result) && $result === 1) ? array( //success
+                            array(
+                                'type' => 'notice',
+                                'msg'  => 'mautic.user.user.notice.updated',
+                                'msgVars' => array('%name%' => $user->getName())
+                            )
+                        ) : array()
+                ));
             }
         }
 
         if ($this->request->isXmlHttpRequest() && !$this->request->get('ignoreAjax', false)) {
-            return $this->ajaxAction(
-                array('form' => $form->createView()),
-                'MauticUserBundle:User:form.html.php',
-                array(
+            return $this->ajaxAction(array(
+                'viewParameters'  => array('form' => $form->createView()),
+                'contentTemplate' => 'MauticUserBundle:User:form.html.php',
+                'passthroughVars' => array(
                     'ajaxForms'   => array('user'),
                     'activeLink'  => '#mautic_user_index',
                     'route'       => $action
                 )
-            );
+            ));
         } else {
             return $this->render('MauticUserBundle:User:form.html.php',
                 array(
@@ -271,7 +289,7 @@ class UserController extends FormController
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function deleteAction($objectId) {
-        if (!$this->get('mautic_core.permissions')->isGranted('user:users:deleteother')) {
+        if (!$this->get('mautic.security')->isGranted('user:users:deleteother')) {
             return $this->accessDenied();
         }
 
@@ -283,7 +301,7 @@ class UserController extends FormController
         if ($this->request->getMethod() == 'POST') {
             //ensure the user logged in is not getting deleted
             if ((int) $currentUser->getId() !== (int) $objectId) {
-                $result = $this->container->get('mautic_user.model.user')->deleteEntity($objectId);
+                $result = $this->container->get('mautic.model.user')->deleteEntity($objectId);
                 $name   = $result->getName();
 
                 if (!$result) {
@@ -310,16 +328,16 @@ class UserController extends FormController
             }
         } //else don't do anything
 
-        return $this->postActionRedirect(
-            $returnUrl,
-            array('page' => $page),
-            'MauticUserBundle:User:index',
-            array(
+        return $this->postActionRedirect(array(
+            'returnUrl'       => $returnUrl,
+            'viewParameters'  => array('page' => $page),
+            'contentTemplate' => 'MauticUserBundle:User:index',
+            'passthroughVars' => array(
                 'activeLink'    => '#mautic_user_index',
                 'route'         => $returnUrl,
                 'success'       => $success
             ),
-            $flashes
-        );
+            'flashes'         => $flashes
+        ));
     }
 }

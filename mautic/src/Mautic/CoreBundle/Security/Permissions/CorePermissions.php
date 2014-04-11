@@ -13,6 +13,7 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManager;
 use Mautic\UserBundle\Entity\Permission;
+
 //@TODO create new exception
 use Symfony\Component\Debug\Exception\DummyException;
 /**

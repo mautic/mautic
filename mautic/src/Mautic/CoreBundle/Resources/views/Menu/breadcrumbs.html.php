@@ -23,7 +23,7 @@ $lastCrumb = count($crumbs) - 1;
             <?php else: ?>
                 <a id="bc_<?php echo $id; ?>"
                    href="javascript: void(0);"
-                   onclick="Mautic.loadMauticContent('<?php echo $route; ?>', '#<?php echo $id; ?>');">
+                   onclick="Mautic.loadContent('<?php echo $route; ?>', '#<?php echo $id; ?>');">
                     <span><?php echo $view['translator']->trans($label); ?></span>
                 </a>
             <?php endif; ?>

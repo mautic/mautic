@@ -5,7 +5,7 @@ var Mautic = {
      * @param link
      * @param toggleMenu
      */
-    loadMauticContent: function (route, link, toggleMenu, mainContentOnly) {
+    loadContent: function (route, link, toggleMenu, mainContentOnly) {
         $("body").addClass("loading-content");
 
         $.ajax({
@@ -154,6 +154,9 @@ var Mautic = {
             $('.main-panel-wrapper').animate({
                 scrollTop: 0
             }, 0);
+
+            //initialize tooltips
+            $("span[data-toggle='tooltip']").tooltip();
         }
         $("body").removeClass("loading-content");
     },
@@ -186,6 +189,9 @@ var Mautic = {
 
                 return false;
             });
+
+            //active tooltips
+            $("span[data-toggle='tooltip']").tooltip();
         });
     },
 
@@ -341,7 +347,7 @@ var Mautic = {
             success: function(response) {
                 if (response.success) {
                     var route = window.location.pathname;
-                    Mautic.loadMauticContent(route, '', false, true);
+                    Mautic.loadContent(route, '', false, true);
                 }
             }
         });

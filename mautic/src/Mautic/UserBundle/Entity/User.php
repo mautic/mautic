@@ -10,9 +10,11 @@
 namespace Mautic\UserBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use FOS\OAuthServerBundle\Model\ClientInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Security\Core\Validator\Constraints as SecurityAssert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Form\Form;
@@ -45,6 +47,18 @@ class User implements AdvancedUserInterface, \Serializable
     protected $password;
 
     /**
+     * Used for when updating the password
+     * @var
+     */
+    protected $plainPassword;
+
+    /**
+     * Used for updating account
+     * @var
+     */
+    protected $currentPassword;
+
+    /**
      * @ORM\Column(type="string", length=50)
      */
     protected $firstName;
@@ -60,10 +74,20 @@ class User implements AdvancedUserInterface, \Serializable
     protected $email;
 
     /**
+     * @ORM\Column(type="string", length=60)
+     */
+    protected $position;
+
+    /**
      * @ORM\ManyToOne(targetEntity="Role", inversedBy="users")
      * @ORM\JoinColumn(name="role_id", referencedColumnName="id")
      */
     protected $role;
+
+    /**
+     * @ORM\OneToMany(targetEntity="Mautic\ApiBundle\Entity\Client", mappedBy="user", cascade={"persist", "remove"}, orphanRemoval=true)
+     */
+    protected $clients;
 
     /**
      * @ORM\Column(name="is_active", type="boolean")
@@ -120,7 +144,6 @@ class User implements AdvancedUserInterface, \Serializable
                 'message' => 'mautic.user.user.email.valid',
                 'groups'  => array('SecondPass')
             )
-
         ));
 
         $metadata->addConstraint(new UniqueEntity(
@@ -134,14 +157,14 @@ class User implements AdvancedUserInterface, \Serializable
             array('message' => 'mautic.user.user.role.notblank')
         ));
 
-        $metadata->addPropertyConstraint('password',  new Assert\NotBlank(
+        $metadata->addPropertyConstraint('plainPassword',  new Assert\NotBlank(
             array(
                 'message' => 'mautic.user.user.password.notblank',
                 'groups'  => array('CheckPassword')
             )
         ));
 
-        $metadata->addPropertyConstraint('password',  new Assert\Length(
+        $metadata->addPropertyConstraint('plainPassword',  new Assert\Length(
             array(
                 'min'        => 6,
                 'minMessage' => 'mautic.user.user.password.minlength',
@@ -149,6 +172,12 @@ class User implements AdvancedUserInterface, \Serializable
             )
         ));
 
+        $metadata->addPropertyConstraint('currentPassword',  new SecurityAssert\UserPassword(
+            array(
+                'message' => 'mautic.user.account.password.userpassword',
+                'groups'  => array('Profile')
+            )
+        ));
         $metadata->setGroupSequence(array('User', 'SecondPass', 'CheckPassword'));
     }
 
@@ -166,13 +195,17 @@ class User implements AdvancedUserInterface, \Serializable
      */
     static public function determineValidationGroups(Form $form) {
         $data = $form->getData();
-        if (!$data->getId() || ($data->getId() && $data->getPassword())) {
+        if (!$data->getId() || ($data->getId() && $data->getPlainPassword())) {
             //creating a new user or editing an existing user and the password has been updated
-            return array('User', 'SecondPass', 'CheckPassword');
+            $groups = array('User', 'SecondPass', 'CheckPassword');
         } else {
             //editing an existing user and the password is empty
-            return array('User', 'SecondPass');
+            $groups = array('User', 'SecondPass');
         }
+        if ($form->has('currentPassword')) {
+            $groups[] = 'Profile';
+        }
+        return $groups;
     }
 
     /**
@@ -198,6 +231,26 @@ class User implements AdvancedUserInterface, \Serializable
     public function getPassword()
     {
         return $this->password;
+    }
+
+    /**
+     * Get plain password
+     *
+     * @return string
+     */
+    public function getPlainPassword()
+    {
+        return $this->plainPassword;
+    }
+
+    /**
+     * Get current password (that a user has typed into a form)
+     *
+     * @return string
+     */
+    public function getCurrentPassword()
+    {
+        return $this->currentPassword;
     }
 
     /**
@@ -277,6 +330,33 @@ class User implements AdvancedUserInterface, \Serializable
 
         return $this;
     }
+
+    /**
+     * Set plain password
+     *
+     * @param $plainPassword
+     * @return $this
+     */
+    public function setPlainPassword($plainPassword)
+    {
+        $this->plainPassword = $plainPassword;
+
+        return $this;
+    }
+
+    /**
+     * Set current password
+     *
+     * @param $currentPassword
+     * @return $this
+     */
+    public function setCurrentPassword($currentPassword)
+    {
+        $this->currentPassword = $currentPassword;
+
+        return $this;
+    }
+
 
     /**
      * Set firstName
@@ -478,5 +558,72 @@ class User implements AdvancedUserInterface, \Serializable
      */
     public function getActivePermissions() {
         return $this->activePermissions;
+    }
+
+    /**
+     * Add clients
+     *
+     * @param \Mautic\ApiBundle\Entity\Client $clients
+     * @return User
+     */
+    public function addClient(\Mautic\ApiBundle\Entity\Client $clients)
+    {
+        $this->clients[] = $clients;
+
+        return $this;
+    }
+
+    /**
+     * Remove clients
+     *
+     * @param \Mautic\ApiBundle\Entity\Client $clients
+     */
+    public function removeClient(\Mautic\ApiBundle\Entity\Client $clients)
+    {
+        $this->clients->removeElement($clients);
+    }
+
+    /**
+     * Get clients
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getClients()
+    {
+        return $this->clients;
+    }
+
+    /**
+     * Set position
+     *
+     * @param string $position
+     * @return User
+     */
+    public function setPosition($position)
+    {
+        $this->position = $position;
+
+        return $this;
+    }
+
+    /**
+     * Get position
+     *
+     * @return string
+     */
+    public function getPosition()
+    {
+        return $this->position;
+    }
+
+    /**
+     * Determines if a client attempting API access is already authorized by the user
+     *
+     * @param ClientInterface $client
+     * @return bool
+     */
+    public function isAuthorizedClient(ClientInterface $client)
+    {
+        return ($client->getUser()->getId() === $this->id);
     }
 }
