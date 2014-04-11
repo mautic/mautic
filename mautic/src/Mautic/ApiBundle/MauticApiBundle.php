@@ -7,9 +7,16 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-//load parameters array from local configuration
-include "local.php";
+namespace Mautic\ApiBundle;
 
-foreach ($parameters as $k => $v) {
-    $container->setParameter("mautic.{$k}", $v);
+use Symfony\Component\HttpKernel\Bundle\Bundle;
+
+/**
+ * Class MauticApiBundle
+ *
+ * @package Mautic\ApiBundle
+ */
+class MauticApiBundle extends Bundle
+{
+
 }

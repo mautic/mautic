@@ -12,7 +12,7 @@ $loader->import("parameters.php");
 $loader->import("security.php");
 
 $container->loadFromExtension("framework", array(
-    "secret"               => "%secret%",
+    "secret"               => "%mautic.secret%",
     "router"               => array(
         "resource"            => "%kernel.root_dir%/config/routing.php",
         "strict_requirements" => null,
@@ -39,13 +39,13 @@ $container->loadFromExtension("framework", array(
         )
         */
     ),
-    "default_locale"       => "%locale%",
+    "default_locale"       => "%mautic.locale%",
     "translator"           => array(
         "enabled"  => true,
         "fallback" => "en"
     ),
-    "trusted_hosts"        => "%trusted_hosts%",
-    "trusted_proxies"      => "%trusted_proxies%",
+    "trusted_hosts"        => "%mautic.trusted_hosts%",
+    "trusted_proxies"      => "%mautic.trusted_proxies%",
     "session"              => array( //handler_id set to null will use default session handler from php.ini
         "handler_id" => null
     ),
@@ -62,12 +62,12 @@ $container->loadFromExtension("twig", array(
 //Doctrine Configuration
 $container->loadFromExtension("doctrine", array(
     "dbal" => array(
-        "driver"   => "%db_driver%",
-        "host"     => "%db_host%",
-        "port"     => "%db_port%",
-        "dbname"   => "%db_name%",
-        "user"     => "%db_user%",
-        "password" => "%db_password%",
+        "driver"   => "%mautic.db_driver%",
+        "host"     => "%mautic.db_host%",
+        "port"     => "%mautic.db_port%",
+        "dbname"   => "%mautic.db_name%",
+        "user"     => "%mautic.db_user%",
+        "password" => "%mautic.db_password%",
         "charset"  => "UTF8",
         //if using pdo_sqlite as your database driver, add the path in parameters.php
         //e.g. "database_path" => "%kernel.root_dir%/data/data.db3"
@@ -80,21 +80,21 @@ $container->loadFromExtension("doctrine", array(
     )
 ));
 
+
+
 //Swiftmailer Configuration
 $container->loadFromExtension("swiftmailer", array(
-    "transport" => "%mailer_transport%",
-    "host"      => "%mailer_host%",
-    "username"  => "%mailer_user%",
-    "password"  => "%mailer_password%",
+    "transport" => "%mautic.mailer_transport%",
+    "host"      => "%mautic.mailer_host%",
+    "username"  => "%mautic.mailer_user%",
+    "password"  => "%mautic.mailer_password%",
     "spool"     => array(
         "type" => "memory"
     )
 ));
 
 
-//Assetic Configuration
-
-//Assetic does not allow variables when loading resources in templates because it renders the media at compilation time and thus
+//Also Assetic does not allow variables when loading resources in templates because it renders the media at compilation time and thus
 //the appropriate variables are not populated.  In order to not have to manually add each bundles' media files to
 //MauticBaseBundle's base.html.php file, we are doing the following which works because of Symfony's caching.
 
@@ -102,6 +102,7 @@ $container->loadFromExtension("swiftmailer", array(
 
 $css    = array();
 $js     = array();
+
 foreach ($mauticbundles as $bundle => $namespace) {
     //parse the namespace into a filepath
     $namespaceParts = explode("\\", $namespace);
@@ -129,6 +130,7 @@ foreach ($mauticbundles as $bundle => $namespace) {
     $getFiles("js");
 }
 
+//Assetic Configuration
 $container->loadFromExtension("assetic", array(
     "debug"          => "%kernel.debug%",
     "use_controller" => false,

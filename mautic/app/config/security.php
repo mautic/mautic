@@ -9,11 +9,9 @@
 
 $container->loadFromExtension('security', array(
     'providers' => array(
-        'administrator' => array(
-            'entity' => array(
-                'class' => 'MauticUserBundle:User',
-            ),
-        ),
+        'user_provider' => array(
+            'id' => 'mautic.user.provider'
+        )
     ),
     'encoders' => array(
         'Symfony\Component\Security\Core\User\User' => array(
@@ -23,17 +21,21 @@ $container->loadFromExtension('security', array(
         'Mautic\UserBundle\Entity\User' => array(
             'algorithm'         => 'bcrypt',
             'iterations'        => 12,
-        ),
+        )
     ),
     'firewalls' => array(
         'dev' => array(
             'pattern' => '^/(_(profiler|wdt)|css|images|js)/',
             'security' => true,
-            'anonymous' => array()
+            'anonymous' => true
         ),
         'login' => array(
             'pattern'   => '^/login$',
-            'anonymous' => array()
+            'anonymous' => true
+        ),
+        'oauth_token' => array(
+            'pattern'  => '^/oauth/v2/token',
+            'security' => false
         ),
         'main' => array(
             'pattern' => "^/",
@@ -42,11 +44,45 @@ $container->loadFromExtension('security', array(
             ),
             'logout' => array(),
             'remember_me' => array(
-                'key'      => '%secret%',
-                'lifetime' => 31536000, // 365 days in seconds
-                'path'     => '/',
-                'domain'   => '', // Defaults to the current domain from $_SERVER
+                'key'      => '%mautic.rememberme_key%',
+                'lifetime' => '%mautic.rememberme_lifetime%',
+                'path'     => '%mautic.rememberme_path%',
+                'domain'   => '%mautic.rememberme_domain%'
             ),
         ),
+        'oauth_authorize' => array(
+            'pattern'    => '^/oauth/v2/auth',
+            'form_login' => array(
+                'provider'   => 'user_provider',
+                'check_path' => '/oauth/v2/auth_login_check',
+                'login_path' => '/oauth/v2/auth_login'
+            ),
+            'anonymous'  => true
+        ),
+        'api' => array(
+            'pattern'   => '^/api',
+            'fos_oauth' => true,
+            'stateless' => true
+        )
+    ),
+    'access_control' => array(
+        array('path' => '^/api', 'roles' => 'IS_AUTHENTICATED_FULLY')
+    )
+));
+
+$container->loadFromExtension('fos_oauth_server', array(
+    'db_driver'           => 'orm',
+    'client_class'        => 'Mautic\ApiBundle\Entity\Client',
+    'access_token_class'  => 'Mautic\ApiBundle\Entity\AccessToken',
+    'refresh_token_class' => 'Mautic\ApiBundle\Entity\RefreshToken',
+    'auth_code_class'     => 'Mautic\ApiBundle\Entity\AuthCode',
+    'service'             => array(
+        'user_provider' => 'mautic.user.provider',
+        'options'       => array(
+            'supported_scopes' => 'user'
+        )
+    ),
+    'template'            => array(
+        'engine' => 'php'
     )
 ));

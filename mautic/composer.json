@@ -19,7 +19,8 @@
         "sensio/generator-bundle": "~2.3",
         "ircmaxell/password-compat": "~1.0",
         "knplabs/knp-menu": "2.0.*@dev",
-        "knplabs/knp-menu-bundle":"dev-master"
+        "knplabs/knp-menu-bundle":"dev-master",
+        "friendsofsymfony/oauth-server-bundle": "dev-master"
     },
     "scripts": {
         "post-install-cmd": [

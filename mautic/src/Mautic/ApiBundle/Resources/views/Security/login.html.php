@@ -8,10 +8,10 @@
  */
 
 $view->extend('MauticUserBundle:Security:base.html.php');
-$view['slots']->set('header', $view['translator']->trans('mautic.user.auth.header'));
+$view['slots']->set('header', $view['translator']->trans('mautic.api.oauth.header'));
 ?>
 
-<form class="form-login" role="form" action="<?php echo $view['router']->generate('mautic_user_logincheck') ?>" method="post">
+<form class="form-login" role="form" action="<?php echo $view['router']->generate('mautic_oauth_server_auth_login_check') ?>" method="post">
     <div class="margin-md">
         <label for="username" class="sr-only"><?php echo $view['translator']->trans('mautic.user.auth.form.loginusername'); ?></label>
         <input type="text" id="username" name="_username"
@@ -24,11 +24,6 @@ $view['slots']->set('header', $view['translator']->trans('mautic.user.auth.heade
                class="form-control input-lg" required
                placeholder='<?php echo $view['translator']->trans('mautic.user.auth.form.loginpw'); ?>' />
     </div>
-    <div class="margin-md">
-        <input type="checkbox" id="remember_me" name="_remember_me" />
-        <label for="remember_me"><?php echo $view['translator']->trans('mautic.user.auth.form.rememberme'); ?></label>
-    </div>
 
-    <input type="hidden" name="_csrf_token" value="<?php echo $view['form']->csrfToken('authenticate') ?>" />
     <button class="btn btn-lg btn-primary btn-block" type="submit"><?php echo $view['translator']->trans('mautic.user.auth.form.loginbtn'); ?></button>
 </form>

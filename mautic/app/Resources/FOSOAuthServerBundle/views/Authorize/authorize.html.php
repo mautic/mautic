@@ -1,0 +1,33 @@
+<?php
+/**
+ * @package     Mautic
+ * @copyright   2014 Mautic, NP. All rights reserved.
+ * @author      Mautic
+ * @link        http://mautic.com
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
+$view->extend('MauticUserBundle:Security:base.html.php');
+$view['slots']->set('header', $view['translator']->trans('mautic.api.oauth.header'));
+$name = $client->getName();
+$msg  = (!empty($name)) ? $view['translator']->trans('mautic.api.oauth.clientwithname', array('%name%' => $name)) :
+    $view['translator']->trans('mautic.api.oauth.clientnoname');
+?>
+<h4><?php echo $msg; ?></h4>
+<form class="form-login" role="form"
+      name="fos_oauth_server_authorize_form"
+      action="<?php echo $view['router']->generate('fos_oauth_server_authorize') ?>"
+      method="post">
+
+<input type="submit" class="btn btn-primary" name="accepted" value="<?php echo $view['translator']->trans('mautic.api.oauth.acccept'); ?>" />
+<input type="submit" class="btn btn-danger" name="rejected" value="<?php echo $view['translator']->trans('mautic.api.oauth.deny'); ?>" />
+
+<?php
+echo $view['form']->row($form['client_id']);
+echo $view['form']->row($form['response_type']);
+echo $view['form']->row($form['redirect_uri']);
+echo $view['form']->row($form['state']);
+echo $view['form']->row($form['scope']);
+echo $view['form']->rest($form);
+?>
+</form>
