@@ -1,25 +1,16 @@
+/* UserBundle */
+
 .login-container {
     background-color: #513B49;
     height: 100%;
     color: #fff;
-    position: absolute:
+    position: absolute;
     top: 0;
     bottom: 0;
     left: 0;
     right: 0;
-}
-
-.login-container .form-login {
     max-width: 280px;
     margin: 50px auto 50px;
     text-align: center;
     height: 100%;
-}
-
-.login-container .btn-primary {
-    background-color: #3E5682;
-    border-color: #3E5682;
-}
-.margin-10 {
-    margin: 10px;
 }

@@ -45,6 +45,13 @@ class UserPermissions extends CommonPermissions
                     'create'        => 8,
                     'deleteother'   => 32,
                     'full'          => 1024
+                ),
+                'profile' => array(
+                    'editusername'  => 1,
+                    'editemail'     => 2,
+                    'editposition'  => 4,
+                    'editname'      => 8,
+                    'full'          => 1024
                 )
             );
     }
@@ -70,37 +77,57 @@ class UserPermissions extends CommonPermissions
         $data = $this->convertBitsToPermissionNames($options['permissions']);
 
         $builder->add('user:users', 'choice', array(
-            'choices'      => array(
-                'view'          => 'mautic.core.permissions.view',
-                'editother'     => 'mautic.core.permissions.edit',
-                'create'        => 'mautic.core.permissions.create',
-                'deleteother'   => 'mautic.core.permissions.delete',
-                'full'          => 'mautic.core.permissions.full'
+            'choices'    => array(
+                'view'        => 'mautic.core.permissions.view',
+                'editother'   => 'mautic.core.permissions.edit',
+                'create'      => 'mautic.core.permissions.create',
+                'deleteother' => 'mautic.core.permissions.delete',
+                'full'        => 'mautic.core.permissions.full'
             ),
-            'label'     => 'mautic.user.permissions.users',
-            'expanded'  => true,
-            'multiple'  => true,
-            'attr'      => array(
+            'label'      => 'mautic.user.permissions.users',
+            'label_attr' => array('class' => 'control-label'),
+            'expanded'   => true,
+            'multiple'   => true,
+            'attr'       => array(
                 'onclick' => 'Mautic.toggleFullPermissions(this, event)'
             ),
             'data'      => (!empty($data['users']) ? $data['users'] : array())
         ));
 
         $builder->add('user:roles', 'choice', array(
-            'choices'           => array(
-                'view'          => 'mautic.core.permissions.view',
-                'editother'     => 'mautic.core.permissions.edit',
-                'create'        => 'mautic.core.permissions.create',
-                'deleteother'   => 'mautic.core.permissions.delete',
-                'full'          => 'mautic.core.permissions.full'
+            'choices'    => array(
+                'view'        => 'mautic.core.permissions.view',
+                'editother'   => 'mautic.core.permissions.edit',
+                'create'      => 'mautic.core.permissions.create',
+                'deleteother' => 'mautic.core.permissions.delete',
+                'full'        => 'mautic.core.permissions.full'
             ),
-            'label'     => 'mautic.user.permissions.roles',
-            'expanded'  => true,
-            'multiple'  => true,
-            'attr'      => array(
+            'label'      => 'mautic.user.permissions.roles',
+            'label_attr' => array('class' => 'control-label'),
+            'expanded'   => true,
+            'multiple'   => true,
+            'attr'       => array(
                 'onclick' => 'Mautic.toggleFullPermissions(this, event)'
             ),
-            'data'      => (!empty($data['roles']) ? $data['roles'] : array())
+            'data'       => (!empty($data['roles']) ? $data['roles'] : array())
+        ));
+
+        $builder->add('user:profile', 'choice', array(
+            'choices'    => array(
+                'editname'     => 'mautic.user.account.permissions.editname',
+                'editusername' => 'mautic.user.account.permissions.editusername',
+                'editemail'    => 'mautic.user.account.permissions.editemail',
+                'editposition' => 'mautic.user.account.permissions.editposition',
+                'full'         => 'mautic.user.account.permissions.editall',
+            ),
+            'label'      => 'mautic.user.permissions.profile',
+            'label_attr' => array('class' => 'control-label'),
+            'expanded'   => true,
+            'multiple'   => true,
+            'attr'       => array(
+                'onclick' => 'Mautic.toggleFullPermissions(this, event)'
+            ),
+            'data'       => (!empty($data['profile']) ? $data['profile'] : array())
         ));
     }
 }

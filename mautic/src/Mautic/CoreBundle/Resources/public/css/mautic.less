@@ -1,9 +1,11 @@
+/* CoreBundle */
+
 @leftPanelWidth: 230px;
 @leftPanelBase: #513B49;
 @leftPanelColor: #B2B2B2;
 @rightPanelBase: @leftPanelBase;
 @rightPanelWidth: @leftPanelWidth;
-@mainPanelBase: #e8e8e8;
+@mainPanelBase: #eaeaea;
 @mainPanelLinkColor: #3E5682;
 @topPanelLinkColor: @mainPanelLinkColor;
 @topPanelHeight: 50px;
@@ -24,6 +26,9 @@ body {
   overflow: hidden;
 }
 
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 300;
+}
 .page-wrapper {
   padding-left: 0;
   padding-right: 0;
@@ -49,11 +54,6 @@ body {
 
 .top-panel-left {
   float: left;
-}
-
-.top-panel h1, .top-panel h2, .top-panel, h3, .top-panel h4, .top-panel h5 {
-  margin: 0;
-  padding: 0;
 }
 
 .top-panel-main {
@@ -115,7 +115,7 @@ body {
   color: @mainPanelLinkColor;
 }
 
-.main-panel-header h1 {
+.main-panel-header h2 {
   margin-top: 5px;
 }
 
@@ -265,8 +265,6 @@ body {
 
 .side-panel-nav {
   list-style: none;
-  margin: 0;
-  padding: 0;
 }
 
 .side-panel-nav li {
@@ -339,9 +337,8 @@ body {
    background-color: lighten(@leftPanelBase, 15%);
 }
 
-.white-background {
+.body-white {
   background: #ffffff;
-  padding: 5px;
 }
 
 .confirmation-modal {
@@ -395,6 +392,68 @@ body {
   width: 150px !important;
   margin-left: 0px;
   padding: 6px 12px;
+}
+
+label.required:after {
+  color: #e32;
+  content: ' *';
+  display:inline;
+}
+
+.margin-none {
+  margin: 0 !important;
+}
+
+.margin-sm {
+  margin: 5px !important;
+}
+
+.margin-md {
+  margin: 15px !important;
+}
+
+.margin-sm-sides {
+  margin: 0 5px !important;
+}
+
+.margin-md-sides {
+  margin: 0 15px !important;
+}
+
+.margin-sm-top {
+  margin-top: 5x !important;
+}
+
+.margin-md-top {
+  margin-top: 15px !important;
+}
+
+.padding-none {
+  padding: 0 !important;
+}
+
+.padding-sm {
+  padding: 5px !important;
+}
+
+.padding-md {
+  padding: 15px !important;
+}
+
+.padding-sm-sides {
+  padding: 5px !important;
+}
+
+.padding-md-sides {
+  padding: 0 15px !important;
+}
+
+.padding-sm-right {
+  padding-right: 5px;
+}
+
+.rounded-corners {
+  border-radius: 4px;
 }
 
 .loading-content .loading-bar
@@ -600,4 +659,19 @@ body {
   .main-panel {
     margin-right: 0;
   }
+
+  //Force button groups to be block
+  .btn-group .btn {
+    float: none;
+    display: block;
+  }
+
+  .btn-group > .btn:not(.dropdown-toggle) {
+    border-radius: 0;
+  }
+
+  .btn-group .btn + .btn, .btn-group .btn + .btn-group, .btn-group .btn-group + .btn, .btn-group .btn-group + .btn-group {
+    margin-left: 0px;
+  }
 }
+

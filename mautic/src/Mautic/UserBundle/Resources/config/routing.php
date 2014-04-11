@@ -54,4 +54,17 @@ $collection->add('mautic_role_action', new Route('/roles/{objectAction}/{objectI
     )
 ));
 
+//account/profile
+$collection->add('mautic_user_account', new Route('/account',
+    array(
+        '_controller' => 'MauticUserBundle:Profile:index'
+    )
+));
+
+$collection->add('mautic_user_profile', new Route('/account/profile',
+    array(
+        '_controller' => 'MauticUserBundle:Profile:profile'
+    )
+));
+
 return $collection;
