@@ -15,6 +15,9 @@ use Knp\Menu\Loader\ArrayLoader;
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\Security\Core\SecurityContext;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+
 /**
  * Class MenuBuilder
  *
@@ -25,18 +28,28 @@ class MenuBuilder extends ContainerAware
     private $factory;
     private $bundles;
     private $matcher;
+    private $securityContext;
+    private $mauticSecurity;
 
     /**
      * @param FactoryInterface $factory
      * @param MatcherInterface $matcher
-     * @param                  $bundles
+     * @param SecurityContext  $securityContext
+     * @param CorePermissions  $permissions
+     * @param array            $bundles
      */
-    public function __construct(FactoryInterface $factory, MatcherInterface $matcher, array $bundles)
+    public function __construct(FactoryInterface $factory,
+                                MatcherInterface $matcher,
+                                SecurityContext $securityContext,
+                                CorePermissions $permissions,
+                                array $bundles
+    )
     {
-        $this->factory   = $factory;
-        $this->matcher   = $matcher;
-        $this->bundles   = $bundles;
-
+        $this->factory         = $factory;
+        $this->matcher         = $matcher;
+        $this->bundles         = $bundles;
+        $this->securityContext = $securityContext;
+        $this->mauticSecurity  = $permissions;
     }
 
     /**
@@ -58,7 +71,7 @@ class MenuBuilder extends ContainerAware
                 $parts = explode("\\", $bundle);
                 $path  = __DIR__ . "/../../" . $parts[1] . "/Resources/config/menu.php";
                 if (file_exists($path)) {
-                    include $path;
+                    $items = include $path;
 
                     if ($parts[1] == "CoreBundle") {
                         //this means that core bundle must be loaded before other bundles as it has the root menu setup

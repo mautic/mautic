@@ -31,7 +31,7 @@ $items = array(
         'uri'      => 'javascript: void(0)',
         'linkAttributes' => array(
             'onclick' =>
-                'return Mautic.loadMauticContent(\''
+                'return Mautic.loadContent(\''
                 . $this->container->get('router')->generate('mautic_dashboard_index')
                 . '\', \'#mautic_dashboard_index\');',
             'id'      => 'mautic_dashboard_index'
@@ -45,3 +45,5 @@ $items = array(
         )
     )
 );
+
+return $items;

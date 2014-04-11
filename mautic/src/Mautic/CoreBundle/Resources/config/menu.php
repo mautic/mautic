@@ -10,8 +10,10 @@
 $items = array(
     'name'               => 'root',
     'childrenAttributes' => array(
-        "class" => "side-panel-nav",
+        "class" => "side-panel-nav margin-none padding-none",
         "role"  => "navigation"
     ),
     'children'           => array()
 );
+
+return $items;

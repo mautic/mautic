@@ -29,27 +29,29 @@ $items = array(
         'route'    => 'mautic_user_index',
         'uri'      => 'javascript: void(0)',
         'linkAttributes' => array(
-            'onclick' =>
-                'return Mautic.loadMauticContent(\''
-                . $this->container->get('router')->generate('mautic_user_index')
-                . '\', \'#mautic_user_index\', true);',
+            'onclick' => $this->mauticSecurity->isGranted('user:users:view') ?
+                    'return Mautic.loadContent(\''
+                    . $this->container->get('router')->generate('mautic_user_index')
+                    . '\', \'#mautic_user_index\', true);'
+                : 'Mautic.toggleSubMenu(\'#mautic_user_index\');',
             'id'      => 'mautic_user_index'
         ),
         'labelAttributes' => array(
             'class'   => 'nav-item-name'
         ),
-        'extras'=> array(
+        'extras'    => array(
             'iconClass' => 'fa-users fa-lg',
             'routeName' => 'mautic_user_index'
         ),
+        'display'   => ($this->mauticSecurity->isGranted('user:users:view') || $this->mauticSecurity->isGranted('user:roles:view'))
+            ? true : false,
         'children' => array(
             'mautic.user.role.menu.index' => array(
                 'route'         => 'mautic_role_index',
                 'uri'           => 'javascript: void(0)',
                 'linkAttributes' => array(
                     'onclick' =>
-                        'return Mautic.loadMauticContent(\''
-                        . $this->container->get('router')->generate('mautic_role_index')
+                        'return Mautic.loadContent(\''. $this->container->get('router')->generate('mautic_role_index')
                         . '\', \'#mautic_role_index\', true);',
                     'id'      => 'mautic_role_index'
                 ),
@@ -60,6 +62,7 @@ $items = array(
                     'iconClass' => 'fa-lock',
                     'routeName' => 'mautic_role_index'
                 ),
+                'display'         => $this->mauticSecurity->isGranted('user:roles:view'),
                 'children'        => array(
                     'mautic.user.role.menu.new' => array(
                         'route'    => 'mautic_role_action',
@@ -96,5 +99,32 @@ $items = array(
                 'display' => false //only used for breadcrumb generation
             )
         )
+    ),
+    'mautic.user.account.menu.index' => array(
+        'route'    => 'mautic_user_account',
+        'uri'      => 'javascript: void(0)',
+        'linkAttributes' => array(
+            'onclick' =>
+                'return Mautic.loadContent(\''
+                . $this->container->get('router')->generate('mautic_user_account')
+                . '\', \'\', true);',
+            'id'      => 'mautic_user_account'
+        ),
+        'display'  => false, //only used for breadcrumb generation
+        'extras'  => array(
+            'routeName' => 'mautic_user_account'
+        ),
+        'children' => array(
+            'mautic.user.user.menu.profile' => array(
+                'route'    => 'mautic_user_profile',
+                'routeParameters' => array("objectAction"  => "new"),
+                'extras'  => array(
+                    'routeName' => 'mautic_user_action|new'
+                ),
+                'display' => false //only used for breadcrumb generation
+            )
+        )
     )
 );
+
+return $items;
