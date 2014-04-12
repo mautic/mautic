@@ -32,8 +32,6 @@ class ProfileController extends FormController
     {
         //get current user
         $me    = $this->get('security.context')->getToken()->getUser();
-        $em    = $this->getDoctrine()->getManager();
-        $user  = $em->getRepository('MauticUserBundle:User')->find($me->getId());
 
         //set some permissions
         $permissions = array(
@@ -46,7 +44,7 @@ class ProfileController extends FormController
             'editEmail'    => $this->get('mautic.security')->isGranted('user:profile:editemail')
         );
 
-        $form  = $this->get('form.factory')->create('user', $user, array(
+        $form  = $this->get('form.factory')->create('user', $me, array(
             'action' => $this->generateUrl('mautic_user_account')
         ));
 
@@ -64,8 +62,8 @@ class ProfileController extends FormController
                 //set the value to its original
                 switch ($permName) {
                     case "editName":
-                        $overrides['firstName'] = $user->getFirstName();
-                        $overrides['lastName'] = $user->getLastName();
+                        $overrides['firstName'] = $me->getFirstName();
+                        $overrides['lastName'] = $me->getLastName();
                         $form->remove("firstName");
                         $form->add('firstName_unbound', 'text', array(
                             'label'      => 'mautic.user.user.form.firstname',
@@ -73,7 +71,7 @@ class ProfileController extends FormController
                             'attr'       => array('class' => 'form-control'),
                             'mapped'     => false,
                             'disabled'   => true,
-                            'data'       => $user->getFirstName(),
+                            'data'       => $me->getFirstName(),
                             'required'   => false
                         ));
 
@@ -84,13 +82,13 @@ class ProfileController extends FormController
                             'attr'       => array('class' => 'form-control'),
                             'mapped'     => false,
                             'disabled'   => true,
-                            'data'       => $user->getLastName(),
+                            'data'       => $me->getLastName(),
                             'required'   => false
                         ));
                         break;
 
                     case "editUsername":
-                        $overrides['username'] = $user->getUsername();
+                        $overrides['username'] = $me->getUsername();
                         $form->remove("username");
                         $form->add('username_unbound', 'text', array(
                             'label'      => 'mautic.user.user.form.username',
@@ -98,12 +96,12 @@ class ProfileController extends FormController
                             'attr'       => array('class' => 'form-control'),
                             'mapped'     => false,
                             'disabled'   => true,
-                            'data'       => $user->getUsername(),
+                            'data'       => $me->getUsername(),
                             'required'   => false
                         ));
                         break;
                     case "editPosition":
-                        $overrides['position'] = $user->getPosition();
+                        $overrides['position'] = $me->getPosition();
                         $form->remove("position");
                         $form->add('position_unbound', 'text', array(
                             'label'      => 'mautic.user.user.form.position',
@@ -111,12 +109,12 @@ class ProfileController extends FormController
                             'attr'       => array('class' => 'form-control'),
                             'mapped'     => false,
                             'disabled'   => true,
-                            'data'       => $user->getPosition(),
+                            'data'       => $me->getPosition(),
                             'required'   => false
                         ));
                         break;
                     case "editEmail":
-                        $overrides['email'] = $user->getEmail();
+                        $overrides['email'] = $me->getEmail();
                         $form->remove("email");
                         $form->add('email_unbound', 'text', array(
                             'label'      => 'mautic.user.user.form.email',
@@ -124,7 +122,7 @@ class ProfileController extends FormController
                             'attr'       => array('class' => 'form-control'),
                             'mapped'     => false,
                             'disabled'   => true,
-                            'data'       => $user->getEmail(),
+                            'data'       => $me->getEmail(),
                             'required'   => false
                         ));
                         break;
@@ -151,17 +149,13 @@ class ProfileController extends FormController
             $model     = $this->container->get('mautic.model.user');
             $overrides = array();
             //check to see if the password needs to be rehashed
-            $overrides['password'] = $model->checkNewPassword(
-                $user,
-                $this->request,
-                $this->container
-            );
+            $overrides['password'] = $model->checkNewPassword($me);
 
             $valid = $this->checkFormValidity($form);
 
             if ($valid === 1) {
                 //form is valid so process the data
-                $result = $model->saveEntity($user, false, $overrides);
+                $result = $model->saveEntity($me, false, $overrides);
             }
 
             if (!empty($valid)) { //cancelled or success

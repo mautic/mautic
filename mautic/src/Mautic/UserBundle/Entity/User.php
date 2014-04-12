@@ -195,16 +195,19 @@ class User implements AdvancedUserInterface, \Serializable
      */
     static public function determineValidationGroups(Form $form) {
         $data = $form->getData();
+        $groups = array('User', 'SecondPass');
+
+        //check if creating a new user or editing an existing user and the password has been updated
         if (!$data->getId() || ($data->getId() && $data->getPlainPassword())) {
-            //creating a new user or editing an existing user and the password has been updated
-            $groups = array('User', 'SecondPass', 'CheckPassword');
-        } else {
-            //editing an existing user and the password is empty
-            $groups = array('User', 'SecondPass');
+            $groups[] = 'CheckPassword';
         }
+
+        //require current password if on profile page
         if ($form->has('currentPassword')) {
             $groups[] = 'Profile';
         }
+
+        //check to see if
         return $groups;
     }
 
