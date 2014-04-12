@@ -54,17 +54,22 @@ class UserModel extends FormModel
         return parent::saveEntity($entity, $isNew, $overrides);
     }
 
-
-    public function checkNewPassword(User $entity, Request $request, $container) {
+    /**
+     * Checks for a new password and rehashes if necessary
+     *
+     * @param User $entity
+     * @return int|string
+     */
+    public function checkNewPassword(User $entity) {
         if (!$entity instanceof User) {
             //@TODO add error message
             return 0;
         }
 
-        $submittedPassword = $request->request->get('user[plainPassword][password]', null, true);
+        $submittedPassword = $this->request->request->get('user[plainPassword][password]', null, true);
         if (!empty($submittedPassword)) {
             //hash the clear password submitted via the form
-            $security = $container->get('security.encoder_factory');
+            $security = $this->container->get('security.encoder_factory');
             $encoder  = $security->getEncoder($entity);
             $password = $encoder->encodePassword($submittedPassword, $entity->getSalt());
         } else {

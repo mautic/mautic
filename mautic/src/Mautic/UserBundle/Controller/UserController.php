@@ -131,11 +131,15 @@ class UserController extends FormController
 
         ///Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
+            $model = $this->container->get('mautic.model.user');
+            //check to see if the password needs to be rehashed
+            $overrides             = array();
+            $overrides['password'] = $model->checkNewPassword($user);
             $valid = $this->checkFormValidity($form);
 
             if ($valid === 1) {
                 //form is valid so process the data
-                $result = $this->container->get('mautic.model.user')->saveEntity($user, true);
+                $result = $this->container->get('mautic.model.user')->saveEntity($user, true, $overrides);
             }
 
             if (!empty($valid)) { //cancelled or success
@@ -229,11 +233,7 @@ class UserController extends FormController
             $model = $this->container->get('mautic.model.user');
             //check to see if the password needs to be rehashed
             $overrides             = array();
-            $overrides['password'] = $model->checkNewPassword(
-                $user,
-                $this->request,
-                $this->container
-            );
+            $overrides['password'] = $model->checkNewPassword($user);
             $valid = $this->checkFormValidity($form);
 
             if ($valid === 1) {
