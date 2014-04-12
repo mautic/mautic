@@ -113,16 +113,6 @@ $items = array(
         'display'  => false, //only used for breadcrumb generation
         'extras'  => array(
             'routeName' => 'mautic_user_account'
-        ),
-        'children' => array(
-            'mautic.user.user.menu.profile' => array(
-                'route'    => 'mautic_user_profile',
-                'routeParameters' => array("objectAction"  => "new"),
-                'extras'  => array(
-                    'routeName' => 'mautic_user_action|new'
-                ),
-                'display' => false //only used for breadcrumb generation
-            )
         )
     )
 );

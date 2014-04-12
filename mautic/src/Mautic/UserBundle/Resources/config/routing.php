@@ -24,9 +24,9 @@ $collection->add('mautic_user_logout', new Route('/logout', array()));
 $collection->add('mautic_user_index', new Route('/users/{page}',
     array(
         '_controller' => 'MauticUserBundle:User:index',
-        'page'        => 1
+        'page'        => 1,
     ), array(
-        'page' => '\d+',
+        'page'    => '\d+'
     )
 ));
 
@@ -43,7 +43,7 @@ $collection->add('mautic_role_index', new Route('/roles/{page}',
         '_controller' => 'MauticUserBundle:Role:index',
         'page'        => 1
     ), array(
-        'page' => '\d+',
+        'page'    => '\d+'
     )
 ));
 
@@ -58,12 +58,6 @@ $collection->add('mautic_role_action', new Route('/roles/{objectAction}/{objectI
 $collection->add('mautic_user_account', new Route('/account',
     array(
         '_controller' => 'MauticUserBundle:Profile:index'
-    )
-));
-
-$collection->add('mautic_user_profile', new Route('/account/profile',
-    array(
-        '_controller' => 'MauticUserBundle:Profile:profile'
     )
 ));
 
