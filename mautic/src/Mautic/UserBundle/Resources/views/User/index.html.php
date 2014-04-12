@@ -35,7 +35,7 @@ $view["slots"]->set("filterInput",
 ?>
 
 <div class="table-responsive body-white padding-sm">
-    <table class="table table-hover table-striped table-bordered">
+    <table class="table table-hover table-striped table-bordered user-list">
         <thead>
             <tr>
                 <th class="visible-md visible-lg"></th>

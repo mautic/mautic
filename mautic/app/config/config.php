@@ -9,7 +9,6 @@ $mauticbundles = array_filter(
 $container->setParameter("mautic.bundles", $mauticbundles);
 
 $loader->import("parameters.php");
-$loader->import("security.php");
 
 $container->loadFromExtension("framework", array(
     "secret"               => "%mautic.secret%",

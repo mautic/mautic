@@ -28,7 +28,9 @@ $view['slots']->set("jsDeclarations", "Mautic.ajaxifyForms(['user']);\n");
                 <div class="panel-heading">
                     <?php echo $view['translator']->trans('mautic.user.account.header.details'); ?>
                     <div class="pull-right">
-                        <button type="submit" class="btn btn-success btn-xs"
+                        <button type="submit"
+                                id ="btn-save-profile"
+                                class="btn btn-success btn-xs"
                                 data-toggle="tooltip"
                                 data-container="body"
                                 data-placement="top"

@@ -15,6 +15,7 @@ $view["slots"]->set("headerTitle", $view['translator']->trans('mautic.user.role.
 <?php if ($permissions['create']): ?>
     <?php $view["slots"]->start("actions"); ?>
     <li><a href="javacript: void(0);"
+           class="new-entity-action"
            onclick="return Mautic.loadContent('<?php echo $this->container->get('router')->generate(
                'mautic_role_action', array("objectAction" => "new")); ?>', '#mautic_role_index'); ">
             <?php echo $view["translator"]->trans("mautic.user.role.menu.new"); ?>
@@ -36,7 +37,7 @@ $view["slots"]->set("filterInput",
 ?>
 
 <div class="table-responsive body-white padding-sm">
-    <table class="table table-hover table-striped table-bordered">
+    <table class="table table-hover table-striped table-bordered role-list">
         <thead>
             <tr>
                 <?php

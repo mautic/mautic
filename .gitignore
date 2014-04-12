@@ -6,6 +6,7 @@
 /mautic/app/logs/*
 /mautic/app/config/local.php
 /mautic/app/Resources/SensioGeneratorBundle
+/mautic/app/phpunit.xml
 /mautic/web
 /mautic/vendor/*
 /mautic/bin/*
