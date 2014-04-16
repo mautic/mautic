@@ -144,6 +144,11 @@ class CommonPermissions {
             throw new DummyException("Permission " . $this->getName() . ":$name:$level was not found.");
         }
 
+        if (!isset($userPermission[$name])) {
+            //the user doesn't have implicit access
+            return 0;
+        }
+
         //test to see if the user has full permissions first
         if ($this->permissions[$name]['full'] & $userPermissions[$name]) {
             return 1;
