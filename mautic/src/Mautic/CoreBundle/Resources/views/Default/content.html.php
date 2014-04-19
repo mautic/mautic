@@ -27,7 +27,7 @@ endif;
             <div class="input-group-btn">
                 <?php if ($view["slots"]->has("filterInput")): ?>
                 <button class="btn btn-default btn-search"
-                        onclick="Mautic.filterList(event, '<?php echo $app->getRequest()->getUri(); ?>');"
+                        onclick="Mautic.filterList(event, '<?php $view['slots']->output('filterUri'); ?>');"
                         onmouseover="Mautic.showFilterInput();"
                         onmouseout="Mautic.hideFilterInput()">
                     <i class="fa fa-search fa-fw"></i>
@@ -44,7 +44,7 @@ endif;
             </div>
             <?php elseif ($view["slots"]->has("filterInput")): ?>
             <button class="btn btn-default btn-search"
-                    onclick="Mautic.filterList(event, '<?php echo $app->getRequest()->getUri(); ?>');">
+                    onclick="Mautic.filterList(event, '<?php $view['slots']->output('filterUri'); ?>');">
                 <i class="fa fa-search fa-fw"></i>
             </button>
             <?php endif; ?>

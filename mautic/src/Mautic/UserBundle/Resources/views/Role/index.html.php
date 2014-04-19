@@ -25,6 +25,7 @@ $view["slots"]->set("headerTitle", $view['translator']->trans('mautic.user.role.
 <?php endif; ?>
 
 <?php
+$view['slots']->set('filterUri', $this->container->get('router')->generate('mautic_role_index'));
 $view["slots"]->set("filterInput",
     $view->render('MauticCoreBundle:Form:filter.html.php',
         array(

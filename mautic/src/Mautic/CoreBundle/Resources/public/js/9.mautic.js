@@ -418,6 +418,7 @@ var Mautic = {
      */
     filterList: function(e,  route) {
         if ($('#list-filter').length && (e.keyCode == 13 || e.which == 13 || $(e.target).hasClass('fa-search'))){
+            e.preventDefault();
             $("body").addClass("loading-content");
             $.ajax({
                 url: route,
