@@ -9,6 +9,8 @@
 
 namespace Mautic\CoreBundle\Controller;
 
+use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+
 /**
  * Interface EventsController
  * A dummy interface to ensure that only Mautic bundles are affected by Mautic defined events
@@ -18,5 +20,5 @@ namespace Mautic\CoreBundle\Controller;
 
 interface EventsController
 {
-    // ...
+    public function initialize(FilterControllerEvent $event);
 }

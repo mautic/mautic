@@ -13,6 +13,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
  * Class CommonController
@@ -30,6 +31,10 @@ class CommonController extends Controller implements EventsController {
      */
     public function setRequest(Request $request) {
         $this->request = $request;
+    }
+
+    public function initialize(FilterControllerEvent $event) {
+        //..
     }
 
     /**
@@ -202,7 +207,7 @@ class CommonController extends Controller implements EventsController {
             ),
             'flashes'         => array(array(
                 'type' => 'error',
-                'msg'  => 'mautic.user.core.error.accessdenied'
+                'msg'  => 'mautic.core.error.accessdenied'
             ))
         ));
     }

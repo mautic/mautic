@@ -12,6 +12,8 @@ namespace Mautic\CoreBundle\Model;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManager;
+use Symfony\Component\HttpKernel\NotFoundHttpException;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * Class FormModel
@@ -20,10 +22,31 @@ use Doctrine\ORM\EntityManager;
  */
 class FormModel
 {
-
+    /**
+     * @var \Symfony\Component\DependencyInjection\Container
+     */
     protected $container;
+
+    /**
+     * @var null|\Symfony\Component\HttpFoundation\Request
+     */
     protected $request;
+
+    /**
+     * @var \Doctrine\ORM\EntityManager
+     */
     protected $em;
+
+    /**
+     * @var string
+     */
+    protected $repository;
+
+    /**
+     * @var string
+     */
+    protected $permissionBase;
+
 
     /**
      * @param Container     $container
@@ -35,23 +58,73 @@ class FormModel
         $this->container = $container;
         $this->request   = $request_stack->getCurrentRequest();
         $this->em        = $em;
+
+        $this->init();
+    }
+
+    /**
+     * Used by child model classes to load required variables, etc
+     */
+    protected function init() { }
+
+    /**
+     * Set the repository required for the model
+     *
+     * @param $repository
+     */
+    public function setRepository($repository)
+    {
+        $this->repository = $repository;
+    }
+
+    /**
+     * Set the permission base (i.e. user:users) used for the model
+     *
+     * @param $permBase
+     */
+    public function setPermissionBase($permBase)
+    {
+        $this->permissionBase = $permBase;
+    }
+
+    /**
+     * Get a specific entity
+     *
+     * @param $id
+     * @return null|object
+     */
+    public function getEntity($id = '')
+    {
+        return $this->em->getRepository($this->repository)->find($id);
+    }
+
+    /**
+     * Return list of entities
+     *
+     * @param array $args [start, limit, filter, orderBy, orderByDir]
+     * @return mixed
+     */
+    public function getEntities(array $args = array())
+    {
+        return $this->em
+            ->getRepository($this->repository)
+            ->getEntities($args);
     }
 
     /**
      * Create/edit entity
      *
      * @param       $entity
-     * @param bool  $isNew
      * @param array $overrides
-     * @return int
+     * @return mixed
+     * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
      */
-    public function saveEntity($entity, $isNew = false, $overrides = array())
+    public function saveEntity($entity, $overrides = array())
     {
         //@TODO add catch to determine editown or editother
-        $permissionNeeded = ($isNew) ? "create" : "editother";
+        $permissionNeeded = ($entity->getId()) ? "create" : "editother";
         if (!$this->container->get('mautic.security')->isGranted($this->permissionBase . ':' . $permissionNeeded)) {
-            //@TODO add error message
-            return 0;
+            throw new AccessDeniedException($this->container->get('translator')->trans('mautic.core.accessdenied'));
         }
 
         if (!empty($overrides)) {
@@ -71,7 +144,7 @@ class FormModel
         }
 
         //set the date/time for new submission
-        if (method_exists($entity, 'setDateAdded')) {
+        if (method_exists($entity, 'setDateAdded') && !$entity->getDateAdded()) {
             $entity->setDateAdded(new \DateTime());
         }
 
@@ -81,23 +154,32 @@ class FormModel
     /**
      * Delete an entity
      *
-     * @param $entityId
-     * @return int|null|object
+     * @param      $entityId
+     * @param bool $skipSecurity
+     * @return null|object
+     * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
      */
     public function deleteEntity($entityId, $skipSecurity = false)
     {
         //@TODO add catch to determine deleteown or deleteother
         if (!$skipSecurity && !$this->container->get('mautic.security')->isGranted($this->permissionBase . ':deleteother')) {
-            //@TODO add error message
-            return 0;
+            throw new AccessDeniedException($this->container->get('translator')->trans('mautic.core.accessdenied'));
         }
 
-        try {
-            $entity = $this->em->getRepository($this->repository)->find($entityId);
-            return ($this->em->getRepository($this->repository)->deleteEntity($entity)) ? $entity : 0;
-        } catch (\Exception $e) {
-            //@TODO return error message
-            return 0;
-        }
+        $entity = $this->em->getRepository($this->repository)->find($entityId);
+        return $this->em->getRepository($this->repository)->deleteEntity($entity);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param      $entity
+     * @param null $action
+     * @return mixed
+     * @throws \Symfony\Component\HttpKernel\NotFoundHttpException
+     */
+    public function createForm($entity, $action = null)
+    {
+        throw new NotFoundHttpException('Form object not found.');
     }
 }
