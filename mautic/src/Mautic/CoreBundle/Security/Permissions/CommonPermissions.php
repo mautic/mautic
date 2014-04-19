@@ -12,6 +12,7 @@ namespace Mautic\CoreBundle\Security\Permissions;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\DependencyInjection\Container;
 use Doctrine\ORM\EntityManager;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Class UserPermissions
@@ -48,6 +49,8 @@ class CommonPermissions {
      */
     public function isSupported($name, $level = '')
     {
+        list($name, $level) = $this->getSynonym($name, $level);
+
         if (empty($level)) {
             //verify permission name only
             return isset($this->permissions[$name]);
@@ -55,7 +58,6 @@ class CommonPermissions {
             //verify permission name and level as well
             return isset($this->permissions[$name][$level]);
         }
-
     }
 
     /**
@@ -139,10 +141,28 @@ class CommonPermissions {
         return $permissionLevels[$bundle];
     }
 
+    /**
+     * Allows the bundle permission class to utilize synonyms for permissions
+     *
+     * @param $name
+     * @param $level
+     * @return array
+     */
+    protected function getSynonym($name, $level) {
+        return array($name, $level);
+    }
+
+    /**
+     * Determines if the user has access to the specified permission
+     *
+     * @param $userPermissions
+     * @param $name
+     * @param $level
+     * @return int
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
     public function isGranted($userPermissions, $name, $level) {
-        if (!$this->isSupported($name, $level)) {
-            throw new DummyException("Permission " . $this->getName() . ":$name:$level was not found.");
-        }
+        list($name, $level) = $this->getSynonym($name, $level);
 
         if (!isset($userPermission[$name])) {
             //the user doesn't have implicit access

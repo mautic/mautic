@@ -11,11 +11,10 @@ namespace Mautic\CoreBundle\Security\Permissions;
 
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Doctrine\ORM\EntityManager;
 use Mautic\UserBundle\Entity\Permission;
 
-//@TODO create new exception
-use Symfony\Component\Debug\Exception\DummyException;
 /**
  * Class CorePermissions
  *
@@ -97,7 +96,7 @@ class CorePermissions {
 
             return $classes[$bundle];
         } else {
-            throw new DummyException("Bundle and permission type must be specified.");
+            throw new NotFoundHttpException("Bundle and permission type must be specified.");
         }
     }
 
@@ -127,7 +126,7 @@ class CorePermissions {
                 if ($supports = $class->isSupported($name, $perm)) {
                     $bit += $class->getValue($name, $perm);
                 } else {
-                    throw new DummyException("$perm does not exist for $bundle:$name");
+                    throw new NotFoundHttpException("$perm does not exist for $bundle:$name");
                 }
             }
             $entity->setBitwise($bit);
@@ -139,25 +138,46 @@ class CorePermissions {
     /**
      * Determines if the user has permission to access the given area
      *
-     * @param $bundle
-     * @param $name
-     * @param $level
+     * @param      $requestedPermission
+     * @param null $userEntity
+     * @return int
+     * @throws \Symfony\Component\Debug\Exception\NotFoundHttpException
      */
-    public function isGranted ($requestedPermission) {
-        $currentUser = $this->container->get('security.context')->getToken()->getUser();
-        if ($currentUser->getRole()->isAdmin()) {
+    public function isGranted ($requestedPermission, $userEntity = null)
+    {
+        if ($this->container->get('security.context')->getToken() === null) {
+            throw new NotFoundHttpException('No security context found.');
+        }
+
+        if ($userEntity === null) {
+           $userEntity = $this->container->get('security.context')->getToken()->getUser();
+        }
+
+        if ($userEntity->getRole()->isAdmin()) {
             //admin user has access to everything
             return 1;
         }
 
         $parts = explode(':', $requestedPermission);
         if (count($parts) != 3) {
-            throw new DummyException("Permission must be in the format of bundle:permission:level (i.e. user:roles:view). $requestedPermission given.");
+            throw new NotFoundHttpException($this->container->get('translator')->trans('mautic.core.permissions.notfound',
+                array("requested" => $requestedPermission))
+            );
         }
-        $activePermissions = $currentUser->getActivePermissions();
+        $activePermissions = $userEntity->getActivePermissions();
 
         //ensure consistency by forcing lowercase
         array_walk($parts, function(&$v) { $v = strtolower($v); });
+
+        //check against bundle permissions class
+        $permissionObject = $this->getPermissionObject($parts[0]);
+
+        //Is the permission supported?
+        if (!$permissionObject->isSupported($parts[1], $parts[2])) {
+            throw new NotFoundHttpException($this->container->get('translator')->trans('mautic.core.permissions.notfound',
+                array("requested" => $requestedPermission))
+            );
+        }
 
         //check to see if the user has implicit access to bundle
         if (!isset($activePermissions[$parts[0]])) {
@@ -165,8 +185,6 @@ class CorePermissions {
             return 0;
         }
 
-        //check against bundle permissions class
-        $permissionObject = $this->getPermissionObject($parts[0]);
         return $permissionObject->isGranted($activePermissions[$parts[0]], $parts[1], $parts[2]);
     }
 }

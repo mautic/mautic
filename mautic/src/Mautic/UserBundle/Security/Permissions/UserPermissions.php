@@ -130,4 +130,25 @@ class UserPermissions extends CommonPermissions
             'data'       => (!empty($data['profile']) ? $data['profile'] : array())
         ));
     }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param $name
+     * @param $level
+     * @return array
+     */
+    protected function getSynonym($name, $level) {
+        //set some synonyms
+        switch ($level) {
+            case "edit":
+                $level = "editother";
+                break;
+            case "delete":
+                $level = "deleteother";
+                break;
+        }
+
+        return array($name, $level);
+    }
 }
