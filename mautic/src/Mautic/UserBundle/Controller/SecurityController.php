@@ -10,8 +10,12 @@
 namespace Mautic\UserBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Component\Security\Core\Exception as Exception;
+use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\Security\Core\SecurityContextInterface;
+
 /**
  * Class DefaultController
  *
@@ -21,11 +25,31 @@ class SecurityController extends CommonController
 {
 
     /**
+     * @param FilterControllerEvent    $event
+     */
+    public function initialize(FilterControllerEvent $event)
+    {
+
+        $securityContext = $this->get('security.context');
+
+        //redirect user if they are already authenticated
+        if ($securityContext->isGranted('IS_AUTHENTICATED_FULLY') ||
+            $securityContext->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+
+            $redirectUrl = $this->generateUrl('mautic_core_index');
+            $event->setController(function() use ($redirectUrl) {
+                return new RedirectResponse($redirectUrl);
+            });
+        }
+    }
+
+    /**
      * Generates login form and processes login
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function loginAction() {
+
         $session = $this->request->getSession();
 
         // get the login error if there is one

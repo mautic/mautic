@@ -10,6 +10,7 @@
 namespace Mautic\UserBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\Criteria;
 use FOS\OAuthServerBundle\Model\ClientInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -19,6 +20,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Security\Core\User\AdvancedUserInterface;
+use JMS\Serializer\Annotation as Serializer;
 
 /**
  * Class User
@@ -26,6 +28,8 @@ use Symfony\Component\Security\Core\User\AdvancedUserInterface;
  * @package Mautic\UserBundle\Entity
  * @ORM\Table(name="users")
  * @ORM\Entity(repositoryClass="Mautic\UserBundle\Entity\UserRepository")
+ * @ORM\HasLifecycleCallbacks
+ * @Serializer\ExclusionPolicy("all")
  */
 class User implements AdvancedUserInterface, \Serializable
 {
@@ -33,11 +37,15 @@ class User implements AdvancedUserInterface, \Serializable
      * @ORM\Column(type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
      */
     protected $id;
 
     /**
      * @ORM\Column(type="string", length=25, unique=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
      */
     protected $username;
 
@@ -60,48 +68,64 @@ class User implements AdvancedUserInterface, \Serializable
 
     /**
      * @ORM\Column(type="string", length=50)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
      */
     protected $firstName;
 
     /**
      * @ORM\Column(type="string", length=50)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
      */
     protected $lastName;
 
     /**
      * @ORM\Column(type="string", length=60, unique=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
      */
     protected $email;
 
     /**
-     * @ORM\Column(type="string", length=60)
+     * @ORM\Column(type="string", length=60, nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
      */
     protected $position;
 
     /**
      * @ORM\ManyToOne(targetEntity="Role", inversedBy="users")
      * @ORM\JoinColumn(name="role_id", referencedColumnName="id")
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
      */
     protected $role;
 
     /**
-     * @ORM\OneToMany(targetEntity="Mautic\ApiBundle\Entity\Client", mappedBy="user", cascade={"persist", "remove"}, orphanRemoval=true)
+     * @ORM\ManyToMany(targetEntity="Mautic\ApiBundle\Entity\Client", mappedBy="user")
      */
     protected $clients;
 
     /**
      * @ORM\Column(name="is_active", type="boolean")
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
      */
     protected $isActive;
 
     /**
      * @ORM\Column(name="date_added", type="datetime")
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
      */
     protected $dateAdded;
 
     /**
      * Stores active role permissions
      * @var
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
      */
     protected $activePermissions;
 
@@ -257,12 +281,17 @@ class User implements AdvancedUserInterface, \Serializable
     }
 
     /**
-     * Not used but required by interface
-     * @return array|\Symfony\Component\Security\Core\Role\Role[]
+     * Determines user role for symfony authentication
+     *
+     * @return array
      */
     public function getRoles()
     {
-        return array();
+        $roles = array(
+            "ROLE_API",
+            (($this->getRole()->isAdmin()) ? "ROLE_ADMIN" : "ROLE_USER")
+        );
+        return $roles;
     }
 
     public function eraseCredentials()
@@ -566,12 +595,12 @@ class User implements AdvancedUserInterface, \Serializable
     /**
      * Add clients
      *
-     * @param \Mautic\ApiBundle\Entity\Client $clients
+     * @param \Mautic\ApiBundle\Entity\Client $client
      * @return User
      */
-    public function addClient(\Mautic\ApiBundle\Entity\Client $clients)
+    public function addClient(\Mautic\ApiBundle\Entity\Client $client)
     {
-        $this->clients[] = $clients;
+        $this->clients[] = $client;
 
         return $this;
     }
@@ -579,11 +608,11 @@ class User implements AdvancedUserInterface, \Serializable
     /**
      * Remove clients
      *
-     * @param \Mautic\ApiBundle\Entity\Client $clients
+     * @param \Mautic\ApiBundle\Entity\Client $client
      */
-    public function removeClient(\Mautic\ApiBundle\Entity\Client $clients)
+    public function removeClient(\Mautic\ApiBundle\Entity\Client $client)
     {
-        $this->clients->removeElement($clients);
+        $this->clients->removeElement($client);
     }
 
     /**
@@ -627,6 +656,19 @@ class User implements AdvancedUserInterface, \Serializable
      */
     public function isAuthorizedClient(ClientInterface $client)
     {
-        return ($client->getUser()->getId() === $this->id);
+        //user has already given authentication if the user is associated with the client
+        return $client->getUser()->contains($this);
+    }
+
+    /**
+     * Sets the Date/Time for new entities
+     *
+     * @ORM\PrePersist
+     */
+    public function onPrePersistSetDateAdded()
+    {
+        if (!$this->getId()) {
+            $this->setDateAdded(new \DateTime());
+        }
     }
 }

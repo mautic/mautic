@@ -38,12 +38,13 @@ class UserRepository extends CommonRepository
     }
 
     /**
-     * Retrieve a list of users
+     * Get a list of users
      *
      * @param array $args [start, limit, filter, orderBy, orderByDir]
      * @return Paginator
      */
-    public function getUsers($args = array()) {
+    public function getEntities($args = array())
+    {
         $start      = array_key_exists('start', $args) ? $args['start'] : 0;
         $limit      = array_key_exists('limit', $args) ? $args['limit'] : 30;
         $filter     = array_key_exists('filter', $args) ? $args['filter'] : '';
@@ -54,9 +55,12 @@ class UserRepository extends CommonRepository
             ->createQueryBuilder('u')
             ->select('u, r')
             ->leftJoin('u.role', 'r')
-            ->orderBy($orderBy, $orderByDir)
             ->setFirstResult($start)
             ->setMaxResults($limit);
+
+        if (!empty($orderBy)) {
+            $q->orderBy($orderBy, $orderByDir);
+        }
 
         if (!empty($filter)) {
             $q->where('u.username LIKE :filter')

@@ -106,7 +106,7 @@ class UserType extends AbstractType
             },
         ));
 
-        $existing = $options['data']->getId();
+        $existing = (!empty($options['data']) && $options['data']->getId());
         $placeholder = ($existing) ?
             $this->container->get('translator')->trans('mautic.user.user.form.passwordplaceholder') : '';
         $required = ($existing) ? false : true;

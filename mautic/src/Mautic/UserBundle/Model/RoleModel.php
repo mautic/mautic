@@ -11,6 +11,9 @@ namespace Mautic\UserBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\UserBundle\Entity\Role;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+
 
 /**
  * Class RoleModel
@@ -19,34 +22,34 @@ use Mautic\UserBundle\Entity\Role;
  */
 class RoleModel extends FormModel
 {
-    /**
-     * @var string
-     */
-    protected $repository     = 'MauticUserBundle:Role';
 
     /**
-     * @var string
+     * {@inheritdoc}
      */
-    protected $permissionBase = 'user:roles';
+    protected function init()
+    {
+        $this->repository     = 'MauticUserBundle:Role';
+        $this->permissionBase = 'user:roles';
+    }
 
     /**
      * {@inheritdoc}
      *
-     * @param Role  $entity
-     * @param bool  $isNew
+     * @param       $entity
      * @param array $overrides
+     * @return int
+     * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function saveEntity($entity, $isNew = false, $overrides = array())
+    public function saveEntity($entity, $overrides = array())
     {
         if (!$entity instanceof Role) {
-            //@TODO add error message
-            return 0;
+            throw new NotFoundHttpException('Entity must be of class Role()');
         }
-
+        $isNew            = ($entity->getId()) ? 0 : 1;
         $permissionNeeded = ($isNew) ? "create" : "editother";
         if (!$this->container->get('mautic.security')->isGranted('user:roles:'. $permissionNeeded)) {
-            //@TODO add error message
-            return 0;
+            throw new AccessDeniedException($this->container->get('translator')->trans('mautic.core.accessdenied'));
         }
 
         if (!$isNew) {
@@ -65,6 +68,40 @@ class RoleModel extends FormModel
             $entity->addPermission($permissionEntity);
         }
 
-        return parent::saveEntity($entity, $isNew, $overrides);
+        return parent::saveEntity($entity, $overrides);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param      $entity
+     * @param null $action
+     * @return mixed
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    public function createForm($entity, $action = null)
+    {
+        if (!$entity instanceof Role) {
+            throw new NotFoundHttpException('Entity must be of class Role()');
+        }
+
+        $params = (!empty($action)) ? array('action' => $action) : array();
+        return $this->container->get('form.factory')->create('role', $entity, $params);
+    }
+
+
+    /**
+     * Get a specific entity or generate a new one if id is empty
+     *
+     * @param $id
+     * @return null|object
+     */
+    public function getEntity($id = '')
+    {
+        if (empty($id)) {
+            return new Role();
+        }
+
+        return parent::getEntity($id);
     }
 }

@@ -47,9 +47,8 @@ class RoleController extends FormController
         $filter     = $this->request->request->get('filter-role', $this->get('session')->get('mautic.role.filter', ''));
         $this->get('session')->set('mautic.role.filter', $filter);
 
-        $items = $this->getDoctrine()
-            ->getRepository('MauticUserBundle:Role')
-            ->getRoles(array(
+        $items = $this->container->get('mautic.model.role')->getEntities(
+            array(
                 'start'      => $start,
                 'limit'      => $limit,
                 'filter'     => $filter,
@@ -120,16 +119,15 @@ class RoleController extends FormController
         }
 
         //retrieve the entity
-        $entity      = new Entity\Role();
-
-        //set action URL
-        $action     = $this->generateUrl('mautic_role_action', array('objectAction' => 'new'));
+        $entity     = new Entity\Role();
+        $model      = $this->container->get('mautic.model.role');
         //set the return URL for post actions
         $returnUrl  = $this->generateUrl('mautic_role_index');
         //set the page we came from
         $page       = $this->get('session')->get('mautic.role.page', 1);
+        $action     = $this->generateUrl('mautic_role_action', array('objectAction' => 'new'));
         //get the user form factory
-        $form       = $this->get('form.factory')->create('role', $entity, array('action' => $action));
+        $form       = $model->createForm($entity, $action);
 
         ///Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
@@ -137,7 +135,7 @@ class RoleController extends FormController
 
             if ($valid === 1) {
                 //form is valid so process the data
-                $result = $this->container->get('mautic.model.role')->saveEntity($entity, true);
+                $model->saveEntity($entity);
             }
 
             if (!empty($valid)) { //cancelled or success
@@ -150,7 +148,7 @@ class RoleController extends FormController
                         'route'         => $returnUrl
                     ),
                     'flashes'         =>
-                        (!empty($result) && $result === 1) ? array( //success
+                        ($valid === 1) ? array(
                             array(
                                 'type'    => 'notice',
                                 'msg'     => 'mautic.user.role.notice.created',
@@ -168,7 +166,7 @@ class RoleController extends FormController
                 'passthroughVars' => array(
                     'ajaxForms'  => array('role'),
                     'activeLink' => '#mautic_role_new',
-                    'route'      => $action
+                    'route'      => $this->generateUrl('mautic_role_action', array('objectAction' => 'new'))
                 )
             ));
         } else {
@@ -191,8 +189,8 @@ class RoleController extends FormController
             return $this->accessDenied();
         }
 
-        $em      = $this->getDoctrine()->getManager();
-        $entity  = $em->getRepository('MauticUserBundle:Role')->find($objectId);
+        $model   = $this->container->get('mautic.model.role');
+        $entity  = $model->getEntity($objectId);
 
         //set the page we came from
         $page    = $this->get('session')->get('mautic.role.page', 1);
@@ -200,7 +198,7 @@ class RoleController extends FormController
         $returnUrl  = $this->generateUrl('mautic_role_index', array('page' => $page));
 
         //user not found
-        if (empty($entity)) {
+        if ($entity === null) {
             return $this->postActionRedirect(array(
                 'returnUrl'       => $returnUrl,
                 'viewParameters'  => array('page' => $page),
@@ -218,13 +216,8 @@ class RoleController extends FormController
                 )
             ));
         }
-
-        //set action URL
-        $action     = $this->generateUrl('mautic_role_action',
-            array('objectAction' => 'edit', 'objectId' => $objectId)
-        );
-
-        $form       = $this->get('form.factory')->create('role', $entity, array('action' => $action));
+        $action = $this->generateUrl('mautic_role_action', array('objectAction' => 'edit', 'objectId' => $objectId));
+        $form   = $model->createForm($entity, $action);
 
         ///Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
@@ -232,7 +225,7 @@ class RoleController extends FormController
 
             if ($valid === 1) {
                 //form is valid so process the data
-                $result = $this->container->get('mautic.model.role')->saveEntity($entity);
+                $model->saveEntity($entity);
             }
 
             if (!empty($valid)) { //cancelled or success
@@ -245,7 +238,7 @@ class RoleController extends FormController
                         'route'         => $returnUrl
                     ),
                     'flashes'         =>
-                        (!empty($result) && $result === 1) ? array( //success
+                        ($valid === 1) ? array( //success
                             array(
                                 'type'    => 'notice',
                                 'msg'     => 'mautic.user.role.notice.updated',
@@ -292,15 +285,15 @@ class RoleController extends FormController
         $flashes     = array();
         if ($this->request->getMethod() == 'POST') {
             $result = $this->container->get('mautic.model.role')->deleteEntity($objectId);
-            $name   = $result->getName();
 
-            if (!$result) {
+            if ($result === null) {
                 $flashes[] = array(
                     'type' => 'error',
                     'msg'  => 'mautic.user.role.error.notfound',
                     'msgVars' => array('%id%' => $objectId)
                 );
             } else {
+                $name = $result->getName();
                 $flashes[] = array(
                     'type' => 'notice',
                     'msg'  => 'mautic.user.role.notice.deleted',

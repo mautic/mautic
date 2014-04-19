@@ -12,40 +12,52 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Security\Core\Role\RoleInterface;
 use Doctrine\Common\Collections\ArrayCollection;
+use JMS\Serializer\Annotation as Serializer;
 
 /**
  * Class Role
  * @ORM\Table(name="roles")
  * @ORM\Entity(repositoryClass="Mautic\UserBundle\Entity\RoleRepository")
+ * @ORM\HasLifecycleCallbacks
+ * @Serializer\ExclusionPolicy("all")
  */
-class Role implements RoleInterface
+class Role
 {
     /**
      * @ORM\Column(type="integer")
      * @ORM\Id()
      * @ORM\GeneratedValue(strategy="AUTO")
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
      */
     protected $id;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
      */
     protected $name;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
      */
     protected $description;
 
     /**
      * @ORM\Column(name="is_admin", type="boolean")
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
      */
     protected $isAdmin = false;
 
     /**
      * @ORM\Column(name="date_added", type="datetime")
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
      */
     protected $dateAdded;
 
@@ -80,14 +92,6 @@ class Role implements RoleInterface
      */
     public function cleanData($value) {
         return trim(strip_tags($value));
-    }
-
-    /**
-     * @see RoleInterface
-     */
-    public function getRole()
-    {
-        return $this->role;
     }
 
     /**
@@ -265,5 +269,17 @@ class Role implements RoleInterface
      */
     public function isAdmin() {
         return $this->getIsAdmin();
+    }
+
+    /**
+     * Sets the Date/Time for new entities
+     *
+     * @ORM\PrePersist
+     */
+    public function onPrePersistSetDateAdded()
+    {
+        if (!$this->getId()) {
+            $this->setDateAdded(new \DateTime());
+        }
     }
 }

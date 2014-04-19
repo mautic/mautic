@@ -26,8 +26,8 @@ class RoleRepository extends CommonRepository
      * @param array $args [start, limit, filter, orderBy, orderByDir]
      * @return Paginator
      */
-    public function getRoles($args = array()) {
-
+    public function getEntities($args = array())
+    {
         $start      = array_key_exists('start', $args) ? $args['start'] : 0;
         $limit      = array_key_exists('limit', $args) ? $args['limit'] : 30;
         $filter     = array_key_exists('filter', $args) ? $args['filter'] : '';
@@ -36,9 +36,12 @@ class RoleRepository extends CommonRepository
 
         $q = $this
             ->createQueryBuilder('r')
-            ->orderBy($orderBy, $orderByDir)
             ->setFirstResult($start)
             ->setMaxResults($limit);
+
+        if (!empty($orderBy)) {
+            $q->orderBy($orderBy, $orderByDir);
+        }
 
         if (!empty($filter)) {
             $q->where('r.name LIKE :filter')

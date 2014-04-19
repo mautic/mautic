@@ -13,7 +13,6 @@ namespace Mautic\UserBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Mautic\CoreBundle\Controller\FormController;
-use Mautic\UserBundle\Entity as Entity;
 use Mautic\UserBundle\Form\Type as FormType;
 
 /**
@@ -46,9 +45,8 @@ class UserController extends FormController
         $filter     = $this->request->request->get('filter-user', $this->get('session')->get('mautic.user.filter', ''));
         $this->get('session')->set('mautic.user.filter', $filter);
 
-        $users = $this->getDoctrine()
-            ->getRepository('MauticUserBundle:User')
-            ->getUsers(array(
+        $users = $this->container->get('mautic.model.user')->getEntities(
+            array(
                 'start'      => $start,
                 'limit'      => $limit,
                 'filter'     => $filter,
@@ -117,33 +115,33 @@ class UserController extends FormController
         if (!$this->get('mautic.security')->isGranted('user:users:create')) {
             return $this->accessDenied();
         }
+        $model      = $this->container->get('mautic.model.user');
 
         //retrieve the user entity
-        $user       = new Entity\User();
-        //set action URL
-        $action     = $this->generateUrl('mautic_user_action', array('objectAction' => 'new'));
+        $user       = $model->getEntity();
         //set the return URL for post actions
         $returnUrl  = $this->generateUrl('mautic_user_index');
         //set the page we came from
         $page       = $this->get('session')->get('mautic.user.page', 1);
+
         //get the user form factory
-        $form       = $this->get('form.factory')->create('user', $user, array('action' => $action));
+        $action     = $this->generateUrl('mautic_user_action', array('objectAction' => 'new'));
+        $form       = $model->createForm($user, $action);
 
         ///Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
-            $model = $this->container->get('mautic.model.user');
             //check to see if the password needs to be rehashed
             $overrides             = array();
-            $overrides['password'] = $model->checkNewPassword($user);
+            $submittedPassword     = $this->request->request->get('user[plainPassword][password]', null, true);
+            $overrides['password'] = $model->checkNewPassword($user, $submittedPassword);
             $valid = $this->checkFormValidity($form);
 
             if ($valid === 1) {
                 //form is valid so process the data
-                $result = $this->container->get('mautic.model.user')->saveEntity($user, true, $overrides);
+                $this->container->get('mautic.model.user')->saveEntity($user, $overrides);
             }
 
             if (!empty($valid)) { //cancelled or success
-
                 return $this->postActionRedirect(array(
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => array('page' => $page),
@@ -153,7 +151,7 @@ class UserController extends FormController
                         'route'         => $returnUrl,
                     ),
                     'flashes'         =>
-                        (!empty($result) && $result === 1) ? array( //success
+                        ($valid === 1) ? array(
                             array(
                                 'type' => 'notice',
                                 'msg'  => 'mautic.user.user.notice.created',
@@ -193,16 +191,15 @@ class UserController extends FormController
         if (!$this->get('mautic.security')->isGranted('user:users:editother')) {
             return $this->accessDenied();
         }
-
-        $em      = $this->getDoctrine()->getManager();
-        $user    = $em->getRepository('MauticUserBundle:User')->find($objectId);
+        $model   = $this->container->get('mautic.model.user');
+        $user    = $model->getEntity($objectId);
         //set the page we came from
         $page    = $this->get('session')->get('mautic.user.page', 1);
         //set the return URL
         $returnUrl  = $this->generateUrl('mautic_user_index', array('page' => $page));
 
         //user not found
-        if (empty($user)) {
+        if ($user === null) {
             return $this->postActionRedirect(array(
                 'returnUrl'       => $returnUrl,
                 'viewParameters'  => array('page' => $page),
@@ -220,25 +217,20 @@ class UserController extends FormController
                 )
             ));
         }
-
-        //set action URL
-        $action     = $this->generateUrl('mautic_user_action',
-            array('objectAction' => 'edit', 'objectId' => $objectId)
-        );
-
-        $form       = $this->get('form.factory')->create('user', $user, array('action' => $action));
+        $action = $this->generateUrl('mautic_user_action', array('objectAction' => 'edit', 'objectId' => $objectId));
+        $form   = $model->createForm($user, $action);
 
         ///Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
-            $model = $this->container->get('mautic.model.user');
             //check to see if the password needs to be rehashed
             $overrides             = array();
-            $overrides['password'] = $model->checkNewPassword($user);
+            $submittedPassword     = $this->request->request->get('user[plainPassword][password]', null, true);
+            $overrides['password'] = $model->checkNewPassword($user, $submittedPassword);
             $valid = $this->checkFormValidity($form);
 
             if ($valid === 1) {
                 //form is valid so process the data
-                $result = $model->saveEntity($user, false, $overrides);
+                $model->saveEntity($user, $overrides);
             }
 
             if (!empty($valid)) { //cancelled or success
@@ -252,7 +244,7 @@ class UserController extends FormController
                         'route'         => $returnUrl,
                     ),
                     'flashes'         =>
-                        (!empty($result) && $result === 1) ? array( //success
+                        ($valid === 1) ? array( //success
                             array(
                                 'type' => 'notice',
                                 'msg'  => 'mautic.user.user.notice.updated',
@@ -302,15 +294,15 @@ class UserController extends FormController
             //ensure the user logged in is not getting deleted
             if ((int) $currentUser->getId() !== (int) $objectId) {
                 $result = $this->container->get('mautic.model.user')->deleteEntity($objectId);
-                $name   = $result->getName();
 
-                if (!$result) {
+                if ($result === null) {
                     $flashes[] = array(
                         'type' => 'error',
                         'msg'  => 'mautic.user.user.error.notfound',
                         'msgVars' => array('%id%' => $objectId)
                     );
                 } else {
+                    $name = $result->getName();
                     $flashes[] = array(
                         'type' => 'notice',
                         'msg'  => 'mautic.user.user.notice.deleted',

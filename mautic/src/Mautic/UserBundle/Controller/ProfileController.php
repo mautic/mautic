@@ -32,7 +32,7 @@ class ProfileController extends FormController
     {
         //get current user
         $me    = $this->get('security.context')->getToken()->getUser();
-
+        $model = $this->container->get('mautic.model.user');
         //set some permissions
         $permissions = array(
             'apiAccess'    => ($this->container->getParameter('mautic.api_enabled')) ?
@@ -44,9 +44,8 @@ class ProfileController extends FormController
             'editEmail'    => $this->get('mautic.security')->isGranted('user:profile:editemail')
         );
 
-        $form  = $this->get('form.factory')->create('user', $me, array(
-            'action' => $this->generateUrl('mautic_user_account')
-        ));
+        $action = $this->generateUrl('mautic_user_account');
+        $form   = $model->createForm($me, $action);
 
         //remove items that cannot be edited by person themselves
         $form->remove('role');
@@ -146,16 +145,16 @@ class ProfileController extends FormController
         $submitted = $this->get('session')->get('formProcessed', 0);
         if ($this->request->getMethod() == "POST" && !$submitted) {
             $this->get('session')->set('formProcessed', 1);
-            $model     = $this->container->get('mautic.model.user');
             $overrides = array();
             //check to see if the password needs to be rehashed
-            $overrides['password'] = $model->checkNewPassword($me);
+            $submittedPassword = $this->request->request->get('user[plainPassword][password]', null, true);
+            $overrides['password'] = $model->checkNewPassword($me, $submittedPassword);
 
             $valid = $this->checkFormValidity($form);
 
             if ($valid === 1) {
                 //form is valid so process the data
-                $result = $model->saveEntity($me, false, $overrides);
+                $model->saveEntity($me, $overrides);
             }
 
             if (!empty($valid)) { //cancelled or success
@@ -167,7 +166,7 @@ class ProfileController extends FormController
                         'route'         => $returnUrl,
                     ),
                     'flashes'         =>
-                        (!empty($result) && $result === 1) ? array( //success
+                        ($valid === 1) ? array( //success
                             array(
                                 'type' => 'notice',
                                 'msg'  => 'mautic.user.account.notice.updated'

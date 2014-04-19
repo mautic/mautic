@@ -26,14 +26,9 @@ class CommonRepository extends EntityRepository
      */
     public function saveEntity($entity)
     {
-        try {
-            $this->_em->persist($entity);
-            $this->_em->flush();
-            return 1;
-        } catch (\Doctrine\ORM\ORMException $e) {
-            //@TODO add error message
-            return 0;
-        }
+        $this->_em->persist($entity);
+        $this->_em->flush();
+        return $entity;
     }
 
     /**
@@ -44,14 +39,9 @@ class CommonRepository extends EntityRepository
      */
     public function deleteEntity($entity)
     {
-        try {
-            //delete entity
-            $this->_em->remove($entity);
-            $this->_em->flush();
-            return 1;
-        } catch (\Exception $e) {
-            //@TODO add error message
-            return 0;
-        }
+        //delete entity
+        $this->_em->remove($entity);
+        $this->_em->flush();
+        return $entity;
     }
 }

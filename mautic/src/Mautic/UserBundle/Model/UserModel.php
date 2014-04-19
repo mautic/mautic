@@ -10,8 +10,10 @@
 namespace Mautic\UserBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel;
-use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
+use Mautic\UserBundle\Entity\User;
+use Symfony\Component\HttpKernel\NotFoundHttpException;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * Class UserModel
@@ -22,51 +24,45 @@ class UserModel extends FormModel
 {
 
     /**
-     * @var string
+     * {@inheritdoc}
      */
-    protected $repository = 'MauticUserBundle:User';
-    /**
-     * @var string
-     */
-    protected $permissionBase = 'user:users';
+    protected function init()
+    {
+        $this->repository     = 'MauticUserBundle:User';
+        $this->permissionBase = 'user:users';
+    }
 
     /**
      * {@inheritdoc}
      *
      * @param       $entity
-     * @param bool  $isNew
      * @param array $overrides
      * @return int
+     * @throws \Symfony\Component\HttpKernel\NotFoundHttpException
+     * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
      */
-    public function saveEntity($entity, $isNew = false, $overrides = array())
+    public function saveEntity($entity, $overrides = array())
     {
         if (!$entity instanceof User) {
-            //@TODO add error message
-            return 0;
+            throw new NotFoundHttpException('Entity must be of class User()');
         }
 
-        $permissionNeeded = ($isNew) ? "create" : "editother";
+        $permissionNeeded = ($entity->getId()) ? "create" : "editother";
         if (!$this->container->get('mautic.security')->isGranted('user:users:'. $permissionNeeded)) {
-            //@TODO add error message
-            return 0;
+            throw new AccessDeniedException($this->container->get('translator')->trans('mautic.core.accessdenied'));
         }
 
-        return parent::saveEntity($entity, $isNew, $overrides);
+        return parent::saveEntity($entity, $overrides);
     }
 
     /**
      * Checks for a new password and rehashes if necessary
      *
      * @param User $entity
+     * @param      $submittedPassword
      * @return int|string
      */
-    public function checkNewPassword(User $entity) {
-        if (!$entity instanceof User) {
-            //@TODO add error message
-            return 0;
-        }
-
-        $submittedPassword = $this->request->request->get('user[plainPassword][password]', null, true);
+    public function checkNewPassword(User $entity, $submittedPassword) {
         if (!empty($submittedPassword)) {
             //hash the clear password submitted via the form
             $security = $this->container->get('security.encoder_factory');
@@ -80,5 +76,47 @@ class UserModel extends FormModel
         }
 
         return $password;
+    }
+
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param      $entity
+     * @param null $action
+     * @return mixed
+     * @throws \Symfony\Component\HttpKernel\NotFoundHttpException
+     */
+    public function createForm($entity, $action = null)
+    {
+        if (!$entity instanceof User) {
+            throw new NotFoundHttpException('Entity must be of class User()');
+        }
+        $params = (!empty($action)) ? array('action' => $action) : array();
+        return $this->container->get('form.factory')->create('user', $entity, $params);
+    }
+
+    /**
+     * Get a specific entity or generate a new one if id is empty
+     *
+     * @param $id
+     * @return null|object
+     */
+    public function getEntity($id = '')
+    {
+        if (empty($id)) {
+            return new User();
+        }
+
+        $entity = parent::getEntity($id);
+
+        if ($entity) {
+            //add user's permissions
+            $entity->setActivePermissions(
+                $this->em->getRepository('MauticUserBundle:Permission')->getPermissionsByRole($entity->getRole())
+            );
+        }
+
+        return $entity;
     }
 }
