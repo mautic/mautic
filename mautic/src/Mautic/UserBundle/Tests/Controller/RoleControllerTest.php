@@ -9,7 +9,7 @@
 
 namespace Mautic\UserBundle\Tests\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Mautic\CoreBundle\Test\MauticWebTestCase;
 
 /**
  * Class RoleControllerTest
@@ -17,30 +17,39 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
  * @package Mautic\UserBundle\Tests\Controller
  */
 
-class RoleControllerTest extends WebTestCase
+class RoleControllerTest extends MauticWebTestCase
 {
 
-    /**
-     * @var \Doctrine\ORM\EntityManager
-     */
-    private $em;
+    private function createRole()
+    {
+        $crawler = $this->client->request('GET', '/roles/new');
 
-    private $encoder;
+        //let's try creating a user
+        $form = $crawler->selectButton('role[save]')->form();
+
+        // set some values
+        $unique                    = uniqid();
+        $form['role[name]']        = $unique;
+        $form['role[description]'] = 'Functional Test';
+        $form['role[isAdmin]']     = 0;
+        $form['role[permissions][api:access][1]']->tick();
+        $form['role[permissions][user:users][0]']->tick();
+
+        // submit the form
+        $crawler = $this->client->submit($form);
+
+        $role = $this->em
+            ->getRepository('MauticUserBundle:Role')
+            ->findOneByName($unique);
+        return array($role, $crawler);
+    }
 
     public function testIndex()
     {
-
-        $client = static::createClient(array(), array(
-            'PHP_AUTH_USER' => 'admin',
-            'PHP_AUTH_PW'   => 'mautic',
-        ));
-
-        $client->followRedirects();
-
-        $crawler = $client->request('GET', '/roles');
+        $crawler = $this->client->request('GET', '/roles');
 
         //should be a 200 code
-        $this->assertTrue($client->getResponse()->isSuccessful());
+        $this->assertTrue($this->client->getResponse()->isSuccessful());
 
         //test to see if at least the role-list table is displayed
         $this->assertGreaterThan(
@@ -51,18 +60,33 @@ class RoleControllerTest extends WebTestCase
 
     public function testNew()
     {
-
-        $client = static::createClient(array(), array(
-            'PHP_AUTH_USER' => 'admin',
-            'PHP_AUTH_PW'   => 'mautic',
-        ));
-
-        $client->followRedirects();
-
-        $crawler = $client->request('GET', '/roles/new');
+        $crawler = $this->client->request('GET', '/roles/new');
 
         //should be a 200 code
-        $this->assertTrue($client->getResponse()->isSuccessful());
+        $this->assertTrue($this->client->getResponse()->isSuccessful());
+
+        //test to see if at least one form element is present
+        $this->assertGreaterThan(
+            0,
+            $crawler->filter('#role_name')->count()
+        );
+
+        list($role, $crawler) = $this->createRole();
+
+        $this->assertRegExp(
+            '/mautic.user.role.notice.created/',
+            $this->client->getResponse()->getContent()
+        );
+    }
+
+    public function testEdit()
+    {
+        list($role, $crawler) = $this->createRole();
+
+        $crawler = $this->client->request('GET', '/roles/edit/' . $role->getId());
+
+        //should be a 200 code
+        $this->assertTrue($this->client->getResponse()->isSuccessful());
 
         //test to see if at least one form element is present
         $this->assertGreaterThan(
@@ -74,43 +98,35 @@ class RoleControllerTest extends WebTestCase
         $form = $crawler->selectButton('role[save]')->form();
 
         // set some values
-        $unique                                    = uniqid();
-        $form['role[name]']                        = $unique;
-        $form['role[description]']                 = 'Functional Test';
-        $form['role[isAdmin]']                     = 0;
-        $form['role[permissions][api:access][1]']->tick();
-        $form['role[permissions][user:users][0]']->tick();
+        $form['role[description]'] = 'Role Edit Test';
 
         // submit the form
-        $crawler = $client->submit($form);
+        $crawler = $this->client->submit($form);
 
         $this->assertRegExp(
-            '/has been created/',
-            $client->getResponse()->getContent()
+            '/mautic.user.role.notice.updated/',
+            $this->client->getResponse()->getContent()
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function setUp()
+    public function testDelete()
     {
-        static::$kernel = static::createKernel();
-        static::$kernel->boot();
-        $this->em = static::$kernel->getContainer()
-            ->get('doctrine')
-            ->getManager();
+        list($role, $crawler) = $this->createRole();
 
-        $this->encoder = static::$kernel->getContainer()
-            ->get('security.encoder_factory');
-    }
+        //ensure we are redirected to list as get should not be allowed
+        $crawler = $this->client->request('GET', '/roles/delete/' . $role->getId());
 
-    /**
-     * {@inheritDoc}
-     */
-    protected function tearDown()
-    {
-        parent::tearDown();
-        $this->em->close();
+        $this->assertGreaterThan(
+            0,
+            $crawler->filter('table.role-list')->count()
+        );
+
+        //post to delete
+        $crawler = $this->client->request('POST', '/roles/delete/' . $role->getId());
+
+        $this->assertRegExp(
+            '/mautic.user.role.notice.deleted/',
+            $this->client->getResponse()->getContent()
+        );
     }
 }

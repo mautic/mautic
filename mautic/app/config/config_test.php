@@ -9,13 +9,16 @@
 $loader->import("config.php");
 
 $container->loadFromExtension("framework", array(
-    "test"     => null,
+    "test"     => true,
     "session"  => array(
-        "storage_id" => "session.storage.mock_file"
+        "storage_id" => "session.storage.filesystem"
     ),
     "profiler" => array(
         "collect" => false
-    )
+    ),
+    'translator' => array(
+        'enabled'  => false,
+    ),
 ));
 
 $container->loadFromExtension("web_profiler", array(
@@ -29,11 +32,18 @@ $container->loadFromExtension("swiftmailer", array(
 
 $container->loadFromExtension('doctrine', array(
     'dbal' => array(
-        'host'     => 'localhost',
-        'dbname'   => 'mautictest',
-        'user'     => 'root',
-        'password' => 'root',
-    ),
+        'default_connection' => 'default',
+        'connections'        => array(
+            'default' => array(
+                'driver' => 'pdo_sqlite',
+                'path'   =>  '%kernel.cache_dir%/test.db'
+            )
+        )
+    )
+));
+
+$container->loadFromExtension('liip_functional_test', array(
+    'cache_sqlite_db' => true
 ));
 
 $loader->import("security_test.php");

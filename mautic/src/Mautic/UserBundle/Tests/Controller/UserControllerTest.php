@@ -9,7 +9,7 @@
 
 namespace Mautic\UserBundle\Tests\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Mautic\CoreBundle\Test\MauticWebTestCase;
 
 /**
  * Class UserControllerTest
@@ -17,30 +17,48 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
  * @package Mautic\UserBundle\Tests\Controller
  */
 
-class UserControllerTest extends WebTestCase
+class UserControllerTest extends MauticWebTestCase
 {
 
-    /**
-     * @var \Doctrine\ORM\EntityManager
-     */
-    private $em;
+    private function createUser()
+    {
+        $crawler = $this->client->request('GET', '/users/new');
 
-    private $encoder;
+        //let's try creating a user
+        $form = $crawler->selectButton('user[save]')->form();
+
+        $role = $this->em
+            ->getRepository('MauticUserBundle:Role')
+            ->findOneByName('mautic.user.role.admin.name');
+
+        // set some values
+        $unique                                 = uniqid();
+        $form['user[username]']                 = $unique;
+        $form['user[firstName]']                = 'Test';
+        $form['user[lastName]']                 = 'User';
+        $form['user[position]']                 = 'Tester';
+        $form['user[email]']                    = "{$unique}@mautic.com";
+        $form['user[role]']                     = $role->getId();
+        $form['user[plainPassword][password]']  = 'mautic';
+        $form['user[plainPassword][confirm]']   = 'mautic';
+
+        // submit the form
+        $crawler = $this->client->submit($form);
+
+        //ensure that the password created is correct
+        $user = $this->em
+            ->getRepository('MauticUserBundle:User')
+            ->findOneByUsername($unique);
+
+        return array($user, $crawler);
+    }
 
     public function testIndex()
     {
-
-        $client = static::createClient(array(), array(
-            'PHP_AUTH_USER' => 'admin',
-            'PHP_AUTH_PW'   => 'mautic',
-        ));
-
-        $client->followRedirects();
-
-        $crawler = $client->request('GET', '/users');
+        $crawler = $this->client->request('GET', '/users');
 
         //should be a 200 code
-        $this->assertTrue($client->getResponse()->isSuccessful());
+        $this->assertTrue($this->client->getResponse()->isSuccessful());
 
         //test to see if at least the user-list table is displayed
         $this->assertGreaterThan(
@@ -51,18 +69,38 @@ class UserControllerTest extends WebTestCase
 
     public function testNew()
     {
-
-        $client = static::createClient(array(), array(
-            'PHP_AUTH_USER' => 'admin',
-            'PHP_AUTH_PW'   => 'mautic',
-        ));
-
-        $client->followRedirects();
-
-        $crawler = $client->request('GET', '/users/new');
+        $crawler = $this->client->request('GET', '/users/new');
 
         //should be a 200 code
-        $this->assertTrue($client->getResponse()->isSuccessful());
+        $this->assertTrue($this->client->getResponse()->isSuccessful());
+
+        //test to see if at least one form element is present
+        $this->assertGreaterThan(
+            0,
+            $crawler->filter('#user_username')->count()
+        );
+
+        list($user, $crawler) = $this->createUser();
+
+        $this->assertRegExp(
+            '/mautic.user.user.notice.created/',
+            $this->client->getResponse()->getContent()
+        );
+
+        $encoder = $this->encoder->getEncoder('Mautic\UserBundle\Entity\User');
+        $this->assertTrue($encoder->isPasswordValid(
+            $user->getPassword(), 'mautic', $user->getSalt()
+        ));
+    }
+
+    public function testEdit()
+    {
+        list($user, $crawler) = $this->createUser();
+
+        $crawler = $this->client->request('GET', '/users/edit/' . $user->getId());
+
+        //should be a 200 code
+        $this->assertTrue($this->client->getResponse()->isSuccessful());
 
         //test to see if at least one form element is present
         $this->assertGreaterThan(
@@ -74,56 +112,42 @@ class UserControllerTest extends WebTestCase
         $form = $crawler->selectButton('user[save]')->form();
 
         // set some values
-        $unique                                 = uniqid();
-        $form['user[username]']                 = $unique;
-        $form['user[firstName]']                = 'Test';
-        $form['user[lastName]']                 = 'User';
-        $form['user[position]']                 = 'Tester';
-        $form['user[email]']                    = "{$unique}@mautic.com";
-        $form['user[role]']                     = '1';
-        $form['user[plainPassword][password]']  = 'mautic';
-        $form['user[plainPassword][confirm]']   = 'mautic';
+        $form['user[firstName]']                = 'Edit User';
+        $form['user[lastName]']                 = 'Test';
 
         // submit the form
-        $crawler = $client->submit($form);
+        $crawler = $this->client->submit($form);
 
         $this->assertRegExp(
-            '/has been created/',
-            $client->getResponse()->getContent()
+            '/mautic.user.user.notice.updated/',
+            $this->client->getResponse()->getContent()
         );
 
-        //ensure that the password created is correct
-        $user = $this->em
-            ->getRepository('MauticUserBundle:User')
-            ->findOneByUsername($unique);
-
+        //ensure that the password created didn't get overwritten or get blanked out
         $encoder = $this->encoder->getEncoder('Mautic\UserBundle\Entity\User');
         $this->assertTrue($encoder->isPasswordValid(
             $user->getPassword(), 'mautic', $user->getSalt()
         ));
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function setUp()
+    public function testDelete()
     {
-        static::$kernel = static::createKernel();
-        static::$kernel->boot();
-        $this->em = static::$kernel->getContainer()
-            ->get('doctrine')
-            ->getManager();
+        list($user, $crawler) = $this->createUser();
 
-        $this->encoder = static::$kernel->getContainer()
-            ->get('security.encoder_factory');
-    }
+        //ensure we are redirected to list as get should not be allowed
+        $crawler = $this->client->request('GET', '/users/delete/'.$user->getId());
 
-    /**
-     * {@inheritDoc}
-     */
-    protected function tearDown()
-    {
-        parent::tearDown();
-        $this->em->close();
+        $this->assertGreaterThan(
+            0,
+            $crawler->filter('table.user-list')->count()
+        );
+
+        //post to delete
+        $crawler = $this->client->request('POST', '/users/delete/'.$user->getId());
+
+        $this->assertRegExp(
+            '/mautic.user.user.notice.deleted/',
+            $this->client->getResponse()->getContent()
+        );
     }
 }

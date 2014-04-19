@@ -24,22 +24,46 @@ $container->loadFromExtension('security', array(
             'iterations'        => 12,
         )
     ),
+    'role_hierarchy' => array(
+        'ROLE_ADMIN' => 'ROLE_USER',
+    ),
     'firewalls' => array(
         'dev' => array(
             'pattern' => '^/(_(profiler|wdt)|css|images|js)/',
             'security' => true,
             'anonymous' => true
         ),
-        'test_firewall' => array(
-            'http_basic' => array(),
-        ),
         'login' => array(
             'pattern'   => '^/login$',
-            'anonymous' => true
+            'anonymous' => true,
+            'security'  => true,
+            'context'   => 'mautic_test'
         ),
         'oauth_token' => array(
             'pattern'  => '^/oauth/v2/token',
             'security' => false
+        ),
+        'oauth_authorize' => array(
+            'pattern'    => '^/oauth/v2/auth',
+            'form_login' => array(
+                'provider'   => 'user_provider',
+                'check_path' => '/oauth/v2/auth_login_check',
+                'login_path' => '/oauth/v2/auth_login'
+            ),
+            'anonymous'  => true,
+        ),
+        'api' => array(
+            'pattern'   => '^/api',
+            'fos_oauth' => true,
+            'stateless' => true,
+        ),
+        'test_firewall' => array(
+            'pattern'    => "^/",
+            'http_basic' => array(),
+            'form_login' => array(
+                'csrf_provider' => 'form.csrf_provider'
+            ),
+            'context'    => 'mautic_test',
         ),
         'main' => array(
             'pattern' => "^/",
@@ -53,21 +77,8 @@ $container->loadFromExtension('security', array(
                 'path'     => '%mautic.rememberme_path%',
                 'domain'   => '%mautic.rememberme_domain%'
             ),
+            'context' => 'mautic_test'
         ),
-        'oauth_authorize' => array(
-            'pattern'    => '^/oauth/v2/auth',
-            'form_login' => array(
-                'provider'   => 'user_provider',
-                'check_path' => '/oauth/v2/auth_login_check',
-                'login_path' => '/oauth/v2/auth_login'
-            ),
-            'anonymous'  => true
-        ),
-        'api' => array(
-            'pattern'   => '^/api',
-            'fos_oauth' => true,
-            'stateless' => true
-        )
     ),
     'access_control' => array(
         array('path' => '^/api', 'roles' => 'IS_AUTHENTICATED_FULLY')

@@ -9,7 +9,7 @@
 
 namespace Mautic\UserBundle\Tests\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Mautic\CoreBundle\Test\MauticWebTestCase;
 
 /**
  * Class ProfileControllerTest
@@ -17,39 +17,25 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
  * @package Mautic\UserBundle\Tests\Controller
  */
 
-class ProfileControllerTest extends WebTestCase
+class ProfileControllerTest extends MauticWebTestCase
 {
 
-    /**
-     * @var \Doctrine\ORM\EntityManager
-     */
-    private $em;
-
-    private $encoder;
+    protected $dataFixturesPaths = array(
+        "UserBundle/DataFixtures/ORM"
+    );
 
     public function testIndex()
     {
-
-        $client = static::createClient(array(), array(
-            'PHP_AUTH_USER' => 'admin',
-            'PHP_AUTH_PW'   => 'mautic',
-        ));
-
-        $client->followRedirects();
-
-        $crawler = $client->request('GET', '/account');
+        $crawler = $this->client->request('GET', '/account');
 
         //should be a 200 code
-        $this->assertTrue($client->getResponse()->isSuccessful());
+        $this->assertTrue($this->client->getResponse()->isSuccessful());
 
-        //test to see if what is expcted shows up
+        //test to see if what is expected shows up
         $this->assertGreaterThan(
             0,
             $crawler->filter('div.account-wrapper')->count()
         );
-
-        $client->followRedirects();
-
         //let's try creating a user
         $form = $crawler->selectButton('btn-save-profile')->form();
 
@@ -62,24 +48,23 @@ class ProfileControllerTest extends WebTestCase
         $form['user[plainPassword][confirm]']   = 'mautic';
 
         // submit the form
-        $crawler = $client->submit($form);
+        $crawler = $this->client->submit($form);
 
         //form should have failed due to lack of current password
         $this->assertRegExp(
-            '/Current password is incorrect/',
-            $client->getResponse()->getContent()
+            '/mautic.user.account.password.userpassword/',
+            $this->client->getResponse()->getContent()
         );
 
         $form['user[currentPassword]']  = 'mautic';
 
         // resubmit the form
-        $crawler = $client->submit($form);
+        $crawler = $this->client->submit($form);
 
         $this->assertRegExp(
-            '/has been updated/',
-            $client->getResponse()->getContent()
+            '/mautic.user.account.notice.updated/',
+            $this->client->getResponse()->getContent()
         );
-
 
         //ensure that the password updated is still correct
         $user = $this->em
@@ -90,29 +75,5 @@ class ProfileControllerTest extends WebTestCase
         $this->assertTrue($encoder->isPasswordValid(
             $user->getPassword(), 'mautic', $user->getSalt()
         ));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setUp()
-    {
-        static::$kernel = static::createKernel();
-        static::$kernel->boot();
-        $this->em = static::$kernel->getContainer()
-            ->get('doctrine')
-            ->getManager();
-
-        $this->encoder = static::$kernel->getContainer()
-            ->get('security.encoder_factory');
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function tearDown()
-    {
-        parent::tearDown();
-        $this->em->close();
     }
 }
