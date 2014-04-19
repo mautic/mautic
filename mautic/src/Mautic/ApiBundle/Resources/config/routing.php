@@ -9,7 +9,6 @@
 
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Route;
-use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 
 $collection = new RouteCollection();
 
@@ -35,10 +34,26 @@ $collection->add('mautic_oauth_server_auth_login_check', new Route('/oauth/v2/au
     )
 ));
 
-$collection->add('mautic_api_action', new Route('/account/authorizedapp/{objectAction}/{objectId}',
+//Clients
+$collection->add('mautic_client_index', new Route('/clients',
+    array('_controller' => 'MauticApiBundle:Client:index')
+));
+
+$collection->add('mautic_client_action', new Route('/clients/{objectAction}/{objectId}',
     array(
-        '_controller' => 'MauticApiBundle:Client:execute'
+        '_controller' => 'MauticApiBundle:Client:execute',
+        "objectId"      => 0
     )
 ));
+
+//Load bundle API urls
+$apiRoute = $loader->import('mautic.api', 'mautic.api');
+$apiRoute->addPrefix('/api');
+$collection->addCollection($apiRoute);
+
+//Load API doc routing
+$apiDoc = $loader->import("@NelmioApiDocBundle/Resources/config/routing.yml");
+$apiDoc->addPrefix('/docs/api');
+$collection->addCollection($apiDoc);
 
 return $collection;

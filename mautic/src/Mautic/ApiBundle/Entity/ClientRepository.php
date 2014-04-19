@@ -10,6 +10,8 @@
 namespace Mautic\ApiBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Doctrine\ORM\Tools\Pagination\Paginator;
+use Doctrine\ORM\NoResultException;
 
 /**
  * ClientRepository
@@ -20,4 +22,36 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 class ClientRepository extends CommonRepository
 {
 
+    /**
+     * {@inheritdoc}
+     *
+     * @param array $args
+     * @return Paginator
+     */
+    public function getEntities($args = array())
+    {
+        $start      = array_key_exists('start', $args) ? $args['start'] : 0;
+        $limit      = array_key_exists('limit', $args) ? $args['limit'] : 30;
+        $filter     = array_key_exists('filter', $args) ? $args['filter'] : '';
+        $orderBy    = array_key_exists('orderBy', $args) ? $args['orderBy'] : 'c.name';
+        $orderByDir = array_key_exists('orderByDir', $args) ? $args['orderByDir'] : "ASC";
+
+        $q = $this
+            ->createQueryBuilder('c')
+            ->setFirstResult($start)
+            ->setMaxResults($limit);
+
+        if (!empty($orderBy)) {
+            $q->orderBy($orderBy, $orderByDir);
+        }
+
+        if (!empty($filter)) {
+            $q->where('c.name LIKE :filter')
+                ->orWhere('c.redirectUris LIKE :filter')
+                ->setParameter(':filter', '%'.$filter.'%');
+        }
+        $query = $q->getQuery();
+        $result = new Paginator($query);
+        return $result;
+    }
 }

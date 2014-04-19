@@ -12,6 +12,8 @@ namespace Mautic\ApiBundle\Entity;
 use FOS\OAuthServerBundle\Entity\Client as BaseClient;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
  * @ORM\Table(name="oauth_clients")
@@ -32,8 +34,8 @@ class Client extends BaseClient
     protected $name;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Mautic\UserBundle\Entity\User", inversedBy="clients")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
+     * @ORM\ManyToMany(targetEntity="Mautic\UserBundle\Entity\User", inversedBy="clients")
+     * @ORM\JoinTable(name="oauth_user_client_xref")
      */
     protected $user;
 
@@ -43,23 +45,20 @@ class Client extends BaseClient
     }
 
     /**
-     * {@inheritdoc}
+     * @param ClassMetadata $metadata
      */
-    public function setUser(UserInterface $user)
+    public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
-        $this->user = $user;
+        $metadata->addPropertyConstraint('name', new Assert\NotBlank(
+            array('message' => 'mautic.api.client.name.notblank')
+        ));
+
+        $metadata->addPropertyConstraint('redirectUris', new Assert\NotBlank(
+            array('message' => 'mautic.api.client.redirecturis.notblank')
+        ));
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getUser()
-    {
-        return $this->user;
-    }
-
-
-    /**
+        /**
      * Get id
      *
      * @return integer
@@ -123,5 +122,51 @@ class Client extends BaseClient
     public function getAuthCodes()
     {
         return $this->authCodes;
+    }
+
+    /**
+     * Set user
+     *
+     * @param \Mautic\UserBundle\Entity\User $user
+     * @return Client
+     */
+    public function setUser(\Mautic\UserBundle\Entity\User $user = null)
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * Get user
+     *
+     * @return \Mautic\UserBundle\Entity\User
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
+
+    /**
+     * Add user
+     *
+     * @param \Mautic\UserBundle\Entity\User $user
+     * @return Client
+     */
+    public function addUser(\Mautic\UserBundle\Entity\User $user)
+    {
+        $this->user[] = $user;
+
+        return $this;
+    }
+
+    /**
+     * Remove user
+     *
+     * @param \Mautic\UserBundle\Entity\User $user
+     */
+    public function removeUser(\Mautic\UserBundle\Entity\User $user)
+    {
+        $this->user->removeElement($user);
     }
 }

@@ -33,7 +33,9 @@ class MauticApiExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        $loader = new Loader\PhpFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader = new Loader\PhpFileLoader($container, new FileLocator(__DIR__.'/../Resources/config/services'));
         $loader->load('services.php');
+        $loader->load('forms.php');
+        $loader->load('models.php');
     }
 }

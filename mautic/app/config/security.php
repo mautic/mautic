@@ -23,6 +23,9 @@ $container->loadFromExtension('security', array(
             'iterations'        => 12,
         )
     ),
+    'role_hierarchy' => array(
+        'ROLE_ADMIN' => 'ROLE_USER',
+    ),
     'firewalls' => array(
         'dev' => array(
             'pattern' => '^/(_(profiler|wdt)|css|images|js)/',
@@ -31,24 +34,13 @@ $container->loadFromExtension('security', array(
         ),
         'login' => array(
             'pattern'   => '^/login$',
-            'anonymous' => true
+            'anonymous' => true,
+            'security'  => true,
+            'context'   => 'mautic'
         ),
         'oauth_token' => array(
             'pattern'  => '^/oauth/v2/token',
             'security' => false
-        ),
-        'main' => array(
-            'pattern' => "^/",
-            'form_login' => array(
-                'csrf_provider' => 'form.csrf_provider'
-            ),
-            'logout' => array(),
-            'remember_me' => array(
-                'key'      => '%mautic.rememberme_key%',
-                'lifetime' => '%mautic.rememberme_lifetime%',
-                'path'     => '%mautic.rememberme_path%',
-                'domain'   => '%mautic.rememberme_domain%'
-            ),
         ),
         'oauth_authorize' => array(
             'pattern'    => '^/oauth/v2/auth',
@@ -63,7 +55,21 @@ $container->loadFromExtension('security', array(
             'pattern'   => '^/api',
             'fos_oauth' => true,
             'stateless' => true
-        )
+        ),
+        'main' => array(
+            'pattern' => "^/",
+            'form_login' => array(
+                'csrf_provider' => 'form.csrf_provider'
+            ),
+            'logout' => array(),
+            'remember_me' => array(
+                'key'      => '%mautic.rememberme_key%',
+                'lifetime' => '%mautic.rememberme_lifetime%',
+                'path'     => '%mautic.rememberme_path%',
+                'domain'   => '%mautic.rememberme_domain%'
+            ),
+            'context'   => 'mautic'
+        ),
     ),
     'access_control' => array(
         array('path' => '^/api', 'roles' => 'IS_AUTHENTICATED_FULLY')

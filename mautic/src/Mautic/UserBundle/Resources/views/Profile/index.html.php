@@ -68,7 +68,7 @@ $view['slots']->set("jsDeclarations", "Mautic.ajaxifyForms(['user']);\n");
                 <div class="panel-body">
                     <?php echo $view['actions']->render(
                         new Symfony\Component\HttpKernel\Controller\ControllerReference(
-                            'MauticApiBundle:Client:apiClients'
+                            'MauticApiBundle:Client:authorizedClients'
                         ));
                         ?>
                 </div>

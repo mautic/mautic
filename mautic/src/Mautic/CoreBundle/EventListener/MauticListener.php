@@ -61,6 +61,9 @@ class MauticListener
 
             //also set the request for easy access throughout controllers
             $controller[0]->setRequest($request);
+
+            //run any initialize functions
+            $controller[0]->initialize($event);
         }
     }
 }

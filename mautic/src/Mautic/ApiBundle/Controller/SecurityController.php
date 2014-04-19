@@ -23,11 +23,11 @@ class SecurityController extends Controller
      */
     public function loginAction(Request $request)
     {
-        $session = $this->request->getSession();
+        $session = $request->getSession();
 
         // get the login error if there is one
-        if ($this->request->attributes->has(SecurityContext::AUTHENTICATION_ERROR)) {
-            $error = $this->request->attributes->get(SecurityContext::AUTHENTICATION_ERROR);
+        if ($request->attributes->has(SecurityContext::AUTHENTICATION_ERROR)) {
+            $error = $request->attributes->get(SecurityContext::AUTHENTICATION_ERROR);
         } else {
             $error = $session->get(SecurityContext::AUTHENTICATION_ERROR);
             $session->remove(SecurityContext::AUTHENTICATION_ERROR);
@@ -57,10 +57,5 @@ class SecurityController extends Controller
                 'last_username' => $session->get(SecurityContext::LAST_USERNAME)
             )
         );
-    }
-
-    public function loginCheckAction(Request $request)
-    {
-
     }
 }

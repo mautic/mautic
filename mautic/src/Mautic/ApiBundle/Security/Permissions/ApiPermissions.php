@@ -35,6 +35,13 @@ class ApiPermissions extends CommonPermissions
                 'access' => array(
                     'prohibit' => 1,
                     'full'     => 1024
+                ),
+                'clients' => array(
+                    'view'          => 1,
+                    'editother'     => 4,
+                    'create'        => 8,
+                    'deleteother'   => 32,
+                    'full'          => 1024
                 )
             );
     }
@@ -59,7 +66,6 @@ class ApiPermissions extends CommonPermissions
         //convert the permission bits from the db into readable names
         $data = $this->convertBitsToPermissionNames($options['permissions']);
 
-
         $builder->add('api:access', 'choice', array(
             'choices'  => array(
                 'prohibit' => 'mautic.api.permissions.prohibited', //basically no permission will be saved
@@ -73,10 +79,28 @@ class ApiPermissions extends CommonPermissions
             ),
             'data'     => (!empty($data['access']) ? $data['access'] : array())
         ));
+
+        $builder->add('api:clients', 'choice', array(
+            'choices'    => array(
+                'view'        => 'mautic.core.permissions.view',
+                'editother'   => 'mautic.core.permissions.edit',
+                'create'      => 'mautic.core.permissions.create',
+                'deleteother' => 'mautic.core.permissions.delete',
+                'full'        => 'mautic.core.permissions.full'
+            ),
+            'label'      => 'mautic.api.permissions.clients',
+            'label_attr' => array('class' => 'control-label'),
+            'expanded'   => true,
+            'multiple'   => true,
+            'attr'       => array(
+                'onclick' => 'Mautic.toggleFullPermissions(this, event)'
+            ),
+            'data'      => (!empty($data['clients']) ? $data['clients'] : array())
+        ));
     }
 
     /**
-     * {inheritdoc}
+     * {@inheritdoc}
      *
      * @param $name
      * @param $perm
@@ -92,11 +116,26 @@ class ApiPermissions extends CommonPermissions
     }
 
     /**
-     * {inheritdoc}
+     * {@inheritdoc}
      *
      * @return bool|mixed
      */
     public function isEnabled() {
         return $this->container->getParameter('mautic.api_enabled', 0);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param $name
+     * @param $level
+     * @return array
+     */
+    protected function getSynonym($name, $level) {
+        if ($name == "access" && $level == "granted") {
+            $level = "full";
+        }
+
+        return array($name, $level);
     }
 }

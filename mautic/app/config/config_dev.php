@@ -48,3 +48,8 @@ $container->loadFromExtension("swiftmailer", array(
     "delivery_address" => "me@example.com"
 ));
 */
+
+if ($container->getParameter('mautic.api_enabled')) {
+    //Load API doc
+    $container->loadFromExtension('nelmio_api_doc', array());
+}

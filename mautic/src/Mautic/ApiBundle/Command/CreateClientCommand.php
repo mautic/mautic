@@ -56,9 +56,7 @@ EOT
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $clientManager = $this->getContainer()->get('fos_oauth_server.client_manager.default');
-        $currentUser   = $this->getContainer()->get('security.context')->getToken()->getUser();
         $client = $clientManager->createClient();
-        $client->setUser($currentUser);
         $client->setName($input->getOption('client-name'));
         $client->setRedirectUris($input->getOption('redirect-uri'));
         $client->setAllowedGrantTypes($input->getOption('grant-type'));

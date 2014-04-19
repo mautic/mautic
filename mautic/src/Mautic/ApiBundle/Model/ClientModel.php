@@ -9,57 +9,57 @@
 
 namespace Mautic\ApiBundle\Model;
 
-use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Model\FormModel;
+use Mautic\ApiBundle\Entity\Client;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * Class ClientModel
  * {@inheritdoc}
  * @package Mautic\CoreBundle\Model
  */
-class ClientModel
+class ClientModel extends FormModel
 {
     /**
-     * @var string
+     * {@inheritdoc}
      */
-    protected $repository = 'MauticApiBundle:Client';
-
-    /**
-     * @var
-     */
-    protected $container;
-
-    /**
-     * @var
-     */
-    protected $request;
-
-    /**
-     * @var
-     */
-    protected $em;
-
-    /**
-     * @param Container     $container
-     * @param RequestStack  $request_stack
-     * @param EntityManager $em
-     */
-    public function __construct(Container $container, RequestStack $request_stack, EntityManager $em)
+    protected function init()
     {
-        $this->container = $container;
-        $this->request   = $request_stack->getCurrentRequest();
-        $this->em        = $em;
+        $this->repository     = 'MauticApiBundle:Client';
+        $this->permissionBase = 'api:clients';
     }
 
-    public function deleteEntity($clientId)
+    /**
+     * {@inheritdoc}
+     *
+     * @param      $entity
+     * @param null $action
+     * @return mixed
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    public function createForm($entity, $action = null)
     {
-        try {
-            $entity = $this->em->getRepository($this->repository)->find($clientId);
-            return ($this->em->getRepository($this->repository)->deleteEntity($entity)) ? $entity : 0;
-        } catch (\Exception $e) {
-            //@TODO return error message
-            return 0;
+        if (!$entity instanceof Client) {
+            throw new NotFoundHttpException('Entity must be of class Client()');
         }
+
+        $params = (!empty($action)) ? array('action' => $action) : array();
+        return $this->container->get('form.factory')->create('client', $entity, $params);
+    }
+
+    /**
+     * Get a specific entity or generate a new one if id is empty
+     *
+     * @param $id
+     * @return null|object
+     */
+    public function getEntity($id = '')
+    {
+        if (empty($id)) {
+            return new Client();
+        }
+
+        return parent::getEntity($id);
     }
 }

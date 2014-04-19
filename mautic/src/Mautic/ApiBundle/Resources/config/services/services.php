@@ -10,28 +10,14 @@
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-//API Client form
-$container->setDefinition(
-    'mautic.form.type.apiclients',
-    new Definition(
-        'Mautic\ApiBundle\Form\Type\ApiClientType',
-        array(
-            new Reference("service_container"),
-            new Reference('security.context'),
-            "%mautic.bundles%"
-        )
-    )
-)
-    ->addTag('form.type', array(
-        'alias' => 'apiClient',
-    ));
-
 //OAuth Event Listener
 $container->setDefinition(
     'mautic.api.oauth.event_listener',
     new Definition('Mautic\ApiBundle\EventListener\OAuthEventListener',
         array(
             new Reference('doctrine.orm.entity_manager'),
+            new Reference('mautic.security'),
+            new Reference('translator')
         )
     )
 )
@@ -44,15 +30,14 @@ $container->setDefinition(
         'method' => 'onPostAuthorizationProcess'
     ));
 
-//Client Model
-$container->setDefinition(
-    'mautic.model.client',
+
+//API Route Loader
+$container->setDefinition ('mautic.api_route_loader',
     new Definition(
-        'Mautic\ApiBundle\Model\ClientModel',
+        'Mautic\ApiBundle\Routing\RouteLoader',
         array(
-            new Reference("service_container"),
-            new Reference('request_stack'),
-            new Reference('doctrine.orm.entity_manager'),
+            new Reference('service_container')
         )
     )
-);
+)
+    ->addTag('routing.loader');

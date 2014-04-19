@@ -19,8 +19,8 @@ $msg  = (!empty($name)) ? $view['translator']->trans('mautic.api.oauth.clientwit
       action="<?php echo $view['router']->generate('fos_oauth_server_authorize') ?>"
       method="post">
 
-<input type="submit" class="btn btn-primary" name="accepted" value="<?php echo $view['translator']->trans('mautic.api.oauth.acccept'); ?>" />
-<input type="submit" class="btn btn-danger" name="rejected" value="<?php echo $view['translator']->trans('mautic.api.oauth.deny'); ?>" />
+<input type="submit" class="btn btn-primary btn-accept" name="accepted" value="<?php echo $view['translator']->trans('mautic.api.oauth.accept'); ?>" />
+<input type="submit" class="btn btn-danger" btn-deny" name="rejected" value="<?php echo $view['translator']->trans('mautic.api.oauth.deny'); ?>" />
 
 <?php
 echo $view['form']->row($form['client_id']);
