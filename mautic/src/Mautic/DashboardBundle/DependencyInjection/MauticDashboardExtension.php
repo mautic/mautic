@@ -33,7 +33,7 @@ class MauticDashboardExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        $loader = new Loader\PhpFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
-        $loader->load('services.php');
+        $loader = new Loader\PhpFileLoader($container, new FileLocator(__DIR__.'/../Resources/config/services'));
+        $loader->load('events.php');
     }
 }

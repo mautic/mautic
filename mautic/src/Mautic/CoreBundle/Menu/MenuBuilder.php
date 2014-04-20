@@ -12,7 +12,11 @@ namespace Mautic\CoreBundle\Menu;
 use Knp\Menu\FactoryInterface;
 use Knp\Menu\Matcher\MatcherInterface;
 use Knp\Menu\Loader\ArrayLoader;
+use Mautic\CoreBundle\CoreEvents;
+use Mautic\CoreBundle\Event\MenuEvent;
 use Symfony\Component\DependencyInjection\ContainerAware;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Security\Core\SecurityContext;
@@ -25,29 +29,35 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
  */
 class MenuBuilder extends ContainerAware
 {
-    private $factory;
-    private $bundles;
-    private $matcher;
-    private $securityContext;
-    private $mauticSecurity;
+    private   $factory;
+    private   $matcher;
+    private   $securityContext;
+    private   $mauticSecurity;
+    protected $container;
+
+    /**
+     * @param ContainerInterface $container
+     */
+    public function setContainer(ContainerInterface $container = null)
+    {
+        $this->container = $container;
+    }
+
 
     /**
      * @param FactoryInterface $factory
      * @param MatcherInterface $matcher
      * @param SecurityContext  $securityContext
      * @param CorePermissions  $permissions
-     * @param array            $bundles
      */
     public function __construct(FactoryInterface $factory,
                                 MatcherInterface $matcher,
                                 SecurityContext $securityContext,
-                                CorePermissions $permissions,
-                                array $bundles
+                                CorePermissions $permissions
     )
     {
         $this->factory         = $factory;
         $this->matcher         = $matcher;
-        $this->bundles         = $bundles;
         $this->securityContext = $securityContext;
         $this->mauticSecurity  = $permissions;
     }
@@ -65,24 +75,11 @@ class MenuBuilder extends ContainerAware
         if (empty($menu)) {
             $loader = new ArrayLoader($this->factory);
 
-            $menuItems = array();
-            foreach ($this->bundles as $bundle) {
-                //Load bundle menu.php if menu.php exists
-                $parts = explode("\\", $bundle);
-                $path  = __DIR__ . "/../../" . $parts[1] . "/Resources/config/menu.php";
-                if (file_exists($path)) {
-                    $items = include $path;
-
-                    if ($parts[1] == "CoreBundle") {
-                        //this means that core bundle must be loaded before other bundles as it has the root menu setup
-                        $menuItems = $items;
-                    } else {
-                        $menuItems['children'] = array_merge($menuItems['children'], $items);
-                    }
-                }
-            }
-
-            $menu = $loader->load($menuItems);
+            //dispatch the MENU_BUILD event to retrieve bundle menu items
+            $event      = new MenuEvent();
+            $this->container->get('event_dispatcher')->dispatch(CoreEvents::MENU_BUILD, $event);
+            $menuItems  = $event->getMenuItems();
+            $menu       = $loader->load($menuItems);
         }
         return $menu;
     }

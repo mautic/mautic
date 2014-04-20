@@ -37,6 +37,7 @@ class MauticUserExtension extends Extension
         $loader->load('forms.php');
         $loader->load('models.php');
         $loader->load('provider.php');
+        $loader->load('events.php');
 
     }
 }

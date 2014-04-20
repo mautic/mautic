@@ -41,8 +41,12 @@ class MauticCoreExtension extends Extension implements PrependExtensionInterface
             $container->setParameter("mautic.{$k}", $v);
         }
 
-        $loader = new Loader\PhpFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader = new Loader\PhpFileLoader($container, new FileLocator(__DIR__.'/../Resources/config/services'));
+        $loader->load('events.php');
+        $loader->load('forms.php');
         $loader->load('services.php');
+        $loader->load('menu.php');
+
     }
 
     public function prepend(ContainerBuilder $container)

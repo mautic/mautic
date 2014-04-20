@@ -9,15 +9,14 @@
 
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Parameter;
 
-
-//API Route Loader
-$container->setDefinition ('mautic.api_route_loader',
+//Mautic event listener
+$container->setDefinition(
+    'mautic.user.subscriber',
     new Definition(
-        'Mautic\ApiBundle\Routing\RouteLoader',
-        array(
-            new Reference('service_container')
-        )
+        'Mautic\UserBundle\EventListener\UserSubscriber',
+        array(new Reference('service_container'))
     )
 )
-    ->addTag('routing.loader');
+    ->addTag('kernel.event_subscriber');

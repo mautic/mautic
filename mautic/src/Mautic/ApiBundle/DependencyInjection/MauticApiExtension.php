@@ -37,5 +37,6 @@ class MauticApiExtension extends Extension
         $loader->load('services.php');
         $loader->load('forms.php');
         $loader->load('models.php');
+        $loader->load('events.php');
     }
 }

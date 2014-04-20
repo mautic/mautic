@@ -11,18 +11,12 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Parameter;
 
-/*
-
+//Mautic event listener
 $container->setDefinition(
-    'mautic_dashboard.example',
+    'mautic.dashboard.subscriber',
     new Definition(
-        'Mautic\DashboardBundle\Example',
-        array(
-            new Reference('service_id'),
-            "plain_value",
-            new Parameter('parameter_name'),
-        )
+        'Mautic\DashboardBundle\EventListener\DashboardSubscriber',
+        array(new Reference('service_container'))
     )
-);
-
-*/
+)
+    ->addTag('kernel.event_subscriber');
