@@ -10,7 +10,7 @@
 namespace Mautic\DashboardBundle\EventListener;
 
 
-use Mautic\CoreBundle\Event\MenuEvent;
+use Mautic\CoreBundle\Event as MauticEvent;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -41,15 +41,15 @@ class DashboardSubscriber implements EventSubscriberInterface
     static public function getSubscribedEvents()
     {
         return array(
-            'menu.build' => array('onMenuBuild', 0),
-            'route.build' => array('onRouteBuild', 0)
+            'mautic.build_menu' => array('onBuildMenu', 0),
+            'mautic.build_route' => array('onBuildRoute', 0)
         );
     }
 
     /**
      * @param MenuEvent $event
      */
-    public function onMenuBuild(MenuEvent $event)
+    public function onBuildMenu(MauticEvent\MenuEvent $event)
     {
         $path = __DIR__ . "/../Resources/config/menu.php";
         $items = include $path;
@@ -59,7 +59,7 @@ class DashboardSubscriber implements EventSubscriberInterface
     /**
      * @param RouteEvent $event
      */
-    public function onRouteBuild(RouteEvent $event)
+    public function onBuildRoute(MauticEvent\RouteEvent $event)
     {
         $path = __DIR__ . "/../Resources/config/routing.php";
         $event->addRoutes($path);

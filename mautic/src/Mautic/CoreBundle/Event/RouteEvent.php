@@ -41,6 +41,6 @@ class RouteEvent extends Event
      */
     public function addRoutes($path)
     {
-        $this->collection->addCollection($this->importer->import($path));
+        $this->collection->addCollection($this->loader->import($path));
     }
 }

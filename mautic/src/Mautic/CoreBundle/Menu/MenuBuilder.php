@@ -77,7 +77,7 @@ class MenuBuilder extends ContainerAware
 
             //dispatch the MENU_BUILD event to retrieve bundle menu items
             $event      = new MenuEvent();
-            $this->container->get('event_dispatcher')->dispatch(CoreEvents::MENU_BUILD, $event);
+            $this->container->get('event_dispatcher')->dispatch(CoreEvents::BUILD_MENU, $event);
             $menuItems  = $event->getMenuItems();
             $menu       = $loader->load($menuItems);
         }

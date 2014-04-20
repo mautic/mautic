@@ -9,6 +9,7 @@
 
 namespace Mautic\CoreBundle\Routing;
 
+use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\RouteEvent;
 use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\Routing\RouteCollection;
@@ -23,18 +24,14 @@ use Symfony\Component\DependencyInjection\Container;
 class RouteLoader extends Loader
 {
     private   $loaded    = false;
-    protected $bundles   = array();
     protected $container;
 
     /**
      * @param Container $container
-     * @param array     $bundles
      */
-    public function __construct(Container $container, array $bundles)
+    public function __construct(Container $container)
     {
         $this->container = $container;
-        //just need bundle names
-        $this->bundles   = $bundles;
     }
 
     /**
@@ -52,8 +49,9 @@ class RouteLoader extends Loader
         }
 
         $collection = new RouteCollection();
+
         $event      = new RouteEvent($this, $collection);
-        $this->container->get('event_dispatcher')->dispatch(CoreEvents::ROUTE_BUILD, $event);
+        $this->container->get('event_dispatcher')->dispatch(CoreEvents::BUILD_ROUTE, $event);
 
         $this->loaded = true;
 

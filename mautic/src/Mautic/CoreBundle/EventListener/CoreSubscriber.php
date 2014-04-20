@@ -42,15 +42,15 @@ class CoreSubscriber implements EventSubscriberInterface
     static public function getSubscribedEvents()
     {
         return array(
-            'menu.build' => array('onMenuBuild', 9999),
-            'route.build' => array('onRouteBuild', 0)
+            'mautic.build_menu' => array('onBuildMenu', 9999),
+            'mautic.build_route' => array('onBuildRoute', 0)
         );
     }
 
     /**
      * @param MenuEvent $event
      */
-    public function onMenuBuild(MenuEvent $event)
+    public function onBuildMenu(MenuEvent $event)
     {
         $path = __DIR__ . "/../Resources/config/menu.php";
         $items = include $path;
@@ -60,7 +60,7 @@ class CoreSubscriber implements EventSubscriberInterface
     /**
      * @param RouteEvent $event
      */
-    public function onRouteBuild(RouteEvent $event)
+    public function onBuildRoute(RouteEvent $event)
     {
         $path = __DIR__ . "/../Resources/config/routing.php";
         $event->addRoutes($path);

@@ -10,9 +10,10 @@
 namespace Mautic\UserBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel;
-use Mautic\RoleBundle\Event\RoleEvent;
+use Mautic\UserBundle\Event\RoleEvent;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\UserEvents;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 

@@ -7,7 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\RoleBundle\Event;
+namespace Mautic\UserBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;
 use Mautic\UserBundle\Entity\Role;
