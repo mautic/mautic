@@ -52,20 +52,8 @@ class RouteLoader extends Loader
         }
 
         $collection = new RouteCollection();
-
-        $event      = new RouteEvent();
-        $event->setLoader($this);
-        $event->setCollection($collection);
+        $event      = new RouteEvent($this, $collection);
         $this->container->get('event_dispatcher')->dispatch(CoreEvents::ROUTE_BUILD, $event);
-
-        foreach($this->bundles as $bundle) {
-            //Load bundle routing if routing.php exists
-            $parts = explode("\\", $bundle);
-            $path = __DIR__ . "/../../" . $parts[1] . "/Resources/config/routing.php";
-            if (file_exists($path)) {
-                $collection->addCollection($this->import($path));
-            }
-        }
 
         $this->loaded = true;
 

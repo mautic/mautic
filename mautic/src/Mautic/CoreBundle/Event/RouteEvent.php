@@ -30,19 +30,9 @@ class RouteEvent extends Event
      */
     protected $collection;
 
-    /**
-     * @param RouteLoader $loader
-     */
-    public function setLoader(RouteLoader &$loader)
+    public function __construct(RouteLoader &$loader, RouteCollection &$collection)
     {
-        $this->loader =& $loader;
-    }
-
-    /**
-     * @param RouteCollection $collection
-     */
-    public function setCollection(RouteCollection &$collection)
-    {
+        $this->loader     =& $loader;
         $this->collection =& $collection;
     }
 
