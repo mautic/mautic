@@ -51,9 +51,4 @@ $apiRoute = $loader->import('mautic.api', 'mautic.api');
 $apiRoute->addPrefix('/api');
 $collection->addCollection($apiRoute);
 
-//Load API doc routing
-$apiDoc = $loader->import("@NelmioApiDocBundle/Resources/config/routing.yml");
-$apiDoc->addPrefix('/docs/api');
-$collection->addCollection($apiDoc);
-
 return $collection;

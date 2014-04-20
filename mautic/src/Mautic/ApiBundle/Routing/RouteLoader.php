@@ -56,6 +56,13 @@ class RouteLoader extends Loader
                     $collection->addCollection($this->import($file->getPathname()));
                 }
             }
+
+            if (in_array($this->container->getParameter("kernel.environment"), array('dev', 'test'))) {
+                //Load API doc routing
+                $apiDoc = $this->import("@NelmioApiDocBundle/Resources/config/routing.yml");
+                $apiDoc->addPrefix('/docs/api');
+                $collection->addCollection($apiDoc);
+            }
         }
 
         $this->loaded = true;
