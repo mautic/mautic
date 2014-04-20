@@ -20,4 +20,14 @@ final class CoreEvents
      * @var string
      */
     const MENU_BUILD = 'menu.build';
+
+    /**
+     * The route.build event is thrown to build Mautic bundle routes
+     *
+     * The event listener receives a
+     * Mautic\CoreBundle\Event\RouteEvent instance.
+     *
+     * @var string
+     */
+    const ROUTE_BUILD = 'route.build';
 }

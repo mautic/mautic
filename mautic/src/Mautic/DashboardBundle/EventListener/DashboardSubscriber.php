@@ -41,7 +41,8 @@ class DashboardSubscriber implements EventSubscriberInterface
     static public function getSubscribedEvents()
     {
         return array(
-            'menu.build' => array('onMenuBuild', 0)
+            'menu.build' => array('onMenuBuild', 0),
+            'route.build' => array('onRouteBuild', 0)
         );
     }
 
@@ -54,4 +55,14 @@ class DashboardSubscriber implements EventSubscriberInterface
         $items = include $path;
         $event->addMenuItems($items);
     }
+
+    /**
+     * @param RouteEvent $event
+     */
+    public function onRouteBuild(RouteEvent $event)
+    {
+        $path = __DIR__ . "/../Resources/config/routing.php";
+        $event->addRoutes($path);
+    }
+
 }

@@ -9,6 +9,7 @@
 
 namespace Mautic\CoreBundle\Routing;
 
+use Mautic\CoreBundle\Event\RouteEvent;
 use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\DependencyInjection\Container;
@@ -51,6 +52,11 @@ class RouteLoader extends Loader
         }
 
         $collection = new RouteCollection();
+
+        $event      = new RouteEvent();
+        $event->setLoader($this);
+        $event->setCollection($collection);
+        $this->container->get('event_dispatcher')->dispatch(CoreEvents::ROUTE_BUILD, $event);
 
         foreach($this->bundles as $bundle) {
             //Load bundle routing if routing.php exists

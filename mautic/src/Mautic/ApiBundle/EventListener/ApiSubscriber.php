@@ -12,6 +12,7 @@ namespace Mautic\ApiBundle\EventListener;
 
 use Mautic\CoreBundle\Event\MenuEvent;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -41,7 +42,8 @@ class ApiSubscriber implements EventSubscriberInterface
     static public function getSubscribedEvents()
     {
         return array(
-            'menu.build' => array('onMenuBuild', 9998)
+            'menu.build'  => array('onMenuBuild', 9998),
+            'route.build' => array('onRouteBuild', 0)
         );
     }
 
@@ -53,5 +55,14 @@ class ApiSubscriber implements EventSubscriberInterface
         $path = __DIR__ . "/../Resources/config/menu.php";
         $items = include $path;
         $event->addMenuItems($items);
+    }
+
+    /**
+     * @param RouteEvent $event
+     */
+    public function onRouteBuild(RouteEvent $event)
+    {
+        $path = __DIR__ . "/../Resources/config/routing.php";
+        $event->addRoutes($path);
     }
 }
