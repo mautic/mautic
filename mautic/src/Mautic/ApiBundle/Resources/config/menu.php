@@ -28,23 +28,10 @@ $items = array(
 $items = array(
     'mautic.api.client.menu.index' => array(
         'route'    => 'mautic_client_index',
-        'uri'      => 'javascript: void(0)',
-        'linkAttributes' => array(
-            'onclick' => $this->mauticSecurity->isGranted('api:clients:view') ?
-                    'return Mautic.loadContent(\''
-                    . $this->container->get('router')->generate('mautic_client_index')
-                    . '\', \'#mautic_client_index\', true);'
-                : 'Mautic.toggleSubMenu(\'#mautic_client_index\');',
-            'id'      => 'mautic_client_index'
-        ),
-        'labelAttributes' => array(
-            'class'   => 'nav-item-name'
-        ),
         'extras'    => array(
-            'iconClass' => 'fa-puzzle-piece fa-lg',
             'routeName' => 'mautic_client_index'
         ),
-        'display'   => ($this->mauticSecurity->isGranted('api:clients:view')) ? true : false,
+        'display'   => false,
         'children' => array(
             'mautic.api.client.menu.new' => array(
                 'route'    => 'mautic_client_action',

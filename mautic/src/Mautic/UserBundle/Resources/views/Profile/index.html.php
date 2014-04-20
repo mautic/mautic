@@ -16,7 +16,7 @@ $view['slots']->set("jsDeclarations", "Mautic.ajaxifyForms(['user']);\n");
     <div class="row padding-md">
         <div class="col-md-3 col-sm-12 body-white padding-md profile-details rounded-corners">
             <img class="img img-responsive img-thumbnail"
-                 src="http://www.gravatar.com/avatar/<?php echo md5(strtolower(trim($me->getEmail()))); ?>?&s=250" />
+                 src="https://www.gravatar.com/avatar/<?php echo md5(strtolower(trim($me->getEmail()))); ?>?&s=250" />
             <h3 class="margin-sm-sides margin-md-top"><?php echo $me->getName(); ?></h3>
             <h4 class="margin-sm-sides"><?php echo $me->getPosition(); ?></h4>
 

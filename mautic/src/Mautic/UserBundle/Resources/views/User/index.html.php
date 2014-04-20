@@ -83,7 +83,7 @@ $view["slots"]->set("filterInput",
             <tr>
                 <td class="visible-md visible-lg" style="width: 75px;">
                     <img class="img img-responsive img-thumbnail"
-                         src="http://www.gravatar.com/avatar/<?php echo md5(strtolower(trim($item->getEmail()))); ?>?&s=50" />
+                         src="https://www.gravatar.com/avatar/<?php echo md5(strtolower(trim($item->getEmail()))); ?>?&s=50" />
                 </td>
                 <td>
                     <?php echo $item->getName(true); ?><br />

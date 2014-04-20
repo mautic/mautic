@@ -60,7 +60,8 @@ h6 {
 .panel-toggle a:hover {
   color: #8c667e;
 }
-.account-menu .dropdown {
+.account-menu .dropdown,
+.admin-menu .dropdown {
   font-size: 1.2em;
 }
 .left-panel-toggle {
