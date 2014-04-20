@@ -10,10 +10,13 @@
 namespace Mautic\UserBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\UserBundle\Event\UserEvent;
+use Mautic\UserBundle\UserEvents;
 use Symfony\Component\HttpFoundation\Request;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpKernel\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
  * Class UserModel
@@ -118,5 +121,32 @@ class UserModel extends FormModel
         }
 
         return $entity;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param      $action
+     * @param      $entity
+     * @param bool $isNew
+     * @throws \Symfony\Component\HttpKernel\NotFoundHttpException
+     */
+    protected function dispatchEvent($action, $entity, $isNew = false)
+    {
+        if (!$entity instanceof User) {
+            throw new NotFoundHttpException('Entity must be of class User()');
+        }
+
+        $dispatcher = new EventDispatcher();
+        $event      = new UserEvent($entity, $isNew);
+
+        switch ($action) {
+            case "save":
+                $dispatcher->dispatch(UserEvents::USER_SAVE, $event);
+                break;
+            case "delete":
+                $dispatcher->dispatch(UserEvents::USER_DELETE, $event);
+                break;
+        }
     }
 }

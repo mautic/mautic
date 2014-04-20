@@ -122,7 +122,8 @@ class FormModel
     public function saveEntity($entity, $overrides = array())
     {
         //@TODO add catch to determine editown or editother
-        $permissionNeeded = ($entity->getId()) ? "create" : "editother";
+        $isNew = ($entity->getId()) ? false : true;
+        $permissionNeeded = ($isNew) ? "create" : "editother";
         if (!$this->container->get('mautic.security')->isGranted($this->permissionBase . ':' . $permissionNeeded)) {
             throw new AccessDeniedException($this->container->get('translator')->trans('mautic.core.accessdenied'));
         }
@@ -148,7 +149,11 @@ class FormModel
             $entity->setDateAdded(new \DateTime());
         }
 
-        return $this->em->getRepository($this->repository)->saveEntity($entity);
+        $entity = $this->em->getRepository($this->repository)->saveEntity($entity);
+
+        $this->dispatchEvent("save", $entity, $isNew);
+
+        return $entity;
     }
 
     /**
@@ -167,11 +172,15 @@ class FormModel
         }
 
         $entity = $this->em->getRepository($this->repository)->find($entityId);
-        return $this->em->getRepository($this->repository)->deleteEntity($entity);
+        $this->em->getRepository($this->repository)->deleteEntity($entity);
+
+        $this->dispatchEvent("delete", $entity);
+
+        return $entity;
     }
 
     /**
-     * {@inheritdoc}
+     * Creates the appropriate form per the model
      *
      * @param      $entity
      * @param null $action
@@ -181,5 +190,17 @@ class FormModel
     public function createForm($entity, $action = null)
     {
         throw new NotFoundHttpException('Form object not found.');
+    }
+
+    /**
+     * Dispatches events for child classes
+     *
+     * @param $action
+     * @param $entity
+     * @param $isNew
+     */
+    protected function dispatchEvent($action, $entity, $isNew = false)
+    {
+        //...
     }
 }

@@ -13,6 +13,7 @@
         "doctrine/doctrine-bundle": "~1.2",
         "doctrine/doctrine-fixtures-bundle": "2.2.*@dev",
         "symfony/assetic-bundle": "~2.3",
+        "symfony/event-dispatcher": "2.5.*@dev",
         "symfony/swiftmailer-bundle": "~2.3",
         "symfony/monolog-bundle": "~2.4",
         "sensio/distribution-bundle": "~2.3",

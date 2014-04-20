@@ -10,7 +10,9 @@
 namespace Mautic\UserBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\RoleBundle\Event\RoleEvent;
 use Mautic\UserBundle\Entity\Role;
+use Mautic\UserBundle\UserEvents;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
@@ -103,5 +105,33 @@ class RoleModel extends FormModel
         }
 
         return parent::getEntity($id);
+    }
+
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param $action
+     * @param $entity
+     * @param $isNew
+     * @throws \Symfony\Component\HttpKernel\NotFoundHttpException
+     */
+    protected function dispatchEvent($action, $entity, $isNew = false)
+    {
+        if (!$entity instanceof Role) {
+            throw new NotFoundHttpException('Entity must be of class Role()');
+        }
+
+        $dispatcher = new EventDispatcher();
+        $event      = new RoleEvent($entity, $isNew);
+
+        switch ($action) {
+            case "save":
+                $dispatcher->dispatch(UserEvents::ROLE_SAVE, $event);
+                break;
+            case "delete":
+                $dispatcher->dispatch(UserEvents::ROLE_DELETE, $event);
+                break;
+        }
     }
 }
