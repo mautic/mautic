@@ -109,13 +109,13 @@ foreach ($mauticbundles as $bundle => $namespace) {
 
     //define the function for use with CSS and JS files
     $getFiles = function ($type) use ($bundleDir, &$css, &$js) {
-        $typeDir = '$bundleDir/Resources/public/$type/';
+        $typeDir = "$bundleDir/Resources/public/$type/";
 
         if (file_exists($typeDir)) {
             //get files within the directory
             $iterator = new FilesystemIterator($typeDir);
             //filter out inappropriate files
-            $filter = new RegexIterator($iterator, '/.$type$/');
+            $filter = new RegexIterator($iterator, "/.$type$/");
             if (iterator_count($filter)) {
                 foreach ($filter as $file) {
                     //add the file to be loaded
