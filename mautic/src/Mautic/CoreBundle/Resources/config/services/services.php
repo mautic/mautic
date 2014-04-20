@@ -16,8 +16,7 @@ $container->setDefinition ('mautic.route_loader',
     new Definition(
         'Mautic\CoreBundle\Routing\RouteLoader',
         array(
-            new Reference('service_container'),
-            '%mautic.bundles%'
+            new Reference('service_container')
         )
     )
 )
@@ -26,7 +25,7 @@ $container->setDefinition ('mautic.route_loader',
 //Database table prefix
 $container->setDefinition ('mautic.tblprefix_subscriber',
     new Definition(
-        'Mautic\CoreBundle\Subscriber\TablePrefixSubscriber',
+        'Mautic\CoreBundle\EventListener\TablePrefixSubscriber',
         array(
             '%mautic.db_table_prefix%',
             '%mautic.bundles%'

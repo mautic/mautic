@@ -9,6 +9,8 @@
 
 namespace Mautic\CoreBundle\Controller;
 
+use Mautic\CoreBundle\CoreEvents;
+use Mautic\CoreBundle\Event\GlobalSearchEvent;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -141,7 +143,7 @@ class CommonController extends Controller implements EventsController {
      */
     protected function executeAjaxActions() {
         //process ajax actions
-        $success         = 0;
+        $dataArray       = array();
         $securityContext = $this->container->get('security.context');
         $action          = $this->request->request->get("ajaxAction");
         if( $securityContext->isGranted('IS_AUTHENTICATED_REMEMBERED') ) {
@@ -151,7 +153,7 @@ class CommonController extends Controller implements EventsController {
                     $status    = $this->get("session")->get("{$panel}-panel", "default");
                     $newStatus = ($status == "unpinned") ? "default" : "unpinned";
                     $this->get("session")->set("{$panel}-panel", $newStatus);
-                    $success = 1;
+                    $dataArray['success'] = 1;
                     break;
                 case "setorderby":
                     $name    = $this->request->request->get("name");
@@ -161,16 +163,27 @@ class CommonController extends Controller implements EventsController {
                         $dir = ($dir == "ASC") ? "DESC" : "ASC";
                         $this->get("session")->set("mautic.$name.orderby", $orderBy);
                         $this->get("session")->set("mautic.$name.orderbydir", $dir);
-                        $success = 1;
+                        $dataArray['success'] = 1;
                     }
+                    break;
+                case "globalsearch":
+                    $searchStr = $this->request->request->get("searchstring", "");
+                    $this->get('session')->set('mautic.global_search', $searchStr);
+
+                    $event = new GlobalSearchEvent($searchStr);
+                    $this->get('event_dispatcher')->dispatch(CoreEvents::GLOBAL_SEARCH, $event);
+
+                    $dataArray['searchResults'] = $this->renderView('MauticCoreBundle:Default:globalsearchresults.html.php',
+                        array('results' => $event->getResults())
+                    );
                     break;
                 default:
                     //ignore
+                    $dataArray['success'] = 0;
                     break;
             }
         }
         $response  = new JsonResponse();
-        $dataArray = array("success" => $success);
         $response->setData($dataArray);
 
         return $response;

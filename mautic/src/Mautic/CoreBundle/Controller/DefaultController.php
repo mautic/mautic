@@ -8,6 +8,8 @@
  */
 
 namespace Mautic\CoreBundle\Controller;
+use Mautic\CoreBundle\CoreEvents;
+use Mautic\CoreBundle\Event\GlobalSearchEvent;
 
 /**
  * Class DefaultController
@@ -32,5 +34,19 @@ class DefaultController extends CommonController
         } else {
             return $this->render('MauticCoreBundle:Default:index.html.php');
         }
+    }
+
+    public function globalSearchAction()
+    {
+        $searchStr = $this->request->request->get("searchstring", $this->get('session')->get('mautic.global_search', ''));
+        $this->get('session')->set('mautic.global_search', $searchStr);
+
+        $event     = new GlobalSearchEvent($searchStr);
+        $this->get('event_dispatcher')->dispatch(CoreEvents::GLOBAL_SEARCH, $event);
+
+        return $this->render('MauticCoreBundle:Default:globalsearchresults.html.php',
+            array('results'      => $event->getResults())
+        );
+
     }
 }

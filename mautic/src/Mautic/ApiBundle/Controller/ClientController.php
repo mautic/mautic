@@ -33,7 +33,7 @@ class ClientController extends FormController
             return $this->accessDenied();
         }
 
-        $filter     = $this->request->request->get('filter-client', $this->get('session')->get('mautic.client.filter', ''));
+        $filter     = $this->request->get('filter-client', $this->get('session')->get('mautic.client.filter', ''));
         $this->get('session')->set('mautic.client.filter', $filter);
 
         $clients = $this->container->get('mautic.model.client')->getEntities(array('filter' => $filter));

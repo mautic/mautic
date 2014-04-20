@@ -14,12 +14,13 @@ $view['slots']->set("jsDeclarations", "Mautic.ajaxifyForms(['user']);\n");
 
 <div class="account-wrapper">
     <div class="row padding-md">
-        <div class="col-md-3 col-sm-12 body-white padding-md profile-details rounded-corners">
-            <img class="img img-responsive img-thumbnail"
-                 src="https://www.gravatar.com/avatar/<?php echo md5(strtolower(trim($me->getEmail()))); ?>?&s=250" />
-            <h3 class="margin-sm-sides margin-md-top"><?php echo $me->getName(); ?></h3>
-            <h4 class="margin-sm-sides"><?php echo $me->getPosition(); ?></h4>
-
+        <div class="col-md-3 col-sm-12">
+            <div class="body-white padding-md profile-details rounded-corners text-center">
+                <img class="img img-responsive img-thumbnail"
+                     src="https://www.gravatar.com/avatar/<?php echo md5(strtolower(trim($me->getEmail()))); ?>?&s=250" />
+                <h3 class="margin-sm-sides margin-md-top"><?php echo $me->getName(); ?></h3>
+                <h4 class="margin-sm-sides"><?php echo $me->getPosition(); ?></h4>
+            </div>
         </div>
 
         <div class="col-lg-9 col-md-9 col-sm-12 padding-md-sides">

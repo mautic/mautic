@@ -80,21 +80,15 @@ h1, h2, h3, h4, h5, h6 {
   font-size: 1.2em;
 }
 
+.account-menu .dropdown {
+  padding: 3px;
+}
+
 .left-panel-toggle {
   border-right: @mainPanelBase 1px solid;
   margin-right: 5px;
   padding: 12px 2px 0 0 !important;
 }
-
-.right-panel-toggle {
-  border-left: @mainPanelBase 1px solid;
-  margin-left: 5px;
-}
-
-.right-panel-toggle a {
-  padding: 4px 0 3px 5px !important;
-}
-
 
 .main-panel-wrapper {
   background-color: @mainPanelBase;
@@ -155,7 +149,7 @@ h1, h2, h3, h4, h5, h6 {
   left: @leftPanelWidth;
   margin-left: -@leftPanelWidth;
   overflow-y: auto;
-  z-index: 5000;
+  z-index: 4500;
   .transitions;
 }
 
@@ -172,10 +166,44 @@ h1, h2, h3, h4, h5, h6 {
   .transitions;
 }
 
+.right-panel-toggle {
+  border-left: @mainPanelBase 1px solid;
+  margin-left: 5px;
+}
+
+.right-panel-toggle a {
+  padding: 4px 0 3px 5px !important;
+}
+
+.right-panel-header {
+  padding: 8px 20px;
+  height: 50px;
+  background-color: lighten(@leftPanelBase, 5%);
+}
+
+.right-panel-inner-wrapper {
+  padding-top: 0;
+}
+
+.global-search-result {
+  height: 50px;
+  border-bottom: @leftPanelColor 1px solid;
+  padding: 7px;
+}
+
+.global-search-panel .panel-heading a {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+.left-panel-inner-wrapper {
+  padding-top: @topPanelHeight;
+}
+
 .left-panel-inner-wrapper, .right-panel-inner-wrapper {
   position: relative;
   height: 100%;
-  padding-top: @topPanelHeight;
   overflow-x: hidden;
   overflow-y: auto;
 }

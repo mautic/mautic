@@ -10,7 +10,7 @@
 namespace Mautic\ApiBundle\EventListener;
 
 
-use Mautic\CoreBundle\Event\MenuEvent;
+use Mautic\CoreBundle\Event as MauticEvent;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -31,7 +31,7 @@ class ApiSubscriber implements EventSubscriberInterface
     /**
      * @param ContainerInterface $container
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct (ContainerInterface $container)
     {
         $this->container = $container;
     }
@@ -39,20 +39,21 @@ class ApiSubscriber implements EventSubscriberInterface
     /**
      * @return array
      */
-    static public function getSubscribedEvents()
+    static public function getSubscribedEvents ()
     {
         return array(
-            'menu.build'  => array('onMenuBuild', 9998),
-            'route.build' => array('onRouteBuild', 0)
+            'mautic.build_menu'    => array('onBuildMenu', 9998),
+            'mautic.build_route'   => array('onBuildRoute', 0),
+            'mautic.global_search' => array('onGlobalSearch', 0)
         );
     }
 
     /**
      * @param MenuEvent $event
      */
-    public function onMenuBuild(MenuEvent $event)
+    public function onBuildMenu (MauticEvent\MenuEvent $event)
     {
-        $path = __DIR__ . "/../Resources/config/menu.php";
+        $path  = __DIR__ . "/../Resources/config/menu.php";
         $items = include $path;
         $event->addMenuItems($items);
     }
@@ -60,9 +61,50 @@ class ApiSubscriber implements EventSubscriberInterface
     /**
      * @param RouteEvent $event
      */
-    public function onRouteBuild(RouteEvent $event)
+    public function onBuildRoute (MauticEvent\RouteEvent $event)
     {
         $path = __DIR__ . "/../Resources/config/routing.php";
         $event->addRoutes($path);
+    }
+
+    /**
+     * @param GlobalSearchEvent $event
+     */
+    public function onGlobalSearch (MauticEvent\GlobalSearchEvent $event)
+    {
+        if ($this->container->get('mautic.security')->isGranted('api:clients:view')) {
+            $str     = $event->getSearchString();
+            $clients = $this->container->get('mautic.model.client')->getEntities(
+                array(
+                    'limit'  => 5,
+                    'filter' => $str
+                ));
+
+            if (count($clients) > 0) {
+                $userResults = array();
+                $canEdit     = $this->container->get('mautic.security')->isGranted('api:clients:edit');
+                foreach ($clients as $client) {
+                    $userResults[] = $this->container->get('templating')->renderResponse(
+                        'MauticApiBundle:Search:client.html.php',
+                        array(
+                            'client'  => $client,
+                            'canEdit' => $canEdit
+                        )
+                    )->getContent();
+                }
+                if (count($clients) > 5) {
+                    $userResults[] = $this->container->get('templating')->renderResponse(
+                        'MauticApiBundle:Search:client.html.php',
+                        array(
+                            'showMore'     => true,
+                            'searchString' => $str,
+                            'remaining'    => (count($clients) - 5)
+                        )
+                    )->getContent();
+                }
+                $event->addResults('mautic.api.client.header.index', $userResults);
+            }
+        }
+
     }
 }

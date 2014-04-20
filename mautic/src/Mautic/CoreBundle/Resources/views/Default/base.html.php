@@ -26,6 +26,15 @@ $activePanelClasses  = ($app->getSession()->get('left-panel', 'default') == 'unp
     <body>
         <div class="loading-bar"></div>
         <div class="page-wrapper<?php echo $activePanelClasses; ?>">
+
+            <header class="top-panel">
+                <?php echo $view->render('MauticCoreBundle:Default:toppanel.html.php'); ?>
+            </header>
+
+            <div class="left-panel">
+                <?php echo $view->render('MauticCoreBundle:Default:leftpanel.html.php'); ?>
+            </div>
+
             <div class="main-panel-wrapper">
                 <div class="main-panel-breadcrumbs">
                     <?php echo $view->render('MauticCoreBundle:Default:breadcrumbs.html.php'); ?>
@@ -41,17 +50,9 @@ $activePanelClasses  = ($app->getSession()->get('left-panel', 'default') == 'unp
                 </div>
             </div>
 
-            <div class="left-panel">
-                <?php echo $view->render('MauticCoreBundle:Default:leftpanel.html.php'); ?>
-            </div>
-
             <div class="right-panel">
                 <?php echo $view->render('MauticCoreBundle:Default:rightpanel.html.php'); ?>
             </div>
-
-            <header class="top-panel">
-                <?php echo $view->render('MauticCoreBundle:Default:toppanel.html.php'); ?>
-            </header>
 
         </div>
 

@@ -42,7 +42,7 @@ class UserController extends FormController
 
         $orderBy    = $this->get('session')->get('mautic.user.orderby', 'u.lastName, u.firstName, u.username');
         $orderByDir = $this->get('session')->get('mautic.user.orderbydir', 'ASC');
-        $filter     = $this->request->request->get('filter-user', $this->get('session')->get('mautic.user.filter', ''));
+        $filter     = $this->request->get('filter-user', $this->get('session')->get('mautic.user.filter', ''));
         $this->get('session')->set('mautic.user.filter', $filter);
 
         $users = $this->container->get('mautic.model.user')->getEntities(

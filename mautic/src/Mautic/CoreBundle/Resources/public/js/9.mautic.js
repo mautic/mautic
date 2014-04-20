@@ -432,15 +432,38 @@ var Mautic = {
         }
     },
 
+    /**
+     * Shows the search filter input in an search list
+     */
     showFilterInput: function () {
         if ($('#list-filter').length) {
             $('#list-filter').addClass('show-filter').removeClass('hide-filter');
         }
     },
 
+    /**
+     * Hides the search filter input in an search list
+     */
     hideFilterInput: function () {
         if ($('#list-filter').length  && !$('#list-filter').val() && !$('#list-filter').is(":focus")) {
             $('#list-filter').addClass('hide-filter').removeClass('show-filter');
+        }
+    },
+
+    loadGlobalSearchResults: function (event, searchStr) {
+        if (event.keyCode == 13) {
+            var query = "ajaxAction=globalsearch&searchstring=" + encodeURI(searchStr);
+            $.ajax({
+                url: mauticBaseUrl,
+                type: "POST",
+                data: query,
+                dataType: "json",
+                success: function (response) {
+                    if (response.searchResults) {
+                        $(".global-search-wrapper").html(response.searchResults);
+                    }
+                }
+            });
         }
     }
 };

@@ -44,7 +44,7 @@ class RoleController extends FormController
 
         $orderBy    = $this->get('session')->get('mautic.role.orderby', 'r.name');
         $orderByDir = $this->get('session')->get('mautic.role.orderbydir', 'ASC');
-        $filter     = $this->request->request->get('filter-role', $this->get('session')->get('mautic.role.filter', ''));
+        $filter     = $this->request->get('filter-role', $this->get('session')->get('mautic.role.filter', ''));
         $this->get('session')->set('mautic.role.filter', $filter);
 
         $items = $this->container->get('mautic.model.role')->getEntities(

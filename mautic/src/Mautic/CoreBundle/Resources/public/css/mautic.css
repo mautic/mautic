@@ -64,17 +64,13 @@ h6 {
 .admin-menu .dropdown {
   font-size: 1.2em;
 }
+.account-menu .dropdown {
+  padding: 3px;
+}
 .left-panel-toggle {
   border-right: #eaeaea 1px solid;
   margin-right: 5px;
   padding: 12px 2px 0 0 !important;
-}
-.right-panel-toggle {
-  border-left: #eaeaea 1px solid;
-  margin-left: 5px;
-}
-.right-panel-toggle a {
-  padding: 4px 0 3px 5px !important;
 }
 .main-panel-wrapper {
   background-color: #eaeaea;
@@ -140,7 +136,7 @@ h6 {
   left: 230px;
   margin-left: -230px;
   overflow-y: auto;
-  z-index: 5000;
+  z-index: 4500;
   -webkit-transition: all 0.3s ease-in-out;
   -moz-transition: all 0.3s ease-in-out;
   -o-transition: all 0.3s ease-in-out;
@@ -161,11 +157,38 @@ h6 {
   -o-transition: all 0.3s ease-in-out;
   transition: all 0.3s ease-in-out 0s;
 }
+.right-panel-toggle {
+  border-left: #eaeaea 1px solid;
+  margin-left: 5px;
+}
+.right-panel-toggle a {
+  padding: 4px 0 3px 5px !important;
+}
+.right-panel-header {
+  padding: 8px 20px;
+  height: 50px;
+  background-color: #604656;
+}
+.right-panel-inner-wrapper {
+  padding-top: 0;
+}
+.global-search-result {
+  height: 50px;
+  border-bottom: #b2b2b2 1px solid;
+  padding: 7px;
+}
+.global-search-panel .panel-heading a {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+.left-panel-inner-wrapper {
+  padding-top: 50px;
+}
 .left-panel-inner-wrapper,
 .right-panel-inner-wrapper {
   position: relative;
   height: 100%;
-  padding-top: 50px;
   overflow-x: hidden;
   overflow-y: auto;
 }

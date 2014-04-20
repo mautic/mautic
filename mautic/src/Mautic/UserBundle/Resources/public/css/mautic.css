@@ -14,3 +14,29 @@
     text-align: center;
     height: 100%;
 }
+
+.profile-details {
+    margin-bottom: 20px;
+}
+
+.gs-user-avatar {
+    float: left;
+    margin: 0 8px;
+}
+
+.gs-user-name {
+    font-weight: bold;
+    display: block;
+}
+
+.gs-user-position {
+    font-size: 0.8em;
+    display: block;
+    line-height: 0.8em;
+}
+
+.gs-role-name {
+    font-weight: bold;
+    display: block;
+    padding: 8px;
+}

@@ -2,6 +2,7 @@
 !.gitignore
 !.htaccess
 /mautic/app/bootstrap*
+/mautic/app/tests.bootstrap*
 /mautic/app/cache/*
 /mautic/app/logs/*
 /mautic/app/config/local.php
