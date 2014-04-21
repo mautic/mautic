@@ -12,14 +12,24 @@ namespace Mautic\UserBundle;
 final class UserEvents
 {
     /**
-     * The user.save event is thrown each time a user is saved.
+     * The user.pre_save event is thrown right before a user is persisted.
      *
      * The event listener receives a
      * Mautic\UserBundle\Event\UserEvent instance.
      *
      * @var string
      */
-    const USER_SAVE   = 'user.save';
+    const USER_PRE_SAVE   = 'user.pre_save';
+
+    /**
+     * The user.post_save event is thrown right after a user is persisted.
+     *
+     * The event listener receives a
+     * Mautic\UserBundle\Event\UserEvent instance.
+     *
+     * @var string
+     */
+    const USER_POST_SAVE   = 'user.post_save';
 
     /**
      * The user.delete event is thrown each time a user is deleted.
@@ -32,14 +42,24 @@ final class UserEvents
     const USER_DELETE   = 'user.delete';
 
     /**
-     * The role.save event is thrown each time a role is saved.
+     * The role.pre_save event is thrown right before a role is persisted.
      *
      * The event listener receives a
      * Mautic\UserBundle\Event\RoleEvent instance.
      *
      * @var string
      */
-    const ROLE_SAVE   = 'role.save';
+    const ROLE_PRE_SAVE   = 'role.pre_save';
+
+    /**
+     * The role.post_save event is thrown right after a role is persisted.
+     *
+     * The event listener receives a
+     * Mautic\UserBundle\Event\RoleEvent instance.
+     *
+     * @var string
+     */
+    const ROLE_POST_SAVE   = 'role.post_save';
 
     /**
      * The role.delete event is thrown each time a role is deleted.

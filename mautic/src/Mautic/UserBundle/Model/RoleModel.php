@@ -117,7 +117,7 @@ class RoleModel extends FormModel
      * @param $isNew
      * @throws \Symfony\Component\HttpKernel\NotFoundHttpException
      */
-    protected function dispatchEvent($action, $entity, $isNew = false)
+    protected function dispatchEvent($action, &$entity, $isNew = false)
     {
         if (!$entity instanceof Role) {
             throw new NotFoundHttpException('Entity must be of class Role()');
@@ -127,8 +127,11 @@ class RoleModel extends FormModel
         $event      = new RoleEvent($entity, $isNew);
 
         switch ($action) {
-            case "save":
-                $dispatcher->dispatch(UserEvents::ROLE_SAVE, $event);
+            case "pre_save":
+                $dispatcher->dispatch(UserEvents::ROLE_PRE_SAVE, $event);
+                break;
+            case "post_save":
+                $dispatcher->dispatch(UserEvents::ROLE_POST_SAVE, $event);
                 break;
             case "delete":
                 $dispatcher->dispatch(UserEvents::ROLE_DELETE, $event);

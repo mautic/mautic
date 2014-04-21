@@ -33,9 +33,9 @@ class RoleEvent extends Event
      * @param Role $role
      * @param bool $isNew
      */
-    public function __construct(Role $role, $isNew = false)
+    public function __construct(Role &$role, $isNew = false)
     {
-        $this->role  = $role;
+        $this->role  =& $role;
         $this->isNew = $isNew;
     }
 

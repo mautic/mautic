@@ -124,14 +124,14 @@ class UserModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
+     *  {@inheritdoc}
      *
      * @param      $action
      * @param      $entity
      * @param bool $isNew
      * @throws \Symfony\Component\HttpKernel\NotFoundHttpException
      */
-    protected function dispatchEvent($action, $entity, $isNew = false)
+    protected function dispatchEvent($action, &$entity, $isNew = false)
     {
         if (!$entity instanceof User) {
             throw new NotFoundHttpException('Entity must be of class User()');
@@ -141,8 +141,11 @@ class UserModel extends FormModel
         $event      = new UserEvent($entity, $isNew);
 
         switch ($action) {
-            case "save":
-                $dispatcher->dispatch(UserEvents::USER_SAVE, $event);
+            case "pre_save":
+                $dispatcher->dispatch(UserEvents::USER_PRE_SAVE, $event);
+                break;
+            case "post_save":
+                $dispatcher->dispatch(UserEvents::USER_POST_SAVE, $event);
                 break;
             case "delete":
                 $dispatcher->dispatch(UserEvents::USER_DELETE, $event);

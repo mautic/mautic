@@ -33,9 +33,9 @@ class UserEvent extends Event
      * @param User $user
      * @param bool $isNew
      */
-    public function __construct(User $user, $isNew = false)
+    public function __construct(User &$user, $isNew = false)
     {
-        $this->user  = $user;
+        $this->user  =& $user;
         $this->isNew = $isNew;
     }
 

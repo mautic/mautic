@@ -149,9 +149,9 @@ class FormModel
             $entity->setDateAdded(new \DateTime());
         }
 
-        $entity = $this->em->getRepository($this->repository)->saveEntity($entity);
-
-        $this->dispatchEvent("save", $entity, $isNew);
+        $this->dispatchEvent("pre_save", $entity, $isNew);
+        $this->em->getRepository($this->repository)->saveEntity($entity);
+        $this->dispatchEvent("post_save", $entity, $isNew);
 
         return $entity;
     }
@@ -199,7 +199,7 @@ class FormModel
      * @param $entity
      * @param $isNew
      */
-    protected function dispatchEvent($action, $entity, $isNew = false)
+    protected function dispatchEvent($action, &$entity, $isNew = false)
     {
         //...
     }
