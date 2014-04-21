@@ -67,14 +67,14 @@ class User implements AdvancedUserInterface, \Serializable
     protected $currentPassword;
 
     /**
-     * @ORM\Column(type="string", length=50)
+     * @ORM\Column(name="first_name",type="string", length=50)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      */
     protected $firstName;
 
     /**
-     * @ORM\Column(type="string", length=50)
+     * @ORM\Column(name="last_name", type="string", length=50)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      */
