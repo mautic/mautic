@@ -14,6 +14,7 @@ use Mautic\UserBundle\Event\RoleEvent;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\UserEvents;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\PreconditionRequiredHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 
@@ -71,6 +72,41 @@ class RoleModel extends FormModel
         }
 
         return parent::saveEntity($entity, $overrides);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param      $entityId
+     * @param bool $skipSecurity
+     * @return null|object
+     * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
+     */
+    public function deleteEntity($entityId, $skipSecurity = false)
+    {
+        if (!$skipSecurity && !$this->container->get('mautic.security')->isGranted($this->permissionBase . ':deleteother')) {
+            throw new AccessDeniedException($this->container->get('translator')->trans('mautic.core.accessdenied'));
+        }
+
+        $entity = $this->em->getRepository($this->repository)->find($entityId);
+
+        if (count($entity->getUsers())) {
+            throw new PreconditionRequiredHttpException(
+                $this->container->get('translator')->trans(
+                    'mautic.user.role.error.deletenotallowed',
+                    array(),
+                    'flashes'
+                )
+            );
+        }
+
+
+        //Event must be called first in order for getId() to be available for events
+        $this->dispatchEvent("delete", $entity);
+
+        $this->em->getRepository($this->repository)->deleteEntity($entity);
+
+        return $entity;
     }
 
     /**
