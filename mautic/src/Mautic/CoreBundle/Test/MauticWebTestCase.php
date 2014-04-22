@@ -12,6 +12,8 @@ namespace Mautic\CoreBundle\Test;
 use Liip\FunctionalTestBundle\Test\WebTestCase;
 use Doctrine\Common\DataFixtures as Fixtures;
 use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class MauticWebTestCase extends WebTestCase
 {
@@ -168,6 +170,14 @@ class MauticWebTestCase extends WebTestCase
         static::$kernel = static::createKernel();
         static::$kernel->boot();
         $this->container = static::$kernel->getContainer();
+
+        //setup the request stack
+        $request = Request::createFromGlobals();
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+        $this->container->set('request_stack', $requestStack);
+
+        //setup the entity manager
         $this->em = $this->container
             ->get('doctrine')
             ->getManager();

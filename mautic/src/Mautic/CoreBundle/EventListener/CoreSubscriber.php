@@ -10,10 +10,15 @@
 namespace Mautic\CoreBundle\EventListener;
 
 
+use Mautic\CoreBundle\Controller\EventsController;
+use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MenuEvent;
 use Mautic\CoreBundle\Event\RouteEvent;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Class CoreSubscriber
@@ -29,11 +34,17 @@ class CoreSubscriber implements EventSubscriberInterface
     protected $container;
 
     /**
+     * @var null|\Symfony\Component\HttpFoundation\Request
+     */
+    protected $request;
+
+    /**
      * @param ContainerInterface $container
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct (ContainerInterface $container, RequestStack $request_stack)
     {
         $this->container = $container;
+        $this->request   = $request_stack->getCurrentRequest();
     }
 
     /**
@@ -42,9 +53,55 @@ class CoreSubscriber implements EventSubscriberInterface
     static public function getSubscribedEvents()
     {
         return array(
-            'mautic.build_menu' => array('onBuildMenu', 9999),
-            'mautic.build_route' => array('onBuildRoute', 0)
+            KernelEvents::CONTROLLER => array('onKernelController', 0),
+            CoreEvents::BUILD_MENU   => array('onBuildMenu', 9999),
+            CoreEvents::BUILD_ROUTE  => array('onBuildRoute', 0)
         );
+    }
+
+    /**
+     * Populates namespace, bundle, controller, and action into request to be used throughout application
+     *
+     * @param FilterControllerEvent $event
+     */
+    public function onKernelController(FilterControllerEvent $event)
+    {
+        $controller = $event->getController();
+
+        if (!is_array($controller)) {
+            return;
+        }
+
+        //only affect Mautic controllers
+        if ($controller[0] instanceof EventsController) {
+
+            //populate request attributes with  namespace, bundle, controller, and action names for use in bundle controllers and templates
+            $request        = $event->getRequest();
+            $matches        = array();
+            $controllerName = $request->attributes->get('_controller');
+            preg_match('/(.*)\\\(.*)Bundle\\\Controller\\\(.*)Controller::(.*)Action/', $controllerName, $matches);
+
+            if (!empty($matches)) {
+                $request->attributes->set('namespace', $matches[1]);
+                $request->attributes->set('bundle', $matches[2]);
+                $request->attributes->set('controller', $matches[3]);
+                $request->attributes->set('action', $matches[4]);
+            } else {
+                preg_match('/Mautic(.*)Bundle:(.*):(.*)/', $controllerName, $matches);
+                if (!empty($matches)) {
+                    $request->attributes->set('namespace', 'Mautic');
+                    $request->attributes->set('bundle', $matches[1]);
+                    $request->attributes->set('controller', $matches[2]);
+                    $request->attributes->set('action', $matches[3]);
+                }
+            }
+
+            //also set the request for easy access throughout controllers
+            $controller[0]->setRequest($request);
+
+            //run any initialize functions
+            $controller[0]->initialize($event);
+        }
     }
 
     /**

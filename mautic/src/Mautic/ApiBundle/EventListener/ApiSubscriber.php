@@ -10,10 +10,14 @@
 namespace Mautic\ApiBundle\EventListener;
 
 
-use Mautic\CoreBundle\Event as MauticEvent;
+use Mautic\CoreBundle\CoreEvents;
+use Mautic\ApiBundle\ApiEvents;
+use Mautic\CoreBundle\Event as MauticEvents;
+use Mautic\ApiBundle\Event as Events;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Class ApiSubscriber
@@ -29,11 +33,17 @@ class ApiSubscriber implements EventSubscriberInterface
     protected $container;
 
     /**
+     * @var null|\Symfony\Component\HttpFoundation\Request
+     */
+    protected $request;
+
+    /**
      * @param ContainerInterface $container
      */
-    public function __construct (ContainerInterface $container)
+    public function __construct (ContainerInterface $container, RequestStack $request_stack)
     {
         $this->container = $container;
+        $this->request   = $request_stack->getCurrentRequest();
     }
 
     /**
@@ -42,16 +52,18 @@ class ApiSubscriber implements EventSubscriberInterface
     static public function getSubscribedEvents ()
     {
         return array(
-            'mautic.build_menu'    => array('onBuildMenu', 9998),
-            'mautic.build_route'   => array('onBuildRoute', 0),
-            'mautic.global_search' => array('onGlobalSearch', 0)
+            CoreEvents::BUILD_MENU      => array('onBuildMenu', 9998),
+            CoreEvents::BUILD_ROUTE     => array('onBuildRoute', 0),
+            CoreEvents::GLOBAL_SEARCH   => array('onGlobalSearch', 0),
+            ApiEvents::CLIENT_POST_SAVE => array('onClientPostSave', 0),
+            ApiEvents::CLIENT_DELETE    => array('onClientDelete', 0)
         );
     }
 
     /**
      * @param MenuEvent $event
      */
-    public function onBuildMenu (MauticEvent\MenuEvent $event)
+    public function onBuildMenu (MauticEvents\MenuEvent $event)
     {
         $path  = __DIR__ . "/../Resources/config/menu.php";
         $items = include $path;
@@ -61,7 +73,7 @@ class ApiSubscriber implements EventSubscriberInterface
     /**
      * @param RouteEvent $event
      */
-    public function onBuildRoute (MauticEvent\RouteEvent $event)
+    public function onBuildRoute (MauticEvents\RouteEvent $event)
     {
         $path = __DIR__ . "/../Resources/config/routing.php";
         $event->addRoutes($path);
@@ -70,7 +82,7 @@ class ApiSubscriber implements EventSubscriberInterface
     /**
      * @param GlobalSearchEvent $event
      */
-    public function onGlobalSearch (MauticEvent\GlobalSearchEvent $event)
+    public function onGlobalSearch (MauticEvents\GlobalSearchEvent $event)
     {
         if ($this->container->get('mautic.security')->isGranted('api:clients:view')) {
             $str     = $event->getSearchString();
@@ -105,6 +117,69 @@ class ApiSubscriber implements EventSubscriberInterface
                 $event->addResults('mautic.api.client.header.index', $userResults);
             }
         }
+    }
 
+
+    /**
+     * Add a client change entry to the audit log
+     *
+     * @param Events\ClientEvent $event
+     */
+    public function onClientPostSave(Events\ClientEvent $event)
+    {
+        $client = $event->getClient();
+
+        //because JMS Serializer doesn't work correctly with the Client entity since it extends FosOAuthServerBundle's
+        //base client, we have to manually set the fields so as to prevent sensitive details from getting added to the
+        //log
+
+        $serializer = $this->container->get('jms_serializer');
+        $data       = array(
+            "id" => $client->getId(),
+            "name" => $client->getName(),
+            "redirectUris" => $client->getRedirectUris()
+        );
+        $details    = $serializer->serialize($data, 'json');
+        $log = array(
+            "bundle"     => "api",
+            "object"     => "client",
+            "objectId"   => $client->getId(),
+            "action"     => ($event->isNew()) ? "create" : "update",
+            "details"    => $details,
+            "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
+        );
+        $this->container->get('mautic.model.auditlog')->writeToLog($log);
+    }
+
+    /**
+     * Add a role delete entry to the audit log
+     *
+     * @param Events\Events $event
+     */
+    public function onClientDelete(Events\ClientEvent $event)
+    {
+        $client = $event->getClient();
+
+        //because JMS Serializer doesn't work correctly with the Client entity since it extends FosOAuthServerBundle's
+        //base client, we have to manually set the fields so as to prevent sensitive details from getting added to the
+        //log
+
+        $serializer = $this->container->get('jms_serializer');
+        $data       = array(
+            "id" => $client->getId(),
+            "name" => $client->getName(),
+            "redirectUris" => $client->getRedirectUris()
+        );
+        $details    = $serializer->serialize($data, 'json');
+
+        $log = array(
+            "bundle"     => "api",
+            "object"     => "client",
+            "objectId"   => $client->getId(),
+            "action"     => "delete",
+            "details"    => $details,
+            "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
+        );
+        $this->container->get('mautic.model.auditlog')->writeToLog($log);
     }
 }

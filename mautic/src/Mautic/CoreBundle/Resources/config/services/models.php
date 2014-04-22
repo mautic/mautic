@@ -11,15 +11,15 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Parameter;
 
-//Mautic event listener
+//Audit log model
 $container->setDefinition(
-    'mautic.dashboard.subscriber',
+    'mautic.model.auditlog',
     new Definition(
-        'Mautic\DashboardBundle\EventListener\DashboardSubscriber',
+        'Mautic\CoreBundle\Model\AuditLogModel',
         array(
             new Reference('service_container'),
-            new Reference('request_stack')
+            new Reference('request_stack'),
+            new Reference('doctrine.orm.entity_manager'),
         )
     )
-)
-    ->addTag('kernel.event_subscriber');
+);

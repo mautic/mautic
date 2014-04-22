@@ -16,18 +16,10 @@ $container->setDefinition(
     'mautic.core.subscriber',
     new Definition(
         'Mautic\CoreBundle\EventListener\CoreSubscriber',
-        array(new Reference('service_container'))
+        array(
+            new Reference('service_container'),
+            new Reference('request_stack')
+        )
     )
 )
     ->addTag('kernel.event_subscriber');
-
-//Listener to prepopulate information such as bundle name, action name, template name, etc into the request
-//attributes for use in the templates
-$container->setDefinition(
-    'mautic.event_listener',
-    new Definition('Mautic\CoreBundle\EventListener\MauticListener')
-)
-    ->addTag('kernel.event_listener', array(
-        'event'  => 'kernel.controller',
-        'method' => 'onKernelController'
-    ));

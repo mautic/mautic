@@ -16,7 +16,10 @@ $container->setDefinition(
     'mautic.user.subscriber',
     new Definition(
         'Mautic\UserBundle\EventListener\UserSubscriber',
-        array(new Reference('service_container'))
+        array(
+            new Reference('service_container'),
+            new Reference('request_stack')
+        )
     )
 )
     ->addTag('kernel.event_subscriber');

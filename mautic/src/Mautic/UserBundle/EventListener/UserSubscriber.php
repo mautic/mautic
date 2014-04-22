@@ -10,9 +10,13 @@
 namespace Mautic\UserBundle\EventListener;
 
 
-use Mautic\CoreBundle\Event as MauticEvent;
+use Mautic\CoreBundle\CoreEvents;
+use Mautic\CoreBundle\Event as MauticEvents;
+use Mautic\UserBundle\Event as Events;
+use Mautic\UserBundle\UserEvents;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Class UserSubscriber
@@ -28,11 +32,17 @@ class UserSubscriber implements EventSubscriberInterface
     protected $container;
 
     /**
+     * @var null|\Symfony\Component\HttpFoundation\Request
+     */
+    protected $request;
+
+    /**
      * @param ContainerInterface $container
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct (ContainerInterface $container, RequestStack $request_stack)
     {
         $this->container = $container;
+        $this->request   = $request_stack->getCurrentRequest();
     }
 
     /**
@@ -41,16 +51,20 @@ class UserSubscriber implements EventSubscriberInterface
     static public function getSubscribedEvents()
     {
         return array(
-            'mautic.build_menu'     => array('onBuildMenu', 9997),
-            'mautic.build_route'    => array('onBuildRoute', 0),
-            'mautic.global_search'  => array('onGlobalSearch', 0)
+            CoreEvents::BUILD_MENU     => array('onBuildMenu', 9997),
+            CoreEvents::BUILD_ROUTE    => array('onBuildRoute', 0),
+            CoreEvents::GLOBAL_SEARCH  => array('onGlobalSearch', 0),
+            UserEvents::USER_POST_SAVE => array('onUserPostSave', 0),
+            UserEvents::USER_DELETE    => array('onUserDelete', 0),
+            UserEvents::ROLE_POST_SAVE => array('onRolePostSave', 0),
+            UserEvents::ROLE_DELETE    => array('onRoleDelete', 0)
         );
     }
 
     /**
      * @param MenuEvent $event
      */
-    public function onBuildMenu(MauticEvent\MenuEvent $event)
+    public function onBuildMenu(MauticEvents\MenuEvent $event)
     {
         $path = __DIR__ . "/../Resources/config/menu.php";
         $items = include $path;
@@ -60,13 +74,13 @@ class UserSubscriber implements EventSubscriberInterface
     /**
      * @param RouteEvent $event
      */
-    public function onBuildRoute(MauticEvent\RouteEvent $event)
+    public function onBuildRoute(MauticEvents\RouteEvent $event)
     {
         $path = __DIR__ . "/../Resources/config/routing.php";
         $event->addRoutes($path);
     }
 
-    public function onGlobalSearch(MauticEvent\GlobalSearchEvent $event)
+    public function onGlobalSearch(MauticEvents\GlobalSearchEvent $event)
     {
         if ($this->container->get('mautic.security')->isGranted('user:users:view')) {
             $str   = $event->getSearchString();
@@ -135,5 +149,97 @@ class UserSubscriber implements EventSubscriberInterface
                 $event->addResults('mautic.user.role.header.index', $roleResults);
             }
         }
+    }
+
+    /**
+     * Add a user entry to the audit log
+     *
+     * @param Events\UserEvent $event
+     */
+    public function onUserPostSave(Events\UserEvent $event)
+    {
+        $user = $event->getUser();
+
+        $serializer = $this->container->get('jms_serializer');
+        $details    = $serializer->serialize($user, 'json');
+
+        $log = array(
+            "bundle"     => "user",
+            "object"     => "user",
+            "objectId"   => $user->getId(),
+            "action"     => ($event->isNew()) ? "create" : "update",
+            "details"    => $details,
+            "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
+        );
+        $this->container->get('mautic.model.auditlog')->writeToLog($log);
+    }
+
+    /**
+     * Add a user delete entry to the audit log
+     *
+     * @param Events\UserEvent $event
+     */
+    public function onUserDelete(Events\UserEvent $event)
+    {
+        $user = $event->getUser();
+
+        $serializer = $this->container->get('jms_serializer');
+        $details    = $serializer->serialize($user, 'json');
+
+        $log = array(
+            "bundle"     => "user",
+            "object"     => "user",
+            "objectId"   => $user->getId(),
+            "action"     => "delete",
+            "details"    => $details,
+            "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
+        );
+        $this->container->get('mautic.model.auditlog')->writeToLog($log);
+    }
+
+    /**
+     * Add a role entry to the audit log
+     *
+     * @param Events\RoleEvent $event
+     */
+    public function onRolePostSave(Events\RoleEvent $event)
+    {
+        $role = $event->getRole();
+
+        $serializer = $this->container->get('jms_serializer');
+        $details    = $serializer->serialize($role, 'json');
+
+        $log = array(
+            "bundle"     => "user",
+            "object"     => "role",
+            "objectId"   => $role->getId(),
+            "action"     => ($event->isNew()) ? "create" : "update",
+            "details"    => $details,
+            "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
+        );
+        $this->container->get('mautic.model.auditlog')->writeToLog($log);
+    }
+
+    /**
+     * Add a role delete entry to the audit log
+     *
+     * @param Events\UserEvent $event
+     */
+    public function onRoleDelete(Events\RoleEvent $event)
+    {
+        $role = $event->getRole();
+
+        $serializer = $this->container->get('jms_serializer');
+        $details    = $serializer->serialize($role, 'json');
+
+        $log = array(
+            "bundle"     => "user",
+            "object"     => "role",
+            "objectId"   => $role->getId(),
+            "action"     => "delete",
+            "details"    => $details,
+            "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
+        );
+        $this->container->get('mautic.model.auditlog')->writeToLog($log);
     }
 }

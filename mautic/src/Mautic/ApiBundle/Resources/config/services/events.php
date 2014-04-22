@@ -36,7 +36,10 @@ $container->setDefinition(
     'mautic.api.subscriber',
     new Definition(
         'Mautic\ApiBundle\EventListener\ApiSubscriber',
-         array(new Reference('service_container'))
+         array(
+             new Reference('service_container'),
+             new Reference('request_stack')
+         )
     )
 )
     ->addTag('kernel.event_subscriber');

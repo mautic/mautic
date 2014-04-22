@@ -12,62 +12,62 @@ namespace Mautic\UserBundle;
 final class UserEvents
 {
     /**
-     * The user.pre_save event is thrown right before a user is persisted.
+     * The mautic.user_pre_save event is thrown right before a user is persisted.
      *
      * The event listener receives a
      * Mautic\UserBundle\Event\UserEvent instance.
      *
      * @var string
      */
-    const USER_PRE_SAVE   = 'user.pre_save';
+    const USER_PRE_SAVE   = 'mautic.user_pre_save';
 
     /**
-     * The user.post_save event is thrown right after a user is persisted.
+     * The mautic.user_post_save event is thrown right after a user is persisted.
      *
      * The event listener receives a
      * Mautic\UserBundle\Event\UserEvent instance.
      *
      * @var string
      */
-    const USER_POST_SAVE   = 'user.post_save';
+    const USER_POST_SAVE   = 'mautic.user_post_save';
 
     /**
-     * The user.delete event is thrown each time a user is deleted.
+     * The mautic.user_delete event is thrown each time a user is deleted.
      *
      * The event listener receives a
      * Mautic\UserBundle\Event\UserEvent instance.
      *
      * @var string
      */
-    const USER_DELETE   = 'user.delete';
+    const USER_DELETE   = 'mautic.user_delete';
 
     /**
-     * The role.pre_save event is thrown right before a role is persisted.
+     * The mautic.role_pre_save event is thrown right before a role is persisted.
      *
      * The event listener receives a
      * Mautic\UserBundle\Event\RoleEvent instance.
      *
      * @var string
      */
-    const ROLE_PRE_SAVE   = 'role.pre_save';
+    const ROLE_PRE_SAVE   = 'mautic.role_pre_save';
 
     /**
-     * The role.post_save event is thrown right after a role is persisted.
+     * The mautic.role_post_save event is thrown right after a role is persisted.
      *
      * The event listener receives a
      * Mautic\UserBundle\Event\RoleEvent instance.
      *
      * @var string
      */
-    const ROLE_POST_SAVE   = 'role.post_save';
+    const ROLE_POST_SAVE   = 'mautic.role_post_save';
 
     /**
-     * The role.delete event is thrown each time a role is deleted.
+     * The mautic.role_delete event is thrown each time a role is deleted.
      *
      * The event listener receives a
      * Mautic\UserBundle\Event\RoleEvent instance.
      *
      * @var string
      */
-    const ROLE_DELETE   = 'role.delete';
+    const ROLE_DELETE   = 'mautic.role_delete';
 }

@@ -16,7 +16,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpKernel\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
  * Class UserModel
@@ -137,7 +136,7 @@ class UserModel extends FormModel
             throw new NotFoundHttpException('Entity must be of class User()');
         }
 
-        $dispatcher = new EventDispatcher();
+        $dispatcher = $this->container->get('event_dispatcher');
         $event      = new UserEvent($entity, $isNew);
 
         switch ($action) {

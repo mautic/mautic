@@ -13,7 +13,6 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\UserBundle\Event\RoleEvent;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\UserEvents;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
@@ -123,7 +122,7 @@ class RoleModel extends FormModel
             throw new NotFoundHttpException('Entity must be of class Role()');
         }
 
-        $dispatcher = new EventDispatcher();
+        $dispatcher = $this->container->get('event_dispatcher');
         $event      = new RoleEvent($entity, $isNew);
 
         switch ($action) {

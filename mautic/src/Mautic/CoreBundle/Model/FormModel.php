@@ -172,9 +172,11 @@ class FormModel
         }
 
         $entity = $this->em->getRepository($this->repository)->find($entityId);
-        $this->em->getRepository($this->repository)->deleteEntity($entity);
 
+        //Event must be called first in order for getId() to be available for events
         $this->dispatchEvent("delete", $entity);
+
+        $this->em->getRepository($this->repository)->deleteEntity($entity);
 
         return $entity;
     }

@@ -9,6 +9,8 @@
 
 namespace Mautic\ApiBundle\Model;
 
+use Mautic\ApiBundle\ApiEvents;
+use Mautic\ApiBundle\Event\ClientEvent;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\ApiBundle\Entity\Client;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -61,5 +63,33 @@ class ClientModel extends FormModel
         }
 
         return parent::getEntity($id);
+    }
+
+
+    /**
+     *  {@inheritdoc}
+     *
+     * @param      $action
+     * @param      $entity
+     * @param bool $isNew
+     * @throws \Symfony\Component\HttpKernel\NotFoundHttpException
+     */
+    protected function dispatchEvent($action, &$entity, $isNew = false)
+    {
+        if (!$entity instanceof Client) {
+            throw new NotFoundHttpException('Entity must be of class Client()');
+        }
+
+        $dispatcher = $this->container->get('event_dispatcher');
+        $event      = new ClientEvent($entity, $isNew);
+
+        switch ($action) {
+            case "post_save":
+                $dispatcher->dispatch(ApiEvents::CLIENT_POST_SAVE, $event);
+                break;
+            case "delete":
+                $dispatcher->dispatch(ApiEvents::CLIENT_DELETE, $event);
+                break;
+        }
     }
 }

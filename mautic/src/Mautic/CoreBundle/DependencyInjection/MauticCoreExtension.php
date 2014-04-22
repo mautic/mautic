@@ -46,6 +46,7 @@ class MauticCoreExtension extends Extension implements PrependExtensionInterface
         $loader->load('forms.php');
         $loader->load('services.php');
         $loader->load('menu.php');
+        $loader->load('models.php');
 
     }
 

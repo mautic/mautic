@@ -10,9 +10,11 @@
 namespace Mautic\DashboardBundle\EventListener;
 
 
+use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvent;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Class DashboardSubscriber
@@ -28,11 +30,17 @@ class DashboardSubscriber implements EventSubscriberInterface
     protected $container;
 
     /**
+     * @var null|\Symfony\Component\HttpFoundation\Request
+     */
+    protected $request;
+
+    /**
      * @param ContainerInterface $container
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct (ContainerInterface $container, RequestStack $request_stack)
     {
         $this->container = $container;
+        $this->request   = $request_stack->getCurrentRequest();
     }
 
     /**
@@ -41,8 +49,8 @@ class DashboardSubscriber implements EventSubscriberInterface
     static public function getSubscribedEvents()
     {
         return array(
-            'mautic.build_menu' => array('onBuildMenu', 0),
-            'mautic.build_route' => array('onBuildRoute', 0)
+            CoreEvents::BUILD_MENU  => array('onBuildMenu', 0),
+            CoreEvents::BUILD_ROUTE => array('onBuildRoute', 0)
         );
     }
 
