@@ -67,11 +67,6 @@ class Role
     protected $permissions;
 
     /**
-     * @ORM\OneToMany(targetEntity="User", mappedBy="role")
-     */
-    protected $users;
-
-    /**
      * @param ClassMetadata $metadata
      */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
@@ -79,11 +74,6 @@ class Role
         $metadata->addPropertyConstraint('name', new Assert\NotBlank(
             array('message' => 'mautic.user.role.name.notblank')
         ));
-    }
-
-    public function __construct()
-    {
-        $this->users = new ArrayCollection();
     }
 
     /**
@@ -125,39 +115,6 @@ class Role
     public function getName()
     {
         return $this->name;
-    }
-
-    /**
-     * Add users
-     *
-     * @param \Mautic\UserBundle\Entity\User $users
-     * @return Role
-     */
-    public function addUser(\Mautic\UserBundle\Entity\User $users)
-    {
-        $this->users[] = $users;
-
-        return $this;
-    }
-
-    /**
-     * Remove users
-     *
-     * @param \Mautic\UserBundle\Entity\User $users
-     */
-    public function removeUser(\Mautic\UserBundle\Entity\User $users)
-    {
-        $this->users->removeElement($users);
-    }
-
-    /**
-     * Get users
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getUsers()
-    {
-        return $this->users;
     }
 
     /**

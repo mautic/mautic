@@ -9,9 +9,7 @@
 
 namespace Mautic\CoreBundle\Model;
 
-use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Helper\SearchStringHelper;
 use Symfony\Component\HttpKernel\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
@@ -20,72 +18,8 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
  *
  * @package Mautic\CoreBundle\Model
  */
-class FormModel
+class FormModel extends CommonModel
 {
-    /**
-     * @var \Symfony\Component\DependencyInjection\Container
-     */
-    protected $container;
-
-    /**
-     * @var null|\Symfony\Component\HttpFoundation\Request
-     */
-    protected $request;
-
-    /**
-     * @var \Doctrine\ORM\EntityManager
-     */
-    protected $em;
-
-    /**
-     * @var string
-     */
-    protected $repository;
-
-    /**
-     * @var string
-     */
-    protected $permissionBase;
-
-
-    /**
-     * @param Container     $container
-     * @param RequestStack  $request_stack
-     * @param EntityManager $em
-     */
-    public function __construct(Container $container, RequestStack $request_stack, EntityManager $em)
-    {
-        $this->container = $container;
-        $this->request   = $request_stack->getCurrentRequest();
-        $this->em        = $em;
-
-        $this->init();
-    }
-
-    /**
-     * Used by child model classes to load required variables, etc
-     */
-    protected function init() { }
-
-    /**
-     * Set the repository required for the model
-     *
-     * @param $repository
-     */
-    public function setRepository($repository)
-    {
-        $this->repository = $repository;
-    }
-
-    /**
-     * Set the permission base (i.e. user:users) used for the model
-     *
-     * @param $permBase
-     */
-    public function setPermissionBase($permBase)
-    {
-        $this->permissionBase = $permBase;
-    }
 
     /**
      * Get a specific entity
@@ -106,6 +40,9 @@ class FormModel
      */
     public function getEntities(array $args = array())
     {
+        //set the translator
+        $this->em->getRepository($this->repository)->setTranslator($this->container->get('translator'));
+
         return $this->em
             ->getRepository($this->repository)
             ->getEntities($args);

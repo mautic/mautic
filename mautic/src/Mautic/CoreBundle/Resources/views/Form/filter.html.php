@@ -9,11 +9,17 @@
 ?>
 
 <input class="form-control filter <?php echo (!empty($filterValue) ? 'show-filter' : 'hide-filter'); ?>"
-       id="list-filter" name="<?php echo $filterName; ?>" maxlength="64" type="text"
+       id="list-filter" name="<?php echo $filterName; ?>" type="text"
        placeholder="<?php echo $view['translator']->trans('mautic.core.form.search'); ?>"
-       value="<?php echo $view->escape($filterValue); ?>"
+       value="<?php echo $filterValue; ?>"
        onkeypress="Mautic.filterList(event, '<?php echo $filterUri; ?>');"
        onmouseover="Mautic.showFilterInput()"
        onmouseout="Mautic.hideFilterInput();"
        onblur="Mautic.hideFilterInput();"
+       autocomplete="off"
+       data-toggle="tooltip"
+       data-container="body"
+       data-placement="bottom"
+       data-original-title="<?php echo $view['translator']->trans('mautic.core.search.help') .
+           (!empty($filterTooltip) ? $view['translator']->trans($filterTooltip) : ""); ?>"
     />

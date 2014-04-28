@@ -14,10 +14,10 @@ $view["slots"]->set("headerTitle", $view['translator']->trans('mautic.user.role.
 
 <?php if ($permissions['create']): ?>
     <?php $view["slots"]->start("actions"); ?>
-    <li><a href="javacript: void(0);"
-           class="new-entity-action"
-           onclick="return Mautic.loadContent('<?php echo $this->container->get('router')->generate(
-               'mautic_role_action', array("objectAction" => "new")); ?>', '#mautic_role_index'); ">
+    <li><a class="new-entity-action"
+           href="<?php echo $this->container->get('router')->generate(
+               'mautic_role_action', array("objectAction" => "new")); ?>"
+            data-toggle="ajax" data-menu-link="#mautic_role_index">
             <?php echo $view["translator"]->trans("mautic.user.role.menu.new"); ?>
         </a>
     </li>
@@ -31,7 +31,8 @@ $view["slots"]->set("filterInput",
         array(
             'filterUri'    => $this->container->get('router')->generate('mautic_role_index'),
             'filterName'   => 'filter-role',
-            'filterValue'  => $filterValue
+            'filterValue'  => $filterValue,
+            'filterTooltip' => 'mautic.user.role.help.searchcommands'
         )
     )
 );
@@ -72,17 +73,19 @@ $view["slots"]->set("filterInput",
                 <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 <td>
                     <?php if ($permissions['edit']): ?>
-                    <button class="btn btn-primary btn-xs"
-                            onclick="Mautic.loadContent('<?php echo $view['router']->generate('mautic_role_action',
-                                array("objectAction" => "edit", "objectId" => $item->getId())); ?>', '#mautic_role_index');">
+                    <a class="btn btn-primary btn-xs"
+                            href="<?php echo $view['router']->generate('mautic_role_action',
+                                array("objectAction" => "edit", "objectId" => $item->getId())); ?>"
+                            data-toggle="ajax"
+                            data-menu-link="#mautic_role_index">
                         <i class="fa fa-pencil-square-o"></i>
-                    </button>
+                    </a>
                     <?php endif; ?>
                     <?php if ($permissions['delete']): ?>
-                    <button class="btn btn-danger btn-xs"
+                    <a class="btn btn-danger btn-xs" href="javascript: void(0);"
                             onclick="Mautic.showConfirmation('<?php echo $view->escape($view["translator"]->trans("mautic.user.role.form.confirmdelete", array("%name%" => $item->getName() . " (" . $item->getId() . ")")), 'js'); ?>','<?php echo $view->escape($view["translator"]->trans("mautic.core.form.delete"), 'js'); ?>','executeAction',['<?php echo $view['router']->generate('mautic_role_action',array("objectAction" => "delete", "objectId" => $item->getId())); ?>','#mautic_role_index'],'<?php echo $view->escape($view["translator"]->trans("mautic.core.form.cancel"), 'js'); ?>','',[]);">
                         <i class="fa fa-trash-o"></i>
-                    </button>
+                    </a>
                     <?php endif; ?>
                 </td>
             </tr>

@@ -33,12 +33,6 @@ class Client extends BaseClient
      */
     protected $name;
 
-    /**
-     * @ORM\ManyToMany(targetEntity="Mautic\UserBundle\Entity\User", inversedBy="clients")
-     * @ORM\JoinTable(name="oauth_user_client_xref")
-     */
-    protected $user;
-
     public function __construct()
     {
         parent::__construct();
@@ -122,51 +116,5 @@ class Client extends BaseClient
     public function getAuthCodes()
     {
         return $this->authCodes;
-    }
-
-    /**
-     * Set user
-     *
-     * @param \Mautic\UserBundle\Entity\User $user
-     * @return Client
-     */
-    public function setUser(\Mautic\UserBundle\Entity\User $user = null)
-    {
-        $this->user = $user;
-
-        return $this;
-    }
-
-    /**
-     * Get user
-     *
-     * @return \Mautic\UserBundle\Entity\User
-     */
-    public function getUser()
-    {
-        return $this->user;
-    }
-
-    /**
-     * Add user
-     *
-     * @param \Mautic\UserBundle\Entity\User $user
-     * @return Client
-     */
-    public function addUser(\Mautic\UserBundle\Entity\User $user)
-    {
-        $this->user[] = $user;
-
-        return $this;
-    }
-
-    /**
-     * Remove user
-     *
-     * @param \Mautic\UserBundle\Entity\User $user
-     */
-    public function removeUser(\Mautic\UserBundle\Entity\User $user)
-    {
-        $this->user->removeElement($user);
     }
 }

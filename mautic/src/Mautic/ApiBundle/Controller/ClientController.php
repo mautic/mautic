@@ -27,16 +27,57 @@ class ClientController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction()
+    public function indexAction($page = 1)
     {
         if (!$this->get('mautic.security')->isGranted('api:clients:view')) {
             return $this->accessDenied();
         }
 
+        //set limits
+        $limit = $this->container->getParameter('mautic.default_pagelimit');
+        $start = ($page === 1) ? 0 : (($page-1) * $limit);
+        if ($start < 0) {
+            $start = 0;
+        }
+
+        $orderBy    = $this->get('session')->get('mautic.client.orderby', 'c.name');
+        $orderByDir = $this->get('session')->get('mautic.client.orderbydir', 'ASC');
         $filter     = $this->request->get('filter-client', $this->get('session')->get('mautic.client.filter', ''));
         $this->get('session')->set('mautic.client.filter', $filter);
 
-        $clients = $this->container->get('mautic.model.client')->getEntities(array('filter' => $filter));
+        $clients = $this->container->get('mautic.model.client')->getEntities(
+            array(
+                'start'      => $start,
+                'limit'      => $limit,
+                'filter'     => $filter,
+                'orderBy'    => $orderBy,
+                'orderByDir' => $orderByDir
+            ));
+
+        $count = count($clients);
+        if ($count && $count < ($start + 1)) {
+            //the number of entities are now less then the current page so redirect to the last page
+            if ($count === 1) {
+                $lastPage = 1;
+            } else {
+                $lastPage = (floor($limit / $count)) ? : 1;
+            }
+            $this->get('session')->set('mautic.client.page', $lastPage);
+            $returnUrl   = $this->generateUrl('mautic_client_index', array('page' => $lastPage));
+
+            return $this->postActionRedirect(array(
+                'returnUrl'       => $returnUrl,
+                'viewParameters'  => array('page' => $lastPage),
+                'contentTemplate' => 'MauticApiBundle:Client:index',
+                'passthroughVars' => array(
+                    'activeLink'    => '#mautic_client_index',
+                    'route'         => $returnUrl,
+                )
+            ));
+        }
+
+        //set what page currently on so that we can return here after form submission/cancellation
+        $this->get('session')->set('mautic.client.page', $page);
 
         //set some permissions
         $permissions = array(
@@ -48,6 +89,8 @@ class ClientController extends FormController
         $parameters = array(
             'filterValue' => $filter,
             'items'       => $clients,
+            'page'        => $page,
+            'limit'       => $limit,
             'permissions' => $permissions
         );
 
@@ -55,7 +98,7 @@ class ClientController extends FormController
             return $this->ajaxAction(array(
                 'viewParameters'  => $parameters,
                 'contentTemplate' => 'MauticApiBundle:Client:index.html.php',
-                'passthroughVars' => array('route' => $this->generateUrl('mautic_client_index'))
+                'passthroughVars' => array('route' => $this->generateUrl('mautic_client_index', array('page' => $page)))
             ));
         } else {
             return $this->render('MauticApiBundle:Client:index.html.php', $parameters);

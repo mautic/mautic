@@ -86,6 +86,10 @@ class ApiSubscriber implements EventSubscriberInterface
     {
         if ($this->container->get('mautic.security')->isGranted('api:clients:view')) {
             $str     = $event->getSearchString();
+            if (empty($str)) {
+                return;
+            }
+
             $clients = $this->container->get('mautic.model.client')->getEntities(
                 array(
                     'limit'  => 5,
@@ -93,10 +97,10 @@ class ApiSubscriber implements EventSubscriberInterface
                 ));
 
             if (count($clients) > 0) {
-                $userResults = array();
+                $clientResults = array();
                 $canEdit     = $this->container->get('mautic.security')->isGranted('api:clients:edit');
                 foreach ($clients as $client) {
-                    $userResults[] = $this->container->get('templating')->renderResponse(
+                    $clientResults[] = $this->container->get('templating')->renderResponse(
                         'MauticApiBundle:Search:client.html.php',
                         array(
                             'client'  => $client,
@@ -105,7 +109,7 @@ class ApiSubscriber implements EventSubscriberInterface
                     )->getContent();
                 }
                 if (count($clients) > 5) {
-                    $userResults[] = $this->container->get('templating')->renderResponse(
+                    $clientResults[] = $this->container->get('templating')->renderResponse(
                         'MauticApiBundle:Search:client.html.php',
                         array(
                             'showMore'     => true,
@@ -114,7 +118,7 @@ class ApiSubscriber implements EventSubscriberInterface
                         )
                     )->getContent();
                 }
-                $event->addResults('mautic.api.client.header.index', $userResults);
+                $event->addResults('mautic.api.client.header.index', $clientResults);
             }
         }
     }

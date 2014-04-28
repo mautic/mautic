@@ -23,3 +23,15 @@ $container->setDefinition(
     )
 )
     ->addTag('kernel.event_subscriber');
+
+
+//Database table prefix
+$container->setDefinition ('mautic.tblprefix_subscriber',
+    new Definition(
+        'Mautic\CoreBundle\EventListener\TablePrefixSubscriber',
+        array(
+            '%mautic.db_table_prefix%',
+            '%mautic.bundles%'
+        )
+    )
+)->addTag('doctrine.event_subscriber');

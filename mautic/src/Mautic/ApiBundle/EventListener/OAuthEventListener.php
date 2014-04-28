@@ -44,7 +44,7 @@ class OAuthEventListener
             }
 
             $event->setAuthorizedClient(
-                $user->isAuthorizedClient($event->getClient())
+                $user->isAuthorizedClient($event->getClient(), $this->em)
             );
         }
     }
@@ -58,10 +58,6 @@ class OAuthEventListener
                 //add the client to the user
                 $user->addClient($client);
                 $this->em->persist($user);
-
-                //add the user to the client
-                $client->addUser($user);
-                $this->em->persist($client);
 
                 $this->em->flush();
             }

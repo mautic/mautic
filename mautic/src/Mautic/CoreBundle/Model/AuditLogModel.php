@@ -10,54 +10,14 @@
 namespace Mautic\CoreBundle\Model;
 
 use Mautic\CoreBundle\Entity\AuditLog;
-use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Doctrine\ORM\EntityManager;
 
 /**
  * Class AuditLogModel
  *
  * @package Mautic\CoreBundle\Model
  */
-class AuditLogModel
+class AuditLogModel extends CommonModel
 {
-    /**
-     * @var \Symfony\Component\DependencyInjection\Container
-     */
-    protected $container;
-
-    /**
-     * @var null|\Symfony\Component\HttpFoundation\Request
-     */
-    protected $request;
-
-    /**
-     * @var \Doctrine\ORM\EntityManager
-     */
-    protected $em;
-
-    /**
-     * @var string
-     */
-    protected $repository;
-
-    /**
-     * @var string
-     */
-    protected $permissionBase;
-
-
-    /**
-     * @param Container     $container
-     * @param RequestStack  $request_stack
-     * @param EntityManager $em
-     */
-    public function __construct(Container $container, RequestStack $request_stack, EntityManager $em)
-    {
-        $this->container = $container;
-        $this->request   = $request_stack->getCurrentRequest();
-        $this->em        = $em;
-    }
 
     /**
      * Writes an entry to the audit log

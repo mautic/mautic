@@ -230,6 +230,7 @@ h1, h2, h3, h4, h5, h6 {
   left: @leftPanelWidth - 20;
   top: 55px;
   width:20px;
+  .transitions;
 }
 
 .left-side-bar-pin i {
@@ -259,6 +260,10 @@ h1, h2, h3, h4, h5, h6 {
 
 .page-wrapper.hide-left .main-panel {
   margin-right: 0;
+}
+
+.page-wrapper.hide-left .left-side-bar-pin, .page-wrapper.right-active .left-side-bar-pin {
+  margin-left: -@leftPanelWidth;
 }
 
 .page-wrapper.right-active {
@@ -486,6 +491,14 @@ label.required:after {
 
 .alert {
   word-wrap: break-word;
+}
+
+.tooltip-inner {
+  text-align: left;
+}
+
+a.btn {
+  color: #ffffff;
 }
 
 .loading-content .loading-bar

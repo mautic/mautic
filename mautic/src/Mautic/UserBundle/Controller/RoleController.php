@@ -15,6 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\UserBundle\Entity as Entity;
 use Mautic\UserBundle\Form\Type as FormType;
+use Symfony\Component\HttpKernel\Exception\PreconditionRequiredHttpException;
 
 /**
  * Class RoleController
@@ -284,25 +285,33 @@ class RoleController extends FormController
         $success     = 0;
         $flashes     = array();
         if ($this->request->getMethod() == 'POST') {
-            $result = $this->container->get('mautic.model.role')->deleteEntity($objectId);
+            try {
+                $result = $this->container->get('mautic.model.role')->deleteEntity($objectId);
 
-            if ($result === null) {
+                if ($result === null) {
+                    $flashes[] = array(
+                        'type' => 'error',
+                        'msg'  => 'mautic.user.role.error.notfound',
+                        'msgVars' => array('%id%' => $objectId)
+                    );
+                } else {
+                    $name = $result->getName();
+                    $flashes[] = array(
+                        'type' => 'notice',
+                        'msg'  => 'mautic.user.role.notice.deleted',
+                        'msgVars' => array(
+                            '%name%' => $name,
+                            '%id%'   => $objectId
+                        )
+                    );
+                }
+            } catch (PreconditionRequiredHttpException $e) {
                 $flashes[] = array(
                     'type' => 'error',
-                    'msg'  => 'mautic.user.role.error.notfound',
-                    'msgVars' => array('%id%' => $objectId)
-                );
-            } else {
-                $name = $result->getName();
-                $flashes[] = array(
-                    'type' => 'notice',
-                    'msg'  => 'mautic.user.role.notice.deleted',
-                    'msgVars' => array(
-                        '%name%' => $name,
-                        '%id%'   => $objectId
-                    )
+                    'msg'  => $e->getMessage()
                 );
             }
+
         } //else don't do anything
 
         return $this->postActionRedirect(array(

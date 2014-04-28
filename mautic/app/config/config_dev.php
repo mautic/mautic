@@ -30,11 +30,12 @@ $container->loadFromExtension("monolog", array(
         ),
         // uncomment to get logging in your browser
         // you may have to allow bigger header sizes in your Web server configuration
-        /*
+
         "firephp" => array(
             "type"  => "firephp",
             "level" => "info"
         ),
+        /*
         "chromephp" => array(
             "type"  => "chromephp",
             "level" => "info"

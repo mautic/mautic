@@ -9,6 +9,7 @@
 
 namespace Mautic\UserBundle\Security\Provider;
 
+use Doctrine\ORM\Query;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
@@ -36,21 +37,21 @@ class UserProvider implements UserProviderInterface
             ->setParameter('username', $username)
             ->getQuery();
 
-        try {
-            $user = $q->getSingleResult();
-        } catch (NoResultException $e) {
+        $users = $q->getResult();
+
+        if (null === $users || count($users) > 1) {
             $message = sprintf(
                 'Unable to find an active admin MauticUserBundle:User object identified by "%s".',
                 $username
             );
-            throw new UsernameNotFoundException($message, 0, $e);
+            throw new UsernameNotFoundException($message, 0);
         }
 
+        $user = $users[0];
         //load permissions
         if ($user->getId()) {
             $user->setActivePermissions($this->permissionRepository->getPermissionsByRole($user->getRole()));
         }
-
         return $user;
     }
 

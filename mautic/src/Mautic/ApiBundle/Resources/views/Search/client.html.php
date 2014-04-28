@@ -11,16 +11,19 @@
 <div class="global-search-result">
     <?php if (!empty($showMore)): ?>
     <div class="gs-client-name">
-        <a href="javascript: void(0);" class="pull-right margin-md-sides" onclick="Mautic.loadContent('<?php echo $this->container->get('router')->generate(
-            'mautic_client_index', array('filter-client' => $searchString)); ?>');">
+        <a href="<?php echo $this->container->get('router')->generate(
+            'mautic_client_index', array('filter-client' => $searchString)); ?>"
+           class="pull-right margin-md-sides"
+           data-toggle="ajax">
             <span><?php echo $view['translator']->trans('mautic.core.search.more', array("%count%" => $remaining)); ?></span>
         </a>
     </div>
     <?php else: ?>
     <div class="gs-client-name">
         <?php if ($canEdit): ?>
-        <a href="javascript: void(0);" onclick="Mautic.loadContent('<?php echo $this->container->get('router')->generate(
-        'mautic_client_action', array('objectAction' => 'edit', 'objectId' => $client->getId())); ?>');">
+        <a href="<?php echo $this->container->get('router')->generate(
+            'mautic_client_action', array('objectAction' => 'edit', 'objectId' => $client->getId())); ?>"
+            data-toggle="ajax">
         <?php endif; ?>
         <span><?php echo $client->getName(); ?></span>
         <?php if ($canEdit): ?>

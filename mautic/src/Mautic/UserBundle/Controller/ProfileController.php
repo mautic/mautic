@@ -49,9 +49,9 @@ class ProfileController extends FormController
 
         //remove items that cannot be edited by person themselves
         $form->remove('role');
+        $form->remove('isActive');
         $form->remove('save');
         $form->remove('cancel');
-
 
         //make sure this user has access to edit privileged fields
         foreach ($permissions as $permName => $hasAccess) {

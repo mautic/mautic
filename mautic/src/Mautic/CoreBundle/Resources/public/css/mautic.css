@@ -211,6 +211,10 @@ h6 {
   left: 210px;
   top: 55px;
   width: 20px;
+  -webkit-transition: all 0.3s ease-in-out;
+  -moz-transition: all 0.3s ease-in-out;
+  -o-transition: all 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out 0s;
 }
 .left-side-bar-pin i {
   transform: rotate(0);
@@ -234,6 +238,10 @@ h6 {
 }
 .page-wrapper.hide-left .main-panel {
   margin-right: 0;
+}
+.page-wrapper.hide-left .left-side-bar-pin,
+.page-wrapper.right-active .left-side-bar-pin {
+  margin-left: -230px;
 }
 .page-wrapper.right-active {
   position: relative;
@@ -419,6 +427,12 @@ label.required:after {
 }
 .alert {
   word-wrap: break-word;
+}
+.tooltip-inner {
+  text-align: left;
+}
+a.btn {
+  color: #ffffff;
 }
 .loading-content .loading-bar {
   display: block;

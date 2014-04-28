@@ -15,8 +15,7 @@
         </a>
         <ul class="dropdown-menu">
             <li>
-                <a href="javascript:void(0);"
-                   onclick="Mautic.loadContent('<?php echo $view['router']->generate("mautic_user_account"); ?>');">
+                <a href="<?php echo $view['router']->generate("mautic_user_account"); ?>" data-toggle="ajax">
                     <i class="fa fa-cog fa-lg fa-fw"></i><span><?php echo $view["translator"]->trans("mautic.user.account.settings"); ?></span>
                 </a>
             </li>

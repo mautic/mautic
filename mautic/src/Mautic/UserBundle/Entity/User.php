@@ -9,6 +9,7 @@
 
 namespace Mautic\UserBundle\Entity;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Criteria;
 use FOS\OAuthServerBundle\Model\ClientInterface;
@@ -95,7 +96,7 @@ class User implements AdvancedUserInterface, \Serializable
     protected $position;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Role", inversedBy="users")
+     * @ORM\ManyToOne(targetEntity="Role")
      * @ORM\JoinColumn(name="role_id", referencedColumnName="id")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
@@ -103,7 +104,8 @@ class User implements AdvancedUserInterface, \Serializable
     protected $role;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Mautic\ApiBundle\Entity\Client", mappedBy="user")
+     * @ORM\ManyToMany(targetEntity="Mautic\ApiBundle\Entity\Client")
+     * @ORM\JoinTable(name="oauth_user_client_xref")
      */
     protected $clients;
 
@@ -112,7 +114,7 @@ class User implements AdvancedUserInterface, \Serializable
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      */
-    protected $isActive;
+    protected $isActive = true;
 
     /**
      * @ORM\Column(name="date_added", type="datetime")
@@ -129,11 +131,6 @@ class User implements AdvancedUserInterface, \Serializable
      */
     protected $activePermissions;
 
-    public function __construct()
-    {
-        $this->isActive = true;
-    }
-
     /**
      * @param ClassMetadata $metadata
      */
@@ -145,9 +142,9 @@ class User implements AdvancedUserInterface, \Serializable
 
         $metadata->addConstraint(new UniqueEntity(
             array(
-                'fields'  => array('username'),
-                'message' => 'mautic.user.user.username.unique',
-                'repositoryMethod' => 'findByUsernameOrMatchEmail'
+                'fields'           => array('username'),
+                'message'          => 'mautic.user.user.username.unique',
+                'repositoryMethod' => 'checkUniqueUsernameEmail'
             )
         ));
 
@@ -172,8 +169,9 @@ class User implements AdvancedUserInterface, \Serializable
 
         $metadata->addConstraint(new UniqueEntity(
             array(
-                'fields'  => 'email',
-                'message' => 'mautic.user.user.email.unique'
+                'fields'           => array('email'),
+                'message'          => 'mautic.user.user.email.unique',
+                'repositoryMethod' => 'checkUniqueUsernameEmail'
             )
         ));
 
@@ -202,6 +200,11 @@ class User implements AdvancedUserInterface, \Serializable
                 'groups'  => array('Profile')
             )
         ));
+
+        $metadata->addPropertyConstraint('isActive',  new Assert\NotBlank(
+            array('message' => 'mautic.user.user.isactive.notblank')
+        ));
+
         $metadata->setGroupSequence(array('User', 'SecondPass', 'CheckPassword'));
     }
 
@@ -656,8 +659,8 @@ class User implements AdvancedUserInterface, \Serializable
      */
     public function isAuthorizedClient(ClientInterface $client)
     {
-        //user has already given authentication if the user is associated with the client
-        return $client->getUser()->contains($this);
+        $clients = $this->getClients();
+        return $clients->contains($client);
     }
 
     /**
@@ -665,10 +668,13 @@ class User implements AdvancedUserInterface, \Serializable
      *
      * @ORM\PrePersist
      */
-    public function onPrePersistSetDateAdded()
+    public function onPrePersistSetDefaults()
     {
         if (!$this->getId()) {
             $this->setDateAdded(new \DateTime());
+        }
+        if (null === $this->getIsActive()) {
+            $this->setIsActive(true);
         }
     }
 }

@@ -9,8 +9,10 @@
 
 namespace Mautic\UserBundle\Entity;
 
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * RoleRepository
@@ -20,36 +22,91 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class RoleRepository extends CommonRepository
 {
+
     /**
-     * Retrieves a list of roles
+     * Get a list of roles
      *
-     * @param array $args [start, limit, filter, orderBy, orderByDir]
+     * @param array      $args
+     * @param Translator $translator
      * @return Paginator
      */
     public function getEntities($args = array())
     {
-        $start      = array_key_exists('start', $args) ? $args['start'] : 0;
-        $limit      = array_key_exists('limit', $args) ? $args['limit'] : 30;
-        $filter     = array_key_exists('filter', $args) ? $args['filter'] : '';
-        $orderBy    = array_key_exists('orderBy', $args) ? $args['orderBy'] : 'r.name';
-        $orderByDir = array_key_exists('orderByDir', $args) ? $args['orderByDir'] : "ASC";
-
         $q = $this
-            ->createQueryBuilder('r')
-            ->setFirstResult($start)
-            ->setMaxResults($limit);
+            ->createQueryBuilder('r');
 
-        if (!empty($orderBy)) {
-            $q->orderBy($orderBy, $orderByDir);
-        }
+        $this->buildClauses($q, $args);
 
-        if (!empty($filter)) {
-            $q->where('r.name LIKE :filter')
-                ->orWhere('r.description LIKE :filter')
-                ->setParameter(':filter', '%'.$filter.'%');
-        }
         $query = $q->getQuery();
         $result = new Paginator($query);
         return $result;
+    }
+
+    protected function addCatchAllWhereClause(QueryBuilder &$q, $filter)
+    {
+        $unique  = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
+        $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
+        $func    = ($filter->not) ? "notLike" : "like";
+        $xFunc   = ($func == "notLike") ? "andX" : "orX";
+
+        $expr = $q->expr()->$xFunc(
+            $q->expr()->$func('r.name',  ':'.$unique),
+            $q->expr()->$func('r.description', ':'.$unique)
+        );
+        return array(
+            $expr,
+            array("$unique" => $string)
+        );
+    }
+
+    protected function addSearchCommandWhereClause(QueryBuilder &$q, $filter)
+    {
+        $command         = $field = $filter->command;
+        $string          = $filter->string;
+        $unique          = $this->generateRandomParameterName();
+        $returnParameter = true; //returning a parameter that is not used will lead to a Doctrine error
+        $func            = ($filter->not) ? "notLike" : "like";
+
+        switch ($command) {
+            case $this->translator->trans('mautic.core.searchcommand.is'):
+                $isFunc = ($filter->not) ? "neq" : "eq";
+                switch($string) {
+                    case $this->translator->trans('mautic.user.user.searchcommand.isadmin');
+                        $expr = $q->expr()->$isFunc("r.isAdmin", 1);
+                        break;
+                }
+                $returnParameter = false;
+                break;
+            case $this->translator->trans('mautic.core.searchcommand.name'):
+                $expr = $q->expr()->$func("r.name", ':'.$unique);
+                break;
+        }
+        if (empty($expr)) {
+            throw new NotFoundHttpException(
+                'Advanced search command and/or string not found!  Remember to use translation strings.' .
+                " ($command = $string)"
+            );
+        }
+
+        $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
+        return array(
+            $expr,
+            ($returnParameter) ? array("$unique" => $string) : array()
+        );
+
+    }
+
+    protected function isSupportedSearchCommand($command)
+    {
+        $commands = array(
+            $this->translator->trans('mautic.core.searchcommand.is'),
+            $this->translator->trans('mautic.core.searchcommand.name'),
+        );
+        return in_array($command, $commands);
+    }
+
+    protected function getDefaultOrderBy()
+    {
+        return 'r.name';
     }
 }

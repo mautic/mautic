@@ -1,5 +1,38 @@
 var Mautic = {
     /**
+     * Initiate various functions on page load, manual or ajax
+     */
+    onPageLoad: function(container) {
+        container = typeof container !== 'undefined' ? container : 'body';
+
+        //set ajax links
+        $(container + " *[data-toggle='ajax']").click(function(event){
+            event.preventDefault();
+
+            var route  = $(this).attr('href');
+            var link   = $(this).attr('data-menu-link');
+            var toggleMenu = false;
+            if ($(this).attr('data-menu-link')) {
+                toggleMenu = ($(this).attr('data-menu-link') == 'true') ? true : false;
+            }
+
+            Mautic.loadContent(route, link, toggleMenu);
+
+        });
+
+        //initialize new
+        $(container + " *[data-toggle='tooltip']").tooltip({html: true});
+    },
+
+    /**
+     * Functions to be ran on ajax page unload
+     */
+    onPageUnload: function(container) {
+        container = typeof container !== 'undefined' ? container : 'body';
+        $(container + " *[data-toggle='tooltip']").tooltip('destroy');
+    },
+
+    /**
      * Takes a given route, retrieves the HTML, and then updates the content
      * @param route
      * @param link
@@ -16,7 +49,9 @@ var Mautic = {
                 if (response) {
                     if (mainContentOnly) {
                         if (response.newContent) {
+                            Mautic.onPageUnload('.main-panel-content');
                             $(".main-panel-content").html(response.newContent);
+                            Mautic.onPageLoad('.main-panel-content');
                         }
                     } else {
                         //set route and activeLink if the response didn't override
@@ -99,6 +134,9 @@ var Mautic = {
      */
     processContent: function (response) {
         if (response && response.newContent) {
+            //inactive tooltips, etc
+            Mautic.onPageUnload('.main-panel-content');
+
             if (response.route) {
                 //update URL in address bar
                 History.pushState(null, "Mautic", response.route);
@@ -155,8 +193,9 @@ var Mautic = {
                 scrollTop: 0
             }, 0);
 
-            //initialize tooltips
-            $("span[data-toggle='tooltip']").tooltip();
+
+            //active tooltips, etc
+            Mautic.onPageLoad('.main-panel-content');
         }
         $("body").removeClass("loading-content");
     },
@@ -189,9 +228,6 @@ var Mautic = {
 
                 return false;
             });
-
-            //active tooltips
-            $("span[data-toggle='tooltip']").tooltip();
         });
     },
 
@@ -338,6 +374,7 @@ var Mautic = {
      * @param orderby
      */
     reorderTableData: function (name, orderby) {
+        $("body").addClass("loading-content");
         var query = "ajaxAction=setorderby&name=" + name + "&orderby=" + orderby;
         $.ajax({
             url: mauticBaseUrl,
@@ -349,6 +386,11 @@ var Mautic = {
                     var route = window.location.pathname;
                     Mautic.loadContent(route, '', false, true);
                 }
+                $("body").removeClass("loading-content");
+            },
+            error: function(request, textStatus, errorThrown) {
+                alert(errorThrown);
+                $("body").removeClass("loading-content");
             }
         });
     },
@@ -360,13 +402,18 @@ var Mautic = {
     executeAction: function (action, menuLink) {
         //dismiss modal if activated
         Mautic.dismissConfirmation();
-
+        $("body").addClass("loading-content");
         $.ajax({
             url: action,
             type: "POST",
             dataType: "json",
             success: function(response) {
                 Mautic.processContent(response);
+                $("body").removeClass("loading-content");
+            },
+            error: function(request, textStatus, errorThrown) {
+                alert(errorThrown);
+                $("body").removeClass("loading-content");
             }
         });
     },
@@ -423,10 +470,14 @@ var Mautic = {
             $.ajax({
                 url: route,
                 type: "POST",
-                data: $('#list-filter').attr('name') + "=" + $('#list-filter').val(),
+                data: $('#list-filter').attr('name') + "=" + encodeURIComponent($('#list-filter').val()),
                 dataType: "json",
                 success: function (response) {
                     Mautic.processContent(response);
+                },
+                error: function(request, textStatus, errorThrown) {
+                    alert(errorThrown);
+                    $("body").removeClass("loading-content");
                 }
             });
         }
@@ -450,9 +501,16 @@ var Mautic = {
         }
     },
 
+    /**
+     * Loads content for right side panel
+     *
+     * @param event
+     * @param searchStr
+     */
     loadGlobalSearchResults: function (event, searchStr) {
         if (event.keyCode == 13) {
-            var query = "ajaxAction=globalsearch&searchstring=" + encodeURI(searchStr);
+            $("body").addClass("loading-content");
+            var query = "ajaxAction=globalsearch&searchstring=" + encodeURIComponent(searchStr);
             $.ajax({
                 url: mauticBaseUrl,
                 type: "POST",
@@ -462,6 +520,11 @@ var Mautic = {
                     if (response.searchResults) {
                         $(".global-search-wrapper").html(response.searchResults);
                     }
+                    $("body").removeClass("loading-content");
+                },
+                error: function(request, textStatus, errorThrown) {
+                    alert(errorThrown);
+                    $("body").removeClass("loading-content");
                 }
             });
         }

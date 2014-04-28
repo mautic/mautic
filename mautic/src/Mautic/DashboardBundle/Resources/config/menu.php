@@ -30,11 +30,9 @@ $items = array(
         'route'    => 'mautic_dashboard_index',
         'uri'      => 'javascript: void(0)',
         'linkAttributes' => array(
-            'onclick' =>
-                'return Mautic.loadContent(\''
-                . $this->container->get('router')->generate('mautic_dashboard_index')
-                . '\', \'#mautic_dashboard_index\');',
-            'id'      => 'mautic_dashboard_index'
+            'data-toggle'    => 'ajax',
+            'data-menu-link' => '#mautic_dashboard_index',
+            'id'             => 'mautic_dashboard_index'
         ),
         'labelAttributes' => array(
             'class'   => 'nav-item-name'

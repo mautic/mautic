@@ -62,6 +62,8 @@ class SecurityController extends CommonController
         if (!empty($error)) {
             if (($error instanceof Exception\BadCredentialsException)) {
                 $msg = "mautic.user.auth.error.invalidlogin";
+            } elseif ($error instanceof Exception\DisabledException) {
+                $msg = "mautic.user.auth.error.disabledaccount";
             } else {
                 $msg = $error->getMessage();
             }

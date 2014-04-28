@@ -82,8 +82,12 @@ class UserSubscriber implements EventSubscriberInterface
 
     public function onGlobalSearch(MauticEvents\GlobalSearchEvent $event)
     {
+        $str = $event->getSearchString();
+        if (empty($str)) {
+            return;
+        }
+
         if ($this->container->get('mautic.security')->isGranted('user:users:view')) {
-            $str   = $event->getSearchString();
             $users = $this->container->get('mautic.model.user')->getEntities(
                 array(
                     'limit'  => 5,
@@ -117,7 +121,6 @@ class UserSubscriber implements EventSubscriberInterface
         }
 
         if ($this->container->get('mautic.security')->isGranted('user:roles:view')) {
-            $str   = $event->getSearchString();
             $roles = $this->container->get('mautic.model.role')->getEntities(
                 array(
                     'limit'  => 5,

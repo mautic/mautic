@@ -11,8 +11,9 @@
 <div class="global-search-result">
     <?php if (!empty($showMore)): ?>
     <div class="gs-role-name">
-        <a href="javascript: void(0);" class="pull-right margin-md-sides" onclick="Mautic.loadContent('<?php echo $this->container->get('router')->generate(
-            'mautic_role_index', array('filter-role' => $searchString)); ?>');">
+        <a class="pull-right margin-md-sides" href="<?php echo $this->container->get('router')->generate(
+            'mautic_role_index', array('filter-role' => $searchString)); ?>"
+            data-toggle="ajax">
             <span><?php echo $view['translator']->trans('mautic.core.search.more', array("%count%" => $remaining)); ?></span>
         </a>
     </div>

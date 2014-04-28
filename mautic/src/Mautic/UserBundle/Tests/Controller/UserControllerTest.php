@@ -57,6 +57,8 @@ class UserControllerTest extends MauticWebTestCase
     {
         $crawler = $this->client->request('GET', '/users');
 
+        $this->assertNoError($this->client->getResponse(), $crawler);
+
         //should be a 200 code
         $this->assertTrue($this->client->getResponse()->isSuccessful());
 
@@ -70,6 +72,7 @@ class UserControllerTest extends MauticWebTestCase
     public function testNew()
     {
         $crawler = $this->client->request('GET', '/users/new');
+        $this->assertNoError($this->client->getResponse(), $crawler);
 
         //should be a 200 code
         $this->assertTrue($this->client->getResponse()->isSuccessful());

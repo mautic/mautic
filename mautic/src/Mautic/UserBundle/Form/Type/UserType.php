@@ -140,6 +140,19 @@ class UserType extends AbstractType
             'required'          => $required
         ));
 
+
+        $builder->add('isActive', 'choice', array(
+            'choices'       => array(
+                '0'   => 'mautic.core.form.no',
+                '1'   => 'mautic.core.form.yes',
+            ),
+            'expanded'      => true,
+            'multiple'      => false,
+            'label'         => 'matuic.user.user.form.isActive',
+            'empty_value'   => false,
+            'required'      => true
+        ));
+
         $builder->add('save', 'submit', array(
             'label' => 'mautic.core.form.save',
             'attr'  => array(

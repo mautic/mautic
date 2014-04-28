@@ -13,9 +13,10 @@ $view["slots"]->set("headerTitle", $view['translator']->trans('mautic.user.user.
 
 <?php if ($permissions['create']): ?>
 <?php $view["slots"]->start("actions"); ?>
-<li><a href="javacript: void(0);"
-       onclick="return Mautic.loadContent('<?php echo $this->container->get('router')->generate(
-        'mautic_user_action', array("objectAction" => "new")); ?>', '#mautic_user_index'); ">
+<li><a href="<?php echo $this->container->get('router')->generate(
+        'mautic_user_action', array("objectAction" => "new")); ?>"
+    data-toggle="ajax"
+    data-menu-link="#mautic_user_index">
         <?php echo $view["translator"]->trans("mautic.user.user.menu.new"); ?>
     </a>
 </li>
@@ -27,9 +28,10 @@ $view['slots']->set('filterUri', $this->container->get('router')->generate('maut
 $view["slots"]->set("filterInput",
     $view->render('MauticCoreBundle:Form:filter.html.php',
         array(
-            'filterUri'    => $this->container->get('router')->generate('mautic_user_index'),
-            'filterName'   => 'filter-user',
-            'filterValue'  => $filterValue
+            'filterUri'     => $this->container->get('router')->generate('mautic_user_index'),
+            'filterName'    => 'filter-user',
+            'filterValue'   => $filterValue,
+            'filterTooltip' => 'mautic.user.user.help.searchcommands'
         )
     )
 );
@@ -97,17 +99,19 @@ $view["slots"]->set("filterInput",
                 <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 <td>
                     <?php if ($permissions['edit']): ?>
-                    <button class="btn btn-primary btn-xs"
-                            onclick="Mautic.loadContent('<?php echo $view['router']->generate('mautic_user_action',
-                                array("objectAction" => "edit", "objectId" => $item->getId())); ?>', '#mautic_user_index');">
+                    <a class="btn btn-primary btn-xs"
+                       href="<?php echo $view['router']->generate('mautic_user_action',
+                                array("objectAction" => "edit", "objectId" => $item->getId())); ?>"
+                       data-toggle="ajax"
+                       data-menu-link="#mautic_user_index">
                         <i class="fa fa-pencil-square-o"></i>
-                    </button>
+                    </a>
                     <?php endif; ?>
                     <?php if ($permissions['delete']): ?>
-                    <button class="btn btn-danger btn-xs"
+                    <a class="btn btn-danger btn-xs" href="javascript:void(0);"
                             onclick="Mautic.showConfirmation('<?php echo $view->escape($view["translator"]->trans("mautic.user.user.form.confirmdelete", array("%user%" => $item->getName() . " (" . $item->getId() . ")")), 'js'); ?>','<?php echo $view->escape($view["translator"]->trans("mautic.core.form.delete"), 'js'); ?>','executeAction',['<?php echo $view['router']->generate('mautic_user_action', array("objectAction" => "delete", "objectId" => $item->getId())); ?>','#mautic_user_index'],'<?php echo $view->escape($view["translator"]->trans("mautic.core.form.cancel"), 'js'); ?>','',[]);">
                         <i class="fa fa-trash-o"></i>
-                    </button>
+                    </a>
                     <?php endif; ?>
                 </td>
             </tr>

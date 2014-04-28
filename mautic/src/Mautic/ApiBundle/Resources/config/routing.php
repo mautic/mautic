@@ -35,8 +35,14 @@ $collection->add('mautic_oauth_server_auth_login_check', new Route('/oauth/v2/au
 ));
 
 //Clients
-$collection->add('mautic_client_index', new Route('/clients',
-    array('_controller' => 'MauticApiBundle:Client:index')
+$collection->add('mautic_client_index', new Route('/clients/{page}',
+    array(
+        '_controller' => 'MauticApiBundle:Client:index',
+        'page'        => 1
+    ),
+    array(
+        'page' => '\d+'
+    )
 ));
 
 $collection->add('mautic_client_action', new Route('/clients/{objectAction}/{objectId}',

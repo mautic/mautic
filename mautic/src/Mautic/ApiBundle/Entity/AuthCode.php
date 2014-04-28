@@ -34,7 +34,7 @@ class AuthCode extends BaseAuthCode
     protected $client;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Mautic\UserBundle\Entity\User")
+     * @ORM\ManyToOne(targetEntity="Mautic\UserBundle\Entity\User", fetch="EXTRA_LAZY")
      */
     protected $user;
 

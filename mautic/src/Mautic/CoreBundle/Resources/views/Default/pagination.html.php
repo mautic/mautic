@@ -35,18 +35,17 @@ if ((int) $page === 1) {
 <div class="pagination-wrapper">
     <ul class="pagination pull-right ">
         <li<?php echo $prevClass;?>>
-            <a href="javascript: void(0);"
-               onclick="Mautic.loadContent('<?php echo $prevUrl; ?>', '#mautic_user_index', false);">&laquo;</a>
+            <a href="<?php echo $prevUrl; ?>" data-toggle="ajax" data-menu-link="#mautic_user_index">&laquo;</a>
         </li>
         <?php for ($i=1; $i<=$totalPages; $i++): ?>
         <li<?php echo ((int) $page === $i) ? ' class="active"' : ''; ?>>
-            <a href="javascript: void(0);"
-               onclick="Mautic.loadContent('<?php echo $baseUrl . "/" . $i;; ?>', '#mautic_user_index', false);"><?php echo $i; ?></a>
+            <a href="<?php echo $baseUrl . "/" . $i; ?>" data-toggle="ajax" data-menu-link="#mautic_user_index">
+                <?php echo $i; ?>
+            </a>
         </li>
         <?php endfor; ?>
         <li<?php echo $nextClass; ?>>
-            <a href="javascript: void(0);"
-               onclick="Mautic.loadContent('<?php echo $nextUrl; ?>', '#mautic_user_index', false);">&raquo;</a>
+            <a href="<?php echo $nextUrl; ?>" data-toggle="ajax" data-menu-link="#mautic_user_index");">&raquo;</a>
         </li>
     </ul>
     <div class="clearfix"></div>

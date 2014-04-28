@@ -13,10 +13,10 @@ $view["slots"]->set("headerTitle", $view['translator']->trans('mautic.api.client
 
 <?php if ($permissions['create']): ?>
 <?php $view["slots"]->start("actions"); ?>
-<li><a href="javacript: void(0);"
-       onclick="return Mautic.loadContent('<?php echo $this->container->get('router')->generate(
-        'mautic_client_action', array("objectAction" => "new")); ?>', '#mautic_client_index'); ">
-        <?php echo $view["translator"]->trans("mautic.api.client.menu.new"); ?>
+<li>
+    <a href="<?php $this->container->get('router')->generate('mautic_client_action', array("objectAction" => "new")); ?>'"
+       data-toggle="ajax">
+       <?php echo $view["translator"]->trans("mautic.api.client.menu.new"); ?>
     </a>
 </li>
 <?php $view["slots"]->stop(); ?>
@@ -29,7 +29,8 @@ $view["slots"]->set("filterInput",
         array(
             'filterUri'    => $this->container->get('router')->generate('mautic_client_index'),
             'filterName'   => 'filter-client',
-            'filterValue'  => $filterValue
+            'filterValue'  => $filterValue,
+            'filterTooltip' => 'mautic.api.client.help.searchcommands'
         )
     )
 );
@@ -39,9 +40,23 @@ $view["slots"]->set("filterInput",
     <table class="table table-hover table-striped table-bordered client-list">
         <thead>
             <tr>
-                <th><?php echo $view['translator']->trans('mautic.api.client.thead.name'); ?></th>
+                <?php
+                echo $view->render('MauticCoreBundle:Table:tableheader.html.php', array(
+                    'entity'  => 'client',
+                    'orderBy' => 'c.name',
+                    'text'    => 'mautic.api.client.thead.name',
+                    'default' => true
+                ));
+                ?>
                 <th class="visible-md visible-lg"><?php echo $view['translator']->trans('mautic.api.client.thead.redirecturis'); ?></th>
-                <th class="visible-md visible-lg"><?php echo $view['translator']->trans('mautic.api.client.thead.id'); ?></th>
+                <?php
+                echo $view->render('MauticCoreBundle:Table:tableheader.html.php', array(
+                    'entity'  => 'client',
+                    'orderBy' => 'c.id',
+                    'text'    => 'mautic.api.client.thead.id',
+                    'class'   => 'visible-md visible-lg'
+                ));
+                ?>
                 <th style="width: 75px;"></th>
             </tr>
         </thead>
@@ -55,21 +70,29 @@ $view["slots"]->set("filterInput",
                 <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 <td>
                     <?php if ($permissions['edit']): ?>
-                    <button class="btn btn-primary btn-xs"
-                            onclick="Mautic.loadContent('<?php echo $view['router']->generate('mautic_client_action',
-                                array("objectAction" => "edit", "objectId" => $item->getId())); ?>', '#mautic_client_index');">
+                    <a class="btn btn-primary btn-xs"
+                       href="<?php echo $view['router']->generate('mautic_client_action',
+                            array("objectAction" => "edit", "objectId" => $item->getId())); ?>"
+                        data-toggle="ajax"
+                        data-menu-link="#mautic_client_index">
                         <i class="fa fa-pencil-square-o"></i>
-                    </button>
+                    </a>
                     <?php endif; ?>
                     <?php if ($permissions['delete']): ?>
-                    <button class="btn btn-danger btn-xs"
+                    <a class="btn btn-danger btn-xs" href="javascript: void(0);"
                             onclick="Mautic.showConfirmation('<?php echo $view->escape($view["translator"]->trans("mautic.api.client.form.confirmdelete", array("%name%" => $item->getName() . " (" . $item->getId() . ")")), 'js'); ?>','<?php echo $view->escape($view["translator"]->trans("mautic.core.form.delete"), 'js'); ?>','executeAction',['<?php echo $view['router']->generate('mautic_client_action', array("objectAction" => "delete", "objectId" => $item->getId())); ?>','#mautic_client_index'],'<?php echo $view->escape($view["translator"]->trans("mautic.core.form.cancel"), 'js'); ?>','',[]);">
                         <i class="fa fa-trash-o"></i>
-                    </button>
+                    </a>
                     <?php endif; ?>
                 </td>
             </tr>
             <?php endforeach; ?>
         </tbody>
     </table>
+    <?php echo $view->render('MauticCoreBundle:Default:pagination.html.php', array(
+        "items"   => $items,
+        "page"    => $page,
+        "limit"   => $limit,
+        "baseUrl" =>  $view['router']->generate('mautic_client_index')
+    )); ?>
 </div>

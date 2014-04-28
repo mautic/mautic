@@ -9,9 +9,12 @@
 
 namespace Mautic\UserBundle\Entity;
 
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\ORM\NoResultException;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Symfony\Bundle\FrameworkBundle\Translation\Translator;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * UserRepository
@@ -21,18 +24,19 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class UserRepository extends CommonRepository
 {
+
     /**
-     * Find user by username or if email matches the username
+     * Checks to ensure that a username and/or email is unique
      *
      * @param $params
      * @return array
      */
-    public function findByUsernameOrMatchEmail($params) {
+    public function checkUniqueUsernameEmail($params) {
+        $identifier = (isset($params['email'])) ? $params['email'] : $params['username'];
         $q = $this
             ->createQueryBuilder('u')
-            ->where('u.username = :username OR u.email = :email')
-            ->setParameter('username', $params['username'])
-            ->setParameter('email', $params['username'])
+            ->where('u.username = :identifier OR u.email = :identifier')
+            ->setParameter("identifier", $identifier)
             ->getQuery();
         return $q->getResult();
     }
@@ -40,38 +44,119 @@ class UserRepository extends CommonRepository
     /**
      * Get a list of users
      *
-     * @param array $args [start, limit, filter, orderBy, orderByDir]
+     * @param array      $args
+     * @param Translator $translator
      * @return Paginator
      */
     public function getEntities($args = array())
     {
-        $start      = array_key_exists('start', $args) ? $args['start'] : 0;
-        $limit      = array_key_exists('limit', $args) ? $args['limit'] : 30;
-        $filter     = array_key_exists('filter', $args) ? $args['filter'] : '';
-        $orderBy    = array_key_exists('orderBy', $args) ? $args['orderBy'] : 'u.lastName, u.firstName, u.username';
-        $orderByDir = array_key_exists('orderByDir', $args) ? $args['orderByDir'] : "ASC";
-
         $q = $this
             ->createQueryBuilder('u')
             ->select('u, r')
-            ->leftJoin('u.role', 'r')
-            ->setFirstResult($start)
-            ->setMaxResults($limit);
+            ->leftJoin('u.role', 'r');
 
-        if (!empty($orderBy)) {
-            $q->orderBy($orderBy, $orderByDir);
-        }
+        $this->buildClauses($q, $args);
 
-        if (!empty($filter)) {
-            $q->where('u.username LIKE :filter')
-                ->orWhere('u.email LIKE :filter')
-                ->orWhere('u.firstName LIKE :filter')
-                ->orWhere('u.lastName LIKE :filter')
-                ->orWhere('u.position LIKE :filter')
-                ->setParameter(':filter', '%'.$filter.'%');
-        }
         $query = $q->getQuery();
         $result = new Paginator($query);
         return $result;
+    }
+
+    protected function addCatchAllWhereClause(QueryBuilder &$q, $filter)
+    {
+        $unique  = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
+        $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
+        $func    = ($filter->not) ? "notLike" : "like";
+        $xFunc   = ($func == "notLike") ? "andX" : "orX";
+
+        $expr = $q->expr()->$xFunc(
+            $q->expr()->$func('u.username',  ':'.$unique),
+            $q->expr()->$func('u.email',     ':'.$unique),
+            $q->expr()->$func('u.firstName', ':'.$unique),
+            $q->expr()->$func('u.lastName',  ':'.$unique),
+            $q->expr()->$func('u.position',  ':'.$unique),
+            $q->expr()->$func('r.name',  ':'.$unique)
+        );
+        return array(
+            $expr,
+            array("$unique" => $string)
+        );
+    }
+
+    protected function addSearchCommandWhereClause(QueryBuilder &$q, $filter)
+    {
+        $command         = $field = $filter->command;
+        $string          = $filter->string;
+        $unique          = $this->generateRandomParameterName();
+        $returnParameter = true; //returning a parameter that is not used will lead to a Doctrine error
+        $func            = ($filter->not) ? "notLike" : "like";
+
+        switch ($command) {
+            case $this->translator->trans('mautic.core.searchcommand.is'):
+                $isFunc = ($filter->not) ? "neq" : "eq";
+                switch($string) {
+                    case $this->translator->trans('mautic.user.user.searchcommand.isactive'):
+                        $expr = $q->expr()->$isFunc("u.isActive", 1);
+                        break;
+                    case $this->translator->trans('mautic.user.user.searchcommand.isinactive'):
+                        $expr = $q->expr()->$isFunc("u.isActive", 0);
+                        break;
+                    case $this->translator->trans('mautic.user.user.searchcommand.isadmin');
+                        $expr = $q->expr()->$isFunc("r.isAdmin", 1);
+                        break;
+                }
+                $returnParameter = false;
+                break;
+            case $this->translator->trans('mautic.user.user.searchcommand.email'):
+                $expr = $q->expr()->$func("u.email", ':'.$unique);
+                break;
+            case $this->translator->trans('mautic.user.user.searchcommand.position'):
+                $expr = $q->expr()->$func("u.position", ':'.$unique);
+                break;
+            case $this->translator->trans('mautic.user.user.searchcommand.username'):
+                $expr = $q->expr()->$func("u.username", ':'.$unique);
+                break;
+            case $this->translator->trans('mautic.user.user.searchcommand.role'):
+                $expr = $q->expr()->$func("r.name", ':'.$unique);
+                break;
+            case $this->translator->trans('mautic.core.searchcommand.name'):
+                $xFunc = ($func == "notLike") ? "andX" : "orX";
+                $expr = $q->expr()->$xFunc(
+                    $q->expr()->$func('u.firstName', ':'.$unique),
+                    $q->expr()->$func('u.lastName', ':'.$unique)
+                );
+                break;
+        }
+        if (empty($expr)) {
+            throw new NotFoundHttpException(
+                'Advanced search command and/or string not found!  Remember to use translation strings.' .
+                " ($command = $string)"
+            );
+        }
+
+        $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
+        return array(
+            $expr,
+            ($returnParameter) ? array("$unique" => $string) : array()
+        );
+
+    }
+
+    protected function isSupportedSearchCommand($command)
+    {
+        $commands = array(
+            $this->translator->trans('mautic.user.user.searchcommand.email'),
+            $this->translator->trans('mautic.core.searchcommand.is'),
+            $this->translator->trans('mautic.core.searchcommand.name'),
+            $this->translator->trans('mautic.user.user.searchcommand.position'),
+            $this->translator->trans('mautic.user.user.searchcommand.role'),
+            $this->translator->trans('mautic.user.user.searchcommand.username'),
+        );
+        return in_array($command, $commands);
+    }
+
+    protected function getDefaultOrderBy()
+    {
+        return 'u.lastName, u.firstName, u.username';
     }
 }
