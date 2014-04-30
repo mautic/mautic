@@ -1,14 +1,25 @@
 <?php
 //Note Mautic specific bundles so they can be applied as needed without having to specify them individually
-$mauticbundles = array_filter(
-    $container->getParameter('kernel.bundles'),
-    function($v) {
-        return ((strpos($v, 'Mautic') !== false) ? 1 : 0);
+$buildBundles = function($namespace, $bundle) use ($container) {
+    if (strpos($namespace, 'Mautic') !== false) {
+        $v = array(
+            "namespace" => $namespace,
+            "directory" => $container->getParameter('kernel.root_dir').'/../src/Mautic/'.str_replace('Mautic', '', $bundle)
+        );
+        return $v;
     }
-);
-$container->setParameter('mautic.bundles', $mauticbundles);
+    return false;
+};
+$symfonyBundles = $container->getParameter('kernel.bundles');
+$mauticBundles  = array_values(array_filter(
+    array_map($buildBundles , $symfonyBundles, array_keys($symfonyBundles)),
+    function ($v) { return (!empty($v)); }
+));
+
+$container->setParameter('mautic.bundles', $mauticBundles);
 
 $loader->import('parameters.php');
+$container->loadFromExtension('mautic_core');
 
 $container->loadFromExtension('framework', array(
     'secret'               => '%mautic.secret%',
@@ -102,11 +113,8 @@ $container->loadFromExtension('swiftmailer', array(
 $css    = array();
 $js     = array();
 
-foreach ($mauticbundles as $bundle => $namespace) {
-    //parse the namespace into a filepath
-    $namespaceParts = explode('\\', $namespace);
-    $bundleDir      = __DIR__ . '/../../src/' . $namespaceParts[0] . '/' . $namespaceParts[1];
-
+foreach ($mauticBundles as $bundle => $details) {
+   $bundleDir = $details['directory'];
     //define the function for use with CSS and JS files
     $getFiles = function ($type) use ($bundleDir, &$css, &$js) {
         $typeDir = "$bundleDir/Resources/public/$type/";

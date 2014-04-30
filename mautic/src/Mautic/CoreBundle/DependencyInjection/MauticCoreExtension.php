@@ -13,7 +13,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader;
-use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 
 
 /**
@@ -24,7 +23,7 @@ use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
  * @package Mautic\CoreBundle\DependencyInjection
  */
 
-class MauticCoreExtension extends Extension implements PrependExtensionInterface
+class MauticCoreExtension extends Extension
 {
 
     /**
@@ -36,31 +35,11 @@ class MauticCoreExtension extends Extension implements PrependExtensionInterface
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        //set the parameters
-        foreach ($config as $k => $v) {
-            $container->setParameter("mautic.{$k}", $v);
-        }
-
         $loader = new Loader\PhpFileLoader($container, new FileLocator(__DIR__.'/../Resources/config/services'));
         $loader->load('events.php');
         $loader->load('forms.php');
         $loader->load('services.php');
         $loader->load('menu.php');
         $loader->load('models.php');
-
-    }
-
-    public function prepend(ContainerBuilder $container)
-    {
-        //here we can disable or modify config settings for other bundles if need be
-        $bundles = $container->getParameter('mautic.bundles');
-
-        $configs = $container->getExtensionConfig($this->getAlias());
-        $config  = $this->processConfiguration(new Configuration(), $configs);
-
-        //inject CoreBundle configuration parameters into the other Mautic bundles
-        foreach ($bundles as $name => $bundle) {
-            $container->prependExtensionConfig($name, $config);
-        }
     }
 }

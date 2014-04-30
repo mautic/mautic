@@ -11,6 +11,7 @@ namespace Mautic\ApiBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader;
 
@@ -21,7 +22,7 @@ use Symfony\Component\DependencyInjection\Loader;
  *
  * @package Mautic\ApiBundle\DependencyInjection
  */
-class MauticApiExtension extends Extension
+class MauticApiExtension extends Extension implements PrependExtensionInterface
 {
 
     /**
@@ -38,5 +39,14 @@ class MauticApiExtension extends Extension
         $loader->load('forms.php');
         $loader->load('models.php');
         $loader->load('events.php');
+    }
+
+    public function prepend(ContainerBuilder $container)
+    {
+
+        //inject this bundle's config into core
+        $configs = $container->getExtensionConfig($this->getAlias());
+        $config = $this->processConfiguration(new Configuration(), $configs);
+        $container->prependExtensionConfig('mautic_core', $config);
     }
 }
