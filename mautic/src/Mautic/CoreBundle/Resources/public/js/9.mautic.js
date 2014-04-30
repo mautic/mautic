@@ -135,7 +135,7 @@ var Mautic = {
     processContent: function (response) {
         if (response && response.newContent) {
             //inactive tooltips, etc
-            Mautic.onPageUnload('.main-panel-content');
+            Mautic.onPageUnload('.main-panel-wrapper');
 
             if (response.route) {
                 //update URL in address bar
@@ -195,7 +195,7 @@ var Mautic = {
 
 
             //active tooltips, etc
-            Mautic.onPageLoad('.main-panel-content');
+            Mautic.onPageLoad('.main-panel-wrapper');
         }
         $("body").removeClass("loading-content");
     },
@@ -463,10 +463,14 @@ var Mautic = {
     /**
      * Filters list based on search contents
      */
-    filterList: function(e,  route) {
-        if ($('#list-filter').length && (e.keyCode == 13 || e.which == 13 || $(e.target).hasClass('fa-search'))){
+    filterList: function(e,  route, clear) {
+        if ($('#list-filter').length && (e.keyCode == 13 || e.which == 13 || $(e.target).hasClass('btn-filter'))){
             e.preventDefault();
             $("body").addClass("loading-content");
+            if (clear) {
+                $('#list-filter').val('');
+            }
+
             $.ajax({
                 url: route,
                 type: "POST",
@@ -503,30 +507,60 @@ var Mautic = {
 
     /**
      * Loads content for right side panel
-     *
-     * @param event
-     * @param searchStr
      */
-    loadGlobalSearchResults: function (event, searchStr) {
-        if (event.keyCode == 13) {
-            $("body").addClass("loading-content");
-            var query = "ajaxAction=globalsearch&searchstring=" + encodeURIComponent(searchStr);
-            $.ajax({
-                url: mauticBaseUrl,
-                type: "POST",
-                data: query,
-                dataType: "json",
-                success: function (response) {
-                    if (response.searchResults) {
-                        $(".global-search-wrapper").html(response.searchResults);
-                    }
-                    $("body").removeClass("loading-content");
-                },
-                error: function(request, textStatus, errorThrown) {
-                    alert(errorThrown);
-                    $("body").removeClass("loading-content");
+    submitGlobalSearchResults: function () {
+        var searchStr = $('#global_search').val();
+
+        $("body").addClass("loading-content");
+        var query = "ajaxAction=globalsearch&searchstring=" + encodeURIComponent(searchStr);
+        $.ajax({
+            url: mauticBaseUrl,
+            type: "POST",
+            data: query,
+            dataType: "json",
+            success: function (response) {
+                Mautic.onPageUnload('.global-search-wrapper');
+                if (response.searchResults) {
+                    $(".global-search-wrapper").html(response.searchResults);
                 }
-            });
+                Mautic.onPageLoad('.global-search-wrapper');
+                $("body").removeClass("loading-content");
+            },
+            error: function(request, textStatus, errorThrown) {
+                alert(errorThrown);
+                $("body").removeClass("loading-content");
+            }
+        });
+    },
+
+    /**
+     * Submit global search results if the enter key pressed
+     * @param event
+     */
+    onKeyPressGlobalSearchResults: function(event) {
+        if (event.keyCode == 13) {
+            Mautic.submitGlobalSearchResults();
+            $('.btn-global-search-submit').attr('onclick','Mautic.clearGlobalSearchResults()');
+            $('.btn-global-search-submit i').removeClass('fa-search').addClass('fa-eraser');
         }
+    },
+
+    /**
+     * Submit global search results if the search button is clicked
+     */
+    onClickGlobalSearchResults: function() {
+        $('.btn-global-search-submit').attr('onclick','Mautic.clearGlobalSearchResults()');
+        $('.btn-global-search-submit i').removeClass('fa-search').addClass('fa-eraser');
+        Mautic.submitGlobalSearchResults();
+    },
+
+    /**
+     * Clear global search results
+     */
+    clearGlobalSearchResults: function () {
+        $('#global_search').val('');
+        $('.btn-global-search-submit').attr('onclick','Mautic.onClickGlobalSearchResults()');
+        $('.btn-global-search-submit i').removeClass('fa-eraser').addClass('fa-search');
+        Mautic.submitGlobalSearchResults();
     }
 };
