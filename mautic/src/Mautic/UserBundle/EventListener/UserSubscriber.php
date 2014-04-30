@@ -9,41 +9,19 @@
 
 namespace Mautic\UserBundle\EventListener;
 
-
+use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\UserBundle\Event as Events;
 use Mautic\UserBundle\UserEvents;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Class UserSubscriber
  *
  * @package Mautic\UserBundle\EventListener
  */
-class UserSubscriber implements EventSubscriberInterface
+class UserSubscriber extends CommonSubscriber
 {
-
-    /**
-     * @var \Symfony\Component\DependencyInjection\ContainerInterface
-     */
-    protected $container;
-
-    /**
-     * @var null|\Symfony\Component\HttpFoundation\Request
-     */
-    protected $request;
-
-    /**
-     * @param ContainerInterface $container
-     */
-    public function __construct (ContainerInterface $container, RequestStack $request_stack)
-    {
-        $this->container = $container;
-        $this->request   = $request_stack->getCurrentRequest();
-    }
 
     /**
      * @return array

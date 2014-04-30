@@ -14,8 +14,6 @@ use Mautic\CoreBundle\Controller\EventsController;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MenuEvent;
 use Mautic\CoreBundle\Event\RouteEvent;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -25,27 +23,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
  *
  * @package Mautic\CoreBundle\EventListener
  */
-class CoreSubscriber implements EventSubscriberInterface
+class CoreSubscriber extends CommonSubscriber
 {
-
-    /**
-     * @var \Symfony\Component\DependencyInjection\ContainerInterface
-     */
-    protected $container;
-
-    /**
-     * @var null|\Symfony\Component\HttpFoundation\Request
-     */
-    protected $request;
-
-    /**
-     * @param ContainerInterface $container
-     */
-    public function __construct (ContainerInterface $container, RequestStack $request_stack)
-    {
-        $this->container = $container;
-        $this->request   = $request_stack->getCurrentRequest();
-    }
 
     /**
      * @return array
