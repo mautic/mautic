@@ -154,7 +154,11 @@ class MauticWebTestCase extends WebTestCase
             if (count($crawler)) {
                 $msg .= ": " . trim($crawler->filter('title')->text());
             } elseif ($response->getContent()) {
-                $msg .= ": " . $response->getContent();
+                if ($response->headers->get('Content-Type') == 'application/json') {
+                    $msg .= ": " . print_r(json_decode($response->getContent()), true);
+                } else {
+                    $msg .= ": " . $response->getContent();
+                }
             }
             $noException = false;
         }
@@ -187,10 +191,9 @@ class MauticWebTestCase extends WebTestCase
 
         $fixtures = array();
         $mauticBundles = $this->container->getParameter('mautic.bundles');
-        foreach ($mauticBundles as $namespace) {
+        foreach ($mauticBundles as $bundle) {
             //parse the namespace into a filepath
-            $namespaceParts = explode('\\', $namespace);
-            $fixturesDir    = __DIR__ . '/../../' . $namespaceParts[1] . '/DataFixtures/ORM';
+            $fixturesDir    = $bundle['directory'] . '/DataFixtures/ORM';
 
             if (file_exists($fixturesDir)) {
                 //get files within the directory
@@ -201,14 +204,13 @@ class MauticWebTestCase extends WebTestCase
                     foreach ($filter as $file) {
                         //add the file to be loaded
                         $class = str_replace(".php", "", $file->getFilename());
-                        $fixtures[] = 'Mautic\\'.$namespaceParts[1].'\\DataFixtures\\ORM\\' . $class;
+                        $fixtures[] = 'Mautic\\'.$bundle['bundle'].'\\DataFixtures\\ORM\\' . $class;
                     }
                 }
             }
         }
 
         $this->loadFixtures($fixtures);
-
         parent::setUp();
     }
 

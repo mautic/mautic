@@ -13,6 +13,7 @@ use Mautic\ApiBundle\ApiEvents;
 use Mautic\ApiBundle\Event\ClientEvent;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\ApiBundle\Entity\Client;
+use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
@@ -91,5 +92,10 @@ class ClientModel extends FormModel
                 $dispatcher->dispatch(ApiEvents::CLIENT_DELETE, $event);
                 break;
         }
+    }
+
+    public function getUserClients(User $user)
+    {
+        return $this->em->getRepository($this->repository)->getUserClients($user);
     }
 }

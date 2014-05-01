@@ -18,8 +18,7 @@ $container->setDefinition(
         'Mautic\UserBundle\Form\Type\UserType',
         array(
             new Reference("service_container"),
-            new Reference('security.context'),
-            "%mautic.bundles%"
+            new Reference('security.context')
         )
     )
 )
@@ -34,8 +33,7 @@ $container->setDefinition(
         'Mautic\UserBundle\Form\Type\RoleType',
         array(
             new Reference("service_container"),
-            new Reference('doctrine.orm.entity_manager'),
-            "%mautic.bundles%"
+            new Reference('doctrine.orm.entity_manager')
         )
     )
 )
@@ -50,8 +48,7 @@ $container->setDefinition(
         'Mautic\UserBundle\Form\Type\PermissionsType',
         array(
             new Reference("service_container"),
-            new Reference('doctrine.orm.entity_manager'),
-            "%mautic.bundles%"
+            new Reference('doctrine.orm.entity_manager')
         )
     )
 )

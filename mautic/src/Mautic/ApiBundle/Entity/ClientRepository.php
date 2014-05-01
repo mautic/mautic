@@ -13,6 +13,7 @@ use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\ORM\NoResultException;
+use Mautic\UserBundle\Entity\User;
 
 /**
  * ClientRepository
@@ -22,6 +23,16 @@ use Doctrine\ORM\NoResultException;
  */
 class ClientRepository extends CommonRepository
 {
+
+    public function getUserClients(User $user)
+    {
+        $result = $this->createQueryBuilder('c')
+            ->join('c.users', 'u')
+            ->where("u.id = " . $user->getId())
+            ->getQuery()
+            ->getResult();
+        return $result;
+    }
 
     /**
      * {@inheritdoc}

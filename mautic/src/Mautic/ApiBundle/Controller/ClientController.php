@@ -111,7 +111,7 @@ class ClientController extends FormController
     public function authorizedClientsAction()
     {
         $me      = $this->get('security.context')->getToken()->getUser();
-        $clients = $me->getClients()->toArray();
+        $clients = $this->get('mautic.model.client')->getUserClients($me);
 
         return $this->render('MauticApiBundle:Client:authorized.html.php', array('clients' => $clients));
     }
@@ -132,10 +132,6 @@ class ClientController extends FormController
                 );
             } else {
                 $name = $client->getName();
-
-                //remove this client from user
-                $me->removeClient($client);
-                $this->container->get('mautic.model.user')->saveEntity($me);
 
                 //remove the user from the client
                 $client->removeUser($me);

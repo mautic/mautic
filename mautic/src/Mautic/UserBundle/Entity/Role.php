@@ -9,6 +9,7 @@
 namespace Mautic\UserBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -77,14 +78,6 @@ class Role
     }
 
     /**
-     * @param $value
-     * @return string
-     */
-    public function cleanData($value) {
-        return trim(strip_tags($value));
-    }
-
-    /**
      * Get id
      *
      * @return integer
@@ -102,7 +95,7 @@ class Role
      */
     public function setName($name)
     {
-        $this->name = $this->cleanData($name);
+        $this->name = InputHelper::clean($name);
 
         return $this;
     }
@@ -160,7 +153,7 @@ class Role
      */
     public function setDescription($description)
     {
-        $this->description = $this->cleanData($description);
+        $this->description = InputHelper::clean($description);
 
         return $this;
     }
@@ -239,4 +232,12 @@ class Role
             $this->setDateAdded(new \DateTime());
         }
     }
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->permissions = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
 }

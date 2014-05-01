@@ -366,7 +366,6 @@ class UserControllerTest extends MauticWebTestCase
             '/api/users/' . $entity->getId() . '/delete.json?access_token='.$token
         );
         $response = $this->client->getResponse();
-
         //should be JSON content
         $this->assertContentType($response);
 
@@ -376,6 +375,7 @@ class UserControllerTest extends MauticWebTestCase
 
         //assert the item returned is the same as sent
         $decoded = json_decode($response->getContent(), true);
+
         $this->assertEquals(
             $decoded['user']['username'],
             $entity->getUsername()

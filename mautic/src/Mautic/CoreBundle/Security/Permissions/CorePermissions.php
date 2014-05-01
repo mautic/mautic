@@ -44,7 +44,7 @@ class CorePermissions {
     public function __construct(Container $container, EntityManager $em, array $bundles) {
         $this->container = $container;
         $this->em        = $em;
-        $this->bundles   = array_keys($bundles);
+        $this->bundles   = $bundles;
     }
 
     /**
@@ -56,13 +56,11 @@ class CorePermissions {
         static $classes = array();
         if (empty($classes)) {
             foreach ($this->bundles as $bundle) {
-                if ($bundle == "MauticCoreBundle")
+                if ($bundle['base'] == "Core")
                     continue; //do not include this file
 
                 //explode MauticUserBundle into Mautic User Bundle so we can build the class needed
-                $string     = preg_replace('/([a-z0-9])([A-Z])/', "$1 $2", $bundle);
-                $namespace  = explode(' ', $string);
-                $object     = $this->getPermissionObject($namespace[1], false);
+                $object     = $this->getPermissionObject($bundle['base'], false);
                 if (!empty($object)) {
                     $classes[] = $object;
                 }
@@ -96,7 +94,7 @@ class CorePermissions {
 
             return $classes[$bundle];
         } else {
-            throw new NotFoundHttpException("Bundle and permission type must be specified.");
+            throw new NotFoundHttpException("Bundle and permission type must be specified. '$bundle' given.");
         }
     }
 

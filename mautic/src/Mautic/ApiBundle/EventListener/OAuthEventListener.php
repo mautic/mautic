@@ -42,9 +42,9 @@ class OAuthEventListener
             if (!$this->mauticSecurity->isGranted("api:access:full")) {
                 throw new AccessDeniedException($this->translator->trans('mautic.core.accessdenied'));
             }
-
+            $client = $event->getClient();
             $event->setAuthorizedClient(
-                $user->isAuthorizedClient($event->getClient(), $this->em)
+                $client->isAuthorizedClient($user, $this->em)
             );
         }
     }
@@ -54,11 +54,8 @@ class OAuthEventListener
         if ($event->isAuthorizedClient()) {
             if (null !== $client = $event->getClient()) {
                 $user = $this->getUser($event);
-
-                //add the client to the user
-                $user->addClient($client);
-                $this->em->persist($user);
-
+                $client->addUser($user);
+                $this->em->persist($client);
                 $this->em->flush();
             }
         }

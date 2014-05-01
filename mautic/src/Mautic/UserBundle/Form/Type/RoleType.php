@@ -26,18 +26,17 @@ use Mautic\CoreBundle\Form\DataTransformer\CleanTransformer;
  */
 class RoleType extends AbstractType
 {
-    private $bundles;
+
     private $container;
     private $em;
 
     /**
-     * @param Container        $container
-     * @param array            $bundles
+     * @param Container     $container
+     * @param EntityManager $em
      */
-    public function __construct(Container $container, EntityManager $em, array $bundles) {
+    public function __construct(Container $container, EntityManager $em) {
         $this->container = $container;
         $this->em        = $em;
-        $this->bundles   = array_keys($bundles);
     }
 
     /**

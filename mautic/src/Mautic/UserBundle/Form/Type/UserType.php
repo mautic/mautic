@@ -29,19 +29,16 @@ use Mautic\CoreBundle\Form\DataTransformer\CleanTransformer;
 class UserType extends AbstractType
 {
 
-    private $bundles;
     private $container;
     private $securityContext;
 
     /**
      * @param Container       $container
      * @param SecurityContext $securityContext
-     * @param array           $bundles
      */
-    public function __construct(Container $container, SecurityContext $securityContext, array $bundles) {
+    public function __construct(Container $container, SecurityContext $securityContext) {
         $this->container       = $container;
         $this->securityContext = $securityContext;
-        $this->bundles         = array_keys($bundles);
     }
 
     /**

@@ -9,6 +9,12 @@
 
 namespace Mautic\UserBundle;
 
+/**
+ * Class UserEvents
+ * Events available for UserBundle
+ *
+ * @package Mautic\UserBundle
+ */
 final class UserEvents
 {
     /**

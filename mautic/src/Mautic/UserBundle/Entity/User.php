@@ -13,6 +13,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Criteria;
 use FOS\OAuthServerBundle\Model\ClientInterface;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -102,12 +103,6 @@ class User implements AdvancedUserInterface, \Serializable
      * @Serializer\Since("1.0")
      */
     protected $role;
-
-    /**
-     * @ORM\ManyToMany(targetEntity="Mautic\ApiBundle\Entity\Client")
-     * @ORM\JoinTable(name="oauth_user_client_xref")
-     */
-    protected $clients;
 
     /**
      * @ORM\Column(name="is_active", type="boolean")
@@ -206,14 +201,6 @@ class User implements AdvancedUserInterface, \Serializable
         ));
 
         $metadata->setGroupSequence(array('User', 'SecondPass', 'CheckPassword'));
-    }
-
-    /**
-     * @param $value
-     * @return string
-     */
-    public function cleanData($value) {
-        return trim(strip_tags($value));
     }
 
     /**
@@ -348,7 +335,7 @@ class User implements AdvancedUserInterface, \Serializable
      */
     public function setUsername($username)
     {
-        $this->username = $this->cleanData($username);
+        $this->username = InputHelper::clean($username);
 
         return $this;
     }
@@ -401,7 +388,7 @@ class User implements AdvancedUserInterface, \Serializable
      */
     public function setFirstName($firstName)
     {
-        $this->firstName = $this->cleanData($firstName);
+        $this->firstName = InputHelper::clean($firstName);
 
         return $this;
     }
@@ -424,7 +411,7 @@ class User implements AdvancedUserInterface, \Serializable
      */
     public function setLastName($lastName)
     {
-        $this->lastName = $this->cleanData($lastName);
+        $this->lastName = InputHelper::clean($lastName);
 
         return $this;
     }
@@ -460,7 +447,7 @@ class User implements AdvancedUserInterface, \Serializable
      */
     public function setEmail($email)
     {
-        $this->email = $this->cleanData($email);
+        $this->email = InputHelper::clean($email);
 
         return $this;
     }
@@ -596,39 +583,6 @@ class User implements AdvancedUserInterface, \Serializable
     }
 
     /**
-     * Add clients
-     *
-     * @param \Mautic\ApiBundle\Entity\Client $client
-     * @return User
-     */
-    public function addClient(\Mautic\ApiBundle\Entity\Client $client)
-    {
-        $this->clients[] = $client;
-
-        return $this;
-    }
-
-    /**
-     * Remove clients
-     *
-     * @param \Mautic\ApiBundle\Entity\Client $client
-     */
-    public function removeClient(\Mautic\ApiBundle\Entity\Client $client)
-    {
-        $this->clients->removeElement($client);
-    }
-
-    /**
-     * Get clients
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getClients()
-    {
-        return $this->clients;
-    }
-
-    /**
      * Set position
      *
      * @param string $position
@@ -652,18 +606,6 @@ class User implements AdvancedUserInterface, \Serializable
     }
 
     /**
-     * Determines if a client attempting API access is already authorized by the user
-     *
-     * @param ClientInterface $client
-     * @return bool
-     */
-    public function isAuthorizedClient(ClientInterface $client)
-    {
-        $clients = $this->getClients();
-        return $clients->contains($client);
-    }
-
-    /**
      * Sets the Date/Time for new entities
      *
      * @ORM\PrePersist
@@ -677,4 +619,12 @@ class User implements AdvancedUserInterface, \Serializable
             $this->setIsActive(true);
         }
     }
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->clients = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
 }

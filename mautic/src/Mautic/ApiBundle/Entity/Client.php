@@ -11,6 +11,8 @@ namespace Mautic\ApiBundle\Entity;
 
 use FOS\OAuthServerBundle\Entity\Client as BaseClient;
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -32,6 +34,13 @@ class Client extends BaseClient
      * @ORM\Column(type="text", length=50, nullable=true)
      */
     protected $name;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="Mautic\UserBundle\Entity\User")
+     * @ORM\JoinTable(name="oauth_user_client_xref")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
+     */
+    protected $users;
 
     public function __construct()
     {
@@ -70,7 +79,7 @@ class Client extends BaseClient
      */
     public function setName($name)
     {
-        $this->name = $name;
+        $this->name = InputHelper::clean($name);
 
         return $this;
     }
@@ -83,6 +92,15 @@ class Client extends BaseClient
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setRedirectUris(array $redirectUris)
+    {
+        array_walk($redirectUris, function (&$v) { InputHelper::clean($v); } );
+        $this->redirectUris = $redirectUris;
     }
 
     /**
@@ -116,5 +134,51 @@ class Client extends BaseClient
     public function getAuthCodes()
     {
         return $this->authCodes;
+    }
+
+
+    /**
+     * Determines if a client attempting API access is already authorized by the user
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function isAuthorizedClient(User $user)
+    {
+        $users = $this->getUsers();
+        return $users->contains($user);
+    }
+
+    /**
+     * Add users
+     *
+     * @param \Mautic\UserBundle\Entity\User $users
+     * @return Client
+     */
+    public function addUser(\Mautic\UserBundle\Entity\User $users)
+    {
+        $this->users[] = $users;
+
+        return $this;
+    }
+
+    /**
+     * Remove users
+     *
+     * @param \Mautic\UserBundle\Entity\User $users
+     */
+    public function removeUser(\Mautic\UserBundle\Entity\User $users)
+    {
+        $this->users->removeElement($users);
+    }
+
+    /**
+     * Get users
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getUsers()
+    {
+        return $this->users;
     }
 }

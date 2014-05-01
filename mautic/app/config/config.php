@@ -2,9 +2,12 @@
 //Note Mautic specific bundles so they can be applied as needed without having to specify them individually
 $buildBundles = function($namespace, $bundle) use ($container) {
     if (strpos($namespace, 'Mautic') !== false) {
+        $bundleBase = str_replace('Mautic', '', $bundle);
         $v = array(
+            "base"      => str_replace('Bundle', '', $bundleBase),
+            "bundle"    => $bundleBase,
             "namespace" => $namespace,
-            "directory" => $container->getParameter('kernel.root_dir').'/../src/Mautic/'.str_replace('Mautic', '', $bundle)
+            "directory" => $container->getParameter('kernel.root_dir').'/../src/Mautic/'. $bundleBase
         );
         return $v;
     }
