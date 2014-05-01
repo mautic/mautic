@@ -1,3 +1,13 @@
+//Fix for back/forward buttons not loading ajax content with History.pushState()
+var manualStateChange = true;
+History.Adapter.bind(window,'statechange',function(){
+    if(manualStateChange == true){
+        //back/forward button pressed
+        window.location.reload();
+    }
+    manualStateChange = true;
+});
+
 var Mautic = {
     /**
      * Initiate various functions on page load, manual or ajax
@@ -41,8 +51,10 @@ var Mautic = {
     loadContent: function (route, link, toggleMenu, mainContentOnly) {
         $("body").addClass("loading-content");
 
+        //keep browser backbutton from loading cached ajax response
+        var ajaxRoute = route + ((/\?/i.test(route)) ? "&ajax=1" : "?ajax=1");
         $.ajax({
-            url: route,
+            url: ajaxRoute,
             type: "GET",
             dataType: "json",
             success: function(response){
@@ -139,6 +151,7 @@ var Mautic = {
 
             if (response.route) {
                 //update URL in address bar
+                manualStateChange = false;
                 History.pushState(null, "Mautic", response.route);
             }
 
