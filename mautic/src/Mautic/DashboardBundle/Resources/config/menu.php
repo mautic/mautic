@@ -28,7 +28,6 @@ $items = array(
     'mautic.dashboard.menu.index' => array(
         'name'    => 'mautic.dashboard.menu.index',
         'route'    => 'mautic_dashboard_index',
-        'uri'      => 'javascript: void(0)',
         'linkAttributes' => array(
             'data-toggle'    => 'ajax',
             'data-menu-link' => '#mautic_dashboard_index',

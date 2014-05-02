@@ -21,9 +21,12 @@ var Mautic = {
 
             var route  = $(this).attr('href');
             var link   = $(this).attr('data-menu-link');
+            if (link.length && link.charAt(0) != '#') {
+                link = "#" + link;
+            }
             var toggleMenu = false;
-            if ($(this).attr('data-menu-link')) {
-                toggleMenu = ($(this).attr('data-menu-link') == 'true') ? true : false;
+            if ($(this).attr('data-toggle-submenu')) {
+                toggleMenu = ($(this).attr('data-toggle-submenu') == 'true') ? true : false;
             }
 
             Mautic.loadContent(route, link, toggleMenu);
