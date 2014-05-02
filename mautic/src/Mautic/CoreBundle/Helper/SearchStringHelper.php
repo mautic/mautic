@@ -70,6 +70,11 @@ class SearchStringHelper
             if ($char == ":") {
                 //the string is a command
                 $command = trim(substr($string, 0, -1));
+                //does this have a negative?
+                if (strpos($command, '!') === 0) {
+                    $filters->{$baseName}[$keyCount]->not = 1;
+                    $command = substr($command, 1);
+                }
                 $filters->{$baseName}[$keyCount]->command = $command;
                 $string  = "";
             } elseif ($char == " ") {
@@ -145,8 +150,13 @@ class SearchStringHelper
         if (!empty($type)) {
             $filters->{$baseName}[$keyCount]->type = $type;
         } elseif ($setFilter) {
-            $filters->{$baseName}[$keyCount]->strict = 0;
-            $filters->{$baseName}[$keyCount]->not    = 0;
+
+            if (!isset($filters->{$baseName}[$keyCount]->strict)) {
+                $filters->{$baseName}[$keyCount]->strict = 0;
+            }
+            if (!isset($filters->{$baseName}[$keyCount]->not)) {
+                $filters->{$baseName}[$keyCount]->not = 0;
+            }
 
             $strictPos = strpos($string, '+');
             $notPos    = strpos($string, '!');

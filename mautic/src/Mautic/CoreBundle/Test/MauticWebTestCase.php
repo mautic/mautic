@@ -189,26 +189,9 @@ class MauticWebTestCase extends WebTestCase
             ->get('security.encoder_factory');
         $this->client = $this->getClient();
 
-        $fixtures = array();
-        $mauticBundles = $this->container->getParameter('mautic.bundles');
-        foreach ($mauticBundles as $bundle) {
-            //parse the namespace into a filepath
-            $fixturesDir    = $bundle['directory'] . '/DataFixtures/ORM';
-
-            if (file_exists($fixturesDir)) {
-                //get files within the directory
-                $iterator = new \FilesystemIterator($fixturesDir);
-                //filter out inappropriate files
-                $filter = new \RegexIterator($iterator, '/.php$/');
-                if (iterator_count($filter)) {
-                    foreach ($filter as $file) {
-                        //add the file to be loaded
-                        $class = str_replace(".php", "", $file->getFilename());
-                        $fixtures[] = 'Mautic\\'.$bundle['bundle'].'\\DataFixtures\\ORM\\' . $class;
-                    }
-                }
-            }
-        }
+        $command = new \Mautic\CoreBundle\Command\InstallDataCommand();
+        $command->setContainer($this->container);
+        $fixtures = $command->getMauticFixtures(true);
 
         $this->loadFixtures($fixtures);
         parent::setUp();

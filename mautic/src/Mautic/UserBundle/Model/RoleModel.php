@@ -55,25 +55,37 @@ class RoleModel extends FormModel
             throw new AccessDeniedException($this->container->get('translator')->trans('mautic.core.accessdenied'));
         }
 
+        if (isset($overrides['permissions'])) {
+            $this->setRolePermissions($entity, $overrides['permissions']);
+            unset($overrides['permissions']);
+        }
+
         if (!$isNew) {
             //delete all existing
             $this->em->getRepository('MauticUserBundle:Permission')->purgeRolePermissions($entity);
         }
 
-        //build the new permissions
-        $formPermissionData = $this->request->request->get('role[permissions]', null, true);
+        return parent::saveEntity($entity, $overrides);
+    }
+
+    /**
+     * Generate the role's permissions
+     *
+     * @param Role $entity
+     * @param array $rawPermissions (i.e. from request)
+     */
+    public function setRolePermissions(Role &$entity, array $rawPermissions)
+    {
         //set permissions if applicable and if the user is not an admin
-        $permissions = (!empty($formPermissionData) && !$this->request->request->get('role[isAdmin]', 0, true)) ?
-            $this->container->get('mautic.security')->generatePermissions($formPermissionData) :
+        $permissions = (!$entity->isAdmin() && !empty($rawPermissions)) ?
+            $this->container->get('mautic.security')->generatePermissions($rawPermissions) :
             array();
 
         foreach ($permissions as $permissionEntity) {
             $entity->addPermission($permissionEntity);
         }
 
-        return parent::saveEntity($entity, $overrides);
     }
-
     /**
      * {@inheritdoc}
      *

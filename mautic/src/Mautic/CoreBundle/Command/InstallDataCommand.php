@@ -70,12 +70,16 @@ class InstallDataCommand extends ContainerAwareCommand
 
         //now populate the tables with fixture
         $command = $this->getApplication()->find('doctrine:fixtures:load');
-        $input = new ArrayInput(array(
-                '--append' => true,
-                'command'  => 'doctrine:fixtures:load'
-
-            )
+        $args = array(
+            '--append' => true,
+            'command'  => 'doctrine:fixtures:load'
         );
+
+        $fixtures = $this->getMauticFixtures();
+        foreach ($fixtures as $fixture) {
+            $args['--fixtures'][] = $fixture;
+        }
+        $input = new ArrayInput($args);
         $returnCode = $command->run($input, $output);
         if ($returnCode !== 0) {
             return $returnCode;
@@ -85,5 +89,40 @@ class InstallDataCommand extends ContainerAwareCommand
             $translator->trans('mautic.core.command.install_data_success')
         );
         return 0;
+    }
+
+    /**
+     * Returns Mautic fixtures
+     *
+     * @param bool $returnClassNames
+     * @return array
+     */
+    public function getMauticFixtures($returnClassNames = false)
+    {
+        $fixtures = array();
+        $mauticBundles = $this->getContainer()->getParameter('mautic.bundles');
+        foreach ($mauticBundles as $bundle) {
+            //parse the namespace into a filepath
+            $fixturesDir    = $bundle['directory'] . '/DataFixtures/ORM';
+
+            if (file_exists($fixturesDir)) {
+                if ($returnClassNames) {
+                    //get files within the directory
+                    $iterator = new \FilesystemIterator($fixturesDir);
+                    //filter out inappropriate files
+                    $filter = new \RegexIterator($iterator, '/.php$/');
+                    if (iterator_count($filter)) {
+                        foreach ($filter as $file) {
+                            //add the file to be loaded
+                            $class      = str_replace(".php", "", $file->getFilename());
+                            $fixtures[] = 'Mautic\\' . $bundle['bundle'] . '\\DataFixtures\\ORM\\' . $class;
+                        }
+                    }
+                } else {
+                    $fixtures[] = $fixturesDir;
+                }
+            }
+        }
+        return $fixtures;
     }
 }

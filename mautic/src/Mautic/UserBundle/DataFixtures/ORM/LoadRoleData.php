@@ -57,6 +57,14 @@ class LoadRoleData extends AbstractFixture implements OrderedFixtureInterface, C
         $role->setName($translator->trans('mautic.user.role.sales.name', array(), 'fixtures'));
         $role->setDescription($translator->trans('mautic.user.role.sales.description', array(), 'fixtures'));
         $role->setIsAdmin(0);
+
+        $permissions = array(
+            'api:access'   => array('prohibit'),
+            'user:profile' => array('editname'),
+            'lead:leads'   => array('full')
+        );
+        $this->container->get('mautic.model.role')->setRolePermissions($role, $permissions);
+
         $manager->persist($role);
         $manager->flush();
 

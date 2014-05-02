@@ -107,7 +107,6 @@ class CorePermissions {
      */
     public function generatePermissions(array $permissions) {
         $entities = array();
-
         foreach($permissions as $key => $perms) {
             list($bundle, $name) = explode(":", $key);
 
