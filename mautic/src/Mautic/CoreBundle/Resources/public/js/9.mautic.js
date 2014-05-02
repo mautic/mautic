@@ -21,7 +21,7 @@ var Mautic = {
 
             var route  = $(this).attr('href');
             var link   = $(this).attr('data-menu-link');
-            if (link.length && link.charAt(0) != '#') {
+            if (link !== undefined && link.charAt(0) != '#') {
                 link = "#" + link;
             }
             var toggleMenu = false;
