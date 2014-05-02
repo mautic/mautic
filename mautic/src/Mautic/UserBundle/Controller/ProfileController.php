@@ -177,10 +177,14 @@ class ProfileController extends FormController
         }
         $this->get('session')->set('formProcessed', 0);
 
+
+        $formView = $form->createView();
+        $this->container->get('templating')->getEngine('MauticUserBundle:Profile:index.html.php')->get('form')
+            ->setTheme($formView, 'MauticUserBundle:Form');
         $parameters = array(
             'permissions' => $permissions,
             'me'          => $me,
-            'userForm'    => $form->createView()
+            'userForm'    => $formView
         );
 
         if ($this->request->isXmlHttpRequest() && !$this->request->get('ignoreAjax', false)) {

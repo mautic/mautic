@@ -135,8 +135,11 @@ class RoleController extends FormController
             $valid = $this->checkFormValidity($form);
 
             if ($valid === 1) {
+                $overrides = array(
+                    'permissions' => $this->request->request->get('role[permissions]', null, true)
+                );
                 //form is valid so process the data
-                $model->saveEntity($entity);
+                $model->saveEntity($entity, $overrides);
             }
 
             if (!empty($valid)) { //cancelled or success
@@ -160,9 +163,13 @@ class RoleController extends FormController
             }
         }
 
+        $formView = $form->createView();
+        $this->container->get('templating')->getEngine('MauticUserBundle:Role:form.html.php')->get('form')
+            ->setTheme($formView, 'MauticUserBundle:Form');
+
         if ($this->request->isXmlHttpRequest() && !$this->request->get('ignoreAjax', false)) {
             return $this->ajaxAction(array(
-                'viewParameters'  => array('form' => $form->createView()),
+                'viewParameters'  => array('form' => $formView),
                 'contentTemplate' => 'MauticUserBundle:Role:form.html.php',
                 'passthroughVars' => array(
                     'ajaxForms'  => array('role'),
@@ -173,7 +180,7 @@ class RoleController extends FormController
         } else {
             return $this->render('MauticUserBundle:Role:form.html.php',
                 array(
-                    'form' => $form->createView()
+                    'form' => $formView
                 )
             );
         }
@@ -225,8 +232,11 @@ class RoleController extends FormController
             $valid = $this->checkFormValidity($form);
 
             if ($valid === 1) {
+                $overrides = array(
+                    'permissions' => $this->request->request->get('role[permissions]', null, true)
+                );
                 //form is valid so process the data
-                $model->saveEntity($entity);
+                $model->saveEntity($entity, $overrides);
             }
 
             if (!empty($valid)) { //cancelled or success
@@ -250,9 +260,13 @@ class RoleController extends FormController
             }
         }
 
+        $formView = $form->createView();
+        $this->container->get('templating')->getEngine('MauticUserBundle:Role:form.html.php')->get('form')
+            ->setTheme($formView, 'MauticUserBundle:Form');
+
         if ($this->request->isXmlHttpRequest() && !$this->request->get('ignoreAjax', false)) {
             return $this->ajaxAction(array(
-                'viewParameters'  => array('form' => $form->createView()),
+                'viewParameters'  => array('form' => $formView),
                 'contentTemplate' => 'MauticUserBundle:Role:form.html.php',
                 'passthroughVars' => array(
                     'ajaxForms'   => array('role'),
@@ -263,7 +277,7 @@ class RoleController extends FormController
         } else {
             return $this->render('MauticUserBundle:Role:form.html.php',
                 array(
-                    'form' => $form->createView()
+                    'form' => $formView
                 )
             );
         }
