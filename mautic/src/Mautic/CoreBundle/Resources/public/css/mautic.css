@@ -165,7 +165,7 @@ h6 {
   padding: 4px 0 3px 5px !important;
 }
 .right-panel-header {
-  padding: 8px 20px;
+  padding: 8px 5px;
   height: 50px;
   background-color: #604656;
 }
@@ -181,6 +181,10 @@ h6 {
   display: block;
   height: 100%;
   width: 100%;
+}
+.gs-count-badge {
+  position: absolute;
+  right: 10px;
 }
 .left-panel-inner-wrapper {
   padding-top: 50px;

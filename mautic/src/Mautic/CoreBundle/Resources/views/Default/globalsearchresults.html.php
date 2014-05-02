@@ -10,14 +10,21 @@
 
 <div class="panel-group margin-sm-sides global-search-panel" id="global-search-panel">
 <?php foreach ($results as $header => $result): ?>
+<?php if (isset($result['count'])) { $count = $result['count']; unset($result['count']); } ?>
 <?php $unique = uniqid(); ?>
     <div class="panel panel-default">
         <div class="panel-heading">
             <h4 class="panel-title">
-                <a data-toggle="collapse" data-parent="#global-search-panel" href="#<?php echo $unique; ?>-panel" class="collapsed"><?php echo $view['translator']->trans($header); ?></a>
+                <a data-toggle="collapse" data-parent="#global-search-panel"
+                   href="#<?php echo $unique; ?>-panel" class="collapsed">
+                    <?php echo $view['translator']->trans($header); ?>
+                    <?php if (!empty($count)): ?>
+                    <span class="badge pull-right gs-count-badge"><?php echo $count; ?></span>
+                    <?php endif; ?>
+                </a>
             </h4>
         </div>
-        <div id="<?php echo $unique; ?>-panel" class="panel-collapse collapse in">
+        <div id="<?php echo $unique; ?>-panel" class="panel-collapse collapse">
             <div class="panel-body padding-md-sides">
                 <?php foreach ($result as $r): ?>
                 <div class="row">

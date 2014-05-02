@@ -65,9 +65,13 @@ class CommonRepository extends EntityRepository
 
     protected function buildClauses(QueryBuilder &$q, array $args)
     {
-        $this->buildWhereClause($q, $args);
+        if (!$this->buildWhereClause($q, $args)) {
+            return false;
+        }
         $this->buildOrderByClause($q, $args);
         $this->buildLimiterClauses($q, $args);
+
+        return true;
     }
 
     protected function buildWhereClause(QueryBuilder &$q, array $args)
@@ -86,9 +90,15 @@ class CommonRepository extends EntityRepository
             $filter         = $filterHelper->parseSearchString($filter);
 
             list($expressions, $parameters) = $this->addAdvancedSearchWhereClause($q, $filter);
-            $q->where($expressions)
-                ->setParameters($parameters);
+            $count = count($expressions->getParts());
+            if (!empty($count)) {
+                $q->where($expressions)
+                    ->setParameters($parameters);
+            } else {
+                return false;
+            }
         }
+        return true;
     }
 
     protected function addCatchAllWhereClause(QueryBuilder &$qb, $filter)
@@ -115,18 +125,24 @@ class CommonRepository extends EntityRepository
 
         $parameters  = array();
         $expressions = $qb->expr()->{"{$type}X"}();
+
         foreach ($parseFilters as $f) {
             if (isset($f->children)) {
                 list($expr, $params) = $this->addAdvancedSearchWhereClause($qb, $f);
             } else {
-                if (!empty($f->command) && $this->isSupportedSearchCommand($f->command)) {
-                    list($expr, $params) = $this->addSearchCommandWhereClause($qb, $f);
+                if (!empty($f->command)) {
+                    if ($this->isSupportedSearchCommand($f->command)) {
+                        list($expr, $params) = $this->addSearchCommandWhereClause($qb, $f);
+                    }
                 } else {
                     list($expr, $params) = $this->addCatchAllWhereClause($qb, $f);
                 }
             }
-            $parameters = array_merge($parameters, $params);
-            $expressions->add($expr);
+            if (!empty($params))
+                $parameters = array_merge($parameters, $params);
+
+            if (!empty($expr))
+                $expressions->add($expr);
         }
         return array($expressions, $parameters);
     }

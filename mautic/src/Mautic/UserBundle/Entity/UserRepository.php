@@ -55,7 +55,9 @@ class UserRepository extends CommonRepository
             ->select('u, r')
             ->leftJoin('u.role', 'r');
 
-        $this->buildClauses($q, $args);
+        if (!$this->buildClauses($q, $args)) {
+            return array();
+        }
 
         $query = $q->getQuery();
         $result = new Paginator($query);
@@ -90,7 +92,7 @@ class UserRepository extends CommonRepository
         $unique          = $this->generateRandomParameterName();
         $returnParameter = true; //returning a parameter that is not used will lead to a Doctrine error
         $func            = ($filter->not) ? "notLike" : "like";
-
+        $expr            = false;
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.is'):
                 $isFunc = ($filter->not) ? "neq" : "eq";
@@ -126,12 +128,6 @@ class UserRepository extends CommonRepository
                     $q->expr()->$func('u.lastName', ':'.$unique)
                 );
                 break;
-        }
-        if (empty($expr)) {
-            throw new NotFoundHttpException(
-                'Advanced search command and/or string not found!  Remember to use translation strings.' .
-                " ($command = $string)"
-            );
         }
 
         $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";

@@ -118,7 +118,8 @@ class ApiSubscriber implements EventSubscriberInterface
                         )
                     )->getContent();
                 }
-                $event->addResults('mautic.api.client.header.index', $clientResults);
+                $clientResults['count'] = count($clients);
+                $event->addResults('mautic.api.client.header.gs', $clientResults);
             }
         }
     }

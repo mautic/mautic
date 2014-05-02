@@ -75,6 +75,10 @@ var Mautic = {
                         }
                         response.toggleMenu = toggleMenu;
 
+                        if ($(".page-wrapper").hasClass("right-active")) {
+                            $(".page-wrapper").removeClass("right-active");
+                        }
+
                         Mautic.processContent(response);
                     }
                 }

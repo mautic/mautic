@@ -94,6 +94,7 @@ class UserSubscriber extends CommonSubscriber
                         )
                     )->getContent();
                 }
+                $userResults['count'] = count($users);
                 $event->addResults('mautic.user.user.header.index', $userResults);
             }
         }
@@ -127,6 +128,7 @@ class UserSubscriber extends CommonSubscriber
                         )
                     )->getContent();
                 }
+                $roleResults['count'] = count($roles);
                 $event->addResults('mautic.user.role.header.index', $roleResults);
             }
         }
