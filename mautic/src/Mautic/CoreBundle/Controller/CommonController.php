@@ -35,8 +35,27 @@ class CommonController extends Controller implements EventsController {
         $this->request = $request;
     }
 
+    /**
+     * @param FilterControllerEvent $event
+     */
     public function initialize(FilterControllerEvent $event) {
         //..
+    }
+
+    /**
+     * Redirects URLs with trailing slashes in order to prevent 404s
+     *
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function removeTrailingSlashAction(Request $request)
+    {
+        $pathInfo = $request->getPathInfo();
+        $requestUri = $request->getRequestUri();
+
+        $url = str_replace($pathInfo, rtrim($pathInfo, ' /'), $requestUri);
+
+        return $this->redirect($url, 301);
     }
 
     /**
