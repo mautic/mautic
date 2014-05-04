@@ -24,9 +24,10 @@ $activePanelClasses  = ($app->getSession()->get('left-panel', 'default') == 'unp
         <link rel="stylesheet" href="<?php echo $view['assets']->getUrl('media/font-awesome/css/font-awesome.min.css'); ?>" />
     </head>
     <body>
-        <div class="loading-bar"></div>
         <div class="page-wrapper<?php echo $activePanelClasses; ?>">
-
+            <div class="loading-bar progress">
+                <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>
+            </div>
             <header class="top-panel">
                 <?php echo $view->render('MauticCoreBundle:Default:toppanel.html.php'); ?>
             </header>

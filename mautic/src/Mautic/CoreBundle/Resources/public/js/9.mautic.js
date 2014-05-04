@@ -8,6 +8,39 @@ History.Adapter.bind(window,'statechange',function(){
     manualStateChange = true;
 });
 
+//setup global ajax request functions
+$.ajaxSetup({
+    beforeSend: function() {
+        $("body").addClass("loading-content");
+    },
+    xhr: function()
+    {
+        var xhr = new window.XMLHttpRequest();
+        xhr.upload.addEventListener("progress", function(evt){
+            if (evt.lengthComputable) {
+                var percentComplete = Math.round((evt.loaded / evt.total) * 100);
+                $(".loading-bar .progress-bar").attr('aria-valuenow', percentComplete);
+                $(".loading-bar .progress-bar").css('width', percentComplete + "%");
+            }
+        }, false);
+        xhr.addEventListener("progress", function(evt){
+            if (evt.lengthComputable) {
+                var percentComplete = Math.round((evt.loaded / evt.total) * 100);
+                $(".loading-bar .progress-bar").attr('aria-valuenow', percentComplete);
+                $(".loading-bar .progress-bar").css('width', percentComplete + "%");
+            }
+        }, false);
+        return xhr;
+    },
+    complete: function() {
+        setTimeout(function() {
+            $("body").removeClass("loading-content");
+            $(".loading-bar .progress-bar").attr('aria-valuenow', 0);
+            $(".loading-bar .progress-bar").css('width', "0%");
+        }, 500);
+    }
+});
+
 var Mautic = {
     /**
      * Initiate various functions on page load, manual or ajax
@@ -52,8 +85,6 @@ var Mautic = {
      * @param toggleMenu
      */
     loadContent: function (route, link, toggleMenu, mainContentOnly) {
-        $("body").addClass("loading-content");
-
         //keep browser backbutton from loading cached ajax response
         var ajaxRoute = route + ((/\?/i.test(route)) ? "&ajax=1" : "?ajax=1");
         $.ajax({
@@ -88,7 +119,6 @@ var Mautic = {
             },
             error: function(request, textStatus, errorThrown) {
                 alert(errorThrown);
-                $("body").removeClass("loading-content");
             }
         });
 
@@ -131,7 +161,6 @@ var Mautic = {
      * @param callback
      */
      postForm: function (form, callback) {
-        $("body").addClass("loading-content");
         $.ajax({
             type: form.attr('method'),
             url: form.attr('action'),
@@ -142,7 +171,6 @@ var Mautic = {
             },
             error: function(request, textStatus, errorThrown) {
                 alert(errorThrown);
-                $("body").removeClass("loading-content");
             }
         });
     },
@@ -217,7 +245,6 @@ var Mautic = {
             //active tooltips, etc
             Mautic.onPageLoad('.main-panel-wrapper');
         }
-        $("body").removeClass("loading-content");
     },
 
     /**
@@ -394,7 +421,6 @@ var Mautic = {
      * @param orderby
      */
     reorderTableData: function (name, orderby) {
-        $("body").addClass("loading-content");
         var query = "ajaxAction=setorderby&name=" + name + "&orderby=" + orderby;
         $.ajax({
             url: mauticBaseUrl,
@@ -406,11 +432,9 @@ var Mautic = {
                     var route = window.location.pathname;
                     Mautic.loadContent(route, '', false, true);
                 }
-                $("body").removeClass("loading-content");
             },
             error: function(request, textStatus, errorThrown) {
                 alert(errorThrown);
-                $("body").removeClass("loading-content");
             }
         });
     },
@@ -422,18 +446,15 @@ var Mautic = {
     executeAction: function (action, menuLink) {
         //dismiss modal if activated
         Mautic.dismissConfirmation();
-        $("body").addClass("loading-content");
         $.ajax({
             url: action,
             type: "POST",
             dataType: "json",
             success: function(response) {
                 Mautic.processContent(response);
-                $("body").removeClass("loading-content");
             },
             error: function(request, textStatus, errorThrown) {
                 alert(errorThrown);
-                $("body").removeClass("loading-content");
             }
         });
     },
@@ -486,7 +507,7 @@ var Mautic = {
     filterList: function(e,  route, clear) {
         if ($('#list-filter').length && (e.keyCode == 13 || e.which == 13 || $(e.target).hasClass('btn-filter'))){
             e.preventDefault();
-            $("body").addClass("loading-content");
+
             if (clear) {
                 $('#list-filter').val('');
             }
@@ -501,7 +522,6 @@ var Mautic = {
                 },
                 error: function(request, textStatus, errorThrown) {
                     alert(errorThrown);
-                    $("body").removeClass("loading-content");
                 }
             });
         }
@@ -531,7 +551,6 @@ var Mautic = {
     submitGlobalSearchResults: function () {
         var searchStr = $('#global_search').val();
 
-        $("body").addClass("loading-content");
         var query = "ajaxAction=globalsearch&searchstring=" + encodeURIComponent(searchStr);
         $.ajax({
             url: mauticBaseUrl,
@@ -544,11 +563,9 @@ var Mautic = {
                     $(".global-search-wrapper").html(response.searchResults);
                 }
                 Mautic.onPageLoad('.global-search-wrapper');
-                $("body").removeClass("loading-content");
             },
             error: function(request, textStatus, errorThrown) {
                 alert(errorThrown);
-                $("body").removeClass("loading-content");
             }
         });
     },

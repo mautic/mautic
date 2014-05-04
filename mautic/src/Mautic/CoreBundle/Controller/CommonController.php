@@ -152,7 +152,7 @@ class CommonController extends Controller implements EventsController {
             $passthrough
         );
         $response->setData($dataArray);
-
+        $response->headers->set('Content-Length', strlen($response->getContent()));
         return $response;
     }
 
