@@ -39,7 +39,7 @@ class UserProvider implements UserProviderInterface
 
         $users = $q->getResult();
 
-        if (null === $users || count($users) > 1) {
+        if (empty($users) || count($users) > 1) {
             $message = sprintf(
                 'Unable to find an active admin MauticUserBundle:User object identified by "%s".',
                 $username
