@@ -228,11 +228,7 @@ class UserController extends CommonApiController
             $permissions = array($permissions);
         }
 
-        $return = array();
-        foreach($permissions as $permission) {
-            $return[$permission] = $this->get('mautic.security')->isGranted($permission, $entity);
-        }
-
+        $return = $this->get('mautic.security')->isGranted($permissions, "RETURN_ARRAY", $entity);
         $view = $this->view($return, Codes::HTTP_OK);
         return $this->handleView($view);
     }

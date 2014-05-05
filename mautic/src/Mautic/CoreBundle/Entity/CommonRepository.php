@@ -11,6 +11,7 @@ namespace Mautic\CoreBundle\Entity;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Helper\SearchStringHelper;
+use Mautic\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator;
 use Symfony\Component\Debug\Exception\FatalErrorException;
 use Symfony\Component\Translation\IdentityTranslator;
@@ -26,7 +27,12 @@ class CommonRepository extends EntityRepository
     /**
      * @var Translator
      */
-    public $translator;
+    protected $translator;
+
+    /**
+     * @var User
+     */
+    protected $currentUser;
 
     public function setTranslator($translator)
     {
@@ -34,6 +40,16 @@ class CommonRepository extends EntityRepository
             throw new FatalErrorException();
         }
         $this->translator = $translator;
+    }
+
+    /**
+     * Set the current user (i.e. from security context) for use within repositories
+     *
+     * @param User $user
+     */
+    public function setCurrentUser(User $user)
+    {
+        $this->currentUser = $user;
     }
 
     /**

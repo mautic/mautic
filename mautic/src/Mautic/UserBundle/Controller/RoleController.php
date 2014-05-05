@@ -136,7 +136,9 @@ class RoleController extends FormController
 
             if ($valid === 1) {
                 $overrides = array(
-                    'permissions' => $this->request->request->get('role[permissions]', null, true)
+                    'entities' => array(
+                        'permission' => $this->request->request->get('role[permissions]', null, true)
+                    )
                 );
                 //form is valid so process the data
                 $model->saveEntity($entity, $overrides);
@@ -233,7 +235,9 @@ class RoleController extends FormController
 
             if ($valid === 1) {
                 $overrides = array(
-                    'permissions' => $this->request->request->get('role[permissions]', null, true)
+                    'entities' => array(
+                        'permission' => $this->request->request->get('role[permissions]', null, true)
+                    )
                 );
                 //form is valid so process the data
                 $model->saveEntity($entity, $overrides);

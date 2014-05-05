@@ -42,6 +42,9 @@ class FormModel extends CommonModel
     {
         //set the translator
         $this->em->getRepository($this->repository)->setTranslator($this->container->get('translator'));
+        $this->em->getRepository($this->repository)->setCurrentUser(
+            $this->container->get('security.context')->getToken()->getUser()
+        );
 
         return $this->em
             ->getRepository($this->repository)
@@ -70,8 +73,10 @@ class FormModel extends CommonModel
                 if ($k == "entities") {
                     foreach ($v as $entityKey => $entityArray) {
                         $func = "add" . ucfirst($entityKey);
-                        foreach ($entityArray as $e) {
-                            $entity->$func($e);
+                        if (!empty($entityArray)) {
+                            foreach ($entityArray as $e) {
+                                $entity->$func($e);
+                            }
                         }
                     }
                 } else {
