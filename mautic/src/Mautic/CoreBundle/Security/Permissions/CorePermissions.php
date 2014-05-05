@@ -75,7 +75,7 @@ class CorePermissions {
      * @param      $bundle
      * @param bool $throwException
      * @return mixed
-     * @throws \Symfony\Component\Debug\Exception\DummyException
+     * @throws \Symfony\Component\Debug\Exception\NotFoundHttpException
      */
     public function getPermissionObject($bundle, $throwException = true) {
         static $classes = array();
@@ -86,7 +86,7 @@ class CorePermissions {
                 if (class_exists($className)) {
                     $classes[$bundle] = new $className($this->container, $this->em);
                 } elseif ($throwException) {
-                    throw new DummyException("$className not found!");
+                    throw new NotFoundHttpException("$className not found!");
                 } else {
                     $classes[$bundle] = false;
                 }
@@ -103,7 +103,7 @@ class CorePermissions {
      *
      * @param array $permissions
      * @return array
-     * @throws \Symfony\Component\Debug\Exception\DummyException
+     * @throws \Symfony\Component\Debug\Exception\NotFoundHttpException
      */
     public function generatePermissions(array $permissions) {
         $entities = array();
@@ -132,15 +132,17 @@ class CorePermissions {
         return $entities;
     }
 
+
     /**
      * Determines if the user has permission to access the given area
      *
      * @param      $requestedPermission
+     * @param bool $mode MATCH_ALL|MATCH_ONE|RETURN_ARRAY
      * @param null $userEntity
-     * @return int
-     * @throws \Symfony\Component\Debug\Exception\NotFoundHttpException
+     * @return bool
+     * @throws NotFoundHttpException
      */
-    public function isGranted ($requestedPermission, $userEntity = null)
+    public function isGranted ($requestedPermission, $mode = "MATCH_ALL", $userEntity = null)
     {
         if ($this->container->get('security.context')->getToken() === null) {
             throw new NotFoundHttpException('No security context found.');
@@ -150,38 +152,59 @@ class CorePermissions {
            $userEntity = $this->container->get('security.context')->getToken()->getUser();
         }
 
-        if ($userEntity->getRole()->isAdmin()) {
-            //admin user has access to everything
-            return 1;
+        if (!is_array($requestedPermission)) {
+            $requestedPermission = array($requestedPermission);
         }
 
-        $parts = explode(':', $requestedPermission);
-        if (count($parts) != 3) {
-            throw new NotFoundHttpException($this->container->get('translator')->trans('mautic.core.permissions.notfound',
-                array("requested" => $requestedPermission))
+        $permissions = array();
+        foreach ($requestedPermission as $permission) {
+            $parts = explode(':', $permission);
+            if (count($parts) != 3) {
+                throw new NotFoundHttpException($this->container->get('translator')->trans('mautic.core.permissions.badformat',
+                        array("%permission%" => $permission))
+                );
+            }
+
+            $activePermissions = $userEntity->getActivePermissions();
+
+            //ensure consistency by forcing lowercase
+            array_walk($parts, function (&$v) {
+                    $v = strtolower($v);
+                });
+
+            //check against bundle permissions class
+            $permissionObject = $this->getPermissionObject($parts[0]);
+
+            //Is the permission supported?
+            if (!$permissionObject->isSupported($parts[1], $parts[2])) {
+                throw new NotFoundHttpException($this->container->get('translator')->trans('mautic.core.permissions.notfound',
+                        array("%permission%" => $permission))
+                );
+            }
+
+            if ($userEntity->getRole()->isAdmin()) {
+                //admin user has access to everything
+                $permissions[$permission] = 1;
+            } elseif (!isset($activePermissions[$parts[0]])) {
+                //user does not have implicit access to bundle so deny
+                $permissions[$permission] = 0;
+            } else {
+                $permissions[$permission] = $permissionObject->isGranted($activePermissions[$parts[0]], $parts[1], $parts[2]);
+            }
+        }
+
+        if ($mode == "MATCH_ALL") {
+            //deny if any of the permissions are denied
+            return in_array(0, $permissions) ? 0 : 1;
+        } elseif ($mode == "MATCH_ONE") {
+            //grant if any of the permissions were granted
+            return in_array(1, $permissions) ? 1 : 0;
+        } elseif ($mode == "RETURN_ARRAY") {
+            return $permissions;
+        } else {
+            throw new NotFoundHttpException($this->container->get('translator')->trans('mautic.core.permissions.mode.notfound',
+                    array("%mode%" => $mode))
             );
         }
-        $activePermissions = $userEntity->getActivePermissions();
-
-        //ensure consistency by forcing lowercase
-        array_walk($parts, function(&$v) { $v = strtolower($v); });
-
-        //check against bundle permissions class
-        $permissionObject = $this->getPermissionObject($parts[0]);
-
-        //Is the permission supported?
-        if (!$permissionObject->isSupported($parts[1], $parts[2])) {
-            throw new NotFoundHttpException($this->container->get('translator')->trans('mautic.core.permissions.notfound',
-                array("requested" => $requestedPermission))
-            );
-        }
-
-        //check to see if the user has implicit access to bundle
-        if (!isset($activePermissions[$parts[0]])) {
-            //user does not have implicit access to bundle so deny
-            return 0;
-        }
-
-        return $permissionObject->isGranted($activePermissions[$parts[0]], $parts[1], $parts[2]);
     }
 }
