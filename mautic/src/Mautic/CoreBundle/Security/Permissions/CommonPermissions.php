@@ -164,12 +164,11 @@ class CommonPermissions {
     public function isGranted($userPermissions, $name, $level) {
         list($name, $level) = $this->getSynonym($name, $level);
 
-        //test to see if the user has full permissions first
-        if ($this->permissions[$name]['full'] & $userPermissions[$name]) {
-            return 1;
-        } elseif (!isset($userPermission[$name])) {
+        if (!isset($userPermissions[$name])) {
             //the user doesn't have implicit access
             return 0;
+        } elseif ($this->permissions[$name]['full'] & $userPermissions[$name]) {
+            return 1;
         } else {
             //otherwise test for specific level
             return ($this->permissions[$name][$level] & $userPermissions[$name]);
