@@ -118,16 +118,20 @@ h6 {
 }
 .main-panel-content {
   position: relative;
-  padding: 0 0 30px 0;
+  padding: 0 0 60px 0;
   width: 100%;
   height: 100%;
-  overflow-x: hidden;
-  overflow-y: auto;
   -webkit-transition: all 0.3s ease-in-out;
   -moz-transition: all 0.3s ease-in-out;
   -o-transition: all 0.3s ease-in-out;
   transition: all 0.3s ease-in-out 0s;
   margin-left: 0;
+  overflow: hidden;
+}
+.main-panel-content-wrapper {
+  overflow-x: hidden;
+  overflow-y: auto;
+  height: 100%;
 }
 .left-panel {
   position: fixed;
@@ -366,6 +370,12 @@ h6 {
   margin-right: 5px;
   width: 300px;
 }
+.action-buttons .input-group {
+  text-align: right;
+}
+.action-buttons .input-group ul {
+  text-align: left;
+}
 .filter {
   position: relative;
   right: 0;
@@ -456,15 +466,15 @@ a.btn {
   margin-bottom: 0px;
   border-radius: 0px;
   box-shadow: none;
-  -webkit-animation: shift-rightwards 3s ease-in-out infinite;
-  -moz-animation: shift-rightwards 3s ease-in-out infinite;
-  -ms-animation: shift-rightwards 3s ease-in-out infinite;
-  -o-animation: shift-rightwards 3s ease-in-out infinite;
-  animation: shift-rightwards 3s ease-in-out infinite;
-  -webkit-animation-delay: .4s;
-  -moz-animation-delay: .4s;
-  -o-animation-delay: .4s;
-  animation-delay: .4s;
+  -webkit-animation: shift-rightwards 5s ease-in-out infinite;
+  -moz-animation: shift-rightwards 5s ease-in-out infinite;
+  -ms-animation: shift-rightwards 5s ease-in-out infinite;
+  -o-animation: shift-rightwards 5s ease-in-out infinite;
+  animation: shift-rightwards 5s ease-in-out infinite;
+  -webkit-animation-delay: .5s;
+  -moz-animation-delay: .5s;
+  -o-animation-delay: .5s;
+  animation-delay: .5s;
 }
 .loading-bar .progress-bar {
   box-shadow: none;
@@ -494,6 +504,15 @@ a.btn {
   }
   .main-panel {
     margin-right: 0;
+  }
+  .main-panel-content {
+    padding: 0 0 100px 0;
+  }
+  .user-menu .user-menu-username {
+    display: none;
+  }
+  .main-panel-header h2 {
+    font-size: 1.8em;
   }
   .btn-group .btn {
     float: none;

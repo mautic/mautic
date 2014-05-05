@@ -17,9 +17,9 @@ $display = ($security->isGranted("user:users:view") || $security->isGranted("use
 <ul class="nav nav-pills navbar-left admin-menu" role="navigation">
     <li class="dropdown">
         <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-            <?php echo $view['translator']->trans('mautic.core.admin'); ?><span class="caret"></span>
+            <?php echo $view['translator']->trans('mautic.core.admin'); ?><i class="fa fa-lg fa-fw fa-angle-double-down"></i>
         </a>
-        <ul class="dropdown-menu">
+        <ul class="dropdown-menu pull-right">
             <?php if ($security->isGranted("user:users:view")): ?>
             <li>
                 <a href="<?php echo $view['router']->generate("mautic_user_index"); ?>" data-toggle="ajax">

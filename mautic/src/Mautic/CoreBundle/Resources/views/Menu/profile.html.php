@@ -10,10 +10,11 @@
 
 <ul class="nav nav-pills navbar-right" role="navigation">
     <li class="dropdown">
-        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-            <?php echo $app->getUser()->getName();?><span class="caret"></span>
+        <a class="dropdown-toggle user-menu" data-toggle="dropdown" href="#">
+            <span class="user-menu-username"><?php echo $app->getUser()->getName();?></span>
+            <span class="user-menu-icon"><i class="fa fa-lg fa-fw fa-user"></i></span>
         </a>
-        <ul class="dropdown-menu">
+        <ul class="pull-right dropdown-menu">
             <li>
                 <a href="<?php echo $view['router']->generate("mautic_user_account"); ?>" data-toggle="ajax">
                     <i class="fa fa-cog fa-lg fa-fw"></i><span><?php echo $view["translator"]->trans("mautic.user.account.settings"); ?></span>

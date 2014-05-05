@@ -57,4 +57,6 @@ $filterBtnAction = (!empty($filterValue)) ? 1 : 0; //clear or populate
     <div class="clearfix"></div>
 </div>
 
-<?php $view['slots']->output('_content'); ?>
+<div class="main-panel-content-wrapper">
+    <?php $view['slots']->output('_content'); ?>
+</div>
