@@ -138,6 +138,7 @@ class UserModel extends FormModel
 
         $dispatcher = $this->container->get('event_dispatcher');
         $event      = new UserEvent($entity, $isNew);
+        $event->setEntityManager($this->em);
 
         switch ($action) {
             case "pre_save":

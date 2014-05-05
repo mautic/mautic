@@ -10,6 +10,7 @@
 namespace Mautic\UserBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -139,9 +140,9 @@ class UserType extends AbstractType
 
 
         $builder->add('isActive', 'choice', array(
-            'choices'       => array(
-                '0'   => 'mautic.core.form.no',
-                '1'   => 'mautic.core.form.yes',
+            'choice_list' => new ChoiceList(
+                array(false, true),
+                array('mautic.core.form.no', 'mautic.core.form.yes')
             ),
             'expanded'      => true,
             'multiple'      => false,

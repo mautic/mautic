@@ -9,7 +9,7 @@
 
 namespace Mautic\ApiBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\ApiBundle\Entity\Client;
 
 /**
@@ -17,7 +17,7 @@ use Mautic\ApiBundle\Entity\Client;
  *
  * @package Mautic\RoleBundle\Event
  */
-class ClientEvent extends Event
+class ClientEvent extends CommonEvent
 {
     /**
      * @var \Mautic\ApiBundle\Entity\Client
@@ -56,5 +56,17 @@ class ClientEvent extends Event
     public function isNew()
     {
         return $this->isNew;
+    }
+
+    /**
+     * Determines changes to original entity
+     *
+     * @return mixed
+     */
+    public function getChanges() {
+        $uow = $this->em->getUnitOfWork();
+        $uow->computeChangeSets();
+        $changeset = $uow->getEntityChangeSet($this->client);
+        return $changeset;
     }
 }

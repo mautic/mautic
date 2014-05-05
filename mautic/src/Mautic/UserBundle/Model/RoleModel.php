@@ -173,6 +173,7 @@ class RoleModel extends FormModel
 
         $dispatcher = $this->container->get('event_dispatcher');
         $event      = new RoleEvent($entity, $isNew);
+        $event->setEntityManager($this->em);
 
         switch ($action) {
             case "pre_save":

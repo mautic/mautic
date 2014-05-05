@@ -9,7 +9,7 @@
 
 namespace Mautic\UserBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\UserBundle\Entity\User;
 
 /**
@@ -17,7 +17,7 @@ use Mautic\UserBundle\Entity\User;
  *
  * @package Mautic\UserBundle\Event
  */
-class UserEvent extends Event
+class UserEvent extends CommonEvent
 {
     /**
      * @var \Mautic\UserBundle\Entity\User
@@ -57,4 +57,17 @@ class UserEvent extends Event
     {
         return $this->isNew;
     }
+
+    /**
+     * Determines changes to original entity
+     *
+     * @return mixed
+     */
+    public function getChanges() {
+        $uow = $this->em->getUnitOfWork();
+        $uow->computeChangeSets();
+        $changeset = $uow->getEntityChangeSet($this->user);
+        return $changeset;
+    }
+
 }

@@ -83,6 +83,7 @@ class ClientModel extends FormModel
 
         $dispatcher = $this->container->get('event_dispatcher');
         $event      = new ClientEvent($entity, $isNew);
+        $event->setEntityManager($this->em);
 
         switch ($action) {
             case "post_save":

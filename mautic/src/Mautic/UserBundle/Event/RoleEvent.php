@@ -9,7 +9,7 @@
 
 namespace Mautic\UserBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\UserBundle\Entity\Role;
 
 /**
@@ -17,7 +17,7 @@ use Mautic\UserBundle\Entity\Role;
  *
  * @package Mautic\RoleBundle\Event
  */
-class RoleEvent extends Event
+class RoleEvent extends CommonEvent
 {
     /**
      * @var \Mautic\UserBundle\Entity\Role
@@ -47,6 +47,18 @@ class RoleEvent extends Event
     public function getRole()
     {
         return $this->role;
+    }
+
+    /**
+     * Determines changes to original entity
+     *
+     * @return mixed
+     */
+    public function getChanges() {
+        $uow = $this->em->getUnitOfWork();
+        $uow->computeChangeSets();
+        $changeset = $uow->getEntityChangeSet($this->role);
+        return $changeset;
     }
 
     /**

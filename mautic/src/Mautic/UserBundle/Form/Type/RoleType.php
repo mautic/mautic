@@ -11,6 +11,7 @@ namespace Mautic\UserBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -65,9 +66,9 @@ class RoleType extends AbstractType
         );
 
         $builder->add('isAdmin', 'choice', array(
-            'choices'       => array(
-                '0'   => 'mautic.core.form.no',
-                '1'   => 'mautic.core.form.yes',
+            'choice_list' => new ChoiceList(
+                array(false, true),
+                array('mautic.core.form.no', 'mautic.core.form.yes')
             ),
             'expanded'      => true,
             'multiple'      => false,
