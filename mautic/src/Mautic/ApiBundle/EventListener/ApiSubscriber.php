@@ -134,16 +134,8 @@ class ApiSubscriber implements EventSubscriberInterface
     {
         $client = $event->getClient();
 
-        //because JMS Serializer doesn't work correctly with the Client entity since it extends FosOAuthServerBundle's
-        //base client, we have to manually set the fields so as to prevent sensitive details from getting added to the
-        //log
-
         $serializer = $this->container->get('jms_serializer');
-        $data       = array(
-            "id" => $client->getId(),
-            "name" => $client->getName(),
-            "redirectUris" => $client->getRedirectUris()
-        );
+        $data       = $event->getChanges();
         $details    = $serializer->serialize($data, 'json');
         $log = array(
             "bundle"     => "api",
@@ -165,24 +157,12 @@ class ApiSubscriber implements EventSubscriberInterface
     {
         $client = $event->getClient();
 
-        //because JMS Serializer doesn't work correctly with the Client entity since it extends FosOAuthServerBundle's
-        //base client, we have to manually set the fields so as to prevent sensitive details from getting added to the
-        //log
-
-        $serializer = $this->container->get('jms_serializer');
-        $data       = array(
-            "id" => $client->getId(),
-            "name" => $client->getName(),
-            "redirectUris" => $client->getRedirectUris()
-        );
-        $details    = $serializer->serialize($data, 'json');
-
         $log = array(
             "bundle"     => "api",
             "object"     => "client",
             "objectId"   => $client->getId(),
             "action"     => "delete",
-            "details"    => $details,
+            "details"    => '',
             "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
         );
         $this->container->get('mautic.model.auditlog')->writeToLog($log);

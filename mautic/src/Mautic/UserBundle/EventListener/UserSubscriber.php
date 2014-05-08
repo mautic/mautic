@@ -144,7 +144,8 @@ class UserSubscriber extends CommonSubscriber
         $user = $event->getUser();
 
         $serializer = $this->container->get('jms_serializer');
-        $details    = $serializer->serialize($user, 'json');
+        $data       = $event->getChanges();
+        $details    = $serializer->serialize($data, 'json');
 
         $log = array(
             "bundle"     => "user",
@@ -166,15 +167,12 @@ class UserSubscriber extends CommonSubscriber
     {
         $user = $event->getUser();
 
-        $serializer = $this->container->get('jms_serializer');
-        $details    = $serializer->serialize($user, 'json');
-
         $log = array(
             "bundle"     => "user",
             "object"     => "user",
             "objectId"   => $user->getId(),
             "action"     => "delete",
-            "details"    => $details,
+            "details"    => '',
             "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
         );
         $this->container->get('mautic.model.auditlog')->writeToLog($log);
@@ -190,7 +188,8 @@ class UserSubscriber extends CommonSubscriber
         $role = $event->getRole();
 
         $serializer = $this->container->get('jms_serializer');
-        $details    = $serializer->serialize($role, 'json');
+        $data       = $event->getChanges();
+        $details    = $serializer->serialize($data, 'json');
 
         $log = array(
             "bundle"     => "user",
@@ -212,15 +211,12 @@ class UserSubscriber extends CommonSubscriber
     {
         $role = $event->getRole();
 
-        $serializer = $this->container->get('jms_serializer');
-        $details    = $serializer->serialize($role, 'json');
-
         $log = array(
             "bundle"     => "user",
             "object"     => "role",
             "objectId"   => $role->getId(),
             "action"     => "delete",
-            "details"    => $details,
+            "details"    => '',
             "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
         );
         $this->container->get('mautic.model.auditlog')->writeToLog($log);
