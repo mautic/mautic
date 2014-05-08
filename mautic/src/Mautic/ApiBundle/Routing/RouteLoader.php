@@ -10,6 +10,7 @@
 namespace Mautic\ApiBundle\Routing;
 
 use Symfony\Component\Config\Loader\Loader;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\DependencyInjection\Container;
 
@@ -49,12 +50,10 @@ class RouteLoader extends Loader
         $collection = new RouteCollection();
         if ($this->container->getParameter('mautic.api_enabled')) {
             //load routing files
-            $iterator = new \FilesystemIterator(__DIR__ . '/../Resources/config/routing/');
-            $filter   = new \RegexIterator($iterator, "/.php$/");
-            if (iterator_count($filter)) {
-                foreach ($filter as $file) {
-                    $collection->addCollection($this->import($file->getPathname()));
-                }
+            $finder = new Finder();
+            $finder->files()->in(__DIR__ . '/../Resources/config/routing/')->name('*.php');
+            foreach ($finder as $file) {
+                $collection->addCollection($this->import($file->getRealPath()));
             }
 
             if (in_array($this->container->getParameter("kernel.environment"), array('dev', 'test'))) {

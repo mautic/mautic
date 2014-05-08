@@ -123,15 +123,11 @@ foreach ($mauticBundles as $bundle => $details) {
         $typeDir = "$bundleDir/Resources/public/$type/";
 
         if (file_exists($typeDir)) {
-            //get files within the directory
-            $iterator = new FilesystemIterator($typeDir);
-            //filter out inappropriate files
-            $filter = new RegexIterator($iterator, "/.$type$/");
-            if (iterator_count($filter)) {
-                foreach ($filter as $file) {
-                    //add the file to be loaded
-                    ${$type}[] = $file->getPathname();
-                }
+            $finder = new \Symfony\Component\Finder\Finder();
+            $finder->files()->in($typeDir)->name('*.'.$type)->depth('== 0');
+            foreach ($finder as $file) {
+                //add the file to be loaded
+                ${$type}[] = $file->getRealpath();
             }
         }
     };

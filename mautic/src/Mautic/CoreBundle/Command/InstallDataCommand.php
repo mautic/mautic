@@ -16,6 +16,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Finder\Finder;
 
 class InstallDataCommand extends ContainerAwareCommand
 {
@@ -108,15 +109,12 @@ class InstallDataCommand extends ContainerAwareCommand
             if (file_exists($fixturesDir)) {
                 if ($returnClassNames) {
                     //get files within the directory
-                    $iterator = new \FilesystemIterator($fixturesDir);
-                    //filter out inappropriate files
-                    $filter = new \RegexIterator($iterator, '/.php$/');
-                    if (iterator_count($filter)) {
-                        foreach ($filter as $file) {
-                            //add the file to be loaded
-                            $class      = str_replace(".php", "", $file->getFilename());
-                            $fixtures[] = 'Mautic\\' . $bundle['bundle'] . '\\DataFixtures\\ORM\\' . $class;
-                        }
+                    $finder = new Finder();
+                    $finder->files()->in($fixturesDir)->name('*.php');
+                    foreach ($finder as $file) {
+                        //add the file to be loaded
+                        $class      = str_replace(".php", "", $file->getFilename());
+                        $fixtures[] = 'Mautic\\' . $bundle['bundle'] . '\\DataFixtures\\ORM\\' . $class;
                     }
                 } else {
                     $fixtures[] = $fixturesDir;
