@@ -159,47 +159,67 @@ class CommonController extends Controller implements EventsController {
     /**
      * Executes an action requested via ajax
      *
+     * @param string $action
+     * @return JsonResponse
      */
-    protected function executeAjaxActions() {
+    public function executeAjaxAction( Request $request, $ajaxAction = "" ) {
         //process ajax actions
-        $dataArray       = array();
+        $dataArray       = array("success" => 0);
         $securityContext = $this->container->get('security.context');
-        $action          = $this->request->request->get("ajaxAction");
+        $action          = (empty($ajaxAction)) ? $this->request->get("ajaxAction") : $ajaxAction;
+
         if( $securityContext->isGranted('IS_AUTHENTICATED_REMEMBERED') ) {
-            switch ($action) {
-                case "togglepanel":
-                    $panel     = $this->request->request->get("panel", "left");
-                    $status    = $this->get("session")->get("{$panel}-panel", "default");
-                    $newStatus = ($status == "unpinned") ? "default" : "unpinned";
-                    $this->get("session")->set("{$panel}-panel", $newStatus);
-                    $dataArray['success'] = 1;
-                    break;
-                case "setorderby":
-                    $name    = $this->request->request->get("name");
-                    $orderBy = $this->request->request->get("orderby");
-                    if (!empty($name) && !empty($orderBy)) {
-                        $dir = $this->get("session")->get("mautic.$name.orderbydir", "ASC");
-                        $dir = ($dir == "ASC") ? "DESC" : "ASC";
-                        $this->get("session")->set("mautic.$name.orderby", $orderBy);
-                        $this->get("session")->set("mautic.$name.orderbydir", $dir);
-                        $dataArray['success'] = 1;
+            if (strpos($action, ":") !== false) {
+                //call the specified bundle's ajax action
+                $parts = explode(":", $action);
+                if (count($parts) == 3) {
+                    $bundle     = ucfirst($parts[0]);
+                    $controller = ucfirst($parts[1]);
+                    $action     = $parts[2];
+
+                    if (class_exists('Mautic\\'.$bundle.'Bundle\\Controller'.'\\'.$controller . 'Controller')) {
+                        return $this->forward("Mautic{$bundle}Bundle:$controller:executeAjax", array(
+                            'ajaxAction' => $action,
+                            'request'    => $this->request
+                        ));
                     }
-                    break;
-                case "globalsearch":
-                    $searchStr = $this->request->request->get("searchstring", "");
-                    $this->get('session')->set('mautic.global_search', $searchStr);
+                }
+            } else {
+                switch ($action) {
+                    case "togglepanel":
+                        $panel     = $this->request->request->get("panel", "left");
+                        $status    = $this->get("session")->get("{$panel}-panel", "default");
+                        $newStatus = ($status == "unpinned") ? "default" : "unpinned";
+                        $this->get("session")->set("{$panel}-panel", $newStatus);
+                        $dataArray['success'] = 1;
+                        break;
+                    case "setorderby":
+                        $name    = $this->request->request->get("name");
+                        $orderBy = $this->request->request->get("orderby");
+                        if (!empty($name) && !empty($orderBy)) {
+                            $dir = $this->get("session")->get("mautic.$name.orderbydir", "ASC");
+                            $dir = ($dir == "ASC") ? "DESC" : "ASC";
+                            $this->get("session")->set("mautic.$name.orderby", $orderBy);
+                            $this->get("session")->set("mautic.$name.orderbydir", $dir);
+                            $dataArray['success'] = 1;
+                        }
+                        break;
+                    case "globalsearch":
+                        $searchStr = $this->request->request->get("searchstring", "");
+                        $this->get('session')->set('mautic.global_search', $searchStr);
 
-                    $event = new GlobalSearchEvent($searchStr);
-                    $this->get('event_dispatcher')->dispatch(CoreEvents::GLOBAL_SEARCH, $event);
+                        $event = new GlobalSearchEvent($searchStr);
+                        $this->get('event_dispatcher')->dispatch(CoreEvents::GLOBAL_SEARCH, $event);
 
-                    $dataArray['searchResults'] = $this->renderView('MauticCoreBundle:Default:globalsearchresults.html.php',
-                        array('results' => $event->getResults())
-                    );
-                    break;
-                default:
-                    //ignore
-                    $dataArray['success'] = 0;
-                    break;
+                        $dataArray['searchResults'] = $this->renderView('MauticCoreBundle:Default:globalsearchresults.html.php',
+                            array('results' => $event->getResults())
+                        );
+                        break;
+                    default:
+                        //ignore
+                        $dataArray['success'] = 0;
+                        break;
+                }
             }
         }
         $response  = new JsonResponse();

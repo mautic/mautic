@@ -103,7 +103,9 @@ h1, h2, h3, h4, h5, h6 {
   padding: 40px 20px 0 20px;
   height: 100%;
   .transitions;
-  margin-right: @leftPanelWidth;
+  position:fixed;
+  right: 0;
+  left: @leftPanelWidth;
 }
 
 .main-panel-wrapper a {
@@ -112,6 +114,10 @@ h1, h2, h3, h4, h5, h6 {
 
 .main-panel-header h2 {
   margin-top: 5px;
+}
+
+.main-panel-footer {
+  margin-bottom: 75px;
 }
 
 .main-panel-breadcrumbs {
@@ -261,9 +267,10 @@ h1, h2, h3, h4, h5, h6 {
   margin-left: 0;
 }
 
-.page-wrapper.hide-left .main-panel-breadcrumbs {
+.page-wrapper.hide-left .main-panel-breadcrumbs, .page-wrapper.hide-left .main-panel {
   left: 0;
 }
+
 
 .page-wrapper.hide-left .left-panel {
   margin-left: -@leftPanelWidth;
@@ -299,8 +306,9 @@ h1, h2, h3, h4, h5, h6 {
   left: 0;
 }
 
-.page-wrapper.right-active .main-panel-breadcrumbs {
+.page-wrapper.right-active .main-panel-breadcrumbs, .page-wrapper.right-active .main-panel {
   margin-left: -@leftPanelWidth;
+  right: @rightPanelWidth;
 }
 
 .side-panel-nav-wrapper {
@@ -564,7 +572,7 @@ a.btn {
     margin-left: 0;
   }
 
-  .page-wrapper .main-panel-breadcrumbs {
+  .page-wrapper .main-panel-breadcrumbs, .page-wrapper .main-panel {
     margin-left: 0;
     left: 0;
   }

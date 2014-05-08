@@ -28,12 +28,14 @@ if ((int) $page === 1) {
     $nextClass = ' class="disabled"';
     $nextUrl   = '#';
 }
+
+$paginationClass = (!isset($paginationClass)) ? "" : " $paginationClass";
 ?>
 
 <?php if (!empty($totalItems)): ?>
 <div class="clearfix"></div>
 <div class="pagination-wrapper">
-    <ul class="pagination pull-right ">
+    <ul class="pagination pull-right<?php echo $paginationClass; ?>">
         <li<?php echo $prevClass;?>>
             <a href="<?php echo $prevUrl; ?>" data-toggle="ajax" data-menu-link="#mautic_user_index">&laquo;</a>
         </li>

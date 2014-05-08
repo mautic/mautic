@@ -47,6 +47,17 @@ $collection->add('mautic_api_getuser', new Route('/users/{id}.{_format}',
     )
 ));
 
+$collection->add('mautic_api_getself', new Route('/users/self.{_format}',
+    array(
+        '_controller' => 'MauticApiBundle:User\User:getSelf',
+        '_format' => 'json'
+    ),
+    array(
+        '_method' => 'GET',
+        '_format' => 'json|xml'
+    )
+));
+
 $collection->add('mautic_api_editputuser', new Route('/users/{id}/edit.{_format}',
     array(
         '_controller' => 'MauticApiBundle:User\User:editEntity',

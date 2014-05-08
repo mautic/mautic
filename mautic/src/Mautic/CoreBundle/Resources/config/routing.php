@@ -17,6 +17,10 @@ $collection->add('mautic_core_index', new Route('/', array(
     '_controller' => 'MauticCoreBundle:Default:index'
 )));
 
+$collection->add('mautic_core_ajax', new Route('/ajax', array(
+    '_controller' => 'MauticCoreBundle:Default:executeAjax'
+)));
+
 $collection->add('remove_trailing_slash', new Route( '/{url}',
     array(
         '_controller' => 'MauticCoreBundle:Common:removeTrailingSlash',

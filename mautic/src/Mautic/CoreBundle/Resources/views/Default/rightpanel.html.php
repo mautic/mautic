@@ -15,10 +15,12 @@ $function = ($value) ? "clearGlobalSearchResults" : "onClickGlobalSearchResults"
 <div class="right-panel-inner-wrapper">
     <div class="right-panel-header">
         <div class="input-group">
-            <input class="input-global-search form-control" name="global_search" id="global_search"
-                onkeypress="Mautic.onKeyPressGlobalSearchResults(event);"
-                placeholder="<?php echo $view['translator']->trans('mautic.core.form.search'); ?>"
-                value="<?php echo $value ?>" />
+            <input type="search"
+                   autocomplete="off"
+                   class="input-global-search form-control" name="global_search" id="global_search"
+                   onkeypress="Mautic.onKeyPressGlobalSearchResults(event);"
+                   placeholder="<?php echo $view['translator']->trans('mautic.core.form.search'); ?>"
+                   value="<?php echo $value ?>" />
             <span class="input-group-btn">
                 <button class="btn btn-default btn-global-search-submit" type="button" onclick="Mautic.<?php echo $function; ?>();">
                     <i class="fa <?php echo $btnClass; ?>"></i>

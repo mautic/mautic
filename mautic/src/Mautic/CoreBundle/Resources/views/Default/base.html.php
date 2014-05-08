@@ -22,6 +22,7 @@ $activePanelClasses  = ($app->getSession()->get('left-panel', 'default') == 'unp
         <link rel="stylesheet" href="<?php echo $view->escape($url) ?>" />
         <?php endforeach; ?>
         <link rel="stylesheet" href="<?php echo $view['assets']->getUrl('media/font-awesome/css/font-awesome.min.css'); ?>" />
+        <link rel="stylesheet" href="<?php echo $view['assets']->getUrl('media/jqueryui/jquery-ui-1.10.4.custom.min.css'); ?>" />
     </head>
     <body>
         <div class="page-wrapper<?php echo $activePanelClasses; ?>">

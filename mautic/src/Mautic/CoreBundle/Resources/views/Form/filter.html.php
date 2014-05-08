@@ -8,7 +8,8 @@
  */
 ?>
 
-<input class="form-control filter <?php echo (!empty($filterValue) ? 'show-filter' : 'hide-filter'); ?>"
+<input type="search"
+       class="form-control filter <?php echo (!empty($filterValue) ? 'show-filter' : 'hide-filter'); ?>"
        id="list-filter" name="<?php echo $filterName; ?>" type="text"
        placeholder="<?php echo $view['translator']->trans('mautic.core.form.search'); ?>"
        value="<?php echo $filterValue; ?>"

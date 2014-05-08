@@ -90,13 +90,18 @@ h6 {
   -moz-transition: all 0.3s ease-in-out;
   -o-transition: all 0.3s ease-in-out;
   transition: all 0.3s ease-in-out 0s;
-  margin-right: 230px;
+  position: fixed;
+  right: 0;
+  left: 230px;
 }
 .main-panel-wrapper a {
   color: #34495e;
 }
 .main-panel-header h2 {
   margin-top: 5px;
+}
+.main-panel-footer {
+  margin-bottom: 75px;
 }
 .main-panel-breadcrumbs {
   height: 40px;
@@ -239,7 +244,8 @@ h6 {
 .page-wrapper.hide-left {
   margin-left: 0;
 }
-.page-wrapper.hide-left .main-panel-breadcrumbs {
+.page-wrapper.hide-left .main-panel-breadcrumbs,
+.page-wrapper.hide-left .main-panel {
   left: 0;
 }
 .page-wrapper.hide-left .left-panel {
@@ -270,8 +276,10 @@ h6 {
   margin-left: -230px;
   left: 0;
 }
-.page-wrapper.right-active .main-panel-breadcrumbs {
+.page-wrapper.right-active .main-panel-breadcrumbs,
+.page-wrapper.right-active .main-panel {
   margin-left: -230px;
+  right: 230px;
 }
 .side-panel-nav-wrapper {
   position: relative;
@@ -486,7 +494,8 @@ a.btn {
   .page-wrapper {
     margin-left: 0;
   }
-  .page-wrapper .main-panel-breadcrumbs {
+  .page-wrapper .main-panel-breadcrumbs,
+  .page-wrapper .main-panel {
     margin-left: 0;
     left: 0;
   }

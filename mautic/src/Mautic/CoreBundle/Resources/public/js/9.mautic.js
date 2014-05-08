@@ -161,9 +161,11 @@ var Mautic = {
      * @param callback
      */
      postForm: function (form, callback) {
+        var action    = form.attr('action');
+        var ajaxRoute = action + ((/\?/i.test(action)) ? "&ajax=1" : "?ajax=1");
         $.ajax({
             type: form.attr('method'),
-            url: form.attr('action'),
+            url: ajaxRoute,
             data: form.serialize(),
             dataType: "json",
             success: function (data) {
@@ -275,6 +277,11 @@ var Mautic = {
 
                 return false;
             });
+
+            //run on loads
+            if (typeof Mautic[formName + "OnLoad"] == 'function') {
+                Mautic[formName + "OnLoad"]();
+            }
         });
     },
 
@@ -324,7 +331,7 @@ var Mautic = {
     stickSidePanel: function (position) {
         var query = "ajaxAction=togglepanel&panel=" + position;
         $.ajax({
-            url: mauticBaseUrl,
+            url: mauticBaseUrl + "ajax",
             type: "POST",
             data: query,
             dataType: "json"
@@ -423,7 +430,7 @@ var Mautic = {
     reorderTableData: function (name, orderby) {
         var query = "ajaxAction=setorderby&name=" + name + "&orderby=" + orderby;
         $.ajax({
-            url: mauticBaseUrl,
+            url: mauticBaseUrl + 'ajax',
             type: "POST",
             data: query,
             dataType: "json",
@@ -553,7 +560,7 @@ var Mautic = {
 
         var query = "ajaxAction=globalsearch&searchstring=" + encodeURIComponent(searchStr);
         $.ajax({
-            url: mauticBaseUrl,
+            url: mauticBaseUrl + 'ajax',
             type: "POST",
             data: query,
             dataType: "json",
