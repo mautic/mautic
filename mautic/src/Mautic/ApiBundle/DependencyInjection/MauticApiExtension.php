@@ -9,11 +9,10 @@
 
 namespace Mautic\ApiBundle\DependencyInjection;
 
+use Mautic\CoreBundle\Helper\ServiceLoaderHelper;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
-use Symfony\Component\DependencyInjection\Loader;
 
 /**
  * Class MauticApiExtension
@@ -34,11 +33,8 @@ class MauticApiExtension extends Extension implements PrependExtensionInterface
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        $loader = new Loader\PhpFileLoader($container, new FileLocator(__DIR__.'/../Resources/config/services'));
-        $loader->load('services.php');
-        $loader->load('forms.php');
-        $loader->load('models.php');
-        $loader->load('events.php');
+        $loader = new ServiceLoaderHelper();
+        $loader->loadServices(__DIR__, $container);
     }
 
     public function prepend(ContainerBuilder $container)
