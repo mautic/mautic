@@ -30,8 +30,8 @@ class ClientRepositoryTest extends MauticWebTestCase
         $args     = array(
             "filter" =>
                 "mautic.core.searchcommand.name:mautic" .
-                "mautic.api.client.searchcommand.redirecturi:" . $this->container->get('router')->generate(
-                    'mautic_core_index', array(), true)
+                " mautic.api.client.searchcommand.redirecturi:" . str_replace("http://", "", $this->container->get('router')->generate(
+                    'mautic_core_index', array(), true))
         );
 
         $filterHelper = new SearchStringHelper();
