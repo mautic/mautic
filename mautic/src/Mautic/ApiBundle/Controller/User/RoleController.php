@@ -52,6 +52,9 @@ class RoleController extends CommonApiController
      */
     public function getEntitiesAction()
     {
+        if (!$this->container->get('mautic.security')->isGranted('user:roles:view')) {
+            return $this->accessDenied();
+        }
         return parent::getEntitiesAction();
     }
 
@@ -73,6 +76,41 @@ class RoleController extends CommonApiController
      */
     public function getEntityAction($id)
     {
+        if (!$this->container->get('mautic.security')->isGranted('user:roles:view')) {
+            return $this->accessDenied();
+        }
         return parent::getEntityAction($id);
+    }
+
+    /**
+     * Delete is not allowed via API
+     *
+     * @param int $id
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function deleteEntityAction($id)
+    {
+        return $this->accessDenied();
+    }
+
+    /**
+     * Editing roles is not allowed via API
+     *
+     * @param int $id
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function editEntityAction($id)
+    {
+        return $this->accessDenied();
+    }
+
+    /**
+     * Adding roles is not allowed via API
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function newEntityAction()
+    {
+        return $this->accessDenied();
     }
 }

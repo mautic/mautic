@@ -30,7 +30,6 @@ class ClientModel extends FormModel
     protected function init()
     {
         $this->repository     = 'MauticApiBundle:Client';
-        $this->permissionBase = 'api:clients';
     }
 
     /**
@@ -73,26 +72,31 @@ class ClientModel extends FormModel
      * @param      $action
      * @param      $entity
      * @param bool $isNew
+     * @param      $event
      * @throws \Symfony\Component\HttpKernel\NotFoundHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false)
+    protected function dispatchEvent($action, &$entity, $isNew = false, $event = false)
     {
         if (!$entity instanceof Client) {
             throw new NotFoundHttpException('Entity must be of class Client()');
         }
 
-        $dispatcher = $this->container->get('event_dispatcher');
-        $event      = new ClientEvent($entity, $isNew);
-        $event->setEntityManager($this->em);
+        if (empty($event)) {
+            $event      = new ClientEvent($entity, $isNew);
+            $event->setEntityManager($this->em);
+        }
 
+        $dispatcher = $this->container->get('event_dispatcher');
         switch ($action) {
             case "post_save":
                 $dispatcher->dispatch(ApiEvents::CLIENT_POST_SAVE, $event);
                 break;
-            case "delete":
-                $dispatcher->dispatch(ApiEvents::CLIENT_DELETE, $event);
+            case "post_delete":
+                $dispatcher->dispatch(ApiEvents::CLIENT_POST_DELETE, $event);
                 break;
         }
+
+        return $event;
     }
 
     public function getUserClients(User $user)

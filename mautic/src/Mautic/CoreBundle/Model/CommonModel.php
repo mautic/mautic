@@ -41,12 +41,6 @@ class CommonModel
     protected $repository;
 
     /**
-     * @var string
-     */
-    protected $permissionBase;
-
-
-    /**
      * @param Container     $container
      * @param RequestStack  $request_stack
      * @param EntityManager $em
@@ -74,17 +68,6 @@ class CommonModel
     {
         $this->repository = $repository;
     }
-
-    /**
-     * Set the permission base (i.e. user:users) used for the model
-     *
-     * @param $permBase
-     */
-    protected function setPermissionBase($permBase)
-    {
-        $this->permissionBase = $permBase;
-    }
-
 
     public function getSupportedSearchCommands()
     {

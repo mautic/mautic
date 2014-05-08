@@ -55,6 +55,9 @@ class UserController extends CommonApiController
      */
     public function getEntitiesAction()
     {
+        if (!$this->container->get('mautic.security')->isGranted('user:users:view')) {
+            return $this->accessDenied();
+        }
         return parent::getEntitiesAction();
     }
 
@@ -76,7 +79,32 @@ class UserController extends CommonApiController
      */
     public function getEntityAction($id)
     {
+        if (!$this->container->get('mautic.security')->isGranted('user:users:view')) {
+            return $this->accessDenied();
+        }
         return parent::getEntityAction($id);
+    }
+
+
+    /**
+     * Obtains the logged in user's data
+     *
+     * @ApiDoc(
+     *   section = "Users",
+     *   description = "Obtains the logged in user's data",
+     *   statusCodes = {
+     *     200 = "Returned when successful"
+     *   }
+     * )
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    public function getSelfAction()
+    {
+        $currentUser = $this->get('security.context')->getToken()->getUser();
+        $view = $this->view($currentUser, Codes::HTTP_OK);
+        return $this->handleView($view);
     }
 
     /**
@@ -95,7 +123,10 @@ class UserController extends CommonApiController
      */
     public function deleteEntityAction($id)
     {
-       return parent::deleteEntityAction($id);
+        if (!$this->container->get('mautic.security')->isGranted('user:users:delete')) {
+            return $this->accessDenied();
+        }
+        return parent::deleteEntityAction($id);
     }
 
     /**
@@ -114,8 +145,14 @@ class UserController extends CommonApiController
      */
     public function newEntityAction()
     {
-        $entity            = $this->model->getEntity();
-        $parameters        = $this->request->request->all();
+        $entity = $this->model->getEntity();
+
+        //@TODO add catch to determine editown or editother
+        if (!$this->container->get('mautic.security')->isGranted('user:users:create')) {
+            return $this->accessDenied();
+        }
+
+        $parameters = $this->request->request->all();
 
         if (isset($parameters['plainPassword']['password'])) {
             $submittedPassword = $parameters['plainPassword']['password'];
@@ -154,14 +191,20 @@ class UserController extends CommonApiController
         $parameters = $this->request->request->all();
         $method     = $this->request->getMethod();
 
+        if (!$this->container->get('mautic.security')->isGranted('user:users:edit')) {
+            $this->accessDenied();
+        }
+
         if (!$entity) {
             if ($method === "PATCH") {
                 //PATCH requires that an entity exists
                 throw new NotFoundHttpException($this->get('translator')->trans('mautic.api.call.notfound'));
             } else {
                 //PUT can create a new entity if it doesn't exist
+                if (!$this->container->get('mautic.security')->isGranted('user:users:create')) {
+                    $this->accessDenied();
+                }
                 $entity = $this->model->getEntity();
-
                 if (isset($parameters['plainPassword']['password'])) {
                     $submittedPassword = $parameters['plainPassword']['password'];
                     $entity->setPassword($this->model->checkNewPassword($entity, $submittedPassword));

@@ -41,11 +41,6 @@ class CommonApiController extends FOSRestController implements EventsController
     protected $model;
 
     /**
-     * @var string
-     */
-    protected $permissionBase;
-
-    /**
      * @var
      */
     protected $entityNameOne;
@@ -263,6 +258,21 @@ class CommonApiController extends FOSRestController implements EventsController
             $view = $this->view($form, Codes::HTTP_BAD_REQUEST);
         }
 
+        return $this->handleView($view);
+    }
+
+    /**
+     * Returns a 403 Access Denied
+     *
+     * @return Response
+     */
+    public function accessDenied()
+    {
+        $view = $this->view(
+            array(
+                "error" => $this->get('translator')->trans('mautic.core.error.accessdenied')
+            ), Codes::HTTP_FORBIDDEN
+        );
         return $this->handleView($view);
     }
 }

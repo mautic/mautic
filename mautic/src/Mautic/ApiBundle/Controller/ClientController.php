@@ -124,7 +124,7 @@ class ClientController extends FormController
             $me      = $this->get('security.context')->getToken()->getUser();
             $client  = $this->container->get('mautic.model.client')->getEntity($clientId);
 
-            if ($client === null) {
+            if ($client === null || !$client->getId()) {
                 $flashes[] = array(
                     'type'    => 'error',
                     'msg'     => 'mautic.api.client.error.notfound',
@@ -252,7 +252,7 @@ class ClientController extends FormController
         $returnUrl = $this->generateUrl('mautic_client_index');
 
         //client not found
-        if ($client === null) {
+        if ($client === null || !$client->getId()) {
             return $this->postActionRedirect(array(
                 'returnUrl'       => $returnUrl,
                 'contentTemplate' => 'MauticApiBundle:Client:index',
@@ -328,7 +328,7 @@ class ClientController extends FormController
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function deleteAction($objectId) {
-        if (!$this->get('mautic.security')->isGranted('api:clients:deleteother')) {
+        if (!$this->get('mautic.security')->isGranted('api:clients:delete')) {
             return $this->accessDenied();
         }
 
@@ -338,7 +338,7 @@ class ClientController extends FormController
         if ($this->request->getMethod() == 'POST') {
             $result = $this->container->get('mautic.model.client')->deleteEntity($objectId);
 
-            if (!$result) {
+            if (!$result === null || !$result->getId()) {
                 $flashes[] = array(
                     'type' => 'error',
                     'msg'  => 'mautic.api.client.error.notfound',
