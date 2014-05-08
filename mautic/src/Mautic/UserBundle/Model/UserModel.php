@@ -31,30 +31,23 @@ class UserModel extends FormModel
     protected function init()
     {
         $this->repository     = 'MauticUserBundle:User';
-        $this->permissionBase = 'user:users';
     }
 
     /**
      * {@inheritdoc}
      *
      * @param       $entity
-     * @param array $overrides
      * @return int
      * @throws \Symfony\Component\HttpKernel\NotFoundHttpException
      * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
      */
-    public function saveEntity($entity, $overrides = array())
+    public function saveEntity($entity)
     {
         if (!$entity instanceof User) {
             throw new NotFoundHttpException('Entity must be of class User()');
         }
 
-        $permissionNeeded = ($entity->getId()) ? "create" : "editother";
-        if (!$this->container->get('mautic.security')->isGranted('user:users:'. $permissionNeeded)) {
-            throw new AccessDeniedException($this->container->get('translator')->trans('mautic.core.accessdenied'));
-        }
-
-        return parent::saveEntity($entity, $overrides);
+        return parent::saveEntity($entity);
     }
 
     /**
@@ -128,18 +121,20 @@ class UserModel extends FormModel
      * @param      $action
      * @param      $entity
      * @param bool $isNew
+     * @param      $event
      * @throws \Symfony\Component\HttpKernel\NotFoundHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false)
+    protected function dispatchEvent($action, &$entity, $isNew = false, $event = false)
     {
         if (!$entity instanceof User) {
             throw new NotFoundHttpException('Entity must be of class User()');
         }
 
+        if (empty($event)) {
+            $event = new UserEvent($entity, $isNew);
+            $event->setEntityManager($this->em);
+        }
         $dispatcher = $this->container->get('event_dispatcher');
-        $event      = new UserEvent($entity, $isNew);
-        $event->setEntityManager($this->em);
-
         switch ($action) {
             case "pre_save":
                 $dispatcher->dispatch(UserEvents::USER_PRE_SAVE, $event);
@@ -147,9 +142,13 @@ class UserModel extends FormModel
             case "post_save":
                 $dispatcher->dispatch(UserEvents::USER_POST_SAVE, $event);
                 break;
-            case "delete":
-                $dispatcher->dispatch(UserEvents::USER_DELETE, $event);
+            case "pre_delete":
+                $dispatcher->dispatch(UserEvents::USER_PRE_DELETE, $event);
+                break;
+            case "post_delete":
+                $dispatcher->dispatch(UserEvents::USER_POST_DELETE, $event);
                 break;
         }
+        return $event;
     }
 }

@@ -53,6 +53,7 @@ class ProfileController extends FormController
         $form->remove('save');
         $form->remove('cancel');
 
+        $overrides = array();
         //make sure this user has access to edit privileged fields
         foreach ($permissions as $permName => $hasAccess) {
             if ($permName == "apiAccess") continue;
@@ -145,16 +146,22 @@ class ProfileController extends FormController
         $submitted = $this->get('session')->get('formProcessed', 0);
         if ($this->request->getMethod() == "POST" && !$submitted) {
             $this->get('session')->set('formProcessed', 1);
-            $overrides = array();
+
             //check to see if the password needs to be rehashed
             $submittedPassword = $this->request->request->get('user[plainPassword][password]', null, true);
             $overrides['password'] = $model->checkNewPassword($me, $submittedPassword);
 
+            //check and bind data
             $valid = $this->checkFormValidity($form);
+
+            foreach ($overrides as $k => $v) {
+                $func = "set" . ucfirst($k);
+                $me->$func($v);
+            }
 
             if ($valid === 1) {
                 //form is valid so process the data
-                $model->saveEntity($me, $overrides);
+                $model->saveEntity($me);
             }
 
             if (!empty($valid)) { //cancelled or success

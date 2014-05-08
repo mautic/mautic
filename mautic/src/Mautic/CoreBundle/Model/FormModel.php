@@ -29,7 +29,12 @@ class FormModel extends CommonModel
      */
     public function getEntity($id = '')
     {
-        return $this->em->getRepository($this->repository)->find($id);
+        $repo = $this->em->getRepository($this->repository);
+        if (method_exists($repo, 'getEntity')) {
+            return $repo->getEntity($id);
+        } else {
+            return $repo->find($id);
+        }
     }
 
     /**
@@ -55,45 +60,21 @@ class FormModel extends CommonModel
      * Create/edit entity
      *
      * @param       $entity
-     * @param array $overrides
      * @return mixed
      * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
      */
-    public function saveEntity($entity, $overrides = array())
+    public function saveEntity($entity)
     {
-        //@TODO add catch to determine editown or editother
         $isNew = ($entity->getId()) ? false : true;
-        $permissionNeeded = ($isNew) ? "create" : "editother";
-        if (!$this->container->get('mautic.security')->isGranted($this->permissionBase . ':' . $permissionNeeded)) {
-            throw new AccessDeniedException($this->container->get('translator')->trans('mautic.core.accessdenied'));
-        }
-
-        if (!empty($overrides)) {
-            foreach ($overrides as $k => $v) {
-                if ($k == "entities") {
-                    foreach ($v as $entityKey => $entityArray) {
-                        $func = "add" . ucfirst($entityKey);
-                        if (!empty($entityArray)) {
-                            foreach ($entityArray as $e) {
-                                $entity->$func($e);
-                            }
-                        }
-                    }
-                } else {
-                    $func = "set" . ucfirst($k);
-                    $entity->$func($v);
-                }
-            }
-        }
 
         //set the date/time for new submission
         if (method_exists($entity, 'setDateAdded') && !$entity->getDateAdded()) {
             $entity->setDateAdded(new \DateTime());
         }
 
-        $this->dispatchEvent("pre_save", $entity, $isNew);
+        $event = $this->dispatchEvent("pre_save", $entity, $isNew);
         $this->em->getRepository($this->repository)->saveEntity($entity);
-        $this->dispatchEvent("post_save", $entity, $isNew);
+        $this->dispatchEvent("post_save", $entity, $isNew, $event);
 
         return $entity;
     }
@@ -102,23 +83,16 @@ class FormModel extends CommonModel
      * Delete an entity
      *
      * @param      $entityId
-     * @param bool $skipSecurity
      * @return null|object
      * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
      */
-    public function deleteEntity($entityId, $skipSecurity = false)
+    public function deleteEntity($entityId)
     {
-        //@TODO add catch to determine deleteown or deleteother
-        if (!$skipSecurity && !$this->container->get('mautic.security')->isGranted($this->permissionBase . ':deleteother')) {
-            throw new AccessDeniedException($this->container->get('translator')->trans('mautic.core.accessdenied'));
-        }
-
         $entity = $this->em->getRepository($this->repository)->find($entityId);
 
-        //Event must be called first in order for getId() to be available for events
-        $this->dispatchEvent("delete", $entity);
-
+        $event = $this->dispatchEvent("pre_delete", $entity);
         $this->em->getRepository($this->repository)->deleteEntity($entity);
+        $this->dispatchEvent("post_delete", $entity, $event);
 
         return $entity;
     }
@@ -142,8 +116,9 @@ class FormModel extends CommonModel
      * @param $action
      * @param $entity
      * @param $isNew
+     * @param $event
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false)
+    protected function dispatchEvent($action, &$entity, $isNew = false, $event = false)
     {
         //...
     }

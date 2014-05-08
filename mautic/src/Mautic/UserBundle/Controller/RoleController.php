@@ -135,13 +135,12 @@ class RoleController extends FormController
             $valid = $this->checkFormValidity($form);
 
             if ($valid === 1) {
-                $overrides = array(
-                    'entities' => array(
-                        'permission' => $this->request->request->get('role[permissions]', null, true)
-                    )
-                );
+                //set the permissions
+                $permissions = $this->request->request->get('role[permissions]', null, true);
+                $model->setRolePermissions($entity, $permissions);
+
                 //form is valid so process the data
-                $model->saveEntity($entity, $overrides);
+                $model->saveEntity($entity);
             }
 
             if (!empty($valid)) { //cancelled or success
@@ -208,7 +207,7 @@ class RoleController extends FormController
         $returnUrl  = $this->generateUrl('mautic_role_index', array('page' => $page));
 
         //user not found
-        if ($entity === null) {
+        if ($entity === null || !$entity->getId()) {
             return $this->postActionRedirect(array(
                 'returnUrl'       => $returnUrl,
                 'viewParameters'  => array('page' => $page),
@@ -234,13 +233,12 @@ class RoleController extends FormController
             $valid = $this->checkFormValidity($form);
 
             if ($valid === 1) {
-                $overrides = array(
-                    'entities' => array(
-                        'permission' => $this->request->request->get('role[permissions]', null, true)
-                    )
-                );
+                //set the permissions
+                $permissions = $this->request->request->get('role[permissions]', null, true);
+                $model->setRolePermissions($entity, $permissions);
+
                 //form is valid so process the data
-                $model->saveEntity($entity, $overrides);
+                $model->saveEntity($entity);
             }
 
             if (!empty($valid)) { //cancelled or success
@@ -294,7 +292,7 @@ class RoleController extends FormController
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function deleteAction($objectId) {
-        if (!$this->get('mautic.security')->isGranted('user:roles:deleteother')) {
+        if (!$this->get('mautic.security')->isGranted('user:roles:delete')) {
             return $this->accessDenied();
         }
 
@@ -306,7 +304,7 @@ class RoleController extends FormController
             try {
                 $result = $this->container->get('mautic.model.role')->deleteEntity($objectId);
 
-                if ($result === null) {
+                if ($result === null || !$result->getId()) {
                     $flashes[] = array(
                         'type' => 'error',
                         'msg'  => 'mautic.user.role.error.notfound',

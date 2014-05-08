@@ -131,14 +131,14 @@ class UserController extends FormController
         ///Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
             //check to see if the password needs to be rehashed
-            $overrides             = array();
-            $submittedPassword     = $this->request->request->get('user[plainPassword][password]', null, true);
-            $overrides['password'] = $model->checkNewPassword($user, $submittedPassword);
+            $submittedPassword  = $this->request->request->get('user[plainPassword][password]', null, true);
+            $password           = $model->checkNewPassword($user, $submittedPassword);
             $valid = $this->checkFormValidity($form);
 
             if ($valid === 1) {
                 //form is valid so process the data
-                $this->container->get('mautic.model.user')->saveEntity($user, $overrides);
+                $user->setPassword($password);
+                $this->container->get('mautic.model.user')->saveEntity($user);
             }
 
             if (!empty($valid)) { //cancelled or success
@@ -199,7 +199,7 @@ class UserController extends FormController
         $returnUrl  = $this->generateUrl('mautic_user_index', array('page' => $page));
 
         //user not found
-        if ($user === null) {
+        if ($user === null || !$user->getId()) {
             return $this->postActionRedirect(array(
                 'returnUrl'       => $returnUrl,
                 'viewParameters'  => array('page' => $page),
@@ -223,14 +223,14 @@ class UserController extends FormController
         ///Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
             //check to see if the password needs to be rehashed
-            $overrides             = array();
-            $submittedPassword     = $this->request->request->get('user[plainPassword][password]', null, true);
-            $overrides['password'] = $model->checkNewPassword($user, $submittedPassword);
-            $valid = $this->checkFormValidity($form);
+            $submittedPassword  = $this->request->request->get('user[plainPassword][password]', null, true);
+            $password           = $model->checkNewPassword($user, $submittedPassword);
+            $valid              = $this->checkFormValidity($form);
 
             if ($valid === 1) {
                 //form is valid so process the data
-                $model->saveEntity($user, $overrides);
+                $user->setPassword($password);
+                $model->saveEntity($user);
             }
 
             if (!empty($valid)) { //cancelled or success
@@ -281,7 +281,7 @@ class UserController extends FormController
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function deleteAction($objectId) {
-        if (!$this->get('mautic.security')->isGranted('user:users:deleteother')) {
+        if (!$this->get('mautic.security')->isGranted('user:users:delete')) {
             return $this->accessDenied();
         }
 
@@ -295,7 +295,7 @@ class UserController extends FormController
             if ((int) $currentUser->getId() !== (int) $objectId) {
                 $result = $this->container->get('mautic.model.user')->deleteEntity($objectId);
 
-                if ($result === null) {
+                if ($result === null || !$result->getId()) {
                     $flashes[] = array(
                         'type' => 'error',
                         'msg'  => 'mautic.user.user.error.notfound',

@@ -32,40 +32,30 @@ class RoleModel extends FormModel
     protected function init()
     {
         $this->repository     = 'MauticUserBundle:Role';
-        $this->permissionBase = 'user:roles';
     }
 
     /**
      * {@inheritdoc}
      *
      * @param       $entity
-     * @param array $overrides
      * @return int
      * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function saveEntity($entity, $overrides = array())
+    public function saveEntity($entity)
     {
         if (!$entity instanceof Role) {
             throw new NotFoundHttpException('Entity must be of class Role()');
         }
-        $isNew            = ($entity->getId()) ? 0 : 1;
-        $permissionNeeded = ($isNew) ? "create" : "editother";
-        if (!$this->container->get('mautic.security')->isGranted('user:roles:'. $permissionNeeded)) {
-            throw new AccessDeniedException($this->container->get('translator')->trans('mautic.core.accessdenied'));
-        }
 
-        if (isset($overrides['permissions'])) {
-            $this->setRolePermissions($entity, $overrides['permissions']);
-            unset($overrides['permissions']);
-        }
+        $isNew = ($entity->getId()) ? 0 : 1;
 
         if (!$isNew) {
             //delete all existing
             $this->em->getRepository('MauticUserBundle:Permission')->purgeRolePermissions($entity);
         }
 
-        return parent::saveEntity($entity, $overrides);
+        return parent::saveEntity($entity);
     }
 
     /**
@@ -90,16 +80,11 @@ class RoleModel extends FormModel
      * {@inheritdoc}
      *
      * @param      $entityId
-     * @param bool $skipSecurity
      * @return null|object
      * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
      */
-    public function deleteEntity($entityId, $skipSecurity = false)
+    public function deleteEntity($entityId)
     {
-        if (!$skipSecurity && !$this->container->get('mautic.security')->isGranted($this->permissionBase . ':deleteother')) {
-            throw new AccessDeniedException($this->container->get('translator')->trans('mautic.core.accessdenied'));
-        }
-
         $entity = $this->em->getRepository($this->repository)->find($entityId);
 
         $users = $this->em->getRepository('MauticUserBundle:User')->findByRole($entity);
@@ -113,13 +98,7 @@ class RoleModel extends FormModel
             );
         }
 
-
-        //Event must be called first in order for getId() to be available for events
-        $this->dispatchEvent("delete", $entity);
-
-        $this->em->getRepository($this->repository)->deleteEntity($entity);
-
-        return $entity;
+        return parent::deleteEntity($entityId);
     }
 
     /**
@@ -163,18 +142,20 @@ class RoleModel extends FormModel
      * @param $action
      * @param $entity
      * @param $isNew
+     * @param $event
      * @throws \Symfony\Component\HttpKernel\NotFoundHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false)
+    protected function dispatchEvent($action, &$entity, $isNew = false, $event = false)
     {
         if (!$entity instanceof Role) {
             throw new NotFoundHttpException('Entity must be of class Role()');
         }
 
+        if (empty($event)) {
+            $event = new RoleEvent($entity, $isNew);
+            $event->setEntityManager($this->em);
+        }
         $dispatcher = $this->container->get('event_dispatcher');
-        $event      = new RoleEvent($entity, $isNew);
-        $event->setEntityManager($this->em);
-
         switch ($action) {
             case "pre_save":
                 $dispatcher->dispatch(UserEvents::ROLE_PRE_SAVE, $event);
@@ -182,9 +163,14 @@ class RoleModel extends FormModel
             case "post_save":
                 $dispatcher->dispatch(UserEvents::ROLE_POST_SAVE, $event);
                 break;
-            case "delete":
-                $dispatcher->dispatch(UserEvents::ROLE_DELETE, $event);
+            case "pre_delete":
+                $dispatcher->dispatch(UserEvents::ROLE_PRE_DELETE, $event);
+                break;
+            case "post_delete":
+                $dispatcher->dispatch(UserEvents::ROLE_POST_DELETE, $event);
                 break;
         }
+
+        return $event;
     }
 }
