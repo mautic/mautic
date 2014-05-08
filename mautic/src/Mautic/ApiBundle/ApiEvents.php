@@ -22,12 +22,12 @@ final class ApiEvents
     const CLIENT_POST_SAVE   = 'mautic.client_post_save';
 
     /**
-     * The mautic.client_delete event is thrown each time an API client is deleted.
+     * The mautic.client_post_delete event is thrown after an API client is deleted.
      *
      * The event listener receives a
      * Mautic\ApiBundle\Event\ClientEvent instance.
      *
      * @var string
      */
-    const CLIENT_DELETE   = 'mautic.client_delete';
+    const CLIENT_POST_DELETE   = 'mautic.client_post_delete';
 }

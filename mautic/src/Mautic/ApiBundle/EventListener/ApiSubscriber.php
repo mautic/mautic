@@ -52,11 +52,11 @@ class ApiSubscriber implements EventSubscriberInterface
     static public function getSubscribedEvents ()
     {
         return array(
-            CoreEvents::BUILD_MENU      => array('onBuildMenu', 9998),
-            CoreEvents::BUILD_ROUTE     => array('onBuildRoute', 0),
-            CoreEvents::GLOBAL_SEARCH   => array('onGlobalSearch', 0),
-            ApiEvents::CLIENT_POST_SAVE => array('onClientPostSave', 0),
-            ApiEvents::CLIENT_DELETE    => array('onClientDelete', 0)
+            CoreEvents::BUILD_MENU          => array('onBuildMenu', 9998),
+            CoreEvents::BUILD_ROUTE         => array('onBuildRoute', 0),
+            CoreEvents::GLOBAL_SEARCH       => array('onGlobalSearch', 0),
+            ApiEvents::CLIENT_POST_SAVE     => array('onClientPostSave', 0),
+            ApiEvents::CLIENT_POST_DELETE   => array('onClientDelete', 0)
         );
     }
 

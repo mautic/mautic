@@ -38,7 +38,8 @@ $container->setDefinition(
         'Mautic\ApiBundle\EventListener\ApiSubscriber',
          array(
              new Reference('service_container'),
-             new Reference('request_stack')
+             new Reference('request_stack'),
+             new Reference('doctrine.orm.entity_manager')
          )
     )
 )

@@ -18,7 +18,8 @@ $container->setDefinition(
         'Mautic\DashboardBundle\EventListener\DashboardSubscriber',
         array(
             new Reference('service_container'),
-            new Reference('request_stack')
+            new Reference('request_stack'),
+            new Reference('doctrine.orm.entity_manager')
         )
     )
 )

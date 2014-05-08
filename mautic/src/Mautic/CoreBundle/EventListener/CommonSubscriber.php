@@ -9,6 +9,7 @@
 
 namespace Mautic\CoreBundle\EventListener;
 
+use Doctrine\ORM\EntityManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -32,12 +33,18 @@ class CommonSubscriber implements EventSubscriberInterface
     protected $request;
 
     /**
+     * @var \Doctrine\ORM\EntityManager
+     */
+    protected $em;
+
+    /**
      * @param ContainerInterface $container
      */
-    public function __construct (ContainerInterface $container, RequestStack $request_stack)
+    public function __construct (ContainerInterface $container, RequestStack $request_stack, EntityManager $em)
     {
         $this->container = $container;
         $this->request   = $request_stack->getCurrentRequest();
+        $this->em        = $em;
     }
 
     static public function getSubscribedEvents ()

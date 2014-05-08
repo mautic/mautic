@@ -9,10 +9,9 @@
 
 namespace Mautic\DashboardBundle\DependencyInjection;
 
+use Mautic\CoreBundle\Helper\ServiceLoaderHelper;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\Config\FileLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
-use Symfony\Component\DependencyInjection\Loader;
 
 /**
  * Class MauticDashboardExtension
@@ -33,7 +32,7 @@ class MauticDashboardExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        $loader = new Loader\PhpFileLoader($container, new FileLocator(__DIR__.'/../Resources/config/services'));
-        $loader->load('events.php');
+        $loader = new ServiceLoaderHelper();
+        $loader->loadServices(__DIR__, $container);
     }
 }

@@ -50,6 +50,16 @@ class UserEvent extends CommonEvent
     }
 
     /**
+     * Sets the User entity
+     *
+     * @param User $user
+     */
+    public function setUser(User $user)
+    {
+        $this->user = $user;
+    }
+
+    /**
      * Returns if a saved user is new or not
      * @return bool
      */
@@ -69,5 +79,4 @@ class UserEvent extends CommonEvent
         $changeset = $uow->getEntityChangeSet($this->user);
         return $changeset;
     }
-
 }

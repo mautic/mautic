@@ -50,6 +50,16 @@ class RoleEvent extends CommonEvent
     }
 
     /**
+     * Sets the Role entity
+     *
+     * @param Role $role
+     */
+    public function setRole(Role $role)
+    {
+        $this->role = $role;
+    }
+
+    /**
      * Determines changes to original entity
      *
      * @return mixed
