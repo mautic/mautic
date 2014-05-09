@@ -50,6 +50,17 @@ class MauticWebTestCase extends WebTestCase
         return $client;
     }
 
+    protected function getNonAdminClient($user = 'sales', array $options = array(), array $server = array())
+    {
+        if (empty($server['PHP_AUTH_USER'])) {
+            $server['PHP_AUTH_USER'] = $user;
+            $server['PHP_AUTH_PW']   = 'mautic';
+        }
+        $client = static::createClient($options, $server);
+
+        return $client;
+    }
+
     protected function getAnonClient(array $options = array(), array $server = array())
     {
         $client = static::createClient($options, $server);

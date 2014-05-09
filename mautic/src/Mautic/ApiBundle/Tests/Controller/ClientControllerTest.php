@@ -54,6 +54,11 @@ class ClientControllerTest extends MauticWebTestCase
             0,
             $crawler->filter('table.client-list')->count()
         );
+
+        //make sure ACL is working
+        $client = $this->getNonAdminClient();
+        $client->request('GET', '/clients');
+        $this->assertEquals(302, $client->getResponse()->getStatusCode());
     }
 
     public function testNew()
@@ -97,6 +102,11 @@ class ClientControllerTest extends MauticWebTestCase
             '/mautic.api.client.notice.created/',
             $this->client->getResponse()->getContent()
         );
+
+        //make sure ACL is working
+        $client = $this->getNonAdminClient();
+        $client->request('GET', '/clients/new');
+        $this->assertEquals(302, $client->getResponse()->getStatusCode());
     }
 
     public function testEdit()
@@ -136,6 +146,11 @@ class ClientControllerTest extends MauticWebTestCase
 
         $this->assertEquals($updatedClient->getRandomId(), $apiClient->getRandomId());
         $this->assertEquals($updatedClient->getSecret(), $apiClient->getSecret());
+
+        //make sure ACL is working
+        $client = $this->getNonAdminClient();
+        $client->request('GET', '/clients/edit/' . $apiClient->getId());
+        $this->assertEquals(302, $client->getResponse()->getStatusCode());
     }
 
     public function testDelete()
@@ -157,5 +172,11 @@ class ClientControllerTest extends MauticWebTestCase
             '/mautic.api.client.notice.deleted/',
             $this->client->getResponse()->getContent()
         );
+
+        //make sure ACL is working
+        $client = $this->getNonAdminClient();
+        $apiClient = $this->createApiClient();
+        $client->request('POST', '/clients/delete/' . $apiClient->getId());
+        $this->assertEquals(302, $client->getResponse()->getStatusCode());
     }
 }

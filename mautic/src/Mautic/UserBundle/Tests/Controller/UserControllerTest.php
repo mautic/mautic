@@ -67,6 +67,11 @@ class UserControllerTest extends MauticWebTestCase
             0,
             $crawler->filter('table.user-list')->count()
         );
+
+        //make sure ACL is working
+        $client = $this->getNonAdminClient();
+        $client->request('GET', '/users');
+        $this->assertEquals(302, $client->getResponse()->getStatusCode());
     }
 
     public function testNew()
@@ -94,6 +99,12 @@ class UserControllerTest extends MauticWebTestCase
         $this->assertTrue($encoder->isPasswordValid(
             $user->getPassword(), 'mautic', $user->getSalt()
         ));
+
+        //make sure ACL is working
+        $client = $this->getNonAdminClient();
+        $client->request('GET', '/users/new');
+        $this->assertEquals(302, $client->getResponse()->getStatusCode());
+
     }
 
     public function testEdit()
@@ -131,6 +142,11 @@ class UserControllerTest extends MauticWebTestCase
         $this->assertTrue($encoder->isPasswordValid(
             $user->getPassword(), 'mautic', $user->getSalt()
         ));
+
+        //make sure ACL is working
+        $client = $this->getNonAdminClient();
+        $client->request('GET', '/users/edit/' . $user->getId());
+        $this->assertEquals(302, $client->getResponse()->getStatusCode());
     }
 
     public function testDelete()
@@ -152,5 +168,11 @@ class UserControllerTest extends MauticWebTestCase
             '/mautic.user.user.notice.deleted/',
             $this->client->getResponse()->getContent()
         );
+
+        //make sure ACL is working
+        list($user, $crawler) = $this->createUser();
+        $client = $this->getNonAdminClient();
+        $client->request('POST', '/users/delete/' . $user->getId());
+        $this->assertEquals(302, $client->getResponse()->getStatusCode());
     }
 }

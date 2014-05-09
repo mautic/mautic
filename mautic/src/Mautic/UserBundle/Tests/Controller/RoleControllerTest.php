@@ -56,6 +56,11 @@ class RoleControllerTest extends MauticWebTestCase
             0,
             $crawler->filter('table.role-list')->count()
         );
+
+        //make sure ACL is working
+        $client = $this->getNonAdminClient();
+        $client->request('GET', '/roles');
+        $this->assertEquals(302, $client->getResponse()->getStatusCode());
     }
 
     public function testNew()
@@ -77,6 +82,11 @@ class RoleControllerTest extends MauticWebTestCase
             '/mautic.user.role.notice.created/',
             $this->client->getResponse()->getContent()
         );
+
+        //make sure ACL is working
+        $client = $this->getNonAdminClient();
+        $client->request('GET', '/roles/new');
+        $this->assertEquals(302, $client->getResponse()->getStatusCode());
     }
 
     public function testEdit()
@@ -107,6 +117,11 @@ class RoleControllerTest extends MauticWebTestCase
             '/mautic.user.role.notice.updated/',
             $this->client->getResponse()->getContent()
         );
+
+        //make sure ACL is working
+        $client = $this->getNonAdminClient();
+        $client->request('GET', '/roles/edit/' . $role->getId());
+        $this->assertEquals(302, $client->getResponse()->getStatusCode());
     }
 
     public function testDelete()
@@ -128,5 +143,11 @@ class RoleControllerTest extends MauticWebTestCase
             '/mautic.user.role.notice.deleted/',
             $this->client->getResponse()->getContent()
         );
+
+        //make sure ACL is working
+        list($role, $crawler) = $this->createRole();
+        $client = $this->getNonAdminClient();
+        $client->request('POST', '/roles/delete/' . $role->getId());
+        $this->assertEquals(302, $client->getResponse()->getStatusCode());
     }
 }
