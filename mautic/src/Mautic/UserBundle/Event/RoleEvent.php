@@ -19,15 +19,6 @@ use Mautic\UserBundle\Entity\Role;
  */
 class RoleEvent extends CommonEvent
 {
-    /**
-     * @var \Mautic\UserBundle\Entity\Role
-     */
-    protected $role;
-
-    /**
-     * @var
-     */
-    protected $isNew;
 
     /**
      * @param Role $role
@@ -35,7 +26,7 @@ class RoleEvent extends CommonEvent
      */
     public function __construct(Role &$role, $isNew = false)
     {
-        $this->role  =& $role;
+        $this->entity  =& $role;
         $this->isNew = $isNew;
     }
 
@@ -46,7 +37,7 @@ class RoleEvent extends CommonEvent
      */
     public function getRole()
     {
-        return $this->role;
+        return $this->entity;
     }
 
     /**
@@ -56,27 +47,6 @@ class RoleEvent extends CommonEvent
      */
     public function setRole(Role $role)
     {
-        $this->role = $role;
-    }
-
-    /**
-     * Determines changes to original entity
-     *
-     * @return mixed
-     */
-    public function getChanges() {
-        $uow = $this->em->getUnitOfWork();
-        $uow->computeChangeSets();
-        $changeset = $uow->getEntityChangeSet($this->role);
-        return $changeset;
-    }
-
-    /**
-     * Returns if a saved role is new or not
-     * @return bool
-     */
-    public function isNew()
-    {
-        return $this->isNew;
+        $this->entity = $role;
     }
 }

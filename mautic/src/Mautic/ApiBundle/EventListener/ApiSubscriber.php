@@ -55,6 +55,7 @@ class ApiSubscriber implements EventSubscriberInterface
             CoreEvents::BUILD_MENU          => array('onBuildMenu', 9998),
             CoreEvents::BUILD_ROUTE         => array('onBuildRoute', 0),
             CoreEvents::GLOBAL_SEARCH       => array('onGlobalSearch', 0),
+            ApiEvents::CLIENT_PRE_SAVE     => array('onClientPreSave', 0),
             ApiEvents::CLIENT_POST_SAVE     => array('onClientPostSave', 0),
             ApiEvents::CLIENT_POST_DELETE   => array('onClientDelete', 0)
         );
@@ -126,6 +127,17 @@ class ApiSubscriber implements EventSubscriberInterface
 
 
     /**
+     * Obtain changes to enter into audit log
+     *
+     * @param Events\ClientEvent $event
+     */
+    public function onClientPreSave(Events\ClientEvent $event)
+    {
+        //stash changes
+        $this->changes = $event->getChanges();
+    }
+
+    /**
      * Add a client change entry to the audit log
      *
      * @param Events\ClientEvent $event
@@ -133,19 +145,19 @@ class ApiSubscriber implements EventSubscriberInterface
     public function onClientPostSave(Events\ClientEvent $event)
     {
         $client = $event->getClient();
-
-        $serializer = $this->container->get('jms_serializer');
-        $data       = $event->getChanges();
-        $details    = $serializer->serialize($data, 'json');
-        $log = array(
-            "bundle"     => "api",
-            "object"     => "client",
-            "objectId"   => $client->getId(),
-            "action"     => ($event->isNew()) ? "create" : "update",
-            "details"    => $details,
-            "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
-        );
-        $this->container->get('mautic.model.auditlog')->writeToLog($log);
+        if (!empty($this->changes)) {
+            $serializer = $this->container->get('jms_serializer');
+            $details    = $serializer->serialize($this->changes, 'json');
+            $log        = array(
+                "bundle"    => "api",
+                "object"    => "client",
+                "objectId"  => $client->getId(),
+                "action"    => ($event->isNew()) ? "create" : "update",
+                "details"   => $details,
+                "ipAddress" => $this->request->server->get('REMOTE_ADDR')
+            );
+            $this->container->get('mautic.model.auditlog')->writeToLog($log);
+        }
     }
 
     /**
@@ -156,13 +168,14 @@ class ApiSubscriber implements EventSubscriberInterface
     public function onClientDelete(Events\ClientEvent $event)
     {
         $client = $event->getClient();
-
+        $serializer = $this->container->get('jms_serializer');
+        $details    = $serializer->serialize($client, 'json');
         $log = array(
             "bundle"     => "api",
             "object"     => "client",
             "objectId"   => $client->getId(),
             "action"     => "delete",
-            "details"    => '',
+            "details"    => $client,
             "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
         );
         $this->container->get('mautic.model.auditlog')->writeToLog($log);

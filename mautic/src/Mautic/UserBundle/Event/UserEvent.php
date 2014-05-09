@@ -19,15 +19,6 @@ use Mautic\UserBundle\Entity\User;
  */
 class UserEvent extends CommonEvent
 {
-    /**
-     * @var \Mautic\UserBundle\Entity\User
-     */
-    protected $user;
-
-    /**
-     * @var
-     */
-    protected $isNew;
 
     /**
      * @param User $user
@@ -35,7 +26,7 @@ class UserEvent extends CommonEvent
      */
     public function __construct(User &$user, $isNew = false)
     {
-        $this->user  =& $user;
+        $this->entity  =& $user;
         $this->isNew = $isNew;
     }
 
@@ -46,7 +37,7 @@ class UserEvent extends CommonEvent
      */
     public function getUser()
     {
-        return $this->user;
+        return $this->entity;
     }
 
     /**
@@ -56,27 +47,6 @@ class UserEvent extends CommonEvent
      */
     public function setUser(User $user)
     {
-        $this->user = $user;
-    }
-
-    /**
-     * Returns if a saved user is new or not
-     * @return bool
-     */
-    public function isNew()
-    {
-        return $this->isNew;
-    }
-
-    /**
-     * Determines changes to original entity
-     *
-     * @return mixed
-     */
-    public function getChanges() {
-        $uow = $this->em->getUnitOfWork();
-        $uow->computeChangeSets();
-        $changeset = $uow->getEntityChangeSet($this->user);
-        return $changeset;
+        $this->entity = $user;
     }
 }

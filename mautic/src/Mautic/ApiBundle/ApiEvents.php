@@ -12,6 +12,16 @@ namespace Mautic\ApiBundle;
 final class ApiEvents
 {
     /**
+     * The mautic.client_pre_save event is thrown right before an API client is persisted.
+     *
+     * The event listener receives a
+     * Mautic\ApiBundle\Event\ClientEvent instance.
+     *
+     * @var string
+     */
+    const CLIENT_PRE_SAVE   = 'mautic.client_pre_save';
+
+    /**
      * The mautic.client_post_save event is thrown right after an API client is persisted.
      *
      * The event listener receives a

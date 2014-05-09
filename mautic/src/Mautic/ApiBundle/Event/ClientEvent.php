@@ -19,15 +19,6 @@ use Mautic\ApiBundle\Entity\Client;
  */
 class ClientEvent extends CommonEvent
 {
-    /**
-     * @var \Mautic\ApiBundle\Entity\Client
-     */
-    protected $client;
-
-    /**
-     * @var
-     */
-    protected $isNew;
 
     /**
      * @param Client $client
@@ -35,7 +26,7 @@ class ClientEvent extends CommonEvent
      */
     public function __construct(Client $client, $isNew = false)
     {
-        $this->client = $client;
+        $this->entity = $client;
         $this->isNew  = $isNew;
     }
 
@@ -46,27 +37,6 @@ class ClientEvent extends CommonEvent
      */
     public function getClient()
     {
-        return $this->client;
-    }
-
-    /**
-     * Returns if a saved client is new or not
-     * @return bool
-     */
-    public function isNew()
-    {
-        return $this->isNew;
-    }
-
-    /**
-     * Determines changes to original entity
-     *
-     * @return mixed
-     */
-    public function getChanges() {
-        $uow = $this->em->getUnitOfWork();
-        $uow->computeChangeSets();
-        $changeset = $uow->getEntityChangeSet($this->client);
-        return $changeset;
+        return $this->entity;
     }
 }

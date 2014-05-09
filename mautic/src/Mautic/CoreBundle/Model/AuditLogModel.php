@@ -40,9 +40,17 @@ class AuditLogModel extends CommonModel
         $log->setAction($action);
         $log->setDetails($details);
         $log->setIpAddress($ipAddress);
+
         $token = $this->container->get('security.context')->getToken();
-        $userId = (!empty($token)) ? $token->getUser()->getId() : 0;
+        $userId = 0;
+        $userName = '';
+        if (!empty($token)) {
+            $user = $token->getUser();
+            $userId = $user->getId();
+            $userName = $user->getName();
+        }
         $log->setUserId($userId);
+        $log->setUserName($userName);
 
         $this->em->getRepository("MauticCoreBundle:AuditLog")->saveEntity($log);
     }
