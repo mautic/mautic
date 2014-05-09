@@ -10,7 +10,7 @@
 namespace Mautic\CoreBundle\Model;
 
 use Mautic\CoreBundle\Helper\SearchStringHelper;
-use Symfony\Component\HttpKernel\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
@@ -27,13 +27,17 @@ class FormModel extends CommonModel
      * @param $id
      * @return null|object
      */
-    public function getEntity($id = '')
+    public function getEntity($id = null)
     {
-        $repo = $this->em->getRepository($this->repository);
-        if (method_exists($repo, 'getEntity')) {
-            return $repo->getEntity($id);
+        if (null !== $id) {
+            $repo = $this->em->getRepository($this->repository);
+            if (method_exists($repo, 'getEntity')) {
+                return $repo->getEntity($id);
+            } else {
+                return $repo->find($id);
+            }
         } else {
-            return $repo->find($id);
+            return null;
         }
     }
 
@@ -82,14 +86,12 @@ class FormModel extends CommonModel
     /**
      * Delete an entity
      *
-     * @param      $entityId
+     * @param  $entity
      * @return null|object
      * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
      */
-    public function deleteEntity($entityId)
+    public function deleteEntity($entity)
     {
-        $entity = $this->em->getRepository($this->repository)->find($entityId);
-
         $event = $this->dispatchEvent("pre_delete", $entity);
         $this->em->getRepository($this->repository)->deleteEntity($entity);
         $this->dispatchEvent("post_delete", $entity, $event);
@@ -103,7 +105,7 @@ class FormModel extends CommonModel
      * @param      $entity
      * @param null $action
      * @return mixed
-     * @throws \Symfony\Component\HttpKernel\NotFoundHttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function createForm($entity, $action = null)
     {

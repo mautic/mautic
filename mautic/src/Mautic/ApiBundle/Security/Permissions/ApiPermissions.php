@@ -134,7 +134,7 @@ class ApiPermissions extends CommonPermissions
     protected function getSynonym($name, $level) {
         if ($name == "access" && $level == "granted") {
             $level = "full";
-        } elseif ($name == "client") {
+        } elseif ($name == "clients") {
             switch ($level) {
                 case "edit":
                     $level = "editother";

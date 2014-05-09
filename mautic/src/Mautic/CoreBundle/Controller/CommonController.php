@@ -84,7 +84,8 @@ class CommonController extends Controller implements EventsController {
         }
 
         if (!$this->request->isXmlHttpRequest()) {
-            return $this->redirect($returnUrl);
+            $code = (isset($args['responseCode'])) ? $args['responseCode'] : 302;
+            return $this->redirect($returnUrl, $code);
         } else {
             //load by ajax
             return $this->ajaxAction($args);
@@ -142,7 +143,6 @@ class CommonController extends Controller implements EventsController {
         $breadcrumbs = $this->renderView("MauticCoreBundle:Default:breadcrumbs.html.php", $parameters);
         $flashes     = $this->renderView("MauticCoreBundle:Default:flashes.html.php", $parameters);
 
-        $response  = new JsonResponse();
         $dataArray = array_merge(
             array(
                 'newContent'  => $newContent,
@@ -151,7 +151,8 @@ class CommonController extends Controller implements EventsController {
             ),
             $passthrough
         );
-        $response->setData($dataArray);
+        $code      = (isset($args['responseCode'])) ? $args['responseCode'] : 200;
+        $response  = new JsonResponse($dataArray, $code);
         $response->headers->set('Content-Length', strlen($response->getContent()));
         return $response;
     }
@@ -253,14 +254,15 @@ class CommonController extends Controller implements EventsController {
         return $this->postActionRedirect( array(
             'returnUrl'       => $this->generateUrl('mautic_core_index'),
             'contentTemplate' => 'MauticCoreBundle:Default:index',
-            'passthroughVars'     =>    array(
+            'passthroughVars' =>    array(
                 'activeLink' => '#mautic_core_index',
                 'route'      => $this->generateUrl('mautic_core_index')
             ),
             'flashes'         => array(array(
                 'type' => 'error',
                 'msg'  => 'mautic.core.error.accessdenied'
-            ))
+            )),
+            'responseCode'     => 302
         ));
     }
 }

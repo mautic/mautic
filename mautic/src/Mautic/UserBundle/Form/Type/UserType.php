@@ -98,10 +98,7 @@ class UserType extends AbstractType
             'class'         => 'MauticUserBundle:Role',
             'property'      => 'name',
             'empty_value'   => 'mautic.core.form.chooseone',
-            'query_builder' => function(EntityRepository $er) {
-                return $er->createQueryBuilder('r')
-                    ->orderBy('r.name', 'ASC');
-            },
+            'choices'       => $this->container->get('mautic.model.role')->getUserRoleList()
         ));
 
         $existing = (!empty($options['data']) && $options['data']->getId());

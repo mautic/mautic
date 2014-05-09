@@ -122,7 +122,7 @@ class UserRepository extends CommonRepository
                 $expr = $q->expr()->$func("r.name", ':'.$unique);
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
-                $xFunc = ($func == "notLike") ? "andX" : "orX";
+                $xFunc = ($filter->not) ? "andX" : "orX";
                 $expr = $q->expr()->$xFunc(
                     $q->expr()->$func('u.firstName', ':'.$unique),
                     $q->expr()->$func('u.lastName', ':'.$unique)

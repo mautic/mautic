@@ -56,9 +56,9 @@ class ClientModel extends FormModel
      * @param $id
      * @return null|object
      */
-    public function getEntity($id = '')
+    public function getEntity($id = null)
     {
-        if (empty($id)) {
+        if ($id === null) {
             return new Client();
         }
 
@@ -73,7 +73,7 @@ class ClientModel extends FormModel
      * @param      $entity
      * @param bool $isNew
      * @param      $event
-     * @throws \Symfony\Component\HttpKernel\NotFoundHttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, $event = false)
     {
@@ -82,7 +82,7 @@ class ClientModel extends FormModel
         }
 
         if (empty($event)) {
-            $event      = new ClientEvent($entity, $isNew);
+            $event = new ClientEvent($entity, $isNew);
             $event->setEntityManager($this->em);
         }
 

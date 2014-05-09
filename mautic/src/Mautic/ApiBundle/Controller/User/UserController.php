@@ -10,6 +10,7 @@
 namespace Mautic\ApiBundle\Controller\User;
 
 use FOS\RestBundle\Util\Codes;
+use JMS\Serializer\SerializationContext;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
@@ -58,6 +59,7 @@ class UserController extends CommonApiController
         if (!$this->container->get('mautic.security')->isGranted('user:users:view')) {
             return $this->accessDenied();
         }
+        $this->serializerGroups = array('full');
         return parent::getEntitiesAction();
     }
 
@@ -82,6 +84,7 @@ class UserController extends CommonApiController
         if (!$this->container->get('mautic.security')->isGranted('user:users:view')) {
             return $this->accessDenied();
         }
+        $this->serializerGroups = array('full');
         return parent::getEntityAction($id);
     }
 
@@ -104,6 +107,7 @@ class UserController extends CommonApiController
     {
         $currentUser = $this->get('security.context')->getToken()->getUser();
         $view = $this->view($currentUser, Codes::HTTP_OK);
+        $this->serializerGroups = array('full');
         return $this->handleView($view);
     }
 
@@ -126,6 +130,7 @@ class UserController extends CommonApiController
         if (!$this->container->get('mautic.security')->isGranted('user:users:delete')) {
             return $this->accessDenied();
         }
+        $this->serializerGroups = array('full');
         return parent::deleteEntityAction($id);
     }
 
@@ -158,7 +163,7 @@ class UserController extends CommonApiController
             $submittedPassword = $parameters['plainPassword']['password'];
             $entity->setPassword($this->model->checkNewPassword($entity, $submittedPassword));
         }
-
+        $this->serializerGroups = array('full');
         return $this->processForm($entity, $parameters, 'POST');
     }
 
@@ -235,6 +240,7 @@ class UserController extends CommonApiController
                 $parameters['role']     = $entity->getRole()->getId();
             }
         }
+        $this->serializerGroups = array('full');
         return $this->processForm($entity, $parameters, $method);
     }
 
@@ -273,6 +279,37 @@ class UserController extends CommonApiController
 
         $return = $this->get('mautic.security')->isGranted($permissions, "RETURN_ARRAY", $entity);
         $view = $this->view($return, Codes::HTTP_OK);
+        return $this->handleView($view);
+    }
+
+
+    /**
+     * Obtains a list of roles for user edits
+     *
+     * @ApiDoc(
+     *   section = "Users",
+     *   description = "Obtains a list of available roles for users",
+     *   statusCodes = {
+     *     200 = "Returned when successful"
+     *   }
+     * )
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function getRolesAction()
+    {
+        if (!$this->container->get('mautic.security')->isGranted(
+            array('user:users:create', 'user:users:edit'),
+            'MATCH_ONE'
+        )) {
+            return $this->accessDenied();
+        }
+
+        $roles = $this->container->get('mautic.model.role')->getUserRoleList();
+
+        $view = $this->view($roles, Codes::HTTP_OK);
+        $context = SerializationContext::create()->setGroups(array('limited'));
+        $view->setSerializationContext($context);
         return $this->handleView($view);
     }
 }

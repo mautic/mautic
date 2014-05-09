@@ -188,7 +188,7 @@ class UserController extends FormController
      */
     public function editAction ($objectId)
     {
-        if (!$this->get('mautic.security')->isGranted('user:users:editother')) {
+        if (!$this->get('mautic.security')->isGranted('user:users:edit')) {
             return $this->accessDenied();
         }
         $model   = $this->container->get('mautic.model.user');
@@ -199,7 +199,7 @@ class UserController extends FormController
         $returnUrl  = $this->generateUrl('mautic_user_index', array('page' => $page));
 
         //user not found
-        if ($user === null || !$user->getId()) {
+        if ($user === null) {
             return $this->postActionRedirect(array(
                 'returnUrl'       => $returnUrl,
                 'viewParameters'  => array('page' => $page),
@@ -293,16 +293,18 @@ class UserController extends FormController
         if ($this->request->getMethod() == 'POST') {
             //ensure the user logged in is not getting deleted
             if ((int) $currentUser->getId() !== (int) $objectId) {
-                $result = $this->container->get('mautic.model.user')->deleteEntity($objectId);
+                $model = $this->container->get('mautic.model.user');
+                $entity = $model->getEntity($objectId);
 
-                if ($result === null || !$result->getId()) {
+                if ($entity === null) {
                     $flashes[] = array(
                         'type' => 'error',
                         'msg'  => 'mautic.user.user.error.notfound',
                         'msgVars' => array('%id%' => $objectId)
                     );
                 } else {
-                    $name = $result->getName();
+                    $model->deleteEntity($entity);
+                    $name = $entity->getName();
                     $flashes[] = array(
                         'type' => 'notice',
                         'msg'  => 'mautic.user.user.notice.deleted',

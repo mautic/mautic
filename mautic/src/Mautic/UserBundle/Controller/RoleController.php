@@ -194,7 +194,7 @@ class RoleController extends FormController
      */
     public function editAction ($objectId)
     {
-        if (!$this->get('mautic.security')->isGranted('user:roles:editother')) {
+        if (!$this->get('mautic.security')->isGranted('user:roles:edit')) {
             return $this->accessDenied();
         }
 
@@ -207,7 +207,7 @@ class RoleController extends FormController
         $returnUrl  = $this->generateUrl('mautic_role_index', array('page' => $page));
 
         //user not found
-        if ($entity === null || !$entity->getId()) {
+        if ($entity === null) {
             return $this->postActionRedirect(array(
                 'returnUrl'       => $returnUrl,
                 'viewParameters'  => array('page' => $page),
@@ -302,16 +302,18 @@ class RoleController extends FormController
         $flashes     = array();
         if ($this->request->getMethod() == 'POST') {
             try {
-                $result = $this->container->get('mautic.model.role')->deleteEntity($objectId);
+                $model = $this->container->get('mautic.model.role');
+                $entity = $model->getEntity($objectId);
 
-                if ($result === null || !$result->getId()) {
+                if ($entity === null) {
                     $flashes[] = array(
                         'type' => 'error',
                         'msg'  => 'mautic.user.role.error.notfound',
                         'msgVars' => array('%id%' => $objectId)
                     );
                 } else {
-                    $name = $result->getName();
+                    $model->deleteEntity($objectId);
+                    $name = $entity->getName();
                     $flashes[] = array(
                         'type' => 'notice',
                         'msg'  => 'mautic.user.role.notice.deleted',

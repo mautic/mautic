@@ -36,6 +36,11 @@ class AuditLog
     protected $userId;
 
     /**
+     * @ORM\Column(name="user_name", type="string", length=255)
+     */
+    protected $userName;
+
+    /**
      * @ORM\Column(type="string", length=50)
      */
     protected $bundle;
@@ -269,10 +274,33 @@ class AuditLog
     /**
      * Get bundle
      *
-     * @return string 
+     * @return string
      */
     public function getBundle()
     {
         return $this->bundle;
+    }
+
+    /**
+     * Set userName
+     *
+     * @param string $userName
+     * @return AuditLog
+     */
+    public function setUserName($userName)
+    {
+        $this->userName = $userName;
+
+        return $this;
+    }
+
+    /**
+     * Get userName
+     *
+     * @return string 
+     */
+    public function getUserName()
+    {
+        return $this->userName;
     }
 }

@@ -41,6 +41,7 @@ class User implements AdvancedUserInterface, \Serializable
      * @ORM\GeneratedValue(strategy="AUTO")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full", "limited"})
      */
     protected $id;
 
@@ -48,6 +49,7 @@ class User implements AdvancedUserInterface, \Serializable
      * @ORM\Column(type="string", length=25, unique=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full"})
      */
     protected $username;
 
@@ -72,6 +74,7 @@ class User implements AdvancedUserInterface, \Serializable
      * @ORM\Column(name="first_name",type="string", length=50)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full", "limited"})
      */
     protected $firstName;
 
@@ -79,6 +82,7 @@ class User implements AdvancedUserInterface, \Serializable
      * @ORM\Column(name="last_name", type="string", length=50)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full", "limited"})
      */
     protected $lastName;
 
@@ -86,6 +90,7 @@ class User implements AdvancedUserInterface, \Serializable
      * @ORM\Column(type="string", length=60, unique=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full"})
      */
     protected $email;
 
@@ -93,6 +98,7 @@ class User implements AdvancedUserInterface, \Serializable
      * @ORM\Column(type="string", length=60, nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full"})
      */
     protected $position;
 
@@ -101,6 +107,7 @@ class User implements AdvancedUserInterface, \Serializable
      * @ORM\JoinColumn(name="role_id", referencedColumnName="id")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full", "limited"})
      */
     protected $role;
 
@@ -108,6 +115,7 @@ class User implements AdvancedUserInterface, \Serializable
      * @ORM\Column(name="is_active", type="boolean")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full"})
      */
     protected $isActive = true;
 
@@ -115,6 +123,7 @@ class User implements AdvancedUserInterface, \Serializable
      * @ORM\Column(name="date_added", type="datetime")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full"})
      */
     protected $dateAdded;
 
@@ -123,6 +132,7 @@ class User implements AdvancedUserInterface, \Serializable
      * @var
      * @Serializer\Expose
      * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full"})
      */
     protected $activePermissions;
 
@@ -615,7 +625,7 @@ class User implements AdvancedUserInterface, \Serializable
         if (!$this->getId()) {
             $this->setDateAdded(new \DateTime());
         }
-        if (null === $this->getIsActive()) {
+        if ($this->getIsActive() === null) {
             $this->setIsActive(true);
         }
     }

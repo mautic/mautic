@@ -106,5 +106,15 @@ $collection->add('mautic_api_checkpermission', new Route('/users/{id}/permission
     )
 ));
 
+$collection->add('mautic_api_getuserroles', new Route('/users/roles.{_format}',
+    array(
+        '_controller' => 'MauticApiBundle:User\User:getRoles',
+        '_format' => 'json'
+    ),
+    array(
+        '_method' => 'GET',
+        '_format' => 'json|xml'
+    )
+));
 
 return $collection;

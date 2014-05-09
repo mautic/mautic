@@ -14,7 +14,7 @@ use Mautic\UserBundle\Event\UserEvent;
 use Mautic\UserBundle\UserEvents;
 use Symfony\Component\HttpFoundation\Request;
 use Mautic\UserBundle\Entity\User;
-use Symfony\Component\HttpKernel\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
@@ -38,7 +38,7 @@ class UserModel extends FormModel
      *
      * @param       $entity
      * @return int
-     * @throws \Symfony\Component\HttpKernel\NotFoundHttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
      */
     public function saveEntity($entity)
@@ -80,7 +80,7 @@ class UserModel extends FormModel
      * @param      $entity
      * @param null $action
      * @return mixed
-     * @throws \Symfony\Component\HttpKernel\NotFoundHttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function createForm($entity, $action = null)
     {
@@ -97,9 +97,9 @@ class UserModel extends FormModel
      * @param $id
      * @return null|object
      */
-    public function getEntity($id = '')
+    public function getEntity($id = null)
     {
-        if (empty($id)) {
+        if ($id === null) {
             return new User();
         }
 
@@ -122,7 +122,7 @@ class UserModel extends FormModel
      * @param      $entity
      * @param bool $isNew
      * @param      $event
-     * @throws \Symfony\Component\HttpKernel\NotFoundHttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, $event = false)
     {
@@ -134,6 +134,7 @@ class UserModel extends FormModel
             $event = new UserEvent($entity, $isNew);
             $event->setEntityManager($this->em);
         }
+
         $dispatcher = $this->container->get('event_dispatcher');
         switch ($action) {
             case "pre_save":

@@ -124,7 +124,7 @@ class ClientController extends FormController
             $me      = $this->get('security.context')->getToken()->getUser();
             $client  = $this->container->get('mautic.model.client')->getEntity($clientId);
 
-            if ($client === null || !$client->getId()) {
+            if ($client === null) {
                 $flashes[] = array(
                     'type'    => 'error',
                     'msg'     => 'mautic.api.client.error.notfound',
@@ -252,7 +252,7 @@ class ClientController extends FormController
         $returnUrl = $this->generateUrl('mautic_client_index');
 
         //client not found
-        if ($client === null || !$client->getId()) {
+        if ($client === null) {
             return $this->postActionRedirect(array(
                 'returnUrl'       => $returnUrl,
                 'contentTemplate' => 'MauticApiBundle:Client:index',
@@ -336,19 +336,20 @@ class ClientController extends FormController
         $success     = 0;
         $flashes     = array();
         if ($this->request->getMethod() == 'POST') {
-            $result = $this->container->get('mautic.model.client')->deleteEntity($objectId);
-
-            if (!$result === null || !$result->getId()) {
+            $model  = $this->container->get('mautic.model.client');
+            $entity = $model->getEntity($objectId);
+            if ($entity === null) {
                 $flashes[] = array(
                     'type' => 'error',
                     'msg'  => 'mautic.api.client.error.notfound',
                     'msgVars' => array('%id%' => $objectId)
                 );
             } else {
-                $name = $result->getName();
+                $model->deleteEntity($entity);
+                $name      = $entity->getName();
                 $flashes[] = array(
-                    'type' => 'notice',
-                    'msg'  => 'mautic.api.client.notice.deleted',
+                    'type'    => 'notice',
+                    'msg'     => 'mautic.api.client.notice.deleted',
                     'msgVars' => array(
                         '%name%' => $name,
                         '%id%'   => $objectId

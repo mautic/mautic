@@ -31,6 +31,7 @@ class Role
      * @ORM\GeneratedValue(strategy="AUTO")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full", "limited"})
      */
     protected $id;
 
@@ -38,6 +39,7 @@ class Role
      * @ORM\Column(type="string", length=255)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full", "limited"})
      */
     protected $name;
 
@@ -45,6 +47,7 @@ class Role
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full", "limited"})
      */
     protected $description;
 
@@ -52,6 +55,7 @@ class Role
      * @ORM\Column(name="is_admin", type="boolean")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full"})
      */
     protected $isAdmin = false;
 
@@ -59,6 +63,7 @@ class Role
      * @ORM\Column(name="date_added", type="datetime")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full"})
      */
     protected $dateAdded;
 

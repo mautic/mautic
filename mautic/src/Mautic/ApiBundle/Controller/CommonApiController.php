@@ -56,6 +56,11 @@ class CommonApiController extends FOSRestController implements EventsController
     protected $entityClass;
 
     /**
+     * @var array
+     */
+    protected $serializerGroups = array();
+
+    /**
      * Initialize some variables
      *
      * @param FilterControllerEvent $event
@@ -110,6 +115,10 @@ class CommonApiController extends FOSRestController implements EventsController
             $entities[] = $r;
         }
         $view = $this->view(array($this->entityNameMulti => $entities), Codes::HTTP_OK);
+        if (!empty($this->serializerGroups)) {
+            $context = SerializationContext::create()->setGroups($this->serializerGroups);
+            $view->setSerializationContext($context);
+        }
         return $this->handleView($view);
     }
 
@@ -136,6 +145,10 @@ class CommonApiController extends FOSRestController implements EventsController
         }
 
         $view = $this->view(array($this->entityNameOne => $entity), Codes::HTTP_OK);
+        if (!empty($this->serializerGroups)) {
+            $context = SerializationContext::create()->setGroups($this->serializerGroups);
+            $view->setSerializationContext($context);
+        }
         return $this->handleView($view);
     }
 
@@ -202,6 +215,7 @@ class CommonApiController extends FOSRestController implements EventsController
      *   description = "Deletes an entity",
      *   statusCodes = {
      *     200 = "Returned if successful",
+     *     404 = "Returned if ID is not found"
      *   }
      * )
      *
@@ -210,9 +224,20 @@ class CommonApiController extends FOSRestController implements EventsController
      */
     public function deleteEntityAction($id)
     {
-        $entity = $this->model->deleteEntity($id);
-        $view = $this->view(array($this->entityNameOne => $entity), Codes::HTTP_OK);
-        return $this->handleView($view);
+        $entity = $this->model->getEntity($id);
+        if (null !== $entity) {
+            $this->model->deleteEntity($entity);
+
+            $view = $this->view(array($this->entityNameOne => $entity), Codes::HTTP_OK);
+            if (!empty($this->serializerGroups)) {
+                $context = SerializationContext::create()->setGroups($this->serializerGroups);
+                $view->setSerializationContext($context);
+            }
+
+            return $this->handleView($view);
+        } else {
+            throw new NotFoundHttpException($this->get('translator')->trans('mautic.api.call.notfound'));
+        }
     }
 
     /**
@@ -225,7 +250,7 @@ class CommonApiController extends FOSRestController implements EventsController
      */
     protected function processForm($entity, $parameters = null, $method = 'PUT')
     {
-        if (null === $parameters) {
+        if ($parameters === null) {
             //get from request
             $parameters = $this->request->request->all();
         }
@@ -254,6 +279,10 @@ class CommonApiController extends FOSRestController implements EventsController
                 );
             }
             $view = $this->view(array($this->entityNameOne => $entity), $statusCode, $headers);
+            if (!empty($this->serializerGroups)) {
+                $context = SerializationContext::create()->setGroups($this->serializerGroups);
+                $view->setSerializationContext($context);
+            }
         } else {
             $view = $this->view($form, Codes::HTTP_BAD_REQUEST);
         }

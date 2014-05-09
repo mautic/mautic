@@ -55,6 +55,7 @@ class RoleController extends CommonApiController
         if (!$this->container->get('mautic.security')->isGranted('user:roles:view')) {
             return $this->accessDenied();
         }
+        $this->serializerGroups = array('full');
         return parent::getEntitiesAction();
     }
 
@@ -79,6 +80,7 @@ class RoleController extends CommonApiController
         if (!$this->container->get('mautic.security')->isGranted('user:roles:view')) {
             return $this->accessDenied();
         }
+        $this->serializerGroups = array('full');
         return parent::getEntityAction($id);
     }
 

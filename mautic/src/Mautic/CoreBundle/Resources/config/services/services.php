@@ -29,7 +29,8 @@ $container->setDefinition ('mautic.security',
         array(
             new Reference('service_container'),
             new Reference('doctrine.orm.entity_manager'),
-            '%mautic.bundles%'
+            '%mautic.bundles%',
+            new Reference('security.context')
         )
     )
 );

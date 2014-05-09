@@ -79,13 +79,15 @@ class RoleModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param      $entityId
+     * @param      $entity
      * @return null|object
      * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
      */
-    public function deleteEntity($entityId)
+    public function deleteEntity($entity)
     {
-        $entity = $this->em->getRepository($this->repository)->find($entityId);
+        if (!$entity instanceof Role) {
+            throw new NotFoundHttpException('Entity must be of class Role()');
+        }
 
         $users = $this->em->getRepository('MauticUserBundle:User')->findByRole($entity);
         if (count($users)) {
@@ -98,7 +100,7 @@ class RoleModel extends FormModel
             );
         }
 
-        return parent::deleteEntity($entityId);
+        return parent::deleteEntity($entity);
     }
 
     /**
@@ -126,9 +128,9 @@ class RoleModel extends FormModel
      * @param $id
      * @return null|object
      */
-    public function getEntity($id = '')
+    public function getEntity($id = null)
     {
-        if (empty($id)) {
+        if ($id === null) {
             return new Role();
         }
 
@@ -143,7 +145,7 @@ class RoleModel extends FormModel
      * @param $entity
      * @param $isNew
      * @param $event
-     * @throws \Symfony\Component\HttpKernel\NotFoundHttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, $event = false)
     {
@@ -172,5 +174,15 @@ class RoleModel extends FormModel
         }
 
         return $event;
+    }
+
+    /**
+     * Obtains a list of roles for user forms
+     *
+     * @return array
+     */
+    public function getUserRoleList()
+    {
+        return $this->em->getRepository($this->repository)->findAll(array(), 'r.name');
     }
 }

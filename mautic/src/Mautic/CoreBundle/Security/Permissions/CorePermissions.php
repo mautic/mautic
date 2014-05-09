@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Doctrine\ORM\EntityManager;
 use Mautic\UserBundle\Entity\Permission;
+use Symfony\Component\Security\Core\SecurityContext;
 
 /**
  * Class CorePermissions
@@ -38,13 +39,19 @@ class CorePermissions {
     private $em;
 
     /**
+     * @var \Symfony\Component\Security\Core\SecurityContext
+     */
+    private $securityContext;
+
+    /**
      * @param Container $container
      * @param array     $bundles
      */
-    public function __construct(Container $container, EntityManager $em, array $bundles) {
-        $this->container = $container;
-        $this->em        = $em;
-        $this->bundles   = $bundles;
+    public function __construct(Container $container, EntityManager $em, array $bundles, SecurityContext $securityContext) {
+        $this->container       = $container;
+        $this->em              = $em;
+        $this->bundles         = $bundles;
+        $this->securityContext = $securityContext;
     }
 
     /**
@@ -205,6 +212,38 @@ class CorePermissions {
             throw new NotFoundHttpException($this->container->get('translator')->trans('mautic.core.permissions.mode.notfound',
                     array("%mode%" => $mode))
             );
+        }
+    }
+
+
+    /**
+     * Checks if the user has access to the requested entity
+     *
+     * @param $ownPermission
+     * @param $otherPermission
+     * @param $owner
+     */
+    public function hasEntityAccess($ownPermission, $otherPermission, $owner)
+    {
+        $permissions = $this->isGranted(
+            array($ownPermission, $otherPermission), 'RETURN_ARRAY'
+        );
+
+        $ownerId = (!empty($owner)) ? $owner->getId() : 0;
+
+        $me = $this->securityContext->getToken()->getUser();
+        if ($ownerId === 0) {
+            if ($permissions[$otherPermission]) {
+                return true;
+            } else {
+                return false;
+            }
+        } elseif ($permissions[$ownPermission] && (int) $me->getId() === (int) $ownerId) {
+            return true;
+        } elseif ($permissions[$otherPermission] && (int) $me->getId() !== (int) $ownerId) {
+            return true;
+        } else {
+            return false;
         }
     }
 }

@@ -22,7 +22,7 @@ class ArrayStringTransformer implements DataTransformerInterface
      */
     public function transform($array)
     {
-        if (null === $array) {
+        if ($array === null) {
             return "";
         }
 
