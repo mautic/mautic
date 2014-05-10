@@ -12,46 +12,106 @@ if (!isset($limit)) {
     $limit = 30;
 }
 
-$totalItems = count($items);
-$totalPages = (int) ceil($totalItems / $limit);
-if ($totalPages > 1):
-
-$prevClass  = "";
-$prevUrl    = $baseUrl . "/" . ($page - 1);
-$nextClass  = "";
-$nextUrl    = $baseUrl . "/" . ($page + 1);
-
-if ((int) $page === 1) {
-    $prevClass = ' class="disabled"';
-    $prevUrl   = '#';
-} elseif ((int) $page === $totalPages) {
-    $nextClass = ' class="disabled"';
-    $nextUrl   = '#';
+if (!isset($range)) {
+    $range = 4;
 }
 
-$paginationClass = (!isset($paginationClass)) ? "" : " $paginationClass";
-?>
+if ($page <= 0) {
+    $page = 1;
+} else {
+    $page = (int) $page;
+}
 
-<?php if (!empty($totalItems)): ?>
+$baseUrl .= "/";
+
+$totalItems  = count($items);
+$totalPages  = (int) ceil($totalItems / $limit);
+if ($totalPages <= 1)
+    return;
+
+$paginationClass = (!isset($paginationClass)) ? "" : " $paginationClass";
+$menuLink = (!empty($menuLinkId)) ? " data-menu-link=\"$menuLinkId\"" : "";
+
+?>
 <div class="clearfix"></div>
 <div class="pagination-wrapper">
-    <ul class="pagination pull-right<?php echo $paginationClass; ?>">
-        <li<?php echo $prevClass;?>>
-            <a href="<?php echo $prevUrl; ?>" data-toggle="ajax" data-menu-link="#mautic_user_index">&laquo;</a>
+    <ul class="pagination pagination-centered <?php echo $paginationClass; ?>">
+        <?php
+        $urlPage = $page - $range;
+        $url     = ($urlPage > 0) ? $baseUrl . $urlPage : '#';
+        $data    = ($url == '#') ? '' : 'data-toggle="ajax"' . $menuLink;
+        $class   = ($urlPage <= 0) ? ' class="disabled"' : '';
+        ?>
+        <li<?php echo $class; ?>>
+            <?php  ?>
+            <a href="<?php echo $url; ?>" <?php echo $data; ?>>
+                <i class="fa fa-angle-double-left"></i>
+            </a>
         </li>
-        <?php for ($i=1; $i<=$totalPages; $i++): ?>
-        <li<?php echo ((int) $page === $i) ? ' class="active"' : ''; ?>>
-            <a href="<?php echo $baseUrl . "/" . $i; ?>" data-toggle="ajax" data-menu-link="#mautic_user_index">
+
+        <?php
+        $urlPage = $page - 1;
+        $url     = ($urlPage >= 1) ? $baseUrl . $urlPage : '#';
+        $data    = ($url == '#') ? '' : 'data-toggle="ajax"' . $menuLink;
+        $class   = ($urlPage <= 0) ? ' class="disabled"' : '';
+        ?>
+        <li<?php echo $class; ?>>
+            <?php  ?>
+            <a href="<?php echo $url; ?>" <?php echo $data; ?>>
+                <i class="fa fa-angle-left"></i>
+            </a>
+        </li>
+
+        <?php
+        $startPage = $page - $range + 1;
+        if ($startPage <= 0) {
+            $startPage = 1;
+        }
+        $lastPage = $startPage + $range - 1;
+        if ($lastPage > $totalPages) {
+            $lastPage = $totalPages;
+        }
+        ?>
+        <?php for ($i=$startPage; $i<=$lastPage; $i++): ?>
+        <?php
+        $class = ($page === (int) $i) ? ' class="active"' : '';
+        $url   = ($page === (int) $i) ? '#' : $baseUrl . $i;
+        $data  = ($url == '#') ? '' : 'data-toggle="ajax"' . $menuLink;
+        ?>
+        <li<?php echo $class; ?>>
+            <a href="<?php echo $url; ?>"<?php echo $data; ?>>
                 <?php echo $i; ?>
             </a>
         </li>
         <?php endfor; ?>
-        <li<?php echo $nextClass; ?>>
-            <a href="<?php echo $nextUrl; ?>" data-toggle="ajax" data-menu-link="#mautic_user_index");">&raquo;</a>
+
+        <?php
+        $urlPage = $page + 1;
+        $url     = ($urlPage <= $totalPages) ? $baseUrl . $urlPage : '#';
+        $data    = ($url == '#') ? '' : 'data-toggle="ajax"' . $menuLink;
+        $class   = ($urlPage > $totalPages) ? ' class="disabled"' : '';
+        ?>
+        <li<?php echo $class; ?>>
+            <?php  ?>
+            <a href="<?php echo $url; ?>" <?php echo $data; ?>>
+                <i class="fa fa-angle-right"></i>
+            </a>
+        </li>
+
+        <?php
+        $urlPage = $page + $range;
+        if ($urlPage > $totalPages)
+            $urlPage = $totalPages;
+        $url     = ($page < $totalPages && $totalPages > $range) ? $baseUrl . $urlPage : '#';
+        $data    = ($url == '#') ? '' : 'data-toggle="ajax"' . $menuLink;
+        $class   = ($urlPage > $totalPages || $page === $totalPages) ? ' class="disabled"' : '';
+        ?>
+        <li<?php echo $class; ?>>
+            <?php  ?>
+            <a href="<?php echo $url; ?>" <?php echo $data; ?>>
+                <i class="fa fa-angle-double-right"></i>
+            </a>
         </li>
     </ul>
     <div class="clearfix"></div>
 </div>
-<?php endif; ?>
-
-<?php endif; ?>
