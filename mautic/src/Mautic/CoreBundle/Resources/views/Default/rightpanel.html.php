@@ -7,9 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-$value    = $app->getSession()->get('mautic.global_search');
-$btnClass = ($value) ? "fa-eraser" : "fa-search";
-$function = ($value) ? "clearGlobalSearchResults" : "onClickGlobalSearchResults";
+$value = $app->getSession()->get('mautic.global_search');
 ?>
 
 <div class="right-panel-inner-wrapper">
@@ -18,12 +16,19 @@ $function = ($value) ? "clearGlobalSearchResults" : "onClickGlobalSearchResults"
             <input type="search"
                    autocomplete="off"
                    class="input-global-search form-control" name="global_search" id="global_search"
-                   onkeypress="Mautic.onKeyPressGlobalSearchResults(event);"
+                   data-target=".global-search-wrapper"
+                   data-action="<?php echo $view['router']->generate('mautic_core_ajax', array('ajaxAction' => 'globalsearch')); ?>"
+                   data-overlay-text="<?php echo $view['translator']->trans('mautic.core.search.livesearch'); ?>"
+                   data-overlay-background="#513B49"
+                   data-overlay-color="#ffffff"
                    placeholder="<?php echo $view['translator']->trans('mautic.core.form.search'); ?>"
                    value="<?php echo $value ?>" />
             <span class="input-group-btn">
-                <button class="btn btn-default btn-global-search-submit" type="button" onclick="Mautic.<?php echo $function; ?>();">
-                    <i class="fa <?php echo $btnClass; ?>"></i>
+                <button class="btn btn-default btn-global-search-submit"
+                        type="button"
+                        data-livesearch-parent="global_search"
+                    >
+                    <i class="fa fa-search"></i>
                 </button>
             </span>
         </div>

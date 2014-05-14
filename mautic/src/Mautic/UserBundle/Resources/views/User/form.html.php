@@ -8,6 +8,7 @@
  */
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
+$view['slots']->set('mauticContent', 'user');
 $userId = $form->vars['data']->getId();
 if (!empty($userId)) {
     $user   = $form->vars['data']->getName();
@@ -16,8 +17,6 @@ if (!empty($userId)) {
     $header = $view['translator']->trans('mautic.user.user.header.new');
 }
 $view["slots"]->set("headerTitle", $header);
-//populate JS functions only required for page refreshes
-$view['slots']->set("jsDeclarations", "Mautic.ajaxifyForms(['user']);\n");
 ?>
 
 <?php echo $view['form']->form($form); ?>

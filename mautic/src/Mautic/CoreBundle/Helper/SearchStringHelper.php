@@ -54,6 +54,9 @@ class SearchStringHelper
         $filters->{$baseName}[$keyCount]          = new \stdClass();
         $filters->{$baseName}[$keyCount]->type    = "and";
         $filters->{$baseName}[$keyCount]->command = $command;
+        $filters->{$baseName}[$keyCount]->string  = '';
+        $filters->{$baseName}[$keyCount]->not     = 0;
+        $filters->{$baseName}[$keyCount]->strict  = 0;
         $chars                                    = str_split($input);
         $pos                                      = 0;
         $string                                   = "";
@@ -69,7 +72,7 @@ class SearchStringHelper
 
             if ($char == ":") {
                 //the string is a command
-                $command = trim(substr($string, 0, -1));
+                $command = strtolower(trim(substr($string, 0, -1)));
                 //does this have a negative?
                 if (strpos($command, '!') === 0) {
                     $filters->{$baseName}[$keyCount]->not = 1;
@@ -150,6 +153,14 @@ class SearchStringHelper
         if (!empty($type)) {
             $filters->{$baseName}[$keyCount]->type = $type;
         } elseif ($setFilter) {
+            $string = strtolower($string);
+
+            //remove operators
+            if (in_array($string, array('or', 'and'))) {
+                unset($filters->{$baseName}[$keyCount]);
+                return;
+            }
+
 
             if (!isset($filters->{$baseName}[$keyCount]->strict)) {
                 $filters->{$baseName}[$keyCount]->strict = 0;
@@ -187,6 +198,9 @@ class SearchStringHelper
                 $filters->{$baseName}[$keyCount]          = new \stdClass();
                 $filters->{$baseName}[$keyCount]->type    = "and";
                 $filters->{$baseName}[$keyCount]->command = $overrideCommand;
+                $filters->{$baseName}[$keyCount]->string  = '';
+                $filters->{$baseName}[$keyCount]->not     = 0;
+                $filters->{$baseName}[$keyCount]->strict  = 0;
             }
         }
         $string  = "";

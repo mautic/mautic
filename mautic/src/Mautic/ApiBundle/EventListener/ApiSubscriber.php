@@ -55,7 +55,8 @@ class ApiSubscriber implements EventSubscriberInterface
             CoreEvents::BUILD_MENU          => array('onBuildMenu', 9998),
             CoreEvents::BUILD_ROUTE         => array('onBuildRoute', 0),
             CoreEvents::GLOBAL_SEARCH       => array('onGlobalSearch', 0),
-            ApiEvents::CLIENT_PRE_SAVE     => array('onClientPreSave', 0),
+            CoreEvents::BUILD_COMMAND_LIST  => array('onBuildCommandList', 0),
+            ApiEvents::CLIENT_PRE_SAVE      => array('onClientPreSave', 0),
             ApiEvents::CLIENT_POST_SAVE     => array('onClientPostSave', 0),
             ApiEvents::CLIENT_POST_DELETE   => array('onClientDelete', 0)
         );
@@ -125,6 +126,19 @@ class ApiSubscriber implements EventSubscriberInterface
         }
     }
 
+    /**
+     * @param MauticEvents\CommandListEvent $event
+     */
+    public function onBuildCommandList(MauticEvents\CommandListEvent $event)
+    {
+        $security   = $this->container->get("mautic.security");
+        if ($security->isGranted('api:clients:view')) {
+            $event->addCommands(
+                'mautic.api.client.header.index',
+                $this->container->get('mautic.model.client')->getCommandList()
+            );
+        }
+    }
 
     /**
      * Obtain changes to enter into audit log

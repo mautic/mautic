@@ -91,10 +91,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .main-panel-wrapper {
-  background-color: @mainPanelBase;
   padding-top: @topPanelHeight;
   width: 100%;
   height: 100%;
+  position: relative;
   overflow-y: auto;
   .transitions;
 }
@@ -106,6 +106,7 @@ h1, h2, h3, h4, h5, h6 {
   position:fixed;
   right: 0;
   left: @leftPanelWidth;
+  background-color: @mainPanelBase;
 }
 
 .main-panel-wrapper a {
@@ -151,6 +152,19 @@ h1, h2, h3, h4, h5, h6 {
   overflow-x: hidden;
   overflow-y: auto;
   height: 100%;
+}
+
+.content-overlay{
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  background-color: @mainPanelBase;
+  padding: 0 20px;
+  text-align:right;
+  display: block;
+  font-weight: bold;
 }
 
 .left-panel {
@@ -270,7 +284,6 @@ h1, h2, h3, h4, h5, h6 {
 .page-wrapper.hide-left .main-panel-breadcrumbs, .page-wrapper.hide-left .main-panel {
   left: 0;
 }
-
 
 .page-wrapper.hide-left .left-panel {
   margin-left: -@leftPanelWidth;
@@ -420,39 +433,51 @@ h1, h2, h3, h4, h5, h6 {
   z-index: 10000;
 }
 
-.action-buttons {
+.toolbar {
   padding:10px 0 10px 10px;
   margin-right: 5px;
   width: 300px;
+  -webkit-transition: all .5s ease-in-out;
+  -moz-transition: all .5s ease-in-out;
+  -o-transition: all .5s ease-in-out;
+  transition: all .5s ease-in-out;
 }
 
-.action-buttons .input-group {
-  text-align: right;
+.toolbar .input-group {
+  float: right;
 }
 
-.action-buttons .input-group ul{
+.toolbar .input-group ul{
   text-align: left;
 }
 
-.filter {
+.search {
   position: relative;
   right: 0;
   float: right !important;
-  -webkit-transition: all 1s ease-in-out;
-  -moz-transition: all 1s ease-in-out;
-  -o-transition: all 1s ease-in-out;
-  transition: all 1s ease-in-out;
 }
 
-.hide-filter {
-  width: 0 !important;
+.toolbar.hide-search {
+  width: 100px;
+}
+
+.toolbar input {
+  -webkit-transition: all .5s ease-in-out;
+  -moz-transition: all .5s ease-in-out;
+  -o-transition: all .5s ease-in-out;
+  transition: all .5s ease-in-out;
+}
+
+.toolbar.hide-search input {
   padding: 0;
+  border-left: 0;
+  border-right: 0;
 }
 
-.show-filter {
-  width: 150px !important;
+.toolbar.show-search input {
   margin-left: 0px;
   padding: 6px 12px;
+  border: 1px solid #CCCCCC;
 }
 
 label.required:after {
@@ -561,6 +586,23 @@ a.btn {
 
 .loading-bar .progress-bar {
   box-shadow: none;
+}
+
+.pagination-wrapper {
+  text-align: center;
+}
+
+.modal {
+  top: 50px;
+  z-index: 9999;
+}
+
+.modal-backdrop {
+  z-index: 5000;
+}
+
+.modal-header button {
+  padding: 2px 6px 3px 6px;
 }
 
 @media (max-width:767px) {

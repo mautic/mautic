@@ -64,6 +64,84 @@ class UserRepository extends CommonRepository
         return $result;
     }
 
+    /**
+     * Get a list of users for an autocomplete input
+     *
+     * @param string $search
+     * @param int    $limit
+     * @param int    $start
+     * @return array
+     */
+    public function getUserList($search = '', $limit = 10, $start = 0)
+    {
+        $q = $this->_em->createQueryBuilder();
+
+        $q->select('partial u.{id, firstName, lastName}')
+            ->from('MauticUserBundle:User', 'u');
+        if (!empty($search)) {
+            $q->where(
+                $q->expr()->orX(
+                    $q->expr()->like('u.firstName', ':search'),
+                    $q->expr()->like('u.lastName', ':search'),
+                    $q->expr()->like(
+                        $q->expr()->concat('u.firstName',
+                            $q->expr()->concat(
+                                $q->expr()->literal(' '),
+                                'u.lastName'
+                            )
+                        ),
+                        ':search'
+                    )
+                )
+            )
+            ->setParameter('search', "{$search}%");
+        }
+
+        $q->orderBy('u.firstName, u.lastName');
+
+        if (!empty($limit)) {
+            $q->setFirstResult($start)
+                ->setMaxResults($limit);
+        }
+
+        $results = $q->getQuery()->getArrayResult();
+        return $results;
+    }
+
+    /**
+     * @param string $search
+     * @param int    $limit
+     * @param int    $start
+     */
+    public function getPositionList($search = '', $limit = 10, $start = 0)
+    {
+        $q = $this->_em->createQueryBuilder()
+            ->select('u.position')
+            ->distinct()
+            ->from('MauticUserBundle:User', 'u')
+            ->where("u.position != ''")
+            ->andWhere("u.position IS NOT NULL");
+        if (!empty($search)) {
+            $q->andWhere('u.position LIKE :search')
+                ->setParameter('search', "{$search}%");
+        }
+
+        $q->orderBy('u.position');
+
+        if (!empty($limit)) {
+            $q->setFirstResult($start)
+                ->setMaxResults($limit);
+        }
+
+        $results = $q->getQuery()->getArrayResult();
+        return $results;
+    }
+
+    /**
+     * @param QueryBuilder $q
+     * @param              $filter
+     * @return array
+     */
     protected function addCatchAllWhereClause(QueryBuilder &$q, $filter)
     {
         $unique  = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
@@ -85,6 +163,11 @@ class UserRepository extends CommonRepository
         );
     }
 
+    /**
+     * @param QueryBuilder $q
+     * @param              $filter
+     * @return array
+     */
     protected function addSearchCommandWhereClause(QueryBuilder &$q, $filter)
     {
         $command         = $field = $filter->command;
@@ -138,19 +221,29 @@ class UserRepository extends CommonRepository
 
     }
 
-    protected function isSupportedSearchCommand($command)
+    /**
+     * @return array
+     */
+    public function getSearchCommands()
     {
-        $commands = array(
-            $this->translator->trans('mautic.user.user.searchcommand.email'),
-            $this->translator->trans('mautic.core.searchcommand.is'),
-            $this->translator->trans('mautic.core.searchcommand.name'),
-            $this->translator->trans('mautic.user.user.searchcommand.position'),
-            $this->translator->trans('mautic.user.user.searchcommand.role'),
-            $this->translator->trans('mautic.user.user.searchcommand.username'),
+         return array(
+            'mautic.user.user.searchcommand.email',
+            'mautic.core.searchcommand.is' => array(
+                'mautic.user.user.searchcommand.isactive',
+                'mautic.user.user.searchcommand.isinactive',
+                'mautic.user.user.searchcommand.isadmin'
+            ),
+            'mautic.core.searchcommand.name',
+            'mautic.user.user.searchcommand.position',
+            'mautic.user.user.searchcommand.role',
+            'mautic.user.user.searchcommand.username'
         );
-        return in_array($command, $commands);
+
     }
 
+    /**
+     * @return string
+     */
     protected function getDefaultOrderBy()
     {
         return 'u.lastName, u.firstName, u.username';

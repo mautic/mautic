@@ -12,10 +12,8 @@ namespace Mautic\UserBundle\Model;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\UserBundle\Event\UserEvent;
 use Mautic\UserBundle\UserEvents;
-use Symfony\Component\HttpFoundation\Request;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * Class UserModel
@@ -30,7 +28,7 @@ class UserModel extends FormModel
      */
     protected function init()
     {
-        $this->repository     = 'MauticUserBundle:User';
+        $this->repository = 'MauticUserBundle:User';
     }
 
     /**
@@ -39,7 +37,6 @@ class UserModel extends FormModel
      * @param       $entity
      * @return int
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
      */
     public function saveEntity($entity)
     {
@@ -151,5 +148,27 @@ class UserModel extends FormModel
                 break;
         }
         return $event;
+    }
+
+    /**
+     * Get list of entities for autopopulate fields
+     *
+     * @param $type
+     * @param $filter
+     * @return array
+     */
+    public function getLookupResults($type, $filter = '')
+    {
+        $results = array();
+        switch ($type) {
+            case 'role':
+                $results = $this->em->getRepository('MauticUserBundle:Role')->getRoleList($filter, 10);
+                break;
+            case 'position':
+                $results = $this->em->getRepository('MauticUserBundle:User')->getPositionList($filter, 10);
+                break;
+        }
+
+        return $results;
     }
 }

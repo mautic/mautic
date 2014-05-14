@@ -102,18 +102,16 @@ class ClientRepository extends CommonRepository
 
     }
 
-    protected function isSupportedSearchCommand($command)
+    public function getSearchCommands()
     {
-        $commands = array(
-            $this->translator->trans('mautic.core.searchcommand.name'),
-            $this->translator->trans('mautic.api.client.searchcommand.redirecturi'),
+        return array(
+            'mautic.core.searchcommand.name',
+            'mautic.api.client.searchcommand.redirecturi',
         );
-        return in_array($command, $commands);
     }
 
     protected function getDefaultOrderBy()
     {
-
         return 'c.name';
     }
 

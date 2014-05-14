@@ -45,8 +45,9 @@ class RoleController extends FormController
 
         $orderBy    = $this->get('session')->get('mautic.role.orderby', 'r.name');
         $orderByDir = $this->get('session')->get('mautic.role.orderbydir', 'ASC');
-        $filter     = $this->request->get('filter-role', $this->get('session')->get('mautic.role.filter', ''));
+        $filter     = $this->request->get('search', $this->get('session')->get('mautic.role.filter', ''));
         $this->get('session')->set('mautic.role.filter', $filter);
+        $tmpl       = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
         $items = $this->container->get('mautic.model.role')->getEntities(
             array(
@@ -70,11 +71,15 @@ class RoleController extends FormController
 
             return $this->postActionRedirect(array(
                 'returnUrl'       => $returnUrl,
-                'viewParameters'  => array('page' => $lastPage),
+                'viewParameters'  => array(
+                    'page' => $lastPage,
+                    'tmpl' => $tmpl
+                ),
                 'contentTemplate' => 'MauticUserBundle:Role:index',
                 'passthroughVars' => array(
                     'activeLink'    => '#mautic_role_index',
-                    'route'         => $returnUrl
+                    'route'         => $returnUrl,
+                    'mauticContent' => 'role'
                 )
             ));
         }
@@ -90,22 +95,21 @@ class RoleController extends FormController
         );
 
         $parameters = array(
-            'filterValue' => $filter,
             'items'       => $items,
             'page'        => $page,
             'limit'       => $limit,
-            'permissions' => $permissions
+            'permissions' => $permissions,
+            'tmpl'        => $tmpl
         );
 
-        if ($this->request->isXmlHttpRequest() && !$this->request->get('ignoreAjax', false)) {
-            return $this->ajaxAction(array(
-                'viewParameters'  => $parameters,
-                'contentTemplate' => 'MauticUserBundle:Role:index.html.php',
-                'passthroughVars' => array('route' => $this->generateUrl('mautic_role_index', array('page' => $page)))
-            ));
-        } else {
-            return $this->render('MauticUserBundle:Role:index.html.php', $parameters);
-        }
+        return $this->delegateView(array(
+            'viewParameters'  => $parameters,
+            'contentTemplate' => 'MauticUserBundle:Role:list.html.php',
+            'passthroughVars' => array(
+                'route'         => $this->generateUrl('mautic_role_index', array('page' => $page)),
+                'mauticContent' => 'role'
+            )
+        ));
     }
 
     /**
@@ -150,7 +154,8 @@ class RoleController extends FormController
                     'contentTemplate' => 'MauticUserBundle:Role:index',
                     'passthroughVars' => array(
                         'activeLink'    => '#mautic_role_index',
-                        'route'         => $returnUrl
+                        'route'         => $returnUrl,
+                        'mauticContent' => 'role'
                     ),
                     'flashes'         =>
                         ($valid === 1) ? array(
@@ -166,25 +171,17 @@ class RoleController extends FormController
 
         $formView = $form->createView();
         $this->container->get('templating')->getEngine('MauticUserBundle:Role:form.html.php')->get('form')
-            ->setTheme($formView, 'MauticUserBundle:Form');
+            ->setTheme($formView, 'MauticUserBundle:FormUser');
 
-        if ($this->request->isXmlHttpRequest() && !$this->request->get('ignoreAjax', false)) {
-            return $this->ajaxAction(array(
-                'viewParameters'  => array('form' => $formView),
-                'contentTemplate' => 'MauticUserBundle:Role:form.html.php',
-                'passthroughVars' => array(
-                    'ajaxForms'  => array('role'),
-                    'activeLink' => '#mautic_role_new',
-                    'route'      => $this->generateUrl('mautic_role_action', array('objectAction' => 'new'))
-                )
-            ));
-        } else {
-            return $this->render('MauticUserBundle:Role:form.html.php',
-                array(
-                    'form' => $formView
-                )
-            );
-        }
+        return $this->delegateView(array(
+            'viewParameters'  => array('form' => $formView),
+            'contentTemplate' => 'MauticUserBundle:Role:form.html.php',
+            'passthroughVars' => array(
+                'activeLink'    => '#mautic_role_new',
+                'route'         => $this->generateUrl('mautic_role_action', array('objectAction' => 'new')),
+                'mauticContent' => 'role'
+            )
+        ));
     }
 
     /**
@@ -214,7 +211,8 @@ class RoleController extends FormController
                 'contentTemplate' => 'MauticUserBundle:Role:index',
                 'passthroughVars' => array(
                     'activeLink'    => '#mautic_role_index',
-                    'route'         => $returnUrl
+                    'route'         => $returnUrl,
+                    'mauticContent' => 'role'
                 ),
                 'flashes'         => array(
                     array(
@@ -248,7 +246,8 @@ class RoleController extends FormController
                     'contentTemplate' => 'MauticUserBundle:Role:index',
                     'passthroughVars' => array(
                         'activeLink'    => '#mautic_role_index',
-                        'route'         => $returnUrl
+                        'route'         => $returnUrl,
+                        'mauticContent' => 'role'
                     ),
                     'flashes'         =>
                         ($valid === 1) ? array( //success
@@ -264,25 +263,17 @@ class RoleController extends FormController
 
         $formView = $form->createView();
         $this->container->get('templating')->getEngine('MauticUserBundle:Role:form.html.php')->get('form')
-            ->setTheme($formView, 'MauticUserBundle:Form');
+            ->setTheme($formView, 'MauticUserBundle:FormUser');
 
-        if ($this->request->isXmlHttpRequest() && !$this->request->get('ignoreAjax', false)) {
-            return $this->ajaxAction(array(
-                'viewParameters'  => array('form' => $formView),
-                'contentTemplate' => 'MauticUserBundle:Role:form.html.php',
-                'passthroughVars' => array(
-                    'ajaxForms'   => array('role'),
-                    'activeLink'  => '#mautic_role_index',
-                    'route'       => $action
-                )
-            ));
-        } else {
-            return $this->render('MauticUserBundle:Role:form.html.php',
-                array(
-                    'form' => $formView
-                )
-            );
-        }
+        return $this->delegateView(array(
+            'viewParameters'  => array('form' => $formView),
+            'contentTemplate' => 'MauticUserBundle:Role:form.html.php',
+            'passthroughVars' => array(
+                'activeLink'    => '#mautic_role_index',
+                'route'         => $action,
+                'mauticContent' => 'role'
+            )
+        ));
     }
 
     /**
@@ -339,7 +330,8 @@ class RoleController extends FormController
             'passthroughVars' => array(
                 'activeLink'    => '#mautic_role_index',
                 'route'         => $returnUrl,
-                'success'       => $success
+                'success'       => $success,
+                'mauticContent' => 'role'
             ),
             'flashes'         => $flashes
         ));

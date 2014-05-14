@@ -73,4 +73,9 @@ class CommonModel
     {
         return array();
     }
+
+    public function getCommandList()
+    {
+        return $this->em->getRepository($this->repository)->getSearchCommands();
+    }
 }

@@ -49,9 +49,11 @@ class ProfileController extends FormController
 
         //remove items that cannot be edited by person themselves
         $form->remove('role');
+        $form->remove('role_lookup');
         $form->remove('isActive');
         $form->remove('save');
         $form->remove('cancel');
+
 
         $overrides = array();
         //make sure this user has access to edit privileged fields
@@ -171,6 +173,7 @@ class ProfileController extends FormController
                     'contentTemplate' => 'MauticUserBundle:Profile:index',
                     'passthroughVars' => array(
                         'route'         => $returnUrl,
+                        'mauticContent' => 'user'
                     ),
                     'flashes'         =>
                         ($valid === 1) ? array( //success
@@ -187,24 +190,20 @@ class ProfileController extends FormController
 
         $formView = $form->createView();
         $this->container->get('templating')->getEngine('MauticUserBundle:Profile:index.html.php')->get('form')
-            ->setTheme($formView, 'MauticUserBundle:Form');
+            ->setTheme($formView, 'MauticUserBundle:FormProfile');
         $parameters = array(
             'permissions' => $permissions,
             'me'          => $me,
             'userForm'    => $formView
         );
 
-        if ($this->request->isXmlHttpRequest() && !$this->request->get('ignoreAjax', false)) {
-            return $this->ajaxAction(array(
-                'viewParameters'  => $parameters,
-                'contentTemplate' => 'MauticUserBundle:Profile:index.html.php',
-                'passthroughVars' => array(
-                    'route'     => $this->generateUrl('mautic_user_account'),
-                    'ajaxForms' => array('user')
-                )
-            ));
-        } else {
-            return $this->render('MauticUserBundle:Profile:index.html.php', $parameters);
-        }
+        return $this->delegateView(array(
+            'viewParameters'  => $parameters,
+            'contentTemplate' => 'MauticUserBundle:Profile:index.html.php',
+            'passthroughVars' => array(
+                'route'         => $this->generateUrl('mautic_user_account'),
+                'mauticContent' => 'user'
+            )
+        ));
     }
 }

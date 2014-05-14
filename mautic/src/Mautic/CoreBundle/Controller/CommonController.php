@@ -10,7 +10,9 @@
 namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\CoreEvents;
+use Mautic\CoreBundle\Event\CommandListEvent;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -43,6 +45,37 @@ class CommonController extends Controller implements EventsController {
     }
 
     /**
+     * Determines if ajax content should be returned or direct content (page refresh)
+     *
+     * @param $args
+     * @return JsonResponse|Response
+     */
+    function delegateView($args)
+    {
+        if (!is_array($args)) {
+            $args = array(
+                'contentTemplate' => $args,
+                'passthroughVars' => array(
+                    'mauticContent'   => strtolower($this->request->get('bundle'))
+                )
+            );
+        }
+
+        //default JS mauticContent to the bundle
+        if (!isset($args['passthroughVars']['mauticContent'])) {
+            $args['passthroughVars'][ 'mauticContent'] = strtolower($this->request->get('bundle'));
+        }
+
+        if ($this->request->isXmlHttpRequest() && !$this->request->get('ignoreAjax', false)) {
+            return $this->ajaxAction($args);
+        } else {
+            $parameters = (isset($args['viewParameters'])) ? $args['viewParameters'] : array();
+            $template   = $args['contentTemplate'];
+            return $this->render($template, $parameters);
+        }
+    }
+
+    /**
      * Redirects URLs with trailing slashes in order to prevent 404s
      *
      * @param Request $request
@@ -70,6 +103,7 @@ class CommonController extends Controller implements EventsController {
         //forward the controller by default
         $args['forwardController'] = (array_key_exists('forwardController', $args)) ? $args['forwardController'] : true;
 
+        //set flashes
         if (!empty($flashes)) {
             foreach ($flashes as $flash) {
                 $this->get('session')->getFlashBag()->add(
@@ -131,7 +165,7 @@ class CommonController extends Controller implements EventsController {
 
         //Ajax call so respond with json
         if ($forward) {
-            //the content is from another controller action so we must retrieve the response from it instead of the
+            //the content is from another controller action so we must retrieve the response from it instead of
             //directly parsing the template
             $query = array("ignoreAjax" => true);
             $newContentResponse = $this->forward($contentTemplate, $parameters, $query);
@@ -140,17 +174,33 @@ class CommonController extends Controller implements EventsController {
             $newContent  = $this->renderView($contentTemplate, $parameters);
         }
 
-        $breadcrumbs = $this->renderView("MauticCoreBundle:Default:breadcrumbs.html.php", $parameters);
-        $flashes     = $this->renderView("MauticCoreBundle:Default:flashes.html.php", $parameters);
+        //there was a redirect within the controller leading to a double call of this function so just return the content
+        //to prevent newContent from being json
+        if ($this->request->get('ignoreAjax', false)) {
+            $response = new Response();
+            $response->setContent($newContent);
+            return $response;
+        }
 
-        $dataArray = array_merge(
-            array(
-                'newContent'  => $newContent,
-                'breadcrumbs' => $breadcrumbs,
-                'flashes'     => $flashes
-            ),
-            $passthrough
-        );
+        if ($this->request->get('tmpl', 'index') == 'index') {
+            $breadcrumbs = $this->renderView("MauticCoreBundle:Default:breadcrumbs.html.php", $parameters);
+            $flashes     = $this->renderView("MauticCoreBundle:Default:flashes.html.php", $parameters);
+
+            $dataArray = array_merge(
+                array(
+                    'newContent'  => $newContent,
+                    'breadcrumbs' => $breadcrumbs,
+                    'flashes'     => $flashes
+                ),
+                $passthrough
+            );
+        } else {
+            //just retrieve the content
+            $dataArray = array_merge(
+                array('newContent'  => $newContent),
+                $passthrough
+            );
+        }
         $code      = (isset($args['responseCode'])) ? $args['responseCode'] : 200;
         $response  = new JsonResponse($dataArray, $code);
         $response->headers->set('Content-Length', strlen($response->getContent()));
@@ -206,15 +256,67 @@ class CommonController extends Controller implements EventsController {
                         }
                         break;
                     case "globalsearch":
-                        $searchStr = $this->request->request->get("searchstring", "");
+                        $searchStr = $this->request->request->get("global_search", "");
                         $this->get('session')->set('mautic.global_search', $searchStr);
 
                         $event = new GlobalSearchEvent($searchStr);
                         $this->get('event_dispatcher')->dispatch(CoreEvents::GLOBAL_SEARCH, $event);
 
-                        $dataArray['searchResults'] = $this->renderView('MauticCoreBundle:Default:globalsearchresults.html.php',
+                        $dataArray['newContent'] = $this->renderView('MauticCoreBundle:Default:globalsearchresults.html.php',
                             array('results' => $event->getResults())
                         );
+                        break;
+                    case "commandlist":
+                        $model = InputHelper::clean($request->query->get('model'));
+                        $commands = $this->get('mautic.model.' . $model)->getCommandList();
+                        $dataArray  = array();
+                        $translator = $this->get('translator');
+                        foreach ($commands as $k => $c) {
+                            if (is_array($c)) {
+                                $k = $translator->trans($k);
+                                foreach ($c as $subc) {
+                                    $dataArray[] = array('value' => $k . ":" . $translator->trans($subc));
+                                }
+                            } else {
+                                $dataArray[] = array('value' => $translator->trans($c) . ":");
+                            }
+                        }
+                        sort($dataArray);
+                        break;
+                    case "globalcommandlist":
+                        $dispatcher = $this->get('event_dispatcher');
+                        $event = new CommandListEvent();
+                        $dispatcher->dispatch(CoreEvents::BUILD_COMMAND_LIST, $event);
+                        $allCommands = $event->getCommands();
+                        $translator  = $this->get('translator');
+                        $dataArray   = array();
+                        $dupChecker  = array();
+                        foreach ($allCommands as $header => $commands) {
+                            //@todo if/when figure out a way for typeahead dynamic headers
+                            //$header = $translator->trans($header);
+                            //$dataArray[$header] = array();
+                            foreach ($commands as $k => $c) {
+                                if (is_array($c)) {
+                                    $k = $translator->trans($k);
+                                    foreach ($c as $subc) {
+                                        $command = $k . ":" . $translator->trans($subc);
+                                        if (!in_array($command, $dupChecker)) {
+                                            $dataArray[] = array('value' => $command);
+                                            $dupChecker[] = $command;
+                                        }
+                                    }
+                                } else {
+                                    $command = $translator->trans($c) . ":";
+                                    if (!in_array($command, $dupChecker)) {
+                                        $dataArray[] = array('value' => $command);
+                                        $dupChecker[] = $command;
+                                    }
+                                }
+                            }
+                            //sort($dataArray[$header]);
+                        }
+                        //ksort($dataArray);
+                        sort($dataArray);
                         break;
                     default:
                         //ignore
@@ -261,8 +363,7 @@ class CommonController extends Controller implements EventsController {
             'flashes'         => array(array(
                 'type' => 'error',
                 'msg'  => 'mautic.core.error.accessdenied'
-            )),
-            'responseCode'     => 302
+            ))
         ));
     }
 }

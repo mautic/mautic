@@ -42,8 +42,9 @@ class ClientController extends FormController
 
         $orderBy    = $this->get('session')->get('mautic.client.orderby', 'c.name');
         $orderByDir = $this->get('session')->get('mautic.client.orderbydir', 'ASC');
-        $filter     = $this->request->get('filter-client', $this->get('session')->get('mautic.client.filter', ''));
+        $filter     = $this->request->get('search', $this->get('session')->get('mautic.client.filter', ''));
         $this->get('session')->set('mautic.client.filter', $filter);
+        $tmpl       = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
         $clients = $this->container->get('mautic.model.client')->getEntities(
             array(
@@ -72,6 +73,7 @@ class ClientController extends FormController
                 'passthroughVars' => array(
                     'activeLink'    => '#mautic_client_index',
                     'route'         => $returnUrl,
+                    'mauticContent' => 'client'
                 )
             ));
         }
@@ -87,22 +89,21 @@ class ClientController extends FormController
         );
 
         $parameters = array(
-            'filterValue' => $filter,
             'items'       => $clients,
             'page'        => $page,
             'limit'       => $limit,
-            'permissions' => $permissions
+            'permissions' => $permissions,
+            'tmpl'        => $tmpl
         );
 
-        if ($this->request->isXmlHttpRequest() && !$this->request->get('ignoreAjax', false)) {
-            return $this->ajaxAction(array(
-                'viewParameters'  => $parameters,
-                'contentTemplate' => 'MauticApiBundle:Client:index.html.php',
-                'passthroughVars' => array('route' => $this->generateUrl('mautic_client_index', array('page' => $page)))
-            ));
-        } else {
-            return $this->render('MauticApiBundle:Client:index.html.php', $parameters);
-        }
+        return $this->delegateView(array(
+            'viewParameters'  => $parameters,
+            'contentTemplate' => 'MauticApiBundle:Client:list.html.php',
+            'passthroughVars' => array(
+                'route'         => $this->generateUrl('mautic_client_index', array('page' => $page)),
+                'mauticContent' => 'client'
+            )
+        ));
     }
 
     /**
@@ -152,7 +153,8 @@ class ClientController extends FormController
             'contentTemplate' => 'MauticUserBundle:Profile:index',
             'passthroughVars' => array(
                 'route'         => $returnUrl,
-                'success'       => $success
+                'success'       => $success,
+                'mauticContent' => 'client'
             ),
             'flashes'         => $flashes
         ));
@@ -201,6 +203,7 @@ class ClientController extends FormController
                     'passthroughVars' => array(
                         'activeLink'    => '#mautic_client_index',
                         'route'         => $returnUrl,
+                        'mauticContent' => 'client'
                     ),
                     'flashes'         =>
                         ($valid === 1) ? array( //success
@@ -218,23 +221,15 @@ class ClientController extends FormController
             }
         }
 
-        if ($this->request->isXmlHttpRequest() && !$this->request->get('ignoreAjax', false)) {
-            return $this->ajaxAction(array(
-                'viewParameters'  => array('form' => $form->createView()),
-                'contentTemplate' => 'MauticApiBundle:Client:form.html.php',
-                'passthroughVars' => array(
-                    'ajaxForms'  => array('client'),
-                    'activeLink' => '#mautic_client_new',
-                    'route'      => $action
-                )
-            ));
-        } else {
-            return $this->render('MauticApiBundle:Client:form.html.php',
-                array(
-                    'form' => $form->createView()
-                )
-            );
-        }
+        return $this->delegateView(array(
+            'viewParameters'  => array('form' => $form->createView()),
+            'contentTemplate' => 'MauticApiBundle:Client:form.html.php',
+            'passthroughVars' => array(
+                'activeLink'    => '#mautic_client_new',
+                'route'         => $action,
+                'mauticContent' => 'client'
+            )
+        ));
     }
 
     /**
@@ -258,7 +253,8 @@ class ClientController extends FormController
                 'contentTemplate' => 'MauticApiBundle:Client:index',
                 'passthroughVars' => array(
                     'activeLink'    => '#mautic_client_index',
-                    'route'         => $returnUrl
+                    'route'         => $returnUrl,
+                    'mauticContent' => 'client'
                 ),
                 'flashes'         =>array(
                     array(
@@ -289,6 +285,7 @@ class ClientController extends FormController
                     'passthroughVars' => array(
                         'activeLink'    => '#mautic_client_index',
                         'route'         => $returnUrl,
+                        'mauticContent' => 'client'
                     ),
                     'flashes'         =>
                         ($valid === 1) ? array( //success
@@ -302,23 +299,15 @@ class ClientController extends FormController
             }
         }
 
-        if ($this->request->isXmlHttpRequest() && !$this->request->get('ignoreAjax', false)) {
-            return $this->ajaxAction(array(
-                'viewParameters'  => array('form' => $form->createView()),
-                'contentTemplate' => 'MauticApiBundle:Client:form.html.php',
-                'passthroughVars' => array(
-                    'ajaxForms'   => array('client'),
-                    'activeLink'  => '#mautic_client_index',
-                    'route'       => $action
-                )
-            ));
-        } else {
-            return $this->render('MauticApiBundle:Client:form.html.php',
-                array(
-                    'form' => $form->createView()
-                )
-            );
-        }
+        return $this->delegateView(array(
+            'viewParameters'  => array('form' => $form->createView()),
+            'contentTemplate' => 'MauticApiBundle:Client:form.html.php',
+            'passthroughVars' => array(
+                'activeLink'    => '#mautic_client_index',
+                'route'         => $action,
+                'mauticContent' => 'client'
+            )
+        ));
     }
 
     /**
@@ -364,7 +353,8 @@ class ClientController extends FormController
             'passthroughVars' => array(
                 'activeLink'    => '#mautic_client_index',
                 'route'         => $returnUrl,
-                'success'       => $success
+                'success'       => $success,
+                'mauticContent' => 'client'
             ),
             'flashes'         => $flashes
         ));

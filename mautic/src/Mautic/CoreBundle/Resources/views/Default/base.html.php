@@ -22,7 +22,6 @@ $activePanelClasses  = ($app->getSession()->get('left-panel', 'default') == 'unp
         <link rel="stylesheet" href="<?php echo $view->escape($url) ?>" />
         <?php endforeach; ?>
         <link rel="stylesheet" href="<?php echo $view['assets']->getUrl('media/font-awesome/css/font-awesome.min.css'); ?>" />
-        <link rel="stylesheet" href="<?php echo $view['assets']->getUrl('media/jqueryui/jquery-ui-1.10.4.custom.min.css'); ?>" />
     </head>
     <body>
         <div class="page-wrapper<?php echo $activePanelClasses; ?>">
@@ -60,6 +59,7 @@ $activePanelClasses  = ($app->getSession()->get('left-panel', 'default') == 'unp
 
         <script type="text/javascript">
         var mauticBaseUrl = '<?php echo $view['router']->generate("mautic_core_index"); ?>';
+        var mauticContent = '<?php $view['slots']->output('mauticContent',''); ?>';
         </script>
         <?php foreach ($view['assetic']->javascripts(array("@mautic_javascripts"), array(), array('combine' => true, 'output' => 'media/js/mautic.js')) as $url): ?>
         <script type="text/javascript" src="<?php echo $view->escape($url) ?>"></script>
@@ -78,5 +78,6 @@ $activePanelClasses  = ($app->getSession()->get('left-panel', 'default') == 'unp
             });
         <?php endif; ?>
         </script>
+        <?php $view['slots']->output('modal'); ?>
     </body>
 </html>

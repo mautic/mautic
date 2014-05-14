@@ -18,7 +18,8 @@ $container->setDefinition(
         'Mautic\UserBundle\Form\Type\UserType',
         array(
             new Reference("service_container"),
-            new Reference('security.context')
+            new Reference('security.context'),
+            new Reference('doctrine.orm.entity_manager')
         )
     )
 )

@@ -15,7 +15,6 @@ use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\UserEvents;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\PreconditionRequiredHttpException;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 
 /**
@@ -39,7 +38,6 @@ class RoleModel extends FormModel
      *
      * @param       $entity
      * @return int
-     * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function saveEntity($entity)
@@ -64,8 +62,11 @@ class RoleModel extends FormModel
      * @param Role $entity
      * @param array $rawPermissions (i.e. from request)
      */
-    public function setRolePermissions(Role &$entity, array $rawPermissions)
+    public function setRolePermissions(Role &$entity, $rawPermissions)
     {
+        if (!is_array($rawPermissions)) {
+            return;
+        }
         //set permissions if applicable and if the user is not an admin
         $permissions = (!$entity->isAdmin() && !empty($rawPermissions)) ?
             $this->container->get('mautic.security')->generatePermissions($rawPermissions) :
@@ -81,7 +82,6 @@ class RoleModel extends FormModel
      *
      * @param      $entity
      * @return null|object
-     * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
      */
     public function deleteEntity($entity)
     {

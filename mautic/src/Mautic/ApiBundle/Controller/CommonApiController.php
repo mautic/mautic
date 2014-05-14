@@ -102,7 +102,7 @@ class CommonApiController extends FOSRestController implements EventsController
         $args = array(
             'start'      => $this->request->query->get('start', 0),
             'limit'      => $this->request->query->get('limit', $this->container->getParameter('mautic.default_pagelimit')),
-            'filter'     => $this->request->query->get('filter', ''),
+            'filter'     => $this->request->query->get('search', ''),
             'orderBy'    => $this->request->query->get('orderBy', ''),
             'orderByDir' => $this->request->query->get('orderByDir', 'ASC')
         );

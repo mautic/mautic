@@ -41,4 +41,14 @@ final class CoreEvents
      * @var string
      */
     const GLOBAL_SEARCH = 'mautic.global_search';
+
+    /**
+     * The mautic.build_command_list event is thrown to build global search's autocomplete list
+     *
+     * The event listener receives a
+     * Mautic\CoreBundle\Event\CommandListEvent instance.
+     *
+     * @var string
+     */
+    const BUILD_COMMAND_LIST = 'mautic.build_command_list';
 }

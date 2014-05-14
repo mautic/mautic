@@ -7,9 +7,8 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 $view->extend('MauticCoreBundle:Default:content.html.php');
+$view['slots']->set('mauticContent', 'user');
 $view["slots"]->set("headerTitle", $view['translator']->trans('mautic.user.account.header.index'));
-//populate JS functions only required for page refreshes
-$view['slots']->set("jsDeclarations", "Mautic.ajaxifyForms(['user']);\n");
 ?>
 
 <div class="account-wrapper">

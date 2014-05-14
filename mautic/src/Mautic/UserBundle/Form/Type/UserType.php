@@ -9,6 +9,8 @@
 
 namespace Mautic\UserBundle\Form\Type;
 
+use Doctrine\ORM\EntityManager;
+use Mautic\UserBundle\Form\DataTransformer\RoleToIdTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -32,14 +34,17 @@ class UserType extends AbstractType
 
     private $container;
     private $securityContext;
+    private $em;
 
     /**
      * @param Container       $container
      * @param SecurityContext $securityContext
+     * @param EntityManager   $em
      */
-    public function __construct(Container $container, SecurityContext $securityContext) {
+    public function __construct(Container $container, SecurityContext $securityContext, EntityManager $em) {
         $this->container       = $container;
         $this->securityContext = $securityContext;
+        $this->em              = $em;
     }
 
     /**
@@ -91,15 +96,26 @@ class UserType extends AbstractType
             )
         ));
 
-        $builder->add('role', 'entity', array(
-            'label'         => 'mautic.user.user.form.role',
-            'label_attr'    => array('class' => 'control-label'),
-            'attr'          => array('class' => 'form-control'),
-            'class'         => 'MauticUserBundle:Role',
-            'property'      => 'name',
-            'empty_value'   => 'mautic.core.form.chooseone',
-            'choices'       => $this->container->get('mautic.model.role')->getUserRoleList()
-        ));
+        $builder->add(
+            $builder->create('role_lookup', 'text', array(
+                'label'      => 'mautic.user.user.form.role',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array(
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.core.help.autocomplete',
+                ),
+                'mapped'     => false
+            ))->addViewTransformer($transformer)
+        );
+        $roleTransformer  = new RoleToIdTransformer($this->em);
+        $builder->add(
+            $builder->create('role', 'hidden', array(
+                'required' => true,
+            ))
+            ->addViewTransformer($roleTransformer)
+        );
+
+
 
         $existing = (!empty($options['data']) && $options['data']->getId());
         $placeholder = ($existing) ?

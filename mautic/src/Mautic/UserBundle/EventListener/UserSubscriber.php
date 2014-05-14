@@ -32,6 +32,7 @@ class UserSubscriber extends CommonSubscriber
             CoreEvents::BUILD_MENU          => array('onBuildMenu', 9997),
             CoreEvents::BUILD_ROUTE         => array('onBuildRoute', 0),
             CoreEvents::GLOBAL_SEARCH       => array('onGlobalSearch', 0),
+            CoreEvents::BUILD_COMMAND_LIST  => array('onBuildCommandList', 0),
             UserEvents::USER_PRE_SAVE       => array('onUserPreSave', 0),
             UserEvents::USER_POST_SAVE      => array('onUserPostSave', 0),
             UserEvents::USER_POST_DELETE    => array('onUserDelete', 0),
@@ -133,6 +134,26 @@ class UserSubscriber extends CommonSubscriber
                 $roleResults['count'] = count($roles);
                 $event->addResults('mautic.user.role.header.index', $roleResults);
             }
+        }
+    }
+
+    /**
+     * @param MauticEvents\CommandListEvent $event
+     */
+    public function onBuildCommandList(MauticEvents\CommandListEvent $event)
+    {
+        $security   = $this->container->get("mautic.security");
+        if ($security->isGranted('user:users:view')) {
+            $event->addCommands(
+                'mautic.user.user.header.index',
+                $this->container->get('mautic.model.user')->getCommandList()
+            );
+        }
+        if ($security->isGranted('user:roles:view')) {
+            $event->addCommands(
+                'mautic.user.role.header.index',
+                $this->container->get('mautic.model.role')->getCommandList()
+            );
         }
     }
 

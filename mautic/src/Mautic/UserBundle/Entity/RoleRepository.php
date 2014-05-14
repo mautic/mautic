@@ -44,6 +44,35 @@ class RoleRepository extends CommonRepository
         return $result;
     }
 
+    /**
+     * @param string $search
+     * @param int    $limit
+     * @param int    $start
+     * @return array
+     */
+    public function getRoleList($search = '', $limit = 10, $start = 0)
+    {
+        $q = $this->_em->createQueryBuilder();
+
+        $q->select('partial r.{id, name}')
+            ->from('MauticUserBundle:Role', 'r');
+
+        if (!empty($search)) {
+            $q->andWhere('r.name LIKE :search')
+                ->setParameter('search', "{$search}%");
+        }
+
+        $q->orderBy('r.name');
+
+        if (!empty($limit)) {
+            $q->setFirstResult($start)
+                ->setMaxResults($limit);
+        }
+
+        $results = $q->getQuery()->getArrayResult();
+        return $results;
+    }
+
     protected function addCatchAllWhereClause(QueryBuilder &$q, $filter)
     {
         $unique  = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
@@ -92,15 +121,22 @@ class RoleRepository extends CommonRepository
 
     }
 
-    protected function isSupportedSearchCommand($command)
+    /**
+     * @return array
+     */
+    public function getSearchCommands()
     {
-        $commands = array(
-            $this->translator->trans('mautic.core.searchcommand.is'),
-            $this->translator->trans('mautic.core.searchcommand.name'),
+        return array(
+            'mautic.core.searchcommand.is' => array(
+                'mautic.user.user.searchcommand.isadmin'
+            ),
+            'mautic.core.searchcommand.name'
         );
-        return in_array($command, $commands);
     }
 
+    /**
+     * @return string
+     */
     protected function getDefaultOrderBy()
     {
         return 'r.name';

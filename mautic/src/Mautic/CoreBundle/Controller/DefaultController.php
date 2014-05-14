@@ -27,11 +27,7 @@ class DefaultController extends CommonController
      */
     public function indexAction()
     {
-        if ($this->request->isXmlHttpRequest() && !$this->request->get("ignoreAjax", false)) {
-            return $this->ajaxAction();
-        } else {
-            return $this->render('MauticCoreBundle:Default:index.html.php');
-        }
+        return $this->delegateView('MauticCoreBundle:Default:index.html.php');
     }
 
     public function globalSearchAction()
@@ -43,8 +39,7 @@ class DefaultController extends CommonController
         $this->get('event_dispatcher')->dispatch(CoreEvents::GLOBAL_SEARCH, $event);
 
         return $this->render('MauticCoreBundle:Default:globalsearchresults.html.php',
-            array('results'      => $event->getResults())
+            array('results' => $event->getResults())
         );
-
     }
 }

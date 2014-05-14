@@ -197,7 +197,7 @@ class UserController extends CommonApiController
         $method     = $this->request->getMethod();
 
         if (!$this->container->get('mautic.security')->isGranted('user:users:edit')) {
-            $this->accessDenied();
+            return $this->accessDenied();
         }
 
         if (!$entity) {
@@ -207,7 +207,7 @@ class UserController extends CommonApiController
             } else {
                 //PUT can create a new entity if it doesn't exist
                 if (!$this->container->get('mautic.security')->isGranted('user:users:create')) {
-                    $this->accessDenied();
+                    return $this->accessDenied();
                 }
                 $entity = $this->model->getEntity();
                 if (isset($parameters['plainPassword']['password'])) {

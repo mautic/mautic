@@ -92,20 +92,51 @@ class CommonRepository extends EntityRepository
 
     protected function buildWhereClause(QueryBuilder &$q, array $args)
     {
+        $filter       = array_key_exists('filter', $args) ? $args['filter'] : '';
+        $filterHelper = new SearchStringHelper();
+        $string       = '';
 
-        $filter = array_key_exists('filter', $args) ? $args['filter'] : '';
         if (!empty($filter)) {
+            if (is_array($filter)) {
+                if (!empty($filter['force'])) {
+                    if (is_array($filter['force'])) {
+                        //defined columns with keys of column, expr, value
+                        $forceParameters  = array();
+                        $forceExpressions = $q->expr()->andX();
+                        foreach ($filter['force'] as $f) {
+                            $unique = $this->generateRandomParameterName();
+                            $forceExpressions->add(
+                                $q->expr()->{$f['expr']}($f['column'], $unique)
+                            );
+                            $forceParameters[$unique] = $f['value'];
+                        }
+                    } else {
+                        //string so parse as advanced search
+                        $parsed = $filterHelper->parseSearchString($filter['force']);
+                        list($forceExpressions, $forceParameters) = $this->addAdvancedSearchWhereClause($q, $parsed);
+                    }
+                }
 
-            //remove wildcards passed by user
-            if (strpos($filter, '%') !== false) {
-                $filter = str_replace('%', '', $filter);
+                if (!empty($filter['string'])) {
+                    $string = $filter['string'];
+                }
+            } else {
+                $string = $filter;
             }
 
-            //parse filter
-            $filterHelper   = new SearchStringHelper();
-            $filter         = $filterHelper->parseSearchString($filter);
+            //remove wildcards passed by user
+            if (strpos($string, '%') !== false) {
+                $string = str_replace('%', '', $string);
+            }
+
+            $filter = $filterHelper->parseSearchString($string);
 
             list($expressions, $parameters) = $this->addAdvancedSearchWhereClause($q, $filter);
+
+            if (!empty($forceExpressions)) {
+                $expressions->add($forceExpressions);
+                $parameters  = array_merge($parameters, $forceParameters);
+            }
             $count = count($expressions->getParts());
             if (!empty($count)) {
                 $q->where($expressions)
@@ -147,8 +178,14 @@ class CommonRepository extends EntityRepository
                 list($expr, $params) = $this->addAdvancedSearchWhereClause($qb, $f);
             } else {
                 if (!empty($f->command)) {
-                    if ($this->isSupportedSearchCommand($f->command)) {
+                    if ($this->isSupportedSearchCommand($f->command, $f->string)) {
                         list($expr, $params) = $this->addSearchCommandWhereClause($qb, $f);
+                    } else {
+                        //treat the command:string as if its a single word
+                        $f->string = $f->command . ":" . $f->string;
+                        $f->not    = false;
+                        $f->strict = true;
+                        list($expr, $params) = $this->addCatchAllWhereClause($qb, $f);
                     }
                 } else {
                     list($expr, $params) = $this->addCatchAllWhereClause($qb, $f);
@@ -163,11 +200,47 @@ class CommonRepository extends EntityRepository
         return array($expressions, $parameters);
     }
 
-    protected function getSupportedCommands()
+    /**
+     * Array of search commands supported by the repository
+     *
+     * @return array
+     */
+    public function getSearchCommands()
     {
         return array();
     }
 
+    /**
+     * Test to see if a given command is supported by the repository
+     *
+     * @param $command
+     * @param $subcommand
+     * @return bool
+     */
+    protected function isSupportedSearchCommand($command, $subcommand = '')
+    {
+        $commands = $this->getSearchCommands();
+        foreach ($commands as $k => $c) {
+            if (is_array($c)) {
+                //subcommands
+                if ($this->translator->trans($k) == $command) {
+                    foreach ($c as $subc) {
+                        if ($this->translator->trans($subc) == $subcommand) {
+                            return true;
+                        }
+                    }
+                }
+            } elseif ($this->translator->trans($c) == $command) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param QueryBuilder $q
+     * @param array        $args
+     */
     protected function buildOrderByClause(QueryBuilder &$q, array $args)
     {
         $orderBy    = array_key_exists('orderBy', $args) ? $args['orderBy'] : $this->getDefaultOrderBy();

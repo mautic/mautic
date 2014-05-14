@@ -8,6 +8,8 @@
  */
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
+$view['slots']->set('mauticContent', 'role');
+
 $objectId = $form->vars['data']->getId();
 if (!empty($objectId)) {
     $name   = $form->vars['data']->getName();
@@ -16,8 +18,6 @@ if (!empty($objectId)) {
     $header = $view['translator']->trans('mautic.user.role.header.new');
 }
 $view["slots"]->set("headerTitle", $header);
-//populate JS functions only required for page refreshes
-$view['slots']->set("jsDeclarations", "Mautic.ajaxifyForms(['role']);\n");
 ?>
 
 <?php echo $view['form']->form($form); ?>

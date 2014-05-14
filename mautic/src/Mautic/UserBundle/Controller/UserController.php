@@ -11,9 +11,12 @@
 
 namespace Mautic\UserBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\UserBundle\Form\Type as FormType;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class UserController
@@ -42,10 +45,10 @@ class UserController extends FormController
 
         $orderBy    = $this->get('session')->get('mautic.user.orderby', 'u.lastName, u.firstName, u.username');
         $orderByDir = $this->get('session')->get('mautic.user.orderbydir', 'ASC');
-        $filter     = $this->request->get('filter-user', $this->get('session')->get('mautic.user.filter', ''));
+        $filter     = $this->request->get('search', $this->get('session')->get('mautic.user.filter', ''));
         $this->get('session')->set('mautic.user.filter', $filter);
-
-        $users = $this->container->get('mautic.model.user')->getEntities(
+        $tmpl       = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
+        $users      = $this->container->get('mautic.model.user')->getEntities(
             array(
                 'start'      => $start,
                 'limit'      => $limit,
@@ -54,6 +57,7 @@ class UserController extends FormController
                 'orderByDir' => $orderByDir
             ));
 
+        //Check to see if the number of pages match the number of users
         $count = count($users);
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page
@@ -67,11 +71,15 @@ class UserController extends FormController
 
             return $this->postActionRedirect(array(
                 'returnUrl'       => $returnUrl,
-                'viewParameters'  => array('page' => $lastPage),
+                'viewParameters'  => array(
+                    'page' => $lastPage,
+                    'tmpl' => $tmpl
+                ),
                 'contentTemplate' => 'MauticUserBundle:User:index',
                 'passthroughVars' => array(
                     'activeLink'    => '#mautic_user_index',
                     'route'         => $returnUrl,
+                    'mauticContent' => 'user'
                 )
             ));
         }
@@ -87,22 +95,21 @@ class UserController extends FormController
         );
 
         $parameters = array(
-            'filterValue' => $filter,
             'items'       => $users,
             'page'        => $page,
             'limit'       => $limit,
-            'permissions' => $permissions
+            'permissions' => $permissions,
+            'tmpl'        => $tmpl
         );
 
-        if ($this->request->isXmlHttpRequest() && !$this->request->get('ignoreAjax', false)) {
-            return $this->ajaxAction(array(
-                'viewParameters'  => $parameters,
-                'contentTemplate' => 'MauticUserBundle:User:index.html.php',
-                'passthroughVars' => array('route' => $this->generateUrl('mautic_user_index', array('page' => $page)))
-            ));
-        } else {
-            return $this->render('MauticUserBundle:User:index.html.php', $parameters);
-        }
+        return $this->delegateView(array(
+            'viewParameters'  => $parameters,
+            'contentTemplate' => 'MauticUserBundle:User:list.html.php',
+            'passthroughVars' => array(
+                'route'         => $this->generateUrl('mautic_user_index', array('page' => $page)),
+                'mauticContent' => 'user'
+            )
+        ));
     }
 
     /**
@@ -149,6 +156,7 @@ class UserController extends FormController
                     'passthroughVars' => array(
                         'activeLink'    => '#mautic_user_index',
                         'route'         => $returnUrl,
+                        'mauticContent' => 'user'
                     ),
                     'flashes'         =>
                         ($valid === 1) ? array(
@@ -159,26 +167,33 @@ class UserController extends FormController
                             )
                         ) : array()
                 ));
+            } else {
+                //check for role error and assign it to role_lookup
+                $errors = $form->getErrors();
+                if (!empty($errors)) {
+                    foreach ($errors as $error) {
+                        if ($error->getMessageTemplate() == 'mautic.user.user.role.notblank') {
+                            $form->get('role_lookup')->addError(new FormError($error->getMessage()));
+                            break;
+                        }
+                    }
+                }
             }
         }
 
-        if ($this->request->isXmlHttpRequest() && !$this->request->get('ignoreAjax', false)) {
-            return $this->ajaxAction(array(
-                'viewParameters'  => array('form' => $form->createView()),
-                'contentTemplate' => 'MauticUserBundle:User:form.html.php',
-                'passthroughVars' => array(
-                    'ajaxForms'  => array('user'),
-                    'activeLink' => '#mautic_user_new',
-                    'route'      => $action
-                )
-            ));
-        } else {
-            return $this->render('MauticUserBundle:User:form.html.php',
-                array(
-                    'form' => $form->createView()
-                )
-            );
-        }
+        $formView = $form->createView();
+        $this->container->get('templating')->getEngine('MauticUserBundle:User:form.html.php')->get('form')
+            ->setTheme($formView, 'MauticUserBundle:FormUser');
+
+        return $this->delegateView(array(
+            'viewParameters'  => array('form' => $formView),
+            'contentTemplate' => 'MauticUserBundle:User:form.html.php',
+            'passthroughVars' => array(
+                'activeLink'    => '#mautic_user_new',
+                'route'         => $action,
+                'mauticContent' => 'user'
+            )
+        ));
     }
 
     /**
@@ -207,6 +222,7 @@ class UserController extends FormController
                 'passthroughVars' => array(
                     'activeLink'    => '#mautic_user_index',
                     'route'         => $returnUrl,
+                    'mauticContent' => 'user'
                 ),
                 'flashes'         =>array(
                     array(
@@ -242,6 +258,7 @@ class UserController extends FormController
                     'passthroughVars' => array(
                         'activeLink'    => '#mautic_user_index',
                         'route'         => $returnUrl,
+                        'mauticContent' => 'user'
                     ),
                     'flashes'         =>
                         ($valid === 1) ? array( //success
@@ -252,26 +269,35 @@ class UserController extends FormController
                             )
                         ) : array()
                 ));
+            } else {
+                //check for role error and assign it to role_lookup
+                $errors = $form->getErrors();
+                if (!empty($errors)) {
+                    foreach ($errors as $error) {
+                        if ($error->getMessageTemplate() == 'mautic.user.user.role.notblank') {
+                            $form->get('role_lookup')->addError(new FormError($error->getMessage()));
+                            break;
+                        }
+                    }
+                }
             }
+        } else {
+            $form->get('role_lookup')->setData($user->getRole()->getName());
         }
 
-        if ($this->request->isXmlHttpRequest() && !$this->request->get('ignoreAjax', false)) {
-            return $this->ajaxAction(array(
-                'viewParameters'  => array('form' => $form->createView()),
-                'contentTemplate' => 'MauticUserBundle:User:form.html.php',
-                'passthroughVars' => array(
-                    'ajaxForms'   => array('user'),
-                    'activeLink'  => '#mautic_user_index',
-                    'route'       => $action
-                )
-            ));
-        } else {
-            return $this->render('MauticUserBundle:User:form.html.php',
-                array(
-                    'form' => $form->createView()
-                )
-            );
-        }
+        $formView = $form->createView();
+        $this->container->get('templating')->getEngine('MauticUserBundle:User:form.html.php')->get('form')
+            ->setTheme($formView, 'MauticUserBundle:FormUser');
+
+        return $this->delegateView(array(
+            'viewParameters'  => array('form' => $formView),
+            'contentTemplate' => 'MauticUserBundle:User:form.html.php',
+            'passthroughVars' => array(
+                'activeLink'    => '#mautic_user_index',
+                'route'         => $action,
+                'mauticContent' => 'user'
+            )
+        ));
     }
 
     /**
@@ -329,9 +355,46 @@ class UserController extends FormController
             'passthroughVars' => array(
                 'activeLink'    => '#mautic_user_index',
                 'route'         => $returnUrl,
-                'success'       => $success
+                'success'       => $success,
+                'mauticContent' => 'user'
             ),
             'flashes'         => $flashes
         ));
+    }
+
+    /**
+     * {@inheritdoc)
+     *
+     * @param $action
+     * @return array|\Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function executeAjaxAction( Request $request, $ajaxAction = "" )
+    {
+        $dataArray = array("success" => 0);
+        switch ($ajaxAction) {
+            case "rolelist":
+                $filter  = InputHelper::clean($request->query->get('filter'));
+                $results = $this->get('mautic.model.user')->getLookupResults('role', $filter);
+                $dataArray = array();
+                foreach ($results as $r) {
+                    $dataArray[] = array(
+                        'label' => $r['name'],
+                        'value' => $r['id']
+                    );
+                }
+                break;
+            case "positionlist":
+                $filter  = InputHelper::clean($request->query->get('filter'));
+                $results = $this->get('mautic.model.user')->getLookupResults('position', $filter);
+                $dataArray = array();
+                foreach ($results as $r) {
+                    $dataArray[] = array('value' => $r['position']);
+                }
+                break;
+        }
+        $response  = new JsonResponse();
+        $response->setData($dataArray);
+
+        return $response;
     }
 }

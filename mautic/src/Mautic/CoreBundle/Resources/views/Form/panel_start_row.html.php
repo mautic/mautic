@@ -7,5 +7,5 @@
             </a>
         </h4>
     </div>
-    <div id="<?php echo $form->vars['attr']['id']; ?>" class="panel-collapse collapse in">
+    <div id="<?php echo $form->vars['attr']['id']; ?>" class="panel-collapse collapse">
         <div class="panel-body">
