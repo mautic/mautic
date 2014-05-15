@@ -79,3 +79,67 @@ Mautic.roleOnLoad = function (container) {
     }
 };
 
+
+/**
+ * Toggles permission panel visibility for roles
+ */
+Mautic.togglePermissionVisibility = function () {
+    //add a very slight delay in order for the clicked on checkbox to be selected since the onclick action
+    //is set to the parent div
+    setTimeout(function () {
+        if ($('#role_isAdmin_0').prop('checked')) {
+            $('#permissions-container').removeClass('hide');
+        } else {
+            $('#permissions-container').addClass('hide');
+        }
+    }, 10);
+};
+
+Mautic.onPermissionChange = function (container, event, bundle) {
+    //add a very slight delay in order for the clicked on checkbox to be selected since the onclick action
+    //is set to the parent div
+    setTimeout(function () {
+        var granted = 0;
+        var clickedBox = $(event.target).find('input:checkbox').first();
+        if ($(clickedBox).prop('checked')) {
+            if ($(clickedBox).val() == 'full') {
+                //uncheck all of the others
+                $(container).find("label input:checkbox:checked").map(function () {
+                    if ($(this).val() != 'full') {
+                        $(this).prop('checked', false);
+                        $(this).parent().toggleClass('active');
+                    }
+                })
+            } else {
+                //uncheck full
+                $(container).find("label input:checkbox:checked").map(function () {
+                    if ($(this).val() == 'full') {
+                        granted = granted - 1;
+                        $(this).prop('checked', false);
+                        $(this).parent().toggleClass('active');
+                    }
+                })
+            }
+        }
+
+        //update granted numbers
+        if ($('.' + bundle + '_granted').length) {
+            mauticVars.showLoadingBar = false;
+            $.ajax({
+                url: mauticBaseUrl + "ajax?ajaxAction=user:role:permissionratio&bundle=" + bundle,
+                type: "POST",
+                data: $('form[name="role"]').serialize(),
+                dataType: "json",
+                success: function (response) {
+                    if (response.granted) {
+                        $('.' + bundle + '_granted').html(response.granted);
+                    }
+                },
+                error: function (request, textStatus, errorThrown) {
+                    alert(errorThrown);
+                }
+            });
+        }
+    }, 10);
+};
+

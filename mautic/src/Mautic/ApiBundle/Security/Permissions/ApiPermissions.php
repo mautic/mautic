@@ -33,7 +33,6 @@ class ApiPermissions extends CommonPermissions
         parent::__construct($container, $em);
             $this->permissions = array(
                 'access' => array(
-                    'prohibit' => 1,
                     'full'     => 1024
                 ),
                 'clients' => array(
@@ -60,22 +59,19 @@ class ApiPermissions extends CommonPermissions
      *
      * @param FormBuilderInterface $builder
      * @param array                $options
+     * @param array                $data
      */
-    public function buildForm(FormBuilderInterface &$builder, array $options)
+    public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {
-        //convert the permission bits from the db into readable names
-        $data = $this->convertBitsToPermissionNames($options['permissions']);
-
         $builder->add('api:access', 'choice', array(
             'choices'  => array(
-                'prohibit' => 'mautic.api.permissions.prohibited', //basically no permission will be saved
                 'full'     => 'mautic.api.permissions.granted',
             ),
             'label'    => 'mautic.api.permissions.apiaccess',
             'expanded' => true,
             'multiple' => true,
             'attr'     => array(
-                'onclick' => 'Mautic.toggleFullPermissions(this, event)'
+                'onclick' => 'Mautic.onPermissionChange(this, event, \'api\')'
             ),
             'data'     => (!empty($data['access']) ? $data['access'] : array())
         ));
@@ -93,7 +89,7 @@ class ApiPermissions extends CommonPermissions
             'expanded'   => true,
             'multiple'   => true,
             'attr'       => array(
-                'onclick' => 'Mautic.toggleFullPermissions(this, event)'
+                'onclick' => 'Mautic.onPermissionChange(this, event, \'api\')'
             ),
             'data'      => (!empty($data['clients']) ? $data['clients'] : array())
         ));
@@ -146,5 +142,46 @@ class ApiPermissions extends CommonPermissions
         }
 
         return array($name, $level);
+    }
+
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param array $data
+     * @return string
+     */
+    public function getPermissionRatio(array $data)
+    {
+        $totalAvailable = $totalGranted = 0;
+
+        foreach ($this->permissions as $level => $perms) {
+            $perms = array_keys($perms);
+
+            if ($level == 'access') {
+                $totalAvailable++;
+                if (!empty($data[$level]) && in_array('full', $data[$level])) {
+                    $totalGranted++;
+                }
+            } else {
+                $totalAvailable += count($perms);
+
+                if (in_array('full', $perms)) {
+                    //remove full from total count
+                    $totalAvailable--;
+                    if (!empty($data[$level]) && in_array('full', $data[$level])) {
+                        //user has full access so sum perms minus full
+                        $totalGranted += count($perms) - 1;
+                        //move on to the next level
+                        continue;
+                    }
+                }
+
+                if (isset($data[$level]))
+                    $totalGranted += count($data[$level]);
+
+            }
+        }
+        return array($totalGranted, $totalAvailable);
     }
 }

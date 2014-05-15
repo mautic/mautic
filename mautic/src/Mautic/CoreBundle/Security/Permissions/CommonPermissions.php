@@ -85,8 +85,9 @@ class CommonPermissions {
      *
      * @param FormBuilderInterface $builder
      * @param array                $options
+     * @param array                $data
      */
-    public function buildForm(FormBuilderInterface &$builder, array $options)
+    public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {
 
     }
@@ -124,7 +125,7 @@ class CommonPermissions {
                             $levels = $this->permissions[$permName];
                             //ensure that at least keys exist
                             $permissionLevels[$bundle][$permName]                      = array();
-                            $permissionLevels[$bundle][$permName]["$bundle:$permName"] = $permId;
+                            //$permissionLevels[$bundle][$permName]["$bundle:$permName"] = $permId;
                             foreach ($levels as $levelName => $levelBit) {
                                 //compare bit against levels to see if it is a match
                                 if ($levelBit & $permBitwise) {
@@ -217,5 +218,37 @@ class CommonPermissions {
         }
 
         return $updatedPerms;
+    }
+
+    /**
+     * Generates an array of granted and total permissions
+     *
+     * @param array $data
+     * @return array
+     */
+    public function getPermissionRatio(array $data)
+    {
+        $totalAvailable = $totalGranted = 0;
+
+        foreach ($this->permissions as $level => $perms) {
+            $perms = array_keys($perms);
+            $totalAvailable += count($perms);
+
+            if (in_array('full', $perms)) {
+                //remove full from total count
+                $totalAvailable--;
+                if (!empty($data[$level]) && in_array('full', $data[$level])) {
+                    //user has full access so sum perms minus full
+                    $totalGranted += count($perms) - 1;
+                    //move on to the next level
+                    continue;
+                }
+            }
+
+            if (isset($data[$level]))
+                $totalGranted += count($data[$level]);
+
+        }
+        return array($totalGranted,$totalAvailable);
     }
 }

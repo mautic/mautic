@@ -71,11 +71,8 @@ class UserPermissions extends CommonPermissions
      * @param FormBuilderInterface $builder
      * @param array                $options
      */
-    public function buildForm(FormBuilderInterface &$builder, array $options)
+    public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {
-        //convert the permission bits from the db into readable names
-        $data = $this->convertBitsToPermissionNames($options['permissions']);
-
         $builder->add('user:users', 'choice', array(
             'choices'    => array(
                 'view'    => 'mautic.core.permissions.view',
@@ -89,7 +86,7 @@ class UserPermissions extends CommonPermissions
             'expanded'   => true,
             'multiple'   => true,
             'attr'       => array(
-                'onclick' => 'Mautic.toggleFullPermissions(this, event)'
+                'onclick' => 'Mautic.onPermissionChange(this, event, \'user\')'
             ),
             'data'      => (!empty($data['users']) ? $data['users'] : array())
         ));
@@ -107,7 +104,7 @@ class UserPermissions extends CommonPermissions
             'expanded'   => true,
             'multiple'   => true,
             'attr'       => array(
-                'onclick' => 'Mautic.toggleFullPermissions(this, event)'
+                'onclick' => 'Mautic.onPermissionChange(this, event, \'user\')'
             ),
             'data'       => (!empty($data['roles']) ? $data['roles'] : array())
         ));
@@ -125,7 +122,7 @@ class UserPermissions extends CommonPermissions
             'expanded'   => true,
             'multiple'   => true,
             'attr'       => array(
-                'onclick' => 'Mautic.toggleFullPermissions(this, event)'
+                'onclick' => 'Mautic.onPermissionChange(this, event, \'user\')'
             ),
             'data'       => (!empty($data['profile']) ? $data['profile'] : array())
         ));

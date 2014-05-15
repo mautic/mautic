@@ -556,48 +556,6 @@ var Mautic = {
     },
 
     /**
-     * Toggles permission panel visibility for roles
-     */
-    togglePermissionVisibility: function () {
-        //add a very slight delay in order for the clicked on checkbox to be selected since the onclick action
-        //is set to the parent div
-        setTimeout(function () {
-            if ($('#role_isAdmin_0').prop('checked')) {
-                $('#permissions-container').removeClass('hide');
-            } else {
-                $('#permissions-container').addClass('hide');
-            }
-        }, 10);
-    },
-
-    toggleFullPermissions: function (container, event) {
-        //add a very slight delay in order for the clicked on checkbox to be selected since the onclick action
-        //is set to the parent div
-        setTimeout(function () {
-            var clickedBox = $(event.target).find('input:checkbox').first();
-            if ($(clickedBox).prop('checked')) {
-                if ($(clickedBox).val() == 'full') {
-                    //uncheck all of the others
-                    $(container).find("label input:checkbox:checked").map(function () {
-                        if ($(this).val() != 'full') {
-                            $(this).prop('checked', false);
-                            $(this).parent().toggleClass('active');
-                        }
-                    })
-                } else {
-                    //uncheck full
-                    $(container).find("label input:checkbox:checked").map(function () {
-                        if ($(this).val() == 'full') {
-                            $(this).prop('checked', false);
-                            $(this).parent().toggleClass('active');
-                        }
-                    })
-                }
-            }
-        }, 10);
-    },
-
-    /**
      * Shows the search search input in an search list
      */
     showSearchInput: function () {

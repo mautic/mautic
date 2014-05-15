@@ -52,7 +52,17 @@ class PermissionsType extends AbstractType
         foreach ($permissionObjects as $object) {
             if ($object->isEnabled()) {
                 $bundle = $object->getName();
-                $label  = "mautic.{$bundle}.permissions.header";
+                //convert the permission bits from the db into readable names
+                $data    = $object->convertBitsToPermissionNames($options['permissions']);
+                //get the ratio of granted/total
+                list($granted, $total) = $object->getPermissionRatio($data);
+                $ratio = (!empty($total)) ?
+                          ' <span class="permission-ratio">('
+                            . '<span class="' . $bundle . '_granted">' . $granted . '</span>/'
+                            . '<span class="' . $bundle . '_total">' . $total . '</span>'
+                        . ')</span>'
+                    : "";
+                $label   = $this->container->get('translator')->trans("mautic.{$bundle}.permissions.header") . $ratio;
                 $builder->add("{$bundle}-panel-start", 'panel_start', array(
                     'label' => $label,
                     'attr'  => array(
@@ -60,7 +70,7 @@ class PermissionsType extends AbstractType
                         'id'          => "{$bundle}-panel"
                     )
                 ));
-                $object->buildForm($builder, $options);
+                $object->buildForm($builder, $options, $data);
 
                 $builder->add("{$bundle}-panel-end", 'panel_end');
             }

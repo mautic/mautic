@@ -11,10 +11,13 @@
 
 namespace Mautic\UserBundle\Controller;
 
+use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\UserBundle\Entity as Entity;
 use Mautic\UserBundle\Form\Type as FormType;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\PreconditionRequiredHttpException;
 
 /**
@@ -335,5 +338,39 @@ class RoleController extends FormController
             ),
             'flashes'         => $flashes
         ));
+    }
+
+
+    /**
+     * {@inheritdoc)
+     *
+     * @param $action
+     * @return array|\Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function executeAjaxAction( Request $request, $ajaxAction = "" )
+    {
+        $dataArray = array("success" => 0);
+        switch ($ajaxAction) {
+            case "permissionratio":
+                $bundle         = InputHelper::clean($request->query->get('bundle'));
+                $rawPermissions = $this->request->request->get('role[permissions]', null, true);
+                $permissions = array();
+                foreach ($rawPermissions as $key => $perm) {
+                    if (strpos($key, $bundle.':') === false)
+                        continue;
+
+                    list($ignore, $level) = explode(':', $key);
+                    $permissions[$level] = $perm;
+                }
+
+                $permClass = $this->get('mautic.security')->getPermissionObject($bundle);
+                list($granted, $ignore) = $permClass->getPermissionRatio($permissions);
+                $dataArray = array("granted" => $granted);
+            break;
+        }
+        $response  = new JsonResponse();
+        $response->setData($dataArray);
+
+        return $response;
     }
 }
