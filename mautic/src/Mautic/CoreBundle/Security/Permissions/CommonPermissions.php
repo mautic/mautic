@@ -188,17 +188,17 @@ class CommonPermissions {
         foreach ($perms as $perm) {
             switch ($perm) {
                 case 'editother':
+                case 'edit':
                     $required = array('viewother', 'viewown');
                     break;
                 case 'editown':
-                case 'edit':
                     $required = array('viewown');
                     break;
                 case 'deleteother':
+                case 'delete':
                     $required = array('editother', 'viewother', 'viewown');
                     break;
                 case 'deleteown':
-                case 'delete':
                     $required = array('viewown');
                     break;
                 case 'create':
