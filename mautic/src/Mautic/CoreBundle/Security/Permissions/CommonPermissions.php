@@ -174,4 +174,48 @@ class CommonPermissions {
             return ($this->permissions[$name][$level] & $userPermissions[$name]);
         }
     }
+
+    /**
+     * Gives the bundle the opportunity to force certain permissions if another is selected
+     *
+     * @param string $level
+     * @param array $perms
+     * @return array $updatedPerms
+     */
+    public function analyzePermissions($level, array $perms)
+    {
+        $updatedPerms = $perms;
+        foreach ($perms as $perm) {
+            switch ($perm) {
+                case 'editother':
+                    $required = array('viewother', 'viewown');
+                    break;
+                case 'editown':
+                case 'edit':
+                    $required = array('viewown');
+                    break;
+                case 'deleteother':
+                    $required = array('editother', 'viewother', 'viewown');
+                    break;
+                case 'deleteown':
+                case 'delete':
+                    $required = array('viewown');
+                    break;
+                case 'create':
+                    $required = array('viewown');
+                    break;
+            }
+
+            if (!empty($required)) {
+                foreach ($required as $r) {
+                    list($ignore, $r) = $this->getSynonym($level, $r);
+                    if ($this->isSupported($level, $r) && !in_array($r, $updatedPerms)) {
+                        $updatedPerms[] = $r;
+                    }
+                }
+            }
+        }
+
+        return $updatedPerms;
+    }
 }

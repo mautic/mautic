@@ -124,9 +124,11 @@ class CorePermissions {
             $entity->setName(strtolower($name));
 
             $bit = 0;
+            $class = $this->getPermissionObject($bundle);
+            $perms = $class->analyzePermissions($name, $perms);
+
             foreach ($perms as $perm) {
                 //get the bit for the perm
-                $class = $this->getPermissionObject($bundle);
                 if ($supports = $class->isSupported($name, $perm)) {
                     $bit += $class->getValue($name, $perm);
                 } else {

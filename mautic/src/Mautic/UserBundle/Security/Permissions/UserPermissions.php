@@ -31,29 +31,29 @@ class UserPermissions extends CommonPermissions
     public function __construct(Container $container, EntityManager $em)
     {
         parent::__construct($container, $em);
-            $this->permissions = array(
-                'users' => array(
-                    'view'          => 1,
-                    'editother'     => 4,
-                    'create'        => 8,
-                    'deleteother'   => 32,
-                    'full'          => 1024
-                ),
-                'roles' => array(
-                    'view'          => 1,
-                    'editother'     => 4,
-                    'create'        => 8,
-                    'deleteother'   => 32,
-                    'full'          => 1024
-                ),
-                'profile' => array(
-                    'editusername'  => 1,
-                    'editemail'     => 2,
-                    'editposition'  => 4,
-                    'editname'      => 8,
-                    'full'          => 1024
-                )
-            );
+        $this->permissions = array(
+            'users' => array(
+                'view'          => 1,
+                'edit'          => 4,
+                'create'        => 8,
+                'delete'        => 32,
+                'full'          => 1024
+            ),
+            'roles' => array(
+                'view'          => 1,
+                'edit'          => 4,
+                'create'        => 8,
+                'delete'        => 32,
+                'full'          => 1024
+            ),
+            'profile' => array(
+                'editusername'  => 1,
+                'editemail'     => 2,
+                'editposition'  => 4,
+                'editname'      => 8,
+                'full'          => 1024
+            )
+        );
     }
 
     /**
@@ -78,11 +78,11 @@ class UserPermissions extends CommonPermissions
 
         $builder->add('user:users', 'choice', array(
             'choices'    => array(
-                'view'        => 'mautic.core.permissions.view',
-                'editother'   => 'mautic.core.permissions.edit',
-                'create'      => 'mautic.core.permissions.create',
-                'deleteother' => 'mautic.core.permissions.delete',
-                'full'        => 'mautic.core.permissions.full'
+                'view'    => 'mautic.core.permissions.view',
+                'edit'    => 'mautic.core.permissions.edit',
+                'create'  => 'mautic.core.permissions.create',
+                'delete'  => 'mautic.core.permissions.delete',
+                'full'    => 'mautic.core.permissions.full'
             ),
             'label'      => 'mautic.user.permissions.users',
             'label_attr' => array('class' => 'control-label'),
@@ -96,11 +96,11 @@ class UserPermissions extends CommonPermissions
 
         $builder->add('user:roles', 'choice', array(
             'choices'    => array(
-                'view'        => 'mautic.core.permissions.view',
-                'editother'   => 'mautic.core.permissions.edit',
-                'create'      => 'mautic.core.permissions.create',
-                'deleteother' => 'mautic.core.permissions.delete',
-                'full'        => 'mautic.core.permissions.full'
+                'view'   => 'mautic.core.permissions.view',
+                'edit'   => 'mautic.core.permissions.edit',
+                'create' => 'mautic.core.permissions.create',
+                'delete' => 'mautic.core.permissions.delete',
+                'full'   => 'mautic.core.permissions.full'
             ),
             'label'      => 'mautic.user.permissions.roles',
             'label_attr' => array('class' => 'control-label'),
@@ -141,11 +141,17 @@ class UserPermissions extends CommonPermissions
     protected function getSynonym($name, $level) {
         //set some synonyms
         switch ($level) {
-            case "edit":
-                $level = "editother";
+            case "viewown":
+            case "viewother":
+                $level = "view";
                 break;
-            case "delete":
-                $level = "deleteother";
+            case "editown":
+            case "editother":
+                $level = "edit";
+                break;
+            case "deleteown":
+            case "deleteother":
+                $level = "delete";
                 break;
         }
 
