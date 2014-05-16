@@ -9,6 +9,8 @@
 
 namespace Mautic\UserBundle\EventListener;
 
+use Mautic\ApiBundle\ApiEvents;
+use Mautic\ApiBundle\Event\RouteEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
@@ -33,6 +35,7 @@ class UserSubscriber extends CommonSubscriber
             CoreEvents::BUILD_ROUTE         => array('onBuildRoute', 0),
             CoreEvents::GLOBAL_SEARCH       => array('onGlobalSearch', 0),
             CoreEvents::BUILD_COMMAND_LIST  => array('onBuildCommandList', 0),
+            ApiEvents::BUILD_ROUTE          => array('onBuildApiRoute', 0),
             UserEvents::USER_PRE_SAVE       => array('onUserPreSave', 0),
             UserEvents::USER_POST_SAVE      => array('onUserPostSave', 0),
             UserEvents::USER_POST_DELETE    => array('onUserDelete', 0),
@@ -57,7 +60,7 @@ class UserSubscriber extends CommonSubscriber
      */
     public function onBuildRoute(MauticEvents\RouteEvent $event)
     {
-        $path = __DIR__ . "/../Resources/config/routing.php";
+        $path = __DIR__ . "/../Resources/config/routing/routing.php";
         $event->addRoutes($path);
     }
 
@@ -135,6 +138,15 @@ class UserSubscriber extends CommonSubscriber
                 $event->addResults('mautic.user.role.header.index', $roleResults);
             }
         }
+    }
+
+    /**
+     * @param RouteEvent $event
+     */
+    public function onBuildApiRoute(RouteEvent $event)
+    {
+        $path = __DIR__ . "/../Resources/config/routing/api.php";
+        $event->addRoutes($path);
     }
 
     /**

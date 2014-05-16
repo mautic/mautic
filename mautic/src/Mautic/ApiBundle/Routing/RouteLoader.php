@@ -9,6 +9,8 @@
 
 namespace Mautic\ApiBundle\Routing;
 
+use Mautic\ApiBundle\ApiEvents;
+use Mautic\ApiBundle\Event\RouteEvent;
 use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Routing\RouteCollection;
@@ -49,12 +51,8 @@ class RouteLoader extends Loader
 
         $collection = new RouteCollection();
         if ($this->container->getParameter('mautic.api_enabled')) {
-            //load routing files
-            $finder = new Finder();
-            $finder->files()->in(__DIR__ . '/../Resources/config/routing/')->name('*.php');
-            foreach ($finder as $file) {
-                $collection->addCollection($this->import($file->getRealPath()));
-            }
+            $event = new RouteEvent($this, $collection);
+            $this->container->get('event_dispatcher')->dispatch(ApiEvents::BUILD_ROUTE, $event);
 
             if (in_array($this->container->getParameter("kernel.environment"), array('dev', 'test'))) {
                 //Load API doc routing
@@ -65,6 +63,7 @@ class RouteLoader extends Loader
         }
 
         $this->loaded = true;
+
 
         return $collection;
     }

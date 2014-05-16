@@ -7,23 +7,22 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\ApiBundle\Controller\User;
+namespace Mautic\UserBundle\Controller\Api;
 
 use FOS\RestBundle\Util\Codes;
 use JMS\Serializer\SerializationContext;
 use Mautic\ApiBundle\Controller\CommonApiController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * Class UserController
+ * Class UserApiController
  *
- * @package Mautic\ApiBundle\Controller\User
+ * @package Mautic\UserBundle\Controller\Api
  */
-class UserController extends CommonApiController
+class UserApiController extends CommonApiController
 {
 
     public function initialize(FilterControllerEvent $event)
@@ -152,7 +151,6 @@ class UserController extends CommonApiController
     {
         $entity = $this->model->getEntity();
 
-        //@TODO add catch to determine editown or editother
         if (!$this->container->get('mautic.security')->isGranted('user:users:create')) {
             return $this->accessDenied();
         }

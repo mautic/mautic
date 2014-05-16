@@ -7,19 +7,18 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\ApiBundle\Controller\User;
+namespace Mautic\UserBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 /**
- * Class RoleController
+ * Class RoleApiController
  *
- * @package Mautic\ApiBundle\Controller\Role
+ * @package Mautic\UserBundle\Controller\Api
  */
-class RoleController extends CommonApiController
+class RoleApiController extends CommonApiController
 {
 
     public function initialize(FilterControllerEvent $event)
