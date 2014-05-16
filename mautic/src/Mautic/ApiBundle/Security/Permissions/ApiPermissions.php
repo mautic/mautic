@@ -31,18 +31,18 @@ class ApiPermissions extends CommonPermissions
     public function __construct(Container $container, EntityManager $em)
     {
         parent::__construct($container, $em);
-            $this->permissions = array(
-                'access' => array(
-                    'full'     => 1024
-                ),
-                'clients' => array(
-                    'view'          => 1,
-                    'editother'     => 4,
-                    'create'        => 8,
-                    'deleteother'   => 32,
-                    'full'          => 1024
-                )
-            );
+        $this->permissions = array(
+            'access' => array(
+                'full'     => 1024
+            ),
+            'clients' => array(
+                'view'   => 1,
+                'edit'   => 4,
+                'create' => 8,
+                'delete' => 32,
+                'full'   => 1024
+            )
+        );
     }
 
     /**
@@ -78,11 +78,11 @@ class ApiPermissions extends CommonPermissions
 
         $builder->add('api:clients', 'choice', array(
             'choices'    => array(
-                'view'        => 'mautic.core.permissions.view',
-                'editother'   => 'mautic.core.permissions.edit',
-                'create'      => 'mautic.core.permissions.create',
-                'deleteother' => 'mautic.core.permissions.delete',
-                'full'        => 'mautic.core.permissions.full'
+                'view'   => 'mautic.core.permissions.view',
+                'edit'   => 'mautic.core.permissions.edit',
+                'create' => 'mautic.core.permissions.create',
+                'delete' => 'mautic.core.permissions.delete',
+                'full'   => 'mautic.core.permissions.full'
             ),
             'label'      => 'mautic.api.permissions.clients',
             'label_attr' => array('class' => 'control-label'),
@@ -132,56 +132,17 @@ class ApiPermissions extends CommonPermissions
             $level = "full";
         } elseif ($name == "clients") {
             switch ($level) {
-                case "edit":
-                    $level = "editother";
+                case "editother":
+                case "editown":
+                    $level = "edit";
                     break;
-                case "delete":
-                    $level = "deleteother";
+                case "deleteother":
+                case "deleteown":
+                    $level = "delete";
                     break;
             }
         }
 
         return array($name, $level);
-    }
-
-
-    /**
-     * {@inheritdoc}
-     *
-     * @param array $data
-     * @return string
-     */
-    public function getPermissionRatio(array $data)
-    {
-        $totalAvailable = $totalGranted = 0;
-
-        foreach ($this->permissions as $level => $perms) {
-            $perms = array_keys($perms);
-
-            if ($level == 'access') {
-                $totalAvailable++;
-                if (!empty($data[$level]) && in_array('full', $data[$level])) {
-                    $totalGranted++;
-                }
-            } else {
-                $totalAvailable += count($perms);
-
-                if (in_array('full', $perms)) {
-                    //remove full from total count
-                    $totalAvailable--;
-                    if (!empty($data[$level]) && in_array('full', $data[$level])) {
-                        //user has full access so sum perms minus full
-                        $totalGranted += count($perms) - 1;
-                        //move on to the next level
-                        continue;
-                    }
-                }
-
-                if (isset($data[$level]))
-                    $totalGranted += count($data[$level]);
-
-            }
-        }
-        return array($totalGranted, $totalAvailable);
     }
 }

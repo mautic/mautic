@@ -235,13 +235,19 @@ class CommonPermissions {
             $totalAvailable += count($perms);
 
             if (in_array('full', $perms)) {
-                //remove full from total count
-                $totalAvailable--;
-                if (!empty($data[$level]) && in_array('full', $data[$level])) {
-                    //user has full access so sum perms minus full
-                    $totalGranted += count($perms) - 1;
-                    //move on to the next level
-                    continue;
+                if (count($perms) === 1) {
+                    //full is the only permission so count as 1
+                    if (!empty($data[$level]) && in_array('full', $data[$level]))
+                        $totalGranted++;
+                } else {
+                    //remove full from total count
+                    $totalAvailable--;
+                    if (!empty($data[$level]) && in_array('full', $data[$level])) {
+                        //user has full access so sum perms minus full
+                        $totalGranted += count($perms) - 1;
+                        //move on to the next level
+                        continue;
+                    }
                 }
             }
 
@@ -250,5 +256,15 @@ class CommonPermissions {
 
         }
         return array($totalGranted,$totalAvailable);
+    }
+
+    /**
+     * Gives the bundle an opportunity to change how javascript calculates permissions granted
+     *
+     * @param array $perms
+     */
+    public function parseForJavascript(array &$perms)
+    {
+        //...
     }
 }

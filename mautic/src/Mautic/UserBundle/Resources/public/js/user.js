@@ -73,12 +73,15 @@ Mautic.userOnLoad = function (container) {
     }
 };
 
-Mautic.roleOnLoad = function (container) {
+Mautic.roleOnLoad = function (container, response) {
     if ($(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'role');
     }
-};
 
+    if (response && response.permissionList) {
+        mauticVars.permissionList = response.permissionList;
+    }
+};
 
 /**
  * Toggles permission panel visibility for roles
@@ -95,6 +98,13 @@ Mautic.togglePermissionVisibility = function () {
     }, 10);
 };
 
+/**
+ * Toggle permissions, update ratio, etc
+ *
+ * @param container
+ * @param event
+ * @param bundle
+ */
 Mautic.onPermissionChange = function (container, event, bundle) {
     //add a very slight delay in order for the clicked on checkbox to be selected since the onclick action
     //is set to the parent div
@@ -124,21 +134,24 @@ Mautic.onPermissionChange = function (container, event, bundle) {
 
         //update granted numbers
         if ($('.' + bundle + '_granted').length) {
-            mauticVars.showLoadingBar = false;
-            $.ajax({
-                url: mauticBaseUrl + "ajax?ajaxAction=user:role:permissionratio&bundle=" + bundle,
-                type: "POST",
-                data: $('form[name="role"]').serialize(),
-                dataType: "json",
-                success: function (response) {
-                    if (response.granted) {
-                        $('.' + bundle + '_granted').html(response.granted);
+            var granted = 0;
+            var levelPerms = mauticVars.permissionList[bundle];
+            $.each(levelPerms, function(level, perms) {
+                $.each(perms, function(index, perm) {
+                    if (perm == 'full') {
+                        if ($('#role_permissions_' + bundle + '\\:' + level + '_' + perm).prop('checked')) {
+                            if (perms.length === 1)
+                                granted++;
+                            else
+                                granted += perms.length - 1;
+                        }
+                    } else {
+                        if ($('#role_permissions_' + bundle + '\\:' + level + '_' + perm).prop('checked'))
+                            granted++;
                     }
-                },
-                error: function (request, textStatus, errorThrown) {
-                    alert(errorThrown);
-                }
+                });
             });
+            $('.' + bundle + '_granted').html(granted);
         }
     }, 10);
 };

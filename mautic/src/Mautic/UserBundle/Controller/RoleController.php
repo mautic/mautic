@@ -176,13 +176,19 @@ class RoleController extends FormController
         $this->container->get('templating')->getEngine('MauticUserBundle:Role:form.html.php')->get('form')
             ->setTheme($formView, 'MauticUserBundle:FormUser');
 
+        $permissionList = $this->get('mautic.security')->getAllPermissions(true);
+
         return $this->delegateView(array(
-            'viewParameters'  => array('form' => $formView),
+            'viewParameters'  => array(
+                'form'           => $formView,
+                'permissionList' => $permissionList
+            ),
             'contentTemplate' => 'MauticUserBundle:Role:form.html.php',
             'passthroughVars' => array(
-                'activeLink'    => '#mautic_role_new',
-                'route'         => $this->generateUrl('mautic_role_action', array('objectAction' => 'new')),
-                'mauticContent' => 'role'
+                'activeLink'      => '#mautic_role_new',
+                'route'           => $this->generateUrl('mautic_role_action', array('objectAction' => 'new')),
+                'mauticContent'   => 'role',
+                'permissionList'  => $permissionList
             )
         ));
     }
@@ -268,13 +274,19 @@ class RoleController extends FormController
         $this->container->get('templating')->getEngine('MauticUserBundle:Role:form.html.php')->get('form')
             ->setTheme($formView, 'MauticUserBundle:FormUser');
 
+        $permissionList = $this->get('mautic.security')->getAllPermissions(true);
+
         return $this->delegateView(array(
-            'viewParameters'  => array('form' => $formView),
+            'viewParameters'  => array(
+                'form'            => $formView,
+                'permissionList'  => $permissionList
+            ),
             'contentTemplate' => 'MauticUserBundle:Role:form.html.php',
             'passthroughVars' => array(
-                'activeLink'    => '#mautic_role_index',
-                'route'         => $action,
-                'mauticContent' => 'role'
+                'activeLink'      => '#mautic_role_index',
+                'route'           => $action,
+                'mauticContent'   => 'role',
+                'permissionList'  => $permissionList
             )
         ));
     }
@@ -338,39 +350,5 @@ class RoleController extends FormController
             ),
             'flashes'         => $flashes
         ));
-    }
-
-
-    /**
-     * {@inheritdoc)
-     *
-     * @param $action
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse
-     */
-    public function executeAjaxAction( Request $request, $ajaxAction = "" )
-    {
-        $dataArray = array("success" => 0);
-        switch ($ajaxAction) {
-            case "permissionratio":
-                $bundle         = InputHelper::clean($request->query->get('bundle'));
-                $rawPermissions = $this->request->request->get('role[permissions]', null, true);
-                $permissions = array();
-                foreach ($rawPermissions as $key => $perm) {
-                    if (strpos($key, $bundle.':') === false)
-                        continue;
-
-                    list($ignore, $level) = explode(':', $key);
-                    $permissions[$level] = $perm;
-                }
-
-                $permClass = $this->get('mautic.security')->getPermissionObject($bundle);
-                list($granted, $ignore) = $permClass->getPermissionRatio($permissions);
-                $dataArray = array("granted" => $granted);
-            break;
-        }
-        $response  = new JsonResponse();
-        $response->setData($dataArray);
-
-        return $response;
     }
 }

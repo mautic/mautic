@@ -62,7 +62,7 @@ var Mautic = {
     /**
      * Initiate various functions on page load, manual or ajax
      */
-    onPageLoad: function (container) {
+    onPageLoad: function (container, response) {
         container = typeof container !== 'undefined' ? container : 'body';
 
         //initiate links
@@ -101,7 +101,7 @@ var Mautic = {
 
         //run specific on loads
         if (typeof Mautic[mauticContent + "OnLoad"] == 'function') {
-            Mautic[mauticContent + "OnLoad"](container);
+            Mautic[mauticContent + "OnLoad"](container, response);
         }
 
         if (container == 'body') {
@@ -143,9 +143,15 @@ var Mautic = {
     /**
      * Functions to be ran on ajax page unload
      */
-    onPageUnload: function (container) {
+    onPageUnload: function (container, response) {
         container = typeof container !== 'undefined' ? container : 'body';
         $(container + " *[data-toggle='tooltip']").tooltip('destroy');
+
+
+        //run specific unloads
+        if (typeof Mautic[mauticContent + "OnUnload"] == 'function') {
+            Mautic[mauticContent + "OnUnload"](container, response);
+        }
     },
 
     /**
@@ -169,9 +175,9 @@ var Mautic = {
                 if (response) {
                     if (mainContentOnly) {
                         if (response.newContent) {
-                            Mautic.onPageUnload('.main-panel-content');
+                            Mautic.onPageUnload('.main-panel-content', response);
                             $(".main-panel-content").html(response.newContent);
-                            Mautic.onPageLoad('.main-panel-content');
+                            Mautic.onPageLoad('.main-panel-content', response);
                         }
                     } else {
                         //set route and activeLink if the response didn't override
@@ -328,7 +334,7 @@ var Mautic = {
             }
 
             //active tooltips, etc
-            Mautic.onPageLoad(response.target);
+            Mautic.onPageLoad(response.target, response);
         }
     },
 
@@ -339,9 +345,9 @@ var Mautic = {
      */
     processContentSection: function (response) {
         if (response.target && response.newContent) {
-            Mautic.onPageUnload(response.target);
+            Mautic.onPageUnload(response.target, response);
             $(response.target).html(response.newContent);
-            Mautic.onPageLoad(response.target);
+            Mautic.onPageLoad(response.target, response);
         }
     },
 

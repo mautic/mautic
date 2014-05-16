@@ -248,4 +248,30 @@ class CorePermissions {
             return false;
         }
     }
+
+    /**
+     * Retrieves all permissions
+     *
+     * @param  boolean  $forJs
+     * @return array
+     */
+    public function getAllPermissions($forJs = false)
+    {
+        $permissionObjects = $this->getPermissionObjects();
+        $permissions = array();
+        foreach ($permissionObjects as $object) {
+            $perms = $object->getPermissions();
+            if ($forJs) {
+                foreach ($perms as $level => $perm) {
+                    $levelPerms = array_keys($perm);
+                    $object->parseForJavascript($levelPerms);
+                    $permissions[$object->getName()][$level] = $levelPerms;
+                }
+            } else {
+                $permissions[$object->getName()] = $perms;
+            }
+
+        }
+        return $permissions;
+    }
 }

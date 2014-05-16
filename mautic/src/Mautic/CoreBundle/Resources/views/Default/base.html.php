@@ -66,9 +66,9 @@ $activePanelClasses  = ($app->getSession()->get('left-panel', 'default') == 'unp
         <?php endforeach; ?>
         <script type="text/javascript">
             Mautic.onPageLoad();
-        <?php $view['slots']->output("jsDeclarations"); ?>
-        <?php if ($app->getEnvironment() === "dev"): ?>
-            $( document ).ajaxComplete(function(event, XMLHttpRequest, ajaxOption){
+            <?php $view['slots']->output("jsDeclarations"); ?>
+            <?php if ($app->getEnvironment() === "dev"): ?>
+                $( document ).ajaxComplete(function(event, XMLHttpRequest, ajaxOption){
                 if(XMLHttpRequest.getResponseHeader('x-debug-token')) {
                     $('.sf-toolbarreset').remove();
                     $.get(mauticBaseUrl +'_wdt/'+XMLHttpRequest.getResponseHeader('x-debug-token'),function(data){
@@ -76,7 +76,7 @@ $activePanelClasses  = ($app->getSession()->get('left-panel', 'default') == 'unp
                     });
                 }
             });
-        <?php endif; ?>
+            <?php endif; ?>
         </script>
         <?php $view['slots']->output('modal'); ?>
     </body>
