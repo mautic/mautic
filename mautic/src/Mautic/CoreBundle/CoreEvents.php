@@ -22,6 +22,16 @@ final class CoreEvents
     const BUILD_MENU = 'mautic.build_menu';
 
     /**
+     * The mautic.build_admin_menu event is thrown to render admin menu items.
+     *
+     * The event listener receives a
+     * Mautic\CoreBundle\Event\MenuEvent instance.
+     *
+     * @var string
+     */
+    const BUILD_ADMIN_MENU = 'mautic.build_admin_menu';
+
+    /**
      * The mautic.build_route event is thrown to build Mautic bundle routes
      *
      * The event listener receives a

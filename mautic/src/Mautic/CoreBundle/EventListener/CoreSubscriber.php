@@ -32,9 +32,10 @@ class CoreSubscriber extends CommonSubscriber
     static public function getSubscribedEvents()
     {
         return array(
-            KernelEvents::CONTROLLER => array('onKernelController', 0),
-            CoreEvents::BUILD_MENU   => array('onBuildMenu', 9999),
-            CoreEvents::BUILD_ROUTE  => array('onBuildRoute', 0)
+            KernelEvents::CONTROLLER        => array('onKernelController', 0),
+            CoreEvents::BUILD_MENU          => array('onBuildMenu', 9999),
+            CoreEvents::BUILD_ADMIN_MENU    => array('onBuildAdminMenu', 9999),
+            CoreEvents::BUILD_ROUTE         => array('onBuildRoute', 0)
         );
     }
 
@@ -88,7 +89,17 @@ class CoreSubscriber extends CommonSubscriber
      */
     public function onBuildMenu(MenuEvent $event)
     {
-        $path = __DIR__ . "/../Resources/config/menu.php";
+        $path = __DIR__ . "/../Resources/config/menu/main.php";
+        $items = include $path;
+        $event->addMenuItems($items);
+    }
+
+    /**
+     * @param MenuEvent $event
+     */
+    public function onBuildAdminMenu(MenuEvent $event)
+    {
+        $path = __DIR__ . "/../Resources/config/menu/admin.php";
         $items = include $path;
         $event->addMenuItems($items);
     }

@@ -71,6 +71,13 @@ class MenuRenderer implements RendererInterface {
             $html = $this->engine->render("MauticCoreBundle:Menu:breadcrumbs.html.php", array(
                 "crumbs"  => $manipulator->getBreadcrumbsArray($item)
             ));
+        } elseif ($options["menu"] == "admin") {
+            //render html
+            $html = $this->engine->render("MauticCoreBundle:Menu:admin.html.php", array(
+                "item"    => $item,
+                "options" => $options,
+                "matcher" => $this->matcher
+            ));
         } else {
             //render html
             $html = $this->engine->render("MauticCoreBundle:Menu:main.html.php", array(

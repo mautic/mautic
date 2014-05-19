@@ -8,12 +8,8 @@
  */
 
 $items = array(
-    'name'               => 'root',
-    'childrenAttributes' => array(
-        "class" => "side-panel-nav margin-none padding-none",
-        "role"  => "navigation"
-    ),
-    'children'           => array()
+    'name'      => 'root',
+    'children'  => array()
 );
 
 return $items;

@@ -32,6 +32,7 @@ class UserSubscriber extends CommonSubscriber
     {
         return array(
             CoreEvents::BUILD_MENU          => array('onBuildMenu', 9997),
+            CoreEvents::BUILD_ADMIN_MENU    => array('onBuildAdminMenu', 9997),
             CoreEvents::BUILD_ROUTE         => array('onBuildRoute', 0),
             CoreEvents::GLOBAL_SEARCH       => array('onGlobalSearch', 0),
             CoreEvents::BUILD_COMMAND_LIST  => array('onBuildCommandList', 0),
@@ -50,7 +51,17 @@ class UserSubscriber extends CommonSubscriber
      */
     public function onBuildMenu(MauticEvents\MenuEvent $event)
     {
-        $path = __DIR__ . "/../Resources/config/menu.php";
+        $path = __DIR__ . "/../Resources/config/menu/main.php";
+        $items = include $path;
+        $event->addMenuItems($items);
+    }
+
+    /**
+     * @param MenuEvent $event
+     */
+    public function onBuildAdminMenu(MauticEvents\MenuEvent $event)
+    {
+        $path = __DIR__ . "/../Resources/config/menu/admin.php";
         $items = include $path;
         $event->addMenuItems($items);
     }

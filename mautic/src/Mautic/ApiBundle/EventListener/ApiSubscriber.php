@@ -53,7 +53,8 @@ class ApiSubscriber implements EventSubscriberInterface
     {
         return array(
             CoreEvents::BUILD_MENU          => array('onBuildMenu', 9998),
-            CoreEvents::BUILD_ROUTE         => array('onBuildRoute', 0),
+            CoreEvents::BUILD_ADMIN_MENU    => array('onBuildAdminMenu', 9996),
+            CoreEvents::BUILD_ROUTE         => array('onBuildRoute', 5),
             CoreEvents::GLOBAL_SEARCH       => array('onGlobalSearch', 0),
             CoreEvents::BUILD_COMMAND_LIST  => array('onBuildCommandList', 0),
             ApiEvents::CLIENT_PRE_SAVE      => array('onClientPreSave', 0),
@@ -67,7 +68,17 @@ class ApiSubscriber implements EventSubscriberInterface
      */
     public function onBuildMenu (MauticEvents\MenuEvent $event)
     {
-        $path  = __DIR__ . "/../Resources/config/menu.php";
+        $path  = __DIR__ . "/../Resources/config/menu/main.php";
+        $items = include $path;
+        $event->addMenuItems($items);
+    }
+
+    /**
+     * @param MenuEvent $event
+     */
+    public function onBuildAdminMenu (MauticEvents\MenuEvent $event)
+    {
+        $path  = __DIR__ . "/../Resources/config/menu/admin.php";
         $items = include $path;
         $event->addMenuItems($items);
     }

@@ -10,7 +10,11 @@
 ?>
 
 <?php if ($item->hasChildren() && $options["depth"] !== 0 && $item->getDisplayChildren()): ?>
+    <?php if ($item->isRoot()): ?>
+    <ul class="side-panel-nav margin-none padding-none" role="navigation">
+    <?php else: ?>
     <ul<?php echo $view["menu_helper"]->parseAttributes($item->getChildrenAttributes()); //convert array to name="value" ?>>
+    <?php endif; ?>
         <?php foreach ($item->getChildren() as $child):
             if (!$child->isDisplayed()) continue; ?>
             <?php $view["menu_helper"]->buildClasses($child, $matcher, $options); //builds the class attributes based on options ?>

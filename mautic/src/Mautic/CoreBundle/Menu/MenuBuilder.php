@@ -76,7 +76,7 @@ class MenuBuilder extends ContainerAware
             $loader = new ArrayLoader($this->factory);
 
             //dispatch the MENU_BUILD event to retrieve bundle menu items
-            $event      = new MenuEvent();
+            $event      = new MenuEvent($this->securityContext, $this->mauticSecurity);
             $this->container->get('event_dispatcher')->dispatch(CoreEvents::BUILD_MENU, $event);
             $menuItems  = $event->getMenuItems();
             $menu       = $loader->load($menuItems);
@@ -85,22 +85,51 @@ class MenuBuilder extends ContainerAware
     }
 
     /**
+     * Generate admin menu navigation object
+     *
+     * @param Request $request
+     * @return \Knp\Menu\ItemInterface
+     */
+    public function adminMenu(Request $request)
+    {
+        static $adminMenu;
+
+        if (empty($adminMenu)) {
+            $loader = new ArrayLoader($this->factory);
+
+            //dispatch the MENU_BUILD event to retrieve bundle menu items
+            $event      = new MenuEvent($this->securityContext, $this->mauticSecurity);
+            $this->container->get('event_dispatcher')->dispatch(CoreEvents::BUILD_ADMIN_MENU, $event);
+            $menuItems  = $event->getMenuItems();
+            $adminMenu  = $loader->load($menuItems);
+        }
+        return $adminMenu;
+    }
+
+    /**
      * Converts navigation object into breadcrumbs
      *
      * @param Request $request
      */
     public function breadcrumbsMenu(Request $request) {
-        $menu = $this->mainMenu($request);
+        $menu  = $this->mainMenu($request);
 
         //check for overrideRoute in request from an ajax content request
         $forRouteUri  = $request->get("overrideRouteUri", "current");
         $forRouteName = $request->get("overrideRouteName", '');
-        $current     = $this->getCurrentMenuItem($menu, $forRouteUri, $forRouteName);
+        $current      = $this->getCurrentMenuItem($menu, $forRouteUri, $forRouteName);
 
+        //if empty, check the admin menu
         if (empty($current)) {
-            //current is root
+            $admin   = $this->adminMenu($request);
+            $current = $this->getCurrentMenuItem($admin, $forRouteUri, $forRouteName);
+        }
+
+        //if still empty, default to root
+        if (empty($current)) {
             $current = $menu->getRoot();
         }
+
         return $current;
     }
 

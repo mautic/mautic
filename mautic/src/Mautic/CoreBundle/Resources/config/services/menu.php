@@ -76,3 +76,17 @@ $container->setDefinition('mautic.menu_breadcrumbs',
     ->setFactoryMethod('breadcrumbsMenu')
     ->setScope('request')
     ->addTag('knp_menu.menu', array('alias' => 'breadcrumbs'));
+
+//Admin menu
+$container->setDefinition('mautic.menu_admin',
+    new Definition(
+        'Knp\Menu\MenuItem',
+        array(
+            new Reference('request')
+        )
+    )
+)
+    ->setFactoryService('mautic.menu_builder')
+    ->setFactoryMethod('adminMenu')
+    ->setScope('request')
+    ->addTag('knp_menu.menu', array('alias' => 'admin'));

@@ -9,7 +9,9 @@
 
 namespace Mautic\CoreBundle\Event;
 
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\Security\Core\SecurityContext;
 
 /**
  * Class MenuEvent
@@ -23,12 +25,42 @@ class MenuEvent extends Event
      */
     protected $menuItems = array('children' => array());
 
+    protected $securityContext;
+
+    protected $mauticSecurity;
+
+    /**
+     * @param $securityContext
+     * @param $mauticSecurity
+     */
+    public function __construct(SecurityContext $securityContext, CorePermissions $mauticSecurity)
+    {
+        $this->security       = $securityContext;
+        $this->mauticSecurity = $mauticSecurity;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSecurityContext()
+    {
+        return $this->security;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getMauticSecurity()
+    {
+        return $this->mauticSecurity;
+    }
+
     /**
      * Add items to the menu
      */
     public function addMenuItems(array $items)
     {
-        if (isset($items['name']) && $items['name'] == 'root') {
+        if (isset($items['name']) && ($items['name'] == 'root' || $items['name'] == 'admin')) {
             //make sure the root does not override the children
             if (isset($this->menuItems['children'])) {
                 if (isset($items['children'])) {
