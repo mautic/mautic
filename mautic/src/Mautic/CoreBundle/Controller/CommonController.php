@@ -83,7 +83,7 @@ class CommonController extends Controller implements EventsController {
      */
     public function removeTrailingSlashAction(Request $request)
     {
-        $pathInfo = $request->getPathInfo();
+        $pathInfo   = $request->getPathInfo();
         $requestUri = $request->getRequestUri();
 
         $url = str_replace($pathInfo, rtrim($pathInfo, ' /'), $requestUri);

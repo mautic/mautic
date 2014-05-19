@@ -57,4 +57,7 @@ $apiRoute = $loader->import('mautic.api', 'mautic.api');
 $apiRoute->addPrefix('/api');
 $collection->addCollection($apiRoute);
 
+$apiDocs = $loader->import('mautic.api_docs', 'mautic.api_docs');
+$collection->addCollection($apiDocs);
+
 return $collection;

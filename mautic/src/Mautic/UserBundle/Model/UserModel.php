@@ -155,17 +155,18 @@ class UserModel extends FormModel
      *
      * @param $type
      * @param $filter
+     * @param $limit
      * @return array
      */
-    public function getLookupResults($type, $filter = '')
+    public function getLookupResults($type, $filter = '', $limit = 10)
     {
         $results = array();
         switch ($type) {
             case 'role':
-                $results = $this->em->getRepository('MauticUserBundle:Role')->getRoleList($filter, 10);
+                $results = $this->em->getRepository('MauticUserBundle:Role')->getRoleList($filter, $limit);
                 break;
             case 'position':
-                $results = $this->em->getRepository('MauticUserBundle:User')->getPositionList($filter, 10);
+                $results = $this->em->getRepository('MauticUserBundle:User')->getPositionList($filter, $limit);
                 break;
         }
 

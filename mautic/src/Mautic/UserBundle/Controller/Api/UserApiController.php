@@ -198,15 +198,13 @@ class UserApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        if (!$entity) {
-            if ($method === "PATCH") {
-                //PATCH requires that an entity exists
+        if ($entity === null) {
+            if ($method === "PATCH" ||
+                ($method === "PUT" && !$this->container->get('mautic.security')->isGranted('user:users:create'))
+            ) {
+                //PATCH requires that an entity exists or must have create access for PUT
                 throw new NotFoundHttpException($this->get('translator')->trans('mautic.api.call.notfound'));
             } else {
-                //PUT can create a new entity if it doesn't exist
-                if (!$this->container->get('mautic.security')->isGranted('user:users:create')) {
-                    return $this->accessDenied();
-                }
                 $entity = $this->model->getEntity();
                 if (isset($parameters['plainPassword']['password'])) {
                     $submittedPassword = $parameters['plainPassword']['password'];
@@ -280,13 +278,16 @@ class UserApiController extends CommonApiController
         return $this->handleView($view);
     }
 
-
     /**
      * Obtains a list of roles for user edits
      *
      * @ApiDoc(
      *   section = "Users",
      *   description = "Obtains a list of available roles for users",
+     *   filters={
+     *      {"name"="filter", "dataType"="string", "required"=false, "description"="A string in which to filter the results by."},
+     *      {"name"="limit", "dataType"="integer", "required"=false, "description"="Limit the number of records to retrieve."},
+     *   },
      *   statusCodes = {
      *     200 = "Returned when successful"
      *   }
@@ -303,7 +304,9 @@ class UserApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $roles = $this->container->get('mautic.model.role')->getUserRoleList();
+        $filter = $this->request->query->get('filter', null);
+        $limit  = $this->request->query->get('limit', null);
+        $roles = $this->container->get('mautic.model.user')->getLookupResults('role', $filter, $limit);
 
         $view = $this->view($roles, Codes::HTTP_OK);
         $context = SerializationContext::create()->setGroups(array('limited'));

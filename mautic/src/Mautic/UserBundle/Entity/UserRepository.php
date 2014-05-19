@@ -70,14 +70,18 @@ class UserRepository extends CommonRepository
      * @param string $search
      * @param int    $limit
      * @param int    $start
+     * @param array  $permissionLimiter
      * @return array
      */
-    public function getUserList($search = '', $limit = 10, $start = 0)
+    public function getUserList($search = '', $limit = 10, $start = 0, $permissionLimiter = array())
     {
         $q = $this->_em->createQueryBuilder();
 
         $q->select('partial u.{id, firstName, lastName}')
-            ->from('MauticUserBundle:User', 'u');
+            ->from('MauticUserBundle:User', 'u')
+            ->leftJoin('u.role', 'r')
+            ->leftJoin('r.permissions', 'p');
+
         if (!empty($search)) {
             $q->where(
                 $q->expr()->orX(
@@ -95,6 +99,24 @@ class UserRepository extends CommonRepository
                 )
             )
             ->setParameter('search', "{$search}%");
+        }
+
+        if (!empty($permissionLimiter)) {
+            //only get users with a role that has some sort of access to set permissions
+            $expr = $q->expr()->andX();
+            foreach ($permissionLimiter as $bundle => $level) {
+                $expr->add(
+                    $q->expr()->andX(
+                        $q->expr()->eq('p.bundle', $q->expr()->literal($bundle)),
+                        $q->expr()->eq('p.name', $q->expr()->literal($level))
+                    )
+                );
+            }
+            $expr = $q->expr()->orX(
+                $q->expr()->eq('r.isAdmin', true),
+                $expr
+            );
+            $q->andWhere($expr);
         }
 
         $q->orderBy('u.firstName, u.lastName');

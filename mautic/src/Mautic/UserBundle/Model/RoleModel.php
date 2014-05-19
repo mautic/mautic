@@ -175,14 +175,4 @@ class RoleModel extends FormModel
 
         return $event;
     }
-
-    /**
-     * Obtains a list of roles for user forms
-     *
-     * @return array
-     */
-    public function getUserRoleList()
-    {
-        return $this->em->getRepository($this->repository)->findAll(array(), 'r.name');
-    }
 }

@@ -10,6 +10,7 @@
 namespace Mautic\UserBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticWebTestCase;
+use Mautic\UserBundle\Entity\Role;
 
 /**
  * Class RoleControllerTest
@@ -22,26 +23,29 @@ class RoleControllerTest extends MauticWebTestCase
 
     private function createRole()
     {
-        $crawler = $this->client->request('GET', '/roles/new');
+        $role = new Role();
+        $unique = uniqid();
+        $role->setName($unique);
+        $role->setDescription('Functional Test');
+        $role->setIsAdmin(false);
 
-        //let's try creating a user
-        $form = $crawler->selectButton('role[save]')->form();
+        //set permissions if applicable and if the user is not an admin
+        $permissions = $this->container->get('mautic.security')->generatePermissions(array(
+            'api:access' => array('full'),
+            'user:users' => array('view', 'edit', 'create')
+        ));
 
-        // set some values
-        $unique                    = uniqid();
-        $form['role[name]']        = $unique;
-        $form['role[description]'] = 'Functional Test';
-        $form['role[isAdmin]']     = 0;
-        $form['role[permissions][api:access][1]']->tick();
-        $form['role[permissions][user:users][0]']->tick();
+        foreach ($permissions as $permissionEntity) {
+            $role->addPermission($permissionEntity);
+        }
 
-        // submit the form
-        $crawler = $this->client->submit($form);
+        $this->em->persist($role);
+        $this->em->flush();
 
         $role = $this->em
             ->getRepository('MauticUserBundle:Role')
             ->findOneByName($unique);
-        return array($role, $crawler);
+        return $role;
     }
 
     public function testIndex()
@@ -76,7 +80,19 @@ class RoleControllerTest extends MauticWebTestCase
             $crawler->filter('#role_name')->count()
         );
 
-        list($role, $crawler) = $this->createRole();
+        //let's try creating a user
+        $form = $crawler->selectButton('role[save]')->form();
+
+        // set some values
+        $unique                    = uniqid();
+        $form['role[name]']        = $unique;
+        $form['role[description]'] = 'Functional Test';
+        $form['role[isAdmin]']     = 0;
+        $form['role[permissions][api:access][0]']->tick();
+        $form['role[permissions][user:users][0]']->tick();
+
+        // submit the form
+        $crawler = $this->client->submit($form);
 
         $this->assertRegExp(
             '/mautic.user.role.notice.created/',
@@ -91,7 +107,7 @@ class RoleControllerTest extends MauticWebTestCase
 
     public function testEdit()
     {
-        list($role, $crawler) = $this->createRole();
+        $role = $this->createRole();
 
         $crawler = $this->client->request('GET', '/roles/edit/' . $role->getId());
 
@@ -126,7 +142,7 @@ class RoleControllerTest extends MauticWebTestCase
 
     public function testDelete()
     {
-        list($role, $crawler) = $this->createRole();
+        $role = $this->createRole();
 
         //ensure we are redirected to list as get should not be allowed
         $crawler = $this->client->request('GET', '/roles/delete/' . $role->getId());
@@ -145,7 +161,7 @@ class RoleControllerTest extends MauticWebTestCase
         );
 
         //make sure ACL is working
-        list($role, $crawler) = $this->createRole();
+        $role   = $this->createRole();
         $client = $this->getNonAdminClient();
         $client->request('POST', '/roles/delete/' . $role->getId());
         $this->assertEquals(302, $client->getResponse()->getStatusCode());

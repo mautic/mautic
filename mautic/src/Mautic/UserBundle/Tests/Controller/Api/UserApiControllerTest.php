@@ -66,6 +66,7 @@ class UserApiControllerTest extends MauticWebTestCase
 
         $content = $response->getContent();
         $decoded = json_decode($content, true);
+
         $this->assertTrue(isset($decoded['users']) && count($decoded['users'] > 0), 'No users found.');
     }
 
@@ -174,6 +175,7 @@ class UserApiControllerTest extends MauticWebTestCase
 
         //assert the item returned is the same as sent
         $decoded = json_decode($response->getContent(), true);
+
         $this->assertEquals(
             $decoded['user']['id'],
             $entity->getId()
@@ -390,5 +392,26 @@ class UserApiControllerTest extends MauticWebTestCase
             ->findOneByUsername($entity->getUsername());
 
         $this->assertTrue(!$user);
+    }
+
+    public function testRoleList()
+    {
+        $token  = $this->getOAuthAccessToken();
+        $crawler  = $this->client->request('GET',
+            '/api/users/roles.json?access_token='.$token
+        );
+        $response = $this->client->getResponse();
+        //should be JSON content
+        $this->assertContentType($response);
+
+        $this->assertNoError($response, $crawler);
+
+        //assert the item returned is the same as sent
+        $decoded = json_decode($response->getContent(), true);
+
+        $this->assertTrue(
+            (is_array($decoded) && count($decoded) > 0),
+            'Seems that something is corrupt with the role list'
+        );
     }
 }

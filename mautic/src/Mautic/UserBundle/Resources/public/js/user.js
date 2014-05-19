@@ -155,4 +155,3 @@ Mautic.onPermissionChange = function (container, event, bundle) {
         }
     }, 10);
 };
-

@@ -10,11 +10,21 @@
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-
 //API Route Loader
 $container->setDefinition ('mautic.api_route_loader',
     new Definition(
         'Mautic\ApiBundle\Routing\RouteLoader',
+        array(
+            new Reference('service_container')
+        )
+    )
+)
+    ->addTag('routing.loader');
+
+//API docs loader
+$container->setDefinition ('mautic.api_docs_route_loader',
+    new Definition(
+        'Mautic\ApiBundle\Routing\ApiDocsLoader',
         array(
             new Reference('service_container')
         )

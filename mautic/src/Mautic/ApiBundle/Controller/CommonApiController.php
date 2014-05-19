@@ -108,7 +108,7 @@ class CommonApiController extends FOSRestController implements EventsController
         );
 
         $results = $this->model->getEntities($args);
-        //we have to conver them from paginated proxy functions to entities in order for them to be
+        //we have to convert them from paginated proxy functions to entities in order for them to be
         //returned by the serializer/rest bundle
         $entities = array();
         foreach ($results as $r) {
@@ -269,7 +269,7 @@ class CommonApiController extends FOSRestController implements EventsController
 
         if ($form->isValid()) {
             $entity = $this->model->saveEntity($entity);
-
+            $this->postProcessForm($entity);
             $headers = array();
             //return the newly created entities location if applicable
             if (Codes::HTTP_CREATED === $statusCode) {
@@ -288,6 +288,14 @@ class CommonApiController extends FOSRestController implements EventsController
         }
 
         return $this->handleView($view);
+    }
+
+    /*
+     * Give the controller an opportunity to process the entity before sending it as a response
+     */
+    protected function postProcessForm(&$entity)
+    {
+        //...
     }
 
     /**

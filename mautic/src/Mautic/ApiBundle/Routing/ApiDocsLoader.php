@@ -17,15 +17,14 @@ use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\DependencyInjection\Container;
 
 /**
- * Class RouteLoader
+ * Class ApiDocsLoader
  *
  * @package Mautic\ApiBundle\Routing
  */
 
-class RouteLoader extends Loader
+class ApiDocsLoader extends Loader
 {
-    private   $loaded    = false;
-    protected $bundles   = array();
+    private $loaded = false;
 
     /**
      * @param Container $container
@@ -36,8 +35,6 @@ class RouteLoader extends Loader
     }
 
     /**
-     * Load each bundles routing.php file
-     *
      * @param mixed $resource
      * @param null  $type
      * @return RouteCollection
@@ -46,17 +43,19 @@ class RouteLoader extends Loader
     public function load($resource, $type = null)
     {
         if (true === $this->loaded) {
-            throw new \RuntimeException('Do not add the "mautic.api" loader twice');
+            throw new \RuntimeException('Do not add the "mautic.api_docs" loader twice');
         }
 
         $collection = new RouteCollection();
-        if ($this->container->getParameter('mautic.api_enabled')) {
-            $event = new RouteEvent($this, $collection);
-            $this->container->get('event_dispatcher')->dispatch(ApiEvents::BUILD_ROUTE, $event);
+
+        if ($this->container->getParameter("kernel.environment") == 'dev') {
+            //Load API doc routing
+            $apiDoc = $this->import("@NelmioApiDocBundle/Resources/config/routing.yml");
+            $apiDoc->addPrefix('/docs/api');
+            $collection->addCollection($apiDoc);
         }
 
         $this->loaded = true;
-
 
         return $collection;
     }
@@ -68,6 +67,6 @@ class RouteLoader extends Loader
      */
     public function supports($resource, $type = null)
     {
-        return 'mautic.api' === $type;
+        return 'mautic.api_docs' === $type;
     }
 }
