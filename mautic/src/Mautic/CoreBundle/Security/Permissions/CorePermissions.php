@@ -274,4 +274,24 @@ class CorePermissions {
         }
         return $permissions;
     }
+
+    /**
+     * Is the user an admin?
+     *
+     * @return mixed
+     */
+    public function isAdmin()
+    {
+        return $this->securityContext->getToken()->getUser()->getRole()->isAdmin();
+    }
+
+    /**
+     * Proxy function to get currently logged in user
+     *
+     * @return mixed
+     */
+    public function getCurrentUser()
+    {
+        return $this->securityContext->getToken()->getUser();
+    }
 }

@@ -61,6 +61,64 @@ class FormModel extends CommonModel
     }
 
     /**
+     * Lock an entity to prevent multiple people from editing
+     *
+     * @param $entity
+     */
+    public function lockEntity($entity)
+    {
+        //unlock the row if applicable
+        if (method_exists($entity, 'setCheckedOut')) {
+            $entity->setCheckedOut(new \DateTime());
+            $entity->setCheckedOutBy($this->container->get('security.context')->getToken()->getUser());
+        }
+
+        $this->em
+            ->getRepository($this->repository)
+            ->saveEntity($entity);
+    }
+
+    /**
+     * Check to see if the entity is locked
+     *
+     * @param $entity
+     * @return bool
+     */
+    public function isLocked($entity)
+    {
+        if (method_exists($entity, 'getCheckedOut')) {
+            $checkedOut = $entity->getCheckedOut();
+            if (!empty($checkedOut)) {
+                //is it checked out by the current user?
+                $checkedOutBy = $entity->getCheckedOutBy();
+                if (!empty($checkedOutBy) && $checkedOutBy->getId() !==
+                    $this->container->get('security.context')->getToken()->getUser()->getId()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Unlock an entity to prevent multiple people from editing
+     *
+     * @param $entity
+     */
+    public function unlockEntity($entity)
+    {
+        //unlock the row if applicable
+        if (method_exists($entity, 'setCheckedOut')) {
+            $entity->setCheckedOut(null);
+            $entity->setCheckedOutBy(null);
+        }
+
+        $this->em
+            ->getRepository($this->repository)
+            ->saveEntity($entity);
+    }
+
+    /**
      * Create/edit entity
      *
      * @param       $entity
@@ -71,9 +129,21 @@ class FormModel extends CommonModel
     {
         $isNew = ($entity->getId()) ? false : true;
 
-        //set the date/time for new submission
-        if (method_exists($entity, 'setDateAdded') && !$entity->getDateAdded()) {
-            $entity->setDateAdded(new \DateTime());
+        //set some defaults
+        if ($isNew) {
+            if (method_exists($entity, 'setCreatedBy' && !$entity->getCreatedBy())) {
+                $entity->setCreatedBy($this->container->get('security.context')->getToken()->getUser());
+            }
+        } else {
+            if (method_exists($entity, 'setModifiedBy') && !$entity->getModifiedBy()) {
+                $entity->setModifiedBy($this->container->get('security.context')->getToken()->getUser());
+            }
+        }
+
+        //unlock the row if applicable
+        if (method_exists($entity, 'setCheckedOut')) {
+            $entity->setCheckedOut(null);
+            $entity->setCheckedOutBy(null);
         }
 
         $event = $this->dispatchEvent("pre_save", $entity, $isNew);
@@ -123,5 +193,31 @@ class FormModel extends CommonModel
     protected function dispatchEvent($action, &$entity, $isNew = false, $event = false)
     {
         //...
+    }
+
+    /**
+     * Set default subject for user contact form
+     *
+     * @param $subject
+     * @param $entity
+     * @return mixed
+     */
+    public function getUserContactSubject($subject, $entity)
+    {
+        switch ($subject) {
+            case 'locked':
+                $msg = 'mautic.user.user.contact.locked';
+                break;
+            default:
+                $msg = 'mautic.user.user.contact.regarding';
+                break;
+        }
+
+        $subject = $this->container->get('translator')->trans($msg, array(
+            '%entityName%' => $entity->getName(),
+            '%entityId%'   => $entity->getId()
+        ));
+
+        return $subject;
     }
 }

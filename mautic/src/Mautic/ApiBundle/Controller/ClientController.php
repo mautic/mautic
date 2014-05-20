@@ -72,7 +72,6 @@ class ClientController extends FormController
                 'contentTemplate' => 'MauticApiBundle:Client:index',
                 'passthroughVars' => array(
                     'activeLink'    => '#mautic_client_index',
-                    'route'         => $returnUrl,
                     'mauticContent' => 'client'
                 )
             ));
@@ -152,7 +151,6 @@ class ClientController extends FormController
             'returnUrl'       => $returnUrl,
             'contentTemplate' => 'MauticUserBundle:Profile:index',
             'passthroughVars' => array(
-                'route'         => $returnUrl,
                 'success'       => $success,
                 'mauticContent' => 'client'
             ),
@@ -202,7 +200,6 @@ class ClientController extends FormController
                     'contentTemplate' => 'MauticApiBundle:Client:index',
                     'passthroughVars' => array(
                         'activeLink'    => '#mautic_client_index',
-                        'route'         => $returnUrl,
                         'mauticContent' => 'client'
                     ),
                     'flashes'         =>
@@ -246,25 +243,33 @@ class ClientController extends FormController
         $client    = $model->getEntity($objectId);
         $returnUrl = $this->generateUrl('mautic_client_index');
 
+        $postActionVars = array(
+            'returnUrl'       => $returnUrl,
+            'contentTemplate' => 'MauticApiBundle:Client:index',
+            'passthroughVars' => array(
+                'activeLink'    => '#mautic_client_index',
+                'mauticContent' => 'client'
+            )
+        );
+
         //client not found
         if ($client === null) {
-            return $this->postActionRedirect(array(
-                'returnUrl'       => $returnUrl,
-                'contentTemplate' => 'MauticApiBundle:Client:index',
-                'passthroughVars' => array(
-                    'activeLink'    => '#mautic_client_index',
-                    'route'         => $returnUrl,
-                    'mauticContent' => 'client'
-                ),
-                'flashes'         =>array(
-                    array(
-                        'type' => 'error',
-                        'msg'  => 'mautic.api.client.error.notfound',
-                        'msgVars' => array('%id%' => $objectId)
-                    )
+            return $this->postActionRedirect(
+                array_merge($postActionVars, array(
+                    'flashes'         =>array(
+                        array(
+                            'type' => 'error',
+                            'msg'  => 'mautic.api.client.error.notfound',
+                            'msgVars' => array('%id%' => $objectId)
+                        )
+                    ))
                 )
-            ));
+            );
+        } elseif ($model->isLocked($client)) {
+            //deny access if the entity is locked
+            return $this->isLocked($postActionVars, $client, 'client');
         }
+
         $action = $this->generateUrl('mautic_client_action', array('objectAction' => 'edit', 'objectId' => $objectId));
         $form   = $model->createForm($client, $action);
 
@@ -278,25 +283,27 @@ class ClientController extends FormController
             }
 
             if (!empty($valid)) { //cancelled or success
-
-                return $this->postActionRedirect(array(
-                    'returnUrl'       => $returnUrl,
-                    'contentTemplate' => 'MauticApiBundle:Client:index',
-                    'passthroughVars' => array(
-                        'activeLink'    => '#mautic_client_index',
-                        'route'         => $returnUrl,
-                        'mauticContent' => 'client'
-                    ),
-                    'flashes'         =>
-                        ($valid === 1) ? array( //success
-                            array(
-                                'type' => 'notice',
-                                'msg'  => 'mautic.api.client.notice.updated',
-                                'msgVars' => array('%name%' => $client->getName())
-                            )
-                        ) : array()
-                ));
+                if ($valid === -1) {
+                    //unlock the entity
+                    $model->unlockEntity($client);
+                }
+                return $this->postActionRedirect(
+                    array_merge($postActionVars, array(
+                        'flashes'         =>
+                            ($valid === 1) ? array( //success
+                                array(
+                                    'type' => 'notice',
+                                    'msg'  => 'mautic.api.client.notice.updated',
+                                    'msgVars' => array('%name%' => $client->getName())
+                                )
+                            ) : array()
+                        )
+                    )
+                );
             }
+        } else {
+            //lock the entity
+            $model->lockEntity($client);
         }
 
         return $this->delegateView(array(
@@ -324,6 +331,17 @@ class ClientController extends FormController
         $returnUrl   = $this->generateUrl('mautic_client_index');
         $success     = 0;
         $flashes     = array();
+
+        $postActionVars = array(
+            'returnUrl'       => $returnUrl,
+            'contentTemplate' => 'MauticApiBundle:Client:index',
+            'passthroughVars' => array(
+                'activeLink'    => '#mautic_client_index',
+                'success'       => $success,
+                'mauticContent' => 'client'
+            )
+        );
+
         if ($this->request->getMethod() == 'POST') {
             $model  = $this->container->get('mautic.model.client');
             $entity = $model->getEntity($objectId);
@@ -333,6 +351,9 @@ class ClientController extends FormController
                     'msg'  => 'mautic.api.client.error.notfound',
                     'msgVars' => array('%id%' => $objectId)
                 );
+            } elseif ($model->isLocked($entity)) {
+                //deny access if the entity is locked
+                return $this->isLocked($postActionVars, $entity);
             } else {
                 $model->deleteEntity($entity);
                 $name      = $entity->getName();
@@ -347,16 +368,10 @@ class ClientController extends FormController
             }
         }
 
-        return $this->postActionRedirect(array(
-            'returnUrl'       => $returnUrl,
-            'contentTemplate' => 'MauticApiBundle:Client:index',
-            'passthroughVars' => array(
-                'activeLink'    => '#mautic_client_index',
-                'route'         => $returnUrl,
-                'success'       => $success,
-                'mauticContent' => 'client'
-            ),
-            'flashes'         => $flashes
-        ));
+        return $this->postActionRedirect(
+            array_merge($postActionVars, array(
+                'flashes' => $flashes
+            ))
+        );
     }
 }

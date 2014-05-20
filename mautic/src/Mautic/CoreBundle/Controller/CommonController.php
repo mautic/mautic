@@ -142,6 +142,11 @@ class CommonController extends Controller implements EventsController {
             $contentTemplate = 'Mautic'. $this->request->get('bundle') . 'Bundle:Default:index.html.php';
         }
 
+        //set the route to the returnUrl
+        if (empty($passthrough["route"]) && !empty($args["returnUrl"])) {
+            $passthrough["route"] = $args["returnUrl"];
+        }
+
         if (!empty($passthrough["route"])) {
             //breadcrumbs may fail as it will retrieve the crumb path for currently loaded URI so we must override
             $this->request->query->set("overrideRouteUri", $passthrough["route"]);
@@ -338,9 +343,9 @@ class CommonController extends Controller implements EventsController {
      * @param int $objectId
      * @return Response
      */
-    public function executeAction($objectAction, $objectId = 0) {
+    public function executeAction($objectAction, $objectId = 0, $objectModel = '') {
         if (method_exists($this, "{$objectAction}Action")) {
-            return $this->{"{$objectAction}Action"}($objectId);
+            return $this->{"{$objectAction}Action"}($objectId, $objectModel);
         } else {
             return $this->accessDenied();
         }

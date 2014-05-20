@@ -9,8 +9,8 @@
 namespace Mautic\UserBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\InputHelper;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -20,10 +20,9 @@ use JMS\Serializer\Annotation as Serializer;
  * Class Role
  * @ORM\Table(name="roles")
  * @ORM\Entity(repositoryClass="Mautic\UserBundle\Entity\RoleRepository")
- * @ORM\HasLifecycleCallbacks
  * @Serializer\ExclusionPolicy("all")
  */
-class Role
+class Role extends FormEntity
 {
     /**
      * @ORM\Column(type="integer")
@@ -33,7 +32,7 @@ class Role
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full", "limited"})
      */
-    protected $id;
+    private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -41,7 +40,7 @@ class Role
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full", "limited"})
      */
-    protected $name;
+    private $name;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
@@ -49,7 +48,7 @@ class Role
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full", "limited"})
      */
-    protected $description;
+    private $description;
 
     /**
      * @ORM\Column(name="is_admin", type="boolean")
@@ -57,20 +56,12 @@ class Role
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})
      */
-    protected $isAdmin = false;
-
-    /**
-     * @ORM\Column(name="date_added", type="datetime")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
-     */
-    protected $dateAdded;
+    private $isAdmin = false;
 
     /**
      * @ORM\OneToMany(targetEntity="Permission", mappedBy="role", cascade={"persist", "remove"}, orphanRemoval=true)
      */
-    protected $permissions;
+    private $permissions;
 
     /**
      * @param ClassMetadata $metadata
@@ -174,29 +165,6 @@ class Role
     }
 
     /**
-     * Set dateAdded
-     *
-     * @param \DateTime $dateAdded
-     * @return Role
-     */
-    public function setDateAdded($dateAdded)
-    {
-        $this->dateAdded = $dateAdded;
-
-        return $this;
-    }
-
-    /**
-     * Get dateAdded
-     *
-     * @return \DateTime
-     */
-    public function getDateAdded()
-    {
-        return $this->dateAdded;
-    }
-
-    /**
      * Set isAdmin
      *
      * @param boolean $isAdmin
@@ -227,22 +195,10 @@ class Role
     }
 
     /**
-     * Sets the Date/Time for new entities
-     *
-     * @ORM\PrePersist
-     */
-    public function onPrePersistSetDateAdded()
-    {
-        if (!$this->getId()) {
-            $this->setDateAdded(new \DateTime());
-        }
-    }
-    /**
      * Constructor
      */
     public function __construct()
     {
-        $this->permissions = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->permissions = new ArrayCollection();
     }
-
 }

@@ -172,7 +172,6 @@ class ProfileController extends FormController
                     'returnUrl'       => $returnUrl,
                     'contentTemplate' => 'MauticUserBundle:Profile:index',
                     'passthroughVars' => array(
-                        'route'         => $returnUrl,
                         'mauticContent' => 'user'
                     ),
                     'flashes'         =>

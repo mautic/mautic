@@ -9,17 +9,13 @@
 
 namespace Mautic\UserBundle\Entity;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\Criteria;
-use FOS\OAuthServerBundle\Model\ClientInterface;
+use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\Validator\Constraints as SecurityAssert;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Security\Core\User\AdvancedUserInterface;
 use JMS\Serializer\Annotation as Serializer;
@@ -30,10 +26,9 @@ use JMS\Serializer\Annotation as Serializer;
  * @package Mautic\UserBundle\Entity
  * @ORM\Table(name="users")
  * @ORM\Entity(repositoryClass="Mautic\UserBundle\Entity\UserRepository")
- * @ORM\HasLifecycleCallbacks
  * @Serializer\ExclusionPolicy("all")
  */
-class User implements AdvancedUserInterface, \Serializable
+class User extends FormEntity implements AdvancedUserInterface, \Serializable
 {
     /**
      * @ORM\Column(type="integer")
@@ -43,7 +38,7 @@ class User implements AdvancedUserInterface, \Serializable
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full", "limited"})
      */
-    protected $id;
+    private $id;
 
     /**
      * @ORM\Column(type="string", length=25, unique=true)
@@ -51,24 +46,24 @@ class User implements AdvancedUserInterface, \Serializable
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})
      */
-    protected $username;
+    private $username;
 
     /**
      * @ORM\Column(type="string", length=64)
      */
-    protected $password;
+    private $password;
 
     /**
      * Used for when updating the password
      * @var
      */
-    protected $plainPassword;
+    private $plainPassword;
 
     /**
      * Used for updating account
      * @var
      */
-    protected $currentPassword;
+    private $currentPassword;
 
     /**
      * @ORM\Column(name="first_name",type="string", length=50)
@@ -76,7 +71,7 @@ class User implements AdvancedUserInterface, \Serializable
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full", "limited"})
      */
-    protected $firstName;
+    private $firstName;
 
     /**
      * @ORM\Column(name="last_name", type="string", length=50)
@@ -84,7 +79,7 @@ class User implements AdvancedUserInterface, \Serializable
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full", "limited"})
      */
-    protected $lastName;
+    private $lastName;
 
     /**
      * @ORM\Column(type="string", length=60, unique=true)
@@ -92,7 +87,7 @@ class User implements AdvancedUserInterface, \Serializable
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})
      */
-    protected $email;
+    private $email;
 
     /**
      * @ORM\Column(type="string", length=60, nullable=true)
@@ -100,7 +95,7 @@ class User implements AdvancedUserInterface, \Serializable
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})
      */
-    protected $position;
+    private $position;
 
     /**
      * @ORM\ManyToOne(targetEntity="Role")
@@ -109,7 +104,7 @@ class User implements AdvancedUserInterface, \Serializable
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full", "limited"})
      */
-    protected $role;
+    private $role;
 
     /**
      * @ORM\Column(name="is_active", type="boolean")
@@ -117,15 +112,7 @@ class User implements AdvancedUserInterface, \Serializable
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})
      */
-    protected $isActive = true;
-
-    /**
-     * @ORM\Column(name="date_added", type="datetime")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
-     */
-    protected $dateAdded;
+    private $isActive = true;
 
     /**
      * Stores active role permissions
@@ -134,7 +121,7 @@ class User implements AdvancedUserInterface, \Serializable
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})
      */
-    protected $activePermissions;
+    private $activePermissions;
 
     /**
      * @param ClassMetadata $metadata
@@ -496,29 +483,6 @@ class User implements AdvancedUserInterface, \Serializable
     }
 
     /**
-     * Set dateAdded
-     *
-     * @param \DateTime $dateAdded
-     * @return User
-     */
-    public function setDateAdded($dateAdded)
-    {
-        $this->dateAdded = $dateAdded;
-
-        return $this;
-    }
-
-    /**
-     * Get dateAdded
-     *
-     * @return \DateTime
-     */
-    public function getDateAdded()
-    {
-        return $this->dateAdded;
-    }
-
-    /**
      * @return bool
      */
     public function isAccountNonExpired()
@@ -622,9 +586,6 @@ class User implements AdvancedUserInterface, \Serializable
      */
     public function onPrePersistSetDefaults()
     {
-        if (!$this->getId()) {
-            $this->setDateAdded(new \DateTime());
-        }
         if ($this->getIsActive() === null) {
             $this->setIsActive(true);
         }
@@ -636,5 +597,4 @@ class User implements AdvancedUserInterface, \Serializable
     {
         $this->clients = new \Doctrine\Common\Collections\ArrayCollection();
     }
-
 }

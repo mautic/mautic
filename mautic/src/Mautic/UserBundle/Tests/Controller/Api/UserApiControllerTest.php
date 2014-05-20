@@ -398,7 +398,7 @@ class UserApiControllerTest extends MauticWebTestCase
     {
         $token  = $this->getOAuthAccessToken();
         $crawler  = $this->client->request('GET',
-            '/api/users/roles.json?access_token='.$token
+            '/api/users/list/roles.json?access_token='.$token
         );
         $response = $this->client->getResponse();
         //should be JSON content

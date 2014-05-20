@@ -45,17 +45,7 @@
                     $options["depth"]         = ($options["depth"]) ? $options["depth"]-- : "";
                     $options["matchingDepth"] = ($options["matchingDepth"]) ? $options["matchingDepth"]-- : "";
 
-                    //add on a level class
-                    $levelClass  = $child->getChildrenAttribute("class") . " nav-level nav-level-" . $child->getLevel();
-                    //note if the item has children
-                    if ($isAncestor):
-                        $levelClass .= ($child->hasChildren()) ? " subnav-open" : "";
-                    else:
-                        $levelClass .= ($child->hasChildren()) ? " subnav-closed" : "";
-                    endif;
-                    //set the class
-                    $child->setChildrenAttribute("class", $levelClass);
-                    echo $view->render('MauticCoreBundle:Menu:main.html.php',
+                    echo $view->render('MauticCoreBundle:Menu:admin.html.php',
                         array( "item"             => $child,
                                "options"          => $options,
                                "matcher"          => $matcher

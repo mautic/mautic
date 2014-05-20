@@ -81,7 +81,6 @@ class RoleController extends FormController
                 'contentTemplate' => 'MauticUserBundle:Role:index',
                 'passthroughVars' => array(
                     'activeLink'    => '#mautic_role_index',
-                    'route'         => $returnUrl,
                     'mauticContent' => 'role'
                 )
             ));
@@ -157,7 +156,6 @@ class RoleController extends FormController
                     'contentTemplate' => 'MauticUserBundle:Role:index',
                     'passthroughVars' => array(
                         'activeLink'    => '#mautic_role_index',
-                        'route'         => $returnUrl,
                         'mauticContent' => 'role'
                     ),
                     'flashes'         =>
@@ -212,26 +210,33 @@ class RoleController extends FormController
         //set the return URL
         $returnUrl  = $this->generateUrl('mautic_role_index', array('page' => $page));
 
+        $postActionVars = array(
+            'returnUrl'       => $returnUrl,
+            'viewParameters'  => array('page' => $page),
+            'contentTemplate' => 'MauticUserBundle:Role:index',
+            'passthroughVars' => array(
+                'activeLink'    => '#mautic_role_index',
+                'mauticContent' => 'role'
+            )
+        );
         //user not found
         if ($entity === null) {
-            return $this->postActionRedirect(array(
-                'returnUrl'       => $returnUrl,
-                'viewParameters'  => array('page' => $page),
-                'contentTemplate' => 'MauticUserBundle:Role:index',
-                'passthroughVars' => array(
-                    'activeLink'    => '#mautic_role_index',
-                    'route'         => $returnUrl,
-                    'mauticContent' => 'role'
-                ),
-                'flashes'         => array(
-                    array(
-                        'type' => 'error',
-                        'msg'  => 'mautic.user.role.error.notfound',
-                        'msgVars' => array('%id' => $objectId)
+            return $this->postActionRedirect(
+                array_merge($postActionVars, array(
+                    'flashes' => array(
+                        array(
+                            'type' => 'error',
+                            'msg'  => 'mautic.user.role.error.notfound',
+                            'msgVars' => array('%id' => $objectId)
+                        )
                     )
-                )
-            ));
+                ))
+            );
+        } elseif ($model->isLocked($entity)) {
+            //deny access if the entity is locked
+            return $this->isLocked($postActionVars, $entity, 'role');
         }
+
         $action = $this->generateUrl('mautic_role_action', array('objectAction' => 'edit', 'objectId' => $objectId));
         $form   = $model->createForm($entity, $action);
 
@@ -249,25 +254,27 @@ class RoleController extends FormController
             }
 
             if (!empty($valid)) { //cancelled or success
-                return $this->postActionRedirect(array(
-                    'returnUrl'       => $returnUrl,
-                    'viewParameters'  => array('page' => $page),
-                    'contentTemplate' => 'MauticUserBundle:Role:index',
-                    'passthroughVars' => array(
-                        'activeLink'    => '#mautic_role_index',
-                        'route'         => $returnUrl,
-                        'mauticContent' => 'role'
-                    ),
-                    'flashes'         =>
-                        ($valid === 1) ? array( //success
-                            array(
-                                'type'    => 'notice',
-                                'msg'     => 'mautic.user.role.notice.updated',
-                                'msgVars' => array('%name%' => $entity->getName())
-                            )
-                        ) : array()
-                ));
+                if ($valid === -1) {
+                    //unlock the entity
+                    $model->unlockEntity($entity);
+                }
+
+                return $this->postActionRedirect(
+                    array_merge($postActionVars, array(
+                        'flashes'         =>
+                            ($valid === 1) ? array( //success
+                                array(
+                                    'type'    => 'notice',
+                                    'msg'     => 'mautic.user.role.notice.updated',
+                                    'msgVars' => array('%name%' => $entity->getName())
+                                )
+                            ) : array()
+                    ))
+                );
             }
+        } else {
+            //lock the entity
+            $model->lockEntity($entity);
         }
 
         $formView = $form->createView();
@@ -302,10 +309,21 @@ class RoleController extends FormController
             return $this->accessDenied();
         }
 
-        $page        = $this->get('session')->get('mautic.role.page', 1);
-        $returnUrl   = $this->generateUrl('mautic_role_index', array('page' => $page));
-        $success     = 0;
-        $flashes     = array();
+        $page           = $this->get('session')->get('mautic.role.page', 1);
+        $returnUrl      = $this->generateUrl('mautic_role_index', array('page' => $page));
+        $success        = 0;
+        $flashes        = array();
+        $postActionVars = array(
+            'returnUrl'       => $returnUrl,
+            'viewParameters'  => array('page' => $page),
+            'contentTemplate' => 'MauticUserBundle:Role:index',
+            'passthroughVars' => array(
+                'activeLink'    => '#mautic_role_index',
+                'success'       => $success,
+                'mauticContent' => 'role'
+            )
+        );
+
         if ($this->request->getMethod() == 'POST') {
             try {
                 $model = $this->container->get('mautic.model.role');
@@ -317,6 +335,8 @@ class RoleController extends FormController
                         'msg'  => 'mautic.user.role.error.notfound',
                         'msgVars' => array('%id%' => $objectId)
                     );
+                } elseif ($model->isLocked($entity)) {
+                    return $this->isLocked($postActionVars, $entity);
                 } else {
                     $model->deleteEntity($objectId);
                     $name = $entity->getName();
@@ -338,17 +358,10 @@ class RoleController extends FormController
 
         } //else don't do anything
 
-        return $this->postActionRedirect(array(
-            'returnUrl'       => $returnUrl,
-            'viewParameters'  => array('page' => $page),
-            'contentTemplate' => 'MauticUserBundle:Role:index',
-            'passthroughVars' => array(
-                'activeLink'    => '#mautic_role_index',
-                'route'         => $returnUrl,
-                'success'       => $success,
-                'mauticContent' => 'role'
-            ),
-            'flashes'         => $flashes
-        ));
+        return $this->postActionRedirect(
+            array_merge($postActionVars, array(
+                'flashes'=> $flashes
+            ))
+        );
     }
 }

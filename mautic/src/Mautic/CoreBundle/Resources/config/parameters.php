@@ -8,26 +8,29 @@
  */
 
 $parameters = array(
-    "db_driver"             => "pdo_mysql",
-    "db_host"               => "localhost",
-    "db_port"               => null,
-    "db_name"               => "",
-    "db_user"               => "",
-    "db_password"           => "",
-    "db_table_prefix"       => "",
-    "mailer_transport"      => "mail",
-    "mailer_host"           => "",
-    "mailer_user"           => null,
-    "mailer_password"       => null,
-    "locale"                => "en_US",
-    "secret"                => "",
-    "trusted_hosts"         => null,
-    "trusted_proxies"       => null,
+    'db_driver'             => 'pdo_mysql',
+    'db_host'               => 'localhost',
+    'db_port'               => null,
+    'db_name'               => '',
+    'db_user'               => '',
+    'db_password'           => '',
+    'db_table_prefix'       => '',
+    'mailer_transport'      => 'mail',
+    'mailer_host'           => '',
+    'mailer_user'           => null,
+    'mailer_password'       => null,
+    'locale'                => 'en_US',
+    'secret'                => '',
+    'trusted_hosts'         => null,
+    'trusted_proxies'       => null,
     'rememberme_key'        => '',
     'rememberme_lifetime'   => 31536000, //365 days in seconds
     'rememberme_path'       => '/',
     'rememberme_domain'     => '',
-    "default_pagelimit"     => 30
+    'default_pagelimit'     => 30,
+    'date_format_full'      => 'F j, Y g:i a',
+    'date_format_dateonly'  => 'F j, Y',
+    'date_format_timeonly'  => 'g:i a'
 );
 
 return $parameters;
