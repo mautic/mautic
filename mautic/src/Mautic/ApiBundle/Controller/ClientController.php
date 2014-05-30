@@ -22,10 +22,12 @@ use Mautic\ApiBundle\Form\Type as FormType;
  */
 class ClientController extends FormController
 {
+
     /**
      * Generate's default client list
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @param int $page
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function indexAction($page = 1)
     {

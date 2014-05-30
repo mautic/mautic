@@ -3,3 +3,7 @@
     display: block;
     padding: 8px;
 }
+
+.col-client-id, .col-client-actions {
+    width: 75px;
+}

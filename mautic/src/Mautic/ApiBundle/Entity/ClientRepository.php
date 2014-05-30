@@ -57,13 +57,16 @@ class ClientRepository extends CommonRepository
     {
         $unique  = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
         $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
-        $func    = ($filter->not) ? "notLike" : "like";
-        $xFunc   = ($func == "notLike") ? "andX" : "orX";
 
-        $expr = $q->expr()->$xFunc(
-            $q->expr()->$func('c.name',  ':'.$unique),
-            $q->expr()->$func('c.redirectUris', ':'.$unique)
+        $expr = $q->expr()->orX(
+            $q->expr()->like('c.name',  ':'.$unique),
+            $q->expr()->like('c.redirectUris', ':'.$unique)
         );
+
+        if ($filter->not) {
+            $expr = $q->expr()->not($expr);
+        }
+
         return array(
             $expr,
             array("$unique" => $string)
@@ -73,28 +76,24 @@ class ClientRepository extends CommonRepository
     protected function addSearchCommandWhereClause(QueryBuilder &$q, $filter)
     {
         $command         = $field = $filter->command;
-        $string          = $filter->string;
         $unique          = $this->generateRandomParameterName();
         $returnParameter = true; //returning a parameter that is not used will lead to a Doctrine error
-        $func            = ($filter->not) ? "notLike" : "like";
+        $expr            = false;
 
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.name'):
-                $expr = $q->expr()->$func("c.name", ':'.$unique);
+                $expr = $q->expr()->like("c.name", ':'.$unique);
                 break;
             case $this->translator->trans('mautic.api.client.searchcommand.redirecturi'):
-                $expr = $q->expr()->$func('c.redirectUris', ":$unique");
+                $expr = $q->expr()->like('c.redirectUris', ":$unique");
                 break;
         }
 
-        if (empty($expr)) {
-            throw new NotFoundHttpException(
-                'Advanced search command and/or string not found!  Remember to use translation strings.' .
-                " ($command = $string)"
-            );
-        }
 
         $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
+        if ($expr && $filter->not) {
+            $expr = $q->expr()->not($expr);
+        }
         return array(
             $expr,
             ($returnParameter) ? array("$unique" => $string) : array()

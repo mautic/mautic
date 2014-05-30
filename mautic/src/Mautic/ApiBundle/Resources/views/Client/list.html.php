@@ -18,22 +18,23 @@ endif;
         <tr>
             <?php
             echo $view->render('MauticCoreBundle:Table:tableheader.html.php', array(
-                'entity'  => 'client',
-                'orderBy' => 'c.name',
-                'text'    => 'mautic.api.client.thead.name',
-                'default' => true
+                'sessionVar' => 'client',
+                'orderBy'    => 'c.name',
+                'text'       => 'mautic.api.client.thead.name',
+                'default'    => true,
+                'class'      => 'col-client-name'
             ));
             ?>
-            <th class="visible-md visible-lg"><?php echo $view['translator']->trans('mautic.api.client.thead.redirecturis'); ?></th>
+            <th class="visible-md visible-lg col-client-redirecturis"><?php echo $view['translator']->trans('mautic.api.client.thead.redirecturis'); ?></th>
             <?php
             echo $view->render('MauticCoreBundle:Table:tableheader.html.php', array(
-                'entity'  => 'client',
-                'orderBy' => 'c.id',
-                'text'    => 'mautic.api.client.thead.id',
-                'class'   => 'visible-md visible-lg'
+                'sessionVar' => 'client',
+                'orderBy'    => 'c.id',
+                'text'       => 'mautic.api.client.thead.id',
+                'class'      => 'visible-md visible-lg col-client-id'
             ));
             ?>
-            <th style="width: 75px;"></th>
+            <th class="col-client-actions"></th>
         </tr>
         </thead>
         <tbody>

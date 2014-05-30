@@ -14,8 +14,7 @@ use Mautic\ApiBundle\Event\ClientEvent;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\ApiBundle\Entity\Client;
 use Mautic\UserBundle\Entity\User;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
  * Class ClientModel
@@ -38,12 +37,12 @@ class ClientModel extends FormModel
      * @param      $entity
      * @param null $action
      * @return mixed
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     public function createForm($entity, $action = null)
     {
         if (!$entity instanceof Client) {
-            throw new NotFoundHttpException('Entity must be of class Client()');
+            throw new MethodNotAllowedHttpException(array('Client'), 'Entity must be of class Client()');
         }
 
         $params = (!empty($action)) ? array('action' => $action) : array();
@@ -73,12 +72,12 @@ class ClientModel extends FormModel
      * @param      $entity
      * @param bool $isNew
      * @param      $event
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, $event = false)
     {
         if (!$entity instanceof Client) {
-            throw new NotFoundHttpException('Entity must be of class Client()');
+            throw new MethodNotAllowedHttpException(array('Client'), 'Entity must be of class Client()');
         }
 
         if (empty($event)) {

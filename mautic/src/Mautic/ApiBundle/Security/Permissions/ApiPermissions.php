@@ -132,6 +132,10 @@ class ApiPermissions extends CommonPermissions
             $level = "full";
         } elseif ($name == "clients") {
             switch ($level) {
+                case "viewown":
+                case "viewother":
+                    $level = "view";
+                    break;
                 case "editother":
                 case "editown":
                     $level = "edit";
