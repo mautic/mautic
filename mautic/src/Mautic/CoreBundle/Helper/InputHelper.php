@@ -25,6 +25,24 @@ class InputHelper
      */
     static public function clean($value)
     {
-        return trim(strip_tags($value));
+        if (is_array($value)) {
+            foreach ($value as &$v) {
+                self::clean($v);
+            }
+            return $value;
+        } else {
+            return trim(strip_tags($value));
+        }
+    }
+
+    /**
+     * Strips non-alphanumeric characters
+     *
+     * @param $value
+     * @return string
+     */
+    static public function alphanum($value)
+    {
+        return trim(preg_replace("/[^0-9a-z]+/i", "", $value));
     }
 }

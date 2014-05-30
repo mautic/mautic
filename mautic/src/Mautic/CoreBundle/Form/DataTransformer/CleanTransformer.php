@@ -22,7 +22,14 @@ class CleanTransformer implements DataTransformerInterface
      */
     public function transform($value)
     {
-        return trim(strip_tags($value));
+        if (is_array($value)) {
+            foreach ($value as &$v) {
+                $v = $this->transform($v);
+            }
+            return $value;
+        } else {
+            return trim(strip_tags($value));
+        }
     }
 
     /**
@@ -33,6 +40,13 @@ class CleanTransformer implements DataTransformerInterface
      */
     public function reverseTransform($value)
     {
-        return trim(strip_tags($value));;
+        if (is_array($value)) {
+            foreach ($value as &$v) {
+                $v = $this->reverseTransform($v);
+            }
+            return $value;
+        } else {
+            return trim(strip_tags($value));
+        }
     }
 }

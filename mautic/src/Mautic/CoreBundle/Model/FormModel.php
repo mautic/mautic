@@ -9,9 +9,7 @@
 
 namespace Mautic\CoreBundle\Model;
 
-use Mautic\CoreBundle\Helper\SearchStringHelper;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * Class FormModel
@@ -111,6 +109,10 @@ class FormModel extends CommonModel
         if (method_exists($entity, 'setCheckedOut')) {
             $entity->setCheckedOut(null);
             $entity->setCheckedOutBy(null);
+
+            if (method_exists($entity, 'setModifiedBy')) {
+                $entity->setModifiedBy($this->container->get('mautic.security')->getCurrentUser());
+            }
         }
 
         $this->em
@@ -130,13 +132,38 @@ class FormModel extends CommonModel
         $isNew = ($entity->getId()) ? false : true;
 
         //set some defaults
+        $this->setTimestamps($entity, $isNew);
+
+        $event = $this->dispatchEvent("pre_save", $entity, $isNew);
+        $this->em->getRepository($this->repository)->saveEntity($entity);
+        $this->dispatchEvent("post_save", $entity, $isNew, $event);
+
+        return $entity;
+    }
+
+    /**
+     * Set timestamps and user ids
+     *
+     * @param $entity
+     * @param $isNew
+     */
+    public function setTimestamps(&$entity, $isNew)
+    {
         if ($isNew) {
-            if (method_exists($entity, 'setCreatedBy' && !$entity->getCreatedBy())) {
-                $entity->setCreatedBy($this->container->get('security.context')->getToken()->getUser());
+            if (method_exists($entity, 'setDateAdded') && !$entity->getDateAdded()) {
+                $entity->setDateAdded(new \DateTime());
+            }
+
+            if (method_exists($entity, 'setCreatedBy') && !$entity->getCreatedBy()) {
+                $entity->setCreatedBy($this->container->get('mautic.security')->getCurrentUser());
             }
         } else {
+            if (method_exists($entity, 'setDateModified') && !$entity->getDateModified()) {
+                $entity->setDateModified(new \DateTime());
+            }
+
             if (method_exists($entity, 'setModifiedBy') && !$entity->getModifiedBy()) {
-                $entity->setModifiedBy($this->container->get('security.context')->getToken()->getUser());
+                $entity->setModifiedBy($this->container->get('mautic.security')->getCurrentUser());
             }
         }
 
@@ -145,12 +172,6 @@ class FormModel extends CommonModel
             $entity->setCheckedOut(null);
             $entity->setCheckedOutBy(null);
         }
-
-        $event = $this->dispatchEvent("pre_save", $entity, $isNew);
-        $this->em->getRepository($this->repository)->saveEntity($entity);
-        $this->dispatchEvent("post_save", $entity, $isNew, $event);
-
-        return $entity;
     }
 
     /**

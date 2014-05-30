@@ -46,3 +46,10 @@ $container->setDefinition('mautic.form.type.panel_wrapper_end', new Definition(
     ->addTag('form.type', array(
         'alias' => 'panel_wrapper_end',
     ));
+
+$container->setDefinition('mautic.form.type.tel', new Definition(
+    'Mautic\CoreBundle\Form\Type\TelType'
+))
+    ->addTag('form.type', array(
+        'alias' => 'tel',
+    ));
