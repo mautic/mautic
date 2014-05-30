@@ -11,10 +11,8 @@ namespace Mautic\UserBundle\Entity;
 
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use Doctrine\ORM\NoResultException;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * UserRepository
@@ -168,17 +166,19 @@ class UserRepository extends CommonRepository
     {
         $unique  = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
         $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
-        $func    = ($filter->not) ? "notLike" : "like";
-        $xFunc   = ($func == "notLike") ? "andX" : "orX";
 
-        $expr = $q->expr()->$xFunc(
-            $q->expr()->$func('u.username',  ':'.$unique),
-            $q->expr()->$func('u.email',     ':'.$unique),
-            $q->expr()->$func('u.firstName', ':'.$unique),
-            $q->expr()->$func('u.lastName',  ':'.$unique),
-            $q->expr()->$func('u.position',  ':'.$unique),
-            $q->expr()->$func('r.name',  ':'.$unique)
+        $expr = $q->expr()->orX(
+            $q->expr()->like('u.username',  ':'.$unique),
+            $q->expr()->like('u.email',     ':'.$unique),
+            $q->expr()->like('u.firstName', ':'.$unique),
+            $q->expr()->like('u.lastName',  ':'.$unique),
+            $q->expr()->like('u.position',  ':'.$unique),
+            $q->expr()->like('r.name',  ':'.$unique)
         );
+
+        if ($filter->not) {
+            $expr = $q->expr()->not($expr);
+        }
         return array(
             $expr,
             array("$unique" => $string)
@@ -196,46 +196,46 @@ class UserRepository extends CommonRepository
         $string          = $filter->string;
         $unique          = $this->generateRandomParameterName();
         $returnParameter = true; //returning a parameter that is not used will lead to a Doctrine error
-        $func            = ($filter->not) ? "notLike" : "like";
         $expr            = false;
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.is'):
-                $isFunc = ($filter->not) ? "neq" : "eq";
                 switch($string) {
-                    case $this->translator->trans('mautic.user.user.searchcommand.isactive'):
-                        $expr = $q->expr()->$isFunc("u.isActive", 1);
+                    case $this->translator->trans('mautic.core.searchcommand.isactive'):
+                        $expr = $q->expr()->eq("u.isActive", 1);
                         break;
-                    case $this->translator->trans('mautic.user.user.searchcommand.isinactive'):
-                        $expr = $q->expr()->$isFunc("u.isActive", 0);
+                    case $this->translator->trans('mautic.core.searchcommand.isinactive'):
+                        $expr = $q->expr()->eq("u.isActive", 0);
                         break;
                     case $this->translator->trans('mautic.user.user.searchcommand.isadmin');
-                        $expr = $q->expr()->$isFunc("r.isAdmin", 1);
+                        $expr = $q->expr()->eq("r.isAdmin", 1);
                         break;
                 }
                 $returnParameter = false;
                 break;
             case $this->translator->trans('mautic.user.user.searchcommand.email'):
-                $expr = $q->expr()->$func("u.email", ':'.$unique);
+                $expr = $q->expr()->like("u.email", ':'.$unique);
                 break;
             case $this->translator->trans('mautic.user.user.searchcommand.position'):
-                $expr = $q->expr()->$func("u.position", ':'.$unique);
+                $expr = $q->expr()->like("u.position", ':'.$unique);
                 break;
             case $this->translator->trans('mautic.user.user.searchcommand.username'):
-                $expr = $q->expr()->$func("u.username", ':'.$unique);
+                $expr = $q->expr()->like("u.username", ':'.$unique);
                 break;
             case $this->translator->trans('mautic.user.user.searchcommand.role'):
-                $expr = $q->expr()->$func("r.name", ':'.$unique);
+                $expr = $q->expr()->like("r.name", ':'.$unique);
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
-                $xFunc = ($filter->not) ? "andX" : "orX";
-                $expr = $q->expr()->$xFunc(
-                    $q->expr()->$func('u.firstName', ':'.$unique),
-                    $q->expr()->$func('u.lastName', ':'.$unique)
+                $expr = $q->expr()->orX(
+                    $q->expr()->like('u.firstName', ':'.$unique),
+                    $q->expr()->like('u.lastName', ':'.$unique)
                 );
                 break;
         }
 
         $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
+        if ($expr && $filter->not) {
+            $expr = $q->expr()->not($expr);
+        }
         return array(
             $expr,
             ($returnParameter) ? array("$unique" => $string) : array()
@@ -251,8 +251,8 @@ class UserRepository extends CommonRepository
          return array(
             'mautic.user.user.searchcommand.email',
             'mautic.core.searchcommand.is' => array(
-                'mautic.user.user.searchcommand.isactive',
-                'mautic.user.user.searchcommand.isinactive',
+                'mautic.core.searchcommand.isactive',
+                'mautic.core.searchcommand.isinactive',
                 'mautic.user.user.searchcommand.isadmin'
             ),
             'mautic.core.searchcommand.name',

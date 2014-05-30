@@ -12,7 +12,6 @@ namespace Mautic\UserBundle\Entity;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * RoleRepository
@@ -77,13 +76,16 @@ class RoleRepository extends CommonRepository
     {
         $unique  = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
         $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
-        $func    = ($filter->not) ? "notLike" : "like";
-        $xFunc   = ($func == "notLike") ? "andX" : "orX";
 
-        $expr = $q->expr()->$xFunc(
-            $q->expr()->$func('r.name',  ':'.$unique),
-            $q->expr()->$func('r.description', ':'.$unique)
+        $expr = $q->expr()->orX(
+            $q->expr()->like('r.name',  ':'.$unique),
+            $q->expr()->like('r.description', ':'.$unique)
         );
+
+        if ($filter->not) {
+            $q->expr()->not($expr);
+        }
+
         return array(
             $expr,
             array("$unique" => $string)
@@ -96,24 +98,25 @@ class RoleRepository extends CommonRepository
         $string          = $filter->string;
         $unique          = $this->generateRandomParameterName();
         $returnParameter = true; //returning a parameter that is not used will lead to a Doctrine error
-        $func            = ($filter->not) ? "notLike" : "like";
         $expr            = false;
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.is'):
-                $isFunc = ($filter->not) ? "neq" : "eq";
                 switch($string) {
                     case $this->translator->trans('mautic.user.user.searchcommand.isadmin');
-                        $expr = $q->expr()->$isFunc("r.isAdmin", 1);
+                        $expr = $q->expr()->eq("r.isAdmin", 1);
                         break;
                 }
                 $returnParameter = false;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
-                $expr = $q->expr()->$func("r.name", ':'.$unique);
+                $expr = $q->expr()->like("r.name", ':'.$unique);
                 break;
         }
 
         $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
+        if ($filter->not) {
+            $expr = $q->expr()->not($expr);
+        }
         return array(
             $expr,
             ($returnParameter) ? array("$unique" => $string) : array()

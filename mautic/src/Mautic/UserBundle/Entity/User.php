@@ -193,10 +193,6 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
             )
         ));
 
-        $metadata->addPropertyConstraint('isActive',  new Assert\NotBlank(
-            array('message' => 'mautic.user.user.isactive.notblank')
-        ));
-
         $metadata->setGroupSequence(array('User', 'SecondPass', 'CheckPassword'));
     }
 

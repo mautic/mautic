@@ -72,7 +72,7 @@ class RoleType extends AbstractType
             ),
             'expanded'      => true,
             'multiple'      => false,
-            'label'         => 'matuic.user.role.form.isadmin',
+            'label'         => 'mautic.user.role.form.isadmin',
             'attr'          => array(
                 'onclick' => 'Mautic.togglePermissionVisibility();'
             ),

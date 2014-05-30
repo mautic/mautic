@@ -17,49 +17,51 @@ endif;
     <table class="table table-hover table-striped table-bordered user-list">
         <thead>
         <tr>
-            <th class="visible-md visible-lg"></th>
+            <th class="visible-md visible-lg col-user-avatar"></th>
             <?php
             echo $view->render('MauticCoreBundle:Table:tableheader.html.php', array(
-                'entity'  => 'user',
-                'orderBy' => 'u.lastName, u.firstName, u.username',
-                'text'    => 'mautic.user.user.thead.name',
-                'default' => true
+                'sessionVar' => 'user',
+                'orderBy'    => 'u.lastName, u.firstName, u.username',
+                'text'       => 'mautic.user.user.thead.name',
+                'class'      => 'visible-md visible-lg col-user-name',
+                'default'    => true
             ));
 
             echo $view->render('MauticCoreBundle:Table:tableheader.html.php', array(
-                'entity'  => 'user',
-                'orderBy' => 'u.username',
-                'text'    => 'mautic.user.user.thead.username'
+                'sessionVar' => 'user',
+                'orderBy'    => 'u.username',
+                'text'       => 'mautic.user.user.thead.username',
+                'class'      => 'col-user-username',
             ));
 
             echo $view->render('MauticCoreBundle:Table:tableheader.html.php', array(
-                'entity'  => 'user',
-                'orderBy' => 'u.email',
-                'text'    => 'mautic.user.user.thead.email',
-                'class'   => 'visible-md visible-lg'
+                'sessionVar' => 'user',
+                'orderBy'    => 'u.email',
+                'text'       => 'mautic.user.user.thead.email',
+                'class'      => 'visible-md visible-lg col-user-email'
             ));
 
             echo $view->render('MauticCoreBundle:Table:tableheader.html.php', array(
-                'entity'  => 'user',
-                'orderBy' => 'r.name',
-                'text'    => 'mautic.user.user.thead.role',
-                'class'   => 'visible-md visible-lg'
+                'sessionVar' => 'user',
+                'orderBy'    => 'r.name',
+                'text'       => 'mautic.user.user.thead.role',
+                'class'      => 'visible-md visible-lg col-user-role'
             ));
 
             echo $view->render('MauticCoreBundle:Table:tableheader.html.php', array(
-                'entity'  => 'user',
-                'orderBy' => 'u.id',
-                'text'    => 'mautic.user.user.thead.id',
-                'class'   => 'visible-md visible-lg'
+                'sessionVar' => 'user',
+                'orderBy'    => 'u.id',
+                'text'       => 'mautic.user.user.thead.id',
+                'class'      => 'visible-md visible-lg col-user-id'
             ));
             ?>
-            <th style="width: 75px;"></th>
+            <th class="col-user-actions"></th>
         </tr>
         </thead>
         <tbody>
         <?php foreach ($items as $item):?>
             <tr>
-                <td class="visible-md visible-lg" style="width: 75px;">
+                <td class="visible-md visible-lg">
                     <img class="img img-responsive img-thumbnail"
                          src="https://www.gravatar.com/avatar/<?php echo md5(strtolower(trim($item->getEmail()))); ?>?&s=50" />
                 </td>

@@ -18,25 +18,26 @@ endif;
         <tr>
             <?php
             echo $view->render('MauticCoreBundle:Table:tableheader.html.php', array(
-                'entity'  => 'role',
-                'orderBy' => 'r.name',
-                'text'    => 'mautic.user.role.thead.name',
-                'default' => true
+                'sessionVar' => 'role',
+                'orderBy'    => 'r.name',
+                'text'       => 'mautic.user.role.thead.name',
+                'class'      => 'col-role-name',
+                'default'    => true
             ));
             echo $view->render('MauticCoreBundle:Table:tableheader.html.php', array(
-                'entity'  => 'role',
-                'orderBy' => 'r.description',
-                'text'    => 'mautic.user.role.thead.description',
-                'class'   => 'visible-md visible-lg'
+                'sessionVar' => 'role',
+                'orderBy'    => 'r.description',
+                'text'       => 'mautic.user.role.thead.description',
+                'class'      => 'visible-md visible-lg col-role-desc'
             ));
             echo $view->render('MauticCoreBundle:Table:tableheader.html.php', array(
-                'entity'  => 'role',
-                'orderBy' => 'r.id',
-                'text'    => 'mautic.user.role.thead.id',
-                'class'   => 'visible-md visible-lg'
+                'sessionVar' => 'role',
+                'orderBy'    => 'r.id',
+                'text'       => 'mautic.user.role.thead.id',
+                'class'      => 'visible-md visible-lg col-role-id'
             ));
             ?>
-            <th style="width: 75px;"></th>
+            <th class="col-role-actions"></th>
         </tr>
         </thead>
         <tbody>

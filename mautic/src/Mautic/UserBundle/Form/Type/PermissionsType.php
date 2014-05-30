@@ -41,7 +41,7 @@ class PermissionsType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        $permissionObjects = $this->container->get("mautic.security")->getPermissionObjects();
+        $permissionClasses = $this->container->get("mautic.security")->getPermissionClasses();
 
         $builder->add("permissions-panel-wrapper-start", 'panel_wrapper_start', array(
             'attr' => array(
@@ -49,13 +49,13 @@ class PermissionsType extends AbstractType
             )
         ));
 
-        foreach ($permissionObjects as $object) {
-            if ($object->isEnabled()) {
-                $bundle = $object->getName();
+        foreach ($permissionClasses as $class) {
+            if ($class->isEnabled()) {
+                $bundle = $class->getName();
                 //convert the permission bits from the db into readable names
-                $data    = $object->convertBitsToPermissionNames($options['permissions']);
+                $data    = $class->convertBitsToPermissionNames($options['permissions']);
                 //get the ratio of granted/total
-                list($granted, $total) = $object->getPermissionRatio($data);
+                list($granted, $total) = $class->getPermissionRatio($data);
                 $ratio = (!empty($total)) ?
                           ' <span class="permission-ratio">('
                             . '<span class="' . $bundle . '_granted">' . $granted . '</span>/'
@@ -70,7 +70,7 @@ class PermissionsType extends AbstractType
                         'id'          => "{$bundle}-panel"
                     )
                 ));
-                $object->buildForm($builder, $options, $data);
+                $class->buildForm($builder, $options, $data);
 
                 $builder->add("{$bundle}-panel-end", 'panel_end');
             }

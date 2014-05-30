@@ -40,3 +40,12 @@
     display: block;
     padding: 8px;
 }
+
+.col-user-actions, .col-user-id, .col-role-actions, .col-role-id {
+    width: 75px;
+}
+
+.col-user-avatar {
+    width: 75px;
+}
+

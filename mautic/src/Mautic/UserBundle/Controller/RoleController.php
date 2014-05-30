@@ -30,7 +30,7 @@ class RoleController extends FormController
     /**
      * Generate's default role list view
      *
-     * @param Request $this->request
+     * @param $page
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function indexAction($page = 1)
@@ -92,8 +92,8 @@ class RoleController extends FormController
         //set some permissions
         $permissions = array(
             'create' => $this->get('mautic.security')->isGranted('user:roles:create'),
-            'edit'   => $this->get('mautic.security')->isGranted('user:roles:editother'),
-            'delete' => $this->get('mautic.security')->isGranted('user:roles:deleteother'),
+            'edit'   => $this->get('mautic.security')->isGranted('user:roles:edit'),
+            'delete' => $this->get('mautic.security')->isGranted('user:roles:delete'),
         );
 
         $parameters = array(

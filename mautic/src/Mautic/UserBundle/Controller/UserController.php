@@ -28,6 +28,7 @@ class UserController extends FormController
     /**
      * Generate's default user list
      *
+     * @param $page
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function indexAction($page = 1)
@@ -45,8 +46,21 @@ class UserController extends FormController
 
         $orderBy    = $this->get('session')->get('mautic.user.orderby', 'u.lastName, u.firstName, u.username');
         $orderByDir = $this->get('session')->get('mautic.user.orderbydir', 'ASC');
-        $filter     = $this->request->get('search', $this->get('session')->get('mautic.user.filter', ''));
-        $this->get('session')->set('mautic.user.filter', $filter);
+
+        $search     = $this->request->get('search', $this->get('session')->get('mautic.user.filter', ''));
+        $this->get('session')->set('mautic.user.filter', $search);
+
+        //do some default filtering
+        $filter      = array('string' => $search, 'force' => '');
+        $translator  = $this->container->get('translator');
+        $isCommand   = $translator->trans('mautic.core.searchcommand.is');
+        $isInactive  = $translator->trans('mautic.core.searchcommand.isinactive');
+        $isActive    = $translator->trans('mautic.core.searchcommand.isactive');
+        if (strpos($search, "$isCommand:$isInactive") === false) {
+            //only show active users unless inactive is specified
+            $filter['force'] .= " $isCommand:$isActive";
+        }
+
         $tmpl       = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
         $users      = $this->container->get('mautic.model.user')->getEntities(
             array(
@@ -448,11 +462,13 @@ class UserController extends FormController
                 if ($valid == -1) {
                     return $this->redirect($returnUrl);
                 } else {
+                    $subject = InputHelper::clean($form->get('msg_subject')->getData());
+                    $body    = InputHelper::clean($form->get('msg_body')->getData());
                     $message = \Swift_Message::newInstance()
-                        ->setSubject($form->get('msg_subject')->getData())
+                        ->setSubject($subject)
                         ->setFrom($currentUser->getEmail(), $currentUser->getName())
                         ->setTo($user->getEmail(), $user->getName())
-                        ->setBody($form->get('msg_body')->getData());
+                        ->setBody($body);
                     $this->get('mailer')->send($message);
 
                     $reEntity = $form->get('entity')->getData();
@@ -471,8 +487,8 @@ class UserController extends FormController
                     $details    = $serializer->serialize(array(
                         "from" => $currentUser->getName(),
                         "to"   => $user->getName(),
-                        "subject" => $form->get('msg_subject')->getData(),
-                        "message" => $form->get('msg_body')->getData()
+                        "subject" => $subject,
+                        "message" => $body
                     ), 'json');
 
                     $log = array(

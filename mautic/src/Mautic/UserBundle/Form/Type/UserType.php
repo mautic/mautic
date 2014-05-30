@@ -115,8 +115,6 @@ class UserType extends AbstractType
             ->addViewTransformer($roleTransformer)
         );
 
-
-
         $existing = (!empty($options['data']) && $options['data']->getId());
         $placeholder = ($existing) ?
             $this->container->get('translator')->trans('mautic.user.user.form.passwordplaceholder') : '';
@@ -151,7 +149,6 @@ class UserType extends AbstractType
             'required'          => $required
         ));
 
-
         $builder->add('isActive', 'choice', array(
             'choice_list' => new ChoiceList(
                 array(false, true),
@@ -159,9 +156,9 @@ class UserType extends AbstractType
             ),
             'expanded'      => true,
             'multiple'      => false,
-            'label'         => 'matuic.user.user.form.isActive',
+            'label'         => 'mautic.core.form.isactive',
             'empty_value'   => false,
-            'required'      => true
+            'required'      => false
         ));
 
         $builder->add('save', 'submit', array(

@@ -13,7 +13,7 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\UserBundle\Event\UserEvent;
 use Mautic\UserBundle\UserEvents;
 use Mautic\UserBundle\Entity\User;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
  * Class UserModel
@@ -36,12 +36,12 @@ class UserModel extends FormModel
      *
      * @param       $entity
      * @return int
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     public function saveEntity($entity)
     {
         if (!$entity instanceof User) {
-            throw new NotFoundHttpException('Entity must be of class User()');
+            throw new MethodNotAllowedHttpException(array('User'), 'Entity must be of class User()');
         }
 
         return parent::saveEntity($entity);
@@ -77,12 +77,12 @@ class UserModel extends FormModel
      * @param      $entity
      * @param null $action
      * @return mixed
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     public function createForm($entity, $action = null)
     {
         if (!$entity instanceof User) {
-            throw new NotFoundHttpException('Entity must be of class User()');
+            throw new MethodNotAllowedHttpException(array('User'), 'Entity must be of class User()');
         }
         $params = (!empty($action)) ? array('action' => $action) : array();
         return $this->container->get('form.factory')->create('user', $entity, $params);
@@ -119,12 +119,12 @@ class UserModel extends FormModel
      * @param      $entity
      * @param bool $isNew
      * @param      $event
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, $event = false)
     {
         if (!$entity instanceof User) {
-            throw new NotFoundHttpException('Entity must be of class User()');
+            throw new MethodNotAllowedHttpException(array('User'), 'Entity must be of class User()');
         }
 
         if (empty($event)) {

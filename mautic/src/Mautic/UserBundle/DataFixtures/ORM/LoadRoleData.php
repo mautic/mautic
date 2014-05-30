@@ -59,7 +59,6 @@ class LoadRoleData extends AbstractFixture implements OrderedFixtureInterface, C
         $role->setIsAdmin(0);
 
         $permissions = array(
-            'api:access'   => array('prohibit'),
             'user:profile' => array('editname'),
             'lead:leads'   => array('full')
         );
@@ -69,6 +68,23 @@ class LoadRoleData extends AbstractFixture implements OrderedFixtureInterface, C
         $manager->flush();
 
         $this->addReference('sales-role', $role);
+
+        $role = new Role();
+        $role->setName($translator->trans('mautic.user.role.limitedsales.name', array(), 'fixtures'));
+        $role->setDescription($translator->trans('mautic.user.role.limitedsales.description', array(), 'fixtures'));
+        $role->setIsAdmin(0);
+
+        //@todo - add more permissions
+        $permissions = array(
+            'user:profile' => array('editname'),
+            'lead:leads'   => array('viewown', 'editown', 'deleteown', 'create')
+        );
+        $this->container->get('mautic.model.role')->setRolePermissions($role, $permissions);
+
+        $manager->persist($role);
+        $manager->flush();
+
+        $this->addReference('limitedsales-role', $role);
     }
 
     /**

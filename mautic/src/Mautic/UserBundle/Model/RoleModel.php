@@ -13,7 +13,7 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\UserBundle\Event\RoleEvent;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\UserEvents;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\PreconditionRequiredHttpException;
 
 
@@ -38,12 +38,12 @@ class RoleModel extends FormModel
      *
      * @param       $entity
      * @return int
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     public function saveEntity($entity)
     {
         if (!$entity instanceof Role) {
-            throw new NotFoundHttpException('Entity must be of class Role()');
+            throw new MethodNotAllowedHttpException(array('Role'), 'Entity must be of class Role()');
         }
 
         $isNew = ($entity->getId()) ? 0 : 1;
@@ -86,7 +86,7 @@ class RoleModel extends FormModel
     public function deleteEntity($entity)
     {
         if (!$entity instanceof Role) {
-            throw new NotFoundHttpException('Entity must be of class Role()');
+            throw new MethodNotAllowedHttpException(array('Role'), 'Entity must be of class Role()');
         }
 
         $users = $this->em->getRepository('MauticUserBundle:User')->findByRole($entity);
@@ -109,12 +109,12 @@ class RoleModel extends FormModel
      * @param      $entity
      * @param null $action
      * @return mixed
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     public function createForm($entity, $action = null)
     {
         if (!$entity instanceof Role) {
-            throw new NotFoundHttpException('Entity must be of class Role()');
+            throw new MethodNotAllowedHttpException(array('Role'), 'Entity must be of class Role()');
         }
 
         $params = (!empty($action)) ? array('action' => $action) : array();
@@ -145,12 +145,12 @@ class RoleModel extends FormModel
      * @param $entity
      * @param $isNew
      * @param $event
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, $event = false)
     {
         if (!$entity instanceof Role) {
-            throw new NotFoundHttpException('Entity must be of class Role()');
+            throw new MethodNotAllowedHttpException(array('Role'), 'Entity must be of class Role()');
         }
 
         if (empty($event)) {

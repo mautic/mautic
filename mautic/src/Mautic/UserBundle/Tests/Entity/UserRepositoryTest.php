@@ -30,7 +30,7 @@ class UserRepositoryTest extends MauticWebTestCase
         $args     = array(
             "filter" =>
                 "mautic.core.searchcommand.is:mautic.user.user.searchcommand.isadmin " .
-                "mautic.core.searchcommand.is:!mautic.user.user.searchcommand.isinactive " .
+                "mautic.core.searchcommand.is:!mautic.core.searchcommand.isinactive " .
                 "mautic.user.user.searchcommand.email:+admin@yoursite.com " .
                 "mautic.core.searchcommand.name:mautic.user.user.admin.name " .
                 "mautic.user.user.searchcommand.role:mautic.user.role.admin.name " .
@@ -46,7 +46,7 @@ class UserRepositoryTest extends MauticWebTestCase
         //mix it up
         $args     = array(
             "filter" =>
-                "mautic.core.searchcommand.is:mautic.user.user.searchcommand.isinactive " .
+                "mautic.core.searchcommand.is:mautic.core.searchcommand.isinactive " .
                 " OR mautic.user.user.searchcommand.email:+admin@yoursite.com"
         );
 
@@ -58,7 +58,7 @@ class UserRepositoryTest extends MauticWebTestCase
 
         $args     = array(
             "filter" =>
-                "(mautic.core.searchcommand.is:mautic.user.user.searchcommand.isinactive OR " .
+                "(mautic.core.searchcommand.is:mautic.core.searchcommand.isinactive OR " .
                 "mautic.core.searchcommand.is:mautic.user.user.searchcommand.isadmin) " .
                 " mautic.user.user.searchcommand.email:+admin@yoursite.com"
         );
