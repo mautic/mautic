@@ -30,11 +30,15 @@ class MenuHelper extends Helper {
      * Parses attributes for the menu view
      *
      * @param $attributes
+     * @param $overrides
      * @return string
      */
-    public function parseAttributes($attributes) {
-        if (!is_array($attributes) || empty ($attributes))
-            return '';
+    public function parseAttributes($attributes, $overrides = array()) {
+        if (!is_array($attributes))
+            $attributes = array();
+
+        $attributes = array_merge($attributes, $overrides);
+
         $string = "";
         foreach ($attributes as $name => $value) {
             $name  = trim($name);
