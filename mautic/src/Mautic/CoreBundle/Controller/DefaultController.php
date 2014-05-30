@@ -23,7 +23,7 @@ class DefaultController extends CommonController
     /**
      * Generates default index.php
      *
-     * @return \Symfony\Component\HttpFoundation\Response|void
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function indexAction()
     {

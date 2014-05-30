@@ -72,6 +72,23 @@ class CommonEvent extends Event
                 $uow = $this->em->getUnitOfWork();
                 $uow->computeChangeSets();
                 $changeset = $uow->getEntityChangeSet($this->entity);
+
+                //remove timestamps and the like
+                $remove = array(
+                    'dateModified',
+                    'modifiedBy',
+                    'dateAdded',
+                    'createdBy',
+                    'checkedOut',
+                    'checkedOutBy'
+                );
+
+                foreach ($remove as $r) {
+                    if (isset($changeset[$r])) {
+                        unset($changeset[$r]);
+                    }
+                }
+
             } else {
                 $changeset = array();
             }
