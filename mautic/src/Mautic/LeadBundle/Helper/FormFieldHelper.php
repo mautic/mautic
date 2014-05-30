@@ -18,11 +18,11 @@ class FormFieldHelper
     static private $types = array(
         'text'   => array(
             'label'       => 'mautic.lead.field.type.text',
-            'definitions' => array()
+            'properties'  => array()
         ),
         'select' => array(
-            'label' => 'mautic.lead.field.type.select',
-            'definitions' => array(
+            'label'       => 'mautic.lead.field.type.select',
+            'properties'  => array(
                 'list' => array(
                     'required'  => true,
                     'error_msg' => 'mautic.lead.field.select.listmissing'
@@ -30,8 +30,8 @@ class FormFieldHelper
             )
         ),
         'boolean'=> array(
-            'label' => 'mautic.lead.field.type.boolean',
-            'definitions' => array(
+            'label'      => 'mautic.lead.field.type.boolean',
+            'properties' => array(
                 'yes' => array(
                     'required'  => true,
                     'error_msg' => 'mautic.lead.field.boolean.yesmissing'
@@ -44,32 +44,32 @@ class FormFieldHelper
         ),
         'lookup' => array(
             'label'       => 'mautic.lead.field.type.lookup',
-            'definitions' => array(
+            'properties'  => array(
                 'list' => array()
             )
         ),
         'date'   => array(
             'label'       => 'mautic.lead.field.type.date',
-            'definitions' => array()
+            'properties'  => array()
         ),
         'email'  => array(
             'label'       => 'mautic.lead.field.type.email',
-            'definitions' => array()
+            'properties'  => array()
         ),
         'number' => array(
             'label' => 'mautic.lead.field.type.number',
-            'definitions' => array(
+            'properties'  => array(
                 'roundmode' => array(),
                 'precision' => array()
             )
         ),
         'tel'    => array(
             'label'       => 'mautic.lead.field.type.tel',
-            'definitions' => array()
+            'properties'  => array()
         ),
         'url'    => array(
             'label'       => 'mautic.lead.field.type.url',
-            'definitions' => array()
+            'properties'  => array()
         )
     );
 
@@ -89,10 +89,10 @@ class FormFieldHelper
 
     /**
      * @param $type
-     * @param $definitions
+     * @param $properties
      * @return bool
      */
-    static public function validateDefinitions($type, $definitions)
+    static public function validateProperties($type, $properties)
     {
         if (!array_key_exists($type, self::$types)) {
             //ensure the field type is supported
@@ -100,15 +100,15 @@ class FormFieldHelper
         }
 
         $fieldType = static::$types[$type];
-        foreach ($definitions as $key => $value) {
-            if (!array_key_exists($key, $fieldType['definitions'])) {
-                //ensure the definitions are recognized
+        foreach ($properties as $key => $value) {
+            if (!array_key_exists($key, $fieldType['properties'])) {
+                //ensure the properties are recognized
                 return array(false, 'mautic.lead.field.keynotrecognized');
             }
 
-            if (!empty($fieldType['definitions'][$key]['required']) && empty($value)) {
+            if (!empty($fieldType['properties'][$key]['required']) && empty($value)) {
                 //ensure requirements are met
-                return array(false, $fieldType['definitions'][$key]['error_msg']);
+                return array(false, $fieldType['properties'][$key]['error_msg']);
             }
         }
         return array(true, '');

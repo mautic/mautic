@@ -19,7 +19,7 @@ $no  = (isset($no)) ? $no : $view['translator']->trans('mautic.core.form.no');
                 <span class="input-group-addon">
                     <i class="fa fa-lg fa-fw fa-check"></i>
                 </span>
-                <input type="text" autocomplete="off" class="form-control" name="leadfield[definitions][yes]" value="<?php echo $yes; ?>">
+                <input type="text" autocomplete="off" class="form-control" name="leadfield[properties][yes]" value="<?php echo $yes; ?>">
             </div>
         </div>
         <div class="form-group col-sm-12 col-md-8 col-lg-6">
@@ -27,7 +27,7 @@ $no  = (isset($no)) ? $no : $view['translator']->trans('mautic.core.form.no');
                 <span class="input-group-addon">
                     <i class="fa fa-lg fa-fw fa-times"></i>
                 </span>
-                <input type="text" autocomplete="off" class="form-control" name="leadfield[definitions][no]" value="<?php echo $no; ?>">
+                <input type="text" autocomplete="off" class="form-control" name="leadfield[properties][no]" value="<?php echo $no; ?>">
             </div>
         </div>
     </div>

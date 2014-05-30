@@ -24,7 +24,7 @@ $options = array(
         <div class="form-group col-sm-12 col-md-8 col-lg-6">
             <label class="control-label"><?php echo $view['translator']->trans('mautic.lead.field.form.definition.numberrounding'); ?></label>
             <div class="input-group">
-                <select class="form-control" autocomplete="off" name="leadfield[definitions][roundmode]">
+                <select class="form-control" autocomplete="off" name="leadfield[properties][roundmode]">
                     <?php foreach ($options as $v => $l): ?>
                     <option value="<?php $v; ?>"<?php if ($roundMode == $v) echo ' selected="selected"'; ?>><?php echo $view['translator']->trans($l); ?></option>
                     <?php endforeach; ?>
@@ -39,7 +39,7 @@ $options = array(
         <div class="form-group col-sm-12 col-md-8 col-lg-6">
             <label class="control-label"><?php echo $view['translator']->trans('mautic.lead.field.form.definition.numberprecision'); ?></label>
             <div class="input-group">
-                <input autocomplete="off" name="leadfield[definitions][precision]" class="form-control" value="<?php echo $precision; ?>" type="number" />
+                <input autocomplete="off" name="leadfield[properties][precision]" class="form-control" value="<?php echo $precision; ?>" type="number" />
                 <span class="input-group-addon" data-toggle="tooltip" data-container="body"
                       data-placement="top" data-original-title="<?php echo $view['translator']->trans('mautic.lead.field.help.numberprecision'); ?>">
                     <i class="fa fa-question-circle"></i>

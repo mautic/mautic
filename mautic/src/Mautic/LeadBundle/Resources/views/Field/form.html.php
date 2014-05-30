@@ -26,45 +26,45 @@ $view["slots"]->set("headerTitle", $header);
 
 <?php
 $type          = $form['type']->vars['data'];
-$definitions   = $form['definitions']->vars['data'];
-$errors        = $form['definitions']->vars['errors'];
+$properties    = $form['properties']->vars['data'];
+$errors        = $form['properties']->vars['errors'];
 $feedbackClass = ($app->getRequest()->getMethod() == 'POST' && !empty($errors)) ? " has-error" : "";
 ?>
 
 <div class="row">
     <div class="form-group  col-sm-12 col-md-8 col-lg-6<?php echo $feedbackClass; ?>">
-        <div id="leadfield_definitions">
+        <div id="leadfield_properties">
             <?php
             switch ($type):
             case 'boolean':
                 echo $view->render('MauticLeadBundle:Field:definition_boolean.html.php', array(
-                    'yes' => isset($definitions['yes']) ? $definitions['yes'] : '',
-                    'no'  => isset($definitions['no'])  ? $definitions['no'] : ''
+                    'yes' => isset($properties['yes']) ? $properties['yes'] : '',
+                    'no'  => isset($properties['no'])  ? $properties['no'] : ''
                 ));
                 break;
             case 'lookup':
                 echo $view->render('MauticLeadBundle:Field:definition_lookup.html.php', array(
-                    'value' => isset($definitions['list']) ? $definitions['list'] : ''
+                    'value' => isset($properties['list']) ? $properties['list'] : ''
                 ));
                 break;
             case 'number':
                 echo $view->render('MauticLeadBundle:Field:definition_number.html.php', array(
-                    'roundMode' => isset($definitions['roundmode']) ? $definitions['roundmode'] : '',
-                    'precision' => isset($definitions['precision']) ? $definitions['precision'] : ''
+                    'roundMode' => isset($properties['roundmode']) ? $properties['roundmode'] : '',
+                    'precision' => isset($properties['precision']) ? $properties['precision'] : ''
                 ));
                 break;
             case 'select':
                 echo $view->render('MauticLeadBundle:Field:definition_select.html.php', array(
-                    'value' => isset($definitions['list']) ? $definitions['list'] : ''
+                    'value' => isset($properties['list']) ? $properties['list'] : ''
                 ));
                 break;
             endswitch;
             ?>
         </div>
-        <?php echo $view['form']->errors($form['definitions']); ?>
+        <?php echo $view['form']->errors($form['properties']); ?>
     </div>
 </div>
-<?php unset($form['definitions']); ?>
+<?php unset($form['properties']); ?>
 <?php echo $view['form']->end($form); ?>
 
 <div id="field-templates" class="hide">

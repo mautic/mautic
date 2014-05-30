@@ -68,11 +68,11 @@ class FieldController extends FormController
 
             if ($valid === 1) {
                 $request = $this->request->request->all();
-                if (isset($request['leadfield']['definitions'])) {
-                    $result = $model->setFieldDefinitions($field, $request['leadfield']['definitions']);
+                if (isset($request['leadfield']['properties'])) {
+                    $result = $model->setFieldProperties($field, $request['leadfield']['properties']);
                     if ($result !== true) {
                         //set the error
-                        $form->get('definitions')->addError(new FormError(
+                        $form->get('properties')->addError(new FormError(
                             $this->get('translator')->trans($result, array(), 'validators')
                         ));
                         $valid = 0;
@@ -170,11 +170,11 @@ class FieldController extends FormController
 
             if ($valid === 1) {
                 $request = $this->request->request->all();
-                if (isset($request['leadfield']['definitions'])) {
-                    $result = $model->setFieldDefinitions($field, $request['leadfield']['definitions']);
+                if (isset($request['leadfield']['properties'])) {
+                    $result = $model->setFieldProperties($field, $request['leadfield']['properties']);
                     if ($result !== true) {
                         //set the error
-                        $form->get('definitions')->addError(new FormError(
+                        $form->get('properties')->addError(new FormError(
                             $this->get('translator')->trans($result, array(), 'validators')
                         ));
                         $valid = 0;

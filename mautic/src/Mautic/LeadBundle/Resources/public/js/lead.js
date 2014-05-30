@@ -9,6 +9,11 @@ Mautic.leadOnLoad = function (container) {
             var options = $(this).attr('data-options');
             Mautic.activateLeadFieldTypeahead(field, target, options);
         });
+    } else {
+        //set height of divs
+        var windowHeight = $(window).height() - 175;
+        $('.lead-list').css('height', windowHeight+'px');
+        $('.lead-details').css('height', windowHeight+'px');
     }
 
     if ($(container + ' #list-search').length) {
@@ -279,14 +284,14 @@ Mautic.filterLeadsByList = function(list) {
 };
 
 /**
- * Update the definitions for field data types
+ * Update the properties for field data types
  */
-Mautic.updateLeadFieldDefinitions = function(selectedVal) {
+Mautic.updateLeadFieldProperties = function(selectedVal) {
     if ($('#field-templates .'+selectedVal).length) {
-        $('#leadfield_definitions').html($('#field-templates .'+selectedVal).html());
+        $('#leadfield_properties').html($('#field-templates .'+selectedVal).html());
 
-        $("#leadfield_definitions *[data-toggle='tooltip']").tooltip({html: true});
+        $("#leadfield_properties *[data-toggle='tooltip']").tooltip({html: true});
     } else {
-        $('#leadfield_definitions').html('');
+        $('#leadfield_properties').html('');
     }
 }

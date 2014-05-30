@@ -104,7 +104,7 @@ class LeadField extends FormEntity
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"limited"})
      */
-    private $definitions;
+    private $properties;
 
     /**
      * @param ClassMetadata $metadata
@@ -289,26 +289,26 @@ class LeadField extends FormEntity
     }
 
     /**
-     * Set definitions
+     * Set properties
      *
-     * @param string $definitions
+     * @param string $properties
      * @return LeadField
      */
-    public function setDefinitions($definitions)
+    public function setProperties($properties)
     {
-        $this->definitions = $definitions;
+        $this->properties = $properties;
 
         return $this;
     }
 
     /**
-     * Get definitions
+     * Get properties
      *
      * @return string
      */
-    public function getDefinitions()
+    public function getProperties()
     {
-        return $this->definitions;
+        return $this->properties;
     }
 
     /**

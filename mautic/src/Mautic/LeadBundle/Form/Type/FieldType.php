@@ -80,11 +80,11 @@ class FieldType extends AbstractType
             'disabled'    => $disabled,
             'attr'        => array(
                 'class'    => 'form-control',
-                'onchange' => 'Mautic.updateLeadFieldDefinitions(this.value);'
+                'onchange' => 'Mautic.updateLeadFieldProperties(this.value);'
             ),
         ));
 
-        $builder->add('definitions', 'collection', array(
+        $builder->add('properties', 'collection', array(
             'required'        => false,
             'allow_add'       => true,
             'error_bubbling'  => false

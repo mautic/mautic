@@ -201,26 +201,26 @@ class LeadFieldModel extends FormModel
 
     /**
      * @param $entity
-     * @param $definitions
+     * @param properties
      * @return bool
      */
-    public function setFieldDefinitions(&$entity, $definitions)
+    public function setFieldProperties(&$entity, $properties)
     {
         if (!$entity instanceof LeadField) {
             throw new MethodNotAllowedHttpException(array('LeadEntity'));
         }
 
-        if (!empty($definitions) && is_array($definitions)) {
-            $definitions = InputHelper::clean($definitions);
+        if (!empty($properties) && is_array($properties)) {
+            $properties = InputHelper::clean($properties);
         } else {
-            $definitions = array();
+            $properties = array();
         }
 
-        //validate definitions
+        //validate properties
         $type   = $entity->getType();
-        $result = FormFieldHelper::validateDefinitions($type, $definitions);
+        $result = FormFieldHelper::validateProperties($type, $properties);
         if ($result[0]) {
-            $entity->setDefinitions($definitions);
+            $entity->setProperties($properties);
             return true;
         } else {
             return $result[1];

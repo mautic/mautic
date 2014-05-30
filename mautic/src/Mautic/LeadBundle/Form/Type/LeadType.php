@@ -75,7 +75,7 @@ class LeadType extends AbstractType
         }
         foreach ($fields as $field) {
             $attr        = array('class' => 'form-control');
-            $definitions = $field->getDefinitions();
+            $properties  = $field->getProperties();
             $type        = $field->getType();
             $required    = $field->isRequired();
             $constraints = array();
@@ -86,17 +86,17 @@ class LeadType extends AbstractType
             }
             if ($type == 'select' || $type == 'boolean') {
                 $choices = array();
-                if ($type == 'select' && !empty($definitions['list'])) {
-                    $list    = explode('|', $definitions['list']);
+                if ($type == 'select' && !empty($properties['list'])) {
+                    $list    = explode('|', $properties['list']);
                     foreach ($list as $l) {
                         $l = trim($l);
                         $choices[$l] = $l;
                     }
                     $expanded = false;
                 }
-                if ($type == 'boolean' && !empty($definitions['yes']) && !empty($definitions['no'])) {
+                if ($type == 'boolean' && !empty($properties['yes']) && !empty($properties['no'])) {
                     $expanded = true;
-                    $choices  = array(1 => $definitions['yes'], 0 => $definitions['no']);
+                    $choices  = array(1 => $properties['yes'], 0 => $properties['no']);
                     $attr     = array();
                 }
 
@@ -121,8 +121,8 @@ class LeadType extends AbstractType
                     $attr['data-toggle'] = 'field-lookup';
                     $attr['data-target'] = $field->getAlias();
 
-                    if (!empty($definitions['list'])) {
-                        $attr['data-options'] = $definitions['list'];
+                    if (!empty($properties['list'])) {
+                        $attr['data-options'] = $properties['list'];
                     }
                 }
                 $builder->add("field_{$field->getAlias()}", $type, array(
