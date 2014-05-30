@@ -9,7 +9,7 @@
 
 namespace Mautic\UserBundle\Model;
 
-use Mautic\CoreBundle\Model\CommonFormModel;
+use Mautic\CoreBundle\Model\FormModel;
 use Mautic\UserBundle\Event\RoleEvent;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\UserEvents;
@@ -20,9 +20,9 @@ use Symfony\Component\HttpKernel\Exception\PreconditionRequiredHttpException;
 /**
  * Class RoleModel
  * {@inheritdoc}
- * @package Mautic\CoreBundle\Model\CommonFormModel
+ * @package Mautic\CoreBundle\Model\FormModel
  */
-class RoleModel extends CommonFormModel
+class RoleModel extends FormModel
 {
 
     /**

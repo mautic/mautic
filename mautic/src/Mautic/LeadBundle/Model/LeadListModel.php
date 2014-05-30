@@ -10,7 +10,7 @@
 namespace Mautic\LeadBundle\Model;
 
 use Mautic\CoreBundle\Helper\InputHelper;
-use Mautic\CoreBundle\Model\CommonFormModel;
+use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Event\LeadListEvent;
 use Mautic\LeadBundle\LeadEvents;
@@ -19,9 +19,9 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 /**
  * Class LeadListModel
  * {@inheritdoc}
- * @package Mautic\CoreBundle\Model\CommonFormModel
+ * @package Mautic\CoreBundle\Model\FormModel
  */
-class LeadListModel extends CommonFormModel
+class LeadListModel extends FormModel
 {
 
     /**

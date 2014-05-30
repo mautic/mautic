@@ -11,7 +11,7 @@ namespace Mautic\ApiBundle\Model;
 
 use Mautic\ApiBundle\ApiEvents;
 use Mautic\ApiBundle\Event\ClientEvent;
-use Mautic\CoreBundle\Model\CommonFormModel;
+use Mautic\CoreBundle\Model\FormModel;
 use Mautic\ApiBundle\Entity\Client;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -21,7 +21,7 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
  * {@inheritdoc}
  * @package Mautic\CoreBundle\Model
  */
-class ClientModel extends CommonFormModel
+class ClientModel extends FormModel
 {
     /**
      * {@inheritdoc}

@@ -9,7 +9,7 @@
 
 namespace Mautic\UserBundle\Model;
 
-use Mautic\CoreBundle\Model\CommonFormModel;
+use Mautic\CoreBundle\Model\FormModel;
 use Mautic\UserBundle\Event\UserEvent;
 use Mautic\UserBundle\UserEvents;
 use Mautic\UserBundle\Entity\User;
@@ -18,9 +18,9 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 /**
  * Class UserModel
  * {@inheritdoc}
- * @package Mautic\CoreBundle\CommonFormModel
+ * @package Mautic\CoreBundle\FormModel
  */
-class UserModel extends CommonFormModel
+class UserModel extends FormModel
 {
 
     /**

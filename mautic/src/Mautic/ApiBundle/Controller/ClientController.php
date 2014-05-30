@@ -11,7 +11,6 @@
 
 namespace Mautic\ApiBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\ApiBundle\Form\Type as FormType;
 
