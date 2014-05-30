@@ -12,7 +12,6 @@ namespace Mautic\CoreBundle\Security\Permissions;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\DependencyInjection\Container;
 use Doctrine\ORM\EntityManager;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Class UserPermissions
@@ -159,65 +158,66 @@ class CommonPermissions {
      * @param $userPermissions
      * @param $name
      * @param $level
-     * @return int
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @return boolean
      */
     public function isGranted($userPermissions, $name, $level) {
         list($name, $level) = $this->getSynonym($name, $level);
 
         if (!isset($userPermissions[$name])) {
             //the user doesn't have implicit access
-            return 0;
+            return false;
         } elseif ($this->permissions[$name]['full'] & $userPermissions[$name]) {
-            return 1;
+            return true;
         } else {
             //otherwise test for specific level
-            return ($this->permissions[$name][$level] & $userPermissions[$name]);
+            $result = ($this->permissions[$name][$level] & $userPermissions[$name]);
+            return ($result) ? true : false;
         }
     }
 
     /**
      * Gives the bundle the opportunity to force certain permissions if another is selected
      *
-     * @param string $level
-     * @param array $perms
-     * @return array $updatedPerms
+     * @param array $permmissions
      */
-    public function analyzePermissions($level, array $perms)
+    public function analyzePermissions(array &$permissions)
     {
-        $updatedPerms = $perms;
-        foreach ($perms as $perm) {
-            switch ($perm) {
-                case 'editother':
-                case 'edit':
-                    $required = array('viewother', 'viewown');
-                    break;
-                case 'editown':
-                    $required = array('viewown');
-                    break;
-                case 'deleteother':
-                case 'delete':
-                    $required = array('editother', 'viewother', 'viewown');
-                    break;
-                case 'deleteown':
-                    $required = array('viewown');
-                    break;
-                case 'create':
-                    $required = array('viewown');
-                    break;
-            }
+        foreach ($permissions as $permissionGroup => &$perms) {
+            list($bundle, $level) = explode(':', $permissionGroup);
 
-            if (!empty($required)) {
-                foreach ($required as $r) {
-                    list($ignore, $r) = $this->getSynonym($level, $r);
-                    if ($this->isSupported($level, $r) && !in_array($r, $updatedPerms)) {
-                        $updatedPerms[] = $r;
+            if ($bundle != $this->getName())
+                continue;
+
+            $updatedPerms = $perms;
+            foreach ($perms as $perm) {
+                $required = array();
+                switch ($perm) {
+                    case 'editother':
+                    case 'edit':
+                        $required = array('viewother', 'viewown');
+                        break;
+                    case 'deleteother':
+                    case 'delete':
+                        $required = array('editother', 'viewother', 'viewown');
+                        break;
+                    case 'viewother':
+                    case 'editown':
+                    case 'deleteown':
+                    case 'create':
+                        $required = array('viewown');
+                        break;
+                }
+                if (!empty($required)) {
+                    foreach ($required as $r) {
+                        list($ignore, $r) = $this->getSynonym($level, $r);
+                        if ($this->isSupported($level, $r) && !in_array($r, $updatedPerms)) {
+                            $updatedPerms[] = $r;
+                        }
                     }
                 }
             }
+            $perms = $updatedPerms;
         }
-
-        return $updatedPerms;
     }
 
     /**

@@ -10,7 +10,6 @@
 namespace Mautic\CoreBundle\Security\Permissions;
 
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Doctrine\ORM\EntityManager;
 use Mautic\UserBundle\Entity\Permission;
@@ -59,7 +58,7 @@ class CorePermissions {
      *
      * @return array
      */
-    public function getPermissionObjects() {
+    public function getPermissionClasses() {
         static $classes = array();
         if (empty($classes)) {
             foreach ($this->bundles as $bundle) {
@@ -67,7 +66,7 @@ class CorePermissions {
                     continue; //do not include this file
 
                 //explode MauticUserBundle into Mautic User Bundle so we can build the class needed
-                $object     = $this->getPermissionObject($bundle['base'], false);
+                $object     = $this->getPermissionClass($bundle['base'], false);
                 if (!empty($object)) {
                     $classes[] = $object;
                 }
@@ -84,7 +83,7 @@ class CorePermissions {
      * @return mixed
      * @throws \Symfony\Component\Debug\Exception\NotFoundHttpException
      */
-    public function getPermissionObject($bundle, $throwException = true) {
+    public function getPermissionClass($bundle, $throwException = true) {
         static $classes = array();
         if (!empty($bundle)) {
             if (empty($classes[$bundle])) {
@@ -114,6 +113,14 @@ class CorePermissions {
      */
     public function generatePermissions(array $permissions) {
         $entities = array();
+
+        //give bundles an opportunity to analyze and adjust permissions based on others
+        $classes = $this->getPermissionClasses();
+        foreach ($classes as $class) {
+            $class->analyzePermissions($permissions);
+        }
+
+        //create entities
         foreach($permissions as $key => $perms) {
             list($bundle, $name) = explode(":", $key);
 
@@ -124,8 +131,7 @@ class CorePermissions {
             $entity->setName(strtolower($name));
 
             $bit = 0;
-            $class = $this->getPermissionObject($bundle);
-            $perms = $class->analyzePermissions($name, $perms);
+            $class = $this->getPermissionClass($bundle);
 
             foreach ($perms as $perm) {
                 //get the bit for the perm
@@ -138,6 +144,7 @@ class CorePermissions {
             $entity->setBitwise($bit);
             $entities[] = $entity;
         }
+
         return $entities;
     }
 
@@ -182,7 +189,7 @@ class CorePermissions {
                 });
 
             //check against bundle permissions class
-            $permissionObject = $this->getPermissionObject($parts[0]);
+            $permissionObject = $this->getPermissionClass($parts[0]);
 
             //Is the permission supported?
             if (!$permissionObject->isSupported($parts[1], $parts[2])) {
@@ -193,10 +200,10 @@ class CorePermissions {
 
             if ($userEntity->getRole()->isAdmin()) {
                 //admin user has access to everything
-                $permissions[$permission] = 1;
+                $permissions[$permission] = true;
             } elseif (!isset($activePermissions[$parts[0]])) {
                 //user does not have implicit access to bundle so deny
-                $permissions[$permission] = 0;
+                $permissions[$permission] = false;
             } else {
                 $permissions[$permission] = $permissionObject->isGranted($activePermissions[$parts[0]], $parts[1], $parts[2]);
             }
@@ -204,10 +211,10 @@ class CorePermissions {
 
         if ($mode == "MATCH_ALL") {
             //deny if any of the permissions are denied
-            return in_array(0, $permissions) ? 0 : 1;
+            return in_array(0, $permissions) ? false : true;
         } elseif ($mode == "MATCH_ONE") {
             //grant if any of the permissions were granted
-            return in_array(1, $permissions) ? 1 : 0;
+            return in_array(1, $permissions) ? true : false;
         } elseif ($mode == "RETURN_ARRAY") {
             return $permissions;
         } else {
@@ -227,22 +234,38 @@ class CorePermissions {
      */
     public function hasEntityAccess($ownPermission, $otherPermission, $owner)
     {
-        $permissions = $this->isGranted(
-            array($ownPermission, $otherPermission), 'RETURN_ARRAY'
-        );
+        if (!is_bool($ownPermission) && !is_bool($otherPermission)) {
+            $permissions = $this->isGranted(
+                array($ownPermission, $otherPermission), 'RETURN_ARRAY'
+            );
+
+            $own   = $permissions[$ownPermission];
+            $other = $permissions[$otherPermission];
+        } else {
+            if (!is_bool($ownPermission)) {
+                $own = $this->isGranted($ownPermission);
+            } else {
+                $own = $ownPermission;
+            }
+
+            if (!is_bool($otherPermission)) {
+                $other = $this->isGranted($otherPermission);
+            } else {
+                $other = $otherPermission;
+            }
+        }
 
         $ownerId = (!empty($owner)) ? $owner->getId() : 0;
-
         $me = $this->securityContext->getToken()->getUser();
         if ($ownerId === 0) {
-            if ($permissions[$otherPermission]) {
+            if ($other) {
                 return true;
             } else {
                 return false;
             }
-        } elseif ($permissions[$ownPermission] && (int) $me->getId() === (int) $ownerId) {
+        } elseif ($own && (int) $me->getId() === (int) $ownerId) {
             return true;
-        } elseif ($permissions[$otherPermission] && (int) $me->getId() !== (int) $ownerId) {
+        } elseif ($other && (int) $me->getId() !== (int) $ownerId) {
             return true;
         } else {
             return false;
@@ -257,7 +280,7 @@ class CorePermissions {
      */
     public function getAllPermissions($forJs = false)
     {
-        $permissionObjects = $this->getPermissionObjects();
+        $permissionObjects = $this->getPermissionClasses();
         $permissions = array();
         foreach ($permissionObjects as $object) {
             $perms = $object->getPermissions();
