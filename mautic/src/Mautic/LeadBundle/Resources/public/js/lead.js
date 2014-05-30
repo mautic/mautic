@@ -9,12 +9,15 @@ Mautic.leadOnLoad = function (container) {
             var options = $(this).attr('data-options');
             Mautic.activateLeadFieldTypeahead(field, target, options);
         });
-    } else {
+    }
+
+    if ($(container + ' .lead-list').length) {
         //set height of divs
         var windowHeight = $(window).height() - 175;
-        $('.lead-list').css('height', windowHeight+'px');
-        $('.lead-details').css('height', windowHeight+'px');
+        $('.lead-list').css('height', windowHeight + 'px');
+        $('.lead-details').css('height', windowHeight + 'px');
     }
+
 
     if ($(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'lead');

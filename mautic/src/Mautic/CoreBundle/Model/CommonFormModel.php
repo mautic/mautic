@@ -12,11 +12,11 @@ namespace Mautic\CoreBundle\Model;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * Class FormModel
+ * Class CommonFormModel
  *
  * @package Mautic\CoreBundle\Model
  */
-class FormModel extends CommonModel
+class CommonFormModel extends CommonModel
 {
 
     /**

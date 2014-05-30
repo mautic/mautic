@@ -200,9 +200,14 @@ class CommonPermissions {
                     case 'delete':
                         $required = array('editother', 'viewother', 'viewown');
                         break;
+                    case 'publishother':
+                    case 'publish':
+                        $required = array('viewother', 'viewown');
+                        break;
                     case 'viewother':
                     case 'editown':
                     case 'deleteown':
+                    case 'publishown':
                     case 'create':
                         $required = array('viewown');
                         break;
