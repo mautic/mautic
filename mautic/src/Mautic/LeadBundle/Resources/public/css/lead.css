@@ -1,0 +1,138 @@
+/* LeadBundle */
+.gs-lead-primary-identifier {
+    display: block;
+}
+
+.gs-lead-secondary-identifier {
+    font-size:0.9em;
+}
+
+.lead-list {
+    height: 475px;
+    overflow: hidden;
+    padding-right: 2px;
+}
+
+.lead-details {
+    height: 475px;
+    padding-left: 2px;
+    overflow: hidden;
+}
+
+.lead-details h1, .lead-details h2, .lead-details h3, .lead-details h4, .lead-details h5 {
+    margin-top: 0;
+}
+
+.lead-list-inner-wrapper, .lead-details-inner-wrapper {
+    height: 100%;
+}
+
+.lead-details-inner-wrapper {
+    overflow-y: auto;
+}
+
+.filter-lead-container {
+    height: 80px;
+}
+
+.leads {
+    overflow: auto;
+    height: 100%;
+    margin-bottom: -50px;
+    padding-bottom: 50px;
+}
+
+.leads a {
+    text-decoration: none;
+}
+
+.lead-list .lead-profile:hover {
+    background-color: #ecf0f1;
+}
+
+.lead-list .lead-profile.active {
+    background-color: #ecf0f1;
+}
+
+.lead-list .lead-profile {
+    height: 50px;
+    border-bottom: 1px solid #cccccc;
+    overflow: hidden;
+}
+
+.leads .lead-primary-identifier {
+    display: block;
+    font-weight: bold;
+}
+
+.leads .lead-secondary-identifier {
+    display: block;
+}
+
+.lead-details .lead-actions .btn {
+    margin-top: -5px;
+    margin-left: -4px;
+}
+
+.lead-details .lead-profile-header {
+    margin-bottom: 10px;
+    padding-top: 10px;
+}
+
+.lead-details .lead-primary-identifier {
+    display: block;
+    font-size: 2em;
+}
+
+.lead-details .lead-secondary-identifier {
+    display: block;
+}
+
+.lead-details .panel {
+    margin-bottom: 5px;
+}
+
+.lead-details .field-label {
+    font-weight: bold;
+}
+
+.lead-footer {
+    margin-bottom: 30px;
+}
+
+.col-leadfield-id, .col-leadfield-actions {
+    width: 75px;
+}
+
+.col-leadfield-statusicons {
+    width: 100px;
+}
+
+.col-leadfield-orderhandle {
+    width: 25px;
+}
+
+.col-leadfield-type {
+    width: 125px;
+}
+
+.leadfield-list .fa-asterisk:hover, .leadfield-list .fa-eye:hover, .leadfield-list .fa-lock:hover, .leadfield-list .fa-list:hover {
+    color: #7D5B71;
+}
+
+@media (max-width:767px) {
+    .lead-list {
+        padding-right: 15px;
+        margin-bottom: 10px;
+        height: 150px;
+    }
+
+    .lead-details {
+        padding-left: 15px;
+    }
+
+    .lead-score h1 {
+        font-size: 1.5em;
+        padding: 5px;
+    }
+}

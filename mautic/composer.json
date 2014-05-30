@@ -31,7 +31,8 @@
     },
     "require-dev": {
         "liip/functional-test-bundle": "dev-master",
-        "nelmio/api-doc-bundle": "2.5.*@dev"
+        "nelmio/api-doc-bundle": "2.5.*@dev",
+        "webfactory/exceptions-bundle": "@stable"
     },
     "scripts": {
         "post-install-cmd": [

@@ -1,0 +1,26 @@
+<?php
+/**
+ * @package     Mautic
+ * @copyright   2014 Mautic, NP. All rights reserved.
+ * @author      Mautic
+ * @link        http://mautic.com
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+?>
+
+<div class="global-search-result">
+<?php if (!empty($showMore)): ?>
+    <a class="pull-right margin-md-sides" href="<?php echo $this->container->get('router')->generate(
+        'mautic_lead_index', array('filter-role' => $searchString)); ?>"
+       data-toggle="ajax">
+        <span><?php echo $view['translator']->trans('mautic.core.search.more', array("%count%" => $remaining)); ?></span>
+    </a>
+<?php else: ?>
+    <a href="<?php echo $this->container->get('router')->generate(
+        'mautic_lead_action', array('objectAction' => 'view', 'objectId' => $lead->getId())); ?>"
+    data-toggle="ajax">
+        <span class="gs-lead-primary-identifier"><?php echo $lead->getPrimaryIdentifier(true); ?></span>
+        <span class="gs-lead-secondary-identifier"><?php echo $lead->getSecondaryIdentifier(true); ?></span>
+    </a>
+<?php endif; ?>
+</div>

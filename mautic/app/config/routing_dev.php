@@ -21,6 +21,10 @@ $profiler = $loader->import("@WebProfilerBundle/Resources/config/routing/profile
 $profiler->addPrefix('/_profiler');
 $collection->addCollection($profiler);
 
+//error pages
+//$errors = $loader->import("@WebfactoryExceptionsBundle/Resources/config/routing.yml");
+//$collection->addCollection($errors);
+
 //main
 $collection->addCollection($loader->import("routing.php"));
 
