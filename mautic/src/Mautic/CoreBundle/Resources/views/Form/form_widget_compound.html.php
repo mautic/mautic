@@ -1,6 +1,6 @@
 <div <?php echo $view['form']->block($form, 'widget_container_attributes') ?>>
     <?php if (!$form->parent && $errors): ?>
-    <div class="has-error has-feedback">
+    <div class="has-error">
         <?php echo $view['form']->errors($form) ?>
     </div>
     <?php endif ?>

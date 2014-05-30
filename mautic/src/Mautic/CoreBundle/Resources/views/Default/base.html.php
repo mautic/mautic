@@ -57,14 +57,14 @@ $activePanelClasses  = ($app->getSession()->get('left-panel', 'default') == 'unp
 
         </div>
 
-        <script type="text/javascript">
-        var mauticBaseUrl = '<?php echo $view['router']->generate("mautic_core_index"); ?>';
-        var mauticContent = '<?php $view['slots']->output('mauticContent',''); ?>';
+        <script>
+            var mauticBaseUrl = '<?php echo $view['router']->generate("mautic_core_index"); ?>';
+            var mauticContent = '<?php $view['slots']->output('mauticContent',''); ?>';
         </script>
         <?php foreach ($view['assetic']->javascripts(array("@mautic_javascripts"), array(), array('combine' => true, 'output' => 'media/js/mautic.js')) as $url): ?>
-        <script type="text/javascript" src="<?php echo $view->escape($url) ?>"></script>
+        <script src="<?php echo $view->escape($url) ?>"></script>
         <?php endforeach; ?>
-        <script type="text/javascript">
+        <script>
             Mautic.onPageLoad();
             <?php $view['slots']->output("jsDeclarations"); ?>
             <?php if ($app->getEnvironment() === "dev"): ?>
@@ -78,6 +78,5 @@ $activePanelClasses  = ($app->getSession()->get('left-panel', 'default') == 'unp
             });
             <?php endif; ?>
         </script>
-        <?php $view['slots']->output('modal'); ?>
     </body>
 </html>

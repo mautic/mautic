@@ -9,13 +9,9 @@
 ?>
 
 <?php
-    if (
-        ($item->$ownerFunction() === null && $permissions['editother']) ||
-        ($currentUser->getId() === $item->$ownerFunction()->getId() && $permissions['editown']) ||
-        ($currentUser->getId() !== $item->$ownerFunction()->getId() && $permissions['editother'])
-    ): ?>
+    if ($edit): ?>
     <a class="btn btn-primary btn-xs"
-       href="<?php echo $view['router']->generate('mautic_' . $bundleName . '_action',
+       href="<?php echo $view['router']->generate('mautic_' . $routeBase . '_action',
            array("objectAction" => "edit", "objectId" => $item->getId())); ?>"
        data-toggle="ajax"
        <?php if (isset($menuLink)):?>
@@ -26,18 +22,14 @@
     </a>
 <?php endif; ?>
 <?php
-    if (
-        ($item->$ownerFunction() === null && $permissions['deleteother']) ||
-        ($currentUser->getId() === $item->$ownerFunction()->getId() && $permissions['deleteown']) ||
-        ($currentUser->getId() !== $item->$ownerFunction()->getId() && $permissions['deleteother'])
-    ): ?>
+    if ($delete): ?>
     <a class="btn btn-danger btn-xs" href="javascript:void(0);"
        onclick="Mautic.showConfirmation(
            '<?php echo $view->escape($view["translator"]->trans("mautic." . $langVar . ".form.confirmdelete",
                 array("%name%" => $item->getName() . " (" . $item->getId() . ")")), 'js'); ?>',
            '<?php echo $view->escape($view["translator"]->trans("mautic.core.form.delete"), 'js'); ?>',
            'executeAction',
-           ['<?php echo $view['router']->generate('mautic_' . $bundleName . '_action',
+           ['<?php echo $view['router']->generate('mautic_' . $routeBase . '_action',
                 array("objectAction" => "delete", "objectId" => $item->getId())); ?>',
            '#<?php echo $menuLink; ?>'],
            '<?php echo $view->escape($view["translator"]->trans("mautic.core.form.cancel"), 'js'); ?>','',[]);">

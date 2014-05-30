@@ -1,5 +1,5 @@
 <?php
-$feedbackClass = ($app->getRequest()->getMethod() == 'POST' && !empty($errors)) ? " has-error has-feedback" : "";
+$feedbackClass = ($app->getRequest()->getMethod() == 'POST' && !empty($errors)) ? " has-error" : "";
 ?>
 <div class="row">
     <div class="form-group col-sm-12 col-md-8 col-lg-6<?php echo $feedbackClass; ?>">

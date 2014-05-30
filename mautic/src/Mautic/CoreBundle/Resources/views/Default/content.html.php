@@ -26,6 +26,7 @@ endif;
 
 <div class="main-panel-content-wrapper">
     <?php $view['slots']->output('_content'); ?>
-
     <div class="main-panel-footer"></div>
 </div>
+
+<?php $view['slots']->output('modal'); ?>

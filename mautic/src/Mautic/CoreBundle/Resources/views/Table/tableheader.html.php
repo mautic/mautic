@@ -8,13 +8,17 @@
  */
 
 $defaultOrder = (!empty($default)) ? $orderBy : "";
-$order        = $app->getSession()->get("mautic.{$entity}.orderby", $defaultOrder);
-$dir          = $app->getSession()->get("mautic.{$entity}.orderbydir", "ASC");
+$order        = $app->getSession()->get("mautic.{$sessionVar}.orderby", $defaultOrder);
+$dir          = $app->getSession()->get("mautic.{$sessionVar}.orderbydir", "ASC");
+$target       = (!empty($target)) ? $target : '.main-panel-content-wrapper';
+$tmpl         = (!empty($tmpl)) ? $tmpl : 'content';
 ?>
 <th<?php echo (!empty($class)) ? ' class="' . $class . '"': ""; ?>>
     <a href="javascript: void(0);" onclick="Mautic.reorderTableData(
-                        '<?php echo $entity; ?>',
-                        '<?php echo $orderBy; ?>');">
+                        '<?php echo $sessionVar; ?>',
+                        '<?php echo $orderBy; ?>',
+                        '<?php echo $tmpl; ?>',
+                        '<?php echo $target; ?>');">
         <span><?php echo $view['translator']->trans($text); ?></span>
         <?php if ($order == $orderBy): ?>
         <i class="fa fa-sort-amount-<?php echo strtolower($dir); ?>"></i>

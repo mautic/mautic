@@ -24,6 +24,7 @@ $.ajaxSetup({
             $("body").addClass("loading-content");
         }
     },
+    cache: false,
     xhr: function () {
         var xhr = new window.XMLHttpRequest();
         if (mauticVars.showLoadingBar) {
@@ -70,7 +71,7 @@ var Mautic = {
             event.preventDefault();
 
             var route = $(this).attr('href');
-            if (route.contains('javascript')) {
+            if (route.indexOf('javascript')>=0) {
                 return false;
             }
 
@@ -78,12 +79,8 @@ var Mautic = {
             if (link !== undefined && link.charAt(0) != '#') {
                 link = "#" + link;
             }
-            var toggleMenu = false;
-            if ($(this).attr('data-toggle-submenu')) {
-                toggleMenu = ($(this).attr('data-toggle-submenu') == 'true') ? true : false;
-            }
 
-            Mautic.loadContent(route, link, toggleMenu);
+            Mautic.loadContent(route, link);
 
         });
 
@@ -92,11 +89,19 @@ var Mautic = {
             Mautic.ajaxifyForm($(this).attr('name'));
         });
 
+        $(container + " *[data-toggle='livesearch']").each(function (index) {
+            Mautic.activateLiveSearch($(this), "lastSearchStr", "liveCache");
+        });
+
         //initialize tooltips
         $(container + " *[data-toggle='tooltip']").tooltip({html: true});
 
-        $(container + " *[data-toggle='livesearch']").each(function (index) {
-            Mautic.activateLiveSearch($(this), "lastSearchStr", "liveCache");
+        //little hack to move modal windows outside of positioned divs
+        $(container + " *[data-toggle='modal']").each(function (index) {
+            var target = $(this).attr('data-target');
+            $(target).on('show.bs.modal', function() {
+                $(target).appendTo("body");
+            });
         });
 
         //run specific on loads
@@ -158,41 +163,37 @@ var Mautic = {
      * Takes a given route, retrieves the HTML, and then updates the content
      * @param route
      * @param link
-     * @param toggleMenu
+     * @param target
      */
-    loadContent: function (route, link, toggleMenu, mainContentOnly) {
+    loadContent: function (route, link, target) {
         //keep browser backbutton from loading cached ajax response
-        var ajaxRoute = route + ((/\?/i.test(route)) ? "&ajax=1" : "?ajax=1");
+        //var ajaxRoute = route + ((/\?/i.test(route)) ? "&ajax=1" : "?ajax=1");
         $.ajax({
-            url: ajaxRoute,
+            url: route,
             type: "GET",
             dataType: "json",
             success: function (response) {
-                //clear the live cache
-                mauticVars.liveCache = new Array();
-                mauticVars.lastSearchStr = '';
-
                 if (response) {
-                    if (mainContentOnly) {
-                        if (response.newContent) {
-                            Mautic.onPageUnload('.main-panel-content', response);
-                            $(".main-panel-content").html(response.newContent);
-                            Mautic.onPageLoad('.main-panel-content', response);
-                        }
+                    if (target) {
+                        response.target = target;
+                        Mautic.processContentSection(response);
                     } else {
+                        //clear the live cache
+                        mauticVars.liveCache = new Array();
+                        mauticVars.lastSearchStr = '';
+
                         //set route and activeLink if the response didn't override
                         if (!response.route) {
                             response.route = route;
                         }
-                        if (!response.activeLink) {
+
+                        if (!response.activeLink && link) {
                             response.activeLink = link;
                         }
-                        response.toggleMenu = toggleMenu;
 
                         if ($(".page-wrapper").hasClass("right-active")) {
                             $(".page-wrapper").removeClass("right-active");
                         }
-
                         Mautic.processPageContent(response);
                     }
                 }
@@ -211,27 +212,24 @@ var Mautic = {
      * Opens or closes submenus in main navigation
      * @param link
      */
-    toggleSubMenu: function (link) {
+    toggleSubMenu: function (link, event) {
         if ($(link).length) {
             //get the parent li element
             var parent = $(link).parent();
             var child = $(parent).find("ul").first();
             if (child.length) {
-                var toggle = $(link).find(".subnav-toggle i");
+                var toggle = event.target;
 
                 if (child.hasClass("subnav-closed")) {
                     //open the submenu
                     child.removeClass("subnav-closed").addClass("subnav-open");
-                    toggle.removeClass("fa-toggle-left").addClass("fa-toggle-down");
+                    $(toggle).removeClass("fa-toggle-left").addClass("fa-toggle-down");
                 } else if (child.hasClass("subnav-open")) {
                     //close the submenu
                     child.removeClass("subnav-open").addClass("subnav-closed");
-                    toggle.removeClass("fa-toggle-down").addClass("fa-toggle-left");
+                    $(toggle).removeClass("fa-toggle-down").addClass("fa-toggle-left");
                 }
             }
-
-            //prevent firing of href link
-            $(link).attr("href", "javascript: void(0)");
         }
     },
 
@@ -242,10 +240,10 @@ var Mautic = {
      */
     postForm: function (form, callback) {
         var action = form.attr('action');
-        var ajaxRoute = action + ((/\?/i.test(action)) ? "&ajax=1" : "?ajax=1");
+       // var ajaxRoute = action + ((/\?/i.test(action)) ? "&ajax=1" : "?ajax=1");
         $.ajax({
             type: form.attr('method'),
-            url: ajaxRoute,
+            url: action,
             data: form.serialize(),
             dataType: "json",
             success: function (data) {
@@ -303,19 +301,12 @@ var Mautic = {
 
                 //add current_ancestor classes
                 $(parent).parentsUntil(".side-panel-nav", "li").addClass("current_ancestor");
+            } else {
+                //remove current classes from menu items
+                $(".side-panel-nav").find(".current").removeClass("current");
 
-                //toggle submenu if applicable
-                if (response.toggleMenu) {
-                    Mautic.toggleSubMenu(link);
-                } else {
-                    //close any submenus not part of the current tree
-                    $(".side-panel-nav").find(".subnav-open:not(:has(li.current) )").each(
-                        function (index, element) {
-                            var link = $(this).parent().find('a').first();
-                            Mautic.toggleSubMenu($(link));
-                        }
-                    );
-                }
+                //remove ancestor classes
+                $(".side-panel-nav").find(".current_ancestor").removeClass("current_ancestor");
             }
 
             //close sidebar if necessary
@@ -522,7 +513,7 @@ var Mautic = {
      * @param name
      * @param orderby
      */
-    reorderTableData: function (name, orderby) {
+    reorderTableData: function (name, orderby, tmpl, target) {
         var query = "ajaxAction=setorderby&name=" + name + "&orderby=" + orderby;
         $.ajax({
             url: mauticBaseUrl + 'ajax',
@@ -531,8 +522,8 @@ var Mautic = {
             dataType: "json",
             success: function (response) {
                 if (response.success) {
-                    var route = window.location.pathname;
-                    Mautic.loadContent(route, '', false, true);
+                    var route = window.location.pathname + "?tmpl=" + tmpl;
+                    Mautic.loadContent(route, '', target);
                 }
             },
             error: function (request, textStatus, errorThrown) {
@@ -712,6 +703,7 @@ var Mautic = {
             if (value && value in mauticVars[liveCacheVar]) {
                 var response = {"newContent": mauticVars[liveCacheVar][value]};
                 response.target = target;
+                console.log('loaded from cache');
                 Mautic.processContentSection(response);
             } else {
                 //disable page loading bar
@@ -719,7 +711,7 @@ var Mautic = {
 
                 $.ajax({
                     url: route,
-                    type: "POST",
+                    type: "GET",
                     data: el.attr('name') + "=" + encodeURIComponent(value) + '&tmpl=content',
                     dataType: "json",
                     success: function (response) {

@@ -305,6 +305,11 @@ h6 {
   line-height: 40px;
   text-indent: 5px;
   border-bottom: #513b49 1px solid;
+  position: relative;
+  display: block;
+  background-color: #604656;
+  margin-left: auto;
+  margin-right: auto;
 }
 .side-panel-nav li a {
   color: #b2b2b2;
@@ -312,10 +317,6 @@ h6 {
   text-decoration: none;
   font-size: 1.1em;
   position: relative;
-  width: 98%;
-  margin-left: auto;
-  margin-right: auto;
-  background-color: #604656;
 }
 .side-panel-nav li.current > a:first-child {
   color: #fff;
@@ -344,12 +345,19 @@ h6 {
   position: absolute !important;
   top: 0;
   right: 3px;
+  color: #b2b2b2;
+}
+.side-panel-nav li .subnav-toggle:hover {
+  color: #fff;
 }
 .side-panel-nav ul.subnav-closed {
   display: none;
 }
 .side-panel-nav ul.subnav-open {
   display: block;
+}
+.side-panel-nav i.fa-toggle-down {
+  color: #fff;
 }
 .side-panel-nav ul.nav-level {
   margin-left: 0;
@@ -523,6 +531,20 @@ a.btn {
 .modal-header button {
   padding: 2px 6px 3px 6px;
 }
+.droppable-active {
+  border: 1px solid #513B49;
+  background: #8c667e;
+  color: #fff;
+}
+ul.draggable,
+ul.droppable {
+  margin-left: 0;
+  padding-left: 3px;
+}
+.ui-droppable li,
+li.ui-draggable {
+  list-style: none;
+}
 @media (max-width: 767px) {
   .left-panel {
     left: 0 ;
@@ -571,5 +593,13 @@ a.btn {
   .btn-group .btn-group + .btn,
   .btn-group .btn-group + .btn-group {
     margin-left: 0px;
+  }
+  .toolbar.hide-search {
+    width: 300px;
+  }
+  .toolbar.hide-search input {
+    margin-left: 0px;
+    padding: 6px 12px;
+    border: 1px solid #CCCCCC;
   }
 }

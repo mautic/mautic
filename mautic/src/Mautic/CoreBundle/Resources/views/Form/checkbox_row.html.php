@@ -1,4 +1,4 @@
-<?php $feedbackClass = ($app->getRequest()->getMethod() == 'POST' && !empty($errors)) ? " has-error has-feedback" : ""; ?>
+<?php $feedbackClass = ($app->getRequest()->getMethod() == 'POST' && !empty($errors)) ? " has-error" : ""; ?>
 <div class="row">
     <div class="form-group col-xs-12 col-md-8 col-lg-6<?php echo $feedbackClass; ?>">
         <div class="checkbox">
