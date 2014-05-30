@@ -130,13 +130,13 @@ class CommonRepository extends EntityRepository
             }
 
             $filter = $filterHelper->parseSearchString($string);
-
             list($expressions, $parameters) = $this->addAdvancedSearchWhereClause($q, $filter);
 
             if (!empty($forceExpressions)) {
                 $expressions->add($forceExpressions);
                 $parameters  = array_merge($parameters, $forceParameters);
             }
+
             $count = count($expressions->getParts());
             if (!empty($count)) {
                 $q->where($expressions)

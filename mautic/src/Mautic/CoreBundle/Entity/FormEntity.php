@@ -22,43 +22,28 @@ class FormEntity
 
     /**
      * @ORM\Column(name="date_added", type="datetime", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $dateAdded;
 
     /**
      * @ORM\ManyToOne(targetEntity="Mautic\UserBundle\Entity\User")
      * @ORM\JoinColumn(name="created_by", referencedColumnName="id", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $createdBy;
 
     /**
      * @ORM\Column(name="date_modified", type="datetime", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $dateModified;
 
     /**
      * @ORM\ManyToOne(targetEntity="Mautic\UserBundle\Entity\User")
      * @ORM\JoinColumn(name="modified_by", referencedColumnName="id", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $modifiedBy;
 
     /**
      * @ORM\Column(name="checked_out", type="datetime", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $checkedOut;
 
@@ -204,24 +189,5 @@ class FormEntity
     public function getCheckedOutBy ()
     {
         return $this->checkedOutBy;
-    }
-
-    /**
-     * @ORM\PrePersist
-     * @ORM\PreUpdate
-     */
-    public function updateDates()
-    {
-        if (!$this->getId()) {
-            //new
-            if (!$this->getDateAdded()) {
-                $this->setDateAdded(new \DateTime);
-            }
-        } else {
-            //update
-            if (!$this->getDateModified()) {
-                $this->setDateModified(new \DateTime);
-            }
-        }
     }
 }
