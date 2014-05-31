@@ -73,12 +73,14 @@ class SecurityController extends CommonController
                 $this->get("translator")->trans($msg, array(), 'flashes')
             );
         }
-
-        return $this->render(
-            'MauticUserBundle:Security:login.html.php',
-            array(
-                'last_username' => $session->get(SecurityContext::LAST_USERNAME)
+        $this->request->query->set('tmpl', 'login');
+        return $this->delegateView(array(
+            'viewParameters'  => array('last_username' => $session->get(SecurityContext::LAST_USERNAME)),
+            'contentTemplate' => 'MauticUserBundle:Security:login.html.php',
+            'passthroughVars' => array(
+                'route'         => $this->generateUrl('login'),
+                'mauticContent' => 'user'
             )
-        );
+        ));
     }
 }

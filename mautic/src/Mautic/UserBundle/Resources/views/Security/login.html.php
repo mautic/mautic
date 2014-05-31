@@ -7,11 +7,16 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-$view->extend('MauticUserBundle:Security:base.html.php');
-$view['slots']->set('header', $view['translator']->trans('mautic.user.auth.header'));
+if (!$app->getRequest()->isXmlHttpRequest()):
+    //load base template
+    $view->extend('MauticUserBundle:Security:base.html.php');
+    $view['slots']->set('header', $view['translator']->trans('mautic.user.auth.header'));
+else:
+    $view->extend('MauticUserBundle:Security:ajax.html.php');
+endif;
 ?>
 
-<form class="form-login" role="form" action="<?php echo $view['router']->generate('mautic_user_logincheck') ?>" method="post">
+<form class="form-login" name="login" data-toggle="ajax" role="form" action="<?php echo $view['router']->generate('mautic_user_logincheck') ?>" method="post">
     <div class="margin-md">
         <label for="username" class="sr-only"><?php echo $view['translator']->trans('mautic.user.auth.form.loginusername'); ?></label>
         <input type="text" id="username" name="_username"
