@@ -11,7 +11,6 @@ namespace Mautic\UserBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Entity\FormEntity;
-use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -328,7 +327,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      */
     public function setUsername($username)
     {
-        $this->username = InputHelper::clean($username);
+        $this->username = $username;
 
         return $this;
     }
@@ -381,7 +380,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      */
     public function setFirstName($firstName)
     {
-        $this->firstName = InputHelper::clean($firstName);
+        $this->firstName = $firstName;
 
         return $this;
     }
@@ -404,7 +403,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      */
     public function setLastName($lastName)
     {
-        $this->lastName = InputHelper::clean($lastName);
+        $this->lastName = $lastName;
 
         return $this;
     }
@@ -440,7 +439,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      */
     public function setEmail($email)
     {
-        $this->email = InputHelper::clean($email);
+        $this->email = $email;
 
         return $this;
     }

@@ -27,7 +27,7 @@ class InputHelper
     {
         if (is_array($value)) {
             foreach ($value as &$v) {
-                self::clean($v);
+                $v = self::clean($v);
             }
             return $value;
         } else {

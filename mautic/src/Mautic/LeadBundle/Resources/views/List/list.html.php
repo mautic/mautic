@@ -29,10 +29,17 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
         <?php foreach ($items as $item):?>
             <tr>
                 <td>
+                    <?php if ($item->isGlobal()): ?>
+                    <i class="fa fa-fw fa-globe"></i>
+                    <?php endif; ?>
                     <a href="<?php echo $view['router']->generate('mautic_lead_index', array('search' => "$listCommand:{$item->getAlias()}")); ?>"
                        data-toggle="ajax">
                         <?php echo $item->getName(); ?> (<?php echo $item->getAlias(); ?>)
                     </a>
+                    <?php if (!$item->isGlobal() && $currentUser->getId() != $item->getCreatedBy()->getId()): ?>
+                    <br />
+                    <span class="small">(<?php echo $item->getCreatedBy()->getName(); ?>)</span>
+                    <?php endif; ?>
                 </td>
                 <td class="visible-md visible-lg"><?php echo $item->getDescription(); ?></td>
                 <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>

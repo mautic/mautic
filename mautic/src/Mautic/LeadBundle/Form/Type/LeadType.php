@@ -9,7 +9,7 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 use Doctrine\ORM\EntityManager;
-use Mautic\Corebundle\Form\DataTransformer\CleanTransformer;
+use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\UserBundle\Form\DataTransformer as Transformers;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\AbstractType;
@@ -42,22 +42,20 @@ class LeadType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
+        $builder->addEventSubscriber(new CleanFormSubscriber());
+
+        $builder->add('owner_lookup', 'text', array(
+            'label'      => 'mautic.lead.lead.field.owner',
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array(
+                'class'   => 'form-control',
+                'tooltip' => 'mautic.core.help.autocomplete',
+            ),
+            'mapped'     => false,
+            'required'   => false
+        ));
+
         $userTransformer  = new Transformers\UserToIdTransformer($this->em);
-        $cleanTransformer = new CleanTransformer();
-
-        $builder->add(
-            $builder->create('owner_lookup', 'text', array(
-                'label'      => 'mautic.lead.lead.field.owner',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array(
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.core.help.autocomplete',
-                ),
-                'mapped'     => false,
-                'required'   => false
-            ))->addViewTransformer($cleanTransformer)
-        );
-
         $builder->add(
             $builder->create('owner', 'hidden', array(
                 'required' => false,

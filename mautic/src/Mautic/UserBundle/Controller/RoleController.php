@@ -11,13 +11,9 @@
 
 namespace Mautic\UserBundle\Controller;
 
-use Mautic\CoreBundle\Helper\InputHelper;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\UserBundle\Entity as Entity;
 use Mautic\UserBundle\Form\Type as FormType;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\PreconditionRequiredHttpException;
 
 /**

@@ -10,6 +10,7 @@ namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Helper\SearchStringHelper;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator;
@@ -50,6 +51,43 @@ class CommonRepository extends EntityRepository
     public function setCurrentUser(User $user)
     {
         $this->currentUser = $user;
+    }
+
+    /**
+     * Get a single entity
+     *
+     * @param int $id
+     * @return null|object
+     */
+    public function getEntity($id = 0)
+    {
+        try {
+            $entity = $this->find($id);
+        } catch (\Exception $e) {
+            $entity = null;
+        }
+        return $entity;
+    }
+
+    /**
+     * Get a list of entities
+     *
+     * @param array      $args
+     * @param Translator $translator
+     * @return Paginator
+     */
+    public function getEntities($args = array())
+    {
+        $q = $this
+            ->createQueryBuilder('e')
+            ->select('e');
+
+        $this->buildOrderByClause($q, $args);
+        $this->buildLimiterClauses($q, $args);
+
+        $query = $q->getQuery();
+        $results = new Paginator($query);
+        return $results;
     }
 
     /**

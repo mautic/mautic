@@ -10,15 +10,13 @@
 namespace Mautic\UserBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\DependencyInjection\Container;
-use Mautic\CoreBundle\Form\DataTransformer\CleanTransformer;
 
 /**
  * Class RoleType
@@ -46,24 +44,20 @@ class RoleType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        $transformer = new CleanTransformer();
+        $builder->addEventSubscriber(new CleanFormSubscriber());
 
-        $builder->add(
-            $builder->create('name', 'text', array(
-                'label'      => 'mautic.user.role.form.name',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control')
-            ))->addViewTransformer($transformer)
-        );
+        $builder->add('name', 'text', array(
+            'label'      => 'mautic.user.role.form.name',
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array('class' => 'form-control')
+        ));
 
-        $builder->add(
-            $builder->create('description', 'text', array(
-                'label'      => 'mautic.user.role.form.description',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control'),
-                'required' => false
-            ))->addViewTransformer($transformer)
-        );
+        $builder->add('description', 'text', array(
+            'label'      => 'mautic.user.role.form.description',
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array('class' => 'form-control'),
+            'required' => false
+        ));
 
         $builder->add('isAdmin', 'choice', array(
             'choice_list' => new ChoiceList(

@@ -205,7 +205,7 @@ class LeadController extends FormController
                 'flashes'         =>array(
                     array(
                         'type' => 'error',
-                        'msg'  => 'mautic.lead.error.notfound',
+                        'msg'  => 'mautic.lead.lead.error.notfound',
                         'msgVars' => array('%id%' => $objectId)
                     )
                 )
@@ -281,7 +281,7 @@ class LeadController extends FormController
                         ($valid === 1) ? array( //success
                             array(
                                 'type'    => 'notice',
-                                'msg'     => 'mautic.lead.notice.created',
+                                'msg'     => 'mautic.lead.lead.notice.created',
                                 'msgVars' => array('%name%' => $identifier)
                             )
                         ) : array()
@@ -330,7 +330,7 @@ class LeadController extends FormController
                     'flashes' => array(
                         array(
                             'type' => 'error',
-                            'msg'  => 'mautic.lead.error.notfound',
+                            'msg'  => 'mautic.lead.lead.error.notfound',
                             'msgVars' => array('%id%' => $objectId)
                         )
                     )
@@ -379,7 +379,7 @@ class LeadController extends FormController
                             ($valid === 1) ? array( //success
                                 array(
                                     'type' => 'notice',
-                                    'msg'  => 'mautic.lead.notice.updated',
+                                    'msg'  => 'mautic.lead.lead.notice.updated',
                                     'msgVars' => array('%name%' => $identifier)
                                 )
                             ) : array()
@@ -402,7 +402,7 @@ class LeadController extends FormController
     }
 
     /**
-     * Deletes a user object
+     * Deletes the entity
      *
      * @param         $objectId
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
@@ -429,7 +429,7 @@ class LeadController extends FormController
             if ($entity === null) {
                 $flashes[] = array(
                     'type'    => 'error',
-                    'msg'     => 'mautic.lead.error.notfound',
+                    'msg'     => 'mautic.lead.lead.error.notfound',
                     'msgVars' => array('%id%' => $objectId)
                 );
             } elseif (!$this->get('mautic.security')->hasEntityAccess(
@@ -445,7 +445,7 @@ class LeadController extends FormController
             $identifier = $this->get('translator')->trans($entity->getPrimaryIdentifier());
             $flashes[] = array(
                 'type' => 'notice',
-                'msg'  => 'mautic.lead.notice.deleted',
+                'msg'  => 'mautic.lead.lead.notice.deleted',
                 'msgVars' => array(
                     '%name%' => $identifier,
                     '%id%'   => $objectId

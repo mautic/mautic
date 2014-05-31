@@ -319,7 +319,7 @@ class ClientController extends FormController
     }
 
     /**
-     * Deletes a user object
+     * Deletes the entity
      *
      * @param         $objectId
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse

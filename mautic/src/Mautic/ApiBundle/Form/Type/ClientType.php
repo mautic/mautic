@@ -9,6 +9,7 @@
 
 namespace Mautic\ApiBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -42,15 +43,13 @@ class ClientType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        $cleanTransformer = new Transformers\CleanTransformer();
-        $builder->add(
-            $builder->create('name', 'text', array(
-                'label'      => 'mautic.api.client.form.name',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control')
-            ))
-            ->addViewTransformer($cleanTransformer)
-        );
+        $builder->addEventSubscriber(new CleanFormSubscriber());
+
+        $builder->add('name', 'text', array(
+            'label'      => 'mautic.api.client.form.name',
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array('class' => 'form-control')
+        ));
 
         $arrayStringTransformer = new Transformers\ArrayStringTransformer();
         $builder->add(

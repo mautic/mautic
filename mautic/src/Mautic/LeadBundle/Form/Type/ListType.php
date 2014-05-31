@@ -10,7 +10,7 @@
 namespace Mautic\LeadBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
-use Mautic\Corebundle\Form\DataTransformer\CleanTransformer;
+use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\LeadBundle\Form\DataTransformer\FieldTypeTransformer;
 use Mautic\UserBundle\Form\DataTransformer as Transformers;
 use Symfony\Component\DependencyInjection\Container;
@@ -47,37 +47,31 @@ class ListType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        $cleanTransformer = new CleanTransformer();
+        $builder->addEventSubscriber(new CleanFormSubscriber());
 
-        $builder->add(
-            $builder->create('name', 'text', array(
-                'label'      => 'mautic.lead.list.form.name',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control', 'length' => 50)
-            ))->addViewTransformer($cleanTransformer)
-        );
+        $builder->add('name', 'text', array(
+            'label'      => 'mautic.lead.list.form.name',
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array('class' => 'form-control', 'length' => 50)
+        ));
 
-        $builder->add(
-            $builder->create('alias', 'text', array(
-                'label'      => 'mautic.lead.list.form.alias',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array(
-                    'class'   => 'form-control',
-                    'length'  => 25,
-                    'tooltip' => 'mautic.lead.list.help.alias'
-                ),
-                'required'   => false
-            ))->addViewTransformer($cleanTransformer)
-        );
+        $builder->add('alias', 'text', array(
+            'label'      => 'mautic.lead.list.form.alias',
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array(
+                'class'   => 'form-control',
+                'length'  => 25,
+                'tooltip' => 'mautic.lead.list.help.alias'
+            ),
+            'required'   => false
+        ));
 
-        $builder->add(
-            $builder->create('description', 'text', array(
-                'label'      => 'mautic.lead.list.form.description',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control'),
-                'required'   => false
-            ))->addViewTransformer($cleanTransformer)
-        );
+        $builder->add('description', 'text', array(
+            'label'      => 'mautic.lead.list.form.description',
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array('class' => 'form-control'),
+            'required'   => false
+        ));
 
         $builder->add('isGlobal', 'choice', array(
             'choice_list' => new ChoiceList(

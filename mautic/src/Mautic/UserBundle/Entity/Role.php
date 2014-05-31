@@ -10,7 +10,6 @@ namespace Mautic\UserBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Entity\FormEntity;
-use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -91,7 +90,7 @@ class Role extends FormEntity
      */
     public function setName($name)
     {
-        $this->name = InputHelper::clean($name);
+        $this->name = $name;
 
         return $this;
     }
@@ -149,7 +148,7 @@ class Role extends FormEntity
      */
     public function setDescription($description)
     {
-        $this->description = InputHelper::clean($description);
+        $this->description = $description;
 
         return $this;
     }

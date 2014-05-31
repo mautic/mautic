@@ -11,9 +11,7 @@ namespace Mautic\ApiBundle\Entity;
 
 use FOS\OAuthServerBundle\Entity\Client as BaseClient;
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\UserBundle\Entity\User;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -79,7 +77,7 @@ class Client extends BaseClient
      */
     public function setName($name)
     {
-        $this->name = InputHelper::clean($name);
+        $this->name = $name;
 
         return $this;
     }
@@ -99,7 +97,6 @@ class Client extends BaseClient
      */
     public function setRedirectUris(array $redirectUris)
     {
-        array_walk($redirectUris, function (&$v) { InputHelper::clean($v); } );
         $this->redirectUris = $redirectUris;
     }
 

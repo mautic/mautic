@@ -10,6 +10,7 @@
 namespace Mautic\UserBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\UserBundle\Form\DataTransformer\RoleToIdTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
@@ -17,12 +18,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\FormError;
 use Symfony\Component\Security\Core\SecurityContext;
-use Doctrine\ORM\EntityRepository;
-use Mautic\CoreBundle\Form\DataTransformer\CleanTransformer;
 
 /**
  * Class UserType
@@ -53,39 +49,32 @@ class UserType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        $transformer = new CleanTransformer();
-        $builder->add(
-            $builder->create('username', 'text', array(
-                'label'      => 'mautic.user.user.form.username',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control')
-            ))->addViewTransformer($transformer)
-        );
+        $builder->addEventSubscriber(new CleanFormSubscriber());
 
-        $builder->add(
-            $builder->create('firstName', 'text', array(
-                'label'      => 'mautic.user.user.form.firstname',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control')
-            ))->addViewTransformer($transformer)
-        );
+        $builder->add('username', 'text', array(
+            'label'      => 'mautic.user.user.form.username',
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array('class' => 'form-control')
+        ));
 
-        $builder->add(
-            $builder->create('lastName',  'text', array(
-                'label'      => 'mautic.user.user.form.lastname',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control')
-            ))->addViewTransformer($transformer)
-        );
+        $builder->add('firstName', 'text', array(
+            'label'      => 'mautic.user.user.form.firstname',
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array('class' => 'form-control')
+        ));
 
-        $builder->add(
-            $builder->create('position',  'text', array(
-                'label'      => 'mautic.user.user.form.position',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control'),
-                'required'   => false
-            ))->addViewTransformer($transformer)
-        );
+        $builder->add('lastName',  'text', array(
+            'label'      => 'mautic.user.user.form.lastname',
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array('class' => 'form-control')
+        ));
+
+        $builder->add('position',  'text', array(
+            'label'      => 'mautic.user.user.form.position',
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array('class' => 'form-control'),
+            'required'   => false
+        ));
 
         $builder->add('email', 'email', array(
             'label'      => 'mautic.user.user.form.email',
@@ -96,17 +85,16 @@ class UserType extends AbstractType
             )
         ));
 
-        $builder->add(
-            $builder->create('role_lookup', 'text', array(
-                'label'      => 'mautic.user.user.form.role',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array(
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.core.help.autocomplete',
-                ),
-                'mapped'     => false
-            ))->addViewTransformer($transformer)
-        );
+        $builder->add('role_lookup', 'text', array(
+            'label'      => 'mautic.user.user.form.role',
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array(
+                'class'   => 'form-control',
+                'tooltip' => 'mautic.core.help.autocomplete',
+            ),
+            'mapped'     => false
+        ));
+
         $roleTransformer  = new RoleToIdTransformer($this->em);
         $builder->add(
             $builder->create('role', 'hidden', array(

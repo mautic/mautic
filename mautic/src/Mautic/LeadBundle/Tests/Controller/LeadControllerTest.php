@@ -99,7 +99,7 @@ class LeadControllerTest extends MauticWebTestCase
         $crawler = $this->client->submit($form);
 
         $this->assertRegExp(
-            '/mautic.lead.notice.created/',
+            '/mautic.lead.lead.notice.created/',
             $this->client->getResponse()->getContent()
         );
 
@@ -136,7 +136,7 @@ class LeadControllerTest extends MauticWebTestCase
         $crawler = $this->client->submit($form);
 
         $this->assertRegExp(
-            '/mautic.lead.notice.updated/',
+            '/mautic.lead.lead.notice.updated/',
             $this->client->getResponse()->getContent()
         );
 
@@ -162,7 +162,7 @@ class LeadControllerTest extends MauticWebTestCase
         $crawler = $this->client->request('POST', '/leads/delete/'.$lead->getId());
 
         $this->assertRegExp(
-            '/mautic.lead.notice.deleted/',
+            '/mautic.lead.lead.notice.deleted/',
             $this->client->getResponse()->getContent()
         );
 

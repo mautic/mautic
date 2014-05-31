@@ -11,7 +11,7 @@ namespace Mautic\LeadBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
-use Mautic\Corebundle\Form\DataTransformer\CleanTransformer;
+use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\LeadBundle\Form\DataTransformer\FieldToOrderTransformer;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\AbstractType;
@@ -46,30 +46,26 @@ class FieldType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        $cleanTransformer = new CleanTransformer();
+        $builder->addEventSubscriber(new CleanFormSubscriber());
 
-        $builder->add(
-            $builder->create('label', 'text', array(
-                'label'      => 'mautic.lead.field.form.label',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control', 'length' => 50)
-            ))->addViewTransformer($cleanTransformer)
-        );
+        $builder->add('label', 'text', array(
+            'label'      => 'mautic.lead.field.form.label',
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array('class' => 'form-control', 'length' => 50)
+        ));
 
         $disabled = (!empty($options['data'])) ? $options['data']->isFixed() : false;
-        $builder->add(
-            $builder->create('alias', 'text', array(
-                'label'      => 'mautic.lead.field.form.alias',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array(
-                    'class'   => 'form-control',
-                    'length'  => 25,
-                    'tooltip' => 'mautic.lead.field.help.alias',
-                ),
-                'required'   => false,
-                'disabled'   => $disabled
-            ))->addViewTransformer($cleanTransformer)
-        );
+        $builder->add('alias', 'text', array(
+            'label'      => 'mautic.lead.field.form.alias',
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array(
+                'class'   => 'form-control',
+                'length'  => 25,
+                'tooltip' => 'mautic.lead.field.help.alias',
+            ),
+            'required'   => false,
+            'disabled'   => $disabled
+        ));
 
         $builder->add('type', 'choice', array(
             'choices'     => FormFieldHelper::getChoiceList(),
@@ -90,14 +86,12 @@ class FieldType extends AbstractType
             'error_bubbling'  => false
         ));
 
-        $builder->add(
-            $builder->create('defaultValue', 'text', array(
-                'label'      => 'mautic.lead.field.form.defaultvalue',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control'),
-                'required'   => false
-            ))->addViewTransformer($cleanTransformer)
-        );
+        $builder->add('defaultValue', 'text', array(
+            'label'      => 'mautic.lead.field.form.defaultvalue',
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array('class' => 'form-control'),
+            'required'   => false
+        ));
 
         //get order list
         $transformer = new FieldToOrderTransformer($this->em);

@@ -98,7 +98,8 @@ class ListController extends FormController
             'limit'       => $limit,
             'permissions' => $permissions,
             'security'    => $this->get('mautic.security'),
-            'tmpl'        => $tmpl
+            'tmpl'        => $tmpl,
+            'currentUser' => $this->get('mautic.security')->getCurrentUser()
         );
 
         return $this->delegateView(array(
