@@ -44,23 +44,28 @@ class FilterType extends AbstractType
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
         $builder->add('glue', 'collection', array(
-            'allow_add' => true
+            'allow_add' => true,
+            'allow_delete' => true
         ));
 
         $builder->add('operator', 'collection', array(
-            'allow_add' => true
+            'allow_add' => true,
+            'allow_delete' => true
         ));
 
         $builder->add('filter', 'collection', array(
-            'allow_add' => true
+            'allow_add' => true,
+            'allow_delete' => true
         ));
 
         $builder->add('display', 'collection', array(
-            'allow_add' => true
+            'allow_add' => true,
+            'allow_delete' => true
         ));
 
         $builder->add('field', 'collection', array(
-            'allow_add' => true
+            'allow_add' => true,
+            'allow_delete' => true
         ));
     }
 
