@@ -70,6 +70,12 @@ var Mautic = {
         $(container + " a[data-toggle='ajax']").click(function (event) {
             event.preventDefault();
 
+            //prevent leaving if currently in a form
+            if ($(container + " .prevent-nonsubmit-form-exit").length) {
+                Mautic.showConfirmation($(container + " .prevent-nonsubmit-form-exit").val());
+                return false;
+            }
+
             var route = $(this).attr('href');
             if (route.indexOf('javascript')>=0) {
                 return false;
@@ -81,7 +87,6 @@ var Mautic = {
             }
 
             Mautic.loadContent(route, link);
-
         });
 
         //initialize forms
@@ -470,6 +475,12 @@ var Mautic = {
             //default is to close the modal
             cancelAction = "dismissConfirmation";
         }
+
+        if (typeof confirmText == 'undefined') {
+            confirmText   = '<i class="fa fa-fw fa-2x fa-check"></i>';
+            confirmAction = 'dismissConfirmation';
+        }
+
         var confirmContainer = $("<div />").attr({ "class": "confirmation-modal" });
         var confirmInnerDiv = $("<div />").attr({ "class": "confirmation-inner-wrapper"});
         var confirmMsgSpan = $("<span />").css("display", "block").html(msg);
@@ -479,22 +490,28 @@ var Mautic = {
             .css("marginLeft", "5px")
             .click(function () {
                 if (typeof Mautic[confirmAction] === "function") {
-                    window["Mautic"][confirmAction].apply('widnow', confirmParams);
+                    window["Mautic"][confirmAction].apply('window', confirmParams);
                 }
             })
             .html(confirmText);
-        var cancelButton = $('<button type="button" />')
-            .addClass("btn btn-primary btn-xs")
-            .click(function () {
-                if (typeof Mautic[cancelAction] === "function") {
-                    window["Mautic"][cancelAction].apply('widnow', cancelParams);
-                }
-            })
-            .html(cancelText);
+        if (cancelText) {
+            var cancelButton = $('<button type="button" />')
+                .addClass("btn btn-primary btn-xs")
+                .click(function () {
+                    if (typeof Mautic[cancelAction] === "function") {
+                        window["Mautic"][cancelAction].apply('window', cancelParams);
+                    }
+                })
+                .html(cancelText);
+        }
 
         confirmInnerDiv.append(confirmMsgSpan);
         confirmInnerDiv.append(confirmButton);
-        confirmInnerDiv.append(cancelButton);
+
+        if (typeof cancelButton != 'undefined') {
+            confirmInnerDiv.append(cancelButton);
+        }
+
         confirmContainer.append(confirmInnerDiv);
         $('body').append(confirmContainer)
     },

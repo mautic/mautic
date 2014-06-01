@@ -10,6 +10,7 @@
 namespace Mautic\LeadBundle\Form\Type;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
+use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\UserBundle\Form\DataTransformer as Transformers;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\AbstractType;
@@ -43,7 +44,9 @@ class LeadType extends AbstractType
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber());
-
+        $builder->addEventSubscriber(new FormExitSubscriber($this->container->get('translator')->trans(
+            'mautic.core.form.inform'
+        )));
         $builder->add('owner_lookup', 'text', array(
             'label'      => 'mautic.lead.lead.field.owner',
             'label_attr' => array('class' => 'control-label'),

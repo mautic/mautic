@@ -12,6 +12,7 @@ namespace Mautic\LeadBundle\Form\Type;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
+use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\LeadBundle\Form\DataTransformer\FieldToOrderTransformer;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\AbstractType;
@@ -47,6 +48,9 @@ class FieldType extends AbstractType
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber());
+        $builder->addEventSubscriber(new FormExitSubscriber($this->container->get('translator')->trans(
+            'mautic.core.form.inform'
+        )));
 
         $builder->add('label', 'text', array(
             'label'      => 'mautic.lead.field.form.label',

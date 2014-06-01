@@ -11,6 +11,7 @@ namespace Mautic\UserBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
+use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -45,6 +46,9 @@ class RoleType extends AbstractType
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber());
+        $builder->addEventSubscriber(new FormExitSubscriber($this->container->get('translator')->trans(
+            'mautic.core.form.inform'
+        )));
 
         $builder->add('name', 'text', array(
             'label'      => 'mautic.user.role.form.name',

@@ -1618,7 +1618,7 @@
                     escapedQuery = _.escapeRegExChars(query);
                     frontMatchRegEx = new RegExp("^(?:" + escapedQuery + ")(.+$)", "i");
                     match = frontMatchRegEx.exec(datum.value);
-                    match ? this.input.setHint(val + match[1]) : this.input.clearHint();
+                    (match && val.length) ? this.input.setHint(val + match[1]) : this.input.clearHint();
                 } else {
                     this.input.clearHint();
                 }
