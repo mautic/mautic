@@ -37,24 +37,24 @@ $feedbackClass = ($app->getRequest()->getMethod() == 'POST' && !empty($errors)) 
             <?php
             switch ($type):
             case 'boolean':
-                echo $view->render('MauticLeadBundle:Field:definition_boolean.html.php', array(
+                echo $view->render('MauticLeadBundle:Field:properties_boolean.html.php', array(
                     'yes' => isset($properties['yes']) ? $properties['yes'] : '',
                     'no'  => isset($properties['no'])  ? $properties['no'] : ''
                 ));
                 break;
             case 'lookup':
-                echo $view->render('MauticLeadBundle:Field:definition_lookup.html.php', array(
+                echo $view->render('MauticLeadBundle:Field:properties_lookup.html.php', array(
                     'value' => isset($properties['list']) ? $properties['list'] : ''
                 ));
                 break;
             case 'number':
-                echo $view->render('MauticLeadBundle:Field:definition_number.html.php', array(
+                echo $view->render('MauticLeadBundle:Field:properties_number.html.php', array(
                     'roundMode' => isset($properties['roundmode']) ? $properties['roundmode'] : '',
                     'precision' => isset($properties['precision']) ? $properties['precision'] : ''
                 ));
                 break;
             case 'select':
-                echo $view->render('MauticLeadBundle:Field:definition_select.html.php', array(
+                echo $view->render('MauticLeadBundle:Field:properties_select.html.php', array(
                     'value' => isset($properties['list']) ? $properties['list'] : ''
                 ));
                 break;
@@ -68,8 +68,8 @@ $feedbackClass = ($app->getRequest()->getMethod() == 'POST' && !empty($errors)) 
 <?php echo $view['form']->end($form); ?>
 
 <div id="field-templates" class="hide">
-    <?php echo $view->render('MauticLeadBundle:Field:definition_boolean.html.php'); ?>
-    <?php echo $view->render('MauticLeadBundle:Field:definition_lookup.html.php'); ?>
-    <?php echo $view->render('MauticLeadBundle:Field:definition_number.html.php'); ?>
-    <?php echo $view->render('MauticLeadBundle:Field:definition_select.html.php'); ?>
+    <?php echo $view->render('MauticLeadBundle:Field:properties_boolean.html.php'); ?>
+    <?php echo $view->render('MauticLeadBundle:Field:properties_lookup.html.php'); ?>
+    <?php echo $view->render('MauticLeadBundle:Field:properties_number.html.php'); ?>
+    <?php echo $view->render('MauticLeadBundle:Field:properties_select.html.php'); ?>
 </div>

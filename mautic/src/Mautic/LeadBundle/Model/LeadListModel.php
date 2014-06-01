@@ -165,18 +165,18 @@ class LeadListModel extends FormModel
         $choices = array(
             'dateAdded' => array(
                 'label'       => $translator->trans('mautic.lead.list.filter.dateadded'),
-                'definition'  => array('type' => 'date')
+                'properties'  => array('type' => 'date')
             ),
             'owner'     => array(
                 'label'      => $translator->trans('mautic.lead.list.filter.owner'),
-                'definition' => array(
+                'properties' => array(
                     'type'     => 'lookup_id',
                     'callback' => 'activateLeadFieldTypeahead'
                 )
             ),
             'score'     => array(
                 'label'      => $translator->trans('mautic.lead.list.filter.score'),
-                'definition' => array('type' => 'integer')
+                'properties' => array('type' => 'number')
             )
         );
 
@@ -188,13 +188,18 @@ class LeadListModel extends FormModel
         );
         foreach ($fields as $field) {
             $type = $field->getType();
-            $definition = array('type' => $type);
-            if ($type == 'lookup') {
-                $definition['callback'] = 'activateLeadFieldTypeahead';
+            $properties = $field->getProperties();
+            $properties['type'] = $type;
+            if (in_array($type, array('lookup', 'select', 'boolean'))) {
+                $properties['callback'] = 'activateLeadFieldTypeahead';
+                if ($type == 'boolean') {
+                    //create a lookup list with ID
+                    $properties['list'] = $properties['yes'].'|'.$properties['no'] . '||1|0';
+                }
             }
             $choices["field_" . $field->getAlias()] = array(
                 'label'      => $field->getLabel(),
-                'definition' => $definition
+                'properties' => $properties
             );
         }
 

@@ -261,6 +261,9 @@ class LeadRepository extends CommonRepository
                     $expr        = $q->expr()->andX();
                     $useExpr     =& $expr;
                     foreach ($filters as $k => $details) {
+                        if (empty($details['glue']))
+                            continue;
+
                         $f = $this->generateRandomParameterName();
                         $v = $this->generateRandomParameterName();
 

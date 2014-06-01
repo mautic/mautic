@@ -26,8 +26,19 @@ Mautic.leadOnLoad = function (container) {
 
 Mautic.activateLeadFieldTypeahead = function(field, target, options) {
     if (options) {
-        options = options.split('|');
-        var substringMatcher = function(strs) {
+        //set to zero so the list shows from the start
+        var taMinLength = 0;
+        var keys = values = [];
+        //check to see if there is a key/value split
+        options = options.split('||');
+        if (options.length == 2) {
+            keys   = options[0].split('|');
+            values = options[1].split('|');
+        } else {
+            values = options[0].split('|');
+        }
+
+        var substringMatcher = function(strs, strKeys) {
             return function findMatches(q, cb) {
                 var matches, substringRegex;
 
@@ -43,7 +54,14 @@ Mautic.activateLeadFieldTypeahead = function(field, target, options) {
                     if (substrRegex.test(str)) {
                         // the typeahead jQuery plugin expects suggestions to a
                         // JavaScript object, refer to typeahead docs for more info
-                        matches.push({ value: str });
+                        if (strKeys.length && typeof strKeys[i] != 'undefined') {
+                            matches.push({
+                                value: str,
+                                id:    strKeys[i]
+                            });
+                        } else {
+                            matches.push({value: str});
+                        }
                     }
                 });
 
@@ -51,8 +69,11 @@ Mautic.activateLeadFieldTypeahead = function(field, target, options) {
             };
         };
 
-        var source = substringMatcher(options);
+        var source = substringMatcher(values, keys);
     } else {
+        //set the length to 2 so it requires at least 2 characters to search
+        var taMinLength = 2;
+
         this[field] = new Bloodhound({
             datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
             queryTokenizer: Bloodhound.tokenizers.whitespace,
@@ -76,7 +97,7 @@ Mautic.activateLeadFieldTypeahead = function(field, target, options) {
         {
             hint: true,
             highlight: true,
-            minLength: 2
+            minLength: taMinLength
         },
         {
             name: field,
@@ -130,7 +151,9 @@ Mautic.activateLeadOwnerTypeahead = function(el) {
                 $("#lead_owner").val(datum["value"]);
             }
         }
-    );
+    ).on( 'focus', function() {
+        $(this).typeahead( 'open');
+    });
 };
 
 Mautic.activateLead = function(leadId) {
@@ -188,14 +211,18 @@ Mautic.leadlistOnLoad = function(container) {
 
             //give the value element a unique id
             var uniqid = "id_" + Date.now();
-            $(container).find("input[name='leadlist[filters][filter][]']").attr('id', uniqid);
+            var filter = $(container).find("input[name='leadlist[filters][filter][]']");
+            filter.attr('id', uniqid);
 
             //activate fields
             var fieldType = $(ui.draggable).find("input.field_type").val();
-            if (fieldType == 'lookup') {
+            if (fieldType == 'lookup' || fieldType == 'select') {
                 var fieldCallback = $(ui.draggable).find("input.field_callback").val();
-                Mautic[fieldCallback](uniqid, alias);
-            } else if (fieldType == 'lookup_id') {
+                if (fieldCallback) {
+                    var fieldOptions = $(ui.draggable).find("input.field_list").val();
+                    Mautic[fieldCallback](uniqid, alias, fieldOptions);
+                }
+            } else if (fieldType == 'lookup_id' || fieldType == 'boolean') {
                 //switch the filter and display elements
                 var oldFilter = $(container).find("input[name='leadlist[filters][filter][]']");
                 var newDisplay = oldFilter.clone();
@@ -211,7 +238,12 @@ Mautic.leadlistOnLoad = function(container) {
                 oldDisplay.replaceWith(newDisplay);
 
                 var fieldCallback = $(ui.draggable).find("input.field_callback").val();
-                Mautic[fieldCallback](uniqid, alias);
+                if (fieldCallback) {
+                    var fieldOptions = $(ui.draggable).find("input.field_list").val();
+                    Mautic[fieldCallback](uniqid, alias, fieldOptions);
+                }
+            } else {
+                filter.attr('type', fieldType);
             }
         }
     }).sortable({
