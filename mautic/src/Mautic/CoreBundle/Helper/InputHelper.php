@@ -18,6 +18,32 @@ class InputHelper
 {
 
     /**
+     * Wrapper function to clean inputs.  $mask can be an array of keys as the field names and values as the cleaning
+     * function to be used for the specific field.
+     *
+     * @param mixed $value
+     * @param mixed $mask
+     * @return mixed
+     */
+    static function _($value, $mask = 'clean') {
+        if (is_array($value) && is_array($mask)) {
+            foreach ($value as $k => &$v) {
+                if (array_key_exists($k, $mask) && method_exists('Mautic\CoreBundle\Helper\InputHelper', $mask[$k])) {
+                    $v = self::$mask[$k]($v);
+                } else {
+                    $v = self::clean($v);
+                }
+            }
+            return $value;
+        } elseif (is_string($mask) && method_exists('Mautic\CoreBundle\Helper\InputHelper', $mask)) {
+            return self::$mask($value);
+        } else {
+            return self::clean($value);
+        }
+    }
+
+
+    /**
      * Strips tags and trims value
      *
      * @param $value
@@ -44,5 +70,16 @@ class InputHelper
     static public function alphanum($value)
     {
         return trim(preg_replace("/[^0-9a-z]+/i", "", $value));
+    }
+
+    /**
+     * Returns raw value
+     *
+     * @param $value
+     * @return mixed
+     */
+    static public function raw($value)
+    {
+        return $value;
     }
 }

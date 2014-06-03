@@ -23,6 +23,12 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class CleanFormSubscriber implements EventSubscriberInterface
 {
 
+    private $masks;
+
+    public function __construct($masks = 'clean') {
+        $this->masks = $masks;
+    }
+
     public static function getSubscribedEvents()
     {
         return array(FormEvents::PRE_SUBMIT  => 'preSubmitData');
@@ -33,7 +39,7 @@ class CleanFormSubscriber implements EventSubscriberInterface
         $data = $event->getData();
 
         //clean the data
-        $data = InputHelper::clean($data);
+        $data = InputHelper::_($data, $this->masks);
 
         $event->setData($data);
     }
