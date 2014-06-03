@@ -64,8 +64,7 @@ $glueOptions = array(
                         <ul class="droppable padding-none" id="<?php echo $filterForm->vars['id']; ?>_right">
                             <?php $class = (!empty($filterValues)) ? ' hide' : ''; ?>
                             <li class="placeholder<?php echo $class; ?>"><?php echo $view['translator']->trans('mautic.core.droppable.placeholder'); ?></li>
-                            <?php
-                            foreach ($filterValues as $filter):?>
+                            <?php foreach ($filterValues as $filter): ?>
                             <?php if (!isset($choices[$filter['field']])) continue; ?>
                             <?php $randomId = "id_" . uniqid(); ?>
                             <li class="padding-sm">

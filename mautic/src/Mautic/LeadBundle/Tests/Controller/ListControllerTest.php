@@ -41,11 +41,11 @@ class ListControllerTest extends MauticWebTestCase
         $list->setIsGlobal(false);
         $list->setFilters(array(
             array(
-                'glue' => 'and',
-                'type' => 'owner',
+                'glue'     => 'and',
+                'field'    => 'owner',
                 'operator' => '=',
-                'filter' => $admin->getId(),
-                'display' => $admin->getName()
+                'filter'   => $admin->getId(),
+                'display'  => $admin->getName()
             )
         ));
         $this->em->persist($list);
