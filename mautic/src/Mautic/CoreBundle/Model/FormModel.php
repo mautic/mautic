@@ -105,6 +105,9 @@ class FormModel extends CommonModel
      */
     public function unlockEntity($entity)
     {
+        //flush any changes first
+        $this->em->refresh($entity);
+
         //unlock the row if applicable
         if (method_exists($entity, 'setCheckedOut')) {
             $entity->setCheckedOut(null);
