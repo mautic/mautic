@@ -47,7 +47,7 @@ class ClientController extends FormController
         $this->get('session')->set('mautic.client.filter', $filter);
         $tmpl       = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
-        $clients = $this->container->get('mautic.model.client')->getEntities(
+        $clients = $this->get('mautic.factory')->getModel('client')->getEntities(
             array(
                 'start'      => $start,
                 'limit'      => $limit,
@@ -112,7 +112,7 @@ class ClientController extends FormController
     public function authorizedClientsAction()
     {
         $me      = $this->get('security.context')->getToken()->getUser();
-        $clients = $this->get('mautic.model.client')->getUserClients($me);
+        $clients = $this->get('mautic.factory')->getModel('client')->getUserClients($me);
 
         return $this->render('MauticApiBundle:Client:authorized.html.php', array('clients' => $clients));
     }
@@ -123,7 +123,7 @@ class ClientController extends FormController
         $flashes = array();
         if ($this->request->getMethod() == 'POST') {
             $me      = $this->get('security.context')->getToken()->getUser();
-            $client  = $this->container->get('mautic.model.client')->getEntity($clientId);
+            $client  = $this->get('mautic.factory')->getModel('client')->getEntity($clientId);
 
             if ($client === null) {
                 $flashes[] = array(
@@ -136,7 +136,7 @@ class ClientController extends FormController
 
                 //remove the user from the client
                 $client->removeUser($me);
-                $this->container->get('mautic.model.client')->saveEntity($client);
+                $this->get('mautic.factory')->getModel('client')->saveEntity($client);
 
                 $flashes[] = array(
                     'type'    => 'notice',
@@ -170,7 +170,7 @@ class ClientController extends FormController
             return $this->accessDenied();
         }
 
-        $model      = $this->container->get('mautic.model.client');
+        $model      = $this->get('mautic.factory')->getModel('client');
         //retrieve the entity
         $client     = $model->getEntity();
         //set the return URL for post actions
@@ -178,7 +178,7 @@ class ClientController extends FormController
 
         //get the user form factory
         $action     = $this->generateUrl('mautic_client_action', array('objectAction' => 'new'));
-        $form       = $model->createForm($client, $action);
+        $form       = $model->createForm($client, $this->get('form.factory'), $action);
 
         //remove the client id and secret fields as they'll be auto generated
         $form->remove("randomId");
@@ -240,7 +240,7 @@ class ClientController extends FormController
         if (!$this->get('mautic.security')->isGranted('api:clients:editother')) {
             return $this->accessDenied();
         }
-        $model     = $this->container->get('mautic.model.client');
+        $model     = $this->get('mautic.factory')->getModel('client');
         $client    = $model->getEntity($objectId);
         $returnUrl = $this->generateUrl('mautic_client_index');
 
@@ -272,7 +272,7 @@ class ClientController extends FormController
         }
 
         $action = $this->generateUrl('mautic_client_action', array('objectAction' => 'edit', 'objectId' => $objectId));
-        $form   = $model->createForm($client, $action);
+        $form   = $model->createForm($client, $this->get('form.factory'), $action);
 
         ///Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
@@ -344,7 +344,7 @@ class ClientController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
-            $model  = $this->container->get('mautic.model.client');
+            $model  = $this->get('mautic.factory')->getModel('client');
             $entity = $model->getEntity($objectId);
             if ($entity === null) {
                 $flashes[] = array(

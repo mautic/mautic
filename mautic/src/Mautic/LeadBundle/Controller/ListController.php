@@ -57,7 +57,7 @@ class ListController extends FormController
             $filter["force"] = " ($isCommand:$mine or $isCommand:$global)";
         }
 
-        $items = $this->container->get('mautic.model.leadlist')->getEntities(
+        $items =$this->get('mautic.factory')->getModel('leadlist')->getEntities(
             array(
                 'start'      => $start,
                 'limit'      => $limit,
@@ -126,14 +126,14 @@ class ListController extends FormController
 
         //retrieve the entity
         $list     = new LeadList();
-        $model      = $this->container->get('mautic.model.leadlist');
+        $model      =$this->get('mautic.factory')->getModel('leadlist');
         //set the page we came from
         $page       = $this->get('session')->get('mautic.leadlist.page', 1);
         //set the return URL for post actions
         $returnUrl  = $this->generateUrl('mautic_leadlist_index', array('page' => $page));
         $action     = $this->generateUrl('mautic_leadlist_action', array('objectAction' => 'new'));
         //get the user form factory
-        $form       = $model->createForm($list, $action);
+        $form       = $model->createForm($list, $this->get('form.factory'),  $action);
 
         ///Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
@@ -191,7 +191,7 @@ class ListController extends FormController
      */
     public function editAction ($objectId)
     {
-        $model   = $this->container->get('mautic.model.leadlist');
+        $model   =$this->get('mautic.factory')->getModel('leadlist');
         $list    = $model->getEntity($objectId);
 
         //set the page we came from
@@ -232,7 +232,7 @@ class ListController extends FormController
         }
 
         $action = $this->generateUrl('mautic_leadlist_action', array('objectAction' => 'edit', 'objectId' => $objectId));
-        $form   = $model->createForm($list, $action);
+        $form   = $model->createForm($list, $this->get('form.factory'), $action);
 
         ///Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
@@ -311,7 +311,7 @@ class ListController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
-            $model  = $this->container->get('mautic.model.leadlist');
+            $model  =$this->get('mautic.factory')->getModel('leadlist');
             $list = $model->getEntity($objectId);
 
             if ($list === null) {

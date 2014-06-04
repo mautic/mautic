@@ -17,9 +17,9 @@ $container->setDefinition(
     new Definition(
         'Mautic\UserBundle\Form\Type\UserType',
         array(
-            new Reference("service_container"),
-            new Reference('security.context'),
-            new Reference('doctrine.orm.entity_manager')
+            new Reference("translator"),
+            new Reference('doctrine.orm.entity_manager'),
+            '%mautic.supported_languages%'
         )
     )
 )
@@ -33,7 +33,7 @@ $container->setDefinition(
     new Definition(
         'Mautic\UserBundle\Form\Type\RoleType',
         array(
-            new Reference("service_container"),
+            new Reference("translator"),
             new Reference('doctrine.orm.entity_manager')
         )
     )
@@ -48,8 +48,8 @@ $container->setDefinition(
     new Definition(
         'Mautic\UserBundle\Form\Type\PermissionsType',
         array(
-            new Reference("service_container"),
-            new Reference('doctrine.orm.entity_manager')
+            new Reference("translator"),
+            new Reference('mautic.security')
         )
     )
 )

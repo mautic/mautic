@@ -10,8 +10,9 @@
 namespace Mautic\CoreBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\OptionsResolver\Options;
 
 /**
  * Class PanelStartType
@@ -25,26 +26,40 @@ class PanelStartType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $attr = function(Options $options, $value){
-            return array(
-                'data-parent' => (isset($value['data-parent'])) ? $value['data-parent'] : '',
-                'class'       => (isset($value['class']))       ? $value['class'] : ' panel-default',
-                'id'          => (isset($value['id']))          ? $value['id'] : ''
-            );
-        };
+        $resolver->setRequired(array('dataParent', 'bodyId'));
 
         $resolver->setDefaults(array(
-            'attr'   => array(),
-            'mapped' => false
+            'attr'       => array('class' => 'panel-default'),
+            'headerAttr' => array(),
+            'bodyAttr'   => array(),
+            'mapped'     => false
         ));
 
-        $resolver->setNormalizers(array('attr' => $attr));
+        $resolver->setOptional(array('headerAttr', 'bodyAttr'));
     }
+
 
     /**
      * @return string
      */
     public function getName() {
         return "panel_start";
+    }
+
+    /**
+     * @param FormView      $view
+     * @param FormInterface $form
+     * @param array         $options
+     */
+    public function buildView(FormView $view, FormInterface $form, array $options)
+    {
+        $customVars = array('dataParent', 'bodyId', 'headerAttr', 'bodyAttr');
+
+        foreach ($customVars as $v) {
+            if (array_key_exists($v, $options)) {
+                // set an "headerAttr" variable that will be available when rendering this field
+                $view->vars[$v] = $options[$v];
+            }
+        }
     }
 }

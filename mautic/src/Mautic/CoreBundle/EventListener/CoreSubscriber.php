@@ -15,6 +15,7 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MenuEvent;
 use Mautic\CoreBundle\Event\RouteEvent;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -33,10 +34,48 @@ class CoreSubscriber extends CommonSubscriber
     {
         return array(
             KernelEvents::CONTROLLER        => array('onKernelController', 0),
+            KernelEvents::REQUEST           => array('onKernelRequest', 9999),
             CoreEvents::BUILD_MENU          => array('onBuildMenu', 9999),
             CoreEvents::BUILD_ADMIN_MENU    => array('onBuildAdminMenu', 9999),
             CoreEvents::BUILD_ROUTE         => array('onBuildRoute', 0)
         );
+    }
+
+    /**
+     * Set default timezone/locale
+     *
+     * @param GetResponseEvent $event
+     */
+    public function onKernelRequest(GetResponseEvent $event)
+    {
+        $currentUser = $this->security->getCurrentUser();
+
+        //set the user's timezone
+        $tz = $currentUser->getTimezone();
+
+        if (empty($tz)) {
+            $tz = $this->params['default_timezone'];
+        }
+        date_default_timezone_set($tz);
+
+        //set the user's default locale
+        $request = $event->getRequest();
+        if (!$request->hasPreviousSession()) {
+            return;
+        }
+
+        // try to see if the locale has been set as a _locale routing parameter
+        if ($locale = $request->attributes->get('_locale')) {
+            $request->getSession()->set('_locale', $locale);
+        } else {
+            $locale = $currentUser->getLocale();
+            if (empty($locale)) {
+                $locale = $this->params['locale'];
+            }
+
+            // if no explicit locale has been set on this request, use one from the session
+            $request->setLocale($request->getSession()->get('_locale', $locale));
+        }
     }
 
     /**

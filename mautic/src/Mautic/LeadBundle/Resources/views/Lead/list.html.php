@@ -26,8 +26,8 @@ foreach ($items as $key => $item):
         <div class="lead-profile<?php echo $activeClass; ?>" id="lead-<?php echo $item->getId(); ?>">
             <div class="padding-sm">
                 <div class="pull-left">
-                    <span class="lead-primary-identifier"><?php echo $view['translator']->trans($item->getPrimaryIdentifier($item)); ?></span>
-                    <span class="lead-secondary-identifier"><?php echo $item->getSecondaryIdentifier($item); ?></span>
+                    <span class="lead-primary-identifier"><?php echo $view['translator']->trans($item->getPrimaryIdentifier(true)); ?></span>
+                    <span class="lead-secondary-identifier"><?php echo $item->getSecondaryIdentifier(); ?></span>
                 </div>
                 <div class="pull-right padding-sm">
                     <span class="badge"><?php echo $item->getScore(); ?></span>

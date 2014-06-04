@@ -28,9 +28,10 @@ $parameters = array(
     'rememberme_path'       => '/',
     'rememberme_domain'     => '',
     'default_pagelimit'     => 30,
+    'default_timezone'      => 'UTC',
     'date_format_full'      => 'F j, Y g:i a',
     'date_format_dateonly'  => 'F j, Y',
-    'date_format_timeonly'  => 'g:i a'
+    'date_format_timeonly'  => 'g:i a',
 );
 
 return $parameters;

@@ -54,7 +54,7 @@ class LeadSubscriber extends CommonSubscriber
      */
     public function onBuildMenu(MauticEvents\MenuEvent $event)
     {
-        $security = $event->getMauticSecurity();
+        $security = $event->getSecurity();
         $path = __DIR__ . "/../Resources/config/menu/main.php";
         $items = include $path;
         $event->addMenuItems($items);
@@ -80,11 +80,9 @@ class LeadSubscriber extends CommonSubscriber
             return;
         }
 
-        $translator = $this->container->get('translator');
-        $security   = $this->container->get('mautic.security');
-        $isCommand  = $translator->trans('mautic.core.searchcommand.is');
-        $anonymous  = $translator->trans('mautic.lead.lead.searchcommand.isanonymous');
-        $mine       = $translator->trans('mautic.core.searchcommand.ismine');
+        $isCommand  = $this->translator->trans('mautic.core.searchcommand.is');
+        $anonymous  = $this->translator->trans('mautic.lead.lead.searchcommand.isanonymous');
+        $mine       = $this->translator->trans('mautic.core.searchcommand.ismine');
         $filter     = array("string" => $str, "force" => '');
 
         //only show results that are not anonymous so as to not clutter up things
@@ -92,7 +90,7 @@ class LeadSubscriber extends CommonSubscriber
             $filter['force'] = " !$isCommand:$anonymous";
         }
 
-        $permissions = $security->isGranted(
+        $permissions = $this->security->isGranted(
             array('lead:leads:viewown', 'lead:leads:viewother'),
             'RETURN_ARRAY'
         );
@@ -102,7 +100,7 @@ class LeadSubscriber extends CommonSubscriber
                 $filter['force'] .= " $isCommand:$mine";
             }
 
-            $leads = $this->container->get('mautic.model.lead')->getEntities(
+            $leads = $this->factory->getModel('lead')->getEntities(
                 array(
                     'limit'  => 5,
                     'filter' => $filter
@@ -112,13 +110,13 @@ class LeadSubscriber extends CommonSubscriber
                 $leadResults = array();
 
                 foreach ($leads as $lead) {
-                    $leadResults[] = $this->container->get('templating')->renderResponse(
+                    $leadResults[] = $this->templating->renderResponse(
                         'MauticLeadBundle:Search:lead.html.php',
                         array('lead' => $lead)
                     )->getContent();
                 }
                 if (count($leads) > 5) {
-                    $leadResults[] = $this->container->get('templating')->renderResponse(
+                    $leadResults[] = $this->templating->renderResponse(
                         'MauticLeadBundle:Search:lead.html.php',
                         array(
                             'showMore'     => true,
@@ -147,11 +145,10 @@ class LeadSubscriber extends CommonSubscriber
      */
     public function onBuildCommandList(MauticEvents\CommandListEvent $event)
     {
-        $security   = $this->container->get("mautic.security");
-        if ($security->isGranted(array('lead:leads:viewown', 'lead:leads:viewother'), "MATCH_ONE")) {
+        if ($this->security->isGranted(array('lead:leads:viewown', 'lead:leads:viewother'), "MATCH_ONE")) {
             $event->addCommands(
                 'mautic.lead.lead.header.index',
-                $this->container->get('mautic.model.lead')->getCommandList()
+                $this->factory->getModel('lead')->getCommandList()
             );
         }
     }
@@ -176,8 +173,7 @@ class LeadSubscriber extends CommonSubscriber
     {
         $lead = $event->getLead();
         if (!empty($this->changes)) {
-            $serializer = $this->container->get('jms_serializer');
-            $details    = $serializer->serialize($this->changes, 'json');
+            $details = $this->serializer->serialize($this->changes, 'json');
             if (isset($this->changes->fieldChangeset)) {
                 //a bit overkill but the only way I could get around JMS Serilizer's exposed settings for the lead entity
                 $details         = json_decode($details);
@@ -192,13 +188,12 @@ class LeadSubscriber extends CommonSubscriber
                 "details"   => $details,
                 "ipAddress" => $this->request->server->get('REMOTE_ADDR')
             );
-            $this->container->get('mautic.model.auditlog')->writeToLog($log);
+            $this->factory->getModel('auditlog')->writeToLog($log);
 
             //trigger the score change event
             if (!$event->isNew() && isset($this->changes["score"])) {
-                $dispatcher = $this->container->get('event_dispatcher');
                 $scoreEvent = new Events\ScoreChangeEvent($lead, $this->changes['score'][0], $this->changes['score'][0]);
-                $dispatcher->dispatch(LeadEvents::LEAD_SCORE_CHANGE, $scoreEvent);
+                $this->dispatcher->dispatch(LeadEvents::LEAD_SCORE_CHANGE, $scoreEvent);
             }
         }
     }
@@ -211,8 +206,7 @@ class LeadSubscriber extends CommonSubscriber
     public function onLeadDelete(Events\LeadEvent $event)
     {
         $lead = $event->getLead();
-        $serializer = $this->container->get('jms_serializer');
-        $details    = $serializer->serialize($lead, 'json');
+        $details = $this->serializer->serialize($lead, 'json');
         $log = array(
             "bundle"     => "lead",
             "object"     => "lead",
@@ -221,7 +215,7 @@ class LeadSubscriber extends CommonSubscriber
             "details"    => $details,
             "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
         );
-        $this->container->get('mautic.model.auditlog')->writeToLog($log);
+        $this->factory->getModel('auditlog')->writeToLog($log);
     }
 
 
@@ -245,8 +239,7 @@ class LeadSubscriber extends CommonSubscriber
     {
         $field = $event->getField();
         if (!empty($this->changes)) {
-            $serializer = $this->container->get('jms_serializer');
-            $details    = $serializer->serialize($this->changes, 'json');
+            $details = $this->serializer->serialize($this->changes, 'json');
 
             $log = array(
                 "bundle"    => "lead",
@@ -256,7 +249,7 @@ class LeadSubscriber extends CommonSubscriber
                 "details"   => $details,
                 "ipAddress" => $this->request->server->get('REMOTE_ADDR')
             );
-            $this->container->get('mautic.model.auditlog')->writeToLog($log);
+            $this->factory->getModel('auditlog')->writeToLog($log);
         }
     }
 
@@ -268,8 +261,7 @@ class LeadSubscriber extends CommonSubscriber
     public function onFieldDelete(Events\LeadFieldEvent $event)
     {
         $field = $event->getField();
-        $serializer = $this->container->get('jms_serializer');
-        $details    = $serializer->serialize($field, 'json');
+        $details = $this->serializer->serialize($field, 'json');
         $log = array(
             "bundle"     => "lead",
             "object"     => "field",
@@ -278,7 +270,7 @@ class LeadSubscriber extends CommonSubscriber
             "details"    => $details,
             "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
         );
-        $this->container->get('mautic.model.auditlog')->writeToLog($log);
+        $this->factory->getModel('auditlog')->writeToLog($log);
     }
 
     /**
@@ -288,6 +280,6 @@ class LeadSubscriber extends CommonSubscriber
      */
     public function onUserDelete(UserEvent $event)
     {
-        $this->container->get('mautic.model.lead')->disassociateOwner($event->getUser()->getId());
+        $this->factory->getModel('lead')->disassociateOwner($event->getUser()->getId());
     }
 }

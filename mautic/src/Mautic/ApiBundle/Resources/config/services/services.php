@@ -15,7 +15,8 @@ $container->setDefinition ('mautic.api_route_loader',
     new Definition(
         'Mautic\ApiBundle\Routing\RouteLoader',
         array(
-            new Reference('service_container')
+            new Reference('event_dispatcher'),
+            '%mautic.parameters%'
         )
     )
 )
@@ -25,9 +26,7 @@ $container->setDefinition ('mautic.api_route_loader',
 $container->setDefinition ('mautic.api_docs_route_loader',
     new Definition(
         'Mautic\ApiBundle\Routing\ApiDocsLoader',
-        array(
-            new Reference('service_container')
-        )
+        array('%kernel.environment%')
     )
 )
     ->addTag('routing.loader');

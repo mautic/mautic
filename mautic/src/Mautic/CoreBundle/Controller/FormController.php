@@ -104,7 +104,7 @@ class FormController extends CommonController {
             if (strpos($model, ':')) {
                 list($bundle, $object) = explode(':', $model);
             }
-            $model = $this->get('mautic.model.'.$object);
+            $model = $this->get('mautic.factory')->getModel($object);
 
             $entity = $model->getEntity($id);
             if ($entity !== null) {
@@ -129,7 +129,7 @@ class FormController extends CommonController {
                         "details"   => $details,
                         "ipAddress" => $this->request->server->get('REMOTE_ADDR')
                     );
-                    $this->container->get('mautic.model.auditlog')->writeToLog($log);
+                    $this->get('mautic.factory')->getModel('auditlog')->writeToLog($log);
 
                     $model->unlockEntity($entity);
                 }

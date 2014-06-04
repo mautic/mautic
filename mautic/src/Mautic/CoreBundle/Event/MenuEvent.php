@@ -25,34 +25,22 @@ class MenuEvent extends Event
      */
     protected $menuItems = array('children' => array());
 
-    protected $securityContext;
-
-    protected $mauticSecurity;
+    protected $security;
 
     /**
-     * @param $securityContext
      * @param $mauticSecurity
      */
-    public function __construct(SecurityContext $securityContext, CorePermissions $mauticSecurity)
+    public function __construct(CorePermissions $mauticSecurity)
     {
-        $this->security       = $securityContext;
-        $this->mauticSecurity = $mauticSecurity;
+        $this->security = $mauticSecurity;
     }
 
     /**
      * @return mixed
      */
-    public function getSecurityContext()
+    public function getSecurity()
     {
         return $this->security;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getMauticSecurity()
-    {
-        return $this->mauticSecurity;
     }
 
     /**

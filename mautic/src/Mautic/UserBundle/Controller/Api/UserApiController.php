@@ -27,7 +27,7 @@ class UserApiController extends CommonApiController
 
     public function initialize(FilterControllerEvent $event)
     {
-        $this->model           = $this->container->get('mautic.model.user');
+        $this->model           = $this->get('mautic.factory')->getModel('user');
         $this->entityClass     = 'Mautic\UserBundle\Entity\User';
         $this->entityNameOne   = 'user';
         $this->entityNameMulti = 'users';
@@ -159,7 +159,8 @@ class UserApiController extends CommonApiController
 
         if (isset($parameters['plainPassword']['password'])) {
             $submittedPassword = $parameters['plainPassword']['password'];
-            $entity->setPassword($this->model->checkNewPassword($entity, $submittedPassword));
+            $encoder           = $this->get('security.encoder_factory')->getEncoder($entity);
+            $entity->setPassword($this->model->checkNewPassword($entity, $encoder, $submittedPassword));
         }
         $this->serializerGroups = array('full');
         return $this->processForm($entity, $parameters, 'POST');
@@ -208,7 +209,8 @@ class UserApiController extends CommonApiController
                 $entity = $this->model->getEntity();
                 if (isset($parameters['plainPassword']['password'])) {
                     $submittedPassword = $parameters['plainPassword']['password'];
-                    $entity->setPassword($this->model->checkNewPassword($entity, $submittedPassword));
+                    $encoder           = $this->get('security.encoder_factory')->getEncoder($entity);
+                    $entity->setPassword($this->model->checkNewPassword($entity, $encoder, $submittedPassword));
                 }
             }
         } else {
@@ -306,7 +308,7 @@ class UserApiController extends CommonApiController
 
         $filter = $this->request->query->get('filter', null);
         $limit  = $this->request->query->get('limit', null);
-        $roles = $this->container->get('mautic.model.user')->getLookupResults('role', $filter, $limit);
+        $roles = $this->get('mautic.factory')->getModel('user')->getLookupResults('role', $filter, $limit);
 
         $view = $this->view($roles, Codes::HTTP_OK);
         $context = SerializationContext::create()->setGroups(array('limited'));

@@ -51,7 +51,7 @@ class UserApiControllerTest extends MauticWebTestCase
             ->get('security.encoder_factory')
             ->getEncoder($user);
         $user->setPassword($encoder->encodePassword('mautic', $user->getSalt()));
-        return $this->container->get('mautic.model.user')->saveEntity($user);
+        return $this->container->get('mautic.factory')->getModel('user')->saveEntity($user);
     }
 
     public function testGetEntities()

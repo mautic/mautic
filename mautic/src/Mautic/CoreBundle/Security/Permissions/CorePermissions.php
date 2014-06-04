@@ -9,7 +9,8 @@
 
 namespace Mautic\CoreBundle\Security\Permissions;
 
-use Symfony\Component\DependencyInjection\Container;
+use Mautic\UserBundle\Entity\User;
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Doctrine\ORM\EntityManager;
 use Mautic\UserBundle\Entity\Permission;
@@ -25,7 +26,7 @@ class CorePermissions {
     /**
      * @var
      */
-    private $container;
+    private $translator;
 
     /**
      * @var array
@@ -38,19 +39,22 @@ class CorePermissions {
     private $em;
 
     /**
-     * @var \Symfony\Component\Security\Core\SecurityContext
+     * @var array
      */
-    private $securityContext;
+    private $params;
 
     /**
-     * @param Container $container
-     * @param array     $bundles
+     * @var \Symfony\Component\Security\Core\SecurityContext
      */
-    public function __construct(Container $container, EntityManager $em, array $bundles, SecurityContext $securityContext) {
-        $this->container       = $container;
+    private $security;
+
+
+    public function __construct(TranslatorInterface $translator, EntityManager $em, SecurityContext $security, array $bundles, array $params) {
+        $this->translator      = $translator;
         $this->em              = $em;
         $this->bundles         = $bundles;
-        $this->securityContext = $securityContext;
+        $this->security = $security;
+        $this->params          = $params;
     }
 
     /**
@@ -90,7 +94,7 @@ class CorePermissions {
                 $bundle    = ucfirst($bundle);
                 $className = "Mautic\\{$bundle}Bundle\\Security\\Permissions\\{$bundle}Permissions";
                 if (class_exists($className)) {
-                    $classes[$bundle] = new $className($this->container, $this->em);
+                    $classes[$bundle] = new $className($this->params);
                 } elseif ($throwException) {
                     throw new NotFoundHttpException("$className not found!");
                 } else {
@@ -160,12 +164,8 @@ class CorePermissions {
      */
     public function isGranted ($requestedPermission, $mode = "MATCH_ALL", $userEntity = null)
     {
-        if ($this->container->get('security.context')->getToken() === null) {
-            throw new NotFoundHttpException('No security context found.');
-        }
-
         if ($userEntity === null) {
-           $userEntity = $this->container->get('security.context')->getToken()->getUser();
+           $userEntity = $this->getCurrentUser();
         }
 
         if (!is_array($requestedPermission)) {
@@ -176,7 +176,7 @@ class CorePermissions {
         foreach ($requestedPermission as $permission) {
             $parts = explode(':', $permission);
             if (count($parts) != 3) {
-                throw new NotFoundHttpException($this->container->get('translator')->trans('mautic.core.permissions.badformat',
+                throw new NotFoundHttpException($this->translator->trans('mautic.core.permissions.badformat',
                         array("%permission%" => $permission))
                 );
             }
@@ -193,7 +193,7 @@ class CorePermissions {
 
             //Is the permission supported?
             if (!$permissionObject->isSupported($parts[1], $parts[2])) {
-                throw new NotFoundHttpException($this->container->get('translator')->trans('mautic.core.permissions.notfound',
+                throw new NotFoundHttpException($this->translator->trans('mautic.core.permissions.notfound',
                         array("%permission%" => $permission))
                 );
             }
@@ -218,7 +218,7 @@ class CorePermissions {
         } elseif ($mode == "RETURN_ARRAY") {
             return $permissions;
         } else {
-            throw new NotFoundHttpException($this->container->get('translator')->trans('mautic.core.permissions.mode.notfound',
+            throw new NotFoundHttpException($this->translator->trans('mautic.core.permissions.mode.notfound',
                     array("%mode%" => $mode))
             );
         }
@@ -256,7 +256,7 @@ class CorePermissions {
         }
 
         $ownerId = (!empty($owner)) ? $owner->getId() : 0;
-        $me = $this->securityContext->getToken()->getUser();
+        $me = $this->security->getToken()->getUser();
         if ($ownerId === 0) {
             if ($other) {
                 return true;
@@ -305,7 +305,7 @@ class CorePermissions {
      */
     public function isAdmin()
     {
-        return $this->securityContext->getToken()->getUser()->getRole()->isAdmin();
+        return $this->security->getToken()->getUser()->getRole()->isAdmin();
     }
 
     /**
@@ -315,6 +315,11 @@ class CorePermissions {
      */
     public function getCurrentUser()
     {
-        return $this->securityContext->getToken()->getUser();
+        $token = $this->security->getToken();
+        if (null !== $token) {
+            return $token->getUser();
+        } else {
+            return new User();
+        }
     }
 }

@@ -201,11 +201,7 @@ h6 {
   border-bottom: #b2b2b2 1px solid;
   padding: 7px;
 }
-.global-search-panel .panel-heading a {
-  display: block;
-  height: 100%;
-  width: 100%;
-}
+
 .gs-count-badge {
   position: absolute;
   right: 10px;
@@ -545,6 +541,13 @@ ul.droppable {
 li.ui-draggable {
   list-style: none;
 }
+
+.panel-heading a {
+    display: block;
+    height: 100%;
+    width: 100%;
+}
+
 @media (max-width: 767px) {
   .left-panel {
     left: 0 ;

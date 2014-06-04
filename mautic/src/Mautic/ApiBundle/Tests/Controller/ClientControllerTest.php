@@ -37,7 +37,7 @@ class ClientControllerTest extends MauticWebTestCase
         $client = new Client();
         $client->setName("Login Test");
         $client->setRedirectUris(array("https://mautic.com"));
-        $this->container->get('mautic.model.client')->saveEntity($client);
+        $this->container->get('mautic.factory')->getModel('client')->saveEntity($client);
 
         return $client;
     }

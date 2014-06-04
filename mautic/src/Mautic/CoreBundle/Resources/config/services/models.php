@@ -7,19 +7,5 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\Parameter;
-
 //Audit log model
-$container->setDefinition(
-    'mautic.model.auditlog',
-    new Definition(
-        'Mautic\CoreBundle\Model\AuditLogModel',
-        array(
-            new Reference('service_container'),
-            new Reference('request_stack'),
-            new Reference('doctrine.orm.entity_manager'),
-        )
-    )
-);
+$container->setParameter('mautic.model.auditlog', 'Mautic\CoreBundle\Model\AuditLogModel');

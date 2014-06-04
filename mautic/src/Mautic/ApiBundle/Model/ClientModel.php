@@ -35,18 +35,19 @@ class ClientModel extends FormModel
      * {@inheritdoc}
      *
      * @param      $entity
+     * @param      $formFactory
      * @param null $action
      * @return mixed
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    public function createForm($entity, $action = null)
+    public function createForm($entity, $formFactory, $action = null)
     {
         if (!$entity instanceof Client) {
             throw new MethodNotAllowedHttpException(array('Client'), 'Entity must be of class Client()');
         }
 
         $params = (!empty($action)) ? array('action' => $action) : array();
-        return $this->container->get('form.factory')->create('client', $entity, $params);
+        return $formFactory->create('client', $entity, $params);
     }
 
     /**
@@ -85,13 +86,12 @@ class ClientModel extends FormModel
             $event->setEntityManager($this->em);
         }
 
-        $dispatcher = $this->container->get('event_dispatcher');
         switch ($action) {
             case "post_save":
-                $dispatcher->dispatch(ApiEvents::CLIENT_POST_SAVE, $event);
+                $this->dispatcher->dispatch(ApiEvents::CLIENT_POST_SAVE, $event);
                 break;
             case "post_delete":
-                $dispatcher->dispatch(ApiEvents::CLIENT_POST_DELETE, $event);
+                $this->dispatcher->dispatch(ApiEvents::CLIENT_POST_DELETE, $event);
                 break;
         }
 

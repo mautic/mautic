@@ -14,12 +14,13 @@ use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormError;
 use Mautic\CoreBundle\Form\DataTransformer as Transformers;
+use Symfony\Component\Validator\Validator;
 
 /**
  * Class ClientType
@@ -29,13 +30,16 @@ use Mautic\CoreBundle\Form\DataTransformer as Transformers;
 class ClientType extends AbstractType
 {
 
-    private $container;
+    private $translator;
+    private $validator;
 
     /**
-     * @param Container $container
+     * @param TranslatorInterface $translator
+     * @param Validator  $validator
      */
-    public function __construct(Container $container) {
-        $this->container       = $container;
+    public function __construct(TranslatorInterface $translator, Validator $validator) {
+        $this->translator = $translator;
+        $this->validator  = $validator;
     }
 
     /**
@@ -45,7 +49,7 @@ class ClientType extends AbstractType
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber());
-        $builder->addEventSubscriber(new FormExitSubscriber($this->container->get('translator')->trans(
+        $builder->addEventSubscriber(new FormExitSubscriber($this->translator->trans(
             'mautic.core.form.inform'
         )));
 
@@ -111,13 +115,13 @@ class ClientType extends AbstractType
                     $urlConstraint = new Assert\Url(array(
                         'protocols' => array('https')
                     ));
-                    $urlConstraint->message = $this->container->get('translator')->trans(
+                    $urlConstraint->message = $this->translator->trans(
                         'mautic.api.client.redirecturl.invalid',
                         array('%url%' => $uri),
                         'validators'
                     );
 
-                    $errors = $this->container->get('validator')->validateValue(
+                    $errors = $this->validator->validateValue(
                         $uri,
                         $urlConstraint
                     );

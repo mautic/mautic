@@ -8,13 +8,13 @@
 }
 
 .lead-list {
-    height: 100%;
+    height: 450px;
     overflow: hidden;
     padding-right: 2px;
 }
 
 .lead-details {
-    height: 100%;
+    height: 450px;
     padding-left: 2px;
     overflow: hidden;
 }

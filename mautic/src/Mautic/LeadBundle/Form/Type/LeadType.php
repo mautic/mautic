@@ -9,10 +9,11 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\UserBundle\Form\DataTransformer as Transformers;
-use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -25,16 +26,19 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 class LeadType extends AbstractType
 {
 
-    private $container;
+    private $translator;
+    private $factory;
     private $em;
 
     /**
-     * @param Container     $container
-     * @param EntityManager $em
+     * @param TranslatorInterface $translator
+     * @param MauticFactory       $factory
+     * @param EntityManager       $em
      */
-    public function __construct(Container $container, EntityManager $em) {
-        $this->container = $container;
-        $this->em        = $em;
+    public function __construct(TranslatorInterface $translator, MauticFactory $factory, EntityManager $em) {
+        $this->translator = $translator;
+        $this->factory    = $factory;
+        $this->em         = $em;
     }
 
     /**
@@ -44,7 +48,7 @@ class LeadType extends AbstractType
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber());
-        $builder->addEventSubscriber(new FormExitSubscriber($this->container->get('translator')->trans(
+        $builder->addEventSubscriber(new FormExitSubscriber($this->translator->trans(
             'mautic.core.form.inform'
         )));
         $builder->add('owner_lookup', 'text', array(
@@ -67,7 +71,7 @@ class LeadType extends AbstractType
         );
 
         //get a list of fields
-        $fields      = $this->container->get('mautic.model.leadfield')->getEntities();
+        $fields      = $this->factory->getModel('leadfield')->getEntities();
         $fieldValues = (!empty($options['data'])) ? $options['data']->getFields() : array('filter' => array('isVisible' => true));
         $values      = array();
         foreach ($fieldValues as $v) {

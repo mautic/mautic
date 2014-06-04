@@ -37,17 +37,18 @@ class LeadModel extends FormModel
      * {@inheritdoc}
      *
      * @param      $entity
+     * @param      $formFactory
      * @param null $action
      * @return mixed
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    public function createForm($entity, $action = null)
+    public function createForm($entity, $formFactory, $action = null)
     {
         if (!$entity instanceof Lead) {
             throw new MethodNotAllowedHttpException(array('Lead'), 'Entity must be of class Lead()');
         }
         $params = (!empty($action)) ? array('action' => $action) : array();
-        return $this->container->get('form.factory')->create('lead', $entity, $params);
+        return $formFactory->create('lead', $entity, $params);
     }
 
     /**
@@ -87,19 +88,19 @@ class LeadModel extends FormModel
             $event = new LeadEvent($entity, $isNew);
             $event->setEntityManager($this->em);
         }
-        $dispatcher = $this->container->get('event_dispatcher');
+
         switch ($action) {
             case "pre_save":
-                $dispatcher->dispatch(LeadEvents::LEAD_PRE_SAVE, $event);
+                $this->dispatcher->dispatch(LeadEvents::LEAD_PRE_SAVE, $event);
                 break;
             case "post_save":
-                $dispatcher->dispatch(LeadEvents::LEAD_POST_SAVE, $event);
+                $this->dispatcher->dispatch(LeadEvents::LEAD_POST_SAVE, $event);
                 break;
             case "pre_delete":
-                $dispatcher->dispatch(LeadEvents::LEAD_PRE_DELETE, $event);
+                $this->dispatcher->dispatch(LeadEvents::LEAD_PRE_DELETE, $event);
                 break;
             case "post_delete":
-                $dispatcher->dispatch(LeadEvents::LEAD_POST_DELETE, $event);
+                $this->dispatcher->dispatch(LeadEvents::LEAD_POST_DELETE, $event);
                 break;
         }
 
@@ -117,7 +118,7 @@ class LeadModel extends FormModel
     {
         //save the field values
         $fieldValues   = $lead->getFields();
-        $fieldModel    = $this->container->get('mautic.model.leadfield');
+        $fieldModel    = $this->factory->getModel('leadfield');
         $fields        = $fieldModel->getEntities();
         $updatedFields = array();
         //update existing values

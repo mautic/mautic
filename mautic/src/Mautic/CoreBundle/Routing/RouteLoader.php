@@ -12,8 +12,8 @@ namespace Mautic\CoreBundle\Routing;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\RouteEvent;
 use Symfony\Component\Config\Loader\Loader;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\DependencyInjection\Container;
 
 /**
  * Class RouteLoader
@@ -24,14 +24,14 @@ use Symfony\Component\DependencyInjection\Container;
 class RouteLoader extends Loader
 {
     private   $loaded    = false;
-    protected $container;
+    protected $dispatcher;
 
     /**
-     * @param Container $container
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function __construct(Container $container)
+    public function __construct(EventDispatcherInterface $dispatcher)
     {
-        $this->container = $container;
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -51,7 +51,7 @@ class RouteLoader extends Loader
         $collection = new RouteCollection();
 
         $event      = new RouteEvent($this, $collection);
-        $this->container->get('event_dispatcher')->dispatch(CoreEvents::BUILD_ROUTE, $event);
+        $this->dispatcher->dispatch(CoreEvents::BUILD_ROUTE, $event);
 
         $this->loaded = true;
 

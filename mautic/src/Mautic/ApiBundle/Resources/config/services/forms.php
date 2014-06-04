@@ -15,7 +15,10 @@ $container->setDefinition(
     'mautic.form.type.apiclients',
     new Definition(
         'Mautic\ApiBundle\Form\Type\ClientType',
-        array(new Reference('service_container'))
+        array(
+            new Reference('translator'),
+            new Reference('validator')
+        )
     )
 )
     ->addTag('form.type', array(

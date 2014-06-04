@@ -12,9 +12,8 @@ namespace Mautic\ApiBundle\Routing;
 use Mautic\ApiBundle\ApiEvents;
 use Mautic\ApiBundle\Event\RouteEvent;
 use Symfony\Component\Config\Loader\Loader;
-use Symfony\Component\Finder\Finder;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\DependencyInjection\Container;
 
 /**
  * Class RouteLoader
@@ -24,15 +23,17 @@ use Symfony\Component\DependencyInjection\Container;
 
 class RouteLoader extends Loader
 {
-    private   $loaded    = false;
-    protected $bundles   = array();
+    private $loaded    = false;
+    private $dispatcher;
+    private $params;
 
     /**
      * @param Container $container
      */
-    public function __construct(Container $container)
+    public function __construct(EventDispatcherInterface $dispatcher, array $params)
     {
-        $this->container = $container;
+        $this->dispatcher = $dispatcher;
+        $this->params     = $params;
     }
 
     /**
@@ -50,9 +51,9 @@ class RouteLoader extends Loader
         }
 
         $collection = new RouteCollection();
-        if ($this->container->getParameter('mautic.api_enabled')) {
+        if (!empty($this->params['api_enabled'])) {
             $event = new RouteEvent($this, $collection);
-            $this->container->get('event_dispatcher')->dispatch(ApiEvents::BUILD_ROUTE, $event);
+            $this->dispatcher->dispatch(ApiEvents::BUILD_ROUTE, $event);
         }
 
         $this->loaded = true;

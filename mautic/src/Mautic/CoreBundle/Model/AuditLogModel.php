@@ -41,11 +41,10 @@ class AuditLogModel extends CommonModel
         $log->setDetails($details);
         $log->setIpAddress($ipAddress);
 
-        $token = $this->container->get('security.context')->getToken();
+        $user   = $this->security->getCurrentUser();
         $userId = 0;
         $userName = '';
-        if (!empty($token)) {
-            $user = $token->getUser();
+        if ($user->getId()) {
             $userId = $user->getId();
             $userName = $user->getName();
         }

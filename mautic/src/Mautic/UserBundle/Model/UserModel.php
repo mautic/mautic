@@ -51,14 +51,13 @@ class UserModel extends FormModel
      * Checks for a new password and rehashes if necessary
      *
      * @param User $entity
+     * @param      $encoder
      * @param      $submittedPassword
      * @return int|string
      */
-    public function checkNewPassword(User $entity, $submittedPassword) {
+    public function checkNewPassword(User $entity, $encoder, $submittedPassword) {
         if (!empty($submittedPassword)) {
             //hash the clear password submitted via the form
-            $security = $this->container->get('security.encoder_factory');
-            $encoder  = $security->getEncoder($entity);
             $password = $encoder->encodePassword($submittedPassword, $entity->getSalt());
         } else {
             //get the original password to save if password is empty from the form
@@ -75,17 +74,18 @@ class UserModel extends FormModel
      * {@inheritdoc}
      *
      * @param      $entity
+     * @param      $formFactory
      * @param null $action
      * @return mixed
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    public function createForm($entity, $action = null)
+    public function createForm($entity, $formFactory, $action = null)
     {
         if (!$entity instanceof User) {
             throw new MethodNotAllowedHttpException(array('User'), 'Entity must be of class User()');
         }
         $params = (!empty($action)) ? array('action' => $action) : array();
-        return $this->container->get('form.factory')->create('user', $entity, $params);
+        return $formFactory->create('user', $entity, $params);
     }
 
     /**
@@ -132,19 +132,18 @@ class UserModel extends FormModel
             $event->setEntityManager($this->em);
         }
 
-        $dispatcher = $this->container->get('event_dispatcher');
         switch ($action) {
             case "pre_save":
-                $dispatcher->dispatch(UserEvents::USER_PRE_SAVE, $event);
+                $this->dispatcher->dispatch(UserEvents::USER_PRE_SAVE, $event);
                 break;
             case "post_save":
-                $dispatcher->dispatch(UserEvents::USER_POST_SAVE, $event);
+                $this->dispatcher->dispatch(UserEvents::USER_POST_SAVE, $event);
                 break;
             case "pre_delete":
-                $dispatcher->dispatch(UserEvents::USER_PRE_DELETE, $event);
+                $this->dispatcher->dispatch(UserEvents::USER_PRE_DELETE, $event);
                 break;
             case "post_delete":
-                $dispatcher->dispatch(UserEvents::USER_POST_DELETE, $event);
+                $this->dispatcher->dispatch(UserEvents::USER_POST_DELETE, $event);
                 break;
         }
         return $event;

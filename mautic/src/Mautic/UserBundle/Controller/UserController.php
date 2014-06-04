@@ -62,7 +62,7 @@ class UserController extends FormController
         }
 
         $tmpl       = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
-        $users      = $this->container->get('mautic.model.user')->getEntities(
+        $users      = $this->get('mautic.factory')->getModel('user')->getEntities(
             array(
                 'start'      => $start,
                 'limit'      => $limit,
@@ -135,7 +135,7 @@ class UserController extends FormController
         if (!$this->get('mautic.security')->isGranted('user:users:create')) {
             return $this->accessDenied();
         }
-        $model      = $this->container->get('mautic.model.user');
+        $model      = $this->get('mautic.factory')->getModel('user');
 
         //retrieve the user entity
         $user       = $model->getEntity();
@@ -147,19 +147,20 @@ class UserController extends FormController
 
         //get the user form factory
         $action     = $this->generateUrl('mautic_user_action', array('objectAction' => 'new'));
-        $form       = $model->createForm($user, $action);
+        $form       = $model->createForm($user, $this->get('form.factory'), $action);
 
         ///Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
             //check to see if the password needs to be rehashed
             $submittedPassword  = $this->request->request->get('user[plainPassword][password]', null, true);
-            $password           = $model->checkNewPassword($user, $submittedPassword);
+            $encoder            = $this->get('security.encoder_factory')->getEncoder($user);
+            $password           = $model->checkNewPassword($user, $encoder, $submittedPassword);
             $valid = $this->checkFormValidity($form);
 
             if ($valid === 1) {
                 //form is valid so process the data
                 $user->setPassword($password);
-                $this->container->get('mautic.model.user')->saveEntity($user);
+                $this->get('mautic.factory')->getModel('user')->saveEntity($user);
             }
 
             if (!empty($valid)) { //cancelled or success
@@ -219,7 +220,7 @@ class UserController extends FormController
         if (!$this->get('mautic.security')->isGranted('user:users:edit')) {
             return $this->accessDenied();
         }
-        $model   = $this->container->get('mautic.model.user');
+        $model   = $this->get('mautic.factory')->getModel('user');
         $user    = $model->getEntity($objectId);
 
         //set the page we came from
@@ -256,13 +257,14 @@ class UserController extends FormController
         }
 
         $action = $this->generateUrl('mautic_user_action', array('objectAction' => 'edit', 'objectId' => $objectId));
-        $form   = $model->createForm($user, $action);
+        $form   = $model->createForm($user, $this->get('form.factory'), $action);
 
         ///Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
             //check to see if the password needs to be rehashed
             $submittedPassword  = $this->request->request->get('user[plainPassword][password]', null, true);
-            $password           = $model->checkNewPassword($user, $submittedPassword);
+            $encoder            = $this->get('security.encoder_factory')->getEncoder($user);
+            $password           = $model->checkNewPassword($user, $encoder, $submittedPassword);
             $valid              = $this->checkFormValidity($form);
 
             if ($valid === 1) {
@@ -353,7 +355,7 @@ class UserController extends FormController
         if ($this->request->getMethod() == 'POST') {
             //ensure the user logged in is not getting deleted
             if ((int) $currentUser->getId() !== (int) $objectId) {
-                $model = $this->container->get('mautic.model.user');
+                $model = $this->get('mautic.factory')->getModel('user');
                 $entity = $model->getEntity($objectId);
 
                 if ($entity === null) {
@@ -403,7 +405,7 @@ class UserController extends FormController
         switch ($ajaxAction) {
             case "rolelist":
                 $filter  = InputHelper::clean($request->query->get('filter'));
-                $results = $this->get('mautic.model.user')->getLookupResults('role', $filter);
+                $results = $this->get('mautic.factory')->getModel('user')->getLookupResults('role', $filter);
                 $dataArray = array();
                 foreach ($results as $r) {
                     $dataArray[] = array(
@@ -414,7 +416,7 @@ class UserController extends FormController
                 break;
             case "positionlist":
                 $filter  = InputHelper::clean($request->query->get('filter'));
-                $results = $this->get('mautic.model.user')->getLookupResults('position', $filter);
+                $results = $this->get('mautic.factory')->getModel('user')->getLookupResults('position', $filter);
                 $dataArray = array();
                 foreach ($results as $r) {
                     $dataArray[] = array('value' => $r['position']);
@@ -429,7 +431,7 @@ class UserController extends FormController
 
     public function contactAction($objectId)
     {
-        $model   = $this->container->get('mautic.model.user');
+        $model   = $this->get('mautic.factory')->getModel('user');
         $user    = $model->getEntity($objectId);
 
         //user not found
@@ -499,7 +501,7 @@ class UserController extends FormController
                         "details"   => $details,
                         "ipAddress" => $this->request->server->get('REMOTE_ADDR')
                     );
-                    $this->container->get('mautic.model.auditlog')->writeToLog($log);
+                    $this->get('mautic.factory')->getModel('auditlog')->writeToLog($log);
 
                     $this->request->getSession()->getFlashBag()->add('notice',
                         $this->get('translator')->trans(
@@ -522,7 +524,7 @@ class UserController extends FormController
             $form->get('returnUrl')->setData($returnUrl);
 
             if (!empty($reEntity) && !empty($reEntityId) && $this->has('mautic.model.' . $reEntity)) {
-                $model  = $this->get('mautic.model.' . $reEntity);
+                $model  = $this->get('mautic.factory')->getModel($reEntity);
                 $entity = $model->getEntity($reEntityId);
 
                 if ($entity !== null) {

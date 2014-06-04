@@ -12,37 +12,16 @@ namespace Mautic\DashboardBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvent;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Class DashboardSubscriber
  *
  * @package Mautic\DashboardBundle\EventListener
  */
-class DashboardSubscriber implements EventSubscriberInterface
+class DashboardSubscriber extends CommonSubscriber
 {
-
-    /**
-     * @var \Symfony\Component\DependencyInjection\ContainerInterface
-     */
-    protected $container;
-
-    /**
-     * @var null|\Symfony\Component\HttpFoundation\Request
-     */
-    protected $request;
-
-    /**
-     * @param ContainerInterface $container
-     */
-    public function __construct (ContainerInterface $container, RequestStack $request_stack)
-    {
-        $this->container = $container;
-        $this->request   = $request_stack->getCurrentRequest();
-    }
-
     /**
      * @return array
      */

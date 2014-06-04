@@ -29,7 +29,7 @@ class FieldController extends FormController
             return $this->accessDenied();
         }
 
-        $items = $this->container->get('mautic.model.leadfield')->getEntities();
+        $items = $this->get('mautic.factory')->getModel('leadfield')->getEntities();
 
         return $this->delegateView(array(
             'viewParameters'  => array('items' => $items),
@@ -55,12 +55,12 @@ class FieldController extends FormController
 
         //retrieve the entity
         $field     = new LeadField();
-        $model      = $this->container->get('mautic.model.leadfield');
+        $model      = $this->get('mautic.factory')->getModel('leadfield');
         //set the return URL for post actions
         $returnUrl  = $this->generateUrl('mautic_leadfield_index');
         $action     = $this->generateUrl('mautic_leadfield_action', array('objectAction' => 'new'));
         //get the user form factory
-        $form       = $model->createForm($field, $action);
+        $form       = $model->createForm($field, $this->get('form.factory'), $action);
 
         ///Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
@@ -129,7 +129,7 @@ class FieldController extends FormController
             return $this->accessDenied();
         }
 
-        $model   = $this->container->get('mautic.model.leadfield');
+        $model   = $this->get('mautic.factory')->getModel('leadfield');
         $field   = $model->getEntity($objectId);
 
         //set the return URL
@@ -162,7 +162,7 @@ class FieldController extends FormController
         }
 
         $action = $this->generateUrl('mautic_leadfield_action', array('objectAction' => 'edit', 'objectId' => $objectId));
-        $form   = $model->createForm($field, $action);
+        $form   = $model->createForm($field, $this->get('form.factory'), $action);
 
         ///Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
@@ -252,7 +252,7 @@ class FieldController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
-            $model  = $this->container->get('mautic.model.leadfield');
+            $model  = $this->get('mautic.factory')->getModel('leadfield');
             $field = $model->getEntity($objectId);
 
             if ($field === null) {
@@ -300,7 +300,7 @@ class FieldController extends FormController
             case "reorder":
                 $fields = $this->request->request->get('field');
                 if (!empty($fields)) {
-                    $this->get('mautic.model.leadfield')->reorderFieldsByList($fields);
+                    $this->get('mautic.factory')->getModel('leadfield')->reorderFieldsByList($fields);
                     $dataArray['success'] = 1;
                 }
                 break;

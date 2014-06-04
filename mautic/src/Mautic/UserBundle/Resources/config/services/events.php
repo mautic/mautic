@@ -17,9 +17,14 @@ $container->setDefinition(
     new Definition(
         'Mautic\UserBundle\EventListener\UserSubscriber',
         array(
-            new Reference('service_container'),
+            new Reference('templating'),
             new Reference('request_stack'),
-            new Reference('doctrine.orm.entity_manager')
+            new Reference('jms_serializer'),
+            new Reference('mautic.security'),
+            new Reference('translator'),
+            new Reference('event_dispatcher'),
+            new Reference('mautic.factory'),
+            '%mautic.parameters%'
         )
     )
 )

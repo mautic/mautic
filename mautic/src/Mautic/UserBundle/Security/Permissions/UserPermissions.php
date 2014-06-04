@@ -11,8 +11,6 @@ namespace Mautic\UserBundle\Security\Permissions;
 
 use Symfony\Component\Form\FormBuilderInterface;
 use Mautic\CoreBundle\Security\Permissions\CommonPermissions;
-use Symfony\Component\DependencyInjection\Container;
-use Doctrine\ORM\EntityManager;
 
 /**
  * Class UserPermissions
@@ -24,13 +22,10 @@ class UserPermissions extends CommonPermissions
 
     /**
      * {@inheritdoc}
-     *
-     * @param Container     $container
-     * @param EntityManager $em
      */
-    public function __construct(Container $container, EntityManager $em)
+    public function __construct($params)
     {
-        parent::__construct($container, $em);
+        parent::__construct($params);
         $this->permissions = array(
             'users' => array(
                 'view'          => 1,

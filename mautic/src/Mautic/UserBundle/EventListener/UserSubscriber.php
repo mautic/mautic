@@ -82,8 +82,8 @@ class UserSubscriber extends CommonSubscriber
             return;
         }
 
-        if ($this->container->get('mautic.security')->isGranted('user:users:view')) {
-            $users = $this->container->get('mautic.model.user')->getEntities(
+        if ($this->security->isGranted('user:users:view')) {
+            $users = $this->factory->getModel('user')->getEntities(
                 array(
                     'limit'  => 5,
                     'filter' => $str
@@ -91,9 +91,9 @@ class UserSubscriber extends CommonSubscriber
 
             if (count($users) > 0) {
                 $userResults = array();
-                $canEdit     = $this->container->get('mautic.security')->isGranted('user:users:edit');
+                $canEdit     = $this->security->isGranted('user:users:edit');
                 foreach ($users as $user) {
-                    $userResults[] = $this->container->get('templating')->renderResponse(
+                    $userResults[] = $this->templating->renderResponse(
                         'MauticUserBundle:Search:user.html.php',
                         array(
                             'user'    => $user,
@@ -102,7 +102,7 @@ class UserSubscriber extends CommonSubscriber
                     )->getContent();
                 }
                 if (count($users) > 5) {
-                    $userResults[] = $this->container->get('templating')->renderResponse(
+                    $userResults[] = $this->templating->renderResponse(
                         'MauticUserBundle:Search:user.html.php',
                         array(
                             'showMore'     => true,
@@ -116,18 +116,18 @@ class UserSubscriber extends CommonSubscriber
             }
         }
 
-        if ($this->container->get('mautic.security')->isGranted('user:roles:view')) {
-            $roles = $this->container->get('mautic.model.role')->getEntities(
+        if ($this->security->isGranted('user:roles:view')) {
+            $roles = $this->factory->getModel('role')->getEntities(
                 array(
                     'limit'  => 5,
                     'filter' => $str
                 ));
             if (count($roles)) {
                 $roleResults = array();
-                $canEdit     = $this->container->get('mautic.security')->isGranted('user:roles:edit');
+                $canEdit     = $this->security->isGranted('user:roles:edit');
 
                 foreach ($roles as $role) {
-                    $roleResults[] = $this->container->get('templating')->renderResponse(
+                    $roleResults[] = $this->templating->renderResponse(
                         'MauticUserBundle:Search:role.html.php',
                         array(
                             'role'    => $role,
@@ -136,7 +136,7 @@ class UserSubscriber extends CommonSubscriber
                     )->getContent();
                 }
                 if (count($roles) > 5) {
-                    $roleResults[] = $this->container->get('templating')->renderResponse(
+                    $roleResults[] = $this->templating->renderResponse(
                         'MauticUserBundle:Search:role.html.php',
                         array(
                             'showMore'     => true,
@@ -165,17 +165,16 @@ class UserSubscriber extends CommonSubscriber
      */
     public function onBuildCommandList(MauticEvents\CommandListEvent $event)
     {
-        $security   = $this->container->get("mautic.security");
-        if ($security->isGranted('user:users:view')) {
+        if ($this->security->isGranted('user:users:view')) {
             $event->addCommands(
                 'mautic.user.user.header.index',
-                $this->container->get('mautic.model.user')->getCommandList()
+                $this->factory->getModel('user')->getCommandList()
             );
         }
-        if ($security->isGranted('user:roles:view')) {
+        if ($this->security->isGranted('user:roles:view')) {
             $event->addCommands(
                 'mautic.user.role.header.index',
-                $this->container->get('mautic.model.role')->getCommandList()
+                $this->factory->getModel('role')->getCommandList()
             );
         }
     }
@@ -201,8 +200,7 @@ class UserSubscriber extends CommonSubscriber
         $user = $event->getUser();
 
         if (!empty($this->userChanges)) {
-            $serializer = $this->container->get('jms_serializer');
-            $details    = $serializer->serialize($this->userChanges, 'json');
+            $details = $this->serializer->serialize($this->userChanges, 'json');
             $log        = array(
                 "bundle"    => "user",
                 "object"    => "user",
@@ -211,7 +209,7 @@ class UserSubscriber extends CommonSubscriber
                 "details"   => $details,
                 "ipAddress" => $this->request->server->get('REMOTE_ADDR')
             );
-            $this->container->get('mautic.model.auditlog')->writeToLog($log);
+            $this->factory->getModel('auditlog')->writeToLog($log);
         }
     }
 
@@ -223,8 +221,7 @@ class UserSubscriber extends CommonSubscriber
     public function onUserDelete(Events\UserEvent $event)
     {
         $user = $event->getUser();
-        $serializer = $this->container->get('jms_serializer');
-        $details    = $serializer->serialize($user, 'json');
+        $details = $this->serializer->serialize($user, 'json');
         $log = array(
             "bundle"     => "user",
             "object"     => "user",
@@ -233,7 +230,7 @@ class UserSubscriber extends CommonSubscriber
             "details"    => $details,
             "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
         );
-        $this->container->get('mautic.model.auditlog')->writeToLog($log);
+        $this->factory->getModel('auditlog')->writeToLog($log);
     }
 
     /**
@@ -256,8 +253,7 @@ class UserSubscriber extends CommonSubscriber
     {
         $role = $event->getRole();
         if (!empty($this->roleChanges)) {
-            $serializer = $this->container->get('jms_serializer');
-            $details    = $serializer->serialize($this->roleChanges, 'json');
+            $details = $this->serializer->serialize($this->roleChanges, 'json');
             $log        = array(
                 "bundle"    => "user",
                 "object"    => "role",
@@ -266,7 +262,7 @@ class UserSubscriber extends CommonSubscriber
                 "details"   => $details,
                 "ipAddress" => $this->request->server->get('REMOTE_ADDR')
             );
-            $this->container->get('mautic.model.auditlog')->writeToLog($log);
+            $this->factory->getModel('auditlog')->writeToLog($log);
         }
     }
 
@@ -278,8 +274,7 @@ class UserSubscriber extends CommonSubscriber
     public function onRoleDelete(Events\RoleEvent $event)
     {
         $role = $event->getRole();
-        $serializer = $this->container->get('jms_serializer');
-        $details    = $serializer->serialize($role, 'json');
+        $details = $this->serializer->serialize($role, 'json');
         $log = array(
             "bundle"     => "user",
             "object"     => "role",
@@ -288,6 +283,6 @@ class UserSubscriber extends CommonSubscriber
             "details"    => $details,
             "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
         );
-        $this->container->get('mautic.model.auditlog')->writeToLog($log);
+        $this->factory->getModel('auditlog')->writeToLog($log);
     }
 }

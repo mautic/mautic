@@ -32,13 +32,9 @@ $container->setDefinition('mautic.menu_builder',
         array(
             new Reference('knp_menu.factory'),
             new Reference('knp_menu.matcher'),
-            new Reference('security.context'),
-            new Reference('mautic.security')
+            new Reference('mautic.security'),
+            new Reference('event_dispatcher')
         )
-    )
-)
-    ->addMethodCall('setContainer', array(
-        new Reference('service_container')
     ));
 
 //MenuHelper class

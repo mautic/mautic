@@ -48,9 +48,9 @@ class FormModel extends CommonModel
     public function getEntities(array $args = array())
     {
         //set the translator
-        $this->em->getRepository($this->repository)->setTranslator($this->container->get('translator'));
+        $this->em->getRepository($this->repository)->setTranslator($this->translator);
         $this->em->getRepository($this->repository)->setCurrentUser(
-            $this->container->get('security.context')->getToken()->getUser()
+            $this->security->getCurrentUser()
         );
 
         return $this->em
@@ -68,7 +68,7 @@ class FormModel extends CommonModel
         //unlock the row if applicable
         if (method_exists($entity, 'setCheckedOut')) {
             $entity->setCheckedOut(new \DateTime());
-            $entity->setCheckedOutBy($this->container->get('security.context')->getToken()->getUser());
+            $entity->setCheckedOutBy($this->security->getCurrentUser());
         }
 
         $this->em
@@ -90,7 +90,7 @@ class FormModel extends CommonModel
                 //is it checked out by the current user?
                 $checkedOutBy = $entity->getCheckedOutBy();
                 if (!empty($checkedOutBy) && $checkedOutBy->getId() !==
-                    $this->container->get('security.context')->getToken()->getUser()->getId()) {
+                    $this->security->getCurrentUser()->getId()) {
                     return true;
                 }
             }
@@ -111,7 +111,7 @@ class FormModel extends CommonModel
             $entity->setCheckedOutBy(null);
 
             if (method_exists($entity, 'setModifiedBy')) {
-                $entity->setModifiedBy($this->container->get('mautic.security')->getCurrentUser());
+                $entity->setModifiedBy($this->security->getCurrentUser());
             }
         }
 
@@ -155,7 +155,7 @@ class FormModel extends CommonModel
             }
 
             if (method_exists($entity, 'setCreatedBy') && !$entity->getCreatedBy()) {
-                $entity->setCreatedBy($this->container->get('mautic.security')->getCurrentUser());
+                $entity->setCreatedBy($this->security->getCurrentUser());
             }
         } else {
             if (method_exists($entity, 'setDateModified') && !$entity->getDateModified()) {
@@ -163,7 +163,7 @@ class FormModel extends CommonModel
             }
 
             if (method_exists($entity, 'setModifiedBy') && !$entity->getModifiedBy()) {
-                $entity->setModifiedBy($this->container->get('mautic.security')->getCurrentUser());
+                $entity->setModifiedBy($this->security->getCurrentUser());
             }
         }
 
@@ -194,11 +194,12 @@ class FormModel extends CommonModel
      * Creates the appropriate form per the model
      *
      * @param      $entity
+     * @param      $formFactory
      * @param null $action
      * @return mixed
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, $action = null)
+    public function createForm($entity, $formFactory, $action = null)
     {
         throw new NotFoundHttpException('Form object not found.');
     }
@@ -234,7 +235,7 @@ class FormModel extends CommonModel
                 break;
         }
 
-        $subject = $this->container->get('translator')->trans($msg, array(
+        $subject = $this->translator->trans($msg, array(
             '%entityName%' => $entity->getName(),
             '%entityId%'   => $entity->getId()
         ));

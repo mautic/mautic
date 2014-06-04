@@ -14,12 +14,9 @@ use Knp\Menu\Matcher\MatcherInterface;
 use Knp\Menu\Loader\ArrayLoader;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MenuEvent;
-use Symfony\Component\DependencyInjection\ContainerAware;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
-use Symfony\Component\Security\Core\SecurityContext;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 
 /**
@@ -27,39 +24,29 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
  *
  * @package Mautic\CoreBundle\Menu
  */
-class MenuBuilder extends ContainerAware
+class MenuBuilder
 {
     private   $factory;
     private   $matcher;
-    private   $securityContext;
-    private   $mauticSecurity;
-    protected $container;
+    private   $security;
+    private   $dispatcher;
 
     /**
-     * @param ContainerInterface $container
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
-    }
-
-
-    /**
-     * @param FactoryInterface $factory
-     * @param MatcherInterface $matcher
-     * @param SecurityContext  $securityContext
-     * @param CorePermissions  $permissions
+     * @param FactoryInterface         $factory
+     * @param MatcherInterface         $matcher
+     * @param CorePermissions          $permissions
+     * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(FactoryInterface $factory,
                                 MatcherInterface $matcher,
-                                SecurityContext $securityContext,
-                                CorePermissions $permissions
+                                CorePermissions $permissions,
+                                EventDispatcherInterface $dispatcher
     )
     {
-        $this->factory         = $factory;
-        $this->matcher         = $matcher;
-        $this->securityContext = $securityContext;
-        $this->mauticSecurity  = $permissions;
+        $this->factory    = $factory;
+        $this->matcher    = $matcher;
+        $this->security   = $permissions;
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -76,8 +63,8 @@ class MenuBuilder extends ContainerAware
             $loader = new ArrayLoader($this->factory);
 
             //dispatch the MENU_BUILD event to retrieve bundle menu items
-            $event      = new MenuEvent($this->securityContext, $this->mauticSecurity);
-            $this->container->get('event_dispatcher')->dispatch(CoreEvents::BUILD_MENU, $event);
+            $event      = new MenuEvent($this->security);
+            $this->dispatcher->dispatch(CoreEvents::BUILD_MENU, $event);
             $menuItems  = $event->getMenuItems();
             $menu       = $loader->load($menuItems);
         }
@@ -98,8 +85,8 @@ class MenuBuilder extends ContainerAware
             $loader = new ArrayLoader($this->factory);
 
             //dispatch the MENU_BUILD event to retrieve bundle menu items
-            $event      = new MenuEvent($this->securityContext, $this->mauticSecurity);
-            $this->container->get('event_dispatcher')->dispatch(CoreEvents::BUILD_ADMIN_MENU, $event);
+            $event      = new MenuEvent($this->security);
+            $this->dispatcher->dispatch(CoreEvents::BUILD_ADMIN_MENU, $event);
             $menuItems  = $event->getMenuItems();
             $adminMenu  = $loader->load($menuItems);
         }

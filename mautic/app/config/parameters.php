@@ -10,11 +10,13 @@
 //load default parameters from bundle files
 $bundles = $container->getParameter('mautic.bundles');
 
+$mauticParams = array();
 foreach ($bundles as $bundle) {
     if (file_exists($bundle['directory'].'/Resources/config/parameters.php')) {
         $bundleParams = include $bundle['directory'].'/Resources/config/parameters.php';
         foreach ($bundleParams as $k => $v) {
             $container->setParameter("mautic.{$k}", $v);
+            $mauticParams[$k] = $v;
         }
     }
 }
@@ -24,4 +26,8 @@ include "local.php";
 
 foreach ($parameters as $k => $v) {
     $container->setParameter("mautic.{$k}", $v);
+    $mauticParams[$k] = $v;
 }
+
+//used for passing params into services
+$container->setParameter('mautic.parameters', $mauticParams);

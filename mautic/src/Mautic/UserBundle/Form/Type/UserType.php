@@ -17,9 +17,8 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\Security\Core\SecurityContext;
 
 /**
  * Class UserType
@@ -29,19 +28,20 @@ use Symfony\Component\Security\Core\SecurityContext;
 class UserType extends AbstractType
 {
 
-    private $container;
-    private $securityContext;
+    private $translator;
     private $em;
+    private $supportedLanguages;
 
     /**
-     * @param Container       $container
-     * @param SecurityContext $securityContext
-     * @param EntityManager   $em
+     * @param TranslatorInterface    $translator
+     * @param EntityManager $em
+     * @param array         $supportedLanguages
      */
-    public function __construct(Container $container, SecurityContext $securityContext, EntityManager $em) {
-        $this->container       = $container;
-        $this->securityContext = $securityContext;
-        $this->em              = $em;
+    public function __construct(TranslatorInterface $translator, EntityManager $em, array $supportedLanguages)
+    {
+        $this->translator         = $translator;
+        $this->supportedLanguages = $supportedLanguages;
+        $this->em                 = $em;
     }
 
     /**
@@ -51,7 +51,7 @@ class UserType extends AbstractType
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber());
-        $builder->addEventSubscriber(new FormExitSubscriber($this->container->get('translator')->trans(
+        $builder->addEventSubscriber(new FormExitSubscriber($this->translator->trans(
             'mautic.core.form.inform'
         )));
 
@@ -109,7 +109,7 @@ class UserType extends AbstractType
 
         $existing = (!empty($options['data']) && $options['data']->getId());
         $placeholder = ($existing) ?
-            $this->container->get('translator')->trans('mautic.user.user.form.passwordplaceholder') : '';
+            $this->translator->trans('mautic.user.user.form.passwordplaceholder') : '';
         $required = ($existing) ? false : true;
         $builder->add('plainPassword', 'repeated', array(
             'first_name'        => 'password',
@@ -139,6 +139,27 @@ class UserType extends AbstractType
             'type'              => 'password',
             'invalid_message'   => 'mautic.user.user.password.mismatch',
             'required'          => $required
+        ));
+
+        $builder->add('timezone', 'timezone', array(
+            'label'       => 'mautic.user.user.form.timezone',
+            'label_attr'  => array('class' => 'control-label'),
+            'attr'        => array(
+                'class'   => 'form-control'
+            ),
+            'multiple'    => false,
+            'empty_value' => 'mautic.user.user.form.defaulttimezone'
+        ));
+
+        $builder->add('locale', 'choice', array(
+            'choices'     => $this->supportedLanguages,
+            'label'       => 'mautic.user.user.form.locale',
+            'label_attr'  => array('class' => 'control-label'),
+            'attr'        => array(
+                'class'   => 'form-control'
+            ),
+            'multiple'    => false,
+            'empty_value' => 'mautic.user.user.form.defaultlocale'
         ));
 
         $builder->add('isActive', 'choice', array(

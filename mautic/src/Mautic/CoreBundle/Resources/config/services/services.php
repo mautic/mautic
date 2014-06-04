@@ -16,7 +16,7 @@ $container->setDefinition ('mautic.route_loader',
     new Definition(
         'Mautic\CoreBundle\Routing\RouteLoader',
         array(
-            new Reference('service_container')
+            new Reference('event_dispatcher')
         )
     )
 )
@@ -27,10 +27,17 @@ $container->setDefinition ('mautic.security',
     new Definition(
         'Mautic\CoreBundle\Security\Permissions\CorePermissions',
         array(
-            new Reference('service_container'),
+            new Reference('translator'),
             new Reference('doctrine.orm.entity_manager'),
+            new Reference('security.context'),
             '%mautic.bundles%',
-            new Reference('security.context')
+            '%mautic.parameters%',
         )
     )
 );
+
+//Factory class
+$container->setDefinition('mautic.factory', new Definition(
+    'Mautic\CoreBundle\Factory\MauticFactory',
+    array(new Reference('service_container'))
+));

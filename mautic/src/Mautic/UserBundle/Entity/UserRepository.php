@@ -12,7 +12,6 @@ namespace Mautic\UserBundle\Entity;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
-use Symfony\Bundle\FrameworkBundle\Translation\Translator;
 
 /**
  * UserRepository
@@ -43,7 +42,6 @@ class UserRepository extends CommonRepository
      * Get a list of users
      *
      * @param array      $args
-     * @param Translator $translator
      * @return Paginator
      */
     public function getEntities($args = array())

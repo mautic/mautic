@@ -720,7 +720,6 @@ var Mautic = {
             if (value && value in mauticVars[liveCacheVar]) {
                 var response = {"newContent": mauticVars[liveCacheVar][value]};
                 response.target = target;
-                console.log('loaded from cache');
                 Mautic.processContentSection(response);
             } else {
                 //disable page loading bar

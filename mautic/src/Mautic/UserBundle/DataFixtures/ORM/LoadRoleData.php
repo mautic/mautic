@@ -62,7 +62,7 @@ class LoadRoleData extends AbstractFixture implements OrderedFixtureInterface, C
             'user:profile' => array('editname'),
             'lead:leads'   => array('full')
         );
-        $this->container->get('mautic.model.role')->setRolePermissions($role, $permissions);
+        $this->container->get('mautic.factory')->getModel('role')->setRolePermissions($role, $permissions);
 
         $manager->persist($role);
         $manager->flush();
@@ -79,7 +79,7 @@ class LoadRoleData extends AbstractFixture implements OrderedFixtureInterface, C
             'user:profile' => array('editname'),
             'lead:leads'   => array('viewown', 'editown', 'deleteown', 'create')
         );
-        $this->container->get('mautic.model.role')->setRolePermissions($role, $permissions);
+        $this->container->get('mautic.factory')->getModeL('role')->setRolePermissions($role, $permissions);
 
         $manager->persist($role);
         $manager->flush();

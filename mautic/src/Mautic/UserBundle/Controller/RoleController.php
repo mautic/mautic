@@ -48,7 +48,7 @@ class RoleController extends FormController
         $this->get('session')->set('mautic.role.filter', $filter);
         $tmpl       = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
-        $items = $this->container->get('mautic.model.role')->getEntities(
+        $items = $this->get('mautic.factory')->getModel('role')->getEntities(
             array(
                 'start'      => $start,
                 'limit'      => $limit,
@@ -123,14 +123,14 @@ class RoleController extends FormController
 
         //retrieve the entity
         $entity     = new Entity\Role();
-        $model      = $this->container->get('mautic.model.role');
+        $model      = $this->get('mautic.factory')->getModel('role');
         //set the return URL for post actions
         $returnUrl  = $this->generateUrl('mautic_role_index');
         //set the page we came from
         $page       = $this->get('session')->get('mautic.role.page', 1);
         $action     = $this->generateUrl('mautic_role_action', array('objectAction' => 'new'));
         //get the user form factory
-        $form       = $model->createForm($entity, $action);
+        $form       = $model->createForm($entity, $this->get('form.factory'), $action);
 
         ///Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
@@ -198,7 +198,7 @@ class RoleController extends FormController
             return $this->accessDenied();
         }
 
-        $model   = $this->container->get('mautic.model.role');
+        $model   = $this->get('mautic.factory')->getModel('role');
         $entity  = $model->getEntity($objectId);
 
         //set the page we came from
@@ -234,7 +234,7 @@ class RoleController extends FormController
         }
 
         $action = $this->generateUrl('mautic_role_action', array('objectAction' => 'edit', 'objectId' => $objectId));
-        $form   = $model->createForm($entity, $action);
+        $form   = $model->createForm($entity, $this->get('form.factory'), $action);
 
         ///Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
@@ -322,7 +322,7 @@ class RoleController extends FormController
 
         if ($this->request->getMethod() == 'POST') {
             try {
-                $model = $this->container->get('mautic.model.role');
+                $model = $this->get('mautic.factory')->getModel('role');
                 $entity = $model->getEntity($objectId);
 
                 if ($entity === null) {

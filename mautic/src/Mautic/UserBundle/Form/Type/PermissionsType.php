@@ -9,12 +9,12 @@
 
 namespace Mautic\UserBundle\Form\Type;
 
-use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\DependencyInjection\Container;
 
 /**
  * Class PermissionsType
@@ -24,15 +24,16 @@ use Symfony\Component\DependencyInjection\Container;
 class PermissionsType extends AbstractType
 {
 
-    private $container;
-    private $em;
+    private $security;
+    private $translator;
 
     /**
-     * @param Container        $container
+     * @param TranslatorInterface      $translator
+     * @param CorePermissions $security
      */
-    public function __construct(Container $container, EntityManager $em) {
-        $this->container = $container;
-        $this->em        = $em;
+    public function __construct(TranslatorInterface $translator, CorePermissions $security) {
+        $this->translator = $translator;
+        $this->security   = $security;
     }
 
     /**
@@ -41,7 +42,7 @@ class PermissionsType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        $permissionClasses = $this->container->get("mautic.security")->getPermissionClasses();
+        $permissionClasses = $this->security->getPermissionClasses();
 
         $builder->add("permissions-panel-wrapper-start", 'panel_wrapper_start', array(
             'attr' => array(
@@ -62,13 +63,11 @@ class PermissionsType extends AbstractType
                             . '<span class="' . $bundle . '_total">' . $total . '</span>'
                         . ')</span>'
                     : "";
-                $label   = $this->container->get('translator')->trans("mautic.{$bundle}.permissions.header") . $ratio;
+                $label   = $this->translator->trans("mautic.{$bundle}.permissions.header") . $ratio;
                 $builder->add("{$bundle}-panel-start", 'panel_start', array(
-                    'label' => $label,
-                    'attr'  => array(
-                        'data-parent' => "permissions-panel",
-                        'id'          => "{$bundle}-panel"
-                    )
+                    'label'      => $label,
+                    'dataParent' => "permissions-panel",
+                    'bodyId'     => "{$bundle}-panel"
                 ));
                 $class->buildForm($builder, $options, $data);
 

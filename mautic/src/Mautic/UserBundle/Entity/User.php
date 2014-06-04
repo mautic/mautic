@@ -114,6 +114,22 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
     private $isActive = true;
 
     /**
+     * @ORM\Column(type="text", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full", "limited"})
+     */
+    private $timezone = 'UTC';
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full", "limited"})
+     */
+    private $locale   = 'en_US';
+
+    /**
      * Stores active role permissions
      * @var
      * @Serializer\Expose
@@ -591,5 +607,51 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
     public function __construct()
     {
         $this->clients = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
+     * Set timezone
+     *
+     * @param string $timezone
+     * @return User
+     */
+    public function setTimezone($timezone)
+    {
+        $this->timezone = $timezone;
+
+        return $this;
+    }
+
+    /**
+     * Get timezone
+     *
+     * @return string
+     */
+    public function getTimezone()
+    {
+        return $this->timezone;
+    }
+
+    /**
+     * Set locale
+     *
+     * @param string $locale
+     * @return User
+     */
+    public function setLocale($locale)
+    {
+        $this->locale = $locale;
+
+        return $this;
+    }
+
+    /**
+     * Get locale
+     *
+     * @return string
+     */
+    public function getLocale()
+    {
+        return $this->locale;
     }
 }

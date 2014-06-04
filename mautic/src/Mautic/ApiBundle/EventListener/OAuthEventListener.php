@@ -12,10 +12,8 @@ namespace Mautic\ApiBundle\EventListener;
 use FOS\OAuthServerBundle\Event\OAuthEvent;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Doctrine\ORM\EntityManager;
-use Symfony\Component\Debug\Exception\FatalErrorException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Symfony\Component\Translation\IdentityTranslator;
-use Symfony\Bundle\FrameworkBundle\Translation\Translator;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class OAuthEventListener
 {
@@ -24,12 +22,8 @@ class OAuthEventListener
     private $mauticSecurity;
     private $translator;
 
-    public function __construct(EntityManager $em, CorePermissions $mauticSecurity, $translator)
+    public function __construct(EntityManager $em, CorePermissions $mauticSecurity, TranslatorInterface $translator)
     {
-        if (!$translator instanceof Translator && !$translator instanceof IdentityTranslator) {
-            throw new FatalErrorException();
-        }
-
         $this->em             = $em;
         $this->mauticSecurity = $mauticSecurity;
         $this->translator     = $translator;

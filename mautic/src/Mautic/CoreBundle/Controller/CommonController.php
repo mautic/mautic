@@ -261,7 +261,7 @@ class CommonController extends Controller implements EventsController {
                         }
                         break;
                     case "globalsearch":
-                        $searchStr = $this->request->request->get("global_search", "");
+                        $searchStr = $this->request->query->get("global_search", "");
                         $this->get('session')->set('mautic.global_search', $searchStr);
 
                         $event = new GlobalSearchEvent($searchStr);
@@ -273,7 +273,7 @@ class CommonController extends Controller implements EventsController {
                         break;
                     case "commandlist":
                         $model = InputHelper::clean($request->query->get('model'));
-                        $commands = $this->get('mautic.model.' . $model)->getCommandList();
+                        $commands = $this->get('mautic.factory')->getModel($model)->getCommandList();
                         $dataArray  = array();
                         $translator = $this->get('translator');
                         foreach ($commands as $k => $c) {

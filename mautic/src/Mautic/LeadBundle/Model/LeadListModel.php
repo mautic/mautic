@@ -48,7 +48,7 @@ class LeadListModel extends FormModel
 
         //make sure alias is not already taken
         $testAlias = $alias;
-        $user      = $this->container->get('mautic.security')->getCurrentUser();
+        $user      = $this->security->getCurrentUser();
         $existing  = $this->em->getRepository('MauticLeadBundle:LeadList')->getUserSmartLists($user, $testAlias, $entity->getId());
         $count     = count($existing);
         $aliasTag  = $count;
@@ -75,17 +75,18 @@ class LeadListModel extends FormModel
      * {@inheritdoc}
      *
      * @param      $entity
+     * @param      $formFactory
      * @param null $action
      * @return mixed
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    public function createForm($entity, $action = null)
+    public function createForm($entity, $formFactory, $action = null)
     {
         if (!$entity instanceof LeadList) {
             throw new MethodNotAllowedHttpException(array('LeadList'), 'Entity must be of class LeadList()');
         }
         $params = (!empty($action)) ? array('action' => $action) : array();
-        return $this->container->get('form.factory')->create('leadlist', $entity, $params);
+        return $formFactory->create('leadlist', $entity, $params);
     }
 
     /**
@@ -125,19 +126,19 @@ class LeadListModel extends FormModel
             $event = new LeadListEvent($entity, $isNew);
             $event->setEntityManager($this->em);
         }
-        $dispatcher = $this->container->get('event_dispatcher');
+
         switch ($action) {
             case "pre_save":
-                $dispatcher->dispatch(LeadEvents::LIST_PRE_SAVE, $event);
+                $this->dispatcher->dispatch(LeadEvents::LIST_PRE_SAVE, $event);
                 break;
             case "post_save":
-                $dispatcher->dispatch(LeadEvents::LIST_POST_SAVE, $event);
+                $this->dispatcher->dispatch(LeadEvents::LIST_POST_SAVE, $event);
                 break;
             case "pre_delete":
-                $dispatcher->dispatch(LeadEvents::LIST_PRE_DELETE, $event);
+                $this->dispatcher->dispatch(LeadEvents::LIST_PRE_DELETE, $event);
                 break;
             case "post_delete":
-                $dispatcher->dispatch(LeadEvents::LIST_POST_DELETE, $event);
+                $this->dispatcher->dispatch(LeadEvents::LIST_POST_DELETE, $event);
                 break;
         }
 
@@ -161,27 +162,26 @@ class LeadListModel extends FormModel
     public function getChoiceFields()
     {
         //field choices
-        $translator = $this->container->get('translator');
         $choices = array(
             'dateAdded' => array(
-                'label'       => $translator->trans('mautic.lead.list.filter.dateadded'),
+                'label'       => $this->translator->trans('mautic.lead.list.filter.dateadded'),
                 'properties'  => array('type' => 'date')
             ),
             'owner'     => array(
-                'label'      => $translator->trans('mautic.lead.list.filter.owner'),
+                'label'      => $this->translator->trans('mautic.lead.list.filter.owner'),
                 'properties' => array(
                     'type'     => 'lookup_id',
                     'callback' => 'activateLeadFieldTypeahead'
                 )
             ),
             'score'     => array(
-                'label'      => $translator->trans('mautic.lead.list.filter.score'),
+                'label'      => $this->translator->trans('mautic.lead.list.filter.score'),
                 'properties' => array('type' => 'number')
             )
         );
 
         //get list of custom fields
-        $fields = $this->container->get('mautic.model.leadfield')->getEntities(
+        $fields = $this->factory->getModel('leadfield')->getEntities(
             array('filter' => array(
                 'isListable' => true
             ))
@@ -216,9 +216,8 @@ class LeadListModel extends FormModel
      */
     public function getSmartLists()
     {
-        $security = $this->container->get('mautic.security');
-        $user = (!$security->isGranted('lead:lists:viewother')) ?
-            $security->getCurrentUser() : false;
+        $user = (!$this->security->isGranted('lead:lists:viewother')) ?
+            $this->security->getCurrentUser() : false;
         $lists = $this->em->getRepository('MauticLeadBundle:LeadList')->getUserSmartLists($user);
         return $lists;
     }

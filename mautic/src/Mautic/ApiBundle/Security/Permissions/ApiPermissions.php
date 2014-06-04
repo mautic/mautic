@@ -11,8 +11,6 @@ namespace Mautic\ApiBundle\Security\Permissions;
 
 use Symfony\Component\Form\FormBuilderInterface;
 use Mautic\CoreBundle\Security\Permissions\CommonPermissions;
-use Symfony\Component\DependencyInjection\Container;
-use Doctrine\ORM\EntityManager;
 
 /**
  * Class ApiPermissions
@@ -22,15 +20,11 @@ use Doctrine\ORM\EntityManager;
 class ApiPermissions extends CommonPermissions
 {
 
-    /**
-     * {@inheritdoc}
-     *
-     * @param Container     $container
-     * @param EntityManager $em
-     */
-    public function __construct(Container $container, EntityManager $em)
+    public function __construct($params)
     {
-        parent::__construct($container, $em);
+
+        parent::__construct($params);
+
         $this->permissions = array(
             'access' => array(
                 'full'     => 1024
@@ -104,7 +98,7 @@ class ApiPermissions extends CommonPermissions
     public function getValue($name, $perm)
     {
         //ensure api is enabled system wide
-        if (!$this->container->getParameter('mautic.api_enabled')) {
+        if (empty($this->params['api_enabled'])) {
             return 0;
         } else {
             return parent::getValue($name, $perm);
@@ -117,7 +111,7 @@ class ApiPermissions extends CommonPermissions
      * @return bool|mixed
      */
     public function isEnabled() {
-        return $this->container->getParameter('mautic.api_enabled', 0);
+        return !empty($this->params['api_enabled']);
     }
 
     /**

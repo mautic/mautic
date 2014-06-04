@@ -9,17 +9,14 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
-use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\LeadBundle\Form\DataTransformer\FieldTypeTransformer;
 use Mautic\UserBundle\Form\DataTransformer as Transformers;
-use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
@@ -30,16 +27,13 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 class ListType extends AbstractType
 {
 
-    private $container;
-    private $em;
+    private $translator;
 
     /**
-     * @param Container     $container
-     * @param EntityManager $em
+     * @param TranslatorInterface $translator
      */
-    public function __construct(Container $container, EntityManager $em) {
-        $this->container = $container;
-        $this->em        = $em;
+    public function __construct(TranslatorInterface $translator) {
+        $this->translator = $translator;
     }
 
     /**
@@ -49,7 +43,7 @@ class ListType extends AbstractType
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber());
-        $builder->addEventSubscriber(new FormExitSubscriber($this->container->get('translator')->trans(
+        $builder->addEventSubscriber(new FormExitSubscriber($this->translator->trans(
             'mautic.core.form.inform'
         )));
 

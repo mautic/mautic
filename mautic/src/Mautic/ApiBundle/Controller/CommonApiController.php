@@ -263,7 +263,7 @@ class CommonApiController extends FOSRestController implements EventsController
         //is an entity being updated or created?
         $statusCode = $entity->getId() ? Codes::HTTP_OK : Codes::HTTP_CREATED;
 
-        $form = $this->model->createForm($entity);
+        $form = $this->model->createForm($entity, $this->get('form.factory'));
 
         $form->submit($parameters, 'PATCH' !== $method);
 

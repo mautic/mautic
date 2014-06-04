@@ -25,13 +25,11 @@ use Symfony\Component\DependencyInjection\Container;
 class ApiDocsLoader extends Loader
 {
     private $loaded = false;
+    private $environment;
 
-    /**
-     * @param Container $container
-     */
-    public function __construct(Container $container)
+    public function __construct($environment)
     {
-        $this->container = $container;
+        $this->environment = $environment;
     }
 
     /**
@@ -48,7 +46,7 @@ class ApiDocsLoader extends Loader
 
         $collection = new RouteCollection();
 
-        if ($this->container->getParameter("kernel.environment") == 'dev') {
+        if ($this->environment == 'dev') {
             //Load API doc routing
             $apiDoc = $this->import("@NelmioApiDocBundle/Resources/config/routing.yml");
             $apiDoc->addPrefix('/docs/api');

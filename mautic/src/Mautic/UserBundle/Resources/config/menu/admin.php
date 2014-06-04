@@ -24,7 +24,7 @@ $items = array(
     )
 );
  */
-$security = $event->getMauticSecurity();
+$security = $event->getSecurity();
 
 $items    = array();
 if ($security->isGranted("user:users:view")) {

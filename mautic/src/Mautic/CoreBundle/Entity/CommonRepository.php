@@ -13,9 +13,7 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Helper\SearchStringHelper;
 use Mautic\UserBundle\Entity\User;
-use Symfony\Bundle\FrameworkBundle\Translation\Translator;
-use Symfony\Component\Debug\Exception\FatalErrorException;
-use Symfony\Component\Translation\IdentityTranslator;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class CommonRepository
@@ -35,11 +33,8 @@ class CommonRepository extends EntityRepository
      */
     protected $currentUser;
 
-    public function setTranslator($translator)
+    public function setTranslator(TranslatorInterface $translator)
     {
-        if (!$translator instanceof Translator && !$translator instanceof IdentityTranslator) {
-            throw new FatalErrorException();
-        }
         $this->translator = $translator;
     }
 

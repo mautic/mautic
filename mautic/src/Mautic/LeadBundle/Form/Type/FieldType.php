@@ -14,7 +14,7 @@ use Doctrine\ORM\EntityRepository;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\LeadBundle\Form\DataTransformer\FieldToOrderTransformer;
-use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -29,16 +29,16 @@ use Mautic\LeadBundle\Helper\FormFieldHelper;
 class FieldType extends AbstractType
 {
 
-    private $container;
+    private $translator;
     private $em;
 
     /**
-     * @param Container     $container
-     * @param EntityManager $em
+     * @param TranslatorInterface $translator
+     * @param EntityManager       $em
      */
-    public function __construct(Container $container, EntityManager $em) {
-        $this->container = $container;
-        $this->em        = $em;
+    public function __construct(TranslatorInterface $translator, EntityManager $em) {
+        $this->translator = $translator;
+        $this->em         = $em;
     }
 
     /**
@@ -48,7 +48,7 @@ class FieldType extends AbstractType
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber());
-        $builder->addEventSubscriber(new FormExitSubscriber($this->container->get('translator')->trans(
+        $builder->addEventSubscriber(new FormExitSubscriber($this->translator->trans(
             'mautic.core.form.inform'
         )));
 

@@ -16,7 +16,8 @@ $container->setDefinition(
     new Definition(
         'Mautic\LeadBundle\Form\Type\LeadType',
         array(
-            new Reference("service_container"),
+            new Reference('translator'),
+            new Reference('mautic.factory'),
             new Reference('doctrine.orm.entity_manager')
         )
     )
@@ -31,8 +32,7 @@ $container->setDefinition(
     new Definition(
         'Mautic\LeadBundle\Form\Type\ListType',
         array(
-            new Reference("service_container"),
-            new Reference('doctrine.orm.entity_manager')
+            new Reference("translator")
         )
     )
 )
@@ -45,12 +45,7 @@ $container->setDefinition(
 $container->setDefinition(
     'mautic.form.type.leadlist_filters',
     new Definition(
-        'Mautic\LeadBundle\Form\Type\FilterType',
-        array(
-            new Reference("service_container"),
-            new Reference('doctrine.orm.entity_manager')
-        )
-    )
+        'Mautic\LeadBundle\Form\Type\FilterType')
 )
     ->addTag('form.type', array(
         'alias' => 'leadlist_filters',
@@ -63,7 +58,7 @@ $container->setDefinition(
     new Definition(
         'Mautic\LeadBundle\Form\Type\FieldType',
         array(
-            new Reference("service_container"),
+            new Reference("translator"),
             new Reference('doctrine.orm.entity_manager')
         )
     )

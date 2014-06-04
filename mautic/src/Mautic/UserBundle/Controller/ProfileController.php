@@ -32,7 +32,7 @@ class ProfileController extends FormController
     {
         //get current user
         $me    = $this->get('security.context')->getToken()->getUser();
-        $model = $this->container->get('mautic.model.user');
+        $model = $this->get('mautic.factory')->getModel('user');
         //set some permissions
         $permissions = array(
             'apiAccess'    => ($this->container->getParameter('mautic.api_enabled')) ?
@@ -45,7 +45,7 @@ class ProfileController extends FormController
         );
 
         $action = $this->generateUrl('mautic_user_account');
-        $form   = $model->createForm($me, $action);
+        $form   = $model->createForm($me, $this->get('form.factory'), $action);
 
         //remove items that cannot be edited by person themselves
         $form->remove('role');
@@ -150,8 +150,9 @@ class ProfileController extends FormController
             $this->get('session')->set('formProcessed', 1);
 
             //check to see if the password needs to be rehashed
-            $submittedPassword = $this->request->request->get('user[plainPassword][password]', null, true);
-            $overrides['password'] = $model->checkNewPassword($me, $submittedPassword);
+            $submittedPassword     = $this->request->request->get('user[plainPassword][password]', null, true);
+            $encoder               = $this->get('security.encoder_factory')->getEncoder($me);
+            $overrides['password'] = $model->checkNewPassword($me, $encoder, $submittedPassword);
 
             //check and bind data
             $valid = $this->checkFormValidity($form);

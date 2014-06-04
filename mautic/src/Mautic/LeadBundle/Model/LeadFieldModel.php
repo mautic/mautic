@@ -186,17 +186,18 @@ class LeadFieldModel extends FormModel
      * {@inheritdoc}
      *
      * @param      $entity
+     * @param      $formFactory
      * @param null $action
      * @return mixed
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    public function createForm($entity, $action = null)
+    public function createForm($entity, $formFactory, $action = null)
     {
         if (!$entity instanceof LeadField) {
             throw new MethodNotAllowedHttpException(array('LeadField'));
         }
         $params = (!empty($action)) ? array('action' => $action) : array();
-        return $this->container->get('form.factory')->create('leadfield', $entity, $params);
+        return $formFactory->create('leadfield', $entity, $params);
     }
 
     /**
@@ -247,19 +248,19 @@ class LeadFieldModel extends FormModel
             $event = new LeadFieldEvent($entity, $isNew);
             $event->setEntityManager($this->em);
         }
-        $dispatcher = $this->container->get('event_dispatcher');
+
         switch ($action) {
             case "pre_save":
-                $dispatcher->dispatch(LeadEvents::FIELD_PRE_SAVE, $event);
+                $this->dispatcher->dispatch(LeadEvents::FIELD_PRE_SAVE, $event);
                 break;
             case "post_save":
-                $dispatcher->dispatch(LeadEvents::FIELD_POST_SAVE, $event);
+                $this->dispatcher->dispatch(LeadEvents::FIELD_POST_SAVE, $event);
                 break;
             case "pre_delete":
-                $dispatcher->dispatch(LeadEvents::FIELD_PRE_DELETE, $event);
+                $this->dispatcher->dispatch(LeadEvents::FIELD_PRE_DELETE, $event);
                 break;
             case "post_delete":
-                $dispatcher->dispatch(LeadEvents::FIELD_POST_DELETE, $event);
+                $this->dispatcher->dispatch(LeadEvents::FIELD_POST_DELETE, $event);
                 break;
         }
 

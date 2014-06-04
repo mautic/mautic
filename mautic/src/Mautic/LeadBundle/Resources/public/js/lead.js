@@ -14,8 +14,10 @@ Mautic.leadOnLoad = function (container) {
     if ($(container + ' .lead-list').length) {
         //set height of divs
         var windowHeight = $(window).height() - 175;
-        $('.lead-list').css('height', windowHeight + 'px');
-        $('.lead-details').css('height', windowHeight + 'px');
+        if (windowHeight > 475) {
+            $('.lead-list').css('height', windowHeight + 'px');
+            $('.lead-details').css('height', windowHeight + 'px');
+        }
     }
 
 

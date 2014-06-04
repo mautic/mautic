@@ -69,7 +69,7 @@ class RoleModel extends FormModel
         }
         //set permissions if applicable and if the user is not an admin
         $permissions = (!$entity->isAdmin() && !empty($rawPermissions)) ?
-            $this->container->get('mautic.security')->generatePermissions($rawPermissions) :
+            $this->security->generatePermissions($rawPermissions) :
             array();
 
         foreach ($permissions as $permissionEntity) {
@@ -92,7 +92,7 @@ class RoleModel extends FormModel
         $users = $this->em->getRepository('MauticUserBundle:User')->findByRole($entity);
         if (count($users)) {
             throw new PreconditionRequiredHttpException(
-                $this->container->get('translator')->trans(
+                $this->translator->trans(
                     'mautic.user.role.error.deletenotallowed',
                     array(),
                     'flashes'
@@ -107,18 +107,19 @@ class RoleModel extends FormModel
      * {@inheritdoc}
      *
      * @param      $entity
+     * @param      $formFactory
      * @param null $action
      * @return mixed
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    public function createForm($entity, $action = null)
+    public function createForm($entity, $formFactory, $action = null)
     {
         if (!$entity instanceof Role) {
             throw new MethodNotAllowedHttpException(array('Role'), 'Entity must be of class Role()');
         }
 
         $params = (!empty($action)) ? array('action' => $action) : array();
-        return $this->container->get('form.factory')->create('role', $entity, $params);
+        return $formFactory->create('role', $entity, $params);
     }
 
 
@@ -157,19 +158,19 @@ class RoleModel extends FormModel
             $event = new RoleEvent($entity, $isNew);
             $event->setEntityManager($this->em);
         }
-        $dispatcher = $this->container->get('event_dispatcher');
+
         switch ($action) {
             case "pre_save":
-                $dispatcher->dispatch(UserEvents::ROLE_PRE_SAVE, $event);
+                $this->dispatcher->dispatch(UserEvents::ROLE_PRE_SAVE, $event);
                 break;
             case "post_save":
-                $dispatcher->dispatch(UserEvents::ROLE_POST_SAVE, $event);
+                $this->dispatcher->dispatch(UserEvents::ROLE_POST_SAVE, $event);
                 break;
             case "pre_delete":
-                $dispatcher->dispatch(UserEvents::ROLE_PRE_DELETE, $event);
+                $this->dispatcher->dispatch(UserEvents::ROLE_PRE_DELETE, $event);
                 break;
             case "post_delete":
-                $dispatcher->dispatch(UserEvents::ROLE_POST_DELETE, $event);
+                $this->dispatcher->dispatch(UserEvents::ROLE_POST_DELETE, $event);
                 break;
         }
 

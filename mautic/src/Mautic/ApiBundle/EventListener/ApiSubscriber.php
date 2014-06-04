@@ -14,37 +14,17 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\ApiBundle\ApiEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\ApiBundle\Event as Events;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Class ApiSubscriber
  *
  * @package Mautic\ApiBundle\EventListener
  */
-class ApiSubscriber implements EventSubscriberInterface
+class ApiSubscriber extends CommonSubscriber
 {
-
-    /**
-     * @var \Symfony\Component\DependencyInjection\ContainerInterface
-     */
-    protected $container;
-
-    /**
-     * @var null|\Symfony\Component\HttpFoundation\Request
-     */
-    protected $request;
-
-    /**
-     * @param ContainerInterface $container
-     */
-    public function __construct (ContainerInterface $container, RequestStack $request_stack)
-    {
-        $this->container = $container;
-        $this->request   = $request_stack->getCurrentRequest();
-    }
 
     /**
      * @return array
@@ -97,13 +77,13 @@ class ApiSubscriber implements EventSubscriberInterface
      */
     public function onGlobalSearch (MauticEvents\GlobalSearchEvent $event)
     {
-        if ($this->container->get('mautic.security')->isGranted('api:clients:view')) {
+        if ($this->security->isGranted('api:clients:view')) {
             $str     = $event->getSearchString();
             if (empty($str)) {
                 return;
             }
 
-            $clients = $this->container->get('mautic.model.client')->getEntities(
+            $clients = $this->factory->getModel('client')->getEntities(
                 array(
                     'limit'  => 5,
                     'filter' => $str
@@ -111,9 +91,9 @@ class ApiSubscriber implements EventSubscriberInterface
 
             if (count($clients) > 0) {
                 $clientResults = array();
-                $canEdit     = $this->container->get('mautic.security')->isGranted('api:clients:edit');
+                $canEdit     = $this->security->isGranted('api:clients:edit');
                 foreach ($clients as $client) {
-                    $clientResults[] = $this->container->get('templating')->renderResponse(
+                    $clientResults[] = $this->templating->renderResponse(
                         'MauticApiBundle:Search:client.html.php',
                         array(
                             'client'  => $client,
@@ -122,7 +102,7 @@ class ApiSubscriber implements EventSubscriberInterface
                     )->getContent();
                 }
                 if (count($clients) > 5) {
-                    $clientResults[] = $this->container->get('templating')->renderResponse(
+                    $clientResults[] = $this->templating->renderResponse(
                         'MauticApiBundle:Search:client.html.php',
                         array(
                             'showMore'     => true,
@@ -142,11 +122,11 @@ class ApiSubscriber implements EventSubscriberInterface
      */
     public function onBuildCommandList(MauticEvents\CommandListEvent $event)
     {
-        $security   = $this->container->get("mautic.security");
+        $security   = $this->security;
         if ($security->isGranted('api:clients:view')) {
             $event->addCommands(
                 'mautic.api.client.header.index',
-                $this->container->get('mautic.model.client')->getCommandList()
+                $this->factory->getModel('client')->getCommandList()
             );
         }
     }
@@ -171,7 +151,7 @@ class ApiSubscriber implements EventSubscriberInterface
     {
         $client = $event->getClient();
         if (!empty($this->changes)) {
-            $serializer = $this->container->get('jms_serializer');
+            $serializer = $this->serializer;
             $details    = $serializer->serialize($this->changes, 'json');
             $log        = array(
                 "bundle"    => "api",
@@ -181,7 +161,7 @@ class ApiSubscriber implements EventSubscriberInterface
                 "details"   => $details,
                 "ipAddress" => $this->request->server->get('REMOTE_ADDR')
             );
-            $this->container->get('mautic.model.auditlog')->writeToLog($log);
+            $this->factory->getModel('auditlog')->writeToLog($log);
         }
     }
 
@@ -193,7 +173,7 @@ class ApiSubscriber implements EventSubscriberInterface
     public function onClientDelete(Events\ClientEvent $event)
     {
         $client = $event->getClient();
-        $serializer = $this->container->get('jms_serializer');
+        $serializer = $this->serializer;
         $details    = $serializer->serialize($client, 'json');
         $log = array(
             "bundle"     => "api",
@@ -203,6 +183,6 @@ class ApiSubscriber implements EventSubscriberInterface
             "details"    => $client,
             "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
         );
-        $this->container->get('mautic.model.auditlog')->writeToLog($log);
+        $this->factory->getModel('auditlog')->writeToLog($log);
     }
 }

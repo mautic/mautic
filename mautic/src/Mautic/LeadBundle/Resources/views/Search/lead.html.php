@@ -20,7 +20,7 @@
         'mautic_lead_action', array('objectAction' => 'view', 'objectId' => $lead->getId())); ?>"
     data-toggle="ajax">
         <span class="gs-lead-primary-identifier"><?php echo $lead->getPrimaryIdentifier(true); ?></span>
-        <span class="gs-lead-secondary-identifier"><?php echo $lead->getSecondaryIdentifier(true); ?></span>
+        <span class="gs-lead-secondary-identifier"><?php echo $lead->getSecondaryIdentifier(); ?></span>
     </a>
 <?php endif; ?>
 </div>

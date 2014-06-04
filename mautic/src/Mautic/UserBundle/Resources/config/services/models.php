@@ -7,32 +7,8 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\Parameter;
-
 //User model
-$container->setDefinition(
-    'mautic.model.user',
-    new Definition(
-        'Mautic\UserBundle\Model\UserModel',
-        array(
-            new Reference('service_container'),
-            new Reference('request_stack'),
-            new Reference('doctrine.orm.entity_manager'),
-        )
-    )
-);
+$container->setParameter('mautic.model.user', 'Mautic\UserBundle\Model\UserModel');
 
 //Role model
-$container->setDefinition(
-    'mautic.model.role',
-    new Definition(
-        'Mautic\UserBundle\Model\RoleModel',
-        array(
-            new Reference("service_container"),
-            new Reference('request_stack'),
-            new Reference('doctrine.orm.entity_manager'),
-        )
-    )
-);
+$container->setParameter('mautic.model.role', 'Mautic\UserBundle\Model\RoleModel');

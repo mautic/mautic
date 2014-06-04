@@ -8,10 +8,6 @@
  */
 namespace Mautic\CoreBundle\Model;
 
-use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Doctrine\ORM\EntityManager;
-
 /**
  * Class CommonModel
  *
@@ -20,36 +16,27 @@ use Doctrine\ORM\EntityManager;
 class CommonModel
 {
 
-    /**
-     * @var \Symfony\Component\DependencyInjection\Container
-     */
-    protected $container;
-
-    /**
-     * @var null|\Symfony\Component\HttpFoundation\Request
-     */
-    protected $request;
-
-    /**
-     * @var \Doctrine\ORM\EntityManager
-     */
     protected $em;
-
-    /**
-     * @var string
-     */
+    protected $security;
+    protected $dispatcher;
+    protected $translator;
     protected $repository;
+    protected $factory;
 
     /**
-     * @param Container     $container
-     * @param RequestStack  $request_stack
-     * @param EntityManager $em
+     * @param $em
+     * @param $security
+     * @param $dispatcher
+     * @param $translator
+     * @param $factory
      */
-    public function __construct(Container $container, RequestStack $request_stack, EntityManager $em)
+    public function __construct($em, $security, $dispatcher, $translator, $factory)
     {
-        $this->container = $container;
-        $this->request   = $request_stack->getCurrentRequest();
-        $this->em        = $em;
+        $this->em         = $em;
+        $this->security   = $security;
+        $this->dispatcher = $dispatcher;
+        $this->translator = $translator;
+        $this->factory    = $factory;
 
         $this->init();
     }

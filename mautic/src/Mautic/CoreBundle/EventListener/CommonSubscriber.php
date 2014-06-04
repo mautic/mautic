@@ -9,10 +9,15 @@
 
 namespace Mautic\CoreBundle\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use JMS\Serializer\Serializer;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Templating\DelegatingEngine;
 
 /**
  * Class CoreSubscriber
@@ -21,31 +26,69 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class CommonSubscriber implements EventSubscriberInterface
 {
-
-    /**
-     * @var \Symfony\Component\DependencyInjection\ContainerInterface
-     */
-    protected $container;
-
     /**
      * @var null|\Symfony\Component\HttpFoundation\Request
      */
     protected $request;
 
     /**
-     * @var \Doctrine\ORM\EntityManager
+     * @var \Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine
      */
-    protected $em;
+    protected $templating;
+
+    /**
+     * @var \JMS\SerializerBundle\JMSSerializerBundle
+     */
+    protected $serializer;
+
+    /**
+     * @var \Mautic\CoreBundle\Security\Permissions\CorePermissions
+     */
+    protected $security;
+
+    /**
+     * @var EventDispatcherInterface
+     */
+    protected $dispatcher;
+
+    /**
+     * @var \Mautic\CoreBundle\Factory\MauticFactory
+     */
+    protected $factory;
+
+    /**
+     * @var array
+     */
+    protected $params;
+
+    /**
+     * @var \Symfony\Component\Translation\TranslatorInterface
+     */
+    protected $translator;
 
     /**
      * @param ContainerInterface $container
      */
-    public function __construct (ContainerInterface $container, RequestStack $request_stack, EntityManager $em)
+    public function __construct (DelegatingEngine $templating,
+                                 RequestStack $request_stack,
+                                 Serializer $serializer,
+                                 CorePermissions $security,
+                                 TranslatorInterface $translator,
+                                 EventDispatcherInterface $dispatcher,
+                                 MauticFactory $factory,
+                                 array $params
+    )
     {
-        $this->container = $container;
-        $this->request   = $request_stack->getCurrentRequest();
-        $this->em        = $em;
+        $this->templating = $templating;
+        $this->request    = $request_stack->getCurrentRequest();
+        $this->security   = $security;
+        $this->serializer = $serializer;
+        $this->params     = $params;
+        $this->dispatcher = $dispatcher;
+        $this->factory    = $factory;
+        $this->translator = $translator;
     }
+
 
     static public function getSubscribedEvents ()
     {

@@ -7,44 +7,11 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Reference;
-
 //Lead Model
-$container->setDefinition(
-    'mautic.model.lead',
-    new Definition(
-        'Mautic\LeadBundle\Model\LeadModel',
-        array(
-            new Reference("service_container"),
-            new Reference('request_stack'),
-            new Reference('doctrine.orm.entity_manager'),
-        )
-    )
-);
+$container->setParameter('mautic.model.lead', 'Mautic\LeadBundle\Model\LeadModel');
 
 //Lead field model
-$container->setDefinition(
-    'mautic.model.leadfield',
-    new Definition(
-        'Mautic\LeadBundle\Model\LeadFieldModel',
-        array(
-            new Reference("service_container"),
-            new Reference('request_stack'),
-            new Reference('doctrine.orm.entity_manager'),
-        )
-    )
-);
+$container->setParameter('mautic.model.leadfield', 'Mautic\LeadBundle\Model\LeadFieldModel');
 
 //Lead list model
-$container->setDefinition(
-    'mautic.model.leadlist',
-    new Definition(
-        'Mautic\LeadBundle\Model\LeadListModel',
-        array(
-            new Reference("service_container"),
-            new Reference('request_stack'),
-            new Reference('doctrine.orm.entity_manager'),
-        )
-    )
-);
+$container->setParameter('mautic.model.leadlist', 'Mautic\LeadBundle\Model\LeadListModel');
