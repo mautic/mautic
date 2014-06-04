@@ -21,6 +21,10 @@ $mauticBundles  = array_values(array_filter(
 
 $container->setParameter('mautic.bundles', $mauticBundles);
 
+$container->setParameter('mautic.supported_languages', array(
+    'en_US' => 'English - United States'
+));
+
 $loader->import('parameters.php');
 $container->loadFromExtension('mautic_core');
 
@@ -85,6 +89,9 @@ $container->loadFromExtension('doctrine', array(
         //if using pdo_sqlite as your database driver, add the path in parameters.php
         //e.g. 'database_path' => '%kernel.root_dir%/data/data.db3'
         //'path'    => '%db_path%'
+        'types'    => array(
+            'datetime' => 'Mautic\CoreBundle\Doctrine\Type\UTCDateTimeType'
+        )
     ),
 
     'orm'  => array(
