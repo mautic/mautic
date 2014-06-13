@@ -9,10 +9,9 @@
 
 namespace Mautic\UserBundle\Form\Type;
 
-use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
-use Mautic\UserBundle\Form\DataTransformer\RoleToIdTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -29,19 +28,16 @@ class UserType extends AbstractType
 {
 
     private $translator;
-    private $em;
     private $supportedLanguages;
 
     /**
      * @param TranslatorInterface    $translator
-     * @param EntityManager $em
      * @param array         $supportedLanguages
      */
-    public function __construct(TranslatorInterface $translator, EntityManager $em, array $supportedLanguages)
+    public function __construct(MauticFactory $factory)
     {
-        $this->translator         = $translator;
-        $this->supportedLanguages = $supportedLanguages;
-        $this->em                 = $em;
+        $this->translator         = $factory->getTranslator();
+        $this->supportedLanguages = $factory->getParam('mautic.supported_languages');
     }
 
     /**
@@ -99,13 +95,10 @@ class UserType extends AbstractType
             'mapped'     => false
         ));
 
-        $roleTransformer  = new RoleToIdTransformer($this->em);
-        $builder->add(
-            $builder->create('role', 'hidden', array(
-                'required' => true,
-            ))
-            ->addViewTransformer($roleTransformer)
-        );
+        $builder->add('role', 'hidden_entity', array(
+            'required'   => true,
+            'repository' => 'MauticUserBundle:Role'
+        ));
 
         $existing = (!empty($options['data']) && $options['data']->getId());
         $placeholder = ($existing) ?

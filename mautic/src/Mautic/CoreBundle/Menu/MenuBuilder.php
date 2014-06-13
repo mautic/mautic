@@ -10,14 +10,14 @@
 namespace Mautic\CoreBundle\Menu;
 
 use Knp\Menu\FactoryInterface;
-use Knp\Menu\Matcher\MatcherInterface;
 use Knp\Menu\Loader\ArrayLoader;
+use Knp\Menu\Matcher\MatcherInterface;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MenuEvent;
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 
 /**
  * Class MenuBuilder
@@ -26,36 +26,32 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
  */
 class MenuBuilder
 {
-    private   $factory;
-    private   $matcher;
-    private   $security;
-    private   $dispatcher;
+    private $factory;
+    private $matcher;
+    private $security;
+    private $dispatcher;
+    private $request;
 
     /**
-     * @param FactoryInterface         $factory
-     * @param MatcherInterface         $matcher
-     * @param CorePermissions          $permissions
-     * @param EventDispatcherInterface $dispatcher
+     * @param FactoryInterface $knpFactory
+     * @param MatcherInterface $matcher
+     * @param MauticFactory    $factory
      */
-    public function __construct(FactoryInterface $factory,
-                                MatcherInterface $matcher,
-                                CorePermissions $permissions,
-                                EventDispatcherInterface $dispatcher
-    )
+    public function __construct(FactoryInterface $knpFactory, MatcherInterface $matcher, MauticFactory $factory)
     {
-        $this->factory    = $factory;
-        $this->matcher    = $matcher;
-        $this->security   = $permissions;
-        $this->dispatcher = $dispatcher;
+        $this->factory    =& $knpFactory;
+        $this->matcher    =& $matcher;
+        $this->security   = $factory->getSecurity();
+        $this->dispatcher = $factory->getDispatcher();
+        $this->request    = $factory->getRequest();
     }
 
     /**
      * Generate menu navigation object
      *
-     * @param Request $request
      * @return \Knp\Menu\ItemInterface
      */
-    public function mainMenu(Request $request)
+    public function mainMenu()
     {
         static $menu;
 
@@ -74,10 +70,9 @@ class MenuBuilder
     /**
      * Generate admin menu navigation object
      *
-     * @param Request $request
      * @return \Knp\Menu\ItemInterface
      */
-    public function adminMenu(Request $request)
+    public function adminMenu()
     {
         static $adminMenu;
 
@@ -96,19 +91,18 @@ class MenuBuilder
     /**
      * Converts navigation object into breadcrumbs
      *
-     * @param Request $request
      */
-    public function breadcrumbsMenu(Request $request) {
-        $menu  = $this->mainMenu($request);
+    public function breadcrumbsMenu() {
+        $menu  = $this->mainMenu($this->request);
 
         //check for overrideRoute in request from an ajax content request
-        $forRouteUri  = $request->get("overrideRouteUri", "current");
-        $forRouteName = $request->get("overrideRouteName", '');
+        $forRouteUri  = $this->request->get("overrideRouteUri", "current");
+        $forRouteName = $this->request->get("overrideRouteName", '');
         $current      = $this->getCurrentMenuItem($menu, $forRouteUri, $forRouteName);
 
         //if empty, check the admin menu
         if (empty($current)) {
-            $admin   = $this->adminMenu($request);
+            $admin   = $this->adminMenu($this->request);
             $current = $this->getCurrentMenuItem($admin, $forRouteUri, $forRouteName);
         }
 

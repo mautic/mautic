@@ -16,11 +16,7 @@ $container->setDefinition(
     'mautic.form.type.user',
     new Definition(
         'Mautic\UserBundle\Form\Type\UserType',
-        array(
-            new Reference("translator"),
-            new Reference('doctrine.orm.entity_manager'),
-            '%mautic.supported_languages%'
-        )
+        array(new Reference('mautic.factory'))
     )
 )
     ->addTag('form.type', array(
@@ -32,10 +28,7 @@ $container->setDefinition(
     'mautic.form.type.role',
     new Definition(
         'Mautic\UserBundle\Form\Type\RoleType',
-        array(
-            new Reference("translator"),
-            new Reference('doctrine.orm.entity_manager')
-        )
+        array(new Reference('mautic.factory'))
     )
 )
     ->addTag('form.type', array(
@@ -47,10 +40,7 @@ $container->setDefinition(
     'mautic.form.type.permissions',
     new Definition(
         'Mautic\UserBundle\Form\Type\PermissionsType',
-        array(
-            new Reference("translator"),
-            new Reference('mautic.security')
-        )
+        array(new Reference('mautic.factory'))
     )
 )
     ->addTag('form.type', array(

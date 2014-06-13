@@ -16,16 +16,7 @@ $container->setDefinition(
     'mautic.core.subscriber',
     new Definition(
         'Mautic\CoreBundle\EventListener\CoreSubscriber',
-        array(
-            new Reference('templating'),
-            new Reference('request_stack'),
-            new Reference('jms_serializer'),
-            new Reference('mautic.security'),
-            new Reference('translator'),
-            new Reference('event_dispatcher'),
-            new Reference('mautic.factory'),
-            '%mautic.parameters%'
-        )
+        array(new Reference('mautic.factory'))
     )
 )
     ->addTag('kernel.event_subscriber');

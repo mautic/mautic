@@ -9,7 +9,6 @@
 
 namespace Mautic\CoreBundle\EventListener;
 
-
 use Mautic\CoreBundle\Controller\EventsController;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MenuEvent;
@@ -17,7 +16,6 @@ use Mautic\CoreBundle\Event\RouteEvent;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Class CoreSubscriber
@@ -51,11 +49,12 @@ class CoreSubscriber extends CommonSubscriber
         $currentUser = $this->security->getCurrentUser();
 
         //set the user's timezone
-        $tz = $currentUser->getTimezone();
+        if (is_object($currentUser))
+            $tz = $currentUser->getTimezone();
 
-        if (empty($tz)) {
+        if (empty($tz))
             $tz = $this->params['default_timezone'];
-        }
+
         date_default_timezone_set($tz);
 
         //set the user's default locale
@@ -68,10 +67,10 @@ class CoreSubscriber extends CommonSubscriber
         if ($locale = $request->attributes->get('_locale')) {
             $request->getSession()->set('_locale', $locale);
         } else {
-            $locale = $currentUser->getLocale();
-            if (empty($locale)) {
+            if (is_object($currentUser))
+                $locale = $currentUser->getLocale();
+            if (empty($locale))
                 $locale = $this->params['locale'];
-            }
 
             // if no explicit locale has been set on this request, use one from the session
             $request->setLocale($request->getSession()->get('_locale', $locale));

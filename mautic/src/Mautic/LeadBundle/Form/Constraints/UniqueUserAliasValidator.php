@@ -7,9 +7,9 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\LeadBundle\Validator\Constraints;
+namespace Mautic\LeadBundle\Form\Constraints;
 
-use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -21,10 +21,10 @@ class UniqueUserAliasValidator extends ConstraintValidator
     public $em;
     public $currentUser;
 
-    public function __construct(EntityManager $em, SecurityContext $securityContext)
+    public function __construct(MauticFactory $factory)
     {
-        $this->em          = $em;
-        $this->currentUser = $securityContext->getToken()->getUser();
+        $this->em          = $factory->getEntityManager();
+        $this->currentUser = $factory->getUser();
     }
 
     public function validate($list, Constraint $constraint)

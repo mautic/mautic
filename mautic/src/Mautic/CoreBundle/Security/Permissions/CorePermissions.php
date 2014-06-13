@@ -9,6 +9,7 @@
 
 namespace Mautic\CoreBundle\Security\Permissions;
 
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -44,17 +45,17 @@ class CorePermissions {
     private $params;
 
     /**
-     * @var \Symfony\Component\Security\Core\SecurityContext
+     * @var bool|object
      */
     private $security;
 
-
-    public function __construct(TranslatorInterface $translator, EntityManager $em, SecurityContext $security, array $bundles, array $params) {
-        $this->translator      = $translator;
-        $this->em              = $em;
-        $this->bundles         = $bundles;
-        $this->security = $security;
-        $this->params          = $params;
+    public function __construct(MauticFactory $factory)
+    {
+        $this->translator = $factory->getTranslator();
+        $this->em         = $factory->getEntityManager();
+        $this->bundles    = $factory->getParam('mautic.bundles');
+        $this->security   = $factory->getSecurityContext();
+        $this->params     = $factory->getSystemParameters();
     }
 
     /**
@@ -256,7 +257,7 @@ class CorePermissions {
         }
 
         $ownerId = (!empty($owner)) ? $owner->getId() : 0;
-        $me = $this->security->getToken()->getUser();
+        $me = $this->getCurrentUser();
         if ($ownerId === 0) {
             if ($other) {
                 return true;

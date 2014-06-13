@@ -9,11 +9,11 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\LeadBundle\Form\DataTransformer\FieldTypeTransformer;
 use Mautic\UserBundle\Form\DataTransformer as Transformers;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -30,10 +30,10 @@ class ListType extends AbstractType
     private $translator;
 
     /**
-     * @param TranslatorInterface $translator
+     * @param MauticFactory $factory
      */
-    public function __construct(TranslatorInterface $translator) {
-        $this->translator = $translator;
+    public function __construct(MauticFactory $factory) {
+        $this->translator = $factory->getTranslator();
     }
 
     /**

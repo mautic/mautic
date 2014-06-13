@@ -50,12 +50,12 @@ class Lead extends FormEntity
     private $score = 0;
 
     /**
-     * @ORM\OneToMany(targetEntity="LeadFieldValue", mappedBy="lead", cascade={"persist", "remove"}, orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="LeadFieldValue", mappedBy="lead", cascade={"persist", "remove", "refresh"}, orphanRemoval=true)
      */
     private $fields;
 
     /**
-     * @ORM\ManyToMany(targetEntity="LeadIpAddress", inversedBy="leads", cascade={"merge", "persist"})
+     * @ORM\ManyToMany(targetEntity="LeadIpAddress", inversedBy="leads", cascade={"merge", "persist", "refresh"})
      * @ORM\JoinTable(name="lead_ips_xref",
      *   joinColumns={@ORM\JoinColumn(name="lead_id", referencedColumnName="id")},
      *   inverseJoinColumns={@ORM\JoinColumn(name="ip_id", referencedColumnName="id")}

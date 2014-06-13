@@ -158,7 +158,13 @@ class ListController extends FormController
                             array(
                                 'type'    => 'notice',
                                 'msg'     => 'mautic.lead.list.notice.created',
-                                'msgVars' => array('%name%' => $list->getName() . " (" . $list->getAlias() . ")")
+                                'msgVars' => array(
+                                    '%name%' => $list->getName() . " (" . $list->getAlias() . ")",
+                                    '%url%'  => $this->generateUrl('mautic_leadlist_action', array(
+                                        'objectAction' => 'edit',
+                                        'objectId'     => $list->getId()
+                                    ))
+                                )
                             )
                         ) : array()
                 ));
@@ -258,7 +264,13 @@ class ListController extends FormController
                                     array(
                                         'type' => 'notice',
                                         'msg'  => 'mautic.lead.list.notice.updated',
-                                        'msgVars' => array('%name%' => $list->getName() . " (" . $list->getAlias() . ")")
+                                        'msgVars' => array(
+                                            '%name%' => $list->getName() . " (" . $list->getAlias() . ")",
+                                            '%url%'  => $this->generateUrl('mautic_leadlist_action', array(
+                                                'objectAction' => 'edit',
+                                                'objectId'     => $list->getId()
+                                            ))
+                                        )
                                     )
                                 ) : array()
                         )

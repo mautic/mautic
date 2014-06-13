@@ -14,12 +14,11 @@ Mautic.leadOnLoad = function (container) {
     if ($(container + ' .lead-list').length) {
         //set height of divs
         var windowHeight = $(window).height() - 175;
-        if (windowHeight > 475) {
+        if (windowHeight > 450) {
             $('.lead-list').css('height', windowHeight + 'px');
             $('.lead-details').css('height', windowHeight + 'px');
         }
     }
-
 
     if ($(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'lead');

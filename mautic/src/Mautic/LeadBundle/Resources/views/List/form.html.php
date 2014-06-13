@@ -35,7 +35,7 @@ $glueOptions = array(
         <?php
         $filterForm   = $form['filters'];
         $filterValues = $filterForm->vars['data'] ?: array();
-        unset($form['filters']);
+        $form['filters']->setRendered();
         $feedbackClass = ($app->getRequest()->getMethod() == 'POST' && !empty($filterForm->vars['errors'])) ? " has-error" : "";
         ?>
         <div class="row">

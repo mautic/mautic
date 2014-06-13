@@ -98,7 +98,13 @@ class FieldController extends FormController
                             array(
                                 'type'    => 'notice',
                                 'msg'     => 'mautic.lead.field.notice.created',
-                                'msgVars' => array('%name%' => $field->getLabel())
+                                'msgVars' => array(
+                                    '%name%' => $field->getLabel(),
+                                    '%url%'          => $this->generateUrl('mautic_leadfield_action', array(
+                                        'objectAction' => 'edit',
+                                        'objectId'     => $field->getId()
+                                    ))
+                                )
                             )
                         ) : array()
                 ));
@@ -202,7 +208,13 @@ class FieldController extends FormController
                                     array(
                                         'type' => 'notice',
                                         'msg'  => 'mautic.lead.field.notice.updated',
-                                        'msgVars' => array('%name%' => $field->getLabel())
+                                        'msgVars' => array(
+                                            '%name%' => $field->getLabel(),
+                                            '%url%'  => $this->generateUrl('mautic_leadfield_action', array(
+                                                'objectAction' => 'edit',
+                                                'objectId'     => $field->getId()
+                                            ))
+                                        )
                                     )
                                 ) : array()
                         )

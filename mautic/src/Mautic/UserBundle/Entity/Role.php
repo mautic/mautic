@@ -58,7 +58,7 @@ class Role extends FormEntity
     private $isAdmin = false;
 
     /**
-     * @ORM\OneToMany(targetEntity="Permission", mappedBy="role", cascade={"persist", "remove"}, orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="Permission", mappedBy="role", cascade={"persist", "remove", "refresh"}, orphanRemoval=true)
      */
     private $permissions;
 

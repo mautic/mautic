@@ -7,15 +7,17 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+use \Symfony\Component\Form\Extension\Core\DataTransformer\NumberToLocalizedStringTransformer;
+
 $roundMode = (isset($roundMode)) ? $roundMode : "";
 $precision = (isset($precision)) ? $precision : "";
 
 $options = array(
-    'ROUND_UP'          => 'mautic.lead.field.form.number.roundup',
-    'ROUND_DOWN'        => 'mautic.lead.field.form.number.rounddown',
-    'ROUND_HALF_UP'     => 'mautic.lead.field.form.number.roundhalfup',
-    'ROUND_HALF_EVEN'   => 'mautic.lead.field.form.number.roundhalfeven',
-    'ROUND_HALF_DOWN'   => 'mautic.lead.field.form.number.roundhalfdown'
+    NumberToLocalizedStringTransformer::ROUND_UP        => 'mautic.lead.field.form.number.roundup',
+    NumberToLocalizedStringTransformer::ROUND_DOWN      => 'mautic.lead.field.form.number.rounddown',
+    NumberToLocalizedStringTransformer::ROUND_HALF_UP   => 'mautic.lead.field.form.number.roundhalfup',
+    NumberToLocalizedStringTransformer::ROUND_HALF_EVEN => 'mautic.lead.field.form.number.roundhalfeven',
+    NumberToLocalizedStringTransformer::ROUND_HALF_DOWN => 'mautic.lead.field.form.number.roundhalfdown'
 );
 ?>
 
@@ -26,7 +28,7 @@ $options = array(
             <div class="input-group">
                 <select class="form-control" autocomplete="off" name="leadfield[properties][roundmode]">
                     <?php foreach ($options as $v => $l): ?>
-                    <option value="<?php $v; ?>"<?php if ($roundMode == $v) echo ' selected="selected"'; ?>><?php echo $view['translator']->trans($l); ?></option>
+                    <option value="<?php echo $v; ?>"<?php if ($roundMode == $v) echo ' selected="selected"'; ?>><?php echo $view['translator']->trans($l); ?></option>
                     <?php endforeach; ?>
                 </select>
 

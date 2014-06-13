@@ -99,13 +99,13 @@ class FormModel extends CommonModel
     }
 
     /**
-     * Unlock an entity to prevent multiple people from editing
+     * Unlock an entity that prevents multiple people from editing
      *
      * @param $entity
      */
     public function unlockEntity($entity)
     {
-        //flush any changes first
+        //flush any changes caused by form binding
         $this->em->refresh($entity);
 
         //unlock the row if applicable
@@ -116,11 +116,11 @@ class FormModel extends CommonModel
             if (method_exists($entity, 'setModifiedBy')) {
                 $entity->setModifiedBy($this->security->getCurrentUser());
             }
-        }
 
-        $this->em
-            ->getRepository($this->repository)
-            ->saveEntity($entity);
+            $this->em
+                ->getRepository($this->repository)
+                ->saveEntity($entity);
+        }
     }
 
     /**
@@ -188,7 +188,7 @@ class FormModel extends CommonModel
     {
         $event = $this->dispatchEvent("pre_delete", $entity);
         $this->em->getRepository($this->repository)->deleteEntity($entity);
-        $this->dispatchEvent("post_delete", $entity, $event);
+        $this->dispatchEvent("post_delete", $entity, false, $event);
 
         return $entity;
     }

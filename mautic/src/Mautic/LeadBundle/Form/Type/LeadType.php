@@ -8,12 +8,11 @@
  */
 
 namespace Mautic\LeadBundle\Form\Type;
-use Doctrine\ORM\EntityManager;
+
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\UserBundle\Form\DataTransformer as Transformers;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -28,17 +27,13 @@ class LeadType extends AbstractType
 
     private $translator;
     private $factory;
-    private $em;
 
     /**
-     * @param TranslatorInterface $translator
      * @param MauticFactory       $factory
-     * @param EntityManager       $em
      */
-    public function __construct(TranslatorInterface $translator, MauticFactory $factory, EntityManager $em) {
-        $this->translator = $translator;
+    public function __construct(MauticFactory $factory) {
+        $this->translator = $factory->getTranslator();
         $this->factory    = $factory;
-        $this->em         = $em;
     }
 
     /**
@@ -62,13 +57,10 @@ class LeadType extends AbstractType
             'required'   => false
         ));
 
-        $userTransformer  = new Transformers\UserToIdTransformer($this->em);
-        $builder->add(
-            $builder->create('owner', 'hidden', array(
-                'required' => false,
-            ))
-                ->addViewTransformer($userTransformer)
-        );
+        $builder->add('owner', 'hidden_entity', array(
+            'required' => false,
+            'repository' => 'MauticUserBundle:User'
+        ));
 
         //get a list of fields
         $fields      = $this->factory->getModel('leadfield')->getEntities();
@@ -89,7 +81,24 @@ class LeadType extends AbstractType
                     array('message' => 'mautic.lead.customfield.notblank')
                 );
             }
-            if ($type == 'select' || $type == 'boolean') {
+            if ($type == 'number') {
+                if (empty($properties['precision']))
+                    $properties['precision'] = null; //ensure deafult locale is used
+                else
+                    $properties['precision'] = (int) $properties['precision'];
+
+                $builder->add("field_{$field->getAlias()}", $type, array(
+                    'required'    => $field->getIsRequired(),
+                    'label'       => $field->getLabel(),
+                    'label_attr'  => array('class' => 'control-label'),
+                    'attr'        => $attr,
+                    'data'        => (isset($values[$field->getId()])) ? $values[$field->getId()] : $field->getDefaultValue(),
+                    'mapped'      => false,
+                    'constraints' => $constraints,
+                    'precision'   => $properties['precision'],
+                    'rounding_mode' => (int) $properties['roundmode']
+                ));
+            } elseif ($type == 'select' || $type == 'boolean') {
                 $choices = array();
                 if ($type == 'select' && !empty($properties['list'])) {
                     $list    = explode('|', $properties['list']);

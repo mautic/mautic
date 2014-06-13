@@ -15,11 +15,7 @@ use Symfony\Component\DependencyInjection\Parameter;
 $container->setDefinition(
     'mautic.api.oauth.event_listener',
     new Definition('Mautic\ApiBundle\EventListener\OAuthEventListener',
-        array(
-            new Reference('doctrine.orm.entity_manager'),
-            new Reference('mautic.security'),
-            new Reference('translator')
-        )
+        array(new Reference('mautic.factory'))
     )
 )
     ->addTag('kernel.event_listener', array(
@@ -36,16 +32,7 @@ $container->setDefinition(
     'mautic.api.subscriber',
     new Definition(
         'Mautic\ApiBundle\EventListener\ApiSubscriber',
-        array(
-            new Reference('templating'),
-            new Reference('request_stack'),
-            new Reference('jms_serializer'),
-            new Reference('mautic.security'),
-            new Reference('translator'),
-            new Reference('event_dispatcher'),
-            new Reference('mautic.factory'),
-            '%mautic.parameters%'
-        )
+        array(new Reference('mautic.factory'))
     )
 )
     ->addTag('kernel.event_subscriber');

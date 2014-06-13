@@ -11,8 +11,8 @@ namespace Mautic\ApiBundle\Routing;
 
 use Mautic\ApiBundle\ApiEvents;
 use Mautic\ApiBundle\Event\RouteEvent;
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Config\Loader\Loader;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
@@ -30,10 +30,10 @@ class RouteLoader extends Loader
     /**
      * @param Container $container
      */
-    public function __construct(EventDispatcherInterface $dispatcher, array $params)
+    public function __construct(MauticFactory $factory)
     {
-        $this->dispatcher = $dispatcher;
-        $this->params     = $params;
+        $this->dispatcher = $factory->getDispatcher();
+        $this->params     = $factory->getSystemParameters();
     }
 
     /**

@@ -15,9 +15,7 @@ use Symfony\Component\DependencyInjection\Parameter;
 $container->setDefinition ('mautic.route_loader',
     new Definition(
         'Mautic\CoreBundle\Routing\RouteLoader',
-        array(
-            new Reference('event_dispatcher')
-        )
+        array(new Reference('mautic.factory'))
     )
 )
     ->addTag('routing.loader');
@@ -26,13 +24,7 @@ $container->setDefinition ('mautic.route_loader',
 $container->setDefinition ('mautic.security',
     new Definition(
         'Mautic\CoreBundle\Security\Permissions\CorePermissions',
-        array(
-            new Reference('translator'),
-            new Reference('doctrine.orm.entity_manager'),
-            new Reference('security.context'),
-            '%mautic.bundles%',
-            '%mautic.parameters%',
-        )
+        array(new Reference('mautic.factory'))
     )
 );
 

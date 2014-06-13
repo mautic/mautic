@@ -159,7 +159,13 @@ class RoleController extends FormController
                             array(
                                 'type'    => 'notice',
                                 'msg'     => 'mautic.user.role.notice.created',
-                                'msgVars' => array('%name%' => $entity->getName())
+                                'msgVars' => array(
+                                    '%name%' => $entity->getName(),
+                                    '%url%'  => $this->generateUrl('mautic_role_action', array(
+                                        'objectAction' => 'edit',
+                                        'objectId'     => $entity->getId()
+                                    ))
+                                )
                             )
                         ) : array()
                 ));
@@ -262,7 +268,13 @@ class RoleController extends FormController
                                 array(
                                     'type'    => 'notice',
                                     'msg'     => 'mautic.user.role.notice.updated',
-                                    'msgVars' => array('%name%' => $entity->getName())
+                                    'msgVars' => array(
+                                        '%name%' => $entity->getName(),
+                                        '%url%'  => $this->generateUrl('mautic_role_action', array(
+                                            'objectAction' => 'edit',
+                                            'objectId'     => $entity->getId()
+                                        ))
+                                    )
                                 )
                             ) : array()
                     ))

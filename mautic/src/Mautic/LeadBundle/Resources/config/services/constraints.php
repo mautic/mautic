@@ -13,11 +13,8 @@ use Symfony\Component\DependencyInjection\Reference;
 $container->setDefinition(
     'mautic.lead.constraint.alias',
     new Definition(
-        'Mautic\LeadBundle\Validator\Constraints\UniqueUserAliasValidator',
-        array(
-            new Reference('doctrine.orm.entity_manager'),
-            new Reference("security.context"),
-        )
+        'Mautic\LeadBundle\Form\Constraints\UniqueUserAliasValidator',
+        array(new Reference('mautic.factory'))
     )
 )
     ->addTag('validator.constraint_validator', array(

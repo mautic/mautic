@@ -16,10 +16,8 @@ $container->setDefinition('mautic.menu_renderer',
     new Definition(
         'Mautic\CoreBundle\Menu\MenuRenderer',
         array(
-            new Reference('templating'),
             new Reference('knp_menu.matcher'),
-            //'%knp_menu.renderer.list.options%',
-            '%kernel.charset%'
+            new Reference('mautic.factory')
         )
     )
 )
@@ -32,8 +30,7 @@ $container->setDefinition('mautic.menu_builder',
         array(
             new Reference('knp_menu.factory'),
             new Reference('knp_menu.matcher'),
-            new Reference('mautic.security'),
-            new Reference('event_dispatcher')
+            new Reference('mautic.factory')
         )
     ));
 
@@ -47,42 +44,24 @@ $container->setDefinition('mautic.menuhelper',
 
 //Main menu
 $container->setDefinition('mautic.menu_main',
-    new Definition(
-        'Knp\Menu\MenuItem',
-        array(
-            new Reference('request')
-        )
-    )
+    new Definition('Knp\Menu\MenuItem')
 )
     ->setFactoryService('mautic.menu_builder')
     ->setFactoryMethod('mainMenu')
-    ->setScope('request')
     ->addTag('knp_menu.menu', array('alias' => 'main'));
 
 //Breacrumbs menu
 $container->setDefinition('mautic.menu_breadcrumbs',
-    new Definition(
-        'Knp\Menu\MenuItem',
-        array(
-            new Reference('request')
-        )
-    )
+    new Definition('Knp\Menu\MenuItem')
 )
     ->setFactoryService('mautic.menu_builder')
     ->setFactoryMethod('breadcrumbsMenu')
-    ->setScope('request')
     ->addTag('knp_menu.menu', array('alias' => 'breadcrumbs'));
 
 //Admin menu
 $container->setDefinition('mautic.menu_admin',
-    new Definition(
-        'Knp\Menu\MenuItem',
-        array(
-            new Reference('request')
-        )
-    )
+    new Definition('Knp\Menu\MenuItem')
 )
     ->setFactoryService('mautic.menu_builder')
     ->setFactoryMethod('adminMenu')
-    ->setScope('request')
     ->addTag('knp_menu.menu', array('alias' => 'admin'));

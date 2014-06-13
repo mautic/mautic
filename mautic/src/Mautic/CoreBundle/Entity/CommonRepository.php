@@ -9,6 +9,7 @@
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Helper\SearchStringHelper;
@@ -68,7 +69,6 @@ class CommonRepository extends EntityRepository
      * Get a list of entities
      *
      * @param array      $args
-     * @param Translator $translator
      * @return Paginator
      */
     public function getEntities($args = array())
@@ -79,8 +79,13 @@ class CommonRepository extends EntityRepository
 
         $this->buildOrderByClause($q, $args);
         $this->buildLimiterClauses($q, $args);
-
         $query = $q->getQuery();
+
+        if (isset($args['hydration_mode'])) {
+            $mode = strtoupper($args['hydration_mode']);
+            $query->setHydrationMode(constant("Query::$mode"));
+        }
+
         $results = new Paginator($query);
         return $results;
     }

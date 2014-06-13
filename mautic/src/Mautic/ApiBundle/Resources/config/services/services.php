@@ -14,10 +14,7 @@ use Symfony\Component\DependencyInjection\Reference;
 $container->setDefinition ('mautic.api_route_loader',
     new Definition(
         'Mautic\ApiBundle\Routing\RouteLoader',
-        array(
-            new Reference('event_dispatcher'),
-            '%mautic.parameters%'
-        )
+        array(new Reference('mautic.factory'))
     )
 )
     ->addTag('routing.loader');

@@ -177,7 +177,13 @@ class UserController extends FormController
                             array(
                                 'type' => 'notice',
                                 'msg'  => 'mautic.user.user.notice.created',
-                                'msgVars' => array('%name%' => $user->getName())
+                                'msgVars' => array(
+                                    '%name%' => $user->getName(),
+                                    '%url%'  => $this->generateUrl('mautic_user_action', array(
+                                        'objectAction' => 'edit',
+                                        'objectId'     => $user->getId()
+                                    ))
+                                )
                             )
                         ) : array()
                 ));
@@ -286,7 +292,13 @@ class UserController extends FormController
                                 array(
                                     'type' => 'notice',
                                     'msg'  => 'mautic.user.user.notice.updated',
-                                    'msgVars' => array('%name%' => $user->getName())
+                                    'msgVars' => array(
+                                        '%name%' => $user->getName(),
+                                        '%url%'  => $this->generateUrl('mautic_user_action', array(
+                                            'objectAction' => 'edit',
+                                            'objectId'     => $user->getId()
+                                        ))
+                                    )
                                 )
                             ) : array()
                     ))

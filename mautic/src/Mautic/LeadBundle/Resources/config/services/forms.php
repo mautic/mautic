@@ -15,11 +15,7 @@ $container->setDefinition(
     'mautic.form.type.lead',
     new Definition(
         'Mautic\LeadBundle\Form\Type\LeadType',
-        array(
-            new Reference('translator'),
-            new Reference('mautic.factory'),
-            new Reference('doctrine.orm.entity_manager')
-        )
+        array(new Reference('mautic.factory'))
     )
 )
     ->addTag('form.type', array(
@@ -31,9 +27,7 @@ $container->setDefinition(
     'mautic.form.type.leadlist',
     new Definition(
         'Mautic\LeadBundle\Form\Type\ListType',
-        array(
-            new Reference("translator")
-        )
+        array(new Reference('mautic.factory'))
     )
 )
     ->addTag('form.type', array(
@@ -57,10 +51,7 @@ $container->setDefinition(
     'mautic.form.type.leadfield',
     new Definition(
         'Mautic\LeadBundle\Form\Type\FieldType',
-        array(
-            new Reference("translator"),
-            new Reference('doctrine.orm.entity_manager')
-        )
+        array(new Reference('mautic.factory'))
     )
 )
     ->addTag('form.type', array(

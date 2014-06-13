@@ -13,7 +13,7 @@ use Knp\Menu\ItemInterface;
 use Knp\Menu\Matcher\MatcherInterface;
 use Knp\Menu\Renderer\RendererInterface;
 use Knp\Menu\Util\MenuManipulator;
-use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
+use Mautic\CoreBundle\Factory\MauticFactory;
 
 /**
  * Class MenuRenderer
@@ -27,15 +27,14 @@ class MenuRenderer implements RendererInterface {
     private $charset;
 
     /**
-     * @param DelegatingEngine $engine
      * @param MatcherInterface $matcher
-     * @param                  $charset
+     * @param MauticFactory    $factory
      * @param array            $defaultOptions
      */
-    public function __construct(DelegatingEngine $engine, MatcherInterface $matcher, $charset, array $defaultOptions = array())
+    public function __construct( MatcherInterface $matcher, MauticFactory $factory, array $defaultOptions = array())
     {
-        $this->engine           = $engine;
-        $this->matcher          = $matcher;
+        $this->engine           = $factory->getTemplating();
+        $this->matcher          =& $matcher;
         $this->defaultOptions   = array_merge(array(
             'depth'             => null,
             'matchingDepth'     => null,
@@ -49,7 +48,7 @@ class MenuRenderer implements RendererInterface {
             'allow_safe_labels' => false,
             'clear_matcher'     => true,
         ), $defaultOptions);
-        $this->charset          = $charset;
+        $this->charset          = $factory->getParam('kernel.charset');
     }
 
     /**

@@ -9,10 +9,9 @@
 
 namespace Mautic\UserBundle\Form\Type;
 
-use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -30,10 +29,12 @@ class RoleType extends AbstractType
     private $translator;
     private $em;
 
-
-    public function __construct(TranslatorInterface $translator, EntityManager $em) {
-        $this->translator = $translator;
-        $this->em         = $em;
+    /**
+     * @param MauticFactory $factory
+     */
+    public function __construct (MauticFactory $factory) {
+        $this->translator = $factory->getTranslator();
+        $this->em         = $factory->getEntityManager();
     }
 
     /**

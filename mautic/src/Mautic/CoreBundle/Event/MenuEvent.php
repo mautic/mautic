@@ -28,11 +28,11 @@ class MenuEvent extends Event
     protected $security;
 
     /**
-     * @param $mauticSecurity
+     * @param CorePermissions $security
      */
-    public function __construct(CorePermissions $mauticSecurity)
+    public function __construct(CorePermissions $security)
     {
-        $this->security = $mauticSecurity;
+        $this->security = $security;
     }
 
     /**

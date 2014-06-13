@@ -64,7 +64,7 @@ $feedbackClass = ($app->getRequest()->getMethod() == 'POST' && !empty($errors)) 
         <?php echo $view['form']->errors($form['properties']); ?>
     </div>
 </div>
-<?php unset($form['properties']); ?>
+<?php $form['properties']->setRendered(); ?>
 <?php echo $view['form']->end($form); ?>
 
 <div id="field-templates" class="hide">

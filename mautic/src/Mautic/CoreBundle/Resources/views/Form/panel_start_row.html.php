@@ -1,4 +1,4 @@
-<?php
+    <?php
 $attr = $form->vars['attr'];
 if (isset($attr['class']))
     $attr['class'] .= ' panel';

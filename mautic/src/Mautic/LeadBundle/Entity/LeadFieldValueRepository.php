@@ -9,10 +9,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
-use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * LeadFieldValueRepository

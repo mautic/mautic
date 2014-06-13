@@ -1,11 +1,13 @@
-
 <?php
+$preaddonAttr  = (isset($form->vars['attr']['preaddon_attr'])) ? $form->vars['attr']['preaddon_attr'] : array();
+$postaddonAttr = (isset($form->vars['attr']['postaddon_attr'])) ? $form->vars['attr']['postaddon_attr'] : array();
+
 if (!empty($form->vars['attr']['tooltip']) ||
     !empty($form->vars['attr']['preaddon']) ||
     !empty($form->vars['attr']['postaddon'])): ?>
 <div class="input-group">
     <?php if (!empty($form->vars['attr']['preaddon'])): ?>
-        <span class="input-group-addon">
+        <span class="input-group-addon" <?php foreach ($preaddonAttr as $k => $v) { printf('%s="%s" ', $view->escape($k), $view->escape($v)); }?>>
         <i class="<?php echo $form->vars['attr']['preaddon']; ?>"></i>
     </span>
     <?php endif; ?>
@@ -21,7 +23,7 @@ if (!empty($form->vars['attr']['tooltip']) ||
     </span>
 
     <?php elseif (!empty($form->vars['attr']['postaddon'])): ?>
-    <span class="input-group-addon">
+    <span class="input-group-addon" <?php foreach ($postaddonAttr as $k => $v) { printf('%s="%s" ', $view->escape($k), $view->escape($v)); }?>>
         <i class="<?php echo $form->vars['attr']['postaddon']; ?>"></i>
     </span>
     <?php endif; ?>

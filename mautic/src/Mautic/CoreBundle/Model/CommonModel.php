@@ -7,6 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 namespace Mautic\CoreBundle\Model;
+use Mautic\CoreBundle\Factory\MauticFactory;
 
 /**
  * Class CommonModel
@@ -24,18 +25,14 @@ class CommonModel
     protected $factory;
 
     /**
-     * @param $em
-     * @param $security
-     * @param $dispatcher
-     * @param $translator
      * @param $factory
      */
-    public function __construct($em, $security, $dispatcher, $translator, $factory)
+    public function __construct(MauticFactory $factory)
     {
-        $this->em         = $em;
-        $this->security   = $security;
-        $this->dispatcher = $dispatcher;
-        $this->translator = $translator;
+        $this->em         = $factory->getEntityManager();
+        $this->security   = $factory->getSecurity();
+        $this->dispatcher = $factory->getDispatcher();
+        $this->translator = $factory->getTranslator();
         $this->factory    = $factory;
 
         $this->init();

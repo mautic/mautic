@@ -9,6 +9,8 @@
 
 namespace Mautic\LeadBundle\Helper;
 
+use Symfony\Component\Translation\TranslatorInterface;
+
 class FormFieldHelper
 {
 
@@ -73,17 +75,28 @@ class FormFieldHelper
         )
     );
 
+    private $translator;
+
+    /**
+     * Set translator
+     *
+     * @param TranslatorInterface $translator
+     */
+    public function setTranslator(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
+    }
+
     /**
      * @return array
      */
-    static public function getChoiceList()
+    public function getChoiceList()
     {
         $choices = array();
-
         foreach (self::$types as $v => $type) {
-            $choices[$v] = $type['label'];
+            $choices[$v] = $this->translator->trans($type['label']);
         }
-
+        asort($choices);
         return $choices;
     }
 
@@ -99,7 +112,7 @@ class FormFieldHelper
             return array(false, 'mautic.lead.field.typenotrecognized');
         }
 
-        $fieldType = static::$types[$type];
+        $fieldType = self::$types[$type];
         foreach ($properties as $key => $value) {
             if (!array_key_exists($key, $fieldType['properties'])) {
                 //ensure the properties are recognized

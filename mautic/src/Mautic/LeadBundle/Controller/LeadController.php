@@ -248,6 +248,15 @@ class LeadController extends FormController
             if ($valid === 1) {
                 //get custom field values
                 $data = $this->request->request->get('lead');
+
+                //pull the data from the form in order to apply the form's formatting
+                foreach ($form as $f) {
+                    $name = $f->getName();
+                    if (strpos($name, 'field_') === 0) {
+                        $data[$name] = $f->getData();
+                    }
+                }
+
                 $model->setFieldValues($lead, $data);
 
                 //form is valid so process the data
@@ -282,7 +291,13 @@ class LeadController extends FormController
                             array(
                                 'type'    => 'notice',
                                 'msg'     => 'mautic.lead.lead.notice.created',
-                                'msgVars' => array('%name%' => $identifier)
+                                'msgVars' => array(
+                                    '%name%' => $identifier,
+                                    '%url%'  => $this->generateUrl('mautic_lead_action', array(
+                                        'objectAction' => 'edit',
+                                        'objectId'     => $lead->getId()
+                                    ))
+                                )
                             )
                         ) : array()
                 ));
@@ -354,6 +369,15 @@ class LeadController extends FormController
 
             if ($valid === 1) {
                 $data = $this->request->request->get('lead');
+
+                //pull the data from the form in order to apply the form's formatting
+                foreach ($form as $f) {
+                    $name = $f->getName();
+                    if (strpos($name, 'field_') === 0) {
+                        $data[$name] = $f->getData();
+                    }
+                }
+
                 $model->setFieldValues($lead, $data);
                 //form is valid so process the data
                 $lead = $model->saveEntity($lead);
@@ -380,7 +404,13 @@ class LeadController extends FormController
                                 array(
                                     'type' => 'notice',
                                     'msg'  => 'mautic.lead.lead.notice.updated',
-                                    'msgVars' => array('%name%' => $identifier)
+                                    'msgVars' => array(
+                                        '%name%' => $identifier,
+                                        '%url%'  => $this->generateUrl('mautic_lead_action', array(
+                                            'objectAction' => 'edit',
+                                            'objectId'     => $lead->getId()
+                                        ))
+                                    )
                                 )
                             ) : array()
                         )

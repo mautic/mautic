@@ -10,7 +10,6 @@
 namespace Mautic\CoreBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;
-use Doctrine\ORM\EntityManager;
 
 /**
  * Class CommonEvent
@@ -38,9 +37,9 @@ class CommonEvent extends Event
     /**
      * Sets the entity manager for the event to use
      *
-     * @param EntityManager $em
+     * @param $em
      */
-    public function setEntityManager(EntityManager $em)
+    public function setEntityManager($em)
     {
         $this->em = $em;
     }
@@ -61,7 +60,7 @@ class CommonEvent extends Event
      */
     public function getChanges()
     {
-        if (!$this->em instanceof EntityManager) {
+        if ($this->em === null) {
             throw new NotAcceptableHttpException('EntityManager not set. Did you forget to set it with $event->setEntityManager()?');
         }
 
@@ -72,23 +71,6 @@ class CommonEvent extends Event
                 $uow = $this->em->getUnitOfWork();
                 $uow->computeChangeSets();
                 $changeset = $uow->getEntityChangeSet($this->entity);
-
-                //remove timestamps and the like
-                $remove = array(
-                    'dateModified',
-                    'modifiedBy',
-                    'dateAdded',
-                    'createdBy',
-                    'checkedOut',
-                    'checkedOutBy'
-                );
-
-                foreach ($remove as $r) {
-                    if (isset($changeset[$r])) {
-                        unset($changeset[$r]);
-                    }
-                }
-
             } else {
                 $changeset = array();
             }

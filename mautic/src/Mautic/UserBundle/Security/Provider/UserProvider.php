@@ -10,6 +10,7 @@
 namespace Mautic\UserBundle\Security\Provider;
 
 use Doctrine\ORM\Query;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
@@ -21,10 +22,12 @@ class UserProvider implements UserProviderInterface
 {
     protected $userRepository;
     protected $permissionRepository;
+    protected $session;
 
-    public function __construct(ObjectRepository $userRepository, ObjectRepository $permissionRepository){
+    public function __construct(ObjectRepository $userRepository, ObjectRepository $permissionRepository, Session $session){
         $this->userRepository       = $userRepository;
         $this->permissionRepository = $permissionRepository;
+        $this->session              = $session;
     }
 
     public function loadUserByUsername($username)
@@ -50,7 +53,12 @@ class UserProvider implements UserProviderInterface
         $user = $users[0];
         //load permissions
         if ($user->getId()) {
-            $user->setActivePermissions($this->permissionRepository->getPermissionsByRole($user->getRole()));
+            $permissions = $this->session->get('mautic.user.permissions', false);
+            if ($permissions === false) {
+                $permissions = $this->permissionRepository->getPermissionsByRole($user->getRole());
+                $this->session->set('mautic.user.permissions', $permissions);
+            }
+            $user->setActivePermissions($permissions);
         }
         return $user;
     }

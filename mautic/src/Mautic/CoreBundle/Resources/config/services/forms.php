@@ -53,3 +53,11 @@ $container->setDefinition('mautic.form.type.tel', new Definition(
     ->addTag('form.type', array(
         'alias' => 'tel',
     ));
+
+$container->setDefinition('mautic.form.type.hidden_entity', new Definition(
+    'Mautic\CoreBundle\Form\Type\HiddenEntityType',
+    array(new Reference('mautic.factory'))
+))
+    ->addTag('form.type', array(
+        'alias' => 'hidden_entity',
+    ));

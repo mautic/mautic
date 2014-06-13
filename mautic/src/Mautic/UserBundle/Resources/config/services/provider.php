@@ -61,7 +61,8 @@ $container->setDefinition(
         'Mautic\UserBundle\Security\Provider\UserProvider',
         array(
             new Reference('mautic.user.repository'),
-            new Reference('mautic.permission.repository')
+            new Reference('mautic.permission.repository'),
+            new Reference('session')
         )
     )
 );

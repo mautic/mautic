@@ -16,6 +16,7 @@ use JMS\Serializer\Annotation as Serializer;
  * Class FormEntity
  * @ORM\MappedSuperclass
  * @ORM\HasLifecycleCallbacks
+ * @Serializer\ExclusionPolicy("all")
  */
 class FormEntity
 {

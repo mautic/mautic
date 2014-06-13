@@ -9,8 +9,7 @@
 
 namespace Mautic\UserBundle\Form\Type;
 
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -28,12 +27,11 @@ class PermissionsType extends AbstractType
     private $translator;
 
     /**
-     * @param TranslatorInterface      $translator
-     * @param CorePermissions $security
+     * @param MauticFactory $factory
      */
-    public function __construct(TranslatorInterface $translator, CorePermissions $security) {
-        $this->translator = $translator;
-        $this->security   = $security;
+    public function __construct(MauticFactory $factory) {
+        $this->translator = $factory->getTranslator();
+        $this->security   = $factory->getSecurity();
     }
 
     /**
@@ -66,7 +64,7 @@ class PermissionsType extends AbstractType
                 $label   = $this->translator->trans("mautic.{$bundle}.permissions.header") . $ratio;
                 $builder->add("{$bundle}-panel-start", 'panel_start', array(
                     'label'      => $label,
-                    'dataParent' => "permissions-panel",
+                    'dataParent' => "#permissions-panel",
                     'bodyId'     => "{$bundle}-panel"
                 ));
                 $class->buildForm($builder, $options, $data);

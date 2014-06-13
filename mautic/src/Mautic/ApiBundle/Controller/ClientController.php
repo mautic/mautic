@@ -211,7 +211,11 @@ class ClientController extends FormController
                                 'msgVars' => array(
                                     '%name%'         => $client->getName(),
                                     '%clientId%'     => $client->getPublicId(),
-                                    '%clientSecret%' => $client->getSecret()
+                                    '%clientSecret%' => $client->getSecret(),
+                                    '%url%'          => $this->generateUrl('mautic_client_action', array(
+                                        'objectAction' => 'edit',
+                                        'objectId'     => $client->getId()
+                                    ))
                                 )
                             )
                         ) : array()
@@ -295,7 +299,13 @@ class ClientController extends FormController
                                 array(
                                     'type' => 'notice',
                                     'msg'  => 'mautic.api.client.notice.updated',
-                                    'msgVars' => array('%name%' => $client->getName())
+                                    'msgVars' => array(
+                                        '%name%' => $client->getName(),
+                                        '%url%'          => $this->generateUrl('mautic_client_action', array(
+                                            'objectAction' => 'edit',
+                                            'objectId'     => $client->getId()
+                                        ))
+                                    )
                                 )
                             ) : array()
                         )

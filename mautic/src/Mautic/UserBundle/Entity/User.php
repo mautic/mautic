@@ -37,7 +37,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full", "limited"})
      */
-    private $id;
+    protected $id;
 
     /**
      * @ORM\Column(type="string", length=25, unique=true)
@@ -45,12 +45,12 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})
      */
-    private $username;
+    protected $username;
 
     /**
      * @ORM\Column(type="string", length=64)
      */
-    private $password;
+    protected $password;
 
     /**
      * Used for when updating the password
@@ -111,7 +111,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})
      */
-    private $isActive = true;
+    protected $isActive = true;
 
     /**
      * @ORM\Column(type="text", nullable=true)
@@ -306,7 +306,6 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
             $this->id,
             $this->username,
             $this->password,
-            $this->role,
             $this->isActive
         ));
     }
@@ -320,7 +319,6 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
             $this->id,
             $this->username,
             $this->password,
-            $this->role,
             $this->isActive
         ) = unserialize($serialized);
     }

@@ -9,12 +9,11 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\LeadBundle\Form\DataTransformer\FieldToOrderTransformer;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -33,12 +32,11 @@ class FieldType extends AbstractType
     private $em;
 
     /**
-     * @param TranslatorInterface $translator
-     * @param EntityManager       $em
+     * @param MauticFactory $factory
      */
-    public function __construct(TranslatorInterface $translator, EntityManager $em) {
-        $this->translator = $translator;
-        $this->em         = $em;
+    public function __construct(MauticFactory $factory) {
+        $this->translator = $factory->getTranslator();
+        $this->em         = $factory->getEntityManager();
     }
 
     /**
@@ -59,20 +57,11 @@ class FieldType extends AbstractType
         ));
 
         $disabled = (!empty($options['data'])) ? $options['data']->isFixed() : false;
-        $builder->add('alias', 'text', array(
-            'label'      => 'mautic.lead.field.form.alias',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array(
-                'class'   => 'form-control',
-                'length'  => 25,
-                'tooltip' => 'mautic.lead.field.help.alias',
-            ),
-            'required'   => false,
-            'disabled'   => $disabled
-        ));
 
+        $fieldHelper = new FormFieldHelper();
+        $fieldHelper->setTranslator($this->translator);
         $builder->add('type', 'choice', array(
-            'choices'     => FormFieldHelper::getChoiceList(),
+            'choices'     => $fieldHelper->getChoiceList(),
             'expanded'    => false,
             'multiple'    => false,
             'label'       => 'mautic.lead.field.form.type',
@@ -101,6 +90,7 @@ class FieldType extends AbstractType
         $transformer = new FieldToOrderTransformer($this->em);
         $builder->add(
             $builder->create('order', 'entity', array(
+                'label'         => 'mautic.lead.field.form.order',
                 'class'         => 'MauticLeadBundle:LeadField',
                 'property'      => 'label',
                 'label_attr'    => array('class' => 'control-label'),
@@ -111,6 +101,18 @@ class FieldType extends AbstractType
                 }
             ))->addModelTransformer($transformer)
         );
+
+        $builder->add('alias', 'text', array(
+            'label'      => 'mautic.lead.field.form.alias',
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array(
+                'class'   => 'form-control',
+                'length'  => 25,
+                'tooltip' => 'mautic.lead.field.help.alias',
+            ),
+            'required'   => false,
+            'disabled'   => $disabled
+        ));
 
         $builder->add('isRequired', 'choice', array(
             'choice_list' => new ChoiceList(

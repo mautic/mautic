@@ -9,18 +9,17 @@
 
 namespace Mautic\ApiBundle\Form\Type;
 
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormError;
 use Mautic\CoreBundle\Form\DataTransformer as Transformers;
-use Symfony\Component\Validator\Validator;
 
 /**
  * Class ClientType
@@ -34,12 +33,11 @@ class ClientType extends AbstractType
     private $validator;
 
     /**
-     * @param TranslatorInterface $translator
-     * @param Validator  $validator
+     * @param MauticFactory $factory
      */
-    public function __construct(TranslatorInterface $translator, Validator $validator) {
-        $this->translator = $translator;
-        $this->validator  = $validator;
+    public function __construct(MauticFactory $factory) {
+        $this->translator = $factory->getTranslator();
+        $this->validator  = $factory->getValidator();;
     }
 
     /**

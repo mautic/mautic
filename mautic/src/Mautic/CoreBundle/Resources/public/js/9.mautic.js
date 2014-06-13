@@ -70,23 +70,7 @@ var Mautic = {
         $(container + " a[data-toggle='ajax']").click(function (event) {
             event.preventDefault();
 
-            //prevent leaving if currently in a form
-            if ($(container + " .prevent-nonsubmit-form-exit").length) {
-                Mautic.showConfirmation($(container + " .prevent-nonsubmit-form-exit").val());
-                return false;
-            }
-
-            var route = $(this).attr('href');
-            if (route.indexOf('javascript')>=0) {
-                return false;
-            }
-
-            var link = $(this).attr('data-menu-link');
-            if (link !== undefined && link.charAt(0) != '#') {
-                link = "#" + link;
-            }
-
-            Mautic.loadContent(route, link);
+            return Mautic.ajaxifyLink(this);
         });
 
         //initialize forms
@@ -266,17 +250,17 @@ var Mautic = {
      */
     processPageContent: function (response) {
         if (response && response.newContent) {
+            if (!response.target) {
+                response.target = '.main-panel-content';
+            }
+
             //inactive tooltips, etc
-            Mautic.onPageUnload('.main-panel-wrapper');
+            Mautic.onPageUnload(response.target);
 
             if (response.route) {
                 //update URL in address bar
                 mauticVars.manualStateChange = false;
                 History.pushState(null, "Mautic", response.route);
-            }
-
-            if (!response.target) {
-                response.target = '.main-panel-content';
             }
 
             //set content
@@ -290,6 +274,13 @@ var Mautic = {
             //update latest flashes
             if (response.flashes) {
                 $(".main-panel-flash-msgs").html(response.flashes);
+
+                //ajaxify links
+                $(".main-panel-flash-msgs a[data-toggle='ajax']").click(function (event) {
+                    event.preventDefault();
+
+                    return Mautic.ajaxifyLink(this);
+                });
             }
 
             if (response.activeLink) {
@@ -300,6 +291,10 @@ var Mautic = {
                 $(".side-panel-nav").find(".current_ancestor").removeClass("current_ancestor");
 
                 var link = response.activeLink;
+                if (link !== undefined && link.charAt(0) != '#') {
+                    link = "#" + link;
+                }
+
                 //add current class
                 var parent = $(link).parent();
                 $(parent).addClass("current");
@@ -329,7 +324,7 @@ var Mautic = {
                 mauticContent = response.mauticContent;
             }
 
-            //active tooltips, etc
+            //activate tooltips, etc
             Mautic.onPageLoad(response.target, response);
         }
     },
@@ -374,6 +369,28 @@ var Mautic = {
 
             return false;
         });
+    },
+
+    ajaxifyLink: function (el) {
+        //prevent leaving if currently in a form
+        if ($(".prevent-nonsubmit-form-exit").length) {
+            if ($(el).attr('data-ignore-formexit') != 'true') {
+                Mautic.showConfirmation($(".prevent-nonsubmit-form-exit").val());
+                return false;
+            }
+        }
+
+        var route = $(el).attr('href');
+        if (route.indexOf('javascript')>=0) {
+            return false;
+        }
+
+        var link = $(el).attr('data-menu-link');
+        if (link !== undefined && link.charAt(0) != '#') {
+            link = "#" + link;
+        }
+
+        Mautic.loadContent(route, link);
     },
 
     /**
