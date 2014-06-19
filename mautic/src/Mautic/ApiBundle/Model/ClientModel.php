@@ -37,10 +37,11 @@ class ClientModel extends FormModel
      * @param      $entity
      * @param      $formFactory
      * @param null $action
+     * @param array $options
      * @return mixed
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    public function createForm($entity, $formFactory, $action = null)
+    public function createForm($entity, $formFactory, $action = null, $options = array())
     {
         if (!$entity instanceof Client) {
             throw new MethodNotAllowedHttpException(array('Client'), 'Entity must be of class Client()');

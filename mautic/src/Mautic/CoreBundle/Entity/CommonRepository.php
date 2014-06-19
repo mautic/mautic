@@ -94,27 +94,30 @@ class CommonRepository extends EntityRepository
      * Save an entity through the repository
      *
      * @param $entity
+     * @param $flush true by default; use false if persisting in batches
      * @return int
      */
-    public function saveEntity($entity)
+    public function saveEntity($entity, $flush = true)
     {
         $this->_em->persist($entity);
-        $this->_em->flush();
-        return $entity;
+        if ($flush)
+            $this->_em->flush();
     }
 
     /**
      * Delete an entity through the repository
      *
      * @param $entity
+     * @param $flush true by default; use false if persisting in batches
      * @return int
      */
-    public function deleteEntity($entity)
+    public function deleteEntity($entity, $flush = true)
     {
         //delete entity
         $this->_em->remove($entity);
-        $this->_em->flush();
-        return $entity;
+
+        if ($flush)
+            $this->_em->flush();
     }
 
     protected function buildClauses(QueryBuilder &$q, array $args)

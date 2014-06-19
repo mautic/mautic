@@ -128,7 +128,6 @@ class FormModel extends CommonModel
      *
      * @param       $entity
      * @return mixed
-     * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
      */
     public function saveEntity($entity)
     {
@@ -182,7 +181,6 @@ class FormModel extends CommonModel
      *
      * @param  $entity
      * @return null|object
-     * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
      */
     public function deleteEntity($entity)
     {
@@ -194,15 +192,44 @@ class FormModel extends CommonModel
     }
 
     /**
+     * Delete an array of entities
+     *
+     * @param  $ids
+     * @return array
+     */
+    public function deleteEntities($ids)
+    {
+        $entities = array();
+        //iterate over the results so the events are dispatched on each delete
+        $batchSize = 20;
+        foreach ($ids as $k => $id) {
+            $entity = $this->getEntity($id);
+            $entities[$id] = $entity;
+            if ($entity !== null) {
+                $event = $this->dispatchEvent("pre_delete", $entity);
+                $this->em->getRepository($this->repository)->deleteEntity($entity, false);
+                $this->dispatchEvent("post_delete", $entity, false, $event);
+            }
+            if ((($k + 1) % $batchSize) === 0) {
+                $this->em->flush();
+            }
+        }
+        $this->em->flush();
+        //retrieving the entities while here so may as well return them so they can be used if needed
+        return $entities;
+    }
+
+    /**
      * Creates the appropriate form per the model
      *
      * @param      $entity
      * @param      $formFactory
      * @param null $action
+     * @param array $options
      * @return mixed
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, $formFactory, $action = null)
+    public function createForm($entity, $formFactory, $action = null, $options = array())
     {
         throw new NotFoundHttpException('Form object not found.');
     }

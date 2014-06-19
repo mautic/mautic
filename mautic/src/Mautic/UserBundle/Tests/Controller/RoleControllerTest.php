@@ -42,9 +42,6 @@ class RoleControllerTest extends MauticWebTestCase
         $this->em->persist($role);
         $this->em->flush();
 
-        $role = $this->em
-            ->getRepository('MauticUserBundle:Role')
-            ->findOneByName($unique);
         return $role;
     }
 

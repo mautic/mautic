@@ -53,7 +53,7 @@ class RoleModel extends FormModel
             $this->em->getRepository('MauticUserBundle:Permission')->purgeRolePermissions($entity);
         }
 
-        return parent::saveEntity($entity);
+        parent::saveEntity($entity);
     }
 
     /**
@@ -100,7 +100,7 @@ class RoleModel extends FormModel
             );
         }
 
-        return parent::deleteEntity($entity);
+        parent::deleteEntity($entity);
     }
 
     /**
@@ -109,10 +109,11 @@ class RoleModel extends FormModel
      * @param      $entity
      * @param      $formFactory
      * @param null $action
+     * @param array $options
      * @return mixed
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, $formFactory, $action = null)
+    public function createForm($entity, $formFactory, $action = null, $options = array())
     {
         if (!$entity instanceof Role) {
             throw new MethodNotAllowedHttpException(array('Role'), 'Entity must be of class Role()');

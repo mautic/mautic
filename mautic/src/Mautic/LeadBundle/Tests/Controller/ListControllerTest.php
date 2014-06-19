@@ -10,9 +10,6 @@
 namespace Mautic\LeadBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticWebTestCase;
-use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Entity\LeadFieldValue;
-use Mautic\LeadBundle\Entity\LeadIpAddress;
 use Mautic\LeadBundle\Entity\LeadList;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 

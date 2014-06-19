@@ -44,7 +44,7 @@ class UserModel extends FormModel
             throw new MethodNotAllowedHttpException(array('User'), 'Entity must be of class User()');
         }
 
-        return parent::saveEntity($entity);
+        parent::saveEntity($entity);
     }
 
     /**
@@ -76,16 +76,19 @@ class UserModel extends FormModel
      * @param      $entity
      * @param      $formFactory
      * @param null $action
+     * @param array $options
      * @return mixed
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, $formFactory, $action = null)
+    public function createForm($entity, $formFactory, $action = null, $options = array())
     {
         if (!$entity instanceof User) {
             throw new MethodNotAllowedHttpException(array('User'), 'Entity must be of class User()');
         }
-        $params = (!empty($action)) ? array('action' => $action) : array();
-        return $formFactory->create('user', $entity, $params);
+        if (!empty($action)) {
+            $options['action'] = $action;
+        }
+        return $formFactory->create('user', $entity, $options);
     }
 
     /**

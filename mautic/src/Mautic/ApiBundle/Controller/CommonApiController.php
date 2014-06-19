@@ -268,7 +268,7 @@ class CommonApiController extends FOSRestController implements EventsController
         $form->submit($parameters, 'PATCH' !== $method);
 
         if ($form->isValid()) {
-            $entity = $this->model->saveEntity($entity);
+            $this->model->saveEntity($entity);
             $this->postProcessForm($entity);
             $headers = array();
             //return the newly created entities location if applicable

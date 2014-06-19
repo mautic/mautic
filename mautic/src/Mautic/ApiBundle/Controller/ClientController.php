@@ -170,15 +170,15 @@ class ClientController extends FormController
             return $this->accessDenied();
         }
 
-        $model      = $this->get('mautic.factory')->getModel('client');
+        $model = $this->get('mautic.factory')->getModel('client');
         //retrieve the entity
-        $client     = $model->getEntity();
+        $client = $model->getEntity();
         //set the return URL for post actions
-        $returnUrl  = $this->generateUrl('mautic_client_index');
+        $returnUrl = $this->generateUrl('mautic_client_index');
 
         //get the user form factory
-        $action     = $this->generateUrl('mautic_client_action', array('objectAction' => 'new'));
-        $form       = $model->createForm($client, $this->get('form.factory'), $action);
+        $action = $this->generateUrl('mautic_client_action', array('objectAction' => 'new'));
+        $form   = $model->createForm($client, $this->get('form.factory'), $action);
 
         //remove the client id and secret fields as they'll be auto generated
         $form->remove("randomId");
@@ -187,14 +187,15 @@ class ClientController extends FormController
 
         ///Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
-            $valid = $this->checkFormValidity($form);
-
-            if ($valid === 1) {
-                //form is valid so process the data
-                $model->saveEntity($client);
+            $valid = false;
+            if (!$cancelled = $this->isFormCancelled($form)) {
+                if ($valid = $this->isFormValid($form)) {
+                    //form is valid so process the data
+                    $model->saveEntity($client);
+                }
             }
 
-            if (!empty($valid)) { //cancelled or success
+            if ($cancelled || $valid) { //cancelled or success
 
                 return $this->postActionRedirect(array(
                     'returnUrl'       => $returnUrl,
@@ -204,10 +205,10 @@ class ClientController extends FormController
                         'mauticContent' => 'client'
                     ),
                     'flashes'         =>
-                        ($valid === 1) ? array( //success
+                        ($valid) ? array( //success
                             array(
-                                'type' => 'notice',
-                                'msg'  => 'mautic.api.client.notice.created',
+                                'type'    => 'notice',
+                                'msg'     => 'mautic.api.client.notice.created',
                                 'msgVars' => array(
                                     '%name%'         => $client->getName(),
                                     '%clientId%'     => $client->getPublicId(),
@@ -280,37 +281,33 @@ class ClientController extends FormController
 
         ///Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
-            $valid = $this->checkFormValidity($form);
+            $valid = false;
+            if (!$cancelled = $this->isFormCancelled($form)) {
+                if ($valid = $this->isFormValid($form)) {
+                    //form is valid so process the data
+                    $model->saveEntity($client);
 
-            if ($valid === 1) {
-                //form is valid so process the data
-                $model->saveEntity($client);
+                    $postActionVars['flashes'] = array(
+                        array(
+                            'type' => 'notice',
+                            'msg'  => 'mautic.api.client.notice.updated',
+                            'msgVars' => array(
+                                '%name%' => $client->getName(),
+                                '%url%'          => $this->generateUrl('mautic_client_action', array(
+                                    'objectAction' => 'edit',
+                                    'objectId'     => $client->getId()
+                                ))
+                            )
+                        )
+                    );
+                }
+            } else {
+                //unlock the entity
+                $model->unlockEntity($client);
             }
 
-            if (!empty($valid)) { //cancelled or success
-                if ($valid === -1) {
-                    //unlock the entity
-                    $model->unlockEntity($client);
-                }
-                return $this->postActionRedirect(
-                    array_merge($postActionVars, array(
-                        'flashes'         =>
-                            ($valid === 1) ? array( //success
-                                array(
-                                    'type' => 'notice',
-                                    'msg'  => 'mautic.api.client.notice.updated',
-                                    'msgVars' => array(
-                                        '%name%' => $client->getName(),
-                                        '%url%'          => $this->generateUrl('mautic_client_action', array(
-                                            'objectAction' => 'edit',
-                                            'objectId'     => $client->getId()
-                                        ))
-                                    )
-                                )
-                            ) : array()
-                        )
-                    )
-                );
+            if ($cancelled || $valid) {
+                return $this->postActionRedirect($postActionVars);
             }
         } else {
             //lock the entity

@@ -67,8 +67,6 @@ class LeadListModel extends FormModel
         $event = $this->dispatchEvent("pre_save", $entity, $isNew);
         $this->em->getRepository($this->repository)->saveEntity($entity);
         $this->dispatchEvent("post_save", $entity, $isNew, $event);
-
-        return $entity;
     }
 
     /**
@@ -77,10 +75,11 @@ class LeadListModel extends FormModel
      * @param      $entity
      * @param      $formFactory
      * @param null $action
+     * @param array $options
      * @return mixed
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, $formFactory, $action = null)
+    public function createForm($entity, $formFactory, $action = null, $options = array())
     {
         if (!$entity instanceof LeadList) {
             throw new MethodNotAllowedHttpException(array('LeadList'), 'Entity must be of class LeadList()');
