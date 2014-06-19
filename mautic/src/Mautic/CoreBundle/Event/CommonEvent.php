@@ -56,23 +56,40 @@ class CommonEvent extends Event
     /**
      * Determines changes to original entity
      *
+     * @param array $ignore
      * @return mixed
      */
-    public function getChanges()
+    public function getChanges($ignore = array())
     {
         if ($this->em === null) {
             throw new NotAcceptableHttpException('EntityManager not set. Did you forget to set it with $event->setEntityManager()?');
         }
 
         if ($this->isNew) {
-            $changeset = $this->entity;
+            $changeset = array('entity' => $this->entity);
         } else {
             if (!empty($this->entity)) {
                 $uow = $this->em->getUnitOfWork();
                 $uow->computeChangeSets();
-                $changeset = $uow->getEntityChangeSet($this->entity);
+                $changeset = array('changes' => $uow->getEntityChangeSet($this->entity));
             } else {
                 $changeset = array();
+            }
+        }
+
+        //remove timestamps and the like
+        $ignore = array_merge($ignore, array(
+            'dateModified',
+            'modifiedBy',
+            'dateAdded',
+            'createdBy',
+            'checkedOut',
+            'checkedOutBy'
+        ));
+
+        foreach ($ignore as $r) {
+            if (isset($changeset[$r])) {
+                unset($changeset[$r]);
             }
         }
 

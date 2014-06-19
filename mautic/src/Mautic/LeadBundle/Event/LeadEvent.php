@@ -52,11 +52,12 @@ class LeadEvent extends CommonEvent
     /**
      * Determines changes to original entity
      *
+     * @param $ignore array
      * @return mixed
      */
-    public function getChanges()
+    public function getChanges($ignore = array())
     {
-        $changeset = parent::getChanges();
+        $changeset = parent::getChanges($ignore);
 
         //Check for and add updated custom field values
         $updatedFields = $this->entity->getUpdatedFields();
@@ -72,7 +73,7 @@ class LeadEvent extends CommonEvent
                     }
                 }
                 //actually entity so add it for serialization
-                $changeset->fieldChangeset = $fields;
+                $changeset["fields"] = $fields;
             }
         }
         return $changeset;
