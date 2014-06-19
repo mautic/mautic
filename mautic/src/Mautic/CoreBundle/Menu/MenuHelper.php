@@ -60,10 +60,27 @@ class MenuHelper extends Helper {
     public function buildClasses(ItemInterface &$item, MatcherInterface &$matcher, $options) {
         $class   = $item->getAttribute("class");
         $classes = ($class) ? " {$class}" : "";
-        $classes .= ($matcher->isCurrent($item)) ? " {$options["currentClass"]}" : "";
-        $classes .= ($matcher->isAncestor($item, $options["matchingDepth"])) ? " {$options["ancestorClass"]}" : "";
+        $classes .= ($isCurrent = $matcher->isCurrent($item)) ? " {$options["currentClass"]}" : "";
+        $classes .= ($isAncestor = $matcher->isAncestor($item, $options["matchingDepth"])) ? " {$options["ancestorClass"]}" : "";
+        $classes .= ($isAncestor && $this->invisibleChildSelected($item, $matcher)) ?  " {$options["currentClass"]}" : "";
         $classes .= ($item->actsLikeFirst()) ? " {$options["firstClass"]}" : "";
         $classes .= ($item->actsLikeLast()) ? " {$options["lastClass"]}" : "";
         $item->setAttribute("class", trim($classes));
+    }
+
+    /**
+     * @param                  $menu
+     * @param MatcherInterface $matcher
+     * @return bool
+     */
+    public function invisibleChildSelected($menu, MatcherInterface $matcher)
+    {
+        foreach ($menu as $item) {
+            if ($matcher->isCurrent($item)) {
+                return ($item->isDisplayed()) ? false : true;
+            }
+        }
+
+        return false;
     }
 }
