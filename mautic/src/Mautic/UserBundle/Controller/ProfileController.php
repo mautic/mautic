@@ -45,7 +45,7 @@ class ProfileController extends FormController
         );
 
         $action = $this->generateUrl('mautic_user_account');
-        $form   = $model->createForm($me, $this->get('form.factory'), $action);
+        $form   = $model->createForm($me, $this->get('form.factory'), $action, array('ignore_formexit' => true));
 
         //remove items that cannot be edited by person themselves
         $form->remove('role');
@@ -147,27 +147,27 @@ class ProfileController extends FormController
         ///Check for a submitted form and process it
         $submitted = $this->get('session')->get('formProcessed', 0);
         if ($this->request->getMethod() == "POST" && !$submitted) {
-            $this->get('session')->set('formProcessed', 1);
+            $valid = false;
+            if (!$cancelled = $this->isFormCancelled($form)) {
+                $this->get('session')->set('formProcessed', 1);
 
-            //check to see if the password needs to be rehashed
-            $submittedPassword     = $this->request->request->get('user[plainPassword][password]', null, true);
-            $encoder               = $this->get('security.encoder_factory')->getEncoder($me);
-            $overrides['password'] = $model->checkNewPassword($me, $encoder, $submittedPassword);
+                //check to see if the password needs to be rehashed
+                $submittedPassword     = $this->request->request->get('user[plainPassword][password]', null, true);
+                $encoder               = $this->get('security.encoder_factory')->getEncoder($me);
+                $overrides['password'] = $model->checkNewPassword($me, $encoder, $submittedPassword);
 
-            //check and bind data
-            $valid = $this->checkFormValidity($form);
+                if ($valid = $this->isFormValid($form)) {
+                    foreach ($overrides as $k => $v) {
+                        $func = "set" . ucfirst($k);
+                        $me->$func($v);
+                    }
 
-            foreach ($overrides as $k => $v) {
-                $func = "set" . ucfirst($k);
-                $me->$func($v);
+                    //form is valid so process the data
+                    $model->saveEntity($me);
+                }
             }
 
-            if ($valid === 1) {
-                //form is valid so process the data
-                $model->saveEntity($me);
-            }
-
-            if (!empty($valid)) { //cancelled or success
+            if ($cancelled || $valid) { //cancelled or success
                 $returnUrl = $this->generateUrl('mautic_user_account');
                 return $this->postActionRedirect(array(
                     'returnUrl'       => $returnUrl,
@@ -176,7 +176,7 @@ class ProfileController extends FormController
                         'mauticContent' => 'user'
                     ),
                     'flashes'         =>
-                        ($valid === 1) ? array( //success
+                        ($valid) ? array( //success
                             array(
                                 'type' => 'notice',
                                 'msg'  => 'mautic.user.account.notice.updated'

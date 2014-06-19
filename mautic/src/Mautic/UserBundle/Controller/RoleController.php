@@ -134,18 +134,19 @@ class RoleController extends FormController
 
         ///Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
-            $valid = $this->checkFormValidity($form);
+            $valid = false;
+            if (!$cancelled = $this->isFormCancelled($form)) {
+                if ($valid = $this->isFormValid($form)) {
+                    //set the permissions
+                    $permissions = $this->request->request->get('role[permissions]', null, true);
+                    $model->setRolePermissions($entity, $permissions);
 
-            if ($valid === 1) {
-                //set the permissions
-                $permissions = $this->request->request->get('role[permissions]', null, true);
-                $model->setRolePermissions($entity, $permissions);
-
-                //form is valid so process the data
-                $model->saveEntity($entity);
+                    //form is valid so process the data
+                    $model->saveEntity($entity);
+                }
             }
 
-            if (!empty($valid)) { //cancelled or success
+            if ($cancelled || $valid) { //cancelled or success
                 return $this->postActionRedirect(array(
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => array('page' => $page),
@@ -154,8 +155,8 @@ class RoleController extends FormController
                         'activeLink'    => '#mautic_role_index',
                         'mauticContent' => 'role'
                     ),
-                    'flashes'         =>
-                        ($valid === 1) ? array(
+                    'flashes'         => ($valid) ?
+                        array(
                             array(
                                 'type'    => 'notice',
                                 'msg'     => 'mautic.user.role.notice.created',
@@ -244,41 +245,37 @@ class RoleController extends FormController
 
         ///Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
-            $valid = $this->checkFormValidity($form);
+            $valid = false;
+            if (!$cancelled = $this->isFormCancelled($form)) {
+                if ($valid = $this->isFormValid($form)) {
+                    //set the permissions
+                    $permissions = $this->request->request->get('role[permissions]', null, true);
+                    $model->setRolePermissions($entity, $permissions);
 
-            if ($valid === 1) {
-                //set the permissions
-                $permissions = $this->request->request->get('role[permissions]', null, true);
-                $model->setRolePermissions($entity, $permissions);
+                    //form is valid so process the data
+                    $model->saveEntity($entity);
 
-                //form is valid so process the data
-                $model->saveEntity($entity);
+                    $postActionVars['flashes'] = array( //success
+                        array(
+                            'type'    => 'notice',
+                            'msg'     => 'mautic.user.role.notice.updated',
+                            'msgVars' => array(
+                                '%name%' => $entity->getName(),
+                                '%url%'  => $this->generateUrl('mautic_role_action', array(
+                                    'objectAction' => 'edit',
+                                    'objectId'     => $entity->getId()
+                                ))
+                            )
+                        )
+                    );
+                }
+            } else {
+                //unlock the entity
+                $model->unlockEntity($entity);
             }
 
-            if (!empty($valid)) { //cancelled or success
-                if ($valid === -1) {
-                    //unlock the entity
-                    $model->unlockEntity($entity);
-                }
-
-                return $this->postActionRedirect(
-                    array_merge($postActionVars, array(
-                        'flashes'         =>
-                            ($valid === 1) ? array( //success
-                                array(
-                                    'type'    => 'notice',
-                                    'msg'     => 'mautic.user.role.notice.updated',
-                                    'msgVars' => array(
-                                        '%name%' => $entity->getName(),
-                                        '%url%'  => $this->generateUrl('mautic_role_action', array(
-                                            'objectAction' => 'edit',
-                                            'objectId'     => $entity->getId()
-                                        ))
-                                    )
-                                )
-                            ) : array()
-                    ))
-                );
+            if ($cancelled || $valid) { //cancelled or success
+                return $this->postActionRedirect($postActionVars);
             }
         } else {
             //lock the entity

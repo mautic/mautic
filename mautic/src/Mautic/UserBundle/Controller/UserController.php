@@ -151,19 +151,21 @@ class UserController extends FormController
 
         ///Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
-            //check to see if the password needs to be rehashed
-            $submittedPassword  = $this->request->request->get('user[plainPassword][password]', null, true);
-            $encoder            = $this->get('security.encoder_factory')->getEncoder($user);
-            $password           = $model->checkNewPassword($user, $encoder, $submittedPassword);
-            $valid = $this->checkFormValidity($form);
+            $valid = false;
+            if (!$cancelled = $this->isFormCancelled($form)) {
+                //check to see if the password needs to be rehashed
+                $submittedPassword  = $this->request->request->get('user[plainPassword][password]', null, true);
+                $encoder            = $this->get('security.encoder_factory')->getEncoder($user);
+                $password           = $model->checkNewPassword($user, $encoder, $submittedPassword);
 
-            if ($valid === 1) {
-                //form is valid so process the data
-                $user->setPassword($password);
-                $this->get('mautic.factory')->getModel('user')->saveEntity($user);
+                if ($valid = $this->isFormValid($form)) {
+                    //form is valid so process the data
+                    $user->setPassword($password);
+                    $this->get('mautic.factory')->getModel('user')->saveEntity($user);
+                }
             }
 
-            if (!empty($valid)) { //cancelled or success
+            if ($cancelled || $valid) { //cancelled or success
                 return $this->postActionRedirect(array(
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => array('page' => $page),
@@ -173,7 +175,7 @@ class UserController extends FormController
                         'mauticContent' => 'user'
                     ),
                     'flashes'         =>
-                        ($valid === 1) ? array(
+                        ($valid) ? array(
                             array(
                                 'type' => 'notice',
                                 'msg'  => 'mautic.user.user.notice.created',
@@ -267,42 +269,39 @@ class UserController extends FormController
 
         ///Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
-            //check to see if the password needs to be rehashed
-            $submittedPassword  = $this->request->request->get('user[plainPassword][password]', null, true);
-            $encoder            = $this->get('security.encoder_factory')->getEncoder($user);
-            $password           = $model->checkNewPassword($user, $encoder, $submittedPassword);
-            $valid              = $this->checkFormValidity($form);
+            $valid = false;
+            if (!$cancelled = $this->isFormCancelled($form)) {
+                //check to see if the password needs to be rehashed
+                $submittedPassword  = $this->request->request->get('user[plainPassword][password]', null, true);
+                $encoder            = $this->get('security.encoder_factory')->getEncoder($user);
+                $password           = $model->checkNewPassword($user, $encoder, $submittedPassword);
 
-            if ($valid === 1) {
-                //form is valid so process the data
-                $user->setPassword($password);
-                $model->saveEntity($user);
+                if ($valid = $this->isFormValid($form)) {
+                    //form is valid so process the data
+                    $user->setPassword($password);
+                    $model->saveEntity($user);
+
+                    $postActionVars['flashes'] = array( //success
+                        array(
+                            'type' => 'notice',
+                            'msg'  => 'mautic.user.user.notice.updated',
+                            'msgVars' => array(
+                                '%name%' => $user->getName(),
+                                '%url%'  => $this->generateUrl('mautic_user_action', array(
+                                    'objectAction' => 'edit',
+                                    'objectId'     => $user->getId()
+                                ))
+                            )
+                        )
+                    );
+                }
+            } else {
+                //unlock the entity
+                $model->unlockEntity($user);
             }
 
-            if (!empty($valid)) { //cancelled or success
-                if ($valid === -1) {
-                    //unlock the entity
-                    $model->unlockEntity($user);
-                }
-
-                return $this->postActionRedirect(
-                    array_merge($postActionVars, array(
-                        'flashes'         =>
-                            ($valid === 1) ? array( //success
-                                array(
-                                    'type' => 'notice',
-                                    'msg'  => 'mautic.user.user.notice.updated',
-                                    'msgVars' => array(
-                                        '%name%' => $user->getName(),
-                                        '%url%'  => $this->generateUrl('mautic_user_action', array(
-                                            'objectAction' => 'edit',
-                                            'objectId'     => $user->getId()
-                                        ))
-                                    )
-                                )
-                            ) : array()
-                    ))
-                );
+            if ($cancelled || $valid) { //cancelled or success
+                return $this->postActionRedirect($postActionVars);
             } else {
                 //check for role error and assign it to role_lookup
                 $errors = $form->getErrors();
@@ -467,15 +466,11 @@ class UserController extends FormController
         $currentUser = $this->get('security.context')->getToken()->getUser();
 
         if ($this->request->getMethod() == 'POST') {
-            $valid = $this->checkFormValidity($form);
-
-            if ($valid) {
-                $formUrl = $form->get('returnUrl')->getData();
-
-                $returnUrl = ($formUrl) ? urldecode($formUrl) : $this->generateUrl('mautic_core_index');
-                if ($valid == -1) {
-                    return $this->redirect($returnUrl);
-                } else {
+            $formUrl   = $this->request->request->get('contact[returnUrl]', '', true);
+            $returnUrl = ($formUrl) ? urldecode($formUrl) : $this->generateUrl('mautic_core_index');
+            $valid     = false;
+            if (!$cancelled = $this->isFormCancelled($form)) {
+                if ($valid = $this->isFormValid($form)) {
                     $subject = InputHelper::clean($form->get('msg_subject')->getData());
                     $body    = InputHelper::clean($form->get('msg_body')->getData());
                     $message = \Swift_Message::newInstance()
@@ -487,7 +482,7 @@ class UserController extends FormController
 
                     $reEntity = $form->get('entity')->getData();
                     if (empty($reEntity)) {
-                        $bundle = $object = 'user';
+                        $bundle   = $object = 'user';
                         $entityId = $user->getId();
                     } else {
                         $bundle = $object = $reEntity;
@@ -499,8 +494,8 @@ class UserController extends FormController
 
                     $serializer = $this->get('jms_serializer');
                     $details    = $serializer->serialize(array(
-                        "from" => $currentUser->getName(),
-                        "to"   => $user->getName(),
+                        "from"    => $currentUser->getName(),
+                        "to"      => $user->getName(),
                         "subject" => $subject,
                         "message" => $body
                     ), 'json');
@@ -522,8 +517,10 @@ class UserController extends FormController
                             'flashes'
                         )
                     );
-                    return $this->redirect($returnUrl);
                 }
+            }
+            if ($cancelled || $valid) {
+                return $this->redirect($returnUrl);
             }
         } else {
             $reEntityId = $this->request->get('id');

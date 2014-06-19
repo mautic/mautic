@@ -15,7 +15,21 @@ use Symfony\Component\Form\Form;
  *
  * @package Mautic\CoreBundle\Controller
  */
-class FormController extends CommonController {
+class FormController extends CommonController
+{
+
+    /**
+     * Checks to see if the form was cancelled
+     *
+     * @param Form $form
+     * @return int
+     */
+    protected function isFormCancelled(Form &$form)
+    {
+        $name   = $form->getName();
+        $cancel = $this->request->request->get($name . '[cancel]', false, true);
+        return ($cancel !== false);
+    }
 
     /**
      * Binds form data, checks validity, and determines cancel request
@@ -23,18 +37,11 @@ class FormController extends CommonController {
      * @param Form    $form
      * @return int
      */
-    protected function checkFormValidity(Form &$form) {
+    protected function isFormValid(Form &$form)
+    {
         //bind request to the form
         $form->handleRequest($this->request);
-
-        //redirect if the cancel button was clicked
-        if ($form->has('cancel') && $form->get('cancel')->isClicked()) {
-            return -1;
-        } elseif ($form->isValid()) {
-            return 1;
-        } else {
-            return 0;
-        }
+        return $form->isValid();
     }
 
     /**

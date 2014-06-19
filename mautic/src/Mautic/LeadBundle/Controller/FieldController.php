@@ -64,28 +64,29 @@ class FieldController extends FormController
 
         ///Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
-            $valid = $this->checkFormValidity($form);
-
-            if ($valid === 1) {
-                $request = $this->request->request->all();
-                if (isset($request['leadfield']['properties'])) {
-                    $result = $model->setFieldProperties($field, $request['leadfield']['properties']);
-                    if ($result !== true) {
-                        //set the error
-                        $form->get('properties')->addError(new FormError(
-                            $this->get('translator')->trans($result, array(), 'validators')
-                        ));
-                        $valid = 0;
+            $valid = false;
+            if (!$cancelled = $this->isFormCancelled($form)) {
+                if ($valid = $this->isFormValid($form)) {
+                    $request = $this->request->request->all();
+                    if (isset($request['leadfield']['properties'])) {
+                        $result = $model->setFieldProperties($field, $request['leadfield']['properties']);
+                        if ($result !== true) {
+                            //set the error
+                            $form->get('properties')->addError(new FormError(
+                                $this->get('translator')->trans($result, array(), 'validators')
+                            ));
+                            $valid = false;
+                        }
                     }
-                }
 
-                if ($valid) {
-                    //form is valid so process the data
-                    $model->saveEntity($field);
+                    if ($valid) {
+                        //form is valid so process the data
+                        $model->saveEntity($field);
+                    }
                 }
             }
 
-            if (!empty($valid)) { //cancelled or success
+            if ($cancelled || $valid) { //cancelled or success
                 return $this->postActionRedirect(array(
                     'returnUrl'       => $returnUrl,
                     'contentTemplate' => 'MauticLeadBundle:Field:index',
@@ -94,7 +95,7 @@ class FieldController extends FormController
                         'mauticContent' => 'leadfield'
                     ),
                     'flashes'         =>
-                        ($valid === 1) ? array(
+                        ($valid) ? array(
                             array(
                                 'type'    => 'notice',
                                 'msg'     => 'mautic.lead.field.notice.created',
@@ -172,39 +173,37 @@ class FieldController extends FormController
 
         ///Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
-            $valid = $this->checkFormValidity($form);
+            $valid = false;
+            if (!$cancelled = $this->isFormCancelled($form)) {
+                if ($valid = $this->isFormValid($form)) {
+                    $request = $this->request->request->all();
+                    if (isset($request['leadfield']['properties'])) {
+                        $result = $model->setFieldProperties($field, $request['leadfield']['properties']);
+                        if ($result !== true) {
+                            //set the error
+                            $form->get('properties')->addError(new FormError(
+                                $this->get('translator')->trans($result, array(), 'validators')
+                            ));
+                            $valid = false;
+                        }
+                    }
 
-            if ($valid === 1) {
-                $request = $this->request->request->all();
-                if (isset($request['leadfield']['properties'])) {
-                    $result = $model->setFieldProperties($field, $request['leadfield']['properties']);
-                    if ($result !== true) {
-                        //set the error
-                        $form->get('properties')->addError(new FormError(
-                            $this->get('translator')->trans($result, array(), 'validators')
-                        ));
-                        $valid = 0;
+                    if ($valid) {
+                        //form is valid so process the data
+                        $model->saveEntity($field);
                     }
                 }
-
-                if ($valid) {
-                    //form is valid so process the data
-                    $model->saveEntity($field);
-                }
+            } else {
+                //unlock the entity
+                $model->unlockEntity($field);
             }
-
-            if (!empty($valid)) { //cancelled or success
-                if ($valid === -1) {
-                    //unlock the entity
-                    $model->unlockEntity($field);
-                }
-
+            if ($cancelled || $valid) {
                 return $this->postActionRedirect(
                     array_merge($postActionVars, array(
                             'viewParameters'  => array('objectId' => $field->getId()),
                             'contentTemplate' => 'MauticLeadBundle:Field:index',
                             'flashes'         =>
-                                ($valid === 1) ? array( //success
+                                ($valid) ? array( //success
                                     array(
                                         'type' => 'notice',
                                         'msg'  => 'mautic.lead.field.notice.updated',

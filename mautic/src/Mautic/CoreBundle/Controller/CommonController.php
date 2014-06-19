@@ -166,7 +166,8 @@ class CommonController extends Controller implements EventsController {
             return $response;
         }
 
-        if ($this->request->get('tmpl', 'index') == 'index') {
+        $tmpl = (isset($parameters['tmpl'])) ? $parameters['tmpl'] : $this->request->get('tmpl', 'index');
+        if ($tmpl == 'index') {
             if (!empty($passthrough["route"])) {
                 //breadcrumbs may fail as it will retrieve the crumb path for currently loaded URI so we must override
                 $this->request->query->set("overrideRouteUri", $passthrough["route"]);
@@ -189,14 +190,20 @@ class CommonController extends Controller implements EventsController {
             }
 
             $breadcrumbs = $this->renderView("MauticCoreBundle:Default:breadcrumbs.html.php", $parameters);
-            $flashes     = $this->renderView("MauticCoreBundle:Default:flashes.html.php", $parameters);
+            $flashes     = trim($this->renderView("MauticCoreBundle:Default:flashes.html.php", $parameters));
+
+            $updatedContent = array();
+            if (!empty($newContent))
+                $updatedContent['newContent'] = $newContent;
+
+            if (!empty($breadcrumbs))
+                $updatedContent['breadcrumbs'] = $breadcrumbs;
+
+            if (!empty($flashes))
+                $updatedContent['flashes'] = $flashes;
 
             $dataArray = array_merge(
-                array(
-                    'newContent'  => $newContent,
-                    'breadcrumbs' => $breadcrumbs,
-                    'flashes'     => $flashes
-                ),
+                $updatedContent,
                 $passthrough
             );
         } else {

@@ -7,12 +7,13 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+//@todo - write merge action
+//@todo - write export action
+
 namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Controller\FormController;
-use Mautic\UserBundle\Entity as Entity;
-use Mautic\UserBundle\Form\Type as FormType;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -128,7 +129,12 @@ class LeadController extends FormController
             'form'        => $form,
             'tmpl'        => $tmpl,
             'lists'       => $lists,
-            'security'    => $this->get('mautic.security')
+            'security'    => $this->get('mautic.security'),
+            'dateFormats' => array(
+                'datetime' => $this->container->getParameter('mautic.date_format_full'),
+                'date'     => $this->container->getParameter('mautic.date_format_dateonly'),
+                'time'     => $this->container->getParameter('mautic.date_format_timeonly'),
+            )
         );
 
         $vars = array('activeLink' => '#mautic_lead_index', 'mauticContent'   => 'lead');
@@ -160,7 +166,10 @@ class LeadController extends FormController
             }
         } elseif ($tmpl == 'lead') {
             $template       = 'MauticLeadBundle:Lead:lead.html.php';
-            $vars['route']  = $this->generateUrl('mautic_lead_index', array('page' => $page));
+            $vars['route']  = $this->generateUrl('mautic_lead_action', array(
+                    'objectAction' => 'view',
+                    'objectId'     => $activeLead->getId())
+            );
             $vars['target'] = '.lead-details-inner-wrapper';
 
         } else {
@@ -243,40 +252,39 @@ class LeadController extends FormController
 
         ///Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
-            $valid = $this->checkFormValidity($form);
+            $valid = false;
+            if (!$cancelled = $this->isFormCancelled($form)) {
+                if ($valid = $this->isFormValid($form)) {
+                    //get custom field values
+                    $data = $this->request->request->get('lead');
 
-            if ($valid === 1) {
-                //get custom field values
-                $data = $this->request->request->get('lead');
-
-                //pull the data from the form in order to apply the form's formatting
-                foreach ($form as $f) {
-                    $name = $f->getName();
-                    if (strpos($name, 'field_') === 0) {
-                        $data[$name] = $f->getData();
+                    //pull the data from the form in order to apply the form's formatting
+                    foreach ($form as $f) {
+                        $name = $f->getName();
+                        if (strpos($name, 'field_') === 0) {
+                            $data[$name] = $f->getData();
+                        }
                     }
-                }
 
-                $model->setFieldValues($lead, $data);
+                    $model->setFieldValues($lead, $data);
 
-                //form is valid so process the data
-                $lead = $model->saveEntity($lead);
-            }
+                    //form is valid so process the data
+                    $model->saveEntity($lead);
 
-            if (!empty($valid)) { //cancelled or success
-                if ($valid === 1) {
                     $viewParameters = array(
                         'objectAction' => 'view',
                         'objectId'     => $lead->getId()
                     );
                     $returnUrl = $this->generateUrl('mautic_lead_action', $viewParameters);
                     $template  = 'MauticLeadBundle:Lead:view';
-                } else {
-                    $viewParameters  = array('page' => $page);
-                    $returnUrl = $this->generateUrl('mautic_lead_index', $viewParameters);
-                    $template  = 'MauticLeadBundle:Lead:index';
                 }
+            } else {
+                $viewParameters  = array('page' => $page);
+                $returnUrl = $this->generateUrl('mautic_lead_index', $viewParameters);
+                $template  = 'MauticLeadBundle:Lead:index';
+            }
 
+            if ($cancelled | $valid) { //cancelled or success
                 $identifier = $this->get('translator')->trans($lead->getPrimaryIdentifier());
                 return $this->postActionRedirect(array(
                     'returnUrl'       => $returnUrl,
@@ -287,7 +295,7 @@ class LeadController extends FormController
                         'mauticContent' => 'lead'
                     ),
                     'flashes'         =>
-                        ($valid === 1) ? array( //success
+                        ($valid) ? array( //success
                             array(
                                 'type'    => 'notice',
                                 'msg'     => 'mautic.lead.lead.notice.created',
@@ -365,30 +373,29 @@ class LeadController extends FormController
 
         ///Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
-            $valid = $this->checkFormValidity($form);
+            $valid = false;
+            if (!$cancelled = $this->isFormCancelled($form)) {
+                if ($valid = $this->isFormValid($form)) {
+                    $data = $this->request->request->get('lead');
 
-            if ($valid === 1) {
-                $data = $this->request->request->get('lead');
-
-                //pull the data from the form in order to apply the form's formatting
-                foreach ($form as $f) {
-                    $name = $f->getName();
-                    if (strpos($name, 'field_') === 0) {
-                        $data[$name] = $f->getData();
+                    //pull the data from the form in order to apply the form's formatting
+                    foreach ($form as $f) {
+                        $name = $f->getName();
+                        if (strpos($name, 'field_') === 0) {
+                            $data[$name] = $f->getData();
+                        }
                     }
-                }
 
-                $model->setFieldValues($lead, $data);
-                //form is valid so process the data
-                $lead = $model->saveEntity($lead);
+                    $model->setFieldValues($lead, $data);
+                    //form is valid so process the data
+                    $model->saveEntity($lead);
+                }
+            } else {
+                //unlock the entity
+                $model->unlockEntity($lead);
             }
 
             if (!empty($valid)) { //cancelled or success
-                if ($valid === -1) {
-                    //unlock the entity
-                    $model->unlockEntity($lead);
-                }
-
                 $returnUrl = $this->generateUrl('mautic_lead_action', array(
                     'objectAction' => 'view',
                     'objectId'     => $lead->getId()
@@ -400,7 +407,7 @@ class LeadController extends FormController
                         'viewParameters'  => array('objectId' => $lead->getId()),
                         'contentTemplate' => 'MauticLeadBundle:Lead:view',
                         'flashes'         =>
-                            ($valid === 1) ? array( //success
+                            ($valid) ? array( //success
                                 array(
                                     'type' => 'notice',
                                     'msg'  => 'mautic.lead.lead.notice.updated',

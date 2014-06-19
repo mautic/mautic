@@ -137,14 +137,15 @@ class ListController extends FormController
 
         ///Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
-            $valid = $this->checkFormValidity($form);
-
-            if ($valid === 1) {
-                //form is valid so process the data
-                $model->saveEntity($list);
+            $valid = false;
+            if (!$cancelled = $this->isFormCancelled($form)) {
+                if ($valid = $this->isFormValid($form)) {
+                    //form is valid so process the data
+                    $model->saveEntity($list);
+                }
             }
 
-            if (!empty($valid)) { //cancelled or success
+            if ($cancelled || $valid) { //cancelled or success
                 return $this->postActionRedirect(array(
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => array('page' => $page),
@@ -154,7 +155,7 @@ class ListController extends FormController
                         'mauticContent' => 'leadlist'
                     ),
                     'flashes'         =>
-                        ($valid === 1) ? array(
+                        ($valid) ? array(
                             array(
                                 'type'    => 'notice',
                                 'msg'     => 'mautic.lead.list.notice.created',
@@ -242,37 +243,36 @@ class ListController extends FormController
 
         ///Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
-            $valid = $this->checkFormValidity($form);
-
-            if ($valid === 1) {
-                //form is valid so process the data
-                $list = $model->saveEntity($list);
+            $valid = false;
+            if (!$cancelled = $this->isFormCancelled($form)) {
+                if ($valid = $this->isFormValid($form)) {
+                    //form is valid so process the data
+                    $model->saveEntity($list);
+                }
+            } else {
+                //unlock the entity
+                $model->unlockEntity($list);
             }
 
-            if (!empty($valid)) { //cancelled or success
-                if ($valid === -1) {
-                    //unlock the entity
-                    $model->unlockEntity($list);
-                }
-
+            if ($cancelled || $valid) { //cancelled or success
                 return $this->postActionRedirect(
                     array_merge($postActionVars, array(
-                            'viewParameters'  => array('objectId' => $list->getId()),
-                            'contentTemplate' => 'MauticLeadBundle:List:index',
-                            'flashes'         =>
-                                ($valid === 1) ? array( //success
-                                    array(
-                                        'type' => 'notice',
-                                        'msg'  => 'mautic.lead.list.notice.updated',
-                                        'msgVars' => array(
-                                            '%name%' => $list->getName() . " (" . $list->getAlias() . ")",
-                                            '%url%'  => $this->generateUrl('mautic_leadlist_action', array(
-                                                'objectAction' => 'edit',
-                                                'objectId'     => $list->getId()
-                                            ))
-                                        )
+                        'viewParameters'  => array('objectId' => $list->getId()),
+                        'contentTemplate' => 'MauticLeadBundle:List:index',
+                        'flashes'         =>
+                            ($valid) ? array( //success
+                                array(
+                                    'type' => 'notice',
+                                    'msg'  => 'mautic.lead.list.notice.updated',
+                                    'msgVars' => array(
+                                        '%name%' => $list->getName() . " (" . $list->getAlias() . ")",
+                                        '%url%'  => $this->generateUrl('mautic_leadlist_action', array(
+                                            'objectAction' => 'edit',
+                                            'objectId'     => $list->getId()
+                                        ))
                                     )
-                                ) : array()
+                                )
+                            ) : array()
                         )
                     )
                 );
