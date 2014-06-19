@@ -13,7 +13,7 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Mautic\LeadBundle\Entity\LeadFieldValue;
-use Mautic\LeadBundle\Entity\LeadIpAddress;
+use Mautic\CoreBundle\Entity\IpAddress;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Mautic\LeadBundle\Entity\Lead;
@@ -46,7 +46,7 @@ class LoadLeadData extends AbstractFixture implements OrderedFixtureInterface, C
     public function load(ObjectManager $manager)
     {
         $lead = new Lead();
-        $ipAddress = new LeadIpAddress();
+        $ipAddress = new IpAddress();
         $ipAddress->setIpAddress("208.110.200.3");
         $lead->addIpAddress($ipAddress);
         $lead->setOwner($this->getReference('sales-user'));

@@ -12,6 +12,7 @@ namespace Mautic\LeadBundle\Form\Type;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
+use Mautic\LeadBundle\Form\DataTransformer\FieldDateTimeTransformer;
 use Mautic\LeadBundle\Form\DataTransformer\FieldTypeTransformer;
 use Mautic\UserBundle\Form\DataTransformer as Transformers;
 use Symfony\Component\Form\AbstractType;
@@ -97,13 +98,15 @@ class ListType extends AbstractType
             'required'      => false
         ));
 
-        $filterTransformer = new FieldTypeTransformer();
+        $filterTransformer      = new FieldTypeTransformer();
+        $filterModalTransformer = new FieldDateTimeTransformer();
         $builder->add(
             $builder->create('filters', 'leadlist_filters', array(
                 'error_bubbling' => false,
                 'mapped'         => true
             ))
                 ->addViewTransformer($filterTransformer)
+                ->addModelTransformer($filterModalTransformer)
         );
 
         $builder->add('save', 'submit', array(

@@ -120,6 +120,34 @@
     color: #7D5B71;
 }
 
+.leadlist-filter a {
+    text-decoration: none;
+}
+
+.leadlist-filter:hover {
+    background-color: #ecf0f1;
+}
+
+.leadlist-filter {
+    height: 40px;
+    border-bottom: 1px solid #cccccc;
+    overflow: hidden;
+}
+
+.leadlist-filter-name {
+    font-size: 1.1em;
+}
+
+.available-filters .rounded-corners {
+    height: 300px;
+    overflow: auto;
+}
+
+.selected-filters .rounded-corners {
+    height: 300px;
+    overflow: auto;
+}
+
 @media (max-width:767px) {
     .lead-list {
         padding-right: 15px;

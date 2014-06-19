@@ -15,6 +15,8 @@ use Mautic\ApiBundle\Event\RouteEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
+use Mautic\FormBundle\Event\FormBuilderEvent;
+use Mautic\FormBundle\FormEvents;
 use Mautic\LeadBundle\Event as Events;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\UserBundle\Event\UserEvent;
@@ -45,10 +47,15 @@ class LeadSubscriber extends CommonSubscriber
             LeadEvents::FIELD_PRE_SAVE      => array('onFieldPreSave', 0),
             LeadEvents::FIELD_POST_SAVE     => array('onFieldPostSave', 0),
             LeadEvents::FIELD_POST_DELETE   => array('onFieldDelete', 0),
-            UserEvents::USER_PRE_DELETE    => array('onUserDelete', 0)
+            UserEvents::USER_PRE_DELETE    => array('onUserDelete', 0),
+            FormEvents::FORM_ON_BUILD      => array('onFormBuilder', 0)
         );
     }
 
+    public function onFormBuilder(FormBuilderEvent $event)
+    {
+
+    }
     /**
      * @param MenuEvent $event
      */
@@ -174,10 +181,10 @@ class LeadSubscriber extends CommonSubscriber
         $lead = $event->getLead();
         if (!empty($this->changes)) {
             $details = $this->serializer->serialize($this->changes, 'json');
-            if (isset($this->changes->fieldChangeset)) {
+            if (isset($this->changes["fieldChangeset"])) {
                 //a bit overkill but the only way I could get around JMS Serilizer's exposed settings for the lead entity
                 $details         = json_decode($details);
-                $details->fields = $this->changes->fieldChangeset;
+                $details->fields = $this->changes["fieldChangeset"];
                 $details         = json_encode($details);
             }
             $log = array(

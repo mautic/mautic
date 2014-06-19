@@ -55,7 +55,7 @@ class Lead extends FormEntity
     private $fields;
 
     /**
-     * @ORM\ManyToMany(targetEntity="LeadIpAddress", inversedBy="leads", cascade={"merge", "persist", "refresh"})
+     * @ORM\ManyToMany(targetEntity="Mautic\CoreBundle\Entity\IpAddress", cascade={"merge", "persist", "refresh"})
      * @ORM\JoinTable(name="lead_ips_xref",
      *   joinColumns={@ORM\JoinColumn(name="lead_id", referencedColumnName="id")},
      *   inverseJoinColumns={@ORM\JoinColumn(name="ip_id", referencedColumnName="id")}
@@ -170,10 +170,10 @@ class Lead extends FormEntity
     /**
      * Add ipAddresses
      *
-     * @param \Mautic\LeadBundle\Entity\LeadIpAddress $ipAddresses
+     * @param \Mautic\CoreBundle\Entity\IpAddress $ipAddresses
      * @return Lead
      */
-    public function addIpAddress(\Mautic\LeadBundle\Entity\LeadIpAddress $ipAddresses)
+    public function addIpAddress(\Mautic\CoreBundle\Entity\IpAddress $ipAddresses)
     {
         $this->ipAddresses[] = $ipAddresses;
 
@@ -183,9 +183,9 @@ class Lead extends FormEntity
     /**
      * Remove ipAddresses
      *
-     * @param \Mautic\LeadBundle\Entity\LeadIpAddress $ipAddresses
+     * @param \Mautic\CoreBundle\Entity\IpAddress $ipAddresses
      */
-    public function removeIpAddress(\Mautic\LeadBundle\Entity\LeadIpAddress $ipAddresses)
+    public function removeIpAddress(\Mautic\CoreBundle\Entity\IpAddress $ipAddresses)
     {
         $this->ipAddresses->removeElement($ipAddresses);
     }

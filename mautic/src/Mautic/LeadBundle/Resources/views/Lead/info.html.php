@@ -39,7 +39,10 @@
                     <?php echo $field->getField()->getLabel(); ?>
                 </div>
                 <div class="col-sm-9 field-value">
-                    <?php echo $view->render('MauticLeadBundle:Lead:info_value.html.php', array('field' => $field)); ?>
+                    <?php echo $view->render('MauticLeadBundle:Lead:info_value.html.php', array(
+                        'field'       => $field,
+                        'dateFormats' => $dateFormats
+                    )); ?>
                 </div>
             </div>
         <?php endforeach; ?>

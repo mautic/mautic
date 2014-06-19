@@ -10,7 +10,6 @@
 
 namespace Mautic\LeadBundle\Form\DataTransformer;
 
-use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\Form\DataTransformerInterface;
 
 class FieldTypeTransformer implements DataTransformerInterface
@@ -18,11 +17,12 @@ class FieldTypeTransformer implements DataTransformerInterface
 
     public function transform($rawFilters)
     {
+
         if (!is_array($rawFilters)) {
             return array();
         }
 
-        $keys    = array( "glue", "field", "operator", "filter", "display");
+        $keys    = array( "glue", "field", "type", "operator", "filter", "display");
         $filters = array();
 
         foreach ($keys as $k) {
@@ -41,16 +41,17 @@ class FieldTypeTransformer implements DataTransformerInterface
 
     public function reverseTransform($rawFilters)
     {
+
         if (!is_array($rawFilters)) {
             return array();
         }
 
-        $keys    = array( "glue", "field", "operator", "filter", "display");
+        $keys    = array( "glue", "field", "type", "operator", "filter", "display");
         $filters = array();
 
         foreach ($keys as $key) {
             foreach ($rawFilters[$key] as $k => $v) {
-                $filters[$k][$key] = InputHelper::clean($v);
+                $filters[$k][$key] = $v;
             }
         }
         $filters = array_values($filters);

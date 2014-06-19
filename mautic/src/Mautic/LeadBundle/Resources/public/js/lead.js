@@ -172,87 +172,9 @@ Mautic.leadlistOnLoad = function(container) {
         helper: "clone"
     });
 
-    $('#leadlist_filters_right').droppable({
-        activeClass: "droppable-active",
-        hoverClass: "dropper-hover",
-        accept: ":not(.ui-sortable-helper)",
-        drop: function(event, ui) {
-            if ($(this).find(".placeholder").length) {
-                if (typeof mauticVars.droppablePlaceholder == "undefined") {
-                    mauticVars.droppablePlaceholder = new Array();
-                }
-                mauticVars.droppablePlaceholder['#leadlist_filters_right'] = $(this).find(".placeholder").html();
-                $('#leadlist_filters_right li.placeholder').addClass('hide');
-            }
-
-            //create a new filter
-            var li = $("<li />").addClass("padding-sm").text(ui.draggable.text()).appendTo(this);
-
-            //add a delete button
-            $("<i />").addClass("fa fa-fw fa-trash-o remove-selected").prependTo(li).on('click', function() {
-                $(this).parent().remove();
-                if (!$('#leadlist_filters_right li:not(.placeholder)').length) {
-                    $('#leadlist_filters_right li.placeholder').removeClass('hide');
-                } else {
-                    $('#leadlist_filters_right li.placeholder').addClass('hide');
-                }
-            });
-
-            //add a sortable handle
-            $("<i />").addClass("fa fa-fw fa-arrows sortable-handle").prependTo(li);
-
-            var alias = $(ui.draggable).find("input.field_alias").val();
-
-            //add wrapping div and add the template html
-            var container = $('<div />')
-                .addClass('filter-container')
-                .html($('#filter-template').html())
-                .appendTo(li);
-            $(container).find("input[type='hidden']").val(alias);
-
-            //give the value element a unique id
-            var uniqid = "id_" + Date.now();
-            var filter = $(container).find("input[name='leadlist[filters][filter][]']");
-            filter.attr('id', uniqid);
-
-            //activate fields
-            var fieldType = $(ui.draggable).find("input.field_type").val();
-            if (fieldType == 'lookup' || fieldType == 'select') {
-                var fieldCallback = $(ui.draggable).find("input.field_callback").val();
-                if (fieldCallback) {
-                    var fieldOptions = $(ui.draggable).find("input.field_list").val();
-                    Mautic[fieldCallback](uniqid, alias, fieldOptions);
-                }
-            } else if (fieldType == 'lookup_id' || fieldType == 'boolean') {
-                //switch the filter and display elements
-                var oldFilter = $(container).find("input[name='leadlist[filters][filter][]']");
-                var newDisplay = oldFilter.clone();
-                newDisplay.attr('id', uniqid);
-                newDisplay.attr('name', 'leadlist[filters][display][]');
-
-                var oldDisplay = $(container).find("input[name='leadlist[filters][display][]']");
-                var newFilter = oldDisplay.clone();
-                newFilter.attr('id', uniqid + "_id");
-                newFilter.attr('name', 'leadlist[filters][filter][]');
-
-                oldFilter.replaceWith(newFilter);
-                oldDisplay.replaceWith(newDisplay);
-
-                var fieldCallback = $(ui.draggable).find("input.field_callback").val();
-                if (fieldCallback) {
-                    var fieldOptions = $(ui.draggable).find("input.field_list").val();
-                    Mautic[fieldCallback](uniqid, alias, fieldOptions);
-                }
-            } else {
-                filter.attr('type', fieldType);
-            }
-        }
-    }).sortable({
-        items: "li:not(.placeholder)",
-        handle: '.sortable-handle',
-        sort: function() {
-            $( this ).removeClass( "droppable-active" );
-        }
+    $('#leadlist_filters_right').sortable({
+        items: "li",
+        handle: '.sortable-handle'
     });
 
     if ($('#leadlist_filters_right').length) {
@@ -274,6 +196,102 @@ Mautic.leadlistOnLoad = function(container) {
         var field  = $(this).attr('id');
         Mautic.activateLeadFieldTypeahead(field, target, options);
     });
+};
+
+Mautic.addLeadListFilter = function (elId) {
+    var filter = '#available_' + elId;
+    var label  = $(filter + ' span.leadlist-filter-name').text();
+
+    //create a new filter
+    var li = $("<li />").addClass("padding-sm").text(label).appendTo($('#leadlist_filters_right'));
+
+    //add a delete button
+    $("<i />").addClass("fa fa-fw fa-trash-o remove-selected").prependTo(li).on('click', function() {
+        $(this).parent().remove();
+    });
+
+    //add a sortable handle
+    $("<i />").addClass("fa fa-fw fa-ellipsis-v sortable-handle").prependTo(li);
+
+    var fieldType = $(filter).find("input.field_type").val();
+    var alias     = $(filter).find("input.field_alias").val();
+
+    //add wrapping div and add the template html
+
+    var container = $('<div />')
+        .addClass('filter-container')
+        .appendTo(li);
+
+    if (fieldType == 'country' || fieldType == 'timezone') {
+        container.html($('#filter-' + fieldType + '-template').html());
+    } else {
+        container.html($('#filter-template').html());
+    }
+    $(container).find("input[name='leadlist[filters][field][]']").val(alias);
+    $(container).find("input[name='leadlist[filters][type][]']").val(fieldType);
+
+    //give the value element a unique id
+    var uniqid = "id_" + Date.now();
+    var filter = $(container).find("input[name='leadlist[filters][filter][]']");
+    filter.attr('id', uniqid);
+
+    //activate fields
+    if (fieldType == 'lookup' || fieldType == 'select') {
+        var fieldCallback = $(filter).find("input.field_callback").val();
+        if (fieldCallback) {
+            var fieldOptions = $(filter).find("input.field_list").val();
+            Mautic[fieldCallback](uniqid, alias, fieldOptions);
+        }
+    } else if (fieldType == 'datetime') {
+        filter.datetimepicker({
+            format: 'Y-m-d H:i',
+            lazyInit: true,
+            validateOnBlur: false,
+            allowBlank: true,
+            scrollInput: false
+        });
+    } else if (fieldType == 'date') {
+        filter.datetimepicker({
+            timepicker: false,
+            format: 'Y-m-d',
+            lazyInit: true,
+            validateOnBlur: false,
+            allowBlank: true,
+            scrollInput: false,
+            closeOnDateSelect: true
+        });
+    } else if (fieldType == 'time') {
+        filter.datetimepicker({
+            datepicker: false,
+            format: 'H:i',
+            lazyInit: true,
+            validateOnBlur: false,
+            allowBlank: true,
+            scrollInput: false
+        });
+    } else if (fieldType == 'lookup_id' || fieldType == 'boolean') {
+        //switch the filter and display elements
+        var oldFilter = $(container).find("input[name='leadlist[filters][filter][]']");
+        var newDisplay = oldFilter.clone();
+        newDisplay.attr('id', uniqid);
+        newDisplay.attr('name', 'leadlist[filters][display][]');
+
+        var oldDisplay = $(container).find("input[name='leadlist[filters][display][]']");
+        var newFilter = oldDisplay.clone();
+        newFilter.attr('id', uniqid + "_id");
+        newFilter.attr('name', 'leadlist[filters][filter][]');
+
+        oldFilter.replaceWith(newFilter);
+        oldDisplay.replaceWith(newDisplay);
+
+        var fieldCallback = $(filter).find("input.field_callback").val();
+        if (fieldCallback) {
+            var fieldOptions = $(filter).find("input.field_list").val();
+            Mautic[fieldCallback](uniqid, alias, fieldOptions);
+        }
+    } else {
+        filter.attr('type', fieldType);
+    }
 };
 
 Mautic.leadfieldOnLoad = function (container) {
@@ -329,5 +347,11 @@ Mautic.updateLeadFieldProperties = function(selectedVal) {
         $("#leadfield_properties *[data-toggle='tooltip']").tooltip({html: true});
     } else {
         $('#leadfield_properties').html('');
+    }
+
+    if (selectedVal == 'time') {
+        $('#leadfield_isListable').closest('.row').addClass('hide');
+    } else {
+        $('#leadfield_isListable').closest('.row').removeClass('hide');
     }
 }

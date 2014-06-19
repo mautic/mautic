@@ -70,7 +70,7 @@ class FieldType extends AbstractType
             'attr'        => array(
                 'class'    => 'form-control',
                 'onchange' => 'Mautic.updateLeadFieldProperties(this.value);'
-            ),
+            )
         ));
 
         $builder->add('properties', 'collection', array(

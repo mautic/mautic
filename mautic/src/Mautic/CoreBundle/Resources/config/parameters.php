@@ -29,7 +29,7 @@ $parameters = array(
     'rememberme_domain'     => '',
     'default_pagelimit'     => 30,
     'default_timezone'      => 'UTC',
-    'date_format_full'      => 'F j, Y g:i a',
+    'date_format_full'      => 'F j, Y g:i a T',
     'date_format_dateonly'  => 'F j, Y',
     'date_format_timeonly'  => 'g:i a',
 );

@@ -51,6 +51,11 @@ class FilterType extends AbstractType
             'allow_add' => true,
             'allow_delete' => true
         ));
+
+        $builder->add('type', 'collection', array(
+            'allow_add' => true,
+            'allow_delete' => true
+        ));
     }
 
     /**

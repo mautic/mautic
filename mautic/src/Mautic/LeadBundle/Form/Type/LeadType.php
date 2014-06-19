@@ -10,6 +10,8 @@
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Form\DataTransformer\DatetimeToStringTransformer;
+use Mautic\CoreBundle\Form\DataTransformer\StringToDatetimeTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\UserBundle\Form\DataTransformer as Transformers;
@@ -92,12 +94,38 @@ class LeadType extends AbstractType
                     'label'       => $field->getLabel(),
                     'label_attr'  => array('class' => 'control-label'),
                     'attr'        => $attr,
-                    'data'        => (isset($values[$field->getId()])) ? $values[$field->getId()] : $field->getDefaultValue(),
+                    'data'        => (isset($values[$field->getId()])) ? (float) $values[$field->getId()] : (float) $field->getDefaultValue(),
                     'mapped'      => false,
                     'constraints' => $constraints,
                     'precision'   => $properties['precision'],
                     'rounding_mode' => (int) $properties['roundmode']
                 ));
+            } elseif (in_array($type, array('date', 'datetime', 'time'))) {
+                $attr['data-toggle'] = $type;
+
+                $opts = array(
+                    'required'          => $field->getIsRequired(),
+                    'label'             => $field->getLabel(),
+                    'label_attr'        => array('class' => 'control-label'),
+                    'widget'            => 'single_text',
+                    'attr'              => $attr,
+                    'data'              => (isset($values[$field->getId()])) ? $values[$field->getId()] :
+                        $field->getDefaultValue(),
+                    'mapped'            => false,
+                    'constraints'       => $constraints,
+                    'input'             => 'string'
+                );
+
+                if ($type == 'date' || $type == 'time') {
+                    $opts['input'] = 'string';
+                    $builder->add("field_{$field->getAlias()}", $type, $opts);
+                } else {
+                    $opts['model_timezone'] = 'UTC';
+                    $opts['view_timezone']  = date_default_timezone_get();
+                    $opts['format']         = 'yyyy-MM-dd HH:mm';
+                }
+
+                $builder->add("field_{$field->getAlias()}", $type, $opts);
             } elseif ($type == 'select' || $type == 'boolean') {
                 $choices = array();
                 if ($type == 'select' && !empty($properties['list'])) {

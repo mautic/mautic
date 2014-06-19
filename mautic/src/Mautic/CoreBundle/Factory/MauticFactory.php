@@ -9,6 +9,7 @@
 
 namespace Mautic\CoreBundle\Factory;
 
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
 
@@ -172,5 +173,22 @@ class MauticFactory
     public function getParam($id)
     {
         return ($this->container->hasParameter($id)) ? $this->container->getParameter($id) : false;
+    }
+
+    public function getDate($string = null, $format = null, $tz = null)
+    {
+        static $dates;
+
+        if (!empty($string)) {
+            $key = "$string.$format.$tz";
+
+            if (empty($dates[$key])) {
+                $dates[$key] = new DateTimeHelper($string, $format, $tz);
+            }
+            return $dates[$key];
+        } else {
+            //now so generate a new helper
+            new DateTimeHelper($string, $format, $tz);
+        }
     }
 }

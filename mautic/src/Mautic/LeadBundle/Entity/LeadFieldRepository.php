@@ -24,25 +24,19 @@ class LeadFieldRepository extends CommonRepository
 {
 
     /**
-     * @param $alias
-     * @param $id
-     * @return bool
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * Retrieves array of aliases used to ensure unique alias for new fields
+     *
+     * @param $exludingId
+     * @return array
      */
-    public function checkUniqueAlias($alias, $id)
+    public function getAliases($exludingId)
     {
         $q = $this->createQueryBuilder('l')
-            ->select('count(l.id) as aliasCount')
-            ->where('l.alias = :alias');
-        $q->setParameter('alias', $alias);
+            ->select('l.alias')
+            ->where('l.id != :id')
+            ->setParameter('id', $exludingId);
 
-        if (!empty($id)) {
-            $q->andWhere('l.id != :id');
-            $q->setParameter('id', $id);
-        }
-
-        $results = $q->getQuery()->getSingleResult();
-        return $results['aliasCount'];
+        $results = $q->getQuery()->getArrayResult();
+        return $results;
     }
 }

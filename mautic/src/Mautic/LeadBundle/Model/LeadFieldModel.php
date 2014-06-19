@@ -91,12 +91,13 @@ class LeadFieldModel extends FormModel
 
             //make sure alias is not already taken
             $testAlias = $alias;
-            $count     = $this->em->getRepository('MauticLeadBundle:LeadField')->checkUniqueAlias($alias, $entity->getId());
+            $aliases   = $this->em->getRepository('MauticLeadBundle:LeadField')->getAliases($entity->getId());
+            $count     = count($aliases);
             $aliasTag  = $count;
 
             while ($count) {
                 $testAlias = $alias . $aliasTag;
-                $count     = $this->em->getRepository('MauticLeadBundle:LeadField')->checkUniqueAlias($testAlias, $entity->getId());
+                $count     = (int) in_array($testAlias, $aliases);
                 $aliasTag++;
             }
             if ($testAlias != $alias) {
@@ -105,14 +106,17 @@ class LeadFieldModel extends FormModel
             $entity->setAlias($alias);
         }
 
+        if ($entity->getType() == 'time') {
+            //time does not work well with list filters
+            $entity->setIsListable(false);
+        }
+
         $event = $this->dispatchEvent("pre_save", $entity, $isNew);
         $this->em->getRepository($this->repository)->saveEntity($entity);
         $this->dispatchEvent("post_save", $entity, $isNew, $event);
 
         //update order of other fields
         $this->reorderFieldsByEntity($entity);
-
-        return $entity;
     }
 
     /**
@@ -188,10 +192,11 @@ class LeadFieldModel extends FormModel
      * @param      $entity
      * @param      $formFactory
      * @param null $action
+     * @param array $options
      * @return mixed
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, $formFactory, $action = null)
+    public function createForm($entity, $formFactory, $action = null, $options = array())
     {
         if (!$entity instanceof LeadField) {
             throw new MethodNotAllowedHttpException(array('LeadField'));

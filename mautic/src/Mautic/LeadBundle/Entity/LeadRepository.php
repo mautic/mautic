@@ -28,9 +28,10 @@ class LeadRepository extends CommonRepository
      * {@inheritdoc}
      *
      * @param $entity
+     * @param $flush
      * @return int
      */
-    public function saveEntity($entity)
+    public function saveEntity($entity, $flush = true)
     {
         $this->_em->persist($entity);
 
@@ -39,8 +40,8 @@ class LeadRepository extends CommonRepository
             $this->_em->persist($field);
         }
 
-        $this->_em->flush();
-        return $entity;
+        if ($flush)
+            $this->_em->flush();
     }
 
     /**
@@ -260,6 +261,7 @@ class LeadRepository extends CommonRepository
                     $options     = $this->getFilterExpressionFunctions();
                     $expr        = $q->expr()->andX();
                     $useExpr     =& $expr;
+
                     foreach ($filters as $k => $details) {
                         if (empty($details['glue']))
                             continue;
@@ -269,6 +271,7 @@ class LeadRepository extends CommonRepository
 
                         $uniqueFilter              = $this->generateRandomParameterName();
                         $parameters[$uniqueFilter] = $details['filter'];
+
                         $uniqueFilter              = ":$uniqueFilter";
                         $func                      = $options[$details['operator']]['func'];
                         $field                     = (strpos($details['field'], 'field_') === 0) ?
@@ -306,10 +309,39 @@ class LeadRepository extends CommonRepository
                             $useExpr =& $expr;
                         }
                         if ($type == "lead") {
-                            $useExpr->add($q->expr()->$func($field, $uniqueFilter));
+                            if ($func == 'notEmpty') {
+                                $useExpr->add(
+                                    $q->expr()->andX(
+                                        $q->expr()->isNotNull($field, $uniqueFilter),
+                                        $q->expr()->neq($field, $q->expr()->literal(''))
+                                    )
+                                );
+                            } elseif ($func == 'empty') {
+                                $useExpr->add(
+                                    $q->expr()->orX(
+                                        $q->expr()->isNull($field, $uniqueFilter),
+                                        $q->expr()->eq($field, $q->expr()->literal(''))
+                                    )
+                                );
+                            } else {
+                                $useExpr->add($q->expr()->$func($field, $uniqueFilter));
+                            }
                         } else {
                             $sq = $this->getEntityManager()->createQueryBuilder();
-                            $valueField = $q->expr()->like("{$v}.value", $uniqueFilter);
+                            if ($func == 'notEmpty') {
+                                $valueField = $q->expr()->andX(
+                                    $q->expr()->isNotNull("{$v}.value", $uniqueFilter),
+                                    $q->expr()->neq("{$v}.value", $q->expr()->literal(''))
+                                );
+                            } elseif ($func == 'empty') {
+                                $valueField = $q->expr()->orX(
+                                    $q->expr()->isNull("{$v}.value", $uniqueFilter),
+                                    $q->expr()->eq("{$v}.value", $q->expr()->literal(''))
+                                );
+                            } else {
+                                $valueField = $q->expr()->$func("{$v}.value", $uniqueFilter);
+                            }
+
                             if ($filter->not)
                                 $valueField = $q->expr()->not($valueField);
 
@@ -373,22 +405,22 @@ class LeadRepository extends CommonRepository
                     'label' => 'mautic.lead.list.form.operator.notequals',
                     'func'  => 'neq'
                 ),
-            '>'      =>
+            '&gt;'   =>
                 array(
                     'label' => 'mautic.lead.list.form.operator.greaterthan',
                     'func'  => 'gt'
                 ),
-            '>='     =>
+            '&gt;='   =>
                 array(
                     'label' => 'mautic.lead.list.form.operator.greaterthanequals',
                     'func'  => 'gte'
                 ),
-            '<'      =>
+            '&lt;'    =>
                 array(
                     'label' => 'mautic.lead.list.form.operator.lessthan',
                     'func'  => 'lt'
                 ),
-            '<='     =>
+            '&lt;='   =>
                 array(
                     'label' => 'mautic.lead.list.form.operator.lessthanequals',
                     'func'  => 'lte'
@@ -396,22 +428,22 @@ class LeadRepository extends CommonRepository
             'empty'  =>
                 array(
                     'label' => 'mautic.lead.list.form.operator.isempty',
-                    'func'  => array('')
+                    'func'  => 'empty' //special case
                 ),
             '!empty' =>
                 array(
                     'label' => 'mautic.lead.list.form.operator.isnotempty',
-                    'func'  => ''
+                    'func'  => 'notEmpty' //special case
                 ),
             'like'   =>
                 array(
                     'label' => 'mautic.lead.list.form.operator.islike',
-                    'func'  => ''
+                    'func'  => 'like'
                 ),
             '!like'  =>
                 array(
                     'label' => 'mautic.lead.list.form.operator.isnotlike',
-                    'func'  => ''
+                    'func'  => 'notLike'
                 )
         );
 

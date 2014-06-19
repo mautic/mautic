@@ -12,7 +12,7 @@ namespace Mautic\LeadBundle\Tests\Controller;
 use Mautic\CoreBundle\Test\MauticWebTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadFieldValue;
-use Mautic\LeadBundle\Entity\LeadIpAddress;
+use Mautic\CoreBundle\Entity\IpAddress;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 /**
@@ -34,7 +34,7 @@ class LeadControllerTest extends MauticWebTestCase
         $token = new UsernamePasswordToken($admin, null, 'main', array('ROLE_ADMIN'));
         $this->container->get('security.context')->setToken($token);
         $lead = new Lead();
-        $ipAddress = new LeadIpAddress();
+        $ipAddress = new IpAddress();
         $ipAddress->setIpAddress("208.110.200.3");
         $lead->addIpAddress($ipAddress);
 

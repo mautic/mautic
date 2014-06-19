@@ -9,6 +9,7 @@
 
 $name  = $field->getField()->getLabel();
 $value = $field->getValue();
+$type  = $field->getField()->getType();
 ?>
 
 <?php if (stripos($name, "email") !== false): ?>
@@ -58,6 +59,12 @@ $value = $field->getValue();
 <?php else: ?>
 <a target="_new" href="<?php echo $value; ?>"><?php echo $value; ?></a>
 <?php endif; ?>
+
+<?php
+elseif ($type == 'datetime'):
+    $dateHelper = new \Mautic\CoreBundle\Helper\DateTimeHelper($value);
+    echo $dateHelper->getLocalString($dateFormats[$type]);
+?>
 
 <?php else: ?>
 <?php echo $value; ?>

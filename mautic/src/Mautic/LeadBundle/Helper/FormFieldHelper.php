@@ -52,6 +52,22 @@ class FormFieldHelper
         ),
         'date'   => array(
             'label'       => 'mautic.lead.field.type.date',
+            'properties'  => array(
+                'format' => array()
+            )
+        ),
+        'datetime'   => array(
+            'label'       => 'mautic.lead.field.type.datetime',
+            'properties'  => array(
+                'format' => array()
+            )
+        ),
+        'time'   => array(
+            'label'       => 'mautic.lead.field.type.time',
+            'properties'  => array()
+        ),
+        'timezone' => array(
+            'label'       => 'mautic.lead.field.type.timezone',
             'properties'  => array()
         ),
         'email'  => array(
@@ -71,6 +87,10 @@ class FormFieldHelper
         ),
         'url'    => array(
             'label'       => 'mautic.lead.field.type.url',
+            'properties'  => array()
+        ),
+        'country' => array(
+            'label'       => 'mautic.lead.field.type.country',
             'properties'  => array()
         )
     );

@@ -52,6 +52,14 @@ $items = array(
                 ),
                 'display' => false //only used for breadcrumb generation
             ),
+            'mautic.lead.lead.menu.view' => array(
+                'route'           => 'mautic_lead_action',
+                'routeParameters' => array("objectAction"  => "view"),
+                'extras'  => array(
+                    'routeName' => 'mautic_lead_action|view'
+                ),
+                'display' => false //only used for breadcrumb generation
+            ),
             'mautic.lead.list.menu.index' => array(
                 'route'    => 'mautic_leadlist_index',
                 'extras'  => array(
