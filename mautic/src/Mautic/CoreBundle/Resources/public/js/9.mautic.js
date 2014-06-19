@@ -1,33 +1,33 @@
-var mauticVars = {};
+var MauticVars = {};
 
 //Fix for back/forward buttons not loading ajax content with History.pushState()
-mauticVars.manualStateChange = true;
+MauticVars.manualStateChange = true;
 History.Adapter.bind(window, 'statechange', function () {
-    if (mauticVars.manualStateChange == true) {
+    if (MauticVars.manualStateChange == true) {
         //back/forward button pressed
         window.location.reload();
     }
-    mauticVars.manualStateChange = true;
+    MauticVars.manualStateChange = true;
 });
 
 //live search vars
-mauticVars.liveCache = new Array();
-mauticVars.lastSearchStr = "";
-mauticVars.globalLivecache = new Array();
-mauticVars.lastGlobalSearchStr  = "";
+MauticVars.liveCache = new Array();
+MauticVars.lastSearchStr = "";
+MauticVars.globalLivecache = new Array();
+MauticVars.lastGlobalSearchStr  = "";
 
 //register the loading bar for ajax page loads
-mauticVars.showLoadingBar = true;
+MauticVars.showLoadingBar = true;
 $.ajaxSetup({
     beforeSend: function () {
-        if (mauticVars.showLoadingBar) {
+        if (MauticVars.showLoadingBar) {
             $("body").addClass("loading-content");
         }
     },
     cache: false,
     xhr: function () {
         var xhr = new window.XMLHttpRequest();
-        if (mauticVars.showLoadingBar) {
+        if (MauticVars.showLoadingBar) {
             xhr.upload.addEventListener("progress", function (evt) {
                 if (evt.lengthComputable) {
                     var percentComplete = Math.round((evt.loaded / evt.total) * 100);
@@ -46,7 +46,7 @@ $.ajaxSetup({
         return xhr;
     },
     complete: function () {
-        if (mauticVars.showLoadingBar) {
+        if (MauticVars.showLoadingBar) {
             setTimeout(function () {
                 $("body").removeClass("loading-content");
                 $(".loading-bar .progress-bar").attr('aria-valuenow', 0);
@@ -54,7 +54,7 @@ $.ajaxSetup({
             }, 500);
         } else {
             //change default back to show
-            mauticVars.showLoadingBar = true;
+            MauticVars.showLoadingBar = true;
         }
     }
 });
@@ -70,7 +70,7 @@ var Mautic = {
         $(container + " a[data-toggle='ajax']").click(function (event) {
             event.preventDefault();
 
-            return Mautic.ajaxifyLink(this);
+            return Mautic.ajaxifyLink(this, event);
         });
 
         //initialize forms
@@ -91,6 +91,34 @@ var Mautic = {
             $(target).on('show.bs.modal', function() {
                 $(target).appendTo("body");
             });
+        });
+
+        //initialize date/time
+        $(container + " *[data-toggle='datetime']").datetimepicker({
+            format: 'Y-m-d H:i',
+            lazyInit: true,
+            validateOnBlur: false,
+            allowBlank: true,
+            scrollInput: false
+        });
+
+        $(container + " *[data-toggle='date']").datetimepicker({
+            timepicker: false,
+            format: 'Y-m-d',
+            lazyInit: true,
+            validateOnBlur: false,
+            allowBlank: true,
+            scrollInput: false,
+            closeOnDateSelect: true
+        });
+
+        $(container + " *[data-toggle='time']").datetimepicker({
+            datepicker: false,
+            format: 'H:i',
+            lazyInit: true,
+            validateOnBlur: false,
+            allowBlank: true,
+            scrollInput: false
         });
 
         //run specific on loads
@@ -122,11 +150,11 @@ var Mautic = {
                 }
             ).on('typeahead:selected', function (event, datum) {
                 //force live search update
-                mauticVars.lastGlobalSearchStr = '';
+                MauticVars.lastGlobalSearchStr = '';
                 $('#global_search').keyup();
             }).on('typeahead:autocompleted', function (event, datum) {
                 //force live search update
-                mauticVars.lastGlobalSearchStr = '';
+                MauticVars.lastGlobalSearchStr = '';
                 $('#global_search').keyup();
             });
 
@@ -152,31 +180,46 @@ var Mautic = {
      * Takes a given route, retrieves the HTML, and then updates the content
      * @param route
      * @param link
+     * @param method
      * @param target
+     * @param event
      */
-    loadContent: function (route, link, target) {
+    loadContent: function (route, link, method, target, event) {
         //keep browser backbutton from loading cached ajax response
         //var ajaxRoute = route + ((/\?/i.test(route)) ? "&ajax=1" : "?ajax=1");
+
+        //little animation to let the user know that something is happening
+        if (typeof event != 'undefined' && event.target) {
+            var hasBtn = $(event.target).hasClass('btn');
+            var hasIcon = $(event.target).hasClass('fa');
+            if ((hasBtn && $(event.target).find('i.fa').length) || hasIcon) {
+                MauticVars.iconButton = (hasIcon) ? event.target :  $(event.target).find('i.fa').first();
+                MauticVars.iconClassesRemoved = $(MauticVars.iconButton).attr('class');
+                $(MauticVars.iconButton).removeClass();
+                $(MauticVars.iconButton).addClass('fa fa-spinner fa-spin');
+            }
+        }
+
         $.ajax({
             url: route,
-            type: "GET",
+            type: method,
             dataType: "json",
             success: function (response) {
                 if (response) {
-                    if (target) {
-                        response.target = target;
-                        Mautic.processContentSection(response);
+                    if (target || response.target) {
+                        if (target) response.target = target;
+                        Mautic.processPageContent(response);
                     } else {
                         //clear the live cache
-                        mauticVars.liveCache = new Array();
-                        mauticVars.lastSearchStr = '';
+                        MauticVars.liveCache = new Array();
+                        MauticVars.lastSearchStr = '';
 
                         //set route and activeLink if the response didn't override
-                        if (!response.route) {
+                        if (typeof response.route === 'undefined') {
                             response.route = route;
                         }
 
-                        if (!response.activeLink && link) {
+                        if (typeof response.activeLink === 'undefined' && link) {
                             response.activeLink = link;
                         }
 
@@ -184,6 +227,15 @@ var Mautic = {
                             $(".page-wrapper").removeClass("right-active");
                         }
                         Mautic.processPageContent(response);
+                    }
+
+                    //restore button class if applicable
+                    if (typeof MauticVars.iconClassesRemoved != 'undefined') {
+                        if ($(MauticVars.iconButton).hasClass('fa-spin')) {
+                            $(MauticVars.iconButton).removeClass('fa fa-spinner fa-spin').addClass(MauticVars.iconClassesRemoved);
+                        }
+                        delete MauticVars.iconButton;
+                        delete MauticVars.iconClassesRemoved;
                     }
                 }
             },
@@ -249,22 +301,33 @@ var Mautic = {
      * @param response
      */
     processPageContent: function (response) {
-        if (response && response.newContent) {
+        if (response) {
             if (!response.target) {
                 response.target = '.main-panel-content';
             }
 
+            //update type of content displayed
+            if (response.mauticContent) {
+                mauticContent = response.mauticContent;
+            }
+
             //inactive tooltips, etc
-            Mautic.onPageUnload(response.target);
+            Mautic.onPageUnload(response.target, response);
 
             if (response.route) {
                 //update URL in address bar
-                mauticVars.manualStateChange = false;
+                MauticVars.manualStateChange = false;
                 History.pushState(null, "Mautic", response.route);
             }
 
             //set content
-            $(response.target).html(response.newContent);
+            if (response.newContent) {
+                if (response.replaceContent) {
+                    $(response.target).replaceWith(response.newContent);
+                } else {
+                    $(response.target).html(response.newContent);
+                }
+            }
 
             //update breadcrumbs
             if (response.breadcrumbs) {
@@ -279,8 +342,14 @@ var Mautic = {
                 $(".main-panel-flash-msgs a[data-toggle='ajax']").click(function (event) {
                     event.preventDefault();
 
-                    return Mautic.ajaxifyLink(this);
+                    return Mautic.ajaxifyLink(this, event);
                 });
+
+                window.setTimeout(function() {
+                    $(".main-panel-flash-msgs .alert").fadeTo(500, 0).slideUp(500, function(){
+                        $(this).remove();
+                    });
+                }, 10000);
             }
 
             if (response.activeLink) {
@@ -301,12 +370,6 @@ var Mautic = {
 
                 //add current_ancestor classes
                 $(parent).parentsUntil(".side-panel-nav", "li").addClass("current_ancestor");
-            } else {
-                //remove current classes from menu items
-                $(".side-panel-nav").find(".current").removeClass("current");
-
-                //remove ancestor classes
-                $(".side-panel-nav").find(".current_ancestor").removeClass("current_ancestor");
             }
 
             //close sidebar if necessary
@@ -314,30 +377,15 @@ var Mautic = {
                 $(".page-wrapper").addClass("hide-left");
             }
 
-            //scroll to the top of the main panel
-            $('.main-panel-wrapper').animate({
-                scrollTop: 0
-            }, 0);
-
-            //update type of content displayed
-            if (response.mauticContent) {
-                mauticContent = response.mauticContent;
+            //scroll to the top
+            if (response.target == '.main-panel-content') {
+                $('.main-panel-wrapper').animate({
+                    scrollTop: 0
+                }, 0);
             }
 
-            //activate tooltips, etc
-            Mautic.onPageLoad(response.target, response);
-        }
-    },
 
-    /**
-     * Processes a response from an ajax call to update a specific element (not the entire page)
-     *
-     * @param response
-     */
-    processContentSection: function (response) {
-        if (response.target && response.newContent) {
-            Mautic.onPageUnload(response.target, response);
-            $(response.target).html(response.newContent);
+            //activate tooltips, etc
             Mautic.onPageLoad(response.target, response);
         }
     },
@@ -357,6 +405,12 @@ var Mautic = {
                             value: $(this).attr('value') })
                     );
                 }
+
+                //give an ajaxified form the option of not displaying the global loading bar
+                var loading = $(this).attr('data-hide-loadingbar');
+                if (loading) {
+                    MauticVars.showLoadingBar = false;
+                }
             });
         });
         //activate the forms
@@ -371,7 +425,7 @@ var Mautic = {
         });
     },
 
-    ajaxifyLink: function (el) {
+    ajaxifyLink: function (el, event) {
         //prevent leaving if currently in a form
         if ($(".prevent-nonsubmit-form-exit").length) {
             if ($(el).attr('data-ignore-formexit') != 'true') {
@@ -390,7 +444,18 @@ var Mautic = {
             link = "#" + link;
         }
 
-        Mautic.loadContent(route, link);
+        var method = $(el).attr('data-method');
+        if (!method) {
+            method = 'GET'
+        }
+
+        //give an ajaxified link the option of not displaying the global loading bar
+        var loading = $(el).attr('data-hide-loadingbar');
+        if (loading) {
+            MauticVars.showLoadingBar = false;
+        }
+
+        Mautic.loadContent(route, link, method, null, event);
     },
 
     /**
@@ -557,7 +622,7 @@ var Mautic = {
             success: function (response) {
                 if (response.success) {
                     var route = window.location.pathname + "?tmpl=" + tmpl;
-                    Mautic.loadContent(route, '', target);
+                    Mautic.loadContent(route, '', 'GET', target);
                 }
             },
             error: function (request, textStatus, errorThrown) {
@@ -636,13 +701,13 @@ var Mautic = {
             ).on('typeahead:selected', function (event, datum) {
                 if (livesearch) {
                     //force live search update,
-                    mauticVars.lastSearchStr = '';
+                    MauticVars.lastSearchStr = '';
                     $('#' + elId).keyup();
                 }
             }).on('typeahead:autocompleted', function (event, datum) {
                 if (livesearch) {
                     //force live search update
-                    mauticVars.lastSearchStr = '';
+                    MauticVars.lastSearchStr = '';
                     $('#' + elId).keyup();
                 }
             });
@@ -652,7 +717,7 @@ var Mautic = {
     activateLiveSearch: function(el, searchStrVar, liveCacheVar) {
         $(el).on('keyup', {}, function (event) {
             var searchStr = $(el).val().trim();
-            var diff = searchStr.length - mauticVars[searchStrVar].length;
+            var diff = searchStr.length - MauticVars[searchStrVar].length;
             var overlay = $('<div />', {"class": "content-overlay"}).html($(el).attr('data-overlay-text'));
             if ($(el).attr('data-overlay-background')) {
                 overlay.css('background', $(el).attr('data-overlay-background'));
@@ -662,13 +727,13 @@ var Mautic = {
             }
             var target = $(el).attr('data-target');
             if (
-                searchStr in mauticVars[liveCacheVar] ||
+                searchStr in MauticVars[liveCacheVar] ||
                 diff >= 3 ||
                 event.which == 32 || event.keyCode == 32 ||
                 event.which == 13 || event.keyCode == 13
             ) {
                 $(target + ' .content-overlay').remove();
-                mauticVars[searchStrVar] = searchStr;
+                MauticVars[searchStrVar] = searchStr;
                 event.data.livesearch = true;
                 Mautic.filterList(event, $(el).attr('id'), $(el).attr('data-action'), target, liveCacheVar);
             } else {
@@ -734,13 +799,13 @@ var Mautic = {
             }
 
             //make the request
-            if (value && value in mauticVars[liveCacheVar]) {
-                var response = {"newContent": mauticVars[liveCacheVar][value]};
+            if (value && value in MauticVars[liveCacheVar]) {
+                var response = {"newContent": MauticVars[liveCacheVar][value]};
                 response.target = target;
-                Mautic.processContentSection(response);
+                Mautic.processPageContent(response);
             } else {
                 //disable page loading bar
-                mauticVars.showLoadingBar = false;
+                MauticVars.showLoadingBar = false;
 
                 $.ajax({
                     url: route,
@@ -750,11 +815,11 @@ var Mautic = {
                     success: function (response) {
                         //cache the response
                         if (response.newContent) {
-                            mauticVars[liveCacheVar][value] = response.newContent;
+                            MauticVars[liveCacheVar][value] = response.newContent;
                         }
                         //note the target to be updated
                         response.target = target;
-                        Mautic.processContentSection(response);
+                        Mautic.processPageContent(response);
                     },
                     error: function (request, textStatus, errorThrown) {
                         alert(errorThrown);
@@ -764,3 +829,13 @@ var Mautic = {
         }
     }
 };
+
+//prevent page navigation if in the middle of a form
+window.addEventListener("beforeunload", function (e) {
+    if ($(".prevent-nonsubmit-form-exit").length) {
+        var msg = $(".prevent-nonsubmit-form-exit").val();
+
+        (e || window.event).returnValue = msg;     //Gecko + IE
+        return msg;                                //Webkit, Safari, Chrome etc.
+    }
+});
