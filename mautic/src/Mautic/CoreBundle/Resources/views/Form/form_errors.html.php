@@ -1,4 +1,4 @@
-<?php if ($errors): ?>
+<?php if (count($errors) > 0): ?>
     <div class="help-block">
     <?php if (count($errors) > 1): ?>
         <ul>
