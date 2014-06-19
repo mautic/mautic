@@ -79,7 +79,7 @@ Mautic.roleOnLoad = function (container, response) {
     }
 
     if (response && response.permissionList) {
-        mauticVars.permissionList = response.permissionList;
+        MauticVars.permissionList = response.permissionList;
     }
 };
 
@@ -135,7 +135,7 @@ Mautic.onPermissionChange = function (container, event, bundle) {
         //update granted numbers
         if ($('.' + bundle + '_granted').length) {
             var granted = 0;
-            var levelPerms = mauticVars.permissionList[bundle];
+            var levelPerms = MauticVars.permissionList[bundle];
             $.each(levelPerms, function(level, perms) {
                 $.each(perms, function(index, perm) {
                     if (perm == 'full') {

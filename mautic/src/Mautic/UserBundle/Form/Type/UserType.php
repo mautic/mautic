@@ -47,9 +47,12 @@ class UserType extends AbstractType
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber());
-        $builder->addEventSubscriber(new FormExitSubscriber($this->translator->trans(
-            'mautic.core.form.inform'
-        )));
+
+        if (!$options['ignore_formexit']) {
+            $builder->addEventSubscriber(new FormExitSubscriber($this->translator->trans(
+                'mautic.core.form.inform'
+            )));
+        }
 
         $builder->add('username', 'text', array(
             'label'      => 'mautic.user.user.form.username',
@@ -199,7 +202,8 @@ class UserType extends AbstractType
             'validation_groups' => array(
                 'Mautic\UserBundle\Entity\User',
                 'determineValidationGroups',
-            )
+            ),
+            'ignore_formexit' => false
         ));
     }
 
