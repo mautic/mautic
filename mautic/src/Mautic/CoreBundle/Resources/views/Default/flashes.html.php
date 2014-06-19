@@ -6,8 +6,7 @@
  * @link        http://mautic.com
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-?>
-<?php foreach ($view['session']->getFlash('notice') as $message): ?>
+foreach ($view['session']->getFlash('notice') as $message): ?>
 <div class="alert alert-success alert-dismissable">
     <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
     <span><?php echo $message; ?></span>

@@ -19,7 +19,7 @@ if ($tmpl == 'index') {
             <?php echo $view['translator']->trans($lead->getPrimaryIdentifier()); ?>
             <span class="lead-actions">
                 <?php
-                echo $view->render('MauticCoreBundle:Default:actions.html.php', array(
+                echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
                     'item'      => $lead,
                     'edit'      => $security->hasEntityAccess(
                         $permissions['lead:leads:editown'],
@@ -46,7 +46,7 @@ if ($tmpl == 'index') {
 </div>
 
 <?php
-    echo $view->render('MauticLeadBundle:Lead:info.html.php', array("lead" => $lead));
+    echo $view->render('MauticLeadBundle:Lead:info.html.php', array("lead" => $lead, 'dateFormats' => $dateFormats));
 
     if (!empty($scoreLog))
         echo $view->render('MauticLeadBundle:Lead:score_log.html.php', array("lead" => $lead));

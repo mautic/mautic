@@ -11,7 +11,7 @@ $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'role');
 
 $view['slots']->start('jsDeclarations');
-echo "mauticVars.permissionList = " . json_encode($permissionList) . "\n";
+echo "MauticVars.permissionList = " . json_encode($permissionList) . "\n";
 $view['slots']->stop();
 
 $objectId = $form->vars['data']->getId();

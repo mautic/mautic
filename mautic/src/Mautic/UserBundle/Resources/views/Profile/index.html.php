@@ -46,11 +46,13 @@ $view["slots"]->set("headerTitle", $view['translator']->trans('mautic.user.accou
                         echo ($permissions['editName']) ? $view['form']->row($userForm['firstName']) : $view['form']->row($userForm['firstName_unbound']);
                         echo ($permissions['editName']) ? $view['form']->row($userForm['lastName']) : $view['form']->row($userForm['lastName_unbound']);
                         echo ($permissions['editPosition']) ? $view['form']->row($userForm['position']) : $view['form']->row($userForm['position_unbound']);
+                        echo ($permissions['editEmail']) ? $view['form']->row($userForm['email']) : $view['form']->row($userForm['email_unbound']);
                         ?>
                     </div>
                     <div class="col-md-6">
                         <?php
-                        echo ($permissions['editEmail']) ? $view['form']->row($userForm['email']) : $view['form']->row($userForm['email_unbound']);
+                        echo $view['form']->row($userForm['timezone']);
+                        echo $view['form']->row($userForm['locale']);
                         echo $view['form']->row($userForm['currentPassword']);
                         echo $view['form']->row($userForm['plainPassword']['password']);
                         echo $view['form']->row($userForm['plainPassword']['confirm']);

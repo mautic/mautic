@@ -46,7 +46,7 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                 <td>
                     <span class="lead-actions">
                         <?php
-                        echo $view->render('MauticCoreBundle:Default:actions.html.php', array(
+                        echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
                             'item'      => $item,
                             'edit'      => $security->hasEntityAccess(
                                 true,
@@ -69,7 +69,7 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
         <?php endforeach; ?>
         </tbody>
     </table>
-    <?php echo $view->render('MauticCoreBundle:Default:pagination.html.php', array(
+    <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
         "items"   => $items,
         "page"    => $page,
         "limit"   => $limit,

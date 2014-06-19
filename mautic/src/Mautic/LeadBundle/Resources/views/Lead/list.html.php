@@ -39,7 +39,7 @@ foreach ($items as $key => $item):
 
     <div class="clearfix"></div>
 <?php endforeach; ?>
-<?php echo $view->render('MauticCoreBundle:Default:pagination.html.php', array(
+<?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
     "items"           => $items,
     "page"            => $page,
     "limit"           => $limit,

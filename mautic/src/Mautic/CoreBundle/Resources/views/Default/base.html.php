@@ -24,10 +24,16 @@ $activePanelClasses  = ($app->getSession()->get('left-panel', 'default') == 'unp
         <link rel="stylesheet" href="<?php echo $view['assets']->getUrl('media/font-awesome/css/font-awesome.min.css'); ?>" />
     </head>
     <body>
+        <div class="loading-message">
+            <div class="loading-message-inner-wrapper bg-success">
+                <?php echo $view['translator']->trans('mautic.core.loading'); ?>
+            </div>
+        </div>
         <div class="page-wrapper<?php echo $activePanelClasses; ?>">
             <div class="loading-bar progress">
                 <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>
             </div>
+
             <header class="top-panel">
                 <?php echo $view->render('MauticCoreBundle:Default:toppanel.html.php'); ?>
             </header>
@@ -68,8 +74,9 @@ $activePanelClasses  = ($app->getSession()->get('left-panel', 'default') == 'unp
             Mautic.onPageLoad();
             <?php $view['slots']->output("jsDeclarations"); ?>
             <?php if ($app->getEnvironment() === "dev"): ?>
-                $( document ).ajaxComplete(function(event, XMLHttpRequest, ajaxOption){
+            $( document ).ajaxComplete(function(event, XMLHttpRequest, ajaxOption){
                 if(XMLHttpRequest.getResponseHeader('x-debug-token')) {
+                    MauticVars.showLoadingBar = false;
                     $('.sf-toolbarreset').remove();
                     $.get(mauticBaseUrl +'_wdt/'+XMLHttpRequest.getResponseHeader('x-debug-token'),function(data){
                         $('body').append(data);

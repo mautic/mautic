@@ -97,7 +97,7 @@ $activeClass     = "";
     </div>
 </div>
 <?php
-echo $view->render('MauticCoreBundle:Default:modal.html.php', array(
+echo $view->render('MauticCoreBundle:Helper:modal.html.php', array(
     'id'     => 'search-help',
     'header' => $view['translator']->trans('mautic.core.search.header'),
     'body'   => $view['translator']->trans('mautic.core.search.help') .

@@ -67,7 +67,7 @@ endif;
         <?php endforeach; ?>
         </tbody>
     </table>
-    <?php echo $view->render('MauticCoreBundle:Default:pagination.html.php', array(
+    <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
         "items"   => $items,
         "page"    => $page,
         "limit"   => $limit,

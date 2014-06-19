@@ -57,7 +57,7 @@ $view["slots"]->set("headerTitle", $view['translator']->trans('mautic.lead.field
                 </td>
                 <td>
                     <?php
-                    echo $view->render('MauticCoreBundle:Default:actions.html.php', array(
+                    echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
                         'item'      => $item,
                         'edit'      => true,
                         'delete'    => $item->isFixed() ? false : true,
