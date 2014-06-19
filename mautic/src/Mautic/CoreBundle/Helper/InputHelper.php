@@ -57,7 +57,7 @@ class InputHelper
             }
             return $value;
         } else {
-            return trim(strip_tags($value));
+            return trim(htmlspecialchars($value));
         }
     }
 
