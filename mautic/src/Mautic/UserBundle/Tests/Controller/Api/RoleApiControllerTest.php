@@ -22,9 +22,10 @@ class RoleApiControllerTest extends MauticWebTestCase
 
     public function testGetEntities()
     {
+        $client = $this->getClient();
         $token    = $this->getOAuthAccessToken();
-        $crawler  = $this->client->request('GET', '/api/roles.json?access_token='.$token);
-        $response = $this->client->getResponse();
+        $crawler  = $client->request('GET', '/api/roles.json?access_token='.$token);
+        $response = $client->getResponse();
 
         $this->assertNoError($response, $crawler);
         $this->assertContentType($response);
@@ -36,13 +37,14 @@ class RoleApiControllerTest extends MauticWebTestCase
 
     public function testGetEntity()
     {
+        $client = $this->getClient();
         $token = $this->getOAuthAccessToken();
         $role = $this->em
             ->getRepository('MauticUserBundle:Role')
             ->findOneByName('mautic.user.role.admin.name');
 
-        $crawler  = $this->client->request('GET', '/api/roles/' . $role->getId() . '.json?access_token='.$token);
-        $response = $this->client->getResponse();
+        $crawler  = $client->request('GET', '/api/roles/' . $role->getId() . '.json?access_token='.$token);
+        $response = $client->getResponse();
 
         $this->assertNoError($response, $crawler);
         $this->assertContentType($response);

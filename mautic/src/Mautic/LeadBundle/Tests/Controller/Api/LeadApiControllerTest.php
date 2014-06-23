@@ -52,15 +52,17 @@ class LeadApiControllerTest extends MauticWebTestCase
 
         $this->em->persist($lead);
         $this->em->flush();
+        $this->em->detach($lead);
         return $lead;
     }
 
     public function testGetEntities()
     {
+        $client = $this->getClient();
         $token = $this->getOAuthAccessToken();
 
-        $crawler  = $this->client->request('GET', '/api/leads.json?access_token='.$token);
-        $response = $this->client->getResponse();
+        $crawler  = $client->request('GET', '/api/leads.json?access_token='.$token);
+        $response = $client->getResponse();
 
         $this->assertNoError($response, $crawler);
         $this->assertContentType($response);
@@ -72,6 +74,7 @@ class LeadApiControllerTest extends MauticWebTestCase
 
     public function testNewEntity()
     {
+        $client = $this->getClient();
         $token  = $this->getOAuthAccessToken();
 
         $admin = $this->em
@@ -85,8 +88,8 @@ class LeadApiControllerTest extends MauticWebTestCase
             'owner'         => $admin->getId()
         );
 
-        $crawler  = $this->client->request('POST', '/api/leads/new.json?access_token='.$token, $data);
-        $response = $this->client->getResponse();
+        $crawler  = $client->request('POST', '/api/leads/new.json?access_token='.$token, $data);
+        $response = $client->getResponse();
 
         $this->assertNoError($response, $crawler);
         $this->assertEquals(201, $response->getStatusCode(), 'New entity should return with a 201 status code.');
@@ -94,11 +97,12 @@ class LeadApiControllerTest extends MauticWebTestCase
 
     public function testGetEntity()
     {
+        $client = $this->getClient();
         $token  = $this->getOAuthAccessToken();
         $entity = $this->createEntity();
 
-        $crawler  = $this->client->request('GET', '/api/leads/' . $entity->getId() . '.json?access_token='.$token);
-        $response = $this->client->getResponse();
+        $crawler  = $client->request('GET', '/api/leads/' . $entity->getId() . '.json?access_token='.$token);
+        $response = $client->getResponse();
 
         $this->assertNoError($response, $crawler);
         $this->assertContentType($response);
@@ -110,6 +114,7 @@ class LeadApiControllerTest extends MauticWebTestCase
 
     public function testPatchEditEntity()
     {
+        $client = $this->getClient();
         $token  = $this->getOAuthAccessToken();
         $entity = $this->createEntity();
 
@@ -118,14 +123,14 @@ class LeadApiControllerTest extends MauticWebTestCase
             'field_lastname'   => 'Test Update'
         );
 
-        $crawler  = $this->client->request('PATCH',
+        $crawler  = $client->request('PATCH',
             '/api/leads/' . $entity->getId() . '/edit.json?access_token='.$token,
             array(),
             array(),
             array('CONTENT_TYPE' => 'application/json'),
             json_encode($data)
         );
-        $response = $this->client->getResponse();
+        $response = $client->getResponse();
         $this->assertNoError($response, $crawler);
 
         //should be JSON content
@@ -143,6 +148,7 @@ class LeadApiControllerTest extends MauticWebTestCase
 
     public function testPutEditEntity()
     {
+        $client = $this->getClient();
         $token  = $this->getOAuthAccessToken();
         $entity = $this->createEntity();
 
@@ -152,18 +158,19 @@ class LeadApiControllerTest extends MauticWebTestCase
             'field_lastname'   => 'Test Update'
         );
 
-        $crawler  = $this->client->request('PUT',
+        $crawler  = $client->request('PUT',
             '/api/leads/' . $entity->getId() . '/edit.json?access_token='.$token,
             array(),
             array(),
             array('CONTENT_TYPE' => 'application/json'),
             json_encode($data)
         );
-        $response = $this->client->getResponse();
+        $response = $client->getResponse();
 
         //should be JSON content
         $this->assertContentType($response);
 
+        $this->assertNoError($response, $crawler,true);
         $this->assertEquals(Codes::HTTP_OK, $response->getStatusCode(), 'Edited entity should return with a 200 status code.');
 
         //assert the item returned is the same as sent
@@ -180,17 +187,17 @@ class LeadApiControllerTest extends MauticWebTestCase
         );
 
         //reset the client
-        $this->client->restart();
+        $client->restart();
 
         //now try with all of entity
-        $crawler  = $this->client->request('PUT',
+        $crawler  = $client->request('PUT',
             '/api/leads/1000/edit.json?access_token='.$token,
             array(),
             array(),
             array('CONTENT_TYPE' => 'application/json'),
             json_encode($data)
         );
-        $response = $this->client->getResponse();
+        $response = $client->getResponse();
         $this->assertNoError($response, $crawler);
 
         //should be JSON content
@@ -201,19 +208,21 @@ class LeadApiControllerTest extends MauticWebTestCase
         //make sure a user was returned
         $decoded = json_decode($response->getContent(), true);
         $this->assertTrue(
-            !empty($decoded['lead']['id'])
+            !empty($decoded['lead']['id']),
+            'No lead id was found: ' . print_r($decoded, true)
         );
     }
 
     public function testDeleteEntity()
     {
+        $client = $this->getClient();
         $token  = $this->getOAuthAccessToken();
         $entity = $this->createEntity();
         $id     = $entity->getId();
-        $crawler  = $this->client->request('DELETE',
+        $crawler = $client->request('DELETE',
             '/api/leads/' . $entity->getId() . '/delete.json?access_token='.$token
         );
-        $response = $this->client->getResponse();
+        $response = $client->getResponse();
         //should be JSON content
         $this->assertContentType($response);
 
@@ -229,7 +238,7 @@ class LeadApiControllerTest extends MauticWebTestCase
         );
 
         //clear attachments in order to retrieve updated data
-        $this->em->clear();
+        //$this->em->clear();
 
         //make sure the lead doesn't exist
         $lead = $this->em
@@ -241,11 +250,12 @@ class LeadApiControllerTest extends MauticWebTestCase
 
     public function testOwnerList()
     {
+        $client = $this->getClient();
         $token  = $this->getOAuthAccessToken();
-        $crawler  = $this->client->request('GET',
+        $crawler  = $client->request('GET',
             '/api/leads/list/owners.json?access_token='.$token
         );
-        $response = $this->client->getResponse();
+        $response = $client->getResponse();
         //should be JSON content
         $this->assertContentType($response);
 
@@ -262,11 +272,12 @@ class LeadApiControllerTest extends MauticWebTestCase
 
     public function testListsList()
     {
+        $client = $this->getClient();
         $token  = $this->getOAuthAccessToken();
-        $crawler  = $this->client->request('GET',
+        $crawler  = $client->request('GET',
             '/api/leads/list/lists.json?access_token='.$token
         );
-        $response = $this->client->getResponse();
+        $response = $client->getResponse();
         //should be JSON content
         $this->assertContentType($response);
 
@@ -283,11 +294,12 @@ class LeadApiControllerTest extends MauticWebTestCase
 
     public function testFieldsList()
     {
+        $client = $this->getClient();
         $token  = $this->getOAuthAccessToken();
-        $crawler  = $this->client->request('GET',
+        $crawler  = $client->request('GET',
             '/api/leads/list/fields.json?access_token='.$token
         );
-        $response = $this->client->getResponse();
+        $response = $client->getResponse();
         //should be JSON content
         $this->assertContentType($response);
 

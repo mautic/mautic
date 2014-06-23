@@ -26,10 +26,11 @@ class ProfileControllerTest extends MauticWebTestCase
 
     public function testIndex()
     {
-        $crawler = $this->client->request('GET', '/account');
+        $client = $this->getClient();
+        $crawler = $client->request('GET', '/account');
 
         //should be a 200 code
-        $this->assertTrue($this->client->getResponse()->isSuccessful());
+        $this->assertNoError($client->getResponse(), $crawler);
 
         //test to see if what is expected shows up
         $this->assertGreaterThan(
@@ -48,22 +49,24 @@ class ProfileControllerTest extends MauticWebTestCase
         $form['user[plainPassword][confirm]']   = 'mautic';
 
         // submit the form
-        $crawler = $this->client->submit($form);
+        $crawler = $client->submit($form);
 
         //form should have failed due to lack of current password
         $this->assertRegExp(
             '/mautic.user.account.password.userpassword/',
-            $this->client->getResponse()->getContent()
+            $client->getResponse()->getContent(),
+            'mautic.user.account.password.userpassword not found'
         );
 
         $form['user[currentPassword]']  = 'mautic';
 
         // resubmit the form
-        $crawler = $this->client->submit($form);
+        $crawler = $client->submit($form);
 
         $this->assertRegExp(
             '/mautic.user.account.notice.updated/',
-            $this->client->getResponse()->getContent()
+            $client->getResponse()->getContent(),
+            'mautic.user.account.notice.updated not found'
         );
 
         //ensure that the password updated is still correct

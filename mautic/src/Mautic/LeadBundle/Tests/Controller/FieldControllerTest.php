@@ -42,12 +42,11 @@ class FieldControllerTest extends MauticWebTestCase
 
     public function testIndex()
     {
-        $crawler = $this->client->request('GET', '/leads/fields');
-
-        $this->assertNoError($this->client->getResponse(), $crawler);
+        $client = $this->getClient();
+        $crawler = $client->request('GET', '/leads/fields');
 
         //should be a 200 code
-        $this->assertTrue($this->client->getResponse()->isSuccessful());
+        $this->assertNoError($client->getResponse(), $crawler);
 
         //test to see if at least the lead-list table is displayed
         $this->assertGreaterThan(
@@ -58,11 +57,12 @@ class FieldControllerTest extends MauticWebTestCase
 
     public function testNew()
     {
-        $crawler = $this->client->request('GET', '/leads/fields/new');
-        $this->assertNoError($this->client->getResponse(), $crawler);
+        $client = $this->getClient();
+        $crawler = $client->request('GET', '/leads/fields/new');
+        $this->assertNoError($client->getResponse(), $crawler);
 
         //should be a 200 code
-        $this->assertTrue($this->client->getResponse()->isSuccessful());
+        $this->assertNoError($client->getResponse(), $crawler);
 
         //test to see if at least one form element is present
         $this->assertGreaterThan(
@@ -78,22 +78,24 @@ class FieldControllerTest extends MauticWebTestCase
         $form['leadfield[type]']       = 'text';
 
         // submit the form
-        $crawler = $this->client->submit($form);
+        $crawler = $client->submit($form);
 
         $this->assertRegExp(
             '/mautic.lead.field.notice.created/',
-            $this->client->getResponse()->getContent()
+            $client->getResponse()->getContent(),
+            'mautic.lead.field.notice.created not found'
         );
     }
 
     public function testEdit()
     {
+        $client = $this->getClient();
         $field = $this->createField();
 
-        $crawler = $this->client->request('GET', '/leads/fields/edit/' . $field->getId());
+        $crawler = $client->request('GET', '/leads/fields/edit/' . $field->getId());
 
         //should be a 200 code
-        $this->assertTrue($this->client->getResponse()->isSuccessful());
+        $this->assertNoError($client->getResponse(), $crawler);
 
         //test to see if at least one form element is present
         $this->assertGreaterThan(
@@ -108,11 +110,13 @@ class FieldControllerTest extends MauticWebTestCase
         $form['leadfield[label]'] = 'Edit Name';
 
         // submit the form
-        $crawler = $this->client->submit($form);
+        $crawler = $client->submit($form);
+        $this->assertNoError($client->getResponse(), $crawler);
 
         $this->assertRegExp(
             '/mautic.lead.field.notice.updated/',
-            $this->client->getResponse()->getContent()
+            $client->getResponse()->getContent(),
+            'mautic.lead.field.notice.updated not found'
         );
 
         //make sure ACL is working
@@ -124,22 +128,24 @@ class FieldControllerTest extends MauticWebTestCase
 
     public function testDelete()
     {
+        $client = $this->getClient();
         $field = $this->createField();
 
         //ensure we are redirected to list as get should not be allowed
-        $crawler = $this->client->request('GET', '/leads/fields/delete/'.$field->getId());
-
+        $crawler = $client->request('GET', '/leads/fields/delete/'.$field->getId());
+        $this->assertNoError($client->getResponse(), $crawler);
         $this->assertGreaterThan(
             0,
             $crawler->filter('table.leadfield-list')->count()
         );
 
         //post to delete
-        $crawler = $this->client->request('POST', '/leads/fields/delete/'.$field->getId());
+        $crawler = $client->request('POST', '/leads/fields/delete/'.$field->getId());
 
         $this->assertRegExp(
             '/mautic.lead.field.notice.deleted/',
-            $this->client->getResponse()->getContent()
+            $client->getResponse()->getContent(),
+            'mautic.lead.field.notice.deleted not found'
         );
 
         //make sure ACL is working

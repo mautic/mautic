@@ -10,6 +10,7 @@
 namespace Mautic\UserBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticWebTestCase;
+use Mautic\UserBundle\Entity\User;
 
 /**
  * Class UserControllerTest
@@ -22,7 +23,64 @@ class UserControllerTest extends MauticWebTestCase
 
     private function createUser()
     {
-        $crawler = $this->client->request('GET', '/users/new');
+        $role = $this->em
+            ->getRepository('MauticUserBundle:Role')
+            ->findOneByName('mautic.user.role.admin.name');
+
+        $unique  = uniqid();
+        $entity = new User();
+        $entity->setUsername($unique);
+        $entity->setFirstName('Test');
+        $entity->setLastName('User');
+        $entity->setPosition('Tester');
+        $entity->setEmail("{$unique}@mautic.com");
+        $entity->setRole($role);
+        $encoder = $this->encoder->getEncoder('Mautic\UserBundle\Entity\User');
+        $entity->setPassword($encoder->encodePassword('mautic', $entity->getSalt()));
+
+        $this->em->persist($entity);
+        $this->em->flush();
+        $this->em->detach($entity);
+        return $entity;
+    }
+
+    public function testIndex()
+    {
+        $client = $this->getClient();
+        $crawler = $client->request('GET', '/users');
+
+        $this->assertNoError($client->getResponse(), $crawler);
+
+        //should be a 200 code
+        $this->assertNoError($client->getResponse(), $crawler);
+
+        //test to see if at least the user-list table is displayed
+        $this->assertGreaterThan(
+            0,
+            $crawler->filter('table.user-list')->count()
+        );
+
+        //make sure ACL is working
+        $client = $this->getNonAdminClient();
+        $client->request('GET', '/users');
+        $this->assertEquals(302, $client->getResponse()->getStatusCode());
+    }
+
+    public function testNew()
+    {
+        $client = $this->getClient();
+        $crawler = $client->request('GET', '/users/new');
+        $this->assertNoError($client->getResponse(), $crawler);
+
+        //should be a 200 code
+        $this->assertNoError($client->getResponse(), $crawler);
+
+        //test to see if at least one form element is present
+        $this->assertGreaterThan(
+            0,
+            $crawler->filter('#user_username')->count()
+        );
+        $crawler = $client->request('GET', '/users/new');
 
         //let's try creating a user
         $form = $crawler->selectButton('user[save]')->form();
@@ -43,57 +101,20 @@ class UserControllerTest extends MauticWebTestCase
         $form['user[plainPassword][confirm]']   = 'mautic';
 
         // submit the form
-        $crawler = $this->client->submit($form);
+        $crawler = $client->submit($form);
+
+        $this->assertRegExp(
+            '/mautic.user.user.notice.created/',
+            $client->getResponse()->getContent(),
+            'mautic.user.user.notice.created not found'
+        );
 
         //ensure that the password created is correct
         $user = $this->em
             ->getRepository('MauticUserBundle:User')
             ->findOneByUsername($unique);
 
-        return array($user, $crawler);
-    }
-
-    public function testIndex()
-    {
-        $crawler = $this->client->request('GET', '/users');
-
-        $this->assertNoError($this->client->getResponse(), $crawler);
-
-        //should be a 200 code
-        $this->assertTrue($this->client->getResponse()->isSuccessful());
-
-        //test to see if at least the user-list table is displayed
-        $this->assertGreaterThan(
-            0,
-            $crawler->filter('table.user-list')->count()
-        );
-
-        //make sure ACL is working
-        $client = $this->getNonAdminClient();
-        $client->request('GET', '/users');
-        $this->assertEquals(302, $client->getResponse()->getStatusCode());
-    }
-
-    public function testNew()
-    {
-        $crawler = $this->client->request('GET', '/users/new');
-        $this->assertNoError($this->client->getResponse(), $crawler);
-
-        //should be a 200 code
-        $this->assertTrue($this->client->getResponse()->isSuccessful());
-
-        //test to see if at least one form element is present
-        $this->assertGreaterThan(
-            0,
-            $crawler->filter('#user_username')->count()
-        );
-
-        list($user, $crawler) = $this->createUser();
-
-        $this->assertRegExp(
-            '/mautic.user.user.notice.created/',
-            $this->client->getResponse()->getContent()
-        );
+        $this->assertNotEquals($user, null);
 
         $encoder = $this->encoder->getEncoder('Mautic\UserBundle\Entity\User');
         $this->assertTrue($encoder->isPasswordValid(
@@ -109,12 +130,13 @@ class UserControllerTest extends MauticWebTestCase
 
     public function testEdit()
     {
-        list($user, $crawler) = $this->createUser();
+        $client = $this->getClient();
+        $user   = $this->createUser();
 
-        $crawler = $this->client->request('GET', '/users/edit/' . $user->getId());
+        $crawler = $client->request('GET', '/users/edit/' . $user->getId());
 
         //should be a 200 code
-        $this->assertTrue($this->client->getResponse()->isSuccessful());
+        $this->assertNoError($client->getResponse(), $crawler);
 
         //test to see if at least one form element is present
         $this->assertGreaterThan(
@@ -130,11 +152,12 @@ class UserControllerTest extends MauticWebTestCase
         $form['user[lastName]']                 = 'Test';
 
         // submit the form
-        $crawler = $this->client->submit($form);
+        $crawler = $client->submit($form);
 
         $this->assertRegExp(
             '/mautic.user.user.notice.updated/',
-            $this->client->getResponse()->getContent()
+            $client->getResponse()->getContent(),
+            'mautic.user.user.notice.updated not found'
         );
 
         //ensure that the password created didn't get overwritten or get blanked out
@@ -151,10 +174,11 @@ class UserControllerTest extends MauticWebTestCase
 
     public function testDelete()
     {
-        list($user, $crawler) = $this->createUser();
+        $client = $this->getClient();
+        $user = $this->createUser();
 
         //ensure we are redirected to list as get should not be allowed
-        $crawler = $this->client->request('GET', '/users/delete/'.$user->getId());
+        $crawler = $client->request('GET', '/users/delete/'.$user->getId());
 
         $this->assertGreaterThan(
             0,
@@ -162,15 +186,16 @@ class UserControllerTest extends MauticWebTestCase
         );
 
         //post to delete
-        $crawler = $this->client->request('POST', '/users/delete/'.$user->getId());
+        $crawler = $client->request('POST', '/users/delete/'.$user->getId());
 
         $this->assertRegExp(
             '/mautic.user.user.notice.deleted/',
-            $this->client->getResponse()->getContent()
+            $client->getResponse()->getContent(),
+            'mautic.user.user.notice.deleted not found'
         );
 
         //make sure ACL is working
-        list($user, $crawler) = $this->createUser();
+        $user = $this->createUser();
         $client = $this->getNonAdminClient();
         $client->request('POST', '/users/delete/' . $user->getId());
         $this->assertEquals(302, $client->getResponse()->getStatusCode());

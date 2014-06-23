@@ -22,24 +22,25 @@ class SecurityControllerTest extends MauticWebTestCase
 
     public function testLogin()
     {
-        $this->client->followRedirects(false);
-        $crawler = $this->client->request('GET', '/login');
+        $client = $this->getClient();
+        $client->followRedirects(false);
+        $crawler = $client->request('GET', '/login');
 
         //should be a 200 code
-        $this->assertTrue($this->client->getResponse()->isSuccessful());
+        $this->assertNoError($client->getResponse(), $crawler);
 
         $form = $crawler->selectButton('mautic.user.auth.form.loginbtn')->form();
 
         // submit the form
-        $crawler = $this->client->submit($form,
+        $crawler = $client->submit($form,
             array(
                 '_username' => 'admin',
                 '_password' => 'mautic'
             )
         );
 
-        $this->assertNoError($this->client->getResponse(), $crawler);
-        $crawler = $this->client->followRedirect();
+        $this->assertNoError($client->getResponse(), $crawler);
+        $crawler = $client->followRedirect();
 
         $this->assertGreaterThan(
             0,

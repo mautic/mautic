@@ -47,10 +47,11 @@ class RoleControllerTest extends MauticWebTestCase
 
     public function testIndex()
     {
-        $crawler = $this->client->request('GET', '/roles');
+        $client = $this->getClient();
+        $crawler = $client->request('GET', '/roles');
 
         //should be a 200 code
-        $this->assertTrue($this->client->getResponse()->isSuccessful());
+        $this->assertNoError($client->getResponse(), $crawler);
 
         //test to see if at least the role-list table is displayed
         $this->assertGreaterThan(
@@ -66,10 +67,11 @@ class RoleControllerTest extends MauticWebTestCase
 
     public function testNew()
     {
-        $crawler = $this->client->request('GET', '/roles/new');
+        $client = $this->getClient();
+        $crawler = $client->request('GET', '/roles/new');
 
         //should be a 200 code
-        $this->assertTrue($this->client->getResponse()->isSuccessful());
+        $this->assertNoError($client->getResponse(), $crawler);
 
         //test to see if at least one form element is present
         $this->assertGreaterThan(
@@ -89,11 +91,12 @@ class RoleControllerTest extends MauticWebTestCase
         $form['role[permissions][user:users][0]']->tick();
 
         // submit the form
-        $crawler = $this->client->submit($form);
+        $crawler = $client->submit($form);
 
         $this->assertRegExp(
             '/mautic.user.role.notice.created/',
-            $this->client->getResponse()->getContent()
+            $client->getResponse()->getContent(),
+            'mautic.user.role.notice.created not found'
         );
 
         //make sure ACL is working
@@ -104,12 +107,14 @@ class RoleControllerTest extends MauticWebTestCase
 
     public function testEdit()
     {
+        $client = $this->getClient();
         $role = $this->createRole();
 
-        $crawler = $this->client->request('GET', '/roles/edit/' . $role->getId());
+        $crawler = $client->request('GET', '/roles/edit/' . $role->getId());
 
         //should be a 200 code
-        $this->assertTrue($this->client->getResponse()->isSuccessful());
+        $this->assertNoError($client->getResponse(), $crawler);
+
 
         //test to see if at least one form element is present
         $this->assertGreaterThan(
@@ -124,11 +129,12 @@ class RoleControllerTest extends MauticWebTestCase
         $form['role[description]'] = 'Role Edit Test';
 
         // submit the form
-        $crawler = $this->client->submit($form);
+        $crawler = $client->submit($form);
 
         $this->assertRegExp(
             '/mautic.user.role.notice.updated/',
-            $this->client->getResponse()->getContent()
+            $client->getResponse()->getContent(),
+            'mautic.user.role.notice.updated not found'
         );
 
         //make sure ACL is working
@@ -139,10 +145,11 @@ class RoleControllerTest extends MauticWebTestCase
 
     public function testDelete()
     {
+        $client = $this->getClient();
         $role = $this->createRole();
 
         //ensure we are redirected to list as get should not be allowed
-        $crawler = $this->client->request('GET', '/roles/delete/' . $role->getId());
+        $crawler = $client->request('GET', '/roles/delete/' . $role->getId());
 
         $this->assertGreaterThan(
             0,
@@ -150,11 +157,12 @@ class RoleControllerTest extends MauticWebTestCase
         );
 
         //post to delete
-        $crawler = $this->client->request('POST', '/roles/delete/' . $role->getId());
+        $crawler = $client->request('POST', '/roles/delete/' . $role->getId());
 
         $this->assertRegExp(
             '/mautic.user.role.notice.deleted/',
-            $this->client->getResponse()->getContent()
+            $client->getResponse()->getContent(),
+            'mautic.user.role.notice.deleted not found'
         );
 
         //make sure ACL is working

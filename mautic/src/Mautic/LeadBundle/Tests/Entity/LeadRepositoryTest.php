@@ -36,6 +36,6 @@ class LeadRepositoryTest extends MauticWebTestCase
         $filter       = $filterHelper->parseSearchString($args["filter"]);
 
         $roles = $repo->getEntities($args);
-        $this->assertCount(1, $roles, $roles->getQuery()->getDql() . "\n\n" . print_r($roles->getQuery()->getParameters(), true) . "\n\n".print_r($filter,true));
+        $this->assertCount(1, $roles, print_r($filter,true));
     }
 }

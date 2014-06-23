@@ -56,12 +56,11 @@ class LeadControllerTest extends MauticWebTestCase
 
     public function testIndex()
     {
-        $crawler = $this->client->request('GET', '/leads');
-
-        $this->assertNoError($this->client->getResponse(), $crawler);
+        $client = $this->getClient();
+        $crawler = $client->request('GET', '/leads');
 
         //should be a 200 code
-        $this->assertTrue($this->client->getResponse()->isSuccessful());
+        $this->assertNoError($client->getResponse(), $crawler);
 
         //test to see if at least the lead-list table is displayed
         $this->assertGreaterThan(
@@ -77,11 +76,11 @@ class LeadControllerTest extends MauticWebTestCase
 
     public function testNew()
     {
-        $crawler = $this->client->request('GET', '/leads/new');
-        $this->assertNoError($this->client->getResponse(), $crawler);
+        $client = $this->getClient();
+        $crawler = $client->request('GET', '/leads/new');
 
         //should be a 200 code
-        $this->assertTrue($this->client->getResponse()->isSuccessful());
+        $this->assertNoError($client->getResponse(), $crawler);
 
         //test to see if at least one form element is present
         $this->assertGreaterThan(
@@ -96,11 +95,12 @@ class LeadControllerTest extends MauticWebTestCase
         $form['lead[field_mobile]']   = '123-123-1234';
 
         // submit the form
-        $crawler = $this->client->submit($form);
+        $crawler = $client->submit($form);
 
         $this->assertRegExp(
             '/mautic.lead.lead.notice.created/',
-            $this->client->getResponse()->getContent()
+            $client->getResponse()->getContent(),
+            'mautic.lead.lead.notice.created not found'
         );
 
         //make sure ACL is working
@@ -112,12 +112,13 @@ class LeadControllerTest extends MauticWebTestCase
 
     public function testEdit()
     {
+        $client = $this->getClient();
         $lead = $this->createLead();
 
-        $crawler = $this->client->request('GET', '/leads/edit/' . $lead->getId());
+        $crawler = $client->request('GET', '/leads/edit/' . $lead->getId());
 
         //should be a 200 code
-        $this->assertTrue($this->client->getResponse()->isSuccessful());
+        $this->assertNoError($client->getResponse(), $crawler);
 
         //test to see if at least one form element is present
         $this->assertGreaterThan(
@@ -133,11 +134,12 @@ class LeadControllerTest extends MauticWebTestCase
         $form['lead[field_lastname]']   = 'Test';
 
         // submit the form
-        $crawler = $this->client->submit($form);
+        $crawler = $client->submit($form);
 
         $this->assertRegExp(
             '/mautic.lead.lead.notice.updated/',
-            $this->client->getResponse()->getContent()
+            $client->getResponse()->getContent(),
+            'mautic.lead.lead.notice.updated not found'
         );
 
         //make sure ACL is working
@@ -148,10 +150,11 @@ class LeadControllerTest extends MauticWebTestCase
 
     public function testDelete()
     {
+        $client = $this->getClient();
         $lead = $this->createLead();
 
         //ensure we are redirected to list as get should not be allowed
-        $crawler = $this->client->request('GET', '/leads/delete/'.$lead->getId());
+        $crawler = $client->request('GET', '/leads/delete/'.$lead->getId());
 
         $this->assertGreaterThan(
             0,
@@ -159,11 +162,12 @@ class LeadControllerTest extends MauticWebTestCase
         );
 
         //post to delete
-        $crawler = $this->client->request('POST', '/leads/delete/'.$lead->getId());
+        $crawler = $client->request('POST', '/leads/delete/'.$lead->getId());
 
         $this->assertRegExp(
             '/mautic.lead.lead.notice.deleted/',
-            $this->client->getResponse()->getContent()
+            $client->getResponse()->getContent(),
+            'mautic.lead.lead.notice.deleted not found'
         );
 
         //make sure ACL is working
