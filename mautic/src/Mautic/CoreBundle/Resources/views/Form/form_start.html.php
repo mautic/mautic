@@ -4,3 +4,8 @@
 <?php if ($form_method !== $method): ?>
     <input type="hidden" name="_method" value="<?php echo $method ?>" />
 <?php endif ?>
+<?php if (count($form->vars['errors'])): ?>
+<div class="has-error">
+    <?php echo $view['form']->errors($form); ?>
+</div>
+<?php endif; ?>
