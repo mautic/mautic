@@ -55,4 +55,27 @@ class LeadFieldValueRepository extends CommonRepository
         $results = $q->getQuery()->getArrayResult();
         return $results;
     }
+
+    /**
+     * Get a list of leads based on field value
+     *
+     * @param $field
+     * @param $value
+     * @return array
+     */
+    public function getLeadsByFieldValue($field, $value)
+    {
+        return $this->_em->createQueryBuilder()
+            ->select('v.lead')
+            ->from('MauticLeadBundle:LeadFieldValue', 'v')
+            ->leftJoin('MauticLeadBundle:LeadField', 'f', 'WITH', 'v.field = f.id')
+            ->leftJoin('MauticLeadBundle:Lead', 'l', 'WITH', 'v.lead = l')
+            ->where('f.alias = :field')
+            ->andWhere('v.value = :value')
+            ->orderBy('l.DateAdded', 'DESC')
+            ->setParameter('field', $field)
+            ->setParameter('value', $value)
+            ->getQuery()
+            ->getArrayResult();
+    }
 }

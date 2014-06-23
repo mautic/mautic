@@ -13,7 +13,6 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * LeadRepository
@@ -93,7 +92,10 @@ class LeadRepository extends CommonRepository
 
         $query = $q->getQuery();
         $results = new Paginator($query);
-        return $results;
+
+        //use getIterator() here so that the first lead can be extracted without duplicating queries or looping through
+        //them twice
+        return $results->getIterator();
     }
 
     /**

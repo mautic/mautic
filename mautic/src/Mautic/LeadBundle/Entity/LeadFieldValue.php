@@ -25,6 +25,9 @@ class LeadFieldValue
      * @ORM\Column(type="integer")
      * @ORM\Id()
      * @ORM\GeneratedValue(strategy="AUTO")
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full", "limited"})
      */
     private $id;
 
@@ -42,8 +45,18 @@ class LeadFieldValue
 
     /**
      * @ORM\Column(type="text", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full", "limited", "log"})
      */
     private $value;
+
+    private $changes;
+
+    public function getChanges()
+    {
+        return $this->changes;
+    }
 
     /**
      * Get id
@@ -63,6 +76,9 @@ class LeadFieldValue
      */
     public function setValue($value)
     {
+        //the model only sets the value if its new or changed
+        $this->changes[$this->field->getAlias()] = array($this->value, $value);
+
         $this->value = $value;
 
         return $this;

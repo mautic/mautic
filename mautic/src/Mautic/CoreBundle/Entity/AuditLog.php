@@ -19,7 +19,6 @@ use Doctrine\Common\Collections\Criteria;
  * @package Mautic\CoreBundle\Entity
  * @ORM\Table(name="audit_log")
  * @ORM\Entity(repositoryClass="Mautic\CoreBundle\Entity\AuditLogRepository")
- * @ORM\HasLifecycleCallbacks
  */
 class AuditLog
 {
@@ -61,7 +60,7 @@ class AuditLog
     protected $action;
 
     /**
-     * @ORM\Column(type="text", nullable=true)
+     * @ORM\Column(type="array", nullable=true)
      */
     protected $details;
 
@@ -74,18 +73,6 @@ class AuditLog
      * @ORM\Column(name="ip_address", type="string", length=15)
      */
     protected $ipAddress;
-
-    /**
-     * Sets the Date/Time for new entities
-     *
-     * @ORM\PrePersist
-     */
-    public function onPrePersistSetDateAdded()
-    {
-        if (!$this->getId()) {
-            $this->setDateAdded(new \DateTime());
-        }
-    }
 
     /**
      * Get id
@@ -297,7 +284,7 @@ class AuditLog
     /**
      * Get userName
      *
-     * @return string 
+     * @return string
      */
     public function getUserName()
     {

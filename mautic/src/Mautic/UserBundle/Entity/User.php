@@ -35,7 +35,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      * @ORM\GeneratedValue(strategy="AUTO")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"full", "limited", "log"})
      */
     protected $id;
 
@@ -43,7 +43,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      * @ORM\Column(type="string", length=25, unique=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"full", "log"})
      */
     protected $username;
 
@@ -68,7 +68,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      * @ORM\Column(name="first_name",type="string", length=50)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"full", "limited", "log"})
      */
     private $firstName;
 
@@ -76,7 +76,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      * @ORM\Column(name="last_name", type="string", length=50)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"full", "limited", "log"})
      */
     private $lastName;
 
@@ -84,7 +84,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      * @ORM\Column(type="string", length=60, unique=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"full", "log"})
      */
     private $email;
 
@@ -92,7 +92,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      * @ORM\Column(type="string", length=60, nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"full", "log"})
      */
     private $position;
 
@@ -101,7 +101,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      * @ORM\JoinColumn(name="role_id", referencedColumnName="id")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"full", "limited", "log"})
      */
     private $role;
 
@@ -109,7 +109,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      * @ORM\Column(name="is_active", type="boolean")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"full", "log"})
      */
     protected $isActive = true;
 
@@ -117,7 +117,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      * @ORM\Column(type="text", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"full", "limited", "log"})
      */
     private $timezone = 'UTC';
 
@@ -125,7 +125,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      * @ORM\Column(type="text", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"full", "limited", "log"})
      */
     private $locale   = 'en_US';
 
@@ -134,9 +134,33 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      * @var
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"full", "log"})
      */
     private $activePermissions;
+
+
+    private $changes;
+
+    private function isChanged($prop, $val)
+    {
+        if ($prop == 'role') {
+            if ($this->role && !$val) {
+                $this->changes['role'] = array($this->role->getName() . ' ('. $this->role->getId().')', $val);
+            } elseif (!$this->role && $val) {
+                $this->changes['role'] = array($this->role, $val->getName() . ' ('. $val->getId().')');
+            } elseif ($this->role && $val && $this->role->getId() != $val->getId()) {
+                $this->changes['role'] = array($this->role->getName() . '('. $this->role->getId().')',
+                    $val->getName() . '('. $val->getId().')');
+            }
+        } elseif ($this->$prop != $val) {
+            $this->changes[$prop] = array($this->$prop, $val);
+        }
+    }
+
+    public function getChanges()
+    {
+        return $this->changes;
+    }
 
     /**
      * @param ClassMetadata $metadata
@@ -229,7 +253,6 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
             $groups[] = 'Profile';
         }
 
-        //check to see if
         return $groups;
     }
 
@@ -287,7 +310,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
     {
         $roles = array(
             "ROLE_API",
-            (($this->getRole()->isAdmin()) ? "ROLE_ADMIN" : "ROLE_USER")
+            (($this->isAdmin()) ? "ROLE_ADMIN" : "ROLE_USER")
         );
         return $roles;
     }
@@ -341,6 +364,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      */
     public function setUsername($username)
     {
+        $this->isChanged('username', $username);
         $this->username = $username;
 
         return $this;
@@ -394,6 +418,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      */
     public function setFirstName($firstName)
     {
+        $this->isChanged('firstName', $firstName);
         $this->firstName = $firstName;
 
         return $this;
@@ -417,6 +442,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      */
     public function setLastName($lastName)
     {
+        $this->isChanged('lastName', $lastName);
         $this->lastName = $lastName;
 
         return $this;
@@ -453,6 +479,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      */
     public function setEmail($email)
     {
+        $this->isChanged('email', $email);
         $this->email = $email;
 
         return $this;
@@ -476,6 +503,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      */
     public function setIsActive($isActive)
     {
+        $this->isChanged('isActive', $isActive);
         $this->isActive = $isActive;
 
         return $this;
@@ -531,6 +559,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      */
     public function setRole(\Mautic\UserBundle\Entity\Role $role = null)
     {
+        $this->isChanged('role', $role);
         $this->role = $role;
 
         return $this;
@@ -573,6 +602,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      */
     public function setPosition($position)
     {
+        $this->isChanged('position', $position);
         $this->position = $position;
 
         return $this;
@@ -599,13 +629,6 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
             $this->setIsActive(true);
         }
     }
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        $this->clients = new \Doctrine\Common\Collections\ArrayCollection();
-    }
 
     /**
      * Set timezone
@@ -615,6 +638,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      */
     public function setTimezone($timezone)
     {
+        $this->isChanged('timezone', $timezone);
         $this->timezone = $timezone;
 
         return $this;
@@ -638,6 +662,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      */
     public function setLocale($locale)
     {
+        $this->isChanged('locale', $locale);
         $this->locale = $locale;
 
         return $this;
@@ -651,5 +676,19 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
     public function getLocale()
     {
         return $this->locale;
+    }
+
+    /**
+     * Determines if user is admin
+     *
+     * @return bool
+     */
+    public function isAdmin()
+    {
+        if ($this->role !== null) {
+            return $this->role->isAdmin();
+        } else {
+            return false;
+        }
     }
 }

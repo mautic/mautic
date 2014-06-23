@@ -15,7 +15,7 @@ use JMS\Serializer\Annotation as Serializer;
 
 /**
  * Class IpAddress
- * @ORM\Entity();
+ * @ORM\Entity(repositoryClass="Mautic\CoreBundle\Entity\IpAddressRepository")
  * @ORM\Table(name="ip_addresses")
  * @ORM\HasLifecycleCallbacks
  * @Serializer\ExclusionPolicy("all")

@@ -28,7 +28,7 @@ class Lead extends FormEntity
      * @ORM\GeneratedValue(strategy="AUTO")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"limited"})
+     * @Serializer\Groups({"full", "limited", "log"})
      */
     private $id;
 
@@ -37,7 +37,7 @@ class Lead extends FormEntity
      * @ORM\JoinColumn(name="owner_id", referencedColumnName="id", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"limited"})
+     * @Serializer\Groups({"full", "limited", "log"})
      */
     private $owner;
 
@@ -45,24 +45,24 @@ class Lead extends FormEntity
      * @ORM\Column(type="integer")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"limited"})
+     * @Serializer\Groups({"full", "limited", "log"})
      */
     private $score = 0;
 
     /**
-     * @ORM\OneToMany(targetEntity="LeadFieldValue", mappedBy="lead", cascade={"persist", "remove", "refresh"}, orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="LeadFieldValue", mappedBy="lead", cascade={"all"}, orphanRemoval=true, fetch="EXTRA_LAZY")
      */
     private $fields;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Mautic\CoreBundle\Entity\IpAddress", cascade={"merge", "persist", "refresh"})
+     * @ORM\ManyToMany(targetEntity="Mautic\CoreBundle\Entity\IpAddress", cascade={"merge", "persist", "refresh", "detach"}, fetch="EXTRA_LAZY")
      * @ORM\JoinTable(name="lead_ips_xref",
      *   joinColumns={@ORM\JoinColumn(name="lead_id", referencedColumnName="id")},
      *   inverseJoinColumns={@ORM\JoinColumn(name="ip_id", referencedColumnName="id")}
      * )
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"limited"})
+     * @Serializer\Groups({"full", "limited", "log"})
      */
     private $ipAddresses;
 
@@ -89,6 +89,34 @@ class Lead extends FormEntity
      * @Serializer\Groups({"limited"})
      */
     private $customFields = array();
+
+
+    private $changes;
+
+    private function isChanged($prop, $val)
+    {
+        if ($prop == 'owner') {
+            if ($this->owner && !$val) {
+                $this->changes['owner'] = array($this->owner->getName() . ' ('. $this->owner->getId().')', $val);
+            } elseif (!$this->owner && $val) {
+                $this->changes['owner'] = array($this->owner, $val->getName() . ' ('. $val->getId().')');
+            } elseif ($this->owner && $val && $this->owner->getId() != $val->getId()) {
+                $this->changes['owner'] = array($this->owner->getName() . '('. $this->owner->getId().')',
+                    $val->getName() . '('. $val->getId().')');
+            }
+        } elseif ($prop == 'ipAddresses') {
+            $this->changes['ipAddresses'] = array('', $val->getIpAddress());
+        } elseif ($prop == 'fields') {
+            $this->changes['fields'][$val[0]] = $val[1];
+        } elseif ($this->$prop != $val) {
+            $this->changes[$prop] = array($this->$prop, $val);
+        }
+    }
+
+    public function getChanges()
+    {
+        return $this->changes;
+    }
 
     /**
      * Constructor
@@ -117,6 +145,7 @@ class Lead extends FormEntity
      */
     public function setOwner(\Mautic\UserBundle\Entity\User $owner = null)
     {
+        $this->isChanged('owner', $owner);
         $this->owner = $owner;
 
         return $this;
@@ -141,9 +170,11 @@ class Lead extends FormEntity
      */
     public function addField(\Mautic\LeadBundle\Entity\LeadFieldValue $fields)
     {
+        if ($changes = $fields->getChanges()) {
+            $this->isChanged('fields', array($fields->getField()->getAlias(), $changes));
+        }
         $this->fields[] = $fields;
 
-        $this->addFieldValue($fields->getField()->getLabel(), '', $fields);
         return $this;
     }
 
@@ -175,6 +206,7 @@ class Lead extends FormEntity
      */
     public function addIpAddress(\Mautic\CoreBundle\Entity\IpAddress $ipAddresses)
     {
+        $this->isChanged('ipAddresses', $ipAddresses);
         $this->ipAddresses[] = $ipAddresses;
 
         return $this;
@@ -282,16 +314,6 @@ class Lead extends FormEntity
     }
 
     /**
-     * Gets the fields that were updated for LeadEvent
-     *
-     * @return mixed
-     */
-    public function getUpdatedFields()
-    {
-        return $this->updatedFields;
-    }
-
-    /**
      * Get field values
      *
      * @return array
@@ -299,19 +321,6 @@ class Lead extends FormEntity
     public function getFieldValues()
     {
         return $this->fieldValues;
-    }
-
-    /**
-     * Add a field that was updated for LeadEvent
-     *
-     * @param array $field
-     */
-    public function addFieldValue($key, $oldValue, $entity, $update = false)
-    {
-        if ($update) {
-            $this->fieldsValues[] = $entity;
-        }
-        $this->updatedFields[$key] = array($oldValue, $entity->getValue());
     }
 
     /**

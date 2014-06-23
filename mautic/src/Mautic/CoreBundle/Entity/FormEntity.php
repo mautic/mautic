@@ -11,6 +11,7 @@ namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 /**
  * Class FormEntity
@@ -53,6 +54,11 @@ class FormEntity
      * @ORM\JoinColumn(name="checked_out_by", referencedColumnName="id", nullable=true)
      */
     private $checkedOutBy;
+
+    public function __toString()
+    {
+        return get_called_class()  . " with ID #" . $this->getId();
+    }
 
     /**
      * Set dateAdded
@@ -190,5 +196,37 @@ class FormEntity
     public function getCheckedOutBy ()
     {
         return $this->checkedOutBy;
+    }
+
+    /**
+     * Check the publish status of an entity based on publish up and down datetimes
+     *
+     * @return string early|expired|published|unpublished
+     * @throws \BadMethodCallException
+     */
+    public function getPublishStatus()
+    {
+        if (method_exists($this, 'isPublished')) {
+            $dt      = new DateTimeHelper();
+            $current = $dt->getLocalDateTime();
+            if (!$this->isPublished()) {
+                return 'unpublished';
+            } else {
+                $status  =  'published';
+                if (method_exists($this, 'getPublishUp')) {
+                    $up = $this->getPublishUp();
+                    if (!empty($up) && $current <= $up)
+                        $status = 'pending';
+                }
+                if (method_exists($this, 'getPublishDown')) {
+                    $down = $this->getPublishDown();
+                    if (!empty($down) && $current >= $down)
+                        $status = 'expired';
+                }
+                return $status;
+            }
+        } else {
+            throw new \BadMethodCallException('This entity does not have a isPublished method');
+        }
     }
 }

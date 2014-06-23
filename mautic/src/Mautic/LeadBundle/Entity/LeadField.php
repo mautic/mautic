@@ -30,7 +30,7 @@ class LeadField extends FormEntity
      * @ORM\Id()
      * @ORM\GeneratedValue(strategy="AUTO")
      * @Serializer\Expose
-     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full", "limited"})
      */
     private $id;
 
@@ -38,7 +38,7 @@ class LeadField extends FormEntity
      * @ORM\Column(type="string", length=50)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"limited"})
+     * @Serializer\Groups({"full", "limited", "log"})
      */
     private $label;
 
@@ -46,7 +46,7 @@ class LeadField extends FormEntity
      * @ORM\Column(type="string", length=25)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"limited"})
+     * @Serializer\Groups({"full", "limited", "log"})
      */
     private $alias;
 
@@ -54,7 +54,7 @@ class LeadField extends FormEntity
      * @ORM\Column(type="string", length=50)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"limited"})
+     * @Serializer\Groups({"full", "limited", "log"})
      */
     private $type;
 
@@ -62,7 +62,7 @@ class LeadField extends FormEntity
      * @ORM\Column(name="default_value", type="string", length=255, nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"limited"})
+     * @Serializer\Groups({"full", "limited", "log"})
      */
     private $defaultValue;
 
@@ -70,22 +70,31 @@ class LeadField extends FormEntity
      * @ORM\Column(name="is_required", type="boolean")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"limited"})
+     * @Serializer\Groups({"full", "limited", "log"})
      */
     private $isRequired = false;
 
     /**
      * @ORM\Column(name="is_fixed", type="boolean")
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full", "limited", "log"})
      */
     private $isFixed = false;
 
     /**
      * @ORM\Column(name="is_visible", type="boolean")
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full", "limited", "log"})
      */
     private $isVisible = true;
 
     /**
      * @ORM\Column(name="is_listable", type="boolean")
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full", "limited", "log"})
      */
     private $isListable = true;
 
@@ -93,18 +102,31 @@ class LeadField extends FormEntity
      * @ORM\Column(name="field_order", type="integer", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"limited"})
+     * @Serializer\Groups({"full", "limited", "log"})
      */
-
     private $order = 0;
 
     /**
      * @ORM\Column(type="array", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"limited"})
+     * @Serializer\Groups({"full", "limited", "log"})
      */
     private $properties;
+
+    private $changes;
+
+    private function isChanged($prop, $val)
+    {
+        if ($this->$prop != $val) {
+            $this->changes[$prop] = array($this->$prop, $val);
+        }
+    }
+
+    public function getChanges()
+    {
+        return $this->changes;
+    }
 
     /**
      * @param ClassMetadata $metadata
@@ -139,6 +161,7 @@ class LeadField extends FormEntity
      */
     public function setLabel($label)
     {
+        $this->isChanged('label', $label);
         $this->label = $label;
 
         return $this;
@@ -163,6 +186,7 @@ class LeadField extends FormEntity
      */
     public function setName($label)
     {
+        $this->isChanged('label', $label);
         return $this->setLabel($label);
     }
 
@@ -184,6 +208,7 @@ class LeadField extends FormEntity
      */
     public function setType($type)
     {
+        $this->isChanged('type', $type);
         $this->type = $type;
 
         return $this;
@@ -207,6 +232,7 @@ class LeadField extends FormEntity
      */
     public function setDefaultValue($defaultValue)
     {
+        $this->isChanged('defaultValue', $defaultValue);
         $this->defaultValue = $defaultValue;
 
         return $this;
@@ -230,6 +256,7 @@ class LeadField extends FormEntity
      */
     public function setIsRequired($isRequired)
     {
+        $this->isChanged('isRequired', $isRequired);
         $this->isRequired = $isRequired;
 
         return $this;
@@ -296,6 +323,7 @@ class LeadField extends FormEntity
      */
     public function setProperties($properties)
     {
+        $this->isChanged('properties', $properties);
         $this->properties = $properties;
 
         return $this;
@@ -319,6 +347,7 @@ class LeadField extends FormEntity
      */
     public function setOrder($order)
     {
+        $this->isChanged('order', $order);
         $this->order = $order;
 
         return $this;
@@ -342,6 +371,7 @@ class LeadField extends FormEntity
      */
     public function setIsVisible($isVisible)
     {
+        $this->isChanged('isVisible', $isVisible);
         $this->isVisible = $isVisible;
 
         return $this;
@@ -375,6 +405,7 @@ class LeadField extends FormEntity
      */
     public function setAlias($alias)
     {
+        $this->isChanged('alias', $alias);
         $this->alias = $alias;
 
         return $this;
@@ -398,6 +429,7 @@ class LeadField extends FormEntity
      */
     public function setIsListable($isListable)
     {
+        $this->isChanged('isListable', $isListable);
         $this->isListable = $isListable;
 
         return $this;

@@ -22,6 +22,22 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 class UserRepository extends CommonRepository
 {
 
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param $entity
+     * @param $flush true by default; use false if persisting in batches
+     * @return int
+     */
+    public function saveEntity($entity, $flush = true)
+    {
+        $this->_em->persist($entity);
+        if ($flush)
+            $this->_em->flush();
+    }
+
+
     /**
      * Checks to ensure that a username and/or email is unique
      *
@@ -35,6 +51,7 @@ class UserRepository extends CommonRepository
             ->where('u.username = :identifier OR u.email = :identifier')
             ->setParameter("identifier", $identifier)
             ->getQuery();
+
         return $q->getResult();
     }
 

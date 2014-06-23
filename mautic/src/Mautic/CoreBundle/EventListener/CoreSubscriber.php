@@ -46,7 +46,7 @@ class CoreSubscriber extends CommonSubscriber
      */
     public function onKernelRequest(GetResponseEvent $event)
     {
-        $currentUser = $this->security->getCurrentUser();
+        $currentUser = $this->factory->getUser();
 
         //set the user's timezone
         if (is_object($currentUser))

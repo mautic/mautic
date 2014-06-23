@@ -48,34 +48,4 @@ class LeadEvent extends CommonEvent
     {
         $this->entity = $lead;
     }
-
-    /**
-     * Determines changes to original entity
-     *
-     * @param $ignore array
-     * @return mixed
-     */
-    public function getChanges($ignore = array())
-    {
-        $changeset = parent::getChanges($ignore);
-
-        //Check for and add updated custom field values
-        $updatedFields = $this->entity->getUpdatedFields();
-        if (!empty($updatedFields)) {
-            if (!$this->isNew) {
-                $changeset['fields'] = $updatedFields;
-            } else {
-                $fields = array();
-                //we don't need the old since it'll just be blank for new leads
-                foreach ($updatedFields as $k => $v) {
-                    if (!empty($v[1])) {
-                        $fields[$k] = $v[1];
-                    }
-                }
-                //actually entity so add it for serialization
-                $changeset["fields"] = $fields;
-            }
-        }
-        return $changeset;
-    }
 }

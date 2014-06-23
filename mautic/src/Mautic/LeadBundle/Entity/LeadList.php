@@ -30,7 +30,7 @@ class LeadList extends FormEntity
      * @ORM\GeneratedValue(strategy="AUTO")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"limited", "full"})
+     * @Serializer\Groups({"full", "limited", "log"})
      */
     private $id;
 
@@ -38,7 +38,7 @@ class LeadList extends FormEntity
      * @ORM\Column(type="string", length=50)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"limited", "full"})
+     * @Serializer\Groups({"full", "limited", "log"})
      */
     private $name;
 
@@ -46,29 +46,55 @@ class LeadList extends FormEntity
      * @ORM\Column(type="string", length=25)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"limited", "full"})
+     * @Serializer\Groups({"full", "limited", "log"})
      */
     private $alias;
 
     /**
      * @ORM\Column(type="text", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full", "limited", "log"})
      */
     private $description;
 
     /**
      * @ORM\Column(name="is_active", type="boolean")
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full", "limited", "log"})
      */
     private $isActive = true;
 
     /**
      * @ORM\Column(type="array")
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full", "limited", "log"})
      */
     private $filters;
 
     /**
      * @ORM\Column(name="is_global", type="boolean")
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full", "limited", "log"})
      */
     private $isGlobal = false;
+
+    private $changes;
+
+    private function isChanged($prop, $val)
+    {
+        if ($this->$prop != $val) {
+            $this->changes[$prop] = array($this->$prop, $val);
+        }
+    }
+
+    public function getChanges()
+    {
+        return $this->changes;
+    }
 
     /**
      * @param ClassMetadata $metadata
@@ -109,6 +135,7 @@ class LeadList extends FormEntity
      */
     public function setName($name)
     {
+        $this->isChanged('name', $name);
         $this->name = $name;
 
         return $this;
@@ -132,6 +159,7 @@ class LeadList extends FormEntity
      */
     public function setDescription($description)
     {
+        $this->isChanged('description', $description);
         $this->description = $description;
 
         return $this;
@@ -155,6 +183,7 @@ class LeadList extends FormEntity
      */
     public function setIsActive($isActive)
     {
+        $this->isChanged('isActive', $isActive);
         $this->isActive = $isActive;
 
         return $this;
@@ -178,6 +207,7 @@ class LeadList extends FormEntity
      */
     public function setFilters(array $filters)
     {
+        $this->isChanged('filters', $filters);
         $this->filters = $filters;
 
         return $this;
@@ -201,6 +231,7 @@ class LeadList extends FormEntity
      */
     public function setIsGlobal($isGlobal)
     {
+        $this->isChanged('isGlobal', $isGlobal);
         $this->isGlobal = $isGlobal;
 
         return $this;
@@ -234,6 +265,7 @@ class LeadList extends FormEntity
      */
     public function setAlias($alias)
     {
+        $this->isChanged('alias', $alias);
         $this->alias = $alias;
 
         return $this;

@@ -41,10 +41,8 @@ class LeadSubscriber extends CommonSubscriber
             CoreEvents::GLOBAL_SEARCH      => array('onGlobalSearch', 0),
             CoreEvents::BUILD_COMMAND_LIST => array('onBuildCommandList', 0),
             ApiEvents::BUILD_ROUTE         => array('onBuildApiRoute', 0),
-            LeadEvents::LEAD_PRE_SAVE      => array('onLeadPreSave', 0),
             LeadEvents::LEAD_POST_SAVE     => array('onLeadPostSave', 0),
             LeadEvents::LEAD_POST_DELETE   => array('onLeadDelete', 0),
-            LeadEvents::FIELD_PRE_SAVE      => array('onFieldPreSave', 0),
             LeadEvents::FIELD_POST_SAVE     => array('onFieldPostSave', 0),
             LeadEvents::FIELD_POST_DELETE   => array('onFieldDelete', 0),
             UserEvents::USER_PRE_DELETE    => array('onUserDelete', 0),
@@ -52,10 +50,36 @@ class LeadSubscriber extends CommonSubscriber
         );
     }
 
+    /**
+     * Add a lead generation action to available form submit actions
+     *
+     * @param FormBuilderEvent $event
+     */
     public function onFormBuilder(FormBuilderEvent $event)
     {
+        //add lead generation submit action
+        $action = array(
+            'group'     => 'mautic.lead.lead.submitaction.group',
+            'label'     => 'mautic.lead.lead.submitaction.createlead',
+            'descr'     => 'mautic.lead.lead.submitaction.createlead_descr',
+            'formType'  => 'lead_submitaction_createlead',
+            'callback'  => '\Mautic\LeadBundle\Helper\EventHelper::createLead'
+        );
 
+        $event->addSubmitAction('lead.create', $action);
+
+        //add lead generation submit action
+        $action = array(
+            'group'     => 'mautic.lead.lead.submitaction.group',
+            'label'     => 'mautic.lead.lead.submitaction.changescore',
+            'descr'     => 'mautic.lead.lead.submitaction.changescore_descr',
+            'formType'  => 'lead_submitaction_scorechange',
+            'callback'  => '\Mautic\LeadBundle\Helper\EventHelper::scoreChange'
+        );
+
+        $event->addSubmitAction('lead.scorechange', $action);
     }
+
     /**
      * @param MenuEvent $event
      */
@@ -107,7 +131,7 @@ class LeadSubscriber extends CommonSubscriber
                 $filter['force'] .= " $isCommand:$mine";
             }
 
-            $leads = $this->factory->getModel('lead')->getEntities(
+            $leads = $this->factory->getModel('lead.lead')->getEntities(
                 array(
                     'limit'  => 5,
                     'filter' => $filter
@@ -155,20 +179,9 @@ class LeadSubscriber extends CommonSubscriber
         if ($this->security->isGranted(array('lead:leads:viewown', 'lead:leads:viewother'), "MATCH_ONE")) {
             $event->addCommands(
                 'mautic.lead.lead.header.index',
-                $this->factory->getModel('lead')->getCommandList()
+                $this->factory->getModel('lead.lead')->getCommandList()
             );
         }
-    }
-
-    /**
-     * Obtain changes to enter into audit log
-     *
-     * @param Events\LeadEvent $event
-     */
-    public function onLeadPreSave(Events\LeadEvent $event)
-    {
-        //stash changes
-        $this->changes = $event->getChanges();
     }
 
     /**
@@ -179,14 +192,7 @@ class LeadSubscriber extends CommonSubscriber
     public function onLeadPostSave(Events\LeadEvent $event)
     {
         $lead = $event->getLead();
-        if (!empty($this->changes)) {
-            $details = $this->serializer->serialize($this->changes, 'json');
-            if (isset($this->changes["fieldChangeset"])) {
-                //a bit overkill but the only way I could get around JMS Serilizer's exposed settings for the lead entity
-                $details         = json_decode($details);
-                $details->fields = $this->changes["fieldChangeset"];
-                $details         = json_encode($details);
-            }
+        if ($details = $event->getChanges()) {
             $log = array(
                 "bundle"    => "lead",
                 "object"    => "lead",
@@ -195,7 +201,7 @@ class LeadSubscriber extends CommonSubscriber
                 "details"   => $details,
                 "ipAddress" => $this->request->server->get('REMOTE_ADDR')
             );
-            $this->factory->getModel('auditlog')->writeToLog($log);
+            $this->factory->getModel('core.auditLog')->writeToLog($log);
 
             //trigger the score change event
             if (!$event->isNew() && isset($this->changes["score"])) {
@@ -213,28 +219,15 @@ class LeadSubscriber extends CommonSubscriber
     public function onLeadDelete(Events\LeadEvent $event)
     {
         $lead = $event->getLead();
-        $details = $this->serializer->serialize($lead, 'json');
         $log = array(
             "bundle"     => "lead",
             "object"     => "lead",
-            "objectId"   => $lead->getId(),
+            "objectId"   => $lead->deletedId,
             "action"     => "delete",
-            "details"    => $details,
+            "details"    => array('name' => $lead->getPrimaryIdentifier()),
             "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
         );
-        $this->factory->getModel('auditlog')->writeToLog($log);
-    }
-
-
-    /**
-     * Obtain changes to enter into audit log
-     *
-     * @param Events\LeadFieldEvent $event
-     */
-    public function onFieldPreSave(Events\LeadFieldEvent $event)
-    {
-        //stash changes
-        $this->changes = $event->getChanges();
+        $this->factory->getModel('core.auditLog')->writeToLog($log);
     }
 
     /**
@@ -245,9 +238,7 @@ class LeadSubscriber extends CommonSubscriber
     public function onFieldPostSave(Events\LeadFieldEvent $event)
     {
         $field = $event->getField();
-        if (!empty($this->changes)) {
-            $details = $this->serializer->serialize($this->changes, 'json');
-
+        if ($details = $event->getChanges()) {
             $log = array(
                 "bundle"    => "lead",
                 "object"    => "field",
@@ -256,7 +247,7 @@ class LeadSubscriber extends CommonSubscriber
                 "details"   => $details,
                 "ipAddress" => $this->request->server->get('REMOTE_ADDR')
             );
-            $this->factory->getModel('auditlog')->writeToLog($log);
+            $this->factory->getModel('core.auditLog')->writeToLog($log);
         }
     }
 
@@ -268,16 +259,15 @@ class LeadSubscriber extends CommonSubscriber
     public function onFieldDelete(Events\LeadFieldEvent $event)
     {
         $field = $event->getField();
-        $details = $this->serializer->serialize($field, 'json');
         $log = array(
             "bundle"     => "lead",
             "object"     => "field",
-            "objectId"   => $field->getId(),
+            "objectId"   => $field->deletedId,
             "action"     => "delete",
-            "details"    => $details,
+            "details"    => array('name', $field->getLabel()),
             "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
         );
-        $this->factory->getModel('auditlog')->writeToLog($log);
+        $this->factory->getModel('core.auditLog')->writeToLog($log);
     }
 
     /**
@@ -287,6 +277,6 @@ class LeadSubscriber extends CommonSubscriber
      */
     public function onUserDelete(UserEvent $event)
     {
-        $this->factory->getModel('lead')->disassociateOwner($event->getUser()->getId());
+        $this->factory->getModel('lead.lead')->disassociateOwner($event->getUser()->getId());
     }
 }

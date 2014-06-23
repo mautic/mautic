@@ -10,16 +10,13 @@
 namespace Mautic\UserBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Security\Core\Role\RoleInterface;
-use Doctrine\Common\Collections\ArrayCollection;
+use JMS\Serializer\Annotation as Serializer;
 
 /**
  * Class Permission
  * @ORM\Table(name="permissions", uniqueConstraints={@ORM\UniqueConstraint(name="unique_perm", columns={"bundle", "name", "role_id"})})
  * @ORM\Entity(repositoryClass="Mautic\UserBundle\Entity\PermissionRepository")
+ * @Serializer\ExclusionPolicy("all")
  */
 
 class Permission

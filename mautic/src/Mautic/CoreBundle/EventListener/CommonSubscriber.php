@@ -33,6 +33,7 @@ class CommonSubscriber implements EventSubscriberInterface
 
     public function __construct (MauticFactory $factory)
     {
+        $this->factory         = $factory;
         $this->templating      = $factory->getTemplating();
         $this->request         = $factory->getRequest();
         $this->security        = $factory->getSecurity();
@@ -40,7 +41,6 @@ class CommonSubscriber implements EventSubscriberInterface
         $this->serializer      = $factory->getSerializer();
         $this->params          = $factory->getSystemParameters();
         $this->dispatcher      = $factory->getDispatcher();
-        $this->factory         =& $factory;
         $this->translator      = $factory->getTemplating();
     }
 

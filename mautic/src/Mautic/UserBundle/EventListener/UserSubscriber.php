@@ -37,10 +37,8 @@ class UserSubscriber extends CommonSubscriber
             CoreEvents::GLOBAL_SEARCH       => array('onGlobalSearch', 0),
             CoreEvents::BUILD_COMMAND_LIST  => array('onBuildCommandList', 0),
             ApiEvents::BUILD_ROUTE          => array('onBuildApiRoute', 0),
-            UserEvents::USER_PRE_SAVE       => array('onUserPreSave', 0),
             UserEvents::USER_POST_SAVE      => array('onUserPostSave', 0),
             UserEvents::USER_POST_DELETE    => array('onUserDelete', 0),
-            UserEvents::ROLE_PRE_SAVE       => array('onRolePreSave', 0),
             UserEvents::ROLE_POST_SAVE      => array('onRolePostSave', 0),
             UserEvents::ROLE_POST_DELETE    => array('onRoleDelete', 0)
         );
@@ -83,7 +81,7 @@ class UserSubscriber extends CommonSubscriber
         }
 
         if ($this->security->isGranted('user:users:view')) {
-            $users = $this->factory->getModel('user')->getEntities(
+            $users = $this->factory->getModel('user.user')->getEntities(
                 array(
                     'limit'  => 5,
                     'filter' => $str
@@ -117,7 +115,7 @@ class UserSubscriber extends CommonSubscriber
         }
 
         if ($this->security->isGranted('user:roles:view')) {
-            $roles = $this->factory->getModel('role')->getEntities(
+            $roles = $this->factory->getModel('user.role')->getEntities(
                 array(
                     'limit'  => 5,
                     'filter' => $str
@@ -168,26 +166,15 @@ class UserSubscriber extends CommonSubscriber
         if ($this->security->isGranted('user:users:view')) {
             $event->addCommands(
                 'mautic.user.user.header.index',
-                $this->factory->getModel('user')->getCommandList()
+                $this->factory->getModel('user.user')->getCommandList()
             );
         }
         if ($this->security->isGranted('user:roles:view')) {
             $event->addCommands(
                 'mautic.user.role.header.index',
-                $this->factory->getModel('role')->getCommandList()
+                $this->factory->getModel('user.role')->getCommandList()
             );
         }
-    }
-
-    /**
-     * Obtain changes to enter into audit log
-     *
-     * @param Events\UserEvent $event
-     */
-    public function onUserPreSave(Events\UserEvent $event)
-    {
-        //stash changes
-        $this->userChanges = $event->getChanges();
     }
 
     /**
@@ -199,8 +186,7 @@ class UserSubscriber extends CommonSubscriber
     {
         $user = $event->getUser();
 
-        if (!empty($this->userChanges)) {
-            $details = $this->serializer->serialize($this->userChanges, 'json');
+        if ($details = $event->getChanges()) {
             $log        = array(
                 "bundle"    => "user",
                 "object"    => "user",
@@ -209,7 +195,7 @@ class UserSubscriber extends CommonSubscriber
                 "details"   => $details,
                 "ipAddress" => $this->request->server->get('REMOTE_ADDR')
             );
-            $this->factory->getModel('auditlog')->writeToLog($log);
+            $this->factory->getModel('core.auditLog')->writeToLog($log);
         }
     }
 
@@ -221,27 +207,15 @@ class UserSubscriber extends CommonSubscriber
     public function onUserDelete(Events\UserEvent $event)
     {
         $user = $event->getUser();
-        $details = $this->serializer->serialize($user, 'json');
         $log = array(
             "bundle"     => "user",
             "object"     => "user",
-            "objectId"   => $user->getId(),
+            "objectId"   => $user->deletedId,
             "action"     => "delete",
-            "details"    => $details,
+            "details"    => array('name' => $user->getName()),
             "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
         );
-        $this->factory->getModel('auditlog')->writeToLog($log);
-    }
-
-    /**
-     * Obtain changes to enter into audit log
-     *
-     * @param Events\RoleEvent $event
-     */
-    public function onRolePreSave(Events\RoleEvent $event)
-    {
-        //stash changes
-        $this->roleChanges = $event->getChanges();
+        $this->factory->getModel('core.auditLog')->writeToLog($log);
     }
 
     /**
@@ -252,8 +226,7 @@ class UserSubscriber extends CommonSubscriber
     public function onRolePostSave(Events\RoleEvent $event)
     {
         $role = $event->getRole();
-        if (!empty($this->roleChanges)) {
-            $details = $this->serializer->serialize($this->roleChanges, 'json');
+        if ($details = $event->getChanges()) {
             $log        = array(
                 "bundle"    => "user",
                 "object"    => "role",
@@ -262,7 +235,7 @@ class UserSubscriber extends CommonSubscriber
                 "details"   => $details,
                 "ipAddress" => $this->request->server->get('REMOTE_ADDR')
             );
-            $this->factory->getModel('auditlog')->writeToLog($log);
+            $this->factory->getModel('core.auditLog')->writeToLog($log);
         }
     }
 
@@ -274,15 +247,14 @@ class UserSubscriber extends CommonSubscriber
     public function onRoleDelete(Events\RoleEvent $event)
     {
         $role = $event->getRole();
-        $details = $this->serializer->serialize($role, 'json');
         $log = array(
             "bundle"     => "user",
             "object"     => "role",
-            "objectId"   => $role->getId(),
+            "objectId"   => $role->deletedId,
             "action"     => "delete",
-            "details"    => $details,
+            "details"    => array('name' => $role->getName()),
             "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
         );
-        $this->factory->getModel('auditlog')->writeToLog($log);
+        $this->factory->getModel('core.auditLog')->writeToLog($log);
     }
 }

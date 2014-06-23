@@ -21,6 +21,8 @@ use JMS\Serializer\Annotation as Serializer;
  * @ORM\Entity(repositoryClass="Mautic\UserBundle\Entity\RoleRepository")
  * @Serializer\ExclusionPolicy("all")
  */
+
+
 class Role extends FormEntity
 {
     /**
@@ -29,7 +31,7 @@ class Role extends FormEntity
      * @ORM\GeneratedValue(strategy="AUTO")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"full", "limited", "log"})
      */
     private $id;
 
@@ -37,7 +39,7 @@ class Role extends FormEntity
      * @ORM\Column(type="string", length=255)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"full", "limited", "log"})
      */
     private $name;
 
@@ -45,7 +47,7 @@ class Role extends FormEntity
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"full", "limited", "log"})
      */
     private $description;
 
@@ -53,15 +55,36 @@ class Role extends FormEntity
      * @ORM\Column(name="is_admin", type="boolean")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"full", "log"})
      */
     private $isAdmin = false;
 
     /**
-     * @ORM\OneToMany(targetEntity="Permission", mappedBy="role", cascade={"persist", "remove", "refresh"}, orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="Permission", mappedBy="role", cascade={"persist","remove"}, orphanRemoval=true, fetch="EXTRA_LAZY")
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"log"})
      */
     private $permissions;
 
+    /**
+     * @ORM\Column(name="readable_permissions", type="array")
+     */
+    private $rawPermissions;
+
+    private $changes;
+
+    private function isChanged($prop, $val)
+    {
+        if ($this->$prop != $val) {
+            $this->changes[$prop] = array($this->$prop, $val);
+        }
+    }
+
+    public function getChanges()
+    {
+        return $this->changes;
+    }
     /**
      * @param ClassMetadata $metadata
      */
@@ -90,6 +113,7 @@ class Role extends FormEntity
      */
     public function setName($name)
     {
+        $this->isChanged('name', $name);
         $this->name = $name;
 
         return $this;
@@ -148,6 +172,7 @@ class Role extends FormEntity
      */
     public function setDescription($description)
     {
+        $this->isChanged('description', $description);
         $this->description = $description;
 
         return $this;
@@ -171,6 +196,7 @@ class Role extends FormEntity
      */
     public function setIsAdmin($isAdmin)
     {
+        $this->isChanged('isAdmin', $isAdmin);
         $this->isAdmin = $isAdmin;
 
         return $this;
@@ -199,5 +225,16 @@ class Role extends FormEntity
     public function __construct()
     {
         $this->permissions = new ArrayCollection();
+    }
+
+    /**
+     * Simply used to store a readable format of permissions for the changelog
+     *
+     * @param array $permissions
+     */
+    public function setRawPermissions(array $permissions)
+    {
+        $this->isChanged('rawPermissions', $permissions);
+        $this->rawPermissions = $permissions;
     }
 }
