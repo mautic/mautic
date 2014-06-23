@@ -14,11 +14,11 @@ use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
 /**
- * Class EntityToIdTransformer
+ * Class IdToEntityModelTransformer
  *
  * @package Mautic\CoreBundle\Form\DataTransformer
  */
-class EntityToIdTransformer implements DataTransformerInterface
+class IdToEntityModelTransformer implements DataTransformerInterface
 {
     /**
      * @var EntityManager

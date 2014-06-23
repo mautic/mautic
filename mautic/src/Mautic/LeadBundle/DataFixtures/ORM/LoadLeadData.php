@@ -188,7 +188,6 @@ class LoadLeadData extends AbstractFixture implements OrderedFixtureInterface, C
         $this->setReference('lead5', $lead);
 
         $manager->flush();
-        $manager->clear();
     }
 
     /**

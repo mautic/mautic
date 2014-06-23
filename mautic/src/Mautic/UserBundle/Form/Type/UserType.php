@@ -29,6 +29,7 @@ class UserType extends AbstractType
 
     private $translator;
     private $supportedLanguages;
+    private $em;
 
     /**
      * @param TranslatorInterface    $translator
@@ -37,7 +38,8 @@ class UserType extends AbstractType
     public function __construct(MauticFactory $factory)
     {
         $this->translator         = $factory->getTranslator();
-        $this->supportedLanguages = $factory->getParam('mautic.supported_languages');
+        $this->supportedLanguages = $factory->getParam('supported_languages');
+        $this->em                 = $factory->getEntityManager();
     }
 
     /**
@@ -100,7 +102,8 @@ class UserType extends AbstractType
 
         $builder->add('role', 'hidden_entity', array(
             'required'   => true,
-            'repository' => 'MauticUserBundle:Role'
+            'repository' => 'MauticUserBundle:Role',
+            'em'         => $this->em
         ));
 
         $existing = (!empty($options['data']) && $options['data']->getId());
@@ -118,7 +121,8 @@ class UserType extends AbstractType
                     'tooltip'     => 'mautic.user.user.form.help.passwordrequirements',
                     'preaddon'    => 'fa fa-lock'
                 ),
-                'required'   => $required
+                'required'   => $required,
+                'error_bubbling'    => false
             ),
             'second_name'       => 'confirm',
             'second_options'    => array(
@@ -130,11 +134,13 @@ class UserType extends AbstractType
                     'tooltip'     => 'mautic.user.user.form.help.passwordrequirements',
                     'preaddon'    => 'fa fa-lock'
                 ),
-                'required'   => $required
+                'required'   => $required,
+                'error_bubbling'    => false
             ),
             'type'              => 'password',
             'invalid_message'   => 'mautic.user.user.password.mismatch',
-            'required'          => $required
+            'required'          => $required,
+            'error_bubbling'    => false
         ));
 
         $builder->add('timezone', 'timezone', array(

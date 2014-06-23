@@ -57,3 +57,38 @@ $container->setDefinition(
     ->addTag('form.type', array(
         'alias' => 'leadfield',
     ));
+
+
+//Form submit action forms
+$container->setDefinition(
+    'mautic.form.type.lead.submitaction.createlead',
+    new Definition(
+        'Mautic\LeadBundle\Form\Type\FormSubmitActionCreateLeadType'
+    )
+)
+    ->addTag('form.type', array(
+        'alias' => 'lead_submitaction_createlead',
+    ));
+
+$container->setDefinition(
+    'mautic.form.type.lead.submitaction.mappedfields',
+    new Definition(
+        'Mautic\LeadBundle\Form\Type\FormSubmitActionMappedFieldsType',
+        array(new Reference('mautic.factory'))
+    )
+)
+    ->addTag('form.type', array(
+        'alias' => 'lead_submitaction_mappedfields',
+    ));
+
+
+$container->setDefinition(
+    'mautic.form.type.lead.submitaction.scorechange',
+    new Definition(
+        'Mautic\LeadBundle\Form\Type\FormSubmitActionScoreChangeType',
+        array(new Reference('mautic.factory'))
+    )
+)
+    ->addTag('form.type', array(
+        'alias' => 'lead_submitaction_scorechange',
+    ));

@@ -68,14 +68,14 @@ Mautic.userOnLoad = function (container) {
         }
     } else {
         if ($(container + ' #list-search').length) {
-            Mautic.activateSearchAutocomplete('list-search', 'user');
+            Mautic.activateSearchAutocomplete('list-search', 'user.user');
         }
     }
 };
 
 Mautic.roleOnLoad = function (container, response) {
     if ($(container + ' #list-search').length) {
-        Mautic.activateSearchAutocomplete('list-search', 'role');
+        Mautic.activateSearchAutocomplete('list-search', 'user.role');
     }
 
     if (response && response.permissionList) {

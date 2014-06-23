@@ -382,10 +382,17 @@ var Mautic = {
                 $('.main-panel-wrapper').animate({
                     scrollTop: 0
                 }, 0);
+            } else {
+                var overflow = $(response.target).css('overflow');
+                var overflowY = $(response.target).css('overflowY');
+                if (overflow == 'auto' || overflow == 'scroll' || overflowY == 'auto' || overflowY == 'scroll') {
+                    $(response.target).animate({
+                        scrollTop: 0
+                    }, 0);
+                }
             }
 
-
-            //activate tooltips, etc
+            //activate content specific stuff
             Mautic.onPageLoad(response.target, response);
         }
     },

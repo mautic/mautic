@@ -9,7 +9,7 @@
 
 namespace Mautic\CoreBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Doctrine\ORM\EntityManager;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -17,16 +17,10 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 class HiddenEntityType extends AbstractType
 {
 
-    /**
-     * @var
-     */
     private $em;
-
-    public function __construct (MauticFactory $factory)
-    {
-        $this->em = $factory->getEntityManager();
+    public function __construct(EntityManager $em) {
+        $this->em = $em;
     }
-
     /**
      * {@inheritdoc}
      *
@@ -45,11 +39,11 @@ class HiddenEntityType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setRequired(
-            array("repository")
+            array("repository", "em")
         );
 
         $resolver->setDefaults(array(
-            'transformer' => 'Mautic\CoreBundle\Form\DataTransformer\EntityToIdTransformer',
+            'transformer' => 'Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer',
             'identifier'  => 'id'
         ));
     }

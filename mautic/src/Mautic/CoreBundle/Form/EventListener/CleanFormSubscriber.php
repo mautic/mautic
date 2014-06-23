@@ -31,7 +31,9 @@ class CleanFormSubscriber implements EventSubscriberInterface
 
     public static function getSubscribedEvents()
     {
-        return array(FormEvents::PRE_SUBMIT  => 'preSubmitData');
+        return array(
+            FormEvents::PRE_SUBMIT  => 'preSubmitData'
+        );
     }
 
     public function preSubmitData(FormEvent $event)

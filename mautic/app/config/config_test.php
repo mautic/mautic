@@ -36,7 +36,7 @@ $container->loadFromExtension('doctrine', array(
         'connections'        => array(
             'default' => array(
                 'driver' => 'pdo_sqlite',
-                'path'   =>  '%kernel.cache_dir%/test.db'
+                'path'   =>  '%kernel.root_dir%/cache/test.db'
             )
         )
     )

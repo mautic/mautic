@@ -278,6 +278,7 @@ class CommonApiController extends FOSRestController implements EventsController
                     true
                 );
             }
+
             $view = $this->view(array($this->entityNameOne => $entity), $statusCode, $headers);
             if (!empty($this->serializerGroups)) {
                 $context = SerializationContext::create()->setGroups($this->serializerGroups);

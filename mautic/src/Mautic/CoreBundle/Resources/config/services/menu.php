@@ -17,7 +17,8 @@ $container->setDefinition('mautic.menu_renderer',
         'Mautic\CoreBundle\Menu\MenuRenderer',
         array(
             new Reference('knp_menu.matcher'),
-            new Reference('mautic.factory')
+            new Reference('mautic.factory'),
+            '%kernel.charset%'
         )
     )
 )

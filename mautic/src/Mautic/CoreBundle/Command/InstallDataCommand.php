@@ -24,33 +24,45 @@ class InstallDataCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this->setName('mautic:install:data');
+        $this->addOption('--force', InputOption::VALUE_OPTIONAL);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $options    = $input->getOptions();
+        $force      = (!empty($options['force'])) ? true : false;
         $translator = $this->getContainer()->get('translator');
-        $translator->setLocale($this->getContainer()->getParameter('mautic.locale'));
 
-        $dialog     = $this->getHelperSet()->get('dialog');
-        $confirm    = $dialog->select(
-            $output,
-            $translator->trans('mautic.core.command.install_data_confirm'),
-            array(
-                $translator->trans('mautic.core.form.no'),
-                $translator->trans('mautic.core.form.yes'),
-            ),
-            0
-        );
+        if (!$force) {
+            $translator->setLocale($this->getContainer()->getParameter('mautic.locale'));
 
-        if (!$confirm) {
-            return 0;
+            $dialog  = $this->getHelperSet()->get('dialog');
+            $confirm = $dialog->select(
+                $output,
+                $translator->trans('mautic.core.command.install_data_confirm'),
+                array(
+                    $translator->trans('mautic.core.form.no'),
+                    $translator->trans('mautic.core.form.yes'),
+                ),
+                0
+            );
+
+            if (!$confirm) {
+                return 0;
+            }
         }
 
+        $env =  (!empty($options['env'])) ? $options['env'] : 'dev';
+
+        $verbosity = $output->getVerbosity();
+        $output->setVerbosity(OutputInterface::VERBOSITY_QUIET);
         //due to foreign restraint and truncate issues with doctrine, the whole schema must be dropped and recreated
         $command = $this->getApplication()->find('doctrine:schema:drop');
         $input = new ArrayInput(array(
             'command' => 'doctrine:schema:drop',
-            '--force' => true
+            '--force' => true,
+            '--env'   => $env,
+            '--quiet'  => true
         ));
         $returnCode = $command->run($input, $output);
 
@@ -61,10 +73,11 @@ class InstallDataCommand extends ContainerAwareCommand
         //recreate the database
         $command = $this->getApplication()->find('doctrine:schema:create');
         $input = new ArrayInput(array(
-            'command' => 'doctrine:schema:create'
+            'command' => 'doctrine:schema:create',
+            '--env'   => $env,
+            '--quiet'  => true
         ));
         $returnCode = $command->run($input, $output);
-
         if ($returnCode !== 0) {
             return $returnCode;
         }
@@ -73,7 +86,9 @@ class InstallDataCommand extends ContainerAwareCommand
         $command = $this->getApplication()->find('doctrine:fixtures:load');
         $args = array(
             '--append' => true,
-            'command'  => 'doctrine:fixtures:load'
+            'command'  => 'doctrine:fixtures:load',
+            '--env'    => $env,
+            '--quiet'  => true
         );
 
         $fixtures = $this->getMauticFixtures();
@@ -86,9 +101,12 @@ class InstallDataCommand extends ContainerAwareCommand
             return $returnCode;
         }
 
-        $output->writeln(
-            $translator->trans('mautic.core.command.install_data_success')
-        );
+        $output->setVerbosity($verbosity);
+        if (!isset($args['quiet'])) {
+            $output->writeln(
+                $translator->trans('mautic.core.command.install_data_success')
+            );
+        }
         return 0;
     }
 

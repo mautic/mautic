@@ -76,6 +76,7 @@ class RoleModel extends FormModel
             $entity->addPermission($permissionEntity);
         }
 
+        $entity->setRawPermissions($rawPermissions);
     }
     /**
      * {@inheritdoc}
@@ -155,26 +156,32 @@ class RoleModel extends FormModel
             throw new MethodNotAllowedHttpException(array('Role'), 'Entity must be of class Role()');
         }
 
-        if (empty($event)) {
-            $event = new RoleEvent($entity, $isNew);
-            $event->setEntityManager($this->em);
-        }
-
         switch ($action) {
             case "pre_save":
-                $this->dispatcher->dispatch(UserEvents::ROLE_PRE_SAVE, $event);
+                $name = UserEvents::ROLE_PRE_SAVE;
                 break;
             case "post_save":
-                $this->dispatcher->dispatch(UserEvents::ROLE_POST_SAVE, $event);
+                $name = UserEvents::ROLE_POST_SAVE;
                 break;
             case "pre_delete":
-                $this->dispatcher->dispatch(UserEvents::ROLE_PRE_DELETE, $event);
+                $name = UserEvents::ROLE_PRE_DELETE;
                 break;
             case "post_delete":
-                $this->dispatcher->dispatch(UserEvents::ROLE_POST_DELETE, $event);
+                $name = UserEvents::ROLE_POST_DELETE;
                 break;
+            default:
+                return false;
         }
 
-        return $event;
+        if ($this->dispatcher->hasListeners($name)) {
+            if (empty($event)) {
+                $event = new RoleEvent($entity, $isNew);
+                $event->setEntityManager($this->em);
+            }
+            $this->dispatcher->dispatch($name, $event);
+            return $event;
+        } else {
+            return false;
+        }
     }
 }

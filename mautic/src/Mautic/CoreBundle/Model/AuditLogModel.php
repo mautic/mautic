@@ -40,8 +40,9 @@ class AuditLogModel extends CommonModel
         $log->setAction($action);
         $log->setDetails($details);
         $log->setIpAddress($ipAddress);
+        $log->setDateAdded(new \DateTime());
 
-        $user   = $this->security->getCurrentUser();
+        $user   = $this->factory->getUser();
         $userId = 0;
         $userName = '';
         if ($user->getId()) {

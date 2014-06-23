@@ -57,6 +57,7 @@ class FieldType extends AbstractType
         ));
 
         $disabled = (!empty($options['data'])) ? $options['data']->isFixed() : false;
+        $new      = (!empty($options['data']) && $options['data']->getAlias()) ? false : true;
 
         $fieldHelper = new FormFieldHelper();
         $fieldHelper->setTranslator($this->translator);
@@ -66,7 +67,7 @@ class FieldType extends AbstractType
             'multiple'    => false,
             'label'       => 'mautic.lead.field.form.type',
             'empty_value' => false,
-            'disabled'    => $disabled,
+            'disabled'    => ($disabled || !$new),
             'attr'        => array(
                 'class'    => 'form-control',
                 'onchange' => 'Mautic.updateLeadFieldProperties(this.value);'

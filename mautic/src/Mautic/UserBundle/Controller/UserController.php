@@ -62,7 +62,7 @@ class UserController extends FormController
         }
 
         $tmpl       = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
-        $users      = $this->get('mautic.factory')->getModel('user')->getEntities(
+        $users      = $this->get('mautic.factory')->getModel('user.user')->getEntities(
             array(
                 'start'      => $start,
                 'limit'      => $limit,
@@ -135,7 +135,7 @@ class UserController extends FormController
         if (!$this->get('mautic.security')->isGranted('user:users:create')) {
             return $this->accessDenied();
         }
-        $model      = $this->get('mautic.factory')->getModel('user');
+        $model      = $this->get('mautic.factory')->getModel('user.user');
 
         //retrieve the user entity
         $user       = $model->getEntity();
@@ -161,7 +161,7 @@ class UserController extends FormController
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
                     $user->setPassword($password);
-                    $this->get('mautic.factory')->getModel('user')->saveEntity($user);
+                    $this->get('mautic.factory')->getModel('user.user')->saveEntity($user);
                 }
             }
 
@@ -228,7 +228,7 @@ class UserController extends FormController
         if (!$this->get('mautic.security')->isGranted('user:users:edit')) {
             return $this->accessDenied();
         }
-        $model   = $this->get('mautic.factory')->getModel('user');
+        $model   = $this->get('mautic.factory')->getModel('user.user');
         $user    = $model->getEntity($objectId);
 
         //set the page we came from
@@ -366,7 +366,7 @@ class UserController extends FormController
         if ($this->request->getMethod() == 'POST') {
             //ensure the user logged in is not getting deleted
             if ((int) $currentUser->getId() !== (int) $objectId) {
-                $model = $this->get('mautic.factory')->getModel('user');
+                $model = $this->get('mautic.factory')->getModel('user.user');
                 $entity = $model->getEntity($objectId);
 
                 if ($entity === null) {
@@ -416,7 +416,7 @@ class UserController extends FormController
         switch ($ajaxAction) {
             case "rolelist":
                 $filter  = InputHelper::clean($request->query->get('filter'));
-                $results = $this->get('mautic.factory')->getModel('user')->getLookupResults('role', $filter);
+                $results = $this->get('mautic.factory')->getModel('user.user')->getLookupResults('role', $filter);
                 $dataArray = array();
                 foreach ($results as $r) {
                     $dataArray[] = array(
@@ -427,7 +427,7 @@ class UserController extends FormController
                 break;
             case "positionlist":
                 $filter  = InputHelper::clean($request->query->get('filter'));
-                $results = $this->get('mautic.factory')->getModel('user')->getLookupResults('position', $filter);
+                $results = $this->get('mautic.factory')->getModel('user.user')->getLookupResults('position', $filter);
                 $dataArray = array();
                 foreach ($results as $r) {
                     $dataArray[] = array('value' => $r['position']);
@@ -442,7 +442,7 @@ class UserController extends FormController
 
     public function contactAction($objectId)
     {
-        $model   = $this->get('mautic.factory')->getModel('user');
+        $model   = $this->get('mautic.factory')->getModel('user.user');
         $user    = $model->getEntity($objectId);
 
         //user not found
@@ -508,7 +508,7 @@ class UserController extends FormController
                         "details"   => $details,
                         "ipAddress" => $this->request->server->get('REMOTE_ADDR')
                     );
-                    $this->get('mautic.factory')->getModel('auditlog')->writeToLog($log);
+                    $this->get('mautic.factory')->getModel('core.auditLog')->writeToLog($log);
 
                     $this->request->getSession()->getFlashBag()->add('notice',
                         $this->get('translator')->trans(

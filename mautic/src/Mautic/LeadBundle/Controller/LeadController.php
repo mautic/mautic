@@ -70,7 +70,7 @@ class LeadController extends FormController
             $filter['force'] .= " $isCommand:$mine";
         }
 
-        $leads = $this->get('mautic.factory')->getModel('lead')->getEntities(
+        $leads = $this->get('mautic.factory')->getModel('lead.lead')->getEntities(
             array(
                 'start'      => $start,
                 'limit'      => $limit,
@@ -105,9 +105,7 @@ class LeadController extends FormController
 
         //get active lead
         if (empty($activeLead) && $count) {
-            //set to the first in the list
-            $iterator   = $leads->getIterator();
-            $activeLead = $iterator[0];
+            $activeLead = $leads[0];
         }
 
         $tmpl  = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
@@ -117,8 +115,8 @@ class LeadController extends FormController
             $listArgs["filter"]["force"] = " $isCommand:$mine";
         }
 
-        $lists = $this->get('mautic.factory')->getModel('leadlist')->getSmartLists();
-
+        $lists = $this->get('mautic.factory')->getModel('lead.list')->getSmartLists();
+        $factory = $this->get('mautic.factory');
         $parameters = array(
             'searchValue' => $search,
             'items'       => $leads,
@@ -131,9 +129,9 @@ class LeadController extends FormController
             'lists'       => $lists,
             'security'    => $this->get('mautic.security'),
             'dateFormats' => array(
-                'datetime' => $this->container->getParameter('mautic.date_format_full'),
-                'date'     => $this->container->getParameter('mautic.date_format_dateonly'),
-                'time'     => $this->container->getParameter('mautic.date_format_timeonly'),
+                'datetime' => $factory->getParam('date_format_full'),
+                'date'     => $factory->getParam('date_format_dateonly'),
+                'time'     => $factory->getParam('date_format_timeonly'),
             )
         );
 
@@ -195,7 +193,7 @@ class LeadController extends FormController
      */
     public function viewAction($objectId)
     {
-        $activeLead  = $this->get('mautic.factory')->getModel('lead')->getEntity($objectId);
+        $activeLead  = $this->get('mautic.factory')->getModel('lead.lead')->getEntity($objectId);
         //set the page we came from
         $page    = $this->get('session')->get('mautic.lead.page', 1);
 
@@ -237,7 +235,7 @@ class LeadController extends FormController
      */
     public function newAction ()
     {
-        $model   = $this->get('mautic.factory')->getModel('lead');
+        $model   = $this->get('mautic.factory')->getModel('lead.lead');
         $lead    = $model->getEntity();
 
         if (!$this->get('mautic.security')->isGranted('lead:leads:create')) {
@@ -328,7 +326,7 @@ class LeadController extends FormController
      */
     public function editAction ($objectId)
     {
-        $model   = $this->get('mautic.factory')->getModel('lead');
+        $model   = $this->get('mautic.factory')->getModel('lead.lead');
         $lead    = $model->getEntity($objectId);
 
         //set the page we came from
@@ -460,7 +458,7 @@ class LeadController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
-            $model  = $this->get('mautic.factory')->getModel('lead');
+            $model  = $this->get('mautic.factory')->getModel('lead.lead');
             $entity = $model->getEntity($objectId);
 
             if ($entity === null) {
@@ -509,7 +507,7 @@ class LeadController extends FormController
         switch ($ajaxAction) {
             case "userlist":
                 $filter  = InputHelper::clean($request->query->get('filter'));
-                $results = $this->get('mautic.factory')->getModel('lead')->getLookupResults('user', $filter);
+                $results = $this->get('mautic.factory')->getModel('lead.lead')->getLookupResults('user', $filter);
                 $dataArray = array();
                 foreach ($results as $r) {
                     $name = $r['firstName'] . ' ' . $r['lastName'];
@@ -529,12 +527,12 @@ class LeadController extends FormController
                         $field = str_replace('field_', '', $field);
                     }
                     if ($field == 'company') {
-                        $results = $this->get('mautic.factory')->getModel('lead')->getLookupResults('company', $filter);
+                        $results = $this->get('mautic.factory')->getModel('lead.lead')->getLookupResults('company', $filter);
                         foreach ($results as $r) {
                             $dataArray[] = array('value' => $r['company']);
                         }
                     } elseif ($field == "owner") {
-                        $results = $this->get('mautic.factory')->getModel('lead')->getLookupResults('user', $filter);
+                        $results = $this->get('mautic.factory')->getModel('lead.lead')->getLookupResults('user', $filter);
                         foreach ($results as $r) {
                             $name = $r['firstName'] . ' ' . $r['lastName'];
                             $dataArray[] = array(
@@ -544,7 +542,7 @@ class LeadController extends FormController
                         }
                         break;
                     } else {
-                        $results = $this->get('mautic.factory')->getModel('leadfield')->getLookupResults($field, $filter);
+                        $results = $this->get('mautic.factory')->getModel('lead.field')->getLookupResults($field, $filter);
                         foreach ($results as $r) {
                             $dataArray[] = array('value' => $r['value']);
                         }

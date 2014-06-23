@@ -32,7 +32,7 @@ class ProfileController extends FormController
     {
         //get current user
         $me    = $this->get('security.context')->getToken()->getUser();
-        $model = $this->get('mautic.factory')->getModel('user');
+        $model = $this->get('mautic.factory')->getModel('user.user');
         //set some permissions
         $permissions = array(
             'apiAccess'    => ($this->container->getParameter('mautic.api_enabled')) ?

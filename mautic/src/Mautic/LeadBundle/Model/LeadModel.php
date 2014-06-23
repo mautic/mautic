@@ -85,27 +85,34 @@ class LeadModel extends FormModel
             throw new MethodNotAllowedHttpException(array('Lead'), 'Entity must be of class Lead()');
         }
 
-        if (empty($event)) {
-            $event = new LeadEvent($entity, $isNew);
-            $event->setEntityManager($this->em);
-        }
-
         switch ($action) {
             case "pre_save":
-                $this->dispatcher->dispatch(LeadEvents::LEAD_PRE_SAVE, $event);
+                $name = LeadEvents::LEAD_PRE_SAVE;
                 break;
             case "post_save":
-                $this->dispatcher->dispatch(LeadEvents::LEAD_POST_SAVE, $event);
+                $name = LeadEvents::LEAD_POST_SAVE;
                 break;
             case "pre_delete":
-                $this->dispatcher->dispatch(LeadEvents::LEAD_PRE_DELETE, $event);
+                $name = LeadEvents::LEAD_PRE_DELETE;
                 break;
             case "post_delete":
-                $this->dispatcher->dispatch(LeadEvents::LEAD_POST_DELETE, $event);
+                $name = LeadEvents::LEAD_POST_DELETE;
                 break;
+            default:
+                return false;
         }
 
-        return $event;
+        if ($this->dispatcher->hasListeners($name)) {
+            if (empty($event)) {
+                $event = new LeadEvent($entity, $isNew);
+                $event->setEntityManager($this->em);
+            }
+            $this->dispatcher->dispatch($name, $event);
+
+            return $event;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -119,7 +126,7 @@ class LeadModel extends FormModel
     {
         //save the field values
         $fieldValues   = $lead->getFields();
-        $fieldModel    = $this->factory->getModel('leadfield');
+        $fieldModel    = $this->factory->getModel('lead.field');
         $fields        = $fieldModel->getEntities();
         $updatedFields = array();
         //update existing values
@@ -130,9 +137,6 @@ class LeadModel extends FormModel
                 $data["field_{$alias}"] : "";
             if ($v->getValue() !== $value) {
                 $v->setValue($value);
-
-                //take note of updated field
-                $lead->addFieldValue($v->getField()->getLabel(), $value, $v, true);
             }
             $updatedFields[$field->getId()] = 1;
         }

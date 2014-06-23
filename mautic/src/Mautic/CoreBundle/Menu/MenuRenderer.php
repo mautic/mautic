@@ -29,9 +29,10 @@ class MenuRenderer implements RendererInterface {
     /**
      * @param MatcherInterface $matcher
      * @param MauticFactory    $factory
+     * @param string           $charset
      * @param array            $defaultOptions
      */
-    public function __construct( MatcherInterface $matcher, MauticFactory $factory, array $defaultOptions = array())
+    public function __construct( MatcherInterface $matcher, MauticFactory $factory, $charset, array $defaultOptions = array())
     {
         $this->engine           = $factory->getTemplating();
         $this->matcher          =& $matcher;
@@ -48,7 +49,7 @@ class MenuRenderer implements RendererInterface {
             'allow_safe_labels' => false,
             'clear_matcher'     => true,
         ), $defaultOptions);
-        $this->charset          = $factory->getParam('kernel.charset');
+        $this->charset          = $charset;
     }
 
     /**

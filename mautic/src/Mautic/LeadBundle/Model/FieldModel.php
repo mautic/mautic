@@ -19,11 +19,11 @@ use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
- * Class LeadFieldModel
+ * Class FieldModel
  * {@inheritdoc}
  * @package Mautic\CoreBundle\Model\FormModel
  */
-class LeadFieldModel extends FormModel
+class FieldModel extends FormModel
 {
 
     /**
@@ -233,7 +233,6 @@ class LeadFieldModel extends FormModel
         }
     }
 
-
     /**
      * {@inheritdoc}
      *
@@ -249,26 +248,34 @@ class LeadFieldModel extends FormModel
             throw new MethodNotAllowedHttpException(array('LeadField'));
         }
 
-        if (empty($event)) {
-            $event = new LeadFieldEvent($entity, $isNew);
-            $event->setEntityManager($this->em);
-        }
-
         switch ($action) {
             case "pre_save":
-                $this->dispatcher->dispatch(LeadEvents::FIELD_PRE_SAVE, $event);
+                $name = LeadEvents::FIELD_PRE_SAVE;
                 break;
             case "post_save":
-                $this->dispatcher->dispatch(LeadEvents::FIELD_POST_SAVE, $event);
+                $name = LeadEvents::FIELD_POST_SAVE;
                 break;
             case "pre_delete":
-                $this->dispatcher->dispatch(LeadEvents::FIELD_PRE_DELETE, $event);
+                $name = LeadEvents::FIELD_PRE_DELETE;
                 break;
             case "post_delete":
-                $this->dispatcher->dispatch(LeadEvents::FIELD_POST_DELETE, $event);
+                $name = LeadEvents::FIELD_POST_DELETE;
                 break;
+            default:
+                return false;
         }
 
-        return $event;
+        if ($this->dispatcher->hasListerners($name)) {
+            if (empty($event)) {
+                $event = new LeadFieldEvent($entity, $isNew);
+                $event->setEntityManager($this->em);
+            }
+
+            $this->dispatcher->dispatch($name, $event);
+
+            return $event;
+        } else {
+            return false;
+        }
     }
 }

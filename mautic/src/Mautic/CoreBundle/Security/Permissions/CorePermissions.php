@@ -9,13 +9,12 @@
 
 namespace Mautic\CoreBundle\Security\Permissions;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\UserBundle\Entity\User;
-use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Doctrine\ORM\EntityManager;
+use Mautic\UserBundle\Entity\User;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Mautic\UserBundle\Entity\Permission;
 use Symfony\Component\Security\Core\SecurityContext;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class CorePermissions
@@ -45,17 +44,17 @@ class CorePermissions {
     private $params;
 
     /**
-     * @var bool|object
+     * @var \Symfony\Component\Security\Core\SecurityContext
      */
     private $security;
 
-    public function __construct(MauticFactory $factory)
+    public function __construct(TranslatorInterface $translator, EntityManager $em, SecurityContext $security, array $bundles, array $params)
     {
-        $this->translator = $factory->getTranslator();
-        $this->em         = $factory->getEntityManager();
-        $this->bundles    = $factory->getParam('mautic.bundles');
-        $this->security   = $factory->getSecurityContext();
-        $this->params     = $factory->getSystemParameters();
+        $this->translator = $translator;
+        $this->em         = $em;
+        $this->bundles    = $bundles;
+        $this->security   = $security;
+        $this->params     = $params;
     }
 
     /**
@@ -166,7 +165,7 @@ class CorePermissions {
     public function isGranted ($requestedPermission, $mode = "MATCH_ALL", $userEntity = null)
     {
         if ($userEntity === null) {
-           $userEntity = $this->getCurrentUser();
+           $userEntity = $this->getUser();
         }
 
         if (!is_array($requestedPermission)) {
@@ -199,7 +198,7 @@ class CorePermissions {
                 );
             }
 
-            if ($userEntity->getRole()->isAdmin()) {
+            if ($userEntity->isAdmin()) {
                 //admin user has access to everything
                 $permissions[$permission] = true;
             } elseif (!isset($activePermissions[$parts[0]])) {
@@ -257,16 +256,16 @@ class CorePermissions {
         }
 
         $ownerId = (!empty($owner)) ? $owner->getId() : 0;
-        $me = $this->getCurrentUser();
+
         if ($ownerId === 0) {
             if ($other) {
                 return true;
             } else {
                 return false;
             }
-        } elseif ($own && (int) $me->getId() === (int) $ownerId) {
+        } elseif ($own && (int) $this->getUser()->getId() === (int) $ownerId) {
             return true;
-        } elseif ($other && (int) $me->getId() !== (int) $ownerId) {
+        } elseif ($other && (int) $this->getUser()->getId() !== (int) $ownerId) {
             return true;
         } else {
             return false;
@@ -299,28 +298,13 @@ class CorePermissions {
         return $permissions;
     }
 
-    /**
-     * Is the user an admin?
-     *
-     * @return mixed
-     */
-    public function isAdmin()
+    private function getUser()
     {
-        return $this->security->getToken()->getUser()->getRole()->isAdmin();
-    }
-
-    /**
-     * Proxy function to get currently logged in user
-     *
-     * @return mixed
-     */
-    public function getCurrentUser()
-    {
-        $token = $this->security->getToken();
-        if (null !== $token) {
-            return $token->getUser();
+        if ($token = $this->security->getToken()) {
+            $this->user = $token->getUser();
         } else {
-            return new User();
+            $this->user = new User();
         }
+        return $this->user;
     }
 }

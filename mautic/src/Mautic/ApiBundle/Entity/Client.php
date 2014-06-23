@@ -40,6 +40,20 @@ class Client extends BaseClient
      */
     protected $users;
 
+    private $changes;
+
+    private function isChanged($prop, $val)
+    {
+        if ($this->$prop != $val) {
+            $this->changes[$prop] = array($this->$prop, $val);
+        }
+    }
+
+    public function getChanges()
+    {
+        return $this->changes;
+    }
+
     public function __construct()
     {
         parent::__construct();
@@ -77,8 +91,9 @@ class Client extends BaseClient
      */
     public function setName($name)
     {
-        $this->name = $name;
+        $this->isChanged('name', $name);
 
+        $this->name = $name;
         return $this;
     }
 
@@ -97,6 +112,8 @@ class Client extends BaseClient
      */
     public function setRedirectUris(array $redirectUris)
     {
+        $this->isChanged('redirectUris', $redirectUris);
+
         $this->redirectUris = $redirectUris;
     }
 

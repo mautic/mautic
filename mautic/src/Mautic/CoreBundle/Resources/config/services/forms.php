@@ -56,7 +56,9 @@ $container->setDefinition('mautic.form.type.tel', new Definition(
 
 $container->setDefinition('mautic.form.type.hidden_entity', new Definition(
     'Mautic\CoreBundle\Form\Type\HiddenEntityType',
-    array(new Reference('mautic.factory'))
+    array(
+        new Reference('doctrine.orm.entity_manager')
+    )
 ))
     ->addTag('form.type', array(
         'alias' => 'hidden_entity',

@@ -107,7 +107,6 @@ class LoadLeadFieldData extends AbstractFixture implements OrderedFixtureInterfa
             $manager->flush();
             $this->addReference('leadfield-'.$name, $entity);
         }
-        $manager->clear();
     }
 
     /**

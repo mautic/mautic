@@ -41,6 +41,7 @@ class FormController extends CommonController
     {
         //bind request to the form
         $form->handleRequest($this->request);
+
         return $form->isValid();
     }
 
@@ -72,6 +73,7 @@ class FormController extends CommonController
             ));
         }
 
+        $factory = $this->get('mautic.factory');
         return $this->postActionRedirect(
             array_merge($postActionVars, array(
                 'flashes' => array(array(
@@ -91,9 +93,9 @@ class FormController extends CommonController
                                 'returnUrl' => $returnUrl
                             )
                         ),
-                        '%date%'        => $date->format($this->container->getParameter('mautic.date_format_dateonly')),
-                        '%time%'        => $date->format($this->container->getParameter('mautic.date_format_timeonly')),
-                        '%datetime%'    => $date->format($this->container->getParameter('mautic.date_format_full')),
+                        '%date%'        => $date->format($factory->getParam('date_format_dateonly')),
+                        '%time%'        => $date->format($factory->getParam('date_format_timeonly')),
+                        '%datetime%'    => $date->format($factory->getParam('date_format_full')),
                         '%override%'    => $override
                     )
                 ))
@@ -136,7 +138,7 @@ class FormController extends CommonController
                         "details"   => $details,
                         "ipAddress" => $this->request->server->get('REMOTE_ADDR')
                     );
-                    $this->get('mautic.factory')->getModel('auditlog')->writeToLog($log);
+                    $this->get('mautic.factory')->getModel('core.auditLog')->writeToLog($log);
 
                     $model->unlockEntity($entity);
                 }

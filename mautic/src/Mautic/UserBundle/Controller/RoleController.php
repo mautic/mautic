@@ -48,7 +48,7 @@ class RoleController extends FormController
         $this->get('session')->set('mautic.role.filter', $filter);
         $tmpl       = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
-        $items = $this->get('mautic.factory')->getModel('role')->getEntities(
+        $items = $this->get('mautic.factory')->getModel('user.role')->getEntities(
             array(
                 'start'      => $start,
                 'limit'      => $limit,
@@ -123,7 +123,7 @@ class RoleController extends FormController
 
         //retrieve the entity
         $entity     = new Entity\Role();
-        $model      = $this->get('mautic.factory')->getModel('role');
+        $model      = $this->get('mautic.factory')->getModel('user.role');
         //set the return URL for post actions
         $returnUrl  = $this->generateUrl('mautic_role_index');
         //set the page we came from
@@ -205,7 +205,7 @@ class RoleController extends FormController
             return $this->accessDenied();
         }
 
-        $model   = $this->get('mautic.factory')->getModel('role');
+        $model   = $this->get('mautic.factory')->getModel('user.role');
         $entity  = $model->getEntity($objectId);
 
         //set the page we came from
@@ -331,7 +331,7 @@ class RoleController extends FormController
 
         if ($this->request->getMethod() == 'POST') {
             try {
-                $model = $this->get('mautic.factory')->getModel('role');
+                $model = $this->get('mautic.factory')->getModel('user.role');
                 $entity = $model->getEntity($objectId);
 
                 if ($entity === null) {

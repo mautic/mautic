@@ -10,8 +10,10 @@
 namespace Mautic\CoreBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\OptionsResolver\Options;
 
 /**
  * Class SpacerType
@@ -25,21 +27,38 @@ class SpacerType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $attr = function(Options $options, $value){
-            return array(
-                'text'  => (isset($value['text'])) ? $value['text'] : '',
-                'class' => (isset($value['class'])) ? $value['class'] : 'form-header',
-                'tag'   => (isset($value['tag'])) ? $value['tag'] : 'div'
-            );
-        };
-
         $resolver->setDefaults(array(
-            'attr'   => array(),
-            'mapped' => false
+            'mapped' => false,
+            'text'  =>  '',
+            'class' =>  '',
+            'tag'   =>  'div'
         ));
-
-        $resolver->setNormalizers(array('attr' => $attr));
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function buildView(FormView $view, FormInterface $form, array $options)
+    {
+        $view->vars = array_replace($view->vars, array(
+            'text'  => $options['text'],
+            'class' => $options['class'],
+            'tag'   => $options['tag']
+        ));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        $builder
+            ->setAttribute('text', $options['text'])
+            ->setAttribute('class', $options['class'])
+            ->setAttribute('tag', $options['tag'])
+        ;
+    }
+
 
     /**
      * @return string

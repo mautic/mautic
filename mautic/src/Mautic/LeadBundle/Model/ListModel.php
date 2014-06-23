@@ -17,11 +17,11 @@ use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
- * Class LeadListModel
+ * Class ListModel
  * {@inheritdoc}
  * @package Mautic\CoreBundle\Model\FormModel
  */
-class LeadListModel extends FormModel
+class ListModel extends FormModel
 {
 
     /**
@@ -48,7 +48,7 @@ class LeadListModel extends FormModel
 
         //make sure alias is not already taken
         $testAlias = $alias;
-        $user      = $this->security->getCurrentUser();
+        $user      = $this->factory->getUser();
         $existing  = $this->em->getRepository('MauticLeadBundle:LeadList')->getUserSmartLists($user, $testAlias, $entity->getId());
         $count     = count($existing);
         $aliasTag  = $count;
@@ -121,27 +121,34 @@ class LeadListModel extends FormModel
             throw new MethodNotAllowedHttpException(array('LeadList'), 'Entity must be of class LeadList()');
         }
 
-        if (empty($event)) {
-            $event = new LeadListEvent($entity, $isNew);
-            $event->setEntityManager($this->em);
-        }
-
         switch ($action) {
             case "pre_save":
-                $this->dispatcher->dispatch(LeadEvents::LIST_PRE_SAVE, $event);
+                $name = LeadEvents::LIST_PRE_SAVE;
                 break;
             case "post_save":
-                $this->dispatcher->dispatch(LeadEvents::LIST_POST_SAVE, $event);
+                $name = LeadEvents::LIST_POST_SAVE;
                 break;
             case "pre_delete":
-                $this->dispatcher->dispatch(LeadEvents::LIST_PRE_DELETE, $event);
+                $name = LeadEvents::LIST_PRE_DELETE;
                 break;
             case "post_delete":
-                $this->dispatcher->dispatch(LeadEvents::LIST_POST_DELETE, $event);
+                $name = LeadEvents::LIST_POST_DELETE;
                 break;
+            default:
+                return false;
         }
 
-        return $event;
+        if ($this->dispatcher->hasListeners($name)) {
+            if (empty($event)) {
+                $event = new LeadListEvent($entity, $isNew);
+                $event->setEntityManager($this->em);
+            }
+            $this->dispatcher->dispatch(LeadEvents::LIST_PRE_SAVE, $event);
+
+            return $event;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -180,7 +187,7 @@ class LeadListModel extends FormModel
         );
 
         //get list of custom fields
-        $fields = $this->factory->getModel('leadfield')->getEntities(
+        $fields = $this->factory->getModel('lead.field')->getEntities(
             array('filter' => array(
                 'isListable' => true
             ))
@@ -216,7 +223,7 @@ class LeadListModel extends FormModel
     public function getSmartLists()
     {
         $user = (!$this->security->isGranted('lead:lists:viewother')) ?
-            $this->security->getCurrentUser() : false;
+            $this->factory->getUser() : false;
         $lists = $this->em->getRepository('MauticLeadBundle:LeadList')->getUserSmartLists($user);
         return $lists;
     }

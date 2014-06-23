@@ -37,7 +37,6 @@ class ApiSubscriber extends CommonSubscriber
             CoreEvents::BUILD_ROUTE         => array('onBuildRoute', 5),
             CoreEvents::GLOBAL_SEARCH       => array('onGlobalSearch', 0),
             CoreEvents::BUILD_COMMAND_LIST  => array('onBuildCommandList', 0),
-            ApiEvents::CLIENT_PRE_SAVE      => array('onClientPreSave', 0),
             ApiEvents::CLIENT_POST_SAVE     => array('onClientPostSave', 0),
             ApiEvents::CLIENT_POST_DELETE   => array('onClientDelete', 0)
         );
@@ -83,7 +82,7 @@ class ApiSubscriber extends CommonSubscriber
                 return;
             }
 
-            $clients = $this->factory->getModel('client')->getEntities(
+            $clients = $this->factory->getModel('api.client')->getEntities(
                 array(
                     'limit'  => 5,
                     'filter' => $str
@@ -126,20 +125,9 @@ class ApiSubscriber extends CommonSubscriber
         if ($security->isGranted('api:clients:view')) {
             $event->addCommands(
                 'mautic.api.client.header.index',
-                $this->factory->getModel('client')->getCommandList()
+                $this->factory->getModel('api.client')->getCommandList()
             );
         }
-    }
-
-    /**
-     * Obtain changes to enter into audit log
-     *
-     * @param Events\ClientEvent $event
-     */
-    public function onClientPreSave(Events\ClientEvent $event)
-    {
-        //stash changes
-        $this->changes = $event->getChanges();
     }
 
     /**
@@ -150,9 +138,7 @@ class ApiSubscriber extends CommonSubscriber
     public function onClientPostSave(Events\ClientEvent $event)
     {
         $client = $event->getClient();
-        if (!empty($this->changes)) {
-            $serializer = $this->serializer;
-            $details    = $serializer->serialize($this->changes, 'json');
+        if ($details = $event->getChanges()) {
             $log        = array(
                 "bundle"    => "api",
                 "object"    => "client",
@@ -161,7 +147,7 @@ class ApiSubscriber extends CommonSubscriber
                 "details"   => $details,
                 "ipAddress" => $this->request->server->get('REMOTE_ADDR')
             );
-            $this->factory->getModel('auditlog')->writeToLog($log);
+            $this->factory->getModel('core.auditLog')->writeToLog($log);
         }
     }
 
@@ -173,16 +159,14 @@ class ApiSubscriber extends CommonSubscriber
     public function onClientDelete(Events\ClientEvent $event)
     {
         $client = $event->getClient();
-        $serializer = $this->serializer;
-        $details    = $serializer->serialize($client, 'json');
         $log = array(
             "bundle"     => "api",
             "object"     => "client",
-            "objectId"   => $client->getId(),
+            "objectId"   => $client->deletedId,
             "action"     => "delete",
-            "details"    => $client,
+            "details"    => array('name' => $client->getName()),
             "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
         );
-        $this->factory->getModel('auditlog')->writeToLog($log);
+        $this->factory->getModel('core.auditLog')->writeToLog($log);
     }
 }

@@ -37,17 +37,18 @@ class ClientControllerTest extends MauticWebTestCase
         $client = new Client();
         $client->setName("Login Test");
         $client->setRedirectUris(array("https://mautic.com"));
-        $this->container->get('mautic.factory')->getModel('client')->saveEntity($client);
+        $this->container->get('mautic.factory')->getModel('api.client')->saveEntity($client);
 
         return $client;
     }
 
     public function testIndex()
     {
-        $crawler = $this->client->request('GET', '/clients');
+        $client = $this->getClient();
+        $crawler = $client->request('GET', '/clients');
 
         //should be a 200 code
-        $this->assertTrue($this->client->getResponse()->isSuccessful());
+        $this->assertNoError($client->getResponse(), $crawler);
 
         //test to see if at least the role-list table is displayed
         $this->assertGreaterThan(
@@ -63,10 +64,11 @@ class ClientControllerTest extends MauticWebTestCase
 
     public function testNew()
     {
-        $crawler = $this->client->request('GET', '/clients/new');
+        $client = $this->getClient();
+        $crawler = $client->request('GET', '/clients/new');
 
         //should be a 200 code
-        $this->assertTrue($this->client->getResponse()->isSuccessful());
+        $this->assertNoError($client->getResponse(), $crawler);
 
         //test to see if at least one form element is present
         $this->assertGreaterThan(
@@ -83,24 +85,25 @@ class ClientControllerTest extends MauticWebTestCase
         $form['client[redirectUris]']    = 'http://mautic.com';
 
         // submit the form
-        $crawler = $this->client->submit($form);
+        $crawler = $client->submit($form);
 
         //should fail because of not using a secure redirectUri
         $this->assertRegExp(
             '/mautic.api.client.redirecturl.invalid/',
-            $this->client->getResponse()->getContent()
+            $client->getResponse()->getContent()
         );
 
         //try again using secure URIs
         $form['client[redirectUris]'] = 'https://mautic.com';
 
         // submit the form
-        $crawler = $this->client->submit($form);
+        $crawler = $client->submit($form);
 
         //should be successful
         $this->assertRegExp(
             '/mautic.api.client.notice.created/',
-            $this->client->getResponse()->getContent()
+            $client->getResponse()->getContent(),
+            'mautic.api.client.notice.created not found'
         );
 
         //make sure ACL is working
@@ -111,12 +114,13 @@ class ClientControllerTest extends MauticWebTestCase
 
     public function testEdit()
     {
+        $client = $this->getClient();
         $apiClient = $this->createApiClient();
 
-        $crawler = $this->client->request('GET', '/clients/edit/'.$apiClient->getId());
+        $crawler = $client->request('GET', '/clients/edit/'.$apiClient->getId());
 
         //should be a 200 code
-        $this->assertTrue($this->client->getResponse()->isSuccessful());
+        $this->assertNoError($client->getResponse(), $crawler);
 
         //test to see if at least one form element is present
         $this->assertGreaterThan(
@@ -131,12 +135,13 @@ class ClientControllerTest extends MauticWebTestCase
         $form['client[redirectUris]']    = 'https://mautic-test.com';
 
         // submit the form
-        $crawler = $this->client->submit($form);
+        $crawler = $client->submit($form);
 
         //success?
         $this->assertRegExp(
             '/mautic.api.client.notice.updated/',
-            $this->client->getResponse()->getContent()
+            $client->getResponse()->getContent(),
+            'mautic.api.client.notice.updated not found'
         );
 
         //make sure the client id and secret remained the same
@@ -155,10 +160,11 @@ class ClientControllerTest extends MauticWebTestCase
 
     public function testDelete()
     {
+        $client = $this->getClient();
         $apiClient = $this->createApiClient();
 
         //ensure we are redirected to list as get should not be allowed
-        $crawler = $this->client->request('GET', '/clients/delete/'.$apiClient->getId());
+        $crawler = $client->request('GET', '/clients/delete/'.$apiClient->getId());
 
         $this->assertGreaterThan(
             0,
@@ -166,11 +172,12 @@ class ClientControllerTest extends MauticWebTestCase
         );
 
         //post to delete
-        $crawler = $this->client->request('POST', '/clients/delete/'.$apiClient->getId());
+        $crawler = $client->request('POST', '/clients/delete/'.$apiClient->getId());
 
         $this->assertRegExp(
             '/mautic.api.client.notice.deleted/',
-            $this->client->getResponse()->getContent()
+            $client->getResponse()->getContent(),
+            'mautic.api.client.notice.deleted not found'
         );
 
         //make sure ACL is working

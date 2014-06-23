@@ -44,7 +44,7 @@ class InputHelper
 
 
     /**
-     * Strips tags and trims value
+     * Cleans value by HTML-escaping '"<>& and characters with ASCII value less than 32
      *
      * @param $value
      * @return string
@@ -57,8 +57,19 @@ class InputHelper
             }
             return $value;
         } else {
-            return trim(htmlspecialchars($value));
+            return filter_var($value, FILTER_SANITIZE_SPECIAL_CHARS);
         }
+    }
+
+    /**
+     * Strips tags
+     *
+     * @param $value
+     * @return mixed
+     */
+    static public function string($value)
+    {
+        return filter_var($value, FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
     }
 
     /**
@@ -80,6 +91,125 @@ class InputHelper
      */
     static public function raw($value)
     {
+        return $value;
+    }
+
+    /**
+     * Returns float value
+     *
+     * @param $value
+     * @return float
+     */
+    static public function float($value)
+    {
+        return (float) filter_var($value, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION | FILTER_FLAG_ALLOW_THOUSAND);
+    }
+
+    /**
+     * Returns int value
+     *
+     * @param $value
+     * @return int
+     */
+    static public function int($value)
+    {
+        return (int) filter_var($value, FILTER_SANITIZE_NUMBER_INT);
+    }
+
+    /**
+     * Returns boolean value
+     *
+     * @param $value
+     * @return bool
+     */
+    static public function boolean($value)
+    {
+        return filter_var($value, FILTER_VALIDATE_BOOLEAN);
+    }
+
+    /**
+     * Removes all characters except those allowed in URLs
+     *
+     * @param $value
+     * @param $allowedProtocols
+     * @return mixed
+     */
+    static public function url($value, $allowedProtocols = null, $defaultProtocol = null, $removeQuery = array())
+    {
+
+        if (empty($allowedProtocols)) {
+            $allowedProtocols = array('https', 'http', 'ftp');
+        }
+        if (empty($defaultProtocol)) {
+            $defaultProtocol = 'http';
+        }
+
+        $value = filter_var($value, FILTER_SANITIZE_URL);
+        $parts = parse_url($value);
+
+        if ($parts) {
+            if (isset($parts['scheme'])) {
+                if (!in_array($parts['scheme'], $allowedProtocols)) {
+                    $parts['scheme'] = $defaultProtocol;
+                }
+            } else {
+                $parts['scheme'] = $defaultProtocol;
+            }
+
+            if (!empty($removeQuery) && !empty($parts['query'])) {
+                parse_str($parts['query'], $query);
+                foreach ($removeQuery as $q) {
+                    if (isset($query[$q]))
+                        unset($query[$q]);
+                }
+                $parts['query'] = http_build_query($query);
+            }
+
+            $value =
+                (!empty($parts["scheme"])   ? $parts["scheme"]."://" :"") .
+                (!empty($parts["user"])     ? $parts["user"].":"     :"") .
+                (!empty($parts["pass"])     ? $parts["pass"]."@"     :"") .
+                (!empty($parts["host"])     ? $parts["host"]         :"") .
+                (!empty($parts["port"])     ? ":".$parts["port"]     :"") .
+                (!empty($parts["path"])     ? $parts["path"]         :"") .
+                (!empty($parts["query"])    ? "?".$parts["query"]    :"") .
+                (!empty($parts["fragment"]) ? "#".$parts["fragment"] :"");
+        } else {
+            //must have a really bad URL since parse_url returned false so let's just clean it
+            $value = self::clean($value);
+        }
+
+        //since a URL allows <>, let's add a safety step to remove <script> tags
+        $value = preg_replace('#<script(.*?)>(.*?)</script>#is', '', $value);
+
+        return $value;
+    }
+
+    /**
+     * Removes all characters except those allowed in emails
+     *
+     * @param $value
+     * @return mixed
+     */
+
+    static public function email($value)
+    {
+        $value = substr($value, 0, 254);
+        return filter_var($value, FILTER_SANITIZE_EMAIL);
+    }
+
+    /**
+     * Returns a clean array
+     *
+     * @param $value
+     * @return array|string
+     */
+    static public function cleanArray($value)
+    {
+        $value = self::clean($value);
+        if (!is_array($value)) {
+            $value = array($value);
+        }
         return $value;
     }
 }

@@ -40,9 +40,9 @@ class UserProvider implements UserProviderInterface
             ->setParameter('username', $username)
             ->getQuery();
 
-        $users = $q->getResult();
+        $user = $q->getOneOrNullResult();
 
-        if (empty($users) || count($users) > 1) {
+        if (empty($user)) {
             $message = sprintf(
                 'Unable to find an active admin MauticUserBundle:User object identified by "%s".',
                 $username
@@ -50,7 +50,6 @@ class UserProvider implements UserProviderInterface
             throw new UsernameNotFoundException($message, 0);
         }
 
-        $user = $users[0];
         //load permissions
         if ($user->getId()) {
             $permissions = $this->session->get('mautic.user.permissions', false);

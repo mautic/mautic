@@ -29,7 +29,7 @@ class FieldController extends FormController
             return $this->accessDenied();
         }
 
-        $items = $this->get('mautic.factory')->getModel('leadfield')->getEntities();
+        $items = $this->get('mautic.factory')->getModel('lead.field')->getEntities();
 
         return $this->delegateView(array(
             'viewParameters'  => array('items' => $items),
@@ -55,7 +55,7 @@ class FieldController extends FormController
 
         //retrieve the entity
         $field     = new LeadField();
-        $model      = $this->get('mautic.factory')->getModel('leadfield');
+        $model      = $this->get('mautic.factory')->getModel('lead.field');
         //set the return URL for post actions
         $returnUrl  = $this->generateUrl('mautic_leadfield_index');
         $action     = $this->generateUrl('mautic_leadfield_action', array('objectAction' => 'new'));
@@ -136,7 +136,7 @@ class FieldController extends FormController
             return $this->accessDenied();
         }
 
-        $model   = $this->get('mautic.factory')->getModel('leadfield');
+        $model   = $this->get('mautic.factory')->getModel('lead.field');
         $field   = $model->getEntity($objectId);
 
         //set the return URL
@@ -263,7 +263,7 @@ class FieldController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
-            $model  = $this->get('mautic.factory')->getModel('leadfield');
+            $model  = $this->get('mautic.factory')->getModel('lead.field');
             $field = $model->getEntity($objectId);
 
             if ($field === null) {
@@ -311,7 +311,7 @@ class FieldController extends FormController
             case "reorder":
                 $fields = $this->request->request->get('field');
                 if (!empty($fields)) {
-                    $this->get('mautic.factory')->getModel('leadfield')->reorderFieldsByList($fields);
+                    $this->get('mautic.factory')->getModel('lead.field')->reorderFieldsByList($fields);
                     $dataArray['success'] = 1;
                 }
                 break;

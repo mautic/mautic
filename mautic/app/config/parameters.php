@@ -15,11 +15,14 @@ foreach ($bundles as $bundle) {
     if (file_exists($bundle['directory'].'/Resources/config/parameters.php')) {
         $bundleParams = include $bundle['directory'].'/Resources/config/parameters.php';
         foreach ($bundleParams as $k => $v) {
-            $container->setParameter("mautic.{$k}", $v);
             $mauticParams[$k] = $v;
         }
     }
 }
+
+$mauticParams['supported_languages'] = array(
+    'en_US' => 'English - United States'
+);
 
 //load parameters array from local configuration
 include "local.php";

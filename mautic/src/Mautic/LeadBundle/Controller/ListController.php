@@ -57,7 +57,7 @@ class ListController extends FormController
             $filter["force"] = " ($isCommand:$mine or $isCommand:$global)";
         }
 
-        $items =$this->get('mautic.factory')->getModel('leadlist')->getEntities(
+        $items =$this->get('mautic.factory')->getModel('lead.list')->getEntities(
             array(
                 'start'      => $start,
                 'limit'      => $limit,
@@ -99,7 +99,7 @@ class ListController extends FormController
             'permissions' => $permissions,
             'security'    => $this->get('mautic.security'),
             'tmpl'        => $tmpl,
-            'currentUser' => $this->get('mautic.security')->getCurrentUser()
+            'currentUser' => $this->get('mautic.factory')->getUser()
         );
 
         return $this->delegateView(array(
@@ -126,7 +126,7 @@ class ListController extends FormController
 
         //retrieve the entity
         $list     = new LeadList();
-        $model      =$this->get('mautic.factory')->getModel('leadlist');
+        $model      =$this->get('mautic.factory')->getModel('lead.list');
         //set the page we came from
         $page       = $this->get('session')->get('mautic.leadlist.page', 1);
         //set the return URL for post actions
@@ -198,7 +198,7 @@ class ListController extends FormController
      */
     public function editAction ($objectId)
     {
-        $model   =$this->get('mautic.factory')->getModel('leadlist');
+        $model   =$this->get('mautic.factory')->getModel('lead.list');
         $list    = $model->getEntity($objectId);
 
         //set the page we came from
@@ -323,7 +323,7 @@ class ListController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
-            $model  =$this->get('mautic.factory')->getModel('leadlist');
+            $model  =$this->get('mautic.factory')->getModel('lead.list');
             $list = $model->getEntity($objectId);
 
             if ($list === null) {

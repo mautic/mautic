@@ -10,7 +10,6 @@
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\CoreBundle\Form\DataTransformer\DatetimeToStringTransformer;
 use Mautic\CoreBundle\Form\DataTransformer\StringToDatetimeTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
@@ -60,12 +59,13 @@ class LeadType extends AbstractType
         ));
 
         $builder->add('owner', 'hidden_entity', array(
-            'required' => false,
-            'repository' => 'MauticUserBundle:User'
+            'required'   => false,
+            'repository' => 'MauticUserBundle:User',
+            'em'         => $this->factory->getEntityManager()
         ));
 
         //get a list of fields
-        $fields      = $this->factory->getModel('leadfield')->getEntities();
+        $fields      = $this->factory->getModel('lead.field')->getEntities();
         $fieldValues = (!empty($options['data'])) ? $options['data']->getFields() : array('filter' => array('isVisible' => true));
         $values      = array();
         foreach ($fieldValues as $v) {

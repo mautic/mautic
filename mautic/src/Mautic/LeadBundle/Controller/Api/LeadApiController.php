@@ -26,7 +26,7 @@ class LeadApiController extends CommonApiController
 
     public function initialize(FilterControllerEvent $event)
     {
-        $this->model           = $this->get('mautic.factory')->getModel('lead');
+        $this->model           = $this->get('mautic.factory')->getModel('lead.lead');
         $this->entityClass     = 'Mautic\LeadBundle\Entity\Lead';
         $this->entityNameOne   = 'lead';
         $this->entityNameMulti = 'leads';
@@ -159,12 +159,13 @@ class LeadApiController extends CommonApiController
         }
 
         if ($entity !== null) {
+            /**
             //set custom fields before deleting
             $fields = $entity->getFields();
             foreach ($fields as $f) {
                 $entity->addCustomField($f->getField()->getAlias(), $f->getValue());
             }
-
+            */
             $this->model->deleteEntity($entity);
 
             $view = $this->view(array($this->entityNameOne => $entity), Codes::HTTP_OK);
@@ -209,6 +210,7 @@ class LeadApiController extends CommonApiController
                 unset($parameters['customFields']);
             }
         }
+
         $this->serializerGroups = array("limited");
         return $this->processForm($entity, $parameters, 'POST');
     }
@@ -265,9 +267,10 @@ class LeadApiController extends CommonApiController
             foreach ($parameters['customFields'] as $alias => $value) {
                 $parameters['field_'.$alias] = $value;
             }
-            $this->model->setFieldValues($entity, $parameters);
             unset($parameters['customFields']);
         }
+        $this->model->setFieldValues($entity, $parameters);
+
         $this->serializerGroups = array("limited");
         return $this->processForm($entity, $parameters, $method);
     }
@@ -337,7 +340,7 @@ class LeadApiController extends CommonApiController
      */
     public function getListsAction()
     {
-        $lists = $this->get('mautic.factory')->getModel('leadlist')->getSmartLists();
+        $lists = $this->get('mautic.factory')->getModel('lead.list')->getSmartLists();
         $view = $this->view($lists, Codes::HTTP_OK);
         $context = SerializationContext::create()->setGroups(array('limited'));
         $view->setSerializationContext($context);
@@ -366,7 +369,7 @@ class LeadApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $fields = $this->get('mautic.factory')->getModel('leadfield')->getEntities();
+        $fields = $this->get('mautic.factory')->getModel('lead.field')->getEntities();
         $view = $this->view($fields, Codes::HTTP_OK);
         $context = SerializationContext::create()->setGroups(array('limited'));
         $view->setSerializationContext($context);

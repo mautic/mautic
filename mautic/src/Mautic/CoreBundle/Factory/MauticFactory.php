@@ -9,18 +9,60 @@
 
 namespace Mautic\CoreBundle\Factory;
 
+use Doctrine\Bundle\DoctrineBundle\Registry;
+use JMS\Serializer\Serializer;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
-use Symfony\Component\DependencyInjection\Container;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\UserBundle\Entity\User;
+use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
+use Symfony\Component\Security\Core\SecurityContext;
+use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\Validator;
 
 class MauticFactory
 {
 
-    private $container;
+    private $dispatcher;
+    private $db;
+    private $requestStack;
+    private $securityContext;
+    private $security;
+    private $serializer;
+    private $session;
+    private $templating;
+    private $translator;
+    private $validator;
+    private $params;
 
-    public function __construct(Container $container)
-    {
-        $this->container = $container;
+    public function __construct(
+        EventDispatcherInterface $dispatcher,
+        Registry $db,
+        RequestStack $requestStack,
+        SecurityContext $securityContext,
+        CorePermissions $mauticSecurity,
+        Serializer $serializer,
+        Session $session,
+        DelegatingEngine $templating,
+        TranslatorInterface $translator,
+        Validator $validator,
+        array $mauticParams
+    ) {
+        $this->dispatcher       = $dispatcher;
+        $this->db               =& $db;
+        $this->requestStack     = $requestStack;
+        $this->securityContext  = $securityContext;
+        $this->security         = $mauticSecurity;
+        $this->serializer       = $serializer;
+        $this->session          = $session;
+        $this->templating       = $templating;
+        $this->translator       = $translator;
+        $this->validator        = $validator;
+        $this->params           = $mauticParams;
     }
 
     /**
@@ -31,10 +73,15 @@ class MauticFactory
     {
         static $models = array();
 
-        if (!in_array($name, $models)) {
-            if ($this->container->hasParameter('mautic.model.'.$name)) {
-                $modelClass    = $this->container->getParameter(('mautic.model.'.$name));
-                $models[$name] = new $modelClass($this);
+        if (!array_key_exists($name, $models)) {
+            $parts = explode('.', $name);
+            if (count($parts) == 2) {
+                $modelClass = '\\Mautic\\' . ucfirst($parts[0]) . 'Bundle\\Model\\' . ucfirst($parts[1]) . 'Model';
+                if (class_exists($modelClass)) {
+                    $models[$name] = new $modelClass($this);
+                } else {
+                    throw new NotAcceptableHttpException($name . " is not an acceptable model name.");
+                }
             } else {
                 throw new NotAcceptableHttpException($name . " is not an acceptable model name.");
             }
@@ -50,7 +97,7 @@ class MauticFactory
      */
     public function getSecurity()
     {
-        return $this->container->get('mautic.security');
+        return $this->security;
     }
 
     /**
@@ -60,17 +107,25 @@ class MauticFactory
      */
     public function getSecurityContext()
     {
-        return $this->container->get('security.context');
+        return $this->securityContext;
     }
 
     /**
      * Retrieves user currently logged in
      *
+     * @param $allowNull
      * @return mixed
      */
-    public function getUser()
+    public function getUser($allowNull = false)
     {
-        return $this->getSecurity()->getCurrentUser();
+        $token = $this->getSecurityContext()->getToken();
+        if (null !== $token) {
+            return $token->getUser();
+        } elseif ($allowNull) {
+            return null;
+        } else {
+            return new User();
+        }
     }
 
     /**
@@ -80,7 +135,7 @@ class MauticFactory
      */
     public function getSession()
     {
-        return $this->container->get('session');
+        return $this->session;
     }
 
     /**
@@ -90,7 +145,7 @@ class MauticFactory
      */
     public function getEntityManager()
     {
-        return $this->container->get('doctrine.orm.entity_manager');
+        return $this->db->getManager();
     }
 
     /**
@@ -100,7 +155,7 @@ class MauticFactory
      */
     public function getTranslator()
     {
-        return $this->container->get('translator');
+        return $this->translator;
     }
 
     /**
@@ -110,7 +165,7 @@ class MauticFactory
      */
     public function getSerializer()
     {
-        return $this->container->get('jms_serializer');
+        return $this->serializer;
     }
 
     /**
@@ -120,7 +175,7 @@ class MauticFactory
      */
     public function getTemplating()
     {
-        return $this->container->get('templating');
+        return $this->templating;
     }
 
     /**
@@ -130,7 +185,7 @@ class MauticFactory
      */
     public function getDispatcher()
     {
-        return $this->container->get('event_dispatcher');
+        return $this->dispatcher;
     }
 
     /**
@@ -140,8 +195,15 @@ class MauticFactory
      */
     public function getRequest()
     {
-        $stack = $this->container->get('request_stack');
-        return $stack->getCurrentRequest();
+        $request = $this->requestStack->getCurrentRequest();
+        if (empty($request)) {
+            //likely in a test as the request is not populated for outside the container
+            $request = Request::createFromGlobals();
+            $requestStack = new RequestStack();
+            $requestStack->push($request);
+            $this->requestStack = $requestStack;
+        }
+        return $request;
     }
 
     /**
@@ -151,7 +213,7 @@ class MauticFactory
      */
     public function getValidator()
     {
-        return $this->container->get('validator');
+        return $this->validator;
     }
 
     /**
@@ -161,20 +223,27 @@ class MauticFactory
      */
     public function getSystemParameters()
     {
-        return $this->getParam('mautic.parameters');
+        return $this->params;
     }
 
     /**
-     * Retrieves a parameter
+     * Retrieves a Mautic parameter
      *
      * @param $id
      * @return bool|mixed
      */
     public function getParam($id)
     {
-        return ($this->container->hasParameter($id)) ? $this->container->getParameter($id) : false;
+        return (isset($this->params[$id])) ? $this->params[$id] : false;
     }
 
+    /**
+     * Get DateTimeHelper
+     *
+     * @param null $string
+     * @param null $format
+     * @param null $tz
+     */
     public function getDate($string = null, $format = null, $tz = null)
     {
         static $dates;
@@ -188,7 +257,7 @@ class MauticFactory
             return $dates[$key];
         } else {
             //now so generate a new helper
-            new DateTimeHelper($string, $format, $tz);
+            return new DateTimeHelper($string, $format, $tz);
         }
     }
 }

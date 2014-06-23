@@ -21,7 +21,7 @@ Mautic.leadOnLoad = function (container) {
     }
 
     if ($(container + ' #list-search').length) {
-        Mautic.activateSearchAutocomplete('list-search', 'lead');
+        Mautic.activateSearchAutocomplete('list-search', 'lead.lead');
     }
 };
 
@@ -164,7 +164,7 @@ Mautic.activateLead = function(leadId) {
 
 Mautic.leadlistOnLoad = function(container) {
     if ($(container + ' #list-search').length) {
-        Mautic.activateSearchAutocomplete('list-search', 'leadlist');
+        Mautic.activateSearchAutocomplete('list-search', 'lead.list');
     }
 
     $('#leadlist_filters_left li').draggable({

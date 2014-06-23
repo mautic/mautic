@@ -10,10 +10,11 @@
 namespace Mautic\CoreBundle\Test;
 
 use Liip\FunctionalTestBundle\Test\WebTestCase;
-use Doctrine\Common\DataFixtures as Fixtures;
-use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
+//use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+
+define('MAUTIC_TEST_ENV', 1);
 
 class MauticWebTestCase extends WebTestCase
 {
@@ -156,7 +157,7 @@ class MauticWebTestCase extends WebTestCase
         );
     }
 
-    protected function assertNoError($response, $crawler)
+    protected function assertNoError($response, $crawler, $fullOutput = false)
     {
         $noException = true;
         $msg         = "Status code " . $response->getStatusCode();
@@ -166,7 +167,17 @@ class MauticWebTestCase extends WebTestCase
                 $msg .= ": " . trim($crawler->filter('title')->text());
             } elseif ($response->getContent()) {
                 if ($response->headers->get('Content-Type') == 'application/json') {
-                    $msg .= ": " . print_r(json_decode($response->getContent()), true);
+                    $content = json_decode($response->getContent());
+                    if ($fullOutput) {
+                        $message = print_r($content, true);
+                    } elseif (is_array($content) && (isset($content[0]) && is_object($content[0]))) {
+                        $message = (isset($content[0]->message)) ? $content[0]->message : '';
+                    } elseif (is_object($content)) {
+                        $message = $content->message;
+                    } else {
+                        $message = print_r($content, true);
+                    }
+                    $msg .= ": " . $message;
                 } else {
                     $msg .= ": " . $response->getContent();
                 }
@@ -192,20 +203,38 @@ class MauticWebTestCase extends WebTestCase
         $requestStack->push($request);
         $this->container->set('request_stack', $requestStack);
 
-        //setup the entity manager
-        $this->em = $this->container
-            ->get('doctrine')
-            ->getManager();
-        $this->encoder = $this->container
-            ->get('security.encoder_factory');
-        $this->client = $this->getClient();
-
         $command = new \Mautic\CoreBundle\Command\InstallDataCommand();
         $command->setContainer($this->container);
-        $fixtures = $command->getMauticFixtures(true);
 
-        $this->loadFixtures($fixtures);
-        parent::setUp();
+        /*
+        $application = new Application(static::$kernel);
+        $doctrineCreate = new CreateSchemaDoctrineCommand();
+        $application->add($doctrineCreate);
+        $doctrineDrop = new DropSchemaDoctrineCommand();
+        $application->add($doctrineDrop);
+        $doctrineLoad = new LoadDataFixturesDoctrineCommand();
+        $application->add($doctrineLoad);
+        $command->setApplication($application);
+
+        //recreate the database
+        $input = new ArrayInput(array(
+            'command' => 'mautic:install:data',
+            '--env'   => 'test',
+            '--force' => true,
+            '--quiet' => true
+        ));
+        $output = new ConsoleOutput();
+        $command->run($input, $output);
+        */
+
+        $fixtures = $command->getMauticFixtures(true);
+        $executor = $this->loadFixtures($fixtures);
+
+        //setup the entity manager
+        $this->em = $this->container
+            ->get('doctrine')->getManager();
+        $this->encoder = $this->container
+            ->get('security.encoder_factory');
     }
 
     /**
@@ -215,5 +244,6 @@ class MauticWebTestCase extends WebTestCase
     {
         parent::tearDown();
         $this->em->close();
+        unset($this->em, $this->container, $this->client, $this->encoder);
     }
 }

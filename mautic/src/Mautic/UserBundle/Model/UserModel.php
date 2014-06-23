@@ -130,26 +130,34 @@ class UserModel extends FormModel
             throw new MethodNotAllowedHttpException(array('User'), 'Entity must be of class User()');
         }
 
-        if (empty($event)) {
-            $event = new UserEvent($entity, $isNew);
-            $event->setEntityManager($this->em);
-        }
-
         switch ($action) {
             case "pre_save":
-                $this->dispatcher->dispatch(UserEvents::USER_PRE_SAVE, $event);
+                $name = UserEvents::USER_PRE_SAVE;
                 break;
             case "post_save":
-                $this->dispatcher->dispatch(UserEvents::USER_POST_SAVE, $event);
+                $name = UserEvents::USER_POST_SAVE;
                 break;
             case "pre_delete":
-                $this->dispatcher->dispatch(UserEvents::USER_PRE_DELETE, $event);
+                $name = UserEvents::USER_PRE_DELETE;
                 break;
             case "post_delete":
-                $this->dispatcher->dispatch(UserEvents::USER_POST_DELETE, $event);
+                $name = UserEvents::USER_POST_DELETE;
                 break;
+            default:
+                return false;
         }
-        return $event;
+
+        if ($this->dispatcher->hasListeners($name)) {
+
+            if (empty($event)) {
+                $event = new UserEvent($entity, $isNew);
+                $event->setEntityManager($this->em);
+            }
+            $this->dispatcher->dispatch($name, $event);
+            return $event;
+        } else {
+            return false;
+        }
     }
 
     /**

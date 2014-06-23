@@ -20,11 +20,6 @@ $mauticBundles  = array_values(array_filter(
 ));
 
 $container->setParameter('mautic.bundles', $mauticBundles);
-
-$container->setParameter('mautic.supported_languages', array(
-    'en_US' => 'English - United States'
-));
-
 $loader->import('parameters.php');
 $container->loadFromExtension('mautic_core');
 
@@ -67,7 +62,11 @@ $container->loadFromExtension('framework', array(
         'handler_id' => null
     ),
     'fragments'            => null,
-    'http_method_override' => true
+    'http_method_override' => true,
+
+    /*'validation'           => array(
+        'static_method' => array('loadValidatorMetadata')
+    )*/
 ));
 
 //Twig Configuration

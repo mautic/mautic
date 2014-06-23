@@ -82,21 +82,27 @@ class ClientModel extends FormModel
             throw new MethodNotAllowedHttpException(array('Client'), 'Entity must be of class Client()');
         }
 
-        if (empty($event)) {
-            $event = new ClientEvent($entity, $isNew);
-            $event->setEntityManager($this->em);
-        }
-
         switch ($action) {
             case "post_save":
-                $this->dispatcher->dispatch(ApiEvents::CLIENT_POST_SAVE, $event);
+                $name = ApiEvents::CLIENT_POST_SAVE;
                 break;
             case "post_delete":
-                $this->dispatcher->dispatch(ApiEvents::CLIENT_POST_DELETE, $event);
+                $name = ApiEvents::CLIENT_POST_DELETE;
                 break;
+            default:
+                return false;
         }
 
-        return $event;
+        if ($this->dispatcher->hasListeners($name)) {
+            if (empty($event)) {
+                $event = new ClientEvent($entity, $isNew);
+                $event->setEntityManager($this->em);
+            }
+            $this->dispatcher->dispatch(ApiEvents::CLIENT_POST_SAVE, $event);
+            return $event;
+        } else {
+            return false;
+        }
     }
 
     public function getUserClients(User $user)

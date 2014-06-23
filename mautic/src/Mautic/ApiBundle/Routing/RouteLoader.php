@@ -25,15 +25,15 @@ class RouteLoader extends Loader
 {
     private $loaded    = false;
     private $dispatcher;
-    private $params;
+    private $apiEnabled;
 
     /**
      * @param Container $container
      */
     public function __construct(MauticFactory $factory)
     {
-        $this->dispatcher = $factory->getDispatcher();
-        $this->params     = $factory->getSystemParameters();
+        $this->dispatcher  = $factory->getDispatcher();
+        $this->apiEnabled = $factory->getParam('api_enabled');
     }
 
     /**
@@ -51,7 +51,7 @@ class RouteLoader extends Loader
         }
 
         $collection = new RouteCollection();
-        if (!empty($this->params['api_enabled'])) {
+        if (!empty($this->apiEnabled)) {
             $event = new RouteEvent($this, $collection);
             $this->dispatcher->dispatch(ApiEvents::BUILD_ROUTE, $event);
         }

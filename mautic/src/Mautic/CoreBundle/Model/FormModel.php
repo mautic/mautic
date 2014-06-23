@@ -50,7 +50,7 @@ class FormModel extends CommonModel
         //set the translator
         $this->em->getRepository($this->repository)->setTranslator($this->translator);
         $this->em->getRepository($this->repository)->setCurrentUser(
-            $this->security->getCurrentUser()
+            $this->factory->getUser()
         );
 
         return $this->em
@@ -65,15 +65,16 @@ class FormModel extends CommonModel
      */
     public function lockEntity($entity)
     {
-        //unlock the row if applicable
+        //lock the row if applicable
         if (method_exists($entity, 'setCheckedOut')) {
-            $entity->setCheckedOut(new \DateTime());
-            $entity->setCheckedOutBy($this->security->getCurrentUser());
+            $user = $this->factory->getUser();
+            if ($user->getId()) {
+                $entity->setCheckedOut(new \DateTime());
+                $entity->setCheckedOutBy($user);
+                $this->em->persist($entity);
+                $this->em->flush();
+            }
         }
-
-        $this->em
-            ->getRepository($this->repository)
-            ->saveEntity($entity);
     }
 
     /**
@@ -90,7 +91,7 @@ class FormModel extends CommonModel
                 //is it checked out by the current user?
                 $checkedOutBy = $entity->getCheckedOutBy();
                 if (!empty($checkedOutBy) && $checkedOutBy->getId() !==
-                    $this->security->getCurrentUser()->getId()) {
+                    $this->factory->getUser()->getId()) {
                     return true;
                 }
             }
@@ -105,21 +106,16 @@ class FormModel extends CommonModel
      */
     public function unlockEntity($entity)
     {
-        //flush any changes caused by form binding
-        $this->em->refresh($entity);
-
         //unlock the row if applicable
         if (method_exists($entity, 'setCheckedOut')) {
+            //flush any potential changes
+            $this->em->refresh($entity);
+
             $entity->setCheckedOut(null);
             $entity->setCheckedOutBy(null);
 
-            if (method_exists($entity, 'setModifiedBy')) {
-                $entity->setModifiedBy($this->security->getCurrentUser());
-            }
-
-            $this->em
-                ->getRepository($this->repository)
-                ->saveEntity($entity);
+            $this->em->persist($entity);
+            $this->em->flush();
         }
     }
 
@@ -157,7 +153,7 @@ class FormModel extends CommonModel
             }
 
             if (method_exists($entity, 'setCreatedBy') && !$entity->getCreatedBy()) {
-                $entity->setCreatedBy($this->security->getCurrentUser());
+                $entity->setCreatedBy($this->factory->getUser(true));
             }
         } else {
             if (method_exists($entity, 'setDateModified') && !$entity->getDateModified()) {
@@ -165,7 +161,7 @@ class FormModel extends CommonModel
             }
 
             if (method_exists($entity, 'setModifiedBy') && !$entity->getModifiedBy()) {
-                $entity->setModifiedBy($this->security->getCurrentUser());
+                $entity->setModifiedBy($this->factory->getUser(true));
             }
         }
 
@@ -184,8 +180,12 @@ class FormModel extends CommonModel
      */
     public function deleteEntity($entity)
     {
+        //take note of ID before doctrine wipes it out
+        $id = $entity->getId();
         $event = $this->dispatchEvent("pre_delete", $entity);
         $this->em->getRepository($this->repository)->deleteEntity($entity);
+        //set the id for use in events
+        $entity->deletedId = $id;
         $this->dispatchEvent("post_delete", $entity, false, $event);
 
         return $entity;
