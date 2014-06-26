@@ -70,10 +70,12 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
         </tbody>
     </table>
     <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
-        "items"   => $items,
-        "page"    => $page,
-        "limit"   => $limit,
-        "baseUrl" =>  $view['router']->generate('mautic_leadlist_index')
+        "items"      => $items,
+        "page"       => $page,
+        "limit"      => $limit,
+        "baseUrl"    =>  $view['router']->generate('mautic_leadlist_index'),
+        'tmpl'       => $tmpl,
+        'sessionVar' => 'leadlist'
     )); ?>
     <?php else: ?>
         <h4><?php echo $view['translator']->trans('mautic.core.noresults'); ?></h4>

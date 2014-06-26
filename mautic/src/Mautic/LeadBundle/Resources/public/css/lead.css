@@ -148,6 +148,13 @@
     overflow: auto;
 }
 
+.col-leadscore-date {
+    width: 175px;
+}
+.col-leadscore-delta {
+    width: 75px;
+}
+
 @media (max-width:767px) {
     .lead-list {
         padding-right: 15px;

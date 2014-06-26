@@ -63,19 +63,23 @@ class LeadFieldValueRepository extends CommonRepository
      * @param $value
      * @return array
      */
-    public function getLeadsByFieldValue($field, $value)
+    public function getLeadsByFieldValue($field, $value, $fieldIsId = false)
     {
-        return $this->_em->createQueryBuilder()
-            ->select('v.lead')
+        $q = $this->_em->createQueryBuilder()
+            ->select('l')
             ->from('MauticLeadBundle:LeadFieldValue', 'v')
             ->leftJoin('MauticLeadBundle:LeadField', 'f', 'WITH', 'v.field = f.id')
-            ->leftJoin('MauticLeadBundle:Lead', 'l', 'WITH', 'v.lead = l')
-            ->where('f.alias = :field')
-            ->andWhere('v.value = :value')
-            ->orderBy('l.DateAdded', 'DESC')
+            ->leftJoin('MauticLeadBundle:Lead', 'l', 'WITH', 'v.lead = l');
+        if ($fieldIsId) {
+            $q->where('f.id = :field');
+        } else {
+            $q->where('f.alias = :field');
+        }
+        return $q->andWhere('v.value = :value')
+            ->orderBy('l.dateAdded', 'DESC')
             ->setParameter('field', $field)
             ->setParameter('value', $value)
             ->getQuery()
-            ->getArrayResult();
+            ->getResult();
     }
 }

@@ -48,8 +48,9 @@ if ($tmpl == 'index') {
 <?php
     echo $view->render('MauticLeadBundle:Lead:info.html.php', array("lead" => $lead, 'dateFormats' => $dateFormats));
 
+    $scoreLog = count($lead->getScoreChangeLog());
     if (!empty($scoreLog))
-        echo $view->render('MauticLeadBundle:Lead:score_log.html.php', array("lead" => $lead));
+        echo $view->render('MauticLeadBundle:Lead:score_log.html.php', array("lead" => $lead, 'dateFormats' => $dateFormats));
 
     $ipAddresses = count($lead->getIpAddresses());
     if (!empty($ipAddresses))

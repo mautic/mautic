@@ -26,7 +26,7 @@ class FieldDateTimeTransformer implements DataTransformerInterface
         foreach ($rawFilters as $k => $f) {
             if ($f['type']  == 'datetime') {
                 $dt = new DateTimeHelper($f['filter'], 'Y-m-d H:i');
-                $rawFilters[$k]['filter'] = $dt->getLocalString();
+                $rawFilters[$k]['filter'] = $dt->toLocalString();
             }
         }
         return $rawFilters;
@@ -42,7 +42,7 @@ class FieldDateTimeTransformer implements DataTransformerInterface
         foreach ($rawFilters as $k => $f) {
             if ($f['type']  == 'datetime') {
                 $dt = new DateTimeHelper($f['filter'], 'Y-m-d H:i', 'local');
-                $rawFilters[$k]['filter'] = $dt->getUtcString();
+                $rawFilters[$k]['filter'] = $dt->toUtcString();
             }
         }
 

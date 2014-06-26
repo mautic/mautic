@@ -54,6 +54,7 @@ class LoadLeadListData extends AbstractFixture implements OrderedFixtureInterfac
         $list->setFilters(array(
             array(
                 'glue'      => 'and',
+                'type'      => 'lookup',
                 'field'     => 'owner',
                 'operator'  => '=',
                 'filter'    => $adminUser->getId(),

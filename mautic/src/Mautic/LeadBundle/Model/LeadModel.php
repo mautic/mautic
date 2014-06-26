@@ -26,12 +26,23 @@ class LeadModel extends FormModel
 
     /**
      * {@inheritdoc}
+     *
+     * @return string
      */
-    protected function init()
+    public function getRepository()
     {
-        $this->repository = 'MauticLeadBundle:Lead';
+        return $this->em->getRepository('MauticLeadBundle:Lead');
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return string
+     */
+    public function getPermissionBase()
+    {
+        return 'lead:leads';
+    }
 
     /**
      * {@inheritdoc}
@@ -120,9 +131,10 @@ class LeadModel extends FormModel
      *
      * @param Lead  $lead
      * @param array $data
+     * @param $overwriteWithBlank
      * @return array
      */
-    public function setFieldValues(Lead &$lead, array $data)
+    public function setFieldValues(Lead &$lead, array $data, $overwriteWithBlank = true)
     {
         //save the field values
         $fieldValues   = $lead->getFields();
@@ -135,7 +147,7 @@ class LeadModel extends FormModel
             $alias   = $field->getAlias();
             $value   = (isset($data["field_{$alias}"])) ?
                 $data["field_{$alias}"] : "";
-            if ($v->getValue() !== $value) {
+            if ($v->getValue() !== $value && (!empty($value) || (empty($value) && $overwriteWithBlank))) {
                 $v->setValue($value);
             }
             $updatedFields[$field->getId()] = 1;
@@ -160,7 +172,7 @@ class LeadModel extends FormModel
      */
     public function disassociateOwner($userId)
     {
-        $leads = $this->em->getRepository($this->repository)->findByOwner($userId);
+        $leads = $this->getRepository()->findByOwner($userId);
         foreach ($leads as $lead) {
             $lead->setOwner(null);
             $this->saveEntity($lead);

@@ -12,7 +12,16 @@
 <div class="panel-heading"><?php echo $view['translator']->trans('mautic.lead.lead.header.ipaddress'); ?></div>
 <div class="panel-body">
     <div class="table-responsive">
-        <table class="table table-striped table-condensed">
+        <table class="table table-hover table-bordered table-striped table-condensed">
+            <thead>
+                <tr>
+                    <th class="col-leadip-ip"><?php echo $view['translator']->trans('mautic.lead.lead.thead.ip'); ?></th>
+                    <th class="col-leadip-city"><?php echo $view['translator']->trans('mautic.lead.lead.thead.city'); ?></th>
+                    <th class="col-leadip-state"><?php echo $view['translator']->trans('mautic.lead.lead.thead.state'); ?></th>
+                    <th class="col-leadip-country"><?php echo $view['translator']->trans('mautic.lead.lead.thead.country'); ?></th>
+                    <th class="col-leadip-icons"></th>
+                </tr>
+            </thead>
             <tbody>
             <?php foreach ($lead->getIpAddresses() as $ip): ?>
                 <?php $details = $ip->getIpDetails(); ?>

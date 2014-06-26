@@ -63,7 +63,7 @@ $type  = $field->getField()->getType();
 <?php
 elseif ($type == 'datetime'):
     $dateHelper = new \Mautic\CoreBundle\Helper\DateTimeHelper($value);
-    echo $dateHelper->getLocalString($dateFormats[$type]);
+    echo $dateHelper->toLocalString($dateFormats[$type]);
 ?>
 
 <?php else: ?>

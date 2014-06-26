@@ -43,10 +43,14 @@ foreach ($items as $key => $item):
     "items"           => $items,
     "page"            => $page,
     "limit"           => $limit,
+    "totalItems"      => $totalCount,
     "menuLinkId"      => 'mautic_lead_index',
     "baseUrl"         => $view['router']->generate('mautic_lead_index'),
     "queryString"     => 'tmpl=list',
-    "paginationClass" => "pagination-sm"
+    "paginationClass" => "sm",
+    'tmpl'            => 'list',
+    'target'          => '.leads',
+    'sessionVar'      => 'lead'
 )); ?>
 <?php else: ?>
 <h4><?php echo $view['translator']->trans('mautic.core.noresults'); ?></h4>

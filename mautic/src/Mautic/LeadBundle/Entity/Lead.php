@@ -55,6 +55,12 @@ class Lead extends FormEntity
     private $fields;
 
     /**
+     * @ORM\OneToMany(targetEntity="ScoreChangeLog", mappedBy="lead", cascade={"all"}, orphanRemoval=true, fetch="EXTRA_LAZY")
+     * @ORM\OrderBy({"dateAdded" = "DESC"})
+     */
+    private $scoreChangeLog;
+
+    /**
      * @ORM\ManyToMany(targetEntity="Mautic\CoreBundle\Entity\IpAddress", cascade={"merge", "persist", "refresh", "detach"}, fetch="EXTRA_LAZY")
      * @ORM\JoinTable(name="lead_ips_xref",
      *   joinColumns={@ORM\JoinColumn(name="lead_id", referencedColumnName="id")},
@@ -65,13 +71,6 @@ class Lead extends FormEntity
      * @Serializer\Groups({"full", "limited", "log"})
      */
     private $ipAddresses;
-
-    /**
-     * Simply used to populate the changeset LeadEvent with updated field values
-     *
-     * @var
-     */
-    private $updatedFields = array();
 
     /**
      * Unmapped array used internally to update field values rather than creating new ones
@@ -298,6 +297,7 @@ class Lead extends FormEntity
      */
     public function setScore($score)
     {
+        $this->isChanged('score', $score);
         $this->score = $score;
 
         return $this;
@@ -367,5 +367,38 @@ class Lead extends FormEntity
             $this->company = '';
         if (!isset($this->email))
             $this->email = '';
+    }
+
+    /**
+     * Add scoreChangeLog
+     *
+     * @param \Mautic\LeadBundle\Entity\ScoreChangeLog $scoreChangeLog
+     * @return Lead
+     */
+    public function addScoreChangeLog(\Mautic\LeadBundle\Entity\ScoreChangeLog $scoreChangeLog)
+    {
+        $this->scoreChangeLog[] = $scoreChangeLog;
+
+        return $this;
+    }
+
+    /**
+     * Remove scoreChangeLog
+     *
+     * @param \Mautic\LeadBundle\Entity\ScoreChangeLog $scoreChangeLog
+     */
+    public function removeScoreChangeLog(\Mautic\LeadBundle\Entity\ScoreChangeLog $scoreChangeLog)
+    {
+        $this->scoreChangeLog->removeElement($scoreChangeLog);
+    }
+
+    /**
+     * Get scoreChangeLog
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getScoreChangeLog()
+    {
+        return $this->scoreChangeLog;
     }
 }

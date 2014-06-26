@@ -192,8 +192,10 @@ class LeadListRepository extends CommonRepository
     /**
      * @return string
      */
-    protected function getDefaultOrderBy()
+    protected function getDefaultOrder()
     {
-        return 'l.name';
+        return array(
+            array('l.name', 'ASC')
+        );
     }
 }

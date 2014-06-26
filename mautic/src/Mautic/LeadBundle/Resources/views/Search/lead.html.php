@@ -11,7 +11,7 @@
 <div class="global-search-result">
 <?php if (!empty($showMore)): ?>
     <a class="pull-right margin-md-sides" href="<?php echo $this->container->get('router')->generate(
-        'mautic_lead_index', array('filter-role' => $searchString)); ?>"
+        'mautic_lead_index', array('search' => $searchString)); ?>"
        data-toggle="ajax">
         <span><?php echo $view['translator']->trans('mautic.core.search.more', array("%count%" => $remaining)); ?></span>
     </a>

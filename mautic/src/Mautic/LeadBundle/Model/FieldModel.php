@@ -28,10 +28,22 @@ class FieldModel extends FormModel
 
     /**
      * {@inheritdoc}
+     *
+     * @return string
      */
-    protected function init()
+    public function getRepository()
     {
-        $this->repository = 'MauticLeadBundle:LeadField';
+        return $this->em->getRepository('MauticLeadBundle:LeadField');
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return string
+     */
+    public function getPermissionBase()
+    {
+        return 'lead:fields';
     }
 
     /**
@@ -66,10 +78,11 @@ class FieldModel extends FormModel
 
     /**
      * @param       $entity
+     * @param       $unlock
      * @return mixed
      * @throws AccessDeniedException
      */
-    public function saveEntity($entity)
+    public function saveEntity($entity, $unlock = true)
     {
         if (!$entity instanceof LeadField && !$entity instanceof LeadFieldValue) {
             throw new MethodNotAllowedHttpException(array('LeadEntity', 'LeadFieldEntity'), 'Entity must be of type LeadField or LeadFieldValue');
@@ -78,7 +91,7 @@ class FieldModel extends FormModel
         $isNew = ($entity->getId()) ? false : true;
 
         //set some defaults
-        $this->setTimestamps($entity, $isNew);
+        $this->setTimestamps($entity, $isNew, $unlock);
 
         if ($entity instanceof LeadField) {
 
@@ -112,7 +125,7 @@ class FieldModel extends FormModel
         }
 
         $event = $this->dispatchEvent("pre_save", $entity, $isNew);
-        $this->em->getRepository($this->repository)->saveEntity($entity);
+        $this->getRepository()->saveEntity($entity);
         $this->dispatchEvent("post_save", $entity, $isNew, $event);
 
         //update order of other fields
@@ -130,7 +143,7 @@ class FieldModel extends FormModel
             throw new MethodNotAllowedHttpException(array('LeadEntity'));
         }
 
-        $fields = $this->em->getRepository($this->repository)->findBy(array(), array('order' => 'ASC'));
+        $fields = $this->getRepository()->findBy(array(), array('order' => 'ASC'));
         $count  = 1;
         $order  = $entity->getOrder();
         $id     = $entity->getId();
@@ -162,7 +175,7 @@ class FieldModel extends FormModel
      */
     public function reorderFieldsByList(array $list)
     {
-        $fields = $this->em->getRepository($this->repository)->findBy(array(), array('order' => 'ASC'));
+        $fields = $this->getRepository()->findBy(array(), array('order' => 'ASC'));
         foreach ($fields as $field) {
             if (in_array($field->getId(), $list)) {
                 $order = ((int) array_search($field->getId(), $list) + 1);

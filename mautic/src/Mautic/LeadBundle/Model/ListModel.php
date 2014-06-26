@@ -23,21 +23,39 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
  */
 class ListModel extends FormModel
 {
+    /**
+     * {@inheritdoc}
+     *
+     * @return string
+     */
+    public function getRepository()
+    {
+        return $this->em->getRepository('MauticLeadBundle:LeadList');
+    }
 
     /**
      * {@inheritdoc}
+     *
+     * @return string
      */
-    protected function init()
+    public function getPermissionBase()
     {
-        $this->repository = 'MauticLeadBundle:LeadList';
+        return 'lead:list';
     }
 
-    public function saveEntity($entity)
+    /**
+     * {@inheritdoc}
+     *
+     * @param      $entity
+     * @param bool $unlock
+     * @return mixed|void
+     */
+    public function saveEntity($entity, $unlock = true)
     {
         $isNew = ($entity->getId()) ? false : true;
 
         //set some defaults
-        $this->setTimestamps($entity, $isNew);
+        $this->setTimestamps($entity, $isNew, $unlock);
 
         $alias = $entity->getAlias();
         if (empty($alias)) {
@@ -65,7 +83,7 @@ class ListModel extends FormModel
         $entity->setAlias($alias);
 
         $event = $this->dispatchEvent("pre_save", $entity, $isNew);
-        $this->em->getRepository($this->repository)->saveEntity($entity);
+        $this->getRepository()->saveEntity($entity);
         $this->dispatchEvent("post_save", $entity, $isNew, $event);
     }
 

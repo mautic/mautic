@@ -95,7 +95,16 @@ class LeadRepository extends CommonRepository
 
         //use getIterator() here so that the first lead can be extracted without duplicating queries or looping through
         //them twice
-        return $results->getIterator();
+        $iterator = $results->getIterator();
+
+        if (!empty($args['getTotalCount'])) {
+            //get the total count from paginator
+            $totalItems = count($results);
+
+            $iterator['totalCount'] = $totalItems;
+        }
+
+        return $iterator;
     }
 
     /**
@@ -407,22 +416,22 @@ class LeadRepository extends CommonRepository
                     'label' => 'mautic.lead.list.form.operator.notequals',
                     'func'  => 'neq'
                 ),
-            '&gt;'   =>
+            '&#62;'   =>
                 array(
                     'label' => 'mautic.lead.list.form.operator.greaterthan',
                     'func'  => 'gt'
                 ),
-            '&gt;='   =>
+            '&#62;='   =>
                 array(
                     'label' => 'mautic.lead.list.form.operator.greaterthanequals',
                     'func'  => 'gte'
                 ),
-            '&lt;'    =>
+            '&#60;'    =>
                 array(
                     'label' => 'mautic.lead.list.form.operator.lessthan',
                     'func'  => 'lt'
                 ),
-            '&lt;='   =>
+            '&#60;='   =>
                 array(
                     'label' => 'mautic.lead.list.form.operator.lessthanequals',
                     'func'  => 'lte'
@@ -473,8 +482,10 @@ class LeadRepository extends CommonRepository
     /**
      * @return string
      */
-    protected function getDefaultOrderBy()
+    protected function getDefaultOrder()
     {
-       return 'l.dateAdded';
+       return array(
+           array('l.dateAdded', 'ASC')
+       );
     }
 }

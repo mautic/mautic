@@ -63,7 +63,7 @@ class LeadSubscriber extends CommonSubscriber
             'label'     => 'mautic.lead.lead.submitaction.createlead',
             'descr'     => 'mautic.lead.lead.submitaction.createlead_descr',
             'formType'  => 'lead_submitaction_createlead',
-            'callback'  => '\Mautic\LeadBundle\Helper\EventHelper::createLead'
+            'callback'  => '\Mautic\LeadBundle\Helper\EventHelper::createLeadOnFormSubmit'
         );
 
         $event->addSubmitAction('lead.create', $action);
@@ -74,7 +74,7 @@ class LeadSubscriber extends CommonSubscriber
             'label'     => 'mautic.lead.lead.submitaction.changescore',
             'descr'     => 'mautic.lead.lead.submitaction.changescore_descr',
             'formType'  => 'lead_submitaction_scorechange',
-            'callback'  => '\Mautic\LeadBundle\Helper\EventHelper::scoreChange'
+            'callback'  => '\Mautic\LeadBundle\Helper\EventHelper::changeScoreOnFormSubmit'
         );
 
         $event->addSubmitAction('lead.scorechange', $action);
@@ -204,9 +204,11 @@ class LeadSubscriber extends CommonSubscriber
             $this->factory->getModel('core.auditLog')->writeToLog($log);
 
             //trigger the score change event
-            if (!$event->isNew() && isset($this->changes["score"])) {
-                $scoreEvent = new Events\ScoreChangeEvent($lead, $this->changes['score'][0], $this->changes['score'][0]);
-                $this->dispatcher->dispatch(LeadEvents::LEAD_SCORE_CHANGE, $scoreEvent);
+            if (isset($this->changes["score"])) {
+                if (!$event->isNew() && $this->dispatcher->hasListeners(LeadEvents::LEAD_SCORE_CHANGE)) {
+                    $scoreEvent = new Events\ScoreChangeEvent($lead, $this->changes['score'][0], $this->changes['score'][0]);
+                    $this->dispatcher->dispatch(LeadEvents::LEAD_SCORE_CHANGE, $scoreEvent);
+                }
             }
         }
     }

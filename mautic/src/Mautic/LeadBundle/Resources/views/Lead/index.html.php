@@ -78,11 +78,12 @@ $activeClass     = "";
             </div>
             <div class="leads">
                 <?php echo $view->render('MauticLeadBundle:Lead:list.html.php', array(
-                    'items' => $items,
-                    'page'  => $page,
-                    'lead'  => $lead,
-                    'limit' => $limit,
-                    'tmpl'  => $tmpl
+                    'items'      => $items,
+                    'page'       => $page,
+                    'lead'       => $lead,
+                    'limit'      => $limit,
+                    'totalCount' => $totalCount,
+                    'tmpl'       => $tmpl
                 )); ?>
             </div>
             <div class="clearfix"></div>
