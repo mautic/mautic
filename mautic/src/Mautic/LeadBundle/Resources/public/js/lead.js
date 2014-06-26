@@ -79,10 +79,20 @@ Mautic.activateLeadFieldTypeahead = function(field, target, options) {
             datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
             queryTokenizer: Bloodhound.tokenizers.whitespace,
             prefetch: {
-                url: mauticBaseUrl + "ajax?ajaxAction=lead:lead:fieldlist&field=" + target
+                url: mauticBaseUrl + "ajax?ajaxAction=lead:fieldList&field=" + target,
+                ajax: {
+                    beforeSend: function () {
+                        MauticVars.showLoadingBar = false;
+                    }
+                }
             },
             remote: {
-                url: mauticBaseUrl + "ajax?ajaxAction=lead:lead:fieldlist&field=" + target + "&filter=%QUERY"
+                url: mauticBaseUrl + "ajax?ajaxAction=lead:fieldList&field=" + target + "&filter=%QUERY",
+                ajax: {
+                    beforeSend: function () {
+                        MauticVars.showLoadingBar = false;
+                    }
+                }
             },
             dupDetector: function (remoteMatch, localMatch) {
                 return (remoteMatch.value == localMatch.value);
@@ -121,10 +131,20 @@ Mautic.activateLeadOwnerTypeahead = function(el) {
         datumTokenizer: Bloodhound.tokenizers.obj.whitespace('label'),
         queryTokenizer: Bloodhound.tokenizers.whitespace,
         prefetch: {
-            url: mauticBaseUrl + "ajax?ajaxAction=lead:lead:userlist"
+            url: mauticBaseUrl + "ajax?ajaxAction=lead:userList",
+            ajax: {
+                beforeSend: function () {
+                    MauticVars.showLoadingBar = false;
+                }
+            }
         },
         remote: {
-            url: mauticBaseUrl + "ajax?ajaxAction=lead:lead:userlist&filter=%QUERY"
+            url: mauticBaseUrl + "ajax?ajaxAction=lead:userList&filter=%QUERY",
+            ajax: {
+                beforeSend: function () {
+                    MauticVars.showLoadingBar = false;
+                }
+            }
         },
         dupDetector: function (remoteMatch, localMatch) {
             return (remoteMatch.label == localMatch.label);
@@ -199,8 +219,8 @@ Mautic.leadlistOnLoad = function(container) {
 };
 
 Mautic.addLeadListFilter = function (elId) {
-    var filter = '#available_' + elId;
-    var label  = $(filter + ' span.leadlist-filter-name').text();
+    var filterId = '#available_' + elId;
+    var label  = $(filterId + ' span.leadlist-filter-name').text();
 
     //create a new filter
     var li = $("<li />").addClass("padding-sm").text(label).appendTo($('#leadlist_filters_right'));
@@ -213,8 +233,8 @@ Mautic.addLeadListFilter = function (elId) {
     //add a sortable handle
     $("<i />").addClass("fa fa-fw fa-ellipsis-v sortable-handle").prependTo(li);
 
-    var fieldType = $(filter).find("input.field_type").val();
-    var alias     = $(filter).find("input.field_alias").val();
+    var fieldType = $(filterId).find("input.field_type").val();
+    var alias     = $(filterId).find("input.field_alias").val();
 
     //add wrapping div and add the template html
 
@@ -237,9 +257,9 @@ Mautic.addLeadListFilter = function (elId) {
 
     //activate fields
     if (fieldType == 'lookup' || fieldType == 'select') {
-        var fieldCallback = $(filter).find("input.field_callback").val();
+        var fieldCallback = $(filterId).find("input.field_callback").val();
         if (fieldCallback) {
-            var fieldOptions = $(filter).find("input.field_list").val();
+            var fieldOptions = $(filterId).find("input.field_list").val();
             Mautic[fieldCallback](uniqid, alias, fieldOptions);
         }
     } else if (fieldType == 'datetime') {
@@ -284,9 +304,9 @@ Mautic.addLeadListFilter = function (elId) {
         oldFilter.replaceWith(newFilter);
         oldDisplay.replaceWith(newDisplay);
 
-        var fieldCallback = $(filter).find("input.field_callback").val();
+        var fieldCallback = $(filterId).find("input.field_callback").val();
         if (fieldCallback) {
-            var fieldOptions = $(filter).find("input.field_list").val();
+            var fieldOptions = $(filterId).find("input.field_list").val();
             Mautic[fieldCallback](uniqid, alias, fieldOptions);
         }
     } else {
@@ -310,7 +330,7 @@ Mautic.leadfieldOnLoad = function (container) {
             stop: function(i) {
                 $.ajax({
                     type: "POST",
-                    url: mauticBaseUrl + "ajax?ajaxAction=lead:field:reorder",
+                    url: mauticBaseUrl + "ajax?ajaxAction=lead:reorder",
                     data: $(container + ' .leadfield-list tbody').sortable("serialize")});
             }
         });

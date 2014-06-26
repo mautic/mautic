@@ -35,7 +35,7 @@ class ClientController extends FormController
         }
 
         //set limits
-        $limit = $this->container->getParameter('mautic.default_pagelimit');
+        $limit = $this->get('session')->get('mautic.client.limit', $this->container->getParameter('mautic.default_pagelimit'));
         $start = ($page === 1) ? 0 : (($page-1) * $limit);
         if ($start < 0) {
             $start = 0;
@@ -123,7 +123,8 @@ class ClientController extends FormController
         $flashes = array();
         if ($this->request->getMethod() == 'POST') {
             $me      = $this->get('security.context')->getToken()->getUser();
-            $client  = $this->get('mautic.factory')->getModel('api.client')->getEntity($clientId);
+            $model   = $this->get('mautic.factory')->getModel('api.client');
+            $client  = $model->getEntity($clientId);
 
             if ($client === null) {
                 $flashes[] = array(
@@ -136,7 +137,7 @@ class ClientController extends FormController
 
                 //remove the user from the client
                 $client->removeUser($me);
-                $this->get('mautic.factory')->getModel('api.client')->saveEntity($client);
+                $model->saveEntity($client);
 
                 $flashes[] = array(
                     'type'    => 'notice',
@@ -192,35 +193,33 @@ class ClientController extends FormController
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
                     $model->saveEntity($client);
+
+                    $this->request->getSession()->getFlashBag()->add(
+                        'notice',
+                        $this->get('translator')->trans('mautic.api.client.notice.created', array(
+                            '%name%'         => $client->getName(),
+                            '%clientId%'     => $client->getPublicId(),
+                            '%clientSecret%' => $client->getSecret(),
+                            '%url%'          => $this->generateUrl('mautic_client_action', array(
+                                'objectAction' => 'edit',
+                                'objectId'     => $client->getId()
+                            ))
+                        ), 'flashes')
+                    );
                 }
             }
 
-            if ($cancelled || $valid) { //cancelled or success
-
+            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 return $this->postActionRedirect(array(
                     'returnUrl'       => $returnUrl,
                     'contentTemplate' => 'MauticApiBundle:Client:index',
                     'passthroughVars' => array(
                         'activeLink'    => '#mautic_client_index',
                         'mauticContent' => 'client'
-                    ),
-                    'flashes'         =>
-                        ($valid) ? array( //success
-                            array(
-                                'type'    => 'notice',
-                                'msg'     => 'mautic.api.client.notice.created',
-                                'msgVars' => array(
-                                    '%name%'         => $client->getName(),
-                                    '%clientId%'     => $client->getPublicId(),
-                                    '%clientSecret%' => $client->getSecret(),
-                                    '%url%'          => $this->generateUrl('mautic_client_action', array(
-                                        'objectAction' => 'edit',
-                                        'objectId'     => $client->getId()
-                                    ))
-                                )
-                            )
-                        ) : array()
+                    )
                 ));
+            } elseif (!$cancelled) {
+                return $this->editAction($client->getId(), false);
             }
         }
 
@@ -240,7 +239,7 @@ class ClientController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function editAction ($objectId)
+    public function editAction ($objectId, $ignorePost = false)
     {
         if (!$this->get('mautic.security')->isGranted('api:clients:editother')) {
             return $this->accessDenied();
@@ -280,33 +279,30 @@ class ClientController extends FormController
         $form   = $model->createForm($client, $this->get('form.factory'), $action);
 
         ///Check for a submitted form and process it
-        if ($this->request->getMethod() == 'POST') {
-            $valid = false;
+        if (!$ignorePost && $this->request->getMethod() == 'POST') {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
-                    $model->saveEntity($client);
+                    $model->saveEntity($client, $form->get('buttons')->get('save')->isClicked());
 
-                    $postActionVars['flashes'] = array(
-                        array(
-                            'type' => 'notice',
-                            'msg'  => 'mautic.api.client.notice.updated',
-                            'msgVars' => array(
-                                '%name%' => $client->getName(),
-                                '%url%'          => $this->generateUrl('mautic_client_action', array(
-                                    'objectAction' => 'edit',
-                                    'objectId'     => $client->getId()
-                                ))
-                            )
-                        )
+                    $this->request->getSession()->getFlashBag()->add(
+                        'notice',
+                        $this->get('translator')->trans('mautic.api.client.notice.updated', array(
+                            '%name%' => $client->getName(),
+                            '%url%'  => $this->generateUrl('mautic_client_action', array(
+                                'objectAction' => 'edit',
+                                'objectId'     => $client->getId()
+                            ))
+                        ), 'flashes')
                     );
+
+                    if ($form->get('buttons')->get('save')->isClicked()) {
+                        return $this->postActionRedirect($postActionVars);
+                    }
                 }
             } else {
                 //unlock the entity
                 $model->unlockEntity($client);
-            }
-
-            if ($cancelled || $valid) {
                 return $this->postActionRedirect($postActionVars);
             }
         } else {

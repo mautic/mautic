@@ -38,7 +38,7 @@ class UserController extends FormController
         }
 
         //set limits
-        $limit = $this->container->getParameter('mautic.default_pagelimit');
+        $limit = $this->get('session')->get('mautic.user.limit', $this->container->getParameter('mautic.default_pagelimit'));
         $start = ($page === 1) ? 0 : (($page-1) * $limit);
         if ($start < 0) {
             $start = 0;
@@ -161,11 +161,22 @@ class UserController extends FormController
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
                     $user->setPassword($password);
-                    $this->get('mautic.factory')->getModel('user.user')->saveEntity($user);
+                    $model->saveEntity($user);
+
+                    $this->request->getSession()->getFlashBag()->add(
+                        'notice',
+                        $this->get('translator')->trans('mautic.user.user.notice.created',  array(
+                            '%name%' => $user->getName(),
+                            '%url%'  => $this->generateUrl('mautic_user_action', array(
+                                'objectAction' => 'edit',
+                                'objectId'     => $user->getId()
+                            ))
+                        ), 'flashes')
+                    );
                 }
             }
 
-            if ($cancelled || $valid) { //cancelled or success
+            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 return $this->postActionRedirect(array(
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => array('page' => $page),
@@ -173,25 +184,13 @@ class UserController extends FormController
                     'passthroughVars' => array(
                         'activeLink'    => '#mautic_user_index',
                         'mauticContent' => 'user'
-                    ),
-                    'flashes'         =>
-                        ($valid) ? array(
-                            array(
-                                'type' => 'notice',
-                                'msg'  => 'mautic.user.user.notice.created',
-                                'msgVars' => array(
-                                    '%name%' => $user->getName(),
-                                    '%url%'  => $this->generateUrl('mautic_user_action', array(
-                                        'objectAction' => 'edit',
-                                        'objectId'     => $user->getId()
-                                    ))
-                                )
-                            )
-                        ) : array()
+                    )
                 ));
-            } else {
+            } elseif ($valid && !$cancelled) {
+                return $this->editAction($user->getId(), true);
+            } elseif (!$valid) {
                 //check for role error and assign it to role_lookup
-                $errors = $form->getErrors();
+                $errors = $form['role']->getErrors();
                 if (!empty($errors)) {
                     foreach ($errors as $error) {
                         if ($error->getMessageTemplate() == 'mautic.user.user.role.notblank') {
@@ -223,7 +222,7 @@ class UserController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function editAction ($objectId)
+    public function editAction ($objectId, $ignorePost = false)
     {
         if (!$this->get('mautic.security')->isGranted('user:users:edit')) {
             return $this->accessDenied();
@@ -268,7 +267,7 @@ class UserController extends FormController
         $form   = $model->createForm($user, $this->get('form.factory'), $action);
 
         ///Check for a submitted form and process it
-        if ($this->request->getMethod() == 'POST') {
+        if (!$ignorePost && $this->request->getMethod() == 'POST') {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 //check to see if the password needs to be rehashed
@@ -279,20 +278,17 @@ class UserController extends FormController
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
                     $user->setPassword($password);
-                    $model->saveEntity($user);
+                    $model->saveEntity($user, $form->get('buttons')->get('save')->isClicked());
 
-                    $postActionVars['flashes'] = array( //success
-                        array(
-                            'type' => 'notice',
-                            'msg'  => 'mautic.user.user.notice.updated',
-                            'msgVars' => array(
-                                '%name%' => $user->getName(),
-                                '%url%'  => $this->generateUrl('mautic_user_action', array(
-                                    'objectAction' => 'edit',
-                                    'objectId'     => $user->getId()
-                                ))
-                            )
-                        )
+                    $this->request->getSession()->getFlashBag()->add(
+                        'notice',
+                        $this->get('translator')->trans('mautic.user.user.notice.updated',  array(
+                            '%name%' => $user->getName(),
+                            '%url%'  => $this->generateUrl('mautic_user_action', array(
+                                'objectAction' => 'edit',
+                                'objectId'     => $user->getId()
+                            ))
+                        ), 'flashes')
                     );
                 }
             } else {
@@ -300,7 +296,7 @@ class UserController extends FormController
                 $model->unlockEntity($user);
             }
 
-            if ($cancelled || $valid) { //cancelled or success
+            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 return $this->postActionRedirect($postActionVars);
             } else {
                 //check for role error and assign it to role_lookup
@@ -405,41 +401,9 @@ class UserController extends FormController
     }
 
     /**
-     * {@inheritdoc)
-     *
-     * @param $action
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse
+     * @param $objectId
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function executeAjaxAction( Request $request, $ajaxAction = "" )
-    {
-        $dataArray = array("success" => 0);
-        switch ($ajaxAction) {
-            case "rolelist":
-                $filter  = InputHelper::clean($request->query->get('filter'));
-                $results = $this->get('mautic.factory')->getModel('user.user')->getLookupResults('role', $filter);
-                $dataArray = array();
-                foreach ($results as $r) {
-                    $dataArray[] = array(
-                        'label' => $r['name'],
-                        'value' => $r['id']
-                    );
-                }
-                break;
-            case "positionlist":
-                $filter  = InputHelper::clean($request->query->get('filter'));
-                $results = $this->get('mautic.factory')->getModel('user.user')->getLookupResults('position', $filter);
-                $dataArray = array();
-                foreach ($results as $r) {
-                    $dataArray[] = array('value' => $r['position']);
-                }
-                break;
-        }
-        $response  = new JsonResponse();
-        $response->setData($dataArray);
-
-        return $response;
-    }
-
     public function contactAction($objectId)
     {
         $model   = $this->get('mautic.factory')->getModel('user.user');
@@ -523,10 +487,10 @@ class UserController extends FormController
                 return $this->redirect($returnUrl);
             }
         } else {
-            $reEntityId = $this->request->get('id');
-            $reSubject  = $this->request->get('subject');
-            $returnUrl  = $this->request->get('returnUrl', $this->generateUrl('mautic_core_index'));
-            $reEntity   = $this->request->get('entity');
+            $reEntityId = InputHelper::int($this->request->get('id'));
+            $reSubject  = InputHelper::clean($this->request->get('subject'));
+            $returnUrl  = InputHelper::url($this->request->get('returnUrl', $this->generateUrl('mautic_core_index')));
+            $reEntity   = InputHelper::clean($this->request->get('entity'));
 
             $form->get('entity')->setData($reEntity);
             $form->get('id')->setData($reEntityId);

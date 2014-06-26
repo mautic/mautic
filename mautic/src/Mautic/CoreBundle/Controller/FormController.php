@@ -27,7 +27,7 @@ class FormController extends CommonController
     protected function isFormCancelled(Form &$form)
     {
         $name   = $form->getName();
-        $cancel = $this->request->request->get($name . '[cancel]', false, true);
+        $cancel = $this->request->request->get($name . '[buttons][cancel]', false, true);
         return ($cancel !== false);
     }
 

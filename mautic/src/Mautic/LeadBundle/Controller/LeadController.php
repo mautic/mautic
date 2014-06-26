@@ -45,7 +45,7 @@ class LeadController extends FormController
         }
 
         //set limits
-        $limit = $this->container->getParameter('mautic.default_pagelimit');
+        $limit = $this->get('session')->get('mautic.lead.limit', $this->container->getParameter('mautic.default_pagelimit'));
         $start = ($page === 1) ? 0 : (($page-1) * $limit);
         if ($start < 0) {
             $start = 0;
@@ -72,13 +72,16 @@ class LeadController extends FormController
 
         $leads = $this->get('mautic.factory')->getModel('lead.lead')->getEntities(
             array(
-                'start'      => $start,
-                'limit'      => $limit,
-                'filter'     => $filter,
-                'orderByDir' => "DESC"
+                'start'         => $start,
+                'limit'         => $limit,
+                'filter'        => $filter,
+                'orderByDir'    => "DESC",
+                'getTotalCount' => true
             ));
 
-        $count = count($leads);
+        $count = $leads['totalCount'];
+        unset($leads['totalCount']);
+
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page
             if ($count === 1) {
@@ -122,6 +125,7 @@ class LeadController extends FormController
             'items'       => $leads,
             'page'        => $page,
             'limit'       => $limit,
+            'totalCount'  => $count,
             'permissions' => $permissions,
             'lead'        => $activeLead,
             'form'        => $form,
@@ -269,12 +273,29 @@ class LeadController extends FormController
                     //form is valid so process the data
                     $model->saveEntity($lead);
 
-                    $viewParameters = array(
-                        'objectAction' => 'view',
-                        'objectId'     => $lead->getId()
+                    $identifier = $this->get('translator')->trans($lead->getPrimaryIdentifier());
+
+                    $this->request->getSession()->getFlashBag()->add(
+                        'notice',
+                        $this->get('translator')->trans('mautic.lead.list.notice.created',  array(
+                            '%name%' => $identifier,
+                            '%url%'  => $this->generateUrl('mautic_lead_action', array(
+                                'objectAction' => 'edit',
+                                'objectId'     => $lead->getId()
+                            ))
+                        ), 'flashes')
                     );
-                    $returnUrl = $this->generateUrl('mautic_lead_action', $viewParameters);
-                    $template  = 'MauticLeadBundle:Lead:view';
+
+                    if ($form->get('buttons')->get('save')->isClicked()) {
+                        $viewParameters = array(
+                            'objectAction' => 'view',
+                            'objectId'     => $lead->getId()
+                        );
+                        $returnUrl      = $this->generateUrl('mautic_lead_action', $viewParameters);
+                        $template       = 'MauticLeadBundle:Lead:view';
+                    } else {
+                        return $this->editAction($lead->getId(), true);
+                    }
                 }
             } else {
                 $viewParameters  = array('page' => $page);
@@ -282,8 +303,7 @@ class LeadController extends FormController
                 $template  = 'MauticLeadBundle:Lead:index';
             }
 
-            if ($cancelled | $valid) { //cancelled or success
-                $identifier = $this->get('translator')->trans($lead->getPrimaryIdentifier());
+            if ($cancelled || $valid) { //cancelled or success
                 return $this->postActionRedirect(array(
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => $viewParameters,
@@ -291,21 +311,7 @@ class LeadController extends FormController
                     'passthroughVars' => array(
                         'activeLink'    => '#mautic_lead_index',
                         'mauticContent' => 'lead'
-                    ),
-                    'flashes'         =>
-                        ($valid) ? array( //success
-                            array(
-                                'type'    => 'notice',
-                                'msg'     => 'mautic.lead.lead.notice.created',
-                                'msgVars' => array(
-                                    '%name%' => $identifier,
-                                    '%url%'  => $this->generateUrl('mautic_lead_action', array(
-                                        'objectAction' => 'edit',
-                                        'objectId'     => $lead->getId()
-                                    ))
-                                )
-                            )
-                        ) : array()
+                    )
                 ));
             }
         } else {
@@ -324,7 +330,7 @@ class LeadController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function editAction ($objectId)
+    public function editAction ($objectId, $ignorePost = false)
     {
         $model   = $this->get('mautic.factory')->getModel('lead.lead');
         $lead    = $model->getEntity($objectId);
@@ -370,7 +376,7 @@ class LeadController extends FormController
         $form   = $model->createForm($lead, $this->get('form.factory'), $action);
 
         ///Check for a submitted form and process it
-        if ($this->request->getMethod() == 'POST') {
+        if (!$ignorePost && $this->request->getMethod() == 'POST') {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -386,40 +392,37 @@ class LeadController extends FormController
 
                     $model->setFieldValues($lead, $data);
                     //form is valid so process the data
-                    $model->saveEntity($lead);
+                    $model->saveEntity($lead, $form->get('buttons')->get('save')->isClicked());
+
+                    $identifier = $this->get('translator')->trans($lead->getPrimaryIdentifier());
+                    $this->request->getSession()->getFlashBag()->add(
+                        'notice',
+                        $this->get('translator')->trans('mautic.lead.list.notice.created',  array(
+                            '%name%' => $identifier,
+                            '%url%'  => $this->generateUrl('mautic_lead_action', array(
+                                'objectAction' => 'edit',
+                                'objectId'     => $lead->getId()
+                            ))
+                        ), 'flashes')
+                    );
                 }
             } else {
                 //unlock the entity
                 $model->unlockEntity($lead);
             }
 
-            if (!empty($valid)) { //cancelled or success
+            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 $returnUrl = $this->generateUrl('mautic_lead_action', array(
                     'objectAction' => 'view',
                     'objectId'     => $lead->getId()
                 ));
-                $identifier = $this->get('translator')->trans($lead->getPrimaryIdentifier());
+
                 return $this->postActionRedirect(
                     array_merge($postActionVars, array(
                         'returnUrl'       => $returnUrl,
                         'viewParameters'  => array('objectId' => $lead->getId()),
-                        'contentTemplate' => 'MauticLeadBundle:Lead:view',
-                        'flashes'         =>
-                            ($valid) ? array( //success
-                                array(
-                                    'type' => 'notice',
-                                    'msg'  => 'mautic.lead.lead.notice.updated',
-                                    'msgVars' => array(
-                                        '%name%' => $identifier,
-                                        '%url%'  => $this->generateUrl('mautic_lead_action', array(
-                                            'objectAction' => 'edit',
-                                            'objectId'     => $lead->getId()
-                                        ))
-                                    )
-                                )
-                            ) : array()
-                        )
-                    )
+                        'contentTemplate' => 'MauticLeadBundle:Lead:view'
+                    ))
                 );
             }
         } else {
@@ -493,66 +496,5 @@ class LeadController extends FormController
                 'flashes' => $flashes
             ))
         );
-    }
-
-    /**
-     * {@inheritdoc)
-     *
-     * @param $action
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse
-     */
-    public function executeAjaxAction( Request $request, $ajaxAction = "" )
-    {
-        $dataArray = array("success" => 0);
-        switch ($ajaxAction) {
-            case "userlist":
-                $filter  = InputHelper::clean($request->query->get('filter'));
-                $results = $this->get('mautic.factory')->getModel('lead.lead')->getLookupResults('user', $filter);
-                $dataArray = array();
-                foreach ($results as $r) {
-                    $name = $r['firstName'] . ' ' . $r['lastName'];
-                    $dataArray[] = array(
-                        "label" => $name,
-                        "value" => $r['id']
-                    );
-                }
-                break;
-            case "fieldlist":
-                $filter = InputHelper::clean($request->query->get('filter'));
-                $field  = InputHelper::clean($request->query->get('field'));
-                if (!empty($field)) {
-                    $dataArray = array();
-                    //field_ is attached when looking up in list filters
-                    if (strpos($field, 'field_') === 0) {
-                        $field = str_replace('field_', '', $field);
-                    }
-                    if ($field == 'company') {
-                        $results = $this->get('mautic.factory')->getModel('lead.lead')->getLookupResults('company', $filter);
-                        foreach ($results as $r) {
-                            $dataArray[] = array('value' => $r['company']);
-                        }
-                    } elseif ($field == "owner") {
-                        $results = $this->get('mautic.factory')->getModel('lead.lead')->getLookupResults('user', $filter);
-                        foreach ($results as $r) {
-                            $name = $r['firstName'] . ' ' . $r['lastName'];
-                            $dataArray[] = array(
-                                "value" => $name,
-                                "id" => $r['id']
-                            );
-                        }
-                        break;
-                    } else {
-                        $results = $this->get('mautic.factory')->getModel('lead.field')->getLookupResults($field, $filter);
-                        foreach ($results as $r) {
-                            $dataArray[] = array('value' => $r['value']);
-                        }
-                    }
-                }
-                break;
-        }
-        $response  = new JsonResponse();
-        $response->setData($dataArray);
-
-        return $response;
     }
 }

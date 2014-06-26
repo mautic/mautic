@@ -38,7 +38,7 @@ class ListController extends FormController
         }
 
         //set limits
-        $limit = $this->container->getParameter('mautic.default_pagelimit');
+        $limit = $this->get('session')->get('mautic.leadlist.limit', $this->container->getParameter('mautic.default_pagelimit'));
         $start = ($page === 1) ? 0 : (($page-1) * $limit);
         if ($start < 0) {
             $start = 0;
@@ -142,10 +142,21 @@ class ListController extends FormController
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
                     $model->saveEntity($list);
+
+                    $this->request->getSession()->getFlashBag()->add(
+                        'notice',
+                        $this->get('translator')->trans('mautic.lead.list.notice.created',  array(
+                            '%name%' => $list->getName() . " (" . $list->getAlias() . ")",
+                            '%url%'  => $this->generateUrl('mautic_leadlist_action', array(
+                                'objectAction' => 'edit',
+                                'objectId'     => $list->getId()
+                            ))
+                        ), 'flashes')
+                    );
                 }
             }
 
-            if ($cancelled || $valid) { //cancelled or success
+            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 return $this->postActionRedirect(array(
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => array('page' => $page),
@@ -153,22 +164,10 @@ class ListController extends FormController
                     'passthroughVars' => array(
                         'activeLink'    => '#mautic_leadlist_index',
                         'mauticContent' => 'leadlist'
-                    ),
-                    'flashes'         =>
-                        ($valid) ? array(
-                            array(
-                                'type'    => 'notice',
-                                'msg'     => 'mautic.lead.list.notice.created',
-                                'msgVars' => array(
-                                    '%name%' => $list->getName() . " (" . $list->getAlias() . ")",
-                                    '%url%'  => $this->generateUrl('mautic_leadlist_action', array(
-                                        'objectAction' => 'edit',
-                                        'objectId'     => $list->getId()
-                                    ))
-                                )
-                            )
-                        ) : array()
+                    )
                 ));
+            } elseif (!$cancelled) {
+                return $this->editAction($list->getId(), true);
             }
         }
 
@@ -196,7 +195,7 @@ class ListController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function editAction ($objectId)
+    public function editAction ($objectId, $ignorePost = false)
     {
         $model   =$this->get('mautic.factory')->getModel('lead.list');
         $list    = $model->getEntity($objectId);
@@ -242,39 +241,35 @@ class ListController extends FormController
         $form   = $model->createForm($list, $this->get('form.factory'), $action);
 
         ///Check for a submitted form and process it
-        if ($this->request->getMethod() == 'POST') {
+        if (!$ignorePost && $this->request->getMethod() == 'POST') {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
-                    $model->saveEntity($list);
+                    $model->saveEntity($list, $form->get('buttons')->get('save')->isClicked());
+
+                    $this->request->getSession()->getFlashBag()->add(
+                        'notice',
+                        $this->get('translator')->trans('mautic.lead.list.notice.updated',  array(
+                            '%name%' => $list->getName() . " (" . $list->getAlias() . ")",
+                            '%url%'  => $this->generateUrl('mautic_leadlist_action', array(
+                                'objectAction' => 'edit',
+                                'objectId'     => $list->getId()
+                            ))
+                        ), 'flashes')
+                    );
                 }
             } else {
                 //unlock the entity
                 $model->unlockEntity($list);
             }
 
-            if ($cancelled || $valid) { //cancelled or success
+            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 return $this->postActionRedirect(
                     array_merge($postActionVars, array(
                         'viewParameters'  => array('objectId' => $list->getId()),
-                        'contentTemplate' => 'MauticLeadBundle:List:index',
-                        'flashes'         =>
-                            ($valid) ? array( //success
-                                array(
-                                    'type' => 'notice',
-                                    'msg'  => 'mautic.lead.list.notice.updated',
-                                    'msgVars' => array(
-                                        '%name%' => $list->getName() . " (" . $list->getAlias() . ")",
-                                        '%url%'  => $this->generateUrl('mautic_leadlist_action', array(
-                                            'objectAction' => 'edit',
-                                            'objectId'     => $list->getId()
-                                        ))
-                                    )
-                                )
-                            ) : array()
-                        )
-                    )
+                        'contentTemplate' => 'MauticLeadBundle:List:index'
+                    ))
                 );
             }
         } else {

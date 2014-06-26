@@ -82,33 +82,32 @@ class FieldController extends FormController
                     if ($valid) {
                         //form is valid so process the data
                         $model->saveEntity($field);
+
+                        $this->request->getSession()->getFlashBag()->add(
+                            'notice',
+                            $this->get('translator')->trans('mautic.lead.field.notice.created',  array(
+                                '%name%' => $field->getLabel(),
+                                '%url%'          => $this->generateUrl('mautic_leadfield_action', array(
+                                    'objectAction' => 'edit',
+                                    'objectId'     => $field->getId()
+                                ))
+                            ), 'flashes')
+                        );
                     }
                 }
             }
 
-            if ($cancelled || $valid) { //cancelled or success
+            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 return $this->postActionRedirect(array(
                     'returnUrl'       => $returnUrl,
                     'contentTemplate' => 'MauticLeadBundle:Field:index',
                     'passthroughVars' => array(
                         'activeLink'    => '#mautic_leadfield_index',
                         'mauticContent' => 'leadfield'
-                    ),
-                    'flashes'         =>
-                        ($valid) ? array(
-                            array(
-                                'type'    => 'notice',
-                                'msg'     => 'mautic.lead.field.notice.created',
-                                'msgVars' => array(
-                                    '%name%' => $field->getLabel(),
-                                    '%url%'          => $this->generateUrl('mautic_leadfield_action', array(
-                                        'objectAction' => 'edit',
-                                        'objectId'     => $field->getId()
-                                    ))
-                                )
-                            )
-                        ) : array()
+                    )
                 ));
+            } elseif (!$cancelled) {
+                return $this->editAction($field->getId(), true);
             }
         }
 
@@ -130,7 +129,7 @@ class FieldController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function editAction ($objectId)
+    public function editAction ($objectId, $ignorePost = false)
     {
         if (!$this->get('mautic.security')->isGranted('lead:fields:full')) {
             return $this->accessDenied();
@@ -172,7 +171,7 @@ class FieldController extends FormController
         $form   = $model->createForm($field, $this->get('form.factory'), $action);
 
         ///Check for a submitted form and process it
-        if ($this->request->getMethod() == 'POST') {
+        if (!$ignorePost && $this->request->getMethod() == 'POST') {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -190,32 +189,30 @@ class FieldController extends FormController
 
                     if ($valid) {
                         //form is valid so process the data
-                        $model->saveEntity($field);
+                        $model->saveEntity($field, $form->get('buttons')->get('save')->isClicked());
+
+                        $this->request->getSession()->getFlashBag()->add(
+                            'notice',
+                            $this->get('translator')->trans('mautic.lead.field.notice.created',  array(
+                                '%name%' => $field->getLabel(),
+                                '%url%'          => $this->generateUrl('mautic_leadfield_action', array(
+                                    'objectAction' => 'edit',
+                                    'objectId'     => $field->getId()
+                                ))
+                            ), 'flashes')
+                        );
                     }
                 }
             } else {
                 //unlock the entity
                 $model->unlockEntity($field);
             }
-            if ($cancelled || $valid) {
+
+            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 return $this->postActionRedirect(
                     array_merge($postActionVars, array(
                             'viewParameters'  => array('objectId' => $field->getId()),
-                            'contentTemplate' => 'MauticLeadBundle:Field:index',
-                            'flashes'         =>
-                                ($valid) ? array( //success
-                                    array(
-                                        'type' => 'notice',
-                                        'msg'  => 'mautic.lead.field.notice.updated',
-                                        'msgVars' => array(
-                                            '%name%' => $field->getLabel(),
-                                            '%url%'  => $this->generateUrl('mautic_leadfield_action', array(
-                                                'objectAction' => 'edit',
-                                                'objectId'     => $field->getId()
-                                            ))
-                                        )
-                                    )
-                                ) : array()
+                            'contentTemplate' => 'MauticLeadBundle:Field:index'
                         )
                     )
                 );
@@ -296,29 +293,5 @@ class FieldController extends FormController
                 'flashes' => $flashes
             ))
         );
-    }
-
-    /**
-     * {@inheritdoc)
-     *
-     * @param $action
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse
-     */
-    public function executeAjaxAction( Request $request, $ajaxAction = "" )
-    {
-        $dataArray = array("success" => 0);
-        switch ($ajaxAction) {
-            case "reorder":
-                $fields = $this->request->request->get('field');
-                if (!empty($fields)) {
-                    $this->get('mautic.factory')->getModel('lead.field')->reorderFieldsByList($fields);
-                    $dataArray['success'] = 1;
-                }
-                break;
-        }
-        $response  = new JsonResponse();
-        $response->setData($dataArray);
-
-        return $response;
     }
 }

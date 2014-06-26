@@ -36,7 +36,7 @@ class RoleController extends FormController
         }
 
         //set limits
-        $limit = $this->container->getParameter('mautic.default_pagelimit');
+        $limit = $this->get('session')->get('mautic.role.limit', $this->container->getParameter('mautic.default_pagelimit'));
         $start = ($page === 1) ? 0 : (($page-1) * $limit);
         if ($start < 0) {
             $start = 0;
@@ -143,10 +143,21 @@ class RoleController extends FormController
 
                     //form is valid so process the data
                     $model->saveEntity($entity);
+
+                    $this->request->getSession()->getFlashBag()->add(
+                        'notice',
+                        $this->get('translator')->trans('mautic.user.role.notice.created',  array(
+                            '%name%' => $entity->getName(),
+                            '%url%'  => $this->generateUrl('mautic_role_action', array(
+                                'objectAction' => 'edit',
+                                'objectId'     => $entity->getId()
+                            ))
+                        ), 'flashes')
+                    );
                 }
             }
 
-            if ($cancelled || $valid) { //cancelled or success
+            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 return $this->postActionRedirect(array(
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => array('page' => $page),
@@ -154,22 +165,10 @@ class RoleController extends FormController
                     'passthroughVars' => array(
                         'activeLink'    => '#mautic_role_index',
                         'mauticContent' => 'role'
-                    ),
-                    'flashes'         => ($valid) ?
-                        array(
-                            array(
-                                'type'    => 'notice',
-                                'msg'     => 'mautic.user.role.notice.created',
-                                'msgVars' => array(
-                                    '%name%' => $entity->getName(),
-                                    '%url%'  => $this->generateUrl('mautic_role_action', array(
-                                        'objectAction' => 'edit',
-                                        'objectId'     => $entity->getId()
-                                    ))
-                                )
-                            )
-                        ) : array()
+                    )
                 ));
+            } else {
+                return $this->editAction($entity->getId(), true);
             }
         }
 
@@ -199,7 +198,7 @@ class RoleController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function editAction ($objectId)
+    public function editAction ($objectId, $ignorePost = true)
     {
         if (!$this->get('mautic.security')->isGranted('user:roles:edit')) {
             return $this->accessDenied();
@@ -244,7 +243,7 @@ class RoleController extends FormController
         $form   = $model->createForm($entity, $this->get('form.factory'), $action);
 
         ///Check for a submitted form and process it
-        if ($this->request->getMethod() == 'POST') {
+        if (!$ignorePost && $this->request->getMethod() == 'POST') {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -253,20 +252,17 @@ class RoleController extends FormController
                     $model->setRolePermissions($entity, $permissions);
 
                     //form is valid so process the data
-                    $model->saveEntity($entity);
+                    $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
 
-                    $postActionVars['flashes'] = array( //success
-                        array(
-                            'type'    => 'notice',
-                            'msg'     => 'mautic.user.role.notice.updated',
-                            'msgVars' => array(
-                                '%name%' => $entity->getName(),
-                                '%url%'  => $this->generateUrl('mautic_role_action', array(
-                                    'objectAction' => 'edit',
-                                    'objectId'     => $entity->getId()
-                                ))
-                            )
-                        )
+                    $this->request->getSession()->getFlashBag()->add(
+                        'notice',
+                        $this->get('translator')->trans('mautic.user.role.notice.updated',  array(
+                            '%name%' => $entity->getName(),
+                            '%url%'  => $this->generateUrl('mautic_role_action', array(
+                                'objectAction' => 'edit',
+                                'objectId'     => $entity->getId()
+                            ))
+                        ), 'flashes')
                     );
                 }
             } else {
@@ -274,8 +270,11 @@ class RoleController extends FormController
                 $model->unlockEntity($entity);
             }
 
-            if ($cancelled || $valid) { //cancelled or success
+            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 return $this->postActionRedirect($postActionVars);
+            } else {
+                //the form has to be rebuilt because the permissions were updated
+                $form = $model->createForm($entity, $this->get('form.factory'), $action);
             }
         } else {
             //lock the entity

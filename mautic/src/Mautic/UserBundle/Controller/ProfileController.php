@@ -147,27 +147,22 @@ class ProfileController extends FormController
         ///Check for a submitted form and process it
         $submitted = $this->get('session')->get('formProcessed', 0);
         if ($this->request->getMethod() == "POST" && !$submitted) {
-            $valid = false;
-            if (!$cancelled = $this->isFormCancelled($form)) {
-                $this->get('session')->set('formProcessed', 1);
+            $this->get('session')->set('formProcessed', 1);
 
-                //check to see if the password needs to be rehashed
-                $submittedPassword     = $this->request->request->get('user[plainPassword][password]', null, true);
-                $encoder               = $this->get('security.encoder_factory')->getEncoder($me);
-                $overrides['password'] = $model->checkNewPassword($me, $encoder, $submittedPassword);
+            //check to see if the password needs to be rehashed
+            $submittedPassword     = $this->request->request->get('user[plainPassword][password]', null, true);
+            $encoder               = $this->get('security.encoder_factory')->getEncoder($me);
+            $overrides['password'] = $model->checkNewPassword($me, $encoder, $submittedPassword);
 
-                if ($valid = $this->isFormValid($form)) {
-                    foreach ($overrides as $k => $v) {
-                        $func = "set" . ucfirst($k);
-                        $me->$func($v);
-                    }
-
-                    //form is valid so process the data
-                    $model->saveEntity($me);
+            if ($valid = $this->isFormValid($form)) {
+                foreach ($overrides as $k => $v) {
+                    $func = "set" . ucfirst($k);
+                    $me->$func($v);
                 }
-            }
 
-            if ($cancelled || $valid) { //cancelled or success
+                //form is valid so process the data
+                $model->saveEntity($me);
+
                 $returnUrl = $this->generateUrl('mautic_user_account');
                 return $this->postActionRedirect(array(
                     'returnUrl'       => $returnUrl,
@@ -175,13 +170,12 @@ class ProfileController extends FormController
                     'passthroughVars' => array(
                         'mauticContent' => 'user'
                     ),
-                    'flashes'         =>
-                        ($valid) ? array( //success
-                            array(
-                                'type' => 'notice',
-                                'msg'  => 'mautic.user.account.notice.updated'
-                            )
-                        ) : array()
+                    'flashes'         => array( //success
+                        array(
+                            'type' => 'notice',
+                            'msg'  => 'mautic.user.account.notice.updated'
+                        )
+                    )
                 ));
             }
         }
