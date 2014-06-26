@@ -51,7 +51,7 @@ class Submission
     private $referer;
 
     /**
-     * @ORM\OneToMany(targetEntity="Result", mappedBy="submission", cascade={"persist", "remove", "refresh", "detach"})
+     * @ORM\OneToMany(targetEntity="Result", mappedBy="submission", cascade={"persist", "remove", "refresh", "detach"}, fetch="EXTRA_LAZY")
      */
     private $results;
     /**

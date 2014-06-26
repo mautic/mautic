@@ -50,8 +50,8 @@ class ResultController extends CommonFormController
         }
 
         //set limits
-        //$limit = $this->get('session')->get('mautic.formresult.'.$formId.'.limit', $this->container->getParameter('mautic.default_pagelimit'));
-        $limit = $this->container->getParameter('mautic.default_pagelimit');
+        $limit = $this->get('session')->get('mautic.formresult.'.$formId.'.limit', $this->container->getParameter('mautic.default_pagelimit'));
+        //$limit = $this->container->getParameter('mautic.default_pagelimit');
 
         $start = ($page === 1) ? 0 : (($page-1) * $limit);
         if ($start < 0) {
@@ -64,9 +64,9 @@ class ResultController extends CommonFormController
         $filters    = $this->get('session')->get('mautic.formresult.'.$formId.'.filters', array());
         //add the form
         $filters[]  = array(
-            'column' => 's.form',
+            'column' => 'IDENTITY(s.form)',
             'expr'   => 'eq',
-            'value'  => $form
+            'value'  => $form->getId()
         );
 
         $model = $this->get('mautic.factory')->getModel('form.submission');
@@ -176,9 +176,9 @@ class ResultController extends CommonFormController
 
         //add the form
         $filters[]  = array(
-            'column' => 's.form',
+            'column' => 'IDENTITY(s.form)',
             'expr'   => 'eq',
-            'value'  => $form
+            'value'  => $form->getId()
         );
 
         $args = array(

@@ -24,23 +24,18 @@ class SubmissionRepository extends CommonRepository
 
     public function getEntities($args = array())
     {
-        $q = $this->_em->createQueryBuilder()
-            ->select('partial f.{id, alias, label, type, order}, s, partial r.{id, value}, partial i.{id,ipAddress}')
-            ->from('MauticFormBundle:Submission', 's')
+        $q = $this->createQueryBuilder('s')
+            ->select('s, r, i')
             ->leftJoin('s.results', 'r')
             ->leftJoin('r.field', 'f')
-            ->leftJoin('s.form', 'm')
             ->leftJoin('s.ipAddress', 'i');
-
-        //@todo - there is an issue with paginator here only returning half the results set by limit
 
         $this->buildClauses($q, $args);
 
         $q->addOrderBy('f.order', 'ASC');
         $query = $q->getQuery();
         $query->setHydrationMode(Query::HYDRATE_ARRAY);
-        $results = new Paginator($query, false);
-
+        $results = new Paginator($query);
         return $results;
     }
 
