@@ -17,7 +17,7 @@ endif;
         <thead>
         <tr>
             <?php
-            echo $view->render('MauticCoreBundle:Table:tableheader.html.php', array(
+            echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                 'sessionVar' => 'client',
                 'orderBy'    => 'c.name',
                 'text'       => 'mautic.api.client.thead.name',
@@ -27,7 +27,7 @@ endif;
             ?>
             <th class="visible-md visible-lg col-client-redirecturis"><?php echo $view['translator']->trans('mautic.api.client.thead.redirecturis'); ?></th>
             <?php
-            echo $view->render('MauticCoreBundle:Table:tableheader.html.php', array(
+            echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                 'sessionVar' => 'client',
                 'orderBy'    => 'c.id',
                 'text'       => 'mautic.api.client.thead.id',
@@ -67,9 +67,11 @@ endif;
         </tbody>
     </table>
     <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
-        "items"   => $items,
-        "page"    => $page,
-        "limit"   => $limit,
-        "baseUrl" =>  $view['router']->generate('mautic_client_index')
+        "items"      => $items,
+        "page"       => $page,
+        "limit"      => $limit,
+        "baseUrl"    =>  $view['router']->generate('mautic_client_index'),
+        'sessionVar' => 'client',
+        'tmpl'       => $tmpl
     )); ?>
 </div>

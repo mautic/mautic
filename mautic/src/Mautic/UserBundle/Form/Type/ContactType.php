@@ -56,22 +56,13 @@ class ContactType extends AbstractType
                 'attr' => array(
                     'autocomplete' => 'off'
                 )
-            ))
-            ->add('save', 'submit', array(
-                'label' => 'mautic.user.user.contact.send',
-                'attr'  => array(
-                    'class' => 'btn btn-primary',
-                    'icon'  => 'fa fa-send padding-sm-right'
-                )
-            ))
-            ->add('cancel', 'submit', array(
-                'label' => 'mautic.core.form.cancel',
-                'attr'  => array(
-                    'class'   => 'btn btn-danger',
-                    'icon'    => 'fa fa-times padding-sm-right'
-                )
             ));
 
+        $builder->add('buttons', 'form_buttons', array(
+            'save_text'  => 'mautic.user.user.contact.send',
+            'save_icon'  => 'fa fa-send',
+            'apply_text' => false
+        ));
     }
 
     public function getName()

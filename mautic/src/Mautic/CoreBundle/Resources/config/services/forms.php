@@ -54,6 +54,13 @@ $container->setDefinition('mautic.form.type.tel', new Definition(
         'alias' => 'tel',
     ));
 
+$container->setDefinition('mautic.form.type.form_buttons', new Definition(
+    'Mautic\CoreBundle\Form\Type\FormButtonsType'
+))
+    ->addTag('form.type', array(
+        'alias' => 'form_buttons',
+    ));
+
 $container->setDefinition('mautic.form.type.hidden_entity', new Definition(
     'Mautic\CoreBundle\Form\Type\HiddenEntityType',
     array(
@@ -62,4 +69,14 @@ $container->setDefinition('mautic.form.type.hidden_entity', new Definition(
 ))
     ->addTag('form.type', array(
         'alias' => 'hidden_entity',
+    ));
+
+$container->setDefinition(
+    'mautic.form.type.list',
+    new Definition(
+        'Mautic\CoreBundle\Form\Type\SortableListType'
+    )
+)
+    ->addTag('form.type', array(
+        'alias' => 'sortablelist',
     ));

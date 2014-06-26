@@ -48,29 +48,42 @@ class PermissionsType extends AbstractType
             )
         ));
 
+        //first pass to order headers
+        $panels = array();
         foreach ($permissionClasses as $class) {
             if ($class->isEnabled()) {
                 $bundle = $class->getName();
-                //convert the permission bits from the db into readable names
-                $data    = $class->convertBitsToPermissionNames($options['permissions']);
-                //get the ratio of granted/total
-                list($granted, $total) = $class->getPermissionRatio($data);
-                $ratio = (!empty($total)) ?
-                          ' <span class="permission-ratio">('
-                            . '<span class="' . $bundle . '_granted">' . $granted . '</span>/'
-                            . '<span class="' . $bundle . '_total">' . $total . '</span>'
-                        . ')</span>'
-                    : "";
-                $label   = $this->translator->trans("mautic.{$bundle}.permissions.header") . $ratio;
-                $builder->add("{$bundle}-panel-start", 'panel_start', array(
-                    'label'      => $label,
-                    'dataParent' => "#permissions-panel",
-                    'bodyId'     => "{$bundle}-panel"
-                ));
-                $class->buildForm($builder, $options, $data);
+                $label  = $this->translator->trans("mautic.{$bundle}.permissions.header");
 
-                $builder->add("{$bundle}-panel-end", 'panel_end');
+                $panels[$bundle] = $label;
             }
+        }
+
+        //order panels
+        asort($panels, SORT_NATURAL);
+
+        //build forms
+        foreach ($panels as $bundle => $label) {
+            $class =& $permissionClasses[$bundle];
+            //convert the permission bits from the db into readable names
+            $data    = $class->convertBitsToPermissionNames($options['permissions']);
+            //get the ratio of granted/total
+            list($granted, $total) = $class->getPermissionRatio($data);
+            $ratio = (!empty($total)) ?
+                      ' <span class="permission-ratio">('
+                        . '<span class="' . $bundle . '_granted">' . $granted . '</span>/'
+                        . '<span class="' . $bundle . '_total">' . $total . '</span>'
+                    . ')</span>'
+                : "";
+
+            $builder->add("{$bundle}-panel-start", 'panel_start', array(
+                'label'      => $label . $ratio,
+                'dataParent' => "#permissions-panel",
+                'bodyId'     => "{$bundle}-panel"
+            ));
+            $class->buildForm($builder, $options, $data);
+
+            $builder->add("{$bundle}-panel-end", 'panel_end');
         }
 
         $builder->add("permissions-panel-wrapper-end", 'panel_wrapper_end');

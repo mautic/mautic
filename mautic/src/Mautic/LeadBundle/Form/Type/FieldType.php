@@ -151,21 +151,7 @@ class FieldType extends AbstractType
             'required'      => false
         ));
 
-        $builder->add('save', 'submit', array(
-            'label' => 'mautic.core.form.save',
-            'attr'  => array(
-                'class' => 'btn btn-primary',
-                'icon'  => 'fa fa-check padding-sm-right'
-            ),
-        ));
-
-        $builder->add('cancel', 'submit', array(
-            'label' => 'mautic.core.form.cancel',
-            'attr'  => array(
-                'class'   => 'btn btn-danger',
-                'icon'    => 'fa fa-times padding-sm-right'
-            )
-        ));
+        $builder->add('buttons', 'form_buttons');
 
         if (!empty($options["action"])) {
             $builder->setAction($options["action"]);
