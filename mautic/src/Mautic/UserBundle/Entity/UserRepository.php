@@ -281,8 +281,12 @@ class UserRepository extends CommonRepository
     /**
      * @return string
      */
-    protected function getDefaultOrderBy()
+    protected function getDefaultOrder()
     {
-        return 'u.lastName, u.firstName, u.username';
+        return array(
+            array('u.lastName', 'ASC'),
+            array('u.firstName', 'ASC'),
+            array('u.username', 'ASC')
+        );
     }
 }

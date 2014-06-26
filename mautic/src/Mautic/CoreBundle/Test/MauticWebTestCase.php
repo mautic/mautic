@@ -9,6 +9,8 @@
 
 namespace Mautic\CoreBundle\Test;
 
+//@TODO - fix entity detachment issue that is leading to failed tests
+
 use Liip\FunctionalTestBundle\Test\WebTestCase;
 //use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;

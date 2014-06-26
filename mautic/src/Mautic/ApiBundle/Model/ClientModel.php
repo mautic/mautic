@@ -23,12 +23,25 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
  */
 class ClientModel extends FormModel
 {
+
     /**
      * {@inheritdoc}
+     *
+     * @return object
      */
-    protected function init()
+    public function getRepository()
     {
-        $this->repository     = 'MauticApiBundle:Client';
+        return $this->em->getRepository('MauticApiBundle:Client');
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return string
+     */
+    public function getPermissionBase()
+    {
+        return 'api:clients';
     }
 
     /**
@@ -107,6 +120,6 @@ class ClientModel extends FormModel
 
     public function getUserClients(User $user)
     {
-        return $this->em->getRepository($this->repository)->getUserClients($user);
+        return $this->em->getRepository($this->getRepository())->getUserClients($user);
     }
 }

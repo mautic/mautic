@@ -7,7 +7,9 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-//$items should be a Doctrine paginator instance
+$target = (!empty($target)) ? $target : '.main-panel-content-wrapper';
+$tmpl   = (!empty($tmpl)) ? $tmpl : 'content';
+
 if (!isset($limit)) {
     $limit = 30;
 }
@@ -24,13 +26,11 @@ if ($page <= 0) {
 
 $baseUrl .= "/";
 
-$totalItems  = count($items);
-$totalPages  = (int) ceil($totalItems / $limit);
-if ($totalPages <= 1)
-    return;
+$totalItems  = (!isset($totalItems)) ? count($items) : $totalItems;
+$totalPages = ($limit) ? (int) ceil($totalItems / $limit) : 1;
 
-$paginationClass = (!isset($paginationClass)) ? "" : " $paginationClass";
-$menuLink = (!empty($menuLinkId)) ? " data-menu-link=\"$menuLinkId\"" : "";
+$pageClass = (!isset($paginationClass)) ? "" : " pagination-$paginationClass";
+$menuLink  = (!empty($menuLinkId)) ? " data-menu-link=\"$menuLinkId\"" : "";
 
 if (isset($queryString)) {
     $queryString = '?' . $queryString;
@@ -38,10 +38,22 @@ if (isset($queryString)) {
     $queryString = '';
 }
 
+$limitOptions = array(
+    5   => '5',
+    10  => '10',
+    15  => '15',
+    20  => '20',
+    25  => '25',
+    30  => '30',
+    50  => '50',
+    100 => '100',
+    0   => 'all'
+);
+
 ?>
 <div class="clearfix"></div>
 <div class="pagination-wrapper">
-    <ul class="pagination pagination-centered <?php echo $paginationClass; ?>">
+    <ul class="pagination pagination-centered <?php echo $pageClass; ?>">
         <?php
         $urlPage = $page - $range;
         $url     = ($urlPage > 0) ? $baseUrl . $urlPage . $queryString : 'javascript: void(0);';
@@ -110,7 +122,7 @@ if (isset($queryString)) {
             $urlPage = $totalPages;
         $url     = ($page < $totalPages && $totalPages > $range) ? $baseUrl . $urlPage . $queryString : 'javascript: void(0);';
         $data    = ($url == 'javascript: void(0);') ? '' : ' data-toggle="ajax"' . $menuLink;
-        $class   = ($urlPage > $totalPages || $page === $totalPages) ? ' class="disabled"' : '';
+        $class   = ($urlPage == $totalPages || $page === $totalPages) ? ' class="disabled"' : '';
         ?>
         <li<?php echo $class; ?>>
             <?php  ?>
@@ -118,6 +130,22 @@ if (isset($queryString)) {
                 <i class="fa fa-angle-double-right"></i>
             </a>
         </li>
+        <li>
+            <?php $class = (!empty($paginationClass)) ? " input-{$paginationClass}" : ""; ?>
+            <select autocomplete="off" class="form-control pagination-limit<?php echo $class; ?>" onchange="Mautic.limitTableData(
+                '<?php echo $sessionVar; ?>',
+                this.value,
+                '<?php echo $tmpl; ?>',
+                '<?php echo $target; ?>'
+                );">
+                <?php foreach ($limitOptions as $value => $label): ?>
+                <?php $selected = ($limit === $value) ? ' selected="selected"': '';?>
+                <option<?php echo $selected; ?> value="<?php echo $value; ?>"><?php echo $view['translator']->trans('mautic.core.pagination.'.$label); ?></option>
+                <?php endforeach; ?>
+            </select>
+
+        </li>
+
     </ul>
     <div class="clearfix"></div>
 </div>

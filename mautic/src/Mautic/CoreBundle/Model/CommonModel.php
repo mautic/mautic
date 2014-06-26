@@ -21,7 +21,6 @@ class CommonModel
     protected $security;
     protected $dispatcher;
     protected $translator;
-    protected $repository;
     protected $factory;
 
     /**
@@ -34,32 +33,42 @@ class CommonModel
         $this->dispatcher = $factory->getDispatcher();
         $this->translator = $factory->getTranslator();
         $this->factory    = $factory;
-
-        $this->init();
     }
 
     /**
-     * Used by child model classes to load required variables, etc
+     * @return array
      */
-    protected function init() { }
-
-    /**
-     * Set the repository required for the model
-     *
-     * @param $repository
-     */
-    protected function setRepository($repository)
-    {
-        $this->repository = $repository;
-    }
-
     public function getSupportedSearchCommands()
     {
         return array();
     }
 
+    /**
+     * @return mixed
+     */
     public function getCommandList()
     {
-        return $this->em->getRepository($this->repository)->getSearchCommands();
+        return $this->getRepository()->getSearchCommands();
     }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return string
+     */
+    public function getRepository()
+    {
+        return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return string
+     */
+    public function getPermissionBase()
+    {
+        return false;
+    }
+
 }

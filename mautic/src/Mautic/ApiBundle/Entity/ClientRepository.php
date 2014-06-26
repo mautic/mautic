@@ -109,9 +109,11 @@ class ClientRepository extends CommonRepository
         );
     }
 
-    protected function getDefaultOrderBy()
+    protected function getDefaultOrder()
     {
-        return 'c.name';
+        return array(
+            array('c.name', 'ASC')
+        );
     }
 
 }

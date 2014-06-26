@@ -11,7 +11,6 @@ namespace Mautic\CoreBundle\Security\Permissions;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\UserBundle\Entity\User;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Mautic\UserBundle\Entity\Permission;
 use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -72,7 +71,7 @@ class CorePermissions {
                 //explode MauticUserBundle into Mautic User Bundle so we can build the class needed
                 $object     = $this->getPermissionClass($bundle['base'], false);
                 if (!empty($object)) {
-                    $classes[] = $object;
+                    $classes[strtolower($bundle['base'])] = $object;
                 }
             }
         }
@@ -96,7 +95,7 @@ class CorePermissions {
                 if (class_exists($className)) {
                     $classes[$bundle] = new $className($this->params);
                 } elseif ($throwException) {
-                    throw new NotFoundHttpException("$className not found!");
+                    throw new \InvalidArgumentException("$className not found!");
                 } else {
                     $classes[$bundle] = false;
                 }
@@ -104,7 +103,7 @@ class CorePermissions {
 
             return $classes[$bundle];
         } else {
-            throw new NotFoundHttpException("Bundle and permission type must be specified. '$bundle' given.");
+            throw new \InvalidArgumentException("Bundle and permission type must be specified. '$bundle' given.");
         }
     }
 
@@ -113,7 +112,7 @@ class CorePermissions {
      *
      * @param array $permissions
      * @return array
-     * @throws \Symfony\Component\Debug\Exception\NotFoundHttpException
+     * @throws \InvalidArgumentException
      */
     public function generatePermissions(array $permissions) {
         $entities = array();
@@ -142,7 +141,7 @@ class CorePermissions {
                 if ($supports = $class->isSupported($name, $perm)) {
                     $bit += $class->getValue($name, $perm);
                 } else {
-                    throw new NotFoundHttpException("$perm does not exist for $bundle:$name");
+                    throw new \InvalidArgumentException("$perm does not exist for $bundle:$name");
                 }
             }
             $entity->setBitwise($bit);
@@ -160,7 +159,7 @@ class CorePermissions {
      * @param bool $mode MATCH_ALL|MATCH_ONE|RETURN_ARRAY
      * @param null $userEntity
      * @return bool
-     * @throws NotFoundHttpException
+     * @throws \InvalidArgumentException
      */
     public function isGranted ($requestedPermission, $mode = "MATCH_ALL", $userEntity = null)
     {
@@ -176,7 +175,7 @@ class CorePermissions {
         foreach ($requestedPermission as $permission) {
             $parts = explode(':', $permission);
             if (count($parts) != 3) {
-                throw new NotFoundHttpException($this->translator->trans('mautic.core.permissions.badformat',
+                throw new \InvalidArgumentException($this->translator->trans('mautic.core.permissions.badformat',
                         array("%permission%" => $permission))
                 );
             }
@@ -193,7 +192,7 @@ class CorePermissions {
 
             //Is the permission supported?
             if (!$permissionObject->isSupported($parts[1], $parts[2])) {
-                throw new NotFoundHttpException($this->translator->trans('mautic.core.permissions.notfound',
+                throw new \InvalidArgumentException($this->translator->trans('mautic.core.permissions.notfound',
                         array("%permission%" => $permission))
                 );
             }
@@ -218,7 +217,7 @@ class CorePermissions {
         } elseif ($mode == "RETURN_ARRAY") {
             return $permissions;
         } else {
-            throw new NotFoundHttpException($this->translator->trans('mautic.core.permissions.mode.notfound',
+            throw new \InvalidArgumentException($this->translator->trans('mautic.core.permissions.mode.notfound',
                     array("%mode%" => $mode))
             );
         }

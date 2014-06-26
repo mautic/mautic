@@ -237,4 +237,14 @@ class Role extends FormEntity
         $this->isChanged('rawPermissions', $permissions);
         $this->rawPermissions = $permissions;
     }
+
+    /**
+     * Get rawPermissions
+     *
+     * @return array 
+     */
+    public function getRawPermissions()
+    {
+        return $this->rawPermissions;
+    }
 }

@@ -53,7 +53,7 @@ class MauticFactory
         array $mauticParams
     ) {
         $this->dispatcher       = $dispatcher;
-        $this->db               =& $db;
+        $this->db               = $db;
         $this->requestStack     = $requestStack;
         $this->securityContext  = $securityContext;
         $this->security         = $mauticSecurity;
@@ -244,7 +244,7 @@ class MauticFactory
      * @param null $format
      * @param null $tz
      */
-    public function getDate($string = null, $format = null, $tz = null)
+    public function getDate($string = null, $format = null, $tz = 'local')
     {
         static $dates;
 

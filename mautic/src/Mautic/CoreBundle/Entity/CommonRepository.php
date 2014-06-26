@@ -12,6 +12,7 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\SearchStringHelper;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -28,6 +29,11 @@ class CommonRepository extends EntityRepository
      * @var Translator
      */
     protected $translator;
+
+    /**
+     * @var MauticFactory
+     */
+    protected $factory;
 
     /**
      * @var User
@@ -47,6 +53,11 @@ class CommonRepository extends EntityRepository
     public function setCurrentUser(User $user)
     {
         $this->currentUser = $user;
+    }
+
+    public function setFactory(MauticFactory $factory)
+    {
+        $this->factory = $factory;
     }
 
     /**
@@ -145,11 +156,10 @@ class CommonRepository extends EntityRepository
                         $forceParameters  = array();
                         $forceExpressions = $q->expr()->andX();
                         foreach ($filter['force'] as $f) {
-                            $unique = $this->generateRandomParameterName();
-                            $forceExpressions->add(
-                                $q->expr()->{$f['expr']}($f['column'], $unique)
-                            );
-                            $forceParameters[$unique] = $f['value'];
+                            list ($expr, $parameters) = $this->getFilterExpr($q, $f);
+                            $forceExpressions->add($expr);
+                            if (is_array($parameters))
+                                $forceParameters = array_merge($forceParameters, $parameters);
                         }
                     } else {
                         //string so parse as advanced search
@@ -187,6 +197,18 @@ class CommonRepository extends EntityRepository
             }
         }
         return true;
+    }
+
+    protected function getFilterExpr(QueryBuilder &$q, $filter)
+    {
+        $unique = $this->generateRandomParameterName();
+        $func   = (!empty($filter['operator'])) ? $filter['operator'] : $filter['expr'];
+        if (isset($filter['strict']) && !$filter['strict'])
+            $filter['value'] = "%{$filter['value']}%";
+        $expr   = $q->expr()->{$func}($filter['column'], ':'.$unique);
+        if (!empty($filter['not']))
+            $expr = $q->expr()->not($expr);
+        return  array($expr, array($unique => $filter['value']));
     }
 
     protected function addCatchAllWhereClause(QueryBuilder &$qb, $filter)
@@ -284,17 +306,26 @@ class CommonRepository extends EntityRepository
      */
     protected function buildOrderByClause(QueryBuilder &$q, array $args)
     {
-        $orderBy    = array_key_exists('orderBy', $args) ? $args['orderBy'] : $this->getDefaultOrderBy();
-        $orderByDir = array_key_exists('orderByDir', $args) ? $args['orderByDir'] : "ASC";
+        $orderBy    = array_key_exists('orderBy', $args) ? $args['orderBy'] : '';
+        $orderByDir = array_key_exists('orderByDir', $args) ? $args['orderByDir'] : '';
+        if (empty($orderBy)) {
+            $defaultOrder = $this->getDefaultOrder();
 
-        if (!empty($orderBy)) {
-            $q->orderBy($orderBy, $orderByDir);
+            foreach ($defaultOrder as $order) {
+                $q->addOrderBy($order[0], $order[1]);
+            }
+        } else {
+            //add direction after each column
+            $parts = explode(',', $orderBy);
+            foreach ($parts as $order) {
+                $q->orderBy($order, $orderByDir);
+            }
         }
     }
 
-    protected function getDefaultOrderBy()
+    protected function getDefaultOrder()
     {
-        return '';
+        return array();
     }
 
     protected function buildLimiterClauses(QueryBuilder &$q, array $args)
@@ -302,8 +333,10 @@ class CommonRepository extends EntityRepository
         $start      = array_key_exists('start', $args) ? $args['start'] : 0;
         $limit      = array_key_exists('limit', $args) ? $args['limit'] : 30;
 
-        $q->setFirstResult($start)
-            ->setMaxResults($limit);
+        if (!empty($limit)) {
+            $q->setFirstResult($start)
+                ->setMaxResults($limit);
+        }
     }
 
     protected function generateRandomParameterName()

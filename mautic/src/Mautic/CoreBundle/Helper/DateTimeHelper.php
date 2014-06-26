@@ -28,9 +28,11 @@ class DateTimeHelper
     {
         if ($timezone == 'local') {
             $timezone = date_default_timezone_get();
+        } elseif (empty($timezone)) {
+            $timezone = 'UTC';
         }
 
-        $this->format   = $fromFormat;
+        $this->format   = (empty($fromFormat)) ? 'Y-m-d H:i:s' : $fromFormat;
         $this->timezone = $timezone;
 
         $this->utc   = new \DateTimeZone('UTC');
@@ -50,7 +52,7 @@ class DateTimeHelper
         }
     }
 
-    public function getUtcString($format = null)
+    public function toUtcString($format = null)
     {
         if ($this->datetime) {
             $utc = $this->datetime->setTimezone($this->utc);
@@ -63,7 +65,7 @@ class DateTimeHelper
         }
     }
 
-    public function getLocalString($format = null)
+    public function toLocalString($format = null)
     {
         if ($this->datetime) {
             $local = $this->datetime->setTimezone($this->local);

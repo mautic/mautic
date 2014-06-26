@@ -140,8 +140,10 @@ class RoleRepository extends CommonRepository
     /**
      * @return string
      */
-    protected function getDefaultOrderBy()
+    protected function getDefaultOrder()
     {
-        return 'r.name';
+        return array(
+            array('r.name', 'ASC')
+        );
     }
 }

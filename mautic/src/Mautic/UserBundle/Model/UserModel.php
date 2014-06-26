@@ -22,29 +22,41 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
  */
 class UserModel extends FormModel
 {
+    /**
+     * {@inheritdoc}
+     *
+     * @return string
+     */
+    public function getRepository()
+    {
+        return $this->em->getRepository('MauticUserBundle:User');
+    }
 
     /**
      * {@inheritdoc}
+     *
+     * @return string
      */
-    protected function init()
+    public function getPermissionBase()
     {
-        $this->repository = 'MauticUserBundle:User';
+        return 'user:users';
     }
 
     /**
      * {@inheritdoc}
      *
      * @param       $entity
+     * @param       $unlock
      * @return int
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    public function saveEntity($entity)
+    public function saveEntity($entity, $unlock = true)
     {
         if (!$entity instanceof User) {
             throw new MethodNotAllowedHttpException(array('User'), 'Entity must be of class User()');
         }
 
-        parent::saveEntity($entity);
+        parent::saveEntity($entity, $unlock);
     }
 
     /**

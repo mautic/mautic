@@ -19,7 +19,7 @@ endif;
         <tr>
             <th class="visible-md visible-lg col-user-avatar"></th>
             <?php
-            echo $view->render('MauticCoreBundle:Table:tableheader.html.php', array(
+            echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                 'sessionVar' => 'user',
                 'orderBy'    => 'u.lastName, u.firstName, u.username',
                 'text'       => 'mautic.user.user.thead.name',
@@ -27,28 +27,28 @@ endif;
                 'default'    => true
             ));
 
-            echo $view->render('MauticCoreBundle:Table:tableheader.html.php', array(
+            echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                 'sessionVar' => 'user',
                 'orderBy'    => 'u.username',
                 'text'       => 'mautic.user.user.thead.username',
                 'class'      => 'col-user-username',
             ));
 
-            echo $view->render('MauticCoreBundle:Table:tableheader.html.php', array(
+            echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                 'sessionVar' => 'user',
                 'orderBy'    => 'u.email',
                 'text'       => 'mautic.user.user.thead.email',
                 'class'      => 'visible-md visible-lg col-user-email'
             ));
 
-            echo $view->render('MauticCoreBundle:Table:tableheader.html.php', array(
+            echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                 'sessionVar' => 'user',
                 'orderBy'    => 'r.name',
                 'text'       => 'mautic.user.user.thead.role',
                 'class'      => 'visible-md visible-lg col-user-role'
             ));
 
-            echo $view->render('MauticCoreBundle:Table:tableheader.html.php', array(
+            echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                 'sessionVar' => 'user',
                 'orderBy'    => 'u.id',
                 'text'       => 'mautic.user.user.thead.id',
@@ -100,6 +100,7 @@ endif;
         "items"   => $items,
         "page"    => $page,
         "limit"   => $limit,
-        "baseUrl" =>  $view['router']->generate('mautic_user_index')
+        "baseUrl" =>  $view['router']->generate('mautic_user_index'),
+        'sessionVar' => 'user'
     )); ?>
 </div>

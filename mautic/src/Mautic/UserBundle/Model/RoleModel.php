@@ -27,20 +27,33 @@ class RoleModel extends FormModel
 
     /**
      * {@inheritdoc}
+     *
+     * @return string
      */
-    protected function init()
+    public function getRepository()
     {
-        $this->repository     = 'MauticUserBundle:Role';
+        return $this->em->getRepository('MauticUserBundle:Role');
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return string
+     */
+    public function getPermissionBase()
+    {
+        return 'user:roles';
     }
 
     /**
      * {@inheritdoc}
      *
      * @param       $entity
+     * @param       $unlock
      * @return int
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    public function saveEntity($entity)
+    public function saveEntity($entity, $unlock = true)
     {
         if (!$entity instanceof Role) {
             throw new MethodNotAllowedHttpException(array('Role'), 'Entity must be of class Role()');
@@ -53,7 +66,7 @@ class RoleModel extends FormModel
             $this->em->getRepository('MauticUserBundle:Permission')->purgeRolePermissions($entity);
         }
 
-        parent::saveEntity($entity);
+        parent::saveEntity($entity, $unlock);
     }
 
     /**

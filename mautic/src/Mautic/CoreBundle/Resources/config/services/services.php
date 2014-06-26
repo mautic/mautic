@@ -28,7 +28,6 @@ $factory = new Definition(
         '%mautic.parameters%'
     )
 );
-$factory->setLazy(true);
 $container->setDefinition('mautic.factory', $factory);
 
 //Routing

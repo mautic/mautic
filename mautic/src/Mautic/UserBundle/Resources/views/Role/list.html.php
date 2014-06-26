@@ -17,20 +17,20 @@ endif;
         <thead>
         <tr>
             <?php
-            echo $view->render('MauticCoreBundle:Table:tableheader.html.php', array(
+            echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                 'sessionVar' => 'role',
                 'orderBy'    => 'r.name',
                 'text'       => 'mautic.user.role.thead.name',
                 'class'      => 'col-role-name',
                 'default'    => true
             ));
-            echo $view->render('MauticCoreBundle:Table:tableheader.html.php', array(
+            echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                 'sessionVar' => 'role',
                 'orderBy'    => 'r.description',
                 'text'       => 'mautic.user.role.thead.description',
                 'class'      => 'visible-md visible-lg col-role-desc'
             ));
-            echo $view->render('MauticCoreBundle:Table:tableheader.html.php', array(
+            echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                 'sessionVar' => 'role',
                 'orderBy'    => 'r.id',
                 'text'       => 'mautic.user.role.thead.id',
@@ -71,6 +71,7 @@ endif;
         "items"   => $items,
         "page"    => $page,
         "limit"   => $limit,
-        "baseUrl" =>  $view['router']->generate('mautic_role_index')
+        "baseUrl" =>  $view['router']->generate('mautic_role_index'),
+        'sessionVar' => 'role'
     )); ?>
 </div>
