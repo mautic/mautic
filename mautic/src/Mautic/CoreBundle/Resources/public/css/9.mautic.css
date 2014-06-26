@@ -548,6 +548,9 @@ a.btn {
 .pagination-wrapper {
   text-align: center;
 }
+.pagination-limit {
+  width: 75px;
+}
 .modal {
   top: 50px;
   z-index: 9999;
@@ -572,8 +575,32 @@ ul.droppable {
 li.ui-draggable {
   list-style: none;
 }
-.panel-heading a {
+.panel-group .panel-heading a {
   display: block;
+}
+.choice-wrapper .btn-default.active.disabled {
+  background-color: #ebebeb;
+  border-color: #adadad;
+}
+.choice-wrapper .btn-primary.active.disabled {
+  background-color: #253544;
+  border-color: #151e26;
+}
+.choice-wrapper .btn-success.active.disabled {
+  background-color: #654a5c;
+  border-color: #4b3644;
+}
+.choice-wrapper .btn-info.active.disabled {
+  background-color: #39b3d7;
+  border-color: #269abc;
+}
+.choice-wrapper .btn-warning.active.disabled {
+  background-color: #ed9c28;
+  border-color: #d58512;
+}
+.choice-wrapper .btn-danger.active.disabled {
+  background-color: #8b3c36;
+  border-color: #692e29;
 }
 @media (max-width: 767px) {
   .left-panel {

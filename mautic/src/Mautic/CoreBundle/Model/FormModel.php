@@ -9,6 +9,7 @@
 
 namespace Mautic\CoreBundle\Model;
 
+use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -28,7 +29,7 @@ class FormModel extends CommonModel
     public function getEntity($id = null)
     {
         if (null !== $id) {
-            $repo = $this->em->getRepository($this->repository);
+            $repo = $this->getRepository();
             if (method_exists($repo, 'getEntity')) {
                 return $repo->getEntity($id);
             } else {
@@ -48,14 +49,13 @@ class FormModel extends CommonModel
     public function getEntities(array $args = array())
     {
         //set the translator
-        $this->em->getRepository($this->repository)->setTranslator($this->translator);
-        $this->em->getRepository($this->repository)->setCurrentUser(
+        $repo = $this->getRepository();
+        $repo->setTranslator($this->translator);
+        $repo->setCurrentUser(
             $this->factory->getUser()
         );
 
-        return $this->em
-            ->getRepository($this->repository)
-            ->getEntities($args);
+        return $repo->getEntities($args);
     }
 
     /**
@@ -123,50 +123,111 @@ class FormModel extends CommonModel
      * Create/edit entity
      *
      * @param       $entity
+     * @param       $unlock
      * @return mixed
      */
-    public function saveEntity($entity)
+    public function saveEntity($entity, $unlock = true)
     {
         $isNew = ($entity->getId()) ? false : true;
 
         //set some defaults
-        $this->setTimestamps($entity, $isNew);
+        $this->setTimestamps($entity, $isNew, $unlock);
 
         $event = $this->dispatchEvent("pre_save", $entity, $isNew);
-        $this->em->getRepository($this->repository)->saveEntity($entity);
+        $this->getRepository()->saveEntity($entity);
         $this->dispatchEvent("post_save", $entity, $isNew, $event);
 
         return $entity;
     }
+
+
+    /**
+     * Save an array of entities
+     *
+     * @param  $entities
+     * @return array
+     */
+    public function saveEntities($entities, $unlock = true)
+    {
+        //iterate over the results so the events are dispatched on each delete
+        $batchSize = 20;
+        foreach ($entities as $k => $entity) {
+            $isNew = ($entity->getId()) ? false : true;
+
+            //set some defaults
+            $this->setTimestamps($entity, $isNew, $unlock);
+
+            $event = $this->dispatchEvent("pre_save", $entity, $isNew);
+            $this->getRepository()->saveEntity($entity, false);
+            $this->dispatchEvent("post_save", $entity, $isNew, $event);
+
+            if ((($k + 1) % $batchSize) === 0) {
+                $this->em->flush();
+            }
+        }
+        $this->em->flush();
+    }
+
+    /**
+     * Toggles entity publish status
+     *
+     * @param $entity
+     */
+    public function togglePublishStatus($entity)
+    {
+        $status = $entity->getPublishStatus();
+
+        switch ($status) {
+            case 'unpublished':
+                $entity->setIsPublished(true);
+                break;
+            case 'published':
+            case 'expired':
+            case 'pending':
+                $entity->setIsPublished(false);
+                break;
+        }
+
+        //set timestamp changes
+        $this->setTimestamps($entity, false, false);
+
+        //hit up event listeners
+        $event = $this->dispatchEvent("pre_save", $entity, false);
+        $this->getRepository()->saveEntity($entity);
+        $this->dispatchEvent("post_save", $entity, false, $event);
+    }
+
 
     /**
      * Set timestamps and user ids
      *
      * @param $entity
      * @param $isNew
+     * @param $unlock
      */
-    public function setTimestamps(&$entity, $isNew)
+    public function setTimestamps(&$entity, $isNew, $unlock = true)
     {
+        $user = $this->factory->getUser(true);
         if ($isNew) {
             if (method_exists($entity, 'setDateAdded') && !$entity->getDateAdded()) {
                 $entity->setDateAdded(new \DateTime());
             }
 
-            if (method_exists($entity, 'setCreatedBy') && !$entity->getCreatedBy()) {
-                $entity->setCreatedBy($this->factory->getUser(true));
+            if ($user instanceof User && method_exists($entity, 'setCreatedBy') && !$entity->getCreatedBy()) {
+                $entity->setCreatedBy($user);
             }
         } else {
             if (method_exists($entity, 'setDateModified') && !$entity->getDateModified()) {
                 $entity->setDateModified(new \DateTime());
             }
 
-            if (method_exists($entity, 'setModifiedBy') && !$entity->getModifiedBy()) {
-                $entity->setModifiedBy($this->factory->getUser(true));
+            if ($user instanceof User && method_exists($entity, 'setModifiedBy') && !$entity->getModifiedBy()) {
+                $entity->setModifiedBy($user);
             }
         }
 
         //unlock the row if applicable
-        if (method_exists($entity, 'setCheckedOut')) {
+        if ($unlock && method_exists($entity, 'setCheckedOut')) {
             $entity->setCheckedOut(null);
             $entity->setCheckedOutBy(null);
         }
@@ -183,7 +244,7 @@ class FormModel extends CommonModel
         //take note of ID before doctrine wipes it out
         $id = $entity->getId();
         $event = $this->dispatchEvent("pre_delete", $entity);
-        $this->em->getRepository($this->repository)->deleteEntity($entity);
+        $this->getRepository()->deleteEntity($entity);
         //set the id for use in events
         $entity->deletedId = $id;
         $this->dispatchEvent("post_delete", $entity, false, $event);
@@ -207,7 +268,7 @@ class FormModel extends CommonModel
             $entities[$id] = $entity;
             if ($entity !== null) {
                 $event = $this->dispatchEvent("pre_delete", $entity);
-                $this->em->getRepository($this->repository)->deleteEntity($entity, false);
+                $this->getRepository()->deleteEntity($entity, false);
                 $this->dispatchEvent("post_delete", $entity, false, $event);
             }
             if ((($k + 1) % $batchSize) === 0) {

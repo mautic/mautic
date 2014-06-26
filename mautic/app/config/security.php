@@ -32,10 +32,13 @@ $container->loadFromExtension('security', array(
             'security' => true,
             'anonymous' => true
         ),
+        'public' => array(
+            'pattern'   => '^/public',
+            'anonymous' => true
+        ),
         'login' => array(
             'pattern'   => '^/login$',
             'anonymous' => true,
-            'security'  => true,
             'context'   => 'mautic'
         ),
         'oauth_token' => array(

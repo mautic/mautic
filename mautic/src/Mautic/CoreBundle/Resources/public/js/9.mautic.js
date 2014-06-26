@@ -1,5 +1,5 @@
 var MauticVars = {};
-
+//window.localStorage.clear();
 //Fix for back/forward buttons not loading ajax content with History.pushState()
 MauticVars.manualStateChange = true;
 History.Adapter.bind(window, 'statechange', function () {
@@ -85,10 +85,54 @@ var Mautic = {
         //initialize tooltips
         $(container + " *[data-toggle='tooltip']").tooltip({html: true});
 
+        //initialize sortable lists
+        $(container + " *[data-toggle='sortablelist']").each(function (index) {
+            var prefix = $(this).attr('data-prefix');
+
+            if ($('#' + prefix + '_additem').length) {
+                $('#' + prefix + '_additem').click(function () {
+                    var count     = $('#' + prefix + '_itemcount').val();
+                    var prototype = $('#' + prefix + '_additem').attr('data-prototype');
+                    prototype = prototype.replace(/__name__/g, count);
+                    $(prototype).appendTo($('#' + prefix + '_list div.list-sortable'));
+                    $('#' + prefix + '_list_' + count).focus();
+                    count++;
+                    $('#' + prefix + '_itemcount').val(count);
+                    return false;
+                });
+            }
+
+            $('#' + prefix + '_list div.list-sortable').sortable({
+                items: 'div.sortable',
+                handle: 'span.postaddon',
+                stop: function(i) {
+                    var order = 0;
+                    $('#' + prefix + '_list div.list-sortable div.input-group input').each(function() {
+                        var name = $(this).attr('name');
+                        name = name.replace(/\[list\]\[(.+)\]$/g, '') + '[list]['+order+']';
+                        $(this).attr('name', name);
+                        order++;
+                    });
+                }
+            });
+        });
+
+        $(container + " a[data-toggle='download']").click(function(event) {
+            event.preventDefault();
+
+            var link = $(event.target).attr('href');
+
+            //initialize download links
+            var iframe = $("<iframe/>").attr({
+                src: link,
+                style: "visibility:hidden;display:none"
+            }).appendTo($('body'));
+        });
+
         //little hack to move modal windows outside of positioned divs
         $(container + " *[data-toggle='modal']").each(function (index) {
             var target = $(this).attr('data-target');
-            $(target).on('show.bs.modal', function() {
+            $(target).on('show.bs.modal', function () {
                 $(target).appendTo("body");
             });
         });
@@ -132,7 +176,7 @@ var Mautic = {
                 datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
                 queryTokenizer: Bloodhound.tokenizers.whitespace,
                 prefetch: {
-                    url: mauticBaseUrl + "ajax?ajaxAction=globalcommandlist"
+                    url: mauticBaseUrl + "ajax?ajaxAction=globalCommandList"
                 }
             });
             engine.initialize();
@@ -509,7 +553,7 @@ var Mautic = {
      * @param position
      */
     stickSidePanel: function (position) {
-        var query = "ajaxAction=togglepanel&panel=" + position;
+        var query = "ajaxAction=togglePanel&panel=" + position;
         $.ajax({
             url: mauticBaseUrl + "ajax",
             type: "POST",
@@ -620,7 +664,7 @@ var Mautic = {
      * @param orderby
      */
     reorderTableData: function (name, orderby, tmpl, target) {
-        var query = "ajaxAction=setorderby&name=" + name + "&orderby=" + orderby;
+        var query = "ajaxAction=setTableOrder&name=" + name + "&orderby=" + orderby;
         $.ajax({
             url: mauticBaseUrl + 'ajax',
             type: "POST",
@@ -638,6 +682,51 @@ var Mautic = {
         });
     },
 
+    /**
+     *
+     * @param name
+     * @param filterby
+     * @param filterValue
+     * @param tmpl
+     * @param target
+     */
+    filterTableData: function (name, filterby, filterValue, tmpl, target) {
+        var query = "ajaxAction=setTableFilter&name=" + name + "&filterby=" + filterby + "&value=" + filterValue;
+        $.ajax({
+            url: mauticBaseUrl + 'ajax',
+            type: "POST",
+            data: query,
+            dataType: "json",
+            success: function (response) {
+                if (response.success) {
+                    var route = window.location.pathname + "?tmpl=" + tmpl;
+                    Mautic.loadContent(route, '', 'GET', target);
+                }
+            },
+            error: function (request, textStatus, errorThrown) {
+                alert(errorThrown);
+            }
+        });
+    },
+
+    limitTableData: function (name, limit, tmpl, target) {
+        var query = "ajaxAction=setTableLimit&name=" + name + "&limit=" + limit;
+        $.ajax({
+            url: mauticBaseUrl + 'ajax',
+            type: "POST",
+            data: query,
+            dataType: "json",
+            success: function (response) {
+                if (response.success) {
+                    var route = window.location.pathname + "?tmpl=" + tmpl;
+                    Mautic.loadContent(route, '', 'GET', target);
+                }
+            },
+            error: function (request, textStatus, errorThrown) {
+                alert(errorThrown);
+            }
+        });
+    },
     /**
      * Executes an object action
      * @param action
@@ -689,7 +778,7 @@ var Mautic = {
                 datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
                 queryTokenizer: Bloodhound.tokenizers.whitespace,
                 prefetch: {
-                    url: mauticBaseUrl + "ajax?ajaxAction=commandlist&model=" + modelName
+                    url: mauticBaseUrl + "ajax?ajaxAction=commandList&model=" + modelName
                 }
             });
             engine.initialize();
@@ -834,6 +923,45 @@ var Mautic = {
                 });
             }
         }
+    },
+
+    /**
+     * Removes a list option from a list generated by ListType
+     * @param el
+     */
+    removeFormListOption: function(el) {
+        var sortableDiv = $(el).parents('div.sortable');
+        var inputCount  = $(sortableDiv).parents('div.form-group').find('input.sortable-itemcount');
+        var count = $(inputCount).val();
+        count--;
+        $(inputCount).val(count);
+        $(sortableDiv).remove();
+    },
+
+    /**
+     * Toggles published status of an entity
+     *
+     * @param el
+     * @param model
+     * @param id
+     */
+    togglePublishStatus: function (el, model, id) {
+        MauticVars.showLoadingBar = false;
+        $.ajax({
+            url: mauticBaseUrl + "ajax",
+            type: "POST",
+            data: "ajaxAction=togglePublishStatus&model=" + model + '&id=' + id,
+            dataType: "json",
+            success: function (response) {
+                if (response.statusHtml) {
+                    $(el).replaceWith(response.statusHtml);
+                    $('.publish-icon'+id).tooltip({html: true});
+                }
+            },
+            error: function (request, textStatus, errorThrown) {
+                alert(errorThrown);
+            }
+        });
     }
 };
 

@@ -27,6 +27,7 @@ class AppKernel extends Kernel
             new Mautic\DashboardBundle\MauticDashboardBundle(),
             new Mautic\UserBundle\MauticUserBundle(),
             new Mautic\LeadBundle\MauticLeadBundle(),
+            new Mautic\FormBundle\MauticFormBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {

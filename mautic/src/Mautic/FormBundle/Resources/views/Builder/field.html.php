@@ -6,6 +6,11 @@
  * @link        http://mautic.com
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+?>
 
-//Client Model
-$container->setParameter('mautic.model.client', 'Mautic\ApiBundle\Model\ClientModel');
+<div class="form-profile-header">
+    <h3><?php echo $fieldHeader; ?></h3>
+</div>
+
+<?php echo $view['form']->form($form); ?>
+<div class="form-footer"></div>

@@ -30,7 +30,10 @@
         "knplabs/knp-menu-bundle":"dev-master",
         "friendsofsymfony/oauth-server-bundle": "dev-master",
         "jms/serializer-bundle": "@dev",
-        "friendsofsymfony/rest-bundle": "1.3.*"
+        "friendsofsymfony/rest-bundle": "1.3.*",
+
+        "mpdf/mpdf": "v5.7.2",
+        "phpoffice/phpexcel": "1.8.0"
     },
     "require-dev": {
         "liip/functional-test-bundle": "dev-master",

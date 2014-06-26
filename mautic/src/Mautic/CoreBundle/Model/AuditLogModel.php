@@ -10,6 +10,7 @@
 namespace Mautic\CoreBundle\Model;
 
 use Mautic\CoreBundle\Entity\AuditLog;
+use Mautic\UserBundle\Entity\User;
 
 /**
  * Class AuditLogModel
@@ -45,7 +46,10 @@ class AuditLogModel extends CommonModel
         $user   = $this->factory->getUser();
         $userId = 0;
         $userName = '';
-        if ($user->getId()) {
+        if (!$user instanceof User) {
+            $userId = 0;
+            $userName = $this->translator->trans('mautic.core.system');
+        } elseif ($user->getId()) {
             $userId = $user->getId();
             $userName = $user->getName();
         }

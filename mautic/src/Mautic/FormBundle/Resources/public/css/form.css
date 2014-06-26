@@ -1,0 +1,210 @@
+/* FormBundle */
+.form-list, .form-components {
+    height: 450px;
+    overflow: hidden;
+}
+
+.form-components {
+    padding-left: 2px;
+}
+
+.form-details {
+    height: 450px;
+    padding-left: 2px;
+    overflow: hidden;
+}
+
+.form-builder {
+    padding-left: 15px;
+}
+
+.form-details h1, .form-details h2, .form-details h3, .form-details h4, .form-details h5 {
+    margin-top: 0;
+}
+
+.form-list-inner-wrapper, .form-details-inner-wrapper, .form-components-inner-wrapper {
+    height: 100%;
+}
+
+.form-details-inner-wrapper {
+    overflow-y: auto;
+}
+
+.filter-form-container {
+    height: 40px;
+}
+
+.form-list .forms {
+    overflow: auto;
+    height: 100%;
+    margin-bottom: -50px;
+    padding-bottom: 50px;
+}
+
+.form-list .forms a {
+    text-decoration: none;
+}
+
+.form-list .form-profile:hover {
+    background-color: #ecf0f1;
+}
+
+.form-list .form-profile.active {
+    background-color: #ecf0f1;
+}
+
+.form-list .form-profile {
+    height: 50px;
+    border-bottom: 1px solid #cccccc;
+    overflow: hidden;
+}
+
+.forms .form-name {
+    display: block;
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+.form-list .forms .form-description {
+    display: block;
+}
+
+.form-details .form-actions .btn {
+    margin-top: -5px;
+    margin-left: -4px;
+}
+
+.form-details .form-profile-header {
+    margin-bottom: 10px;
+    padding-top: 10px;
+}
+
+.form-details .form-name {
+    display: block;
+    font-size: 2em;
+}
+
+.form-details .panel {
+    margin-bottom: 5px;
+}
+
+.form-details .field-label {
+    font-weight: bold;
+}
+
+.form-footer {
+    margin-bottom: 30px;
+}
+
+.form-components-inner-wrapper {
+    overflow: auto;
+    height: 100%;
+    margin-bottom: -50px;
+    padding-bottom: 50px;
+}
+
+.form-components .components a {
+    text-decoration: none;
+}
+
+.form-components .form-component:hover {
+    background-color: #ecf0f1;
+}
+
+.form-components .form-component {
+    height: 50px;
+    border-bottom: 1px solid #cccccc;
+    overflow: hidden;
+}
+
+.form-component .form-component-name {
+    font-size: 1.1em;
+}
+
+.form-submitaction-group-header {
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+.form-component-descr {
+    font-size: 0.8em;
+    display:block;
+}
+
+.btn-add-item {
+    margin-left: 3px;
+}
+
+#mauticforms_fields .mauticform-row {
+    padding: 10px;
+    margin-bottom: 0 !important;
+}
+
+#mauticforms_actions .mauticform-row {
+    padding: 20px;
+    margin-bottom: 0 !important;
+    border: 1px solid #ecf0f1;
+}
+
+#mauticforms_actions .mauticform-row .action-label {
+    font-size: 1.1em;
+    font-weight: bold;
+    display: block;
+}
+
+#mauticforms_actions .mauticform-row .action-descr {
+    font-size: 0.9em;
+    display: block;
+}
+
+#mauticforms_fields .mauticform-row:hover, #mauticforms_actions .mauticform-row:hover {
+    background-color: #ecf0f1;
+}
+
+#mauticforms_fields .mauticform-row.bg-danger:hover, #mauticforms_actions .mauticform-row.bg-danger:hover {
+    background-color: #f2d4d2;
+}
+
+#mauticforms_fields .form-buttons, #mauticforms_actions .form-buttons {
+    float: right;
+}
+
+textarea.form-html {
+    height: 200px;
+}
+
+#form-preview .modal-dialog{
+    height: 85%;
+}
+
+#form-preview .modal-content, #form-preview .modal-body {
+    height: 90%;
+}
+
+.col-formresult-id {
+    width: 25px;
+}
+.col-formresult-ip {
+    width: 125px;
+}
+
+.formresult-list th .input-group {
+    margin-top: 10px;
+}
+
+@media (max-width:767px) {
+    .form-list {
+        padding-right: 15px;
+        margin-bottom: 10px;
+        height: 150px;
+    }
+
+    .form-details {
+        padding-left: 15px;
+    }
+
+    .form-score h1 {
+        font-size: 1.5em;
+        padding: 5px;
+    }
+}

@@ -630,6 +630,10 @@ a.btn {
   text-align: center;
 }
 
+.pagination-limit {
+  width: 75px;
+}
+
 .modal {
   top: 50px;
   z-index: 9999;
@@ -658,8 +662,38 @@ ul.draggable, ul.droppable {
   list-style: none;
 }
 
-.panel-heading a {
+.panel-group .panel-heading a {
   display: block;
+}
+
+.choice-wrapper .btn-default.active.disabled {
+  background-color: darken(@btn-default-bg, 8%);
+  border-color: darken(@btn-default-border, 12%);
+}
+
+.choice-wrapper .btn-primary.active.disabled {
+  background-color: darken(@btn-primary-bg, 8%);
+  border-color: darken(@btn-primary-border, 12%);
+}
+
+.choice-wrapper .btn-success.active.disabled {
+  background-color: darken(@btn-success-bg, 8%);
+  border-color: darken(@btn-success-border, 12%);
+}
+
+.choice-wrapper .btn-info.active.disabled {
+  background-color: darken(@btn-info-bg, 8%);
+  border-color: darken(@btn-info-border, 12%);
+}
+
+.choice-wrapper .btn-warning.active.disabled {
+  background-color: darken(@btn-warning-bg, 8%);
+  border-color: darken(@btn-warning-border, 12%);
+}
+
+.choice-wrapper .btn-danger.active.disabled {
+  background-color: darken(@btn-danger-bg, 8%);
+  border-color: darken(@btn-danger-border, 12%);
 }
 
 @media (max-width:767px) {
