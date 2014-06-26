@@ -41,7 +41,7 @@ class CommonSubscriber implements EventSubscriberInterface
         $this->serializer      = $factory->getSerializer();
         $this->params          = $factory->getSystemParameters();
         $this->dispatcher      = $factory->getDispatcher();
-        $this->translator      = $factory->getTemplating();
+        $this->translator      = $factory->getTranslator();
     }
 
     static public function getSubscribedEvents ()
