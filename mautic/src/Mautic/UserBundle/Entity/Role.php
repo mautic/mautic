@@ -31,7 +31,7 @@ class Role extends FormEntity
      * @ORM\GeneratedValue(strategy="AUTO")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited", "log"})
+     * @Serializer\Groups({"full", "limited"})
      */
     private $id;
 
@@ -39,7 +39,7 @@ class Role extends FormEntity
      * @ORM\Column(type="string", length=255)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited", "log"})
+     * @Serializer\Groups({"full", "limited"})
      */
     private $name;
 
@@ -47,7 +47,7 @@ class Role extends FormEntity
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited", "log"})
+     * @Serializer\Groups({"full", "limited"})
      */
     private $description;
 
@@ -55,15 +55,12 @@ class Role extends FormEntity
      * @ORM\Column(name="is_admin", type="boolean")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "log"})
+     * @Serializer\Groups({"full"})
      */
     private $isAdmin = false;
 
     /**
      * @ORM\OneToMany(targetEntity="Permission", mappedBy="role", cascade={"persist","remove"}, orphanRemoval=true, fetch="EXTRA_LAZY")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"log"})
      */
     private $permissions;
 
@@ -241,7 +238,7 @@ class Role extends FormEntity
     /**
      * Get rawPermissions
      *
-     * @return array 
+     * @return array
      */
     public function getRawPermissions()
     {

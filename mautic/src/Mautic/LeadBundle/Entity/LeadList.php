@@ -30,7 +30,7 @@ class LeadList extends FormEntity
      * @ORM\GeneratedValue(strategy="AUTO")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited", "log"})
+     * @Serializer\Groups({"full", "limited"})
      */
     private $id;
 
@@ -38,7 +38,7 @@ class LeadList extends FormEntity
      * @ORM\Column(type="string", length=50)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited", "log"})
+     * @Serializer\Groups({"full", "limited"})
      */
     private $name;
 
@@ -46,7 +46,7 @@ class LeadList extends FormEntity
      * @ORM\Column(type="string", length=25)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited", "log"})
+     * @Serializer\Groups({"full", "limited"})
      */
     private $alias;
 
@@ -54,7 +54,7 @@ class LeadList extends FormEntity
      * @ORM\Column(type="text", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited", "log"})
+     * @Serializer\Groups({"full", "limited"})
      */
     private $description;
 
@@ -62,7 +62,7 @@ class LeadList extends FormEntity
      * @ORM\Column(name="is_active", type="boolean")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited", "log"})
+     * @Serializer\Groups({"full", "limited"})
      */
     private $isActive = true;
 
@@ -70,7 +70,7 @@ class LeadList extends FormEntity
      * @ORM\Column(type="array")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited", "log"})
+     * @Serializer\Groups({"full", "limited"})
      */
     private $filters;
 
@@ -78,7 +78,7 @@ class LeadList extends FormEntity
      * @ORM\Column(name="is_global", type="boolean")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited", "log"})
+     * @Serializer\Groups({"full", "limited"})
      */
     private $isGlobal = false;
 

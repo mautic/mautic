@@ -47,7 +47,7 @@ class LeadFieldValue
      * @ORM\Column(type="text", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited", "log"})
+     * @Serializer\Groups({"full", "limited"})
      */
     private $value;
 

@@ -12,10 +12,8 @@
 
 namespace Mautic\LeadBundle\Controller;
 
-use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Controller\FormController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 
 class LeadController extends FormController
 {

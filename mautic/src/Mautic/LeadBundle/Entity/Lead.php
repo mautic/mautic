@@ -28,7 +28,7 @@ class Lead extends FormEntity
      * @ORM\GeneratedValue(strategy="AUTO")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited", "log"})
+     * @Serializer\Groups({"full", "limited"})
      */
     private $id;
 
@@ -37,7 +37,7 @@ class Lead extends FormEntity
      * @ORM\JoinColumn(name="owner_id", referencedColumnName="id", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited", "log"})
+     * @Serializer\Groups({"full", "limited"})
      */
     private $owner;
 
@@ -45,7 +45,7 @@ class Lead extends FormEntity
      * @ORM\Column(type="integer")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited", "log"})
+     * @Serializer\Groups({"full", "limited"})
      */
     private $score = 0;
 
@@ -68,7 +68,7 @@ class Lead extends FormEntity
      * )
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited", "log"})
+     * @Serializer\Groups({"full", "limited"})
      */
     private $ipAddresses;
 

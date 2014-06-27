@@ -39,7 +39,7 @@ class Form extends FormEntity
      * @ORM\Column(type="string", length=50)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "log"})
+     * @Serializer\Groups({"full"})
      */
     private $name;
 
@@ -47,7 +47,7 @@ class Form extends FormEntity
      * @ORM\Column(type="string", length=25)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "log"})
+     * @Serializer\Groups({"full"})
      */
     private $alias;
 
@@ -55,7 +55,7 @@ class Form extends FormEntity
      * @ORM\Column(type="string", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "log"})
+     * @Serializer\Groups({"full"})
      */
     private $description;
 
@@ -63,7 +63,7 @@ class Form extends FormEntity
      * @ORM\Column(name="is_published", type="boolean")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "log"})
+     * @Serializer\Groups({"full"})
      */
     private $isPublished = true;
 
@@ -81,7 +81,7 @@ class Form extends FormEntity
      * @ORM\Column(name="post_action", type="string")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "log"})
+     * @Serializer\Groups({"full"})
      */
     private $postAction;
 
@@ -89,7 +89,7 @@ class Form extends FormEntity
      * @ORM\Column(name="post_action_property", type="string", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "log"})
+     * @Serializer\Groups({"full"})
      */
     private $postActionProperty;
 
@@ -97,7 +97,7 @@ class Form extends FormEntity
      * @ORM\Column(name="publish_up", type="datetime", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "log"})
+     * @Serializer\Groups({"full"})
      */
     private $publishUp;
 
@@ -105,7 +105,7 @@ class Form extends FormEntity
      * @ORM\Column(name="publish_down", type="datetime", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "log"})
+     * @Serializer\Groups({"full"})
      */
     private $publishDown;
 

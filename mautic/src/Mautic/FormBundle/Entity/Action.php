@@ -36,7 +36,7 @@ class Action
      * @ORM\Column(type="string", length=50)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "log"})
+     * @Serializer\Groups({"full"})
      */
     private $type;
 
@@ -44,7 +44,7 @@ class Action
      * @ORM\Column(type="string", length=50, nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "log"})
+     * @Serializer\Groups({"full"})
      */
     private $name;
 
@@ -52,7 +52,7 @@ class Action
      * @ORM\Column(type="string", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "log"})
+     * @Serializer\Groups({"full"})
      */
     private $description;
 
@@ -60,7 +60,7 @@ class Action
      * @ORM\Column(name="action_order", type="integer")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "log"})
+     * @Serializer\Groups({"full"})
      */
     private $order = 0;
 
@@ -68,7 +68,7 @@ class Action
      * @ORM\Column(name="is_published", type="boolean")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "log"})
+     * @Serializer\Groups({"full"})
      */
     private $isPublished = true;
 
@@ -76,7 +76,7 @@ class Action
      * @ORM\Column(type="array")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "log"})
+     * @Serializer\Groups({"full"})
      */
     private $properties = array();
 
@@ -84,7 +84,7 @@ class Action
      * @ORM\Column(type="array")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "log"})
+     * @Serializer\Groups({"full"})
      */
     private $settings = array();
 

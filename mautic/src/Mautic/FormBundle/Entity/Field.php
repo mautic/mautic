@@ -35,7 +35,7 @@ class Field
      * @ORM\Column(type="string", length=50)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "log"})
+     * @Serializer\Groups({"full"})
      */
     private $label;
 
@@ -43,7 +43,7 @@ class Field
      * @ORM\Column(type="boolean", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "log"})
+     * @Serializer\Groups({"full"})
      */
     private $showLabel = true;
 
@@ -51,7 +51,7 @@ class Field
      * @ORM\Column(type="string", length=25)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "log"})
+     * @Serializer\Groups({"full"})
      */
     private $alias;
 
@@ -59,7 +59,7 @@ class Field
      * @ORM\Column(type="string")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "log"})
+     * @Serializer\Groups({"full"})
      */
     private $type;
 
@@ -67,7 +67,7 @@ class Field
      * @ORM\Column(name="is_custom", type="boolean")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "log"})
+     * @Serializer\Groups({"full"})
      */
     private $isCustom = false;
 
@@ -75,7 +75,7 @@ class Field
      * @ORM\Column(name="custom_parameters", type="array", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "log"})
+     * @Serializer\Groups({"full"})
      */
     private $customParameters = array();
 
@@ -83,7 +83,7 @@ class Field
      * @ORM\Column(name="default_value", type="string", length=255, nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "log"})
+     * @Serializer\Groups({"full"})
      */
     private $defaultValue;
 
@@ -91,7 +91,7 @@ class Field
      * @ORM\Column(name="is_required", type="boolean")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "log"})
+     * @Serializer\Groups({"full"})
      */
     private $isRequired = false;
 
@@ -99,7 +99,7 @@ class Field
      * @ORM\Column(name="validation_message", type="string", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "log"})
+     * @Serializer\Groups({"full"})
      */
     private $validationMessage;
 
@@ -107,7 +107,7 @@ class Field
      * @ORM\Column(name="help_message", type="string", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "log"})
+     * @Serializer\Groups({"full"})
      */
     private $helpMessage;
 
@@ -115,7 +115,7 @@ class Field
      * @ORM\Column(name="field_order", type="integer", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "log"})
+     * @Serializer\Groups({"full"})
      */
     private $order = 0;
 
@@ -123,7 +123,7 @@ class Field
      * @ORM\Column(type="array", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "log"})
+     * @Serializer\Groups({"full"})
      */
     private $properties = array();
 

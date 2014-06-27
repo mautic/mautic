@@ -35,7 +35,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      * @ORM\GeneratedValue(strategy="AUTO")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited", "log"})
+     * @Serializer\Groups({"full", "limited"})
      */
     protected $id;
 
@@ -43,7 +43,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      * @ORM\Column(type="string", length=25, unique=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "log"})
+     * @Serializer\Groups({"full"})
      */
     protected $username;
 
@@ -68,7 +68,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      * @ORM\Column(name="first_name",type="string", length=50)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited", "log"})
+     * @Serializer\Groups({"full", "limited"})
      */
     private $firstName;
 
@@ -76,7 +76,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      * @ORM\Column(name="last_name", type="string", length=50)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited", "log"})
+     * @Serializer\Groups({"full", "limited"})
      */
     private $lastName;
 
@@ -84,7 +84,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      * @ORM\Column(type="string", length=60, unique=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "log"})
+     * @Serializer\Groups({"full"})
      */
     private $email;
 
@@ -92,7 +92,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      * @ORM\Column(type="string", length=60, nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "log"})
+     * @Serializer\Groups({"full"})
      */
     private $position;
 
@@ -101,7 +101,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      * @ORM\JoinColumn(name="role_id", referencedColumnName="id")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited", "log"})
+     * @Serializer\Groups({"full", "limited"})
      */
     private $role;
 
@@ -109,7 +109,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      * @ORM\Column(name="is_active", type="boolean")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "log"})
+     * @Serializer\Groups({"full"})
      */
     protected $isActive = true;
 
@@ -117,7 +117,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      * @ORM\Column(type="text", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited", "log"})
+     * @Serializer\Groups({"full", "limited"})
      */
     private $timezone = 'UTC';
 
@@ -125,7 +125,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      * @ORM\Column(type="text", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited", "log"})
+     * @Serializer\Groups({"full", "limited"})
      */
     private $locale   = 'en_US';
 
@@ -134,7 +134,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      * @var
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "log"})
+     * @Serializer\Groups({"full"})
      */
     private $activePermissions;
 
