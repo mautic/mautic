@@ -11,6 +11,7 @@ namespace Mautic\FormBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class AjaxController
@@ -21,14 +22,14 @@ class AjaxController extends CommonAjaxController
 {
 
     /**
-     * @param string $name
-     * @return \Mautic\CoreBundle\Controller\JsonResponse
+     * @param Request $request
+     * @param string  $name
      */
-    protected function reorderFieldsAction ($name = 'fields')
+    protected function reorderFieldsAction (Request $request, $name = 'fields')
     {
         $dataArray  = array('success' => 0);
         $session    = $this->get('session');
-        $order      = InputHelper::clean($this->request->request->get('mauticform'));
+        $order      = InputHelper::clean($request->request->get('mauticform'));
         $components = $session->get('mautic.form' . $name . '.add');
         if (!empty($order) && !empty($components)) {
             $components = array_replace(array_flip($order), $components);
@@ -40,9 +41,10 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
+     * @param Request $request
      * @return \Mautic\CoreBundle\Controller\JsonResponse
      */
-    protected function reorderActionsAction() {
-        return $this->reorderFieldsAction('actions');
+    protected function reorderActionsAction(Request $request) {
+        return $this->reorderFieldsAction($request, 'actions');
     }
 }

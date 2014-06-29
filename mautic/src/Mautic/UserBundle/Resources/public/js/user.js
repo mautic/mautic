@@ -6,7 +6,7 @@ Mautic.userOnLoad = function (container) {
                 datumTokenizer: Bloodhound.tokenizers.obj.whitespace('label'),
                 queryTokenizer: Bloodhound.tokenizers.whitespace,
                 prefetch: {
-                    url: mauticBaseUrl + "ajax?ajaxAction=user:roleList",
+                    url: mauticBaseUrl + "ajax?action=user:roleList",
                     ajax: {
                         beforeSend: function () {
                             MauticVars.showLoadingBar = false;
@@ -14,7 +14,7 @@ Mautic.userOnLoad = function (container) {
                     }
                 },
                 remote: {
-                    url: mauticBaseUrl + "ajax?ajaxAction=user:roleList&filter=%QUERY",
+                    url: mauticBaseUrl + "ajax?action=user:roleList&filter=%QUERY",
                     ajax: {
                         beforeSend: function () {
                             MauticVars.showLoadingBar = false;
@@ -51,10 +51,10 @@ Mautic.userOnLoad = function (container) {
                 datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
                 queryTokenizer: Bloodhound.tokenizers.whitespace,
                 prefetch: {
-                    url: mauticBaseUrl + "ajax?ajaxAction=user:positionList"
+                    url: mauticBaseUrl + "ajax?action=user:positionList"
                 },
                 remote: {
-                    url: mauticBaseUrl + "ajax?ajaxAction=user:positionList&filter=%QUERY"
+                    url: mauticBaseUrl + "ajax?action=user:positionList&filter=%QUERY"
                 },
                 dupDetector: function (remoteMatch, localMatch) {
                     return (remoteMatch.label == localMatch.label);

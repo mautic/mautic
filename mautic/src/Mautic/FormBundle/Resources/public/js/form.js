@@ -1,21 +1,5 @@
 //FormBundle
 Mautic.formOnLoad = function (container) {
-    if ($(container + ' .form-list').length) {
-        //set height of divs
-        var windowHeight = $(window).height() - 175;
-        if (windowHeight > 450) {
-            $('.form-list').css('height', windowHeight + 'px');
-            $('.form-details').css('height', windowHeight + 'px');
-        }
-    } else if ($(container + ' .form-components').length) {
-        //set height of divs
-        var windowHeight = $(window).height() - 175;
-        if (windowHeight > 450) {
-            $('.form-components').css('height', windowHeight + 'px');
-            $('.form-details').css('height', windowHeight + 'px');
-        }
-    }
-
     if ($(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'form.form');
     }
@@ -29,7 +13,7 @@ Mautic.formOnLoad = function (container) {
                 MauticVars.showLoadingBar = false;
                 $.ajax({
                     type: "POST",
-                    url: mauticBaseUrl + "ajax?ajaxAction=form:reorderFields",
+                    url: mauticBaseUrl + "ajax?action=form:reorderFields",
                     data: $('#mauticforms_fields').sortable("serialize")});
             }
         });
@@ -50,7 +34,7 @@ Mautic.formOnLoad = function (container) {
                 MauticVars.showLoadingBar = false;
                 $.ajax({
                     type: "POST",
-                    url: mauticBaseUrl + "ajax?ajaxAction=form:reorderActions",
+                    url: mauticBaseUrl + "ajax?action=form:reorderActions",
                     data: $('#mauticforms_actions').sortable("serialize")});
             }
         });
@@ -98,7 +82,7 @@ Mautic.formfieldOnLoad = function (container, response) {
         }
 
         if (newField) {
-            $('.form-details-inner-wrapper').scrollTop($('.form-details-inner-wrapper').height());
+            $('.bundle-main-inner-wrapper').scrollTop($('.bundle-main-inner-wrapper').height());
         }
 
         if ($('#form-field-placeholder').length) {
@@ -142,7 +126,7 @@ Mautic.formactionOnLoad = function (container, response) {
         }
 
         if (newField) {
-            $('.form-details-inner-wrapper').scrollTop($('.form-details-inner-wrapper').height());
+            $('.bundle-main-inner-wrapper').scrollTop($('.bundle-main-inner-wrapper').height());
         }
 
         if ($('#form-action-placeholder').length) {
@@ -161,9 +145,4 @@ Mautic.onPostSubmitActionChange = function(value) {
 
     $('#mauticform_postActionProperty').next().html('');
     $('#mauticform_postActionProperty').parent().removeClass('has-error');
-};
-
-Mautic.activateForm = function(formId) {
-    $('.form-profile').removeClass('active');
-    $('#form-' + formId).addClass('active');
 };

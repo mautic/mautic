@@ -14,15 +14,14 @@ namespace Mautic\ApiBundle\Controller;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Util\Codes;
 use JMS\Serializer\SerializationContext;
-use Mautic\CoreBundle\Controller\EventsController;
+use Mautic\CoreBundle\Controller\MauticController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
-class CommonApiController extends FOSRestController implements EventsController
+class CommonApiController extends FOSRestController implements MauticController
 {
 
     /**

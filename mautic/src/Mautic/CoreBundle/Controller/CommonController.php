@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
  *
  * @package Mautic\CoreBundle\Controller
  */
-class CommonController extends Controller implements EventsController {
+class CommonController extends Controller implements MauticController{
     /**
      * @var \Symfony\Component\HttpFoundation\Request
      */
@@ -29,15 +29,17 @@ class CommonController extends Controller implements EventsController {
     /**
      * @param Request $request
      */
-    public function setRequest(Request $request) {
+    public function setRequest(Request $request)
+    {
         $this->request = $request;
     }
 
     /**
      * @param FilterControllerEvent $event
      */
-    public function initialize(FilterControllerEvent $event) {
-        //..
+    public function initialize(FilterControllerEvent $event)
+    {
+
     }
 
     /**
@@ -147,7 +149,7 @@ class CommonController extends Controller implements EventsController {
         if ($forward) {
             //the content is from another controller action so we must retrieve the response from it instead of
             //directly parsing the template
-            $query = array("ignoreAjax" => true);
+            $query = array("ignoreAjax" => true, 'request' => $this->request);
             $newContentResponse = $this->forward($contentTemplate, $parameters, $query);
             $newContent         = $newContentResponse->getContent();
         } else {

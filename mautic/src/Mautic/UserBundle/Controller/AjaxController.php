@@ -11,6 +11,7 @@ namespace Mautic\FormBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class AjaxController
@@ -23,9 +24,9 @@ class AjaxController extends CommonAjaxController
     /**
      * @return \Mautic\CoreBundle\Controller\JsonResponse
      */
-    protected function roleListAction()
+    protected function roleListAction(Request $request)
     {
-        $filter    = InputHelper::clean($this->request->query->get('filter'));
+        $filter    = InputHelper::clean($request->query->get('filter'));
         $results   = $this->get('mautic.factory')->getModel('user.user')->getLookupResults('role', $filter);
         $dataArray = array();
         foreach ($results as $r) {
@@ -40,9 +41,9 @@ class AjaxController extends CommonAjaxController
     /**
      * @return \Mautic\CoreBundle\Controller\JsonResponse
      */
-    protected function positionListAction()
+    protected function positionListAction(Request $request)
     {
-        $filter  = InputHelper::clean($this->request->query->get('filter'));
+        $filter  = InputHelper::clean($request->query->get('filter'));
         $results = $this->get('mautic.factory')->getModel('user.user')->getLookupResults('position', $filter);
         $dataArray = array();
         foreach ($results as $r) {

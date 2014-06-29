@@ -1,6 +1,8 @@
 //LeadBundle
 Mautic.leadOnLoad = function (container) {
     if ($(container + ' form[name="lead"]').length) {
+        $('.bundle-main').addClass('fullpanel');
+
         Mautic.activateLeadOwnerTypeahead('lead_owner_lookup');
 
         $("*[data-toggle='field-lookup']").each(function (index) {
@@ -9,15 +11,6 @@ Mautic.leadOnLoad = function (container) {
             var options = $(this).attr('data-options');
             Mautic.activateLeadFieldTypeahead(field, target, options);
         });
-    }
-
-    if ($(container + ' .lead-list').length) {
-        //set height of divs
-        var windowHeight = $(window).height() - 175;
-        if (windowHeight > 450) {
-            $('.lead-list').css('height', windowHeight + 'px');
-            $('.lead-details').css('height', windowHeight + 'px');
-        }
     }
 
     if ($(container + ' #list-search').length) {
@@ -79,7 +72,7 @@ Mautic.activateLeadFieldTypeahead = function(field, target, options) {
             datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
             queryTokenizer: Bloodhound.tokenizers.whitespace,
             prefetch: {
-                url: mauticBaseUrl + "ajax?ajaxAction=lead:fieldList&field=" + target,
+                url: mauticBaseUrl + "ajax?action=lead:fieldList&field=" + target,
                 ajax: {
                     beforeSend: function () {
                         MauticVars.showLoadingBar = false;
@@ -87,7 +80,7 @@ Mautic.activateLeadFieldTypeahead = function(field, target, options) {
                 }
             },
             remote: {
-                url: mauticBaseUrl + "ajax?ajaxAction=lead:fieldList&field=" + target + "&filter=%QUERY",
+                url: mauticBaseUrl + "ajax?action=lead:fieldList&field=" + target + "&filter=%QUERY",
                 ajax: {
                     beforeSend: function () {
                         MauticVars.showLoadingBar = false;
@@ -131,7 +124,7 @@ Mautic.activateLeadOwnerTypeahead = function(el) {
         datumTokenizer: Bloodhound.tokenizers.obj.whitespace('label'),
         queryTokenizer: Bloodhound.tokenizers.whitespace,
         prefetch: {
-            url: mauticBaseUrl + "ajax?ajaxAction=lead:userList",
+            url: mauticBaseUrl + "ajax?action=lead:userList",
             ajax: {
                 beforeSend: function () {
                     MauticVars.showLoadingBar = false;
@@ -139,7 +132,7 @@ Mautic.activateLeadOwnerTypeahead = function(el) {
             }
         },
         remote: {
-            url: mauticBaseUrl + "ajax?ajaxAction=lead:userList&filter=%QUERY",
+            url: mauticBaseUrl + "ajax?action=lead:userList&filter=%QUERY",
             ajax: {
                 beforeSend: function () {
                     MauticVars.showLoadingBar = false;
@@ -175,11 +168,6 @@ Mautic.activateLeadOwnerTypeahead = function(el) {
     ).on( 'focus', function() {
         $(this).typeahead( 'open');
     });
-};
-
-Mautic.activateLead = function(leadId) {
-    $('.lead-profile').removeClass('active');
-    $('#lead-' + leadId).addClass('active');
 };
 
 Mautic.leadlistOnLoad = function(container) {
@@ -330,7 +318,7 @@ Mautic.leadfieldOnLoad = function (container) {
             stop: function(i) {
                 $.ajax({
                     type: "POST",
-                    url: mauticBaseUrl + "ajax?ajaxAction=lead:reorder",
+                    url: mauticBaseUrl + "ajax?action=lead:reorder",
                     data: $(container + ' .leadfield-list tbody').sortable("serialize")});
             }
         });

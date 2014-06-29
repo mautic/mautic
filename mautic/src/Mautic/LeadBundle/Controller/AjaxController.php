@@ -11,6 +11,7 @@ namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class AjaxController
@@ -19,9 +20,14 @@ use Mautic\CoreBundle\Helper\InputHelper;
  */
 class AjaxController extends CommonAjaxController
 {
-    protected function userListAction()
+
+    /**
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    protected function userListAction(Request $request)
     {
-        $filter    = InputHelper::clean($this->request->query->get('filter'));
+        $filter    = InputHelper::clean($request->query->get('filter'));
         $results   = $this->get('mautic.factory')->getModel('lead.lead')->getLookupResults('user', $filter);
         $dataArray = array();
         foreach ($results as $r) {
@@ -34,11 +40,15 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    protected function fieldListAction()
+    /**
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    protected function fieldListAction(Request $request)
     {
         $dataArray = array('success' => 0);
-        $filter = InputHelper::clean($this->request->query->get('filter'));
-        $field  = InputHelper::clean($this->request->query->get('field'));
+        $filter = InputHelper::clean($request->query->get('filter'));
+        $field  = InputHelper::clean($request->query->get('field'));
         if (!empty($field)) {
             $dataArray = array();
             //field_ is attached when looking up in list filters

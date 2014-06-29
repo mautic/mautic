@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Event\GlobalSearchEvent;
 use Mautic\CoreBundle\Event\CommandListEvent;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class AjaxController
@@ -35,11 +36,11 @@ class AjaxController extends CommonController
      *
      * @return JsonResponse
      */
-    public function delegateAjaxAction(  )
+    public function delegateAjaxAction()
     {
         //process ajax actions
         $securityContext = $this->container->get('security.context');
-        $action          = (empty($ajaxAction)) ? $this->request->get("ajaxAction") : $ajaxAction;
+        $action          = (empty($ajaxAction)) ? $this->request->get("action") : $ajaxAction;
 
         if ($securityContext->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
             if (strpos($action, ":") !== false) {
@@ -51,31 +52,33 @@ class AjaxController extends CommonController
 
                     if (class_exists('Mautic\\' . $bundle . 'Bundle\\Controller' . '\\' . 'AjaxController')) {
                         return $this->forward("Mautic{$bundle}Bundle:Ajax:executeAjax", array(
-                            'ajaxAction' => $action
+                            'action'  => $action,
+                            //forward the request as well as Symfony creates a subrequest without GET/POST
+                            'request' => $this->request
                         ));
                     }
                 }
             } else {
-                return $this->executeAjaxAction($action);
+                return $this->executeAjaxAction($action, $this->request);
             }
         }
         return $this->sendJsonResponse(array('success' => 0));
     }
 
-    protected function executeAjaxAction($action)
+    public function executeAjaxAction($action, Request $request)
     {
         if (method_exists($this, "{$action}Action")) {
-            return $this->{"{$action}Action"}();
+            return $this->{"{$action}Action"}($request);
         } else {
             return $this->sendJsonResponse(array('success' => 0));
         }
     }
 
-    protected function setTableOrderAction()
+    protected function setTableOrderAction(Request $request)
     {
         $dataArray = array('success' => 0);
-        $name    = InputHelper::clean($this->request->request->get("name"));
-        $orderBy = InputHelper::clean($this->request->request->get("orderby"));
+        $name    = InputHelper::clean($request->request->get("name"));
+        $orderBy = InputHelper::clean($request->request->get("orderby"));
         if (!empty($name) && !empty($orderBy)) {
             $dir = $this->get("session")->get("mautic.$name.orderbydir", "ASC");
             $dir = ($dir == "ASC") ? "DESC" : "ASC";
@@ -86,11 +89,11 @@ class AjaxController extends CommonController
         return $this->sendJsonResponse($dataArray);
     }
 
-    protected function setTableLimitAction()
+    protected function setTableLimitAction(Request $request)
     {
         $dataArray = array('success' => 0);
-        $name  = InputHelper::clean($this->request->request->get("name"));
-        $limit = InputHelper::int($this->request->request->get("limit"));
+        $name  = InputHelper::clean($request->request->get("name"));
+        $limit = InputHelper::int($request->request->get("limit"));
         if (!empty($name)) {
             $this->get("session")->set("mautic.$name.limit", $limit);
             $dataArray['success'] = 1;
@@ -98,12 +101,12 @@ class AjaxController extends CommonController
         return $this->sendJsonResponse($dataArray);
     }
 
-    protected function setTableFilterAction()
+    protected function setTableFilterAction(Request $request)
     {
         $dataArray = array('success' => 0);
-        $name   = InputHelper::clean($this->request->request->get("name"));
-        $filter = InputHelper::clean($this->request->request->get("filterby"));
-        $value  = InputHelper::clean($this->request->request->get("value"));
+        $name   = InputHelper::clean($request->request->get("name"));
+        $filter = InputHelper::clean($request->request->get("filterby"));
+        $value  = InputHelper::clean($request->request->get("value"));
         if (!empty($name) && !empty($filter)) {
             $filters              = $this->get("session")->get("mautic.$name.filters", '');
             if (empty($value) && isset($filters[$filter])) {
@@ -122,10 +125,10 @@ class AjaxController extends CommonController
         return $this->sendJsonResponse($dataArray);
     }
 
-    protected function globalSearchAction()
+    protected function globalSearchAction(Request $request)
     {
         $dataArray = array('success' => 1);
-        $searchStr = InputHelper::clean($this->request->query->get("global_search", ""));
+        $searchStr = InputHelper::clean($request->query->get("global_search", ""));
         $this->get('session')->set('mautic.global_search', $searchStr);
 
         $event = new GlobalSearchEvent($searchStr);
@@ -137,9 +140,9 @@ class AjaxController extends CommonController
         return $this->sendJsonResponse($dataArray);
     }
 
-    protected function commandListAction()
+    protected function commandListAction(Request $request)
     {
-        $model      = InputHelper::clean($this->request->query->get('model'));
+        $model      = InputHelper::clean($request->query->get('model'));
         $commands   = $this->get('mautic.factory')->getModel($model)->getCommandList();
         $dataArray  = array();
         $translator = $this->get('translator');
@@ -157,7 +160,7 @@ class AjaxController extends CommonController
         return $this->sendJsonResponse($dataArray);
     }
 
-    protected function globalCommandListAction()
+    protected function globalCommandListAction(Request $request)
     {
         $dispatcher = $this->get('event_dispatcher');
         $event = new CommandListEvent();
@@ -195,9 +198,9 @@ class AjaxController extends CommonController
         return $this->sendJsonResponse($dataArray);
     }
 
-    protected function togglePanelAction()
+    protected function togglePanelAction(Request $request)
     {
-        $panel     = InputHelper::clean($this->request->request->get("panel", "left"));
+        $panel     = InputHelper::clean($request->request->get("panel", "left"));
         $status    = $this->get("session")->get("{$panel}-panel", "default");
         $newStatus = ($status == "unpinned") ? "default" : "unpinned";
         $this->get("session")->set("{$panel}-panel", $newStatus);
@@ -205,11 +208,11 @@ class AjaxController extends CommonController
         return $this->sendJsonResponse($dataArray);
     }
 
-    protected function togglePublishStatusAction()
+    protected function togglePublishStatusAction(Request $request)
     {
         $dataArray = array('success' => 0);
-        $name   = InputHelper::clean($this->request->request->get('model'));
-        $id     = InputHelper::int($this->request->request->get('id'));
+        $name   = InputHelper::clean($request->request->get('model'));
+        $id     = InputHelper::int($request->request->get('id'));
         $model  = $this->get('mautic.factory')->getModel($name);
         $entity = $model->getEntity($id);
         if ($entity !== null) {
