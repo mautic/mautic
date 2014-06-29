@@ -47,6 +47,7 @@ class LeadType extends AbstractType
         $builder->addEventSubscriber(new FormExitSubscriber($this->translator->trans(
             'mautic.core.form.inform'
         )));
+
         $builder->add('owner_lookup', 'text', array(
             'label'      => 'mautic.lead.lead.field.owner',
             'label_attr' => array('class' => 'control-label'),
@@ -60,8 +61,7 @@ class LeadType extends AbstractType
 
         $builder->add('owner', 'hidden_entity', array(
             'required'   => false,
-            'repository' => 'MauticUserBundle:User',
-            'em'         => $this->factory->getEntityManager()
+            'repository' => 'MauticUserBundle:User'
         ));
 
         //get a list of fields

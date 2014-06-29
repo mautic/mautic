@@ -65,14 +65,6 @@ class Action
     private $order = 0;
 
     /**
-     * @ORM\Column(name="is_published", type="boolean")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
-     */
-    private $isPublished = true;
-
-    /**
      * @ORM\Column(type="array")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
@@ -141,31 +133,6 @@ class Action
     public function getOrder()
     {
         return $this->order;
-    }
-
-    /**
-     * Set isPublished
-     *
-     * @param boolean $isPublished
-     * @return Action
-     */
-    public function setIsPublished($isPublished)
-    {
-        $this->isChanged('isPublished', $isPublished);
-
-        $this->isPublished = $isPublished;
-
-        return $this;
-    }
-
-    /**
-     * Get isPublished
-     *
-     * @return boolean
-     */
-    public function getIsPublished()
-    {
-        return $this->isPublished;
     }
 
     /**

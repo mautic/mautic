@@ -35,7 +35,7 @@ class LeadList extends FormEntity
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=50)
+     * @ORM\Column(type="string")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full", "limited"})
@@ -43,7 +43,7 @@ class LeadList extends FormEntity
     private $name;
 
     /**
-     * @ORM\Column(type="string", length=25)
+     * @ORM\Column(type="string")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full", "limited"})
@@ -57,14 +57,6 @@ class LeadList extends FormEntity
      * @Serializer\Groups({"full", "limited"})
      */
     private $description;
-
-    /**
-     * @ORM\Column(name="is_active", type="boolean")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
-     */
-    private $isActive = true;
 
     /**
      * @ORM\Column(type="array")
@@ -173,30 +165,6 @@ class LeadList extends FormEntity
     public function getDescription()
     {
         return $this->description;
-    }
-
-    /**
-     * Set isActive
-     *
-     * @param boolean $isActive
-     * @return LeadList
-     */
-    public function setIsActive($isActive)
-    {
-        $this->isChanged('isActive', $isActive);
-        $this->isActive = $isActive;
-
-        return $this;
-    }
-
-    /**
-     * Get isActive
-     *
-     * @return boolean
-     */
-    public function getIsActive()
-    {
-        return $this->isActive;
     }
 
     /**

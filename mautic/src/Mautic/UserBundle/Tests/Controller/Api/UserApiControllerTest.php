@@ -95,7 +95,7 @@ class UserApiControllerTest extends MauticWebTestCase
                 'password' => 'mautic',
                 'confirm'  => 'mautic'
             ),
-            'isActive'      => true
+            'isPublished'      => true
         );
 
         $crawler  = $client->request('POST', '/api/users/new.json?access_token='.$token, $data);
@@ -264,7 +264,7 @@ class UserApiControllerTest extends MauticWebTestCase
             'role'          => $entity->getRole()->getId(),
             'email'         => $unique . "@mautic.com", //updated email
             'position'      => $entity->getPosition(),
-            'isActive'      => true
+            'isPublished'      => true
         );
 
         //reset the client
@@ -343,7 +343,7 @@ class UserApiControllerTest extends MauticWebTestCase
             'role'          => $entity->getRole()->getId(),
             'email'         => $unique . "@mautic.com", //updated email
             'position'      => $unique,
-            'isActive'      => true
+            'isPublished'      => true
         );
 
         //reset the client

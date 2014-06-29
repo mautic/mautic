@@ -65,7 +65,7 @@ class FormType extends AbstractType
         $builder->add('name', 'text', array(
             'label'      => 'mautic.form.form.name',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control', 'length' => 50)
+            'attr'       => array('class' => 'form-control')
         ));
 
         $builder->add('description', 'text', array(
@@ -107,7 +107,7 @@ class FormType extends AbstractType
 
         $builder->add('publishUp', 'datetime', array(
             'widget'     => 'single_text',
-            'label'      => 'mautic.form.form.publishup',
+            'label'      => 'mautic.core.form.publishup',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
                 'class' => 'form-control',
@@ -119,7 +119,7 @@ class FormType extends AbstractType
 
         $builder->add('publishDown', 'datetime', array(
             'widget'     => 'single_text',
-            'label'      => 'mautic.form.form.publishdown',
+            'label'      => 'mautic.core.form.publishdown',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
                 'class' => 'form-control',

@@ -21,31 +21,6 @@ class FormRepository extends CommonRepository
 {
 
     /**
-     * @param      $alias
-     * @param null $id
-     * @return mixed
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
-     * @throws \Doctrine\ORM\ORMException
-     */
-    public function checkUniqueAlias($alias, $id = null)
-    {
-        $q = $this->createQueryBuilder('f')
-            ->select('count(f.id) as aliasCount')
-            ->where('f.alias = :alias');
-        $q->setParameter('alias', $alias);
-
-        if (!empty($id)) {
-            $q->andWhere('f.id != :id');
-            $q->setParameter('id', $id);
-        }
-
-        $results = $q->getQuery()->getSingleResult();
-        return $results['aliasCount'];
-    }
-
-
-    /**
      * Get a list of entities
      *
      * @param array      $args
@@ -58,7 +33,7 @@ class FormRepository extends CommonRepository
             ->select('f');
 
         if (!$this->buildClauses($q, $args)) {
-            return array();
+            return array('totalCount' => 0);
         }
 
         $query = $q->getQuery();

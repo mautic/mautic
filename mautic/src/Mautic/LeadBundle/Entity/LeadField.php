@@ -35,7 +35,7 @@ class LeadField extends FormEntity
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=50)
+     * @ORM\Column(type="string")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full", "limited"})
@@ -43,7 +43,7 @@ class LeadField extends FormEntity
     private $label;
 
     /**
-     * @ORM\Column(type="string", length=25)
+     * @ORM\Column(type="string")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full", "limited"})

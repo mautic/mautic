@@ -215,11 +215,11 @@ class UserRepository extends CommonRepository
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.is'):
                 switch($string) {
-                    case $this->translator->trans('mautic.core.searchcommand.isactive'):
-                        $expr = $q->expr()->eq("u.isActive", 1);
+                    case $this->translator->trans('mautic.core.searchcommand.ispublished'):
+                        $expr = $q->expr()->eq("u.isPublished", 1);
                         break;
-                    case $this->translator->trans('mautic.core.searchcommand.isinactive'):
-                        $expr = $q->expr()->eq("u.isActive", 0);
+                    case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
+                        $expr = $q->expr()->eq("u.isPublished", 0);
                         break;
                     case $this->translator->trans('mautic.user.user.searchcommand.isadmin');
                         $expr = $q->expr()->eq("r.isAdmin", 1);
@@ -266,8 +266,8 @@ class UserRepository extends CommonRepository
          return array(
             'mautic.user.user.searchcommand.email',
             'mautic.core.searchcommand.is' => array(
-                'mautic.core.searchcommand.isactive',
-                'mautic.core.searchcommand.isinactive',
+                'mautic.core.searchcommand.ispublished',
+                'mautic.core.searchcommand.isunpublished',
                 'mautic.user.user.searchcommand.isadmin'
             ),
             'mautic.core.searchcommand.name',

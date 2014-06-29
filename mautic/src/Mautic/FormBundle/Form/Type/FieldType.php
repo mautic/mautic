@@ -35,7 +35,7 @@ class FieldType extends AbstractType
         $builder->add('label', 'text', array(
             'label'      => 'mautic.form.field.form.label',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control', 'length' => 50),
+            'attr'       => array('class' => 'form-control'),
             'constraints' => array(
                 new Assert\NotBlank(
                     array('message' => 'mautic.form.field.label.notblank')

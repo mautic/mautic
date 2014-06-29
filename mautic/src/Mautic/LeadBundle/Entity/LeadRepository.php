@@ -87,7 +87,7 @@ class LeadRepository extends CommonRepository
             ->leftJoin('l.owner', 'u');
 
         if (!$this->buildClauses($q, $args)) {
-            return array();
+            return array('totalCount' => 0);
         }
 
         $query = $q->getQuery();

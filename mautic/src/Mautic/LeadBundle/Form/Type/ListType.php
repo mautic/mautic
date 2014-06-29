@@ -51,7 +51,7 @@ class ListType extends AbstractType
         $builder->add('name', 'text', array(
             'label'      => 'mautic.lead.list.form.name',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control', 'length' => 50)
+            'attr'       => array('class' => 'form-control')
         ));
 
         $builder->add('alias', 'text', array(
@@ -85,7 +85,7 @@ class ListType extends AbstractType
             'required'      => false
         ));
 
-        $builder->add('isActive', 'choice', array(
+        $builder->add('isPublished', 'choice', array(
             'choice_list' => new ChoiceList(
                 array(false, true),
                 array('mautic.core.form.no', 'mautic.core.form.yes')
@@ -93,7 +93,7 @@ class ListType extends AbstractType
             'expanded'      => true,
             'label_attr'    => array('class' => 'control-label'),
             'multiple'      => false,
-            'label'         => 'mautic.core.form.isactive',
+            'label'         => 'mautic.core.form.ispublished',
             'empty_value'   => false,
             'required'      => false
         ));

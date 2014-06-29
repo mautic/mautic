@@ -39,7 +39,7 @@ class HiddenEntityType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setRequired(
-            array("repository", "em")
+            array("repository")
         );
 
         $resolver->setDefaults(array(

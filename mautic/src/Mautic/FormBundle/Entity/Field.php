@@ -32,7 +32,7 @@ class Field
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=50)
+     * @ORM\Column(type="string")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})
@@ -48,7 +48,7 @@ class Field
     private $showLabel = true;
 
     /**
-     * @ORM\Column(type="string", length=25)
+     * @ORM\Column(type="string")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})

@@ -22,6 +22,15 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 class FormEntity
 {
 
+
+    /**
+     * @ORM\Column(name="is_published", type="boolean")
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full"})
+     */
+    private $isPublished = true;
+
     /**
      * @ORM\Column(name="date_added", type="datetime", nullable=true)
      */
@@ -54,6 +63,20 @@ class FormEntity
      * @ORM\JoinColumn(name="checked_out_by", referencedColumnName="id", nullable=true)
      */
     private $checkedOutBy;
+
+    private $changes;
+
+    private function isChanged($prop, $val)
+    {
+        if ($this->$prop != $val) {
+            $this->changes[$prop] = array($this->$prop, $val);
+        }
+    }
+
+    public function getChanges()
+    {
+        return $this->changes;
+    }
 
     public function __toString()
     {
@@ -199,6 +222,42 @@ class FormEntity
     }
 
     /**
+     * Set isPublished
+     *
+     * @param boolean $isPublished
+     * @return Action
+     */
+    public function setIsPublished($isPublished)
+    {
+        $this->isChanged('isPublished', $isPublished);
+
+        $this->isPublished = $isPublished;
+
+        return $this;
+    }
+
+    /**
+     * Get isPublished
+     *
+     * @return boolean
+     */
+    public function getIsPublished()
+    {
+        return $this->isPublished;
+    }
+
+    /**
+     * Proxy function to getIsPublished()
+     *
+     * @return bool
+     */
+    public function isPublished()
+    {
+        return $this->getIsPublished();
+    }
+
+
+    /**
      * Check the publish status of an entity based on publish up and down datetimes
      *
      * @return string early|expired|published|unpublished
@@ -228,5 +287,11 @@ class FormEntity
         } else {
             throw new \BadMethodCallException('This entity does not have a isPublished method');
         }
+    }
+
+    public function isNew()
+    {
+        $id = $this->getId();
+        return (empty($id)) ? true : false;
     }
 }

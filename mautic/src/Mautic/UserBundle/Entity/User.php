@@ -106,14 +106,6 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
     private $role;
 
     /**
-     * @ORM\Column(name="is_active", type="boolean")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
-     */
-    protected $isActive = true;
-
-    /**
      * @ORM\Column(type="text", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
@@ -329,7 +321,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
             $this->id,
             $this->username,
             $this->password,
-            $this->isActive
+            $this->isPublished()
         ));
     }
 
@@ -342,8 +334,9 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
             $this->id,
             $this->username,
             $this->password,
-            $this->isActive
+            $published
         ) = unserialize($serialized);
+        $this->setIsPublished($published);
     }
 
     /**
@@ -496,30 +489,6 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
     }
 
     /**
-     * Set isActive
-     *
-     * @param boolean $isActive
-     * @return User
-     */
-    public function setIsActive($isActive)
-    {
-        $this->isChanged('isActive', $isActive);
-        $this->isActive = $isActive;
-
-        return $this;
-    }
-
-    /**
-     * Get isActive
-     *
-     * @return boolean
-     */
-    public function getIsActive()
-    {
-        return $this->isActive;
-    }
-
-    /**
      * @return bool
      */
     public function isAccountNonExpired()
@@ -548,7 +517,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      */
     public function isEnabled()
     {
-        return $this->isActive;
+        return $this->isPublished();
     }
 
     /**
@@ -625,8 +594,8 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      */
     public function onPrePersistSetDefaults()
     {
-        if ($this->getIsActive() === null) {
-            $this->setIsActive(true);
+        if ($this->getIsPublished() === null) {
+            $this->setIsPublished(true);
         }
     }
 

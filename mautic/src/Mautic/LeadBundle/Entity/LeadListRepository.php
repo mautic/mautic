@@ -77,7 +77,7 @@ class LeadListRepository extends CommonRepository
         $q = $this->_em->createQueryBuilder()
             ->select('l.name, l.id, l.alias')
             ->from('MauticLeadBundle:LeadList', 'l');
-        $q->where($q->expr()->eq('l.isActive', true));
+        $q->where($q->expr()->eq('l.isPublished', true));
 
         if (!empty($user)) {
             $q->andWhere($q->expr()->eq('l.isGlobal', true));
@@ -148,11 +148,11 @@ class LeadListRepository extends CommonRepository
                     case $this->translator->trans('mautic.lead.list.searchcommand.isglobal'):
                         $expr = $q->expr()->eq("l.isGlobal", 1);
                         break;
-                    case $this->translator->trans('mautic.core.searchcommand.isactive'):
-                        $expr = $q->expr()->eq("l.isActive", 1);
+                    case $this->translator->trans('mautic.core.searchcommand.ispublished'):
+                        $expr = $q->expr()->eq("l.isPublished", 1);
                         break;
-                    case $this->translator->trans('mautic.core.searchcommand.isinactive'):
-                        $expr = $q->expr()->eq("l.isActive", 0);
+                    case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
+                        $expr = $q->expr()->eq("l.isPublished", 0);
                         break;
                 }
                 $returnParameter = false;
@@ -182,7 +182,7 @@ class LeadListRepository extends CommonRepository
             'mautic.core.searchcommand.is' => array(
                 'mautic.lead.list.searchcommand.isglobal',
                 'mautic.core.searchcommand.ismine',
-                'mautic.core.searchcommand.isactive',
+                'mautic.core.searchcommand.ispublished',
                 'mautic.core.searchcommand.isinactive'
             ),
             'mautic.core.searchcommand.name'

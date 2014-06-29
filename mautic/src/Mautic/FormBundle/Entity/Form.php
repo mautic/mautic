@@ -36,7 +36,7 @@ class Form extends FormEntity
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=50)
+     * @ORM\Column(type="string")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})
@@ -44,7 +44,7 @@ class Form extends FormEntity
     private $name;
 
     /**
-     * @ORM\Column(type="string", length=25)
+     * @ORM\Column(type="string")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})
@@ -58,14 +58,6 @@ class Form extends FormEntity
      * @Serializer\Groups({"full"})
      */
     private $description;
-
-    /**
-     * @ORM\Column(name="is_published", type="boolean")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
-     */
-    private $isPublished = true;
 
     /**
      * @ORM\Column(name="cached_html", type="text", nullable=true)
@@ -242,7 +234,7 @@ class Form extends FormEntity
      *
      * @return string
      */
-    public function getDescription($truncate = false, $length = 50)
+    public function getDescription($truncate = false, $length = 45)
     {
         if ($truncate) {
             if (strlen($this->description) > $length) {
@@ -250,40 +242,6 @@ class Form extends FormEntity
             }
         }
         return $this->description;
-    }
-
-    /**
-     * Set isPublished
-     *
-     * @param boolean $isPublished
-     * @return Form
-     */
-    public function setIsPublished($isPublished)
-    {
-        $this->isChanged('isPublished', $isPublished);
-        $this->isPublished = $isPublished;
-
-        return $this;
-    }
-
-    /**
-     * Get isPublished
-     *
-     * @return boolean
-     */
-    public function getIsPublished()
-    {
-        return $this->isPublished;
-    }
-
-    /**
-     * Proxy function to getIsPublished()
-     *
-     * @return bool
-     */
-    public function isPublished()
-    {
-        return $this->getIsPublished();
     }
 
     /**

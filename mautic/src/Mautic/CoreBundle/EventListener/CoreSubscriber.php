@@ -9,7 +9,7 @@
 
 namespace Mautic\CoreBundle\EventListener;
 
-use Mautic\CoreBundle\Controller\EventsController;
+use Mautic\CoreBundle\Controller\MauticController;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MenuEvent;
 use Mautic\CoreBundle\Event\RouteEvent;
@@ -91,28 +91,10 @@ class CoreSubscriber extends CommonSubscriber
         }
 
         //only affect Mautic controllers
-        if ($controller[0] instanceof EventsController) {
+        if ($controller[0] instanceof MauticController) {
 
             //populate request attributes with  namespace, bundle, controller, and action names for use in bundle controllers and templates
-            $request        = $event->getRequest();
-            $matches        = array();
-            $controllerName = $request->attributes->get('_controller');
-            preg_match('/(.*)\\\(.*)Bundle\\\Controller\\\(.*)Controller::(.*)Action/', $controllerName, $matches);
-
-            if (!empty($matches)) {
-                $request->attributes->set('namespace', $matches[1]);
-                $request->attributes->set('bundle', $matches[2]);
-                $request->attributes->set('controller', $matches[3]);
-                $request->attributes->set('action', $matches[4]);
-            } else {
-                preg_match('/Mautic(.*)Bundle:(.*):(.*)/', $controllerName, $matches);
-                if (!empty($matches)) {
-                    $request->attributes->set('namespace', 'Mautic');
-                    $request->attributes->set('bundle', $matches[1]);
-                    $request->attributes->set('controller', $matches[2]);
-                    $request->attributes->set('action', $matches[3]);
-                }
-            }
+            $request = $event->getRequest();
 
             //also set the request for easy access throughout controllers
             $controller[0]->setRequest($request);
