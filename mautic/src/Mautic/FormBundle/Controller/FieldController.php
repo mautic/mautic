@@ -113,7 +113,7 @@ class FieldController extends CommonFormController
         $passthroughVars = array(
             'mauticContent' => 'formfield',
             'success'       => $success,
-            'target'        => '.form-components-inner-wrapper',
+            'target'        => '.bundle-side-inner-wrapper',
             'route'         => false
         );
 
@@ -230,7 +230,7 @@ class FieldController extends CommonFormController
             $passthroughVars = array(
                 'mauticContent' => 'formfield',
                 'success'       => $success,
-                'target'        => '.form-components-inner-wrapper',
+                'target'        => '.bundle-side-inner-wrapper',
                 'route'         => false
             );
 
@@ -411,24 +411,6 @@ class FieldController extends CommonFormController
 
         $response  = new JsonResponse($dataArray);
         $response->headers->set('Content-Length', strlen($response->getContent()));
-        return $response;
-    }
-
-    /**
-     * {@inheritdoc)
-     *
-     * @param $action
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse
-     */
-    public function executeAjaxAction( Request $request, $ajaxAction = "" )
-    {
-        $dataArray = array("success" => 0);
-        switch ($ajaxAction) {
-
-        }
-        $response  = new JsonResponse();
-        $response->setData($dataArray);
-
         return $response;
     }
 }

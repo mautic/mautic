@@ -103,8 +103,9 @@ class FieldModel extends FormModel
             }
 
             //make sure alias is not already taken
+            $repo      = $this->getRepository();
             $testAlias = $alias;
-            $aliases   = $this->em->getRepository('MauticLeadBundle:LeadField')->getAliases($entity->getId());
+            $aliases   = $repo->getAliases($entity->getId());
             $count     = count($aliases);
             $aliasTag  = $count;
 

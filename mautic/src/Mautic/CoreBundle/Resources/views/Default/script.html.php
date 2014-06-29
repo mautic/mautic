@@ -13,8 +13,10 @@
     var mauticContent = '<?php $view['slots']->output('mauticContent',''); ?>';
 </script>
 <?php foreach ($view['assetic']->javascripts(array("@mautic_javascripts"), array(), array('combine' => true, 'output' => 'media/js/mautic.js')) as $url): ?>
-    <script src="<?php echo $view->escape($url) ?>"></script>
+<script src="<?php echo $view->escape($url) ?>"></script>
 <?php endforeach; ?>
+<script src="<?php echo $view['assets']->getUrl('media/tinymce/tinymce.min.js'); ?>"></script>
+<script src="<?php echo $view['assets']->getUrl('media/tinymce/jquery.tinymce.min.js'); ?>"></script>
 <script>
     Mautic.onPageLoad();
     <?php $view['slots']->output("jsDeclarations"); ?>

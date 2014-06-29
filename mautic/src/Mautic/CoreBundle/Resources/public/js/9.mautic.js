@@ -83,7 +83,7 @@ var Mautic = {
         });
 
         //initialize tooltips
-        $(container + " *[data-toggle='tooltip']").tooltip({html: true});
+        $(container + " *[data-toggle='tooltip']").tooltip({html: true, container: 'body'});
 
         //initialize sortable lists
         $(container + " *[data-toggle='sortablelist']").each(function (index) {
@@ -91,7 +91,7 @@ var Mautic = {
 
             if ($('#' + prefix + '_additem').length) {
                 $('#' + prefix + '_additem').click(function () {
-                    var count     = $('#' + prefix + '_itemcount').val();
+                    var count = $('#' + prefix + '_itemcount').val();
                     var prototype = $('#' + prefix + '_additem').attr('data-prototype');
                     prototype = prototype.replace(/__name__/g, count);
                     $(prototype).appendTo($('#' + prefix + '_list div.list-sortable'));
@@ -105,11 +105,11 @@ var Mautic = {
             $('#' + prefix + '_list div.list-sortable').sortable({
                 items: 'div.sortable',
                 handle: 'span.postaddon',
-                stop: function(i) {
+                stop: function (i) {
                     var order = 0;
-                    $('#' + prefix + '_list div.list-sortable div.input-group input').each(function() {
+                    $('#' + prefix + '_list div.list-sortable div.input-group input').each(function () {
                         var name = $(this).attr('name');
-                        name = name.replace(/\[list\]\[(.+)\]$/g, '') + '[list]['+order+']';
+                        name = name.replace(/\[list\]\[(.+)\]$/g, '') + '[list][' + order + ']';
                         $(this).attr('name', name);
                         order++;
                     });
@@ -117,7 +117,7 @@ var Mautic = {
             });
         });
 
-        $(container + " a[data-toggle='download']").click(function(event) {
+        $(container + " a[data-toggle='download']").click(function (event) {
             event.preventDefault();
 
             var link = $(event.target).attr('href');
@@ -165,6 +165,28 @@ var Mautic = {
             scrollInput: false
         });
 
+        //Set the height of containers
+        var windowHeight = $(window).height() - 175;
+        $(container + ' .auto-height').each(function (index) {
+            //set height of divs
+            $(this).css('height', windowHeight + 'px');
+        });
+
+        //Activate editors
+        $(container + " textarea[data-toggle='editor']").each(function (index) {
+            $(this).tinymce({
+                theme: "modern",
+                height: 300,
+                editor_deselector: "mceNoEditor",
+                plugins: [
+                    "advlist autolink link image lists charmap print preview hr anchor pagebreak spellchecker",
+                    "searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking",
+                    "save table contextmenu directionality emoticons template paste textcolor"
+                ],
+                toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | print preview media fullpage | forecolor backcolor emoticons"
+            });
+        });
+
         //run specific on loads
         if (typeof Mautic[mauticContent + "OnLoad"] == 'function') {
             Mautic[mauticContent + "OnLoad"](container, response);
@@ -176,7 +198,7 @@ var Mautic = {
                 datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
                 queryTokenizer: Bloodhound.tokenizers.whitespace,
                 prefetch: {
-                    url: mauticBaseUrl + "ajax?ajaxAction=globalCommandList"
+                    url: mauticBaseUrl + "ajax?action=globalCommandList"
                 }
             });
             engine.initialize();
@@ -210,9 +232,15 @@ var Mautic = {
      * Functions to be ran on ajax page unload
      */
     onPageUnload: function (container, response) {
+        //unload tooltips so they don't double show
         container = typeof container !== 'undefined' ? container : 'body';
+
         $(container + " *[data-toggle='tooltip']").tooltip('destroy');
 
+        //unload tinymce editor so that it can be reloaded if needed with new ajax content
+        $(container + " textarea[data-toggle='editor']").each(function (index) {
+            $(this).tinymce().remove();
+        });
 
         //run specific unloads
         if (typeof Mautic[mauticContent + "OnUnload"] == 'function') {
@@ -553,7 +581,7 @@ var Mautic = {
      * @param position
      */
     stickSidePanel: function (position) {
-        var query = "ajaxAction=togglePanel&panel=" + position;
+        var query = "action=togglePanel&panel=" + position;
         $.ajax({
             url: mauticBaseUrl + "ajax",
             type: "POST",
@@ -664,7 +692,7 @@ var Mautic = {
      * @param orderby
      */
     reorderTableData: function (name, orderby, tmpl, target) {
-        var query = "ajaxAction=setTableOrder&name=" + name + "&orderby=" + orderby;
+        var query = "action=setTableOrder&name=" + name + "&orderby=" + orderby;
         $.ajax({
             url: mauticBaseUrl + 'ajax',
             type: "POST",
@@ -691,7 +719,7 @@ var Mautic = {
      * @param target
      */
     filterTableData: function (name, filterby, filterValue, tmpl, target) {
-        var query = "ajaxAction=setTableFilter&name=" + name + "&filterby=" + filterby + "&value=" + filterValue;
+        var query = "action=setTableFilter&name=" + name + "&filterby=" + filterby + "&value=" + filterValue;
         $.ajax({
             url: mauticBaseUrl + 'ajax',
             type: "POST",
@@ -710,7 +738,7 @@ var Mautic = {
     },
 
     limitTableData: function (name, limit, tmpl, target) {
-        var query = "ajaxAction=setTableLimit&name=" + name + "&limit=" + limit;
+        var query = "action=setTableLimit&name=" + name + "&limit=" + limit;
         $.ajax({
             url: mauticBaseUrl + 'ajax',
             type: "POST",
@@ -778,7 +806,7 @@ var Mautic = {
                 datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
                 queryTokenizer: Bloodhound.tokenizers.whitespace,
                 prefetch: {
-                    url: mauticBaseUrl + "ajax?ajaxAction=commandList&model=" + modelName
+                    url: mauticBaseUrl + "ajax?action=commandList&model=" + modelName
                 }
             });
             engine.initialize();
@@ -950,19 +978,38 @@ var Mautic = {
         $.ajax({
             url: mauticBaseUrl + "ajax",
             type: "POST",
-            data: "ajaxAction=togglePublishStatus&model=" + model + '&id=' + id,
+            data: "action=togglePublishStatus&model=" + model + '&id=' + id,
             dataType: "json",
             success: function (response) {
                 if (response.statusHtml) {
                     $(el).replaceWith(response.statusHtml);
-                    $('.publish-icon'+id).tooltip({html: true});
+                    $('.publish-icon'+id).tooltip({html: true, container: 'body'});
                 }
             },
             error: function (request, textStatus, errorThrown) {
                 alert(errorThrown);
             }
         });
+    },
+
+    /**
+     * Adds active class to selected list item in left/right panel view
+     * @param prefix
+     * @param id
+     */
+    activateListItem: function(prefix,id) {
+        $('.bundle-list-item').removeClass('active');
+        $('#'+prefix+'-' + id).addClass('active');
+    },
+
+    /**
+     * Expand right panel
+     * @param el
+     */
+    expandPanel: function(el) {
+        $(el).toggleClass('fullpanel');
     }
+
 };
 
 //prevent page navigation if in the middle of a form

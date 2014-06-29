@@ -13,11 +13,11 @@ if ($tmpl == 'index') {
 ?>
 
 <?php if (!empty($lead)): ?>
-<div class="lead-profile-header">
-    <div class="lead-profile pull-left">
-        <span class="lead-primary-identifier">
+<div class="bundle-main-header">
+    <div class="pull-left">
+        <span class="bundle-main-item-primary">
             <?php echo $view['translator']->trans($lead->getPrimaryIdentifier()); ?>
-            <span class="lead-actions">
+            <span class="bundle-main-actions">
                 <?php
                 echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
                     'item'      => $lead,
@@ -37,9 +37,9 @@ if ($tmpl == 'index') {
                 ?>
             </span>
         </span>
-        <span class="lead-secondary-identifer"><?php echo $lead->getSecondaryIdentifier(); ?></span>
+        <span class="bundle-main-item-secondary"><?php echo $lead->getSecondaryIdentifier(); ?></span>
     </div>
-    <div class="lead-score pull-right">
+    <div class="badge-count pull-right">
         <h1><span class="label label-success"><?php echo $lead->getScore(); ?></span></h1>
     </div>
     <div class="clearfix"></div>

@@ -78,10 +78,19 @@ class InputHelper
      * @param $value
      * @return string
      */
-    static public function alphanum($value)
+    static public function alphanum($value, $convertSpacesToHyphen = false)
     {
-        return trim(preg_replace("/[^0-9a-z]+/i", "", $value));
+        if ($convertSpacesToHyphen) {
+            $value = str_replace(' ', '-', $value);
+            return trim(preg_replace("/[^0-9a-z-]+/i", "", $value));
+        } else {
+            return trim(preg_replace("/[^0-9a-z]+/i", "", $value));
+        }
     }
+
+    /**
+     *
+     */
 
     /**
      * Returns raw value
@@ -211,5 +220,133 @@ class InputHelper
             $value = array($value);
         }
         return $value;
+    }
+
+    /**
+     * Clean HTML using htmLawed
+     *
+     * @param $element
+     * @param $attribute_array
+     * @return string
+     */
+    static public function html($value)
+    {
+        require_once __DIR__ . '/../Libraries/htmLawed/htmLawed.php';
+        $config = array('tidy' => 4, 'hook_tag' => 'InputHelper::element');
+        $value = htmLawed($value, $config);
+        return $value;
+    }
+
+    /**
+     * Cleans input sent from htmLawed
+     *
+     * @param $element
+     * @param $attribute_array
+     * @return string
+     */
+    static public function element($element, $attribute_array)
+    {
+        static $allowedElements = array('a', 'span', 'p', 'img', 'ul', 'ol', 'li');
+        $badMatch = "`[^\w\s;:,#\-']`";
+        static $allowedProperties = array('border', 'color', 'display', 'float', 'font-family', 'font-size', 'list-style-type', 'margin', 'margin-left', 'margin-right', 'margin-top', 'margin-bottom', 'text-align', 'text-decoration', 'vertical-align');
+
+        if (in_array($element, $allowedElements) && isset($attribute_array['style']) && !preg_match($badMatch, $attribute_array['style'])) {
+
+            $style = $attribute_array['style'];
+            $style = str_replace(array("\r", "\n", "\t"), '', $style);
+
+            $properties      = explode(';', $style);
+            $finalProperties = array();
+            foreach ($properties as $namevalue) {
+                $namevalue = explode(':', trim($namevalue));
+                $name      = strtolower(trim($namevalue[0]));
+                $value     = isset($namevalue[1]) ? $namevalue[1] : 0;
+                if ($value and in_array($name, $allowedProperties)) {
+
+                    $value = trim($value);
+                    switch ($name) {
+                        case 'border':
+                            if (stripos('solid black', $value)) {
+                                $finalProperties[] = 'border: ' . $value;
+                            }
+                            break;
+                        case 'color':
+                        case 'margin-top':
+                        case 'margin-bottom':
+                            $finalProperties[] = $name . ': ' . $value;
+                            break;
+                        case 'display':
+                            if (stripos(' block', $value)) {
+                                $finalProperties[] = 'display: ' . $value;
+                            }
+                            break;
+                        case 'float':
+                            if (stripos(' left right', $value)) {
+                                $finalProperties[] = 'float: ' . $value;
+                            }
+                            break;
+                        case 'font-size':
+                            if (stripos(' xx-small medium large xx-large', $value)) {
+                                $finalProperties[] = 'font-size: ' . $value;
+                            }
+                            break;
+                        case 'font-family':
+                            $fonts      = explode(',', $value);
+                            $finalFonts = array();
+                            foreach ($fonts as $font) {
+                                $font = trim(strtolower($font), " '\"");
+                                if (in_array($font, array('andale mono', 'arial', 'arial black', 'avant garde', 'chicago', 'comic sans ms', 'courier', 'courier new', 'geneva', 'georgia', 'helvetica', 'impact', 'monaco', 'tahoma', 'terminal', 'times', 'times new roman', 'trebuchet ms', 'verdana', 'serif', 'san-serif'))) {
+                                    $finalFonts[] = $font;
+                                }
+                            }
+                            if (!empty($finalFonts)) {
+                                $finalProperties[] = 'font-family: ' . implode(', ', $finalFonts);
+                            }
+                            break;
+                        case 'list-style-type':
+                            if (stripos(' circle disc square lower-roman upper-roman lower-greek upper-greek lower-alpha upper-alpha', $value)) {
+                                $finalProperties[] = 'list-style-type: ' . $value;
+                            }
+                            break;
+                        case 'margin-left':
+                        case 'margin-right':
+                            if ((strtolower($value) == 'auto') or (preg_match('`(\d+)\s*px`i', $value, $m) and intval($m[1]) < 601)) {
+                                $finalProperties[] = $name . ': ' . $value;
+                            }
+                            break;
+                        case 'text-align':
+                            if (stripos(' left right center justify', $value)) {
+                                $finalProperties[] = 'text-align: ' . $value;
+                            }
+                            break;
+                        case 'text-decoration':
+                            if (strtolower($value) == 'underline') {
+                                $finalProperties[] = 'text-decoration: ' . $value;
+                            }
+                            break;
+                        case 'vertical-align':
+                            if (stripos(' middle, bottom, top, baseline, text-top, text-bottom', $value)) {
+                                $finalProperties[] = 'vertical-align: ' . $value;
+                            }
+                            break;
+                    }
+                }
+            }
+            $style = implode('; ', $finalProperties);
+            if (!empty($style)) {
+                $attribute_array['style'] = $style;
+            } else {
+                unset($attribute_array['style']);
+            }
+        } elseif (isset($attribute_array['style'])) {
+            unset($attribute_array['style']);
+        }
+
+        $attributes = '';
+        foreach ($attribute_array as $k => $v) {
+            $attributes .= " {$k}=\"{$v}\"";
+        }
+        static $empty_elements = array('area' => 1, 'br' => 1, 'col' => 1, 'embed' => 1, 'hr' => 1, 'img' => 1, 'input' => 1, 'isindex' => 1, 'param' => 1);
+        return "<{$element}{$attributes}" . (isset($empty_elements[$element]) ? ' /' : '') . '>';
     }
 }

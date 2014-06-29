@@ -13,31 +13,29 @@ if ($tmpl == 'index') {
 ?>
 
 <?php if (!empty($activeForm)): ?>
-<div class="form-profile-header">
-    <div class="form-profile">
-        <span class="form-name">
-            <?php echo $view['translator']->trans($activeForm->getName()); ?>
-            <span class="form-actions">
-                <?php
-                echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
-                    'item'      => $activeForm,
-                    'edit'      => $security->hasEntityAccess(
-                        $permissions['form:forms:editown'],
-                        $permissions['form:forms:editother'],
-                        $activeForm->getCreatedBy()
-                    ),
-                    'delete'    => $security->hasEntityAccess(
-                        $permissions['form:forms:deleteown'],
-                        $permissions['form:forms:deleteother'],
-                        $activeForm->getCreatedBy()),
-                    'routeBase' => 'form',
-                    'menuLink'  => 'mautic_form_index',
-                    'langVar'   => 'form'
-                ));
-                ?>
-            </span>
+<div class="bundle-main-header">
+    <span class="bundle-main-item-primary">
+        <?php echo $view['translator']->trans($activeForm->getName()); ?>
+        <span class="bundle-main-actions">
+            <?php
+            echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
+                'item'      => $activeForm,
+                'edit'      => $security->hasEntityAccess(
+                    $permissions['form:forms:editown'],
+                    $permissions['form:forms:editother'],
+                    $activeForm->getCreatedBy()
+                ),
+                'delete'    => $security->hasEntityAccess(
+                    $permissions['form:forms:deleteown'],
+                    $permissions['form:forms:deleteother'],
+                    $activeForm->getCreatedBy()),
+                'routeBase' => 'form',
+                'menuLink'  => 'mautic_form_index',
+                'langVar'   => 'form'
+            ));
+            ?>
         </span>
-    </div>
+    </span>
     <div class="clearfix"></div>
 </div>
 

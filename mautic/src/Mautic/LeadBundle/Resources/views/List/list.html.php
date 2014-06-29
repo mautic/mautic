@@ -44,7 +44,7 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                 <td class="visible-md visible-lg"><?php echo $item->getDescription(); ?></td>
                 <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 <td>
-                    <span class="lead-actions">
+                    <span class="bundle-main-actions">
                         <?php
                         echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
                             'item'      => $item,

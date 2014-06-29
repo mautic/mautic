@@ -89,7 +89,7 @@ class ListControllerTest extends MauticWebTestCase
         $form['leadlist[name]']                 = 'My List';
         $form['leadlist[alias]']                = 'mylist';
         $form['leadlist[isGlobal]']             = 0;
-        $form['leadlist[isActive]']             = 1;
+        $form['leadlist['isPublished']          = 1;
 
         // submit the form
         $crawler = $client->submit($form);

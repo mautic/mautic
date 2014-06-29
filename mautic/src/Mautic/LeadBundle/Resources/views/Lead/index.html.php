@@ -37,10 +37,10 @@ $activeClass     = "";
 
 <?php $view["slots"]->stop(); ?>
 
-<div class="row lead-page-wrapper">
-    <div class="col-xs-12 col-sm-4 lead-list">
-        <div class="rounded-corners body-white lead-list-inner-wrapper padding-sm">
-            <div class="filter-lead-container">
+<div class="row bundle-content-wrapper">
+    <div class="col-xs-12 col-sm-4 bundle-side auto-height">
+        <div class="rounded-corners body-white bundle-side-inner-wrapper padding-sm">
+            <div class="bundle-side-filter-container lead-filter-container">
                 <div class="input-group">
                     <div class="input-group-btn">
                         <button class="btn btn-default" data-toggle="modal" data-target="#search-help">
@@ -54,7 +54,7 @@ $activeClass     = "";
                            value="<?php echo $searchValue; ?>"
                            autocomplete="off"
                            data-toggle="livesearch"
-                           data-target=".leads"
+                           data-target=".bundle-list"
                            data-action="<?php echo $view['router']->generate('mautic_lead_index', array('page' => $page)); ?>"
                            data-overlay-text="<?php echo $view['translator']->trans('mautic.core.search.livesearch'); ?>"
                            data-overlay-background="#ffffff"
@@ -76,7 +76,7 @@ $activeClass     = "";
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div class="leads">
+            <div class="bundle-list">
                 <?php echo $view->render('MauticLeadBundle:Lead:list.html.php', array(
                     'items'      => $items,
                     'page'       => $page,
@@ -90,10 +90,11 @@ $activeClass     = "";
         </div>
     </div>
 
-    <div class="col-xs-12 col-sm-8 lead-details">
-        <div class="rounded-corners body-white lead-details-inner-wrapper padding-md-sides">
+    <div class="col-xs-12 col-sm-8 bundle-main auto-height">
+        <div class="rounded-corners body-white bundle-main-inner-wrapper padding-lg-sides">
+            <i class="fa fa-arrows-alt expand-panel" onclick="Mautic.expandPanel('.bundle-main');"></i>
             <?php $view['slots']->output('_content'); ?>
-            <div class="lead-footer"></div>
+            <div class="footer-margin"></div>
         </div>
     </div>
 </div>

@@ -51,14 +51,14 @@ class UserController extends FormController
         $this->get('session')->set('mautic.user.filter', $search);
 
         //do some default filtering
-        $filter      = array('string' => $search, 'force' => '');
-        $translator  = $this->container->get('translator');
-        $isCommand   = $translator->trans('mautic.core.searchcommand.is');
-        $isInactive  = $translator->trans('mautic.core.searchcommand.isinactive');
-        $isActive    = $translator->trans('mautic.core.searchcommand.isactive');
-        if (strpos($search, "$isCommand:$isInactive") === false) {
+        $filter         = array('string' => $search, 'force' => '');
+        $translator     = $this->container->get('translator');
+        $isCommand      = $translator->trans('mautic.core.searchcommand.is');
+        $isUnpublished  = $translator->trans('mautic.core.searchcommand.isunpublished');
+        $isPublished    = $translator->trans('mautic.core.searchcommand.ispublished');
+        if (strpos($search, "$isCommand:$isUnpublished") === false) {
             //only show active users unless inactive is specified
-            $filter['force'] .= " $isCommand:$isActive";
+            $filter['force'] .= " $isCommand:$isPublished";
         }
 
         $tmpl       = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';

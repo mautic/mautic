@@ -28,10 +28,10 @@ $activeClass     = "";
 
 <?php $view["slots"]->stop(); ?>
 
-<div class="row form-page-wrapper">
-    <div class="col-xs-12 col-sm-4 form-list">
-        <div class="rounded-corners body-white form-list-inner-wrapper padding-sm">
-            <div class="filter-form-container">
+<div class="row bundle-content-container">
+    <div class="col-xs-12 col-sm-4  auto-height">
+        <div class="rounded-corners body-white bundle-side-inner-wrapper padding-sm">
+            <div class="bundle-side-filter-container">
                 <div class="input-group">
                     <div class="input-group-btn">
                         <button class="btn btn-default" data-toggle="modal" data-target="#search-help">
@@ -45,7 +45,7 @@ $activeClass     = "";
                            value="<?php echo $searchValue; ?>"
                            autocomplete="off"
                            data-toggle="livesearch"
-                           data-target=".forms"
+                           data-target=".bundle-list"
                            data-action="<?php echo $view['router']->generate('mautic_form_index', array('page' => $page)); ?>"
                            data-overlay-text="<?php echo $view['translator']->trans('mautic.core.search.livesearch'); ?>"
                            data-overlay-background="#ffffff"
@@ -58,7 +58,7 @@ $activeClass     = "";
                     </div>
                 </div>
             </div>
-            <div class="forms">
+            <div class="bundle-list">
                 <?php echo $view->render('MauticFormBundle:Form:list.html.php', array(
                     'items'       => $items,
                     'page'        => $page,
@@ -72,10 +72,11 @@ $activeClass     = "";
         </div>
     </div>
 
-    <div class="col-xs-12 col-sm-8 form-details">
-        <div class="rounded-corners body-white form-details-inner-wrapper padding-md-sides">
+    <div class="col-xs-12 col-sm-8 bundle-main auto-height">
+        <div class="rounded-corners body-white bundle-main-inner-wrapper padding-lg-sides">
+            <i class="fa fa-arrows-alt expand-panel" onclick="Mautic.expandPanel('.bundle-main');"></i>
             <?php $view['slots']->output('_content'); ?>
-            <div class="form-footer"></div>
+            <div class="footer-margin"></div>
         </div>
     </div>
 </div>

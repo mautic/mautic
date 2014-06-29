@@ -17,9 +17,9 @@ $header = ($activeForm->getId()) ?
 $view["slots"]->set("headerTitle", $header);
 ?>
 
-<div class="row form-page-wrapper">
-    <div class="col-xs-12 col-sm-8 form-details form-builder">
-        <div class="rounded-corners body-white form-details-inner-wrapper padding-md">
+<div class="row bundle-content-container">
+    <div class="col-xs-12 col-sm-8 bundle-main bundle-main-left auto-height">
+        <div class="rounded-corners body-white bundle-main-inner-wrapper padding-md">
             <?php echo $view['form']->start($form); ?>
             <?php
             echo $view['form']->row($form['forms-panel-wrapper-start']);
@@ -83,12 +83,12 @@ $view["slots"]->set("headerTitle", $header);
             echo $view['form']->row($form['forms-panel-wrapper-end']);
             echo $view['form']->end($form);
             ?>
-            <div class="form-footer"></div>
+            <div class="footer-margin"></div>
         </div>
     </div>
 
-    <div class="col-xs-12 col-sm-4 form-components">
-        <div class="rounded-corners body-white form-components-inner-wrapper padding-md">
+    <div class="col-xs-12 col-sm-4 bundle-side bundle-side-right auto-height">
+        <div class="rounded-corners body-white bundle-side-inner-wrapper padding-md">
             <?php $view['slots']->output('_content'); ?>
         </div>
     </div>

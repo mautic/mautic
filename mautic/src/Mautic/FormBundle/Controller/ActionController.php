@@ -104,7 +104,7 @@ class ActionController extends CommonFormController
         $passthroughVars = array(
             'mauticContent' => 'formaction',
             'success'       => $success,
-            'target'        => '.form-components-inner-wrapper',
+            'target'        => '.bundle-side-inner-wrapper',
             'route'         => false
         );
 
@@ -227,7 +227,7 @@ class ActionController extends CommonFormController
             $passthroughVars = array(
                 'mauticContent' => 'formaction',
                 'success'       => $success,
-                'target'        => '.form-components-inner-wrapper',
+                'target'        => '.bundle-side-inner-wrapper',
                 'route'         => false
             );
 

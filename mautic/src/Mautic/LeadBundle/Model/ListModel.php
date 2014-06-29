@@ -59,21 +59,22 @@ class ListModel extends FormModel
 
         $alias = $entity->getAlias();
         if (empty($alias)) {
-            $alias = strtolower(InputHelper::alphanum($entity->getName()));
+            $alias = strtolower(InputHelper::alphanum($entity->getName(), true));
         } else {
-            $alias = strtolower(InputHelper::alphanum($alias));
+            $alias = strtolower(InputHelper::alphanum($alias, true));
         }
 
         //make sure alias is not already taken
+        $repo      = $this->getRepository();
         $testAlias = $alias;
         $user      = $this->factory->getUser();
-        $existing  = $this->em->getRepository('MauticLeadBundle:LeadList')->getUserSmartLists($user, $testAlias, $entity->getId());
+        $existing  = $repo->getUserSmartLists($user, $testAlias, $entity->getId());
         $count     = count($existing);
         $aliasTag  = $count;
 
         while ($count) {
             $testAlias = $alias . $aliasTag;
-            $existing  = $this->em->getRepository('MauticLeadBundle:LeadList')->getUserSmartLists($user, $testAlias, $entity->getId());
+            $existing  = $repo->getUserSmartLists($user, $testAlias, $entity->getId());
             $count     = count($existing);
             $aliasTag++;
         }

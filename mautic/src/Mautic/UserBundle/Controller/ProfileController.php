@@ -50,7 +50,7 @@ class ProfileController extends FormController
         //remove items that cannot be edited by person themselves
         $form->remove('role');
         $form->remove('role_lookup');
-        $form->remove('isActive');
+        $form->remove('isPublished');
         $form->remove('save');
         $form->remove('cancel');
 

@@ -17,7 +17,7 @@ if (!isset($expanded))
 $fieldExpanded   = ($expanded == 'fields') ? ' in' : '';
 $actionExpanded  = (empty($fieldExpanded)) ? ' in' : '';
 ?>
-<div class="components">
+<div class="bundle-list">
     <div class="panel-group" id="form-components">
         <div class="panel panel-default">
             <div class="panel-heading">
@@ -33,10 +33,10 @@ $actionExpanded  = (empty($fieldExpanded)) ? ' in' : '';
                     <a data-toggle="ajax" data-ignore-formexit="true" href="<?php echo $view['router']->generate(
                         'mautic_formfield_action',
                         array('objectAction' => 'new', 'type' => $fieldType, 'tmpl' => 'field')); ?>">
-                        <div class="form-component">
+                        <div class="bundle-list-item">
                             <div class="padding-sm">
                                 <div class="pull-left padding-sm">
-                                    <span class="form-component-name"><?php echo $field; ?></span>
+                                    <span class="list-item-primary"><?php echo $field; ?></span>
                                 </div>
                                 <div class="pull-right padding-sm">
                                     <i class="fa fa-fw fa-plus fa-lg"></i>
@@ -68,12 +68,12 @@ $actionExpanded  = (empty($fieldExpanded)) ? ' in' : '';
                             <a data-toggle="ajax" data-ignore-formexit="true" href="<?php echo $view['router']->generate(
                                 'mautic_formaction_action',
                                 array('objectAction' => 'new', 'type' => $k, 'tmpl' => 'action')); ?>">
-                            <div class="form-component">
+                            <div class="bundle-list-item">
                                 <div class="padding-sm">
                                     <div class="pull-left padding-sm">
-                                        <span class="form-component-name"><?php echo $view['translator']->trans($action['label']); ?></span>
+                                        <span class="list-item-primary"><?php echo $view['translator']->trans($action['label']); ?></span>
                                         <?php if (isset($action['descr'])): ?>
-                                        <span class="form-component-descr"><?php echo  $view['translator']->trans($action['descr']); ?></span>
+                                        <span class="list-item-secondary"><?php echo  $view['translator']->trans($action['descr']); ?></span>
                                         <?php endif; ?>
                                     </div>
                                     <div class="pull-right padding-sm">
@@ -91,4 +91,4 @@ $actionExpanded  = (empty($fieldExpanded)) ? ' in' : '';
         </div>
     </div>
 </div>
-<div class="form-footer"></div>
+<div class="footer-margin"></div>

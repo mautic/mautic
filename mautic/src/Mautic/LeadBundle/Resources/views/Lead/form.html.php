@@ -9,14 +9,14 @@
 $view->extend('MauticLeadBundle:Lead:index.html.php');
 ?>
 
-<div class="lead-profile-header">
-    <h3><?php
+<div class="bundle-main-header">
+    <div class="bundle-main-item-primary"><?php
     $header = ($lead->getId()) ?
         $view['translator']->trans('mautic.lead.lead.header.edit',
             array('%name%' => $view['translator']->trans($lead->getPrimaryIdentifier()))) :
         $view['translator']->trans('mautic.lead.lead.header.new');
     echo $header;
     ?>
-    </h3>
+    </div>
 </div>
 <?php echo $view['form']->form($form); ?>

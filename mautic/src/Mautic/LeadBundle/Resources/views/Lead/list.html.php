@@ -20,16 +20,14 @@ foreach ($items as $key => $item):
             'tmpl' => 'lead',
 
         )); ?>"
-       onclick="Mautic.activateLead(<?php echo $item->getId(); ?>);"
+       onclick="Mautic.activateListItem('lead', <?php echo $item->getId(); ?>);"
        data-toggle="ajax"
        data-menu-link="mautic_lead_index">
-        <div class="lead-profile<?php echo $activeClass; ?>" id="lead-<?php echo $item->getId(); ?>">
+        <div class="bundle-list-item<?php echo $activeClass; ?>" id="lead-<?php echo $item->getId(); ?>">
             <div class="padding-sm">
-                <div class="pull-left">
-                    <span class="lead-primary-identifier"><?php echo $view['translator']->trans($item->getPrimaryIdentifier(true)); ?></span>
-                    <span class="lead-secondary-identifier"><?php echo $item->getSecondaryIdentifier(); ?></span>
-                </div>
-                <div class="pull-right padding-sm">
+                <span class="list-item-primary"><?php echo $view['translator']->trans($item->getPrimaryIdentifier(true)); ?></span>
+                <span class="list-item-secondary"><?php echo $item->getSecondaryIdentifier(); ?></span>
+                <div class="badge-count padding-sm">
                     <span class="badge"><?php echo $item->getScore(); ?></span>
                 </div>
                 <div class="clearfix"></div>
@@ -56,4 +54,4 @@ foreach ($items as $key => $item):
 <h4><?php echo $view['translator']->trans('mautic.core.noresults'); ?></h4>
 <?php endif; ?>
 
-<div class="lead-footer"></div>
+<div class="footer-margin"></div>

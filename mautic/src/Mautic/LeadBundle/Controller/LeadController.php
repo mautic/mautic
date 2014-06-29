@@ -170,7 +170,7 @@ class LeadController extends FormController
                     'objectAction' => 'view',
                     'objectId'     => $activeLead->getId())
             );
-            $vars['target'] = '.lead-details-inner-wrapper';
+            $vars['target'] = '.bundle-main-inner-wrapper';
 
         } else {
             $template      = 'MauticLeadBundle:Lead:list.html.php';

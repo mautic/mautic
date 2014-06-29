@@ -8,9 +8,11 @@
  */
 ?>
 
-<div class="form-profile-header">
-    <h3><?php echo $fieldHeader; ?></h3>
-</div>
+<div class="bundle-form">
+    <div class="bundle-form-header">
+        <h3><?php echo $fieldHeader; ?></h3>
+    </div>
 
-<?php echo $view['form']->form($form); ?>
-<div class="form-footer"></div>
+    <?php echo $view['form']->form($form); ?>
+    <div class="footer-margin"></div>
+</div>

@@ -17,7 +17,7 @@ $value = $app->getSession()->get('mautic.global_search');
                    autocomplete="off"
                    class="input-global-search form-control" name="global_search" id="global_search"
                    data-target=".global-search-wrapper"
-                   data-action="<?php echo $view['router']->generate('mautic_core_ajax', array('ajaxAction' => 'globalSearch')); ?>"
+                   data-action="<?php echo $view['router']->generate('mautic_core_ajax', array('action' => 'globalSearch')); ?>"
                    data-overlay-text="<?php echo $view['translator']->trans('mautic.core.search.livesearch'); ?>"
                    data-overlay-background="#513B49"
                    data-overlay-color="#ffffff"

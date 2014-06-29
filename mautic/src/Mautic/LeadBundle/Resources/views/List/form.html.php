@@ -35,7 +35,7 @@ $timezones = $tz->getTimezones();
         <?php echo $view['form']->row($form['alias']); ?>
         <?php echo $view['form']->row($form['description']); ?>
         <?php echo $view['form']->row($form['isGlobal']); ?>
-        <?php echo $view['form']->row($form['isActive']); ?>
+        <?php echo $view['form']->row($form['isPublished']); ?>
     </div>
 
     <?php

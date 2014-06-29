@@ -20,23 +20,24 @@ foreach ($items as $key => $item):
             'tmpl' => 'form',
 
         )); ?>"
-       onclick="Mautic.activateForm(<?php echo $item->getId(); ?>);"
+       onclick="Mautic.activateListItem('form', <?php echo $item->getId(); ?>);"
        data-toggle="ajax"
        data-menu-link="mautic_form_index">
-        <div class="form-profile<?php echo $activeClass; ?>" id="form-<?php echo $item->getId(); ?>">
+        <div class="bundle-list-item<?php echo $activeClass; ?>" id="form-<?php echo $item->getId(); ?>">
             <div class="padding-sm">
-                <div class="pull-left">
-                    <span class="form-name">
-                        <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php',array(
-                            'item'       => $item,
-                            'dateFormat' => (!empty($dateFormat)) ? $dateFormat : 'F j, Y g:i a',
-                            'model'      => 'form.form'
-                        )); ?>
-                        <?php echo $item->getName(); ?>
-                    </span>
-                    <span class="form-description"><?php echo $item->getDescription(true); ?></span>
-                </div>
-                <div class="pull-right padding-sm">
+                <span class="list-item-primary">
+                    <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php',array(
+                        'item'       => $item,
+                        'dateFormat' => (!empty($dateFormat)) ? $dateFormat : 'F j, Y g:i a',
+                        'model'      => 'form.form'
+                    )); ?>
+                    <?php echo $item->getName(); ?>
+                </span>
+                <span class="list-item-secondary list-item-indent" data-toggle="tooltip" data-placement="right" title="<?php echo $item->getDescription(); ?>">
+                    <?php echo $item->getDescription(true); ?>
+                </span>
+
+                <div class="badge-count padding-sm">
                     <span class="badge"><?php echo $item->getResultCount(); ?></span>
                 </div>
                 <div class="clearfix"></div>
@@ -63,4 +64,4 @@ foreach ($items as $key => $item):
 <h4><?php echo $view['translator']->trans('mautic.core.noresults'); ?></h4>
 <?php endif; ?>
 
-<div class="form-footer"></div>
+<div class="footer-margin"></div>

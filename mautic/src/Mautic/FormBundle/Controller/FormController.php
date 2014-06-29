@@ -53,11 +53,21 @@ class FormController extends CommonFormController
         $search = $this->request->get('search', $this->get('session')->get('mautic.form.filter', ''));
         $this->get('session')->set('mautic.form.filter', $search);
 
-        $filter      = array('string' => $search, 'force' => '');
+        $filter      = array('string' => $search, 'force' => array());
 
         if (!$permissions['form:forms:viewother']) {
-            $filter['force'] = array(
-                array('column' => 'f.createdBy', 'expr' => 'eq', 'value' => $this->get('mautic.factory')->getUser())
+            $filter['force'] =
+                array('column' => 'f.createdBy', 'expr' => 'eq', 'value' => $this->get('mautic.factory')->getUser());
+        }
+
+        $translator  = $this->container->get('translator');
+        $isCommand   = $translator->trans('mautic.core.searchcommand.is');
+        $unpublished = $translator->trans('mautic.core.searchcommand.isunpublished');
+
+        if (strpos($search, "$isCommand:$unpublished") === false) {
+            //remove anonymous leads unless requested to prevent clutter
+            $filter['force'][] = array(
+                'column' => 'f.isPublished', 'expr' => 'eq', 'value' => true
             );
         }
 
@@ -135,7 +145,7 @@ class FormController extends CommonFormController
             }
         } elseif ($tmpl == 'form') {
             $template       = 'MauticFormBundle:Form:details.html.php';
-            $vars['target'] = '.form-details-inner-wrapper';
+            $vars['target'] = '.bundle-main-inner-wrapper';
             $vars['route']  = $this->generateUrl('mautic_form_action', array(
                     'objectAction' => 'view',
                     'objectId'     => $activeForm->getId())

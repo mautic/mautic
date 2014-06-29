@@ -71,6 +71,11 @@
 
         var self = this;
 
+        // Allow focus on inputs. Issue #142
+        if (event.originalEvent.target.localName == 'textarea' || event.originalEvent.target.localName == 'input') {
+            return true;
+        }
+
         // Ignore the event if another widget is already being handled
         if (touchHandled || !self._mouseCapture(event.originalEvent.changedTouches[0])) {
             return;

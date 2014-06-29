@@ -188,7 +188,6 @@ class FormModel extends CommonFormModel
         }
     }
 
-
     /**
      * @param Form $entity
      * @param      $sessionActions
@@ -229,9 +228,9 @@ class FormModel extends CommonFormModel
     {
         $alias = $entity->getAlias();
         if (empty($alias)) {
-            $alias = strtolower(InputHelper::alphanum($entity->getName()));
+            $alias = strtolower(InputHelper::alphanum($entity->getName(), true));
         } else {
-            $alias = strtolower(InputHelper::alphanum($alias));
+            $alias = strtolower(InputHelper::alphanum($alias, true));
         }
 
         //make sure alias is not already taken
@@ -255,9 +254,8 @@ class FormModel extends CommonFormModel
         $html = $templating->render('MauticFormBundle:Builder:form.html.php', array(
             'form' => $entity
         ));
-        //beautify the html
-        require_once __DIR__ . '/../../CoreBundle/Libraries/htmLawed/htmLawed.php';
-        $html = htmLawed($html, array('tidy' => 4));
+
+        $html = InputHelper::html($html);
 
         $style  = $templating->render('MauticFormBundle:Builder:style.html.php', array(
             'form' => $entity

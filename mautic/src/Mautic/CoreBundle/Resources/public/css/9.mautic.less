@@ -497,51 +497,59 @@ label.required:after {
 }
 
 .margin-none {
-  margin: 0 !important;
+  margin: 0;
 }
 
 .margin-sm {
-  margin: 5px !important;
+  margin: 5px;
 }
 
 .margin-md {
-  margin: 15px !important;
+  margin: 15px;
 }
 
 .margin-sm-sides {
-  margin: 0 5px !important;
+  margin: 0 5px;
 }
 
 .margin-md-sides {
-  margin: 0 15px !important;
+  margin: 0 15px;
 }
 
 .margin-sm-top {
-  margin-top: 5x !important;
+  margin-top: 5x;
 }
 
 .margin-md-top {
-  margin-top: 15px !important;
+  margin-top: 15px;
 }
 
 .padding-none {
-  padding: 0 !important;
+  padding: 0;
 }
 
 .padding-sm {
-  padding: 5px !important;
+  padding: 5px;
 }
 
 .padding-md {
-  padding: 15px !important;
+  padding: 15px;
+}
+
+.padding-lg {
+  padding: 30px;
 }
 
 .padding-sm-sides {
-  padding: 5px !important;
+  padding: 0 5px;
 }
 
 .padding-md-sides {
-  padding: 0 15px !important;
+  padding: 0 15px;
+}
+
+.padding-lg-sides {
+  padding: 0 30px;
 }
 
 .padding-sm-right {
@@ -632,6 +640,12 @@ a.btn {
 
 .pagination-limit {
   width: 75px;
+  display: inline-block;
+}
+
+.pagination {
+  /* account for limit select */
+  margin: 20px 0 20px -75px;
 }
 
 .modal {
@@ -696,6 +710,153 @@ ul.draggable, ul.droppable {
   border-color: darken(@btn-danger-border, 12%);
 }
 
+.btn-add-item {
+  margin-left: 3px;
+}
+
+.footer-margin {
+  margin-bottom: 30px;
+}
+
+.bundle-main, .bundle-side {
+  height: 450px;
+  overflow: hidden;
+}
+
+.bundle-main, .bundle-side.bundle-side-right {
+  padding-left: 2px;
+}
+
+.bundle-side.bundle-side-right .bundle-side-inner-wrapper {
+  overflow-y: auto;
+}
+
+.bundle-main.bundle-main-left {
+  padding-left: 15px;
+}
+
+.bundle-main {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin-top: 0;
+  }
+}
+
+.bundle-side-inner-wrapper, .bundle-main-inner-wrapper {
+  height: 100%;
+  margin-bottom: -50px;
+  padding-bottom: 50px;
+}
+
+.bundle-main-inner-wrapper {
+  overflow-y: auto;
+}
+
+.bundle-side-filter-container {
+  height: 40px;
+}
+
+.bundle-list {
+  overflow-y: auto;
+  height: 100%;
+  margin-bottom: -50px;
+  padding-bottom: 50px;
+
+  a {
+    text-decoration: none;
+  }
+
+  .bundle-list-item {
+    height: 50px;
+    border-bottom: 1px solid #cccccc;
+    overflow: hidden;
+    position: relative;
+    white-space: nowrap;
+    &:hover, &.active {
+      background-color: #ecf0f1;
+    }
+
+    .list-item-primary {
+      display: block;
+      font-weight: bold;
+      font-size: 1.1em;
+    }
+
+    .list-item-secondary {
+      display: block;
+      font-size: 0.9em;
+    }
+
+    .badge-count {
+      position: absolute;
+      right: 0;
+      top: 2px;
+    }
+  }
+}
+
+.list-item-indent {
+  margin-left: 30px;
+}
+
+.bundle-main-actions .btn {
+  margin-top: -5px;
+  margin-left: -4px;
+}
+
+.bundle-main-item-primary {
+  display: block;
+  font-size: 2em;
+}
+
+.bundle-main-item-secondary {
+  display: block;
+}
+
+.bundle-main {
+  .bundle-main-header {
+    margin-bottom: 10px;
+    padding-top: 10px;
+  }
+
+  .bundle-main .panel {
+    margin-bottom: 5px;
+  }
+
+  .bundle-main .field-label {
+    font-weight: bold;
+  }
+}
+.fullpanel {
+  width: 100% !important;
+  position: absolute !important;
+  right: 0;
+  padding: 0 !important;
+  z-index: 9999;
+  transition: width .5s;
+  -moz-transition: width .5s;
+  -webkit-transition: width .5s;
+  -o-transition: width .5s;
+  -webkit-transform: translateZ(0);
+}
+
+.expand-panel {
+  font-size: 65%;
+  position: absolute;
+  left: 6px;
+  top: 3px;
+  cursor: pointer;
+  color: #a3a3a3;
+}
+
+.expand-panel:hover {
+  color: #7a7a7a;
+}
+
 @media (max-width:767px) {
   .left-panel {
     left:0 ;
@@ -743,7 +904,7 @@ ul.draggable, ul.droppable {
     font-size: 1.8em;
   }
 
-    //Force button groups to be block
+  //Force button groups to be block
   .btn-group .btn {
     float: none;
     display: block;
@@ -765,6 +926,21 @@ ul.draggable, ul.droppable {
     margin-left: 0px;
     padding: 6px 12px;
     border: 1px solid #CCCCCC;
+  }
+
+  .bundle-side {
+    padding-right: 15px;
+    margin-bottom: 10px;
+    height: 150px;
+  }
+
+  .bundle-main {
+    padding-left: 15px;
+
+    .badge-count h1 {
+      font-size: 1.5em;
+      padding: 5px;
+    }
   }
 }
 
