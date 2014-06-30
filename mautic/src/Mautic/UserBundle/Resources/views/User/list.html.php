@@ -13,7 +13,7 @@ if ($tmpl == 'index'):
 endif;
 ?>
 
-<div class="table-responsive body-white padding-sm">
+<div class="table-responsive scrollable body-white padding-sm">
     <table class="table table-hover table-striped table-bordered user-list">
         <thead>
         <tr>
@@ -103,4 +103,5 @@ endif;
         "baseUrl" =>  $view['router']->generate('mautic_user_index'),
         'sessionVar' => 'user'
     )); ?>
+    <div class="footer-margin"></div>
 </div>

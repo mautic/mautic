@@ -68,8 +68,8 @@ function htmLawed($t, $C=1, $S=array()){
     $C['css_expression'] = empty($C['css_expression']) ? 0 : 1;
     $C['direct_list_nest'] = empty($C['direct_list_nest']) ? 0 : 1;
     $C['hexdec_entity'] = isset($C['hexdec_entity']) ? $C['hexdec_entity'] : 1;
-    $C['hook'] = (!empty($C['hook']) && function_exists($C['hook'])) ? $C['hook'] : 0;
-    $C['hook_tag'] = (!empty($C['hook_tag']) && function_exists($C['hook_tag'])) ? $C['hook_tag'] : 0;
+    $C['hook'] = (!empty($C['hook']) && is_callable($C['hook'])) ? $C['hook'] : 0;
+    $C['hook_tag'] = (!empty($C['hook_tag']) && is_callable($C['hook_tag'])) ? $C['hook_tag'] : 0;
     $C['keep_bad'] = isset($C['keep_bad']) ? $C['keep_bad'] : 6;
     $C['lc_std_val'] = isset($C['lc_std_val']) ? (bool)$C['lc_std_val'] : 1;
     $C['make_tag_strict'] = isset($C['make_tag_strict']) ? $C['make_tag_strict'] : 1;
@@ -430,7 +430,7 @@ function hl_tag($t){
     // close tag
     static $eE = array('area'=>1, 'br'=>1, 'col'=>1, 'command'=>1, 'embed'=>1, 'hr'=>1, 'img'=>1, 'input'=>1, 'isindex'=>1, 'keygen'=>1, 'link'=>1, 'meta'=>1, 'param'=>1, 'source'=>1, 'track'=>1, 'wbr'=>1); // Empty ele
     if(!empty($m[1])){
-        return (!isset($eE[$e]) ? (empty($C['hook_tag']) ? "</$e>" : $C['hook_tag']($e)) : (($C['keep_bad'])%2 ? str_replace(array('<', '>'), array('&lt;', '&gt;'), $t) : ''));
+        return (!isset($eE[$e]) ? (empty($C['hook_tag']) ? "</$e>" : call_user_func($C['hook_tag'],$e)) : (($C['keep_bad'])%2 ? str_replace(array('<', '>'), array('&lt;', '&gt;'), $t) : ''));
     }
 
     // open tag & attr
@@ -606,7 +606,7 @@ function hl_tag($t){
         foreach($a as $k=>$v){$aA .= " {$k}=\"{$v}\"";}
         return "<{$e}{$aA}". (isset($eE[$e]) ? ' /' : ''). '>';
     }
-    else{return $C['hook_tag']($e, $a);}
+    else{return call_user_func($C['hook_tag'], $e, $a);}
     // eof
 }
 

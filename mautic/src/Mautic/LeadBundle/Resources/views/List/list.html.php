@@ -14,7 +14,7 @@ endif;
 $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list');
 ?>
 
-<div class="table-responsive body-white padding-sm leadlist-list">
+<div class="table-responsive scrollable body-white padding-sm leadlist-list">
     <?php if (count($items)): ?>
     <table class="table table-hover table-striped table-bordered">
         <thead>
@@ -80,4 +80,5 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
     <?php else: ?>
         <h4><?php echo $view['translator']->trans('mautic.core.noresults'); ?></h4>
     <?php endif; ?>
+    <div class="footer-margin"></div>
 </div>

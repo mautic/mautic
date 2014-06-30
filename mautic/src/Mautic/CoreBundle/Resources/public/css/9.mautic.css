@@ -135,7 +135,9 @@ h6 {
   overflow: hidden;
 }
 .main-panel-content-wrapper {
-  overflow-x: hidden;
+  height: 100%;
+}
+.scrollable {
   overflow-y: auto;
   height: 100%;
 }
@@ -153,13 +155,11 @@ h6 {
 }
 .left-panel {
   position: fixed;
-  height: 100%;
   background-color: #513b49;
   bottom: 0;
   width: 230px;
   left: 230px;
   margin-left: -230px;
-  overflow-y: auto;
   z-index: 4500;
   -webkit-transition: all 0.3s ease-in-out;
   -moz-transition: all 0.3s ease-in-out;
@@ -168,11 +168,9 @@ h6 {
 }
 .right-panel {
   position: fixed;
-  height: 100%;
   background-color: #513b49;
   width: 230px;
   margin-right: -230px;
-  overflow-y: auto;
   right: 0;
   bottom: 0;
   z-index: 6000;
@@ -405,6 +403,7 @@ h6 {
 }
 .toolbar .input-group {
   float: right;
+  text-align: right;
 }
 .toolbar .input-group ul {
   text-align: left;
@@ -432,6 +431,13 @@ h6 {
   margin-left: 0px;
   padding: 6px 12px;
   border: 1px solid #CCCCCC;
+}
+.toolbar-form-buttons .btn {
+  margin-left: 3px;
+  margin-bottom: 3px;
+}
+.bottom-form-buttons .btn {
+  margin-bottom: 3px;
 }
 label.required:after {
   color: #e32;
@@ -558,10 +564,6 @@ a.btn {
   width: 75px;
   display: inline-block;
 }
-.pagination {
-  /* account for limit select */
-  margin: 20px 0 20px -75px;
-}
 .modal {
   top: 50px;
   z-index: 9999;
@@ -624,12 +626,19 @@ li.ui-draggable {
   height: 450px;
   overflow: hidden;
 }
+.bundle-side-header {
+  margin-bottom: 10px;
+}
+.bundle-side-item-primary {
+  display: block;
+  font-size: 1.5em;
+}
+.bundle-side-item-secondary {
+  display: block;
+}
 .bundle-main,
 .bundle-side.bundle-side-right {
   padding-left: 2px;
-}
-.bundle-side.bundle-side-right .bundle-side-inner-wrapper {
-  overflow-y: auto;
 }
 .bundle-main.bundle-main-left {
   padding-left: 15px;
@@ -648,17 +657,8 @@ li.ui-draggable {
   margin-bottom: -50px;
   padding-bottom: 50px;
 }
-.bundle-main-inner-wrapper {
-  overflow-y: auto;
-}
 .bundle-side-filter-container {
   height: 40px;
-}
-.bundle-list {
-  overflow-y: auto;
-  height: 100%;
-  margin-bottom: -50px;
-  padding-bottom: 50px;
 }
 .bundle-list a {
   text-decoration: none;
@@ -765,6 +765,10 @@ li.ui-draggable {
   .main-panel-content {
     padding: 0 0 100px 0;
   }
+  .main-panel-content-wrapper {
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
   .user-menu .user-menu-username {
     display: none;
   }
@@ -791,6 +795,9 @@ li.ui-draggable {
     margin-left: 0px;
     padding: 6px 12px;
     border: 1px solid #CCCCCC;
+  }
+  .toolbar-form-buttons {
+    display: none;
   }
   .bundle-side {
     padding-right: 15px;

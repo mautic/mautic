@@ -12,7 +12,7 @@ if ($tmpl == 'index'):
 endif;
 ?>
 
-<div class="table-responsive body-white padding-sm">
+<div class="table-responsive scrollable body-white padding-sm">
     <table class="table table-hover table-striped table-bordered client-list">
         <thead>
         <tr>
@@ -74,4 +74,5 @@ endif;
         'sessionVar' => 'client',
         'tmpl'       => $tmpl
     )); ?>
+    <div class="footer-margin"></div>
 </div>

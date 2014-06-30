@@ -153,7 +153,7 @@ class FormController extends CommonFormController
         } else {
             $template      = 'MauticFormBundle:Form:list.html.php';
             if ($tmpl == 'list') {
-                $vars['target'] = '.forms';
+                $vars['target'] = '.bundle-list';
             }
             $parameters['dateFormat'] = $this->get('mautic.factory')->getParam('date_format_full');
         }

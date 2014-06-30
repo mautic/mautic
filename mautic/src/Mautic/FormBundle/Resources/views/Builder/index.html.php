@@ -19,7 +19,7 @@ $view["slots"]->set("headerTitle", $header);
 
 <div class="row bundle-content-container">
     <div class="col-xs-12 col-sm-8 bundle-main bundle-main-left auto-height">
-        <div class="rounded-corners body-white bundle-main-inner-wrapper padding-md">
+        <div class="rounded-corners body-white bundle-main-inner-wrapper scrollable padding-md">
             <?php echo $view['form']->start($form); ?>
             <?php
             echo $view['form']->row($form['forms-panel-wrapper-start']);
@@ -88,7 +88,7 @@ $view["slots"]->set("headerTitle", $header);
     </div>
 
     <div class="col-xs-12 col-sm-4 bundle-side bundle-side-right auto-height">
-        <div class="rounded-corners body-white bundle-side-inner-wrapper padding-md">
+        <div class="rounded-corners body-white bundle-side-inner-wrapper scrollable padding-md">
             <?php $view['slots']->output('_content'); ?>
         </div>
     </div>

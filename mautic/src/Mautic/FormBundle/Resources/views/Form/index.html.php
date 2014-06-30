@@ -58,7 +58,7 @@ $activeClass     = "";
                     </div>
                 </div>
             </div>
-            <div class="bundle-list">
+            <div class="bundle-list scrollable">
                 <?php echo $view->render('MauticFormBundle:Form:list.html.php', array(
                     'items'       => $items,
                     'page'        => $page,
@@ -68,12 +68,11 @@ $activeClass     = "";
                     'tmpl'        => $tmpl
                 )); ?>
             </div>
-            <div class="clearfix"></div>
         </div>
     </div>
 
     <div class="col-xs-12 col-sm-8 bundle-main auto-height">
-        <div class="rounded-corners body-white bundle-main-inner-wrapper padding-lg-sides">
+        <div class="rounded-corners body-white bundle-main-inner-wrapper scrollable padding-lg-sides">
             <i class="fa fa-arrows-alt expand-panel" onclick="Mautic.expandPanel('.bundle-main');"></i>
             <?php $view['slots']->output('_content'); ?>
             <div class="footer-margin"></div>

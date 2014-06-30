@@ -295,7 +295,7 @@ class FormModel extends CommonFormModel
         $customComponents = $session->get('mautic.formcomponents.custom');
         if (empty($customComponents)) {
             //build them
-            $event = new FormBuilderEvent();
+            $event = new FormBuilderEvent($this->translator);
             $this->dispatcher->dispatch(FormEvents::FORM_ON_BUILD, $event);
             $customComponents['fields']  = $event->getFormFields();
             $customComponents['actions'] = $event->getSubmitActions();

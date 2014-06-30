@@ -24,7 +24,7 @@
     $( document ).ajaxComplete(function(event, XMLHttpRequest, ajaxOption){
         if(XMLHttpRequest.getResponseHeader('x-debug-token')) {
             MauticVars.showLoadingBar = false;
-            $('.sf-toolbarreset').remove();
+            $('.sf-toolbar-block').remove();
             $.get(mauticBaseUrl +'_wdt/'+XMLHttpRequest.getResponseHeader('x-debug-token'),function(data){
                 $('body').append(data);
             });

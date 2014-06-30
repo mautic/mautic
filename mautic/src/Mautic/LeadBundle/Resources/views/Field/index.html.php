@@ -18,7 +18,7 @@ $view["slots"]->set("headerTitle", $view['translator']->trans('mautic.lead.field
 </li>
 <?php $view["slots"]->stop(); ?>
 
-<div class="table-responsive body-white padding-sm">
+<div class="table-responsive scrollable body-white padding-sm">
     <table class="table table-hover table-striped table-bordered leadfield-list">
         <thead>
             <th class="col-leadfield-orderhandle"></th>
@@ -71,4 +71,5 @@ $view["slots"]->set("headerTitle", $view['translator']->trans('mautic.lead.field
         <?php endforeach; ?>
         </tbody>
     </table>
+    <div class="footer-margin"></div>
 </div>

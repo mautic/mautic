@@ -17,7 +17,7 @@ if (!isset($expanded))
 $fieldExpanded   = ($expanded == 'fields') ? ' in' : '';
 $actionExpanded  = (empty($fieldExpanded)) ? ' in' : '';
 ?>
-<div class="bundle-list">
+<div class="bundle-list scrollable">
     <div class="panel-group" id="form-components">
         <div class="panel panel-default">
             <div class="panel-heading">
@@ -61,13 +61,13 @@ $actionExpanded  = (empty($fieldExpanded)) ? ' in' : '';
             <div id="form-submitactions" class="panel-collapse collapse<?php echo $actionExpanded; ?>">
                 <div class="panel-body">
                     <?php foreach ($actions['groupOrder'] as $group => $groupActions): ?>
-                    <div class="form-submitaction-group-header"><?php echo  $view['translator']->trans($group); ?></div>
+                    <div class="form-submitaction-group-header"><?php echo $group; ?></div>
                     <div class="form-submitaction-group-body">
                         <?php foreach ($groupActions as $k): ?>
                         <?php $action = $actions['actions'][$k]; ?>
-                            <a data-toggle="ajax" data-ignore-formexit="true" href="<?php echo $view['router']->generate(
-                                'mautic_formaction_action',
-                                array('objectAction' => 'new', 'type' => $k, 'tmpl' => 'action')); ?>">
+                        <a data-toggle="ajax" data-ignore-formexit="true" href="<?php echo $view['router']->generate(
+                            'mautic_formaction_action',
+                            array('objectAction' => 'new', 'type' => $k, 'tmpl' => 'action')); ?>">
                             <div class="bundle-list-item">
                                 <div class="padding-sm">
                                     <div class="pull-left padding-sm">
@@ -90,5 +90,6 @@ $actionExpanded  = (empty($fieldExpanded)) ? ' in' : '';
             </div>
         </div>
     </div>
+
+    <div class="footer-margin"></div>
 </div>
-<div class="footer-margin"></div>

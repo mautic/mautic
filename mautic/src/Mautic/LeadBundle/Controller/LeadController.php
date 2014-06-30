@@ -176,7 +176,7 @@ class LeadController extends FormController
             $template      = 'MauticLeadBundle:Lead:list.html.php';
             $vars['route'] = $this->generateUrl('mautic_lead_index', array('page' => $page));
             if ($tmpl == 'list') {
-                $vars['target'] = '.leads';
+                $vars['target'] = '.bundle-list';
             }
         }
 
@@ -275,7 +275,7 @@ class LeadController extends FormController
 
                     $this->request->getSession()->getFlashBag()->add(
                         'notice',
-                        $this->get('translator')->trans('mautic.lead.list.notice.created',  array(
+                        $this->get('translator')->trans('mautic.lead.lead.notice.created',  array(
                             '%name%' => $identifier,
                             '%url%'  => $this->generateUrl('mautic_lead_action', array(
                                 'objectAction' => 'edit',
@@ -395,7 +395,7 @@ class LeadController extends FormController
                     $identifier = $this->get('translator')->trans($lead->getPrimaryIdentifier());
                     $this->request->getSession()->getFlashBag()->add(
                         'notice',
-                        $this->get('translator')->trans('mautic.lead.list.notice.created',  array(
+                        $this->get('translator')->trans('mautic.lead.lead.notice.updated',  array(
                             '%name%' => $identifier,
                             '%url%'  => $this->generateUrl('mautic_lead_action', array(
                                 'objectAction' => 'edit',

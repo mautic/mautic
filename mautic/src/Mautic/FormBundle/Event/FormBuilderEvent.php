@@ -21,6 +21,12 @@ class FormBuilderEvent extends Event
 {
     private $actions = array();
     private $fields  = array();
+    private $translator;
+
+    public function __construct($translator)
+    {
+        $this->translator = $translator;
+    }
 
     /**
      * Adds a submit action to the list of available actions.
@@ -73,10 +79,8 @@ class FormBuilderEvent extends Event
         if ($includeGroupOrder) {
             $byGroup = array();
             foreach ($this->actions as $k => $action) {
-                $byGroup[$action['group']][] = $k;
-            }
-            foreach ($byGroup as &$group) {
-                sort($group, SORT_NATURAL);
+                $group = $this->translator->trans($action['group']);
+                $byGroup[$group][] = $k;
             }
             ksort($byGroup, SORT_NATURAL);
 

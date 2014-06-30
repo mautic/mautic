@@ -27,7 +27,7 @@ $activePanelClasses  = ($app->getSession()->get('left-panel', 'default') == 'unp
                 <?php echo $view->render('MauticCoreBundle:Default:toppanel.html.php'); ?>
             </header>
 
-            <div class="left-panel">
+            <div class="left-panel scrollable">
                 <?php echo $view->render('MauticCoreBundle:Default:leftpanel.html.php'); ?>
             </div>
 
@@ -46,7 +46,7 @@ $activePanelClasses  = ($app->getSession()->get('left-panel', 'default') == 'unp
                 </div>
             </div>
 
-            <div class="right-panel">
+            <div class="right-panel scrollable">
                 <?php echo $view->render('MauticCoreBundle:Default:rightpanel.html.php'); ?>
             </div>
 

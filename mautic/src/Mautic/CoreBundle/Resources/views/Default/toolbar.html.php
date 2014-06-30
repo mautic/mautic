@@ -7,8 +7,8 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-$searchUri = $view['slots']->get('searchUri');
-$actions   = $view['slots']->get('actions');
+$searchUri   = $view['slots']->get('searchUri');
+$actions     = $view['slots']->get('actions');
 
 if (!empty($searchUri)):
 $bundle        = strtolower($app->getRequest()->get('bundle'));
@@ -16,8 +16,9 @@ $searchString  = $view['slots']->get('searchString', '');
 endif;
 ?>
 
+<div class="toolbar-form-buttons pull-right"></div>
 <div class="pull-right toolbar <?php echo (!empty($searchString) ? 'show-search' : 'hide-search'); ?>">
-    <div class="input-group">
+    <div class="input-group toolbar-action-buttons">
         <?php if (!empty($searchUri)): ?>
         <div class="input-group-btn">
             <button class="btn btn-default" data-toggle="modal" data-target="#search-help">
@@ -64,6 +65,7 @@ endif;
         </div>
     </div>
 </div>
+<div class="clearfix"></div>
 <?php
 if (!empty($searchUri)):
     $view['slots']->start('modal');

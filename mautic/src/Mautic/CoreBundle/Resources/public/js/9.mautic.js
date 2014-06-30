@@ -187,6 +187,25 @@ var Mautic = {
             });
         });
 
+        //Copy form buttons to the toolbar
+        if ($(container + " .bottom-form-buttons").length) {
+            //hide the toolbar actions if applicable
+            $('.toolbar-action-buttons').addClass('hide');
+
+            var buttons = $(container + " .bottom-form-buttons").html();
+            $(buttons).filter("button").each(function(i, v) {
+                //get the ID
+                var id = $(this).attr('id');
+                $(this).attr('id', '');
+                $(this).attr('name', '');
+                $(this).appendTo('.toolbar-form-buttons');
+                $(this).click( function(event) {
+                    event.preventDefault();
+                    $('#' + id).click();
+                });
+            });
+        }
+
         //run specific on loads
         if (typeof Mautic[mauticContent + "OnLoad"] == 'function') {
             Mautic[mauticContent + "OnLoad"](container, response);
