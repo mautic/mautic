@@ -213,21 +213,51 @@ h1, h2, h3, h4, h5, h6 {
   padding-top: 0;
 }
 
+.global-search-panel {
+  a {
+    display: block;
+    height: 100%;
+    width: 100%;
+    &:hover {
+      text-decoration: none;
+    }
+  }
+  .panel-title {
+    position: relative;
+  }
+  .gs-count-badge {
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+}
+
 .global-search-result {
   height: 50px;
   border-bottom: @leftPanelColor 1px solid;
   padding: 7px;
+  position: relative;
+  overflow: hidden;
+  .gs-count-badge {
+    top: 10px;
+    right: 10px;
+  }
+  &:hover {
+    background-color: #ecf0f1;
+  }
 }
 
-.global-search-panel .panel-heading a {
+.global-search-primary {
   display: block;
-  height: 100%;
-  width: 100%;
 }
 
-.gs-count-badge {
-  position: absolute;
-  right: 10px;
+.global-search-secondary {
+  font-size: 0.9em;
+  line-height: 0.9em;
+}
+
+.global-search-indent {
+  margin-left: 28px;
 }
 
 .left-panel-inner-wrapper {
@@ -410,8 +440,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .side-panel-nav ul.nav-level a {
-   padding-left: 25px;
-   background-color: lighten(@leftPanelBase, 15%);
+  padding-left: 25px;
+  background-color: lighten(@leftPanelBase, 15%);
 }
 
 .body-white {
@@ -577,6 +607,10 @@ ul.no-bullet {
 
 .alert {
   word-wrap: break-word;
+}
+
+.tooltip {
+  z-index: 9999;
 }
 
 .tooltip-inner {
@@ -768,7 +802,11 @@ ul.draggable, ul.droppable {
 }
 
 .bundle-side-filter-container {
-  height: 40px;
+  margin-bottom: 3px;
+}
+
+.bundle-list-actions i {
+  margin-right: 6px;
 }
 
 .bundle-list {
@@ -782,6 +820,10 @@ ul.draggable, ul.droppable {
     overflow: hidden;
     position: relative;
     white-space: nowrap;
+    a {
+      display:block;
+    }
+
     &:hover, &.active {
       background-color: #ecf0f1;
     }
@@ -797,6 +839,11 @@ ul.draggable, ul.droppable {
       font-size: 0.9em;
     }
 
+    .list-item-publish-status {
+      float: left;
+      margin-right: 5px;
+    }
+
     .badge-count {
       position: absolute;
       right: 0;
@@ -809,6 +856,20 @@ ul.draggable, ul.droppable {
   margin-left: 30px;
 }
 
+.hidden-shelf {
+  margin-bottom: 3px;
+  select {
+    margin-top: 3px;
+  }
+  &:hover {
+    background-color: #ecf0f1;
+  }
+  .shelf-handle {
+    text-align: center;
+    height: 25px;
+    border: 1px solid #ecf0f1;
+  }
+}
 .bundle-main-actions .btn {
   margin-top: -5px;
   margin-left: -4px;
@@ -821,6 +882,10 @@ ul.draggable, ul.droppable {
 
 .bundle-main-item-secondary {
   display: block;
+}
+
+.has-click-event {
+  cursor: pointer;
 }
 
 .bundle-main {
@@ -842,7 +907,7 @@ ul.draggable, ul.droppable {
   position: absolute !important;
   right: 0;
   padding: 0 !important;
-  z-index: 9999;
+  z-index: 5000;
   transition: width .5s;
   -moz-transition: width .5s;
   -webkit-transition: width .5s;
@@ -940,7 +1005,13 @@ ul.draggable, ul.droppable {
   }
 
   .toolbar-form-buttons {
-    display: none;
+    display: block;
+    width: 100%;
+  }
+
+  .toolbar-form-buttons .btn {
+    display: block;
+    width: 100%;
   }
 
   .bundle-side {

@@ -19,32 +19,17 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
     <table class="table table-hover table-striped table-bordered">
         <thead>
         <tr>
-            <th><?php echo $view['translator']->trans('mautic.lead.list.thead.name'); ?></th>
-            <th class="visible-md visible-lg"><?php echo $view['translator']->trans('mautic.lead.list.thead.descr'); ?></th>
-            <th class="visible-md visible-lg"><?php echo $view['translator']->trans('mautic.lead.list.thead.id'); ?></th>
-            <th style="width: 75px;"></th>
+            <th class="col-leadlist-actions"></th>
+            <th class="col-leadlist-name"><?php echo $view['translator']->trans('mautic.lead.list.thead.name'); ?></th>
+            <th class="visible-md visible-lg col-leadlist-descr"><?php echo $view['translator']->trans('mautic.lead.list.thead.descr'); ?></th>
+            <th class="visible-md visible-lg col-leadlist-id"><?php echo $view['translator']->trans('mautic.lead.list.thead.id'); ?></th>
         </tr>
         </thead>
         <tbody>
         <?php foreach ($items as $item):?>
             <tr>
                 <td>
-                    <?php if ($item->isGlobal()): ?>
-                    <i class="fa fa-fw fa-globe"></i>
-                    <?php endif; ?>
-                    <a href="<?php echo $view['router']->generate('mautic_lead_index', array('search' => "$listCommand:{$item->getAlias()}")); ?>"
-                       data-toggle="ajax">
-                        <?php echo $item->getName(); ?> (<?php echo $item->getAlias(); ?>)
-                    </a>
-                    <?php if (!$item->isGlobal() && $currentUser->getId() != $item->getCreatedBy()->getId()): ?>
-                    <br />
-                    <span class="small">(<?php echo $item->getCreatedBy()->getName(); ?>)</span>
-                    <?php endif; ?>
-                </td>
-                <td class="visible-md visible-lg"><?php echo $item->getDescription(); ?></td>
-                <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
-                <td>
-                    <span class="bundle-main-actions">
+                    <span class="bundle-list-actions">
                         <?php
                         echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
                             'item'      => $item,
@@ -65,6 +50,21 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                         ?>
                     </span>
                 </td>
+                <td>
+                    <?php if ($item->isGlobal()): ?>
+                    <i class="fa fa-fw fa-globe"></i>
+                    <?php endif; ?>
+                    <a href="<?php echo $view['router']->generate('mautic_lead_index', array('search' => "$listCommand:{$item->getAlias()}")); ?>"
+                       data-toggle="ajax">
+                        <?php echo $item->getName(); ?> (<?php echo $item->getAlias(); ?>)
+                    </a>
+                    <?php if (!$item->isGlobal() && $currentUser->getId() != $item->getCreatedBy()->getId()): ?>
+                    <br />
+                    <span class="small">(<?php echo $item->getCreatedBy()->getName(); ?>)</span>
+                    <?php endif; ?>
+                </td>
+                <td class="visible-md visible-lg"><?php echo $item->getDescription(); ?></td>
+                <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
             </tr>
         <?php endforeach; ?>
         </tbody>
@@ -75,7 +75,8 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
         "limit"      => $limit,
         "baseUrl"    =>  $view['router']->generate('mautic_leadlist_index'),
         'tmpl'       => $tmpl,
-        'sessionVar' => 'leadlist'
+        'sessionVar' => 'leadlist',
+        'target'     => '.main-panel-content-wrapper'
     )); ?>
     <?php else: ?>
         <h4><?php echo $view['translator']->trans('mautic.core.noresults'); ?></h4>

@@ -32,10 +32,10 @@ switch ($status) {
 }
 ?>
 
-<i class="fa fa-fw fa-lg <?php echo $icon; ?> publish-icon<?php echo $item->getId(); ?>"
+<i class="fa fa-fw fa-lg <?php echo $icon; ?> has-click-event publish-icon<?php echo $item->getId(); ?>"
    data-toggle="tooltip"
    data-container="body"
    data-placement="right"
    data-status="<?php echo $status; ?>"
    data-original-title="<?php echo $text ?>"
-   onclick="Mautic.togglePublishStatus(this, '<?php echo $model; ?>', <?php echo $item->getId(); ?>);"></i>
+   onclick="Mautic.togglePublishStatus(event, this, '<?php echo $model; ?>', <?php echo $item->getId(); ?>);"></i>

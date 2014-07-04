@@ -55,7 +55,7 @@ endif;
             <?php if (!empty($actions)): ?>
             <button type="button" class="btn btn-default dropdown-toggle action-buttons" data-toggle="dropdown">
                 <span><?php echo $view['translator']->trans('mautic.core.form.actions'); ?></span>
-                <span class="caret"></span>
+                <i class="fa fa-angle-down"></i>
             </button>
 
             <ul class="dropdown-menu pull-right">

@@ -47,6 +47,16 @@ class LeadModel extends FormModel
     /**
      * {@inheritdoc}
      *
+     * @return string
+     */
+    public function getNameGetter()
+    {
+        return "getPrimaryIdentifier";
+    }
+
+    /**
+     * {@inheritdoc}
+     *
      * @param      $entity
      * @param      $formFactory
      * @param null $action

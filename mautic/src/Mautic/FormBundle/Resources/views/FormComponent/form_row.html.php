@@ -5,6 +5,13 @@ $feedbackClass = ($app->getRequest()->getMethod() == 'POST' && !empty($hasErrors
 <div class="row">
     <div class="form-group col-sm-12<?php echo $feedbackClass; ?>">
         <?php echo $view['form']->label($form, $label) ?>
+        <?php if (!empty($form->vars['attr']['tooltip'])): ?>
+            <span data-toggle="tooltip" data-container="body" data-placement="top"
+                  data-original-title="<?php echo $view['translator']->trans($form->vars['attr']['tooltip']); ?>">
+            <i class="fa fa-question-circle"></i>
+        </span>
+        <?php endif; ?>
+
         <?php if (isset($prototype)): ?>
         <?php $attr['data-prototype'] = $view->escape($view['form']->row($prototype)) ?>
         <?php endif ?>

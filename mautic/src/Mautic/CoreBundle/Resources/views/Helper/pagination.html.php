@@ -7,7 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-$target = (!empty($target)) ? $target : '.main-panel-content-wrapper';
+$target = (!empty($target)) ? $target : '.bundle-list';
 $tmpl   = (!empty($tmpl)) ? $tmpl : 'content';
 
 if (!isset($limit)) {

@@ -16,6 +16,7 @@ endif;
     <table class="table table-hover table-striped table-bordered role-list">
         <thead>
         <tr>
+            <th class="col-role-actions"></th>
             <?php
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                 'sessionVar' => 'role',
@@ -37,42 +38,43 @@ endif;
                 'class'      => 'visible-md visible-lg col-role-id'
             ));
             ?>
-            <th class="col-role-actions"></th>
         </tr>
         </thead>
         <tbody>
         <?php foreach ($items as $item): ?>
             <tr>
-                <td><?php echo $item->getName(); ?></td>
+                <td>
+                    <?php
+                    echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
+                        'item'      => $item,
+                        'edit'      => $permissions['edit'],
+                        'delete'    => $permissions['delete'],
+                        'routeBase' => 'user',
+                        'menuLink'  => 'mautic_role_index',
+                        'langVar'   => 'user.role'
+                    ));
+                    ?>
+                </td>
+                <td>
+                    <a href="<?php echo $view['router']->generate('mautic_user_index',
+                        array("search" => $view['translator']->trans('mautic.user.user.searchcommand.role') . ':' .  $item->getName())); ?>"
+                       data-toggle="ajax">
+                        <?php echo $item->getName(); ?>
+                    </a>
+                </td>
                 <td class="visible-md visible-lg"><?php echo $item->getDescription(); ?></td>
                 <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
-                <td>
-                    <?php if ($permissions['edit']): ?>
-                        <a class="btn btn-primary btn-xs"
-                           href="<?php echo $view['router']->generate('mautic_role_action',
-                               array("objectAction" => "edit", "objectId" => $item->getId())); ?>"
-                           data-toggle="ajax"
-                           data-menu-link="#mautic_role_index">
-                            <i class="fa fa-pencil-square-o"></i>
-                        </a>
-                    <?php endif; ?>
-                    <?php if ($permissions['delete']): ?>
-                        <a class="btn btn-danger btn-xs" href="javascript: void(0);"
-                           onclick="Mautic.showConfirmation('<?php echo $view->escape($view["translator"]->trans("mautic.user.role.form.confirmdelete", array("%name%" => $item->getName() . " (" . $item->getId() . ")")), 'js'); ?>','<?php echo $view->escape($view["translator"]->trans("mautic.core.form.delete"), 'js'); ?>','executeAction',['<?php echo $view['router']->generate('mautic_role_action',array("objectAction" => "delete", "objectId" => $item->getId())); ?>','#mautic_role_index'],'<?php echo $view->escape($view["translator"]->trans("mautic.core.form.cancel"), 'js'); ?>','',[]);">
-                            <i class="fa fa-trash-o"></i>
-                        </a>
-                    <?php endif; ?>
-                </td>
             </tr>
         <?php endforeach; ?>
         </tbody>
     </table>
     <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
-        "items"   => $items,
-        "page"    => $page,
-        "limit"   => $limit,
-        "baseUrl" =>  $view['router']->generate('mautic_role_index'),
-        'sessionVar' => 'role'
+        "items"      => $items,
+        "page"       => $page,
+        "limit"      => $limit,
+        "baseUrl"    =>  $view['router']->generate('mautic_role_index'),
+        'sessionVar' => 'role',
+        'target'     => '.main-panel-content-wrapper'
     )); ?>
     <div class="footer-margin"></div>
 </div>

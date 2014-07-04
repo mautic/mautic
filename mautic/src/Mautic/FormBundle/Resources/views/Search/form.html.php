@@ -40,17 +40,23 @@ switch ($status) {
         <span><?php echo $view['translator']->trans('mautic.core.search.more', array("%count%" => $remaining)); ?></span>
     </a>
 <?php else: ?>
-    <i class="fa fa-fw <?php echo $icon; ?>"
-       data-toggle="tooltip"
-       data-container="body"
-       data-placement="right"
-       data-status="<?php echo $status; ?>"
-       data-original-title="<?php echo $text ?>"></i>
     <a href="<?php echo $this->container->get('router')->generate(
         'mautic_form_action', array('objectAction' => 'view', 'objectId' => $form->getId())); ?>"
     data-toggle="ajax">
-        <span class="gs-form-name"><?php echo $form->getName(); ?></span>
-        <span class="gs-form-desc"><?php echo $form->getDescription(); ?></span>
+        <span class="global-search-primary">
+            <i class="fa fa-fw fa-lg <?php echo $icon; ?> global-search-publish-status"
+               data-toggle="tooltip"
+               data-container="body"
+               data-placement="right"
+               data-status="<?php echo $status; ?>"
+               data-original-title="<?php echo $text ?>"></i>
+            <?php echo $form->getName(); ?>
+        </span>
+        <span class="global-search-secondary global-search-indent"><?php echo $form->getDescription(); ?></span>
+        <span class="badge alert-success gs-count-badge" data-toggle="tooltip"
+              title="<?php echo $view['translator']->trans('mautic.form.form.resultcount'); ?>" data-placement="left">
+            <?php echo $form->getResultCount(); ?>
+        </span>
     </a>
 <?php endif; ?>
 </div>

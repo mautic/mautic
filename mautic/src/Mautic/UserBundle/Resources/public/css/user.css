@@ -16,30 +16,21 @@
     margin-bottom: 20px;
 }
 
-.gs-user-avatar {
+.gs-user-profile {
     float: left;
+}
+
+.gs-user-avatar {
+    float: right;
     margin: 0 8px;
 }
 
-.gs-user-name {
-    font-weight: bold;
-    display: block;
-}
-
-.gs-user-position {
-    font-size: 0.8em;
-    display: block;
-    line-height: 0.8em;
-}
-
-.gs-role-name {
-    font-weight: bold;
-    display: block;
-    padding: 8px;
-}
-
-.col-user-actions, .col-user-id, .col-role-actions, .col-role-id {
+.col-user-id, .col-role-id {
     width: 75px;
+}
+
+.col-user-actions, .col-role-actions {
+    width: 25px;
 }
 
 .col-user-avatar {

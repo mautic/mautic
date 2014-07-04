@@ -237,7 +237,7 @@ class CommonController extends Controller implements MauticController{
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function accessDenied()
+    public function accessDenied($msg = 'mautic.core.error.accessdenied')
     {
         return $this->postActionRedirect( array(
             'returnUrl'       => $this->generateUrl('mautic_core_index'),
@@ -248,7 +248,7 @@ class CommonController extends Controller implements MauticController{
             ),
             'flashes'         => array(array(
                 'type' => 'error',
-                'msg'  => 'mautic.core.error.accessdenied'
+                'msg'  => $msg
             ))
         ));
     }

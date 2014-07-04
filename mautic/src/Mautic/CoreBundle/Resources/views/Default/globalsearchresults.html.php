@@ -17,7 +17,7 @@
             <h4 class="panel-title">
                 <a data-toggle="collapse" data-parent="#global-search-panel"
                    href="#<?php echo $unique; ?>-panel" class="collapsed">
-                    <?php echo $view['translator']->trans($header); ?>
+                    <?php echo $header; ?>
                     <?php if (!empty($count)): ?>
                     <span class="badge pull-right gs-count-badge"><?php echo $count; ?></span>
                     <?php endif; ?>

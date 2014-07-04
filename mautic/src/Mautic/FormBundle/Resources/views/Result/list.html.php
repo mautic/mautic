@@ -72,5 +72,6 @@ $formId = $form->getId();
     "baseUrl"    =>  $view['router']->generate('mautic_form_results', array('formId' => $form->getId())),
     'sessionVar' => 'formresult.'.$formId,
     'target'     => '.formresults',
-    'tmpl'       => 'list'
+    'tmpl'       => 'list',
+    'target'     => '.main-panel-content-wrapper'
 )); ?>

@@ -194,19 +194,45 @@ h6 {
 .right-panel-inner-wrapper {
   padding-top: 0;
 }
-.global-search-result {
-  height: 50px;
-  border-bottom: #b2b2b2 1px solid;
-  padding: 7px;
-}
-.global-search-panel .panel-heading a {
+.global-search-panel a {
   display: block;
   height: 100%;
   width: 100%;
 }
-.gs-count-badge {
+.global-search-panel a:hover {
+  text-decoration: none;
+}
+.global-search-panel .panel-title {
+  position: relative;
+}
+.global-search-panel .gs-count-badge {
   position: absolute;
+  right: 0;
+  top: 0;
+}
+.global-search-result {
+  height: 50px;
+  border-bottom: #b2b2b2 1px solid;
+  padding: 7px;
+  position: relative;
+  overflow: hidden;
+}
+.global-search-result .gs-count-badge {
+  top: 10px;
   right: 10px;
+}
+.global-search-result:hover {
+  background-color: #ecf0f1;
+}
+.global-search-primary {
+  display: block;
+}
+.global-search-secondary {
+  font-size: 0.9em;
+  line-height: 0.9em;
+}
+.global-search-indent {
+  margin-left: 28px;
 }
 .left-panel-inner-wrapper {
   padding-top: 50px;
@@ -498,6 +524,9 @@ ul.no-bullet {
 .alert {
   word-wrap: break-word;
 }
+.tooltip {
+  z-index: 9999;
+}
 .tooltip-inner {
   text-align: left;
 }
@@ -658,7 +687,10 @@ li.ui-draggable {
   padding-bottom: 50px;
 }
 .bundle-side-filter-container {
-  height: 40px;
+  margin-bottom: 3px;
+}
+.bundle-list-actions i {
+  margin-right: 6px;
 }
 .bundle-list a {
   text-decoration: none;
@@ -669,6 +701,9 @@ li.ui-draggable {
   overflow: hidden;
   position: relative;
   white-space: nowrap;
+}
+.bundle-list .bundle-list-item a {
+  display: block;
 }
 .bundle-list .bundle-list-item:hover,
 .bundle-list .bundle-list-item.active {
@@ -683,6 +718,10 @@ li.ui-draggable {
   display: block;
   font-size: 0.9em;
 }
+.bundle-list .bundle-list-item .list-item-publish-status {
+  float: left;
+  margin-right: 5px;
+}
 .bundle-list .bundle-list-item .badge-count {
   position: absolute;
   right: 0;
@@ -690,6 +729,20 @@ li.ui-draggable {
 }
 .list-item-indent {
   margin-left: 30px;
+}
+.hidden-shelf {
+  margin-bottom: 3px;
+}
+.hidden-shelf select {
+  margin-top: 3px;
+}
+.hidden-shelf:hover {
+  background-color: #ecf0f1;
+}
+.hidden-shelf .shelf-handle {
+  text-align: center;
+  height: 25px;
+  border: 1px solid #ecf0f1;
 }
 .bundle-main-actions .btn {
   margin-top: -5px;
@@ -701,6 +754,9 @@ li.ui-draggable {
 }
 .bundle-main-item-secondary {
   display: block;
+}
+.has-click-event {
+  cursor: pointer;
 }
 .bundle-main .bundle-main-header {
   margin-bottom: 10px;
@@ -717,7 +773,7 @@ li.ui-draggable {
   position: absolute !important;
   right: 0;
   padding: 0 !important;
-  z-index: 9999;
+  z-index: 5000;
   transition: width .5s;
   -moz-transition: width .5s;
   -webkit-transition: width .5s;
@@ -797,7 +853,12 @@ li.ui-draggable {
     border: 1px solid #CCCCCC;
   }
   .toolbar-form-buttons {
-    display: none;
+    display: block;
+    width: 100%;
+  }
+  .toolbar-form-buttons .btn {
+    display: block;
+    width: 100%;
   }
   .bundle-side {
     padding-right: 15px;

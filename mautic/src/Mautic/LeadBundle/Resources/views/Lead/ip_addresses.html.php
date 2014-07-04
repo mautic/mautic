@@ -27,21 +27,23 @@
                 <?php $details = $ip->getIpDetails(); ?>
                 <tr>
                     <td><strong><?php echo $ip->getIpAddress(); ?></strong></td>
-                    <td><?php echo $details->city; ?></td>
-                    <td><?php echo $details->region_name; ?></td>
-                    <td><?php echo $details->country_name; ?></td>
+                    <td><?php echo $details['city']; ?></td>
+                    <td><?php echo $details['region']; ?></td>
+                    <td><?php echo $details['country']; ?></td>
                     <td>
-                        <?php if ($details->latitude): ?>
-                            <a href="http://maps.google.com/maps?q=<?php echo $details->latitude; ?>+<?php echo $details->longitude; ?>"
+                        <?php if ($details['latitude']): ?>
+                            <a href="http://maps.google.com/maps?q=<?php echo $details['latitude']; ?>+<?php echo $details['longitude']; ?>"
                                target="_blank">
                                 <i class="fa fa-map-marker"></i>
                             </a>
                         <?php endif; ?>
                         <?php
                         $info = "";
-                        foreach ($details as $k => $d):
+                        if (!empty($details['other'])):
+                        foreach ($details['other'] as $k => $d):
                             $info .= "$k: $d<br />";
                         endforeach;
+                        endif;
                         ?>
                         <i class="fa fa-info-circle"
                            data-toggle="tooltip"

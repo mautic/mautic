@@ -9,7 +9,7 @@
 ?>
 
 <div class="global-search-result">
-    <div class="gs-role-name">
+    <div class="global-search-primary">
     <?php if (!empty($showMore)): ?>
         <a class="pull-right margin-md-sides" href="<?php echo $this->container->get('router')->generate(
             'mautic_role_index', array('filter-role' => $searchString)); ?>"
@@ -26,6 +26,10 @@
         <?php if ($canEdit): ?>
         </a>
         <?php endif; ?>
+        <span class="badge alert-success gs-count-badge" data-toggle="tooltip"
+              title="<?php echo $view['translator']->trans('mautic.user.role.usercount'); ?>" data-placement="left">
+            <?php echo count($role->getUsers()); ?>
+        </span>
     <?php endif; ?>
     </div>
 </div>

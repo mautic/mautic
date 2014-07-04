@@ -22,17 +22,29 @@ $view["slots"]->set("headerTitle", $view['translator']->trans('mautic.lead.field
     <table class="table table-hover table-striped table-bordered leadfield-list">
         <thead>
             <th class="col-leadfield-orderhandle"></th>
+            <th class="col-leadfield-actions"></th>
             <th class="col-leadfield-label"><?php echo $view['translator']->trans('mautic.lead.field.thead.label'); ?></th>
             <th class="visible-md visible-lg col-leadfield-alias"><?php echo $view['translator']->trans('mautic.lead.field.thead.alias'); ?></th>
             <th class="col-leadfield-type"><?php echo $view['translator']->trans('mautic.lead.field.thead.type'); ?></th>
             <th class="visible-md visible-lg col-leadfield-id"><?php echo $view['translator']->trans('mautic.lead.field.thead.id'); ?></th>
             <th class="visible-md visible-lg col-leadfield-statusicons"></th>
-            <th class="col-leadfield-actions"></th>
         </thead>
         <tbody>
         <?php foreach ($items as $item): ?>
             <tr id="field_<?php echo $item->getId(); ?>">
                 <td><i class="fa fa-fw fa-ellipsis-v"></i></td>
+                <td>
+                    <?php
+                    echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
+                        'item'      => $item,
+                        'edit'      => true,
+                        'delete'    => $item->isFixed() ? false : true,
+                        'routeBase' => 'leadfield',
+                        'menuLink'  => 'mautic_leadfield_index',
+                        'langVar'   => 'lead.field'
+                    ));
+                    ?>
+                </td>
                 <td><?php echo $item->getLabel(); ?></td>
                 <td class="visible-md visible-lg"><?php echo $item->getAlias(); ?></td>
                 <td><?php echo $view['translator']->trans('mautic.lead.field.type.'.$item->getType()); ?></td>
@@ -54,18 +66,6 @@ $view["slots"]->set("headerTitle", $view['translator']->trans('mautic.lead.field
                         <i class="fa fa-list "data-toggle="tooltip" data-placement="left"
                            title="<?php echo $view['translator']->trans('mautic.lead.field.tooltip.listable'); ?>"></i>
                     <?php endif; ?>
-                </td>
-                <td>
-                    <?php
-                    echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
-                        'item'      => $item,
-                        'edit'      => true,
-                        'delete'    => $item->isFixed() ? false : true,
-                        'routeBase' => 'leadfield',
-                        'menuLink'  => 'mautic_leadfield_index',
-                        'langVar'   => 'lead.field'
-                    ));
-                    ?>
                 </td>
             </tr>
         <?php endforeach; ?>

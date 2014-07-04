@@ -59,11 +59,11 @@ $collection->add('mautic_form_action', new Route('/forms/{objectAction}/{objectI
     )
 ));
 
-$collection->add('mautic_form_postresults', new Route('/public/forms/submit',
+$collection->add('mautic_form_postresults', new Route('/p/form/submit',
     array('_controller' => 'MauticFormBundle:Public:submit')
 ));
 
-$collection->add('mautic_form_generateform', new Route('/public/forms/generate.js',
+$collection->add('mautic_form_generateform', new Route('/p/form/generate.js',
     array('_controller' => 'MauticFormBundle:Public:generate')
 ));
 

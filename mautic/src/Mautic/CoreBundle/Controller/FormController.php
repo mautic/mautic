@@ -50,9 +50,9 @@ class FormController extends CommonController
      *
      * @param        $returnUrl
      * @param        $entity
-     * @param string $nameFunction
+     * @param        $entityType
      */
-    protected function isLocked($postActionVars, $entity, $entityType = '', $nameFunction = 'getName')
+    protected function isLocked($postActionVars, $entity, $entityType)
     {
         $date      = $entity->getCheckedOut();
         $returnUrl = !empty($postActionVars['returnUrl']) ?
@@ -60,6 +60,9 @@ class FormController extends CommonController
             urlencode($this->generateUrl('mautic_core_index'));
         $override  = '';
 
+        $factory      = $this->get('mautic.factory');
+        $model        = $factory->getModel($entityType);
+        $nameFunction = $model->getNameGetter();
         if ($this->get('mautic.security')->isAdmin()) {
             $override = $this->get('translator')->trans('mautic.core.override.lock',array(
                 '%url%' => $this->generateUrl('mautic_core_form_action', array(
@@ -73,7 +76,6 @@ class FormController extends CommonController
             ));
         }
 
-        $factory = $this->get('mautic.factory');
         return $this->postActionRedirect(
             array_merge($postActionVars, array(
                 'flashes' => array(array(
@@ -86,7 +88,6 @@ class FormController extends CommonController
                             array(
                                 'objectAction' => 'contact',
                                 'objectId'     => $entity->getCheckedOutBy()->getId(),
-
                                 'entity'    => $entityType,
                                 'id'        => $entity->getId(),
                                 'subject'   => 'locked',

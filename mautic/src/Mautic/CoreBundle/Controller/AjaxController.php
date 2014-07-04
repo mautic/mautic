@@ -131,7 +131,7 @@ class AjaxController extends CommonController
         $searchStr = InputHelper::clean($request->query->get("global_search", ""));
         $this->get('session')->set('mautic.global_search', $searchStr);
 
-        $event = new GlobalSearchEvent($searchStr);
+        $event = new GlobalSearchEvent($searchStr, $this->get('translator'));
         $this->get('event_dispatcher')->dispatch(CoreEvents::GLOBAL_SEARCH, $event);
 
         $dataArray['newContent'] = $this->renderView('MauticCoreBundle:Default:globalsearchresults.html.php',
@@ -220,7 +220,7 @@ class AjaxController extends CommonController
             if ($this->get('mautic.security')->hasEntityAccess(
                 $permissionBase . ':publishown',
                 $permissionBase . ':publishother',
-                $entity
+                $entity->getCreatedBy()
             )
             ) {
                 $dataArray['success'] = 1;

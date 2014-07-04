@@ -40,7 +40,7 @@ $activeClass     = "";
 <div class="row bundle-content-wrapper">
     <div class="col-xs-12 col-sm-4 bundle-side auto-height">
         <div class="rounded-corners body-white bundle-side-inner-wrapper padding-sm">
-            <div class="bundle-side-filter-container lead-filter-container">
+            <div class="bundle-side-filter-container">
                 <div class="input-group">
                     <div class="input-group-btn">
                         <button class="btn btn-default" data-toggle="modal" data-target="#search-help">
@@ -66,15 +66,22 @@ $activeClass     = "";
                         </button>
                     </div>
                 </div>
-                <?php $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list') . ':'; ?>
-                <select id="filterByList" class="form-control" autocomplete="off" onchange="Mautic.filterLeadsByList(this.value);">
-                    <option value=""><?php echo $view['translator']->trans('mautic.lead.lead.form.leadlists'); ?></option>
-                    <?php foreach ($lists as $list): ?>
-                    <option value="<?php echo $listCommand . $list['alias']; ?>">
-                        <?php echo $list['name'] . " ({$list['alias']})"; ?>
-                    </option>
-                    <?php endforeach; ?>
-                </select>
+                <div class="hidden-shelf">
+                    <div class="shelf-contents collapse">
+                        <?php $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list') . ':'; ?>
+                        <select id="filterByList" class="form-control" autocomplete="off" onchange="Mautic.filterLeadsByList(this.value);">
+                            <option value=""><?php echo $view['translator']->trans('mautic.lead.lead.form.leadlists'); ?></option>
+                            <?php foreach ($lists as $list): ?>
+                            <option value="<?php echo $listCommand . $list['alias']; ?>">
+                                <?php echo $list['name'] . " ({$list['alias']})"; ?>
+                            </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="shelf-handle">
+                        <i class="fa fa-chevron-circle-down"></i>
+                    </div>
+                </div>
             </div>
             <div class="bundle-list scrollable">
                 <?php echo $view->render('MauticLeadBundle:Lead:list.html.php', array(

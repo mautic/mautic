@@ -63,6 +63,10 @@ class ContactType extends AbstractType
             'save_icon'  => 'fa fa-send',
             'apply_text' => false
         ));
+
+        if (!empty($options["action"])) {
+            $builder->setAction($options["action"]);
+        }
     }
 
     public function getName()

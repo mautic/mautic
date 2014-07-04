@@ -17,6 +17,7 @@ endif;
     <table class="table table-hover table-striped table-bordered user-list">
         <thead>
         <tr>
+            <th class="col-user-actions"></th>
             <th class="visible-md visible-lg col-user-avatar"></th>
             <?php
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
@@ -55,12 +56,23 @@ endif;
                 'class'      => 'visible-md visible-lg col-user-id'
             ));
             ?>
-            <th class="col-user-actions"></th>
         </tr>
         </thead>
         <tbody>
         <?php foreach ($items as $item):?>
             <tr>
+                <td>
+                    <?php
+                    echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
+                        'item'      => $item,
+                        'edit'      => $permissions['edit'],
+                        'delete'    => $permissions['delete'],
+                        'routeBase' => 'user',
+                        'menuLink'  => 'mautic_user_index',
+                        'langVar'   => 'user.user'
+                    ));
+                    ?>
+                </td>
                 <td class="visible-md visible-lg">
                     <img class="img img-responsive img-thumbnail"
                          src="https://www.gravatar.com/avatar/<?php echo md5(strtolower(trim($item->getEmail()))); ?>?&s=50" />
@@ -75,33 +87,17 @@ endif;
                 </td>
                 <td class="visible-md visible-lg"><?php echo $item->getRole()->getName(); ?></td>
                 <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
-                <td>
-                    <?php if ($permissions['edit']): ?>
-                        <a class="btn btn-primary btn-xs"
-                           href="<?php echo $view['router']->generate('mautic_user_action',
-                               array("objectAction" => "edit", "objectId" => $item->getId())); ?>"
-                           data-toggle="ajax"
-                           data-menu-link="#mautic_user_index">
-                            <i class="fa fa-pencil-square-o"></i>
-                        </a>
-                    <?php endif; ?>
-                    <?php if ($permissions['delete']): ?>
-                        <a class="btn btn-danger btn-xs" href="javascript:void(0);"
-                           onclick="Mautic.showConfirmation('<?php echo $view->escape($view["translator"]->trans("mautic.user.user.form.confirmdelete", array("%user%" => $item->getName() . " (" . $item->getId() . ")")), 'js'); ?>','<?php echo $view->escape($view["translator"]->trans("mautic.core.form.delete"), 'js'); ?>','executeAction',['<?php echo $view['router']->generate('mautic_user_action', array("objectAction" => "delete", "objectId" => $item->getId())); ?>','#mautic_user_index'],'<?php echo $view->escape($view["translator"]->trans("mautic.core.form.cancel"), 'js'); ?>','',[]);">
-                            <i class="fa fa-trash-o"></i>
-                        </a>
-                    <?php endif; ?>
-                </td>
             </tr>
         <?php endforeach; ?>
         </tbody>
     </table>
     <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
-        "items"   => $items,
-        "page"    => $page,
-        "limit"   => $limit,
-        "baseUrl" =>  $view['router']->generate('mautic_user_index'),
-        'sessionVar' => 'user'
+        "items"      => $items,
+        "page"       => $page,
+        "limit"      => $limit,
+        "baseUrl"    =>  $view['router']->generate('mautic_user_index'),
+        'sessionVar' => 'user',
+        'target'     => '.main-panel-content-wrapper'
     )); ?>
     <div class="footer-margin"></div>
 </div>

@@ -47,7 +47,6 @@ foreach ($items as $key => $item):
     "queryString"     => 'tmpl=list',
     "paginationClass" => "sm",
     'tmpl'            => 'list',
-    'target'          => '.leads',
     'sessionVar'      => 'lead'
 )); ?>
 <?php else: ?>

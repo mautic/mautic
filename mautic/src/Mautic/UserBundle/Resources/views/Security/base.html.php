@@ -33,8 +33,12 @@
         <?php $view['slots']->output('_content'); ?>
     </div>
 </div>
+<script>
+    //clear typeahead caches
+    window.localStorage.clear();
+</script>
 <?php foreach ($view['assetic']->javascripts(array("@mautic_javascripts"), array(), array('combine' => true, 'output' => 'media/js/mautic.js')) as $url): ?>
-    <script type="text/javascript" src="<?php echo $view->escape($url) ?>"></script>
+<script src="<?php echo $view->escape($url) ?>"></script>
 <?php endforeach; ?>
 </body>
 </html>

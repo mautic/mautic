@@ -1,13 +1,6 @@
 /* LeadBundle */
-.gs-lead-primary-identifier {
-    display: block;
-}
 
-.gs-lead-secondary-identifier {
-    font-size:0.9em;
-}
-
-.col-leadfield-id, .col-leadfield-actions {
+.col-leadfield-id {
     width: 75px;
 }
 
@@ -23,15 +16,12 @@
     width: 125px;
 }
 
-.lead-filter-container {
-    height: 75px;
-}
-.lead-filter-container select {
-    margin-top: 2px;
- }
-
 .leadfield-list .fa-asterisk:hover, .leadfield-list .fa-eye:hover, .leadfield-list .fa-lock:hover, .leadfield-list .fa-list:hover {
     color: #7D5B71;
+}
+
+.col-leadlist-actions, .col-leadfield-actions {
+    width: 25px;
 }
 
 .leadlist-filter a {

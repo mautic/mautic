@@ -9,24 +9,25 @@
 ?>
 
 <script>
-    var mauticBaseUrl = '<?php echo $view['router']->generate("mautic_core_index"); ?>';
+    var mauticAjaxUrl = '<?php echo $view['router']->generate("mautic_core_ajax"); ?>';
     var mauticContent = '<?php $view['slots']->output('mauticContent',''); ?>';
 </script>
 <?php foreach ($view['assetic']->javascripts(array("@mautic_javascripts"), array(), array('combine' => true, 'output' => 'media/js/mautic.js')) as $url): ?>
 <script src="<?php echo $view->escape($url) ?>"></script>
 <?php endforeach; ?>
-<script src="<?php echo $view['assets']->getUrl('media/tinymce/tinymce.min.js'); ?>"></script>
-<script src="<?php echo $view['assets']->getUrl('media/tinymce/jquery.tinymce.min.js'); ?>"></script>
 <script>
     Mautic.onPageLoad();
     <?php $view['slots']->output("jsDeclarations"); ?>
     <?php if ($app->getEnvironment() === "dev"): ?>
-    $( document ).ajaxComplete(function(event, XMLHttpRequest, ajaxOption){
+    mQuery( document ).ajaxComplete(function(event, XMLHttpRequest, ajaxOption){
         if(XMLHttpRequest.getResponseHeader('x-debug-token')) {
             MauticVars.showLoadingBar = false;
-            $('.sf-toolbar-block').remove();
-            $.get(mauticBaseUrl +'_wdt/'+XMLHttpRequest.getResponseHeader('x-debug-token'),function(data){
-                $('body').append(data);
+            mQuery('.sf-toolbar-block').remove();
+            mQuery('.sf-minitoolbar').remove();
+            mQuery('.sf-toolbarreset').remove();
+            mQuery('.sf-toolbar').remove();
+            mQuery.get('<?php echo $view['router']->generate("mautic_core_index"); ?>_wdt/'+XMLHttpRequest.getResponseHeader('x-debug-token'),function(data){
+                mQuery('body').append(data);
             });
         }
     });
