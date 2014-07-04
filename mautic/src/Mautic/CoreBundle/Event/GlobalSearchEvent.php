@@ -30,11 +30,17 @@ class GlobalSearchEvent extends Event
     protected $searchString;
 
     /**
+     * @var
+     */
+    protected $translator;
+
+    /**
      * @param $searchString
      */
-    public function __construct($searchString)
+    public function __construct($searchString, $translator)
     {
         $this->searchString = strtolower(trim(strip_tags($searchString)));
+        $this->translator   = $translator;
     }
 
     /**
@@ -56,6 +62,7 @@ class GlobalSearchEvent extends Event
      */
     public function addResults($header, array $results)
     {
+        $header = $this->translator->trans($header);
         $this->results[$header] = $results;
     }
 
@@ -66,6 +73,7 @@ class GlobalSearchEvent extends Event
      */
     public function getResults()
     {
+        ksort($this->results, SORT_NATURAL);
         return $this->results;
     }
 }

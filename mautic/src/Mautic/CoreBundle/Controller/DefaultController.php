@@ -35,7 +35,7 @@ class DefaultController extends CommonController
         $searchStr = $this->request->request->get("searchstring", $this->get('session')->get('mautic.global_search', ''));
         $this->get('session')->set('mautic.global_search', $searchStr);
 
-        $event     = new GlobalSearchEvent($searchStr);
+        $event     = new GlobalSearchEvent($searchStr, $this->get('translator'));
         $this->get('event_dispatcher')->dispatch(CoreEvents::GLOBAL_SEARCH, $event);
 
         return $this->render('MauticCoreBundle:Default:globalsearchresults.html.php',
