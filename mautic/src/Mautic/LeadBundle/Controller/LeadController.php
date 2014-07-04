@@ -367,7 +367,7 @@ class LeadController extends FormController
             return $this->accessDenied();
         } elseif ($model->isLocked($lead)) {
             //deny access if the entity is locked
-            return $this->isLocked($postActionVars, $lead, 'lead', "getPrimaryIdentifier");
+            return $this->isLocked($postActionVars, $lead, 'lead.lead');
         }
 
         $action = $this->generateUrl('mautic_lead_action', array('objectAction' => 'edit', 'objectId' => $objectId));
@@ -473,7 +473,7 @@ class LeadController extends FormController
             )) {
                 return $this->accessDenied();
             } elseif ($model->isLocked($entity)) {
-                return $this->isLocked($postActionVars, $entity);
+                return $this->isLocked($postActionVars, $entity, 'lead.lead');
             }
 
             $model->deleteEntity($entity);

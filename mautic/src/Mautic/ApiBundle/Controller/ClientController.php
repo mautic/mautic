@@ -272,7 +272,7 @@ class ClientController extends FormController
             );
         } elseif ($model->isLocked($client)) {
             //deny access if the entity is locked
-            return $this->isLocked($postActionVars, $client, 'client');
+            return $this->isLocked($postActionVars, $client, 'api.client');
         }
 
         $action = $this->generateUrl('mautic_client_action', array('objectAction' => 'edit', 'objectId' => $objectId));
@@ -357,7 +357,7 @@ class ClientController extends FormController
                 );
             } elseif ($model->isLocked($entity)) {
                 //deny access if the entity is locked
-                return $this->isLocked($postActionVars, $entity);
+                return $this->isLocked($postActionVars, $entity, 'api.client');
             } else {
                 $model->deleteEntity($entity);
                 $name      = $entity->getName();

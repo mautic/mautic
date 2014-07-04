@@ -51,15 +51,7 @@ class UserController extends FormController
         $this->get('session')->set('mautic.user.filter', $search);
 
         //do some default filtering
-        $filter         = array('string' => $search, 'force' => '');
-        $translator     = $this->container->get('translator');
-        $isCommand      = $translator->trans('mautic.core.searchcommand.is');
-        $isUnpublished  = $translator->trans('mautic.core.searchcommand.isunpublished');
-        $isPublished    = $translator->trans('mautic.core.searchcommand.ispublished');
-        if (strpos($search, "$isCommand:$isUnpublished") === false) {
-            //only show active users unless inactive is specified
-            $filter['force'] .= " $isCommand:$isPublished";
-        }
+        $filter     = array('string' => $search, 'force' => '');
 
         $tmpl       = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
         $users      = $this->get('mautic.factory')->getModel('user.user')->getEntities(
@@ -260,7 +252,7 @@ class UserController extends FormController
             );
         } elseif ($model->isLocked($user)) {
             //deny access if the entity is locked
-            return $this->isLocked($postActionVars, $user, 'user');
+            return $this->isLocked($postActionVars, $user, 'user.user');
         }
 
         $action = $this->generateUrl('mautic_user_action', array('objectAction' => 'edit', 'objectId' => $objectId));
@@ -372,7 +364,7 @@ class UserController extends FormController
                         'msgVars' => array('%id%' => $objectId)
                     );
                 } elseif ($model->isLocked($entity)) {
-                    return $this->isLocked($postActionVars, $entity);
+                    return $this->isLocked($postActionVars, $entity, 'user.user');
                 } else {
                     $model->deleteEntity($entity);
                     $name = $entity->getName();
@@ -425,7 +417,7 @@ class UserController extends FormController
         }
 
         $action = $this->generateUrl('mautic_user_action', array('objectAction' => 'contact', 'objectId' => $objectId));
-        $form   = $this->createForm(new FormType\ContactType(),  array('action' => $action));
+        $form   = $this->createForm(new FormType\ContactType(), array(), array('action' => $action));
 
         $currentUser = $this->get('security.context')->getToken()->getUser();
 
@@ -487,16 +479,16 @@ class UserController extends FormController
                 return $this->redirect($returnUrl);
             }
         } else {
-            $reEntityId = InputHelper::int($this->request->get('id'));
-            $reSubject  = InputHelper::clean($this->request->get('subject'));
-            $returnUrl  = InputHelper::url($this->request->get('returnUrl', $this->generateUrl('mautic_core_index')));
-            $reEntity   = InputHelper::clean($this->request->get('entity'));
+            $reEntityId   = InputHelper::int($this->request->get('id'));
+            $reSubject    = InputHelper::clean($this->request->get('subject'));
+            $returnUrl    = InputHelper::clean($this->request->get('returnUrl', $this->generateUrl('mautic_core_index')));
+            $reEntity     = InputHelper::clean($this->request->get('entity'));
 
             $form->get('entity')->setData($reEntity);
             $form->get('id')->setData($reEntityId);
             $form->get('returnUrl')->setData($returnUrl);
 
-            if (!empty($reEntity) && !empty($reEntityId) && $this->has('mautic.model.' . $reEntity)) {
+            if (!empty($reEntity) && !empty($reEntityId)) {
                 $model  = $this->get('mautic.factory')->getModel($reEntity);
                 $entity = $model->getEntity($reEntityId);
 

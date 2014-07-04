@@ -33,8 +33,9 @@ $container->loadFromExtension('security', array(
             'anonymous' => true
         ),
         'public' => array(
-            'pattern'   => '^/public',
-            'anonymous' => true
+            'pattern'   => '^/p/',
+            'anonymous' => true,
+            'context'   => 'mautic'
         ),
         'login' => array(
             'pattern'   => '^/login$',

@@ -234,7 +234,7 @@ class ListController extends FormController
             return $this->accessDenied();
         } elseif ($model->isLocked($list)) {
             //deny access if the entity is locked
-            return $this->isLocked($postActionVars, $list, 'leadlist');
+            return $this->isLocked($postActionVars, $list, 'lead.list');
         }
 
         $action = $this->generateUrl('mautic_leadlist_action', array('objectAction' => 'edit', 'objectId' => $objectId));
@@ -333,7 +333,7 @@ class ListController extends FormController
             ) {
                 return $this->accessDenied();
             } elseif ($model->isLocked($list)) {
-                return $this->isLocked($postActionVars, $list);
+                return $this->isLocked($postActionVars, $list, 'lead.list');
             }
 
             $model->deleteEntity($list);

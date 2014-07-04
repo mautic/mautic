@@ -7,6 +7,8 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+//@todo - add support to editing more than one form at a time (i.e. opened in different tabs)
+
 namespace Mautic\FormBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
@@ -58,17 +60,6 @@ class FormController extends CommonFormController
         if (!$permissions['form:forms:viewother']) {
             $filter['force'] =
                 array('column' => 'f.createdBy', 'expr' => 'eq', 'value' => $this->get('mautic.factory')->getUser());
-        }
-
-        $translator  = $this->container->get('translator');
-        $isCommand   = $translator->trans('mautic.core.searchcommand.is');
-        $unpublished = $translator->trans('mautic.core.searchcommand.isunpublished');
-
-        if (strpos($search, "$isCommand:$unpublished") === false) {
-            //remove anonymous leads unless requested to prevent clutter
-            $filter['force'][] = array(
-                'column' => 'f.isPublished', 'expr' => 'eq', 'value' => true
-            );
         }
 
         $forms = $this->get('mautic.factory')->getModel('form.form')->getEntities(
@@ -390,7 +381,7 @@ class FormController extends CommonFormController
             return $this->accessDenied();
         } elseif ($model->isLocked($entity)) {
             //deny access if the entity is locked
-            return $this->isLocked($postActionVars, $entity, 'form', "getName");
+            return $this->isLocked($postActionVars, $entity, 'form.form');
         }
 
         $action = $this->generateUrl('mautic_form_action', array('objectAction' => 'edit', 'objectId' => $objectId));
@@ -609,7 +600,7 @@ class FormController extends CommonFormController
             )) {
                 return $this->accessDenied();
             } elseif ($model->isLocked($entity)) {
-                return $this->isLocked($postActionVars, $entity);
+                return $this->isLocked($postActionVars, $entity, 'form.form');
             }
 
             $model->deleteEntity($entity);

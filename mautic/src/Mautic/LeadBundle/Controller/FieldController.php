@@ -162,7 +162,7 @@ class FieldController extends FormController
             );
         } elseif ($model->isLocked($field)) {
             //deny access if the entity is locked
-            return $this->isLocked($postActionVars, $field, 'leadfield');
+            return $this->isLocked($postActionVars, $field, 'lead.field');
         }
 
         $action = $this->generateUrl('mautic_leadfield_action', array('objectAction' => 'edit', 'objectId' => $objectId));
@@ -268,7 +268,7 @@ class FieldController extends FormController
                     'msgVars' => array('%id%' => $objectId)
                 );
             } elseif ($model->isLocked($field)) {
-                return $this->isLocked($postActionVars, $field);
+                return $this->isLocked($postActionVars, $field, 'lead.field');
             } elseif ($field->isFixed()) {
                 //cannot delete fixed fields
                 return $this->accessDenied();

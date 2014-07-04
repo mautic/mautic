@@ -236,7 +236,7 @@ class RoleController extends FormController
             );
         } elseif ($model->isLocked($entity)) {
             //deny access if the entity is locked
-            return $this->isLocked($postActionVars, $entity, 'role');
+            return $this->isLocked($postActionVars, $entity, 'user.role');
         }
 
         $action = $this->generateUrl('mautic_role_action', array('objectAction' => 'edit', 'objectId' => $objectId));
@@ -340,7 +340,7 @@ class RoleController extends FormController
                         'msgVars' => array('%id%' => $objectId)
                     );
                 } elseif ($model->isLocked($entity)) {
-                    return $this->isLocked($postActionVars, $entity);
+                    return $this->isLocked($postActionVars, $entity, 'user.role');
                 } else {
                     $model->deleteEntity($objectId);
                     $name = $entity->getName();
