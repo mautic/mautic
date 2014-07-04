@@ -1,19 +1,19 @@
 //LeadBundle
 Mautic.leadOnLoad = function (container) {
-    if ($(container + ' form[name="lead"]').length) {
-        $('.bundle-main').addClass('fullpanel');
+    if (mQuery(container + ' form[name="lead"]').length) {
+        mQuery('.bundle-main').addClass('fullpanel');
 
         Mautic.activateLeadOwnerTypeahead('lead_owner_lookup');
 
-        $("*[data-toggle='field-lookup']").each(function (index) {
-            var target = $(this).attr('data-target');
-            var field  = $(this).attr('id');
-            var options = $(this).attr('data-options');
+        mQuery("*[data-toggle='field-lookup']").each(function (index) {
+            var target = mQuery(this).attr('data-target');
+            var field  = mQuery(this).attr('id');
+            var options = mQuery(this).attr('data-options');
             Mautic.activateLeadFieldTypeahead(field, target, options);
         });
     }
 
-    if ($(container + ' #list-search').length) {
+    if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'lead.lead');
     }
 };
@@ -44,7 +44,7 @@ Mautic.activateLeadFieldTypeahead = function(field, target, options) {
 
                 // iterate through the pool of strings and for any string that
                 // contains the substring `q`, add it to the `matches` array
-                $.each(strs, function(i, str) {
+                mQuery.each(strs, function(i, str) {
                     if (substrRegex.test(str)) {
                         // the typeahead jQuery plugin expects suggestions to a
                         // JavaScript object, refer to typeahead docs for more info
@@ -72,7 +72,7 @@ Mautic.activateLeadFieldTypeahead = function(field, target, options) {
             datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
             queryTokenizer: Bloodhound.tokenizers.whitespace,
             prefetch: {
-                url: mauticBaseUrl + "ajax?action=lead:fieldList&field=" + target,
+                url: mauticAjaxUrl + "?action=lead:fieldList&field=" + target,
                 ajax: {
                     beforeSend: function () {
                         MauticVars.showLoadingBar = false;
@@ -80,7 +80,7 @@ Mautic.activateLeadFieldTypeahead = function(field, target, options) {
                 }
             },
             remote: {
-                url: mauticBaseUrl + "ajax?action=lead:fieldList&field=" + target + "&filter=%QUERY",
+                url: mauticAjaxUrl + "?action=lead:fieldList&field=" + target + "&filter=%QUERY",
                 ajax: {
                     beforeSend: function () {
                         MauticVars.showLoadingBar = false;
@@ -97,7 +97,7 @@ Mautic.activateLeadFieldTypeahead = function(field, target, options) {
         var source = this[field].ttAdapter();
     }
 
-    $('#' + field).typeahead(
+    mQuery('#' + field).typeahead(
         {
             hint: true,
             highlight: true,
@@ -109,12 +109,16 @@ Mautic.activateLeadFieldTypeahead = function(field, target, options) {
             source: source
         }
     ).on('typeahead:selected', function (event, datum) {
-        if ($("#" + field + "_id").length && datum["id"]) {
-            $("#" + field + "_id").val(datum["id"]);
+        if (mQuery("#" + field + "_id").length && datum["id"]) {
+            mQuery("#" + field + "_id").val(datum["id"]);
         }
     }).on('typeahead:autocompleted', function (event, datum) {
-        if ($("#" + field + "_id").length && datum["id"]) {
-            $("#" + field + "_id").val(datum["id"]);
+        if (mQuery("#" + field + "_id").length && datum["id"]) {
+            mQuery("#" + field + "_id").val(datum["id"]);
+        }
+    }).on('keypress', function (event) {
+        if ((event.keyCode || event.which) == 13) {
+            mQuery('#' + field).typeahead('close');
         }
     });
 };
@@ -124,7 +128,7 @@ Mautic.activateLeadOwnerTypeahead = function(el) {
         datumTokenizer: Bloodhound.tokenizers.obj.whitespace('label'),
         queryTokenizer: Bloodhound.tokenizers.whitespace,
         prefetch: {
-            url: mauticBaseUrl + "ajax?action=lead:userList",
+            url: mauticAjaxUrl + "?action=lead:userList",
             ajax: {
                 beforeSend: function () {
                     MauticVars.showLoadingBar = false;
@@ -132,7 +136,7 @@ Mautic.activateLeadOwnerTypeahead = function(el) {
             }
         },
         remote: {
-            url: mauticBaseUrl + "ajax?action=lead:userList&filter=%QUERY",
+            url: mauticAjaxUrl + "?action=lead:userList&filter=%QUERY",
             ajax: {
                 beforeSend: function () {
                     MauticVars.showLoadingBar = false;
@@ -146,7 +150,7 @@ Mautic.activateLeadOwnerTypeahead = function(el) {
         limit: 5
     });
     owners.initialize();
-    $("#"  + el).typeahead(
+    mQuery("#"  + el).typeahead(
         {
             hint: true,
             highlight: true,
@@ -157,97 +161,97 @@ Mautic.activateLeadOwnerTypeahead = function(el) {
             displayKey: 'label',
             source: owners.ttAdapter()
         }).on('typeahead:selected', function (event, datum) {
-            if ($("#lead_owner").length) {
-                $("#lead_owner").val(datum["value"]);
+            if (mQuery("#lead_owner").length) {
+                mQuery("#lead_owner").val(datum["value"]);
             }
         }).on('typeahead:autocompleted', function (event, datum) {
-            if ($("#lead_owner").length) {
-                $("#lead_owner").val(datum["value"]);
+            if (mQuery("#lead_owner").length) {
+                mQuery("#lead_owner").val(datum["value"]);
             }
         }
     ).on( 'focus', function() {
-        $(this).typeahead( 'open');
+        mQuery(this).typeahead( 'open');
     });
 };
 
 Mautic.leadlistOnLoad = function(container) {
-    if ($(container + ' #list-search').length) {
+    if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'lead.list');
     }
 
-    $('#leadlist_filters_left li').draggable({
+    mQuery('#leadlist_filters_left li').draggable({
         appendTo: "body",
         helper: "clone"
     });
 
-    $('#leadlist_filters_right').sortable({
+    mQuery('#leadlist_filters_right').sortable({
         items: "li",
         handle: '.sortable-handle'
     });
 
-    if ($('#leadlist_filters_right').length) {
-        $('#leadlist_filters_right .remove-selected').each( function (index, el) {
-            $(el).on('click', function () {
-                $(this).parent().remove();
-                if (!$('#leadlist_filters_right li:not(.placeholder)').length) {
-                    $('#leadlist_filters_right li.placeholder').removeClass('hide');
+    if (mQuery('#leadlist_filters_right').length) {
+        mQuery('#leadlist_filters_right .remove-selected').each( function (index, el) {
+            mQuery(el).on('click', function () {
+                mQuery(this).parent().remove();
+                if (!mQuery('#leadlist_filters_right li:not(.placeholder)').length) {
+                    mQuery('#leadlist_filters_right li.placeholder').removeClass('hide');
                 } else {
-                    $('#leadlist_filters_right li.placeholder').addClass('hide');
+                    mQuery('#leadlist_filters_right li.placeholder').addClass('hide');
                 }
             });
         });
     }
 
-    $("*[data-toggle='field-lookup']").each(function (index) {
-        var target = $(this).attr('data-target');
-        var options = $(this).attr('data-options');
-        var field  = $(this).attr('id');
+    mQuery("*[data-toggle='field-lookup']").each(function (index) {
+        var target = mQuery(this).attr('data-target');
+        var options = mQuery(this).attr('data-options');
+        var field  = mQuery(this).attr('id');
         Mautic.activateLeadFieldTypeahead(field, target, options);
     });
 };
 
 Mautic.addLeadListFilter = function (elId) {
     var filterId = '#available_' + elId;
-    var label  = $(filterId + ' span.leadlist-filter-name').text();
+    var label  = mQuery(filterId + ' span.leadlist-filter-name').text();
 
     //create a new filter
-    var li = $("<li />").addClass("padding-sm").text(label).appendTo($('#leadlist_filters_right'));
+    var li = mQuery("<li />").addClass("padding-sm").text(label).appendTo(mQuery('#leadlist_filters_right'));
 
     //add a delete button
-    $("<i />").addClass("fa fa-fw fa-trash-o remove-selected").prependTo(li).on('click', function() {
-        $(this).parent().remove();
+    mQuery("<i />").addClass("fa fa-fw fa-trash-o remove-selected").prependTo(li).on('click', function() {
+        mQuery(this).parent().remove();
     });
 
     //add a sortable handle
-    $("<i />").addClass("fa fa-fw fa-ellipsis-v sortable-handle").prependTo(li);
+    mQuery("<i />").addClass("fa fa-fw fa-ellipsis-v sortable-handle").prependTo(li);
 
-    var fieldType = $(filterId).find("input.field_type").val();
-    var alias     = $(filterId).find("input.field_alias").val();
+    var fieldType = mQuery(filterId).find("input.field_type").val();
+    var alias     = mQuery(filterId).find("input.field_alias").val();
 
     //add wrapping div and add the template html
 
-    var container = $('<div />')
+    var container = mQuery('<div />')
         .addClass('filter-container')
         .appendTo(li);
 
     if (fieldType == 'country' || fieldType == 'timezone') {
-        container.html($('#filter-' + fieldType + '-template').html());
+        container.html(mQuery('#filter-' + fieldType + '-template').html());
     } else {
-        container.html($('#filter-template').html());
+        container.html(mQuery('#filter-template').html());
     }
-    $(container).find("input[name='leadlist[filters][field][]']").val(alias);
-    $(container).find("input[name='leadlist[filters][type][]']").val(fieldType);
+    mQuery(container).find("input[name='leadlist[filters][field][]']").val(alias);
+    mQuery(container).find("input[name='leadlist[filters][type][]']").val(fieldType);
 
     //give the value element a unique id
     var uniqid = "id_" + Date.now();
-    var filter = $(container).find("input[name='leadlist[filters][filter][]']");
+    var filter = mQuery(container).find("input[name='leadlist[filters][filter][]']");
     filter.attr('id', uniqid);
 
     //activate fields
     if (fieldType == 'lookup' || fieldType == 'select') {
-        var fieldCallback = $(filterId).find("input.field_callback").val();
+        var fieldCallback = mQuery(filterId).find("input.field_callback").val();
         if (fieldCallback) {
-            var fieldOptions = $(filterId).find("input.field_list").val();
+            var fieldOptions = mQuery(filterId).find("input.field_list").val();
             Mautic[fieldCallback](uniqid, alias, fieldOptions);
         }
     } else if (fieldType == 'datetime') {
@@ -279,12 +283,12 @@ Mautic.addLeadListFilter = function (elId) {
         });
     } else if (fieldType == 'lookup_id' || fieldType == 'boolean') {
         //switch the filter and display elements
-        var oldFilter = $(container).find("input[name='leadlist[filters][filter][]']");
+        var oldFilter = mQuery(container).find("input[name='leadlist[filters][filter][]']");
         var newDisplay = oldFilter.clone();
         newDisplay.attr('id', uniqid);
         newDisplay.attr('name', 'leadlist[filters][display][]');
 
-        var oldDisplay = $(container).find("input[name='leadlist[filters][display][]']");
+        var oldDisplay = mQuery(container).find("input[name='leadlist[filters][display][]']");
         var newFilter = oldDisplay.clone();
         newFilter.attr('id', uniqid + "_id");
         newFilter.attr('name', 'leadlist[filters][filter][]');
@@ -292,9 +296,9 @@ Mautic.addLeadListFilter = function (elId) {
         oldFilter.replaceWith(newFilter);
         oldDisplay.replaceWith(newDisplay);
 
-        var fieldCallback = $(filterId).find("input.field_callback").val();
+        var fieldCallback = mQuery(filterId).find("input.field_callback").val();
         if (fieldCallback) {
-            var fieldOptions = $(filterId).find("input.field_list").val();
+            var fieldOptions = mQuery(filterId).find("input.field_list").val();
             Mautic[fieldCallback](uniqid, alias, fieldOptions);
         }
     } else {
@@ -306,20 +310,20 @@ Mautic.leadfieldOnLoad = function (container) {
 
     var fixHelper = function(e, ui) {
         ui.children().each(function() {
-            $(this).width($(this).width());
+            mQuery(this).width(mQuery(this).width());
         });
         return ui;
     };
 
-    if ($(container + ' .leadfield-list').length) {
-        $(container + ' .leadfield-list tbody').sortable({
+    if (mQuery(container + ' .leadfield-list').length) {
+        mQuery(container + ' .leadfield-list tbody').sortable({
             handle: '.fa-ellipsis-v',
             helper: fixHelper,
             stop: function(i) {
-                $.ajax({
+                mQuery.ajax({
                     type: "POST",
-                    url: mauticBaseUrl + "ajax?action=lead:reorder",
-                    data: $(container + ' .leadfield-list tbody').sortable("serialize")});
+                    url: mauticAjaxUrl + "?action=lead:reorder",
+                    data: mQuery(container + ' .leadfield-list tbody').sortable("serialize")});
             }
         });
     }
@@ -327,39 +331,20 @@ Mautic.leadfieldOnLoad = function (container) {
 };
 
 /**
- * Filter leads by selected list
- * @param list
- */
-Mautic.filterLeadsByList = function(list) {
-    $('#list-search').typeahead('val', list);
-    var e = $.Event( "keypress", { which: 13 } );
-    e.data = {};
-    e.data.livesearch = true;
-    Mautic.filterList(
-        e,
-        'list-search',
-        $('#list-search').attr('data-action'),
-        $('#list-search').attr('data-target'),
-        'liveCache'
-    );
-    $('#filterByList').val('');
-};
-
-/**
  * Update the properties for field data types
  */
 Mautic.updateLeadFieldProperties = function(selectedVal) {
-    if ($('#field-templates .'+selectedVal).length) {
-        $('#leadfield_properties').html($('#field-templates .'+selectedVal).html());
+    if (mQuery('#field-templates .'+selectedVal).length) {
+        mQuery('#leadfield_properties').html(mQuery('#field-templates .'+selectedVal).html());
 
-        $("#leadfield_properties *[data-toggle='tooltip']").tooltip({html: true});
+        mQuery("#leadfield_properties *[data-toggle='tooltip']").tooltip({html: true});
     } else {
-        $('#leadfield_properties').html('');
+        mQuery('#leadfield_properties').html('');
     }
 
     if (selectedVal == 'time') {
-        $('#leadfield_isListable').closest('.row').addClass('hide');
+        mQuery('#leadfield_isListable').closest('.row').addClass('hide');
     } else {
-        $('#leadfield_isListable').closest('.row').removeClass('hide');
+        mQuery('#leadfield_isListable').closest('.row').removeClass('hide');
     }
 }

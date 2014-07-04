@@ -1,5 +1,6 @@
 var MauticVars = {};
-//window.localStorage.clear();
+var mQuery = jQuery.noConflict(true);
+
 //Fix for back/forward buttons not loading ajax content with History.pushState()
 MauticVars.manualStateChange = true;
 History.Adapter.bind(window, 'statechange', function () {
@@ -11,17 +12,18 @@ History.Adapter.bind(window, 'statechange', function () {
 });
 
 //live search vars
-MauticVars.liveCache = new Array();
-MauticVars.lastSearchStr = "";
-MauticVars.globalLivecache = new Array();
+MauticVars.liveCache            = new Array();
+MauticVars.lastSearchStr        = "";
+MauticVars.globalLivecache      = new Array();
 MauticVars.lastGlobalSearchStr  = "";
 
 //register the loading bar for ajax page loads
-MauticVars.showLoadingBar = true;
-$.ajaxSetup({
+MauticVars.showLoadingBar       = true;
+
+mQuery.ajaxSetup({
     beforeSend: function () {
         if (MauticVars.showLoadingBar) {
-            $("body").addClass("loading-content");
+            mQuery("body").addClass("loading-content");
         }
     },
     cache: false,
@@ -31,15 +33,15 @@ $.ajaxSetup({
             xhr.upload.addEventListener("progress", function (evt) {
                 if (evt.lengthComputable) {
                     var percentComplete = Math.round((evt.loaded / evt.total) * 100);
-                    $(".loading-bar .progress-bar").attr('aria-valuenow', percentComplete);
-                    $(".loading-bar .progress-bar").css('width', percentComplete + "%");
+                    mQuery(".loading-bar .progress-bar").attr('aria-valuenow', percentComplete);
+                    mQuery(".loading-bar .progress-bar").css('width', percentComplete + "%");
                 }
             }, false);
             xhr.addEventListener("progress", function (evt) {
                 if (evt.lengthComputable) {
                     var percentComplete = Math.round((evt.loaded / evt.total) * 100);
-                    $(".loading-bar .progress-bar").attr('aria-valuenow', percentComplete);
-                    $(".loading-bar .progress-bar").css('width', percentComplete + "%");
+                    mQuery(".loading-bar .progress-bar").attr('aria-valuenow', percentComplete);
+                    mQuery(".loading-bar .progress-bar").css('width', percentComplete + "%");
                 }
             }, false);
         }
@@ -48,9 +50,9 @@ $.ajaxSetup({
     complete: function () {
         if (MauticVars.showLoadingBar) {
             setTimeout(function () {
-                $("body").removeClass("loading-content");
-                $(".loading-bar .progress-bar").attr('aria-valuenow', 0);
-                $(".loading-bar .progress-bar").css('width', "0%");
+                mQuery("body").removeClass("loading-content");
+                mQuery(".loading-bar .progress-bar").attr('aria-valuenow', 0);
+                mQuery(".loading-bar .progress-bar").css('width', "0%");
             }, 500);
         } else {
             //change default back to show
@@ -67,78 +69,78 @@ var Mautic = {
         container = typeof container !== 'undefined' ? container : 'body';
 
         //initiate links
-        $(container + " a[data-toggle='ajax']").click(function (event) {
+        mQuery(container + " a[data-toggle='ajax']").on('click.ajax', function (event) {
             event.preventDefault();
 
             return Mautic.ajaxifyLink(this, event);
         });
 
         //initialize forms
-        $(container + " form[data-toggle='ajax']").each(function (index) {
-            Mautic.ajaxifyForm($(this).attr('name'));
+        mQuery(container + " form[data-toggle='ajax']").each(function (index) {
+            Mautic.ajaxifyForm(mQuery(this).attr('name'));
         });
 
-        $(container + " *[data-toggle='livesearch']").each(function (index) {
-            Mautic.activateLiveSearch($(this), "lastSearchStr", "liveCache");
+        mQuery(container + " *[data-toggle='livesearch']").each(function (index) {
+            Mautic.activateLiveSearch(mQuery(this), "lastSearchStr", "liveCache");
         });
 
         //initialize tooltips
-        $(container + " *[data-toggle='tooltip']").tooltip({html: true, container: 'body'});
+        mQuery(container + " *[data-toggle='tooltip']").tooltip({html: true, container: 'body'});
 
         //initialize sortable lists
-        $(container + " *[data-toggle='sortablelist']").each(function (index) {
-            var prefix = $(this).attr('data-prefix');
+        mQuery(container + " *[data-toggle='sortablelist']").each(function (index) {
+            var prefix = mQuery(this).attr('data-prefix');
 
-            if ($('#' + prefix + '_additem').length) {
-                $('#' + prefix + '_additem').click(function () {
-                    var count = $('#' + prefix + '_itemcount').val();
-                    var prototype = $('#' + prefix + '_additem').attr('data-prototype');
+            if (mQuery('#' + prefix + '_additem').length) {
+                mQuery('#' + prefix + '_additem').click(function () {
+                    var count = mQuery('#' + prefix + '_itemcount').val();
+                    var prototype = mQuery('#' + prefix + '_additem').attr('data-prototype');
                     prototype = prototype.replace(/__name__/g, count);
-                    $(prototype).appendTo($('#' + prefix + '_list div.list-sortable'));
-                    $('#' + prefix + '_list_' + count).focus();
+                    mQuery(prototype).appendTo(mQuery('#' + prefix + '_list div.list-sortable'));
+                    mQuery('#' + prefix + '_list_' + count).focus();
                     count++;
-                    $('#' + prefix + '_itemcount').val(count);
+                    mQuery('#' + prefix + '_itemcount').val(count);
                     return false;
                 });
             }
 
-            $('#' + prefix + '_list div.list-sortable').sortable({
+            mQuery('#' + prefix + '_list div.list-sortable').sortable({
                 items: 'div.sortable',
                 handle: 'span.postaddon',
                 stop: function (i) {
                     var order = 0;
-                    $('#' + prefix + '_list div.list-sortable div.input-group input').each(function () {
-                        var name = $(this).attr('name');
+                    mQuery('#' + prefix + '_list div.list-sortable div.input-group input').each(function () {
+                        var name = mQuery(this).attr('name');
                         name = name.replace(/\[list\]\[(.+)\]$/g, '') + '[list][' + order + ']';
-                        $(this).attr('name', name);
+                        mQuery(this).attr('name', name);
                         order++;
                     });
                 }
             });
         });
 
-        $(container + " a[data-toggle='download']").click(function (event) {
+        mQuery(container + " a[data-toggle='download']").on('click.download', function (event) {
             event.preventDefault();
 
-            var link = $(event.target).attr('href');
+            var link = mQuery(event.target).attr('href');
 
             //initialize download links
-            var iframe = $("<iframe/>").attr({
+            var iframe = mQuery("<iframe/>").attr({
                 src: link,
                 style: "visibility:hidden;display:none"
-            }).appendTo($('body'));
+            }).appendTo(mQuery('body'));
         });
 
         //little hack to move modal windows outside of positioned divs
-        $(container + " *[data-toggle='modal']").each(function (index) {
-            var target = $(this).attr('data-target');
-            $(target).on('show.bs.modal', function () {
-                $(target).appendTo("body");
+        mQuery(container + " *[data-toggle='modal']").each(function (index) {
+            var target = mQuery(this).attr('data-target');
+            mQuery(target).on('show.bs.modal', function () {
+                mQuery(target).appendTo("body");
             });
         });
 
         //initialize date/time
-        $(container + " *[data-toggle='datetime']").datetimepicker({
+        mQuery(container + " *[data-toggle='datetime']").datetimepicker({
             format: 'Y-m-d H:i',
             lazyInit: true,
             validateOnBlur: false,
@@ -146,7 +148,7 @@ var Mautic = {
             scrollInput: false
         });
 
-        $(container + " *[data-toggle='date']").datetimepicker({
+        mQuery(container + " *[data-toggle='date']").datetimepicker({
             timepicker: false,
             format: 'Y-m-d',
             lazyInit: true,
@@ -156,7 +158,7 @@ var Mautic = {
             closeOnDateSelect: true
         });
 
-        $(container + " *[data-toggle='time']").datetimepicker({
+        mQuery(container + " *[data-toggle='time']").datetimepicker({
             datepicker: false,
             format: 'H:i',
             lazyInit: true,
@@ -166,45 +168,50 @@ var Mautic = {
         });
 
         //Set the height of containers
-        var windowHeight = $(window).height() - 175;
-        $(container + ' .auto-height').each(function (index) {
+        var windowHeight = mQuery(window).height() - 175;
+        mQuery(container + ' .auto-height').each(function (index) {
             //set height of divs
-            $(this).css('height', windowHeight + 'px');
-        });
-
-        //Activate editors
-        $(container + " textarea[data-toggle='editor']").each(function (index) {
-            $(this).tinymce({
-                theme: "modern",
-                height: 300,
-                editor_deselector: "mceNoEditor",
-                plugins: [
-                    "advlist autolink link image lists charmap print preview hr anchor pagebreak spellchecker",
-                    "searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking",
-                    "save table contextmenu directionality emoticons template paste textcolor"
-                ],
-                toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | print preview media fullpage | forecolor backcolor emoticons"
-            });
+            mQuery(this).css('height', windowHeight + 'px');
         });
 
         //Copy form buttons to the toolbar
-        if ($(container + " .bottom-form-buttons").length) {
+        if (mQuery(container + " .bottom-form-buttons").length) {
             //hide the toolbar actions if applicable
-            $('.toolbar-action-buttons').addClass('hide');
+            mQuery('.toolbar-action-buttons').addClass('hide');
 
-            var buttons = $(container + " .bottom-form-buttons").html();
-            $(buttons).filter("button").each(function(i, v) {
+            //hide the bottom buttons
+            mQuery('.bottom-form-buttons').addClass('hide');
+            var buttons = mQuery(container + " .bottom-form-buttons").html();
+            mQuery(buttons).filter("button").each(function(i, v) {
                 //get the ID
-                var id = $(this).attr('id');
-                $(this).attr('id', '');
-                $(this).attr('name', '');
-                $(this).appendTo('.toolbar-form-buttons');
-                $(this).click( function(event) {
-                    event.preventDefault();
-                    $('#' + id).click();
-                });
+                var id = mQuery(this).attr('id');
+                var button = mQuery("<button type='button' />")
+                    .addClass(mQuery(this).attr('class'))
+                    .html(mQuery(this).html())
+                    .appendTo('.toolbar-form-buttons')
+                    .click( function(event) {
+                        event.preventDefault();
+                        mQuery('#' + id).click();
+                    });
             });
         }
+
+        //Activate hidden shelves
+        mQuery(container + ' .hidden-shelf').each(function(index) {
+            var shelf    = mQuery(this);
+            var handle   = mQuery(this).find('.shelf-handle').first();
+            var contents = mQuery(this).find('.shelf-contents').first();
+
+            mQuery(handle).on('click.shelf', function(event) {
+                if (mQuery(contents).css('display') == 'block') {
+                    mQuery(handle).find('i').removeClass('fa-chevron-circle-up').addClass('fa-chevron-circle-down')
+                    mQuery(contents).slideUp();
+                } else {
+                    mQuery(handle).find('i').removeClass('fa-chevron-circle-down').addClass('fa-chevron-circle-up')
+                    mQuery(contents).slideDown();
+                }
+            });
+        });
 
         //run specific on loads
         if (typeof Mautic[mauticContent + "OnLoad"] == 'function') {
@@ -217,12 +224,12 @@ var Mautic = {
                 datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
                 queryTokenizer: Bloodhound.tokenizers.whitespace,
                 prefetch: {
-                    url: mauticBaseUrl + "ajax?action=globalCommandList"
+                    url: mauticAjaxUrl + "?action=globalCommandList"
                 }
             });
             engine.initialize();
 
-            $('#global_search').typeahead({
+            mQuery('#global_search').typeahead({
                     hint: true,
                     highlight: true,
                     minLength: 0,
@@ -236,11 +243,15 @@ var Mautic = {
             ).on('typeahead:selected', function (event, datum) {
                 //force live search update
                 MauticVars.lastGlobalSearchStr = '';
-                $('#global_search').keyup();
+                mQuery('#global_search').keyup();
             }).on('typeahead:autocompleted', function (event, datum) {
                 //force live search update
                 MauticVars.lastGlobalSearchStr = '';
-                $('#global_search').keyup();
+                mQuery('#global_search').keyup();
+            }).on('keypress', function (event) {
+                if ((event.keyCode || event.which) == 13) {
+                    mQuery('#global_search').typeahead('close');
+                }
             });
 
             Mautic.activateLiveSearch("#global_search", "lastGlobalSearchStr", "globalLivecache");
@@ -254,11 +265,11 @@ var Mautic = {
         //unload tooltips so they don't double show
         container = typeof container !== 'undefined' ? container : 'body';
 
-        $(container + " *[data-toggle='tooltip']").tooltip('destroy');
+        mQuery(container + " *[data-toggle='tooltip']").tooltip('destroy');
 
         //unload tinymce editor so that it can be reloaded if needed with new ajax content
-        $(container + " textarea[data-toggle='editor']").each(function (index) {
-            $(this).tinymce().remove();
+        mQuery(container + " textarea[data-toggle='editor']").each(function (index) {
+            mQuery(this).tinymce().remove();
         });
 
         //run specific unloads
@@ -281,17 +292,10 @@ var Mautic = {
 
         //little animation to let the user know that something is happening
         if (typeof event != 'undefined' && event.target) {
-            var hasBtn = $(event.target).hasClass('btn');
-            var hasIcon = $(event.target).hasClass('fa');
-            if ((hasBtn && $(event.target).find('i.fa').length) || hasIcon) {
-                MauticVars.iconButton = (hasIcon) ? event.target :  $(event.target).find('i.fa').first();
-                MauticVars.iconClassesRemoved = $(MauticVars.iconButton).attr('class');
-                $(MauticVars.iconButton).removeClass();
-                $(MauticVars.iconButton).addClass('fa fa-spinner fa-spin');
-            }
+            Mautic.startIconSpinOnEvent(event);
         }
 
-        $.ajax({
+        mQuery.ajax({
             url: route,
             type: method,
             dataType: "json",
@@ -314,20 +318,14 @@ var Mautic = {
                             response.activeLink = link;
                         }
 
-                        if ($(".page-wrapper").hasClass("right-active")) {
-                            $(".page-wrapper").removeClass("right-active");
+                        if (mQuery(".page-wrapper").hasClass("right-active")) {
+                            mQuery(".page-wrapper").removeClass("right-active");
                         }
                         Mautic.processPageContent(response);
                     }
 
                     //restore button class if applicable
-                    if (typeof MauticVars.iconClassesRemoved != 'undefined') {
-                        if ($(MauticVars.iconButton).hasClass('fa-spin')) {
-                            $(MauticVars.iconButton).removeClass('fa fa-spinner fa-spin').addClass(MauticVars.iconClassesRemoved);
-                        }
-                        delete MauticVars.iconButton;
-                        delete MauticVars.iconClassesRemoved;
-                    }
+                    Mautic.stopIconSpinPostEvent();
                 }
             },
             error: function (request, textStatus, errorThrown) {
@@ -336,8 +334,47 @@ var Mautic = {
         });
 
         //prevent firing of href link
-        //$(link).attr("href", "javascript: void(0)");
+        //mQuery(link).attr("href", "javascript: void(0)");
         return false;
+    },
+
+    /**
+     * Just a little visual that an action is taking place
+     * @param event
+     */
+    startIconSpinOnEvent: function (event)
+    {
+        var hasBtn = mQuery(event.target).hasClass('btn');
+        var hasIcon = mQuery(event.target).hasClass('fa');
+        if ((hasBtn && mQuery(event.target).find('i.fa').length) || hasIcon) {
+            MauticVars.iconButton = (hasIcon) ? event.target :  mQuery(event.target).find('i.fa').first();
+            MauticVars.iconClassesRemoved = mQuery(MauticVars.iconButton).attr('class');
+            var specialClasses = ['fa-fw', 'fa-lg', 'fa-2x', 'fa-3x', 'fa-4x', 'fa-5x', 'fa-li'];
+            var appendClasses  = "";
+
+            //check for special classes to add to spinner
+            for (var i=0; i<specialClasses.length; i++) {
+                if (mQuery(MauticVars.iconButton).hasClass(specialClasses[i])) {
+                    appendClasses += " " + specialClasses[i];
+                }
+            }
+            mQuery(MauticVars.iconButton).removeClass();
+            mQuery(MauticVars.iconButton).addClass('fa fa-spinner fa-spin' + appendClasses);
+        }
+    },
+
+    /**
+     * Stops the icon spinning after an event is complete
+     */
+    stopIconSpinPostEvent: function()
+    {
+        if (typeof MauticVars.iconClassesRemoved != 'undefined') {
+            if (mQuery(MauticVars.iconButton).hasClass('fa-spin')) {
+                mQuery(MauticVars.iconButton).removeClass('fa fa-spinner fa-spin').addClass(MauticVars.iconClassesRemoved);
+            }
+            delete MauticVars.iconButton;
+            delete MauticVars.iconClassesRemoved;
+        }
     },
 
     /**
@@ -345,21 +382,21 @@ var Mautic = {
      * @param link
      */
     toggleSubMenu: function (link, event) {
-        if ($(link).length) {
+        if (mQuery(link).length) {
             //get the parent li element
-            var parent = $(link).parent();
-            var child = $(parent).find("ul").first();
+            var parent = mQuery(link).parent();
+            var child = mQuery(parent).find("ul").first();
             if (child.length) {
                 var toggle = event.target;
 
                 if (child.hasClass("subnav-closed")) {
                     //open the submenu
                     child.removeClass("subnav-closed").addClass("subnav-open");
-                    $(toggle).removeClass("fa-toggle-left").addClass("fa-toggle-down");
+                    mQuery(toggle).removeClass("fa-toggle-left").addClass("fa-toggle-down");
                 } else if (child.hasClass("subnav-open")) {
                     //close the submenu
                     child.removeClass("subnav-open").addClass("subnav-closed");
-                    $(toggle).removeClass("fa-toggle-down").addClass("fa-toggle-left");
+                    mQuery(toggle).removeClass("fa-toggle-down").addClass("fa-toggle-left");
                 }
             }
         }
@@ -373,7 +410,7 @@ var Mautic = {
     postForm: function (form, callback) {
         var action = form.attr('action');
        // var ajaxRoute = action + ((/\?/i.test(action)) ? "&ajax=1" : "?ajax=1");
-        $.ajax({
+        mQuery.ajax({
             type: form.attr('method'),
             url: action,
             data: form.serialize(),
@@ -414,41 +451,41 @@ var Mautic = {
             //set content
             if (response.newContent) {
                 if (response.replaceContent) {
-                    $(response.target).replaceWith(response.newContent);
+                    mQuery(response.target).replaceWith(response.newContent);
                 } else {
-                    $(response.target).html(response.newContent);
+                    mQuery(response.target).html(response.newContent);
                 }
             }
 
             //update breadcrumbs
             if (response.breadcrumbs) {
-                $(".main-panel-breadcrumbs").html(response.breadcrumbs);
+                mQuery(".main-panel-breadcrumbs").html(response.breadcrumbs);
             }
 
             //update latest flashes
             if (response.flashes) {
-                $(".main-panel-flash-msgs").html(response.flashes);
+                mQuery(".main-panel-flash-msgs").html(response.flashes);
 
                 //ajaxify links
-                $(".main-panel-flash-msgs a[data-toggle='ajax']").click(function (event) {
+                mQuery(".main-panel-flash-msgs a[data-toggle='ajax']").click(function (event) {
                     event.preventDefault();
 
                     return Mautic.ajaxifyLink(this, event);
                 });
-
-                window.setTimeout(function() {
-                    $(".main-panel-flash-msgs .alert").fadeTo(500, 0).slideUp(500, function(){
-                        $(this).remove();
-                    });
-                }, 10000);
             }
+
+            window.setTimeout(function() {
+                mQuery(".main-panel-flash-msgs .alert").fadeTo(500, 0).slideUp(500, function(){
+                    mQuery(this).remove();
+                });
+            }, 7000);
 
             if (response.activeLink) {
                 //remove current classes from menu items
-                $(".side-panel-nav").find(".current").removeClass("current");
+                mQuery(".side-panel-nav").find(".current").removeClass("current");
 
                 //remove ancestor classes
-                $(".side-panel-nav").find(".current_ancestor").removeClass("current_ancestor");
+                mQuery(".side-panel-nav").find(".current_ancestor").removeClass("current_ancestor");
 
                 var link = response.activeLink;
                 if (link !== undefined && link.charAt(0) != '#') {
@@ -456,28 +493,28 @@ var Mautic = {
                 }
 
                 //add current class
-                var parent = $(link).parent();
-                $(parent).addClass("current");
+                var parent = mQuery(link).parent();
+                mQuery(parent).addClass("current");
 
                 //add current_ancestor classes
-                $(parent).parentsUntil(".side-panel-nav", "li").addClass("current_ancestor");
+                mQuery(parent).parentsUntil(".side-panel-nav", "li").addClass("current_ancestor");
             }
 
             //close sidebar if necessary
-            if ($(".left-side-bar-pin i").hasClass("unpinned") && !$(".page-wrapper").hasClass("hide-left")) {
-                $(".page-wrapper").addClass("hide-left");
+            if (mQuery(".left-side-bar-pin i").hasClass("unpinned") && !mQuery(".page-wrapper").hasClass("hide-left")) {
+                mQuery(".page-wrapper").addClass("hide-left");
             }
 
             //scroll to the top
             if (response.target == '.main-panel-content') {
-                $('.main-panel-wrapper').animate({
+                mQuery('.main-panel-wrapper').animate({
                     scrollTop: 0
                 }, 0);
             } else {
-                var overflow = $(response.target).css('overflow');
-                var overflowY = $(response.target).css('overflowY');
+                var overflow = mQuery(response.target).css('overflow');
+                var overflowY = mQuery(response.target).css('overflowY');
                 if (overflow == 'auto' || overflow == 'scroll' || overflowY == 'auto' || overflowY == 'scroll') {
-                    $(response.target).animate({
+                    mQuery(response.target).animate({
                         scrollTop: 0
                     }, 0);
                 }
@@ -493,29 +530,41 @@ var Mautic = {
      * @param form
      */
     ajaxifyForm: function (formName) {
+        //prevent enter submitting form and instead jump to next line
+        mQuery('form[name="' + formName + '"] input').keydown(function (e) {
+            if (e.keyCode == 13) {
+                var inputs = mQuery(this).parents("form").eq(0).find(":input");
+                if (inputs[inputs.index(this) + 1] != null) {
+                    inputs[inputs.index(this) + 1].focus();
+                }
+                e.preventDefault();
+                return false;
+            }
+        });
+
         //activate the submit buttons so symfony knows which were clicked
-        $('form[name="' + formName + '"] :submit').each(function () {
-            $(this).click(function () {
-                if ($(this).attr('name')) {
-                    $('form[name="' + formName + '"]').append(
-                        $("<input type='hidden'>").attr({
-                            name: $(this).attr('name'),
-                            value: $(this).attr('value') })
+        mQuery('form[name="' + formName + '"] :submit').each(function () {
+            mQuery(this).click(function () {
+                if (mQuery(this).attr('name')) {
+                    mQuery('form[name="' + formName + '"]').append(
+                        mQuery("<input type='hidden'>").attr({
+                            name: mQuery(this).attr('name'),
+                            value: mQuery(this).attr('value') })
                     );
                 }
 
                 //give an ajaxified form the option of not displaying the global loading bar
-                var loading = $(this).attr('data-hide-loadingbar');
+                var loading = mQuery(this).attr('data-hide-loadingbar');
                 if (loading) {
                     MauticVars.showLoadingBar = false;
                 }
             });
         });
         //activate the forms
-        $('form[name="' + formName + '"]').submit(function (e) {
+        mQuery('form[name="' + formName + '"]').submit(function (e) {
             e.preventDefault();
 
-            Mautic.postForm($(this), function (response) {
+            Mautic.postForm(mQuery(this), function (response) {
                 Mautic.processPageContent(response);
             });
 
@@ -525,30 +574,30 @@ var Mautic = {
 
     ajaxifyLink: function (el, event) {
         //prevent leaving if currently in a form
-        if ($(".prevent-nonsubmit-form-exit").length) {
-            if ($(el).attr('data-ignore-formexit') != 'true') {
-                Mautic.showConfirmation($(".prevent-nonsubmit-form-exit").val());
+        if (mQuery(".prevent-nonsubmit-form-exit").length) {
+            if (mQuery(el).attr('data-ignore-formexit') != 'true') {
+                Mautic.showConfirmation(mQuery(".prevent-nonsubmit-form-exit").val());
                 return false;
             }
         }
 
-        var route = $(el).attr('href');
+        var route = mQuery(el).attr('href');
         if (route.indexOf('javascript')>=0) {
             return false;
         }
 
-        var link = $(el).attr('data-menu-link');
+        var link = mQuery(el).attr('data-menu-link');
         if (link !== undefined && link.charAt(0) != '#') {
             link = "#" + link;
         }
 
-        var method = $(el).attr('data-method');
+        var method = mQuery(el).attr('data-method');
         if (!method) {
             method = 'GET'
         }
 
         //give an ajaxified link the option of not displaying the global loading bar
-        var loading = $(el).attr('data-hide-loadingbar');
+        var loading = mQuery(el).attr('data-hide-loadingbar');
         if (loading) {
             MauticVars.showLoadingBar = false;
         }
@@ -564,34 +613,34 @@ var Mautic = {
         //spring the right panel back into place after clicking elsewhere
         if (position == "right") {
             //toggle active state
-            $(".page-wrapper").toggleClass("right-active");
+            mQuery(".page-wrapper").toggleClass("right-active");
             //prevent firing event multiple times if directly toggling the panel
-            $(".main-panel-wrapper").off("click");
-            $(".main-panel-wrapper").click(function (e) {
+            mQuery(".main-panel-wrapper").off("click");
+            mQuery(".main-panel-wrapper").click(function (e) {
                 e.preventDefault();
-                if ($(".page-wrapper").hasClass("right-active")) {
-                    $(".page-wrapper").removeClass("right-active");
+                if (mQuery(".page-wrapper").hasClass("right-active")) {
+                    mQuery(".page-wrapper").removeClass("right-active");
                 }
                 //prevent firing event multiple times
-                $(".main-panel-wrapper").off("click");
+                mQuery(".main-panel-wrapper").off("click");
             });
 
-            $(".top-panel").off("click");
-            $(".top-panel").click(function (e) {
-                if (!$(e.target).parents('.panel-toggle').length) {
+            mQuery(".top-panel").off("click");
+            mQuery(".top-panel").click(function (e) {
+                if (!mQuery(e.target).parents('.panel-toggle').length) {
                     //dismiss the panel if clickng anywhere in the top panel except the toggle button
                     e.preventDefault();
-                    if ($(".page-wrapper").hasClass("right-active")) {
-                        $(".page-wrapper").removeClass("right-active");
+                    if (mQuery(".page-wrapper").hasClass("right-active")) {
+                        mQuery(".page-wrapper").removeClass("right-active");
                     }
                     //prevent firing event multiple times
-                    $(".top-panel").off("click");
+                    mQuery(".top-panel").off("click");
                 }
             });
 
         } else {
             //toggle hidden state
-            $(".page-wrapper").toggleClass("hide-left");
+            mQuery(".page-wrapper").toggleClass("hide-left");
         }
     },
 
@@ -601,39 +650,39 @@ var Mautic = {
      */
     stickSidePanel: function (position) {
         var query = "action=togglePanel&panel=" + position;
-        $.ajax({
-            url: mauticBaseUrl + "ajax",
+        mQuery.ajax({
+            url: mauticAjaxUrl,
             type: "POST",
             data: query,
             dataType: "json"
         });
 
         if (position == "left") {
-            $(".left-side-bar-pin i").toggleClass("unpinned");
+            mQuery(".left-side-bar-pin i").toggleClass("unpinned");
 
             //auto collapse the left side panel
-            if ($(".left-side-bar-pin i").hasClass("unpinned")) {
+            if (mQuery(".left-side-bar-pin i").hasClass("unpinned")) {
                 //prevent firing event multiple times if directly toggling the panel
-                $(".main-panel-wrapper").off("click");
-                $(".main-panel-wrapper").click(function (e) {
+                mQuery(".main-panel-wrapper").off("click");
+                mQuery(".main-panel-wrapper").click(function (e) {
                     e.preventDefault();
-                    if (!$(".page-wrapper").hasClass("hide-left")) {
-                        $(".page-wrapper").addClass("hide-left");
+                    if (!mQuery(".page-wrapper").hasClass("hide-left")) {
+                        mQuery(".page-wrapper").addClass("hide-left");
                     }
                     //prevent firing event multiple times
-                    $(".main-panel-wrapper").off("click");
+                    mQuery(".main-panel-wrapper").off("click");
                 });
 
-                $(".top-panel").off("click");
-                $(".top-panel").click(function (e) {
-                    if (!$(e.target).parents('.panel-toggle').length) {
+                mQuery(".top-panel").off("click");
+                mQuery(".top-panel").click(function (e) {
+                    if (!mQuery(e.target).parents('.panel-toggle').length) {
                         //dismiss the panel if clickng anywhere in the top panel except the toggle button
                         e.preventDefault();
-                        if (!$(".page-wrapper").hasClass("hide-left")) {
-                            $(".page-wrapper").addClass("hide-left");
+                        if (!mQuery(".page-wrapper").hasClass("hide-left")) {
+                            mQuery(".page-wrapper").addClass("hide-left");
                         }
                         //prevent firing event multiple times
-                        $(".top-panel").off("click");
+                        mQuery(".top-panel").off("click");
                     }
                 });
             }
@@ -661,10 +710,10 @@ var Mautic = {
             confirmAction = 'dismissConfirmation';
         }
 
-        var confirmContainer = $("<div />").attr({ "class": "confirmation-modal" });
-        var confirmInnerDiv = $("<div />").attr({ "class": "confirmation-inner-wrapper"});
-        var confirmMsgSpan = $("<span />").css("display", "block").html(msg);
-        var confirmButton = $('<button type="button" />')
+        var confirmContainer = mQuery("<div />").attr({ "class": "confirmation-modal" });
+        var confirmInnerDiv = mQuery("<div />").attr({ "class": "confirmation-inner-wrapper"});
+        var confirmMsgSpan = mQuery("<span />").css("display", "block").html(msg);
+        var confirmButton = mQuery('<button type="button" />')
             .addClass("btn btn-danger btn-xs")
             .css("marginRight", "5px")
             .css("marginLeft", "5px")
@@ -675,7 +724,7 @@ var Mautic = {
             })
             .html(confirmText);
         if (cancelText) {
-            var cancelButton = $('<button type="button" />')
+            var cancelButton = mQuery('<button type="button" />')
                 .addClass("btn btn-primary btn-xs")
                 .click(function () {
                     if (typeof Mautic[cancelAction] === "function") {
@@ -693,15 +742,15 @@ var Mautic = {
         }
 
         confirmContainer.append(confirmInnerDiv);
-        $('body').append(confirmContainer)
+        mQuery('body').append(confirmContainer)
     },
 
     /**
      * Dismiss confirmation modal
      */
     dismissConfirmation: function () {
-        if ($('.confirmation-modal').length) {
-            $('.confirmation-modal').remove();
+        if (mQuery('.confirmation-modal').length) {
+            mQuery('.confirmation-modal').remove();
         }
     },
 
@@ -712,8 +761,8 @@ var Mautic = {
      */
     reorderTableData: function (name, orderby, tmpl, target) {
         var query = "action=setTableOrder&name=" + name + "&orderby=" + orderby;
-        $.ajax({
-            url: mauticBaseUrl + 'ajax',
+        mQuery.ajax({
+            url: mauticAjaxUrl,
             type: "POST",
             data: query,
             dataType: "json",
@@ -739,8 +788,8 @@ var Mautic = {
      */
     filterTableData: function (name, filterby, filterValue, tmpl, target) {
         var query = "action=setTableFilter&name=" + name + "&filterby=" + filterby + "&value=" + filterValue;
-        $.ajax({
-            url: mauticBaseUrl + 'ajax',
+        mQuery.ajax({
+            url: mauticAjaxUrl,
             type: "POST",
             data: query,
             dataType: "json",
@@ -758,8 +807,8 @@ var Mautic = {
 
     limitTableData: function (name, limit, tmpl, target) {
         var query = "action=setTableLimit&name=" + name + "&limit=" + limit;
-        $.ajax({
-            url: mauticBaseUrl + 'ajax',
+        mQuery.ajax({
+            url: mauticAjaxUrl,
             type: "POST",
             data: query,
             dataType: "json",
@@ -781,7 +830,7 @@ var Mautic = {
     executeAction: function (action, menuLink) {
         //dismiss modal if activated
         Mautic.dismissConfirmation();
-        $.ajax({
+        mQuery.ajax({
             url: action,
             type: "POST",
             dataType: "json",
@@ -798,8 +847,8 @@ var Mautic = {
      * Shows the search search input in an search list
      */
     showSearchInput: function () {
-        if ($('.toolbar').length) {
-            $('.toolbar').addClass('show-search').removeClass('hide-search');
+        if (mQuery('.toolbar').length) {
+            mQuery('.toolbar').addClass('show-search').removeClass('hide-search');
         }
     },
 
@@ -807,8 +856,8 @@ var Mautic = {
      * Hides the search search input in an search list
      */
     hideSearchInput: function (elId) {
-        if ($('.toolbar').length && $('#' + elId).length && !$('#' + elId).val() && !$('#' + elId).is(":focus")) {
-            $('.toolbar').addClass('hide-search').removeClass('show-search');
+        if (mQuery('.toolbar').length && mQuery('#' + elId).length && !mQuery('#' + elId).val() && !mQuery('#' + elId).is(":focus")) {
+            mQuery('.toolbar').addClass('hide-search').removeClass('show-search');
         }
     },
 
@@ -818,19 +867,19 @@ var Mautic = {
      * @param modelName
      */
     activateSearchAutocomplete: function (elId, modelName) {
-        if ($('#' + elId).length) {
-            var livesearch = ($('#' + elId).attr("data-toggle=['livesearch']")) ? true : false;
+        if (mQuery('#' + elId).length) {
+            var livesearch = (mQuery('#' + elId).attr("data-toggle=['livesearch']")) ? true : false;
 
             var engine = new Bloodhound({
                 datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
                 queryTokenizer: Bloodhound.tokenizers.whitespace,
                 prefetch: {
-                    url: mauticBaseUrl + "ajax?action=commandList&model=" + modelName
+                    url: mauticAjaxUrl + "?action=commandList&model=" + modelName
                 }
             });
             engine.initialize();
 
-            $('#' + elId).typeahead({
+            mQuery('#' + elId).typeahead({
                     hint: true,
                     highlight: true,
                     minLength: 0,
@@ -845,63 +894,71 @@ var Mautic = {
                 if (livesearch) {
                     //force live search update,
                     MauticVars.lastSearchStr = '';
-                    $('#' + elId).keyup();
+                    mQuery('#' + elId).keyup();
                 }
             }).on('typeahead:autocompleted', function (event, datum) {
                 if (livesearch) {
                     //force live search update
                     MauticVars.lastSearchStr = '';
-                    $('#' + elId).keyup();
+                    mQuery('#' + elId).keyup();
+                }
+            }).on('keypress', function (event) {
+                if ((event.keyCode || event.which) == 13) {
+                    mQuery('#' + elId).typeahead('close');
                 }
             });
         }
     },
 
     activateLiveSearch: function(el, searchStrVar, liveCacheVar) {
-        $(el).on('keyup', {}, function (event) {
-            var searchStr = $(el).val().trim();
+        mQuery(el).on('keyup', {}, function (event) {
+            var searchStr = mQuery(el).val().trim();
             var diff = searchStr.length - MauticVars[searchStrVar].length;
-            var overlay = $('<div />', {"class": "content-overlay"}).html($(el).attr('data-overlay-text'));
-            if ($(el).attr('data-overlay-background')) {
-                overlay.css('background', $(el).attr('data-overlay-background'));
+            var overlay = mQuery('<div />', {"class": "content-overlay"}).html(mQuery(el).attr('data-overlay-text'));
+            if (mQuery(el).attr('data-overlay-background')) {
+                overlay.css('background', mQuery(el).attr('data-overlay-background'));
             }
-            if ($(el).attr('data-overlay-color')) {
-                overlay.css('color', $(el).attr('data-overlay-color'));
+            if (mQuery(el).attr('data-overlay-color')) {
+                overlay.css('color', mQuery(el).attr('data-overlay-color'));
             }
-            var target = $(el).attr('data-target');
+            var target = mQuery(el).attr('data-target');
             if (
-                searchStr in MauticVars[liveCacheVar] ||
-                diff >= 3 ||
-                event.which == 32 || event.keyCode == 32 ||
-                event.which == 13 || event.keyCode == 13
+                !MauticVars.searchIsActive &&
+                (
+                    searchStr in MauticVars[liveCacheVar] ||
+                    diff >= 3 ||
+                    event.which == 32 || event.keyCode == 32 ||
+                    event.which == 13 || event.keyCode == 13
+                )
             ) {
-                $(target + ' .content-overlay').remove();
+                MauticVars.searchIsActive = true;
+                mQuery(target + ' .content-overlay').remove();
                 MauticVars[searchStrVar] = searchStr;
                 event.data.livesearch = true;
-                Mautic.filterList(event, $(el).attr('id'), $(el).attr('data-action'), target, liveCacheVar);
+                Mautic.filterList(event, mQuery(el).attr('id'), mQuery(el).attr('data-action'), target, liveCacheVar);
             } else {
-                if (!$(target + ' .content-overlay').length) {
-                    $(target).prepend(overlay);
+                if (!mQuery(target + ' .content-overlay').length) {
+                    mQuery(target).prepend(overlay);
                 }
             }
         });
         //find associated button
-        var btn = "button[data-livesearch-parent='" + $(el).attr('id') + "']";
-        if ($(btn).length) {
-            if ($(el).val()) {
-                $(btn).attr('data-livesearch-action', 'clear');
-                $(btn + ' i').removeClass('fa-search').addClass('fa-eraser');
+        var btn = "button[data-livesearch-parent='" + mQuery(el).attr('id') + "']";
+        if (mQuery(btn).length) {
+            if (mQuery(el).val()) {
+                mQuery(btn).attr('data-livesearch-action', 'clear');
+                mQuery(btn + ' i').removeClass('fa-search').addClass('fa-eraser');
             } else {
-                $(btn).attr('data-livesearch-action', 'search');
-                $(btn + ' i').removeClass('fa-eraser').addClass('fa-search');
+                mQuery(btn).attr('data-livesearch-action', 'search');
+                mQuery(btn + ' i').removeClass('fa-eraser').addClass('fa-search');
             }
-            $(btn).on('click', {'parent': $(el).attr('id')}, function (event) {
+            mQuery(btn).on('click', {'parent': mQuery(el).attr('id')}, function (event) {
                 Mautic.filterList(event,
                     event.data.parent,
-                    $('#' + event.data.parent).attr('data-action'),
-                    $('#' + event.data.parent).attr('data-target'),
+                    mQuery('#' + event.data.parent).attr('data-action'),
+                    mQuery('#' + event.data.parent).attr('data-target'),
                     'liveCache',
-                    $(this).attr('data-livesearch-action')
+                    mQuery(this).attr('data-livesearch-action')
                 );
             });
         }
@@ -915,9 +972,9 @@ var Mautic = {
             liveCacheVar = "liveCache";
         }
 
-        var el = $('#' + elId);
+        var el = mQuery('#' + elId);
         //only submit if the element exists, its a livesearch, or on button click
-        if (el.length && (e.data.livesearch || $(e.target).prop("tagName") == 'BUTTON')) {
+        if (el.length && (e.data.livesearch || mQuery(e.target).prop("tagName") == 'BUTTON')) {
             var value = el.val().trim();
             //should the content be cleared?
             if (!value) {
@@ -931,13 +988,13 @@ var Mautic = {
 
             //update the buttons class and action
             var btn = "button[data-livesearch-parent='" + elId + "']";
-            if ($(btn).length) {
+            if (mQuery(btn).length) {
                 if (action == 'clear') {
-                    $(btn).attr('data-livesearch-action', 'search');
-                    $(btn).children('i').first().removeClass('fa-eraser').addClass('fa-search');
+                    mQuery(btn).attr('data-livesearch-action', 'search');
+                    mQuery(btn).children('i').first().removeClass('fa-eraser').addClass('fa-search');
                 } else {
-                    $(btn).attr('data-livesearch-action', 'clear');
-                    $(btn).children('i').first().removeClass('fa-search').addClass('fa-eraser');
+                    mQuery(btn).attr('data-livesearch-action', 'clear');
+                    mQuery(btn).children('i').first().removeClass('fa-search').addClass('fa-eraser');
                 }
             }
 
@@ -946,11 +1003,12 @@ var Mautic = {
                 var response = {"newContent": MauticVars[liveCacheVar][value]};
                 response.target = target;
                 Mautic.processPageContent(response);
+                MauticVars.searchIsActive = false;
             } else {
                 //disable page loading bar
                 MauticVars.showLoadingBar = false;
 
-                $.ajax({
+                mQuery.ajax({
                     url: route,
                     type: "GET",
                     data: el.attr('name') + "=" + encodeURIComponent(value) + '&tmpl=content',
@@ -963,6 +1021,8 @@ var Mautic = {
                         //note the target to be updated
                         response.target = target;
                         Mautic.processPageContent(response);
+
+                        MauticVars.searchIsActive = false;
                     },
                     error: function (request, textStatus, errorThrown) {
                         alert(errorThrown);
@@ -977,12 +1037,12 @@ var Mautic = {
      * @param el
      */
     removeFormListOption: function(el) {
-        var sortableDiv = $(el).parents('div.sortable');
-        var inputCount  = $(sortableDiv).parents('div.form-group').find('input.sortable-itemcount');
-        var count = $(inputCount).val();
+        var sortableDiv = mQuery(el).parents('div.sortable');
+        var inputCount  = mQuery(sortableDiv).parents('div.form-group').find('input.sortable-itemcount');
+        var count = mQuery(inputCount).val();
         count--;
-        $(inputCount).val(count);
-        $(sortableDiv).remove();
+        mQuery(inputCount).val(count);
+        mQuery(sortableDiv).remove();
     },
 
     /**
@@ -992,17 +1052,27 @@ var Mautic = {
      * @param model
      * @param id
      */
-    togglePublishStatus: function (el, model, id) {
+    togglePublishStatus: function (event, el, model, id) {
+        event.preventDefault();
+
+        //destroy tooltips so it can be regenerated
+        mQuery(el).tooltip('destroy');
+        //clear the lookup cache
+        MauticVars.liveCache      = new Array();
         MauticVars.showLoadingBar = false;
-        $.ajax({
-            url: mauticBaseUrl + "ajax",
+
+        //start icon spin
+        Mautic.startIconSpinOnEvent(event);
+
+        mQuery.ajax({
+            url: mauticAjaxUrl,
             type: "POST",
             data: "action=togglePublishStatus&model=" + model + '&id=' + id,
             dataType: "json",
             success: function (response) {
                 if (response.statusHtml) {
-                    $(el).replaceWith(response.statusHtml);
-                    $('.publish-icon'+id).tooltip({html: true, container: 'body'});
+                    mQuery(el).replaceWith(response.statusHtml);
+                    mQuery('.publish-icon'+id).tooltip({html: true, container: 'body'});
                 }
             },
             error: function (request, textStatus, errorThrown) {
@@ -1017,8 +1087,8 @@ var Mautic = {
      * @param id
      */
     activateListItem: function(prefix,id) {
-        $('.bundle-list-item').removeClass('active');
-        $('#'+prefix+'-' + id).addClass('active');
+        mQuery('.bundle-list-item').removeClass('active');
+        mQuery('#'+prefix+'-' + id).addClass('active');
     },
 
     /**
@@ -1026,15 +1096,48 @@ var Mautic = {
      * @param el
      */
     expandPanel: function(el) {
-        $(el).toggleClass('fullpanel');
+        mQuery(el).toggleClass('fullpanel');
+    },
+
+
+    /**
+     * Apply filter
+     * @param list
+     */
+    setSearchFilter: function(el, searchId) {
+        if (typeof searchId == 'undefined')
+            searchId = '#list-search';
+        else
+            searchId = '#' + searchId;
+        var filter  = mQuery(el).val();
+        var current = mQuery('#list-search').typeahead('val');
+        current    += " " + filter;
+
+        //append the filter
+        mQuery(searchId).typeahead('val', current);
+
+        //submit search
+        var e = mQuery.Event( "keypress", { which: 13 } );
+        e.data = {};
+        e.data.livesearch = true;
+        Mautic.filterList(
+            e,
+            'list-search',
+            mQuery(searchId).attr('data-action'),
+            mQuery(searchId).attr('data-target'),
+            'liveCache'
+        );
+
+        //clear filter
+        mQuery(el).val('');
     }
 
 };
 
 //prevent page navigation if in the middle of a form
 window.addEventListener("beforeunload", function (e) {
-    if ($(".prevent-nonsubmit-form-exit").length) {
-        var msg = $(".prevent-nonsubmit-form-exit").val();
+    if (mQuery(".prevent-nonsubmit-form-exit").length) {
+        var msg = mQuery(".prevent-nonsubmit-form-exit").val();
 
         (e || window.event).returnValue = msg;     //Gecko + IE
         return msg;                                //Webkit, Safari, Chrome etc.

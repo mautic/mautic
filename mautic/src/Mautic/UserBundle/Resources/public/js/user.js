@@ -1,12 +1,12 @@
 //UserBundle
 Mautic.userOnLoad = function (container) {
-    if ($(container + ' form[name="user"]').length) {
-        if ($('#user_role_lookup').length) {
+    if (mQuery(container + ' form[name="user"]').length) {
+        if (mQuery('#user_role_lookup').length) {
             var roles = new Bloodhound({
                 datumTokenizer: Bloodhound.tokenizers.obj.whitespace('label'),
                 queryTokenizer: Bloodhound.tokenizers.whitespace,
                 prefetch: {
-                    url: mauticBaseUrl + "ajax?action=user:roleList",
+                    url: mauticAjaxUrl + "?action=user:roleList",
                     ajax: {
                         beforeSend: function () {
                             MauticVars.showLoadingBar = false;
@@ -14,7 +14,7 @@ Mautic.userOnLoad = function (container) {
                     }
                 },
                 remote: {
-                    url: mauticBaseUrl + "ajax?action=user:roleList&filter=%QUERY",
+                    url: mauticAjaxUrl + "?action=user:roleList&filter=%QUERY",
                     ajax: {
                         beforeSend: function () {
                             MauticVars.showLoadingBar = false;
@@ -28,8 +28,8 @@ Mautic.userOnLoad = function (container) {
                 limit: 5
             });
             roles.initialize();
-            roles.clearPrefetchCache();
-            $("#user_role_lookup").typeahead(
+
+            mQuery("#user_role_lookup").typeahead(
                 {
                     hint: true,
                     highlight: true,
@@ -40,21 +40,24 @@ Mautic.userOnLoad = function (container) {
                     displayKey: 'label',
                     source: roles.ttAdapter()
                 }).on('typeahead:selected', function (event, datum) {
-                    $("#user_role").val(datum["value"]);
+                    mQuery("#user_role").val(datum["value"]);
                 }).on('typeahead:autocompleted', function (event, datum) {
-                    $("#user_role").val(datum["value"]);
-                }
-            );
+                    mQuery("#user_role").val(datum["value"]);
+                }).on('keypress', function (event) {
+                    if ((event.keyCode || event.which) == 13) {
+                        mQuery('#user_role_lookup').typeahead('close');
+                    }
+                });
         }
-        if ($('#user_position').length) {
+        if (mQuery('#user_position').length) {
             var positions = new Bloodhound({
                 datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
                 queryTokenizer: Bloodhound.tokenizers.whitespace,
                 prefetch: {
-                    url: mauticBaseUrl + "ajax?action=user:positionList"
+                    url: mauticAjaxUrl + "?action=user:positionList"
                 },
                 remote: {
-                    url: mauticBaseUrl + "ajax?action=user:positionList&filter=%QUERY"
+                    url: mauticAjaxUrl + "?action=user:positionList&filter=%QUERY"
                 },
                 dupDetector: function (remoteMatch, localMatch) {
                     return (remoteMatch.label == localMatch.label);
@@ -63,7 +66,7 @@ Mautic.userOnLoad = function (container) {
                 limit: 5
             });
             positions.initialize();
-            $("#user_position").typeahead(
+            mQuery("#user_position").typeahead(
                 {
                     hint: true,
                     highlight: true,
@@ -77,14 +80,14 @@ Mautic.userOnLoad = function (container) {
             );
         }
     } else {
-        if ($(container + ' #list-search').length) {
+        if (mQuery(container + ' #list-search').length) {
             Mautic.activateSearchAutocomplete('list-search', 'user.user');
         }
     }
 };
 
 Mautic.roleOnLoad = function (container, response) {
-    if ($(container + ' #list-search').length) {
+    if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'user.role');
     }
 
@@ -100,10 +103,10 @@ Mautic.togglePermissionVisibility = function () {
     //add a very slight delay in order for the clicked on checkbox to be selected since the onclick action
     //is set to the parent div
     setTimeout(function () {
-        if ($('#role_isAdmin_0').prop('checked')) {
-            $('#permissions-container').removeClass('hide');
+        if (mQuery('#role_isAdmin_0').prop('checked')) {
+            mQuery('#permissions-container').removeClass('hide');
         } else {
-            $('#permissions-container').addClass('hide');
+            mQuery('#permissions-container').addClass('hide');
         }
     }, 10);
 };
@@ -120,48 +123,48 @@ Mautic.onPermissionChange = function (container, event, bundle) {
     //is set to the parent div
     setTimeout(function () {
         var granted = 0;
-        var clickedBox = $(event.target).find('input:checkbox').first();
-        if ($(clickedBox).prop('checked')) {
-            if ($(clickedBox).val() == 'full') {
+        var clickedBox = mQuery(event.target).find('input:checkbox').first();
+        if (mQuery(clickedBox).prop('checked')) {
+            if (mQuery(clickedBox).val() == 'full') {
                 //uncheck all of the others
-                $(container).find("label input:checkbox:checked").map(function () {
-                    if ($(this).val() != 'full') {
-                        $(this).prop('checked', false);
-                        $(this).parent().toggleClass('active');
+                mQuery(container).find("label input:checkbox:checked").map(function () {
+                    if (mQuery(this).val() != 'full') {
+                        mQuery(this).prop('checked', false);
+                        mQuery(this).parent().toggleClass('active');
                     }
                 })
             } else {
                 //uncheck full
-                $(container).find("label input:checkbox:checked").map(function () {
-                    if ($(this).val() == 'full') {
+                mQuery(container).find("label input:checkbox:checked").map(function () {
+                    if (mQuery(this).val() == 'full') {
                         granted = granted - 1;
-                        $(this).prop('checked', false);
-                        $(this).parent().toggleClass('active');
+                        mQuery(this).prop('checked', false);
+                        mQuery(this).parent().toggleClass('active');
                     }
                 })
             }
         }
 
         //update granted numbers
-        if ($('.' + bundle + '_granted').length) {
+        if (mQuery('.' + bundle + '_granted').length) {
             var granted = 0;
             var levelPerms = MauticVars.permissionList[bundle];
-            $.each(levelPerms, function(level, perms) {
-                $.each(perms, function(index, perm) {
+            mQuery.each(levelPerms, function(level, perms) {
+                mQuery.each(perms, function(index, perm) {
                     if (perm == 'full') {
-                        if ($('#role_permissions_' + bundle + '\\:' + level + '_' + perm).prop('checked')) {
+                        if (mQuery('#role_permissions_' + bundle + '\\:' + level + '_' + perm).prop('checked')) {
                             if (perms.length === 1)
                                 granted++;
                             else
                                 granted += perms.length - 1;
                         }
                     } else {
-                        if ($('#role_permissions_' + bundle + '\\:' + level + '_' + perm).prop('checked'))
+                        if (mQuery('#role_permissions_' + bundle + '\\:' + level + '_' + perm).prop('checked'))
                             granted++;
                     }
                 });
             });
-            $('.' + bundle + '_granted').html(granted);
+            mQuery('.' + bundle + '_granted').html(granted);
         }
     }, 10);
 };
