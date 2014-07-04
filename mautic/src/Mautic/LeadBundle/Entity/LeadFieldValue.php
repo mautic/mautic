@@ -51,13 +51,6 @@ class LeadFieldValue
      */
     private $value;
 
-    private $changes;
-
-    public function getChanges()
-    {
-        return $this->changes;
-    }
-
     /**
      * Get id
      *

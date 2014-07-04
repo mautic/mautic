@@ -37,7 +37,7 @@ class IpAddress {
     private $ipAddress;
 
     /**
-     * @ORM\Column(name="ip_details", type="text", nullable=true)
+     * @ORM\Column(name="ip_details", type="array", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      */
@@ -62,6 +62,36 @@ class IpAddress {
     public function setIpAddress($ipAddress)
     {
         $this->ipAddress = $ipAddress;
+
+        if (empty($this->ipDetails)) {
+            //@todo - configure other IP services
+            $url = 'http://freegeoip.net/json/' . $this->getIpAddress();
+            if (function_exists('curl_init')) {
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                curl_setopt($ch, CURLOPT_URL, $url);
+                $data = @curl_exec($ch);
+                curl_close($ch);
+            } elseif (ini_get('allow_url_fopen')) {
+                $data = @file_get_contents($url);
+            }
+
+            if (!empty($data)) {
+                $data = json_decode($data);
+                $ipData = array(
+                    'city'         => $data->city,
+                    'region'       => $data->region_name,
+                    'country'      => $data->country_name,
+                    'latitude'     => $data->latitude,
+                    'longitude'    => $data->longitude,
+                    'isp'          => '',
+                    'organization' => '',
+                    'other'        => get_object_vars($data)
+                );
+
+                $this->ipDetails = $ipData;
+            }
+        }
 
         return $this;
     }
@@ -97,29 +127,5 @@ class IpAddress {
     public function getIpDetails()
     {
         return json_decode($this->ipDetails);
-    }
-
-    /**
-     * Sets the Date/Time for new entities
-     *
-     * @ORM\PrePersist
-     */
-    public function onPrePersistSetIpDetails()
-    {
-        //@todo - configure other IP services
-        $url = 'http://freegeoip.net/json/' . $this->getIpAddress();
-        if (function_exists('curl_init')) {
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-            curl_setopt($ch, CURLOPT_URL, $url);
-            $data = @curl_exec($ch);
-            curl_close($ch);
-        } elseif (ini_get('allow_url_fopen')) {
-            $data = @file_get_contents($url);
-        }
-
-        if (!empty($data)) {
-            $this->ipDetails = $data;
-        }
     }
 }

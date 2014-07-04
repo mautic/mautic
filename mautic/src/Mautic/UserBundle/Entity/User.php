@@ -97,7 +97,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
     private $position;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Role")
+     * @ORM\ManyToOne(targetEntity="Role", inversedBy="users")
      * @ORM\JoinColumn(name="role_id", referencedColumnName="id")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
@@ -130,28 +130,22 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      */
     private $activePermissions;
 
-
-    private $changes;
-
-    private function isChanged($prop, $val)
+    protected function isChanged($prop, $val)
     {
+        $getter  = "get" . ucfirst($prop);
+        $current = $this->$getter();
         if ($prop == 'role') {
-            if ($this->role && !$val) {
-                $this->changes['role'] = array($this->role->getName() . ' ('. $this->role->getId().')', $val);
+            if ($current && !$val) {
+                $this->changes['role'] = array($current->getName() . ' ('. $current->getId().')', $val);
             } elseif (!$this->role && $val) {
-                $this->changes['role'] = array($this->role, $val->getName() . ' ('. $val->getId().')');
-            } elseif ($this->role && $val && $this->role->getId() != $val->getId()) {
-                $this->changes['role'] = array($this->role->getName() . '('. $this->role->getId().')',
+                $this->changes['role'] = array($current, $val->getName() . ' ('. $val->getId().')');
+            } elseif ($current && $val && $current->getId() != $val->getId()) {
+                $this->changes['role'] = array($current->getName() . '('. $current->getId().')',
                     $val->getName() . '('. $val->getId().')');
             }
-        } elseif ($this->$prop != $val) {
-            $this->changes[$prop] = array($this->$prop, $val);
+        } elseif ($current != $val) {
+            $this->changes[$prop] = array($current, $val);
         }
-    }
-
-    public function getChanges()
-    {
-        return $this->changes;
     }
 
     /**

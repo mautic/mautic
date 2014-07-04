@@ -114,20 +114,6 @@ class LeadField extends FormEntity
      */
     private $properties;
 
-    private $changes;
-
-    private function isChanged($prop, $val)
-    {
-        if ($this->$prop != $val) {
-            $this->changes[$prop] = array($this->$prop, $val);
-        }
-    }
-
-    public function getChanges()
-    {
-        return $this->changes;
-    }
-
     /**
      * @param ClassMetadata $metadata
      */

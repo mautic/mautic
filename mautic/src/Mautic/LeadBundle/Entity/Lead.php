@@ -89,32 +89,26 @@ class Lead extends FormEntity
      */
     private $customFields = array();
 
-
-    private $changes;
-
-    private function isChanged($prop, $val)
+    protected function isChanged($prop, $val)
     {
+        $getter  = "get" . ucfirst($prop);
+        $current = $this->$getter();
         if ($prop == 'owner') {
-            if ($this->owner && !$val) {
-                $this->changes['owner'] = array($this->owner->getName() . ' ('. $this->owner->getId().')', $val);
-            } elseif (!$this->owner && $val) {
-                $this->changes['owner'] = array($this->owner, $val->getName() . ' ('. $val->getId().')');
-            } elseif ($this->owner && $val && $this->owner->getId() != $val->getId()) {
-                $this->changes['owner'] = array($this->owner->getName() . '('. $this->owner->getId().')',
+            if ($current && !$val) {
+                $this->changes['owner'] = array($current->getName() . ' ('. $current->getId().')', $val);
+            } elseif (!$current && $val) {
+                $this->changes['owner'] = array($current, $val->getName() . ' ('. $val->getId().')');
+            } elseif ($current && $val && $current->getId() != $val->getId()) {
+                $this->changes['owner'] = array($current->getName() . '('. $current->getId().')',
                     $val->getName() . '('. $val->getId().')');
             }
         } elseif ($prop == 'ipAddresses') {
             $this->changes['ipAddresses'] = array('', $val->getIpAddress());
         } elseif ($prop == 'fields') {
             $this->changes['fields'][$val[0]] = $val[1];
-        } elseif ($this->$prop != $val) {
-            $this->changes[$prop] = array($this->$prop, $val);
+        } elseif ($this->$getter() != $val) {
+            $this->changes[$prop] = array($this->$getter(), $val);
         }
-    }
-
-    public function getChanges()
-    {
-        return $this->changes;
     }
 
     /**

@@ -69,19 +69,11 @@ class Role extends FormEntity
      */
     private $rawPermissions;
 
-    private $changes;
+    /**
+     * @ORM\OneToMany(targetEntity="User", mappedBy="role", fetch="EXTRA_LAZY")
+     */
+    private $users;
 
-    private function isChanged($prop, $val)
-    {
-        if ($this->$prop != $val) {
-            $this->changes[$prop] = array($this->$prop, $val);
-        }
-    }
-
-    public function getChanges()
-    {
-        return $this->changes;
-    }
     /**
      * @param ClassMetadata $metadata
      */
@@ -243,5 +235,38 @@ class Role extends FormEntity
     public function getRawPermissions()
     {
         return $this->rawPermissions;
+    }
+
+    /**
+     * Add users
+     *
+     * @param \Mautic\UserBundle\Entity\User $users
+     * @return Role
+     */
+    public function addUser(\Mautic\UserBundle\Entity\User $users)
+    {
+        $this->users[] = $users;
+
+        return $this;
+    }
+
+    /**
+     * Remove users
+     *
+     * @param \Mautic\UserBundle\Entity\User $users
+     */
+    public function removeUser(\Mautic\UserBundle\Entity\User $users)
+    {
+        $this->users->removeElement($users);
+    }
+
+    /**
+     * Get users
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getUsers()
+    {
+        return $this->users;
     }
 }

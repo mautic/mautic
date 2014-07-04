@@ -22,7 +22,6 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 class FormEntity
 {
 
-
     /**
      * @ORM\Column(name="is_published", type="boolean")
      * @Serializer\Expose
@@ -64,12 +63,14 @@ class FormEntity
      */
     private $checkedOutBy;
 
-    private $changes;
+    protected $changes;
 
-    private function isChanged($prop, $val)
+    protected function isChanged($prop, $val)
     {
-        if ($this->$prop != $val) {
-            $this->changes[$prop] = array($this->$prop, $val);
+        $getter  = "get" . ucfirst($prop);
+        $current = $this->$getter();
+        if ($current != $val) {
+            $this->changes[$prop] = array($current, $val);
         }
     }
 

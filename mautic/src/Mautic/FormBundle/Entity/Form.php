@@ -119,21 +119,16 @@ class Form extends FormEntity
      */
     private $submissions;
 
-    private $changes;
-
-    private function isChanged($prop, $val)
+    protected function isChanged($prop, $val)
     {
+        $getter  = "get" . ucfirst($prop);
+        $current = $this->$getter();
         if ($prop == 'actions' || $prop == 'fields') {
             //changes are already computed so just add them
             $this->changes[$prop][$val[0]] = $val[1];
-        } elseif ($this->$prop != $val) {
-            $this->changes[$prop] = array($this->$prop, $val);
+        } elseif ($current != $val) {
+            $this->changes[$prop] = array($current, $val);
         }
-    }
-
-    public function getChanges()
-    {
-        return $this->changes;
     }
 
     /**
