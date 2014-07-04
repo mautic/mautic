@@ -23,6 +23,14 @@ class FormButtonsType extends AbstractType
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
 
+        foreach ($options['pre_extra_buttons'] as $btn) {
+            $type = (empty($btn['type'])) ? 'button' : 'submit';
+            $builder->add($btn['name'], $type, array(
+                'label' => $btn['label'],
+                'attr'  => $btn['attr']
+            ));
+        }
+
         if (!empty($options['apply_text'])) {
             $builder->add('apply', 'submit', array(
                 'label' => $options['apply_text'],
@@ -52,6 +60,14 @@ class FormButtonsType extends AbstractType
                 )
             ));
         }
+
+        foreach ($options['post_extra_buttons'] as $btn) {
+            $type = (empty($btn['type'])) ? 'button' : 'submit';
+            $builder->add($btn['name'], $type, array(
+                'label' => $btn['label'],
+                'attr'  => $btn['attr']
+            ));
+        }
     }
 
     /**
@@ -60,18 +76,20 @@ class FormButtonsType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
-            'apply_text'   => 'mautic.core.form.apply',
-            'apply_icon'   => 'fa fa-check',
-            'apply_class'  => 'btn btn-primary',
-            'save_text'    => 'mautic.core.form.save',
-            'save_icon'    => 'fa fa-save padding-sm-right',
-            'save_class'   => 'btn btn-primary',
-            'cancel_text'  => 'mautic.core.form.cancel',
-            'cancel_icon'  => 'fa fa-times padding-sm-right',
-            'cancel_class' => 'btn btn-danger',
-            'mapped'       => false,
-            'label'        => false,
-            'required'     => false
+            'apply_text'         => 'mautic.core.form.apply',
+            'apply_icon'         => 'fa fa-check',
+            'apply_class'        => 'btn btn-primary',
+            'save_text'          => 'mautic.core.form.save',
+            'save_icon'          => 'fa fa-save padding-sm-right',
+            'save_class'         => 'btn btn-primary',
+            'cancel_text'        => 'mautic.core.form.cancel',
+            'cancel_icon'        => 'fa fa-times padding-sm-right',
+            'cancel_class'       => 'btn btn-danger',
+            'mapped'             => false,
+            'label'              => false,
+            'required'           => false,
+            'pre_extra_buttons'  => array(),
+            'post_extra_buttons' => array()
         ));
     }
 

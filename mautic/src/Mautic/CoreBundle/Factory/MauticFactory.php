@@ -14,6 +14,7 @@ use JMS\Serializer\Serializer;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\UserBundle\Entity\User;
+use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -38,6 +39,7 @@ class MauticFactory
     private $translator;
     private $validator;
     private $params;
+    private $router;
 
     public function __construct(
         EventDispatcherInterface $dispatcher,
@@ -50,6 +52,7 @@ class MauticFactory
         DelegatingEngine $templating,
         TranslatorInterface $translator,
         Validator $validator,
+        Router $router,
         array $mauticParams
     ) {
         $this->dispatcher       = $dispatcher;
@@ -62,6 +65,7 @@ class MauticFactory
         $this->templating       = $templating;
         $this->translator       = $translator;
         $this->validator        = $validator;
+        $this->router           = $router;
         $this->params           = $mauticParams;
     }
 
@@ -259,5 +263,15 @@ class MauticFactory
             //now so generate a new helper
             return new DateTimeHelper($string, $format, $tz);
         }
+    }
+
+    /**
+     * Get Router
+     *
+     * @return Router
+     */
+    public function getRouter()
+    {
+        return $this->router;
     }
 }

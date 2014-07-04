@@ -237,7 +237,6 @@ class FormModel extends CommonModel
      * Delete an entity
      *
      * @param  $entity
-     * @return null|object
      */
     public function deleteEntity($entity)
     {
@@ -248,8 +247,6 @@ class FormModel extends CommonModel
         //set the id for use in events
         $entity->deletedId = $id;
         $this->dispatchEvent("post_delete", $entity, false, $event);
-
-        return $entity;
     }
 
     /**
@@ -326,11 +323,43 @@ class FormModel extends CommonModel
                 break;
         }
 
-        $subject = $this->translator->trans($msg, array(
-            '%entityName%' => $entity->getName(),
+        $nameGetter = $this->getNameGetter();
+        $subject    = $this->translator->trans($msg, array(
+            '%entityName%' => $entity->$nameGetter(),
             '%entityId%'   => $entity->getId()
         ));
 
         return $subject;
+    }
+
+    /**
+     * Returns the function used to name the entity
+     *
+     * @return string
+     */
+    public function getNameGetter()
+    {
+        return "getName";
+    }
+
+    /**
+     * Retrieve entity based on id/alias slugs
+     *
+     * @param $slug1
+     * @param $slug2
+     */
+    public function getEntityBySlugs($slug1, $slug2)
+    {
+        $idSlug = (!empty($slug2)) ? $slug2 : $slug1;
+        $parts  = explode(':', $idSlug);
+        if (count($parts) == 2) {
+            $entity = $this->getEntity($parts[0]);
+
+            if (!empty($entity)) {
+                return $entity;
+            }
+        }
+
+        return false;
     }
 }

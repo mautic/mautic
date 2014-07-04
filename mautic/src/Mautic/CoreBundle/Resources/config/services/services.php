@@ -25,6 +25,7 @@ $factory = new Definition(
         new Reference('templating'),
         new Reference('translator'),
         new Reference('validator'),
+        new Reference('router'),
         '%mautic.parameters%'
     )
 );
