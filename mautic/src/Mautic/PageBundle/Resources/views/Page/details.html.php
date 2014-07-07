@@ -78,7 +78,15 @@ if ($tmpl == 'index') {
     </span>
     <div class="form-group margin-md-top">
         <label><?php echo $view['translator']->trans('mautic.page.page.url'); ?></label>
-        <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly value="<?php echo $pageUrl; ?>" />
+        <div class="input-group">
+            <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly
+                   value="<?php echo $pageUrl; ?>" />
+            <span class="input-group-btn">
+                <button class="btn btn-default" onclick="window.open('<?php echo $pageUrl; ?>', '_blank');">
+                    <i class="fa fa-external-link"></i>
+                </button>
+            </span>
+        </div>
     </div>
 
 </div>

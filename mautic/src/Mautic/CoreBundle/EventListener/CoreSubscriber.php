@@ -16,6 +16,8 @@ use Mautic\CoreBundle\Event\RouteEvent;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
+use Symfony\Component\Security\Http\SecurityEvents;
 
 /**
  * Class CoreSubscriber
@@ -31,11 +33,12 @@ class CoreSubscriber extends CommonSubscriber
     static public function getSubscribedEvents()
     {
         return array(
-            KernelEvents::CONTROLLER        => array('onKernelController', 0),
-            KernelEvents::REQUEST           => array('onKernelRequest', 0),
-            CoreEvents::BUILD_MENU          => array('onBuildMenu', 9999),
-            CoreEvents::BUILD_ADMIN_MENU    => array('onBuildAdminMenu', 9999),
-            CoreEvents::BUILD_ROUTE         => array('onBuildRoute', 0)
+            KernelEvents::CONTROLLER          => array('onKernelController', 0),
+            KernelEvents::REQUEST             => array('onKernelRequest', 0),
+            CoreEvents::BUILD_MENU            => array('onBuildMenu', 9999),
+            CoreEvents::BUILD_ADMIN_MENU      => array('onBuildAdminMenu', 9999),
+            CoreEvents::BUILD_ROUTE           => array('onBuildRoute', 0),
+            SecurityEvents::INTERACTIVE_LOGIN => array('onSecurityInteractiveLogin', 0)
         );
     }
 
@@ -75,6 +78,27 @@ class CoreSubscriber extends CommonSubscriber
             // if no explicit locale has been set on this request, use one from the session
             $request->setLocale($request->getSession()->get('_locale', $locale));
         }
+    }
+
+    /**
+     * Set vars on login
+     *
+     * @param InteractiveLoginEvent $event
+     */
+    public function onSecurityInteractiveLogin(InteractiveLoginEvent $event)
+    {
+        $session = $event->getRequest()->getSession();
+        if ($this->securityContext->isGranted('IS_AUTHENTICATED_FULLY') ||
+            $this->securityContext->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+            $user = $event->getAuthenticationToken()->getUser();
+
+            //set a session var for filemanager to know someone is logged in
+            $session->set('mautic.user', $user->getId());
+        } else {
+            $session->remove('mautic.user');
+        }
+
+        $session->set('mautic.basepath', $event->getRequest()->getBasePath());
     }
 
     /**

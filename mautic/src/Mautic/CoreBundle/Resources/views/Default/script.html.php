@@ -9,6 +9,7 @@
 ?>
 
 <script>
+    var mauticBaseUrl = '<?php echo $view['router']->generate("mautic_core_index"); ?>';
     var mauticAjaxUrl = '<?php echo $view['router']->generate("mautic_core_ajax"); ?>';
     var mauticContent = '<?php $view['slots']->output('mauticContent',''); ?>';
 </script>
@@ -26,7 +27,7 @@
             mQuery('.sf-minitoolbar').remove();
             mQuery('.sf-toolbarreset').remove();
             mQuery('.sf-toolbar').remove();
-            mQuery.get('<?php echo $view['router']->generate("mautic_core_index"); ?>_wdt/'+XMLHttpRequest.getResponseHeader('x-debug-token'),function(data){
+            mQuery.get(mauticBaseUrl + '_wdt/'+XMLHttpRequest.getResponseHeader('x-debug-token'),function(data){
                 mQuery('body').append(data);
             });
         }

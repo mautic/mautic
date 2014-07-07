@@ -9,4 +9,7 @@ CKEDITOR.editorConfig = function( config ) {
 	// config.uiColor = '#AADC6E';
 
     config.removePlugins = 'floating-tools, symbol, language';
+
+    config.filebrowserImageBrowseUrl = mauticBasePath + '/media/ckeditor/filemanager/index.html?type=Images';
+    config.filebrowserImageUploadUrl = mauticBasePath + '/media/ckeditor/filemanager/connectors/php/filemanager.php?command=QuickUpload&type;=Images';
 };

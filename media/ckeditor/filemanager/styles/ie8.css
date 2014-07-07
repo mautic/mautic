@@ -1,0 +1,26 @@
+* {
+	zoom: 1;
+}
+
+#filepath {
+	height: 27px;
+	line-height: 1.6em;
+}
+
+#file-input-container {
+	width: 205px;
+}
+
+#file-input-container * {
+	box-sizing: border-box;
+	-ms-box-sizing: border-box;
+}
+
+#newfile {
+	width: 205px;
+}
+
+#uploader {
+	min-height: 32px;
+}
+#q { width:192px; height:1.8em}

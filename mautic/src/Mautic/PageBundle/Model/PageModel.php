@@ -242,7 +242,7 @@ class PageModel extends FormModel
 
         if ($ipAddress === null) {
             $ipAddress = new IpAddress();
-            $ipAddress->setIpAddress($ip);
+            $ipAddress->setIpAddress($ip, $this->factory->getSystemParameters());
         }
 
         $hit->setIpAddress($ipAddress);

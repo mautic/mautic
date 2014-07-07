@@ -118,7 +118,7 @@ Mautic.launchPageEditor = function () {
     //append template to the URL
     var src = mQuery('#pageBuilderUrl').val();
     src += '?template=' + mQuery('#page_template').val();
-    console.log(src);
+
     mQuery('.page-builder iframe').attr('src', src);
 
     //Append to body to break out of the main panel

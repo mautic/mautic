@@ -14,7 +14,9 @@ $head = $view['slots']->get('head', '');
 $view['slots']->start('head');
 echo $head;
 ?>
-
+<script>
+    var mauticBasePath = '<?php echo $basePath; ?>';
+</script>
 <?php foreach ($view['assetic']->javascripts(array("@mautic_javascripts"), array(), array('combine' => true, 'output' => 'media/js/mautic.js')) as $url): ?>
 <script src="<?php echo $view->escape($url) ?>"></script>
 <?php endforeach; ?>

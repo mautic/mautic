@@ -81,11 +81,15 @@ class PublicController extends CommonFormController
             $content    = $entity->getContent();
 
             $model->hitPage($entity, $this->request, 200);
+
+            $googleAnalytics = $this->get('mautic.factory')->getParam('google_analytics');
+
             return $this->render('MauticPageBundle::public.html.php', array(
-                'slots'    => $slots,
-                'content'  => $content,
-                'page'     => $entity,
-                'template' => $template
+                'slots'           => $slots,
+                'content'         => $content,
+                'page'            => $entity,
+                'template'        => $template,
+                'googleAnalytics' => $googleAnalytics
             ));
         }
 

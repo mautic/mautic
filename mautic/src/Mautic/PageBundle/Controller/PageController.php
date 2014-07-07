@@ -275,6 +275,8 @@ class PageController extends FormController
                 $viewParameters  = array('page' => $page);
                 $returnUrl = $this->generateUrl('mautic_page_index', $viewParameters);
                 $template  = 'MauticPageBundle:Page:index';
+                //clear any modified content
+                $session->remove('mautic.pagebuilder.'.$entity->getSessionId().'.content', array());
             }
 
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
@@ -302,8 +304,8 @@ class PageController extends FormController
     {
         $model      = $this->get('mautic.factory')->getModel('page.page');
         $entity     = $model->getEntity($objectId);
-        //set the page we came from
-        $page    = $this->get('session')->get('mautic.page.page', 1);
+        $session    = $this->get('session');
+        $page       = $this->get('session')->get('mautic.page.page', 1);
 
         //set the return URL
         $returnUrl  = $this->generateUrl('mautic_page_index', array('page' => $page));
@@ -349,7 +351,6 @@ class PageController extends FormController
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    $session     = $this->get('session');
                     $contentName = 'mautic.pagebuilder.'.$entity->getSessionId().'.content';
                     $content = $session->get($contentName, array());
                     $entity->setContent($content);
@@ -372,6 +373,8 @@ class PageController extends FormController
                     );
                 }
             } else {
+                //clear any modified content
+                $session->remove('mautic.pagebuilder.'.$objectId.'.content', array());
                 //unlock the entity
                 $model->unlockEntity($entity);
             }
@@ -508,7 +511,8 @@ class PageController extends FormController
             'slots'    => $slots,
             'content'  => $content,
             'page'     => $entity,
-            'template' => $template
+            'template' => $template,
+            'basePath' => $this->request->getBasePath()
         ));
     }
 }
