@@ -47,7 +47,7 @@ class LoadLeadData extends AbstractFixture implements OrderedFixtureInterface, C
     {
         $lead = new Lead();
         $ipAddress = new IpAddress();
-        $ipAddress->setIpAddress("208.110.200.3");
+        $ipAddress->setIpAddress("208.110.200.3", $this->container->get('mautic.factory')->getSystemParameters());
         $lead->addIpAddress($ipAddress);
         $lead->setOwner($this->getReference('sales-user'));
 

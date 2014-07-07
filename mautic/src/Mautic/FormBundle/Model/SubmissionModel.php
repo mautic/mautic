@@ -57,7 +57,7 @@ class SubmissionModel extends CommonFormModel
         $ipAddress  = $this->em->getRepository('MauticCoreBundle:IpAddress')->findOneByIpAddress($ip);
         if ($ipAddress === null) {
             $ipAddress = new IpAddress();
-            $ipAddress->setIpAddress($ip);
+            $ipAddress->setIpAddress($ip, $this->factory->getSystemParameters());
         }
         $submission->setIpAddress($ipAddress);
 

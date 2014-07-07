@@ -98,7 +98,7 @@ class EventHelper
 
         if ($ipAddress === null) {
             $ipAddress = new IpAddress();
-            $ipAddress->setIpAddress($ip);
+            $ipAddress->setIpAddress($ip, $factory->getSystemParameters());
         }
 
         //add the IP if the lead is not already associated with it
@@ -148,7 +148,7 @@ class EventHelper
 
                 if ($ipAddress === null) {
                     $ipAddress = new IpAddress();
-                    $ipAddress->setIpAddress($ip);
+                    $ipAddress->setIpAddress($ip, $factory->getSystemParameters());
                 }
 
                 //create a new score change event

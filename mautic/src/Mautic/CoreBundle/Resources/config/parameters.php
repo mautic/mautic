@@ -32,6 +32,14 @@ $parameters = array(
     'date_format_full'      => 'F j, Y g:i a T',
     'date_format_dateonly'  => 'F j, Y',
     'date_format_timeonly'  => 'g:i a',
+    'ip_lookup_service'     => 'telize',
+        //telize (free with no limit at this time)
+        //freegeoip (free with 10000/hr limit)
+        //geobytes ( free 20/hr limit or paid account restricted to calls from single IP
+        //ipinfodb (paid; api key required)
+        //geoips (paid; api key required)
+        //maxmind_country, maxmind_precision, or maxmind_omni (paid; username/license key required)
+    'ip_lookup_auth'        => ''
 );
 
 return $parameters;

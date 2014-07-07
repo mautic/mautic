@@ -35,7 +35,7 @@ class LeadControllerTest extends MauticWebTestCase
         $this->container->get('security.context')->setToken($token);
         $lead = new Lead();
         $ipAddress = new IpAddress();
-        $ipAddress->setIpAddress("208.110.200.3");
+        $ipAddress->setIpAddress("208.110.200.3", $this->container->get('mautic.factory')->getSystemParameters());
         $lead->addIpAddress($ipAddress);
 
         $fieldValue = new LeadFieldValue();

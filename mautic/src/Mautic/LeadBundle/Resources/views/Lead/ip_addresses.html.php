@@ -19,6 +19,7 @@
                     <th class="col-leadip-city"><?php echo $view['translator']->trans('mautic.lead.lead.thead.city'); ?></th>
                     <th class="col-leadip-state"><?php echo $view['translator']->trans('mautic.lead.lead.thead.state'); ?></th>
                     <th class="col-leadip-country"><?php echo $view['translator']->trans('mautic.lead.lead.thead.country'); ?></th>
+                    <th class="col-leadip-country"><?php echo $view['translator']->trans('mautic.lead.lead.thead.timezone'); ?></th>
                     <th class="col-leadip-icons"></th>
                 </tr>
             </thead>
@@ -30,6 +31,7 @@
                     <td><?php echo $details['city']; ?></td>
                     <td><?php echo $details['region']; ?></td>
                     <td><?php echo $details['country']; ?></td>
+                    <td><?php echo $details['timezone']; ?></td>
                     <td>
                         <?php if ($details['latitude']): ?>
                             <a href="http://maps.google.com/maps?q=<?php echo $details['latitude']; ?>+<?php echo $details['longitude']; ?>"
@@ -39,11 +41,9 @@
                         <?php endif; ?>
                         <?php
                         $info = "";
-                        if (!empty($details['other'])):
-                        foreach ($details['other'] as $k => $d):
+                        foreach ($details as $k => $d):
                             $info .= "$k: $d<br />";
                         endforeach;
-                        endif;
                         ?>
                         <i class="fa fa-info-circle"
                            data-toggle="tooltip"
