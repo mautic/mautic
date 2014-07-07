@@ -8,7 +8,8 @@
  */
 
 $parameters = array(
-    "cat_in_page_url" => false,
+    'cat_in_page_url'  => false,
+    'google_analytics' => false,
 );
 
 return $parameters;

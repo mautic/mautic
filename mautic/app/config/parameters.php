@@ -27,10 +27,13 @@ $mauticParams['supported_languages'] = array(
 //load parameters array from local configuration
 include "local.php";
 
-foreach ($parameters as $k => $v) {
+//override default with local
+$mauticParams = array_merge($mauticParams, $parameters);
+
+foreach ($mauticParams as $k => $v) {
+    //add to the container
     $container->setParameter("mautic.{$k}", $v);
-    $mauticParams[$k] = $v;
 }
 
-//used for passing params into services
+//used for passing params into factory/services
 $container->setParameter('mautic.parameters', $mauticParams);

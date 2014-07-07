@@ -59,7 +59,23 @@ class Client extends BaseClient
         ));
     }
 
-        /**
+    protected $changes;
+
+    protected function isChanged($prop, $val)
+    {
+        $getter  = "get" . ucfirst($prop);
+        $current = $this->$getter();
+        if ($current != $val) {
+            $this->changes[$prop] = array($current, $val);
+        }
+    }
+
+    public function getChanges()
+    {
+        return $this->changes;
+    }
+
+    /**
      * Get id
      *
      * @return integer

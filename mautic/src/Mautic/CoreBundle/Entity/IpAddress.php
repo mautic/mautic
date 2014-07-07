@@ -76,8 +76,8 @@ class IpAddress {
                 $data = @file_get_contents($url);
             }
 
-            if (!empty($data)) {
-                $data = json_decode($data);
+            $data = json_decode($data);
+            if (is_object($data)) {
                 $ipData = array(
                     'city'         => $data->city,
                     'region'       => $data->region_name,
@@ -88,9 +88,12 @@ class IpAddress {
                     'organization' => '',
                     'other'        => get_object_vars($data)
                 );
-
-                $this->ipDetails = $ipData;
+            } else {
+                $ipData = array(
+                    'other' => $data
+                );
             }
+            $this->ipDetails = $ipData;
         }
 
         return $this;
