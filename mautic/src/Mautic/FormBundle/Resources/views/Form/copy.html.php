@@ -24,13 +24,11 @@
 
         <h2><?php echo $view['translator']->trans('mautic.form.form.header.automaticcopy'); ?></h2>
         <p><?php echo $view['translator']->trans('mautic.form.form.help.automaticcopy'); ?></p>
-        <textarea class="form-html form-control" readonly>
-&lt;script type="text/javascript" src="<?php echo $view['router']->generate('mautic_form_generateform', array('id' => $form->getId()), true); ?>"&gt;&lt;/script&gt;
-        </textarea>
+        <textarea class="form-html form-control" readonly onclick="this.setSelectionRange(0, this.value.length);">&lt;script type="text/javascript" src="<?php echo $view['router']->generate('mautic_form_generateform', array('id' => $form->getId()), true); ?>"&gt;&lt;/script&gt;</textarea>
         <br />
         <h2><?php echo $view['translator']->trans('mautic.form.form.header.manualcopy'); ?></h2>
         <p><?php echo $view['translator']->trans('mautic.form.form.help.manualcopy'); ?></p>
-        <textarea class="form-html form-control" readonly>
+        <textarea class="form-html form-control" readonly onclick="this.setSelectionRange(0, this.value.length);">
             <?php echo htmlentities($form->getCachedHtml()); ?>
         </textarea>
     </div>
