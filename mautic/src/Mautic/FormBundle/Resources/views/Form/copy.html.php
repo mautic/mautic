@@ -25,8 +25,6 @@
         <h2><?php echo $view['translator']->trans('mautic.form.form.header.automaticcopy'); ?></h2>
         <p><?php echo $view['translator']->trans('mautic.form.form.help.automaticcopy'); ?></p>
         <textarea class="form-html form-control" readonly>
-<?php echo $view->render('MauticFormBundle:Builder:style.html.php', array('form' => $form)); ?>
-
 &lt;script type="text/javascript" src="<?php echo $view['router']->generate('mautic_form_generateform', array('id' => $form->getId()), true); ?>"&gt;&lt;/script&gt;
         </textarea>
         <br />
