@@ -8,7 +8,7 @@
  */
 ?>
 
-<div <?php echo $view['form']->block($form, 'widget_container_attributes') ?> class="bottom-form-buttons">
+<div <?php echo $view['form']->block($form, 'widget_container_attributes') ?> class="<?php echo $containerClass; ?>">
     <?php if (!$form->parent && $errors): ?>
         <div class="has-error">
             <?php echo $view['form']->errors($form) ?>

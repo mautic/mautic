@@ -66,7 +66,8 @@ class ActionType extends AbstractType
         $builder->add('buttons', 'form_buttons', array(
             'save_text' => $btnValue,
             'save_icon' => $btnIcon,
-            'apply_text' => false
+            'apply_text' => false,
+            'container_class' => 'bottom-formaction-buttons'
         ));
 
         if (!empty($options["action"])) {

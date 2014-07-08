@@ -11,6 +11,8 @@ namespace Mautic\CoreBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class FormButtonsType extends AbstractType
@@ -89,7 +91,8 @@ class FormButtonsType extends AbstractType
             'label'              => false,
             'required'           => false,
             'pre_extra_buttons'  => array(),
-            'post_extra_buttons' => array()
+            'post_extra_buttons' => array(),
+            'container_class'    => 'bottom-form-buttons'
         ));
     }
 
@@ -99,5 +102,15 @@ class FormButtonsType extends AbstractType
     public function getName()
     {
         return 'form_buttons';
+    }
+
+    /**
+     * @param FormView      $view
+     * @param FormInterface $form
+     * @param array         $options
+     */
+    public function buildView(FormView $view, FormInterface $form, array $options)
+    {
+        $view->vars['containerClass'] = $options['container_class'];
     }
 }
