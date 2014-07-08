@@ -4,6 +4,10 @@
     padding: 8px;
 }
 
-.col-client-id, .col-client-actions {
+.col-client-id{
     width: 75px;
+}
+
+.col-client-actions {
+    width: 25px;
 }

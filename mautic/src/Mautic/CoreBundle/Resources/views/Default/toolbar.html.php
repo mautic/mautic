@@ -11,13 +11,16 @@ $searchUri   = $view['slots']->get('searchUri');
 $actions     = $view['slots']->get('actions');
 
 if (!empty($searchUri)):
-$bundle        = strtolower($app->getRequest()->get('bundle'));
-$searchString  = $view['slots']->get('searchString', '');
+    $bundle        = strtolower($app->getRequest()->get('bundle'));
+    $searchString  = $view['slots']->get('searchString', '');
+    $searchClass   = (!empty($searchString) ? 'show-search' : 'hide-search');
+else:
+    $searchClass = "no-search";
 endif;
 ?>
 
-<div class="toolbar-form-buttons pull-right"></div>
-<div class="pull-right toolbar <?php echo (!empty($searchString) ? 'show-search' : 'hide-search'); ?>">
+<div class="toolbar-form-buttons hide pull-right"></div>
+<div class="pull-right toolbar <?php echo $searchClass; ?>">
     <div class="input-group toolbar-action-buttons">
         <?php if (!empty($searchUri)): ?>
         <div class="input-group-btn">

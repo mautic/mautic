@@ -23,7 +23,7 @@ $options = array(
 
 <div class="number">
     <div class="row">
-        <div class="form-group col-sm-12 col-md-8 col-lg-6">
+        <div class="form-group col-xs-12 col-sm-8 col-md-6">
             <label class="control-label"><?php echo $view['translator']->trans('mautic.lead.field.form.properties.numberrounding'); ?></label>
             <div class="input-group">
                 <select class="form-control" autocomplete="off" name="leadfield[properties][roundmode]">
@@ -38,7 +38,7 @@ $options = array(
                 </span>
             </div>
         </div>
-        <div class="form-group col-sm-12 col-md-8 col-lg-6">
+        <div class="form-group col-xs-12 col-sm-8 col-md-6">
             <label class="control-label"><?php echo $view['translator']->trans('mautic.lead.field.form.properties.numberprecision'); ?></label>
             <div class="input-group">
                 <input autocomplete="off" name="leadfield[properties][precision]" class="form-control" value="<?php echo $precision; ?>" type="number" />

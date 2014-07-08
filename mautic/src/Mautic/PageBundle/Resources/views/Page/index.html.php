@@ -92,7 +92,6 @@ $activeClass     = "";
         <i class="fa fa-arrows-alt expand-panel" onclick="Mautic.expandPanel('.bundle-main');"></i>
         <div class="rounded-corners body-white bundle-main-inner-wrapper scrollable padding-lg-sides">
             <?php $view['slots']->output('_content'); ?>
-            <div class="footer-margin"></div>
         </div>
     </div>
 </div>

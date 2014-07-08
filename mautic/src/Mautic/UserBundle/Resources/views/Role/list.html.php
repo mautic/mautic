@@ -51,7 +51,8 @@ endif;
                         'delete'    => $permissions['delete'],
                         'routeBase' => 'user',
                         'menuLink'  => 'mautic_role_index',
-                        'langVar'   => 'user.role'
+                        'langVar'   => 'user.role',
+                        'pull'      => 'left'
                     ));
                     ?>
                 </td>

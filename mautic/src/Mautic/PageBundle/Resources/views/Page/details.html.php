@@ -17,7 +17,6 @@ if ($tmpl == 'index') {
 <?php if (!empty($activePage)): ?>
 <div class="bundle-main-header">
     <span class="bundle-main-item-primary">
-        <?php echo $view['translator']->trans($activePage->getTitle()); ?>
         <span class="bundle-main-actions">
             <?php
             echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
@@ -38,6 +37,7 @@ if ($tmpl == 'index') {
             ));
             ?>
         </span>
+        <?php echo $view['translator']->trans($activePage->getTitle()); ?>
     </span>
     <?php
     if ($category = $activePage->getCategory()):
@@ -93,5 +93,5 @@ if ($tmpl == 'index') {
 
 <h3>@todo - landing page stats/analytics will go here</h3>
 
-<div class="clearfix"></div>
+<div class="footer-margin"></div>
 <?php endif;?>

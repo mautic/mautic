@@ -648,7 +648,8 @@ li.ui-draggable {
   margin-left: 3px;
 }
 .footer-margin {
-  margin-bottom: 30px;
+  margin-bottom: -30px;
+  padding-bottom: 30px;
 }
 .bundle-main,
 .bundle-side {
@@ -691,6 +692,9 @@ li.ui-draggable {
 }
 .bundle-list-actions i {
   margin-right: 6px;
+}
+.bundle-content-wrapper {
+  position: relative;
 }
 .bundle-list a {
   text-decoration: none;
@@ -844,6 +848,13 @@ li.ui-draggable {
   .btn-group .btn-group + .btn-group {
     margin-left: 0px;
   }
+  .toolbar.no-search {
+    width: 35px;
+    padding: 0 0 10px 10px;
+  }
+  .toolbar button.btn span {
+    display: none;
+  }
   .toolbar.hide-search {
     width: 300px;
   }
@@ -865,11 +876,30 @@ li.ui-draggable {
     margin-bottom: 10px;
     height: 150px;
   }
-  .bundle-main {
+  .bundle-side.bundle-side-right {
+    height: 100%;
+    overflow: visible;
     padding-left: 15px;
   }
+  .bundle-side.bundle-side-right .scrollable {
+    overflow: visible;
+  }
+  .bundle-main {
+    padding-left: 15px;
+    overflow: visible;
+    height: 100%;
+  }
+  .bundle-main .bundle-main-inner-wrapper.scrollable {
+    overflow: visible;
+  }
   .bundle-main .badge-count h1 {
-    font-size: 1.5em;
-    padding: 5px;
+    display: none;
+  }
+  .expand-panel {
+    display: none !important;
+  }
+  .footer-margin {
+    padding-bottom: 120px;
+    margin-bottom: -120px;
   }
 }

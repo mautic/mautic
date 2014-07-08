@@ -16,7 +16,6 @@ if ($tmpl == 'index') {
 <div class="bundle-main-header">
     <div class="pull-left">
         <span class="bundle-main-item-primary">
-            <?php echo $view['translator']->trans($lead->getPrimaryIdentifier()); ?>
             <span class="bundle-main-actions">
                 <?php
                 echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
@@ -36,6 +35,7 @@ if ($tmpl == 'index') {
                 ));
                 ?>
             </span>
+            <?php echo $view['translator']->trans($lead->getPrimaryIdentifier()); ?>
         </span>
         <span class="bundle-main-item-secondary"><?php echo $lead->getSecondaryIdentifier(); ?></span>
     </div>
@@ -57,3 +57,4 @@ if ($tmpl == 'index') {
         echo $view->render('MauticLeadBundle:Lead:ip_addresses.html.php', array("lead" => $lead));
 ?>
 <?php endif; ?>
+<div class="footer-margin"></div>

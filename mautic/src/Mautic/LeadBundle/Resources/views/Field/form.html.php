@@ -30,7 +30,7 @@ $feedbackClass = ($app->getRequest()->getMethod() == 'POST' && !empty($errors)) 
 ?>
 
 <div class="row">
-    <div class="form-group  col-sm-12 col-md-8 col-lg-6<?php echo $feedbackClass; ?>">
+    <div class="form-group  col-xs-12 col-sm-8 col-md-6<?php echo $feedbackClass; ?>">
         <div id="leadfield_properties">
             <?php
             switch ($type):

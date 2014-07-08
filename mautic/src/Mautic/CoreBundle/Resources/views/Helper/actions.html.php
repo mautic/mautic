@@ -8,12 +8,14 @@
  */
 
 $nameGetter = (!empty($nameGetter)) ? $nameGetter : 'getName';
+if (empty($pull))
+    $pull = 'left';
 ?>
 <div class="btn-group">
     <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
         <i class="fa fa-angle-down"></i>
     </button>
-    <ul class="bundle-list-actions dropdown-menu" role="menu">
+    <ul class="pull-<?php echo $pull; ?> bundle-list-actions dropdown-menu" role="menu">
         <?php if (!empty($edit)): ?>
         <li>
             <a href="<?php echo $view['router']->generate('mautic_' . $routeBase . '_action',
@@ -43,6 +45,9 @@ $nameGetter = (!empty($nameGetter)) ? $nameGetter : 'getName';
                 <span><i class="fa fa-trash-o"></i><?php echo $view['translator']->trans('mautic.core.form.delete'); ?></span>
             </a>
         </li>
+        <?php endif; ?>
+        <?php if (!empty($custom)): ?>
+        <?php echo $custom; ?>
         <?php endif; ?>
     </ul>
 </div>

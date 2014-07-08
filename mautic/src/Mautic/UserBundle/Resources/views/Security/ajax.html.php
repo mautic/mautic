@@ -11,7 +11,7 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.user.auth.
 ?>
 
 <div class="row">
-    <div class="col-sm-12 col-md-8 col-lg-6">
+    <div class="col-xs-12 col-sm-8 col-md-6">
         <?php $view['slots']->output('_content'); ?>
     </div>
 </div>

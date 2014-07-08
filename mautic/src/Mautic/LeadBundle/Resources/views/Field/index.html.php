@@ -41,7 +41,8 @@ $view["slots"]->set("headerTitle", $view['translator']->trans('mautic.lead.field
                         'delete'    => $item->isFixed() ? false : true,
                         'routeBase' => 'leadfield',
                         'menuLink'  => 'mautic_leadfield_index',
-                        'langVar'   => 'lead.field'
+                        'langVar'   => 'lead.field',
+                        'pull'      => 'left'
                     ));
                     ?>
                 </td>

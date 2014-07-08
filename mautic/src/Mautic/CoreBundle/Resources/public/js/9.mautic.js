@@ -168,11 +168,14 @@ var Mautic = {
         });
 
         //Set the height of containers
-        var windowHeight = mQuery(window).height() - 175;
-        mQuery(container + ' .auto-height').each(function (index) {
-            //set height of divs
-            mQuery(this).css('height', windowHeight + 'px');
-        });
+        var windowWidth  = mQuery(window).width();
+        if (windowWidth > 765) {
+            var windowHeight = mQuery(window).height() - 175;
+            mQuery(container + ' .auto-height').each(function (index) {
+                //set height of divs
+                mQuery(this).css('height', windowHeight + 'px');
+            });
+        }
 
         //Copy form buttons to the toolbar
         if (mQuery(container + " .bottom-form-buttons").length) {
@@ -194,6 +197,7 @@ var Mautic = {
                         mQuery('#' + id).click();
                     });
             });
+            mQuery('.toolbar-form-buttons').removeClass('hide');
         }
 
         //Activate hidden shelves

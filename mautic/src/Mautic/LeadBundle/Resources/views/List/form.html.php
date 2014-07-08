@@ -30,7 +30,7 @@ $timezones = $tz->getTimezones();
 ?>
 <?php echo $view['form']->start($form); ?>
 <div class="row">
-    <div class="col-sm-12 col-md-6">
+    <div class="col-xs-12 col-sm-6">
         <?php echo $view['form']->row($form['name']); ?>
         <?php echo $view['form']->row($form['alias']); ?>
         <?php echo $view['form']->row($form['description']); ?>
@@ -46,11 +46,11 @@ $timezones = $tz->getTimezones();
     ?>
 </div>
 <div class="row">
-    <div class="form-group col-sm-12 col-md-8<?php echo $feedbackClass; ?>">
+    <div class="form-group col-xs-12 col-sm-8<?php echo $feedbackClass; ?>">
         <?php echo $view['form']->label($filterForm); ?>
         <?php echo $view['form']->errors($filterForm); ?>
         <div class="row">
-            <div class="col-sm-4 available-filters">
+            <div class="col-xs-4 available-filters">
                 <h4><?php echo $view['translator']->trans('mautic.core.form.filters.available'); ?></h4>
                 <div class="rounded-corners body-white padding-md">
                     <?php foreach ($choices as $value => $params): ?>
@@ -78,7 +78,7 @@ $timezones = $tz->getTimezones();
                     <?php endforeach; ?>
                 </div>
             </div>
-            <div class="col-sm-8 selected-filters">
+            <div class="col-xs-8 selected-filters">
                 <h4><?php echo $view['translator']->trans('mautic.core.form.filters.selected'); ?></h4>
                 <div class="rounded-corners body-white padding-md">
                     <ul class="padding-none no-bullet" id="<?php echo $filterForm->vars['id']; ?>_right">
@@ -89,7 +89,7 @@ $timezones = $tz->getTimezones();
                             <i class="fa fa-fw fa-ellipsis-v sortable-handle"></i><i class="fa fa-fw fa-trash-o remove-selected"></i>
                             <?php echo $choices[$filter['field']]['label']; ?>
                             <div class="filter-container">
-                                <div class="col-sm-6 col-md-2 padding-none">
+                                <div class="col-xs-6 col-sm-2 padding-none">
                                     <select name="leadlist[filters][glue][]" class="form-control ">
                                         <?php
                                         foreach ($glueOptions as $v => $l):
@@ -99,7 +99,7 @@ $timezones = $tz->getTimezones();
                                         <?php endforeach; ?>
                                     </select>
                                 </div>
-                                <div class="col-sm-6 col-md-3 padding-none">
+                                <div class="col-xs-6 col-sm-3 padding-none">
                                     <select name="leadlist[filters][operator][]" class="form-control ">
                                         <?php
                                         foreach ($operatorOptions as $v => $l):
@@ -109,7 +109,7 @@ $timezones = $tz->getTimezones();
                                         <?php endforeach; ?>
                                     </select>
                                 </div>
-                                <div class="col-sm-12 col-md-7 padding-none">
+                                <div class="col-xs-12 col-sm-7 padding-none">
                                     <?php switch ($choices[$filter['field']]['properties']['type']):
                                     case 'lookup':
                                     case 'select':
@@ -210,21 +210,21 @@ $timezones = $tz->getTimezones();
 <?php echo $view['form']->end($form); ?>
 
 <div id="filter-template" class="hide">
-    <div class="col-sm-6 col-md-2 padding-none">
+    <div class="col-xs-6 col-sm-2 padding-none">
         <select name="leadlist[filters][glue][]" class="form-control ">
             <?php foreach ($glueOptions as $v => $l): ?>
                 <option value="<?php echo $v; ?>"><?php echo $view['translator']->trans($l); ?></option>
             <?php endforeach; ?>
         </select>
     </div>
-    <div class="col-sm-6 col-md-3 padding-none">
+    <div class="col-xs-6 col-sm-3 padding-none">
         <select name="leadlist[filters][operator][]" class="form-control ">
             <?php foreach ($operatorOptions as $v => $l): ?>
                 <option value="<?php echo $v; ?>"><?php echo $view['translator']->trans($l['label']); ?></option>
             <?php endforeach; ?>
         </select>
     </div>
-    <div class="col-sm-12 col-md-7 padding-none">
+    <div class="col-xs-12 col-sm-7 padding-none">
         <input type="text" class="form-control" name="leadlist[filters][filter][]"
                placeholder="<?php echo $view['translator']->trans('mautic.lead.list.form.filtervalue'); ?>" />
         <input type="hidden" name="leadlist[filters][display][]" />
@@ -235,21 +235,21 @@ $timezones = $tz->getTimezones();
 </div>
 
 <div id="filter-country-template" class="hide">
-    <div class="col-sm-6 col-md-2 padding-none">
+    <div class="col-xs-6 col-sm-2 padding-none">
         <select name="leadlist[filters][glue][]" class="form-control ">
             <?php foreach ($glueOptions as $v => $l): ?>
                 <option value="<?php echo $v; ?>"><?php echo $view['translator']->trans($l); ?></option>
             <?php endforeach; ?>
         </select>
     </div>
-    <div class="col-sm-6 col-md-3 padding-none">
+    <div class="col-xs-6 col-sm-3 padding-none">
         <select name="leadlist[filters][operator][]" class="form-control ">
             <?php foreach ($operatorOptions as $v => $l): ?>
                 <option value="<?php echo $v; ?>"><?php echo $view['translator']->trans($l['label']); ?></option>
             <?php endforeach; ?>
         </select>
     </div>
-    <div class="col-sm-12 col-md-7 padding-none">
+    <div class="col-xs-12 col-sm-7 padding-none">
         <select class="form-control" name="leadlist[filters][filter][]">
         <?php foreach ($countries as $c): ?>
             <option value="<?php echo $c; ?>"><?php echo $c; ?></option>
@@ -263,21 +263,21 @@ $timezones = $tz->getTimezones();
 </div>
 
 <div id="filter-timezone-template" class="hide">
-    <div class="col-sm-6 col-md-2 padding-none">
+    <div class="col-xs-6 col-sm-2 padding-none">
         <select name="leadlist[filters][glue][]" class="form-control ">
             <?php foreach ($glueOptions as $v => $l): ?>
                 <option value="<?php echo $v; ?>"><?php echo $view['translator']->trans($l); ?></option>
             <?php endforeach; ?>
         </select>
     </div>
-    <div class="col-sm-6 col-md-3 padding-none">
+    <div class="col-xs-6 col-sm-3 padding-none">
         <select name="leadlist[filters][operator][]" class="form-control ">
             <?php foreach ($operatorOptions as $v => $l): ?>
                 <option value="<?php echo $v; ?>"><?php echo $view['translator']->trans($l['label']); ?></option>
             <?php endforeach; ?>
         </select>
     </div>
-    <div class="col-sm-12 col-md-7 padding-none">
+    <div class="col-xs-12 col-sm-7 padding-none">
         <select class="form-control" name="leadlist[filters][filter][]">
             <?php foreach ($timezones as $continent => $zones): ?>
                 <optgroup label="<?php echo $continent; ?>" />

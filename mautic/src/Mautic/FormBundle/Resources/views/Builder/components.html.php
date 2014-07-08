@@ -17,7 +17,7 @@ if (!isset($expanded))
 $fieldExpanded   = ($expanded == 'fields') ? ' in' : '';
 $actionExpanded  = (empty($fieldExpanded)) ? ' in' : '';
 ?>
-<div class="bundle-list scrollable">
+<div class="bundle-list">
     <div class="panel-group" id="form-components">
         <div class="panel panel-default">
             <div class="panel-heading">

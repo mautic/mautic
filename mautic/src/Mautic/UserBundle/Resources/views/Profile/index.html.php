@@ -13,7 +13,7 @@ $view["slots"]->set("headerTitle", $view['translator']->trans('mautic.user.accou
 
 <div class="account-wrapper">
     <div class="row padding-md">
-        <div class="col-md-3 col-sm-12">
+        <div class="col-sm-3 col-xs-12">
             <div class="body-white padding-md profile-details rounded-corners text-center">
                 <img class="img img-responsive img-thumbnail"
                      src="https://www.gravatar.com/avatar/<?php echo md5(strtolower(trim($me->getEmail()))); ?>?&s=250" />
@@ -22,7 +22,7 @@ $view["slots"]->set("headerTitle", $view['translator']->trans('mautic.user.accou
             </div>
         </div>
 
-        <div class="col-lg-9 col-md-9 col-sm-12 padding-md-sides">
+        <div class="col-sm-9 col-xs-12 padding-md-sides">
             <?php echo $view['form']->start($userForm); ?>
             <div class="panel panel-default">
                 <div class="panel-heading">

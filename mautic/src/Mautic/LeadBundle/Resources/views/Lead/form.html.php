@@ -20,3 +20,4 @@ $view->extend('MauticLeadBundle:Lead:index.html.php');
     </div>
 </div>
 <?php echo $view['form']->form($form); ?>
+<div class="footer-margin"></div>

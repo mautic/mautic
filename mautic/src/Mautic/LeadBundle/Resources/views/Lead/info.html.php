@@ -13,10 +13,10 @@
     <div class="panel-body">
         <?php if ($lead->getOwner()): ?>
             <div class="row">
-                <div class="col-sm-3 field-label">
+                <div class="col-xs-3 field-label">
                     <?php echo $view['translator']->trans('mautic.lead.lead.field.owner'); ?>
                 </div>
-                <div class="col-sm-9 field-value">
+                <div class="col-xs-9 field-value">
                     <a href="<?php echo $view['router']->generate('mautic_user_action', array(
                         'objectAction' => 'contact',
                         'objectId'     => $lead->getOwner()->getId(),
@@ -35,10 +35,10 @@
         <?php foreach ($lead->getFields() as $field): ?>
         <?php if (!$field->getValue()) continue; ?>
             <div class="row">
-                <div class="col-sm-3 field-label">
+                <div class="col-xs-3 field-label">
                     <?php echo $field->getField()->getLabel(); ?>
                 </div>
-                <div class="col-sm-9 field-value">
+                <div class="col-xs-9 field-value">
                     <?php echo $view->render('MauticLeadBundle:Lead:info_value.html.php', array(
                         'field'       => $field,
                         'dateFormats' => $dateFormats

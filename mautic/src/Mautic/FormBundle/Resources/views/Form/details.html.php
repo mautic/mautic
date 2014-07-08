@@ -15,8 +15,7 @@ if ($tmpl == 'index') {
 <?php if (!empty($activeForm)): ?>
 <div class="bundle-main-header">
     <span class="bundle-main-item-primary">
-        <?php echo $view['translator']->trans($activeForm->getName()); ?>
-        <span class="bundle-main-actions">
+<span class="bundle-main-actions">
             <?php
             echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
                 'item'      => $activeForm,
@@ -31,10 +30,22 @@ if ($tmpl == 'index') {
                     $activeForm->getCreatedBy()),
                 'routeBase' => 'form',
                 'menuLink'  => 'mautic_form_index',
-                'langVar'   => 'form'
+                'langVar'   => 'form',
+                'custom'    => <<<CUSTOM
+<li>
+    <a href="{$view['router']->generate('mautic_form_action', array('objectAction' => 'results', 'objectId' => $activeForm->getId()))}"
+       data-toggle="ajax"
+       data-menu-link="mautic_form_index">
+        <span>
+            <i class="fa fa-database"></i>{$view['translator']->trans('mautic.form.form.results')}
+        </span>
+   </a>
+</li>
+CUSTOM
             ));
             ?>
         </span>
+        <?php echo $view['translator']->trans($activeForm->getName()); ?>
     </span>
     <div class="clearfix"></div>
 </div>
@@ -44,3 +55,4 @@ if ($tmpl == 'index') {
     echo $view->render('MauticFormBundle:Form:copy.html.php', array('form' => $activeForm));
 ?>
 <?php endif;?>
+<div class="footer-margin"></div>

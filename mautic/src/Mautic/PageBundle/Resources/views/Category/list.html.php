@@ -72,4 +72,4 @@ foreach ($items as $key => $item):
 <h4><?php echo $view['translator']->trans('mautic.core.noresults'); ?></h4>
 <?php endif; ?>
 
-<div class="page-footer"></div>
+<div class="footer-margin"></div>

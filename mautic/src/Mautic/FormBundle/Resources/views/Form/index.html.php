@@ -29,7 +29,7 @@ $activeClass     = "";
 <?php $view["slots"]->stop(); ?>
 
 <div class="row bundle-content-container">
-    <div class="col-xs-12 col-sm-4  auto-height">
+    <div class="col-xs-12 col-sm-4 bundle-side auto-height">
         <div class="rounded-corners body-white bundle-side-inner-wrapper padding-sm">
             <div class="bundle-side-filter-container">
                 <div class="input-group">
@@ -72,10 +72,9 @@ $activeClass     = "";
     </div>
 
     <div class="col-xs-12 col-sm-8 bundle-main auto-height">
+        <i class="fa fa-arrows-alt expand-panel" onclick="Mautic.expandPanel('.bundle-main');"></i>
         <div class="rounded-corners body-white bundle-main-inner-wrapper scrollable padding-lg-sides">
-            <i class="fa fa-arrows-alt expand-panel" onclick="Mautic.expandPanel('.bundle-main');"></i>
             <?php $view['slots']->output('_content'); ?>
-            <div class="footer-margin"></div>
         </div>
     </div>
 </div>
