@@ -236,7 +236,7 @@ class MauticFactory
      * @param $id
      * @return bool|mixed
      */
-    public function getParam($id)
+    public function getParameter($id)
     {
         return (isset($this->params[$id])) ? $this->params[$id] : false;
     }

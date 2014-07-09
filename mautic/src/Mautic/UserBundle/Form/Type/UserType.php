@@ -38,7 +38,7 @@ class UserType extends AbstractType
     public function __construct(MauticFactory $factory)
     {
         $this->translator         = $factory->getTranslator();
-        $this->supportedLanguages = $factory->getParam('supported_languages');
+        $this->supportedLanguages = $factory->getParameter('supported_languages');
         $this->em                 = $factory->getEntityManager();
     }
 

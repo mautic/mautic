@@ -58,7 +58,6 @@ class FormRepository extends CommonRepository
         return $iterator;
     }
 
-
     /**
      * @param QueryBuilder $q
      * @param              $filter

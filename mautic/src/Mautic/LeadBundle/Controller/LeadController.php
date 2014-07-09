@@ -43,7 +43,7 @@ class LeadController extends FormController
         }
 
         //set limits
-        $limit = $this->get('session')->get('mautic.lead.limit', $this->container->getParameter('mautic.default_pagelimit'));
+        $limit = $this->get('session')->get('mautic.lead.limit', $this->get('mautic.factory')->getParameter('default_pagelimit'));
         $start = ($page === 1) ? 0 : (($page-1) * $limit);
         if ($start < 0) {
             $start = 0;
@@ -131,9 +131,9 @@ class LeadController extends FormController
             'lists'       => $lists,
             'security'    => $this->get('mautic.security'),
             'dateFormats' => array(
-                'datetime' => $factory->getParam('date_format_full'),
-                'date'     => $factory->getParam('date_format_dateonly'),
-                'time'     => $factory->getParam('date_format_timeonly'),
+                'datetime' => $factory->getParameter('date_format_full'),
+                'date'     => $factory->getParameter('date_format_dateonly'),
+                'time'     => $factory->getParameter('date_format_timeonly'),
             )
         );
 

@@ -46,7 +46,7 @@ class FormController extends CommonFormController
         }
 
         //set limits
-        $limit = $this->get('session')->get('mautic.form.limit', $this->container->getParameter('mautic.default_pagelimit'));
+        $limit = $this->get('session')->get('mautic.form.limit', $this->get('mautic.factory')->getParameter('default_pagelimit'));
         $start = ($page === 1) ? 0 : (($page-1) * $limit);
         if ($start < 0) {
             $start = 0;
@@ -146,7 +146,7 @@ class FormController extends CommonFormController
             if ($tmpl == 'list') {
                 $vars['target'] = '.bundle-list';
             }
-            $parameters['dateFormat'] = $this->get('mautic.factory')->getParam('date_format_full');
+            $parameters['dateFormat'] = $this->get('mautic.factory')->getParameter('date_format_full');
         }
 
         return $this->delegateView(array(

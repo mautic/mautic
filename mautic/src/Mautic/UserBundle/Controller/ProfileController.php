@@ -35,7 +35,7 @@ class ProfileController extends FormController
         $model = $this->get('mautic.factory')->getModel('user.user');
         //set some permissions
         $permissions = array(
-            'apiAccess'    => ($this->container->getParameter('mautic.api_enabled')) ?
+            'apiAccess'    => ($this->get('mautic.factory')->getParameter('api_enabled')) ?
                 $this->get('mautic.security')->isGranted('api:access:full')
                 : 0,
             'editName'     => $this->get('mautic.security')->isGranted('user:profile:editname'),

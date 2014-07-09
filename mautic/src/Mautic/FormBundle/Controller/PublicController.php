@@ -48,7 +48,7 @@ class PublicController extends CommonFormController
 
                //check to ensure the form is published
                 $status = $form->getPublishStatus();
-                $dateFormat = $this->get('mautic.factory')->getParam('date_format_full');
+                $dateFormat = $this->get('mautic.factory')->getParameter('date_format_full');
                 if ($status == 'pending') {
                     $error = $translator->trans('mautic.form.submit.error.pending', array(
                         '%date%' => $form->getPublishUp()->format($dateFormat)

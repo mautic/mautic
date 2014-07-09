@@ -94,9 +94,9 @@ class FormController extends CommonController
                                 'returnUrl' => $returnUrl
                             )
                         ),
-                        '%date%'        => $date->format($factory->getParam('date_format_dateonly')),
-                        '%time%'        => $date->format($factory->getParam('date_format_timeonly')),
-                        '%datetime%'    => $date->format($factory->getParam('date_format_full')),
+                        '%date%'        => $date->format($factory->getParameter('date_format_dateonly')),
+                        '%time%'        => $date->format($factory->getParameter('date_format_timeonly')),
+                        '%datetime%'    => $date->format($factory->getParameter('date_format_full')),
                         '%override%'    => $override
                     )
                 ))

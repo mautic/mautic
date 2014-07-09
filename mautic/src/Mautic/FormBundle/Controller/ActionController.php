@@ -50,10 +50,10 @@ class ActionController extends CommonFormController
         $customComponents = $this->get('mautic.factory')->getModel('form.form')->getCustomComponents();
         $form = $this->get('form.factory')->create('formaction', $formAction, array(
             'action'    => $this->generateUrl('mautic_formaction_action', array('objectAction' => 'new')),
-            'settings'  => $customComponents['actions']['actions'][$actionType]
+            'settings'  => $customComponents['actions'][$actionType]
         ));
 
-        $formAction['settings'] = $customComponents['actions']['actions'][$actionType];
+        $formAction['settings'] = $customComponents['actions'][$actionType];
 
         //Check for a submitted form and process it
         if ($method == 'POST') {

@@ -10,6 +10,8 @@
 namespace Mautic\PageBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\PageBundle\Event\PageEvent;
+use Mautic\PageBundle\PageEvents;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
@@ -40,7 +42,7 @@ class PublicController extends CommonFormController
                 $translator->trans('mautic.core.url.uncategorized');
 
             //Check to make sure slugs match up and do a redirect if they don't
-            $catInUrl = $this->get('mautic.factory')->getParam('cat_in_page_url');
+            $catInUrl = $this->get('mautic.factory')->getParameter('cat_in_page_url');
 
             if (
                 //slugs don't match up
@@ -78,11 +80,18 @@ class PublicController extends CommonFormController
             }
 
             $slots      = $tmplConfig['slots']['page'];
-            $content    = $entity->getContent();
+            $dispatcher = $this->get('event_dispatcher');
+            if ($dispatcher->hasListeners(PageEvents::PAGE_ON_DISPLAY)) {
+                $event = new PageEvent($entity);
+                $dispatcher->dispatch(PageEvents::PAGE_ON_DISPLAY, $event);
+                $content = $event->getContent();
+            } else {
+                $content = $entity->getContent();
+            }
 
             $model->hitPage($entity, $this->request, 200);
 
-            $googleAnalytics = $this->get('mautic.factory')->getParam('google_analytics');
+            $googleAnalytics = $this->get('mautic.factory')->getParameter('google_analytics');
 
             return $this->render('MauticPageBundle::public.html.php', array(
                 'slots'           => $slots,

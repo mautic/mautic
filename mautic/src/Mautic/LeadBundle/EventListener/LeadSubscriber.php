@@ -51,36 +51,6 @@ class LeadSubscriber extends CommonSubscriber
     }
 
     /**
-     * Add a lead generation action to available form submit actions
-     *
-     * @param FormBuilderEvent $event
-     */
-    public function onFormBuilder(FormBuilderEvent $event)
-    {
-        //add lead generation submit action
-        $action = array(
-            'group'     => 'mautic.lead.lead.submitaction.group',
-            'label'     => 'mautic.lead.lead.submitaction.createlead',
-            'descr'     => 'mautic.lead.lead.submitaction.createlead_descr',
-            'formType'  => 'lead_submitaction_createlead',
-            'callback'  => '\Mautic\LeadBundle\Helper\EventHelper::createLeadOnFormSubmit'
-        );
-
-        $event->addSubmitAction('lead.create', $action);
-
-        //add lead generation submit action
-        $action = array(
-            'group'     => 'mautic.lead.lead.submitaction.group',
-            'label'     => 'mautic.lead.lead.submitaction.changescore',
-            'descr'     => 'mautic.lead.lead.submitaction.changescore_descr',
-            'formType'  => 'lead_submitaction_scorechange',
-            'callback'  => '\Mautic\LeadBundle\Helper\EventHelper::changeScoreOnFormSubmit'
-        );
-
-        $event->addSubmitAction('lead.scorechange', $action);
-    }
-
-    /**
      * @param MenuEvent $event
      */
     public function onBuildMenu(MauticEvents\MenuEvent $event)
@@ -280,5 +250,35 @@ class LeadSubscriber extends CommonSubscriber
     public function onUserDelete(UserEvent $event)
     {
         $this->factory->getModel('lead.lead')->disassociateOwner($event->getUser()->getId());
+    }
+
+    /**
+     * Add a lead generation action to available form submit actions
+     *
+     * @param FormBuilderEvent $event
+     */
+    public function onFormBuilder(FormBuilderEvent $event)
+    {
+        //add lead generation submit action
+        $action = array(
+            'group'     => 'mautic.lead.lead.submitaction.group',
+            'label'     => 'mautic.lead.lead.submitaction.createlead',
+            'descr'     => 'mautic.lead.lead.submitaction.createlead_descr',
+            'formType'  => 'lead_submitaction_createlead',
+            'callback'  => '\Mautic\LeadBundle\Helper\EventHelper::createLeadOnFormSubmit'
+        );
+
+        $event->addSubmitAction('lead.create', $action);
+
+        //add lead generation submit action
+        $action = array(
+            'group'     => 'mautic.lead.lead.submitaction.group',
+            'label'     => 'mautic.lead.lead.submitaction.changescore',
+            'descr'     => 'mautic.lead.lead.submitaction.changescore_descr',
+            'formType'  => 'lead_submitaction_scorechange',
+            'callback'  => '\Mautic\LeadBundle\Helper\EventHelper::changeScoreOnFormSubmit'
+        );
+
+        $event->addSubmitAction('lead.scorechange', $action);
     }
 }

@@ -34,7 +34,7 @@ class InstallDataCommand extends ContainerAwareCommand
         $translator = $this->getContainer()->get('translator');
 
         if (!$force) {
-            $translator->setLocale($this->getContainer()->getParameter('mautic.locale'));
+            $translator->setLocale($this->getContainer()->get('mautic.factory')->getParameter('locale'));
 
             $dialog  = $this->getHelperSet()->get('dialog');
             $confirm = $dialog->select(

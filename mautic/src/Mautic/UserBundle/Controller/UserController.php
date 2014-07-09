@@ -38,7 +38,7 @@ class UserController extends FormController
         }
 
         //set limits
-        $limit = $this->get('session')->get('mautic.user.limit', $this->container->getParameter('mautic.default_pagelimit'));
+        $limit = $this->get('session')->get('mautic.user.limit', $this->get('mautic.factory')->getParameter('default_pagelimit'));
         $start = ($page === 1) ? 0 : (($page-1) * $limit);
         if ($start < 0) {
             $start = 0;

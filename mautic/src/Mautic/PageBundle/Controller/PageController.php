@@ -45,7 +45,7 @@ class PageController extends FormController
         }
 
         //set limits
-        $limit = $this->get('session')->get('mautic.page.limit', $this->container->getParameter('mautic.default_pagelimit'));
+        $limit = $this->get('session')->get('mautic.page.limit', $this->get('mautic.factory')->getParameter('default_pagelimit'));
         $start = ($page === 1) ? 0 : (($page-1) * $limit);
         if ($start < 0) {
             $start = 0;
@@ -144,7 +144,8 @@ class PageController extends FormController
                             'objectAction' => $view,
                             'objectId'     => $activePage->getId())
                     );
-                    $parameters['form'] = $formView;
+                    $parameters['form']   = $formView;
+                    $parameters['tokens'] = $model->getPageTokens();
                     break;
             }
         } elseif ($tmpl == 'page') {
@@ -159,7 +160,7 @@ class PageController extends FormController
             if ($tmpl == 'list') {
                 $vars['target'] = '.bundle-list';
             }
-            $parameters['dateFormat'] = $this->get('mautic.factory')->getParam('date_format_full');
+            $parameters['dateFormat'] = $this->get('mautic.factory')->getParameter('date_format_full');
         }
 
         return $this->delegateView(array(
@@ -351,8 +352,10 @@ class PageController extends FormController
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    $contentName = 'mautic.pagebuilder.'.$entity->getSessionId().'.content';
-                    $content = $session->get($contentName, array());
+                    $contentName     = 'mautic.pagebuilder.'.$entity->getSessionId().'.content';
+                    $existingContent = $entity->getContent();
+                    $newContent      = $session->get($contentName, array());
+                    $content         = array_merge($existingContent, $newContent);
                     $entity->setContent($content);
 
                     //form is valid so process the data
