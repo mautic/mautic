@@ -1,5 +1,7 @@
 /* CoreBundle */
 @import "bootstrap_less/variables.less";
+@import "bootstrap_less/mixins.less";
+
 @leftPanelWidth: 230px;
 @leftPanelBase: #513B49;
 @leftPanelColor: #B2B2B2;
@@ -23,7 +25,7 @@ html {
 
 body {
   height: 100%;
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -686,6 +688,10 @@ a.btn {
 .pagination-limit {
   width: 75px;
   display: inline-block;
+}
+
+.pagination-xs {
+  .pagination-size(@padding-xs-vertical; @padding-xs-horizontal; ceil((@font-size-base * 0.80)); 1px);
 }
 
 .modal {

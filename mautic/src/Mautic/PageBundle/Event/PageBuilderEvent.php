@@ -27,65 +27,31 @@ class PageBuilderEvent extends Event
         $this->translator = $translator;
     }
 
-    /**
-     * Adds a token to the list of available tokens in the page builder
-     *
-     * @param string $key - a unique identifier; it is recommended that it be namespaced i.e. lead.field_firstname
-     * @param array $action - can contain the following keys:
-     *  'group'    => (required) translation string to group tokens by
-     *  'label'    => (required) name to display in the list
-     *  'token'    => (required) tag that is added to the editor
-     *  'descr'    => (optional) short description of token
-     *  'ondrop'   => (optional) Optional JS function to be called when the user drops a token into the editor;
-     *                  the function must be in the Mautic namespace
-     *  ''
-     */
-    public function addToken($key, array $token)
+    public function addTokenSection($key, $header, $content)
     {
         if (array_key_exists($key, $this->tokens)) {
             throw new InvalidArgumentException("The key, '$key' is already used by another subscriber. Please use a different key.");
         }
 
-        $this->verifyToken(array('group', 'label', 'token'), $token);
-
-        $this->tokens[$key] = $token;
+        $header = $this->translator->trans($header);
+        $this->tokens[$key] = array(
+            "header"  => $header,
+            "content" => $content
+        );
     }
 
     /**
-     * Get submit actions
+     * Get tokens
      *
-     * @param boolean $includeGroupOrder
      * @return array
      */
-    public function getTokens($includeGroupOrder = true)
+    public function getTokenSections()
     {
-        if ($includeGroupOrder) {
-            $byGroup = array();
-            foreach ($this->tokens as $k => $token) {
-                $group = $this->translator->trans($token['group']);
-                $byGroup[$group][] = $k;
-            }
-            foreach ($byGroup as &$group) {
-                sort($group, SORT_NATURAL);
-            }
-            ksort($byGroup, SORT_NATURAL);
+        uasort($this->tokens, function ($a, $b) {
+            return strnatcmp(
+                $a['header'], $b['header']);
+        });
+        return $this->tokens;
 
-            return array('groupOrder' => $byGroup, 'tokens' => $this->tokens);
-        } else {
-            return $this->actions;
-        }
-    }
-
-    /**
-     * @param array $keys
-     * @param array $token
-     */
-    private function verifyToken(array $keys, array $token)
-    {
-        foreach ($keys as $k) {
-            if (!array_key_exists($k, $token)) {
-                throw new InvalidArgumentException("The key, '$k' is missing.");
-            }
-        }
     }
 }

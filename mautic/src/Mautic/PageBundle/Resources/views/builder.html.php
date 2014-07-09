@@ -21,6 +21,7 @@ echo $head;
 <script src="<?php echo $view->escape($url) ?>"></script>
 <?php endforeach; ?>
 <script src="<?php echo $view['assets']->getUrl('media/ckeditor/ckeditor.js'); ?>"></script>
+<script src="<?php echo $view['assets']->getUrl('media/ckeditor/adapters/jquery.js'); ?>"></script>
 
 <script>
     mQuery(document).ready( function() {
@@ -55,6 +56,7 @@ echo $head;
 <style>
     .mautic-editable { min-height: 75px; width: 100%; border: dashed 1px #000; margin-top: 3px; margin-bottom: 3px; }
     .mautic-content-placeholder { height: 100%; width: 100%; text-align: center; margin-top: 25px; }
+    .mautic-editable.over-droppable { border: dashed 1px #ED9C28; }
 </style>
 <?php
 $view['slots']->stop();

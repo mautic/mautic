@@ -14,6 +14,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\PageBundle\Entity\Analytics;
 use Mautic\PageBundle\Entity\Page;
+use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageEvent;
 use Mautic\PageBundle\PageEvents;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -207,7 +208,7 @@ class PageModel extends FormModel
         $pageSlug = $entity->getId() . ':' . $entity->getAlias();
 
         //should the url include the category
-        $catInUrl    = $this->factory->getParam('cat_in_page_url');
+        $catInUrl    = $this->factory->getParameter('cat_in_page_url');
         if ($catInUrl) {
             $category = $entity->getCategory();
             $catSlug = (!empty($category)) ? $category->getId() . ':' . $category->getAlias() :
@@ -284,5 +285,18 @@ class PageModel extends FormModel
 
         $this->em->persist($hit);
         $this->em->flush();
+    }
+
+    /**
+     * Get array of page builder tokens from bundles subscribed PageEvents::PAGE_ON_BUILD
+     *
+     * @return mixed
+     */
+    public function getPageTokens()
+    {
+        $event = new PageBuilderEvent($this->translator);
+        $this->dispatcher->dispatch(PageEvents::PAGE_ON_BUILD, $event);
+        $tokens = $event->getTokenSections();
+        return $tokens;
     }
 }

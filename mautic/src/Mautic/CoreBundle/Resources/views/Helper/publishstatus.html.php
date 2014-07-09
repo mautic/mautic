@@ -30,12 +30,16 @@ switch ($status) {
         ));
         break;
 }
+
+$clickAction = (empty($disableToggle)) ? '' : ' has-click-event';
 ?>
 
-<i class="fa fa-fw fa-lg <?php echo $icon; ?> has-click-event publish-icon<?php echo $item->getId(); ?>"
+<i class="fa fa-fw fa-lg <?php echo $icon . $clickAction; ?> publish-icon<?php echo $item->getId(); ?>"
    data-toggle="tooltip"
    data-container="body"
    data-placement="right"
    data-status="<?php echo $status; ?>"
    data-original-title="<?php echo $text ?>"
-   onclick="Mautic.togglePublishStatus(event, this, '<?php echo $model; ?>', <?php echo $item->getId(); ?>);"></i>
+   <?php if (empty($disableToggle)): ?>
+   onclick="Mautic.togglePublishStatus(event, this, '<?php echo $model; ?>', <?php echo $item->getId(); ?>);"
+   <?php endif; ?>></i>

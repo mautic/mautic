@@ -12,28 +12,50 @@
     width: 250px;
 }
 
+.page-builder {
+    position: relative;
+}
 .page-builder-active {
     background-color: #fff !important;
     position: absolute !important;
-    top: 35px !important;
+    top: 0 !important;
     bottom: 0 !important;
     right: 0 !important;
     left: 0 !important;
     width: 100% !important;
     height: 100% !important;
-    z-index: 9999;
+    z-index: 8000;
 }
 
-.page-builder-toolbar {
+.page-builder-panel {
     position: fixed;
     top: 0;
-    width: 100%;
-    height: 40px;
-    padding: 3px;
+    bottom: 0;
+    right: 0;
+    width: 250px;
+    height: 100%;
+    padding: 15px;
     background-color: #604656;
-    text-align: center;
+    overflow-y: auto;
 }
 
-.page-builder iframe {
-    margin-top: 30px;
+.page-builder-panel .panel-body {
+    padding: 0;
+}
+
+.page-builder-panel .btn-close-builder {
+    width: 100%;
+}
+
+.page-builder-content {
+    position: fixed;
+    left: 0;
+    top: 0;
+    right: 250px;
+    height: 100%;
+    position: fixed;
+}
+
+.ui-draggable-iframeFix {
+    z-index: 9999 !important;
 }

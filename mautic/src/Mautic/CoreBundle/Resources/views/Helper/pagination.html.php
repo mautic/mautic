@@ -50,6 +50,7 @@ $limitOptions = array(
     0   => 'all'
 );
 
+$formExit = (!empty($ignoreFormExit)) ? ' data-ignore-formexit="true"' : '';
 ?>
 <div class="clearfix"></div>
 <div class="pagination-wrapper">
@@ -62,7 +63,7 @@ $limitOptions = array(
         ?>
         <li<?php echo $class; ?>>
             <?php  ?>
-            <a href="<?php echo $url; ?>"<?php echo $data; ?>>
+            <a href="<?php echo $url; ?>"<?php echo $data.$formExit; ?>>
                 <i class="fa fa-angle-double-left"></i>
             </a>
         </li>
@@ -75,7 +76,7 @@ $limitOptions = array(
         ?>
         <li<?php echo $class; ?>>
             <?php  ?>
-            <a href="<?php echo $url; ?>"<?php echo $data; ?>>
+            <a href="<?php echo $url; ?>"<?php echo $data.$formExit; ?>>
                 <i class="fa fa-angle-left"></i>
             </a>
         </li>
@@ -97,7 +98,7 @@ $limitOptions = array(
         $data  = ($url == 'javascript: void(0);') ? '' : ' data-toggle="ajax"' . $menuLink;
         ?>
         <li<?php echo $class; ?>>
-            <a href="<?php echo $url; ?>"<?php echo $data; ?>>
+            <a href="<?php echo $url; ?>"<?php echo $data.$formExit; ?>>
                 <span><?php echo $i; ?></span>
             </a>
         </li>
@@ -111,7 +112,7 @@ $limitOptions = array(
         ?>
         <li<?php echo $class; ?>>
             <?php  ?>
-            <a href="<?php echo $url; ?>" <?php echo $data; ?>>
+            <a href="<?php echo $url; ?>" <?php echo $data.$formExit; ?>>
                 <i class="fa fa-angle-right"></i>
             </a>
         </li>
@@ -126,10 +127,11 @@ $limitOptions = array(
         ?>
         <li<?php echo $class; ?>>
             <?php  ?>
-            <a href="<?php echo $url; ?>"<?php echo $data; ?>>
+            <a href="<?php echo $url; ?>"<?php echo $data.$formExit; ?>>
                 <i class="fa fa-angle-double-right"></i>
             </a>
         </li>
+        <?php if (empty($fixedLimit)): ?>
         <li>
             <?php $class = (!empty($paginationClass)) ? " input-{$paginationClass}" : ""; ?>
             <select autocomplete="off" class="form-control pagination-limit<?php echo $class; ?>" onchange="Mautic.limitTableData(
@@ -143,9 +145,8 @@ $limitOptions = array(
                 <option<?php echo $selected; ?> value="<?php echo $value; ?>"><?php echo $view['translator']->trans('mautic.core.pagination.'.$label); ?></option>
                 <?php endforeach; ?>
             </select>
-
         </li>
-
+        <?php endif; ?>
     </ul>
     <div class="clearfix"></div>
 </div>

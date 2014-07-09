@@ -918,14 +918,20 @@ var Mautic = {
         mQuery(el).on('keyup', {}, function (event) {
             var searchStr = mQuery(el).val().trim();
             var diff = searchStr.length - MauticVars[searchStrVar].length;
-            var overlay = mQuery('<div />', {"class": "content-overlay"}).html(mQuery(el).attr('data-overlay-text'));
-            if (mQuery(el).attr('data-overlay-background')) {
-                overlay.css('background', mQuery(el).attr('data-overlay-background'));
+            var overlayEnabled = mQuery(el).attr('data-overlay');
+
+            if (overlayEnabled != 'false') {
+                var overlay = mQuery('<div />', {"class": "content-overlay"}).html(mQuery(el).attr('data-overlay-text'));
+                if (mQuery(el).attr('data-overlay-background')) {
+                    overlay.css('background', mQuery(el).attr('data-overlay-background'));
+                }
+                if (mQuery(el).attr('data-overlay-color')) {
+                    overlay.css('color', mQuery(el).attr('data-overlay-color'));
+                }
+                var target = mQuery(el).attr('data-target');
+                var overlayTarget = mQuery(el).attr('data-overlay-target');
+                if (!overlayTarget) overlayTarget = target;
             }
-            if (mQuery(el).attr('data-overlay-color')) {
-                overlay.css('color', mQuery(el).attr('data-overlay-color'));
-            }
-            var target = mQuery(el).attr('data-target');
             if (
                 !MauticVars.searchIsActive &&
                 (
@@ -936,13 +942,17 @@ var Mautic = {
                 )
             ) {
                 MauticVars.searchIsActive = true;
-                mQuery(target + ' .content-overlay').remove();
                 MauticVars[searchStrVar] = searchStr;
                 event.data.livesearch = true;
+
+                if (overlayEnabled != 'false') {
+                    mQuery(overlayTarget + ' .content-overlay').remove();
+                }
+
                 Mautic.filterList(event, mQuery(el).attr('id'), mQuery(el).attr('data-action'), target, liveCacheVar);
-            } else {
-                if (!mQuery(target + ' .content-overlay').length) {
-                    mQuery(target).prepend(overlay);
+            } else if (overlayEnabled != 'false') {
+                if (!mQuery(overlayTarget + ' .content-overlay').length) {
+                    mQuery(overlayTarget).prepend(overlay);
                 }
             }
         });

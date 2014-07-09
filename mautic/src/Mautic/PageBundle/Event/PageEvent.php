@@ -19,6 +19,9 @@ use Mautic\PageBundle\Entity\Page;
  */
 class PageEvent extends CommonEvent
 {
+
+    private $content;
+
     /**
      * @param Page $page
      * @param bool $isNew
@@ -26,7 +29,8 @@ class PageEvent extends CommonEvent
     public function __construct(Page &$page, $isNew = false)
     {
         $this->entity  =& $page;
-        $this->isNew = $isNew;
+        $this->content = $page->getContent();
+        $this->isNew   = $isNew;
     }
 
     /**
@@ -47,5 +51,25 @@ class PageEvent extends CommonEvent
     public function setPage(Page $page)
     {
         $this->entity = $page;
+    }
+
+    /**
+     * Get page content
+     *
+     * @return string
+     */
+    public function getContent()
+    {
+        return $this->content;
+    }
+
+    /**
+     * Set page content
+     *
+     * @param array $content
+     */
+    public function setContent(array $content)
+    {
+        $this->content = $content;
     }
 }

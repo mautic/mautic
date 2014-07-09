@@ -22,12 +22,21 @@ final class PageEvents
      * The mautic.page_on_build event is thrown before displaying the page builder form to allow adding of tokens
      *
      * The event listener receives a
-     * Mautic\PageBundle\Event\PageBuilderEvent instance.
+     * Mautic\PageBundle\Event\PageContent instance.
      *
      * @var string
      */
     const PAGE_ON_BUILD   = 'mautic.page_on_build';
 
+    /*
+     * The mautic.page_on_display event is thrown before displaying the page content
+     *
+     * The event listener receives a
+     * Mautic\PageBundle\Event\PageEvent instance.
+     *
+     * @var string
+     */
+    const PAGE_ON_DISPLAY   = 'mautic.page_on_display';
 
     /**
      * The mautic.page_pre_save event is thrown right before a page is persisted.

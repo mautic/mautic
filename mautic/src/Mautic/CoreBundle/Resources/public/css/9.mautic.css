@@ -4,7 +4,7 @@ html {
 }
 body {
   height: 100%;
-  overflow: hidden;
+  overflow-x: hidden;
 }
 h1,
 h2,
@@ -592,6 +592,21 @@ a.btn {
 .pagination-limit {
   width: 75px;
   display: inline-block;
+}
+.pagination-xs > li > a,
+.pagination-xs > li > span {
+  padding: 1px 5px;
+  font-size: 12px;
+}
+.pagination-xs > li:first-child > a,
+.pagination-xs > li:first-child > span {
+  border-bottom-left-radius: 1px;
+  border-top-left-radius: 1px;
+}
+.pagination-xs > li:last-child > a,
+.pagination-xs > li:last-child > span {
+  border-bottom-right-radius: 1px;
+  border-top-right-radius: 1px;
 }
 .modal {
   top: 50px;

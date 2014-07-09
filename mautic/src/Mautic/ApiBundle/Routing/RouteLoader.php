@@ -33,7 +33,7 @@ class RouteLoader extends Loader
     public function __construct(MauticFactory $factory)
     {
         $this->dispatcher  = $factory->getDispatcher();
-        $this->apiEnabled = $factory->getParam('api_enabled');
+        $this->apiEnabled = $factory->getParameter('api_enabled');
     }
 
     /**
