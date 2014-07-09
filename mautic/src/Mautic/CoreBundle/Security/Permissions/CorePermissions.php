@@ -233,6 +233,12 @@ class CorePermissions {
      */
     public function hasEntityAccess($ownPermission, $otherPermission, $owner)
     {
+        $user = $this->getUser();
+        if (!is_object($user)) {
+            //user is likely anon. so assume no access and let controller handle via published status
+            return false;
+        }
+
         if (!is_bool($ownPermission) && !is_bool($otherPermission)) {
             $permissions = $this->isGranted(
                 array($ownPermission, $otherPermission), 'RETURN_ARRAY'
