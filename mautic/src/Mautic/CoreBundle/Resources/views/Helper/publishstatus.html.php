@@ -31,7 +31,7 @@ switch ($status) {
         break;
 }
 
-$clickAction = (empty($disableToggle)) ? '' : ' has-click-event';
+$clickAction = (isset($disableToggle) && $disableToggle === false) ? '' : ' has-click-event';
 ?>
 
 <i class="fa fa-fw fa-lg <?php echo $icon . $clickAction; ?> publish-icon<?php echo $item->getId(); ?>"

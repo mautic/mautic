@@ -29,26 +29,24 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
         <?php foreach ($items as $item):?>
             <tr>
                 <td>
-                    <span class="bundle-list-actions">
-                        <?php
-                        echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
-                            'item'      => $item,
-                            'edit'      => $security->hasEntityAccess(
-                                true,
-                                $permissions['lead:lists:editother'],
-                                $item->getCreatedBy()
-                            ),
-                            'delete'    => $security->hasEntityAccess(
-                                true,
-                                $permissions['lead:lists:deleteother'],
-                                $item->getCreatedBy()
-                            ),
-                            'routeBase' => 'leadlist',
-                            'menuLink'  => 'mautic_leadlist_index',
-                            'langVar'   => 'lead.list'
-                        ));
-                        ?>
-                    </span>
+                    <?php
+                    echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
+                        'item'      => $item,
+                        'edit'      => $security->hasEntityAccess(
+                            true,
+                            $permissions['lead:lists:editother'],
+                            $item->getCreatedBy()
+                        ),
+                        'delete'    => $security->hasEntityAccess(
+                            true,
+                            $permissions['lead:lists:deleteother'],
+                            $item->getCreatedBy()
+                        ),
+                        'routeBase' => 'leadlist',
+                        'menuLink'  => 'mautic_leadlist_index',
+                        'langVar'   => 'lead.list'
+                    ))  ;
+                    ?>
                 </td>
                 <td>
                     <?php if ($item->isGlobal()): ?>

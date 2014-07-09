@@ -4,7 +4,7 @@ html {
 }
 body {
   height: 100%;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 h1,
 h2,
@@ -139,6 +139,7 @@ h6 {
 }
 .scrollable {
   overflow-y: auto;
+  overflow-x: hidden;
   height: 100%;
 }
 .content-overlay {

@@ -49,7 +49,7 @@ endif;
                         'item'      => $item,
                         'edit'      => $permissions['edit'],
                         'delete'    => $permissions['delete'],
-                        'routeBase' => 'user',
+                        'routeBase' => 'role',
                         'menuLink'  => 'mautic_role_index',
                         'langVar'   => 'user.role',
                         'pull'      => 'left'

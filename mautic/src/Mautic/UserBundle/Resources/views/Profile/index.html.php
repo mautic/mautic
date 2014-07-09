@@ -11,7 +11,7 @@ $view['slots']->set('mauticContent', 'user');
 $view["slots"]->set("headerTitle", $view['translator']->trans('mautic.user.account.header.index'));
 ?>
 
-<div class="account-wrapper">
+<div class="account-wrapper scrollable">
     <div class="row padding-md">
         <div class="col-sm-3 col-xs-12">
             <div class="body-white padding-md profile-details rounded-corners text-center">
@@ -78,4 +78,5 @@ $view["slots"]->set("headerTitle", $view['translator']->trans('mautic.user.accou
             <?php endif; ?>
         </div>
     </div>
+    <div class="footer-margin"></div>
 </div>

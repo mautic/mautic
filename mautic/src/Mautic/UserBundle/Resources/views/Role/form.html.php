@@ -24,4 +24,7 @@ if (!empty($objectId)) {
 $view["slots"]->set("headerTitle", $header);
 ?>
 
-<?php echo $view['form']->form($form); ?>
+<div class="scrollable">
+    <?php echo $view['form']->form($form); ?>
+    <div class="footer-margin"></div>
+</div>
