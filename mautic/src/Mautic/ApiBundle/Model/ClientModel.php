@@ -120,6 +120,6 @@ class ClientModel extends FormModel
 
     public function getUserClients(User $user)
     {
-        return $this->em->getRepository($this->getRepository())->getUserClients($user);
+        return $this->getRepository()->getUserClients($user);
     }
 }
