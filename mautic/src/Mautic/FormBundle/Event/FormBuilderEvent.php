@@ -65,29 +65,23 @@ class FormBuilderEvent extends Event
             $action
         );
 
+        //translate the group
+        $action['group'] = $this->translator->trans($action['group']);
         $this->actions[$key] = $action;
     }
 
     /**
      * Get submit actions
      *
-     * @param boolean $includeGroupOrder
      * @return array
      */
-    public function getSubmitActions($includeGroupOrder = true)
+    public function getSubmitActions()
     {
-        if ($includeGroupOrder) {
-            $byGroup = array();
-            foreach ($this->actions as $k => $action) {
-                $group = $this->translator->trans($action['group']);
-                $byGroup[$group][] = $k;
-            }
-            ksort($byGroup, SORT_NATURAL);
-
-            return array('groupOrder' => $byGroup, 'actions' => $this->actions);
-        } else {
-            return $this->actions;
-        }
+        uasort($this->actions, function ($a, $b) {
+            return strnatcmp(
+                $a['group'], $b['group']);
+        });
+        return $this->actions;
     }
 
     /**

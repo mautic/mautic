@@ -16,6 +16,10 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\FormBundle\Event as Events;
 use Mautic\FormBundle\FormEvents;
+use Mautic\FormBundle\Helper\PageTokenHelper;
+use Mautic\PageBundle\Event\PageBuilderEvent;
+use Mautic\PageBundle\Event\PageEvent;
+use Mautic\PageBundle\PageEvents;
 
 /**
  * Class FormSubscriber
@@ -37,7 +41,9 @@ class FormSubscriber extends CommonSubscriber
             CoreEvents::BUILD_COMMAND_LIST => array('onBuildCommandList', 0),
             ApiEvents::BUILD_ROUTE         => array('onBuildApiRoute', 0),
             FormEvents::FORM_POST_SAVE     => array('onFormPostSave', 0),
-            FormEvents::FORM_POST_DELETE   => array('onFormDelete', 0)
+            FormEvents::FORM_POST_DELETE   => array('onFormDelete', 0),
+            PageEvents::PAGE_ON_DISPLAY    => array('onPageDisplay', 0),
+            PageEvents::PAGE_ON_BUILD      => array('OnPageBuild', 0)
         );
     }
 
@@ -47,6 +53,7 @@ class FormSubscriber extends CommonSubscriber
     public function onBuildMenu(MauticEvents\MenuEvent $event)
     {
         $security = $event->getSecurity();
+        $request  = $this->factory->getRequest();
         $path = __DIR__ . "/../Resources/config/menu/main.php";
         $items = include $path;
         $event->addMenuItems($items);
@@ -71,10 +78,7 @@ class FormSubscriber extends CommonSubscriber
             return;
         }
 
-        $translator = $this->translator;
         $security   = $this->security;
-        $isCommand  = $translator->trans('mautic.core.searchcommand.is');
-        $mine       = $translator->trans('mautic.core.searchcommand.ismine');
         $filter     = array("string" => $str, "force" => '');
 
         $permissions = $security->isGranted(
@@ -97,7 +101,7 @@ class FormSubscriber extends CommonSubscriber
 
             if (count($forms) > 0) {
                 $formResults = array();
-                $dateForm = $this->factory->getParam('date_format_full');
+                $dateForm = $this->factory->getParameter('date_format_full');
                 foreach ($forms as $form) {
                     $formResults[] = $this->templating->renderResponse(
                         'MauticFormBundle:Search:form.html.php',
@@ -183,5 +187,57 @@ class FormSubscriber extends CommonSubscriber
             "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
         );
         $this->factory->getModel('core.auditLog')->writeToLog($log);
+    }
+
+    /**
+     * Add forms to available page tokens
+     *
+     * @param PageBuilderEvent $event
+     */
+    public function onPageBuild(PageBuilderEvent $event)
+    {
+        $tokenHelper = new PageTokenHelper($this->factory);
+        $event->addTokenSection('form.pagetokens', 'mautic.form.form.header.index', $tokenHelper->getTokenContent());
+    }
+
+    /**
+     * @param PageEvent $event
+     */
+    public function onPageDisplay(PageEvent $event)
+    {
+        $content = $event->getContent();
+        foreach ($content as $slot => &$html) {
+            $regex = '/{form=(.*?)}/i';
+
+            preg_match_all($regex, $html, $matches);
+
+            if (count($matches[0])) {
+                $model = $this->factory->getModel('form.form');
+                foreach ($matches[1] as $k => $id) {
+                    $form = $model->getEntity($id);
+                    if ($form !== null &&
+                        (
+                            $form->isPublished() ||
+                            $this->security->hasEntityAccess(
+                                'form:forms:viewown', 'form:forms:viewother', $form->getCreatedBy()
+                            )
+                        )
+                    ) {
+                        $formHtml   = $form->getCachedHtml();
+                        $formStatus = $form->getPublishStatus();
+                        if ($formStatus !== 'published') {
+                            $formHtml .= '<div class="mauticform-error">' .
+                                $this->translator->trans('mautic.form.form.pagetoken.notpublished') .
+                                '</div>';
+
+                        }
+                        $html = preg_replace('#{form='.$id.'}#', $formHtml, $html);
+                    } else {
+                        $html = preg_replace("#{form=".$id."}#", "", $html);
+                    }
+                }
+            }
+        }
+        $event->setContent($content);
     }
 }

@@ -60,20 +60,20 @@ $actionExpanded  = (empty($fieldExpanded)) ? ' in' : '';
             </div>
             <div id="form-submitactions" class="panel-collapse collapse<?php echo $actionExpanded; ?>">
                 <div class="panel-body">
-                    <?php foreach ($actions['groupOrder'] as $group => $groupActions): ?>
-                    <div class="form-submitaction-group-header"><?php echo $group; ?></div>
+                    <?php foreach ($actions as $k => $a): ?>
+                    <?php if ($newGroup = (empty($lastGroup) || $lastGroup != $a['group'])): ?>
+                    <div class="form-submitaction-group-header"><?php echo $a['group']; ?></div>
                     <div class="form-submitaction-group-body">
-                        <?php foreach ($groupActions as $k): ?>
-                        <?php $action = $actions['actions'][$k]; ?>
+                    <?php endif; ?>
                         <a data-toggle="ajax" data-ignore-formexit="true" href="<?php echo $view['router']->generate(
                             'mautic_formaction_action',
                             array('objectAction' => 'new', 'type' => $k, 'tmpl' => 'action')); ?>">
                             <div class="bundle-list-item">
                                 <div class="padding-sm">
                                     <div class="pull-left padding-sm">
-                                        <span class="list-item-primary"><?php echo $view['translator']->trans($action['label']); ?></span>
-                                        <?php if (isset($action['descr'])): ?>
-                                        <span class="list-item-secondary"><?php echo  $view['translator']->trans($action['descr']); ?></span>
+                                        <span class="list-item-primary"><?php echo $view['translator']->trans($a['label']); ?></span>
+                                        <?php if (isset($a['descr'])): ?>
+                                        <span class="list-item-secondary"><?php echo  $view['translator']->trans($a['descr']); ?></span>
                                         <?php endif; ?>
                                     </div>
                                     <div class="pull-right padding-sm">
@@ -83,8 +83,10 @@ $actionExpanded  = (empty($fieldExpanded)) ? ' in' : '';
                                 </div>
                             </div>
                         </a>
-                        <?php endforeach; ?>
+                    <?php if ($newGroup): ?>
                     </div>
+                    <?php endif; ?>
+                    <?php $lastGroup = $a['group']; ?>
                     <?php endforeach; ?>
                 </div>
             </div>

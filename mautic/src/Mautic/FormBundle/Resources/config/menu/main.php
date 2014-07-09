@@ -24,6 +24,7 @@ $items = array(
     )
 );
  */
+
 $items = array(
     'mautic.form.form.menu.index' => array(
         'route'    => 'mautic_form_index',
@@ -54,18 +55,23 @@ $items = array(
             ),
             'mautic.form.form.menu.view' => array(
                 'route'           => 'mautic_form_action',
-                'routeParameters' => array("objectAction"  => "view"),
+                'routeParameters' => array(
+                    "objectAction"  => "view",
+                    "objectId"      => $request->get('objectId')
+                ),
                 'extras'  => array(
                     'routeName' => 'mautic_form_action|view'
                 ),
-                'display' => false //only used for breadcrumb generation
-            ),
-            'mautic.form.result.menu.index' => array(
-                'route'           => 'mautic_form_results',
-                'extras'  => array(
-                    'routeName' => 'mautic_form_results'
-                ),
-                'display' => false //only used for breadcrumb generation
+                'display' => false, //only used for breadcrumb generation
+                'children' => array(
+                    'mautic.form.result.menu.index' => array(
+                        'route'           => 'mautic_form_results',
+                        'extras'  => array(
+                            'routeName' => 'mautic_form_results'
+                        ),
+                        'display' => false //only used for breadcrumb generation
+                    )
+                )
             )
         )
     )

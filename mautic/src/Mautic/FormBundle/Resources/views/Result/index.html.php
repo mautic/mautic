@@ -17,7 +17,7 @@ $view["slots"]->set("headerTitle", $view['translator']->trans('mautic.form.resul
 <?php $view["slots"]->start("actions"); ?>
 <li>
     <a href="<?php echo $this->container->get('router')->generate(
-        'mautic_form_export', array("formId" => $form->getId(), "format" => "csv")); ?>"
+        'mautic_form_export', array("objectId" => $form->getId(), "format" => "csv")); ?>"
        data-toggle="download">
         <?php echo $view["translator"]->trans("mautic.form.result.export.csv"); ?>
     </a>
@@ -25,7 +25,7 @@ $view["slots"]->set("headerTitle", $view['translator']->trans('mautic.form.resul
 <?php if (class_exists('PHPExcel')): ?>
 <li>
     <a href="<?php echo $this->container->get('router')->generate(
-        'mautic_form_export', array("formId" => $form->getId(), "format" => "xlsx")); ?>"
+        'mautic_form_export', array("objectId" => $form->getId(), "format" => "xlsx")); ?>"
        data-toggle="download">
         <?php echo $view["translator"]->trans("mautic.form.result.export.xlsx"); ?>
     </a>
@@ -33,7 +33,7 @@ $view["slots"]->set("headerTitle", $view['translator']->trans('mautic.form.resul
 <?php endif; ?>
 <li>
     <a href="<?php echo $this->container->get('router')->generate(
-        'mautic_form_export', array("formId" => $form->getId(), "format" => "html")); ?>"
+        'mautic_form_export', array("objectId" => $form->getId(), "format" => "html")); ?>"
        target="_blank">
         <?php echo $view["translator"]->trans("mautic.form.result.export.html"); ?>
     </a>
@@ -41,7 +41,7 @@ $view["slots"]->set("headerTitle", $view['translator']->trans('mautic.form.resul
 <?php if (class_exists('mPDF')): ?>
 <li>
     <a href="<?php echo $this->container->get('router')->generate(
-        'mautic_form_export', array("formId" => $form->getId(), "format" => "pdf")); ?>"
+        'mautic_form_export', array("objectId" => $form->getId(), "format" => "pdf")); ?>"
        target="_blank">
         <?php echo $view["translator"]->trans("mautic.form.result.export.pdf"); ?>
     </a>

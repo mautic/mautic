@@ -11,7 +11,6 @@ $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'form');
 $view["slots"]->set("headerTitle", $view['translator']->trans('mautic.form.form.header.index'));
 $searchBtnClass  = (!empty($searchValue)) ? "fa-eraser" : "fa-search";
-$searchBtnAction = (!empty($searchValue)) ? 1 : 0; //clear or populate
 $activeClass     = "";
 ?>
 <?php $view["slots"]->start("actions"); ?>

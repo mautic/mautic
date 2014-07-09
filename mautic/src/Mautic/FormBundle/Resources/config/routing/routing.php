@@ -12,6 +12,15 @@ use Symfony\Component\Routing\Route;
 
 $collection = new RouteCollection();
 
+$collection->add('mautic_formtoken_index', new Route('/forms/pagetokens/{page}',
+    array(
+        '_controller' => 'MauticFormBundle:PageToken:index',
+        'page'        => 1
+    ),
+    array(
+        'page'    => '\d+'
+    )
+));
 
 $collection->add('mautic_formaction_action', new Route('/forms/action/{objectAction}/{objectId}',
     array(
@@ -36,21 +45,20 @@ $collection->add('mautic_form_index', new Route('/forms/{page}',
     )
 ));
 
-$collection->add('mautic_form_results', new Route('/forms/results/{formId}/{page}',
+$collection->add('mautic_form_results', new Route('/forms/results/{objectId}/{page}',
     array(
         '_controller' => 'MauticFormBundle:Result:index',
         'page'        => 1,
-        'formId'      => 0
+        'objectId'    => 0
     )
 ));
 
-$collection->add('mautic_form_export', new Route('/forms/results/{formId}/export/{format}',
+$collection->add('mautic_form_export', new Route('/forms/results/{objectId}/export/{format}',
     array(
         '_controller' => 'MauticFormBundle:Result:export',
         'format'      => 'csv'
     )
 ));
-
 
 $collection->add('mautic_form_action', new Route('/forms/{objectAction}/{objectId}',
     array(
@@ -66,5 +74,6 @@ $collection->add('mautic_form_postresults', new Route('/p/form/submit',
 $collection->add('mautic_form_generateform', new Route('/p/form/generate.js',
     array('_controller' => 'MauticFormBundle:Public:generate')
 ));
+
 
 return $collection;
