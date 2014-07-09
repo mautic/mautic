@@ -27,15 +27,16 @@ class PublicController extends CommonFormController
         $user       = $factory->getUser();
 
         if (!empty($entity)) {
-            $published = $entity->isPublished();
+            $category     = $entity->getCategory();
+            $catPublished = (!empty($category)) ? $category->isPublished() : true;
+            $published    = $entity->isPublished();
+
             //make sure the page is published or deny access if not
-            if (!$published && ($user && !$this->get('mautic.security')->hasEntityAccess(
+            if ((!$catPublished || !$published) && (!$this->get('mautic.security')->hasEntityAccess(
                 'page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy()))) {
                 $model->hitPage($entity, $this->request, 401);
                 throw new AccessDeniedHttpException($translator->trans('mautic.core.url.error.401'));
             }
-
-            $category = $entity->getCategory();
 
             $pageSlug = $entity->getId() . ':' . $entity->getAlias();
             $catSlug  = (!empty($category)) ? $category->getId() . ':' . $category->getTitle() :
