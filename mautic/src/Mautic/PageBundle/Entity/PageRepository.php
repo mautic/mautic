@@ -61,6 +61,48 @@ class PageRepository extends CommonRepository
     }
 
     /**
+     * @param      $alias
+     * @param null $entity
+     * @return mixed
+     */
+    public function checkUniqueAlias($alias, $entity = null)
+    {
+        $q = $this->createQueryBuilder('e')
+            ->select('count(e.id) as aliasCount')
+            ->where('e.alias = :alias');
+        $q->setParameter('alias', $alias);
+
+        if (!empty($entity)) {
+            $q->andWhere('e.id != :id');
+            $q->setParameter('id', $entity->getId());
+            $parent = $entity->getParent();
+            $children = $entity->getChildren();
+            if ($parent || $children) {
+                //allow same alias among language group
+                $ids = array();
+
+                if (!empty($parent)) {
+                    $ids[]    = $parent->getId();
+                    $children = $parent->getChildren();
+                    foreach ($children as $child) {
+                        if ($id = $child->getId() != $entity->getId()) {
+                            $ids[] = $id;
+                        }
+                    }
+                } elseif (!empty($children)) {
+                    foreach ($children as $child) {
+                        $ids[] = $child->getId();
+                    }
+                }
+                $q->andWhere($q->expr()->notIn('e.id', $ids));
+            }
+        }
+
+        $results = $q->getQuery()->getSingleResult();
+        return $results['aliasCount'];
+    }
+
+    /**
      * @param string $search
      * @param int    $limit
      * @param int    $start
@@ -69,7 +111,7 @@ class PageRepository extends CommonRepository
     public function getPageList($search = '', $limit = 10, $start = 0, $viewOther = false)
     {
         $q = $this->createQueryBuilder('p');
-        $q->select('partial p.{id, title}');
+        $q->select('partial p.{id, title, lang, alias}');
 
         if (!empty($search)) {
             $q->where($q->expr()->like('p.title', ':search'))
@@ -154,16 +196,34 @@ class PageRepository extends CommonRepository
                 $expr = $q->expr()->like('c.alias', ":$unique");
                 $filter->strict = true;
                 break;
+            case $this->translator->trans('mautic.page.page.searchcommand.lang'):
+                $langUnique       = $this->generateRandomParameterName();
+                $langValue        = $filter->string . "_%";
+                $forceParameters = array(
+                    $langUnique => $langValue,
+                    $unique     => $filter->string
+                );
+                $expr = $q->expr()->orX(
+                    $q->expr()->eq('p.language', ":$unique"),
+                    $q->expr()->like('p.language', ":$langUnique")
+                );
+                break;
         }
 
-        $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
         if ($expr && $filter->not) {
             $expr = $q->expr()->not($expr);
         }
-        return array(
-            $expr,
-            ($returnParameter) ? array("$unique" => $string) : array()
-        );
+
+        if (!empty($forceParameters)) {
+            $parameters = $forceParameters;
+        } elseif (!$returnParameter) {
+            $parameters = array();
+        } else {
+            $string     = ($filter->strict) ? $filter->string : "%{$filter->string}%";
+            $parameters = array("$unique" => $string);
+        }
+
+        return array( $expr, $parameters );
     }
 
     /**
@@ -178,7 +238,8 @@ class PageRepository extends CommonRepository
                 'mautic.core.searchcommand.isuncategorized',
                 'mautic.core.searchcommand.ismine',
             ),
-            'mautic.core.searchcommand.category'
+            'mautic.core.searchcommand.category',
+            'mautic.page.page.searchcommand.lang'
         );
     }
 

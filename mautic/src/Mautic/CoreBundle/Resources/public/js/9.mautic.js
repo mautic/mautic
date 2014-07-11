@@ -653,6 +653,7 @@ var Mautic = {
      * @param position
      */
     stickSidePanel: function (position) {
+        MauticVars.showLoadingBar = false;
         var query = "action=togglePanel&panel=" + position;
         mQuery.ajax({
             url: mauticAjaxUrl,

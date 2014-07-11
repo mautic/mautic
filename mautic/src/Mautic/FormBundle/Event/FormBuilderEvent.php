@@ -78,7 +78,7 @@ class FormBuilderEvent extends Event
     public function getSubmitActions()
     {
         uasort($this->actions, function ($a, $b) {
-            return strnatcmp(
+            return strnatcasecmp(
                 $a['group'], $b['group']);
         });
         return $this->actions;

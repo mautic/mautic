@@ -32,14 +32,20 @@ foreach ($items as $key => $item):
            data-toggle="ajax"
            data-menu-link="mautic_page_index">
             <span class="list-item-primary">
-                <?php echo $item->getTitle(); ?>
+                <?php echo $item->getTitle(); ?> <span class="small">(<?php echo $item->getAlias(); ?>)</span>
             </span>
             <span class="list-item-secondary list-item-indent">
+                <?php $catName = ($category = $item->getCategory()) ? $category->getTitle() :
+                    $view['translator']->trans('mautic.core.form.uncategorized'); ?>
+                <span><?php echo $catName; ?></span>
+                <span> | </span>
                 <?php
                 $createdBy = $item->getCreatedBy();
                 $author = (empty($createdBy)) ? $item->getAuthor() : $createdBy->getName();
-                echo $author;
                 ?>
+                <span><?php echo $author; ?></span>
+                <span> | </span>
+                <span><?php echo $item->getLanguage(); ?></span>
             </span>
         </a>
         <div class="badge-count padding-sm">

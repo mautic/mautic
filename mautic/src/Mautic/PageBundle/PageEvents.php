@@ -19,10 +19,21 @@ final class PageEvents
 {
 
     /**
+     * The mautic.page_on_hit event is thrown when a public page is browsed and a hit recorded in the analytics table
+     *
+     * The event listener receives a
+     * Mautic\PageBundle\Event\PageHitEvent instance.
+     *
+     * @var string
+     */
+    const PAGE_ON_HIT   = 'mautic.page_on_hit';
+
+
+    /**
      * The mautic.page_on_build event is thrown before displaying the page builder form to allow adding of tokens
      *
      * The event listener receives a
-     * Mautic\PageBundle\Event\PageContent instance.
+     * Mautic\PageBundle\Event\PageEvent instance.
      *
      * @var string
      */

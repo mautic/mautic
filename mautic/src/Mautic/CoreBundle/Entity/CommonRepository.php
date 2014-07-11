@@ -101,22 +101,22 @@ class CommonRepository extends EntityRepository
         return $results;
     }
 
-
     /**
      * @param      $alias
      * @param null $id
+     * @param null $entity
      * @return mixed
      */
-    public function checkUniqueAlias($alias, $id = null)
+    public function checkUniqueAlias($alias, $entity = null)
     {
         $q = $this->createQueryBuilder('e')
             ->select('count(e.id) as aliasCount')
             ->where('e.alias = :alias');
         $q->setParameter('alias', $alias);
 
-        if (!empty($id)) {
+        if (!empty($entity)) {
             $q->andWhere('e.id != :id');
-            $q->setParameter('id', $id);
+            $q->setParameter('id', $entity->getId());
         }
 
         $results = $q->getQuery()->getSingleResult();

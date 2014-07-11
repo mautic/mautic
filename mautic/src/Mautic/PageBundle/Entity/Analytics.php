@@ -138,6 +138,14 @@ class Analytics
     private $remoteHost;
 
     /**
+     * @ORM\Column(name="language", type="string", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full"})
+     */
+    private $language;
+
+    /**
      * @ORM\Column(type="string")
      **/
     private $trackingId;
@@ -473,5 +481,28 @@ class Analytics
     public function getTrackingId()
     {
         return $this->trackingId;
+    }
+
+    /**
+     * Set language
+     *
+     * @param string $language
+     * @return Analytics
+     */
+    public function setLanguage($language)
+    {
+        $this->language = $language;
+
+        return $this;
+    }
+
+    /**
+     * Get language
+     *
+     * @return string 
+     */
+    public function getLanguage()
+    {
+        return $this->language;
     }
 }

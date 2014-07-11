@@ -37,7 +37,7 @@ if ($tmpl == 'index') {
             ));
             ?>
         </span>
-        <?php echo $view['translator']->trans($activePage->getTitle()); ?>
+        <?php echo $view['translator']->trans($activePage->getTitle()); ?> <span class="small">(<?php echo $activePage->getAlias(); ?>)</span>
     </span>
     <?php
     if ($category = $activePage->getCategory()):
@@ -73,6 +73,14 @@ if ($tmpl == 'index') {
                 ))
             )); ?>">
                 <?php echo $authorName; ?>
+            </a>
+        </span>
+        <span> | </span>
+        <span>
+            <?php $langSearch = $view['translator']->trans('mautic.page.page.searchcommand.lang').":".$activePage->getLanguage(); ?>
+            <a href="<?php echo $view['router']->generate('mautic_page_index', array('search' => $langSearch)); ?>"
+               data-toggle="ajax">
+                <?php echo $activePage->getLanguage(); ?>
             </a>
         </span>
     </span>

@@ -48,7 +48,7 @@ class PageBuilderEvent extends Event
     public function getTokenSections()
     {
         uasort($this->tokens, function ($a, $b) {
-            return strnatcmp(
+            return strnatcasecmp(
                 $a['header'], $b['header']);
         });
         return $this->tokens;

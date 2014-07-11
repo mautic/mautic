@@ -539,10 +539,11 @@ class Page extends FormEntity
         $current = $this->$getter();
 
         if ($prop == 'parent') {
-            $currentId = $current->getId();
+            $currentId = ($current) ? $current->getId() : '';
             $newId     = $val->getId();
             if ($currentId != $newId)
-                $this->changes[$prop] = array($current->getTitle() . " ($currentId)", $val->getTitle() . " ($newId)");
+                $currentTitle = ($current) ? $current->getTitle() . " ($currentId)" : '';
+                $this->changes[$prop] = array($currentTitle, $val->getTitle() . " ($newId)");
         } else {
             parent::isChanged($prop, $val);
         }

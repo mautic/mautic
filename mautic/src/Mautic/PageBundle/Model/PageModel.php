@@ -16,6 +16,7 @@ use Mautic\PageBundle\Entity\Analytics;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageEvent;
+use Mautic\PageBundle\Event\PageHitEvent;
 use Mautic\PageBundle\PageEvents;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -54,6 +55,7 @@ class PageModel extends FormModel
         $alias = $entity->getAlias();
         if (empty($alias)) {
             $alias = strtolower(InputHelper::alphanum($entity->getTitle(), true));
+
         } else {
             $alias = strtolower(InputHelper::alphanum($alias, true));
         }
@@ -61,12 +63,12 @@ class PageModel extends FormModel
         //make sure alias is not already taken
         $repo      = $this->getRepository();
         $testAlias = $alias;
-        $count     = $repo->checkUniqueAlias($testAlias, $entity->getId());
+        $count     = $repo->checkUniqueAlias($testAlias, $entity);
         $aliasTag  = $count;
 
         while ($count) {
             $testAlias = $alias . $aliasTag;
-            $count     = $repo->checkUniqueAlias($testAlias, $entity->getId());
+            $count     = $repo->checkUniqueAlias($testAlias, $entity);
             $aliasTag++;
         }
         if ($testAlias != $alias) {
@@ -201,9 +203,10 @@ class PageModel extends FormModel
      * Generate url for a page
      *
      * @param $entity
+     * @param $absolute
      * @return mixed
      */
-    public function generateUrl($entity)
+    public function generateUrl($entity, $absolute = true)
     {
         $pageSlug = $entity->getId() . ':' . $entity->getAlias();
 
@@ -215,10 +218,22 @@ class PageModel extends FormModel
                 $this->translator->trans('mautic.core.url.uncategorized');
         }
 
-        $pageUrl  = $this->factory->getRouter()->generate('mautic_page_public', array(
-            'slug1' => (!empty($catSlug)) ? $catSlug : $pageSlug,
-            'slug2' => (!empty($catSlug)) ? $pageSlug : ''
-        ), true);
+        if ($parent = $entity->getParent()) {
+            //multiple languages so tak on the language
+            $slugs = array(
+                'slug1' => $entity->getLanguage(),
+                'slug2' => (!empty($catSlug)) ? $catSlug : $pageSlug,
+                'slug3' => (!empty($catSlug)) ? $pageSlug : ''
+            );
+        } else {
+            $slugs = array(
+                'slug1' => (!empty($catSlug)) ? $catSlug : $pageSlug,
+                'slug2' => (!empty($catSlug)) ? $pageSlug : '',
+                'slug3' => ''
+            );
+        }
+
+        $pageUrl  = $this->factory->getRouter()->generate('mautic_page_public', $slugs, $absolute);
 
         return $pageUrl;
     }
@@ -234,6 +249,8 @@ class PageModel extends FormModel
             $hitCount++;
             $page->setHits($hitCount);
             $this->em->persist($page);
+
+            $hit->setLanguage($page->getLanguage());
         }
 
         //check for existing IP
@@ -282,6 +299,11 @@ class PageModel extends FormModel
         $expire = time() + 1800;
         setcookie('mautic.analytics.id', $trackingId, $expire);
         $hit->setTrackingId($trackingId);
+
+        if ($this->dispatcher->hasListeners(PageEvents::PAGE_ON_HIT)) {
+            $event = new PageHitEvent($page, $request, $code);
+            $this->dispatcher->dispatch(PageEvents::PAGE_ON_HIT, $event);
+        }
 
         $this->em->persist($hit);
         $this->em->flush();

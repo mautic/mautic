@@ -235,12 +235,12 @@ class FormModel extends CommonFormModel
 
         //make sure alias is not already taken
         $testAlias = $alias;
-        $count     = $this->em->getRepository('MauticFormBundle:Form')->checkUniqueAlias($testAlias, $entity->getId());
+        $count     = $this->em->getRepository('MauticFormBundle:Form')->checkUniqueAlias($testAlias, $entity);
         $aliasTag  = $count;
 
         while ($count) {
             $testAlias = $alias . $aliasTag;
-            $count     = $this->em->getRepository('MauticFormBundle:Form')->checkUniqueAlias($testAlias, $entity->getId());
+            $count     = $this->em->getRepository('MauticFormBundle:Form')->checkUniqueAlias($testAlias, $entity);
             $aliasTag++;
         }
         if ($testAlias != $alias) {

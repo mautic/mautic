@@ -347,10 +347,18 @@ class FormModel extends CommonModel
      *
      * @param $slug1
      * @param $slug2
+     * @param $slug3
      */
-    public function getEntityBySlugs($slug1, $slug2)
+    public function getEntityBySlugs($slug1, $slug2 = '', $slug3 = '')
     {
-        $idSlug = (!empty($slug2)) ? $slug2 : $slug1;
+        if (!empty($slug3)) {
+            $idSlug = $slug3;
+        } elseif (!empty($slug2)) {
+            $idSlug = $slug2;
+        } else {
+            $idSlug = $slug1;
+        }
+
         $parts  = explode(':', $idSlug);
         if (count($parts) == 2) {
             $entity = $this->getEntity($parts[0]);

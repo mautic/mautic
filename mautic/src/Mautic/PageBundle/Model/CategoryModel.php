@@ -56,12 +56,12 @@ class CategoryModel extends FormModel
         //make sure alias is not already taken
         $repo      = $this->getRepository();
         $testAlias = $alias;
-        $count     = $repo->checkUniqueAlias($testAlias, $entity->getId());
+        $count     = $repo->checkUniqueAlias($testAlias, $entity);
         $aliasTag  = $count;
 
         while ($count) {
             $testAlias = $alias . $aliasTag;
-            $count     = $repo->checkUniqueAlias($testAlias, $entity->getId());
+            $count     = $repo->checkUniqueAlias($testAlias, $entity);
             $aliasTag++;
         }
         if ($testAlias != $alias) {

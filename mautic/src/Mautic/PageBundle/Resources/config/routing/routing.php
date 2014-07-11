@@ -50,10 +50,11 @@ $collection->add('mautic_page_tracker', new Route('/p/page/tracker.gif',
     )
 ));
 
-$collection->add('mautic_page_public', new Route('/p/page/{slug1}/{slug2}',
+$collection->add('mautic_page_public', new Route('/p/page/{slug1}/{slug2}/{slug3}',
     array(
         '_controller' => 'MauticPageBundle:Public:index',
-        "slug2"       => ''
+        "slug2"       => '',
+        "slug3"       => ''
     )
 ));
 

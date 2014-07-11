@@ -17,14 +17,13 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class PublicController extends CommonFormController
 {
-    public function indexAction($slug1, $slug2 = '')
+    public function indexAction($slug1, $slug2 = '', $slug3 = '')
     {
         //find the page
         $factory    = $this->get('mautic.factory');
         $model      = $factory->getModel('page.page');
         $translator = $this->get('translator');
-        $entity     = $model->getEntityBySlugs($slug1, $slug2);
-        $user       = $factory->getUser();
+        $entity     = $model->getEntityBySlugs($slug1, $slug2, $slug3);
 
         if (!empty($entity)) {
             $category     = $entity->getCategory();
@@ -33,33 +32,16 @@ class PublicController extends CommonFormController
 
             //make sure the page is published or deny access if not
             if ((!$catPublished || !$published) && (!$this->get('mautic.security')->hasEntityAccess(
-                'page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy()))) {
+                    'page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy()))
+            ) {
                 $model->hitPage($entity, $this->request, 401);
                 throw new AccessDeniedHttpException($translator->trans('mautic.core.url.error.401'));
             }
 
-            $pageSlug = $entity->getId() . ':' . $entity->getAlias();
-            $catSlug  = (!empty($category)) ? $category->getId() . ':' . $category->getTitle() :
-                $translator->trans('mautic.core.url.uncategorized');
+            //make sure URLs match up
+            $url = $model->generateUrl($entity, false);
 
-            //Check to make sure slugs match up and do a redirect if they don't
-            $catInUrl = $this->get('mautic.factory')->getParameter('cat_in_page_url');
-
-            if (
-                //slugs don't match up
-                ($catInUrl && (
-                    empty($slug2) ||
-                    $slug1 != $catSlug ||
-                    $slug2 != $pageSlug
-                )) ||
-                //not supposed to have a cat slug or page slug isn't up to date
-                (!$catInUrl && (
-                    ($slug1 && $slug2) ||
-                    $slug1 != $pageSlug
-                ))
-            ) {
-                //redirect
-                $url = $model->generateUrl($entity);
+            if ($this->request->getRequestUri() != $url) {
                 $model->hitPage($entity, $this->request, 301);
                 return $this->redirect($url, 301);
             }

@@ -30,9 +30,10 @@ class AjaxController extends CommonAjaxController
         $filter    = InputHelper::clean($request->query->get('filter'));
         $results   = $this->get('mautic.factory')->getModel('page.page')->getLookupResults('page', $filter);
         $dataArray = array();
+
         foreach ($results as $r) {
             $dataArray[] = array(
-                "label" => $r['title'] . " ({$r['id']})",
+                "label" => $r['title'] . " ({$r['id']}:{$r['alias']})",
                 "value" => $r['id']
             );
         }
