@@ -116,8 +116,6 @@ Mautic.launchPageEditor = function () {
     var src = mQuery('#pageBuilderUrl').val();
     src += '?template=' + mQuery('#page_template').val();
 
-    var droppableOffsetAdjusted = false;
-
     var builder = mQuery("<iframe />", {
         css: {
             margin: "0",
@@ -165,16 +163,27 @@ Mautic.launchPageEditor = function () {
 Mautic.closePageEditor = function() {
     mQuery('.page-builder').addClass('hide');
 
-    //kill the iframe
-    mQuery('#builder-template-content').remove();
+    //make sure editors have lost focus so the content is updated
+    mQuery('#builder-template-content').contents().find('.mautic-editable').each(function (index) {
+        mQuery(this).blur();
+    });
 
-    //move the page builder back into form
-    mQuery('.page-builder').appendTo('.bundle-main-inner-wrapper');
+    setTimeout( function() {
+        //kill the draggables
+        mQuery('#builder-template-content').contents().find('.mautic-editable').droppable('destroy');
+        mQuery("ul.draggable li").draggable('destroy');
+
+        //kill the iframe
+        mQuery('#builder-template-content').remove();
+
+        //move the page builder back into form
+        mQuery('.page-builder').appendTo('.bundle-main-inner-wrapper');
+    }, 3000);
 };
 
 Mautic.pageEditorOnLoad = function (container) {
     //activate builder drag and drop
-    mQuery(container + " ul.draggable li", window.top.document).draggable({
+    mQuery(container + " ul.draggable li").draggable({
         iframeFix: true,
         iframeId: 'builder-template-content',
         helper: function() {

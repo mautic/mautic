@@ -482,6 +482,7 @@ class PageController extends FormController
                 return $this->accessDenied();
             }
             $entity = $model->getEntity();
+            $entity->setSessionId($objectId);
         } else {
             $isNew    = false;
             $entity = $model->getEntity($objectId);

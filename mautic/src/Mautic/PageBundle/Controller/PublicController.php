@@ -46,6 +46,88 @@ class PublicController extends CommonFormController
                 return $this->redirect($url, 301);
             }
 
+            //let's check for preferred languages if we have a multi-language group of pages
+            $parent   = $entity->getParent();
+            $children = $entity->getChildren();
+            if ($parent || count($children)) {
+                $session = $this->get('session');
+                if ($parent) {
+                    $children = $parent->getChildren();
+                } else {
+                    $parent = $entity;
+                }
+
+                //check to see if this group has already been redirected
+                $doNotRedirect = $session->get('mautic.page.'.$parent->getId().'.donotredirect', false);
+
+                if (empty($doNotRedirect)) {
+                    $session->set('mautic.page.'.$parent->getId().'.donotredirect', 1);
+
+                    //generate a list of translations
+                    $langs    = array($parent->getLanguage());
+                    foreach ($children as $c) {
+                        $langs[$c->getId()] = $c->getLanguage();
+                    }
+
+                    //loop through the translations to ensure there is a generic option for each
+                    //dialect (i.e en if en_US is present)
+                    $pageLangs = array();
+                    $pageIds   = array();
+                    foreach ($langs as $id => $l) {
+                        $pageIds[]   = $id;
+                        $pageLangs[] = $l;
+                        if (strpos($l, '_') !== false) {
+                            $base = substr($l, 0, 2);
+                            if (!in_array($base, $pageLangs)) {
+                                $pageLangs[] = $base;
+                                $pageIds[]   = $id;
+                            }
+                        }
+                    }
+
+                    //get the browser preferred languages
+                    $langs = explode(',', $this->request->server->get('HTTP_ACCEPT_LANGUAGE'));
+                    foreach ($langs as $k => $l) {
+                        if ($pos = strpos($l, ';q=') !== false) {
+                            //remove weights
+                            $l = substr($l, 0, ($pos+1));
+                        }
+                        //change - to _
+                        $langs[$k] = str_replace('-', '_', $l);
+                    }
+
+                    //loop through the browser languages to ensure there is a generic option for each
+                    //dialect (i.e en if en_US is present)
+                    $userLangs = array();
+                    foreach ($langs as $k => $l) {
+                        $userLangs[] = $l;
+
+                        if (strpos($l, '_') !== false) {
+                            $base = substr($l, 0, 2);
+                            if (!in_array($base, $langs) && !in_array($base, $userLangs)) {
+                                $userLangs[] = $base;
+                            }
+                        }
+                    }
+
+                    //get translations in order of browser preference
+                    $matches = array_intersect($userLangs, $pageLangs);
+                    if (!empty($matches)) {
+                        $preferred = reset($matches);
+                        $key       = array_search($preferred, $pageLangs);
+                        $pageId    = $pageIds[$key];
+
+                        //redirect if not already on the correct page
+                        if ($pageId != $entity->getId()) {
+                            $page = ($pageId == $parent->getId()) ? $parent : $children[$pageId];
+                            $url  = $model->generateUrl($page, false);
+                            $model->hitPage($entity, $this->request, 302);
+                            return $this->redirect($url, 302);
+                        }
+                    }
+                }
+            }
+
             //all the checks pass so display the content
             $template   = $entity->getTemplate();
 

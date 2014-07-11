@@ -126,7 +126,7 @@ class Page extends FormEntity
     private $category;
 
     /**
-     * @ORM\OneToMany(targetEntity="Page", mappedBy="parent")
+     * @ORM\OneToMany(targetEntity="Page", mappedBy="parent", indexBy="id")
      **/
     private $children;
 

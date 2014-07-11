@@ -138,12 +138,21 @@ class Analytics
     private $remoteHost;
 
     /**
-     * @ORM\Column(name="language", type="string", nullable=true)
+     * @ORM\Column(name="page_language", type="string", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})
      */
-    private $language;
+    private $pageLanguage;
+
+    /**
+     * @ORM\Column(name="browser_languages", type="array", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full"})
+     */
+    private $browserLanguages = array();
+
 
     /**
      * @ORM\Column(type="string")
@@ -484,25 +493,48 @@ class Analytics
     }
 
     /**
-     * Set language
+     * Set pageLanguage
      *
-     * @param string $language
+     * @param string $pageLanguage
      * @return Analytics
      */
-    public function setLanguage($language)
+    public function setPageLanguage($pageLanguage)
     {
-        $this->language = $language;
+        $this->pageLanguage = $pageLanguage;
 
         return $this;
     }
 
     /**
-     * Get language
+     * Get pageLanguage
      *
-     * @return string 
+     * @return string
      */
-    public function getLanguage()
+    public function getPageLanguage()
     {
-        return $this->language;
+        return $this->pageLanguage;
+    }
+
+    /**
+     * Set browserLanguages
+     *
+     * @param string $browserLanguages
+     * @return Analytics
+     */
+    public function setBrowserLanguages($browserLanguages)
+    {
+        $this->browserLanguages = $browserLanguages;
+
+        return $this;
+    }
+
+    /**
+     * Get browserLanguages
+     *
+     * @return string
+     */
+    public function getBrowserLanguages()
+    {
+        return $this->browserLanguages;
     }
 }

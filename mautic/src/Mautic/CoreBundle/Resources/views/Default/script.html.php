@@ -27,6 +27,7 @@
             mQuery('.sf-minitoolbar').remove();
             mQuery('.sf-toolbarreset').remove();
             mQuery('.sf-toolbar').remove();
+            mQuery("[id^=sfToolbarClearer]").remove();
             mQuery.get(mauticBaseUrl + '_wdt/'+XMLHttpRequest.getResponseHeader('x-debug-token'),function(data){
                 mQuery('body').append(data);
             });

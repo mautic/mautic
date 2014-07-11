@@ -250,7 +250,7 @@ class PageModel extends FormModel
             $page->setHits($hitCount);
             $this->em->persist($page);
 
-            $hit->setLanguage($page->getLanguage());
+            $hit->setPageLanguage($page->getLanguage());
         }
 
         //check for existing IP
@@ -278,6 +278,17 @@ class PageModel extends FormModel
         $hit->setReferer($request->server->get('HTTP_REFERER'));
         $hit->setUserAgent($request->server->get('HTTP_USER_AGENT'));
         $hit->setRemoteHost($request->server->get('REMOTE_HOST'));
+
+        //get a list of the languages the user prefers
+        $browserLanguages = $request->server->get('HTTP_ACCEPT_LANGUAGE');
+        $languages        = explode(',', $browserLanguages);
+        foreach ($languages as $k => $l) {
+            if ($pos = strpos(';q=', $l) !== false) {
+                //remove weights
+                $languages[$k] = substr($l, 0, $pos);
+            }
+        }
+        $hit->setBrowserLanguages($languages);
 
         $pageURL = 'http';
         if ($request->server->get("HTTPS") == "on") {$pageURL .= "s";}
