@@ -60,6 +60,10 @@ class Category extends FormEntity
      **/
     private $pages;
 
+    public function __clone() {
+        $this->id = null;
+    }
+
     /**
      * Constructor
      */

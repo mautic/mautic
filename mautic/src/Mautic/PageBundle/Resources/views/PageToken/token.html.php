@@ -9,12 +9,12 @@
 ?>
 <div class="bundle-list" id="form-page-tokens">
     <ul class="draggable scrollable">
-        <li class="bundle-list-item">
+        <li class="bundle-list-item has-click-event">
             <div class="padding-sm">
                 <span class="list-item-primary">
                     <?php echo $view['translator']->trans('mautic.page.page.token.lang'); ?>
                 </span>
-                <span class="list-item-secondary" data-toggle="tooltip"
+                <span class="list-item-secondary" data-toggle="tooltip" data-placement="bottom"
                       title="<?php echo $view['translator']->trans('mautic.page.page.token.lang.descr'); ?>">
                     <?php echo substr($view['translator']->trans('mautic.page.page.token.lang.descr'), 0, 30); ?>...
                 </span>

@@ -24,6 +24,7 @@ if ($tmpl == 'index') {
                     $permissions['form:forms:editother'],
                     $activeForm->getCreatedBy()
                 ),
+                'clone'     => $permissions['form:forms:create'],
                 'delete'    => $security->hasEntityAccess(
                     $permissions['form:forms:deleteown'],
                     $permissions['form:forms:deleteother'],

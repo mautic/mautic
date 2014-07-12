@@ -32,7 +32,7 @@ foreach ($items as $key => $item):
            data-toggle="ajax"
            data-menu-link="mautic_pagecategory_index">
             <span class="list-item-primary">
-                <?php echo $item->getTitle(); ?>
+                <?php echo $item->getTitle(); ?> <span class="small">(<?php echo $item->getAlias(); ?>)</span>
             </span>
             <span class="list-item-secondary list-item-indent">
                 <?php echo $item->getDescription(); ?>

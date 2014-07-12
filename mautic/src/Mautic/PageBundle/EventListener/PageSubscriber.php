@@ -243,8 +243,8 @@ class PageSubscriber extends CommonSubscriber
         $model    = $this->factory->getModel('page.page');
         $content  = $event->getContent();
         $page     = $event->getPage();
-        $parent   = $page->getParent();
-        $children = $page->getChildren();
+        $parent   = $page->getTranslationParent();
+        $children = $page->getTranslationChildren();
 
         //check to see if this page is grouped with another
         if (empty($parent) && empty($children))
@@ -254,7 +254,7 @@ class PageSubscriber extends CommonSubscriber
 
         //get a list of associated pages/languages
         if (!empty($parent)) {
-            $children = $parent->getChildren();
+            $children = $parent->getTranslationChildren();
         } else {
             $parent = $page; //parent is self
         }

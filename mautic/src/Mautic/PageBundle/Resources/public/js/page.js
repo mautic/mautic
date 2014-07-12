@@ -8,7 +8,7 @@ Mautic.pageOnLoad = function (container) {
         mQuery('.bundle-main').addClass('fullpanel');
 
         //active lookups
-        if (mQuery('#page_parent_lookup').length) {
+        if (mQuery('#page_translationParent_lookup').length) {
             var pages = new Bloodhound({
                 datumTokenizer: Bloodhound.tokenizers.obj.whitespace('label'),
                 queryTokenizer: Bloodhound.tokenizers.whitespace,
@@ -25,7 +25,7 @@ Mautic.pageOnLoad = function (container) {
             });
             pages.initialize();
 
-            mQuery("#page_parent_lookup").typeahead(
+            mQuery("#page_translationParent_lookup").typeahead(
                 {
                     hint: true,
                     highlight: true,
@@ -41,7 +41,7 @@ Mautic.pageOnLoad = function (container) {
                     mQuery("#page_parent").val(datum["value"]);
                 }).on('keypress', function (event) {
                     if ((event.keyCode || event.which) == 13) {
-                        mQuery('#page_parent_lookup').typeahead('close');
+                        mQuery('#page_translationParent_lookup').typeahead('close');
                     }
                 });
         }
@@ -196,4 +196,14 @@ Mautic.pageEditorOnLoad = function (container) {
         scrollSpeed: 100,
         cursorAt: {top: 15, left: 15}
     });
+};
+
+Mautic.toggleRelatedTranslations = function () {
+    if (mQuery('ul.related-translations').css('display') == 'block') {
+        mQuery('.related-translations-toggle').removeClass('fa-chevron-circle-up').addClass('fa-chevron-circle-down')
+        mQuery('ul.related-translations').slideUp();
+    } else {
+        mQuery('.related-translations-toggle').removeClass('fa-chevron-circle-down').addClass('fa-chevron-circle-up')
+        mQuery('ul.related-translations').slideDown();
+    }
 };

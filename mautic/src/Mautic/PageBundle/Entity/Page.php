@@ -126,18 +126,40 @@ class Page extends FormEntity
     private $category;
 
     /**
-     * @ORM\OneToMany(targetEntity="Page", mappedBy="parent", indexBy="id")
+     * @ORM\OneToMany(targetEntity="Page", mappedBy="translationParent", indexBy="id", fetch="EXTRA_LAZY")
      **/
-    private $children;
+    private $translationChildren;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Page", inversedBy="children")
-     * @ORM\JoinColumn(name="parent_id", referencedColumnName="id")
+     * @ORM\ManyToOne(targetEntity="Page", inversedBy="translationChildren")
+     * @ORM\JoinColumn(name="translation_parent_id", referencedColumnName="id")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})
      **/
-    private $parent;
+    private $translationParent;
+
+    /**
+     * @ORM\OneToMany(targetEntity="Page", mappedBy="variationParent", indexBy="id", fetch="EXTRA_LAZY")
+     **/
+    private $variationChildren;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Page", inversedBy="variationChildren")
+     * @ORM\JoinColumn(name="variation_parent_id", referencedColumnName="id")
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full"})
+     **/
+    private $variationParent;
+
+    /**
+     * @ORM\Column(name="variation_settings", type="array", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full"})
+     */
+    private $variationSettings = array();
 
     /**
      * Used to identify the page for the builder
@@ -145,6 +167,10 @@ class Page extends FormEntity
      * @var
      */
     private $sessionId;
+
+    public function __clone() {
+        $this->id = null;
+    }
 
     /**
      * Get id
@@ -417,70 +443,6 @@ class Page extends FormEntity
     {
         return $this->author;
     }
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        $this->children = new \Doctrine\Common\Collections\ArrayCollection();
-    }
-
-    /**
-     * Add children
-     *
-     * @param \Mautic\PageBundle\Entity\Page $children
-     * @return Page
-     */
-    public function addChild(\Mautic\PageBundle\Entity\Page $children)
-    {
-        $this->children[] = $children;
-
-        return $this;
-    }
-
-    /**
-     * Remove children
-     *
-     * @param \Mautic\PageBundle\Entity\Page $children
-     */
-    public function removeChild(\Mautic\PageBundle\Entity\Page $children)
-    {
-        $this->children->removeElement($children);
-    }
-
-    /**
-     * Get children
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getChildren()
-    {
-        return $this->children;
-    }
-
-    /**
-     * Set parent
-     *
-     * @param \Mautic\PageBundle\Entity\Page $parent
-     * @return Page
-     */
-    public function setParent(\Mautic\PageBundle\Entity\Page $parent = null)
-    {
-        $this->isChanged('parent', $parent);
-        $this->parent = $parent;
-
-        return $this;
-    }
-
-    /**
-     * Get parent
-     *
-     * @return \Mautic\PageBundle\Entity\Page
-     */
-    public function getParent()
-    {
-        return $this->parent;
-    }
 
     /**
      * Set sessionId
@@ -538,7 +500,7 @@ class Page extends FormEntity
         $getter  = "get" . ucfirst($prop);
         $current = $this->$getter();
 
-        if ($prop == 'parent') {
+        if ($prop == 'translationParent' || $prop == 'variationParent') {
             $currentId = ($current) ? $current->getId() : '';
             $newId     = $val->getId();
             if ($currentId != $newId)
@@ -547,5 +509,151 @@ class Page extends FormEntity
         } else {
             parent::isChanged($prop, $val);
         }
+    }
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->translationChildren = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->variationChildren = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
+     * Add translationChildren
+     *
+     * @param \Mautic\PageBundle\Entity\Page $translationChildren
+     * @return Page
+     */
+    public function addTranslationChild(\Mautic\PageBundle\Entity\Page $translationChildren)
+    {
+        $this->translationChildren[] = $translationChildren;
+
+        return $this;
+    }
+
+    /**
+     * Remove translationChildren
+     *
+     * @param \Mautic\PageBundle\Entity\Page $translationChildren
+     */
+    public function removeTranslationChild(\Mautic\PageBundle\Entity\Page $translationChildren)
+    {
+        $this->translationChildren->removeElement($translationChildren);
+    }
+
+    /**
+     * Get translationChildren
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getTranslationChildren()
+    {
+        return $this->translationChildren;
+    }
+
+    /**
+     * Set translationParent
+     *
+     * @param \Mautic\PageBundle\Entity\Page $translationParent
+     * @return Page
+     */
+    public function setTranslationParent(\Mautic\PageBundle\Entity\Page $translationParent = null)
+    {
+        $this->isChanged('translationParent', $translationParent);
+        $this->translationParent = $translationParent;
+
+        return $this;
+    }
+
+    /**
+     * Get translationParent
+     *
+     * @return \Mautic\PageBundle\Entity\Page
+     */
+    public function getTranslationParent()
+    {
+        return $this->translationParent;
+    }
+
+    /**
+     * Add variationChildren
+     *
+     * @param \Mautic\PageBundle\Entity\Page $variationChildren
+     * @return Page
+     */
+    public function addVariationChild(\Mautic\PageBundle\Entity\Page $variationChildren)
+    {
+        $this->variationChildren[] = $variationChildren;
+
+        return $this;
+    }
+
+    /**
+     * Remove variationChildren
+     *
+     * @param \Mautic\PageBundle\Entity\Page $variationChildren
+     */
+    public function removeVariationChild(\Mautic\PageBundle\Entity\Page $variationChildren)
+    {
+        $this->variationChildren->removeElement($variationChildren);
+    }
+
+    /**
+     * Get variationChildren
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getVariationChildren()
+    {
+        return $this->variationChildren;
+    }
+
+    /**
+     * Set variationParent
+     *
+     * @param \Mautic\PageBundle\Entity\Page $variationParent
+     * @return Page
+     */
+    public function setVariationParent(\Mautic\PageBundle\Entity\Page $variationParent = null)
+    {
+        $this->isChanged('variationParent', $variationParent);
+        $this->variationParent = $variationParent;
+
+        return $this;
+    }
+
+    /**
+     * Get variationParent
+     *
+     * @return \Mautic\PageBundle\Entity\Page
+     */
+    public function getVariationParent()
+    {
+        return $this->variationParent;
+    }
+
+    /**
+     * Set variationSettings
+     *
+     * @param array $variationSettings
+     * @return Page
+     */
+    public function setVariationSettings($variationSettings)
+    {
+        $this->isChanged('variationSettings', $variationSettings);
+        $this->variationSettings = $variationSettings;
+
+        return $this;
+    }
+
+    /**
+     * Get variationSettings
+     *
+     * @return array
+     */
+    public function getVariationSettings()
+    {
+        return $this->variationSettings;
     }
 }

@@ -119,6 +119,10 @@ class Form extends FormEntity
      */
     private $submissions;
 
+    public function __clone() {
+        $this->id = null;
+    }
+
     protected function isChanged($prop, $val)
     {
         $getter  = "get" . ucfirst($prop);

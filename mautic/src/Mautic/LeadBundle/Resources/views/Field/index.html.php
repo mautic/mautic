@@ -38,6 +38,7 @@ $view["slots"]->set("headerTitle", $view['translator']->trans('mautic.lead.field
                     echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
                         'item'      => $item,
                         'edit'      => true,
+                        'clone'     => true,
                         'delete'    => $item->isFixed() ? false : true,
                         'routeBase' => 'leadfield',
                         'menuLink'  => 'mautic_leadfield_index',

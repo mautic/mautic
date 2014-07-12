@@ -73,26 +73,25 @@ class PageRepository extends CommonRepository
         $q->setParameter('alias', $alias);
 
         if (!empty($entity)) {
-            $parent   = $entity->getParent();
-            $children = $entity->getChildren();
+            $parent   = $entity->getTranslationParent();
+            $children = $entity->getTranslationChildren();
             if ($parent || count($children)) {
                 //allow same alias among language group
                 $ids = array();
 
                 if (!empty($parent)) {
-                    $children = $parent->getChildren();
-                } else {
-                    $parent = $entity;
+                    $children = $parent->getTranslationChildren();
+                    $ids[] = $parent->getId();
                 }
 
-                $ids[] = $parent->getId();
                 foreach ($children as $child) {
                     if ($child->getId() != $entity->getId()) {
                         $ids[] = $child->getId();
                     }
                 }
-                $q->andWhere($q->expr()->notIn('e.id', $ids));
-            } elseif ($entity->getId()) {
+                $q->andWhere($q->expr()->in('e.id', $ids));
+            }
+            if ($entity->getId()) {
                 $q->andWhere('e.id != :id');
                 $q->setParameter('id', $entity->getId());
             }
@@ -108,19 +107,26 @@ class PageRepository extends CommonRepository
      * @param int    $start
      * @param bool   $viewOther
      */
-    public function getPageList($search = '', $limit = 10, $start = 0, $viewOther = false)
+    public function getPageList($search = '', $limit = 10, $start = 0, $viewOther = false, $topLevel = false)
     {
         $q = $this->createQueryBuilder('p');
         $q->select('partial p.{id, title, language, alias}');
 
         if (!empty($search)) {
-            $q->where($q->expr()->like('p.title', ':search'))
+            $q->andWhere($q->expr()->like('p.title', ':search'))
                 ->setParameter('search', "{$search}%");
         }
 
         if (!$viewOther) {
             $q->andWhere($q->expr()->eq('IDENTITY(p.createdBy)', ':id'))
                 ->setParameter('id', $this->currentUser->getId());
+        }
+
+        if ($topLevel == 'translation') {
+            //only get top level pages
+            $q->andWhere($q->expr()->isNull('p.translationParent'));
+        } elseif ($topLevel == 'variation') {
+            $q->andWhere($q->expr()->isNull('p.variationParent'));
         }
 
         $q->orderBy('p.title');

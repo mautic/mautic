@@ -234,6 +234,32 @@ class FieldController extends FormController
     }
 
     /**
+     * Clone an entity
+     *
+     * @param $objectId
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     */
+    public function cloneAction ($objectId)
+    {
+        $model   = $this->get('mautic.factory')->getModel('lead.field');
+        $entity  = $model->getEntity($objectId);
+
+        if ($entity != null) {
+            if (!$this->get('mautic.security')->isGranted('lead:fields:full')) {
+                return $this->accessDenied();
+            }
+
+            $clone = clone $entity;
+            $clone->setIsPublished(false);
+            $clone->setIsFixed(false);
+            $model->saveEntity($clone);
+            $objectId = $clone->getId();
+        }
+
+        return $this->editAction($objectId);
+    }
+
+    /**
      * Delete a field
      *
      * @param         $objectId

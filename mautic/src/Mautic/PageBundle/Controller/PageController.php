@@ -399,15 +399,46 @@ class PageController extends FormController
             $model->lockEntity($entity);
 
             //set the lookup values
-            $parent = $entity->getParent();
+            $parent = $entity->getTranslationParent();
             if ($parent)
-                $form->get('parent_lookup')->setData($parent->getTitle());
+                $form->get('translationParent_lookup')->setData($parent->getTitle());
             $category = $entity->getCategory();
             if ($category)
                 $form->get('category_lookup')->setData($category->getTitle());
         }
 
         return $this->indexAction($page, 'edit', $entity, $form->createView());
+    }
+
+    /**
+     * Clone an entity
+     *
+     * @param $objectId
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     */
+    public function cloneAction ($objectId)
+    {
+        $model   = $this->get('mautic.factory')->getModel('page.page');
+        $entity  = $model->getEntity($objectId);
+
+        if ($entity != null) {
+            if (!$this->get('mautic.security')->isGranted('page:pages:create') ||
+                !$this->get('mautic.security')->hasEntityAccess(
+                    'page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy()
+                )
+            ) {
+                return $this->accessDenied();
+            }
+
+            $clone = clone $entity;
+            $clone->setHits(0);
+            $clone->setRevision(0);
+            $clone->setIsPublished(false);
+            $model->saveEntity($clone);
+            $objectId = $clone->getId();
+        }
+
+        return $this->editAction($objectId);
     }
 
     /**

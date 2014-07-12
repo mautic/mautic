@@ -535,6 +535,35 @@ class FormController extends CommonFormController
     }
 
     /**
+     * Clone an entity
+     *
+     * @param $objectId
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     */
+    public function cloneAction ($objectId)
+    {
+        $model   = $this->get('mautic.factory')->getModel('form.form');
+        $entity  = $model->getEntity($objectId);
+
+        if ($entity != null) {
+            if (!$this->get('mautic.security')->isGranted('form:forms:create') ||
+                !$this->get('mautic.security')->hasEntityAccess(
+                    'form:forms:viewown', 'form:forms:viewother', $entity->getCreatedBy()
+                )
+            ) {
+                return $this->accessDenied();
+            }
+
+            $clone = clone $entity;
+            $clone->setIsPublished(false);
+            $model->saveEntity($clone);
+            $objectId = $clone->getId();
+        }
+
+        return $this->editAction($objectId);
+    }
+
+    /**
      * Gives a preview of the form
      *
      * @param $objectId

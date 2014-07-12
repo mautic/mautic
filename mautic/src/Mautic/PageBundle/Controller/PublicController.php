@@ -47,12 +47,12 @@ class PublicController extends CommonFormController
             }
 
             //let's check for preferred languages if we have a multi-language group of pages
-            $parent   = $entity->getParent();
-            $children = $entity->getChildren();
+            $parent   = $entity->getTranslationParent();
+            $children = $entity->getTranslationChildren();
             if ($parent || count($children)) {
                 $session = $this->get('session');
                 if ($parent) {
-                    $children = $parent->getChildren();
+                    $children = $parent->getTranslationChildren();
                 } else {
                     $parent = $entity;
                 }

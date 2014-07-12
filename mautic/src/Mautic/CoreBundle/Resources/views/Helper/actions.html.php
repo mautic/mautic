@@ -17,15 +17,27 @@ if (empty($pull))
     </button>
     <ul class="pull-<?php echo $pull; ?> bundle-list-actions dropdown-menu" role="menu">
         <?php if (!empty($edit)): ?>
+            <li>
+                <a href="<?php echo $view['router']->generate('mautic_' . $routeBase . '_action',
+                    array("objectAction" => "edit", "objectId" => $item->getId())); ?>"
+                   data-toggle="ajax"
+                    <?php if (isset($menuLink)):?>
+                    data-menu-link="<?php echo $menuLink; ?>"
+                    <?php endif; ?>>
+                    <span><i class="fa fa-pencil-square-o"></i><?php echo $view['translator']->trans('mautic.core.form.edit'); ?></span>
+                </a>
+            </li>
+        <?php
+        endif;
+        if (!empty($clone)): ?>
         <li>
             <a href="<?php echo $view['router']->generate('mautic_' . $routeBase . '_action',
-                   array("objectAction" => "edit", "objectId" => $item->getId())); ?>"
+                   array("objectAction" => "clone", "objectId" => $item->getId())); ?>"
                data-toggle="ajax"
-               <?php if (isset($menuLink)):?>
-               data-menu-link="<?php echo $menuLink; ?>"
-               <?php endif; ?>
-               >
-                <span><i class="fa fa-pencil-square-o"></i><?php echo $view['translator']->trans('mautic.core.form.edit'); ?></span>
+                <?php if (isset($menuLink)):?>
+                data-menu-link="<?php echo $menuLink; ?>"
+                <?php endif; ?>>
+                <span><i class="fa fa-copy"></i><?php echo $view['translator']->trans('mautic.core.form.clone'); ?></span>
             </a>
         </li>
         <?php

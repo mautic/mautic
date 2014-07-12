@@ -231,6 +231,8 @@ class FormModel extends CommonFormModel
             $alias = strtolower(InputHelper::alphanum($entity->getName(), true));
         } else {
             $alias = strtolower(InputHelper::alphanum($alias, true));
+            //remove appended numbers
+            $alias = preg_replace('#[0-9]+$#', '', $alias);
         }
 
         //make sure alias is not already taken

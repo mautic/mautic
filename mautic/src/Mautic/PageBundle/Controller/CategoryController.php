@@ -358,6 +358,31 @@ class CategoryController extends FormController
     }
 
     /**
+     * Clone an entity
+     *
+     * @param $objectId
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     */
+    public function cloneAction ($objectId)
+    {
+        $model   = $this->get('mautic.factory')->getModel('page.category');
+        $entity  = $model->getEntity($objectId);
+
+        if ($entity != null) {
+            if (!$this->get('mautic.security')->isGranted('page:categories:create')) {
+                return $this->accessDenied();
+            }
+
+            $clone = clone $entity;
+            $clone->setIsPublished(false);
+            $model->saveEntity($clone);
+            $objectId = $clone->getId();
+        }
+
+        return $this->editAction($objectId);
+    }
+
+    /**
      * Deletes the entity
      *
      * @param         $objectId

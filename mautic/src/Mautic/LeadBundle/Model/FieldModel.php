@@ -100,13 +100,15 @@ class FieldModel extends FormModel
                 $alias = strtolower(InputHelper::alphanum($entity->getName()));
             } else {
                 $alias = strtolower(InputHelper::alphanum($alias));
+                //remove appended numbers
+                $alias = preg_replace('#[0-9]+$#', '', $alias);
             }
 
             //make sure alias is not already taken
             $repo      = $this->getRepository();
             $testAlias = $alias;
             $aliases   = $repo->getAliases($entity->getId());
-            $count     = count($aliases);
+            $count     = (int) in_array($testAlias, $aliases);
             $aliasTag  = $count;
 
             while ($count) {
@@ -114,6 +116,7 @@ class FieldModel extends FormModel
                 $count     = (int) in_array($testAlias, $aliases);
                 $aliasTag++;
             }
+
             if ($testAlias != $alias) {
                 $alias = $testAlias;
             }
@@ -279,7 +282,7 @@ class FieldModel extends FormModel
                 return false;
         }
 
-        if ($this->dispatcher->hasListerners($name)) {
+        if ($this->dispatcher->hasListeners($name)) {
             if (empty($event)) {
                 $event = new LeadFieldEvent($entity, $isNew);
                 $event->setEntityManager($this->em);

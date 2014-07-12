@@ -1087,8 +1087,9 @@ var Mautic = {
             success: function (response) {
                 if (response.statusHtml) {
                     mQuery(el).replaceWith(response.statusHtml);
-                    mQuery('.publish-icon'+id).tooltip({html: true, container: 'body'});
+                    mQuery(el).tooltip({html: true, container: 'body'});
                 }
+                Mautic.stopIconSpinPostEvent();
             },
             error: function (request, textStatus, errorThrown) {
                 alert(errorThrown);

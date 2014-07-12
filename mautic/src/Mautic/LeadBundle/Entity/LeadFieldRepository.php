@@ -32,11 +32,17 @@ class LeadFieldRepository extends CommonRepository
     public function getAliases($exludingId)
     {
         $q = $this->createQueryBuilder('l')
-            ->select('l.alias')
-            ->where('l.id != :id')
+            ->select('l.alias');
+        if (!empty($exludingId)) {
+        $q->where('l.id != :id')
             ->setParameter('id', $exludingId);
+        }
 
         $results = $q->getQuery()->getArrayResult();
-        return $results;
+        $aliases = array();
+        foreach($results as $item) {
+            $aliases[] = $item['alias'];
+        }
+        return $aliases;
     }
 }

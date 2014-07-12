@@ -16,7 +16,7 @@ if ($tmpl == 'index') {
         <?php
         if (count($items)):
         foreach ($items as $key => $item):?>
-            <li class="bundle-list-item" id="form-<?php echo $item->getId(); ?>">
+            <li class="bundle-list-item has-click-event" id="form-<?php echo $item->getId(); ?>">
                 <div class="padding-sm">
                     <span class="list-item-publish-status">
                         <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php',array(

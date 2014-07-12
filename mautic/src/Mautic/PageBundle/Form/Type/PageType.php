@@ -121,18 +121,18 @@ class PageType extends AbstractType
             'required'   => false
         ));
 
-        $builder->add('parent_lookup', 'text', array(
-            'label'      => 'mautic.page.page.form.parent',
+        $builder->add('translationParent_lookup', 'text', array(
+            'label'      => 'mautic.page.page.form.translationparent',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
                 'class'   => 'form-control',
-                'tooltip' => 'mautic.page.page.form.parent.help'
+                'tooltip' => 'mautic.page.page.form.translationparent.help'
             ),
             'mapped'     => false,
             'required'   => false
         ));
 
-        $builder->add('parent', 'hidden_entity', array(
+        $builder->add('translationParent', 'hidden_entity', array(
             'required'   => false,
             'repository' => 'MauticPageBundle:Page',
             'error_bubbling' => false

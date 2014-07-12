@@ -209,19 +209,19 @@ class FormModel extends CommonModel
     {
         $user = $this->factory->getUser(true);
         if ($isNew) {
-            if (method_exists($entity, 'setDateAdded') && !$entity->getDateAdded()) {
+            if (method_exists($entity, 'setDateAdded')) {
                 $entity->setDateAdded(new \DateTime());
             }
 
-            if ($user instanceof User && method_exists($entity, 'setCreatedBy') && !$entity->getCreatedBy()) {
+            if ($user instanceof User && method_exists($entity, 'setCreatedBy')) {
                 $entity->setCreatedBy($user);
             }
         } else {
-            if (method_exists($entity, 'setDateModified') && !$entity->getDateModified()) {
+            if (method_exists($entity, 'setDateModified')) {
                 $entity->setDateModified(new \DateTime());
             }
 
-            if ($user instanceof User && method_exists($entity, 'setModifiedBy') && !$entity->getModifiedBy()) {
+            if ($user instanceof User && method_exists($entity, 'setModifiedBy')) {
                 $entity->setModifiedBy($user);
             }
         }

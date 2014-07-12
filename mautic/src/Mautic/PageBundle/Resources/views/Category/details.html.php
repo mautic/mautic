@@ -22,6 +22,7 @@ if ($tmpl == 'index') {
             echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
                 'item'       => $activeCategory,
                 'edit'       => $permissions['page:categories:edit'],
+                'clone'      => $permissions['page:categories:create'],
                 'delete'     => $permissions['page:categories:delete'],
                 'routeBase'  => 'pagecategory',
                 'menuLink'   => 'mautic_pagecategory_index',

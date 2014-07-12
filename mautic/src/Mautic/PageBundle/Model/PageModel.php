@@ -55,9 +55,10 @@ class PageModel extends FormModel
         $alias = $entity->getAlias();
         if (empty($alias)) {
             $alias = strtolower(InputHelper::alphanum($entity->getTitle(), true));
-
         } else {
             $alias = strtolower(InputHelper::alphanum($alias, true));
+            //remove appended numbers
+            $alias = preg_replace('#[0-9]+$#', '', $alias);
         }
 
         //make sure alias is not already taken
@@ -218,7 +219,8 @@ class PageModel extends FormModel
                 $this->translator->trans('mautic.core.url.uncategorized');
         }
 
-        if ($parent = $entity->getParent()) {
+        $parent = $entity->getTranslationParent();
+        if ($parent) {
             //multiple languages so tak on the language
             $slugs = array(
                 'slug1' => $entity->getLanguage(),
