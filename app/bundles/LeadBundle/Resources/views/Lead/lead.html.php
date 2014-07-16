@@ -34,6 +34,7 @@ $view["slots"]->set("headerTitle",
         <?php echo $view["translator"]->trans("mautic.core.form.delete"); ?>
     </a>
 </li>
+<?php endif; ?>
 <?php $view["slots"]->stop(); ?>
 
 <?php
@@ -45,5 +46,4 @@ $ipAddresses = count($lead->getIpAddresses());
 if (!empty($ipAddresses))
     echo $view->render('MauticLeadBundle:Lead:ip_addresses.html.php', array("lead" => $lead));
 ?>
-<?php endif; ?>
 <div class="footer-margin"></div>
