@@ -29,14 +29,14 @@ if ($tmpl == 'index')
                     'sessionVar' => 'lead',
                     'orderBy'    => 'l.dateAdded',
                     'text'       => 'mautic.lead.lead.thead.email',
-                    'class'      => 'col-lead-email'
+                    'class'      => 'visible-md visible-lg col-lead-email'
                 ));
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'lead',
                     'orderBy'    => 'l.dateAdded',
                     'text'       => 'mautic.lead.lead.thead.location',
-                    'class'      => 'col-lead-location'
+                    'class'      => 'visible-md visible-lg col-lead-location'
                 ));
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
