@@ -39,11 +39,3 @@ $view['slots']->set('searchHelp', $view['translator']->trans('mautic.lead.list.h
 <?php $view['slots']->stop(); ?>
 
 <?php $view['slots']->output('_content'); ?>
-<?php
-echo $view->render('MauticCoreBundle:Helper:modal.html.php', array(
-    'id'     => 'search-help',
-    'header' => $view['translator']->trans('mautic.core.search.header'),
-    'body'   => $view['translator']->trans('mautic.core.search.help') .
-        $view['translator']->trans('mautic.lead.lead.help.searchcommands')
-));
-?>
