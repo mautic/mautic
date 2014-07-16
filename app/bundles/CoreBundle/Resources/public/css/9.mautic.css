@@ -5,6 +5,7 @@ html {
 body {
   height: 100%;
   overflow: hidden;
+  background: #ecf0f1;
 }
 h1,
 h2,
@@ -17,7 +18,7 @@ h6 {
 .page-wrapper {
   padding-left: 0;
   padding-right: 0;
-  background-color: #513b49;
+  /*  background-color: @leftPanelBase; */
   position: relative;
   height: 100%;
   width: 100%;
@@ -29,10 +30,10 @@ h6 {
   transition: all 0.3s ease-in-out 0s;
 }
 .top-panel {
-  position: fixed;
+  /*  position: fixed;
   top: 0;
   left: 0;
-  right: 0;
+  right: 0; */
   height: 50px;
   background-color: #fff;
   z-index: 5000;
@@ -54,11 +55,11 @@ h6 {
   padding-top: 8px;
 }
 .panel-toggle a {
-  color: #513b49;
+  color: #2a2a2a;
   font-size: 0.9em;
 }
 .panel-toggle a:hover {
-  color: #8c667e;
+  color: #5d5d5d;
 }
 .account-menu .dropdown,
 .admin-menu .dropdown {
@@ -73,7 +74,7 @@ h6 {
   padding: 12px 2px 0 0 !important;
 }
 .main-panel-wrapper {
-  padding-top: 50px;
+  /*  padding-top: @topPanelHeight; */
   width: 100%;
   height: 100%;
   position: relative;
@@ -105,22 +106,17 @@ h6 {
   margin-bottom: 75px;
 }
 .main-panel-breadcrumbs {
-  height: 40px;
+  /*  height: 40px;
   padding-left: 20px;
   padding-right: 20px;
-  position: fixed;
+  position: fixed; */
   z-index: 1000;
   width: 100%;
-  left: 230px;
+  /*  left: @leftPanelWidth; */
   -webkit-transition: all 0.3s ease-in-out;
   -moz-transition: all 0.3s ease-in-out;
   -o-transition: all 0.3s ease-in-out;
   transition: all 0.3s ease-in-out 0s;
-}
-.main-panel-breadcrumbs ol.breadcrumb {
-  padding: 8px 0;
-  margin-bottom: 5px;
-  background-color: #ecf0f1;
 }
 .main-panel-content {
   position: relative;
@@ -156,7 +152,7 @@ h6 {
 }
 .left-panel {
   position: fixed;
-  background-color: #513b49;
+  background-color: #2a2a2a;
   bottom: 0;
   width: 230px;
   left: 230px;
@@ -169,7 +165,7 @@ h6 {
 }
 .right-panel {
   position: fixed;
-  background-color: #513b49;
+  background-color: #2a2a2a;
   width: 230px;
   margin-right: -230px;
   right: 0;
@@ -190,7 +186,7 @@ h6 {
 .right-panel-header {
   padding: 8px 5px;
   height: 50px;
-  background-color: #604656;
+  background-color: #373737;
 }
 .right-panel-inner-wrapper {
   padding-top: 0;
@@ -236,7 +232,7 @@ h6 {
   margin-left: 28px;
 }
 .left-panel-inner-wrapper {
-  padding-top: 50px;
+  /*  padding-top: @topPanelHeight; */
 }
 .left-panel-inner-wrapper,
 .right-panel-inner-wrapper {
@@ -247,6 +243,7 @@ h6 {
 }
 .left-panel-header {
   height: 50px;
+  position: fixed;
   color: #ffffff;
   margin: 12px 3px 5px 3px;
 }
@@ -262,7 +259,7 @@ h6 {
   right: 0;
   color: #ffffff;
   left: 210px;
-  top: 55px;
+  top: 5px;
   width: 20px;
   -webkit-transition: all 0.3s ease-in-out;
   -moz-transition: all 0.3s ease-in-out;
@@ -321,7 +318,8 @@ h6 {
 }
 .side-panel-nav-wrapper {
   position: relative;
-  padding-bottom: 30px;
+  padding: 10px 0 30px;
+  margin-top: 50px;
 }
 .side-panel-nav {
   list-style: none;
@@ -329,10 +327,10 @@ h6 {
 .side-panel-nav li {
   line-height: 40px;
   text-indent: 5px;
-  border-bottom: #513b49 1px solid;
+  border-bottom: #2a2a2a 1px solid;
   position: relative;
   display: block;
-  background-color: #604656;
+  background-color: #373737;
   margin-left: auto;
   margin-right: auto;
 }
@@ -390,7 +388,7 @@ h6 {
 }
 .side-panel-nav ul.nav-level a {
   padding-left: 25px;
-  background-color: #7d5b71;
+  background-color: #505050;
 }
 .body-white {
   background: #ffffff;
@@ -463,6 +461,12 @@ h6 {
   margin-left: 3px;
   margin-bottom: 3px;
 }
+.toolbar-bundle-buttons {
+  padding: 10px 10px 10px 0;
+}
+.toolbar-bundle-buttons a.btn {
+  color: #333333;
+}
 .bottom-form-buttons .btn {
   margin-bottom: 3px;
 }
@@ -497,6 +501,15 @@ label.required:after {
 }
 .margin-md-top {
   margin-top: 30px;
+}
+.margin-sm-bottom {
+  margin-bottom: 5px;
+}
+.margin-md-bottom {
+  margin-bottom: 15px;
+}
+.margin-md-bottom {
+  margin-bottom: 30px;
 }
 .margin-sm-right {
   margin-right: 5px;
@@ -552,11 +565,28 @@ label.required:after {
 .text-lg-indent {
   text-indent: 30px;
 }
+.table-layout {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+.table-layout .valign-middle {
+  vertical-align: middle !important;
+}
+.table-layout > div[class*="col-"] {
+  display: table-cell;
+  table-layout: fixed;
+  float: none;
+  vertical-align: middle;
+}
 ul.no-bullet {
   list-style: none;
 }
 .rounded-corners {
   border-radius: 4px;
+}
+.span-block {
+  display: block;
 }
 .alert {
   word-wrap: break-word;
@@ -657,7 +687,7 @@ a.btn {
 }
 .droppable-active {
   border: 1px solid #513B49;
-  background: #8c667e;
+  background: #5d5d5d;
   color: #fff;
 }
 ul.draggable,
@@ -962,5 +992,88 @@ li.ui-draggable {
   .footer-margin {
     padding-bottom: 120px;
     margin-bottom: -120px;
+  }
+}
+/* Bootstrap Overrides */
+.panel {
+  position: relative;
+  border-width: 1px;
+  border-color: #cfd9db;
+  border-bottom-width: 2px;
+  border-bottom-color: #c0cdd1;
+  border-radius: 3px;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+.panel-heading {
+  padding: 0 15px;
+  border-top-right-radius: 3px;
+  border-top-left-radius: 3px;
+  margin-left: -1px;
+  margin-right: -1px;
+  margin-top: -1px;
+  border: 1px solid transparent;
+}
+.panel-heading > .panel-title {
+  font-size: 14px;
+  font-weight: 600;
+  display: table-cell;
+  vertical-align: middle;
+  width: 1%;
+  height: 40px;
+  float: none!important;
+}
+.panel-default > .panel-heading {
+  color: #444;
+  background-color: #f1f1f1;
+  border-color: #cfd9db;
+}
+.page-header.page-header-block {
+  width: auto;
+  padding: 14px 15px 16px;
+  background-color: #fbfcfc;
+  border-bottom-color: #e9eeef;
+}
+.page-header {
+  position: relative;
+  padding-bottom: 15px;
+  margin: 0 0 15px;
+  border-bottom: 1px solid #e9eeef;
+  overflow: visible;
+}
+.page-header .page-header-section + .page-header-section {
+  margin-top: 10px;
+}
+.page-header .breadcrumb {
+  padding-left: 0;
+  padding-right: 0;
+}
+.breadcrumb.breadcrumb-transparent {
+  background-color: transparent;
+}
+@media (min-width: 768px) {
+  .page-header .page-header-section {
+    display: table-cell;
+    width: 1%;
+    vertical-align: middle;
+    margin-top: 0;
+  }
+}
+.page-header .path {
+  text-align: left;
+  margin-bottom: 5px;
+}
+@media (min-width: 768px) {
+  .page-header .path {
+    text-align: right;
+    margin-bottom: 0;
+  }
+}
+@media (min-width: 768px) {
+  .page-header .page-header-section {
+    display: table-cell;
+    width: 1%;
+    vertical-align: middle;
+    margin-top: 0;
   }
 }

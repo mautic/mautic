@@ -26,6 +26,29 @@
             </thead>
             <tbody>
                 <?php $log = $lead->getScoreChangeLog(); ?>
+                <?php if (!count($log)): ?>
+                <tr>
+                    <?php $date = $lead->getDateAdded(); ?>
+                    <td><?php echo $date->format($dateFormats['date']) . ' ' . $date->format($dateFormats['time']); ?></td>
+                    <td><?php echo $view['translator']->trans('mautic.lead.lead.scoreevent.created'); ?></td>
+                    <td></td>
+                    <?php $delta = $lead->getScore(); ?>
+                    <?php if ($delta > 0): ?>
+                        <td class="success">
+                            <i class="fa fa-fw fa-hand-o-up"></i><?php echo $delta; ?>
+                        </td>
+                    <?php elseif ($delta < 0): ?>
+                        <td class="danger">
+                            <i class="fa fa-fw fa-hand-o-down"></i><?php echo ($delta * -1); ?>
+                        </td>
+                    <?php else: ?>
+                    <td class="text-center">
+                        <?php echo $delta; ?>
+                    </td>
+                    <?php endif; ?>
+                    <td></td>
+                </tr>
+                <?php endif; ?>
                 <?php foreach($log as $e): ?>
                 <tr>
                     <?php $date = $e->getDateAdded(); ?>
@@ -42,7 +65,7 @@
                         <i class="fa fa-fw fa-hand-o-down"></i><?php echo ($delta * -1); ?>
                     </td>
                     <?php else: ?>
-                    <td>
+                    <td class="text-center">
                         <?php echo $delta; ?>
                     </td>
                     <?php endif; ?>

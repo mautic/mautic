@@ -1,8 +1,6 @@
 //LeadBundle
 Mautic.leadOnLoad = function (container) {
     if (mQuery(container + ' form[name="lead"]').length) {
-        Mautic.expandPanel('.bundle-main', 'expand');
-
         Mautic.activateLeadOwnerTypeahead('lead_owner_lookup');
 
         mQuery("*[data-toggle='field-lookup']").each(function (index) {
@@ -347,4 +345,4 @@ Mautic.updateLeadFieldProperties = function(selectedVal) {
     } else {
         mQuery('#leadfield_isListable').closest('.row').removeClass('hide');
     }
-}
+};

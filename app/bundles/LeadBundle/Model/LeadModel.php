@@ -219,4 +219,20 @@ class LeadModel extends FormModel
         $results = $this->em->getRepository('MauticUserBundle:User')->getUserList('', 0);
         return $results;
     }
+
+    /**
+     * Reorganizes a field value persistent collection to be keyed by field alias
+     *
+     * @param $fieldValues
+     * @return array
+     */
+    public function organizeFieldsByAlias($fieldValues)
+    {
+        $array = array();
+        foreach ($fieldValues as $v) {
+            $field = $v->getField();
+            $array[$field->getAlias()] = $v->getValue();
+        }
+        return $array;
+    }
 }

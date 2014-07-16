@@ -9,6 +9,7 @@
 
 $searchUri   = $view['slots']->get('searchUri');
 $actions     = $view['slots']->get('actions');
+$toolbar     = $view['slots']->get('toolbar');
 
 if (!empty($searchUri)):
     $bundle        = strtolower($app->getRequest()->get('bundle'));
@@ -18,7 +19,7 @@ else:
     $searchClass = "no-search";
 endif;
 ?>
-
+<div class="toolbar-bundle-buttons pull-left"><?php echo $toolbar; ?></div>
 <div class="toolbar-form-buttons hide pull-right"></div>
 <div class="pull-right toolbar <?php echo $searchClass; ?>">
     <div class="input-group toolbar-action-buttons">

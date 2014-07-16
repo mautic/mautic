@@ -32,7 +32,7 @@ $items = array(
             'data-toggle' => 'ajax'
         ),
         'extras'=> array(
-            'iconClass' => 'fa-database fa-lg',
+            'iconClass' => 'fa-pencil-square-o',
             'routeName' => 'mautic_form_index'
         ),
         'display' => $security->isGranted(array('form:forms:viewown', 'form:forms:viewother'), 'MATCH_ONE') ? true : false,

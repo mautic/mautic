@@ -86,7 +86,7 @@ class LoadLeadFieldData extends AbstractFixture implements OrderedFixtureInterfa
                 $entity->setProperties(array("list" =>"|Mr|Mrs|Miss"));
             }
             $entity->setType($type);
-            $fixed = in_array($name, array('firstname', 'lastname', 'company', 'email')) ? true : false;
+            $fixed = in_array($name, array('firstname', 'lastname', 'company', 'email', 'country', 'city', 'state')) ? true : false;
             $entity->setIsFixed($fixed);
             $entity->setOrder(($key+1));
             $entity->setAlias($name);

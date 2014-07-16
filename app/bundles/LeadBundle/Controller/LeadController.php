@@ -20,12 +20,9 @@ class LeadController extends FormController
 
     /**
      * @param int    $page
-     * @param string $view
-     * @param bool   $activeLead
-     * @param bool   $form
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction($page = 1 , $view = 'list', $activeLead = false, $form = false)
+    public function indexAction($page = 1)
     {
         //set some permissions
         $permissions = $this->get('mautic.security')->isGranted(array(
@@ -42,17 +39,23 @@ class LeadController extends FormController
             return $this->accessDenied();
         }
 
+        $factory = $this->get('mautic.factory');
+        $model   = $factory->getModel('lead.lead');
+        $session = $this->get('session');
         //set limits
-        $limit = $this->get('session')->get('mautic.lead.limit', $this->get('mautic.factory')->getParameter('default_pagelimit'));
+        $limit = $session->get('mautic.lead.limit',$factory->getParameter('default_pagelimit'));
         $start = ($page === 1) ? 0 : (($page-1) * $limit);
         if ($start < 0) {
             $start = 0;
         }
 
-        $search     = $this->request->get('search', $this->get('session')->get('mautic.lead.filter', ''));
-        $this->get('session')->set('mautic.lead.filter', $search);
+        $search     = $this->request->get('search', $session->get('mautic.lead.filter', ''));
+        $session->set('mautic.lead.filter', $search);
 
         //do some default filtering
+        $orderBy     = $this->get('session')->get('mautic.lead.orderby', 'l.dateAdded');
+        $orderByDir  = $this->get('session')->get('mautic.lead.orderbydir', 'ASC');
+
         $filter      = array('string' => $search, 'force' => '');
         $translator  = $this->container->get('translator');
         $isCommand   = $translator->trans('mautic.core.searchcommand.is');
@@ -68,18 +71,15 @@ class LeadController extends FormController
             $filter['force'] .= " $isCommand:$mine";
         }
 
-        $leads = $this->get('mautic.factory')->getModel('lead.lead')->getEntities(
+        $leads = $model->getEntities(
             array(
                 'start'         => $start,
                 'limit'         => $limit,
                 'filter'        => $filter,
-                'orderByDir'    => "DESC",
-                'getTotalCount' => true
+                'orderBy'       => $orderBy,
+                'orderByDir'    => $orderByDir
             ));
-
-        $count = $leads['totalCount'];
-        unset($leads['totalCount']);
-
+        $count = count($leads);
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page
             if ($count === 1) {
@@ -87,7 +87,7 @@ class LeadController extends FormController
             } else {
                 $lastPage = (floor($limit / $count)) ? : 1;
             }
-            $this->get('session')->set('mautic.lead.page', $lastPage);
+            $session->set('mautic.lead.page', $lastPage);
             $returnUrl   = $this->generateUrl('mautic_lead_index', array('page' => $lastPage));
 
             return $this->postActionRedirect(array(
@@ -102,34 +102,31 @@ class LeadController extends FormController
         }
 
         //set what page currently on so that we can return here after form submission/cancellation
-        $this->get('session')->set('mautic.lead.page', $page);
+        $session->set('mautic.lead.page', $page);
 
-        //get active lead
-        if (empty($activeLead) && $count) {
-            $activeLead = $leads[0];
-        }
-
-        $tmpl  = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
+        $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
         $listArgs = array();
         if (!$this->get('mautic.security')->isGranted('lead:lists:viewother')) {
             $listArgs["filter"]["force"] = " $isCommand:$mine";
         }
 
-        $lists = $this->get('mautic.factory')->getModel('lead.list')->getSmartLists();
-        $factory = $this->get('mautic.factory');
+        $lists     = $factory->getModel('lead.list')->getSmartLists();
+        $indexMode = $this->request->get('view', $session->get('mautic.lead.indexmode', 'list'));
+        $session->set('mautic.lead.indexmode', $indexMode);
+
         $parameters = array(
             'searchValue' => $search,
             'items'       => $leads,
+            'model'       => $model,
             'page'        => $page,
             'limit'       => $limit,
             'totalCount'  => $count,
             'permissions' => $permissions,
-            'lead'        => $activeLead,
-            'form'        => $form,
             'tmpl'        => $tmpl,
+            'indexMode'   => $indexMode,
             'lists'       => $lists,
-            'security'    => $this->get('mautic.security'),
+            'security'    => $factory->getSecurity(),
             'dateFormats' => array(
                 'datetime' => $factory->getParameter('date_format_full'),
                 'date'     => $factory->getParameter('date_format_dateonly'),
@@ -137,53 +134,14 @@ class LeadController extends FormController
             )
         );
 
-        $vars = array('activeLink' => '#mautic_lead_index', 'mauticContent'   => 'lead');
-
-        if ($tmpl == "index") {
-            switch ($view) {
-                case 'list':
-                    $template      = 'MauticLeadBundle:Lead:lead.html.php';
-                    $vars['route'] = $this->generateUrl('mautic_lead_index', array('page' => $page));
-                    break;
-                case 'view':
-                    $template      = 'MauticLeadBundle:Lead:lead.html.php';
-                    $vars['route'] = (!empty($activeLead)) ?
-                        $this->generateUrl('mautic_lead_action', array(
-                                'objectAction' => 'view',
-                                'objectId'     => $activeLead->getId())
-                        ) :
-                        $this->generateUrl('mautic_lead_index', array('page' => $page)
-                        );
-                    break;
-                case 'edit':
-                case 'new':
-                    $template      = 'MauticLeadBundle:Lead:form.html.php';
-                    $vars['route'] = $this->generateUrl('mautic_lead_action', array(
-                            'objectAction' => $view,
-                            'objectId'     => $activeLead->getId())
-                    );
-                    break;
-            }
-        } elseif ($tmpl == 'lead') {
-            $template       = 'MauticLeadBundle:Lead:lead.html.php';
-            $vars['route']  = $this->generateUrl('mautic_lead_action', array(
-                    'objectAction' => 'view',
-                    'objectId'     => $activeLead->getId())
-            );
-            $vars['target'] = '.bundle-main-inner-wrapper';
-
-        } else {
-            $template      = 'MauticLeadBundle:Lead:list.html.php';
-            $vars['route'] = $this->generateUrl('mautic_lead_index', array('page' => $page));
-            if ($tmpl == 'list') {
-                $vars['target'] = '.bundle-list';
-            }
-        }
-
         return $this->delegateView(array(
             'viewParameters'  => $parameters,
-            'contentTemplate' => $template,
-            'passthroughVars' => $vars
+            'contentTemplate' => "MauticLeadBundle:Lead:{$indexMode}.html.php",
+            'passthroughVars' => array(
+                'activeLink'    => '#mautic_lead_index',
+                'mauticContent' => 'lead',
+                'route'         => $this->generateUrl('mautic_lead_index', array('page' => $page))
+            )
         ));
     }
 
@@ -195,11 +153,23 @@ class LeadController extends FormController
      */
     public function viewAction($objectId)
     {
-        $activeLead  = $this->get('mautic.factory')->getModel('lead.lead')->getEntity($objectId);
+        $lead  = $this->get('mautic.factory')->getModel('lead.lead')->getEntity($objectId);
         //set the page we came from
         $page    = $this->get('session')->get('mautic.lead.page', 1);
+        $factory = $this->get('mautic.factory');
 
-        if ($activeLead === null) {
+        //set some permissions
+        $permissions = $this->get('mautic.security')->isGranted(array(
+            'lead:leads:viewown',
+            'lead:leads:viewother',
+            'lead:leads:create',
+            'lead:leads:editown',
+            'lead:leads:editother',
+            'lead:leads:deleteown',
+            'lead:leads:deleteother'
+        ), "RETURN_ARRAY");
+
+        if ($lead === null) {
             //set the return URL
             $returnUrl  = $this->generateUrl('mautic_lead_index', array('page' => $page));
 
@@ -222,12 +192,38 @@ class LeadController extends FormController
         }
 
         if (!$this->get('mautic.security')->hasEntityAccess(
-            'lead:leads:viewown', 'lead:leads:viewother', $activeLead->getOwner()
+            'lead:leads:viewown', 'lead:leads:viewother', $lead->getOwner()
         )) {
             return $this->accessDenied();
         }
 
-        return $this->indexAction($page, 'view', $activeLead);
+        $template      = 'MauticLeadBundle:Lead:lead.html.php';
+        $vars['route'] = $this->generateUrl('mautic_lead_action', array(
+            'objectAction' => 'view',
+            'objectId'     => $lead->getId())
+        );
+
+        return $this->delegateView(array(
+            'viewParameters'  => array(
+                'lead'        => $lead,
+                'security'    => $this->get('mautic.factory')->getSecurity(),
+                'permissions' => $permissions,
+                'dateFormats' => array(
+                    'datetime' => $factory->getParameter('date_format_full'),
+                    'date'     => $factory->getParameter('date_format_dateonly'),
+                    'time'     => $factory->getParameter('date_format_timeonly'),
+                )
+            ),
+            'contentTemplate' => $template,
+            'passthroughVars' => array(
+                'activeLink'    => '#mautic_lead_index',
+                'mauticContent' => 'lead',
+                'route'         => $this->generateUrl('mautic_lead_action', array(
+                    'objectAction' => 'view',
+                    'objectId'     => $lead->getId()
+                ))
+            )
+        ));
     }
 
     /**
@@ -320,7 +316,21 @@ class LeadController extends FormController
             $form->get('owner_lookup')->setData($userName);
         }
 
-        return $this->indexAction($page, 'new', $lead, $form->createView());
+        return $this->delegateView(array(
+            'viewParameters'  => array(
+                'form'  => $form->createView(),
+                'lead'  => $lead
+            ),
+            'contentTemplate' => 'MauticLeadBundle:Lead:form.html.php',
+            'passthroughVars' => array(
+                'activeLink'    => '#mautic_lead_index',
+                'mauticContent' => 'lead',
+                'route'         => $this->generateUrl('mautic_lead_action', array(
+                    'objectAction' => 'edit',
+                    'objectId'     => $lead->getId())
+                )
+            )
+        ));
     }
 
     /**
@@ -403,23 +413,29 @@ class LeadController extends FormController
                             ))
                         ), 'flashes')
                     );
+
+                    $returnUrl = $this->generateUrl('mautic_lead_action', array(
+                        'objectAction' => 'view',
+                        'objectId'     => $lead->getId()
+                    ));
+                    $viewParameters = array('objectId' => $lead->getId());
+                    $template = 'MauticLeadBundle:Lead:view';
                 }
             } else {
                 //unlock the entity
                 $model->unlockEntity($lead);
+
+                $returnUrl = $this->generateUrl('mautic_lead_index', array('page' => $page));
+                $viewParameters = array();
+                $template = 'MauticLeadBundle:Lead:index';
             }
 
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
-                $returnUrl = $this->generateUrl('mautic_lead_action', array(
-                    'objectAction' => 'view',
-                    'objectId'     => $lead->getId()
-                ));
-
                 return $this->postActionRedirect(
                     array_merge($postActionVars, array(
                         'returnUrl'       => $returnUrl,
-                        'viewParameters'  => array('objectId' => $lead->getId()),
-                        'contentTemplate' => 'MauticLeadBundle:Lead:view'
+                        'viewParameters'  => $viewParameters,
+                        'contentTemplate' => $template
                     ))
                 );
             }
@@ -434,7 +450,21 @@ class LeadController extends FormController
             }
         }
 
-        return $this->indexAction($page, 'edit', $lead, $form->createView());
+        return $this->delegateView(array(
+            'viewParameters'  => array(
+                'form'  => $form->createView(),
+                'lead'  => $lead
+            ),
+            'contentTemplate' => 'MauticLeadBundle:Lead:form.html.php',
+            'passthroughVars' => array(
+                'activeLink'    => '#mautic_lead_index',
+                'mauticContent' => 'lead',
+                'route'         => $this->generateUrl('mautic_lead_action', array(
+                        'objectAction' => 'edit',
+                        'objectId'     => $lead->getId())
+                )
+            )
+        ));
     }
 
     /**

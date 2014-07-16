@@ -31,7 +31,7 @@ $items = array(
             'data-toggle' => 'ajax'
         ),
         'extras'=> array(
-            'iconClass' => 'fa-bolt fa-lg',
+            'iconClass' => 'fa-user',
             'routeName' => 'mautic_lead_index'
         ),
         'display' => ($security->isGranted(array('lead:leads:viewown', 'lead:leads:viewother'), 'MATCH_ONE')) ? true : false,

@@ -14,12 +14,6 @@ endif;
 
 ?>
 <div class="main-panel-header">
-    <?php if ($view["slots"]->has("headerTitle")): ?>
-        <div  class="pull-left">
-    <h2><?php $view["slots"]->output("headerTitle"); ?></h2>
-        </div>
-    <?php endif; ?>
-
     <?php echo $view->render('MauticCoreBundle:Default:toolbar.html.php'); ?>
     <div class="clearfix"></div>
 </div>

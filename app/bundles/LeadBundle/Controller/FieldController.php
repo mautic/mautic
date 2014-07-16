@@ -30,7 +30,9 @@ class FieldController extends FormController
         $items = $this->get('mautic.factory')->getModel('lead.field')->getEntities();
 
         return $this->delegateView(array(
-            'viewParameters'  => array('items' => $items),
+            'viewParameters'  => array(
+                'items' => $items
+            ),
             'contentTemplate' => 'MauticLeadBundle:Field:index.html.php',
             'passthroughVars' => array(
                 'activeLink'    => '#mautic_leadfield_index',
