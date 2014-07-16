@@ -45,11 +45,14 @@ class LoadLeadData extends AbstractFixture implements OrderedFixtureInterface, C
      */
     public function load(ObjectManager $manager)
     {
+        $today = new \DateTime();
+
         $lead = new Lead();
         $ipAddress = new IpAddress();
         $ipAddress->setIpAddress("208.110.200.3", $this->container->get('mautic.factory')->getSystemParameters());
         $lead->addIpAddress($ipAddress);
         $lead->setOwner($this->getReference('sales-user'));
+        $lead->setDateAdded($today);
 
         $fields = array(
             'firstname' => "John",
@@ -87,6 +90,7 @@ class LoadLeadData extends AbstractFixture implements OrderedFixtureInterface, C
         $lead = new Lead();
         $lead->addIpAddress($ipAddress);
         $lead->setOwner($this->getReference('sales-user'));
+        $lead->setDateAdded($today);
 
         $fields = array(
             'firstname' => "Jack",
@@ -118,6 +122,7 @@ class LoadLeadData extends AbstractFixture implements OrderedFixtureInterface, C
         $lead = new Lead();
         $lead->addIpAddress($ipAddress);
         $lead->setOwner($this->getReference('admin-user'));
+        $lead->setDateAdded($today);
 
         $fields = array(
             'firstname' => "Susie",
@@ -147,6 +152,7 @@ class LoadLeadData extends AbstractFixture implements OrderedFixtureInterface, C
         $this->setReference('lead3', $lead);
 
         $lead = new Lead();
+        $lead->setDateAdded($today);
         $lead->addIpAddress($ipAddress);
         $lead->setOwner($this->getReference('admin-user'));
         $fields = array(
@@ -168,6 +174,7 @@ class LoadLeadData extends AbstractFixture implements OrderedFixtureInterface, C
         $this->setReference('lead4', $lead);
 
         $lead = new Lead();
+        $lead->setDateAdded($today);
         $lead->addIpAddress($ipAddress);
         $fields = array(
             'firstname' => "",
