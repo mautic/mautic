@@ -12,7 +12,7 @@ if ($tmpl == 'index')
 
 <div class="table-responsive scrollable body-white padding-sm bundle-list">
     <?php if (count($items)): ?>
-    <table class="table table-hover table-striped table-bordered role-list">
+    <table class="table table-hover table-striped table-bordered lead-list">
         <thead>
             <tr>
                 <th class="col-lead-actions"></th>
