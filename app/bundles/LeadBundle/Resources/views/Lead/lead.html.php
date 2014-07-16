@@ -36,14 +36,15 @@ $view["slots"]->set("headerTitle",
 </li>
 <?php endif; ?>
 <?php $view["slots"]->stop(); ?>
+<div class="scrollable lead-details">
+    <?php
+    echo $view->render('MauticLeadBundle:Lead:info.html.php', array("lead" => $lead, 'dateFormats' => $dateFormats));
 
-<?php
-echo $view->render('MauticLeadBundle:Lead:info.html.php', array("lead" => $lead, 'dateFormats' => $dateFormats));
+    echo $view->render('MauticLeadBundle:Lead:score_log.html.php', array("lead" => $lead, 'dateFormats' => $dateFormats));
 
-echo $view->render('MauticLeadBundle:Lead:score_log.html.php', array("lead" => $lead, 'dateFormats' => $dateFormats));
-
-$ipAddresses = count($lead->getIpAddresses());
-if (!empty($ipAddresses))
-    echo $view->render('MauticLeadBundle:Lead:ip_addresses.html.php', array("lead" => $lead));
-?>
-<div class="footer-margin"></div>
+    $ipAddresses = count($lead->getIpAddresses());
+    if (!empty($ipAddresses))
+        echo $view->render('MauticLeadBundle:Lead:ip_addresses.html.php', array("lead" => $lead));
+    ?>
+    <div class="footer-margin"></div>
+</div>
