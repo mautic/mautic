@@ -63,7 +63,7 @@ class FormController extends CommonController
         $factory      = $this->get('mautic.factory');
         $model        = $factory->getModel($entityType);
         $nameFunction = $model->getNameGetter();
-        if ($this->get('mautic.security')->isAdmin()) {
+        if ($this->get('mautic.factory')->getUser()->isAdmin()) {
             $override = $this->get('translator')->trans('mautic.core.override.lock',array(
                 '%url%' => $this->generateUrl('mautic_core_form_action', array(
                         'objectAction' => 'unlock',
@@ -159,5 +159,21 @@ class FormController extends CommonController
         } else {
             $this->accessDenied();
         }
+    }
+
+    /**
+     * Sets a specific them for the form
+     *
+     * @param $form
+     * @param $template
+     * @param $theme
+     * @return mixed
+     */
+    protected function setFormTheme(Form $form, $template, $theme)
+    {
+        $formView = $form->createView();
+        $this->container->get('templating')->getEngine($template)->get('form')
+            ->setTheme($formView, $theme);
+        return $formView;
     }
 }
