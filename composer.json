@@ -4,7 +4,7 @@
     "type": "project",
     "description": "Mautic Open Source Distribution",
     "autoload": {
-        "psr-r": { "Mautic\\": "app/bundles/" }
+        "psr-4": { "Mautic\\": "app/bundles/" }
     },
     "require": {
         "php": ">=5.3.7",
