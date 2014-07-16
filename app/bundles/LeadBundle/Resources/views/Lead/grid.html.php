@@ -22,7 +22,11 @@ if ($tmpl == 'index')
             </div>
             <div class="col-xs-8 valign-middle">
                 <h5>
-                    <?php echo $view['translator']->trans($item->getPrimaryIdentifier(true)); ?>
+                    <a href="<?php echo $view['router']->generate('mautic_lead_action',
+                        array("objectAction" => "view", "objectId" => $item->getId())); ?>"
+                       data-toggle="ajax">
+                        <span><?php echo $item->getPrimaryIdentifier(); ?></span>
+                    </a>
                     <span class="badge"><?php echo $item->getScore(); ?></span>
                 </h5>
                 <div class="text-muted">
