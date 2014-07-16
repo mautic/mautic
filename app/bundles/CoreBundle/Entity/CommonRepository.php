@@ -225,12 +225,19 @@ class CommonRepository extends EntityRepository
     {
         $unique = $this->generateRandomParameterName();
         $func   = (!empty($filter['operator'])) ? $filter['operator'] : $filter['expr'];
-        if (isset($filter['strict']) && !$filter['strict'])
-            $filter['value'] = "%{$filter['value']}%";
-        $expr   = $q->expr()->{$func}($filter['column'], ':'.$unique);
+
+        if (in_array($func, array('isNull', 'isNotNull'))) {
+            $expr = $q->expr()->{$func}($filter['column']);
+            $parameter = false;
+        } else {
+            if (isset($filter['strict']) && !$filter['strict'])
+                $filter['value'] = "%{$filter['value']}%";
+            $expr = $q->expr()->{$func}($filter['column'], ':' . $unique);
+            $parameter = array($unique => $filter['value']);
+        }
         if (!empty($filter['not']))
             $expr = $q->expr()->not($expr);
-        return  array($expr, array($unique => $filter['value']));
+        return  array($expr, $parameter);
     }
 
     protected function addCatchAllWhereClause(QueryBuilder &$qb, $filter)
