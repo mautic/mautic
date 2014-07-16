@@ -27,11 +27,17 @@ $view["slots"]->set("headerTitle",
 <?php endif; ?>
 <?php if ($security->hasEntityAccess($permissions['lead:leads:deleteown'], $permissions['lead:leads:deleteother'], $lead->getOwner())): ?>
 <li>
-    <a href="<?php echo $this->container->get('router')->generate(
-        'mautic_lead_action', array("objectAction" => "delete", "objectId" => $lead->getId())); ?>"
-       data-toggle="ajax"
-       data-menu-link="#mautic_lead_index">
-        <?php echo $view["translator"]->trans("mautic.core.form.delete"); ?>
+    <a href="javascript:void(0);"
+       onclick="Mautic.showConfirmation(
+           '<?php echo $view->escape($view["translator"]->trans("mautic.lead.lead.form.confirmdelete",
+           array("%name%" => $lead->getPrimaryIdentifier() . " (" . $lead->getId() . ")")), 'js'); ?>',
+           '<?php echo $view->escape($view["translator"]->trans("mautic.core.form.delete"), 'js'); ?>',
+           'executeAction',
+           ['<?php echo $view['router']->generate('mautic_lead_action',
+           array("objectAction" => "delete", "objectId" => $lead->getId())); ?>',
+           '#mautic_lead_index'],
+           '<?php echo $view->escape($view["translator"]->trans("mautic.core.form.cancel"), 'js'); ?>','',[]);">
+        <span><?php echo $view['translator']->trans('mautic.core.form.delete'); ?></span>
     </a>
 </li>
 <?php endif; ?>
