@@ -13,7 +13,7 @@ $items = array(
             'data-toggle' => 'ajax'
         ),
         'extras'=> array(
-            'iconClass' => 'fa-file-text-o fa-lg',
+            'iconClass' => 'fa-file-text-o',
             'routeName' => 'mautic_page_index'
         ),
         'display' => ($security->isGranted(array('page:pages:viewown', 'page:pages:viewother'), 'MATCH_ONE')) ? true : false,

@@ -39,59 +39,64 @@ $activeClass     = "";
 
 <div class="row bundle-content-wrapper">
     <div class="col-xs-12 col-sm-4 bundle-side auto-height">
-        <div class="rounded-corners body-white bundle-side-inner-wrapper padding-sm">
-            <div class="bundle-side-filter-container">
-                <div class="input-group">
-                    <div class="input-group-btn">
-                        <button class="btn btn-default" data-toggle="modal" data-target="#search-help">
-                            <i class="fa fa-question-circle"></i>
-                        </button>
-                    </div>
-                    <input type="search"
-                           class="form-control"
-                           id="list-search" name="search"
-                           placeholder="<?php echo $view['translator']->trans('mautic.core.form.search'); ?>"
-                           value="<?php echo $searchValue; ?>"
-                           autocomplete="off"
-                           data-toggle="livesearch"
-                           data-target=".bundle-list"
-                           data-action="<?php echo $view['router']->generate('mautic_lead_index', array('page' => $page)); ?>"
-                           data-overlay-text="<?php echo $view['translator']->trans('mautic.core.search.livesearch'); ?>"
-                           data-overlay-background="#ffffff"
-                    />
-                    <div class="input-group-btn">
-                        <button class="btn btn-default btn-search btn-filter"
-                                data-livesearch-parent="list-search">
-                            <i class="fa <?php echo $searchBtnClass; ?> fa-fw"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="hidden-shelf">
-                    <div class="shelf-contents collapse">
-                        <?php $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list') . ':'; ?>
-                        <select id="filterByList" class="form-control" autocomplete="off" onchange="Mautic.filterLeadsByList(this.value);">
-                            <option value=""><?php echo $view['translator']->trans('mautic.lead.lead.form.leadlists'); ?></option>
-                            <?php foreach ($lists as $list): ?>
-                            <option value="<?php echo $listCommand . $list['alias']; ?>">
-                                <?php echo $list['name'] . " ({$list['alias']})"; ?>
-                            </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                    <div class="shelf-handle">
-                        <i class="fa fa-chevron-circle-down"></i>
-                    </div>
-                </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.lead.lead.header.index'); ?></h3>
             </div>
-            <div class="bundle-list scrollable">
-                <?php echo $view->render('MauticLeadBundle:Lead:list.html.php', array(
-                    'items'      => $items,
-                    'page'       => $page,
-                    'lead'       => $lead,
-                    'limit'      => $limit,
-                    'totalCount' => $totalCount,
-                    'tmpl'       => $tmpl
-                )); ?>
+            <div class="panel-body">
+                <div class="bundle-side-filter-container">
+                    <div class="input-group">
+                        <div class="input-group-btn">
+                            <button class="btn btn-default" data-toggle="modal" data-target="#search-help">
+                                <i class="fa fa-question-circle"></i>
+                            </button>
+                        </div>
+                        <input type="search"
+                               class="form-control"
+                               id="list-search" name="search"
+                               placeholder="<?php echo $view['translator']->trans('mautic.core.form.search'); ?>"
+                               value="<?php echo $searchValue; ?>"
+                               autocomplete="off"
+                               data-toggle="livesearch"
+                               data-target=".bundle-list"
+                               data-action="<?php echo $view['router']->generate('mautic_lead_index', array('page' => $page)); ?>"
+                               data-overlay-text="<?php echo $view['translator']->trans('mautic.core.search.livesearch'); ?>"
+                               data-overlay-background="#ffffff"
+                        />
+                        <div class="input-group-btn">
+                            <button class="btn btn-default btn-search btn-filter"
+                                    data-livesearch-parent="list-search">
+                                <i class="fa <?php echo $searchBtnClass; ?> fa-fw"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="hidden-shelf">
+                        <div class="shelf-contents collapse">
+                            <?php $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list') . ':'; ?>
+                            <select id="filterByList" class="form-control" autocomplete="off" onchange="Mautic.filterLeadsByList(this.value);">
+                                <option value=""><?php echo $view['translator']->trans('mautic.lead.lead.form.leadlists'); ?></option>
+                                <?php foreach ($lists as $list): ?>
+                                <option value="<?php echo $listCommand . $list['alias']; ?>">
+                                    <?php echo $list['name'] . " ({$list['alias']})"; ?>
+                                </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="shelf-handle">
+                            <i class="fa fa-chevron-circle-down"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="bundle-list scrollable">
+                    <?php echo $view->render('MauticLeadBundle:Lead:list.html.php', array(
+                        'items'      => $items,
+                        'page'       => $page,
+                        'lead'       => $lead,
+                        'limit'      => $limit,
+                        'totalCount' => $totalCount,
+                        'tmpl'       => $tmpl
+                    )); ?>
+                </div>
             </div>
         </div>
     </div>

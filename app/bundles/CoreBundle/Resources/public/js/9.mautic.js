@@ -397,11 +397,11 @@ var Mautic = {
                 if (child.hasClass("subnav-closed")) {
                     //open the submenu
                     child.removeClass("subnav-closed").addClass("subnav-open");
-                    mQuery(toggle).removeClass("fa-toggle-left").addClass("fa-toggle-down");
+                    mQuery(toggle).removeClass("fa-angle-right").addClass("fa-angle-down");
                 } else if (child.hasClass("subnav-open")) {
                     //close the submenu
                     child.removeClass("subnav-open").addClass("subnav-closed");
-                    mQuery(toggle).removeClass("fa-toggle-down").addClass("fa-toggle-left");
+                    mQuery(toggle).removeClass("fa-angle-down").addClass("fa-angle-right");
                 }
             }
         }

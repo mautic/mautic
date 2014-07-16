@@ -57,9 +57,9 @@
                 "onclick=\"Mautic.toggleSubMenu('#{$linkAttributes['id']}', event);\" " : ""; ?>
 
             <?php if ($isAncestor): ?>
-            <span class="subnav-toggle"><i <?php echo $onclick; ?>class="fa fa-lg fa-toggle-down"></i></span>
+            <span class="subnav-toggle"><i <?php echo $onclick; ?>class="fa fa-lg fa-angle-down"></i></span>
             <?php else: ?>
-            <span class="subnav-toggle"><i <?php echo $onclick; ?>class="fa fa-lg fa-toggle-left"></i></span>
+            <span class="subnav-toggle"><i <?php echo $onclick; ?>class="fa fa-lg fa-angle-right"></i></span>
             <?php endif; ?>
             <?php endif; ?>
             <?php endif; ?>

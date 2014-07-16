@@ -2,8 +2,9 @@
 @import "bootstrap_less/variables";
 @import "bootstrap_less/mixins";
 
+@bodyBackgroundColor: #ecf0f1;
 @leftPanelWidth: 230px;
-@leftPanelBase: #513B49;
+@leftPanelBase: #2a2a2a;
 @leftPanelColor: #B2B2B2;
 @rightPanelBase: @leftPanelBase;
 @rightPanelWidth: @leftPanelWidth;
@@ -26,6 +27,7 @@ html {
 body {
   height: 100%;
   overflow: hidden;
+  background: @bodyBackgroundColor;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -34,7 +36,7 @@ h1, h2, h3, h4, h5, h6 {
 .page-wrapper {
   padding-left: 0;
   padding-right: 0;
-  background-color: @leftPanelBase;
+/*  background-color: @leftPanelBase; */
   position: relative;
   height: 100%;
   width: 100%;
@@ -44,10 +46,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .top-panel {
-  position: fixed;
+/*  position: fixed;
   top: 0;
   left: 0;
-  right: 0;
+  right: 0; */
   height: @topPanelHeight;
   background-color: #fff;
   z-index: 5000;
@@ -60,6 +62,44 @@ h1, h2, h3, h4, h5, h6 {
 
 .top-panel-main {
   padding: 3px;
+}
+
+/* Bootstrap Panel Override */
+.panel {
+  position: relative;
+  border-width: 1px;
+  border-color: #cfd9db;
+  border-bottom-width: 2px;
+  border-bottom-color: #c0cdd1;
+  border-radius: 3px;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+
+.panel-heading {
+  padding: 0 15px;
+  border-top-right-radius: 3px;
+  border-top-left-radius: 3px;
+  margin-left: -1px;
+  margin-right: -1px;
+  margin-top: -1px;
+  border: 1px solid transparent;
+}
+
+.panel-heading>.panel-title {
+  font-size: 14px;
+  font-weight: 600;
+  display: table-cell;
+  vertical-align: middle;
+  width: 1%;
+  height: 40px;
+  float: none!important;
+}
+
+.panel-default>.panel-heading {
+  color: #444;
+  background-color: #f1f1f1;
+  border-color: #cfd9db;
 }
 
 .panel-toggle {
@@ -93,7 +133,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .main-panel-wrapper {
-  padding-top: @topPanelHeight;
+/*  padding-top: @topPanelHeight; */
   width: 100%;
   height: 100%;
   position: relative;
@@ -124,13 +164,13 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .main-panel-breadcrumbs {
-  height: 40px;
+/*  height: 40px;
   padding-left: 20px;
   padding-right: 20px;
-  position: fixed;
+  position: fixed; */
   z-index: 1000;
   width: 100%;
-  left: @leftPanelWidth;
+/*  left: @leftPanelWidth; */
   .transitions;
 }
 
@@ -264,7 +304,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .left-panel-inner-wrapper {
-  padding-top: @topPanelHeight;
+/*  padding-top: @topPanelHeight; */
 }
 
 .left-panel-inner-wrapper, .right-panel-inner-wrapper {
@@ -275,7 +315,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .left-panel-header {
-  height: 50px;
+  height: @topPanelHeight;
+  position: fixed;
   color: #ffffff;
   margin: 12px 3px 5px 3px;
 }
@@ -294,7 +335,7 @@ h1, h2, h3, h4, h5, h6 {
   right: 0;
   color: #ffffff;
   left: @leftPanelWidth - 20;
-  top: 55px;
+  top: 5px;
   width:20px;
   .transitions;
 }
@@ -360,7 +401,8 @@ h1, h2, h3, h4, h5, h6 {
 
 .side-panel-nav-wrapper {
   position: relative;
-  padding-bottom: 30px;
+  padding: 10px 0 30px;
+  margin-top: @topPanelHeight;
 }
 
 .side-panel-nav {

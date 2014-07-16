@@ -37,7 +37,7 @@ $items = array(
             'class'   => 'nav-item-name'
         ),
         'extras'=> array(
-            'iconClass' => 'fa-th-large fa-lg',
+            'iconClass' => 'fa-th-large',
             'routeName' => 'mautic_dashboard_index'
         )
     )

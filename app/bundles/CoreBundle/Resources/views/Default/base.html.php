@@ -23,15 +23,14 @@ $activePanelClasses  = ($app->getSession()->get('left-panel', 'default') == 'unp
                 <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>
             </div>
 
-            <header class="top-panel">
-                <?php echo $view->render('MauticCoreBundle:Default:toppanel.html.php'); ?>
-            </header>
-
             <div class="left-panel scrollable">
                 <?php echo $view->render('MauticCoreBundle:Default:leftpanel.html.php'); ?>
             </div>
 
             <div class="main-panel-wrapper">
+            <header class="top-panel">
+                <?php echo $view->render('MauticCoreBundle:Default:toppanel.html.php'); ?>
+            </header>
                 <div class="main-panel-breadcrumbs">
                     <?php echo $view->render('MauticCoreBundle:Default:breadcrumbs.html.php'); ?>
                 </div>

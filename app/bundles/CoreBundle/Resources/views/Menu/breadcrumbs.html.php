@@ -9,7 +9,12 @@
 
 $lastCrumb = count($crumbs) - 1;
 ?>
-<nav>
+<div class="page-header page-header-block">
+    <?php if ($view["slots"]->has("headerTitle")): ?>
+        <h4 class="title"><?php $view["slots"]->output("headerTitle"); ?></h4>
+    <?php endif; ?>
+</div>
+<div class="page-header-path">
     <ol class="breadcrumb">
         <?php
         foreach ($crumbs as $crumbCount => $crumb):
@@ -44,4 +49,4 @@ $lastCrumb = count($crumbs) - 1;
             <?php endif; ?>
         <?php endforeach; ?>
     </ol>
-</nav>
+</div>
