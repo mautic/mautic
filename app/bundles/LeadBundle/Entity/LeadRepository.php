@@ -93,18 +93,7 @@ class LeadRepository extends CommonRepository
         $query = $q->getQuery();
         $results = new Paginator($query);
 
-        //use getIterator() here so that the first lead can be extracted without duplicating queries or looping through
-        //them twice
-        $iterator = $results->getIterator();
-
-        if (!empty($args['getTotalCount'])) {
-            //get the total count from paginator
-            $totalItems = count($results);
-
-            $iterator['totalCount'] = $totalItems;
-        }
-
-        return $iterator;
+        return $results;
     }
 
     /**
