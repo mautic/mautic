@@ -146,8 +146,8 @@ foreach ($mauticBundles as $bundle => $details) {
 $container->loadFromExtension('assetic', array(
     'debug'          => '%kernel.debug%',
     'use_controller' => false,
-    'read_from'      => '%kernel.root_dir%/../../',
-    'write_to'       => '%kernel.root_dir%/../../',
+    'read_from'      => '%kernel.root_dir%/../',
+    'write_to'       => '%kernel.root_dir%/../',
     'filters'        => array(
         'cssrewrite' => array(
             'apply_to' => '\.css$',
