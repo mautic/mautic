@@ -30,3 +30,11 @@ $container->setDefinition('mautic.form.type.pagecategory', new Definition(
     ->addTag('form.type', array(
         'alias' => 'pagecategory',
     ));
+
+$container->setDefinition('mautic.form.type.pagevariant', new Definition(
+    'Mautic\PageBundle\Form\Type\VariantType',
+    array(new Reference('mautic.factory'))
+))
+    ->addTag('form.type', array(
+        'alias' => 'pagevariant',
+    ));

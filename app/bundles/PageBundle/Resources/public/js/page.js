@@ -5,7 +5,7 @@ Mautic.pageOnLoad = function (container) {
     }
 
     if (mQuery(container + ' form[name="page"]').length) {
-        mQuery('.bundle-main').addClass('fullpanel');
+        Mautic.expandPanel('.bundle-main', 'expand');
 
         //active lookups
         if (mQuery('#page_translationParent_lookup').length) {
@@ -32,13 +32,13 @@ Mautic.pageOnLoad = function (container) {
                     minLength: 2
                 },
                 {
-                    name: 'page_parent',
+                    name: 'page_translationParent',
                     displayKey: 'label',
                     source: pages.ttAdapter()
                 }).on('typeahead:selected', function (event, datum) {
-                    mQuery("#page_parent").val(datum["value"]);
+                    mQuery("#page_translationParent").val(datum["value"]);
                 }).on('typeahead:autocompleted', function (event, datum) {
-                    mQuery("#page_parent").val(datum["value"]);
+                    mQuery("#page_translationParent").val(datum["value"]);
                 }).on('keypress', function (event) {
                     if ((event.keyCode || event.which) == 13) {
                         mQuery('#page_translationParent_lookup').typeahead('close');
@@ -104,7 +104,7 @@ Mautic.pageUnLoad = function() {
 
 Mautic.pagecategoryOnLoad = function (container) {
     if (mQuery(container + ' form[name="pagecategory"]').length) {
-        mQuery('.bundle-main').addClass('fullpanel');
+        Mautic.expandPanel('.bundle-main', 'expand', true);
     }
 
     if (mQuery(container + ' #list-search').length) {
@@ -198,12 +198,12 @@ Mautic.pageEditorOnLoad = function (container) {
     });
 };
 
-Mautic.toggleRelatedTranslations = function () {
-    if (mQuery('ul.related-translations').css('display') == 'block') {
-        mQuery('.related-translations-toggle').removeClass('fa-chevron-circle-up').addClass('fa-chevron-circle-down')
-        mQuery('ul.related-translations').slideUp();
+Mautic.toggleRelatedPages = function (related) {
+    if (mQuery('ul.related-' + related).css('display') == 'block') {
+        mQuery('.related-' + related + '-toggle').removeClass('fa-chevron-circle-up').addClass('fa-chevron-circle-down')
+        mQuery('ul.related-' + related).slideUp();
     } else {
-        mQuery('.related-translations-toggle').removeClass('fa-chevron-circle-down').addClass('fa-chevron-circle-up')
-        mQuery('ul.related-translations').slideDown();
+        mQuery('.related-' + related + '-toggle').removeClass('fa-chevron-circle-down').addClass('fa-chevron-circle-up')
+        mQuery('ul.related-' + related).slideDown();
     }
 };

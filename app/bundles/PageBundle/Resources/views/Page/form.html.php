@@ -22,6 +22,18 @@ if ($tmpl == 'index') {
         echo $header;
         ?>
     </div>
+    <?php
+    $variantParent = $activePage->getVariantParent();
+    if ($variantParent):
+        $subheader = $view['translator']->trans('mautic.page.page.header.editvariant', array(
+            '%name%' => $activePage->getTitle(),
+            '%parent%' => $variantParent->getTitle()
+        ));
+        ?>
+    <div class="bundle-main-item-secondary">
+        <?php echo $subheader; ?>
+    </div>
+    <?php endif; ?>
 </div>
 
 <?php echo $view['form']->form($form); ?>

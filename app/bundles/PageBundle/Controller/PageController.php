@@ -7,11 +7,12 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+//@todo - fix issue where associations are not populating immediately after an edit
+
 namespace Mautic\PageBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\InputHelper;
-use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class PageController extends FormController
@@ -60,6 +61,16 @@ class PageController extends FormController
             $filter['force'][] =
                 array('column' => 'p.createdBy', 'expr' => 'eq', 'value' => $this->get('mautic.factory')->getUser());
         }
+
+        $translator = $this->get('translator');
+        //do not list variants in the main list
+        $filter['force'][] = array('column' => 'p.variantParent', 'expr' => 'isNull');
+
+        $langSearchCommand = $translator->trans('mautic.page.page.searchcommand.lang');
+        if (strpos($search, "{$langSearchCommand}:") === false) {
+            $filter['force'][] = array('column' => 'p.translationParent', 'expr' => 'isNull');
+        }
+
         $model = $this->get('mautic.factory')->getModel('page.page');
         $pages = $model->getEntities(
             array(
@@ -116,7 +127,8 @@ class PageController extends FormController
             'activePage'  => $activePage,
             'pageUrl'     => (!empty($activePage)) ? $model->generateUrl($activePage) : '',
             'tmpl'        => $tmpl,
-            'security'    => $this->get('mautic.security')
+            'security'    => $this->get('mautic.security'),
+            'dateFormat'  => $this->get('mautic.factory')->getParameter('date_format_full')
         );
 
         $vars = array(
@@ -136,6 +148,10 @@ class PageController extends FormController
                             'objectAction' => 'view',
                             'objectId'     => $activePage->getId())
                     );
+                    $parameters['stats'] = array(
+                        'bounces' => $model->getBounces($activePage)
+                    );
+
                     break;
                 case 'edit':
                 case 'new':
@@ -145,7 +161,8 @@ class PageController extends FormController
                             'objectId'     => $activePage->getId())
                     );
                     $parameters['form']   = $formView;
-                    $parameters['tokens'] = $model->getPageTokens();
+                    $builderComponents    = $model->getBuilderComponents();
+                    $parameters['tokens'] = $builderComponents['pageTokens'];
                     break;
             }
         } elseif ($tmpl == 'page') {
@@ -160,7 +177,6 @@ class PageController extends FormController
             if ($tmpl == 'list') {
                 $vars['target'] = '.bundle-list';
             }
-            $parameters['dateFormat'] = $this->get('mautic.factory')->getParameter('date_format_full');
         }
 
         return $this->delegateView(array(
@@ -400,14 +416,15 @@ class PageController extends FormController
 
             //set the lookup values
             $parent = $entity->getTranslationParent();
-            if ($parent)
+            if ($parent && isset($form['translationParent_lookup']))
                 $form->get('translationParent_lookup')->setData($parent->getTitle());
             $category = $entity->getCategory();
-            if ($category)
+            if ($category && isset($form['category_lookup']))
                 $form->get('category_lookup')->setData($category->getTitle());
         }
 
-        return $this->indexAction($page, 'edit', $entity, $form->createView());
+        $formView = $this->setFormTheme($form, 'MauticPageBundle:Page:form.html.php', 'MauticPageBundle:FormVariant');
+        return $this->indexAction($page, 'edit', $entity, $formView);
     }
 
     /**
@@ -549,5 +566,36 @@ class PageController extends FormController
             'template' => $template,
             'basePath' => $this->request->getBasePath()
         ));
+    }
+
+    public function abtestAction($objectId)
+    {
+        $model   = $this->get('mautic.factory')->getModel('page.page');
+        $entity  = $model->getEntity($objectId);
+
+        if ($entity != null) {
+            $parent = $entity->getVariantParent();
+
+            if ($parent || !$this->get('mautic.security')->isGranted('page:pages:create') ||
+                !$this->get('mautic.security')->hasEntityAccess(
+                    'page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy()
+                )
+            ) {
+                return $this->accessDenied();
+            }
+
+            $clone = clone $entity;
+
+            //reset
+            $clone->setHits(0);
+            $clone->setRevision(0);
+            $clone->setIsPublished(false);
+            $clone->setVariantParent($entity);
+
+            $model->saveEntity($clone);
+            $objectId = $clone->getId();
+        }
+
+        return $this->editAction($objectId);
     }
 }

@@ -102,6 +102,14 @@ class Page extends FormEntity
     private $hits = 0;
 
     /**
+     * @ORM\Column(name="unique_hits", type="integer")
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full"})
+     */
+    private $uniqueHits = 0;
+
+    /**
      * @ORM\Column(name="revision", type="integer")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
@@ -140,26 +148,26 @@ class Page extends FormEntity
     private $translationParent;
 
     /**
-     * @ORM\OneToMany(targetEntity="Page", mappedBy="variationParent", indexBy="id", fetch="EXTRA_LAZY")
+     * @ORM\OneToMany(targetEntity="Page", mappedBy="variantParent", indexBy="id", fetch="EXTRA_LAZY")
      **/
-    private $variationChildren;
+    private $variantChildren;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Page", inversedBy="variationChildren")
-     * @ORM\JoinColumn(name="variation_parent_id", referencedColumnName="id")
+     * @ORM\ManyToOne(targetEntity="Page", inversedBy="variantChildren")
+     * @ORM\JoinColumn(name="variant_parent_id", referencedColumnName="id")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})
      **/
-    private $variationParent;
+    private $variantParent;
 
     /**
-     * @ORM\Column(name="variation_settings", type="array", nullable=true)
+     * @ORM\Column(name="variant_settings", type="array", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})
      */
-    private $variationSettings = array();
+    private $variantSettings = array();
 
     /**
      * Used to identify the page for the builder
@@ -500,7 +508,7 @@ class Page extends FormEntity
         $getter  = "get" . ucfirst($prop);
         $current = $this->$getter();
 
-        if ($prop == 'translationParent' || $prop == 'variationParent') {
+        if ($prop == 'translationParent' || $prop == 'variantParent') {
             $currentId = ($current) ? $current->getId() : '';
             $newId     = $val->getId();
             if ($currentId != $newId)
@@ -516,7 +524,6 @@ class Page extends FormEntity
     public function __construct()
     {
         $this->translationChildren = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->variationChildren = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
     /**
@@ -577,83 +584,106 @@ class Page extends FormEntity
     }
 
     /**
-     * Add variationChildren
+     * Add variantChildren
      *
-     * @param \Mautic\PageBundle\Entity\Page $variationChildren
+     * @param \Mautic\PageBundle\Entity\Page $variantChildren
      * @return Page
      */
-    public function addVariationChild(\Mautic\PageBundle\Entity\Page $variationChildren)
+    public function addVariantChild(\Mautic\PageBundle\Entity\Page $variantChildren)
     {
-        $this->variationChildren[] = $variationChildren;
+        $this->variantChildren[] = $variantChildren;
 
         return $this;
     }
 
     /**
-     * Remove variationChildren
+     * Remove variantChildren
      *
-     * @param \Mautic\PageBundle\Entity\Page $variationChildren
+     * @param \Mautic\PageBundle\Entity\Page $variantChildren
      */
-    public function removeVariationChild(\Mautic\PageBundle\Entity\Page $variationChildren)
+    public function removeVariantChild(\Mautic\PageBundle\Entity\Page $variantChildren)
     {
-        $this->variationChildren->removeElement($variationChildren);
+        $this->variantChildren->removeElement($variantChildren);
     }
 
     /**
-     * Get variationChildren
+     * Get variantChildren
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getVariationChildren()
+    public function getVariantChildren()
     {
-        return $this->variationChildren;
+        return $this->variantChildren;
     }
 
     /**
-     * Set variationParent
+     * Set variantParent
      *
-     * @param \Mautic\PageBundle\Entity\Page $variationParent
+     * @param \Mautic\PageBundle\Entity\Page $variantParent
      * @return Page
      */
-    public function setVariationParent(\Mautic\PageBundle\Entity\Page $variationParent = null)
+    public function setVariantParent(\Mautic\PageBundle\Entity\Page $variantParent = null)
     {
-        $this->isChanged('variationParent', $variationParent);
-        $this->variationParent = $variationParent;
+        $this->isChanged('variantParent', $variantParent);
+        $this->variantParent = $variantParent;
 
         return $this;
     }
 
     /**
-     * Get variationParent
+     * Get variantParent
      *
      * @return \Mautic\PageBundle\Entity\Page
      */
-    public function getVariationParent()
+    public function getVariantParent()
     {
-        return $this->variationParent;
+        return $this->variantParent;
     }
 
     /**
-     * Set variationSettings
+     * Set variantSettings
      *
-     * @param array $variationSettings
+     * @param array $variantSettings
      * @return Page
      */
-    public function setVariationSettings($variationSettings)
+    public function setVariantSettings($variantSettings)
     {
-        $this->isChanged('variationSettings', $variationSettings);
-        $this->variationSettings = $variationSettings;
+        $this->isChanged('variantSettings', $variantSettings);
+        $this->variantSettings = $variantSettings;
 
         return $this;
     }
 
     /**
-     * Get variationSettings
+     * Get variantSettings
      *
      * @return array
      */
-    public function getVariationSettings()
+    public function getVariantSettings()
     {
-        return $this->variationSettings;
+        return $this->variantSettings;
+    }
+
+    /**
+     * Set uniqueHits
+     *
+     * @param integer $uniqueHits
+     * @return Page
+     */
+    public function setUniqueHits($uniqueHits)
+    {
+        $this->uniqueHits = $uniqueHits;
+
+        return $this;
+    }
+
+    /**
+     * Get uniqueHits
+     *
+     * @return integer 
+     */
+    public function getUniqueHits()
+    {
+        return $this->uniqueHits;
     }
 }

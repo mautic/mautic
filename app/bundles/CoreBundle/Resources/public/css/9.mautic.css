@@ -836,6 +836,12 @@ li.ui-draggable {
   -o-transition: width .5s;
   -webkit-transform: translateZ(0);
 }
+.fullpanel.no-transition {
+  transition: none;
+  -moz-transition: none;
+  -webkit-transition: none;
+  -o-transition: none;
+}
 .expand-panel {
   font-size: 65%;
   position: absolute;
@@ -846,6 +852,9 @@ li.ui-draggable {
 }
 .expand-panel:hover {
   color: #7a7a7a;
+}
+.fullpanel .expand-panel {
+  left: 18px;
 }
 @media (max-width: 767px) {
   .left-panel {

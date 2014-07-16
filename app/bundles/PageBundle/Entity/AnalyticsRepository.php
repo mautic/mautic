@@ -18,5 +18,34 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class AnalyticsRepository extends CommonRepository
 {
+    public function getHitCountForTrackingId($pageId, $trackingId)
+    {
+        $count = $this->createQueryBuilder('a')
+            ->select('count(a.id) as num')
+            ->where('IDENTITY(a.page) = ' .$pageId)
+            ->andWhere('a.trackingId = :id')
+            ->setParameter('id', $trackingId)
+            ->getQuery()
+            ->getSingleResult();
 
+        return (int) $count['num'];
+    }
+
+    public function getBounces($pageId)
+    {
+        $q  = $this->createQueryBuilder('a');
+        $sq = $this->createQueryBuilder('a2')
+            ->select('a2.id')
+            ->where('a2.page = a.page')
+            ->groupBy('a2.trackingId')
+            ->having('count(a2.id) = 1')
+            ->getQuery()
+            ->getDql();
+
+        $q->select('a')
+            ->where($q->expr()->eq('IDENTITY(a.page)', $pageId))
+            ->andwhere($q->expr()->in('a.id', sprintf("%s",$sq)));
+        $results = $q->getQuery()->getArrayResult();
+        return $results;
+    }
 }

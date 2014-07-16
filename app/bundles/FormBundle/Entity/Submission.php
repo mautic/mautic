@@ -51,6 +51,12 @@ class Submission
     private $referer;
 
     /**
+     * @ORM\ManyToOne(targetEntity="Mautic\PageBundle\Entity\Page", fetch="EXTRA_LAZY")
+     * @ORM\JoinColumn(name="page_id", referencedColumnName="id", nullable=true)
+     */
+    private $page;
+
+    /**
      * @ORM\OneToMany(targetEntity="Result", mappedBy="submission", cascade={"persist", "remove", "refresh", "detach"}, fetch="EXTRA_LAZY")
      */
     private $results;
@@ -195,5 +201,28 @@ class Submission
     public function getResults()
     {
         return $this->results;
+    }
+
+    /**
+     * Set page
+     *
+     * @param \Mautic\PageBundle\Entity\Page $page
+     * @return Submission
+     */
+    public function setPage(\Mautic\PageBundle\Entity\Page $page = null)
+    {
+        $this->page = $page;
+
+        return $this;
+    }
+
+    /**
+     * Get page
+     *
+     * @return \Mautic\PageBundle\Entity\Page
+     */
+    public function getPage()
+    {
+        return $this->page;
     }
 }

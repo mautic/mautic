@@ -171,6 +171,13 @@ class SubmissionModel extends CommonFormModel
             return $errors;
         }
 
+        //set the landing page the form was submitted from if applicable
+        if (!empty($post['mauticpage'])) {
+            $page = $this->factory->getModel('page.page')->getEntity((int) $post['mauticpage']);
+            if ($page != null)
+                $submission->setPage($page);
+        }
+
         $this->saveEntity($submission);
 
         //execute submit actions

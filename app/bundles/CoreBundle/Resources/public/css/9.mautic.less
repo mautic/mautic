@@ -1,6 +1,6 @@
 /* CoreBundle */
-@import "bootstrap_less/variables.less";
-@import "bootstrap_less/mixins.less";
+@import "bootstrap_less/variables";
+@import "bootstrap_less/mixins";
 
 @leftPanelWidth: 230px;
 @leftPanelBase: #513B49;
@@ -979,6 +979,13 @@ ul.draggable, ul.droppable {
   -webkit-transform: translateZ(0);
 }
 
+.fullpanel.no-transition {
+  transition: none;
+  -moz-transition: none;
+  -webkit-transition: none;
+  -o-transition: none;
+}
+
 .expand-panel {
   font-size: 65%;
   position: absolute;
@@ -990,6 +997,10 @@ ul.draggable, ul.droppable {
 
 .expand-panel:hover {
   color: #7a7a7a;
+}
+
+.fullpanel .expand-panel {
+  left: 18px;
 }
 
 @media (max-width:767px) {

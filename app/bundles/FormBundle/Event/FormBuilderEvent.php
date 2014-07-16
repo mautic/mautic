@@ -87,7 +87,7 @@ class FormBuilderEvent extends Event
     /**
      * Adds a form field to the list of available fields in the form builder.
      *
-*@param string $key - unique identifier; it is recommended that it be namespaced i.e. leadbundle.myfield
+     * @param string $key - unique identifier; it is recommended that it be namespaced i.e. leadbundle.myfield
      * @param array $action - must contain the following keys
      *  'label'    => (required) what to display in the list
      *  'formType' => (required) name of the form type SERVICE for the field's property column

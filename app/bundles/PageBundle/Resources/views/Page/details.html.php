@@ -14,7 +14,24 @@ if ($tmpl == 'index') {
 }
 ?>
 
-<?php if (!empty($activePage)): ?>
+<?php
+if (!empty($activePage)):
+$variantParent = $activePage->getVariantParent();
+
+if (empty($variantParent) && $permissions['page:pages:create']):
+$custom = <<<CUSTOM
+<li>
+    <a href="{$view['router']->generate('mautic_page_action',
+           array("objectAction" => "abtest", "objectId" => $activePage->getId()))}"
+        data-toggle="ajax"
+        data-menu-link="mautic_page_index">
+    <span><i class="fa fa-sitemap"></i>{$view['translator']->trans('mautic.page.page.form.abtest')}</span>
+    </a>
+</li>
+CUSTOM;
+endif;
+?>
+
 <div class="bundle-main-header">
     <span class="bundle-main-item-primary">
         <span class="bundle-main-actions">
@@ -34,7 +51,8 @@ if ($tmpl == 'index') {
                 'routeBase'  => 'page',
                 'menuLink'   => 'mautic_page_index',
                 'langVar'    => 'page.page',
-                'nameGetter' => 'getTitle'
+                'nameGetter' => 'getTitle',
+                'custom'     => !empty($custom) ? $custom : ''
             ));
             ?>
         </span>
@@ -85,59 +103,25 @@ if ($tmpl == 'index') {
             </a>
         </span>
     </span>
+
     <?php
-    $parent = $activePage->getTranslationParent();
-    $children = ($parent) ? $parent->getTranslationChildren() : $activePage->getTranslationChildren();
+    echo $view->render('MauticPageBundle:Page:translations.html.php', array(
+        'page' => $activePage,
+        'dateFormat' => $dateFormat
+    ));
+
+    echo $view->render('MauticPageBundle:Page:variants.html.php', array(
+        'page' => $activePage,
+        'dateFormat' => $dateFormat
+    ));
     ?>
-    <?php if (count($children)): ?>
-    <span class="bundle-main-item-secondary margin-sm-top">
-        <span class="has-click-event"  onclick="Mautic.toggleRelatedTranslations();">
-            <i class="fa fa-language"></i>
-            <span class="margin-sm-left">
-                <em><?php echo $view['translator']->trans('mautic.page.page.translations'); ?>
-                    <i class="fa fa-chevron-circle-down related-translations-toggle"></i>
-                </em>
-            </span>
-        </span>
-        <ul class="no-bullet related-translations" style="display: none;">
-        <?php if ($parent): ?>
-            <li>
-                <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php',array(
-                    'item'       => $parent,
-                    'dateFormat' => (!empty($dateFormat)) ? $dateFormat : 'F j, Y g:i a',
-                    'model'      => 'page.page'
-                )); ?>
-                <a href="<?php echo $view['router']->generate('mautic_page_action', array(
-                    'objectAction' => 'view', 'objectId' => $parent->getId())); ?>"
-                    data-toggle="ajax">
-                    <span><?php echo $parent->getLanguage(); ?></span>
-                    <span> | </span>
-                    <span><?php echo $parent->getTitle() . " (" . $parent->getAlias() . ")"; ?></span>
-                </a>
-            </li>
-        <?php endif; ?>
-        <?php foreach ($children as $c): ?>
-            <?php if ($c->getId() == $activePage->getId()) continue; ?>
-            <li>
-                <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php',array(
-                    'item'       => $c,
-                    'dateFormat' => (!empty($dateFormat)) ? $dateFormat : 'F j, Y g:i a',
-                    'model'      => 'page.page'
-                )); ?>
-                <a href="<?php echo $view['router']->generate('mautic_page_action', array(
-                    'objectAction' => 'view', 'objectId' => $c->getId())); ?>"
-                   data-toggle="ajax">
-                    <span><?php echo $c->getLanguage(); ?></span>
-                    <span> | </span>
-                    <span><?php echo $c->getTitle() . " (" . $c->getAlias() . ")"; ?></span>
-                </a>
-            </li>
-        <?php endforeach; ?>
-        </ul>
-    </span>
-    <?php endif; ?>
+
     <div class="form-group margin-md-top">
+        <?php if (!empty($variationParent)): ?>
+        <label><?php echo $view['translator']->trans('mautic.page.page.urlvariant'); ?></label>
+        <?php else: ?>
         <label><?php echo $view['translator']->trans('mautic.page.page.url'); ?></label>
+        <?php endif; ?>
         <div class="input-group">
             <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly
                    value="<?php echo $pageUrl; ?>" />

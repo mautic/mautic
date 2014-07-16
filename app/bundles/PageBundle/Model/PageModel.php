@@ -244,12 +244,33 @@ class PageModel extends FormModel
     {
         $hit = new Analytics();
         $hit->setDateHit(new \Datetime());
+
+        //check for the tracking cookie
+       // $trackingId = $request->cookies->get('mautic_analytics_id');
+        if (empty($trackingId)) {
+            $trackingId = uniqid();
+        }
+        //create a tracking cookie
+        $expire = time() + 1800;
+        setcookie('mautic_analytics_id', $trackingId, $expire);
+        $hit->setTrackingId($trackingId);
+
         if (!empty($page)) {
             $hit->setPage($page);
 
             $hitCount = $page->getHits();
             $hitCount++;
             $page->setHits($hitCount);
+
+            //check for a hit from tracking id
+            $countById = $this->em
+                ->getRepository('MauticPageBundle:Analytics')->getHitCountForTrackingId($page->getId(), $trackingId);
+            if (empty($countById)) {
+                $uniqueHitCount = $page->getUniqueHits();
+                $uniqueHitCount++;
+                $page->setUniqueHits($uniqueHitCount);
+            }
+
             $this->em->persist($page);
 
             $hit->setPageLanguage($page->getLanguage());
@@ -303,16 +324,6 @@ class PageModel extends FormModel
         }
         $hit->setUrl($pageURL);
 
-        //check for the tracking cookie
-        $trackingId = $request->cookies->get('mautic.analytics.id');
-        if (empty($trackingId)) {
-            $trackingId = uniqid();
-        }
-        //create a tracking cookie
-        $expire = time() + 1800;
-        setcookie('mautic.analytics.id', $trackingId, $expire);
-        $hit->setTrackingId($trackingId);
-
         if ($this->dispatcher->hasListeners(PageEvents::PAGE_ON_HIT)) {
             $event = new PageHitEvent($page, $request, $code);
             $this->dispatcher->dispatch(PageEvents::PAGE_ON_HIT, $event);
@@ -327,11 +338,23 @@ class PageModel extends FormModel
      *
      * @return mixed
      */
-    public function getPageTokens()
+    public function getBuilderComponents()
     {
-        $event = new PageBuilderEvent($this->translator);
-        $this->dispatcher->dispatch(PageEvents::PAGE_ON_BUILD, $event);
-        $tokens = $event->getTokenSections();
-        return $tokens;
+        static $components;
+
+        if (empty($components)) {
+            $components = array();
+            $event      = new PageBuilderEvent($this->translator);
+            $this->dispatcher->dispatch(PageEvents::PAGE_ON_BUILD, $event);
+            $components['pageTokens']           = $event->getTokenSections();
+            $components['abTestWinnerCriteria'] = $event->getAbTestWinnerCriteria();;
+        }
+
+        return $components;
+    }
+
+    public function getBounces(Page $page)
+    {
+        return $this->em->getRepository('MauticPageBundle:Analytics')->getBounces($page->getId());
     }
 }

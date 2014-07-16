@@ -16,6 +16,7 @@
 <?php foreach ($view['assetic']->javascripts(array("@mautic_javascripts"), array(), array('combine' => true, 'output' => 'assets/js/mautic.js')) as $url): ?>
 <script src="<?php echo $view->escape($url) ?>"></script>
 <?php endforeach; ?>
+<?php //load file ?>
 <script>
     Mautic.onPageLoad();
     <?php $view['slots']->output("jsDeclarations"); ?>

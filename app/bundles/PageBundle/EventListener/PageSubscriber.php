@@ -36,9 +36,7 @@ class PageSubscriber extends CommonSubscriber
             CoreEvents::BUILD_COMMAND_LIST => array('onBuildCommandList', 0),
             ApiEvents::BUILD_ROUTE         => array('onBuildApiRoute', 0),
             PageEvents::PAGE_POST_SAVE     => array('onPagePostSave', 0),
-            PageEvents::PAGE_POST_DELETE   => array('onPageDelete', 0),
-            PageEvents::PAGE_ON_DISPLAY    => array('onPageDisplay', 0),
-            PageEvents::PAGE_ON_BUILD      => array('OnPageBuild', 0)
+            PageEvents::PAGE_POST_DELETE   => array('onPageDelete', 0)
         );
     }
 
@@ -221,80 +219,5 @@ class PageSubscriber extends CommonSubscriber
             "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
         );
         $this->factory->getModel('core.auditLog')->writeToLog($log);
-    }
-
-
-    /**
-     * Add forms to available page tokens
-     *
-     * @param PageBuilderEvent $event
-     */
-    public function onPageBuild(Events\PageBuilderEvent $event)
-    {
-        $content = $this->templating->render('MauticPageBundle:PageToken:token.html.php');
-        $event->addTokenSection('page.pagetokens', 'mautic.page.page.header.index', $content);
-    }
-
-    /**
-     * @param PageEvent $event
-     */
-    public function onPageDisplay(Events\PageEvent $event)
-    {
-        $model    = $this->factory->getModel('page.page');
-        $content  = $event->getContent();
-        $page     = $event->getPage();
-        $parent   = $page->getTranslationParent();
-        $children = $page->getTranslationChildren();
-
-        //check to see if this page is grouped with another
-        if (empty($parent) && empty($children))
-            return;
-
-        $related = array();
-
-        //get a list of associated pages/languages
-        if (!empty($parent)) {
-            $children = $parent->getTranslationChildren();
-        } else {
-            $parent = $page; //parent is self
-        }
-
-        if (!empty($children)) {
-            $lang = $parent->getLanguage();
-            $trans = $this->translator->trans('mautic.page.lang.'.$lang);
-            if ($trans == 'mautic.page.lang.'.$lang)
-                $trans = $lang;
-            $related[$parent->getId()] = array(
-                "lang" => $trans,
-                "url"  => $model->generateUrl($parent, false)
-            );
-            foreach ($children as $c) {
-                $lang = $c->getLanguage();
-                $trans = $this->translator->trans('mautic.page.lang.'.$lang);
-                if ($trans == 'mautic.page.lang.'.$lang)
-                    $trans = $lang;
-                $related[$c->getId()] = array(
-                    "lang" => $trans,
-                    "url"  => $model->generateUrl($c, false)
-                );
-            }
-        }
-
-        //sort by language
-        uasort($related, function($a, $b) {
-           return strnatcasecmp($a['lang'], $b['lang']);
-        });
-
-        if (empty($related)) {
-            return;
-        } else {
-            $langbar = $this->templating->render('MauticPageBundle:PageToken:langbar.html.php', array('pages' => $related));
-        }
-
-        foreach ($content as $slot => &$html) {
-            $html = str_ireplace('{langbar}', $langbar, $html);
-        }
-
-        $event->setContent($content);
     }
 }

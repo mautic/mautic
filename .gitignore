@@ -15,10 +15,10 @@
 /composer.lock
 /assetic
 /bundles
-/media/css
-/media/js
-/media/font-awesome/less
-/media/font-awesome/scss
+/assets/css/mautic.*
+/assets/js/mautic*
+/assets/css/font-awesome/less
+/assets/css/font-awesome/scss
 bootstrap_less/
 1.bootstrap.less
 /css

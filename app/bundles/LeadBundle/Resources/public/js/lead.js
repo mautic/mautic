@@ -1,7 +1,7 @@
 //LeadBundle
 Mautic.leadOnLoad = function (container) {
     if (mQuery(container + ' form[name="lead"]').length) {
-        mQuery('.bundle-main').addClass('fullpanel');
+        Mautic.expandPanel('.bundle-main', 'expand');
 
         Mautic.activateLeadOwnerTypeahead('lead_owner_lookup');
 

@@ -206,6 +206,7 @@ class FormSubscriber extends CommonSubscriber
     public function onPageDisplay(PageEvent $event)
     {
         $content = $event->getContent();
+        $page    = $event->getPage();
         foreach ($content as $slot => &$html) {
             $regex = '/{form=(.*?)}/i';
 
@@ -229,9 +230,13 @@ class FormSubscriber extends CommonSubscriber
                             $formHtml .= '<div class="mauticform-error">' .
                                 $this->translator->trans('mautic.form.form.pagetoken.notpublished') .
                                 '</div>';
-
                         }
-                        $html = preg_replace('#{form='.$id.'}#', $formHtml, $html);
+
+                        //add the hidden page input
+                        $pageInput = "\n<input type=\"hidden\" name=\"mauticform[mauticpage]\" value=\"{$page->getId()}\" />\n";
+                        $formHtml  = preg_replace("#</form>#", $pageInput . "</form>", $formHtml);
+
+                        $html      = preg_replace('#{form='.$id.'}#', $formHtml, $html);
                     } else {
                         $html = preg_replace("#{form=".$id."}#", "", $html);
                     }

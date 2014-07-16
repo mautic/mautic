@@ -21,6 +21,7 @@ class PublicController extends CommonFormController
     {
         //find the page
         $factory    = $this->get('mautic.factory');
+        $security   = $factory->getSecurity();
         $model      = $factory->getModel('page.page');
         $translator = $this->get('translator');
         $entity     = $model->getEntityBySlugs($slug1, $slug2, $slug3);
@@ -31,7 +32,7 @@ class PublicController extends CommonFormController
             $published    = $entity->isPublished();
 
             //make sure the page is published or deny access if not
-            if ((!$catPublished || !$published) && (!$this->get('mautic.security')->hasEntityAccess(
+            if ((!$catPublished || !$published) && (!$security->hasEntityAccess(
                     'page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy()))
             ) {
                 $model->hitPage($entity, $this->request, 401);
@@ -39,33 +40,104 @@ class PublicController extends CommonFormController
             }
 
             //make sure URLs match up
-            $url = $model->generateUrl($entity, false);
-
-            if ($this->request->getRequestUri() != $url) {
+            $url        = $model->generateUrl($entity, false);
+            $requestUri = $this->request->getRequestUri();
+            //remove query
+            $query      = $this->request->getQueryString();
+            if (!empty($query)) {
+                $requestUri = str_replace("?{$query}", '', $url);
+            }
+            //redirect if they don't match
+            if ($requestUri != $url) {
                 $model->hitPage($entity, $this->request, 301);
                 return $this->redirect($url, 301);
             }
 
+            //check for variants
+            $parentVariant   = $entity->getVariantParent();
+            $childrenVariant = $entity->getVariantChildren();
+
+            $userAccess = $security->hasEntityAccess('page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy());
+
+            //is this a variant of another? If so, the parent URL should be used unless a user is logged in and previewing
+            if ($parentVariant && !$userAccess) {
+                $model->hitPage($entity, $this->request, 301);
+                $url = $model->generateUrl($parentVariant, false);
+                return $this->redirect($url, 301);
+            }
+
+            if (!$userAccess) {
+                //check to see if a variant should be shown versus the parent but ignore if a user is previewing
+                if (count($childrenVariant)) {
+                    $variants      = array();
+                    $variantWeight = 0;
+                    $totalHits     = $entity->getUniqueHits();
+                    foreach ($childrenVariant as $id => $child) {
+                        if ($child->isPublished()) {
+                            $variantSettings = $child->getVariantSettings();
+                            $variants[$id]   = array(
+                                'weight' => ($variantSettings['weight'] / 100),
+                                'hits'   => $child->getUniqueHits()
+                            );
+                            $variantWeight += $variantSettings['weight'];
+                            $totalHits     += $variants[$id]['hits'];
+                        }
+                    }
+
+                    if (count($variants)) {
+                        //check to see if this user has already been displayed a specific variant
+                        $variantCookie = $this->request->cookies->get('mautic_variant_' . $entity->getId());
+
+                        if (!empty($variantCookie) && isset($variants[$variantCookie])) {
+                            //if not the parent, show the specific variant already displayed to the visitor
+                            if ($variantCookie !== $entity->getId()) {
+                                $entity = $childrenVariant[$variantCookie];
+                            } //otherwise proceed with displaying parent
+                        } else {
+                            //add parent weight
+                            $variants[$entity->getId()] = array(
+                                'weight' => ((100 - $variantWeight)/100),
+                                'hits'   => $entity->getUniqueHits()
+                            );
+
+                            //determine variant to show
+                            $byWeight = array();
+                            foreach ($variants as $id => $v) {
+                                $byWeight[$id] = ($v['hits'] / $totalHits) - $v['weight'];
+                            }
+
+                            //find the one with the most difference from weight
+                            $greatestDiff = min($byWeight);
+                            $useId        = array_search($greatestDiff, $byWeight);
+                            if ($useId != $entity->getId()) {
+                                //set the cookie - 14 days
+                                setcookie('mautic_variant_' . $entity->getId(), $useId, (time() + 3600 * 24 * 14));
+                                $entity = $childrenVariant[$useId];
+                            }
+                        }
+                    }
+                }
+            }
             //let's check for preferred languages if we have a multi-language group of pages
-            $parent   = $entity->getTranslationParent();
-            $children = $entity->getTranslationChildren();
-            if ($parent || count($children)) {
+            $translationParent   = $entity->getTranslationParent();
+            $translationChildren = $entity->getTranslationChildren();
+            if ($translationParent || count($translationChildren)) {
                 $session = $this->get('session');
-                if ($parent) {
-                    $children = $parent->getTranslationChildren();
+                if ($translationParent) {
+                    $translationChildren = $translationParent->getTranslationChildren();
                 } else {
-                    $parent = $entity;
+                    $translationParent = $entity;
                 }
 
                 //check to see if this group has already been redirected
-                $doNotRedirect = $session->get('mautic.page.'.$parent->getId().'.donotredirect', false);
+                $doNotRedirect = $session->get('mautic.page.'.$translationParent->getId().'.donotredirect', false);
 
                 if (empty($doNotRedirect)) {
-                    $session->set('mautic.page.'.$parent->getId().'.donotredirect', 1);
+                    $session->set('mautic.page.'.$translationParent->getId().'.donotredirect', 1);
 
                     //generate a list of translations
-                    $langs    = array($parent->getLanguage());
-                    foreach ($children as $c) {
+                    $langs    = array($translationParent->getLanguage());
+                    foreach ($translationChildren as $c) {
                         $langs[$c->getId()] = $c->getLanguage();
                     }
 
@@ -119,7 +191,7 @@ class PublicController extends CommonFormController
 
                         //redirect if not already on the correct page
                         if ($pageId != $entity->getId()) {
-                            $page = ($pageId == $parent->getId()) ? $parent : $children[$pageId];
+                            $page = ($pageId == $translationParent->getId()) ? $translationParent : $translationChildren[$pageId];
                             $url  = $model->generateUrl($page, false);
                             $model->hitPage($entity, $this->request, 302);
                             return $this->redirect($url, 302);
@@ -156,7 +228,7 @@ class PublicController extends CommonFormController
 
             $model->hitPage($entity, $this->request, 200);
 
-            $googleAnalytics = $this->get('mautic.factory')->getParameter('google_analytics');
+            $googleAnalytics = $factory->getParameter('google_analytics');
 
             return $this->render('MauticPageBundle::public.html.php', array(
                 'slots'           => $slots,

@@ -11,7 +11,9 @@
 <?php
 if (count($items)):
 foreach ($items as $key => $item):
-    $activeClass = ($tmpl == 'index' && !empty($activePage) && $item->getId() === $activePage->getId()) ? " active" : "";
+    $variantChildren     = $item->getVariantChildren();
+    $translationChildren = $item->getTranslationChildren();
+    $activeClass         = ($tmpl == 'index' && !empty($activePage) && $item->getId() === $activePage->getId()) ? " active" : "";
     ?>
 <div class="bundle-list-item<?php echo $activeClass; ?>" id="page-<?php echo $item->getId(); ?>">
     <div class="padding-sm">
@@ -46,6 +48,18 @@ foreach ($items as $key => $item):
                 <span><?php echo $author; ?></span>
                 <span> | </span>
                 <span><?php echo $item->getLanguage(); ?></span>
+                <?php
+                $hasVariants   = count($variantChildren);
+                $hasTranslations = count($translationChildren);
+                if ($hasVariants || $hasTranslations): ?>
+                    <span> | </span>
+                    <?php if ($hasVariants): ?>
+                    <i class="fa fa-fw fa-sitemap"></i>
+                    <?php endif; ?>
+                    <?php if ($hasTranslations): ?>
+                    <i class="fa fa-fw fa-language"></i>
+                    <?php endif; ?>
+                <?php endif; ?>
             </span>
         </a>
         <div class="badge-count padding-sm">

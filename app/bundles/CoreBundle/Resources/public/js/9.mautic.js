@@ -325,6 +325,7 @@ var Mautic = {
                         if (mQuery(".page-wrapper").hasClass("right-active")) {
                             mQuery(".page-wrapper").removeClass("right-active");
                         }
+
                         Mautic.processPageContent(response);
                     }
 
@@ -1085,11 +1086,12 @@ var Mautic = {
             data: "action=togglePublishStatus&model=" + model + '&id=' + id,
             dataType: "json",
             success: function (response) {
+                Mautic.stopIconSpinPostEvent();
+
                 if (response.statusHtml) {
                     mQuery(el).replaceWith(response.statusHtml);
                     mQuery(el).tooltip({html: true, container: 'body'});
                 }
-                Mautic.stopIconSpinPostEvent();
             },
             error: function (request, textStatus, errorThrown) {
                 alert(errorThrown);
@@ -1111,10 +1113,47 @@ var Mautic = {
      * Expand right panel
      * @param el
      */
-    expandPanel: function(el) {
-        mQuery(el).toggleClass('fullpanel');
-    },
+    expandPanel: function(el, force, noTransition) {
+        if (typeof noTransition == 'undefined')
+            noTransition = false
 
+        if (force) {
+            if (force == 'expand') {
+                console.log(mQuery('.main-panel-content').hasClass('has-fullpanel'));
+                if (mQuery('.main-panel-content').hasClass('has-fullpanel')) {
+                    noTransition = true;
+                } else {
+                    mQuery('.main-panel-content').addClass('has-fullpanel')
+                }
+
+                var className = (noTransition) ? 'fullpanel no-transition' : 'fullpanel';
+                mQuery(el).addClass(className);
+                if (noTransition) {
+                    //remove the no-transition class after the panel has expanded
+                    setTimeout(function () {
+                        mQuery(el).removeClass('no-transition');
+                    }, 1000);
+                }
+            } else {
+                if (noTransition) {
+                    mQuery(el).addClass('no-transition');
+                    //remove the no-transition class after the panel has retracted
+                    setTimeout(function() {
+                        mQuery(el).removeClass('no-transition');
+                    }, 1000);
+                }
+                mQuery(el).removeClass('fullpanel');
+                mQuery('.main-panel-content').removeClass('has-fullpanel');
+            }
+        } else {
+            mQuery(el).toggleClass('fullpanel');
+            if (mQuery(el).hasClass('fullpanel')) {
+                mQuery('.main-panel-content').addClass('has-fullpanel');
+            } else {
+                mQuery('.main-panel-content').removeClass('has-fullpanel');
+            }
+        }
+    },
 
     /**
      * Apply filter
