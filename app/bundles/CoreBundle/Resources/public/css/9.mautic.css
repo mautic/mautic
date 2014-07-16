@@ -48,40 +48,6 @@ h6 {
 .top-panel-main {
   padding: 3px;
 }
-/* Bootstrap Panel Override */
-.panel {
-  position: relative;
-  border-width: 1px;
-  border-color: #cfd9db;
-  border-bottom-width: 2px;
-  border-bottom-color: #c0cdd1;
-  border-radius: 3px;
-  -webkit-box-shadow: none;
-  box-shadow: none;
-}
-.panel-heading {
-  padding: 0 15px;
-  border-top-right-radius: 3px;
-  border-top-left-radius: 3px;
-  margin-left: -1px;
-  margin-right: -1px;
-  margin-top: -1px;
-  border: 1px solid transparent;
-}
-.panel-heading > .panel-title {
-  font-size: 14px;
-  font-weight: 600;
-  display: table-cell;
-  vertical-align: middle;
-  width: 1%;
-  height: 40px;
-  float: none!important;
-}
-.panel-default > .panel-heading {
-  color: #444;
-  background-color: #f1f1f1;
-  border-color: #cfd9db;
-}
 .panel-toggle {
   height: 50px;
   width: 50px;
@@ -151,11 +117,6 @@ h6 {
   -moz-transition: all 0.3s ease-in-out;
   -o-transition: all 0.3s ease-in-out;
   transition: all 0.3s ease-in-out 0s;
-}
-.main-panel-breadcrumbs ol.breadcrumb {
-  padding: 8px 0;
-  margin-bottom: 5px;
-  background-color: #ecf0f1;
 }
 .main-panel-content {
   position: relative;
@@ -999,5 +960,88 @@ li.ui-draggable {
   .footer-margin {
     padding-bottom: 120px;
     margin-bottom: -120px;
+  }
+}
+/* Bootstrap Overrides */
+.panel {
+  position: relative;
+  border-width: 1px;
+  border-color: #cfd9db;
+  border-bottom-width: 2px;
+  border-bottom-color: #c0cdd1;
+  border-radius: 3px;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+.panel-heading {
+  padding: 0 15px;
+  border-top-right-radius: 3px;
+  border-top-left-radius: 3px;
+  margin-left: -1px;
+  margin-right: -1px;
+  margin-top: -1px;
+  border: 1px solid transparent;
+}
+.panel-heading > .panel-title {
+  font-size: 14px;
+  font-weight: 600;
+  display: table-cell;
+  vertical-align: middle;
+  width: 1%;
+  height: 40px;
+  float: none!important;
+}
+.panel-default > .panel-heading {
+  color: #444;
+  background-color: #f1f1f1;
+  border-color: #cfd9db;
+}
+.page-header.page-header-block {
+  width: auto;
+  padding: 14px 15px 16px;
+  background-color: #fbfcfc;
+  border-bottom-color: #e9eeef;
+}
+.page-header {
+  position: relative;
+  padding-bottom: 15px;
+  margin: 0 0 15px;
+  border-bottom: 1px solid #e9eeef;
+  overflow: visible;
+}
+.page-header .page-header-section + .page-header-section {
+  margin-top: 10px;
+}
+.page-header .breadcrumb {
+  padding-left: 0;
+  padding-right: 0;
+}
+.breadcrumb.breadcrumb-transparent {
+  background-color: transparent;
+}
+@media (min-width: 768px) {
+  .page-header .page-header-section {
+    display: table-cell;
+    width: 1%;
+    vertical-align: middle;
+    margin-top: 0;
+  }
+}
+.page-header .path {
+  text-align: left;
+  margin-bottom: 5px;
+}
+@media (min-width: 768px) {
+  .page-header .path {
+    text-align: right;
+    margin-bottom: 0;
+  }
+}
+@media (min-width: 768px) {
+  .page-header .page-header-section {
+    display: table-cell;
+    width: 1%;
+    vertical-align: middle;
+    margin-top: 0;
   }
 }
