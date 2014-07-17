@@ -49,15 +49,4 @@ $view["slots"]->set("headerTitle", $view['translator']->trans('mautic.form.resul
 <?php endif; ?>
 <?php $view["slots"]->stop(); ?>
 
-<div class="table-responsive scrollable body-white padding-sm formresults">
-    <?php echo $view->render('MauticFormBundle:Result:list.html.php', array(
-        'items'       => $items,
-        'filters'     => $filters,
-        'form'        => $form,
-        'page'        => $page,
-        'limit'       => $limit,
-        'tmpl'        => $tmpl,
-        'dateFormat'  => $dateFormat
-    )); ?>
-    <div class="footer-margin"></div>
-</div>
+<?php $view['slots']->output('_content'); ?>

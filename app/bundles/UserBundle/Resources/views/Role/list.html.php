@@ -74,8 +74,7 @@ endif;
         "page"       => $page,
         "limit"      => $limit,
         "baseUrl"    =>  $view['router']->generate('mautic_role_index'),
-        'sessionVar' => 'role',
-        'target'     => '.main-panel-content-wrapper'
+        'sessionVar' => 'role'
     )); ?>
     <div class="footer-margin"></div>
 </div>

@@ -97,8 +97,7 @@ endif;
         "page"       => $page,
         "limit"      => $limit,
         "baseUrl"    =>  $view['router']->generate('mautic_user_index'),
-        'sessionVar' => 'user',
-        'target'     => '.main-panel-content-wrapper'
+        'sessionVar' => 'user'
     )); ?>
     <div class="footer-margin"></div>
 </div>

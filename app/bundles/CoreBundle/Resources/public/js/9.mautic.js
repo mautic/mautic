@@ -436,7 +436,7 @@ var Mautic = {
     processPageContent: function (response) {
         if (response) {
             if (!response.target) {
-                response.target = '.main-panel-content';
+                response.target = '#main-content';
             }
 
             //update type of content displayed
@@ -455,7 +455,7 @@ var Mautic = {
 
             //set content
             if (response.newContent) {
-                if (response.replaceContent) {
+                if (response.replaceContent && response.replaceContent == 'true') {
                     mQuery(response.target).replaceWith(response.newContent);
                 } else {
                     mQuery(response.target).html(response.newContent);

@@ -39,7 +39,7 @@ $activePanelClasses  = ($app->getSession()->get('left-panel', 'default') == 'unp
                     <div class="main-panel-flash-msgs">
                         <?php echo $view->render('MauticCoreBundle:Default:flashes.html.php'); ?>
                     </div>
-                    <div class="main-panel-content container-fluid">
+                    <div id="main-content" class="main-panel-content container-fluid">
                         <?php $view['slots']->output('_content'); ?>
                     </div>
                 </div>

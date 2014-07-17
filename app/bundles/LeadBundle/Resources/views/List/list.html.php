@@ -72,9 +72,7 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
         "page"       => $page,
         "limit"      => $limit,
         "baseUrl"    =>  $view['router']->generate('mautic_leadlist_index'),
-        'tmpl'       => $tmpl,
-        'sessionVar' => 'leadlist',
-        'target'     => '.main-panel-content-wrapper'
+        'sessionVar' => 'leadlist'
     )); ?>
     <?php else: ?>
         <h4><?php echo $view['translator']->trans('mautic.core.noresults'); ?></h4>

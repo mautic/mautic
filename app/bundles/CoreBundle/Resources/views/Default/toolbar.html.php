@@ -10,7 +10,6 @@
 $searchUri   = $view['slots']->get('searchUri');
 $actions     = $view['slots']->get('actions');
 $toolbar     = $view['slots']->get('toolbar');
-
 if (!empty($searchUri)):
     $bundle        = strtolower($app->getRequest()->get('bundle'));
     $searchString  = $view['slots']->get('searchString', '');
@@ -37,7 +36,7 @@ endif;
             value="<?php echo $searchString; ?>"
             autocomplete="off"
             data-toggle="livesearch"
-            data-target=".main-panel-content-wrapper"
+            data-target=".bundle-list"
             data-action="<?php echo $searchUri; ?>"
             data-overlay-text="<?php echo $view['translator']->trans('mautic.core.search.livesearch'); ?>"
             onmouseover="Mautic.showSearchInput()"
