@@ -250,6 +250,9 @@ class FormModel extends CommonFormModel
         }
         $entity->setAlias($alias);
 
+        //save the form so that the ID is available for the form html
+        parent::saveEntity($entity, $unlock);
+
         //generate cached HTML and JS
         $templating = $this->factory->getTemplating();
 
@@ -282,8 +285,7 @@ class FormModel extends CommonFormModel
         $html = str_replace($search, $replace, $html);
         $js = "document.write(\"".$html."\");";
         $entity->setCachedJs($js);
-
-        parent::saveEntity($entity, $unlock);
+        $this->getRepository()->saveEntity($entity);
     }
 
     /**

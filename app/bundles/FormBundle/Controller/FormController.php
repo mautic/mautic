@@ -25,8 +25,10 @@ class FormController extends CommonFormController
      * @param string $view
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction($page = 1, $view = 'list', $activeForm = false)
+    public function indexAction($page = 1)
     {
+        $factory = $this->get('mautic.factory');
+
         //set some permissions
         $permissions = $this->get('mautic.security')->isGranted(array(
             'form:forms:viewown',
@@ -46,7 +48,7 @@ class FormController extends CommonFormController
         }
 
         //set limits
-        $limit = $this->get('session')->get('mautic.form.limit', $this->get('mautic.factory')->getParameter('default_pagelimit'));
+        $limit = $this->get('session')->get('mautic.form.limit', $factory->getParameter('default_pagelimit'));
         $start = ($page === 1) ? 0 : (($page-1) * $limit);
         if ($start < 0) {
             $start = 0;
@@ -59,20 +61,22 @@ class FormController extends CommonFormController
 
         if (!$permissions['form:forms:viewother']) {
             $filter['force'] =
-                array('column' => 'f.createdBy', 'expr' => 'eq', 'value' => $this->get('mautic.factory')->getUser());
+                array('column' => 'f.createdBy', 'expr' => 'eq', 'value' => $factory->getUser());
         }
 
-        $forms = $this->get('mautic.factory')->getModel('form.form')->getEntities(
+        $orderBy     = $this->get('session')->get('mautic.form.orderby', 'f.name');
+        $orderByDir  = $this->get('session')->get('mautic.form.orderbydir', 'ASC');
+
+        $forms = $factory->getModel('form.form')->getEntities(
             array(
                 'start'      => $start,
                 'limit'      => $limit,
                 'filter'     => $filter,
-                'orderByDir' => "DESC",
-                'getTotalCount' => true
+                'orderBy'    => $orderBy,
+                'orderByDir' => $orderByDir
             ));
 
-        $count = $forms['totalCount'];
-        unset($forms['totalCount']);
+        $count = count($forms);
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page
             if ($count === 1) {
@@ -97,62 +101,25 @@ class FormController extends CommonFormController
         //set what page currently on so that we can return here after form submission/cancellation
         $this->get('session')->set('mautic.form.page', $page);
 
-        //get active form
-        if ($activeForm === false)
-            $activeForm = ($count) ? $forms[0] : false;
-
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
-        $parameters = array(
-            'searchValue' => $search,
-            'items'       => $forms,
-            'page'        => $page,
-            'limit'       => $limit,
-            'totalCount'  => $count,
-            'permissions' => $permissions,
-            'activeForm'  => $activeForm,
-            'tmpl'        => $tmpl,
-            'security'    => $this->get('mautic.security')
-        );
-
-        $vars = array(
-            'activeLink'    => '#mautic_form_index',
-            'mauticContent' => 'form',
-            'route'         => $this->generateUrl('mautic_form_index', array('page' => $page))
-        );
-
-        if ($tmpl == "index") {
-            switch ($view) {
-                case 'list':
-                    $template = 'MauticFormBundle:Form:details.html.php';
-                    break;
-                case 'view':
-                    $template = 'MauticFormBundle:Form:details.html.php';
-                    $vars['route'] = $this->generateUrl('mautic_form_action', array(
-                        'objectAction' => 'view',
-                        'objectId'     => $activeForm->getId())
-                    );
-                    break;
-            }
-        } elseif ($tmpl == 'form') {
-            $template       = 'MauticFormBundle:Form:details.html.php';
-            $vars['target'] = '.bundle-main-inner-wrapper';
-            $vars['route']  = $this->generateUrl('mautic_form_action', array(
-                    'objectAction' => 'view',
-                    'objectId'     => $activeForm->getId())
-            );
-        } else {
-            $template      = 'MauticFormBundle:Form:list.html.php';
-            if ($tmpl == 'list') {
-                $vars['target'] = '.bundle-list';
-            }
-            $parameters['dateFormat'] = $this->get('mautic.factory')->getParameter('date_format_full');
-        }
-
         return $this->delegateView(array(
-            'viewParameters'  => $parameters,
-            'contentTemplate' => $template,
-            'passthroughVars' => $vars
+            'viewParameters'  => array(
+                'searchValue' => $search,
+                'items'       => $forms,
+                'page'        => $page,
+                'limit'       => $limit,
+                'permissions' => $permissions,
+                'tmpl'        => $tmpl,
+                'dateFormat'  => $factory->getParameter('date_format_full'),
+                'security'    => $factory->getSecurity()
+            ),
+            'contentTemplate' => 'MauticFormBundle:Form:list.html.php',
+            'passthroughVars' => array(
+                'activeLink'    => '#mautic_form_index',
+                'mauticContent' => 'form',
+                'route'         => $this->generateUrl('mautic_form_index', array('page' => $page))
+            )
         ));
     }
 
@@ -164,9 +131,10 @@ class FormController extends CommonFormController
      */
     public function viewAction($objectId)
     {
-        $activeForm  = $this->get('mautic.factory')->getModel('form.form')->getEntity($objectId);
+        $factory     = $this->get('mautic.factory');
+        $activeForm  = $factory->getModel('form.form')->getEntity($objectId);
         //set the page we came from
-        $page    = $this->get('session')->get('mautic.form.page', 1);
+        $page        = $this->get('session')->get('mautic.form.page', 1);
 
         if ($activeForm === null) {
             //set the return URL
@@ -194,6 +162,36 @@ class FormController extends CommonFormController
             return $this->accessDenied();
         }
 
+        $permissions = $this->get('mautic.security')->isGranted(array(
+            'form:forms:viewown',
+            'form:forms:viewother',
+            'form:forms:create',
+            'form:forms:editown',
+            'form:forms:editother',
+            'form:forms:deleteown',
+            'form:forms:deleteother',
+            'form:forms:publishown',
+            'form:forms:publishother'
+
+        ), "RETURN_ARRAY");
+
+        return $this->delegateView(array(
+            'viewParameters'  => array(
+                'activeForm'  => $activeForm,
+                'page'        => $page,
+                'permissions' => $permissions,
+                'security'    => $factory->getSecurity()
+            ),
+            'contentTemplate' => 'MauticFormBundle:Form:details.html.php',
+            'passthroughVars' => array(
+                'activeLink'    => '#mautic_form_index',
+                'mauticContent' => 'form',
+                'route'         => $this->generateUrl('mautic_form_action', array(
+                        'objectAction' => 'view',
+                        'objectId'     => $activeForm->getId())
+                )
+            )
+        ));
         return $this->indexAction($page, 'view', $activeForm);
     }
 
@@ -204,7 +202,8 @@ class FormController extends CommonFormController
      */
     public function newAction ()
     {
-        $model   = $this->get('mautic.factory')->getModel('form.form');
+        $factory = $this->get('mautic.factory');
+        $model   = $factory->getModel('form.form');
         $entity  = $model->getEntity();
         $session = $this->get('session');
 
@@ -343,7 +342,8 @@ class FormController extends CommonFormController
      */
     public function editAction ($objectId, $ignorePost = false)
     {
-        $model      = $this->get('mautic.factory')->getModel('form.form');
+        $factory    = $this->get('mautic.factory');
+        $model      = $factory->getModel('form.form');
         $entity     = $model->getEntity($objectId);
         $session    = $this->get('session');
         $cleanSlate = true;
@@ -425,8 +425,8 @@ class FormController extends CommonFormController
                         $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
 
                         //delete entities
-                        $this->get('mautic.factory')->getModel('form.field')->deleteEntities($deletedFields);
-                        $this->get('mautic.factory')->getModel('form.action')->deleteEntities($deletedActions);
+                        $factory->getModel('form.field')->deleteEntities($deletedFields);
+                        $factory->getModel('form.action')->deleteEntities($deletedActions);
 
                         $this->request->getSession()->getFlashBag()->add(
                             'notice',
@@ -438,11 +438,24 @@ class FormController extends CommonFormController
                                 ))
                             ), 'flashes')
                         );
+
+                        if ($form->get('buttons')->get('save')->isClicked()) {
+                            $viewParameters = array(
+                                'objectAction' => 'view',
+                                'objectId'     => $entity->getId()
+                            );
+                            $returnUrl      = $this->generateUrl('mautic_form_action', $viewParameters);
+                            $template       = 'MauticFormBundle:Form:view';
+                        }
                     }
                 }
             } else {
                 //unlock the entity
                 $model->unlockEntity($entity);
+
+                $viewParameters  = array('page' => $page);
+                $returnUrl = $this->generateUrl('mautic_form_index', $viewParameters);
+                $template  = 'MauticFormBundle:Form:index';
             }
 
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
@@ -451,12 +464,9 @@ class FormController extends CommonFormController
 
                 return $this->postActionRedirect(
                     array_merge($postActionVars, array(
-                        'returnUrl'       => $this->generateUrl('mautic_form_action', array(
-                            'objectAction' => 'view',
-                            'objectId'     => $entity->getId()
-                        )),
-                        'viewParameters'  => array('objectId' => $entity->getId()),
-                        'contentTemplate' => 'MauticFormBundle:Form:view'
+                        'returnUrl'       => $returnUrl,
+                        'viewParameters'  => $viewParameters,
+                        'contentTemplate' => $template
                     ))
                 );
             } elseif ($form->get('buttons')->get('apply')->isClicked()) {
@@ -542,7 +552,7 @@ class FormController extends CommonFormController
      */
     public function cloneAction ($objectId)
     {
-        $model   = $this->get('mautic.factory')->getModel('form.form');
+        $model   = $factory->getModel('form.form');
         $entity  = $model->getEntity($objectId);
 
         if ($entity != null) {
@@ -570,8 +580,9 @@ class FormController extends CommonFormController
      */
     public function previewAction ($objectId)
     {
-        $model = $this->get('mautic.factory')->getModel('form.form');
-        $form  = $model->getEntity($objectId);
+        $factory = $this->get('mautic.factory');
+        $model   = $factory->getModel('form.form');
+        $form    = $model->getEntity($objectId);
 
         if ($form === null) {
             $html =
@@ -600,6 +611,7 @@ class FormController extends CommonFormController
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function deleteAction($objectId) {
+        $factory     = $this->get('mautic.factory');
         $page        = $this->get('session')->get('mautic.form.page', 1);
         $returnUrl   = $this->generateUrl('mautic_form_index', array('page' => $page));
         $flashes     = array();
@@ -615,7 +627,7 @@ class FormController extends CommonFormController
         );
 
         if ($this->request->getMethod() == 'POST') {
-            $model  = $this->get('mautic.factory')->getModel('form.form');
+            $model  = $factory->getModel('form.form');
             $entity = $model->getEntity($objectId);
 
             if ($entity === null) {

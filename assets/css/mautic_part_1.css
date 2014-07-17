@@ -5784,6 +5784,9 @@ h6 {
 .toolbar .input-group ul {
   text-align: left;
 }
+.toolbar .dropdown-menu i.fa {
+  padding-right: 4px;
+}
 .search {
   position: relative;
   right: 0;
@@ -5811,6 +5814,12 @@ h6 {
 .toolbar-form-buttons .btn {
   margin-left: 3px;
   margin-bottom: 3px;
+}
+.toolbar-bundle-buttons {
+  padding: 10px 10px 10px 0;
+}
+.toolbar-bundle-buttons a.btn {
+  color: #333333;
 }
 .bottom-form-buttons .btn {
   margin-bottom: 3px;
@@ -5846,6 +5855,15 @@ label.required:after {
 }
 .margin-md-top {
   margin-top: 30px;
+}
+.margin-sm-bottom {
+  margin-bottom: 5px;
+}
+.margin-md-bottom {
+  margin-bottom: 15px;
+}
+.margin-md-bottom {
+  margin-bottom: 30px;
 }
 .margin-sm-right {
   margin-right: 5px;
@@ -5901,11 +5919,28 @@ label.required:after {
 .text-lg-indent {
   text-indent: 30px;
 }
+.table-layout {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+.table-layout .valign-middle {
+  vertical-align: middle !important;
+}
+.table-layout > div[class*="col-"] {
+  display: table-cell;
+  table-layout: fixed;
+  float: none;
+  vertical-align: middle;
+}
 ul.no-bullet {
   list-style: none;
 }
 .rounded-corners {
   border-radius: 4px;
+}
+.span-block {
+  display: block;
 }
 .alert {
   word-wrap: break-word;
@@ -6472,7 +6507,7 @@ li.ui-draggable {
     color: #7D5B71;
 }
 
-.col-leadlist-actions, .col-leadfield-actions {
+.col-lead-actions, .col-leadlist-actions, .col-leadfield-actions {
     width: 25px;
 }
 
@@ -6562,9 +6597,18 @@ textarea.form-html {
     height: 90%;
 }
 
-.col-formresult-id {
+.col-form-actions {
     width: 25px;
 }
+
+.col-form-id, .col-formresult-id {
+    width: 75px;
+}
+
+.col-form-submissions {
+    width: 100px;
+}
+
 .col-formresult-ip {
     width: 125px;
 }

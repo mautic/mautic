@@ -433,6 +433,9 @@ h6 {
 .toolbar .input-group ul {
   text-align: left;
 }
+.toolbar .dropdown-menu i.fa {
+  padding-right: 4px;
+}
 .search {
   position: relative;
   right: 0;
