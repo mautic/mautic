@@ -1033,7 +1033,7 @@ var Mautic = {
                 mQuery.ajax({
                     url: route,
                     type: "GET",
-                    data: el.attr('name') + "=" + encodeURIComponent(value) + '&tmpl=content',
+                    data: el.attr('name') + "=" + encodeURIComponent(value) + '&tmpl=list',
                     dataType: "json",
                     success: function (response) {
                         //cache the response
