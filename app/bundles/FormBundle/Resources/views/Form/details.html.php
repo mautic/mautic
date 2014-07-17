@@ -40,7 +40,6 @@ $view["slots"]->set("headerTitle", $activeForm->getName());
     </a>
 </li>
 <?php endif; ?>
-<?php if ($permissions['form:forms:create']): ?>
 <li>
     <a href="<?php echo $view['router']->generate('mautic_form_action', array(
         'objectAction' => 'results', 'objectId' => $activeForm->getId())); ?>"
@@ -51,7 +50,6 @@ $view["slots"]->set("headerTitle", $activeForm->getName());
         </span>
     </a>
 </li>
-<?php endif; ?>
 <li>
     <a data-toggle="modal" data-target="#form-preview">
         <i class="fa fa-fw fa-camera"></i><?php echo $view['translator']->trans('mautic.form.form.preview'); ?>

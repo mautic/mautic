@@ -104,8 +104,9 @@ class RoleController extends FormController
             'viewParameters'  => $parameters,
             'contentTemplate' => 'MauticUserBundle:Role:list.html.php',
             'passthroughVars' => array(
-                'route'         => $this->generateUrl('mautic_role_index', array('page' => $page)),
-                'mauticContent' => 'role'
+                'route'          => $this->generateUrl('mautic_role_index', array('page' => $page)),
+                'mauticContent'  => 'role',
+                'replaceContent' => ($tmpl == 'list') ? 'true' : 'false'
             )
         ));
     }

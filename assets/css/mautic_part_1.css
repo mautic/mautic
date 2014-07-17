@@ -6618,16 +6618,12 @@ textarea.form-html {
 }
 /* PageBundle */
 
-.col-page-hits, .col-page-actions, .col-page-id {
+.col-page-id {
     width: 75px;
 }
 
-.col-page-lang {
-    width: 100px;
-}
-
-.col-page-author {
-    width: 250px;
+.col-page-actions {
+    width: 25px;
 }
 
 .page-builder {

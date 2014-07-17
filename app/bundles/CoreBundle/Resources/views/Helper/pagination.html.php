@@ -8,7 +8,7 @@
  */
 
 $target = (!empty($target)) ? $target : '.bundle-list';
-$tmpl   = (!empty($tmpl)) ? $tmpl : 'content';
+$tmpl   = (!empty($tmpl)) ? $tmpl : 'list';
 
 if (!isset($limit)) {
     $limit = 30;

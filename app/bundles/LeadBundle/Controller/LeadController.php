@@ -124,16 +124,18 @@ class LeadController extends FormController
             'permissions' => $permissions,
             'tmpl'        => $tmpl,
             'indexMode'   => $indexMode,
-            'lists'       => $lists
+            'lists'       => $lists,
+            'security'    => $factory->getSecurity()
         );
 
         return $this->delegateView(array(
             'viewParameters'  => $parameters,
             'contentTemplate' => "MauticLeadBundle:Lead:{$indexMode}.html.php",
             'passthroughVars' => array(
-                'activeLink'    => '#mautic_lead_index',
-                'mauticContent' => 'lead',
-                'route'         => $this->generateUrl('mautic_lead_index', array('page' => $page))
+                'activeLink'     => '#mautic_lead_index',
+                'mauticContent'  => 'lead',
+                'route'          => $this->generateUrl('mautic_lead_index', array('page' => $page)),
+                'replaceContent' => ($tmpl == 'list') ? 'true' : 'false'
             )
         ));
     }

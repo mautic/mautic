@@ -32,6 +32,7 @@ class PagePermissions extends CommonPermissions
                 'edit'          => 4,
                 'create'        => 8,
                 'delete'        => 32,
+                'publish'       => 64,
                 'full'          => 1024
             ),
             'pages' => array(

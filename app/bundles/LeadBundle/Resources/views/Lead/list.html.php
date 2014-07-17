@@ -89,7 +89,7 @@ if ($tmpl == 'index')
                         echo $fields['state'];
                     ?>
                 </td>
-                <td class="text-center">
+                <td>
                     <?php echo $item->getScore(); ?>
                 </td>
             </tr>

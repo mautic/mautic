@@ -99,14 +99,14 @@ CUSTOM
                         </a>
                     </td>
                     <td class="visible-md visible-lg"><?php echo $i[0]->getDescription(); ?></td>
-                    <td class="visible-md visible-lg text-center">
+                    <td class="visible-md visible-lg">
                         <a href="<?php echo $view['router']->generate('mautic_form_action', array('objectAction' => 'results', 'objectId' => $i[0]->getId())); ?>"
                            data-toggle="ajax"
                            data-menu-link="mautic_form_index">
                             <?php echo $i['submissionCount']; ?>
                         </a>
                     </td>
-                    <td class="visible-md visible-lg text-center"><?php echo $i[0]->getId(); ?></td>
+                    <td class="visible-md visible-lg"><?php echo $i[0]->getId(); ?></td>
                 </tr>
             <?php endforeach; ?>
             </tbody>

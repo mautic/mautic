@@ -116,9 +116,10 @@ class FormController extends CommonFormController
             ),
             'contentTemplate' => 'MauticFormBundle:Form:list.html.php',
             'passthroughVars' => array(
-                'activeLink'    => '#mautic_form_index',
-                'mauticContent' => 'form',
-                'route'         => $this->generateUrl('mautic_form_index', array('page' => $page))
+                'activeLink'     => '#mautic_form_index',
+                'mauticContent'  => 'form',
+                'route'          => $this->generateUrl('mautic_form_index', array('page' => $page)),
+                'replaceContent' => ($tmpl == 'list') ? 'true' : 'false'
             )
         ));
     }
@@ -552,7 +553,7 @@ class FormController extends CommonFormController
      */
     public function cloneAction ($objectId)
     {
-        $model   = $factory->getModel('form.form');
+        $model   = $this->get('mautic.factory')->getModel('form.form');
         $entity  = $model->getEntity($objectId);
 
         if ($entity != null) {

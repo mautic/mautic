@@ -59,11 +59,6 @@ class CommonController extends Controller implements MauticController{
             );
         }
 
-        //default JS mauticContent to the bundle
-        if (!isset($args['passthroughVars']['mauticContent'])) {
-            $args['passthroughVars'][ 'mauticContent'] = strtolower($this->request->get('bundle'));
-        }
-
         if ($this->request->isXmlHttpRequest() && !$this->request->get('ignoreAjax', false)) {
             return $this->ajaxAction($args);
         } else {

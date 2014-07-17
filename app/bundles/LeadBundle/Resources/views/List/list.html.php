@@ -14,9 +14,9 @@ endif;
 $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list');
 ?>
 
-<div class="table-responsive scrollable body-white padding-sm leadlist-list">
+<div class="table-responsive scrollable body-white padding-sm bundle-list">
     <?php if (count($items)): ?>
-    <table class="table table-hover table-striped table-bordered">
+    <table class="table table-hover table-striped table-bordered leadlist-list">
         <thead>
         <tr>
             <th class="col-leadlist-actions"></th>

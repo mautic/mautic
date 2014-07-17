@@ -5,8 +5,6 @@ Mautic.pageOnLoad = function (container) {
     }
 
     if (mQuery(container + ' form[name="page"]').length) {
-        Mautic.expandPanel('.bundle-main', 'expand');
-
         //active lookups
         if (mQuery('#page_translationParent_lookup').length) {
             var pages = new Bloodhound({
@@ -103,10 +101,6 @@ Mautic.pageUnLoad = function() {
 };
 
 Mautic.pagecategoryOnLoad = function (container) {
-    if (mQuery(container + ' form[name="pagecategory"]').length) {
-        Mautic.expandPanel('.bundle-main', 'expand', true);
-    }
-
     if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'page.category');
     }

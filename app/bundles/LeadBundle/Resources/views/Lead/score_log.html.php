@@ -42,7 +42,7 @@
                             <i class="fa fa-fw fa-hand-o-down"></i><?php echo ($delta * -1); ?>
                         </td>
                     <?php else: ?>
-                    <td class="text-center">
+                    <td>
                         <?php echo $delta; ?>
                     </td>
                     <?php endif; ?>
@@ -65,7 +65,7 @@
                         <i class="fa fa-fw fa-hand-o-down"></i><?php echo ($delta * -1); ?>
                     </td>
                     <?php else: ?>
-                    <td class="text-center">
+                    <td>
                         <?php echo $delta; ?>
                     </td>
                     <?php endif; ?>

@@ -12,7 +12,7 @@ if ($tmpl == 'index'):
 endif;
 ?>
 
-<div class="table-responsive scrollable body-white padding-sm">
+<div class="table-responsive scrollable body-white padding-sm bundle-list">
     <table class="table table-hover table-striped table-bordered client-list">
         <thead>
         <tr>
