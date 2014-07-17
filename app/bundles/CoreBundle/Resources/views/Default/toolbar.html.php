@@ -39,6 +39,7 @@ endif;
             data-target=".bundle-list"
             data-action="<?php echo $searchUri; ?>"
             data-overlay-text="<?php echo $view['translator']->trans('mautic.core.search.livesearch'); ?>"
+            data-overlay-target="#main-content"
             onmouseover="Mautic.showSearchInput()"
             onmouseout="Mautic.hideSearchInput('list-search');"
             onblur="Mautic.hideSearchInput('list-search');"

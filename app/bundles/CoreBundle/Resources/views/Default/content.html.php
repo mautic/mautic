@@ -18,7 +18,7 @@ endif;
     <div class="clearfix"></div>
 </div>
 
-<div class="main-panel-content-wrapper">
+<div id="main-content" class="main-panel-content-wrapper">
     <?php $view['slots']->output('_content'); ?>
     <div class="main-panel-footer"></div>
 </div>

@@ -436,7 +436,7 @@ var Mautic = {
     processPageContent: function (response) {
         if (response) {
             if (!response.target) {
-                response.target = '#main-content';
+                response.target = '#page-content';
             }
 
             //update type of content displayed
