@@ -121,17 +121,10 @@ class LeadController extends FormController
             'model'       => $model,
             'page'        => $page,
             'limit'       => $limit,
-            'totalCount'  => $count,
             'permissions' => $permissions,
             'tmpl'        => $tmpl,
             'indexMode'   => $indexMode,
-            'lists'       => $lists,
-            'security'    => $factory->getSecurity(),
-            'dateFormats' => array(
-                'datetime' => $factory->getParameter('date_format_full'),
-                'date'     => $factory->getParameter('date_format_dateonly'),
-                'time'     => $factory->getParameter('date_format_timeonly'),
-            )
+            'lists'       => $lists
         );
 
         return $this->delegateView(array(
