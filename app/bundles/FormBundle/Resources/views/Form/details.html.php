@@ -7,53 +7,60 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-if ($tmpl == 'index') {
-    $view->extend('MauticFormBundle:Form:index.html.php');
-}
+$view->extend('MauticCoreBundle:Default:content.html.php');
+$view['slots']->set('mauticContent', 'form');
+$view["slots"]->set("headerTitle", $activeForm->getName());
 ?>
-
-<?php if (!empty($activeForm)): ?>
-<div class="bundle-main-header">
-    <span class="bundle-main-item-primary">
-<span class="bundle-main-actions">
-            <?php
-            echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
-                'item'      => $activeForm,
-                'edit'      => $security->hasEntityAccess(
-                    $permissions['form:forms:editown'],
-                    $permissions['form:forms:editother'],
-                    $activeForm->getCreatedBy()
-                ),
-                'clone'     => $permissions['form:forms:create'],
-                'delete'    => $security->hasEntityAccess(
-                    $permissions['form:forms:deleteown'],
-                    $permissions['form:forms:deleteother'],
-                    $activeForm->getCreatedBy()),
-                'routeBase' => 'form',
-                'menuLink'  => 'mautic_form_index',
-                'langVar'   => 'form',
-                'custom'    => <<<CUSTOM
+<?php $view["slots"]->start("actions"); ?>
+<?php if ($security->hasEntityAccess($permissions['form:forms:editown'], $permissions['form:forms:editother'],
+    $activeForm->getCreatedBy())): ?>
+    <li>
+        <a href="<?php echo $this->container->get('router')->generate(
+            'mautic_form_action', array("objectAction" => "edit", "objectId" => $activeForm->getId())); ?>"
+           data-toggle="ajax"
+           data-menu-link="#mautic_form_index">
+            <i class="fa fa-fw fa-pencil-square-o"></i><?php echo $view["translator"]->trans("mautic.core.form.edit"); ?>
+        </a>
+    </li>
+<?php endif; ?>
+<?php if ($security->hasEntityAccess($permissions['form:forms:deleteown'], $permissions['form:forms:deleteother'],
+    $activeForm->getCreatedBy())): ?>
 <li>
-    <a href="{$view['router']->generate('mautic_form_action', array('objectAction' => 'results', 'objectId' => $activeForm->getId()))}"
+    <a href="javascript:void(0);"
+       onclick="Mautic.showConfirmation(
+           '<?php echo $view->escape($view["translator"]->trans("mautic.form.form.confirmdelete",
+           array("%name%" => $activeForm->getName() . " (" . $activeForm->getId() . ")")), 'js'); ?>',
+           '<?php echo $view->escape($view["translator"]->trans("mautic.core.form.delete"), 'js'); ?>',
+           'executeAction',
+           ['<?php echo $view['router']->generate('mautic_form_action',
+           array("objectAction" => "delete", "objectId" => $activeForm->getId())); ?>',
+           '#mautic_form_index'],
+           '<?php echo $view->escape($view["translator"]->trans("mautic.core.form.cancel"), 'js'); ?>','',[]);">
+        <span><i class="fa fa-fw fa-trash-o"></i><?php echo $view['translator']->trans('mautic.core.form.delete'); ?></span>
+    </a>
+</li>
+<?php endif; ?>
+<li>
+    <a href="<?php echo $view['router']->generate('mautic_form_action', array(
+        'objectAction' => 'results', 'objectId' => $activeForm->getId())); ?>"
        data-toggle="ajax"
        data-menu-link="mautic_form_index">
         <span>
-            <i class="fa fa-database"></i>{$view['translator']->trans('mautic.form.form.results')}
+            <i class="fa fa-fw fa-database"></i><?php echo $view['translator']->trans('mautic.form.form.results'); ?>
         </span>
-   </a>
+    </a>
 </li>
-CUSTOM
-            ));
-            ?>
-        </span>
-        <?php echo $view['translator']->trans($activeForm->getName()); ?>
-    </span>
-    <div class="clearfix"></div>
-</div>
+<li>
+    <a data-toggle="modal" data-target="#form-preview">
+        <i class="fa fa-fw fa-camera"></i><?php echo $view['translator']->trans('mautic.form.form.preview'); ?>
+    </a>
+</li>
+<?php $view["slots"]->stop(); ?>
 
-<?php
-    echo $view->render('MauticFormBundle:Form:stats.html.php', array('form' => $activeForm));
-    echo $view->render('MauticFormBundle:Form:copy.html.php', array('form' => $activeForm));
-?>
-<?php endif;?>
-<div class="footer-margin"></div>
+<div class="scrollable form-details">
+    <?php
+        echo $view->render('MauticFormBundle:Form:stats.html.php', array('form' => $activeForm));
+        echo $view->render('MauticFormBundle:Form:copy.html.php', array('form' => $activeForm));
+    ?>
+    <div class="footer-margin"></div>
+</div>

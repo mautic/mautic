@@ -9,9 +9,9 @@
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'lead');
 $view["slots"]->set("headerTitle", $view['translator']->trans('mautic.lead.lead.header.index'));
-$view['slots']->set('searchUri', $view['router']->generate('mautic_lead_index', array('page' => $page, 'tmpl' => $tmpl)));
+$view['slots']->set('searchUri', $view['router']->generate('mautic_lead_index', array('page' => $page)));
 $view['slots']->set('searchString', $app->getSession()->get('mautic.lead.filter'));
-$view['slots']->set('searchHelp', $view['translator']->trans('mautic.lead.list.help.searchcommands'));
+$view['slots']->set('searchHelp', $view['translator']->trans('mautic.lead.lead.help.searchcommands'));
 ?>
 
 <?php if ($permissions['lead:leads:create']): ?>
@@ -39,11 +39,3 @@ $view['slots']->set('searchHelp', $view['translator']->trans('mautic.lead.list.h
 <?php $view['slots']->stop(); ?>
 
 <?php $view['slots']->output('_content'); ?>
-<?php
-echo $view->render('MauticCoreBundle:Helper:modal.html.php', array(
-    'id'     => 'search-help',
-    'header' => $view['translator']->trans('mautic.core.search.header'),
-    'body'   => $view['translator']->trans('mautic.core.search.help') .
-        $view['translator']->trans('mautic.lead.lead.help.searchcommands')
-));
-?>

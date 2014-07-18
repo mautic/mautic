@@ -111,8 +111,9 @@ class UserController extends FormController
             'viewParameters'  => $parameters,
             'contentTemplate' => 'MauticUserBundle:User:list.html.php',
             'passthroughVars' => array(
-                'route'         => $this->generateUrl('mautic_user_index', array('page' => $page)),
-                'mauticContent' => 'user'
+                'route'          => $this->generateUrl('mautic_user_index', array('page' => $page)),
+                'mauticContent'  => 'user',
+                'replaceContent' => ($tmpl == 'list') ? 'true' : 'false'
             )
         ));
     }

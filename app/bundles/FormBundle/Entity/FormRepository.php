@@ -28,34 +28,22 @@ class FormRepository extends CommonRepository
      */
     public function getEntities($args = array())
     {
-        $q = $this
-            ->createQueryBuilder('f')
-            ->select('f');
+        //use a subquery to get a count of submissions otherwise doctrine will not pull all of the results
+        $sq = $this->_em->createQueryBuilder()
+            ->select('count(fs.id)')
+            ->from('MauticFormBundle:Submission', 'fs')
+            ->where('fs.form = f');
+        $q = $this->createQueryBuilder('f');
+
+        $q->select('f, ('.$sq->getDql().') as submissionCount');
 
         if (!$this->buildClauses($q, $args)) {
-            return array('totalCount' => 0);
+            return false;
         }
 
         $query = $q->getQuery();
-
-        if (isset($args['hydration_mode'])) {
-            $mode = strtoupper($args['hydration_mode']);
-            $query->setHydrationMode(constant("Query::$mode"));
-        }
-
         $results = new Paginator($query);
-
-        //use getIterator() here so that the first lead can be extracted without duplicating queries or looping through
-        //them twice
-        $iterator = $results->getIterator();
-
-        if (!empty($args['getTotalCount'])) {
-            //get the total count from paginator
-            $totalItems = count($results);
-
-            $iterator['totalCount'] = $totalItems;
-        }
-        return $iterator;
+        return $results;
     }
 
     /**

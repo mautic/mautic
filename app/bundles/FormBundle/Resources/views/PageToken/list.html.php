@@ -15,12 +15,12 @@ if ($tmpl == 'index') {
     <ul class="draggable scrollable">
         <?php
         if (count($items)):
-        foreach ($items as $key => $item):?>
-            <li class="bundle-list-item has-click-event" id="form-<?php echo $item->getId(); ?>">
+        foreach ($items as $i):?>
+            <li class="bundle-list-item has-click-event" id="form-<?php echo $i[0]->getId(); ?>">
                 <div class="padding-sm">
                     <span class="list-item-publish-status">
                         <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php',array(
-                            'item'          => $item,
+                            'item'          => $i[0],
                             'dateFormat'    => (!empty($dateFormat)) ? $dateFormat : 'F j, Y g:i a',
                             'model'         => 'form.form',
                             'disableToggle' => true
@@ -28,13 +28,13 @@ if ($tmpl == 'index') {
 
                     </span>
                     <span class="list-item-primary">
-                        <?php echo $item->getName(); ?>
+                        <?php echo $i[0]->getName(); ?>
                     </span>
                     <span class="list-item-secondary list-item-indent" data-toggle="tooltip" data-placement="left"
-                          title="<?php echo $item->getDescription(); ?>">
-                        <?php echo $item->getDescription(true, 30); ?>
+                          title="<?php echo $i[0]->getDescription(); ?>">
+                        <?php echo $i[0]->getDescription(true, 30); ?>
                     </span>
-                    <input type="hidden" class="page-token" value="{form=<?php echo $item->getId(); ?>}" />
+                    <input type="hidden" class="page-token" value="{form=<?php echo $i[0]->getId(); ?>}" />
                 </div>
             </li>
         <?php endforeach; ?>

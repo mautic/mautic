@@ -121,26 +121,21 @@ class LeadController extends FormController
             'model'       => $model,
             'page'        => $page,
             'limit'       => $limit,
-            'totalCount'  => $count,
             'permissions' => $permissions,
             'tmpl'        => $tmpl,
             'indexMode'   => $indexMode,
             'lists'       => $lists,
-            'security'    => $factory->getSecurity(),
-            'dateFormats' => array(
-                'datetime' => $factory->getParameter('date_format_full'),
-                'date'     => $factory->getParameter('date_format_dateonly'),
-                'time'     => $factory->getParameter('date_format_timeonly'),
-            )
+            'security'    => $factory->getSecurity()
         );
 
         return $this->delegateView(array(
             'viewParameters'  => $parameters,
             'contentTemplate' => "MauticLeadBundle:Lead:{$indexMode}.html.php",
             'passthroughVars' => array(
-                'activeLink'    => '#mautic_lead_index',
-                'mauticContent' => 'lead',
-                'route'         => $this->generateUrl('mautic_lead_index', array('page' => $page))
+                'activeLink'     => '#mautic_lead_index',
+                'mauticContent'  => 'lead',
+                'route'          => $this->generateUrl('mautic_lead_index', array('page' => $page)),
+                'replaceContent' => ($tmpl == 'list') ? 'true' : 'false'
             )
         ));
     }

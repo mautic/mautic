@@ -61,12 +61,10 @@ class PageTokenHelper
                 'start'      => $start,
                 'limit'      => $limit,
                 'filter'     => $filter,
-                'orderByDir' => "DESC",
-                'getTotalCount' => true
+                'orderByDir' => "DESC"
             ));
+        $count = count($forms);
 
-        $count = $forms['totalCount'];
-        unset($forms['totalCount']);
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page
             if ($count === 1) {

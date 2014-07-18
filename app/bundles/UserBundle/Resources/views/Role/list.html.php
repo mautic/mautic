@@ -12,7 +12,7 @@ if ($tmpl == 'index'):
 endif;
 ?>
 
-<div class="table-responsive scrollable body-white padding-sm">
+<div class="table-responsive scrollable body-white padding-sm bundle-list">
     <table class="table table-hover table-striped table-bordered role-list">
         <thead>
         <tr>
@@ -74,8 +74,7 @@ endif;
         "page"       => $page,
         "limit"      => $limit,
         "baseUrl"    =>  $view['router']->generate('mautic_role_index'),
-        'sessionVar' => 'role',
-        'target'     => '.main-panel-content-wrapper'
+        'sessionVar' => 'role'
     )); ?>
     <div class="footer-margin"></div>
 </div>

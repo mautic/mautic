@@ -10,12 +10,6 @@
 <div class="panel panel-success">
     <div class="panel-heading">
         <?php echo $view['translator']->trans('mautic.form.form.header.copy'); ?>
-        <div class="pull-right" data-toggle="tooltip" data-placement="left"
-             title="<?php echo $view['translator']->trans('mautic.form.form.preview'); ?>">
-            <button class="btn btn-primary btn-xs" data-toggle="modal" data-target="#form-preview">
-                <i class="fa fa-camera"></i>
-            </button>
-        </div>
     </div>
     <div class="panel-body">
         <h2><?php echo $view['translator']->trans('mautic.form.form.header.landingpages'); ?></h2>

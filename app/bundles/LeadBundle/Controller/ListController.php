@@ -106,9 +106,10 @@ class ListController extends FormController
             'viewParameters'  => $parameters,
             'contentTemplate' => 'MauticLeadBundle:List:list.html.php',
             'passthroughVars' => array(
-                'activeLink'    => '#mautic_leadlist_index',
-                'route'         => $this->generateUrl('mautic_leadlist_index', array('page' => $page)),
-                'mauticContent' => 'leadlist'
+                'activeLink'     => '#mautic_leadlist_index',
+                'route'          => $this->generateUrl('mautic_leadlist_index', array('page' => $page)),
+                'mauticContent'  => 'leadlist',
+                'replaceContent' => ($tmpl == 'list') ? 'true' : 'false'
             )
         ));
     }

@@ -29,7 +29,7 @@ class CategoryModel extends FormModel
 
     public function getPermissionBase()
     {
-        return 'page.categories';
+        return 'page:categories';
     }
 
     public function getNameGetter()

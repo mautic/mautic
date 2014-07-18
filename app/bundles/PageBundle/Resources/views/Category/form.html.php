@@ -7,22 +7,20 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-if ($tmpl == 'index') {
-    $view->extend('MauticPageBundle:Category:index.html.php');
+$view->extend('MauticCoreBundle:Default:content.html.php');
+$view['slots']->set('mauticContent', 'pagecategory');
+
+$objectId = $form->vars['data']->getId();
+if (!empty($objectId)) {
+    $name   = $form->vars['data']->getTitle();
+    $header = $view['translator']->trans('mautic.page.category.header.edit', array("%name%" => $name));
+} else {
+    $header = $view['translator']->trans('mautic.page.category.header.new');
 }
+$view["slots"]->set("headerTitle", $header);
 ?>
 
-<div class="bundle-main-header">
-    <div class="bundle-main-item-primary">
-        <?php
-        $header = ($activeCategory->getId()) ?
-            $view['translator']->trans('mautic.page.category.header.edit',
-                array('%name%' => $activeCategory->getTitle())) :
-            $view['translator']->trans('mautic.page.category.header.new');
-        echo $header;
-        ?>
-    </div>
+<div class="scrollable">
+    <?php echo $view['form']->form($form); ?>
+    <div class="footer-margin"></div>
 </div>
-
-<?php echo $view['form']->form($form); ?>
-<div class="footer-margin"></div>

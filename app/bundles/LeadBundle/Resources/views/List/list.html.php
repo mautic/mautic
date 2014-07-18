@@ -14,9 +14,9 @@ endif;
 $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list');
 ?>
 
-<div class="table-responsive scrollable body-white padding-sm leadlist-list">
+<div class="table-responsive scrollable body-white padding-sm bundle-list">
     <?php if (count($items)): ?>
-    <table class="table table-hover table-striped table-bordered">
+    <table class="table table-hover table-striped table-bordered leadlist-list">
         <thead>
         <tr>
             <th class="col-leadlist-actions"></th>
@@ -72,9 +72,7 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
         "page"       => $page,
         "limit"      => $limit,
         "baseUrl"    =>  $view['router']->generate('mautic_leadlist_index'),
-        'tmpl'       => $tmpl,
-        'sessionVar' => 'leadlist',
-        'target'     => '.main-panel-content-wrapper'
+        'sessionVar' => 'leadlist'
     )); ?>
     <?php else: ?>
         <h4><?php echo $view['translator']->trans('mautic.core.noresults'); ?></h4>

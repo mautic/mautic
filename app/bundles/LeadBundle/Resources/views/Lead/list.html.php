@@ -10,6 +10,7 @@ if ($tmpl == 'index')
     $view->extend('MauticLeadBundle:Lead:index.html.php');
 ?>
 
+<<<<<<< HEAD
 <div class="panel panel-default">
     <div class="panel-heading">
         <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.lead.lead.header.index'); ?></h3>
@@ -51,6 +52,36 @@ if ($tmpl == 'index')
                         'text'       => 'mautic.lead.lead.thead.email',
                         'class'      => 'col-lead-email'
                     ));
+=======
+<div class="table-responsive scrollable body-white padding-sm bundle-list">
+    <?php if (count($items)): ?>
+    <table class="table table-hover table-striped table-bordered lead-list">
+        <thead>
+            <tr>
+                <th class="col-lead-actions"></th>
+                <?php
+                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                    'sessionVar' => 'lead',
+                    'orderBy'    => 'l.dateAdded',
+                    'text'       => 'mautic.lead.lead.thead.name',
+                    'class'      => 'col-lead-name',
+                    'default'    => true
+                ));
+
+                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                    'sessionVar' => 'lead',
+                    'orderBy'    => 'l.dateAdded',
+                    'text'       => 'mautic.lead.lead.thead.email',
+                    'class'      => 'visible-md visible-lg col-lead-email'
+                ));
+
+                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                    'sessionVar' => 'lead',
+                    'orderBy'    => 'l.dateAdded',
+                    'text'       => 'mautic.lead.lead.thead.location',
+                    'class'      => 'visible-md visible-lg col-lead-location'
+                ));
+>>>>>>> 50186a2f2314b95c370a55f7d03a3e0885627a53
 
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                         'sessionVar' => 'lead',
@@ -66,6 +97,7 @@ if ($tmpl == 'index')
                         'class'      => 'col-lead-score'
                     ));
                     ?>
+<<<<<<< HEAD
                 </tr>
             </thead>
             <tbody>
@@ -131,5 +163,45 @@ if ($tmpl == 'index')
             'sessionVar'      => 'lead'
         )); ?>
     </div>
+=======
+                </td>
+                <td>
+                    <a href="<?php echo $view['router']->generate('mautic_lead_action',
+                        array("objectAction" => "view", "objectId" => $item->getId())); ?>"
+                       data-toggle="ajax">
+                        <div><?php echo $item->getPrimaryIdentifier(); ?></div>
+                        <div class="small"><?php echo $item->getSecondaryIdentifier(); ?></div>
+                    </a>
+                </td>
+                <td class="visible-md visible-lg"><?php echo $fields['email']; ?></td>
+                <td class="visible-md visible-lg"><?php
+                    if (!empty($fields['city']) && !empty($fields['state']))
+                        echo $fields['city'] . ', ' . $fields['state'];
+                    elseif (!empty($fields['city']))
+                        echo $fields['city'];
+                    elseif (!empty($fields['state']))
+                        echo $fields['state'];
+                    ?>
+                </td>
+                <td>
+                    <?php echo $item->getScore(); ?>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+        </tbody>
+    </table>
+    <?php else: ?>
+        <h4><?php echo $view['translator']->trans('mautic.core.noresults'); ?></h4>
+    <?php endif; ?>
+    <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
+        "items"           => $items,
+        "page"            => $page,
+        "limit"           => $limit,
+        "menuLinkId"      => 'mautic_lead_index',
+        "baseUrl"         => $view['router']->generate('mautic_lead_index'),
+        "tmpl"            => $indexMode,
+        'sessionVar'      => 'lead'
+    )); ?>
+>>>>>>> 50186a2f2314b95c370a55f7d03a3e0885627a53
     <div class="footer-margin"></div>
 </div>

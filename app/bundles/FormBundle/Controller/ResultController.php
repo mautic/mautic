@@ -117,16 +117,17 @@ class ResultController extends CommonFormController
                 'tmpl'        => $tmpl,
                 'dateFormat'  => $this->get('mautic.factory')->getParameter('date_format_full')
             ),
-            'contentTemplate' => 'MauticFormBundle:Result:'.$tmpl.'.html.php',
+            'contentTemplate' => 'MauticFormBundle:Result:list.html.php',
             'passthroughVars' => array(
                 'activeLink'    => 'mautic_form_index',
                 'mauticContent' => 'formresult',
                 'route'         => $this->generateUrl('mautic_form_results', array(
-                    'objectId' => $objectId,
-                    'page'     => $page
-                )
+                    'objectId'       => $objectId,
+                    'page'           => $page
+                )),
+                'replaceContent' => ($tmpl == 'list') ? 'true' : 'false'
             )
-        )));
+        ));
     }
 
     /**
