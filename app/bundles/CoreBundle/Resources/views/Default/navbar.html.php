@@ -30,7 +30,7 @@
                     <li class="navbar-main hidden-lg hidden-md hidden-sm">
                         <a href="javascript:void(0);" data-toggle="sidebar" data-direction="ltr" rel="tooltip" title="Menu sidebar">
                             <span class="meta">
-                                <span class="icon"><i class="ico-paragraph-justify3"></i></span>
+                                <span class="icon"><i class="fa fa-paragraph-justify3"></i></span>
                             </span>
                         </a>
                     </li>
@@ -40,7 +40,7 @@
                     <li class="dropdown custom" id="header-dd-message">
                         <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown">
                             <span class="meta">
-                                <span class="icon"><i class="ico-bubbles3"></i></span>
+                                <span class="icon"><i class="fa fa-comments"></i></span>
                             </span>
                         </a>
 
@@ -78,7 +78,7 @@
                                 <form class="form-horizontal" action="">
                                     <div class="has-icon">
                                         <input type="text" class="form-control" placeholder="Search message...">
-                                        <i class="ico-search form-control-icon"></i>
+                                        <i class="fa fa-search form-control-icon"></i>
                                     </div>
                                 </form>
                                 <!--/ Search form -->
@@ -183,7 +183,7 @@
                     <li class="dropdown custom" id="header-dd-notification">
                         <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown">
                             <span class="meta">
-                                <span class="icon"><i class="ico-bell"></i></span>
+                                <span class="icon"><i class="fa fa-bell"></i></span>
                                 <span class="hasnotification hasnotification-danger"></span>
                             </span>
                         </a>

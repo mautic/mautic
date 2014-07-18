@@ -11,7 +11,7 @@
 
 <?php if ($item->hasChildren() && $options["depth"] !== 0 && $item->getDisplayChildren()): ?>
     <?php if ($item->isRoot()): ?>
-    <ul class="side-panel-nav margin-none padding-none" role="navigation">
+    <ul class="topmenu topmenu-responsive" data-toggle="menu">
     <?php else: ?>
     <ul<?php echo $view["menu_helper"]->parseAttributes($item->getChildrenAttributes()); //convert array to name="value" ?>>
     <?php endif; ?>
