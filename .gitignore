@@ -6,6 +6,8 @@
 /app/cache/*
 /app/logs/*
 /app/config/local.php
+/app/bundles/CoreBundle/Resources/public/css/bootstrap_less/*.css
+/app/bundles/CoreBundle/Resources/public/css/less/*.css
 /app/Resources/SensioGeneratorBundle
 /app/phpunit.xml
 /web
