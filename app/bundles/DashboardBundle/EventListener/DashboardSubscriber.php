@@ -32,24 +32,4 @@ class DashboardSubscriber extends CommonSubscriber
             CoreEvents::BUILD_ROUTE => array('onBuildRoute', 0)
         );
     }
-
-    /**
-     * @param MenuEvent $event
-     */
-    public function onBuildMenu(MauticEvent\MenuEvent $event)
-    {
-        $path = __DIR__ . "/../Resources/config/menu.php";
-        $items = include $path;
-        $event->addMenuItems($items);
-    }
-
-    /**
-     * @param RouteEvent $event
-     */
-    public function onBuildRoute(MauticEvent\RouteEvent $event)
-    {
-        $path = __DIR__ . "/../Resources/config/routing.php";
-        $event->addRoutes($path);
-    }
-
 }

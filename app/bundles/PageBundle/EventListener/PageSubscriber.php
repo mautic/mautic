@@ -41,26 +41,6 @@ class PageSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param MenuEvent $event
-     */
-    public function onBuildMenu(MauticEvents\MenuEvent $event)
-    {
-        $security = $event->getSecurity();
-        $path = __DIR__ . "/../Resources/config/menu/main.php";
-        $items = include $path;
-        $event->addMenuItems($items);
-    }
-
-    /**
-     * @param RouteEvent $event
-     */
-    public function onBuildRoute(MauticEvents\RouteEvent $event)
-    {
-        $path = __DIR__ . "/../Resources/config/routing/routing.php";
-        $event->addRoutes($path);
-    }
-
-    /**
      * @param MauticEvents\GlobalSearchEvent $event
      */
     public function onGlobalSearch(MauticEvents\GlobalSearchEvent $event)

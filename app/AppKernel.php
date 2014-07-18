@@ -21,15 +21,30 @@ class AppKernel extends Kernel
             new FOS\OAuthServerBundle\FOSOAuthServerBundle(),
             new FOS\RestBundle\FOSRestBundle(),
             new JMS\SerializerBundle\JMSSerializerBundle(),
-
-            new Mautic\CoreBundle\MauticCoreBundle(),
-            new Mautic\ApiBundle\MauticApiBundle(),
-            new Mautic\DashboardBundle\MauticDashboardBundle(),
-            new Mautic\UserBundle\MauticUserBundle(),
-            new Mautic\LeadBundle\MauticLeadBundle(),
-            new Mautic\FormBundle\MauticFormBundle(),
-            new Mautic\PageBundle\MauticPageBundle(),
         );
+
+        //dynamically register Mautic Bundles
+        $searchPath = __DIR__.'/bundles';
+        $finder     = new \Symfony\Component\Finder\Finder();
+        $finder->files()
+            ->in($searchPath)
+            ->name('*Bundle.php');
+
+        foreach ($finder as $file) {
+            $path       = substr($file->getRealpath(), strlen($searchPath) + 1, -4);
+            $parts      = explode('/', $path);
+            $class      = array_pop($parts);
+            $namespace  = "Mautic\\" . implode('\\', $parts);
+            $class      = $namespace.'\\'.$class;
+            $bundleInstance = new $class();
+            if (method_exists($bundleInstance, 'isEnabled')) {
+                if ($bundleInstance->isEnabled()) {
+                    $bundles[]  = $bundleInstance;
+                }
+            } else {
+                $bundles[]  = $bundleInstance;
+            }
+        }
 
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {
             $bundles[] = new Symfony\Bundle\WebProfilerBundle\WebProfilerBundle();

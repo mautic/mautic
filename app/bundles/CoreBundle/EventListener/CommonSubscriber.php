@@ -12,6 +12,7 @@ namespace Mautic\CoreBundle\EventListener;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Mautic\CoreBundle\Event as MauticEvents;
 
 /**
  * Class CoreSubscriber
@@ -47,5 +48,51 @@ class CommonSubscriber implements EventSubscriberInterface
     static public function getSubscribedEvents ()
     {
         return array();
+    }
+
+    /**
+     * @param MenuEvent $event
+     */
+    public function onBuildMenu (MauticEvents\MenuEvent $event)
+    {
+        $path  = $this->getSubscriberDirectory() . "/../Resources/config/menu/main.php";
+        if (file_exists($path)) {
+            $security = $event->getSecurity();
+            $request  = $this->factory->getRequest();
+            $items    = include $path;
+            $event->addMenuItems($items);
+        }
+    }
+
+    /**
+     * @param MenuEvent $event
+     */
+    public function onBuildAdminMenu (MauticEvents\MenuEvent $event)
+    {
+        $path  = $this->getSubscriberDirectory() . "/../Resources/config/menu/admin.php";
+        if (file_exists($path)) {
+            $security = $event->getSecurity();
+            $request  = $this->factory->getRequest();
+            $items    = include $path;
+            $event->addMenuItems($items);
+        }
+    }
+
+    /**
+     * @param RouteEvent $event
+     */
+    public function onBuildRoute (MauticEvents\RouteEvent $event)
+    {
+        $path = $this->getSubscriberDirectory() .  "/../Resources/config/routing.php";
+        if (file_exists($path)) {
+            $event->addRoutes($path);
+        }
+    }
+
+    protected function getSubscriberDirectory()
+    {
+        $reflection = new \ReflectionClass($this);
+        $directory = dirname($reflection->getFileName());
+        return $directory;
     }
 }

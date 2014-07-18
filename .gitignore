@@ -8,7 +8,9 @@
 /app/config/local.php
 /app/bundles/CoreBundle/Resources/public/css/bootstrap_less/*.css
 /app/bundles/CoreBundle/Resources/public/css/less/*.css
-/app/bundles/CoreBundle/Resources/public/css/9.mautic.css
+/app/bundles/CoreBundle/Resources/public/css/*.bootstrap.css
+/app/bundles/CoreBundle/Resources/public/css/*.typeahead.css
+/app/bundles/CoreBundle/Resources/public/css/*.mautic.css
 /app/Resources/SensioGeneratorBundle
 /app/phpunit.xml
 /web
