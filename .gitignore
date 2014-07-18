@@ -17,7 +17,7 @@
 /composer.lock
 /assetic
 /bundles
-/assets/css/mautic*
+
 /assets/js/mautic*
 /assets/css/font-awesome/less
 /assets/css/font-awesome/scss
