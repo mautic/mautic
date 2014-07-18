@@ -29,4 +29,3 @@ $view['slots']->set('searchHelp', $view['translator']->trans('mautic.page.catego
 <?php endif; ?>
 
 <?php $view['slots']->output('_content'); ?>
-?>

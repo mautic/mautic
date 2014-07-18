@@ -12,7 +12,9 @@ namespace Mautic\CoreBundle\DependencyInjection;
 use Mautic\CoreBundle\Helper\ServiceLoaderHelper;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
-
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Loader;
 
 /**
  * Class MauticCoreExtension
@@ -31,10 +33,18 @@ class MauticCoreExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $configuration = new Configuration();
-        $config = $this->processConfiguration($configuration, $configs);
+        $mauticBundles = $container->getParameter('mautic.bundles');
+        foreach ($mauticBundles as $bundle) {
+            $serviceDir = $bundle['directory'].'/Resources/config/services';
+            if (file_exists($serviceDir)) {
+                $loader = new Loader\PhpFileLoader($container, new FileLocator($serviceDir));
+                $finder = new Finder();
+                $finder->files()->in($serviceDir)->name('*.php');
 
-        $loader = new ServiceLoaderHelper();
-        $loader->loadServices(__DIR__, $container);
+                foreach ($finder as $file) {
+                    $loader->load($file->getFilename());
+                }
+            }
+        }
     }
 }

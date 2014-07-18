@@ -44,35 +44,6 @@ class UserSubscriber extends CommonSubscriber
         );
     }
 
-    /**
-     * @param MenuEvent $event
-     */
-    public function onBuildMenu(MauticEvents\MenuEvent $event)
-    {
-        $path = __DIR__ . "/../Resources/config/menu/main.php";
-        $items = include $path;
-        $event->addMenuItems($items);
-    }
-
-    /**
-     * @param MenuEvent $event
-     */
-    public function onBuildAdminMenu(MauticEvents\MenuEvent $event)
-    {
-        $path = __DIR__ . "/../Resources/config/menu/admin.php";
-        $items = include $path;
-        $event->addMenuItems($items);
-    }
-
-    /**
-     * @param RouteEvent $event
-     */
-    public function onBuildRoute(MauticEvents\RouteEvent $event)
-    {
-        $path = __DIR__ . "/../Resources/config/routing/routing.php";
-        $event->addRoutes($path);
-    }
-
     public function onGlobalSearch(MauticEvents\GlobalSearchEvent $event)
     {
         $str = $event->getSearchString();

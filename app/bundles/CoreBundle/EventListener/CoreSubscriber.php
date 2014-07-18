@@ -127,33 +127,4 @@ class CoreSubscriber extends CommonSubscriber
             $controller[0]->initialize($event);
         }
     }
-
-    /**
-     * @param MenuEvent $event
-     */
-    public function onBuildMenu(MenuEvent $event)
-    {
-        $path = __DIR__ . "/../Resources/config/menu/main.php";
-        $items = include $path;
-        $event->addMenuItems($items);
-    }
-
-    /**
-     * @param MenuEvent $event
-     */
-    public function onBuildAdminMenu(MenuEvent $event)
-    {
-        $path = __DIR__ . "/../Resources/config/menu/admin.php";
-        $items = include $path;
-        $event->addMenuItems($items);
-    }
-
-    /**
-     * @param RouteEvent $event
-     */
-    public function onBuildRoute(RouteEvent $event)
-    {
-        $path = __DIR__ . "/../Resources/config/routing.php";
-        $event->addRoutes($path);
-    }
 }
