@@ -1,0 +1,66 @@
+/* ----------------------------
+ *
+ * Brand
+ *
+ * --------------------------- */
+.logo-text,
+.logo-figure {
+    display: inline-block;
+    vertical-align: top;
+    text-decoration: none;
+    height: 50px;
+}
+.logo-text {
+    width: 110px;
+    background-image: url("../image/logo/logo-text.png");
+    background-repeat: no-repeat;
+    background-size: 110px 50px;
+
+    + .logo-figure {
+        margin-left: -13px;
+    }
+    &.inverse {
+        background-image: url("../image/logo/logo-text-inverse.png");
+    }
+}
+.logo-figure {
+    width: 32px;
+    background-image: url("../image/logo/logo-figure.png");
+    background-repeat: no-repeat;
+    background-position: 0px 8px;
+    background-size: 32px 32px;
+
+    + .logo-text {
+        margin-left: -13px;
+    }
+    &.inverse {
+        background-image: url("../image/logo/logo-figure-inverse.png");
+    }
+}
+
+/* ----------------------------
+ *
+ * Brand - retina
+ *
+ * --------------------------- */
+@media only screen and (-Webkit-min-device-pixel-ratio: 1.5),
+only screen and (-moz-min-device-pixel-ratio: 1.5),
+only screen and (-o-min-device-pixel-ratio: 3/2),
+only screen and (min-device-pixel-ratio: 1.5) {
+    .logo-text {
+        background-image: url("../image/logo/logo-text@2x.png");
+        background-size: 110px 50px;
+
+        &.inverse {
+            background-image: url("../image/logo/logo-text-inverse@2x.png");
+        }
+    }
+    .logo-figure {
+        background-image: url("../image/logo/logo-figure@2x.png");
+        background-size: 32px 32px;
+
+        &.inverse {
+            background-image: url("../image/logo/logo-figure-inverse@2x.png");
+        }
+    }
+}

@@ -1,0 +1,67 @@
+/* ----------------------------
+ *
+ * Alert
+ *
+ * --------------------------- */
+.alert {
+    padding: 10px;
+
+    &:empty {
+        display: none;
+    }
+}
+.alert-dismissable {
+    padding-right: 10px;
+
+    .close {
+        right: 0px;
+    } 
+}
+
+/* success */
+.alert-success {
+    color: darken(@success, 26%) !important;
+    background-color: lighten(@success, 32%);
+    border-color: lighten(@success, 26%);
+
+    .gritter-item,
+    .gritter-close {
+        color: darken(@success, 26%) !important;
+    }
+}
+
+/* info */
+.alert-info {
+    color: darken(@info, 30%) !important;
+    background-color: lighten(@info, 30%);
+    border-color: lighten(@info, 25%);
+
+    .gritter-item,
+    .gritter-close {
+        color: darken(@info, 30%) !important;
+    }
+}
+
+/* warning */
+.alert-warning {
+    color: darken(@warning, 28%) !important;
+    background-color: lighten(@warning, 25%);
+    border-color: lighten(@warning, 21%);
+
+    .gritter-item,
+    .gritter-close {
+        color: darken(@warning, 28%) !important;
+    }
+}
+
+/* danger */
+.alert-danger {
+    color: darken(@danger, 10%) !important;
+    background-color: lighten(@danger, 30%);
+    border-color: lighten(@danger, 26%);
+
+    .gritter-item,
+    .gritter-close {
+        color: darken(@danger, 10%) !important;
+    }
+}

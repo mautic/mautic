@@ -1,0 +1,39 @@
+/* ----------------------------
+ *
+ * To Top Scroller
+ *
+ * --------------------------- */
+.totop {
+    position: fixed;
+    z-index: 998;
+    bottom: 10px;
+    right: 10px;
+    display: block;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    border-radius: 50%;
+    background-color: fade(@accent-base-color, 80%);
+    color: fade(@white, 80%);
+    text-align: center;
+    text-shadow: 0px -1px 0px rgba(0, 0, 0, 0.1);
+    font-size: 16px;
+
+    &.pull-left {
+        right: auto;
+        left: 10px;
+    }
+
+    &:hover,
+    &:active,
+    &:focus {
+        color: fade(@white, 90%);
+        background-color: fade(@accent-base-color, 90%);
+        outline: 0;
+    }
+}
+/* hide on sidebar open */
+.sidebar-open-rtl .totop,
+.sidebar-open-ltr .totop {
+    opacity: 0;
+}

@@ -1,0 +1,82 @@
+/* ----------------------------
+ *
+ * Spinner / Loading indicator
+ *
+ * --------------------------- */
+.indicator {
+    display: none;
+    position: absolute;
+    z-index: 999;
+    left: 0px;
+    right: 0px;
+    top: 0px;
+    bottom: 0px;
+    overflow: hidden;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: @border-radius - 1;
+    cursor: progress;
+
+    &.inline {
+        display: block;
+        position: relative;
+        z-index: 9;
+        height: 34px;
+        background-color: transparent;
+        border-radius: 0px;
+    }
+
+    > .spinner {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin-top: -9px;
+        margin-left: -9px;
+        width: 18px;
+        height: 18px;
+        background-image: url("../image/loading/spinner.gif");
+        background-repeat: no-repeat;
+
+        &.spinner1 { background-image: url("../image/loading/spinner1.gif"); }
+        &.spinner2 { background-image: url("../image/loading/spinner2.gif"); }
+        &.spinner3 { background-image: url("../image/loading/spinner3.gif"); }
+        &.spinner4 { background-image: url("../image/loading/spinner4.gif"); }
+        &.spinner5 { background-image: url("../image/loading/spinner5.gif"); }
+        &.spinner6 { background-image: url("../image/loading/spinner6.gif"); }
+        &.spinner7 { background-image: url("../image/loading/spinner7.gif"); }
+        &.spinner8 { background-image: url("../image/loading/spinner8.gif"); }
+        &.spinner9 { background-image: url("../image/loading/spinner9.gif"); }
+        &.spinner10 { background-image: url("../image/loading/spinner10.gif"); }
+        &.spinner11 { background-image: url("../image/loading/spinner11.gif"); }
+        &.spinner12 { background-image: url("../image/loading/spinner12.gif"); }
+        &.spinner13 { background-image: url("../image/loading/spinner13.gif"); }
+        &.spinner14 { background-image: url("../image/loading/spinner14.gif"); }
+        &.spinner15 { background-image: url("../image/loading/spinner15.gif"); }
+        &.spinner16 { background-image: url("../image/loading/spinner16.gif"); }
+    }
+}
+@media only screen and (-Webkit-min-device-pixel-ratio: 1.5), only screen and (-moz-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min-device-pixel-ratio: 1.5) {
+    .indicator {
+        .spinner {
+            background-image: url("../image/loading/spinner@2x.gif");
+            background-size: 18px 18px;
+            background-repeat: no-repeat;
+
+            &.spinner1 { background-image: url("../image/loading/spinner1@2x.gif"); }
+            &.spinner2 { background-image: url("../image/loading/spinner2@2x.gif"); }
+            &.spinner3 { background-image: url("../image/loading/spinner3@2x.gif"); }
+            &.spinner4 { background-image: url("../image/loading/spinner4@2x.gif"); }
+            &.spinner5 { background-image: url("../image/loading/spinner5@2x.gif"); }
+            &.spinner6 { background-image: url("../image/loading/spinner6@2x.gif"); }
+            &.spinner7 { background-image: url("../image/loading/spinner7@2x.gif"); }
+            &.spinner8 { background-image: url("../image/loading/spinner8@2x.gif"); }
+            &.spinner9 { background-image: url("../image/loading/spinner9@2x.gif"); }
+            &.spinner10 { background-image: url("../image/loading/spinner10@2x.gif"); }
+            &.spinner11 { background-image: url("../image/loading/spinner11@2x.gif"); }
+            &.spinner12 { background-image: url("../image/loading/spinner12@2x.gif"); }
+            &.spinner13 { background-image: url("../image/loading/spinner13@2x.gif"); }
+            &.spinner14 { background-image: url("../image/loading/spinner14@2x.gif"); }
+            &.spinner15 { background-image: url("../image/loading/spinner15@2x.gif"); }
+            &.spinner16 { background-image: url("../image/loading/spinner16@2x.gif"); }
+        }
+    }
+}

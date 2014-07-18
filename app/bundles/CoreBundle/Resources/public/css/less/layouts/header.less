@@ -1,0 +1,527 @@
+/* ----------------------------
+ *
+ * Template Header
+ *
+ * --------------------------- */
+/* Push right */
+.csstransforms3d.sidebar-open-ltr {
+    #header.navbar {
+        .translate3d(@sidebar-width, 0, 0);
+    }
+}
+.no-csstransforms3d.sidebar-open-ltr {
+    #header.navbar {
+        left: @sidebar-width;
+        right: auto;
+    }
+}
+/* Push left */
+.csstransforms3d.sidebar-open-rtl {
+    #header.navbar {
+        .translate3d(-@sidebar-width, 0, 0);
+    }
+}
+.no-csstransforms3d.sidebar-open-rtl {
+    #header.navbar {
+        right: @sidebar-width;
+        left: auto;
+    }
+}
+
+/* Header Main */
+#header.navbar {
+    position: relative;
+    z-index: 1030;
+    width: 100%;
+    background-color: fade(@white, 97%);
+    border-width: 0px;
+    border-radius: 0px;
+    margin: 0px;
+    -webkit-box-shadow: 0px 3px 1px -3px rgba(0, 0, 0, 0.12);
+    box-shadow: 0px 3px 1px -3px rgba(0, 0, 0, 0.12);
+    .transition(transform 0.2s ease);
+
+    // Container
+    // -----------------------------------
+    .container,
+    .container-fluid {
+
+        // Navbar toolbar
+        // -----------------------------------
+        .navbar-toolbar {
+            margin-right: -15px;
+            margin-left: -15px;
+        }
+    }
+
+    // Navbar header
+    // -----------------------------------
+    .navbar-header {
+        background-color: @accent-base-color;
+        height: @header-height;
+        float: none;
+
+        > .navbar-brand {
+            display: block;
+            width: 100%;
+            padding: 0px 15px;
+            line-height: @header-height;
+            height: @header-height;
+            text-align: center;
+
+            &.text-left {
+                text-align: left;
+            }
+
+            &.text-right {
+                text-align: right;
+            }
+        }
+    }
+
+    // Navbar toolbar
+    // -----------------------------------
+    .navbar-toolbar {
+        // Navbar toolbar - navbar-collapse
+        // -----------------------------------
+        .navbar-collapse {
+            max-height: 220px;
+            width: 100%;
+            padding: 0px;
+            border-color: lighten(@border-color, 12%);
+
+            > .navbar-nav {
+                float: none;
+
+                > li {
+                    float: none;
+
+                    > a {
+                        height: @header-height - 10;
+                        line-height: @header-height - 10;
+                    }
+
+                    &.open {
+                        > a {
+                            // dropdown arrow
+                            &:before,
+                            &:after {
+                                display: none;
+                            }
+                        }
+                    }
+                }
+
+                &.navbar-right,
+                &.navbar-left {
+                    float: none;
+                }
+
+                // Navbar-nav - dropdown menu
+                // -----------------------------------
+                > .dropdown {
+                    > .dropdown-menu {
+                        position: static;
+                        margin: 0px;
+                        border-width: 0px;
+                        border-radius: 0px;
+                        -webkit-box-shadow: none;
+                        box-shadow: none;
+                    }
+                }
+            }
+        }
+
+        // Navbar toolbar - navbar-nav
+        // -----------------------------------
+        .navbar-nav {
+            margin: 0px;
+            float: left;
+
+            // Navbar-nav - Items
+            // -----------------------------------
+            > li {
+                float: left;
+
+                > a {
+                    padding: 0px 15px;
+                    height: @header-height;
+                    line-height: @header-height;
+                    color: lighten(@dark, 35%);
+                    text-shadow: none;
+
+                    &:hover,
+                    &:focus {
+                        background-color: transparent;
+                        color: lighten(@dark, 30%);
+                    }
+
+                    &:active,
+                    &.active {
+                        background-color: lighten(@gray, 3%);
+                        color: lighten(@dark, 25%);
+                    }
+
+                    > .meta {
+                        display: table;
+                        width: 100%;
+
+                        > .avatar {
+                            display: table-cell;
+                            vertical-align: middle;
+                            width: 32px;
+                            height: 32px;
+
+                            > img {
+                                display: block;
+                                width: 100%;
+                            }
+                        }
+                        > .text {
+                            font-size: 13px;
+                            font-weight: 600;
+                        }
+                        > .icon {
+                            display: table-cell;
+                            vertical-align: middle;
+                            font-size: 16px;
+                            min-width: 16px;
+                            text-align: center;
+                        }
+                        > .label,
+                        > .badge {
+                            display: block;
+                            position: absolute;
+                            top: 8px;
+                            left: 5px;
+                            min-width: 18px;
+                            background-color: @danger;
+                            border-radius: 50%;
+                            -webkit-box-shadow: 0px 0px 0px 1px fade(@white, 96%);
+                            box-shadow: 0px 0px 0px 1px fade(@white, 96%);
+
+                            &.pull-right {
+                                left: auto;
+                                right: 5px;
+                            }
+                        }
+                        > .hasnotification {
+                            position: absolute;
+                            top: 12px;
+                            left: 10px;
+                            -webkit-box-shadow: 0px 0px 0px 1px fade(@white, 96%);
+                            box-shadow: 0px 0px 0px 1px fade(@white, 96%);
+
+                            &.pull-right {
+                                left: auto;
+                                right: 12px;
+                            }
+                        }
+                        > .arrow {
+                            display: table-cell;
+                            vertical-align: middle;
+                            text-align: right;
+                            font-family: "iconfont";
+                            font-size: 12px;
+                            width: 12px;
+                            height: 12px;
+
+                            &:after {
+                                content: "\e6be";
+                            }
+                        }
+                        > .caret {
+                            margin-top: -1px;
+                            margin-left: 5px;
+                        }
+                    }
+                    &.sidebar-minimize {
+                        > .meta {
+                            > .icon:after {
+                                display: inline-block;
+                                vertical-align: top;
+                                font-family: "iconfont";
+                                content: "\e4f3";
+                            }
+                        }
+                        &.minimized {
+                            > .meta {
+                                > .icon:after {
+                                    content: "\e47a";
+                                }
+                            }
+                        }
+                    }
+                }
+
+                &.active {
+                    > a {
+                        background-color: lighten(@gray, 3%);
+                        color: lighten(@dark, 25%);
+
+                        &:hover,
+                        &:focus,
+                        &:active {
+                            background-color: lighten(@gray, 3%);
+                            color: lighten(@dark, 25%);
+                        }
+                    }
+                }
+
+                &.open {
+                    > a {
+                        background-color: lighten(@gray, 3%);
+                        color: lighten(@dark, 25%);
+
+                        &:hover,
+                        &:focus,
+                        &:active {
+                            background-color: lighten(@gray, 3%);
+                            color: lighten(@dark, 25%);
+                        }
+
+                        // dropdown arrow
+                        &:before,
+                        &:after {
+                            position: absolute;
+                            content: "";
+                            left: 50%;
+                            width: 0px;
+                            height: 0px;
+                            border-style: solid;
+                        }
+                        &:before {
+                            z-index: 1002;
+                            bottom: -6px;
+                            margin-left: -9px;
+                            border-width: 0 9px 9px 9px;
+                            border-color: transparent transparent lighten(@border-color, 6%) transparent;
+                        }
+                        &:after {
+                            z-index: 1003;
+                            bottom: -7px;
+                            margin-left: -8px;
+                            border-width: 0 8px 8px 8px;
+                            border-color: transparent transparent @white transparent;
+                        }
+
+                        > .meta {
+                            > .arrow {
+                                &:after {
+                                    content: "\e6bf";
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Navbar-nav - main button
+            // -----------------------------------
+            > .navbar-main {
+                position: absolute;
+                z-index: 1;
+                top: 0px;
+                left: 0px;
+
+                > a {
+                    color: @gray;
+
+                    &:hover {
+                        color: @white;
+                    }
+
+                    &:active,
+                    &:focus {
+                        color: @white;
+                        background-color: darken(@accent-base-color, 3%);
+                    }
+
+                    > .meta {
+                        > .label,
+                        > .badge,
+                        > .hasnotification {
+                            -webkit-box-shadow: 0px 0px 0px 1px @accent-base-color;
+                            box-shadow: 0px 0px 0px 1px @accent-base-color;
+                        }
+                    }
+                }
+            }
+
+            // Navbar-nav - toggle collapse
+            // -----------------------------------
+            > .navbar-toggle {
+                padding: 0px;
+                margin: 0px;
+                border-radius: 0px;
+                border-width: 0px;
+            }
+
+            // Navbar-nav - dropdown menu
+            // -----------------------------------
+            > .dropdown {
+                > .dropdown-menu {
+                    position: absolute;
+                    margin-top: 5px;
+                    left: 5px;
+                    background-color: @white;
+                    border: 1px solid lighten(@border-color, 6%);
+                    border-radius: @border-radius;
+                    -webkit-box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.08);
+                    box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.08);
+                }
+                &.custom {
+                    position: static;
+
+                    > .dropdown-menu {
+                        top: auto;
+                        left: 5px;
+                        right: 5px;
+                        padding: 0px;
+                        border-color: lighten(@border-color, 6%);
+
+                        // dropdown - header
+                        // -----------------------------------
+                        > .dropdown-header {
+                            display: table;
+                            width: 100%;
+                            background-color: darken(@white, 3%);
+                            border-bottom: 1px solid lighten(@border-color, 8%);
+                            padding: 0px 15px !important;
+                            height: @header-height - 14;
+                            line-height: @header-height - 14;
+                            color: lighten(@dark, 10%);
+
+                            border-top-left-radius: @border-radius;
+                            border-top-right-radius: @border-radius;
+
+                            > .title {
+                                display: table-cell;
+                                font-weight: 600;
+                            }
+                            > .option {
+                                display: table-cell;
+                                font-weight: normal;
+                            }
+                        }
+
+                        // dropdown - body and viewport
+                        // -----------------------------------
+                        > .viewport,
+                        .dropdown-body {
+                            height: 320px;
+                        }
+                        .dropdown-body {
+                            overflow-y: scroll;
+                            -ms-overflow-style: -ms-autohiding-scrollbar;
+                            -webkit-overflow-scrolling: touch;
+                        }
+
+                        // dropdown - form reset
+                        // -----------------------------------
+                        form,
+                        .form-horizontal {
+                            padding: 6px 15px;
+                            background-color: darken(@white, 2%);
+                            border-bottom: 1px solid lighten(@border-color, 8%);
+                        }
+                    }
+
+                    &.open {
+                        > .dropdown-toggle:before {
+                            border-color: transparent transparent lighten(@border-color, 6%) transparent;
+                        }
+                        > .dropdown-toggle:after {
+                            border-color: transparent transparent darken(@white, 3%) transparent;
+                        }
+                    }
+
+                    &.mega {
+                        > .dropdown-menu {
+                            padding: 5px 0px;
+                        }
+
+                        &.open {
+                            > .dropdown-toggle:before {
+                                border-color: transparent transparent lighten(@border-color, 6%) transparent;
+                            }
+                            > .dropdown-toggle:after {
+                                border-color: transparent transparent @white transparent;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Navbar toolbar - navbar nav right
+            // -----------------------------------
+            &.navbar-right {
+                float: right;
+
+                > .navbar-main {
+                    left: auto;
+                    right: 0px;
+                }
+
+                > li {
+                    > .dropdown-menu {
+                        left: auto;
+                        right: 5px;
+                    }
+                }
+            }
+        }
+
+        // Navbar toolbar - navbar form
+        // -----------------------------------
+        > .navbar-form {
+            position: absolute;
+            z-index: 991;
+            top: -@header-height - 10;
+            left: 0px;
+            right: 0px;
+            background-color: @accent-base-color;
+            border-width: 0px;
+            margin: 0px;
+            padding-top: (@header-height - 34) / 2;
+            padding-right: 15px;
+            padding-bottom: (@header-height - 34) / 2;
+            padding-left: 15px;
+            box-shadow: none;
+            -webkit-box-shadow: none;
+            .transition(top 300ms ease);
+
+            &.open {
+                top: 0px;
+            }
+
+            .form-group {
+                display: block;
+                margin: 0px;
+            }
+            .form-control {
+                display: block;
+                width: 100%;
+                color: darken(@white, 5%);
+                border-width: 0px;
+                background-color: darken(@accent-base-color, 5%);
+            }
+            .has-icon {
+                .form-control-icon {
+                    color: darken(@white, 5%);
+                }
+            }
+            
+            // input placeholder
+            .form-control {
+                .placeholder(darken(@white, 5%));
+            }
+        }
+    }
+
+    // Fixed header
+    // -----------------------------------
+    &.navbar-fixed-top {
+        position: fixed;
+    }
+}

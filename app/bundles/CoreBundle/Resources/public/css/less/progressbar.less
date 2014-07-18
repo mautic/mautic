@@ -1,0 +1,42 @@
+/* ----------------------------
+ *
+ * Progress Bar
+ *
+ * --------------------------- */
+.progress { 
+    display: block;
+    margin-bottom: 15px;
+    background-color: darken(@maincontent-base-color, 2%);
+    box-shadow: none;
+    -webkit-box-shadow: none;
+
+    // Size
+    // -----------------------------------
+    &.progress-sm { 
+        height: 15px; 
+    }
+    &.progress-xs { 
+        height: 6px; 
+    }
+
+    // Bar
+    // -----------------------------------
+    .progress-bar {
+        background-color: @primary;
+        box-shadow: none;
+        -webkit-box-shadow: none;
+
+        &.progress-bar-success { 
+            background-color: @success; 
+        }
+        &.progress-bar-info { 
+            background-color: @info; 
+        }
+        &.progress-bar-warning { 
+            background-color: @warning; 
+        }
+        &.progress-bar-danger { 
+            background-color: @danger; 
+        }
+    }
+}

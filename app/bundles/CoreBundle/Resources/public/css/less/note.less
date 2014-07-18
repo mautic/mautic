@@ -1,0 +1,100 @@
+/* ----------------------------
+ *
+ * Folded Corner Note
+ *
+ * --------------------------- */
+.note {
+    position: relative;
+    padding: 8px 25px 8px 15px;
+    overflow: hidden;
+
+    &:before {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        border-width: 0 16px 16px 0;
+        border-style: solid;
+        border-color: transparent transparent transparent transparent;
+    }
+
+    &.note-rounded {
+        -moz-border-radius: @border-radius 0px @border-radius @border-radius;
+        border-radius: @border-radius 0px @border-radius @border-radius;
+
+        &:before {
+            border-width: 8px;
+            -moz-border-radius: 0 0 0 @border-radius;
+            border-radius: 0 0 0 @border-radius;
+        }
+    }
+
+    // Contextual
+    // -----------------------------------
+    &.note-default {
+        background: darken(@default, 5%);
+        color: @dark;
+        &:before {
+            border-color: @maincontent-base-color @maincontent-base-color darken(@default, 14%) darken(@default,14%);
+        }
+    }
+    &.note-primary {
+        background: @primary;
+        color: @white;
+        &:before {
+            border-color: @maincontent-base-color @maincontent-base-color darken(@primary, 8%) darken(@primary, 8%);
+        }
+    }
+    &.note-info {
+        background: @info;
+        color: @white;
+        &:before {
+            border-color: @maincontent-base-color @maincontent-base-color darken(@info, 8%) darken(@info, 8%);
+        }
+    }
+    &.note-success {
+        background: @success;
+        color: @white;
+        &:before {
+            border-color: @maincontent-base-color @maincontent-base-color darken(@success, 8%) darken(@success, 8%);
+        }
+    }
+    &.note-warning {
+        background: @warning;
+        color: @white;
+        &:before {
+            border-color: @maincontent-base-color @maincontent-base-color darken(@warning, 8%) darken(@warning, 8%);
+        }
+    }
+    &.note-danger {
+        background: @danger;
+        color: @white;
+        &:before {
+            border-color: @maincontent-base-color @maincontent-base-color darken(@danger, 8%) darken(@danger, 8%);
+        }
+    }
+    &.note-inverse {
+        background: @inverse;
+        color: @white;
+        &:before {
+            border-color: @maincontent-base-color @maincontent-base-color darken(@inverse, 8%) darken(@inverse, 8%);
+        }
+    }
+}
+
+.bgcolor-white {
+    .note {
+        &.note-default,
+        &.note-primary,
+        &.note-info,
+        &.note-success,
+        &.note-warning,
+        &.note-danger,
+        &.note-inverse {
+            &:before {
+                border-top-color: @white;
+                border-right-color: @white;
+            }
+        }
+    }
+}

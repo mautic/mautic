@@ -1,0 +1,90 @@
+/* ----------------------------
+ *
+ * Pattern
+ *
+ * --------------------------- */
+.pattern {
+    position: absolute;
+    z-index: 1;
+    left: 0px;
+    right: 0px;
+    top: 0px;
+    bottom: 0px;
+
+    // Overlay
+    // -----------------------------------
+    &.overlay {
+        background-color: fade(#000, 70%);
+
+        &.overlay-accent {
+            background-color: fade(@accent-base-color, 80%);
+        }
+        &.overlay-primary {
+            background-color: fade(@primary, 80%);
+        }
+        &.overlay-info {
+            background-color: fade(@info, 80%);
+        }
+        &.overlay-success {
+            background-color: fade(@success, 80%);
+        }
+        &.overlay-warning {
+            background-color: fade(@warning, 80%);
+        }
+        &.overlay-danger {
+            background-color: fade(@danger, 80%);
+        }
+    }
+
+    + .container,
+    .container-fluid {
+        position: relative;
+        z-index: 2;
+    }
+
+    &.pattern1 {
+        background-image: url("../image/pattern/cartographer.png");
+    }
+    &.pattern2 {
+        background-image: url("../image/pattern/dark-stripes.png");
+    }
+    &.pattern3 {
+        background-image: url("../image/pattern/dark-wall.png");
+    }
+    &.pattern4 {
+        background-image: url("../image/pattern/darth-stripe.png");
+    }
+    &.pattern5 {
+        background-image: url("../image/pattern/egg-shell.png");
+    }
+    &.pattern6 {
+        background-image: url("../image/pattern/escheresque-dark.png");
+    }
+    &.pattern7 {
+        background-image: url("../image/pattern/fabric-1-dark.png");
+    }
+    &.pattern8 {
+        background-image: url("../image/pattern/fake-brick.png");
+    }
+    &.pattern9 {
+        background-image: url("../image/pattern/inspiration-geometry.png");
+    }
+    &.pattern10 {
+        background-image: url("../image/pattern/low-contrast-linen.png");
+    }
+    &.pattern11 {
+        background-image: url("../image/pattern/maze-black.png");
+    }
+    &.pattern12 {
+        background-image: url("../image/pattern/outlets.png");
+    }
+    &.pattern13 {
+        background-image: url("../image/pattern/shattered.png");
+    }
+    &.pattern14 {
+        background-image: url("../image/pattern/translucent-fibres.png");
+    }
+    &.pattern15 {
+        background-image: url("../image/pattern/diagmonds.png");
+    }
+}

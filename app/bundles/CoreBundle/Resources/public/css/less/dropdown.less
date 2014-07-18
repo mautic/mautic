@@ -1,0 +1,123 @@
+/* ----------------------------
+ *
+ * Dropdown Menu
+ *
+ * --------------------------- */
+.dropdown-menu {
+    font-size: 13px;
+    border-color: @border-color;
+    padding: 5px 0px;
+    border-radius: @border-radius + 1;
+    -webkit-box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.1);
+
+    .dropdown-menu {
+        position: static;
+        display: block;
+        width: 100%;
+        margin: 0px;
+        padding: 0px;
+
+        /* reset */
+        border-width: 0px;
+        border-radius: 0px;
+        -webkit-box-shadow: none;
+        box-shadow: none;
+    }
+
+    // Dropdown items
+    // -----------------------------------
+    > li {  
+        margin: 0px; 
+        text-align: left;
+
+        > a {
+            line-height: 20px;
+            color: lighten(@dark, 10%);
+            padding: 4px 15px !important;
+
+            &:active,
+            &:focus {
+                outline: 0;
+            }
+
+            > .icon {
+                display: inline-block;
+                min-width: 14px;
+                text-align: center;
+                margin-right: 6px;
+            }
+        }
+
+        &:active > a,
+        &.active > a, {
+            background-color: lighten(@gray, 5%);
+            color: @dark;
+        }
+        &:active > a:hover,
+        &.active > a:hover {
+            background-color: lighten(@gray, 5%);
+            color: darken(@dark, 5%);
+        }
+    }
+
+    // Dropdown header
+    // -----------------------------------
+    > .dropdown-header {
+        padding: 6px 15px !important;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    // Dropdown content
+    // -----------------------------------
+    > .dropdown-content {
+        padding: 4px 15px;
+    }
+
+    // Dropdown divider
+    // -----------------------------------
+    .divider { 
+        margin: 4px 0px; 
+        background-color: lighten(@border-color, 10%);
+    }
+
+    // Dropdown arrow
+    // -----------------------------------
+    &.hasarrow {
+
+        &:before {
+            position: absolute;
+            z-index: 2;
+            content: "";
+            top: -7px;
+            left: 6px;
+            width: 0px;
+            height: 0px;
+            border-style: solid;
+            border-width: 0 7px 7px 7px;
+            border-color: transparent transparent @border-color transparent;
+        }
+        &:after {
+            position: absolute;
+            z-index: 3;
+            content: "";
+            top: -6px;
+            left: 7px;
+            width: 0px;
+            height: 0px;
+            border-style: solid;
+            border-width: 0 6px 6px 6px;
+            border-color: transparent transparent @white transparent;
+        }
+
+        &.pull-right:after {
+            right: 7px;
+            left: auto;
+        }
+        &.pull-right:before {
+            right: 6px;
+            left: auto;
+        }
+    }
+}

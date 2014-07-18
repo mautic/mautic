@@ -1,0 +1,29 @@
+/* ----------------------------
+ *
+ * Modal
+ *
+ * --------------------------- */
+.modal-content {
+    background-color: @white;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: @border-radius;
+    -webkit-box-shadow: 0px 3px 3px rgba(0, 0, 0, 0.2);
+    box-shadow: 0px 3px 3px rgba(0, 0, 0, 0.2);
+}
+.modal-header {
+    border-bottom: 1px solid @border-color;
+}
+.modal-header + .modal-body {
+    border-radius: 0px;
+}
+.modal-body {
+    background-color: lighten(@maincontent-base-color, 3%);
+    border-top-left-radius: @border-radius;
+    border-top-right-radius: @border-radius;
+}
+.modal-footer {
+    margin-top: 0px;
+    border-top: 1px solid @border-color;
+    border-bottom-left-radius: @border-radius;
+    border-bottom-right-radius: @border-radius;
+}

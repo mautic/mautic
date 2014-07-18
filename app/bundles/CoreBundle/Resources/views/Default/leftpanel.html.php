@@ -7,8 +7,13 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-$pinned = ($app->getSession()->get("left-panel", 'default') == 'unpinned') ? ' unpinned' : '';
+// $pinned = ($app->getSession()->get("left-panel", 'default') == 'unpinned') ? ' unpinned' : '';
 ?>
+<section class="content slimscroll">
+    <?php echo $view['knp_menu']->render('main', array("menu" => "main")); ?>
+</section>
+
+<?php /*
 <div class="left-panel-inner-wrapper">
 	<div class="left-panel-header">
 	    <img class="pull-left" src="<?php echo $view['assets']->getUrl('assets/images/mautic_circle.png'); ?>" />
@@ -19,7 +24,7 @@ $pinned = ($app->getSession()->get("left-panel", 'default') == 'unpinned') ? ' u
 	</div>
     <div class="side-panel-nav-wrapper">
         <nav>
-            <?php echo $view['knp_menu']->render('main', array("menu" => "main")); ?>
         </nav>
     </div>
 </div>
+*/ ?>

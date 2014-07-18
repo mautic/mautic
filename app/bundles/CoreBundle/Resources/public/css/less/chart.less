@@ -1,0 +1,69 @@
+/* ----------------------------
+ *
+ * Chart (flot)
+ *
+ * --------------------------- */
+.chart {
+    height: 200px;
+}
+
+/* Flot tooltip */
+#flotTip {
+    font-size: 12px !important;
+    font-weight: 600;
+    position: relative;
+    z-index: 5;
+    padding: 4px 5px;
+    border-radius: @border-radius !important;
+    border-color: transparent !important;
+    background-color: #444 !important;
+    color: #eee;
+}
+
+/* Flot legend */
+.chart > .legend > table tr td {
+    padding: 3px;
+}
+.chart > .legend > table tr td:first-child {
+    padding-left: 5px;
+}
+.chart > .legend > table tr td:last-child {
+    padding-right: 5px;
+}
+.chart > .legend > table tr + tr td {
+    padding-top: 0px;
+}
+.chart > .legend > div:first-child {
+    background-color: transparent !important;
+}
+.chart > .legend .legendColorBox > div {
+    border-color: rgba(0, 0, 0, 0.1) !important;
+}
+.chart > .legend .legendColorBox > div,
+.chart > .legend .legendColorBox > div > div {
+    border-radius: 50%;
+}
+
+/* Flot label / text */
+.bgcolor-primary .chart .flot-text .tickLabel,
+.bgcolor-info .chart .flot-text .tickLabel,
+.bgcolor-success .chart .flot-text .tickLabel,
+.bgcolor-warning .chart .flot-text .tickLabel,
+.bgcolor-danger .chart .flot-text .tickLabel,
+.bgcolor-teal .chart .flot-text .tickLabel,
+.bgcolor-inverse .chart .flot-text .tickLabel,
+.panel-primary .chart .flot-text .tickLabel,
+.panel-info .chart .flot-text .tickLabel,
+.panel-success .chart .flot-text .tickLabel,
+.panel-warning .chart .flot-text .tickLabel,
+.panel-danger .chart .flot-text .tickLabel,
+.panel-teal .chart .flot-text .tickLabel,
+.panel-inverse .chart .flot-text .tickLabel {
+    color: @white !important;
+}
+
+/* Sparkline tooltip */
+.jqstooltip {
+    width: 40px;
+    height: 25px !important;
+}

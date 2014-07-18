@@ -1,0 +1,92 @@
+/* ----------------------------
+ *
+ * Image
+ *
+ * --------------------------- */
+.img-circle {
+    border-radius: 50% !important;
+}
+.img-bordered {
+    -webkit-box-shadow: 0px 0px 0px 3px @white;
+    box-shadow: 0px 0px 0px 3px @white;
+}
+.img-bordered-primary {
+    -webkit-box-shadow: 0px 0px 0px 2px @white, 0px 0px 0px 4px @primary;
+    box-shadow: 0px 0px 0px 2px @white, 0px 0px 0px 4px @primary;
+}
+.img-bordered-success {
+    -webkit-box-shadow: 0px 0px 0px 2px @white, 0px 0px 0px 4px @success;
+    box-shadow: 0px 0px 0px 2px @white, 0px 0px 0px 4px @success;
+}
+.img-bordered-info {
+    -webkit-box-shadow: 0px 0px 0px 2px @white, 0px 0px 0px 4px @info;
+    box-shadow: 0px 0px 0px 2px @white, 0px 0px 0px 4px @info;
+}
+.img-bordered-warning {
+    -webkit-box-shadow: 0px 0px 0px 2px @white, 0px 0px 0px 4px @warning;
+    box-shadow: 0px 0px 0px 2px @white, 0px 0px 0px 4px @warning;
+}
+.img-bordered-danger {
+    -webkit-box-shadow: 0px 0px 0px 2px @white, 0px 0px 0px 4px @danger;
+    box-shadow: 0px 0px 0px 2px @white, 0px 0px 0px 4px @danger;
+}
+.img-bordered-inverse {
+    -webkit-box-shadow: 0px 0px 0px 2px @white, 0px 0px 0px 4px @inverse;
+    box-shadow: 0px 0px 0px 2px @white, 0px 0px 0px 4px @inverse;
+}
+.img-bordered-teal {
+    -webkit-box-shadow: 0px 0px 0px 2px @white, 0px 0px 0px 4px @teal;
+    box-shadow: 0px 0px 0px 2px @white, 0px 0px 0px 4px @teal;
+}
+
+/*
+ * image group
+ */
+.img-group > img,
+.img-group > .more {
+    width: 38px;
+    height: 38px;
+    -webkit-box-shadow: 0 0 0 2px @white;
+    box-shadow: 0 0 0 2px @white;
+}
+.img-group > .more {
+    display: inline-block;
+    vertical-align: top;
+    background-color: @accent-base-color;
+    line-height: 38px;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    color: @white;
+}
+.img-group-stack > img + img,
+.img-group-stack > img + .more {
+    margin-left: -18px;
+}
+
+/*
+ * image grid
+ */
+.img-grid {
+    .row {
+        margin: 0px;
+
+        + .row {
+            padding-top: 5px;
+        }
+
+        > [class^="col-"],
+        [class*=" col-"] {
+            padding: 0px;
+
+            + [class^="col-"],
+            [class*=" col-"] {
+                padding-left: 5px;
+            }
+        }
+    }
+
+    + .row {
+        padding-top: 5px;
+    }
+}

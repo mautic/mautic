@@ -1,0 +1,40 @@
+/* ----------------------------
+ *
+ * Blockquote
+ *
+ * --------------------------- */
+blockquote {
+    padding-left: 40px;
+    border-width: 0px;
+
+    > p {
+        position: relative;
+        font-style: italic;
+        font-size: 18px !important;
+    }
+
+    > p:before {
+        position: absolute;
+        top: -1px;
+        margin-left: -25px;
+        font-family: "iconfont";
+        font-size: 18px;
+        content: "\e19f";
+        color: @gray;
+    }
+
+    > p:after {
+        position: absolute;
+        bottom: -1px;
+        margin-left: 5px;
+        font-family: "iconfont";
+        font-size: 18px;
+        content: "\e1a0";
+        color: @gray;
+    }
+}
+.blockquote-reverse {
+    padding-left: 20px;
+    padding-right: 40px;
+    border-width: 0px;
+}

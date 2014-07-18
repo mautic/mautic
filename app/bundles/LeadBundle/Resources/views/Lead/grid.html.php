@@ -10,15 +10,15 @@ if ($tmpl == 'index')
     $view->extend('MauticLeadBundle:Lead:index.html.php');
 ?>
 
-<div class="grid row scrollable bundle-list">
+<div class="shuffle grid row scrollable bundle-list" id="shuffle-grid">
     <?php if (count($items)): ?>
     <?php foreach ($items as $item): ?>
     <?php $fields = $model->organizeFieldsByAlias($item->getFields()); ?>
-    <div class="grid margin-md-bottom col-sm-6 col-md-4">
+    <div class="shuffle shuffle-item grid margin-md-bottom col-sm-6 col-md-4">
         <div class="body-white table-layout">
             <div class="col-xs-4 padding-none">
                 <img class="img img-responsive"
-                     src="https://www.gravatar.com/avatar/<?php echo md5(strtolower(trim($fields['email']))); ?>?&s=250" />
+                     src="https://www.gravatar.com/avatar/<?php echo md5(strtolower(trim(@$fields['email']))); ?>?&s=250" />
             </div>
             <div class="col-xs-8 valign-middle">
                 <h5>

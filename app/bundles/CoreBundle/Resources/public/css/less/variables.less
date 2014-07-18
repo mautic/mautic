@@ -1,0 +1,78 @@
+// Below variable created to suite this template look and feel
+// change at your own risk :)
+// ----------------------------------------------------------------------------
+
+// Color variation
+// ----------------------------------------------------------------------------
+@dark:                                  #444; // do not change this
+@gray:                                  #eee; // do not change this
+@white:                                 #fff; // do not change this
+
+@accent-base-color:                     #00B6AD;
+@default:                               #f5f5f5;
+@primary:                               #00B1E1;
+@success:                               #91C854;
+@info:                                  #63D3E9;
+@warning:                               #FFD66A;
+@inverse:                               #2a2a2a;
+@danger:                                #ED5466;
+@teal:                                  #6BCCB4;
+@facebook:                              #3b5998;
+@twitter:                               #55acee;
+
+// border color
+@border-color:                          darken(@maincontent-base-color, 10%); 
+
+// border radius
+@border-radius:                         3px;
+
+// Typography
+@font-family:                           "Open Sans", sans-serif;
+@font-family-alt:                       "Roboto Slab", serif;
+@font-size-global:                      13px;                
+
+
+// Template layout
+// ----------------------------------------------------------------------------
+// Infobar
+@infobar-height:                        36px;
+
+// Header
+@header-height:                         50px;
+@header-height-md:                      @header-height + 10;
+
+// Sidebar
+@sidebar-base-color:                    #2a2a2a;
+@sidebar-width:                         240px;
+@sidebar-collapse-width:                60px;
+
+// Main Content
+@maincontent-base-color:                #ecf0f1;
+
+
+// Media queries breakpoints
+// ----------------------------------------------------------------------------
+// Extra small screen / phone
+@screen-xs:                  480px;
+@screen-xs-min:              @screen-xs;
+@screen-phone:               @screen-xs-min;
+
+// Small screen / tablet
+@screen-sm:                  768px;
+@screen-sm-min:              @screen-sm;
+@screen-tablet:              @screen-sm-min;
+
+// Medium screen / desktop
+@screen-md:                  992px;
+@screen-md-min:              @screen-md;
+@screen-desktop:             @screen-md-min;
+
+// Large screen / wide desktop
+@screen-lg:                  1200px;
+@screen-lg-min:              @screen-lg;
+@screen-lg-desktop:          @screen-lg-min;
+
+// So media queries don't overlap when required, provide a maximum
+@screen-xs-max:              (@screen-sm-min - 1);
+@screen-sm-max:              (@screen-md-min - 1);
+@screen-md-max:              (@screen-lg-min - 1);

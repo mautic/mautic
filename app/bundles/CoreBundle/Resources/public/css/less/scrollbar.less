@@ -1,0 +1,55 @@
+/* ----------------------------
+ *
+ * Custom Scrollbar - slimscroll
+ *
+ * --------------------------- */
+.scrollrail {
+    opacity: 1 !important;
+    background-color: fade(darken(@default, 25%), 15%) !important;
+    border: 0px !important;
+    border-radius: 0px !important;
+}
+.scrollbar {
+    opacity: 1 !important;
+    background-color: fade(darken(@default, 25%), 90%) !important;
+    border: 0px !important;
+    border-radius: 0px !important;
+}
+
+.sidebar {
+    .scrollrail {
+        background-color: fade(darken(@sidebar-base-color, 6%), 15%) !important;
+    }
+    .scrollbar {
+        background-color: fade(darken(@sidebar-base-color, 6%), 90%) !important;
+    }
+}
+
+/* ----------------------------
+ *
+ * Custom scrollbar - webkit
+ *
+ * --------------------------- */
+.no-touch {
+    /* Let's get this party started */
+    ::-webkit-scrollbar {
+        width: 12px;
+    }
+    ::-webkit-scrollbar:horizontal {
+        height: 12px;
+    }
+     
+    /* Track */
+    ::-webkit-scrollbar-track {
+        -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.1);
+        background-color: @maincontent-base-color; 
+    }
+     
+    /* Handle */
+    ::-webkit-scrollbar-thumb {
+        background: darken(@default, 20%);
+    }
+    ::-webkit-scrollbar-thumb:window-inactive {
+        background: darken(@default, 15%);
+    }
+}

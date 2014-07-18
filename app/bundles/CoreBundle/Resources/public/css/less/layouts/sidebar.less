@@ -1,0 +1,534 @@
+/* ----------------------------
+ *
+ * Template Sidebar
+ *
+ * --------------------------- */
+/* Sidebar Transition  */
+.csstransforms3d.sidebar-open-ltr {
+    .sidebar-left {
+        .translate3d(@sidebar-width, 0, 0);
+    }
+}
+.no-csstransforms3d.sidebar-open-ltr {
+    .sidebar-left {
+        right: auto;
+        left: 0px;
+    }
+}
+.csstransforms3d.sidebar-open-rtl {
+    .sidebar-right {
+        .translate3d(-@sidebar-width, 0, 0);
+    }
+}
+.no-csstransforms3d.sidebar-open-rtl {
+    .sidebar-right {
+        left: auto;
+        right: 0px;
+    }
+}
+
+.sidebar {
+    position: fixed;
+    z-index: 200;
+    top: 0px;
+    bottom: 0px;
+    width: @sidebar-width;
+    color: lighten(@sidebar-base-color, 30%);
+    background-color: @sidebar-base-color;
+    .transition(transform 0.2s ease);
+
+    // sidebar left
+    // -----------------------------------
+    &.sidebar-left {
+        left: -@sidebar-width;
+    }
+
+    // sidebar right
+    // -----------------------------------
+    &.sidebar-right {
+        right: -@sidebar-width;
+
+        .scrollbar,
+        .scrollrail {
+            left: 0px !important;
+        }
+    }
+
+    // sidebar header
+    // -----------------------------------
+    .header {
+        position: absolute;
+        background-color: @sidebar-base-color;
+        top: 0px;
+        width: 100%;
+        padding-top: (@header-height - 34) / 2;
+        padding-right: 15px;
+        padding-bottom: (@header-height - 34) / 2;
+        padding-left: 15px;
+        z-index: 10;
+        height: @header-height;
+
+        &:after {
+            position: absolute;
+            bottom: 0px;
+            left: 0px;
+            right: 0px;
+            content: "";
+            border-bottom: 1px solid darken(@sidebar-base-color, 1.5%);
+        }
+
+        + .viewport {
+            top: @header-height;
+        }
+        + .content {
+            top: @header-height;
+        }
+    }
+
+    // sidebar footer
+    // -----------------------------------
+    .footer {
+        display: none;
+    }
+    .has-footer,
+    &.has-footer {
+        .footer {
+            display: block;
+            position: absolute;
+            background-color: @sidebar-base-color;
+            width: 100%;
+            bottom: 0px;
+            padding-top: (@header-height - 34) / 2;
+            padding-right: 15px;
+            padding-bottom: (@header-height - 34) / 2;
+            padding-left: 15px;
+            z-index: 11;
+            height: @header-height;
+
+            &:after {
+                position: absolute;
+                top: 0px;
+                left: 0px;
+                right: 0px;
+                content: "";
+                border-top: 1px solid darken(@sidebar-base-color, 1.5%);
+            }
+        }
+        .viewport {
+            bottom: @header-height;
+            > .content {
+                bottom: 0px;
+            }
+        }
+        .content {
+            bottom: @header-height;
+        }
+    }
+
+    // sidebar viewport
+    // -----------------------------------
+    .viewport {
+        position: absolute !important;
+        top: 0px;
+        bottom: 0px;
+        width: 100% !important;
+    }
+
+    // sidebar content
+    // -----------------------------------
+    .content {
+        position: absolute;
+        top: 0px;
+        bottom: 0px;
+        width: @sidebar-width !important;
+        overflow-y: scroll;
+        -ms-overflow-style: -ms-autohiding-scrollbar;
+        -webkit-overflow-scrolling: touch;
+
+        > .wrapper {
+            padding-left: 25px;
+            padding-right: 25px;
+        }
+
+        hr {
+            border-color: lighten(@sidebar-base-color, 2%);
+        }
+
+        .heading {
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: lighten(@sidebar-base-color, 20%);
+            margin: 0px;
+            padding: 25px 25px 15px 25px;
+        }
+    }
+
+    // sidebar panel
+    // -----------------------------------
+    .panel {
+        background-color: transparent;
+        border-radius: 0px !important;
+        color: darken(@gray, 40%);
+        border-width: 0px !important;
+    }
+
+    // sidebar media-list
+    // -----------------------------------
+    .media-list-contact {
+        > .media {
+            &:after {
+                border-color: lighten(@sidebar-base-color, 2%);
+            }
+            > .media-body {
+                > .media-heading {
+                    color: darken(@gray, 40%);
+                }
+            }
+
+            &:active {
+                background-color: lighten(@sidebar-base-color, 2%);
+            }
+        }
+    }
+
+    // sidebar menu
+    // -----------------------------------
+    .topmenu {
+        margin: 0;
+        padding: 0;
+        background-color: @sidebar-base-color;
+
+        li {
+            display: block;
+            position: relative;
+            width: 100%;
+            list-style: none;
+
+            // Header
+            // -----------------------------------
+            &.submenu-header {
+                display: none;
+            }
+
+            // Line
+            // -----------------------------------
+            &:after {
+                position: absolute;
+                content: "";
+                left: 55px;
+                right: 0px;
+                bottom: -1px;
+                border-top: 1px solid lighten(@sidebar-base-color, 2%);
+            }
+            &:last-child:after {
+                border: 0px;
+            }
+
+            // State - active
+            // -----------------------------------
+            &.active { 
+                background-color: lighten(@sidebar-base-color, 2%);
+
+                &:after {
+                    border-color: transparent;
+                }
+                a {
+                    color: lighten(@sidebar-base-color, 60%);
+
+                    > .figure > [class^="ico-"],
+                    > .figure > [class*=" ico-"] {
+                        border-color: @accent-base-color;
+                        color: @accent-base-color;
+                    }
+
+                    // Menu link - figure
+                    // -----------------------------------
+                    > .figure {
+                        > .hasnotification {
+                            -webkit-box-shadow: 0px 0px 0px 2px lighten(@sidebar-base-color, 2%);
+                            box-shadow: 0px 0px 0px 2px lighten(@sidebar-base-color, 2%);
+                        }
+                    }
+                }
+            }
+
+            // State - open
+            // -----------------------------------
+            &.open {
+                a {
+                    color: lighten(@sidebar-base-color, 60%);
+
+                    > .figure > [class^="ico-"],
+                    > .figure > [class*=" ico-"] {
+                        border-color: lighten(@sidebar-base-color, 60%);
+                    }
+
+                    > .arrow {
+                        &:before {
+                            content: "\e671";
+                        }
+                    }
+                }
+            }
+
+            // Menu link
+            // -----------------------------------
+            a {
+                display: table;
+                position: relative;
+                table-layout: fixed;
+                width: 100%;
+                font-size: 13px;
+                text-decoration: none;
+                color: lighten(@sidebar-base-color, 40%);
+                outline: 0;
+                padding: 6px 25px 6px 15px;
+
+                // State - hover
+                // -----------------------------------
+                &:hover {
+                    color: lighten(@sidebar-base-color, 60%);
+
+                    > .figure > [class^="ico-"],
+                    > .figure > [class*=" ico-"] {
+                        border-color: lighten(@sidebar-base-color, 60%);
+                    }
+                }
+
+                // Menu link - figure
+                // -----------------------------------
+                > .figure {
+                    display: table-cell;
+                    table-layout: fixed;
+                    vertical-align: middle;
+                    width: 40px;
+                    padding-left: 10px;
+                    font-size: 14px;
+
+                    > .hasnotification {
+                        position: absolute;
+                        left: 20px;
+
+                        -webkit-box-shadow: 0px 0px 0px 2px @sidebar-base-color;
+                        box-shadow: 0px 0px 0px 2px @sidebar-base-color;
+                    }
+                }
+
+                // Menu link - text
+                // -----------------------------------
+                > .text {
+                    display: table-cell;
+                    table-layout: fixed;
+                    vertical-align: middle;
+                    width: 100%;
+                    line-height: 30px;
+                    font-weight: 600;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                // Menu link - number
+                // -----------------------------------
+                > .number {
+                    display: table-cell;
+                    table-layout: fixed;
+                    vertical-align: middle;
+                    width: 40px;
+                    font-weight: normal;
+
+                    > .badge,
+                    > .label {
+                        float: right;
+                        max-width: 35px;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                    }
+                }
+
+                // Menu link - arrow
+                // -----------------------------------
+                > .arrow {
+                    display: table-cell;
+                    table-layout: fixed;
+                    vertical-align: middle;
+                    font-weight: normal;
+                    width: 20px;
+                    text-align: right;
+                    color: lighten(@sidebar-base-color, 10%);
+
+                    &:before {
+                        font-family: "iconfont";
+                        content: "\e64f";
+                        font-size: 10px;
+                    }
+                }
+            }
+
+            // Submenu - 2nd level
+            // -----------------------------------
+            > .submenu {
+                position: relative;
+                overflow: hidden;
+                background-color: darken(@sidebar-base-color, 4%);
+
+                &:after {
+                    position: absolute;
+                    content: "";
+                    left: 32px;
+                    top: 0px;
+                    bottom: 0px;
+                    border-left: 1px solid lighten(@sidebar-base-color, 2%);
+                }
+
+                li {
+                    a {
+                        font-size: 13px;
+                        color: lighten(@sidebar-base-color, 30%);
+                        padding: 1px 25px 1px 15px;
+
+                        > .figure {
+                            width: 22px;
+                            padding-left: 0px;
+
+                            > [class*=" ico-"],
+                            > [class^="ico-"] {
+                                color: lighten(@sidebar-base-color, 30%);
+                            }
+                        }
+
+                        > .text {
+                            font-weight: normal;
+                        }
+
+                        > .arrow {
+                            &:before {
+                                content: "\e64f";
+                            }
+                        }
+
+                        &:hover {
+                            color: lighten(@sidebar-base-color, 60%);
+
+                            > .figure {
+                                > [class*=" ico-"],
+                                > [class^="ico-"] {
+                                    color: lighten(@sidebar-base-color, 60%);
+                                }
+                            }
+                        }
+                    }
+
+                    &:after {
+                        z-index: 1;
+                        width: 8px;
+                        height: 8px;
+                        border-radius: 50%;
+                        background-color: lighten(@sidebar-base-color, 2%);
+                        left: -12px;
+                        top: 13px;
+                        bottom: auto;
+                        border-color: transparent;
+
+                        -webkit-box-shadow: 0px 0px 0px 2px darken(@sidebar-base-color, 4%);
+                        box-shadow: 0px 0px 0px 2px darken(@sidebar-base-color, 4%);
+                    }
+
+                    // State - active
+                    // -----------------------------------
+                    &.active { 
+                        background-color: transparent;
+
+                        &:after {
+                            background-color: @accent-base-color;
+                        }
+
+                        a {
+                            color: lighten(@sidebar-base-color, 60%);
+
+                            > .text {
+                                font-weight: 600;
+                            }
+
+                            > .figure {
+                                > [class*=" ico-"],
+                                > [class^="ico-"] {
+                                    color: lighten(@sidebar-base-color, 60%);
+                                }
+                            }
+                        }
+                    }
+
+                    // State - open
+                    // -----------------------------------
+                    &.open {
+                        a {
+                            > .arrow {
+                                &:before {
+                                    content: "\e671";
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Submenu - 3rd level
+                // -----------------------------------
+                .submenu {
+                    overflow: hidden;
+                    padding-left: 10px;
+
+                    &:after {
+                        display: none;
+                    }
+
+                    li {
+                        &:after {
+                            display: none;
+                        }
+
+                        &.active {
+                            a {
+                                color: lighten(@sidebar-base-color, 60%);
+
+                                > .text {
+                                    font-weight: bold;
+                                }
+                            }
+                        }
+
+                        &.open {
+                            a {
+                                > .arrow {
+                                    &:before {
+                                        content: "\e671";
+                                    }
+                                }
+                            }
+                        }
+
+                        a {
+                            color: lighten(@sidebar-base-color, 30%);
+                            padding-top: 0px;
+                            padding-bottom: 0px;
+
+                            &:hover {
+                                color: lighten(@sidebar-base-color, 60%);
+                            }
+                            > .text {
+                                font-weight: normal;
+                            }
+                            > .arrow {
+                                &:before {
+                                    content: "\e64f";
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

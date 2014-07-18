@@ -1,0 +1,177 @@
+/* ----------------------------
+ *
+ * Typography
+ *
+ * --------------------------- */
+body,
+h1, 
+h2, 
+h3, 
+h4, 
+h5, 
+h6, 
+.h1, 
+.h2, 
+.h3, 
+.h4, 
+.h5, 
+.h6 {
+    font-family: @font-family;
+}
+h1 > small, 
+h2 > small, 
+h3 > small, 
+h4 > small,
+h5 > small, 
+h6 > small, {
+    color: inherit;
+}
+
+/* Helper
+-------------------------------*/
+/* 
+ * bold
+ */
+.bold {
+    font-weight: 700;
+}
+/* 
+ * semi bold
+ */
+.semibold {
+    font-weight: 600;
+}
+/* 
+ * Thin
+ */
+.thin {
+    font-weight: 300;
+}
+.ellipsis {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Color
+-------------------------------*/
+/* 
+ * white 
+ */
+.text-white { 
+    color: @white !important; 
+}
+/* 
+ * accent 
+ */
+.text-accent { 
+    color: @accent-base-color !important; 
+}
+a.text-accent:hover { 
+    color: darken(@accent-base-color, 5%) !important; 
+}
+/* 
+ * default 
+ */
+.text-default { 
+    color: lighten(@dark, 20%) !important; 
+}
+a.text-default:hover { 
+    color: lighten(@dark, 10%) !important;  
+}
+/* 
+ * white 
+ */
+.text-white { 
+    color: darken(@white, 5%) !important; 
+}
+a.text-white:hover { 
+    color: @white !important;  
+}
+/* 
+ * muted 
+ */
+.text-muted { 
+    color: darken(@gray, 30%) !important; 
+}
+a.text-muted:hover { 
+    color: darken(@gray, 20%) !important; 
+}
+/* 
+ * primary 
+ */
+.text-primary { 
+    color: @primary !important; 
+}
+a.text-primary:hover { 
+    color: darken(@primary, 5%) !important; 
+}
+/* 
+ * success 
+ */
+.text-success { 
+    color: @success !important; 
+}
+a.text-success:hover { 
+    color: darken(@success, 5%) !important; 
+}
+/* 
+ * info 
+ */
+.text-info { 
+    color: @info !important; 
+}
+a.text-info:hover { 
+    color: darken(@info, 5%) !important; 
+}
+/* 
+ * warning 
+ */
+.text-warning { 
+    color: @warning !important; 
+}
+a.text-warning:hover { 
+    color: darken(@warning, 5%) !important; 
+}
+/* 
+ * danger 
+ */
+.text-danger { 
+    color: @danger !important; 
+}
+a.text-danger:hover { 
+    color: darken(@danger, 5%) !important; 
+}
+/* 
+ * teal 
+ */
+.text-teal { 
+    color: @teal !important; 
+}
+a.text-teal:hover { 
+    color: darken(@teal, 5%) !important; 
+}
+
+/* Long Shadow text
+-------------------------------*/
+.longshadow {
+    text-shadow: rgb(226, 226, 226) 1px 1px,
+    rgb(226, 226, 226) 2px 2px,
+    rgb(226, 226, 226) 3px 3px,
+    rgb(227, 227, 227) 4px 4px,
+    rgb(229, 229, 229) 5px 5px,
+    rgb(231, 231, 231) 6px 6px,
+    rgb(232, 232, 232) 7px 7px,
+    rgb(234, 234, 234) 8px 8px,
+    rgb(236, 236, 236) 9px 9px,
+    rgb(238, 238, 238) 10px 10px;
+}
+/* Dropcap
+-------------------------------*/
+.dropcap {
+    float: left;
+    padding: 0px 10px;
+    font-size: 32px;
+    margin-right: 10px;
+    border-radius: @border-radius;
+}

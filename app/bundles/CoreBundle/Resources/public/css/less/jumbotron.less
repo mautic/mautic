@@ -1,0 +1,79 @@
+/* ----------------------------
+ *
+ * Jumbotron
+ *
+ * --------------------------- */
+.jumbotron { 
+    position: relative;
+    padding: 0px; 
+    background-color: transparent;
+    background: url("../image/stellar/background.jpg") no-repeat center top fixed;
+    -webkit-background-size: cover;
+    background-size: cover;
+    color: @white !important;
+
+    &.jumbotron-bg1 {
+        background: url("../image/stellar/background1.jpg") no-repeat center top fixed;
+    }
+    &.jumbotron-bg2 {
+        background: url("../image/stellar/background2.jpg") no-repeat center top fixed;
+    }
+    &.jumbotron-bg3 {
+        background: url("../image/stellar/background3.jpg") no-repeat center top fixed;
+    }
+    &.jumbotron-bg4 {
+        background: url("../image/stellar/background4.jpg") no-repeat center top fixed;
+    }
+    &.jumbotron-bg5 {
+        background: url("../image/stellar/background5.jpg") no-repeat center top fixed;
+    }
+    &.jumbotron-bg6 {
+        background: url("../image/stellar/background6.jpg") no-repeat center top fixed;
+    }
+    &.jumbotron-bg7 {
+        background: url("../image/stellar/background7.jpg") no-repeat center top fixed;
+    }
+
+    h1,
+    .h1 {
+        font-size: 28px;
+        line-height: 1.4;
+    }
+
+    &:first-child {
+        margin: 0px;
+    }
+
+    p {
+        font-size: 13px;
+        font-weight: normal;
+    }
+}
+
+/* ----------------------------
+ *
+ * Jumbotron - screen-sm
+ *
+ * --------------------------- */
+@media (min-width: @screen-sm-min) {
+    .jumbotron {
+        h1,
+        .h1 {
+            font-size: 34px;
+        }
+    }
+}
+
+/* ----------------------------
+ *
+ * Jumbotron - screen-md
+ *
+ * --------------------------- */
+@media (min-width: @screen-md-min) {
+    .jumbotron {
+        h1,
+        .h1 {
+            font-size: 38px;
+        }
+    }
+}

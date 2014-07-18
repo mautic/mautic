@@ -1,0 +1,208 @@
+/* ----------------------------
+ *
+ * Thumbnails
+ *
+ * --------------------------- */
+.panel {
+    .thumbnail {
+        border-radius: 0px;
+        border: 0px;
+        margin-bottom: 0px;
+
+        + .thumbnail {
+            margin-top: 5px;
+        }
+
+        .media {
+            img,
+            iframe {
+                border-radius: 0px;
+            }
+
+            > .overlay {
+                border-radius: 0px;
+            }
+        }
+    }
+}
+
+.thumbnail {
+    position: relative;
+    padding: 0px;
+    border-width: 0px;
+    border-radius: @border-radius;
+}
+a.thumbnail {
+    position: relative;
+    padding: 4px;
+    border-width: 1px;
+}
+a.thumbnail:hover, 
+a.thumbnail:focus, 
+a.thumbnail.active {
+    border-color: @primary;
+}
+/*
+ * media
+ */
+.thumbnail .media {
+    position: relative;
+    overflow: hidden;
+    margin-top: 0px;
+}
+.thumbnail .media > img,
+.thumbnail .media > iframe  {
+    position: relative;
+    z-index: 2;
+    border-radius: @border-radius;
+    border: 0px;
+}
+.thumbnail .media > img[data-toggle="unveil"] {
+    opacity: 0;
+    .transition(opacity 0.2s ease);
+}
+.thumbnail .media > img[data-toggle="unveil"].unveiled {
+    opacity: 1;
+}
+/* indicator */
+.thumbnail .media > .indicator {
+    display: block;
+    z-index: 1;
+}
+/* overlay */
+.thumbnail .media > .overlay {
+    position: absolute;
+    z-index: 4;
+    border-radius: @border-radius;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    background-color: fade(@accent-base-color, 40%);
+    opacity: 0;
+    color: @white;
+    .transition(opacity 0.2s ease);
+}
+.thumbnail .media:hover > .overlay,
+.thumbnail .media > .overlay.show {
+    opacity: 1;
+}
+.touch .thumbnail .media > .overlay {
+    background-color: transparent;
+    opacity: 1;
+}
+/* overlay toolbar */
+.thumbnail .media > .overlay > .toolbar {
+    position: absolute;
+    top: 50%;
+    margin-top: -20px;
+    width: 100%;
+    text-align: center;
+}
+.touch .thumbnail .media > .overlay > .toolbar {
+    top: 15px;
+    margin-top: 0px;
+}
+.thumbnail .media > .overlay > .toolbar > .btn {
+    width: 40px;
+    line-height: 26px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 0px;
+    .scale(0);
+    .transition(transform 300ms ease);
+}
+.thumbnail .media > .overlay > .toolbar > .btn + .btn {
+    .transition(transform 250ms ease);
+}
+.thumbnail .media > .overlay > .toolbar > .btn + .btn + .btn {
+    .transition(transform 200ms ease);
+}
+.thumbnail .media > .overlay > .toolbar > .btn + .btn + .btn + .btn {
+    .transition(transform 150ms ease);
+}
+.thumbnail .media > .overlay > .toolbar > .btn + .btn + .btn + .btn + .btn {
+    .transition(transform 100ms ease);
+}
+.thumbnail .media:hover > .overlay > .toolbar > .btn,
+.touch .thumbnail > .media > .overlay > .toolbar > .btn {
+    .scale(1);
+}
+/* meta */
+.thumbnail .media .meta {
+    position: absolute;
+    z-index: 3;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    color: @white;
+    padding: 15px;
+    border-top-left-radius: @border-radius;
+    border-top-right-radius: @border-radius;
+}
+.thumbnail .media .meta.bottom {
+    top: auto;
+    bottom: 0px;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+    border-bottom-left-radius: @border-radius;
+    border-bottom-right-radius: @border-radius;
+}
+.thumbnail .media .meta.darken {
+    background-color: fade(#000, 50%);
+}
+/*
+ * caption
+ */
+.thumbnail .caption + .caption {
+    border-top: 1px solid @border-color;
+}
+.thumbnail > .caption .tag {
+    font-size: 11px;
+    color: lighten(@dark, 30%);
+    margin: 0px;
+}
+
+/*
+ * Thumbnail album
+----------------------------------------------------------------------------- */
+.thumbnail-album {
+    border: 1px solid @border-color;
+    background-color: @white;
+    padding: 0px;
+    border-radius: @border-radius + 1;
+}
+/*
+ * media
+ */
+.thumbnail-album .media > img {
+    border-radius: @border-radius @border-radius 0px 0px;
+}
+/* overlay */
+.thumbnail-album .media > .overlay {
+    border-radius: @border-radius @border-radius 0px 0px;
+}
+/*
+ * meta
+ */
+.thumbnail-album .meta {
+    padding: 9px;
+    margin: 0px;
+}
+.thumbnail-album .meta > li {
+    display: table-cell;
+    vertical-align: middle;
+    width: 1%;
+}
+/*
+ * panel reset
+ */
+.panel {
+    .thumbnail-album {
+        .media {
+            > .overlay {
+                border-radius: 0px;
+            }
+        }
+    }
+}

@@ -1,0 +1,121 @@
+/* ----------------------------
+ *
+ * Template Main - screen-sm
+ *
+ * --------------------------- */
+@media (min-width: @screen-sm-min) and (max-width: @screen-sm-max) {
+    /* Push right */
+    .csstransforms3d.sidebar-open-ltr {
+        #main {
+            .translate3d(0, 0, 0);
+        }
+    }
+    .no-csstransforms3d.sidebar-open-ltr {
+        #main {
+            left: 0px;
+            right: auto;
+        }
+    }
+    /* Push left */
+    .csstransforms3d.sidebar-open-rtl {
+        #main {
+            .translate3d(-@sidebar-width, 0, 0);
+        }
+    }
+    .no-csstransforms3d.sidebar-open-rtl {
+        #main {
+            right: @sidebar-width;
+            left: auto;
+        }
+    }
+
+    #header.navbar.navbar-fixed-top {
+        ~ #main {
+            padding-top: @header-height-md;
+        }
+    }
+    #header.navbar {
+        ~ #main {
+            padding-top: 0px;
+        }
+    }
+    .sidebar.sidebar-left {
+        ~ #main {
+            padding-left: @sidebar-collapse-width;
+        }
+    }
+}
+
+/* ----------------------------
+ *
+ * Template Main - screen-md
+ *
+ * --------------------------- */
+@media (min-width: @screen-md-min) {
+    /* Push right */
+    .csstransforms3d.sidebar-open-ltr {
+        #main {
+            .translate3d(0, 0, 0);
+        }
+    }
+    .no-csstransforms3d.sidebar-open-ltr {
+        #main {
+            left: 0px;
+            right: auto;
+        }
+    }
+    /* Push left */
+    .csstransforms3d.sidebar-open-rtl {
+        #main {
+            .translate3d(-@sidebar-width, 0, 0);
+        }
+    }
+    .no-csstransforms3d.sidebar-open-rtl {
+        #main {
+            right: @sidebar-width;
+            left: auto;
+        }
+    }
+
+    #main {
+        padding-top: 0px;
+    }
+    .sidebar {
+        &.sidebar-menu {
+            + #main {
+                padding-left: @sidebar-width;
+            }
+        }
+    }
+    #header.navbar {
+        ~ #main {
+            padding-top: 0px;
+        }
+    }
+    #header.navbar{
+        &.navbar-fixed-top {
+            ~ #main {
+                padding-top: @header-height-md;
+            }
+        }
+    }
+
+    /* Sidebar minimized  */
+    .sidebar-minimized {
+        #header.navbar.navbar-fixed-top {
+            ~ #main {
+                padding-top: @header-height-md;
+            }
+        }
+        #header.navbar {
+            ~ #main {
+                padding-top: 0px;
+            }
+        }
+        .sidebar.sidebar-left {
+            ~ #main {
+                padding-left: @sidebar-collapse-width;
+            }
+        }
+    }
+}

@@ -1,0 +1,68 @@
+/* ----------------------------
+ *
+ * Template Main
+ *
+ * --------------------------- */
+#main {
+    position: relative;
+    .transition(transform 0.2s ease);
+}
+#header.navbar {
+    &.navbar-fixed-top {
+        ~ #main {
+            padding-top: @header-height + @header-height;
+        }
+    }
+}
+
+/* Push right */
+.csstransforms3d.sidebar-open-ltr {
+    #main {
+        .translate3d(@sidebar-width, 0, 0);
+    }
+}
+.no-csstransforms3d.sidebar-open-ltr {
+    #main {
+        left: @sidebar-width;
+        right: auto;
+    }
+}
+/* Push left */
+.csstransforms3d.sidebar-open-rtl {
+    #main {
+        .translate3d(-@sidebar-width, 0, 0);
+    }
+}
+.no-csstransforms3d.sidebar-open-rtl {
+    #main {
+        right: @sidebar-width;
+        left: auto;
+    }
+}
+
+/* Template Main Content */
+#main {
+    > .container-fluid,
+    > .container {
+        padding: 15px;
+    }
+}
+
+/* Datatable print */
+.DTTT_Print {
+    #main {
+        padding: 0px !important;
+    }
+}
+
+/* Template Section */
+section {
+    &.section {
+        padding-top: 35px;
+        padding-bottom: 35px;
+
+        .section-header {
+            margin-bottom: 35px;
+        }
+    }
+}

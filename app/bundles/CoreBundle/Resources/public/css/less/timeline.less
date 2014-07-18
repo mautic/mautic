@@ -1,0 +1,375 @@
+/* ----------------------------
+ *
+ * Timeline
+ *
+ * --------------------------- */
+.timeline {
+    overflow: hidden;
+    height: auto;
+    position: relative;
+    padding: 0px;
+    list-style-type: none;
+
+    // center line
+    // -----------------------------------
+    &:after {
+        position: absolute;
+        width: 2px;
+        left: 50%;
+        margin-left: -2px;
+        top: 0px;
+        bottom: 0px;
+        content: "";
+        background-color: darken(@maincontent-base-color, 5%);
+    }
+
+    // header
+    // -----------------------------------
+    .header {
+        position: relative;
+        z-index: 10;
+        clear: both;
+        margin-top: 0px;
+        margin-right: auto;
+        margin-bottom: 20px;
+        margin-left: auto;
+        background-color: @maincontent-base-color;
+
+        &.year {
+            background: darken(@maincontent-base-color, 5%);
+            font-size: 14px;
+            font-weight: 600;
+            max-width: 120px;
+            padding-top: 2px;
+            padding-bottom: 2px;
+            color: lighten(@dark, 40%);
+            border-radius: @border-radius;
+            text-align: center;
+        }
+    }
+
+    // Events
+    // -----------------------------------
+    .events {
+        padding-left: 0px;
+        overflow: auto;
+
+        // wrapper
+        // -----------------------------------
+        > .wrapper {
+            list-style: none;
+            width: 45%;
+            clear: both;
+
+            &.featured {
+                float: none !important;
+                clear: both !important;
+                margin-top: 80px !important;
+                margin-left: auto;
+                margin-right: auto;
+
+                // wrapper - panel
+                // -----------------------------------
+                > .panel {
+                    
+                    // panel - arrow
+                    // -----------------------------------
+                    &:after,
+                    &:before {
+                        display: none;
+                    }
+                }
+
+                // wrapper - figure
+                // -----------------------------------
+                > .figure {
+                    margin-top: -54px;
+                    width: 44px;
+                    height: 44px;
+                    line-height: 44px;
+                    margin-left: -24px;
+                    font-size: 16px;
+                }
+            }
+
+            &:nth-of-type(odd) {
+                float: left;
+                clear: left;
+
+                // wrapper - panel
+                // -----------------------------------
+                > .panel {
+                    z-index: 5;
+
+                    // panel - arrow
+                    // -----------------------------------
+                    &:after,
+                    &:before {
+                        content: "";
+                        position: absolute;
+                        width: 0px;
+                        height: 0px;
+                        border-style: solid;
+                    }
+                    &:after {
+                        right: -10px;
+                        top: 10px;
+                        border-width: 10px 0 10px 10px;
+                        border-color: transparent transparent transparent @white;
+                    }
+                    &:before {
+                        right: -11px;
+                        top: 10px;
+                        border-width: 10px 0 10px 10px;
+                        border-color: transparent transparent transparent @border-color;
+                    }
+
+                    // panel - arrow contextual
+                    // -----------------------------------
+                    &.panel-default {
+                        &:after {
+                            border-color: transparent transparent transparent lighten(@gray, 3%);
+                        }
+                        &:before {
+                            border-color: transparent transparent transparent @border-color;
+                        }
+                    }
+                    &.panel-primary {
+                        &:after {
+                            border-color: transparent transparent transparent @primary;
+                        }
+                        &:before {
+                            border-color: transparent transparent transparent darken(@primary, 3%);
+                        }
+                    }
+                    &.panel-success {
+                        &:after {
+                            border-color: transparent transparent transparent @success;
+                        }
+                        &:before {
+                            border-color: transparent transparent transparent darken(@success, 5%);
+                        }
+                    }
+                    &.panel-info {
+                        &:after {
+                            border-color: transparent transparent transparent @info;
+                        }
+                        &:before {
+                            border-color: transparent transparent transparent darken(@info, 6%);
+                        }
+                    }
+                    &.panel-warning {
+                        &:after {
+                            border-color: transparent transparent transparent @warning;
+                        }
+                        &:before {
+                            border-color: transparent transparent transparent darken(@warning, 6%);
+                        }
+                    }
+                    &.panel-danger {
+                        &:after {
+                            border-color: transparent transparent transparent @danger;
+                        }
+                        &:before {
+                            border-color: transparent transparent transparent darken(@danger, 6%);
+                        }
+                    }
+                    &.panel-inverse {
+                        &:after {
+                            border-color: transparent transparent transparent @inverse;
+                        }
+                        &:before {
+                            border-color: transparent transparent transparent darken(@inverse, 6%);
+                        }
+                    }
+                    &.panel-teal {
+                        &:after {
+                            border-color: transparent transparent transparent @teal;
+                        }
+                        &:before {
+                            border-color: transparent transparent transparent darken(@teal, 5%);
+                        }
+                    }
+                }
+            }
+
+            &:nth-of-type(even) {
+                float: right;
+                clear: right;
+                margin-top: 44px;
+
+                // wrapper - panel
+                // -----------------------------------
+                > .panel {
+                    z-index: 5;
+
+                    // panel - arrow
+                    // -----------------------------------
+                    &:after,
+                    &:before {
+                        content: "";
+                        position: absolute;
+                        width: 0px;
+                        height: 0px;
+                        border-style: solid;
+                    }
+                    &:after {
+                        left: -10px;
+                        top: 10px;
+                        border-width: 10px 10px 10px 0;
+                        border-color: transparent @white transparent transparent;
+                    }
+                    &:before {
+                        left: -11px;
+                        top: 10px;
+                        border-width: 10px 10px 10px 0;
+                        border-color: transparent @border-color transparent transparent;
+                    }
+
+                    // panel - arrow contextual
+                    // -----------------------------------
+                    &.panel-default {
+                        &:after {
+                            border-color: transparent lighten(@gray, 3%) transparent transparent;
+                        }
+                        &:before {
+                            border-color: transparent @border-color transparent transparent;
+                        }
+                    }
+                    &.panel-primary {
+                        &:after {
+                            border-color: transparent @primary transparent transparent;
+                        }
+                        &:before {
+                            border-color: transparent darken(@primary, 3%) transparent transparent;
+                        }
+                    }
+                    &.panel-success {
+                        &:after {
+                            border-color: transparent @success transparent transparent;
+                        }
+                        &:before {
+                            border-color: transparent darken(@success, 5%) transparent transparent;
+                        }
+                    }
+                    &.panel-info {
+                        &:after {
+                            border-color: transparent @info transparent transparent;
+                        }
+                        &:before {
+                            border-color: transparent darken(@info, 6%) transparent transparent;
+                        }
+                    }
+                    &.panel-warning {
+                        &:after {
+                            border-color: transparent @warning transparent transparent;
+                        }
+                        &:before {
+                            border-color: transparent darken(@warning, 6%) transparent transparent;
+                        }
+                    }
+                    &.panel-danger {
+                        &:after {
+                            border-color: transparent @danger transparent transparent;
+                        }
+                        &:before {
+                            border-color: transparent darken(@danger, 6%) transparent transparent;
+                        }
+                    }
+                    &.panel-inverse {
+                        &:after {
+                            border-color: transparent @inverse transparent transparent;
+                        }
+                        &:before {
+                            border-color: transparent darken(@inverse, 6%) transparent transparent;
+                        }
+                    }
+                    &.panel-teal {
+                        &:after {
+                            border-color: transparent @teal transparent transparent;
+                        }
+                        &:before {
+                            border-color: transparent darken(@teal, 5%) transparent transparent;
+                        }
+                    }
+                }
+            }
+
+            // wrapper - figure
+            // -----------------------------------
+            > .figure {
+                position: absolute;
+                z-index: 5;
+                left: 50%;
+                margin-top: 5px;
+                margin-left: -18px;
+                width: 34px;
+                height: 34px;
+                line-height: 34px;
+                text-align: center;
+                border-radius: 50%;
+                color: darken(@maincontent-base-color, 20%);
+                background-color: @maincontent-base-color;
+
+                -webkit-box-shadow: 0px 0px 0px 3px @maincontent-base-color;
+                box-shadow: 0px 0px 0px 3px @maincontent-base-color;
+
+                > img {
+                    width: 100%;
+                }
+            }
+        }
+    }
+}
+
+/* ----------------------------
+ *
+ * Timeline - screenxs
+ *
+ * --------------------------- */
+@media (max-width: @screen-xs-max) {
+    .timeline {
+
+        // center line
+        // -----------------------------------
+        &:after {
+            
+        }
+
+        // Events
+        // -----------------------------------
+        .events {
+            padding-left: 0px;
+
+            // wrapper
+            // -----------------------------------
+            > .wrapper {
+                width: auto;
+
+                &:nth-of-type(odd),
+                &:nth-of-type(even) {
+                    float: none;
+                    clear: both;
+                    margin-top: 48px;
+
+                    // wrapper - panel
+                    // -----------------------------------
+                    > .panel {
+                        // panel - arrow
+                        // -----------------------------------
+                        &:after,
+                        &:before {
+                            display: none;
+                        }
+                    }
+                }
+
+                // wrapper - figure
+                // -----------------------------------
+                > .figure {
+                    margin-top: -41px;
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,90 @@
+/* ----------------------------
+ *
+ * List Group
+ *
+ * --------------------------- */
+.list-group-header {
+    font-weight: 600;
+    padding: 10px 15px;
+    color: lighten(@dark, 20%);
+    font-size: 14px;
+}
+.list-group-item {
+    border: 1px solid @border-color;
+}
+a.list-group-item.active, 
+a.list-group-item.active:hover, 
+a.list-group-item.active:focus {
+    background-color: @primary;
+    border-color: darken(@primary, 3%);
+}
+a.list-group-item:hover, 
+a.list-group-item:focus {
+    background-color: darken(@white, 3%);
+    color: lighten(@dark, 20%);
+}
+
+/* list table */
+.list-table {
+    display: table;
+    table-layout: fixed;
+    width: 100%;
+    margin: 0px;
+    padding: 0px;
+
+    > li {
+        display: table-cell;
+        table-layout: fixed;
+        vertical-align: middle;
+        width: auto;
+        padding: 0px 5px;
+
+        &:first-child {
+            padding-left: 0px;
+        }
+
+        &:last-child {
+            padding-right: 0px;
+        }
+    }
+}
+
+/* list tabs */
+.list-group-tabs {
+    > .list-group-item {
+        padding: 0px;
+
+        &:first-child {
+            > a {
+                border-top-right-radius: 4px;
+                border-top-left-radius: 4px;
+            }
+        }
+
+        &:last-child {
+            > a {
+                border-bottom-right-radius: 4px;
+                border-bottom-left-radius: 4px;
+            }
+        }
+
+        > a {
+            display: block;
+            padding: 10px 15px;
+            color: lighten(@dark, 30%);
+
+            &:hover,
+            &:focus {
+                background-color: darken(@white, 3%);
+                color: lighten(@dark, 20%);
+            }
+        }
+
+        &.active {
+            > a {
+                background-color: darken(@white, 3%);
+                color: lighten(@dark, 15%);
+            }
+        }
+    }
+}

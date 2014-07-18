@@ -1,0 +1,288 @@
+/* ----------------------------
+ *
+ * Media list
+ *
+ * --------------------------- */
+.media-list > .media {
+    position: relative;
+    padding: 8px 15px;
+}
+.media-list > .media + .media {
+    margin-top: 0px;
+}
+.media-list > a.media { 
+    display: block; 
+}
+.media-list > a.media:active { 
+    background-color: @gray; 
+}
+.media-list > a.media:hover,
+.media-list > a.media:focus {
+    background-color: fade(@gray, 15%); 
+    outline: 0;
+}
+.media-list > .media:after {
+    content: "";
+    position: absolute;
+    bottom: 0px;
+    left: 75px;
+    right: 0px;
+    height: 1px;
+    border-bottom: 1px solid lighten(@border-color, 5%);
+}
+.media-list > .media:last-child:after {
+    border-bottom-width: 0px;
+}
+/* border variation */
+.media-list > .media.border-dotted:after {
+    border-bottom-style: dotted;
+}
+.media-list > .media.no-border:after {
+    border-bottom-width: 0px;
+}
+
+/*
+ * Media body
+ */
+/* media heading */
+.media-list > .media > .media-body > .media-heading {
+    display: block;
+    font-weight: 600;
+    color: @accent-base-color;
+    margin-bottom: 0px;
+}
+/* media text */
+.media-list > .media > .media-body > .media-text {
+    display: block;
+    color: @dark;
+    margin: 0px;
+}
+/* media meta */
+.media-list > .media > .media-body .media-meta {
+    font-size: 11px;
+    margin: 0px;
+}
+.media-list > .media > .media-body span.media-meta,
+.media-list > .media > .media-body p.media-meta,
+.media-list > .media > .media-body small.media-meta {
+    color: lighten(@dark, 20%);
+}
+.media-list > .media > .media-body span.media-meta + span.media-meta {
+    margin-left: 3px;
+}
+/* Media status - read */
+.media-list > .media.read > .media-body > .media-heading,
+.media-list > .media.read > .media-body > .media-text,
+.media-list > .media.read > .media-body span.media-meta,
+.media-list > .media.read > .media-body p.media-meta,
+.media-list > .media.read > .media-body small.media-meta {
+    color: lighten(@dark, 40%);
+}
+
+/*
+ * Media object
+ */
+.media-list > .media .media-object {
+    width: 50px;
+    height: 50px;
+    text-align: center;
+}
+/* image */
+.media-list > .media .media-object > img {
+    max-width: 100%;
+}
+/* icon */
+.media-list > .media .media-object > [class*=" ico-"],
+.media-list > .media .media-object > [class^="ico-"] {
+    display: block;
+    width: 34px;
+    height: 34px;
+    margin: 0px auto;
+    line-height: 33px;
+    text-align: center;
+    background-color: @maincontent-base-color;
+    color: darken(@maincontent-base-color, 20%);
+    border-radius: 50%;
+}
+
+/* 
+ * Media list feed
+----------------------------------------------------------------------------- */
+/*
+ * Media
+ */
+.media-list-feed > .media {
+    z-index: 1;
+    overflow: visible;
+}
+.media-list-feed > .media + .media {
+    margin-top: 10px;
+}
+.media-list-feed > .media:after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    bottom: -50%;
+    top: -50%;
+    left: 32px;
+    right: auto;
+    width: 1px;
+    height: auto;
+    border-bottom-width: 0px;
+    background-color: darken(@maincontent-base-color, 5%);
+}
+.media-list-feed > .media:first-child:after {
+    top: 20%;
+}
+.media-list-feed > .media:last-child:after {
+    background-color: transparent;
+    bottom: 0;
+}
+/*
+ * Media body
+ */
+/* media heading */
+.media-list-feed > .media > .media-body > .media-heading {
+    margin-top: 7px;
+    margin-bottom: 5px;
+}
+/* media text */
+.media-list-feed > .media > .media-body > .media-text {
+    margin-bottom: 5px;
+}
+/*
+ * Media object
+ */
+.media-list-feed > .media .media-object {
+    width: 34px;
+    height: 34px;
+}
+
+
+/* 
+ * Media list contact
+----------------------------------------------------------------------------- */
+/*
+ * Media
+ */
+.media-list-contact > a.media:active,
+.media-list-contact > a.media:hover,
+.media-list-contact > a.media:focus {
+    background-color: transparent;
+}
+.media-list-contact > .media:after {
+    left: 65px;
+}
+/*
+ * Media object
+ */
+.media-list-contact > .media .media-object {
+    width: 40px;
+    height: 40px;
+}
+
+/* 
+ * Media list bubble
+----------------------------------------------------------------------------- */
+/*
+ * Media
+ */
+.media-list-bubble > .media {
+    padding: 15px;
+}
+.media-list-bubble > a.media:active,
+.media-list-bubble > a.media:hover,
+.media-list-bubble > a.media:focus {
+    background-color: transparent;
+}
+.media-list-bubble > .media:after {
+    display: none;
+}
+
+/*
+ * Media object
+ */
+.media-list-bubble > .media .media-object {
+    position: relative;
+    float: left;
+    margin-right: 15px; 
+}
+.media-list-bubble > .media-right .media-object {
+    float: right;
+    margin-left: 15px;
+    margin-right: 0px;
+}
+/* arrow left */
+.media-list-bubble > .media .media-object:after {
+    content: "";
+    position: absolute;
+    top: 7px;
+    right: -18px;
+
+    width: 0px;
+    height: 0px;
+    border-style: solid;
+    border-width: 10px 10px 10px 0;
+    border-color: transparent lighten(@gray, 2%) transparent transparent;
+}
+/* arrow right */
+.media-list-bubble > .media-right .media-object:after {
+    left: -18px;
+    right: auto;
+    border-width: 10px 0 10px 10px;
+    border-color: transparent transparent transparent @primary;
+}
+
+/*
+ * Media body
+ */
+.media-list-bubble > .media-right > .media-body {
+    text-align: right;
+}
+/* media text */
+.media-list-bubble > .media > .media-body .media-text {
+    display: inline-block;
+    padding: 8px;
+    background-color: lighten(@gray, 2%);
+    border-radius: @border-radius * 2;
+    /*float: left;
+    clear: both;*/
+}
+.media-list-bubble > .media-right > .media-body .media-text {
+    /*float: right;*/
+    color: darken(@white, 5%);
+    background-color: @primary;
+}
+.media-list-bubble > .media > .media-body .media-text ~ .media-text {
+    margin-top: 5px;
+}
+/* media meta */
+.media-list-bubble > .media > .media-body span.media-meta,
+.media-list-bubble > .media > .media-body p.media-meta,
+.media-list-bubble > .media > .media-body small.media-meta {
+    color: darken(@gray, 20%);
+    padding: 0px 3px;
+    margin-top: 5px;
+}
+
+/* 
+ * Media list comment
+----------------------------------------------------------------------------- */
+.media-list-comment {
+
+    .media {
+        padding: 0px;
+
+        + .media {
+            margin-top: 25px;
+        }
+
+        .media {
+            margin-top: 25px;
+
+            + .media {
+                margin-top: 25px;
+            }
+        }
+    }
+}

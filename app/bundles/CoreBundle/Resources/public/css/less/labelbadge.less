@@ -1,0 +1,72 @@
+/* ----------------------------
+ *
+ * Label & Badge & Icons
+ *
+ * --------------------------- */
+.badge, .label {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    display: inline-block;
+    font-size: 11px;
+    font-weight: bold;
+    line-height: 1.7;
+    height: 18px;
+    min-width: 18px;
+    padding: 0px 5px;
+}
+.badge:empty, 
+.label:empty {
+    display: none;
+}
+
+/* Hasnotification */
+.hasnotification {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    text-indent: -999999px;
+    border-radius: 50%;
+    background-color: @gray;
+}
+
+/* Color */
+.label-default,
+.badge-default {
+    background-color: @default;
+    color: darken(@default, 30%);
+}
+.label-primary,
+.badge-primary,
+.hasnotification-primary { 
+    background-color: @primary; 
+}
+.label-success,
+.badge-success,
+.hasnotification-success { 
+    background-color: @success; 
+}
+.label-info,
+.badge-info,
+.hasnotification-info { 
+    background-color: @info; 
+}
+.label-warning,
+.badge-warning,
+.hasnotification-warning { 
+    background-color: @warning; 
+}
+.label-danger,
+.badge-danger,
+.hasnotification-danger { 
+    background-color: @danger; 
+}
+.label-teal,
+.badge-teal,
+.hasnotification-teal { 
+    background-color: @teal; 
+}
+.label-inverse,
+.badge-inverse,
+.hasnotification-inverse {
+    background-color: @inverse;
+    color: @white;
+}

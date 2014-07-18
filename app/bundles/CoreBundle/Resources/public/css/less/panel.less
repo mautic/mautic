@@ -1,0 +1,712 @@
+/* ----------------------------
+ *
+ * Panel
+ *
+ * --------------------------- */
+.panel {
+    /* max-width: 100%;  required by text ellipsis */
+    position: relative;
+    border-width: 1px;
+    border-color: @border-color;
+    border-bottom-width: 2px;
+    border-bottom-color: darken(@border-color, 5%);
+    border-radius: @border-radius;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+
+    &.no-border {
+        border-width: 0px;
+    }
+
+    hr {
+        border-color: lighten(@border-color, 5%);
+    }
+}
+.panel > .panel-collapse.pull {
+    display: none;
+}
+.panel > .panel-collapse.pull.out {
+    position: relative;
+    display: block;
+}
+.panel > .panel-collapse.pulling {
+    position: relative;
+    overflow: hidden;
+}
+
+/* panel widget
+ -------------------------------*/
+.widget {
+    margin-bottom: 20px;
+}
+.widget .panel,
+.widget.panel {
+    border-bottom-width: 1px;
+    border-bottom-color: @border-color;
+    overflow: hidden;
+}
+
+/* panel ribbon
+ *   - contextual
+ -------------------------------*/
+.panel > .panel-ribbon {
+    position: absolute;
+    z-index: 10;
+    overflow: hidden;
+    top: -1px;
+    left: -1px;
+    width: 40px;
+    height: 40px;
+    border-top-left-radius: @border-radius;
+    color: darken(@gray, 40%);
+    text-decoration: none;
+}
+.panel > .panel-ribbon.pull-right {
+    left: auto;
+    right: -1px;
+    border-top-right-radius: @border-radius;
+    text-align: right;
+}
+.panel > .panel-ribbon > [class*=" ico-"],
+.panel > .panel-ribbon > [class^="ico-"] {
+    display: inline-block;
+    position: relative;
+    width: 13px;
+    line-height: 13px;
+    margin-top: 6px;
+    margin-left: 6px;
+    text-align: center;
+    z-index: 1;
+}
+.panel > .panel-ribbon.pull-right > [class*=" ico-"],
+.panel > .panel-ribbon.pull-right > [class^="ico-"] {
+    margin-right: 6px;
+    margin-left: 0px;
+}
+.panel > .panel-ribbon.pull-right:after {
+    border-width: 0 40px 40px 0;
+    border-color: transparent @gray transparent transparent;
+}
+.panel > .panel-ribbon:after {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    content: "";
+    width: 0px;
+    height: 0px;
+    border-style: solid;
+    border-width: 40px 40px 0 0;
+    border-color: @gray transparent transparent transparent;
+}
+/*
+ * contextual
+ */
+/* primary */
+.panel > .panel-ribbon-primary { color: darken(@primary, 15%); }
+.panel > .panel-ribbon-primary:after { border-color: @primary transparent transparent transparent; }
+.panel > .panel-ribbon-primary.pull-right:after { border-color: transparent @primary transparent transparent; }
+/* success */
+.panel > .panel-ribbon-success { color: darken(@success, 15%); }
+.panel > .panel-ribbon-success:after { border-color: @success transparent transparent transparent; }
+.panel > .panel-ribbon-success.pull-right:after { border-color: transparent @success transparent transparent; }
+/* warning */
+.panel > .panel-ribbon-warning { color: darken(@warning, 15%); }
+.panel > .panel-ribbon-warning:after { border-color: @warning transparent transparent transparent; }
+.panel > .panel-ribbon-warning.pull-right:after { border-color: transparent @warning transparent transparent; }
+/* info */
+.panel > .panel-ribbon-info { color: darken(@info, 15%); }
+.panel > .panel-ribbon-info:after { border-color: @info transparent transparent transparent; }
+.panel > .panel-ribbon-info.pull-right:after { border-color: transparent @info transparent transparent; }
+/* danger */
+.panel > .panel-ribbon-danger { color: darken(@danger, 15%); }
+.panel > .panel-ribbon-danger:after { border-color: @danger transparent transparent transparent; }
+.panel > .panel-ribbon-danger.pull-right:after { border-color: transparent @danger transparent transparent; }
+/* inverse */
+.panel > .panel-ribbon-inverse { color: darken(@inverse, 15%); }
+.panel > .panel-ribbon-inverse:after { border-color: @inverse transparent transparent transparent; }
+.panel > .panel-ribbon-inverse.pull-right:after { border-color: transparent @inverse transparent transparent; }
+/* teal */
+.panel > .panel-ribbon-teal { color: darken(@teal, 15%); }
+.panel > .panel-ribbon-teal:after { border-color: @teal transparent transparent transparent; }
+.panel > .panel-ribbon-teal.pull-right:after { border-color: transparent @teal transparent transparent; }
+
+/* panel heading  
+ *   - panel icon
+ *   - contextual
+ *   - reset
+ -------------------------------*/
+.panel-heading {
+    padding: 0px 15px;
+    border-top-right-radius: @border-radius;
+    border-top-left-radius: @border-radius;
+
+    /* experiment */
+    margin-left: -1px;
+    margin-right: -1px;
+    margin-top: -1px;
+    border: 1px solid transparent;
+}
+.panel-heading > .panel-title,
+.panel-heading > .panel-toolbar {
+    display: table-cell;
+    vertical-align: middle;
+    width: 1%;
+    height: 40px;
+    float: none !important;
+}
+.panel-heading > .panel-title.ellipsis,
+.panel-heading > .panel-toolbar.ellipsis {
+    max-width: 10px;
+}
+.panel-heading > .panel-title, {
+    font-size: 14px;
+    font-weight: 600;
+}
+.panel-heading > .panel-title > .icon { 
+    margin-right: 5px; 
+}
+.panel-heading > .panel-title > a,
+.panel-heading > .panel-title > a:hover,
+.panel-heading > .panel-title > a:active,
+.panel-heading > .panel-title > a:focus {
+    text-decoration: none;
+    outline: 0;
+}
+.panel-heading > .panel .panel-heading + .panel-body {
+    border-bottom-right-radius: 0px;
+    border-bottom-left-radius: 0px;
+}
+
+/* Panel Toolbar
+ *   static text
+ *   button link
+ *   option
+ *   input field
+ *   tabs
+ -------------------------------*/
+.panel-toolbar-wrapper {
+    display: block;
+    background-color: lighten(@gray, 5%);
+    border-bottom: 1px solid @border-color;
+    padding: 0px 15px;
+}
+.panel-toolbar-wrapper.bottom {
+    border-bottom-width: 0px;
+    border-top: 1px solid @border-color;
+}
+.panel-toolbar-wrapper > .panel-toolbar {
+    display: table-cell;
+    vertical-align: middle;
+    width: 1%;
+    height: 40px;
+    float: none !important;
+}
+.panel-toolbar-wrapper > .panel-toolbar.ellipsis {
+    max-width: 10px;
+}
+.panel .panel-footer > .panel-toolbar-wrapper {
+    background-color: transparent;
+    padding: 0px;
+    border-width: 0px;
+}
+/* 
+ * static text
+ */
+.panel .panel-toolbar .static-text {
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 34px;
+    color: lighten(@dark, 20%);
+}
+/* 
+ * btn-link 
+ */
+.panel .panel-toolbar .btn-link {
+    color: lighten(@gray, 2%);
+    text-decoration: none;
+}
+.panel .panel-toolbar .btn-link:hover,
+.panel .panel-toolbar .btn-link:focus,
+.panel .panel-toolbar .btn-link:active {
+    color: @white;
+    outline: 0;
+    box-shadow: none;
+    -webkit-box-shadow: none;
+}
+.panel.panel-default .panel-toolbar .btn-link { 
+    color: @primary; 
+}
+.panel.panel-default .panel-toolbar .btn-link:hover,
+.panel.panel-default .panel-toolbar .btn-link:active,
+.panel.panel-default .panel-toolbar .btn-link:focus { 
+    color: darken(@primary, 5%); 
+}
+/* 
+ * option
+ */
+.panel .panel-toolbar > .option {
+    display: inline-block;
+    float: right;
+    min-height: 34px;
+}
+.panel .panel-toolbar > .option > .btn {
+    float: left;
+    background-color: transparent;
+    color: lighten(@gray, 2%);
+    padding-left: 6px;
+    padding-right: 6px;
+}
+.panel.panel-default .panel-toolbar > .option > .btn { 
+    color: lighten(@dark, 20%); 
+}
+.panel .panel-toolbar > .option > .btn:hover,
+.panel .panel-toolbar > .option > .btn:active,
+.panel .panel-toolbar > .option > .btn:focus {
+    color: @white;
+    outline: 0;
+    box-shadow: none;
+    -webkit-box-shadow: none;
+}
+.panel.panel-default .panel-toolbar > .option > .btn:hover,
+.panel.panel-default .panel-toolbar > .option > .btn:active,
+.panel.panel-default .panel-toolbar > .option > .btn:focus {
+    color: lighten(@dark, 10%);
+}
+/* icon */
+.panel .panel-toolbar > .option > .btn .arrow,
+.panel .panel-toolbar > .option > .btn .reload,
+.panel .panel-toolbar > .option > .btn .remove {
+    display: block;
+    font-family: 'iconfont';
+    font-size: 12px;
+    width: 12px;
+    text-align: center;
+    font-style: normal;
+}
+.panel .panel-toolbar > .option > .btn.up > .arrow:before { 
+    content: "\e670"; 
+}
+.panel .panel-toolbar > .option > .btn > .arrow:before { 
+    content: "\e671"; 
+}
+.panel .panel-toolbar > .option > .btn > .reload:before { 
+    content: "\e61d";
+    font-size: 13px; 
+}
+.panel .panel-toolbar > .option > .btn > .remove:before { 
+    content: "\e36c"; 
+}
+/*
+ * input field
+ */
+.panel .panel-toolbar > .form-horizontal .form-group {
+    margin: 0px;
+}
+.panel .panel-toolbar > .form-horizontal .has-feedback .form-control-feedback {
+    right: 0px;
+}
+/*
+ * tabs
+ */
+.panel .panel-toolbar > .nav-tabs {
+    border-bottom: 0px;
+    margin-bottom: -4px;
+    background-color: transparent;
+}
+.panel .panel-toolbar > .nav-tabs > li > a {
+    padding: 8px 15px;
+    line-height: 20px;
+    border: 1px solid transparent;
+    border-radius: @border-radius @border-radius 0px 0px;
+    color: lighten(@gray, 2%);
+}
+.panel .panel-toolbar > .nav-tabs > li.active > a,
+.panel .panel-toolbar > .nav-tabs > li.active > a:hover,
+.panel .panel-toolbar > .nav-tabs > li.active > a:active,
+.panel .panel-toolbar > .nav-tabs > li.active > a:focus {
+    border-color: @border-color;
+    border-bottom-color: transparent;
+    background-color: @white;
+    color: @dark;
+}
+.panel .panel-toolbar > .nav-tabs > li.active > a:before {
+    display: none;
+}
+/* panel default reset */
+.panel-default .panel-toolbar > .nav-tabs > li > a:hover,
+.panel-default .panel-toolbar > .nav-tabs > li.open > a {
+    border-bottom-color: @border-color;
+    color: lighten(@dark, 20%);
+}
+.panel-default .panel-toolbar > .nav-tabs > li > a { 
+    color: lighten(@dark, 40%);
+}
+/* tab inside panel toolbar wrapper */
+.panel .panel-toolbar-wrapper > .panel-toolbar > .nav-tabs > li > a, {
+    color: lighten(@dark, 40%);
+}
+.panel .panel-toolbar-wrapper > .panel-toolbar > .nav-tabs > li > a:hover,
+.panel .panel-toolbar-wrapper > .panel-toolbar > .nav-tabs > li.open > a,
+.panel .panel-toolbar-wrapper > .panel-toolbar > .nav-tabs > li.active > a,
+.panel .panel-toolbar-wrapper > .panel-toolbar > .nav-tabs > li.active > a:hover,
+.panel .panel-toolbar-wrapper > .panel-toolbar > .nav-tabs > li.active > a:active,
+.panel .panel-toolbar-wrapper > .panel-toolbar > .nav-tabs > li.active > a:focus {
+    color: lighten(@dark, 20%);
+}
+
+/* panel body
+ *   - indicator
+ *   - scrollable
+ *   - info
+ *   - background
+ *   - iframe
+ *   - contextual
+ -------------------------------*/
+.panel-body { 
+    position: relative;
+}
+.panel-body:last-child { 
+    border-bottom: 0px; 
+}
+.panel-body.no-contextual { 
+    background-color: inherit !important;
+    color: inherit !important; 
+}
+.panel .panel-body + .table-responsive {
+    border-top: 1px solid @border-color;
+}
+.panel > .panel-body + .table, 
+.panel > .panel-body + .table-responsive {
+    border-color: @border-color;
+}
+/*
+ * indicator
+ */
+.panel-body > .indicator {
+    left: 0px;
+    right: 0px;
+    top: 0px;
+    bottom: 0px;
+}
+/*
+ * scrollable
+ */
+.panel .viewport:after {
+    pointer-events: none;
+    position: absolute;
+    content: "";
+    z-index: 10;
+    left: 0px;
+    right: 0px;
+    top: 0px;
+    height: 40px;
+
+    .background-image(linear-gradient(to bottom,  @white 0%, @white 15%, fade(@white, 0%) 100%));
+}
+.panel .viewport:before {
+    pointer-events: none;
+    position: absolute;
+    content: "";
+    z-index: 10;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    height: 40px;
+
+    .background-image(linear-gradient(to bottom,  fade(@white, 0%) 0%, @white 85%, @white 100%));
+}
+.touch .panel-body.slimscroll {
+    overflow-x: hidden;
+    overflow-y: scroll;
+    -ms-overflow-style: -ms-autohiding-scrollbar;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* panel footer  
+ -------------------------------*/
+.panel-footer {
+    overflow: auto;
+    background-color: lighten(@gray, 4%);
+    border-top: 1px solid @border-color;
+    border-bottom-right-radius: @border-radius;
+    border-bottom-left-radius: @border-radius;
+}
+.panel-body .panel-footer {
+    margin: 15px -15px -15px -15px;
+}
+.panel-footer + .panel-body {
+    border-top: 1px solid @border-color;
+}
+
+/* panel group 
+ *    - arrow
+ *    - plus
+ -------------------------------*/
+.panel-group .panel {
+    border-radius: @border-radius + 1;
+}
+.panel-group.panel-group-compact .panel,
+.panel-group.panel-group-compact .panel .panel-heading {
+    border-bottom: none;
+    border-radius: 0px;
+}
+.panel-group.panel-group-compact .panel:first-child,
+.panel-group.panel-group-compact .panel:first-child .panel-heading {
+    border-top-right-radius: @border-radius;
+    border-top-left-radius: @border-radius;
+}
+.panel-group.panel-group-compact .panel:last-child {
+    border-bottom: 1px solid @border-color;
+    border-bottom-right-radius: @border-radius;
+    border-bottom-left-radius: @border-radius;
+}
+.panel-group.panel-group-compact .panel + .panel { 
+    margin: 0px; 
+}
+.panel-group.panel-group-compact .panel-minimal:last-child {
+    border-bottom-width: 0px;
+}
+/* 
+ * arrow 
+ */
+.panel-group .panel-title > a > .arrow,
+.panel-group .panel-title > a > .plus {
+    text-align: left;
+    font-family: "iconfont";
+    font-weight: normal;
+    font-size: 12px;
+    line-height: 12px;
+    width: 12px;
+}
+.panel-group .panel-title > a > .arrow:before { 
+    content: "\e670"; 
+}
+.panel-group .panel-title > a.collapsed > .arrow:before { 
+    content: "\e671"; 
+}
+.panel-group .panel-title > a > .plus:before { 
+    content: "\e662"; 
+}
+.panel-group .panel-title > a.collapsed > .plus:before { 
+    content: "\e661"; 
+}
+
+/* Panel Header contextual
+ *   - default
+ *   - primary
+ *   - success
+ *   - info
+ *   - warning
+ *   - danger
+ *   - inverse
+ *   - teal
+ *   - reset
+ -------------------------------*/
+/* 
+ * default 
+ */
+.panel-default > .panel-heading {
+    color: @dark;
+    background-color: lighten(@gray, 1%);
+    border-color: @border-color;
+}
+/* 
+ * primary 
+ */
+.panel-primary > .panel-heading {
+    color: @white;
+    background-color: @primary;
+    border-color: darken(@primary, 3%);
+}
+.panel-primary > .panel-heading + .panel-collapse .panel-body { 
+    border-top-color: darken(@primary, 5%);
+}
+/* 
+ * success 
+ */
+.panel-success > .panel-heading {
+    color: @white;
+    background-color: @success;
+    border-color: darken(@success, 5%);
+}
+/* 
+ * info 
+ */
+.panel-info > .panel-heading { 
+    color: @white;
+    background-color: @info;
+    border-color: darken(@info, 6%);
+}
+/* 
+ * warning 
+ */
+.panel-warning > .panel-heading { 
+    color: @white;
+    background-color: @warning;
+    border-color: darken(@warning, 6%);
+}
+/*
+ * danger 
+ */
+.panel-danger > .panel-heading { 
+    color: @white;
+    background-color: @danger;
+    border-color: darken(@danger, 6%);
+}
+/* 
+ * inverse 
+ */
+.panel-inverse > .panel-heading { 
+    color: @white;
+    background-color: @inverse;
+    border-color: darken(@inverse, 6%);
+}
+/* 
+ * teal
+ */
+.panel-teal > .panel-heading { 
+    color: @white;
+    background-color: @teal;
+    border-color: darken(@teal, 5%);
+}
+
+/* Panel Minimal
+ -------------------------------*/
+.panel.panel-minimal {
+    border-width: 0px;
+    border-radius: 0px;
+    background-color: transparent;
+}
+.panel.panel-minimal > .panel-heading {
+    border-width: 0px;
+    background-color: transparent !important;
+}
+.panel.panel-minimal > .panel-toolbar-wrapper {
+    background-color: transparent;
+    border-color: transparent;
+}
+.panel.panel-minimal .panel-footer {
+    background-color: transparent;
+    border-width: 0px;
+}
+
+/* Panel No Border
+ -------------------------------*/
+.panel.panel-noborder {
+    border-width: 0px;
+}
+
+/* Panel Table layout
+ -------------------------------*/
+.table-layout > [class*=" col-"].panel,
+.table-layout > [class^="col-"].panel {
+    /*margin-bottom: 0px;
+    overflow: hidden;*/
+}
+.table-layout > [class*=" col-"].panel-minimal:first-child + [class*=" col-"].panel,
+.table-layout > [class^="col-"].panel-minimal:first-child + [class^="col-"].panel {
+    border-left-width: 1px;
+}
+.table-layout > [class*=" col-"].panel-minimal:first-child + [class*=" col-"].panel.panel-minimal,
+.table-layout > [class^="col-"].panel-minimal:first-child + [class^="col-"].panel.panel-minimal {
+    border-left-width: 0px;
+}
+.table-layout > [class*=" col-xs"].panel,
+.table-layout > [class^="col-xs"].panel {
+    border-radius: 0px;
+}
+.table-layout > [class*=" col-xs"].panel + [class*=" col-xs"].panel,
+.table-layout > [class^="col-xs"].panel + [class^="col-xs"].panel {
+    border-left-width: 0px;
+}
+.table-layout > [class*=" col-xs"].panel:first-child,
+.table-layout > [class^="col-xs"].panel:first-child {
+    border-top-left-radius: @border-radius;
+    border-bottom-left-radius: @border-radius;
+}
+.table-layout > [class*=" col-xs"].panel:last-child,
+.table-layout > [class^="col-xs"].panel:last-child {
+    border-top-right-radius: @border-radius;
+    border-bottom-right-radius: @border-radius;
+}
+@media (min-width: @screen-sm-min) {
+    .table-layout > [class*=" col-sm"].panel,
+    .table-layout > [class^="col-sm"].panel {
+        border-radius: 0px;
+    }
+    .table-layout > [class*=" col-sm"].panel + [class*=" col-sm"].panel,
+    .table-layout > [class^="col-sm"].panel + [class^="col-sm"].panel {
+        border-left-width: 0px;
+    }
+    .table-layout > [class*=" col-sm"].panel:first-child,
+    .table-layout > [class^="col-sm"].panel:first-child {
+        border-top-left-radius: @border-radius;
+        border-bottom-left-radius: @border-radius;
+    }
+    .table-layout > [class*=" col-sm"].panel:last-child,
+    .table-layout > [class^="col-sm"].panel:last-child {
+        border-top-right-radius: @border-radius;
+        border-bottom-right-radius: @border-radius;
+    }
+}
+@media (min-width: @screen-md-min) {
+    .table-layout > [class*=" col-md"].panel,
+    .table-layout > [class^="col-md"].panel {
+        border-radius: 0px;
+    }
+    .table-layout > [class*=" col-md"].panel + [class*=" col-md"].panel,
+    .table-layout > [class^="col-md"].panel + [class^="col-md"].panel {
+        border-left-width: 0px;
+    }
+    .table-layout > [class*=" col-md"].panel:first-child,
+    .table-layout > [class^="col-md"].panel:first-child {
+        border-top-left-radius: @border-radius;
+        border-bottom-left-radius: @border-radius;
+    }
+    .table-layout > [class*=" col-md"].panel:last-child,
+    .table-layout > [class^="col-md"].panel:last-child {
+        border-top-right-radius: @border-radius;
+        border-bottom-right-radius: @border-radius;
+    }
+}
+@media (min-width: @screen-lg-min) {
+    .table-layout > [class*=" col-lg"].panel,
+    .table-layout > [class^="col-lg"].panel {
+        border-radius: 0px;
+    }
+    .table-layout > [class*=" col-lg"].panel + [class*=" col-lg"].panel,
+    .table-layout > [class^="col-lg"].panel + [class^="col-lg"].panel {
+        border-left-width: 0px;
+    }
+    .table-layout > [class*=" col-lg"].panel:first-child,
+    .table-layout > [class^="col-lg"].panel:first-child {
+        border-top-left-radius: @border-radius;
+        border-bottom-left-radius: @border-radius;
+    }
+    .table-layout > [class*=" col-lg"].panel:last-child,
+    .table-layout > [class^="col-lg"].panel:last-child {
+        border-top-right-radius: @border-radius;
+        border-bottom-right-radius: @border-radius;
+    }
+}
+
+/* Panel Thumbnail
+ -------------------------------*/
+.panel > .thumbnail,
+.panel .panel-figure > .thumbnail {
+    border-radius: 0px;
+    border-width: 0px;
+    margin: 0px;
+}
+.panel > .thumbnail > .media > .overlay,
+.panel > .thumbnail > .media > img,
+.panel .panel-figure > .thumbnail > .media > .overlay,
+.panel .panel-figure > .thumbnail > .media > img {
+    border-radius: 0px;
+}
+.panel > .thumbnail > .caption,
+.panel > .thumbnail > .meta,
+.panel .panel-figure > .thumbnaill > .caption,
+.panel .panel-figure > .thumbnaill > .meta {
+    padding: 9px 15px;
+}

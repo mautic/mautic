@@ -1,0 +1,123 @@
+/* ----------------------------
+ *
+ * Nav
+ *
+ * --------------------------- */
+.nav > li h1,
+.nav > li h2,
+.nav > li h3,
+.nav > li h4,
+.nav > li h5,
+.nav > li h6 {
+    margin: 0px;
+}
+.nav > li > a:hover, 
+.nav > li > a:focus,
+.nav .open > a, 
+.nav .open > a:hover, 
+.nav .open > a:focus {
+    background-color: transparent;
+    border-color: transparent;
+}
+
+/* Pills */
+.nav-pills > li > a {
+    border-radius: @border-radius;
+}
+.nav-pills > li.active > a, 
+.nav-pills > li.active > a:hover, 
+.nav-pills > li.active > a:focus {
+    background-color: @primary;
+}
+.nav-pills > li > a:hover, 
+.nav-pills > li > a:focus {
+    background-color: @gray;
+}
+
+/* Tabs */
+.nav-tabs {
+    border-top-left-radius: @border-radius;
+    border-top-right-radius: @border-radius;
+    background-color: darken(@maincontent-base-color, 5%);
+}
+.nav-tabs > li > a {
+    color: lighten(@dark, 40%);
+    border-top-left-radius: @border-radius;
+    border-top-right-radius: @border-radius;
+}
+.nav-tabs > li > a:hover,
+.nav-tabs > li.open > a {
+    color: lighten(@dark, 20%);
+}
+.nav-tabs > li.active > a, 
+.nav-tabs > li.active > a:hover, 
+.nav-tabs > li.active > a:focus {
+    border: 1px solid @border-color;
+    border-bottom-color: transparent;
+    color: lighten(@dark, 10%);
+}
+
+/* tab content */
+.tab-content {
+    &.panel {
+        border-top-width: 0px;
+        border-top-left-radius: 0px;
+        border-top-right-radius: 0px;
+
+        .tab-pane {
+            padding: 15px;
+        }
+    }
+}
+
+/* Justified */
+.nav-justified > li {
+    display: table-cell;
+    width: 1%;
+}
+.nav-tabs.nav-justified > li > a {
+    margin-bottom: 0px;
+    border-top-left-radius: @border-radius + 1;
+    border-top-right-radius: @border-radius + 1;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+    border-bottom-color: @border-color;
+}
+.nav-tabs.nav-justified > li.active > a,
+.nav-tabs.nav-justified > li.active > a:hover {
+    border-bottom-color: transparent;
+}
+
+/* Section */
+.nav-section.nav-justified > li {
+    display: table-cell;
+    width: 1%;
+}
+.nav-section > li {
+    position: relative;
+}
+.nav-section > li > a,
+.nav-section > li > .section {
+    position: relative;
+    padding: 5px 10px;
+    margin: 0px;
+    text-align: center;
+}
+/* border */
+.nav-section > li > a:after,
+.nav-section > li > .section:after {
+    position: absolute;
+    z-index: 1;
+    content: "";
+    width: 1px;
+    right: 0px;
+    top: 0px;
+    bottom: 0px;
+
+    .background-image(linear-gradient(to bottom,  fade(darken(@maincontent-base-color, 7%), 20%) 0%,darken(@maincontent-base-color, 7%) 50%,fade(darken(@maincontent-base-color, 7%), 20%) 100%));
+}
+.nav-section > li:last-child > a:after,
+.nav-section > li:last-child > .section:after {
+    background: none;
+    filter: none;
+}

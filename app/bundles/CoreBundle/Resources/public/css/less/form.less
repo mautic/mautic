@@ -1,0 +1,573 @@
+/* ----------------------------
+ *
+ * Forms
+ *
+ * --------------------------- */
+.form-control {
+    font-size: 13px;
+    border: 1px solid @border-color;
+    line-height: normal;
+    -moz-box-shadow: none;
+    box-shadow: none;
+
+    &.form-control-minimal {
+        border-width: 0px;
+        border-radius: 0px;
+        background-color: transparent;
+    }
+
+    &:focus {
+        -moz-box-shadow: none;
+        box-shadow: none;
+        border-color: @primary;
+    }
+}
+.input-group {
+    width: 100%;
+}
+
+/* Input with icon */
+.has-icon {
+    position: relative;
+    float: none !important;
+
+    > .form-control {
+        padding-right: 34px;
+    }
+
+    &.pull-left {
+        > .form-control {
+            padding-left: 34px;
+            padding-right: 0px;
+        }
+
+        > .form-control-icon {
+            right: auto;
+            left: 0px;
+        }
+    }
+
+    > .form-control-icon {
+        position: absolute;
+        z-index: 5;
+        top: 0px;
+        right: 0px;
+        width: 34px;
+        line-height: 34px - 1;
+        text-align: center;
+        color: lighten(@dark, 20%);
+    }
+
+    > .form-control.input-lg + .form-control-icon {
+        line-height: 46px - 1;
+    }
+}
+
+/* Form Feedback */
+.has-feedback {
+    .form-control-feedback {
+        color: lighten(@dark, 20%);
+    }
+}
+.form-horizontal .has-feedback > .form-control-feedback {
+    right: 0px;
+}
+.has-success .form-control-feedback { color: darken(@success, 26%); }
+.has-warning .form-control-feedback { color: darken(@warning, 30%); }
+.has-error .form-control-feedback { color: darken(@danger, 28%); }
+
+/* Form stack */
+.form-group {
+
+    // Form stack
+    // -----------------------------------
+    .form-stack + .form-stack .form-control  {
+        margin-top: -1px;
+    }
+    .form-stack .form-control {
+        position: relative;
+        border-radius: 0px;
+        margin-top: -1px;
+        z-index: 1;
+    }
+    .form-stack .form-control.input-lg {
+        font-size: 13px;
+    }
+    .form-stack:first-child .form-control,
+    .form-stack-wrapper > .form-stack:first-child .form-control {
+        border-top-left-radius: 4px;
+        border-top-right-radius: 4px;
+    }
+    .form-stack:last-child .form-control,
+    .form-stack-wrapper > .form-stack:last-child .form-control {
+        border-bottom-left-radius: 4px;
+        border-bottom-right-radius: 4px;
+    }
+    .form-stack .form-control:focus {
+        z-index: 2;
+    }
+}
+
+.control-label { 
+    font-weight: 600;
+    color: darken(@gray, 50%);
+}
+.help-block { 
+    color: darken(@gray, 40%); 
+}
+.input-group-addon { 
+    color: darken(@gray, 30%);
+    border-color: @border-color;
+    background-color: @default;
+}
+.input-group-lg > .form-control, 
+.input-group-lg > .input-group-addon, 
+.input-group-lg > .input-group-btn > .btn { 
+    height: auto; 
+}
+.input-lg { 
+    font-size: 16px; 
+}
+.input-sm { 
+    font-size: 12px; 
+}
+
+/* Input  */
+input[type="text"],
+input[type="search"],
+input[type="email"],
+input[type="password"],
+textarea {
+    -webkit-appearance: none;
+}
+
+/* checkbox & radio  */
+input[type="radio"], 
+input[type="checkbox"] {
+    margin: 2px 0 0;
+    margin-top: 1px \9;
+    line-height: normal;
+}
+.radio-inline ~ .radio-inline, 
+.checkbox-inline ~ .checkbox-inline {
+    margin-top: 0;
+    margin-left: 10px;
+}
+.checkbox,
+.radio,
+.checkbox label,
+.radio label,
+.checkbox-inline,
+.radio-inline,
+.checkbox-inline label,
+.radio-inline label {
+    min-height: 18px;
+    margin-bottom: 0px;
+    margin-top: 0px;
+    font-weight: normal;
+}
+
+/* custom checkbox & radio  */
+.custom-checkbox.checkbox,
+.custom-checkbox.checkbox-inline,
+.custom-radio.radio,
+.custom-radio.radio-inline,
+.checkbox-icon.checkbox,
+.checkbox-icon.checkbox-inline {
+    padding-left: 0px;
+}
+.custom-checkbox > label,
+.custom-radio > label,
+.checkbox-icon > label {
+    position: relative;
+    padding-left: 18px;
+    cursor: pointer;
+    font-weight: normal;
+    margin: 0px;
+}
+.custom-checkbox > label:before, 
+.custom-checkbox > label:after,
+.custom-radio > label:before, 
+.custom-radio > label:after,
+.checkbox-icon > label:before, 
+.checkbox-icon > label:after {
+    font-family: "iconfont";
+    font-weight: normal;
+    text-shadow: none;
+    position: absolute; 
+    top: 0; 
+    left: 0;
+}
+/* custom checkbox & radio - hover */
+.custom-checkbox:hover > label:before,
+.custom-radio:hover > label:before {
+    border: 1px solid @accent-base-color;
+}
+/* custom checkbox & radio - unchecked */
+.custom-checkbox > label:before {
+    content: "";
+    width: 18px;
+    height: 18px;
+    border: 1px solid darken(@gray, 15%);
+    border-radius: @border-radius;
+}
+.custom-radio > label:before {
+    content: "";
+    width: 18px;
+    height: 18px;
+    border: 1px solid darken(@gray, 15%);
+    border-radius: 50%;
+}
+.checkbox-icon > label:before {
+    content: "";
+    width: 18px;
+    height: 18px;
+}
+.custom-checkbox > input[type="checkbox"]:checked + label:before,
+.custom-radio > input[type="radio"]:checked + label:before {
+    border-color: @accent-base-color;
+    background-color: @accent-base-color;
+}
+/* custom checkbox & radio - checked */
+.custom-checkbox > label:after {
+    float: left;
+    content: "\e370";
+    overflow: hidden;
+    color: transparent;
+    font-size: 10px;
+    line-height: 10px;
+    left: 4px;
+    top: 4px;
+    .transition(max-width ease 0.1s);
+}
+.custom-checkbox > input[type="checkbox"]:checked + label:after { color: @white; }
+.custom-radio > label:after {
+    float: left;
+    content: "";
+    overflow: hidden;
+    background-color: transparent;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    left: 5px;
+    top: 5px;
+    .transition(max-width ease 0.1s);
+}
+.custom-radio > input[type="radio"]:checked + label:after { background-color: @white; }
+.checkbox-icon > label:after {
+    float: left;
+    overflow: hidden;
+    color: darken(@border-color, 20%);
+    font-size: 16px;
+    line-height: 16px;
+    left: 1px;
+    top: 1px;
+    .transition(max-width ease 0.1s);
+}
+.checkbox-icon:hover > label:after { color: darken(@border-color, 30%); }
+
+/* checkbox-icon icon */
+.checkbox-icon.icon-star > label:after { content: "\e2ff"; top: 0px; }
+.checkbox-icon.icon-star > input[type="checkbox"]:checked + label:after { 
+    content: "\e301";
+    color: @warning; 
+}
+.checkbox-icon.icon-heart > label:after { content: "\e682"; }
+.checkbox-icon.icon-heart > input[type="checkbox"]:checked + label:after { 
+    content: "\e604";
+    color: @danger; 
+}
+
+/* hide the checkbox & radio */
+.custom-checkbox > input[type="checkbox"],
+.custom-radio > input[type="radio"],
+.checkbox-icon > input[type="checkbox"] {
+    display: none;
+}
+/* contextual */
+.custom-checkbox-primary:hover > label:before,
+.custom-radio-primary:hover > label:before {
+    border: 1px solid @primary;
+}
+.custom-checkbox-primary > input[type="checkbox"]:checked + label:before,
+.custom-radio-primary > input[type="radio"]:checked + label:before {
+    border-color: @primary;
+    background-color: @primary;
+}
+.custom-checkbox-info:hover > label:before,
+.custom-radio-info:hover > label:before {
+    border: 1px solid @info;
+}
+.custom-checkbox-info > input[type="checkbox"]:checked + label:before,
+.custom-radio-info > input[type="radio"]:checked + label:before {
+    border-color: @info;
+    background-color: @info;
+}
+.has-success .custom-checkbox > label:before,
+.has-success .custom-radio > label:before,
+.has-success .custom-checkbox:hover > label:before,
+.has-success .custom-radio:hover > label:before,
+.custom-checkbox-success:hover > label:before,
+.custom-radio-success:hover > label:before {
+    border: 1px solid @success;
+}
+.has-success .custom-checkbox > input[type="checkbox"]:checked + label:before,
+.has-success .custom-radio > input[type="radio"]:checked + label:before,
+.custom-checkbox-success > input[type="checkbox"]:checked + label:before,
+.custom-radio-success > input[type="radio"]:checked + label:before {
+    border-color: @success;
+    background-color: @success;
+}
+.has-warning .custom-checkbox > label:before,
+.has-warning .custom-radio > label:before,
+.has-warning .custom-checkbox:hover > label:before,
+.has-warning .custom-radio:hover > label:before,
+.custom-checkbox-warning:hover > label:before,
+.custom-radio-warning:hover > label:before {
+    border: 1px solid @warning;
+}
+.has-warning .custom-checkbox > input[type="checkbox"]:checked + label:before,
+.has-warning .custom-radio > input[type="radio"]:checked + label:before,
+.custom-checkbox-warning > input[type="checkbox"]:checked + label:before,
+.custom-radio-warning > input[type="radio"]:checked + label:before {
+    border-color: @warning;
+    background-color: @warning;
+}
+.has-error .custom-checkbox > label:before,
+.has-error .custom-radio > label:before,
+.has-error .custom-checkbox:hover > label:before,
+.has-error .custom-radio:hover > label:before,
+.custom-checkbox-danger:hover > label:before,
+.custom-radio-danger:hover > label:before {
+    border: 1px solid @danger;
+}
+.has-error .custom-checkbox > input[type="checkbox"]:checked + label:before,
+.has-error .custom-radio > input[type="radio"]:checked + label:before,
+.custom-checkbox-danger > input[type="checkbox"]:checked + label:before,
+.custom-radio-danger > input[type="radio"]:checked + label:before {
+    border-color: @danger;
+    background-color: @danger;
+}
+.custom-checkbox-teal:hover > label:before,
+.custom-radio-teal:hover > label:before {
+    border: 1px solid @teal;
+}
+.custom-checkbox-teal > input[type="checkbox"]:checked + label:before,
+.custom-radio-teal > input[type="radio"]:checked + label:before {
+    border-color: @teal;
+    background-color: @teal;
+}
+.custom-checkbox-inverse:hover > label:before,
+.custom-radio-inverse:hover > label:before {
+    border: 1px solid @inverse;
+}
+.custom-checkbox-inverse > input[type="checkbox"]:checked + label:before,
+.custom-radio-inverse > input[type="radio"]:checked + label:before {
+    border-color: @inverse;
+    background-color: @inverse;
+}
+
+/* custom file upload */
+.btn-file {
+    position: relative;
+    overflow: hidden;
+}
+.btn-file input[type=file] {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    min-width: 100%;
+    min-height: 100%;
+    font-size: 999px;
+    text-align: right;
+    filter: alpha(opacity=0);
+    opacity: 0;
+    background: red;
+    cursor: inherit;
+    display: block;
+}
+
+/* Input state */
+.has-success .form-control {
+    border-color: @success;
+}
+.has-success .form-control:focus {
+    border-color: @success;
+}
+.has-success .help-block, 
+.has-success .control-label, 
+.has-success .radio, 
+.has-success .checkbox, 
+.has-success .radio-inline, 
+.has-success .checkbox-inline {
+    color: @success;
+}
+.has-success .input-group-addon {
+    color: darken(@success, 30%);
+    border-color: @success;
+    background-color: @success;
+}
+.has-error .form-control {
+    border-color: @danger;
+}
+.has-error .form-control:focus {
+    border-color: @danger;
+}
+.has-error .help-block, 
+.has-error .control-label, 
+.has-error .radio, 
+.has-error .checkbox, 
+.has-error .radio-inline, 
+.has-error .checkbox-inline {
+    color: @danger;
+}
+.has-error .input-group-addon {
+    color: darken(@danger, 30%);
+    border-color: @danger;
+    background-color: @danger;
+}
+.has-warning .form-control {
+    border-color: @warning;
+}
+.has-warning .form-control:focus {
+    border-color: @warning;
+}
+.has-warning .help-block, 
+.has-warning .control-label, 
+.has-warning .radio, 
+.has-warning .checkbox, 
+.has-warning .radio-inline, 
+.has-warning .checkbox-inline {
+    color: @warning;
+}
+.has-warning .input-group-addon {
+    color: darken(@warning, 30%);
+    border-color: @warning;
+    background-color: @warning;
+}
+.has-success .form-control,
+.has-error .form-control,
+.has-warning .form-control,
+.has-success .form-control:focus,
+.has-error .form-control:focus,
+.has-warning .form-control:focus {
+    -moz-box-shadow: none;
+    box-shadow: none;
+}
+
+/* Form horizontal - bordered  */
+.form-horizontal {
+    // form bordered
+    // -----------------------------
+    &.form-bordered,
+    &.form-striped {
+        .form-group {
+            padding-top: 15px;
+            padding-bottom: 15px;
+            margin-bottom: 0px;
+            border-top: 1px solid transparent;
+            border-top-color: lighten(@border-color, 6%) !important;
+
+            .no-border {
+                border-top-width: 0px;
+            }
+
+            .help-block {
+                margin-bottom: 0px;
+            }
+
+            &:first-child {
+                border-top-width: 0px;
+
+                &.header {
+                    border-top-left-radius: @border-radius;
+                    border-top-right-radius: @border-radius;
+                }
+            }
+
+        }
+    }
+
+    // form striped
+    // -----------------------------
+    &.form-striped {
+        .form-group {
+            &:nth-child(even) {
+                background-color: lighten(@gray, 4%);
+            }
+        }
+    }
+
+    .form-group {
+        &.message-container {
+            padding: 15px;
+
+            &:empty {
+                display: none;
+
+                + .form-group {
+                    border-top-width: 0px;
+
+                    border-top-left-radius: @border-radius;
+                    border-top-right-radius: @border-radius;
+                }
+            }
+
+            > .alert {
+                margin-bottom: 0px;
+            }
+        }
+    }
+}
+
+/* Parsley validation  */
+.parsley-errors-list {
+    display: none;
+    margin: 0px;
+    padding: 0px;
+
+    &.filled {
+        display: block;
+    }
+
+    > li {
+        font-size: 12px;
+        list-style: none;
+        color: @danger;
+    }
+}
+.parsley-error {
+    border-color: @danger !important;
+}
+.parsley-custom-error-message {
+    color: @danger;
+}
+
+/* checkbox + radio */
+.parsley-error.custom-checkbox,
+.parsley-error.custom-radio,
+.parsley-error.custom-checkbox:hover,
+.parsley-error.custom-radio:hover {
+    > label {
+        &:before {
+            border: 1px solid @danger;
+        }
+    }
+}
+.parsley-error.custom-checkbox,
+.parsley-error.custom-radio {
+    > input[type="checkbox"] {
+        &:checked {
+            + label {
+                &:before {
+                    border-color: @danger;
+                    background-color: @danger;
+                }
+            }
+        }
+    }
+
+    > label {
+        color: @danger;
+    }
+}
