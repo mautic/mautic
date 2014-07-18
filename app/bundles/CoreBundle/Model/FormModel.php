@@ -124,7 +124,6 @@ class FormModel extends CommonModel
      *
      * @param       $entity
      * @param       $unlock
-     * @return mixed
      */
     public function saveEntity($entity, $unlock = true)
     {
@@ -136,8 +135,6 @@ class FormModel extends CommonModel
         $event = $this->dispatchEvent("pre_save", $entity, $isNew);
         $this->getRepository()->saveEntity($entity);
         $this->dispatchEvent("post_save", $entity, $isNew, $event);
-
-        return $entity;
     }
 
 

@@ -14,6 +14,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadFieldValue;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\SocialMedia\SocialIntegrationHelper;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
@@ -146,11 +147,39 @@ class LeadModel extends FormModel
      */
     public function setFieldValues(Lead &$lead, array $data, $overwriteWithBlank = true)
     {
+        //gleam social networks if there is an email and applicable
+        if (!empty($data["field_email"])) {
+            $integrationHelper  = new SocialIntegrationHelper($this->factory);
+            $socialMediaRepo    = $this->em->getRepository('MauticLeadBundle:SocialMedia');
+            $socialMediaDetails = $socialMediaRepo->findAll();
+            $socialMediaData    = array();
+
+            foreach ($socialMediaDetails as $sm) {
+                $fields = $sm->getLeadFields();
+                if ($sm->isPublished() && !empty($fields)) {
+                    $service = $sm->getService();
+
+                    //get the helper
+                    $serviceObject = $integrationHelper->getSocialIntegrations($service);
+
+                    if (method_exists($serviceObject, 'getUserData')) {
+                        //set the entity
+                        $serviceObject->setEntity($sm);
+
+                        //make the call and retrieve data
+                        $socialMediaData[$service]['fields'] = $fields;
+                        $socialMediaData[$service]['data']   = $serviceObject->getUserData($data['field_email']);
+                    }
+                }
+            }
+        }
+
         //save the field values
         $fieldValues   = $lead->getFields();
         $fieldModel    = $this->factory->getModel('lead.field');
         $fields        = $fieldModel->getEntities();
         $updatedFields = array();
+
         //update existing values
         foreach ($fieldValues as $v) {
             $field   = $v->getField();
@@ -160,13 +189,48 @@ class LeadModel extends FormModel
             if ($v->getValue() !== $value && (!empty($value) || (empty($value) && $overwriteWithBlank))) {
                 $v->setValue($value);
             }
+
+            //if empty, check for social media data to plug the hole
+            if (empty($value) && !empty($socialMediaData)) {
+                foreach ($socialMediaData as $service => $details) {
+                    //check to see if a field has been assigned
+                    if (in_array($field->getId(), $details['fields'])) {
+
+                        //check to see if the data is available
+                        $key = array_search($field->getId(), $details['fields']);
+                        if (isset($details['data'][$key])) {
+                            //Found!!
+                            $v->setValue($details['data'][$key]);
+                            break;
+                        }
+                    }
+                }
+            }
             $updatedFields[$field->getId()] = 1;
         }
 
+        //find and write new ones
         foreach ($fields as $field) {
             if (isset($updatedFields[$field->getId()]) || !$field->getIsVisible())
                 continue;
             $value = $data["field_{$field->getAlias()}"];
+
+            //if empty, check for social media data to plug the hole
+            if (empty($value) && !empty($socialMediaData)) {
+                foreach ($socialMediaData as $service => $details) {
+                    //check to see if a field has been assigned
+                    if (in_array($field->getId(), $details['fields'])) {
+
+                        //check to see if the data is available
+                        $key = array_search($field->getId(), $details['fields']);
+                        if (isset($details['data'][$key])) {
+                            //Found!!
+                            $value = $details['data'][$key];
+                            break;
+                        }
+                    }
+                }
+            }
             $fieldValue = new LeadFieldValue();
             $fieldValue->setLead($lead);
             $fieldValue->setField($field);

@@ -48,7 +48,7 @@
                     <?php endif; ?>
                     <td></td>
                 </tr>
-                <?php endif; ?>
+                <?php else: ?>
                 <?php foreach($log as $e): ?>
                 <tr>
                     <?php $date = $e->getDateAdded(); ?>
@@ -72,6 +72,7 @@
                     <td><?php echo $e->getIpAddress()->getIpAddress(); ?></td>
                 </tr>
                 <?php endforeach; ?>
+                <?php endif; ?>
             </tbody>
         </table>
         </div>

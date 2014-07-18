@@ -81,7 +81,7 @@ class FormButtonsType extends AbstractType
             'apply_text'         => 'mautic.core.form.apply',
             'apply_icon'         => 'fa fa-check',
             'apply_class'        => 'btn btn-primary',
-            'save_text'          => 'mautic.core.form.save',
+            'save_text'          => 'mautic.core.form.saveandclose',
             'save_icon'          => 'fa fa-save padding-sm-right',
             'save_class'         => 'btn btn-primary',
             'cancel_text'        => 'mautic.core.form.cancel',

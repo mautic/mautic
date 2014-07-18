@@ -39,14 +39,7 @@ $type  = $field->getField()->getType();
 <a target="_new" href="<?php echo $value; ?>"><?php echo $value; ?></a>
 <?php endif; ?>
 
-<?php elseif (stripos($name, "linkedin") !== false): ?>
-<?php if (strpos($value, 'http') === false): ?>
-<a target="_new" href="https://www.linkedin.com/in/<?php echo $value; ?>"><?php echo $value; ?></a>
-<?php else: ?>
-<a target="_new" href="<?php echo $value; ?>"><?php echo $value; ?></a>
-<?php endif; ?>
-
-<?php elseif (stripos($name, "google plus") !== false): ?>
+<?php elseif (stripos($name, "googleplus") !== false): ?>
 <?php if (strpos($value, 'http') === false): ?>
 <a target="_new" href="https://plus.google.com/+<?php echo $value; ?>"><?php echo $value; ?></a>
 <?php else: ?>
@@ -54,10 +47,12 @@ $type  = $field->getField()->getType();
 <?php endif; ?>
 
 <?php elseif (stripos($name, "website") !== false): ?>
-<?php if (strpos($value, 'http') === false): ?>
+<?php if (strpos($value, 'http') === 0): ?>
+<a target="_new" href="<?php echo $value; ?>"><?php echo $value; ?></a>
+<?php elseif (strpos($value, 'http') === false): ?>
 <a target="_new" href="http://<?php echo $value; ?>"><?php echo $value; ?></a>
 <?php else: ?>
-<a target="_new" href="<?php echo $value; ?>"><?php echo $value; ?></a>
+<?php echo $value; ?>
 <?php endif; ?>
 
 <?php

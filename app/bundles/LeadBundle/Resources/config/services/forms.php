@@ -92,3 +92,39 @@ $container->setDefinition(
     ->addTag('form.type', array(
         'alias' => 'lead_submitaction_scorechange',
     ));
+
+//Social media forms
+$container->setDefinition(
+    'mautic.form.type.lead.social.config',
+    new Definition('Mautic\LeadBundle\Form\Type\SocialMediaConfigType'))
+    ->addTag('form.type', array(
+        'alias' => 'socialmedia_config',
+    ));
+
+$container->setDefinition(
+    'mautic.form.type.lead.social.details',
+    new Definition('Mautic\LeadBundle\Form\Type\SocialMediaDetailsType'))
+    ->addTag('form.type', array(
+        'alias' => 'socialmedia_details',
+    ));
+
+$container->setDefinition(
+    'mautic.form.type.lead.social.fields',
+    new Definition('Mautic\LeadBundle\Form\Type\SocialMediaFieldsType'))
+    ->addTag('form.type', array(
+        'alias' => 'socialmedia_fields',
+    ));
+
+$container->setDefinition(
+    'mautic.form.type.lead.social.keys',
+    new Definition('Mautic\LeadBundle\Form\Type\SocialMediaKeysType'))
+    ->addTag('form.type', array(
+        'alias' => 'socialmedia_keys',
+    ));
+
+$container->setDefinition(
+    'mautic.form.type.lead.social.services',
+    new Definition('Mautic\LeadBundle\Form\Type\SocialMediaServicesType'))
+    ->addTag('form.type', array(
+        'alias' => 'socialmedia_services',
+    ));

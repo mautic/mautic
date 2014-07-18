@@ -9,11 +9,13 @@
 
 namespace Mautic\CoreBundle\Controller;
 
+use Mautic\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
  * Class CommonController
@@ -234,17 +236,22 @@ class CommonController extends Controller implements MauticController{
      */
     public function accessDenied($msg = 'mautic.core.error.accessdenied')
     {
-        return $this->postActionRedirect( array(
-            'returnUrl'       => $this->generateUrl('mautic_core_index'),
-            'contentTemplate' => 'MauticCoreBundle:Default:index',
-            'passthroughVars' =>    array(
-                'activeLink' => '#mautic_core_index',
-                'route'      => $this->generateUrl('mautic_core_index')
-            ),
-            'flashes'         => array(array(
-                'type' => 'error',
-                'msg'  => $msg
-            ))
-        ));
+        $user = $this->get('mautic.factory')->getUser();
+        if (!$user instanceof User && !$user->getId()) {
+            throw new AccessDeniedHttpException($this->get('translator')->trans('mautic.core.url.error.401'));
+        } else {
+            return $this->postActionRedirect(array(
+                'returnUrl'       => $this->generateUrl('mautic_core_index'),
+                'contentTemplate' => 'MauticCoreBundle:Default:index',
+                'passthroughVars' => array(
+                    'activeLink' => '#mautic_core_index',
+                    'route'      => $this->generateUrl('mautic_core_index')
+                ),
+                'flashes'         => array(array(
+                    'type' => 'error',
+                    'msg'  => $msg
+                ))
+            ));
+        }
     }
 }

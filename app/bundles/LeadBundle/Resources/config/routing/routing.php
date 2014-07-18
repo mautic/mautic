@@ -55,4 +55,13 @@ $collection->add('mautic_lead_action', new Route('/leads/{objectAction}/{objectI
     )
 ));
 
+//register social media
+$collection->add('mautic_leadsocial_index', new Route('/social/config',
+    array('_controller' => 'MauticLeadBundle:Social:index')
+));
+
+$collection->add('mautic_leadsocial_callback', new Route('/social/{service}/oauth2callback',
+    array('_controller' => 'MauticLeadBundle:Social:oAuth2Callback')
+));
+
 return $collection;
