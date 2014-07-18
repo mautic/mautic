@@ -10,11 +10,6 @@
 $lastCrumb = count($crumbs) - 1;
 ?>
 <div class="page-header page-header-block">
-    <?php if ($view["slots"]->has("headerTitle")): ?>
-        <div class="page-header-section">
-            <h4 class="title"><?php $view["slots"]->output("headerTitle"); ?></h4>
-        </div>
-    <?php endif; ?>
     <div class="page-header-section">
         <div class="path">
             <ol class="breadcrumb breadcrumb-transparent">

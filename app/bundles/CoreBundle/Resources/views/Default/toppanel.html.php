@@ -8,9 +8,11 @@
  */
 ?>
 
-<div class="page-header-section">
-    <h4 class="title semibold"><?php echo $view['slots']->get('pageTitle', 'Mautic'); ?></h4>
-</div>
+<?php if ($view["slots"]->has("headerTitle")): ?>
+        <div class="page-header-section">
+            <h4 class="title semibold"><?php $view["slots"]->output("headerTitle"); ?></h4>
+        </div>
+<?php endif; ?>
 
 <div class="page-header-section">
     <div class="toolbar">
