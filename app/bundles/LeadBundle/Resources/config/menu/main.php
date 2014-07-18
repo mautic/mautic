@@ -63,7 +63,6 @@ $items = array(
             'mautic.lead.list.menu.index' => array(
                 'route'    => 'mautic_leadlist_index',
                 'extras'  => array(
-                    'iconClass' => 'fa-caret-right',
                     'routeName' => 'mautic_leadlist_index'
                 ),
                 'linkAttributes' => array(
@@ -91,7 +90,6 @@ $items = array(
             'mautic.lead.field.menu.index' => array(
                 'route'    => 'mautic_leadfield_index',
                 'extras'  => array(
-                    'iconClass' => 'fa-caret-right',
                     'routeName' => 'mautic_leadfield_index'
                 ),
                 'linkAttributes' => array(

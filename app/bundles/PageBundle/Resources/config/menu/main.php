@@ -45,7 +45,7 @@ $items = array(
             'mautic.page.category.menu.index' => array(
                 'route'    => 'mautic_pagecategory_index',
                 'extras'  => array(
-                    'iconClass' => 'fa-caret-right',
+                    'iconClass' => 'fa-folder-o',
                     'routeName' => 'mautic_pagecategory_index'
                 ),
                 'linkAttributes' => array(
