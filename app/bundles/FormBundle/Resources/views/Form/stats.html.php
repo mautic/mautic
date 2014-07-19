@@ -9,11 +9,50 @@
 
 //@todo generate stats for results
 ?>
-<div class="panel panel-success">
-    <div class="panel-heading">
-        <span><?php echo $view['translator']->trans('mautic.form.form.header.stats'); ?></span>
+<div class="row">
+    <div class="col-sm-4">
+        <!-- START Statistic Widget -->
+        <div class="table-layout">
+            <div class="col-xs-4 panel bgcolor-info">
+                <div class="fa fa-users-o fsize24 text-center"></div>
+            </div>
+            <div class="col-xs-8 panel">
+                <div class="panel-body text-center">
+                    <h4 class="semibold nm">1845</h4>
+                    <p class="semibold text-muted mb0 mt5">REGISTERED USERS</p>
+                </div>
+            </div>
+        </div>
+        <!--/ END Statistic Widget -->
     </div>
-    <div class="panel-body">
-        <h3>@todo - add stats, graphs, etc</h3>
+    <div class="col-sm-4">
+        <!-- START Statistic Widget -->
+        <div class="table-layout">
+            <div class="col-xs-4 panel bgcolor-teal">
+                <div class="ico-crown fsize24 text-center"></div>
+            </div>
+            <div class="col-xs-8 panel">
+                <div class="panel-body text-center">
+                    <h4 class="semibold nm">187</h4>
+                    <p class="semibold text-muted mb0 mt5">PENDING ACTION</p>
+                </div>
+            </div>
+        </div>
+        <!--/ END Statistic Widget -->
+    </div>
+    <div class="col-sm-4">
+        <!-- START Statistic Widget -->
+        <div class="table-layout">
+            <div class="col-xs-4 panel bgcolor-primary">
+                <div class="ico-box-add fsize24 text-center"></div>
+            </div>
+            <div class="col-xs-8 panel">
+                <div class="panel-body text-center">
+                    <h4 class="semibold nm">10</h4>
+                    <p class="semibold text-muted mb0 mt5">UPDATE AVAILABLE</p>
+                </div>
+            </div>
+        </div>
+        <!--/ END Statistic Widget -->
     </div>
 </div>
