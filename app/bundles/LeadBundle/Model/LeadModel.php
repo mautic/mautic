@@ -14,7 +14,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadFieldValue;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\LeadEvents;
-use Mautic\LeadBundle\SocialMedia\SocialIntegrationHelper;
+use Mautic\SocialBundle\Helper\NetworkIntegrationHelper;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
@@ -149,26 +149,18 @@ class LeadModel extends FormModel
     {
         //gleam social networks if there is an email and applicable
         if (!empty($data["field_email"])) {
-            $integrationHelper  = new SocialIntegrationHelper($this->factory);
-            $socialMediaRepo    = $this->em->getRepository('MauticLeadBundle:SocialMedia');
-            $socialMediaDetails = $socialMediaRepo->findAll();
-            $socialMediaData    = array();
-
-            foreach ($socialMediaDetails as $sm) {
-                $fields = $sm->getLeadFields();
-                if ($sm->isPublished() && !empty($fields)) {
-                    $service = $sm->getService();
-
-                    //get the helper
-                    $serviceObject = $integrationHelper->getSocialIntegrations($service);
-
-                    if (method_exists($serviceObject, 'getUserData')) {
-                        //set the entity
-                        $serviceObject->setEntity($sm);
-
+            $serviceObjects  = NetworkIntegrationHelper::getNetworkObjects($this->factory);
+            $socialMediaData = array();
+            foreach ($serviceObjects as $sm) {
+                $service  = $sm->getName();
+                $settings = $sm->getSettings();
+                $fields   = $settings->getLeadFields();
+                $features = $settings->getSupportedFeatures();
+                if (in_array('lead_fields', $features) && $settings->isPublished() && !empty($fields)) {
+                    if (method_exists($sm, 'getUserData')) {
                         //make the call and retrieve data
                         $socialMediaData[$service]['fields'] = $fields;
-                        $socialMediaData[$service]['data']   = $serviceObject->getUserData($data['field_email']);
+                        $socialMediaData[$service]['data']   = $sm->getUserData($data['field_email']);
                     }
                 }
             }

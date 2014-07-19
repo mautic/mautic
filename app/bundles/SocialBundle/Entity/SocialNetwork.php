@@ -7,30 +7,24 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\LeadBundle\Entity;
+namespace Mautic\SocialBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 
 /**
- * Class SocialMedia
- * @ORM\Table(name="lead_socialmedia_tokens")
- * @ORM\Entity(repositoryClass="Mautic\LeadBundle\Entity\SocialMediaRepository")
+ * Class SocialNetwork
+ * @ORM\Table(name="socialnetwork_settings")
+ * @ORM\Entity(repositoryClass="Mautic\SocialBundle\Entity\SocialNetworkRepository")
  * @Serializer\ExclusionPolicy("all")
  */
-class SocialMedia
+class SocialNetwork
 {
     /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
-
-    /**
      * @ORM\Column(type="string")
+     * @ORM\Id()
      */
-    private $service;
+    private $name;
 
     /**
      * @ORM\Column(type="boolean", name="is_published")
@@ -38,15 +32,19 @@ class SocialMedia
     private $isPublished = false;
 
     /**
+     * @ORM\Column(type="array", name="supported_features", nullable=true)
+     */
+    private $supportedFeatures = array();
+
+    /**
      * @ORM\Column(type="array", name="api_keys")
      */
     private $apiKeys = array();
 
     /**
-     * @ORM\Column(type="array", name="lead_fields")
+     * @ORM\Column(type="array", name="lead_fields", nullable=true)
      */
     private $leadFields = array();
-
 
     /**
      * @return mixed
@@ -99,21 +97,40 @@ class SocialMedia
     /**
      * @return mixed
      */
-    public function getService ()
+    public function getName ()
     {
-        return $this->service;
+        return $this->name;
     }
 
     /**
-     * @param mixed $service
+     * @param mixed $name
      */
-    public function setService ($service)
+    public function setName ($name)
     {
-        $this->service = $service;
+        $this->name = $name;
     }
 
+    /**
+     * @return mixed
+     */
     public function isPublished()
     {
         return $this->getIsPublished();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSupportedFeatures ()
+    {
+        return $this->supportedFeatures;
+    }
+
+    /**
+     * @param mixed $supportedFeatures
+     */
+    public function setSupportedFeatures ($supportedFeatures)
+    {
+        $this->supportedFeatures = $supportedFeatures;
     }
 }

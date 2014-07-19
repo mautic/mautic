@@ -123,7 +123,7 @@ class FieldType extends AbstractType
 
         if ($addShowLabel) {
             $default = (!isset($options['data']['showLabel'])) ? true : (boolean) $options['data']['showLabel'];
-            $builder->add('showLabel', 'choice', array(
+            $builder->add('showLabel', 'button_group', array(
                 'choice_list' => new ChoiceList(
                     array(false, true),
                     array('mautic.core.form.no', 'mautic.core.form.yes')
@@ -157,7 +157,7 @@ class FieldType extends AbstractType
 
         if ($addIsRequired) {
             $default = (!isset($options['data']['isRequired'])) ? false : (boolean) $options['data']['isRequired'];
-            $builder->add('isRequired', 'choice', array(
+            $builder->add('isRequired', 'button_group', array(
                 'choice_list' => new ChoiceList(
                     array(false, true),
                     array('mautic.core.form.no', 'mautic.core.form.yes')

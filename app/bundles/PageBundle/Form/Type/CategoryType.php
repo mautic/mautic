@@ -68,7 +68,7 @@ class CategoryType extends AbstractType
             'required'   => false
         ));
 
-        $builder->add('isPublished', 'choice', array(
+        $builder->add('isPublished', 'button_group', array(
             'choice_list' => new ChoiceList(
                 array(false, true),
                 array('mautic.core.form.no', 'mautic.core.form.yes')

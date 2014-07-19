@@ -72,7 +72,7 @@ class ListType extends AbstractType
             'required'   => false
         ));
 
-        $builder->add('isGlobal', 'choice', array(
+        $builder->add('isGlobal', 'button_group', array(
             'choice_list' => new ChoiceList(
                 array(false, true),
                 array('mautic.core.form.no', 'mautic.core.form.yes')
@@ -85,7 +85,7 @@ class ListType extends AbstractType
             'required'      => false
         ));
 
-        $builder->add('isPublished', 'choice', array(
+        $builder->add('isPublished', 'button_group', array(
             'choice_list' => new ChoiceList(
                 array(false, true),
                 array('mautic.core.form.no', 'mautic.core.form.yes')

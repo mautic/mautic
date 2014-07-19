@@ -9,7 +9,7 @@
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'leadsocial');
-$view["slots"]->set("headerTitle", $view['translator']->trans('mautic.lead.social.header.index'));
+$view["slots"]->set("headerTitle", $view['translator']->trans('mautic.social.header.index'));
 ?>
 <div class="scrollable">
     <?php echo $view['form']->start($form); ?>

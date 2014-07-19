@@ -61,7 +61,7 @@ class RoleType extends AbstractType
             'required' => false
         ));
 
-        $builder->add('isAdmin', 'choice', array(
+        $builder->add('isAdmin', 'button_group', array(
             'choice_list' => new ChoiceList(
                 array(false, true),
                 array('mautic.core.form.no', 'mautic.core.form.yes')

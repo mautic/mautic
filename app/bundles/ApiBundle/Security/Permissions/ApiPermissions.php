@@ -57,7 +57,7 @@ class ApiPermissions extends CommonPermissions
      */
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {
-        $builder->add('api:access', 'choice', array(
+        $builder->add('api:access', 'button_group', array(
             'choices'  => array(
                 'full'     => 'mautic.api.permissions.granted',
             ),
@@ -70,7 +70,7 @@ class ApiPermissions extends CommonPermissions
             'data'     => (!empty($data['access']) ? $data['access'] : array())
         ));
 
-        $builder->add('api:clients', 'choice', array(
+        $builder->add('api:clients', 'button_group', array(
             'choices'    => array(
                 'view'   => 'mautic.core.permissions.view',
                 'edit'   => 'mautic.core.permissions.edit',

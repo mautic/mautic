@@ -68,7 +68,7 @@ class UserPermissions extends CommonPermissions
      */
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {
-        $builder->add('user:users', 'choice', array(
+        $builder->add('user:users', 'button_group', array(
             'choices'    => array(
                 'view'    => 'mautic.core.permissions.view',
                 'edit'    => 'mautic.core.permissions.edit',
@@ -86,7 +86,7 @@ class UserPermissions extends CommonPermissions
             'data'      => (!empty($data['users']) ? $data['users'] : array())
         ));
 
-        $builder->add('user:roles', 'choice', array(
+        $builder->add('user:roles', 'button_group', array(
             'choices'    => array(
                 'view'   => 'mautic.core.permissions.view',
                 'edit'   => 'mautic.core.permissions.edit',
@@ -104,7 +104,7 @@ class UserPermissions extends CommonPermissions
             'data'       => (!empty($data['roles']) ? $data['roles'] : array())
         ));
 
-        $builder->add('user:profile', 'choice', array(
+        $builder->add('user:profile', 'button_group', array(
             'choices'    => array(
                 'editname'     => 'mautic.user.account.permissions.editname',
                 'editusername' => 'mautic.user.account.permissions.editusername',

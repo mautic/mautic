@@ -7,16 +7,12 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\SocialMediaBundle;
+namespace Mautic\SocialBundle\Network;
 
-use Symfony\Component\HttpKernel\Bundle\Bundle;
-
-/**
- * Class MauticSocialMediaBundle
- *
- * @package Mautic\LeadBundle
- */
-class MauticSocialMediaBundle extends Bundle
+class TwitterNetwork extends CommonNetwork
 {
-
+    public function getName()
+    {
+        return 'Twitter';
+    }
 }

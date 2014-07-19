@@ -65,7 +65,7 @@ class LeadPermissions extends CommonPermissions
      */
     public function buildForm (FormBuilderInterface &$builder, array $options, array $data)
     {
-        $builder->add('lead:leads', 'choice', array(
+        $builder->add('lead:leads', 'button_group', array(
             'choices'  => array(
                 'viewown'     => 'mautic.core.permissions.viewown',
                 'viewother'   => 'mautic.core.permissions.viewother',
@@ -85,7 +85,7 @@ class LeadPermissions extends CommonPermissions
             'data'     => (!empty($data['leads']) ? $data['leads'] : array())
         ));
 
-        $builder->add('lead:lists', 'choice', array(
+        $builder->add('lead:lists', 'button_group', array(
             'choices'  => array(
                 'viewother'    => 'mautic.core.permissions.viewother',
                 'editother'    => 'mautic.core.permissions.editother',
@@ -101,7 +101,7 @@ class LeadPermissions extends CommonPermissions
             'data'     => (!empty($data['lists']) ? $data['lists'] : array())
         ));
 
-        $builder->add('lead:fields', 'choice', array(
+        $builder->add('lead:fields', 'button_group', array(
             'choices'  => array(
                 'full' => 'mautic.lead.field.permissions.full'
             ),

@@ -7,11 +7,13 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\LeadBundle\SocialMedia;
+namespace Mautic\SocialBundle\Network;
 
-class GooglePlus extends SocialIntegrationHelper
+use Mautic\SocialBundle\Helper\NetworkIntegrationHelper;
+
+class GooglePlusNetwork extends CommonNetwork
 {
-    public function getService()
+    public function getName()
     {
         return 'GooglePlus';
     }
@@ -23,7 +25,7 @@ class GooglePlus extends SocialIntegrationHelper
     public function findUserByEmail($email)
     {
         $email = urlencode($email);
-        $keys  = $this->entity->getApiKeys();
+        $keys  = $this->settings->getApiKeys();
         if (!empty($keys['key'])) {
             $url  = "https://www.googleapis.com/plus/v1/people?query={$email}&key={$keys['key']}";
             $data = $this->makeCall($url);
@@ -70,7 +72,6 @@ class GooglePlus extends SocialIntegrationHelper
     public function getUserPublicPosts($email)
     {
         $data  = $this->findUserByEmail($email);
-        die(var_dump($data));
         $posts = array();
         if ($data) {
             $key  = $this->factory->getParameter('googleplus_apikey');
@@ -124,7 +125,7 @@ class GooglePlus extends SocialIntegrationHelper
                     break;
                 case 'array_object':
                     if ($field == "urls") {
-                        $socialProfileUrls = $this->getSocialProfileUrls();
+                        $socialProfileUrls = NetworkIntegrationHelper::getSocialProfileUrls();
                         foreach ($values as $k => $v) {
                             $socialMatch       = false;
                             foreach ($socialProfileUrls as $service => $url) {
@@ -253,7 +254,22 @@ class GooglePlus extends SocialIntegrationHelper
     public function getRequiredKeyFields()
     {
         return array(
-            'key' => 'mautic.lead.social.keyfield.api'
+            'key' => 'mautic.social.keyfield.api'
         );
     }
+
+    public function getSupportedFeatures()
+    {
+        return array(
+            'lead_fields',
+            'public_activity',
+            'share_button'
+        );
+    }
+
+    public function getAuthenticationType()
+    {
+        return 'key';
+    }
+
 }
