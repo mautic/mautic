@@ -44,7 +44,7 @@ class FormFieldSelectType extends AbstractType
         } else {
             $default = false;
         }
-        $builder->add('multiple', 'choice', array(
+        $builder->add('multiple', 'button_group', array(
             'choice_list' => new ChoiceList(
                 array(false, true),
                 array('mautic.core.form.no', 'mautic.core.form.yes')

@@ -1152,6 +1152,7 @@ var Mautic = {
 
 };
 
+/*
 //prevent page navigation if in the middle of a form
 window.addEventListener("beforeunload", function (e) {
     if (mQuery(".prevent-nonsubmit-form-exit").length) {
@@ -1161,3 +1162,4 @@ window.addEventListener("beforeunload", function (e) {
         return msg;                                //Webkit, Safari, Chrome etc.
     }
 });
+ */

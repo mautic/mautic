@@ -67,7 +67,7 @@ class PagePermissions extends CommonPermissions
      */
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {
-        $builder->add('page:categories', 'choice', array(
+        $builder->add('page:categories', 'button_group', array(
             'choices'    => array(
                 'view'    => 'mautic.core.permissions.view',
                 'edit'    => 'mautic.core.permissions.edit',
@@ -86,7 +86,7 @@ class PagePermissions extends CommonPermissions
             'data'      => (!empty($data['categories']) ? $data['categories'] : array())
         ));
 
-        $builder->add('page:pages', 'choice', array(
+        $builder->add('page:pages', 'button_group', array(
             'choices'  => array(
                 'viewown'      => 'mautic.core.permissions.viewown',
                 'viewother'    => 'mautic.core.permissions.viewother',

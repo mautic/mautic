@@ -115,7 +115,7 @@ class FieldType extends AbstractType
             'disabled'   => $disabled
         ));
 
-        $builder->add('isRequired', 'choice', array(
+        $builder->add('isRequired', 'button_group', array(
             'choice_list' => new ChoiceList(
                 array(false, true),
                 array('mautic.core.form.no', 'mautic.core.form.yes')
@@ -127,7 +127,7 @@ class FieldType extends AbstractType
             'required'      => false
         ));
 
-        $builder->add('isVisible', 'choice', array(
+        $builder->add('isVisible', 'button_group', array(
             'choice_list' => new ChoiceList(
                 array(false, true),
                 array('mautic.core.form.no', 'mautic.core.form.yes')
@@ -139,7 +139,7 @@ class FieldType extends AbstractType
             'required'      => false
         ));
 
-        $builder->add('isListable', 'choice', array(
+        $builder->add('isListable', 'button_group', array(
             'choice_list' => new ChoiceList(
                 array(false, true),
                 array('mautic.core.form.no', 'mautic.core.form.yes')

@@ -58,7 +58,7 @@ class FormPermissions extends CommonPermissions
      */
     public function buildForm (FormBuilderInterface &$builder, array $options, array $data)
     {
-        $builder->add('form:forms', 'choice', array(
+        $builder->add('form:forms', 'button_group', array(
             'choices'  => array(
                 'viewown'      => 'mautic.core.permissions.viewown',
                 'viewother'    => 'mautic.core.permissions.viewother',
