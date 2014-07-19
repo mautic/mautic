@@ -11,7 +11,6 @@ namespace Mautic\SocialBundle\Network;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\SocialBundle\Entity\SocialNetwork;
-use Mautic\SocialBundle\Helper\NetworkIntegrationHelper;
 
 class CommonNetwork
 {
@@ -70,7 +69,7 @@ class CommonNetwork
             true //absolute
         );
         if (!$url || !isset($keys['clientId']) || !isset($keys['clientSecret'])) {
-            return false;
+            return array(false, $this->factory->getTranslator()->trans('mautic.social.missingkeys'));
         }
 
         $url .= '?client_id='.$keys['clientId'];
@@ -171,4 +170,8 @@ class CommonNetwork
         return array();
     }
 
+    protected function getAuthenticationUrl()
+    {
+        return '';
+    }
 }

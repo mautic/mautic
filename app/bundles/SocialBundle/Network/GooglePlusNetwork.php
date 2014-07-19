@@ -50,17 +50,26 @@ class GooglePlusNetwork extends CommonNetwork
     /**
      * Get public data
      *
-     * @param $email
+     * @param $fields
      * @return array
      */
-    public function getUserData($email)
+    public function getUserData($fields)
     {
+        if (isset($fields['email'])) {
+            $email = $fields['email'];
+        } elseif (isset($fields['field_email'])) {
+            $email = $fields['field_email'];
+        } else {
+            return null;
+        }
+
         $userid = $this->findUserByEmail($email);
-        if ($userid) {
-            $key                          = $this->factory->getParameter('googleplus_apikey');
-            $url                          = "https://www.googleapis.com/plus/v1/people/{$userid}?key={$key}";
-            $data                         = $this->makeCall($url);
-            $info                         = $this->matchUpData($data);
+        $keys  = $this->settings->getApiKeys();
+        if ($userid && !empty($keys['key'])) {
+
+            $url                = "https://www.googleapis.com/plus/v1/people/{$userid}?key={$keys['key']}";
+            $data               = $this->makeCall($url);
+            $info               = $this->matchUpData($data);
             $info['profileUrl'] = $data->url;
             if (isset($data->image->url)) {
                 //remove the size from the end
@@ -75,16 +84,25 @@ class GooglePlusNetwork extends CommonNetwork
     /**
      * Retrieve public posts
      *
-     * @param $email
+     * @param $fields
      * @return array
      */
-    public function getPublicActivity($email)
+    public function getPublicActivity($fields)
     {
-        $id  = $this->findUserByEmail($email);
+        if (isset($fields['email'])) {
+            $email = $fields['email'];
+        } elseif (isset($fields['field_email'])) {
+            $email = $fields['field_email'];
+        } else {
+            return null;
+        }
+
+        $id    = $this->findUserByEmail($email);
+        $keys  = $this->settings->getApiKeys();
         $posts = array();
-        if ($id) {
-            $key  = $this->factory->getParameter('googleplus_apikey');
-            $url  = "https://www.googleapis.com/plus/v1/people/$id/activities/public?key={$key}&maxResults=5";
+        if ($id && !empty($keys['key'])) {
+
+            $url  = "https://www.googleapis.com/plus/v1/people/$id/activities/public?key={$keys['key']}&maxResults=10";
             $data = $this->makeCall($url);
 
             if (!empty($data) && isset($data->items) && count($data->items)) {

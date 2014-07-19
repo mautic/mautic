@@ -26,8 +26,10 @@ class SocialController extends FormController
         $networkObjects = NetworkIntegrationHelper::getNetworkObjects($factory);
         $em             = $factory->getEntityManager();
         $services       = array();
+        $currentKeys    = array(); //prevent overriding of secrets
         foreach ($networkObjects as $name => $service) {
-            $services[$name] = $service->getSettings();
+            $services[$name]    = $service->getSettings();
+            $currentKeys[$name] = $services[$name]->getApiKeys();
         }
 
         //get a list of custom form fields
@@ -50,7 +52,15 @@ class SocialController extends FormController
         if ($this->request->getMethod() == 'POST') {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    foreach ($services['services'] as $entity) {
+                    foreach ($services['services'] as $network => $entity) {
+                        //check to make sure secret keys were not wiped out
+                        if (!empty($currentKeys[$network]['clientId'])) {
+                            $newKeys = $entity->getApiKeys();
+                            if (!empty($currentKeys[$network]['clientSecret']) && empty($newKeys['clientSecret'])) {
+                                $newKeys['clientSecret'] = $currentKeys[$network]['clientSecret'];
+                                $entity->setApiKeys($newKeys);
+                            }
+                        }
                         $em->persist($entity);
                     }
                     $em->flush();

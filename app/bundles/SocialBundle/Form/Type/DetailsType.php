@@ -55,7 +55,8 @@ class DetailsType extends AbstractType
         $builder->add('apiKeys', 'socialmedia_keys', array(
             'label'    => false,
             'required' => false,
-            'sm_keys'  => $keys
+            'sm_keys'  => $keys,
+            'data'     => $options['data']->getApiKeys()
         ));
 
         if ($options['sm_object']->getAuthenticationType() == 'oauth2') {
@@ -67,8 +68,7 @@ class DetailsType extends AbstractType
                 $disabled = true;
                 $builder->add('notice', 'spacer', array(
                     'text' => 'mautic.social.form.savefirst',
-                    'class' => 'text-danger',
-                    ''
+                    'class' => 'text-danger'
                 ));
             }
             $builder->add('authButton', 'standalone_button', array(
@@ -81,6 +81,7 @@ class DetailsType extends AbstractType
             ));
         }
 
+        //@todo - add event so that other bundles can plug in custom features
         $features = $options['sm_object']->getSupportedFeatures();
         if (!empty($features)) {
             $labels = array();
@@ -97,6 +98,7 @@ class DetailsType extends AbstractType
             ));
         }
 
+        //@todo - add event so that other bundles can plug in custom settings
         $fields = NetworkIntegrationHelper::getAvailableFields($this->factory, $options['sm_service']);
         if (!empty($fields)) {
             $builder->add('leadFields', 'socialmedia_fields', array(

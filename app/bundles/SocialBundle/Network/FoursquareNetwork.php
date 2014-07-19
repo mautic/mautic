@@ -72,11 +72,18 @@ class FoursquareNetwork extends CommonNetwork
     /**
      * Get public data
      *
-     * @param $email
+     * @param $fields
      * @return array
      */
-    public function getUserData($email)
+    public function getUserData($fields)
     {
+        if (isset($fields['email'])) {
+            $email = $fields['email'];
+        } elseif (isset($fields['field_email'])) {
+            $email = $fields['field_email'];
+        } else {
+            return null;
+        }
         $id = $this->findUserByEmail($email);
         if ($id) {
             $keys = $this->settings->getApiKeys();
@@ -91,13 +98,16 @@ class FoursquareNetwork extends CommonNetwork
                         $info['profileImage'] = $result->photo->prefix . '300x300' . $result->photo->suffix;
                     }
                     $info['profileUrl'] = 'https://foursquare.com/user/' . $id;
+
                     return $info;
                 }
             }
         }
+
+        return null;
     }
 
-    public function parseResponse($response)
+    public function getErrorsFromResponse($response)
     {
         if (is_object($response) && isset($response->meta->errorDetail)) {
             return $response->meta->errorDetail . ' (' . $response->meta->code . ')';

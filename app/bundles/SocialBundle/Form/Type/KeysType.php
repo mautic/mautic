@@ -28,10 +28,15 @@ class KeysType extends AbstractType
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
         foreach ($options['sm_keys'] as $key => $label) {
-            $builder->add($key, 'text', array(
-                'label'      => $label,
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control')
+            $type = (stripos($key, 'secret') !== false) ? 'password' : 'text';
+            $placeholder = (!empty($options['data']['clientId']) && $type == 'password') ? '************' : '';
+            $builder->add($key, $type, array(
+                'label'        => $label,
+                'label_attr'   => array('class' => 'control-label'),
+                'attr'         => array(
+                    'class'       => 'form-control',
+                    'placeholder' => $placeholder
+                )
             ));
         }
     }

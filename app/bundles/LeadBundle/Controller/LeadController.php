@@ -210,8 +210,8 @@ class LeadController extends FormController
                 $settings = $sn->getSettings();
                 $features = $settings->getSupportedFeatures();
                 if ($settings->isPublished() && in_array('public_activity', $features)) {
-                    $socialProfiles[$network]['data']     = $sn->getUserData($fields['email']);
-                    $socialProfiles[$network]['activity'] = $sn->getPublicActivity($fields['email']);
+                    $socialProfiles[$network]['data']     = $sn->getUserData($fields);
+                    $socialProfiles[$network]['activity'] = $sn->getPublicActivity($fields);
                 }
             }
         }

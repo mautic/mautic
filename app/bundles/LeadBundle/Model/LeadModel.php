@@ -160,7 +160,7 @@ class LeadModel extends FormModel
                     if (method_exists($sm, 'getUserData')) {
                         //make the call and retrieve data
                         $socialMediaData[$service]['fields'] = $fields;
-                        $socialMediaData[$service]['data']   = $sm->getUserData($data['field_email']);
+                        $socialMediaData[$service]['data']   = $sm->getUserData($data);
                     }
                 }
             }
