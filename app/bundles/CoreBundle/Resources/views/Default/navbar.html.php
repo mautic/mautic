@@ -284,14 +284,8 @@
                     </li>
                     <!--/ Search form toggler -->
                 </ul>
-</div>
 
-<div class="top-panel-main pull-right">
-    <nav>
-        <?php echo $view['knp_menu']->render('admin', array("menu" => "admin")); ?>
-    </nav>
-</div>
+<?php echo $view['knp_menu']->render('admin', array("menu" => "admin")); ?>
+<?php echo $view->render("MauticCoreBundle:Menu:profile.html.php"); ?>
 
-<div class="pull-right account-menu">
-    <?php echo $view->render("MauticCoreBundle:Menu:profile.html.php"); ?>
 </div>

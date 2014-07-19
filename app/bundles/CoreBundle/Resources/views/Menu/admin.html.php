@@ -11,7 +11,7 @@
 <?php if ($item->hasChildren() && $options["depth"] !== 0 && $item->getDisplayChildren()): ?>
 
 <?php if ($isRoot = ($item->isRoot())): ?>
-<ul class="nav nav-pills navbar-left admin-menu" role="navigation">
+<ul class="nav navbar-nav navbar-right" role="navigation">
     <li class="dropdown">
         <a class="dropdown-toggle" data-toggle="dropdown" href="#">
             <?php echo $view['translator']->trans('mautic.core.menu.admin'); ?><i class="fa fa-lg fa-fw fa-angle-double-down"></i>

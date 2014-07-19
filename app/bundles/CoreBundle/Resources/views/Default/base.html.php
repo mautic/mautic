@@ -13,7 +13,7 @@ $activePanelClasses  = ($app->getSession()->get('left-panel', 'default') == 'unp
 <html>
     <?php echo $view->render('MauticCoreBundle:Default:head.html.php'); ?>
     <body>
-        <div class="loading-message">
+        <div class="loading-message hidden">
             <div class="loading-message-inner-wrapper bg-success">
                 <?php echo $view['translator']->trans('mautic.core.loading'); ?>
             </div>
