@@ -7,13 +7,16 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\LeadBundle\SocialMedia;
+namespace Mautic\SocialBundle;
 
-class Twitter extends SocialIntegrationHelper
+use Symfony\Component\HttpKernel\Bundle\Bundle;
+
+/**
+ * Class MauticSocialBundle
+ *
+ * @package Mautic\LeadBundle
+ */
+class MauticSocialBundle extends Bundle
 {
-    public function getService()
-    {
-        return 'Twitter';
-    }
 
 }

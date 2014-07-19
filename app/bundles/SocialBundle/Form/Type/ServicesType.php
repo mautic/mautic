@@ -7,7 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\LeadBundle\Form\Type;
+namespace Mautic\SocialBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -18,7 +18,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  *
  * @package Mautic\FormBundle\Form\Type
  */
-class SocialMediaServicesType extends AbstractType
+class ServicesType extends AbstractType
 {
 
     /**
@@ -35,7 +35,7 @@ class SocialMediaServicesType extends AbstractType
 
         foreach ($options['integrations'] as $service => $object) {
             $builder->add("{$service}-panel-start", 'panel_start', array(
-                'label'      => 'mautic.lead.social.' . $service,
+                'label'      => 'mautic.social.' . $service,
                 'dataParent' => '#sm-panel',
                 'bodyId'     => $service . '-panel'
             ));
@@ -44,7 +44,8 @@ class SocialMediaServicesType extends AbstractType
                 'label'       => false,
                 'sm_service'  => $service,
                 'sm_object'   => $object,
-                'lead_fields' => $options['lead_fields']
+                'lead_fields' => $options['lead_fields'],
+                'data'        => $options['data'][$service]
             ));
 
             $builder->add("{$service}-panel-end", 'panel_end');

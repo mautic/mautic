@@ -7,18 +7,18 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\LeadBundle\Form\Type;
+namespace Mautic\SocialBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * Class SocialMediaKeysType
+ * Class SocialMediaConfigType
  *
  * @package Mautic\FormBundle\Form\Type
  */
-class SocialMediaKeysType extends AbstractType
+class ConfigType extends AbstractType
 {
 
     /**
@@ -27,12 +27,21 @@ class SocialMediaKeysType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        foreach ($options['sm_keys'] as $key => $label) {
-            $builder->add($key, 'text', array(
-                'label'      => $label,
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control')
-            ));
+        $builder->add('services', 'socialmedia_services', array(
+            'label'        => false,
+            'integrations' => $options['integrations'],
+            'lead_fields'  => $options['lead_fields'],
+            'data'         => $options['data']['services']
+        ));
+
+        $builder->add('buttons', 'form_buttons', array(
+            'apply_text' => 'mautic.core.form.save',
+            'apply_icon' => 'fa fa-save padding-sm-right',
+            'save_text'  => false
+        ));
+
+        if (!empty($options["action"])) {
+            $builder->setAction($options["action"]);
         }
     }
 
@@ -41,13 +50,13 @@ class SocialMediaKeysType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setRequired(array('sm_keys'));
+        $resolver->setRequired(array('integrations', 'lead_fields'));
     }
 
     /**
      * @return string
      */
     public function getName() {
-        return "socialmedia_keys";
+        return "socialmedia_config";
     }
 }
