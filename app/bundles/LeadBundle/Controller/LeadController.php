@@ -13,6 +13,7 @@
 namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\SocialBundle\Helper\NetworkIntegrationHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class LeadController extends FormController
@@ -148,10 +149,11 @@ class LeadController extends FormController
      */
     public function viewAction($objectId)
     {
-        $lead  = $this->get('mautic.factory')->getModel('lead.lead')->getEntity($objectId);
+        $factory = $this->get('mautic.factory');
+        $model   = $factory->getModel('lead.lead');
+        $lead    = $model->getEntity($objectId);
         //set the page we came from
         $page    = $this->get('session')->get('mautic.lead.page', 1);
-        $factory = $this->get('mautic.factory');
 
         //set some permissions
         $permissions = $this->get('mautic.security')->isGranted(array(
@@ -198,12 +200,30 @@ class LeadController extends FormController
             'objectId'     => $lead->getId())
         );
 
+        $fields     = $model->organizeFieldsByAlias($lead->getFields());
+        $socialActivity = array();
+        if (isset($fields['email'])) {
+            //check to see if there are social profiles activated
+            $socialNetworks = NetworkIntegrationHelper::getNetworkObjects($factory);
+            $socialProfiles = array();
+            foreach ($socialNetworks as $network => $sn) {
+                $settings = $sn->getSettings();
+                $features = $settings->getSupportedFeatures();
+                if ($settings->isPublished() && in_array('public_activity', $features)) {
+                    $socialProfiles[$network]['data']     = $sn->getUserData($fields['email']);
+                    $socialProfiles[$network]['activity'] = $sn->getPublicActivity($fields['email']);
+                }
+            }
+        }
+
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'lead'        => $lead,
-                'security'    => $this->get('mautic.factory')->getSecurity(),
-                'permissions' => $permissions,
-                'dateFormats' => array(
+                'lead'           => $lead,
+                'fields'         => $fields,
+                'socialProfiles' => $socialProfiles,
+                'security'       => $this->get('mautic.factory')->getSecurity(),
+                'permissions'    => $permissions,
+                'dateFormats'    => array(
                     'datetime' => $factory->getParameter('date_format_full'),
                     'date'     => $factory->getParameter('date_format_dateonly'),
                     'time'     => $factory->getParameter('date_format_timeonly'),

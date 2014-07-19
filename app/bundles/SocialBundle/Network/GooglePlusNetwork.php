@@ -13,6 +13,9 @@ use Mautic\SocialBundle\Helper\NetworkIntegrationHelper;
 
 class GooglePlusNetwork extends CommonNetwork
 {
+    private $userEmail = '';
+    private $userId    = false;
+
     public function getName()
     {
         return 'GooglePlus';
@@ -22,20 +25,26 @@ class GooglePlusNetwork extends CommonNetwork
      * @param $email
      * @return mixed|null
      */
-    public function findUserByEmail($email)
+    private function findUserByEmail($email)
     {
-        $email = urlencode($email);
-        $keys  = $this->settings->getApiKeys();
-        if (!empty($keys['key'])) {
-            $url  = "https://www.googleapis.com/plus/v1/people?query={$email}&key={$keys['key']}";
-            $data = $this->makeCall($url);
+        if ($email != $this->userEmail || empty($this->userId)) {
+            $this->userEmail = $email;
+            $email = urlencode($email);
+            $keys  = $this->settings->getApiKeys();
+            if (!empty($keys['key'])) {
+                $url  = "https://www.googleapis.com/plus/v1/people?query={$email}&key={$keys['key']}";
+                $data = $this->makeCall($url);
 
-            if (!empty($data) && isset($data->items) && count($data->items)) {
-                $result = $data->items[0];
-                return $result;
+                if (!empty($data) && isset($data->items) && count($data->items)) {
+                    $result = $data->items[0];
+                    $this->userId = $result->id;
+                    return $this->userId;
+                }
             }
+        } elseif (!empty($this->userId)) {
+            return $this->userId;
         }
-        return null;
+        return false;
     }
 
     /**
@@ -46,18 +55,18 @@ class GooglePlusNetwork extends CommonNetwork
      */
     public function getUserData($email)
     {
-        $data = $this->findUserByEmail($email);
-        if ($data) {
+        $userid = $this->findUserByEmail($email);
+        if ($userid) {
             $key                          = $this->factory->getParameter('googleplus_apikey');
-            $url                          = "https://www.googleapis.com/plus/v1/people/{$data->id}?key={$key}";
+            $url                          = "https://www.googleapis.com/plus/v1/people/{$userid}?key={$key}";
             $data                         = $this->makeCall($url);
             $info                         = $this->matchUpData($data);
-            $info['googlePlusProfileUrl'] = $data->url;
+            $info['profileUrl'] = $data->url;
             if (isset($data->image->url)) {
                 //remove the size from the end
                 $image = $data->image->url;
                 $image                   = preg_replace('/\?.*/', '', $image);
-                $info["googlePlusImage"] = $image;
+                $info["profileImage"] = $image;
             }
             return $info;
         }
@@ -69,13 +78,13 @@ class GooglePlusNetwork extends CommonNetwork
      * @param $email
      * @return array
      */
-    public function getUserPublicPosts($email)
+    public function getPublicActivity($email)
     {
-        $data  = $this->findUserByEmail($email);
+        $id  = $this->findUserByEmail($email);
         $posts = array();
-        if ($data) {
+        if ($id) {
             $key  = $this->factory->getParameter('googleplus_apikey');
-            $url  = "https://www.googleapis.com/plus/v1/people/{$data->id}/activities/public?key={$key}&maxResults=5";
+            $url  = "https://www.googleapis.com/plus/v1/people/$id/activities/public?key={$key}&maxResults=5";
             $data = $this->makeCall($url);
 
             if (!empty($data) && isset($data->items) && count($data->items)) {
@@ -200,13 +209,15 @@ class GooglePlusNetwork extends CommonNetwork
     public function getAvailableFields()
     {
         return array(
-            "nickname" => array("type" => "string"),
-            "occupation" => array("type" => "string"),
-            "skills" => array("type" => "string"),
-            "birthday" => array("type" => "string"),
-            "gender" => array("type" => "string"),
-            "urls" => array(
-                "type" => "array_object",
+            "profileUrl"         => array("type" => "string"),
+            "profileImage"       => array("type" => "string"),
+            "nickname"           => array("type" => "string"),
+            "occupation"         => array("type" => "string"),
+            "skills"             => array("type" => "string"),
+            "birthday"           => array("type" => "string"),
+            "gender"             => array("type" => "string"),
+            "urls"               => array(
+                "type"   => "array_object",
                 "fields" => array(
                     "otherProfile",
                     "contributor",
@@ -214,8 +225,8 @@ class GooglePlusNetwork extends CommonNetwork
                     "other"
                 )
             ),
-            "name" => array(
-                "type" => "object",
+            "name"               => array(
+                "type"   => "object",
                 "fields" => array(
                     "formatted",
                     "familyName",
@@ -225,24 +236,24 @@ class GooglePlusNetwork extends CommonNetwork
                     "honorificSuffix"
                 )
             ),
-            "tagline" => array("type" => "string"),
-            "braggingRights" => array("type" => "string"),
-            "aboutMe" => array("type" => "string"),
-            "currentLocation" => array("type" => "string"),
+            "tagline"            => array("type" => "string"),
+            "braggingRights"     => array("type" => "string"),
+            "aboutMe"            => array("type" => "string"),
+            "currentLocation"    => array("type" => "string"),
             "relationshipStatus" => array("type" => "string"),
-            "organizations" => array(
+            "organizations"      => array(
                 "type"   => "array_object",
                 "fields" => array(
                     "work",
                     "home"
                 )
             ),
-            "placesLived" => array(
+            "placesLived"        => array(
                 "type" => "array_object"
             ),
-            "language" => array("type" => "string"),
-            "ageRange" => array(
-                "type" => "object",
+            "language"           => array("type" => "string"),
+            "ageRange"           => array(
+                "type"   => "object",
                 "fields" => array(
                     "min",
                     "max"
@@ -271,5 +282,4 @@ class GooglePlusNetwork extends CommonNetwork
     {
         return 'key';
     }
-
 }
