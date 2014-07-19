@@ -83,9 +83,14 @@ class CommonSubscriber implements EventSubscriberInterface
      */
     public function onBuildRoute (MauticEvents\RouteEvent $event)
     {
-        $path = $this->getSubscriberDirectory() .  "/../Resources/config/routing.php";
-        if (file_exists($path)) {
-            $event->addRoutes($path);
+        $routing = $this->getSubscriberDirectory() .  "/../Resources/config/routing.php";
+        if (file_exists($routing)) {
+            $event->addRoutes($routing);
+        } else {
+            $routing = $this->getSubscriberDirectory() .  "/../Resources/config/routing/routing.php";
+            if (file_exists($routing)) {
+                $event->addRoutes($routing);
+            }
         }
     }
 
