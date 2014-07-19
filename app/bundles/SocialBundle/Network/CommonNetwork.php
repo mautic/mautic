@@ -166,4 +166,9 @@ class CommonNetwork
         return implode(' ', $response);
     }
 
+    public function getPublicActivity($email)
+    {
+        return array();
+    }
+
 }

@@ -11,6 +11,8 @@ namespace Mautic\SocialBundle\Network;
 
 class FoursquareNetwork extends CommonNetwork
 {
+    private $userEmail = '';
+    private $userId    = false;
 
     public function getName()
     {
@@ -44,21 +46,26 @@ class FoursquareNetwork extends CommonNetwork
      * @param $email
      * @return mixed|null
      */
-    public function findUserByEmail($email)
+    private function findUserByEmail($email)
     {
-        $email = urlencode($email);
-        $keys  = $this->settings->getApiKeys();
+        if ($email != $this->userEmail || empty($this->userId)) {
+            $email = urlencode($email);
+            $keys  = $this->settings->getApiKeys();
 
-        if (!empty($keys['access_token'])) {
-            $url  = "https://api.foursquare.com/v2/users/search?v=20140719&email={$email}&oauth_token={$keys['access_token']}";
-            $data = $this->makeCall($url);
-            if (!empty($data) && isset($data->response->results) && count($data->response->results)) {
-                $result = $data->response->results[0];
-                return $result;
+            if (!empty($keys['access_token'])) {
+                $url  = "https://api.foursquare.com/v2/users/search?v=20140719&email={$email}&oauth_token={$keys['access_token']}";
+                $data = $this->makeCall($url);
+                if (!empty($data) && isset($data->response->results) && count($data->response->results)) {
+                    $result = $data->response->results[0];
+                    $this->userId = $result->id;
+                    return $this->userId;
+                }
             }
+        } elseif (!empty($this->userId)) {
+            return $this->userId;
         }
 
-        return null;
+        return false;
     }
 
 
@@ -70,20 +77,20 @@ class FoursquareNetwork extends CommonNetwork
      */
     public function getUserData($email)
     {
-        $data = $this->findUserByEmail($email);
-
-        if ($data) {
+        $id = $this->findUserByEmail($email);
+        if ($id) {
             $keys = $this->settings->getApiKeys();
 
             if (!empty($keys['access_token'])) {
-                $url  = "https://api.foursquare.com/v2/users/{$data->id}?v=20140719&&oauth_token={$keys['access_token']}";
+                $url  = "https://api.foursquare.com/v2/users/{$id}?v=20140719&&oauth_token={$keys['access_token']}";
                 $data = $this->makeCall($url);
                 if (!empty($data) && isset($data->response->user)) {
                     $result = $data->response->user;
                     $info   = $this->matchUpData($result);
                     if (isset($result->photo)) {
-                        $info['FoursquareImage'] = $result->photo->prefix . '100x100' . $result->photo->suffix;
+                        $info['profileImage'] = $result->photo->prefix . '300x300' . $result->photo->suffix;
                     }
+                    $info['profileUrl'] = 'https://foursquare.com/user/' . $id;
                     return $info;
                 }
             }
@@ -136,12 +143,14 @@ class FoursquareNetwork extends CommonNetwork
     public function getAvailableFields()
     {
         return array(
-            "firstName" => array("type" => "string"),
-            "lastName"  => array("type" => "string"),
-            "gender"    => array("type" => "string"),
-            "homeCity"  => array("type" => "string"),
-            "bio"       => array("type" => "string"),
-            "contact"   => array(
+            "profileUrl"   => array("type" => "string"),
+            "profileImage" => array("type" => "string"),
+            "firstName"    => array("type" => "string"),
+            "lastName"     => array("type" => "string"),
+            "gender"       => array("type" => "string"),
+            "homeCity"     => array("type" => "string"),
+            "bio"          => array("type" => "string"),
+            "contact"      => array(
                 "type"   => "object",
                 "fields" => array(
                     "twitter",
