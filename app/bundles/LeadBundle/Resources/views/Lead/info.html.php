@@ -9,7 +9,9 @@
 ?>
 
 <div class="panel panel-success">
-    <div class="panel-heading"><?php echo $view['translator']->trans('mautic.lead.lead.header.leadinfo'); ?></div>
+    <div class="panel-heading">
+        <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.lead.lead.header.leadinfo'); ?></h3>
+    </div>
     <div class="panel-body">
         <?php if ($lead->getOwner()): ?>
             <div class="row">
