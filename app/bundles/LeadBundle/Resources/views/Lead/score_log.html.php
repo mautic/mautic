@@ -10,12 +10,11 @@
 //@todo generate score log view
 ?>
 
-<div class="panel panel-success">
+<div class="panel panel-default">
     <div class="panel-heading">
         <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.lead.lead.header.scorelog'); ?></h3>
     </div>
-    <div class="panel-body">
-        <div class="table-responsive">
+    <div class="table-responsive panel-collapse pull out">
         <table class="table table-hover table-bordered table-striped table-condensed">
             <thead>
                 <tr>
@@ -78,5 +77,4 @@
             </tbody>
         </table>
         </div>
-    </div>
 </div>

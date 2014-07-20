@@ -10,7 +10,7 @@
 
 <div class="panel panel-default">
     <div class="panel-heading">
-        <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.lead.lead.header.ipaddress'); ?></h3>
+        <h3 class="panel-title">Pages Visited</h3>
     </div>
     <div class="table-responsive panel-collapse pull out">
             <table class="table table-hover table-bordered table-striped table-condensed">

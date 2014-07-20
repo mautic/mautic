@@ -10,20 +10,23 @@
 //@todo generate score log view
 ?>
 
-<div class="panel panel-success">
-    <div class="panel-heading"><?php echo $view['translator']->trans('mautic.lead.lead.header.socialprofiles'); ?></div>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <div class="panel-title"><?php echo $view['translator']->trans('mautic.lead.lead.header.socialprofiles'); ?></div>
+        <div class="panel-toolbar">
+            <?php $networks = array_keys($socialProfiles); ?>
+            <ul class="nav nav-tabs" role="tablist">
+                <?php foreach ($networks as $k => $network): ?>
+                <li<?php echo ($k === 0) ? ' class="active"' : ''; ?>>
+                    <a href="#<?php echo $network; ?>" role="tab" data-toggle="tab">
+                        <?php echo $view['translator']->trans('mautic.social.'.$network); ?>
+                    </a>
+                </li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
+    </div>
     <div class="panel-body">
-        <?php $networks = array_keys($socialProfiles); ?>
-        <ul class="nav nav-tabs" role="tablist">
-            <?php foreach ($networks as $k => $network): ?>
-            <li<?php echo ($k === 0) ? ' class="active"' : ''; ?>>
-                <a href="#<?php echo $network; ?>" role="tab" data-toggle="tab">
-                    <?php echo $view['translator']->trans('mautic.social.'.$network); ?>
-                </a>
-            </li>
-            <?php endforeach; ?>
-        </ul>
-
         <div class="tab-content">
             <?php $count = 0; ?>
             <?php foreach ($socialProfiles as $network => $details): ?>

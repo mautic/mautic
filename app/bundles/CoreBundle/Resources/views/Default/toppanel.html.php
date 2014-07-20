@@ -7,20 +7,23 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
+<div class="page-header-section">
+    <?php echo $view->render('MauticCoreBundle:Default:breadcrumbs.html.php'); ?>
+</div>
 
-<?php if ($view["slots"]->has("headerTitle")): ?>
+<?php if ($view["slots"]->has("actions")): ?>
+<div class="page-header-section">
+    <div class="toolbar">
+        <?php echo $view['slots']->output('actions'); ?>
+    </div>
+</div>
+<?php endif; ?>
+
+<?php /*
+
         <div class="page-header-section">
             <h4 class="title semibold"><?php $view["slots"]->output("headerTitle"); ?></h4>
         </div>
-<?php endif; ?>
-
-<div class="page-header-section">
-    <div class="toolbar">
-        <?php echo $view->render('MauticCoreBundle:Default:breadcrumbs.html.php'); ?>
-    </div>
-</div>
-
-<?php /*
 
 
 <div class="panel-toggle left-panel-toggle pull-left">

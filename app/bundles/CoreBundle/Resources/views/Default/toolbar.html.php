@@ -56,7 +56,7 @@ endif;
             </button>
             <?php endif; ?>
 
-            <?php if (!empty($actions)): ?>
+            <?php /* if (!empty($actions)): ?>
             <button type="button" class="btn btn-default dropdown-toggle action-buttons" data-toggle="dropdown">
                 <span><?php echo $view['translator']->trans('mautic.core.form.actions'); ?></span>
                 <i class="fa fa-angle-down"></i>
@@ -65,7 +65,7 @@ endif;
             <ul class="dropdown-menu pull-right">
                 <?php echo $actions; ?>
             </ul>
-            <?php endif; ?>
+            <?php endif; */ ?>
         </div>
     </div>
 </div>
