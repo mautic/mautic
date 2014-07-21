@@ -28,7 +28,7 @@
         <?php $col = 12; ?>
         <?php if (!empty($fields['email'])): ?>
         <div class="col-sm-2">
-            
+
         </div>
         <?php $col = 10; ?>
         <?php endif; ?>
@@ -54,15 +54,17 @@
                     </div>
                 </div>
             <?php endif; ?>
-            <?php foreach ($lead->getFields() as $field): ?>
-            <?php if (!$field->getValue()) continue; ?>
+            <?php foreach ($fields as $field): ?>
+                <?php if (empty($field['value'])) continue; ?>
                 <div class="row">
                     <div class="col-xs-3 field-label">
-                        <?php echo $field->getField()->getLabel(); ?>
+                        <?php echo $field['label']; ?>
                     </div>
                     <div class="col-xs-9 field-value">
                         <?php echo $view->render('MauticLeadBundle:Lead:info_value.html.php', array(
-                            'field'       => $field,
+                            'value'       => $field['value'],
+                            'name'        => $field['alias'],
+                            'type'        => $field['type'],
                             'dateFormats' => $dateFormats
                         )); ?>
                     </div>
