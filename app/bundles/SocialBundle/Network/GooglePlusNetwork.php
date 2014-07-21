@@ -55,18 +55,10 @@ class GooglePlusNetwork extends CommonNetwork
      */
     public function getUserData($fields)
     {
-        if (isset($fields['email'])) {
-            $email = $fields['email'];
-        } elseif (isset($fields['field_email'])) {
-            $email = $fields['field_email'];
-        } else {
-            return null;
-        }
+        $userid = $this->getUserId($fields);
+        $keys   = $this->settings->getApiKeys();
 
-        $userid = $this->findUserByEmail($email);
-        $keys  = $this->settings->getApiKeys();
         if ($userid && !empty($keys['key'])) {
-
             $url                = "https://www.googleapis.com/plus/v1/people/{$userid}?key={$keys['key']}";
             $data               = $this->makeCall($url);
             $info               = $this->matchUpData($data);
@@ -89,15 +81,7 @@ class GooglePlusNetwork extends CommonNetwork
      */
     public function getPublicActivity($fields)
     {
-        if (isset($fields['email'])) {
-            $email = $fields['email'];
-        } elseif (isset($fields['field_email'])) {
-            $email = $fields['field_email'];
-        } else {
-            return null;
-        }
-
-        $id    = $this->findUserByEmail($email);
+        $id    = $this->getUserId($fields);
         $keys  = $this->settings->getApiKeys();
         $posts = array();
         if ($id && !empty($keys['key'])) {
@@ -299,5 +283,22 @@ class GooglePlusNetwork extends CommonNetwork
     public function getAuthenticationType()
     {
         return 'key';
+    }
+
+    private function getUserId($fields)
+    {
+        if (isset($fields['email'])) {
+            //from a lead profile
+            $email = $fields['email']['value'];
+        } elseif (isset($fields['field_email'])) {
+            //from creating a lead
+            $email = $fields['field_email'];
+        } else {
+
+            return null;
+        }
+        $id = $this->findUserByEmail($email);
+
+        return $id;
     }
 }

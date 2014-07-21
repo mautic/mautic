@@ -261,8 +261,10 @@ class TwitterNetwork extends CommonNetwork
     private function getHandle($fields)
     {
         if (isset($fields['twitter'])) {
-            $handle = $fields['twitter'];
+            //from lead profile
+            $handle = $fields['twitter']['value'];
         } elseif (isset($fields['field_twitter'])) {
+            //from creating a lead
             $handle = $fields['field_twitter'];
         } else {
             return null;

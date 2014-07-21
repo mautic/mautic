@@ -81,8 +81,8 @@
                                 </div>
                                 <div class="col-xs-9 field-value">
                                     <?php echo $view->render('MauticLeadBundle:Lead:info_value.html.php', array(
-                                        'name'       => $l,
-                                        'value'      => $v
+                                        'name'  => $l,
+                                        'value' => $v
                                     )); ?>
                                 </div>
                             </div>

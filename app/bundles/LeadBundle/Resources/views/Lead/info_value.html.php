@@ -7,13 +7,10 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-if (!empty($field)) {
-    $name  = $field->getField()->getLabel();
-    $value = $field->getValue();
-    $type  = $field->getField()->getType();
-} else {
+if (empty($type)):
     $type = 'string';
-}
+endif;
+
 ?>
 
 <?php if (stripos($name, "email") !== false): ?>

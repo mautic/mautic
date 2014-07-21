@@ -18,7 +18,7 @@ if ($tmpl == 'index')
         <div class="body-white table-layout">
             <div class="col-xs-4 padding-none">
                 <img class="img img-responsive"
-                     src="https://www.gravatar.com/avatar/<?php echo md5(strtolower(trim(@$fields['email']))); ?>?&s=250" />
+                     src="https://www.gravatar.com/avatar/<?php echo md5(strtolower(trim($fields['email']['value']))); ?>?&s=250" />
             </div>
             <div class="col-xs-8 valign-middle">
                 <h5>
@@ -30,23 +30,23 @@ if ($tmpl == 'index')
                     <span class="badge"><?php echo $item->getScore(); ?></span>
                 </h5>
                 <div class="text-muted">
-                    <i class="fa fa-fw fa-building"></i><span class="padding-sm-left"><?php echo @$fields['company']; ?></span>
+                    <i class="fa fa-fw fa-building"></i><span class="padding-sm-left"><?php echo $fields['company']['value']; ?></span>
                 </div>
                 <div class="text-muted">
-                    <i class="fa fa-fw fa-envelope"></i><span class="padding-sm-left"><?php echo @$fields['email']; ?></span>
+                    <i class="fa fa-fw fa-envelope"></i><span class="padding-sm-left"><?php echo $fields['email']['value']; ?></span>
                 </div>
                 <div class="text-muted">
                     <i class="fa fa-fw fa-map-marker"></i><span class="padding-sm-left"><?php
-                    if (!empty($fields['city']) && !empty($fields['state']))
-                        echo $fields['city'] . ', ' . $fields['state'];
-                    elseif (!empty($fields['city']))
-                        echo $fields['city'];
-                    elseif (!empty($fields['state']))
-                        echo $fields['state'];
+                    if (!empty($fields['city']['value']) && !empty($fields['state']['value']))
+                        echo $fields['city']['value'] . ', ' . $fields['state']['value'];
+                    elseif (!empty($fields['city']['value']))
+                        echo $fields['city']['value]'];
+                    elseif (!empty($fields['state']['value']))
+                        echo $fields['state']['value'];
                     ?></span>
                 </div>
                 <div class="text-muted">
-                    <i class="fa fa-fw fa-globe"></i><span class="padding-sm-left"><?php echo @$fields['country']; ?></span>
+                    <i class="fa fa-fw fa-globe"></i><span class="padding-sm-left"><?php echo $fields['country']['value']; ?></span>
                 </div>
             </div>
         </div>

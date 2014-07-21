@@ -200,21 +200,8 @@ class LeadController extends FormController
             'objectId'     => $lead->getId())
         );
 
-        $fields     = $model->organizeFieldsByAlias($lead->getFields());
-        $socialActivity = array();
-        if (isset($fields['email'])) {
-            //check to see if there are social profiles activated
-            $socialNetworks = NetworkIntegrationHelper::getNetworkObjects($factory);
-            $socialProfiles = array();
-            foreach ($socialNetworks as $network => $sn) {
-                $settings = $sn->getSettings();
-                $features = $settings->getSupportedFeatures();
-                if ($settings->isPublished() && in_array('public_activity', $features)) {
-                    $socialProfiles[$network]['data']     = $sn->getUserData($fields);
-                    $socialProfiles[$network]['activity'] = $sn->getPublicActivity($fields);
-                }
-            }
-        }
+        $fields         = $model->organizeFieldsByAlias($lead->getFields());
+        $socialProfiles = NetworkIntegrationHelper::getUserProfile($factory, $lead, $fields);
 
         return $this->delegateView(array(
             'viewParameters'  => array(

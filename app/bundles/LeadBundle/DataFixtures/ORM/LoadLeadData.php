@@ -160,6 +160,9 @@ class LoadLeadData extends AbstractFixture implements OrderedFixtureInterface, C
             'lastname'  => "Doe",
             'company'   => "",
             'email'     => "janedoe@example.com",
+            'city'      => "",
+            'state'     => "",
+            'country'   => ""
         );
 
         foreach ($fields as $name => $value) {
@@ -181,6 +184,9 @@ class LoadLeadData extends AbstractFixture implements OrderedFixtureInterface, C
             'lastname'  => "",
             'company'   => "",
             'email'     => "",
+            'city'      => "",
+            'state'     => "",
+            'country'   => ""
         );
 
         foreach ($fields as $name => $value) {

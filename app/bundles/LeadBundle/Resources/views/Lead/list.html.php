@@ -100,14 +100,14 @@ if ($tmpl == 'index')
                             <div class="small"><?php echo $item->getSecondaryIdentifier(); ?></div>
                         </a>
                     </td>
-                    <td class="visible-md visible-lg"><?php echo @$fields['email']; ?></td>
+                    <td class="visible-md visible-lg"><?php echo $fields['email']['value']; ?></td>
                     <td class="visible-md visible-lg"><?php
                         if (!empty($fields['city']) && !empty($fields['state']))
-                            echo $fields['city'] . ', ' . $fields['state'];
+                            echo $fields['city']['value'] . ', ' . $fields['state']['value'];
                         elseif (!empty($fields['city']))
-                            echo $fields['city'];
+                            echo $fields['city']['value'];
                         elseif (!empty($fields['state']))
-                            echo $fields['state'];
+                            echo $fields['state']['value'];
                         ?>
                     </td>
                     <td class="text-center">

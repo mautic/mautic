@@ -77,15 +77,7 @@ class FoursquareNetwork extends CommonNetwork
      */
     public function getUserData($fields)
     {
-        if (isset($fields['email'])) {
-            $email = $fields['email'];
-        } elseif (isset($fields['field_email'])) {
-            $email = $fields['field_email'];
-        } else {
-            return null;
-        }
-        $id = $this->findUserByEmail($email);
-        if ($id) {
+        if ($id = $this->getUserId($fields)) {
             $keys = $this->settings->getApiKeys();
 
             if (!empty($keys['access_token'])) {
@@ -114,7 +106,6 @@ class FoursquareNetwork extends CommonNetwork
         }
         return '';
     }
-
 
     /**
      * Convert and assign the data to assignable fields
@@ -177,5 +168,22 @@ class FoursquareNetwork extends CommonNetwork
             'lead_fields',
             'public_activity'
         );
+    }
+
+    private function getUserId($fields)
+    {
+        if (isset($fields['email'])) {
+            //from a lead profile
+            $email = $fields['email']['value'];
+        } elseif (isset($fields['field_email'])) {
+            //from creating a lead
+            $email = $fields['field_email'];
+        } else {
+
+            return null;
+        }
+        $id = $this->findUserByEmail($email);
+
+        return $id;
     }
 }

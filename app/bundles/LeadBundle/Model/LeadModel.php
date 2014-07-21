@@ -287,7 +287,11 @@ class LeadModel extends FormModel
         $array = array();
         foreach ($fieldValues as $v) {
             $field = $v->getField();
-            $array[$field->getAlias()] = $v->getValue();
+            $array[$field->getAlias()]['id']    = $field->getId();
+            $array[$field->getAlias()]['label'] = $field->getLabel();
+            $array[$field->getAlias()]['alias'] = $field->getLabel();
+            $array[$field->getAlias()]['value'] = $v->getValue();
+            $array[$field->getAlias()]['type']  = $field->getType();
         }
         return $array;
     }

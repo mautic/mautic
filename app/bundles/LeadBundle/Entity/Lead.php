@@ -22,6 +22,7 @@ use JMS\Serializer\Annotation as Serializer;
  */
 class Lead extends FormEntity
 {
+
     /**
      * @ORM\Column(type="integer")
      * @ORM\Id()
@@ -71,6 +72,16 @@ class Lead extends FormEntity
      * @Serializer\Groups({"full", "limited"})
      */
     private $ipAddresses;
+
+    /**
+     * @ORM\Column(type="array", nullable=true)
+     */
+    private $internal = array();
+
+    /**
+     * @ORM\Column(type="array", nullable=true)
+     */
+    private $socialCache = array();
 
     /**
      * Unmapped array used internally to update field values rather than creating new ones
@@ -394,5 +405,45 @@ class Lead extends FormEntity
     public function getScoreChangeLog()
     {
         return $this->scoreChangeLog;
+    }
+
+    /**
+     * Set internal storage
+     *
+     * @param $internal
+     */
+    public function setInternal($internal)
+    {
+        $this->internal = $internal;
+    }
+
+    /**
+     * Get internal storage
+     *
+     * @return mixed
+     */
+    public function getInternal()
+    {
+        return $this->internal;
+    }
+
+    /**
+     * Set social cache
+     *
+     * @param $cache
+     */
+    public function setSocialCache($cache)
+    {
+        $this->socialCache = $cache;
+    }
+
+    /**
+     * Get social cache
+     *
+     * @return mixed
+     */
+    public function getSocialCache()
+    {
+        return $this->socialCache;
     }
 }
