@@ -198,7 +198,6 @@ class Filemanager {
 		}
 
 		if(!is_dir($current_path)) {
-            die(var_dump($current_path));
 			$this->error(sprintf($this->lang('DIRECTORY_NOT_EXIST'),$this->get['path']));
 		}
 		if(!$handle = opendir($current_path)) {

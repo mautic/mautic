@@ -169,6 +169,7 @@ class CommonRepository extends EntityRepository
         $filter       = array_key_exists('filter', $args) ? $args['filter'] : '';
         $filterHelper = new SearchStringHelper();
         $string       = '';
+        $filterCount  = 0;
 
         if (!empty($filter)) {
             if (is_array($filter)) {
@@ -197,21 +198,31 @@ class CommonRepository extends EntityRepository
                 $string = $filter;
             }
 
-            //remove wildcards passed by user
-            if (strpos($string, '%') !== false) {
-                $string = str_replace('%', '', $string);
+            //parse the filter if set
+            if (!empty($string) || !empty($forceExpressions)) {
+                if (!empty($string)) {
+                    //remove wildcards passed by user
+                    if (strpos($string, '%') !== false) {
+                        $string = str_replace('%', '', $string);
+                    }
+
+                    $filter = $filterHelper->parseSearchString($string);
+                    list($expressions, $parameters) = $this->addAdvancedSearchWhereClause($q, $filter);
+
+                    if (!empty($forceExpressions)) {
+                        $expressions->add($forceExpressions);
+                        $parameters = array_merge($parameters, $forceParameters);
+                    }
+                } elseif (!empty($forceExpressions)) {
+                    //We do not have a user search but have some required filters
+                    $expressions = $forceExpressions;
+                    $parameters  = $forceParameters;
+                }
+
+                $filterCount = count($expressions->getParts());
             }
 
-            $filter = $filterHelper->parseSearchString($string);
-            list($expressions, $parameters) = $this->addAdvancedSearchWhereClause($q, $filter);
-
-            if (!empty($forceExpressions)) {
-                $expressions->add($forceExpressions);
-                $parameters  = array_merge($parameters, $forceParameters);
-            }
-
-            $count = count($expressions->getParts());
-            if (!empty($count)) {
+            if (!empty($filterCount)) {
                 $q->where($expressions)
                     ->setParameters($parameters);
             } else {

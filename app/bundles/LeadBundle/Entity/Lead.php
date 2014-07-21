@@ -51,7 +51,7 @@ class Lead extends FormEntity
     private $score = 0;
 
     /**
-     * @ORM\OneToMany(targetEntity="LeadFieldValue", mappedBy="lead", indexBy="field", cascade={"all"}, orphanRemoval=true, fetch="EXTRA_LAZY")
+     * @ORM\OneToMany(targetEntity="LeadFieldValue", mappedBy="lead", indexBy="field", cascade={"all"})
      */
     private $fields;
 

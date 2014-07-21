@@ -39,6 +39,9 @@ class SearchStringHelper
         if (!empty($closingChars)) {
             self::$closingChars = $closingChars;
         }
+        if (empty($input)) {
+
+        }
 
         $input   = strtolower(trim(strip_tags($input)));
         $filters = self::splitUpSearchString($input);
