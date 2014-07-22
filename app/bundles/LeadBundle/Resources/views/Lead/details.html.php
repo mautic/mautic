@@ -11,7 +11,12 @@
 <div class="row">
     <div class="col-sm-10">
         <h1 class="mt0"><?php echo $lead->getName(); ?></h1>
-        <h4 class="mt0">My Position at <a href="#">Company Name</a></h4>
+        <h4 class="mt0">
+            <?php if(isset($fields['position']): ?>
+                <?php echo $fields['position']); ?>
+            <?php endif; ?>
+            at 
+            <a href="#">Company Name</a></h4>
     </div>
     <div class="col-sm-2">
         <div class="alert alert-success text-center pa15">
