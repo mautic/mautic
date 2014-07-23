@@ -201,6 +201,7 @@ class NetworkIntegrationHelper
 
             //check to see if there are social profiles activated
             $socialNetworks = NetworkIntegrationHelper::getNetworkObjects($factory);
+
             foreach ($socialNetworks as $network => $sn) {
                 $settings        = $sn->getSettings();
                 $features        = $settings->getSupportedFeatures();
@@ -256,28 +257,53 @@ class NetworkIntegrationHelper
      */
     public static function getUserIdentifierField($networkObject, $fields)
     {
-        $availableFields = array_keys($fields);
         $identifierField = $networkObject->getIdentifierField();
         $identifier      = (is_array($identifierField)) ? array() : false;
+        $matchFound      = false;
 
-        foreach ($availableFields as $f) {
+        $findMatch = function ($f, $fields) use(&$identifierField, &$identifier, &$matchFound) {
             if (is_array($identifier)) {
                 //there are multiple fields the network can identify by
                 foreach ($identifierField as $idf) {
                     $value = (is_array($fields[$f]) && isset($fields[$f]['value'])) ? $fields[$f]['value'] : $fields[$f];
+
                     if (!in_array($value, $identifier) && strpos($f, $idf) !== false) {
                         //remove field prefix in case this is from a lead form so the network doesn't have to account for it
                         $parsedField              = str_ireplace('field_', '', $f);
                         $identifier[$parsedField] = $value;
                         if (count($identifier) === count($identifierField)) {
                             //found enough matches so break
+                            $matchFound = true;
                             break;
                         }
                     }
                 }
             } elseif ($identifierField == $f || strpos($f, $identifierField) !== false) {
+                $matchFound = true;
                 $identifier = (is_array($fields[$f])) ? $fields[$f]['value'] : $fields[$f];
-                break;
+            }
+        };
+
+        if (isset($fields['core'])) {
+            //fields are group
+            foreach ($fields as $group => $groupFields) {
+                $availableFields = array_keys($groupFields);
+                foreach ($availableFields as $f) {
+                    $findMatch($f, $groupFields);
+
+                    if ($matchFound) {
+                        break;
+                    }
+                }
+            }
+        } else {
+            $availableFields = array_keys($fields);
+            foreach ($availableFields as $f) {
+                $findMatch($f, $fields);
+
+                if ($matchFound) {
+                    break;
+                }
             }
         }
 
