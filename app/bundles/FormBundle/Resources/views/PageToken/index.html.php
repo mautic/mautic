@@ -34,4 +34,4 @@ $searchBtnClass = (!empty($searchValue)) ? "fa-eraser" : "fa-search";
         <i class="fa fa-chevron-circle-down"></i>
     </div>
 </div>
-<?php $view['slots']->output('_content'); ?>
+<?php $view['blocks']->output('_content'); ?>

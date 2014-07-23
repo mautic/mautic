@@ -8,8 +8,8 @@
  */
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
-$view['slots']->set('mauticContent', 'user');
-$view["slots"]->set("headerTitle", $view['translator']->trans(
+$view['blocks']->set('mauticContent', 'user');
+$view['blocks']->set("headerTitle", $view['translator']->trans(
     'mautic.user.user.header.contact',
     array('%name%' => $user->getName()))
 );

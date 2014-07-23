@@ -8,7 +8,7 @@
  */
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
-$view['slots']->set('mauticContent', 'page');
+$view['blocks']->set('mauticContent', 'page');
 
 $variantParent = $activePage->getVariantParent();
 $subheader = ($variantParent) ? '<span class="small"> - ' . $view['translator']->trans('mautic.page.page.header.editvariant', array(
@@ -21,7 +21,7 @@ $header = ($activePage->getId()) ?
         array('%name%' => $activePage->getTitle())) :
     $view['translator']->trans('mautic.page.page.header.new');
 
-$view["slots"]->set("headerTitle", $header.$subheader);
+$view['blocks']->set("headerTitle", $header.$subheader);
 ?>
 
 <div class="scrollable">

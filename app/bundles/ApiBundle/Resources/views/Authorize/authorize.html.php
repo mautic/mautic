@@ -8,7 +8,7 @@
  */
 
 $view->extend('MauticUserBundle:Security:base.html.php');
-$view['slots']->set('header', $view['translator']->trans('mautic.api.oauth.header'));
+$view['blocks']->set('header', $view['translator']->trans('mautic.api.oauth.header'));
 $name = $client->getName();
 $msg  = (!empty($name)) ? $view['translator']->trans('mautic.api.oauth.clientwithname', array('%name%' => $name)) :
     $view['translator']->trans('mautic.api.oauth.clientnoname');

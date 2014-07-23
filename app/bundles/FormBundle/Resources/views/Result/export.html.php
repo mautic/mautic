@@ -8,9 +8,9 @@
  */
 
 $view->extend('MauticCoreBundle:Default:slim.html.php');
-$view['slots']->set('pageTitle', $pageTitle);
-$view['slots']->set('mauticContent', 'formresult');
-$view["slots"]->set("headerTitle", $view['translator']->trans('mautic.form.result.header.index', array(
+$view['blocks']->set('pageTitle', $pageTitle);
+$view['blocks']->set('mauticContent', 'formresult');
+$view['blocks']->set("headerTitle", $view['translator']->trans('mautic.form.result.header.index', array(
     '%name%' => $form->getName()
 )));
 ?>

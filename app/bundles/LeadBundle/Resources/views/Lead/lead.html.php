@@ -9,12 +9,12 @@
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view->extend('MauticCoreBundle:Default:content.html.php');
-$view['slots']->set('mauticContent', 'lead');
-$view["slots"]->set("headerTitle",
+$view['blocks']->set('mauticContent', 'lead');
+$view['blocks']->set("headerTitle",
     '<span class="span-block">' . $view['translator']->trans($lead->getPrimaryIdentifier())) . '</span><span class="span-block small">' .
     $lead->getSecondaryIdentifier() . '</span>';
 ?>
-<?php $view["slots"]->start("actions"); ?>
+<?php $view['blocks']->start("actions"); ?>
 <?php if ($security->hasEntityAccess($permissions['lead:leads:editown'], $permissions['lead:leads:editother'], $lead->getOwner())): ?>
     <a class="btn btn-default" href="<?php echo $this->container->get('router')->generate(
         'mautic_lead_action', array("objectAction" => "edit", "objectId" => $lead->getId())); ?>"
@@ -37,7 +37,7 @@ $view["slots"]->set("headerTitle",
         <span><?php echo $view['translator']->trans('mautic.core.form.delete'); ?></span>
     </a>
 <?php endif; ?>
-<?php $view["slots"]->stop(); ?>
+<?php $view['blocks']->stop(); ?>
 <div class="scrollable lead-details">
   <div class="row">
     <div class="col-sm-3">

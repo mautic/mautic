@@ -8,11 +8,9 @@
  */
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
-$view['slots']->set('mauticContent', 'role');
+$view['blocks']->set('mauticContent', 'role');
 
-$view['slots']->start('jsDeclarations');
-echo "MauticVars.permissionList = " . json_encode($permissionList) . "\n";
-$view['slots']->stop();
+$view['blocks']->addScriptDeclaration("MauticVars.permissionList = " . json_encode($permissionList), 'bodyClose');
 
 $objectId = $form->vars['data']->getId();
 if (!empty($objectId)) {
@@ -21,7 +19,7 @@ if (!empty($objectId)) {
 } else {
     $header = $view['translator']->trans('mautic.user.role.header.new');
 }
-$view["slots"]->set("headerTitle", $header);
+$view['blocks']->set("headerTitle", $header);
 ?>
 
 <div class="scrollable">

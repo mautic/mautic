@@ -10,7 +10,7 @@
 if (!$app->getRequest()->isXmlHttpRequest()):
     //load base template
     $view->extend('MauticUserBundle:Security:base.html.php');
-    $view['slots']->set('header', $view['translator']->trans('mautic.user.auth.header'));
+    $view['blocks']->set('header', $view['translator']->trans('mautic.user.auth.header'));
 else:
     $view->extend('MauticUserBundle:Security:ajax.html.php');
 endif;

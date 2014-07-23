@@ -8,15 +8,15 @@
  */
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
-$view['slots']->set('mauticContent', 'user');
-$view["slots"]->set("headerTitle", $view['translator']->trans('mautic.user.user.header.index'));
-$view['slots']->set('searchUri', $this->container->get('router')->generate('mautic_user_index'));
-$view['slots']->set('searchString', $app->getSession()->get('mautic.user.filter'));
-$view['slots']->set('searchHelp', $view['translator']->trans('mautic.user.user.help.searchcommands'));
+$view['blocks']->set('mauticContent', 'user');
+$view['blocks']->set("headerTitle", $view['translator']->trans('mautic.user.user.header.index'));
+$view['blocks']->set('searchUri', $this->container->get('router')->generate('mautic_user_index'));
+$view['blocks']->set('searchString', $app->getSession()->get('mautic.user.filter'));
+$view['blocks']->set('searchHelp', $view['translator']->trans('mautic.user.user.help.searchcommands'));
 ?>
 
 <?php if ($permissions['create']): ?>
-<?php $view["slots"]->start("actions"); ?>
+<?php $view['blocks']->start("actions"); ?>
 <li>
     <a href="<?php echo $this->container->get('router')->generate(
         'mautic_user_action', array("objectAction" => "new")); ?>"
@@ -25,7 +25,7 @@ $view['slots']->set('searchHelp', $view['translator']->trans('mautic.user.user.h
         <?php echo $view["translator"]->trans("mautic.user.user.menu.new"); ?>
     </a>
 </li>
-<?php $view["slots"]->stop(); ?>
+<?php $view['blocks']->stop(); ?>
 <?php endif; ?>
 
-<?php $view['slots']->output('_content'); ?>
+<?php $view['blocks']->output('_content'); ?>

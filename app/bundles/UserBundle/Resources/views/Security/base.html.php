@@ -25,12 +25,12 @@
 <div class="login-container">
     <div class="container-fluid">
         <img src="<?php echo $view['assets']->getUrl('assets/images/mautic_logo.png') ?>" />
-        <h2 class="user-login-heading"><?php $view['slots']->output('header', ''); ?></h2>
+        <h2 class="user-login-heading"><?php $view['blocks']->output('header', ''); ?></h2>
         <div id="main-panel-flash-msgs">
             <?php echo $view->render('MauticCoreBundle:Default:flashes.html.php'); ?>
         </div>
 
-        <?php $view['slots']->output('_content'); ?>
+        <?php $view['blocks']->output('_content'); ?>
     </div>
 </div>
 <script>

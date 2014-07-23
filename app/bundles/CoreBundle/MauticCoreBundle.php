@@ -9,7 +9,9 @@
 
 namespace Mautic\CoreBundle;
 
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Mautic\CoreBundle\DependencyInjection\Compiler;
 
 /**
  * Class MauticCoreBundle
@@ -18,5 +20,8 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class MauticCoreBundle extends Bundle
 {
-
+    public function build(ContainerBuilder $container)
+    {
+        $container->addCompilerPass(new Compiler\TemplatingPass());
+    }
 }

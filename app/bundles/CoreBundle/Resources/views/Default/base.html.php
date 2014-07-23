@@ -13,6 +13,7 @@ $activePanelClasses  = ($app->getSession()->get('left-panel', 'default') == 'unp
 <html>
     <?php echo $view->render('MauticCoreBundle:Default:head.html.php'); ?>
     <body>
+        <?php $view['blocks']->outputScripts("bodyOpen"); ?>
         <div class="loading-message hidden">
             <div class="loading-message-inner-wrapper bg-success">
                 <?php echo $view['translator']->trans('mautic.core.loading'); ?>
@@ -32,7 +33,7 @@ $activePanelClasses  = ($app->getSession()->get('left-panel', 'default') == 'unp
                     <?php echo $view->render('MauticCoreBundle:Default:toppanel.html.php'); ?>
                 </div>
 
-                <?php $view['slots']->output('_content'); ?>
+                <?php $view['blocks']->output('_content'); ?>
             </div>
         </section>
 
@@ -49,12 +50,12 @@ $activePanelClasses  = ($app->getSession()->get('left-panel', 'default') == 'unp
                         <?php echo $view->render('MauticCoreBundle:Default:flashes.html.php'); ?>
                     </div>
                     <div id="page-content" class="main-panel-content container-fluid">
-                        <?php $view['slots']->output('_content'); ?>
+                        <?php $view['blocks']->output('_content'); ?>
                     </div>
                 </div>
             </div>
             */ ?>
-           
+
            <aside class="sidebar sidebar-right">
                 <?php echo $view->render('MauticCoreBundle:Default:rightpanel.html.php'); ?>
            </aside>

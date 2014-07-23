@@ -53,3 +53,53 @@ $container->setDefinition ('mautic.security',
         )
     )
 );
+
+//Custom template engine
+$container->setDefinition('templating.engine.mautic',
+    new Definition(
+        'Mautic\CoreBundle\Templating\Engine\MauticEngine',
+        array(
+            new Reference('templating.name_parser'),
+            new Reference('service_container'),
+            new Reference('templating.loader'),
+            new Reference('templating.globals'),
+        )
+    ))
+    ->addMethodCall('setCharset', array('%kernel.charset%'))
+    ->addTag('templating.engine', array('alias' => 'mautic'));
+
+//Custom loader for assetic support
+$container->setDefinition('mautic.assetic.loader',
+    new Definition(
+        'Mautic\CoreBundle\Templating\Loader\MauticLoader',
+        array(
+            new Reference('assetic.asset_factory')
+        )
+    )
+)
+    ->addTag('assetic.formula_loader', array('alias' => 'mautic'));
+
+//Add an assetic alias for the custom engine/loader
+$container->setDefinition('mautic.assetic.helper',
+    new Definition(
+        'Symfony\Bundle\AsseticBundle\Templating\StaticAsseticHelper',
+        array(
+            new Reference('templating.helper.assets'),
+            new Reference('assetic.asset_factory')
+        )
+    )
+)
+    ->setScope('request')
+    ->addTag('templating.helper', array('alias' => 'assetic'));
+
+//Custom slots helper replacement
+$container->setDefinition('mautic.core.helper.templateblocks',
+    new Definition(
+        'Mautic\CoreBundle\Templating\Helper\BlockHelper',
+        array(
+            new Reference('templating.helper.assets')
+        )
+    ))
+    ->addTag('templating.helper', array('alias' => 'blocks'))
+    ->setScope('request');
+

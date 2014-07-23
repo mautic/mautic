@@ -8,13 +8,13 @@
  */
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
-$view['slots']->set('mauticContent', 'form');
+$view['blocks']->set('mauticContent', 'form');
 
 $header = ($activeForm->getId()) ?
     $view['translator']->trans('mautic.form.form.header.edit',
         array('%name%' => $view['translator']->trans($activeForm->getName()))) :
     $view['translator']->trans('mautic.form.form.header.new');
-$view["slots"]->set("headerTitle", $header);
+$view['blocks']->set("headerTitle", $header);
 ?>
 
 <div class="row bundle-content-container">
@@ -89,7 +89,7 @@ $view["slots"]->set("headerTitle", $header);
 
     <div class="col-xs-12 col-sm-4 bundle-side bundle-side-right auto-height">
         <div class="rounded-corners body-white bundle-side-inner-wrapper scrollable padding-md">
-            <?php $view['slots']->output('_content'); ?>
+            <?php $view['blocks']->output('_content'); ?>
         </div>
     </div>
 </div>

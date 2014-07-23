@@ -8,7 +8,7 @@
  */
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
-$view['slots']->set('mauticContent', 'pagecategory');
+$view['blocks']->set('mauticContent', 'pagecategory');
 
 $objectId = $form->vars['data']->getId();
 if (!empty($objectId)) {
@@ -17,7 +17,7 @@ if (!empty($objectId)) {
 } else {
     $header = $view['translator']->trans('mautic.page.category.header.new');
 }
-$view["slots"]->set("headerTitle", $header);
+$view['blocks']->set("headerTitle", $header);
 ?>
 
 <div class="scrollable">

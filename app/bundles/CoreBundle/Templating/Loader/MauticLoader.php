@@ -6,9 +6,12 @@
  * @link        http://mautic.com
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-$view->extend('MauticCoreBundle:Default:content.html.php');
-$view['blocks']->set("headerTitle", "Dashboard");
-?>
 
+namespace Mautic\CoreBundle\Templating\Loader;
 
-<h5>Dashboard content</h5>
+use Symfony\Bundle\AsseticBundle\Factory\Loader\AsseticHelperFormulaLoader;
+
+class MauticLoader extends AsseticHelperFormulaLoader
+{
+
+}

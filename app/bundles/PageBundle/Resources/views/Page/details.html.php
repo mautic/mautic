@@ -9,11 +9,11 @@
 
 //@todo - add landing page stats/analytics
 $view->extend('MauticCoreBundle:Default:content.html.php');
-$view['slots']->set('mauticContent', 'page');
-$view["slots"]->set("headerTitle", $activePage->getTitle());?>
+$view['blocks']->set('mauticContent', 'page');
+$view['blocks']->set("headerTitle", $activePage->getTitle());?>
 
 <?php
-$view['slots']->start('actions');
+$view['blocks']->start('actions');
 $variantParent = $activePage->getVariantParent();
 if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions['page:pages:editother'],
     $activePage->getCreatedBy())): ?>
@@ -53,7 +53,7 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
         </a>
     </li>
 <?php endif; ?>
-<?php $view['slots']->stop(); ?>
+<?php $view['blocks']->stop(); ?>
 
 <div class="scrollable">
     <div class="bundle-main-header">

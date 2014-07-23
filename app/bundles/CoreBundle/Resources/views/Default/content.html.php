@@ -19,8 +19,8 @@ endif;
 </div>
 
 <div id="main-content" class="main-panel-content-wrapper">
-    <?php $view['slots']->output('_content'); ?>
+    <?php $view['blocks']->output('_content'); ?>
     <div class="main-panel-footer"></div>
 </div>
 
-<?php $view['slots']->output('modal'); ?>
+<?php $view['blocks']->output('modal'); ?>

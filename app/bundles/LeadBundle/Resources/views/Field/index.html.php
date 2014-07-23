@@ -7,16 +7,16 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 $view->extend('MauticCoreBundle:Default:content.html.php');
-$view['slots']->set('mauticContent', 'leadfield');
-$view["slots"]->set("headerTitle", $view['translator']->trans('mautic.lead.field.header.index'));
+$view['blocks']->set('mauticContent', 'leadfield');
+$view['blocks']->set("headerTitle", $view['translator']->trans('mautic.lead.field.header.index'));
 ?>
-<?php $view["slots"]->start("actions"); ?>
+<?php $view['blocks']->start("actions"); ?>
 <li><a href="<?php echo $this->container->get('router')->generate(
         'mautic_leadfield_action', array("objectAction" => "new")); ?>" data-toggle="ajax">
         <?php echo $view["translator"]->trans("mautic.lead.field.menu.new"); ?>
     </a>
 </li>
-<?php $view["slots"]->stop(); ?>
+<?php $view['blocks']->stop(); ?>
 
 <div class="table-responsive scrollable body-white padding-sm">
     <table class="table table-hover table-striped table-bordered leadfield-list">

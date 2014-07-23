@@ -8,16 +8,16 @@
  */
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
-$view['slots']->set('mauticContent', 'role');
-$view['slots']->set('headerTitle', $view['translator']->trans('mautic.user.role.header.index'));
-$view['slots']->set('searchUri', $this->container->get('router')->generate('mautic_role_index'));
-$view['slots']->set('searchString', $app->getSession()->get('mautic.role.filter'));
-$view['slots']->set('searchHelp', $view['translator']->trans('mautic.user.role.help.searchcommands'));
+$view['blocks']->set('mauticContent', 'role');
+$view['blocks']->set('headerTitle', $view['translator']->trans('mautic.user.role.header.index'));
+$view['blocks']->set('searchUri', $this->container->get('router')->generate('mautic_role_index'));
+$view['blocks']->set('searchString', $app->getSession()->get('mautic.role.filter'));
+$view['blocks']->set('searchHelp', $view['translator']->trans('mautic.user.role.help.searchcommands'));
 
 ?>
 
 <?php if ($permissions['create']): ?>
-    <?php $view["slots"]->start("actions"); ?>
+    <?php $view['blocks']->start("actions"); ?>
     <li><a class="new-entity-action"
            href="<?php echo $this->container->get('router')->generate(
                'mautic_role_action', array("objectAction" => "new")); ?>"
@@ -25,7 +25,7 @@ $view['slots']->set('searchHelp', $view['translator']->trans('mautic.user.role.h
             <?php echo $view["translator"]->trans("mautic.user.role.menu.new"); ?>
         </a>
     </li>
-    <?php $view["slots"]->stop(); ?>
+    <?php $view['blocks']->stop(); ?>
 <?php endif; ?>
 
-<?php $view['slots']->output('_content'); ?>
+<?php $view['blocks']->output('_content'); ?>

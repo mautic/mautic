@@ -8,10 +8,10 @@
  */
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
-$view['slots']->set('mauticContent', 'form');
-$view["slots"]->set("headerTitle", $activeForm->getName());
+$view['blocks']->set('mauticContent', 'form');
+$view['blocks']->set("headerTitle", $activeForm->getName());
 ?>
-<?php $view["slots"]->start("actions"); ?>
+<?php $view['blocks']->start("actions"); ?>
 <?php if ($security->hasEntityAccess($permissions['form:forms:editown'], $permissions['form:forms:editother'],
     $activeForm->getCreatedBy())): ?>
     <li>
@@ -55,7 +55,7 @@ $view["slots"]->set("headerTitle", $activeForm->getName());
         <i class="fa fa-fw fa-camera"></i><?php echo $view['translator']->trans('mautic.form.form.preview'); ?>
     </a>
 </li>
-<?php $view["slots"]->stop(); ?>
+<?php $view['blocks']->stop(); ?>
 
 <div class="scrollable form-details">
     <?php

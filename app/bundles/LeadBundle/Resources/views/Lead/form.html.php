@@ -13,8 +13,8 @@ $header = ($lead->getId()) ?
         array('%name%' => $view['translator']->trans($lead->getPrimaryIdentifier()))) :
     $view['translator']->trans('mautic.lead.lead.header.new');
 
-$view['slots']->set('mauticContent', 'lead');
-$view["slots"]->set("headerTitle", $header);
+$view['blocks']->set('mauticContent', 'lead');
+$view['blocks']->set("headerTitle", $header);
 ?>
 
 <div class="scrollable">

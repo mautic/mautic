@@ -8,7 +8,7 @@
  */
 
 $view->extend('MauticUserBundle:Security:base.html.php');
-$view['slots']->set('header', $view['translator']->trans('mautic.api.oauth.header'));
+$view['blocks']->set('header', $view['translator']->trans('mautic.api.oauth.header'));
 ?>
 
 <form class="form-login" role="form" action="<?php echo $view['router']->generate('mautic_oauth_server_auth_login_check') ?>" method="post">

@@ -7,15 +7,15 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 $view->extend('MauticCoreBundle:Default:content.html.php');
-$view['slots']->set('mauticContent', 'lead');
-$view["slots"]->set("headerTitle", $view['translator']->trans('mautic.lead.lead.header.index'));
-$view['slots']->set('searchUri', $view['router']->generate('mautic_lead_index', array('page' => $page)));
-$view['slots']->set('searchString', $app->getSession()->get('mautic.lead.filter'));
-$view['slots']->set('searchHelp', $view['translator']->trans('mautic.lead.lead.help.searchcommands'));
+$view['blocks']->set('mauticContent', 'lead');
+$view['blocks']->set("headerTitle", $view['translator']->trans('mautic.lead.lead.header.index'));
+$view['blocks']->set('searchUri', $view['router']->generate('mautic_lead_index', array('page' => $page)));
+$view['blocks']->set('searchString', $app->getSession()->get('mautic.lead.filter'));
+$view['blocks']->set('searchHelp', $view['translator']->trans('mautic.lead.lead.help.searchcommands'));
 ?>
 
 <?php if ($permissions['lead:leads:create']): ?>
-    <?php $view["slots"]->start("actions"); ?>
+    <?php $view['blocks']->start("actions"); ?>
     <li>
         <a href="<?php echo $this->container->get('router')->generate(
             'mautic_lead_action', array("objectAction" => "new")); ?>"
@@ -24,10 +24,10 @@ $view['slots']->set('searchHelp', $view['translator']->trans('mautic.lead.lead.h
             <?php echo $view["translator"]->trans("mautic.lead.lead.menu.new"); ?>
         </a>
     </li>
-    <?php $view["slots"]->stop(); ?>
+    <?php $view['blocks']->stop(); ?>
 <?php endif; ?>
 
-<?php $view['slots']->start('toolbar'); ?>
+<?php $view['blocks']->start('toolbar'); ?>
 <div class="btn-group">
     <a href="<?php echo $view['router']->generate('mautic_lead_index', array('page' => $page, 'view' => 'list')); ?>"
        data-toggle="ajax"
@@ -36,6 +36,6 @@ $view['slots']->set('searchHelp', $view['translator']->trans('mautic.lead.lead.h
        data-toggle="ajax"
        class="btn btn-default"><i class="fa fa-fw fa-th-large"></i></a>
 </div>
-<?php $view['slots']->stop(); ?>
+<?php $view['blocks']->stop(); ?>
 
-<?php $view['slots']->output('_content'); ?>
+<?php $view['blocks']->output('_content'); ?>

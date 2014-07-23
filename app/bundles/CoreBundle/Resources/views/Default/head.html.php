@@ -9,7 +9,7 @@
 ?>
 <head>
     <meta charset="UTF-8" />
-    <title><?php echo $view['slots']->get('pageTitle', 'Mautic'); ?></title>
+    <title><?php echo $view['blocks']->get('pageTitle', 'Mautic'); ?></title>
     <link rel="icon" type="image/x-icon" href="<?php echo $view['assets']->getUrl('assets/images/favicon.ico') ?>" />
     <link rel="apple-touch-icon" href="<?php echo $view['assets']->getUrl('assets/images/apple-touch-icon.png') ?>" />
 
@@ -18,4 +18,6 @@
         <link rel="stylesheet" href="<?php echo $view->escape($url) ?>" />
     <?php endforeach; ?>
     <link rel="stylesheet" href="<?php echo $view['assets']->getUrl('assets/css/font-awesome/css/font-awesome.min.css'); ?>" />
+
+    <?php $view['blocks']->outputHeadDeclarations(); ?>
 </head>

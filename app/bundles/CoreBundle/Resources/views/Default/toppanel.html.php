@@ -11,10 +11,10 @@
     <?php echo $view->render('MauticCoreBundle:Default:breadcrumbs.html.php'); ?>
 </div>
 
-<?php if ($view["slots"]->has("actions")): ?>
+<?php if ($view['blocks']->has("actions")): ?>
 <div class="page-header-section">
     <div class="toolbar">
-        <?php echo $view['slots']->output('actions'); ?>
+        <?php echo $view['blocks']->output('actions'); ?>
     </div>
 </div>
 <?php endif; ?>
@@ -22,7 +22,7 @@
 <?php /*
 
         <div class="page-header-section">
-            <h4 class="title semibold"><?php $view["slots"]->output("headerTitle"); ?></h4>
+            <h4 class="title semibold"><?php $view['blocks']->output("headerTitle"); ?></h4>
         </div>
 
 
