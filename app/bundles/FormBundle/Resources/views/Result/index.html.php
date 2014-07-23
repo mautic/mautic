@@ -8,13 +8,13 @@
  */
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
-$view['slots']->set('mauticContent', 'formresult');
-$view["slots"]->set("headerTitle", $view['translator']->trans('mautic.form.result.header.index', array(
+$view['blocks']->set('mauticContent', 'formresult');
+$view['blocks']->set("headerTitle", $view['translator']->trans('mautic.form.result.header.index', array(
     '%name%' => $form->getName()
 )));
 ?>
 
-<?php $view["slots"]->start("actions"); ?>
+<?php $view['blocks']->start("actions"); ?>
 <li>
     <a href="<?php echo $this->container->get('router')->generate(
         'mautic_form_export', array("objectId" => $form->getId(), "format" => "csv")); ?>"
@@ -47,6 +47,6 @@ $view["slots"]->set("headerTitle", $view['translator']->trans('mautic.form.resul
     </a>
 </li>
 <?php endif; ?>
-<?php $view["slots"]->stop(); ?>
+<?php $view['blocks']->stop(); ?>
 
-<?php $view['slots']->output('_content'); ?>
+<?php $view['blocks']->output('_content'); ?>

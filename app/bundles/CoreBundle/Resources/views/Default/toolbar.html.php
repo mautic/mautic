@@ -7,12 +7,12 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-$searchUri   = $view['slots']->get('searchUri');
-$actions     = $view['slots']->get('actions');
-$toolbar     = $view['slots']->get('toolbar');
+$searchUri   = $view['blocks']->get('searchUri');
+$actions     = $view['blocks']->get('actions');
+$toolbar     = $view['blocks']->get('toolbar');
 if (!empty($searchUri)):
     $bundle        = strtolower($app->getRequest()->get('bundle'));
-    $searchString  = $view['slots']->get('searchString', '');
+    $searchString  = $view['blocks']->get('searchString', '');
     $searchClass   = (!empty($searchString) ? 'show-search' : 'hide-search');
 else:
     $searchClass = "no-search";
@@ -72,13 +72,13 @@ endif;
 <div class="clearfix"></div>
 <?php
 if (!empty($searchUri)):
-    $view['slots']->start('modal');
+    $view['blocks']->start('modal');
     echo $view->render('MauticCoreBundle:Helper:modal.html.php', array(
         'id'     => 'search-help',
         'header' => $view['translator']->trans('mautic.core.search.header'),
         'body'   => $view['translator']->trans('mautic.core.search.help') .
-            $view['slots']->get('searchHelp', '')
+            $view['blocks']->get('searchHelp', '')
     ));
-    $view['slots']->stop();
+    $view['blocks']->stop();
 endif;
 ?>

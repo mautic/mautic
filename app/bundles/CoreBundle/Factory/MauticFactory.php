@@ -12,6 +12,7 @@ namespace Mautic\CoreBundle\Factory;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use JMS\Serializer\Serializer;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\CoreBundle\Helper\TemplateBlockHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;

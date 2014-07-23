@@ -8,15 +8,15 @@
  */
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
-$view['slots']->set('mauticContent', 'pagecategory');
-$view["slots"]->set("headerTitle", $view['translator']->trans('mautic.page.category.header.index'));
-$view['slots']->set('searchUri', $view['router']->generate('mautic_pagecategory_index', array('page' => $page)));
-$view['slots']->set('searchString', $app->getSession()->get('mautic.pagecategory.filter'));
-$view['slots']->set('searchHelp', $view['translator']->trans('mautic.page.category.help.searchcommands'));
+$view['blocks']->set('mauticContent', 'pagecategory');
+$view['blocks']->set("headerTitle", $view['translator']->trans('mautic.page.category.header.index'));
+$view['blocks']->set('searchUri', $view['router']->generate('mautic_pagecategory_index', array('page' => $page)));
+$view['blocks']->set('searchString', $app->getSession()->get('mautic.pagecategory.filter'));
+$view['blocks']->set('searchHelp', $view['translator']->trans('mautic.page.category.help.searchcommands'));
 ?>
 
 <?php if ($permissions['page:categories:create']): ?>
-    <?php $view["slots"]->start("actions"); ?>
+    <?php $view['blocks']->start("actions"); ?>
     <li>
         <a href="<?php echo $this->container->get('router')->generate(
             'mautic_pagecategory_action', array("objectAction" => "new")); ?>"
@@ -25,7 +25,7 @@ $view['slots']->set('searchHelp', $view['translator']->trans('mautic.page.catego
             <?php echo $view["translator"]->trans("mautic.page.category.menu.new"); ?>
         </a>
     </li>
-    <?php $view["slots"]->stop(); ?>
+    <?php $view['blocks']->stop(); ?>
 <?php endif; ?>
 
-<?php $view['slots']->output('_content'); ?>
+<?php $view['blocks']->output('_content'); ?>

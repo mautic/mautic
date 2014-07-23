@@ -8,7 +8,7 @@
  */
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
-$view['slots']->set('mauticContent', 'client');
+$view['blocks']->set('mauticContent', 'client');
 $id = $form->vars['data']->getId();
 if (!empty($id)) {
     $name   = $form->vars['data']->getName();
@@ -16,7 +16,7 @@ if (!empty($id)) {
 } else {
     $header = $view['translator']->trans('mautic.api.client.header.new');
 }
-$view["slots"]->set("headerTitle", $header);
+$view['blocks']->set("headerTitle", $header);
 ?>
 
 <?php echo $view['form']->form($form); ?>

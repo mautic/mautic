@@ -8,7 +8,7 @@
  */
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
-$view['slots']->set('mauticContent', 'leadfield');
+$view['blocks']->set('mauticContent', 'leadfield');
 $userId = $form->vars['data']->getId();
 if (!empty($userId)) {
     $field   = $form->vars['data']->getLabel();
@@ -16,7 +16,7 @@ if (!empty($userId)) {
 } else {
     $header = $view['translator']->trans('mautic.lead.field.header.new');
 }
-$view["slots"]->set("headerTitle", $header);
+$view['blocks']->set("headerTitle", $header);
 ?>
 <div class="scrollable">
     <?php echo $view['form']->start($form); ?>

@@ -11,7 +11,7 @@
 <script>
     var mauticBaseUrl = '<?php echo $view['router']->generate("mautic_core_index"); ?>';
     var mauticAjaxUrl = '<?php echo $view['router']->generate("mautic_core_ajax"); ?>';
-    var mauticContent = '<?php $view['slots']->output('mauticContent',''); ?>';
+    var mauticContent = '<?php $view['blocks']->output('mauticContent',''); ?>';
 </script>
 <?php foreach ($view['assetic']->javascripts(array("@mautic_javascripts"), array(), array('combine' => true, 'output' => 'assets/js/mautic.js')) as $url): ?>
 <script src="<?php echo $view->escape($url) ?>"></script>
@@ -19,7 +19,6 @@
 <?php //load file ?>
 <script>
     Mautic.onPageLoad();
-    <?php $view['slots']->output("jsDeclarations"); ?>
     <?php if ($app->getEnvironment() === "dev"): ?>
     mQuery( document ).ajaxComplete(function(event, XMLHttpRequest, ajaxOption){
         if(XMLHttpRequest.getResponseHeader('x-debug-token')) {
@@ -36,3 +35,4 @@
     });
     <?php endif; ?>
 </script>
+<?php $view['blocks']->outputScripts("bodyClose"); ?>

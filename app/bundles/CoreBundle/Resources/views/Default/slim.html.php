@@ -12,14 +12,14 @@
     <?php echo $view->render('MauticCoreBundle:Default:head.html.php'); ?>
     <body style="overflow: auto;">
         <div class="container">
-            <?php if ($view["slots"]->has("headerTitle")): ?>
+            <?php if ($view['blocks']->has("headerTitle")): ?>
                 <div  class="row">
-                    <h2><?php $view["slots"]->output("headerTitle"); ?></h2>
+                    <h2><?php $view['blocks']->output("headerTitle"); ?></h2>
                 </div>
             <?php endif; ?>
 
             <div class="row">
-                <?php $view['slots']->output('_content'); ?>
+                <?php $view['blocks']->output('_content'); ?>
             </div>
         </div>
     </body>

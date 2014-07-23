@@ -7,7 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 $view->extend('MauticCoreBundle:Default:content.html.php');
-$view['slots']->set('mauticContent', 'leadlist');
+$view['blocks']->set('mauticContent', 'leadlist');
 
 $id = $form->vars['data']->getId();
 if (!empty($id)) {
@@ -16,7 +16,7 @@ if (!empty($id)) {
 } else {
     $header = $view['translator']->trans('mautic.lead.list.header.new');
 }
-$view["slots"]->set("headerTitle", $header);
+$view['blocks']->set("headerTitle", $header);
 
 $glueOptions = array(
     'and' => 'mautic.lead.list.form.glue.and',
