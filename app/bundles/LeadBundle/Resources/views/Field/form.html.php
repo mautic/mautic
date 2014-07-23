@@ -22,6 +22,7 @@ $view["slots"]->set("headerTitle", $header);
     <?php echo $view['form']->start($form); ?>
     <?php echo $view['form']->row($form['label']); ?>
     <?php echo $view['form']->row($form['alias']); ?>
+    <?php echo $view['form']->row($form['group']); ?>
     <?php
     $type          = $form['type']->vars['data'];
     $properties    = $form['properties']->vars['data'];

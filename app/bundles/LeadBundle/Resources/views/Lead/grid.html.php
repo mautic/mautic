@@ -13,12 +13,12 @@ if ($tmpl == 'index')
 <div class="shuffle grid row scrollable bundle-list" id="shuffle-grid">
     <?php if (count($items)): ?>
     <?php foreach ($items as $item): ?>
-    <?php $fields = $model->organizeFieldsByAlias($item->getFields()); ?>
+    <?php $fields['core'] = $model->organizeFieldsByGroup($item->getFields()); ?>
     <div class="shuffle shuffle-item grid margin-md-bottom col-sm-6 col-md-4">
         <div class="body-white table-layout">
             <div class="col-xs-4 padding-none">
                 <img class="img img-responsive"
-                     src="https://www.gravatar.com/avatar/<?php echo md5(strtolower(trim($fields['email']['value']))); ?>?&s=250" />
+                     src="https://www.gravatar.com/avatar/<?php echo md5(strtolower(trim($fields['core']['email']['value']))); ?>?&s=250" />
             </div>
             <div class="col-xs-8 valign-middle">
                 <h5>
@@ -30,23 +30,23 @@ if ($tmpl == 'index')
                     <span class="badge"><?php echo $item->getScore(); ?></span>
                 </h5>
                 <div class="text-muted">
-                    <i class="fa fa-fw fa-building"></i><span class="padding-sm-left"><?php echo $fields['company']['value']; ?></span>
+                    <i class="fa fa-fw fa-building"></i><span class="padding-sm-left"><?php echo $fields['core']['company']['value']; ?></span>
                 </div>
                 <div class="text-muted">
-                    <i class="fa fa-fw fa-envelope"></i><span class="padding-sm-left"><?php echo $fields['email']['value']; ?></span>
+                    <i class="fa fa-fw fa-envelope"></i><span class="padding-sm-left"><?php echo $fields['core']['email']['value']; ?></span>
                 </div>
                 <div class="text-muted">
                     <i class="fa fa-fw fa-map-marker"></i><span class="padding-sm-left"><?php
-                    if (!empty($fields['city']['value']) && !empty($fields['state']['value']))
-                        echo $fields['city']['value'] . ', ' . $fields['state']['value'];
-                    elseif (!empty($fields['city']['value']))
-                        echo $fields['city']['value]'];
-                    elseif (!empty($fields['state']['value']))
-                        echo $fields['state']['value'];
+                    if (!empty($fields['core']['city']['value']) && !empty($fields['core']['state']['value']))
+                        echo $fields['core']['city']['value'] . ', ' . $fields['core']['state']['value'];
+                    elseif (!empty($fields['core']['city']['value']))
+                        echo $fields['core']['city']['value]'];
+                    elseif (!empty($fields['core']['state']['value']))
+                        echo $fields['core']['state']['value'];
                     ?></span>
                 </div>
                 <div class="text-muted">
-                    <i class="fa fa-fw fa-globe"></i><span class="padding-sm-left"><?php echo $fields['country']['value']; ?></span>
+                    <i class="fa fa-fw fa-globe"></i><span class="padding-sm-left"><?php echo $fields['core']['country']['value']; ?></span>
                 </div>
             </div>
         </div>

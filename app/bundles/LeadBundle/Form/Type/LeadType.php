@@ -65,7 +65,9 @@ class LeadType extends AbstractType
         ));
 
         //get a list of fields
-        $fields      = $this->factory->getModel('lead.field')->getEntities();
+        $fields = $this->factory->getModel('lead.field')->getEntities(
+            array('filter' => array('isPublished' => true))
+        );
         $fieldValues = (!empty($options['data'])) ? $options['data']->getFields() : array('filter' => array('isVisible' => true));
         $values      = array();
         foreach ($fieldValues as $v) {

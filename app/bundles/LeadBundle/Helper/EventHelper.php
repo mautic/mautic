@@ -37,7 +37,9 @@ class EventHelper
         $properties = $action->getProperties();
 
         //set the mapped data
-        $leadFields = $factory->getModel('lead.field')->getEntities();
+        $leadFields = $fields = $factory->getModel('lead.field')->getEntities(
+            array('filter' => array('isPublished' => true))
+        );
         $data   = array();
         foreach ($leadFields as $f) {
             $id    = $f->getId();

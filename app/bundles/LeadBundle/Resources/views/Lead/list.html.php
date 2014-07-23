@@ -71,7 +71,7 @@ if ($tmpl == 'index')
             </thead>
             <tbody>
             <?php foreach ($items as $item): ?>
-                <?php $fields = $model->organizeFieldsByAlias($item->getFields()); ?>
+                <?php $fields = $model->organizeFieldsByGroup($item->getFields()); ?>
                 <tr>
                     <td>
                         <?php
@@ -100,14 +100,14 @@ if ($tmpl == 'index')
                             <div class="small"><?php echo $item->getSecondaryIdentifier(); ?></div>
                         </a>
                     </td>
-                    <td class="visible-md visible-lg"><?php echo $fields['email']['value']; ?></td>
+                    <td class="visible-md visible-lg"><?php echo $fields['core']['email']['value']; ?></td>
                     <td class="visible-md visible-lg"><?php
-                        if (!empty($fields['city']) && !empty($fields['state']))
-                            echo $fields['city']['value'] . ', ' . $fields['state']['value'];
-                        elseif (!empty($fields['city']))
-                            echo $fields['city']['value'];
-                        elseif (!empty($fields['state']))
-                            echo $fields['state']['value'];
+                        if (!empty($fields['core']['city']) && !empty($fields['core']['state']))
+                            echo $fields['core']['city']['value'] . ', ' . $fields['core']['state']['value'];
+                        elseif (!empty($fields['core']['city']))
+                            echo $fields['core']['city']['value'];
+                        elseif (!empty($fields['core']['state']))
+                            echo $fields['core']['state']['value'];
                         ?>
                     </td>
                     <td class="text-center">
