@@ -55,7 +55,9 @@ class FormSubmitActionMappedFieldsType extends AbstractType
         }
 
         //get a list of fields
-        $fields = $this->factory->getModel('lead.field')->getEntities();
+        $fields = $this->factory->getModel('lead.field')->getEntities(
+            array('filter' => array('isPublished' => true))
+        );
 
         foreach ($fields as $field) {
             $id    = $field->getId();

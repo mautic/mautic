@@ -133,4 +133,26 @@ class LeadPermissions extends CommonPermissions
                 $permissions['lead:leads'][] = 'viewown';
         }
     }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param $name
+     * @param $level
+     * @return array
+     */
+    protected function getSynonym($name, $level) {
+        if ($name == "fields") {
+            //set some synonyms
+            switch ($level) {
+                case "publishown":
+                case "publishother":
+                    $level = "full";
+                    break;
+            }
+        }
+
+        return array($name, $level);
+    }
+
 }

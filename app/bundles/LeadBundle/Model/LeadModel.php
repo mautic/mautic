@@ -147,24 +147,11 @@ class LeadModel extends FormModel
      */
     public function setFieldValues(Lead &$lead, array $data, $overwriteWithBlank = true)
     {
-        //gleam social networks if there is an email and applicable
-        if (!empty($data["field_email"])) {
-            $serviceObjects  = NetworkIntegrationHelper::getNetworkObjects($this->factory);
-            $socialMediaData = array();
-            foreach ($serviceObjects as $sm) {
-                $service  = $sm->getName();
-                $settings = $sm->getSettings();
-                $fields   = $settings->getLeadFields();
-                $features = $settings->getSupportedFeatures();
-                if (in_array('lead_fields', $features) && $settings->isPublished() && !empty($fields)) {
-                    if (method_exists($sm, 'getUserData')) {
-                        //make the call and retrieve data
-                        $socialMediaData[$service]['fields'] = $fields;
-                        $socialMediaData[$service]['data']   = $sm->getUserData($data);
-                    }
-                }
-            }
-        }
+        //generate the social cache
+        list($socialCache, $socialMediaFields) = NetworkIntegrationHelper::getUserProfiles($this->factory, $lead, $data, true, false, true);
+
+        //set the social cache while we have it
+        $lead->setSocialCache($socialCache);
 
         //save the field values
         $fieldValues   = $lead->getFields();
@@ -183,16 +170,16 @@ class LeadModel extends FormModel
             }
 
             //if empty, check for social media data to plug the hole
-            if (empty($value) && !empty($socialMediaData)) {
-                foreach ($socialMediaData as $service => $details) {
+            if (empty($value) && !empty($socialCache)) {
+                foreach ($socialCache as $service => $details) {
                     //check to see if a field has been assigned
-                    if (in_array($field->getId(), $details['fields'])) {
+                    if (in_array($field->getId(), $socialMediaFields[$service])) {
 
                         //check to see if the data is available
-                        $key = array_search($field->getId(), $details['fields']);
-                        if (isset($details['data'][$key])) {
+                        $key = array_search($field->getId(), $socialMediaFields[$service]);
+                        if (isset($details['profile'][$key])) {
                             //Found!!
-                            $v->setValue($details['data'][$key]);
+                            $v->setValue($details['profile'][$key]);
                             break;
                         }
                     }
@@ -208,16 +195,16 @@ class LeadModel extends FormModel
             $value = $data["field_{$field->getAlias()}"];
 
             //if empty, check for social media data to plug the hole
-            if (empty($value) && !empty($socialMediaData)) {
-                foreach ($socialMediaData as $service => $details) {
+            if (empty($value) && !empty($socialCache)) {
+                foreach ($socialCache as $service => $details) {
                     //check to see if a field has been assigned
-                    if (in_array($field->getId(), $details['fields'])) {
+                    if (in_array($field->getId(), $socialMediaFields[$service])) {
 
                         //check to see if the data is available
-                        $key = array_search($field->getId(), $details['fields']);
-                        if (isset($details['data'][$key])) {
+                        $key = array_search($field->getId(), $socialMediaFields[$service]);
+                        if (isset($details['profile'][$key])) {
                             //Found!!
-                            $value = $details['data'][$key];
+                            $value = $details['profile'][$key];
                             break;
                         }
                     }
@@ -277,21 +264,26 @@ class LeadModel extends FormModel
     }
 
     /**
-     * Reorganizes a field value persistent collection to be keyed by field alias
+     * Reorganizes a field value persistent collection to be keyed by field's group then alias
      *
      * @param $fieldValues
      * @return array
      */
-    public function organizeFieldsByAlias($fieldValues)
+    public function organizeFieldsByGroup($fieldValues)
     {
         $array = array();
         foreach ($fieldValues as $v) {
             $field = $v->getField();
-            $array[$field->getAlias()]['id']    = $field->getId();
-            $array[$field->getAlias()]['label'] = $field->getLabel();
-            $array[$field->getAlias()]['alias'] = $field->getLabel();
-            $array[$field->getAlias()]['value'] = $v->getValue();
-            $array[$field->getAlias()]['type']  = $field->getType();
+            if ($field->isPublished()) {
+                $group = $field->getGroup();
+                $alias = $field->getAlias();
+                $array[$group][$alias]['id']    = $field->getId();
+                $array[$group][$alias]['group'] = $group;
+                $array[$group][$alias]['label'] = $field->getLabel();
+                $array[$group][$alias]['alias'] = $alias;
+                $array[$group][$alias]['value'] = $v->getValue();
+                $array[$group][$alias]['type']  = $field->getType();
+            }
         }
         return $array;
     }

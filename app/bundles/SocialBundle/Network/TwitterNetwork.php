@@ -12,25 +12,57 @@ namespace Mautic\SocialBundle\Network;
 class TwitterNetwork extends CommonNetwork
 {
 
+    /**
+     * Used in getUserData to prevent a double user search call with getUserId
+     *
+     * @var bool
+     */
+    private $preventDoubleCall = false;
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return string
+     */
     public function getName()
     {
         return 'Twitter';
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return string
+     */
+    public function getIdentifierField()
+    {
+        return 'twitter';
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return string
+     */
     public function getOAuthLoginUrl()
     {
         return $this->factory->getRouter()->generate('mautic_social_callback', array('network' => $this->getName()));
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return bool|string
+     */
     public function getAccessTokenUrl()
     {
         return 'https://api.twitter.com/oauth2/token';
     }
 
     /**
-     * Retrieves and stores tokens returned from oAuthLogin
+     * {@inheritdoc}
      *
-     * @return SocialMedia|mixed
+     * @return array
      */
     public function oAuthCallback()
     {
@@ -89,6 +121,12 @@ class TwitterNetwork extends CommonNetwork
         return array($entity, $error);
     }
 
+    /**
+     * Generate a Twitter bearer token
+     *
+     * @param $keys
+     * @return string
+     */
     private function getBearerToken($keys)
     {
         //Per Twitter's recommendations
@@ -98,6 +136,12 @@ class TwitterNetwork extends CommonNetwork
         return base64_encode($consumer_key . ':' . $consumer_secret);
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @param $response
+     * @return string
+     */
     public function getErrorsFromResponse($response)
     {
         if (is_array($response) && isset($response['errors'])) {
@@ -112,6 +156,11 @@ class TwitterNetwork extends CommonNetwork
         return '';
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return array
+     */
     public function getRequiredKeyFields()
     {
         return array(
@@ -120,79 +169,106 @@ class TwitterNetwork extends CommonNetwork
         );
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return string
+     */
     public function getAuthenticationType()
     {
         return 'oauth2';
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return array
+     */
     public function getSupportedFeatures()
     {
         return array(
-            'lead_fields',
-            'public_activity'
+            'public_profile',
+            'public_activity',
+            'suggestion_matching'
         );
     }
 
     /**
-     * Get public data
+     * {@inheritdoc}
      *
-     * @param $fields
+     * @param $identifier
+     * @param $socialCache
      * @return array
      */
-    public function getUserData($fields)
+    public function getUserData($identifier, &$socialCache)
     {
-        $handle = $this->getHandle($fields);
+        //tell getUserId to return a user array if it obtains it
+        $this->preventDoubleCall = true;
 
-        if ($handle) {
-            $url  = "https://api.twitter.com/1.1/users/lookup.json?screen_name={$handle}&include_entities=false";
-            $data = $this->makeCall($url);
+        if ($id = $this->getUserId($identifier, $socialCache)) {
+            if (is_array($id)) {
+                //getUserId has alread obtained the data
+                $data = $id;
+            } else {
+                $url  = "https://api.twitter.com/1.1/users/lookup.json?user_id={$id}&include_entities=false";
+                $data = $this->makeCall($url);
+            }
+
             if (isset($data[0])) {
-                $info                 = $this->matchUpData($data[0]);
-                $info['profileUrl']   = "https://twitter.com/{$handle}";
+                $info                  = $this->matchUpData($data[0]);
+                $info['profileHandle'] = $data[0]['screen_name'];
                 //remove the size variant
                 $image = $data[0]['profile_image_url_https'];
                 $image = str_replace(array('_normal', '_bigger', '_mini'), '', $image);
                 $info['profileImage'] = $image;
-                return $info;
+
+                $socialCache['profile'] = $info;
+                $socialCache['updated'] = true;
             }
+            $this->preventDoubleCall = false;
         }
-        return null;
     }
 
     /**
-     * Retrieve public posts
+     * {@inheritdoc}
      *
-     * @param $fields
+     * @param $identifier
+     * @param $socialCache
      * @return array
      */
-    public function getPublicActivity($fields)
+    public function getPublicActivity($identifier, &$socialCache)
     {
-        $handle = $this->getHandle($fields);
-        $tweets = array();
-        if ($handle) {
+        if ($id = $this->getUserId($identifier, $socialCache)) {
             //due to the way Twitter filters, get more than 10 tweets
-            $url  = "https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name={$handle}&exclude_replies=true&count=25&trim_user=true";
+            $url  = "https://api.twitter.com/1.1/statuses/user_timeline.json?user_id={$id}&exclude_replies=true&count=25&trim_user=true";
             $data = $this->makeCall($url);
 
             if (!empty($data) && count($data)) {
+                $socialCache['activity'] = array();
                 foreach ($data as $k => $d) {
                     if ($k == 10) {
                         break;
                     }
 
                     $tweet = array(
-                        'title'       => $d['text'],
-                        'url'         => "https://twitter.com/{$handle}/status/{$d['id']}",
+                        'tweet'       => $d['text'],
+                        'url'         => "https://twitter.com/{$id}/status/{$d['id']}",
                         'published'   => $d['created_at'],
                         'coordinates' => $d['coordinates']
                     );
-                    $tweets[] = $tweet;
+                    $socialCache['activity'][] = $tweet;
                 }
+                $socialCache['updated']  = true;
             }
         }
-        return $tweets;
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @param $url
+     * @return mixed
+     */
     public function makeCall($url) {
         $request     = $this->factory->getRequest();
         $route       = $request->get('_route');
@@ -225,17 +301,21 @@ class TwitterNetwork extends CommonNetwork
         return $values;
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return array
+     */
     public function getAvailableFields()
     {
         return array(
-            "profileUrl"   => array("type" => "string"),
-            "profileImage" => array("type" => "string"),
-            "name"         => array("type" => "string"),
-            "location"     => array("type" => "string"),
-            "description"  => array("type" => "string"),
-            "url"          => array("type" => "string"),
+            "profileHandle" => array("type" => "string"),
+            "name"          => array("type" => "string"),
+            "location"      => array("type" => "string"),
+            "description"   => array("type" => "string"),
+            "url"           => array("type" => "string"),
             "time_zone"     => array("type" => "string"),
-            "lang"         => array("type" => "string")
+            "lang"          => array("type" => "string")
         );
     }
 
@@ -244,7 +324,7 @@ class TwitterNetwork extends CommonNetwork
      *
      * @param $data
      */
-    protected function matchUpData($data)
+    private function matchUpData($data)
     {
         $info       = array();
         $available  = $this->getAvailableFields();
@@ -258,23 +338,48 @@ class TwitterNetwork extends CommonNetwork
         return $info;
     }
 
-    private function getHandle($fields)
+    /**
+     * Gets the ID of the user for the network
+     *
+     * @param $identifier
+     * @param $socialCache
+     * @return mixed|null
+     */
+    public function getUserId($identifier, &$socialCache)
     {
-        if (isset($fields['twitter'])) {
-            //from lead profile
-            $handle = $fields['twitter']['value'];
-        } elseif (isset($fields['field_twitter'])) {
-            //from creating a lead
-            $handle = $fields['field_twitter'];
-        } else {
-            return null;
+        if (!empty($socialCache['id'])) {
+            return $socialCache['id'];
+        } elseif (empty($identifier)) {
+            return false;
         }
 
-        if (strpos($handle, 'http') !== false) {
+        $url  = "https://api.twitter.com/1.1/users/lookup.json?screen_name={$identifier}&include_entities=false";
+        $data = $this->makeCall($url);
+        if (isset($data[0])) {
+            $socialCache['id'] = $data[0]['id'];
+            //mark the cache as needing to be updated
+            $socialCache['updated'] = true;
+
+            //return the entire data set if the function has been called from getUserData()
+            return ($this->preventDoubleCall) ? $data : $socialCache['id'];
+        }
+
+        return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param $identifier
+     * @return null|string
+     */
+    public function cleanIdentifier($identifier)
+    {
+        if (strpos($identifier, 'http') !== false) {
             //extract the handle
-            $handle = substr(strrchr(rtrim($handle, '/'), '/'), 1);
+            $identifier = substr(strrchr(rtrim($identifier, '/'), '/'), 1);
         }
 
-        return $handle;
+        return urlencode($identifier);
     }
 }

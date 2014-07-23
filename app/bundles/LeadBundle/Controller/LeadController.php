@@ -200,17 +200,19 @@ class LeadController extends FormController
             'objectId'     => $lead->getId())
         );
 
-        $fields         = $model->organizeFieldsByAlias($lead->getFields());
-        $socialProfiles = NetworkIntegrationHelper::getUserProfile($factory, $lead, $fields);
+        $fields            = $model->organizeFieldsByGroup($lead->getFields());
+        $socialProfiles    = NetworkIntegrationHelper::getUserProfiles($factory, $lead, $fields);
+        $socialProfileUrls = NetworkIntegrationHelper::getSocialProfileUrlRegex(false);
 
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'lead'           => $lead,
-                'fields'         => $fields,
-                'socialProfiles' => $socialProfiles,
-                'security'       => $this->get('mautic.factory')->getSecurity(),
-                'permissions'    => $permissions,
-                'dateFormats'    => array(
+                'lead'              => $lead,
+                'fields'            => $fields,
+                'socialProfiles'    => $socialProfiles,
+                'socialProfileUrls' => $socialProfileUrls,
+                'security'          => $this->get('mautic.factory')->getSecurity(),
+                'permissions'       => $permissions,
+                'dateFormats'       => array(
                     'datetime' => $factory->getParameter('date_format_full'),
                     'date'     => $factory->getParameter('date_format_dateonly'),
                     'time'     => $factory->getParameter('date_format_timeonly'),

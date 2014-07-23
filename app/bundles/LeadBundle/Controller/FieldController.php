@@ -26,12 +26,13 @@ class FieldController extends FormController
         if (!$this->get('mautic.security')->isGranted('lead:fields:full')) {
             return $this->accessDenied();
         }
-
-        $items = $this->get('mautic.factory')->getModel('lead.field')->getEntities();
+        $factory = $this->get('mautic.factory');
+        $items   = $factory->getModel('lead.field')->getEntities();
 
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'items' => $items
+                'items'      => $items,
+                'dateFormat' => $factory->getParameter('date_format_full')
             ),
             'contentTemplate' => 'MauticLeadBundle:Field:index.html.php',
             'passthroughVars' => array(

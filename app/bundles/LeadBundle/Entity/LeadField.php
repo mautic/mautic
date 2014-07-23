@@ -59,6 +59,14 @@ class LeadField extends FormEntity
     private $type;
 
     /**
+     * @ORM\Column(type="string", name="field_group", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full", "limited"})
+     */
+    private $group;
+
+    /**
      * @ORM\Column(name="default_value", type="string", length=255, nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
@@ -443,5 +451,21 @@ class LeadField extends FormEntity
     public function isListable()
     {
         return $this->getIsListable();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getGroup ()
+    {
+        return $this->group;
+    }
+
+    /**
+     * @param mixed $group
+     */
+    public function setGroup ($group)
+    {
+        $this->group = $group;
     }
 }

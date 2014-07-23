@@ -59,7 +59,9 @@ class FormSubmitActionScoreChangeType extends AbstractType
 
 
         //get a list of fields
-        $fields  = $this->factory->getModel('lead.field')->getEntities();
+        $fields = $this->factory->getModel('lead.field')->getEntities(
+            array('filter' => array('isPublished' => true))
+        );
         $choices = array();
         foreach ($fields as $field) {
             $choices[$field->getId()] = $field->getLabel();

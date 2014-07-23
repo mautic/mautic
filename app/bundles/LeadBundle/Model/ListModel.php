@@ -210,7 +210,8 @@ class ListModel extends FormModel
         //get list of custom fields
         $fields = $this->factory->getModel('lead.field')->getEntities(
             array('filter' => array(
-                'isListable' => true
+                'isListable'  => true,
+                'isPublished' => true
             ))
         );
         foreach ($fields as $field) {

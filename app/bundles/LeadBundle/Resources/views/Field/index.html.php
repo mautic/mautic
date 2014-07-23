@@ -25,6 +25,7 @@ $view["slots"]->set("headerTitle", $view['translator']->trans('mautic.lead.field
             <th class="col-leadfield-actions"></th>
             <th class="col-leadfield-label"><?php echo $view['translator']->trans('mautic.lead.field.thead.label'); ?></th>
             <th class="visible-md visible-lg col-leadfield-alias"><?php echo $view['translator']->trans('mautic.lead.field.thead.alias'); ?></th>
+            <th class="visible-md visible-lg col-leadfield-group"><?php echo $view['translator']->trans('mautic.lead.field.thead.group'); ?></th>
             <th class="col-leadfield-type"><?php echo $view['translator']->trans('mautic.lead.field.thead.type'); ?></th>
             <th class="visible-md visible-lg col-leadfield-id"><?php echo $view['translator']->trans('mautic.lead.field.thead.id'); ?></th>
             <th class="visible-md visible-lg col-leadfield-statusicons"></th>
@@ -47,8 +48,16 @@ $view["slots"]->set("headerTitle", $view['translator']->trans('mautic.lead.field
                     ));
                     ?>
                 </td>
-                <td><?php echo $item->getLabel(); ?></td>
+                <td>
+                    <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php',array(
+                        'item'       => $item,
+                        'dateFormat' => (!empty($dateFormat)) ? $dateFormat : 'F j, Y g:i a',
+                        'model'      => 'lead.field'
+                    )); ?>
+                    <?php echo $item->getLabel(); ?>
+                </td>
                 <td class="visible-md visible-lg"><?php echo $item->getAlias(); ?></td>
+                <td class="visible-md visible-lg"><?php echo $view['translator']->trans('mautic.lead.field.group.'.$item->getGroup()); ?></td>
                 <td><?php echo $view['translator']->trans('mautic.lead.field.type.'.$item->getType()); ?></td>
                 <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 <td>

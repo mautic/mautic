@@ -30,14 +30,7 @@
         <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.lead.lead.header.leadinfo'); ?></h3>
     </div>
     <div class="panel-body">
-        <?php $col = 12; ?>
-        <?php if (!empty($fields['email'])): ?>
-        <div class="col-sm-2">
-
-        </div>
-        <?php $col = 10; ?>
-        <?php endif; ?>
-        <div class="col-sm-<?php echo $col; ?>">
+        <div class="col-sm-12">
             <?php if ($lead->getOwner()): ?>
                 <div class="row">
                     <div class="col-xs-3 field-label">
@@ -59,7 +52,7 @@
                     </div>
                 </div>
             <?php endif; ?>
-            <?php foreach ($fields as $field): ?>
+            <?php foreach ($fields['core'] as $field): ?>
                 <?php if (empty($field['value'])) continue; ?>
                 <div class="row">
                     <div class="col-xs-3 field-label">
@@ -67,10 +60,11 @@
                     </div>
                     <div class="col-xs-9 field-value">
                         <?php echo $view->render('MauticLeadBundle:Lead:info_value.html.php', array(
-                            'value'       => $field['value'],
-                            'name'        => $field['alias'],
-                            'type'        => $field['type'],
-                            'dateFormats' => $dateFormats
+                            'value'             => $field['value'],
+                            'name'              => $field['alias'],
+                            'type'              => $field['type'],
+                            'dateFormats'       => $dateFormats,
+                            'socialProfileUrls' => $socialProfileUrls
                         )); ?>
                     </div>
                 </div>

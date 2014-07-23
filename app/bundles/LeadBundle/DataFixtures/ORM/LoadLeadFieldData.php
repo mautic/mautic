@@ -49,6 +49,7 @@ class LoadLeadFieldData extends AbstractFixture implements OrderedFixtureInterfa
             'firstname',
             'lastname',
             'company',
+            'position',
             'email',
             'title',
             'phone',
@@ -63,7 +64,7 @@ class LoadLeadFieldData extends AbstractFixture implements OrderedFixtureInterfa
             'website',
             'twitter',
             'facebook',
-            'plus',
+            'googleplus',
             'skype'
         );
 
@@ -86,7 +87,8 @@ class LoadLeadFieldData extends AbstractFixture implements OrderedFixtureInterfa
                 $entity->setProperties(array("list" =>"|Mr|Mrs|Miss"));
             }
             $entity->setType($type);
-            $fixed = in_array($name, array('firstname', 'lastname', 'company', 'email', 'country', 'city', 'state')) ? true : false;
+            $fixed = in_array($name, array('firstname', 'lastname', 'position', 'company', 'email', 'address1', 'address2',
+                'country', 'city', 'state')) ? true : false;
             $entity->setIsFixed($fixed);
             $entity->setOrder(($key+1));
             $entity->setAlias($name);
@@ -97,12 +99,16 @@ class LoadLeadFieldData extends AbstractFixture implements OrderedFixtureInterfa
                 'phone',
                 'twitter',
                 'facebook',
-                'plus',
+                'googleplus',
                 'skype',
                 'mobile',
                 'website'
             )) ? false : true;
             $entity->setIsListable($listable);
+
+            $group = (in_array($name, array('twitter', 'facebook', 'googleplus', 'skype'))) ? 'social' : 'core';
+            $entity->setGroup($group);
+
             $manager->persist($entity);
             $manager->flush();
             $this->addReference('leadfield-'.$name, $entity);

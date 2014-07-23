@@ -10,6 +10,7 @@
 namespace Mautic\SocialBundle\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\SocialBundle\Entity\SocialNetwork;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -19,9 +20,11 @@ class NetworkIntegrationHelper
     static $factory;
 
     /**
-     * Get a list of social media helper classes
+     * Get a list of social network helper classes
      *
-     * @return array
+     * @param MauticFactory $factory
+     * @param null          $service
+     * @return mixed
      */
     public static function getNetworkObjects(MauticFactory $factory, $service = null)
     {
@@ -31,7 +34,8 @@ class NetworkIntegrationHelper
         $available = array(
             'GooglePlus',
             'Foursquare',
-            'Twitter'
+            'Twitter',
+            'Facebook'
         );
 
         if (empty($networks)) {
@@ -61,7 +65,7 @@ class NetworkIntegrationHelper
     }
 
     /**
-     * Get available fields for choices
+     * Get available fields for choices in the config UI
      *
      * @return mixed
      */
@@ -95,9 +99,9 @@ class NetworkIntegrationHelper
                         case 'array_object':
                             if ($field == "urls" || $field == "url") {
                                 //create social profile fields
-                                $socialProfileUrls = self::getSocialProfileUrls();
+                                $socialProfileUrls = self::getSocialProfileUrlRegex();
                                 foreach ($socialProfileUrls as $p => $d) {
-                                    $fields[$s]["{$p}ProfileUrl"] = $translator->trans("mautic.social.{$s}.{$p}ProfileUrl");
+                                    $fields[$s]["{$p}ProfileHandle"] = $translator->trans("mautic.social.{$s}.{$p}ProfileHandle");
                                 }
                                 foreach ($details['fields'] as $f) {
                                     $fields[$s]["{$f}Urls"] = $translator->trans("mautic.social.{$s}.{$f}Urls");
@@ -119,33 +123,53 @@ class NetworkIntegrationHelper
         return (!empty($service)) ? $fields[$service] : $fields;
     }
 
-
     /**
-     * Returns popular social media services and URLs
+     * Returns popular social media services and regex URLs for parsing purposes
      *
+     * @param $find     If true, array of regexes to find a handle will be returned;
+     *                  If false, array of URLs with a placeholder of %handle% will be returned
      * @return array
      */
-    public static function getSocialProfileUrls()
+    public static function getSocialProfileUrlRegex($find = true)
     {
-        return array(
-            "twitter"   => "twitter.com",
-            "facebook"  => array(
-                "facebook.com",
-                "fb.me"
-            ),
-            "linkedin"  => "linkedin.com",
-            "instagram" => "instagram.com",
-            "pinterest" => "pinterest.com",
-            "klout"     => "klout.com",
-            "youtube"   => array(
-                "youtube.com",
-                "youtu.be"
-            ),
-            "flickr"     => "flickr.com"
-        );
+        if ($find) {
+            //regex to find a match
+            return array(
+                "twitter"   => "/twitter.com\/(.*?)($|\/)/",
+                "facebook"  => array(
+                    "/facebook.com\/(.*?)($|\/)/",
+                    "/fb.me\/(.*?)($|\/)/"
+                ),
+                "linkedin"  => "/linkedin.com\/in\/(.*?)($|\/)/",
+                "instagram" => "/instagram.com\/(.*?)($|\/)/",
+                "pinterest" => "/pinterest.com\/(.*?)($|\/)/",
+                "klout"     => "/klout.com\/(.*?)($|\/)/",
+                "youtube"   => array(
+                    "/youtube.com\/user\/(.*?)($|\/)/",
+                    "/youtu.be\/user\/(.*?)($|\/)/"
+                ),
+                "flickr"    => "/flickr.com\/photos\/(.*?)($|\/)/",
+                "skype"     => "/skype:(.*?)($|\?)/"
+            );
+        } else {
+            //populate placeholder
+            return array(
+                "twitter"   => "https://twitter.com/%handle%",
+                "facebook"  => "https://facebook.com/%handle%",
+                "linkedin"  => "https://linkedin.com/in/%handle%",
+                "instagram" => "https://instagram.com/%handle%",
+                "pinterest" => "https://pinterest.com/%handle%",
+                "klout"     => "https://klout.com/%handle%",
+                "youtube"   => "https://youtube.com/user/%handle%",
+                "flickr"    => "https://flickr.com/photos/%handle%",
+                "skype"     => "skype:%handle%?call"
+            );
+        }
     }
 
     /**
+     * Get array of social network entities
+     *
      * @return mixed
      */
     public static function getNetworkSettings()
@@ -154,23 +178,109 @@ class NetworkIntegrationHelper
         return $repo->getNetworkSettings();
     }
 
-    public static function getUserProfile($factory, $lead, $fields)
+    /**
+     * Get the user's social profile data from cache or networks if indicated
+     *
+     * @param $factory
+     * @param $lead
+     * @param $fields
+     * @param $refresh
+     * @param $persistLead
+     * @param $includeLeadFields
+     *
+     * @return array
+     */
+    public static function getUserProfiles($factory, $lead, $fields, $refresh = true, $persistLead = true,
+                                           $includeLeadFields = false)
     {
-       //$cached = $lead->getSocialCache();
+        $socialCache  = $lead->getSocialCache();
+        $leadFields   = array();
 
-        $socialProfiles = array();
-        if (!empty($fields['email']['value'])) {
+        if ($refresh) {
+            //regenerate from networks
+
             //check to see if there are social profiles activated
             $socialNetworks = NetworkIntegrationHelper::getNetworkObjects($factory);
             foreach ($socialNetworks as $network => $sn) {
-                $settings = $sn->getSettings();
-                $features = $settings->getSupportedFeatures();
-                if ($settings->isPublished() && in_array('public_activity', $features)) {
-                    $socialProfiles[$network]['data']     = $sn->getUserData($fields);
-                    $socialProfiles[$network]['activity'] = $sn->getPublicActivity($fields);
+                $settings        = $sn->getSettings();
+                $features        = $settings->getSupportedFeatures();
+                $identifierField = self::getUserIdentifierField($sn, $fields);
+
+                if ($identifierField && $settings->isPublished()) {
+                    if (!isset($socialCache[$network])) {
+                        $socialCache[$network] = array();
+                    }
+
+                    if ($includeLeadFields) {
+                        $leadFields[$network] = $settings->getLeadFields();
+                    }
+
+                    if (in_array('public_profile', $features)) {
+                        $sn->getUserData($identifierField, $socialCache[$network]);
+                    }
+
+                    if (in_array('public_activity', $features)) {
+                        $sn->getPublicActivity($identifierField, $socialCache[$network]);
+                    }
+
+                    //regenerating all of the cache so remove update notice
+                    if (isset($socialCache[$network]['updated'])) {
+                        $now = new DateTimeHelper();
+                        $socialCache[$network]['lastRefresh'] = $now->toUtcString();
+                        unset($socialCache[$network]['updated']);
+                    }
                 }
             }
+
+            if ($persistLead) {
+                $lead->setSocialCache($socialCache);
+                $factory->getEntityManager()->getRepository('MauticLeadBundle:Lead')->saveEntity($lead);
+            }
+        } elseif ($includeLeadFields) {
+            $socialNetworks = NetworkIntegrationHelper::getNetworkObjects($factory);
+            foreach ($socialNetworks as $network => $sn) {
+                $settings             = $sn->getSettings();
+                $leadFields[$network] = $settings->getLeadFields();
+            }
         }
-        return $socialProfiles;
+
+        return ($includeLeadFields) ? array($socialCache, $leadFields) : $socialCache;
+    }
+
+    /**
+     * Loops through field values available and finds the field the network needs to obtain the user
+     *
+     * @param $networkObject
+     * @param $fields
+     * @return bool
+     */
+    public static function getUserIdentifierField($networkObject, $fields)
+    {
+        $availableFields = array_keys($fields);
+        $identifierField = $networkObject->getIdentifierField();
+        $identifier      = (is_array($identifierField)) ? array() : false;
+
+        foreach ($availableFields as $f) {
+            if (is_array($identifier)) {
+                //there are multiple fields the network can identify by
+                foreach ($identifierField as $idf) {
+                    $value = (is_array($fields[$f]) && isset($fields[$f]['value'])) ? $fields[$f]['value'] : $fields[$f];
+                    if (!in_array($value, $identifier) && strpos($f, $idf) !== false) {
+                        //remove field prefix in case this is from a lead form so the network doesn't have to account for it
+                        $parsedField              = str_ireplace('field_', '', $f);
+                        $identifier[$parsedField] = $value;
+                        if (count($identifier) === count($identifierField)) {
+                            //found enough matches so break
+                            break;
+                        }
+                    }
+                }
+            } elseif ($identifierField == $f || strpos($f, $identifierField) !== false) {
+                $identifier = (is_array($fields[$f])) ? $fields[$f]['value'] : $fields[$f];
+                break;
+            }
+        }
+
+        return $identifier;
     }
 }

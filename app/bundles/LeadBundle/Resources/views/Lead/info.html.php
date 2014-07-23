@@ -8,7 +8,7 @@
  */
 ?>
 
- <img class="img img-responsive" src="https://www.gravatar.com/avatar/<?php echo md5(strtolower(trim($fields['email']['value']))); ?>?&s=250" />
+ <img class="img img-responsive" src="https://www.gravatar.com/avatar/<?php echo md5(strtolower(trim($fields['core']['email']['value']))); ?>?&s=250" />
  <hr />
 <strong>About</strong><br />
 <p><em>3 kids and counting, 1 wife and holding.</em></p>

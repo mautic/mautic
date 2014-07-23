@@ -56,6 +56,24 @@ class FieldType extends AbstractType
             'attr'       => array('class' => 'form-control', 'length' => 50)
         ));
 
+        $builder->add('group', 'choice', array(
+            'choices'       => array(
+                'core'         => 'mautic.lead.field.group.core',
+                'social'       => 'mautic.lead.field.group.social',
+                'personal'     => 'mautic.lead.field.group.personal',
+                'professional' => 'mautic.lead.field.group.professional'
+            ),
+            'attr'        => array(
+                'class'    => 'form-control',
+                'tooltip'  => 'mautic.lead.field.form.group.help'
+            ),
+            'expanded'      => false,
+            'multiple'      => false,
+            'label'         => 'mautic.lead.field.form.group',
+            'empty_value'   => false,
+            'required'      => false
+        ));
+
         $disabled = (!empty($options['data'])) ? $options['data']->isFixed() : false;
         $new      = (!empty($options['data']) && $options['data']->getAlias()) ? false : true;
 
@@ -113,6 +131,18 @@ class FieldType extends AbstractType
             ),
             'required'   => false,
             'disabled'   => $disabled
+        ));
+
+        $builder->add('isPublished', 'button_group', array(
+            'choice_list' => new ChoiceList(
+                array(false, true),
+                array('mautic.core.form.no', 'mautic.core.form.yes')
+            ),
+            'expanded'      => true,
+            'multiple'      => false,
+            'label'         => 'mautic.core.form.ispublished',
+            'empty_value'   => false,
+            'required'      => false
         ));
 
         $builder->add('isRequired', 'button_group', array(
