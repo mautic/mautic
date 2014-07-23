@@ -43,18 +43,20 @@ $view["slots"]->set("headerTitle",
     <div class="col-sm-3">
       <?php
       echo $view->render('MauticLeadBundle:Lead:info.html.php', array(
-          "lead"        => $lead,
-          'dateFormats' => $dateFormats,
-          'fields'      => $fields
+          "lead"              => $lead,
+          'dateFormats'       => $dateFormats,
+          'fields'            => $fields,
+          'socialProfileUrls' => $socialProfileUrls
       ));
       ?>
     </div>
     <div class="col-md-9">
       <?php
       echo $view->render('MauticLeadBundle:Lead:details.html.php', array(
-          "lead"        => $lead,
-          'dateFormats' => $dateFormats,
-          'fields'      => $fields
+          "lead"              => $lead,
+          'dateFormats'       => $dateFormats,
+          'fields'            => $fields,
+          'socialProfileUrls' => $socialProfileUrls
       ));
 
       echo $view->render('MauticLeadBundle:Lead:visits.html.php', array(
@@ -64,11 +66,12 @@ $view["slots"]->set("headerTitle",
       ));
 
       echo $view->render('MauticLeadBundle:Lead:social.html.php', array(
-          "lead"           => $lead,
-          'dateFormats'    => $dateFormats,
-          'socialProfiles' => $socialProfiles
+          "lead"              => $lead,
+          'dateFormats'       => $dateFormats,
+          'socialProfiles'    => $socialProfiles,
+          'socialProfileUrls' => $socialProfileUrls
       ));
-      
+
       echo $view->render('MauticLeadBundle:Lead:score_log.html.php', array(
           "lead" => $lead,
           'dateFormats' => $dateFormats

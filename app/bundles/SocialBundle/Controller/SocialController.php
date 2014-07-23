@@ -33,7 +33,9 @@ class SocialController extends FormController
         }
 
         //get a list of custom form fields
-        $fields     = $factory->getModel('lead.field')->getEntities();
+        $fields     = $factory->getModel('lead.field')->getEntities(
+            array('filter' => array('isPublished' => true))
+        );
         $leadFields = array();
         foreach ($fields as $f) {
             $leadFields[$f->getId()] = $f->getLabel();

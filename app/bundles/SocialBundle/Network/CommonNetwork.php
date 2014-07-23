@@ -18,23 +18,58 @@ class CommonNetwork
     protected $entity;
     protected $settings;
 
+    /**
+     * @param MauticFactory $factory
+     */
     public function __construct(MauticFactory $factory)
     {
         $this->factory = $factory;
     }
 
+    /**
+     * Returns the name of the social network that must match the name of the file
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        throw new \InvalidArgumentException('Missing required getName() function');
+    }
+
+    /**
+     * Returns the field the network needs in order to find the user
+     *
+     * @return mixed
+     */
+    public function getIdentifierField()
+    {
+        throw new \InvalidArgumentException('Missing required getIdentifierField() function');
+    }
+
+    /**
+     * Set the social network entity
+     *
+     * @param SocialNetwork $settings
+     */
     public function setSettings(SocialNetwork $settings)
     {
         $this->settings = $settings;
     }
 
+    /**
+     * Get the social network entity
+     *
+     * @return mixed
+     */
     public function getSettings()
     {
         return $this->settings;
     }
 
     /**
-     * Generate the oAuth login url
+     * Generate the oauth login URL
+     *
+     * @return string
      */
     public function getOAuthLoginUrl()
     {
@@ -44,10 +79,14 @@ class CommonNetwork
             true //absolute
         );
         if (isset($keys['clientId']) && isset($keys['clientSecret'])) {
+            $state = uniqid();
             $url = $this->getAuthenticationUrl();
             $url .= '?client_id=' . $keys['clientId'];
             $url .= '&response_type=code';
             $url .= '&redirect_uri=' . $callback;
+            //set a state to protect against CSRF attacks
+            $url .= '&state=' . $state;
+            $this->factory->getSession()->set($this->getName() . '_csrf_token', $state);
 
             return $url;
         }
@@ -57,7 +96,7 @@ class CommonNetwork
     /**
      * Retrieves and stores tokens returned from oAuthLogin
      *
-     * @return SocialMedia|mixed
+     * @return array
      */
     public function oAuthCallback()
     {
@@ -88,7 +127,8 @@ class CommonNetwork
             $data = @file_get_contents($url);
         }
 
-        $values = json_decode($data, true);
+        //parse the response
+        $values = $this->parseCallbackResponse($data);
 
         //check to see if an entity exists
         $entity = $this->getSettings();
@@ -97,7 +137,7 @@ class CommonNetwork
             $entity->setName($this->getName());
         }
 
-        if (isset($values['access_token'])) {
+        if (is_array($values) && isset($values['access_token'])) {
             $keys['access_token'] = $values['access_token'];
 
             if (isset($values['refresh_token'])) {
@@ -105,7 +145,7 @@ class CommonNetwork
             }
             $error = false;
         } else {
-            $error = $this->parseResponse($values);
+            $error = $this->getErrorsFromResponse($values);
         }
 
         $entity->setApiKeys($keys);
@@ -118,6 +158,23 @@ class CommonNetwork
         return array($entity, $error);
     }
 
+    /**
+     * Extract the tokens returned by the oauth2 callback
+     *
+     * @param $data
+     * @return mixed
+     */
+    protected function parseCallbackResponse($data)
+    {
+        return json_decode($data, true);
+    }
+
+    /**
+     * Make a basic call using cURL to get the data
+     *
+     * @param $url
+     * @return mixed
+     */
     public function makeCall($url) {
         $request     = $this->factory->getRequest();
         $route       = $request->get('_route');
@@ -135,43 +192,137 @@ class CommonNetwork
         return $data;
     }
 
+    /**
+     * Get a list of available fields from the social networking API
+     *
+     * @return array
+     */
     public function getAvailableFields()
     {
         return array();
     }
 
+    /**
+     * Get a list of keys required to make an API call.  Examples are key, clientId, clientSecret
+     *
+     * @return array
+     */
     public function getRequiredKeyFields()
     {
         return array();
     }
 
+    /**
+     * Get a list of supported features for this social network
+     *
+     * @return array
+     */
     public function getSupportedFeatures()
     {
         return array();
     }
 
+    /**
+     * Get the type of authentication required for this API.  Values can be none, key, or oauth2
+     *
+     * @return string
+     */
     public function getAuthenticationType()
     {
         return 'none';
     }
 
+    /**
+     * Get the URL required to obtain an oauth2 access token
+     *
+     * @return bool
+     */
     public function getAccessTokenUrl()
     {
         return false;
     }
 
-    public function parseResponse($response)
-    {
-        return implode(' ', $response);
-    }
-
-    public function getPublicActivity($email)
-    {
-        return array();
-    }
-
+    /**
+     * Get the authentication/login URL for oauth2 access
+     *
+     * @return string
+     */
     protected function getAuthenticationUrl()
     {
         return '';
+    }
+
+    /**
+     * Get a string formatted error from an API response
+     *
+     * @param $response
+     * @return string
+     */
+    public function getErrorsFromResponse($response)
+    {
+        if (is_array($response)) {
+            return implode(' ', $response);
+        } else {
+            $response;
+        }
+    }
+
+    /**
+     * Cleans the identifier for api calls
+     *
+     * @param $identifier
+     * @return string
+     */
+    protected function cleanIdentifier($identifier)
+    {
+        if (is_array($identifier)) {
+            foreach ($identifier as &$i) {
+                $i = urlencode($i);
+            }
+        } else {
+            $identifier = urlencode($identifier);
+        }
+
+        return $identifier;
+    }
+
+    /**
+     * Gets the ID of the user for the network
+     *
+     * @param $identifier
+     * @param $socialCache
+     * @return mixed|null
+     */
+    public function getUserId($identifier, &$socialCache)
+    {
+        if (!empty($socialCache['id'])) {
+            return $socialCache['id'];
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Get an array of public activity
+     *
+     * @param $identifier
+     * @param $socialCache
+     * @return array
+     */
+    public function getPublicActivity($identifier, &$socialCache)
+    {
+
+    }
+
+    /**
+     * Get an array of public data
+     *
+     * @param $identifier
+     * @param $socialCache
+     * @return array
+     */
+    public function getUserData($identifier, &$socialCache)
+    {
+
     }
 }

@@ -7,55 +7,27 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-if (empty($type)):
+if (empty($type)) {
     $type = 'string';
-endif;
+}
 
 ?>
-
+<?php //email ?>
 <?php if (stripos($name, "email") !== false): ?>
 <a target="_blank" href="mailto:<?php echo $value; ?>"><?php echo $value; ?></a>
-
-<?php elseif (stripos($name, "skype") !== false): ?>
-<a href="skype:<?php echo $value; ?>?call"><?php echo $value; ?></a>
-
-<?php elseif (stripos($name, "facebook") !== false): ?>
-<?php if (strpos($value, 'http') === false): ?>
-<a target="_blank" href="https://www.facebook.com/<?php echo $value; ?>"><?php echo $value; ?></a>
-<?php else: ?>
-<a target="_blank" href="<?php echo $value; ?>"><?php echo $value; ?></a>
-<?php endif; ?>
-
-<?php elseif (stripos($name, "twitter") !== false): ?>
-<?php if (strpos($value, 'http') === false): ?>
-<a target="_blank" href="https://www.twitter.com/<?php echo $value; ?>"><?php echo $value; ?></a>
-<?php else: ?>
-<a target="_blank" href="<?php echo $value; ?>"><?php echo $value; ?></a>
-<?php endif; ?>
-
-<?php elseif (stripos($name, "linkedin") !== false): ?>
-<?php if (strpos($value, 'http') === false): ?>
-<a target="_blank" href="https://www.linkedin.com/in/<?php echo $value; ?>"><?php echo $value; ?></a>
-<?php else: ?>
-<a target="_blank" href="<?php echo $value; ?>"><?php echo $value; ?></a>
-<?php endif; ?>
-
-<?php elseif (stripos($name, "googleplus") !== false): ?>
-<?php if (strpos($value, 'http') === false): ?>
-<a target="_blank" href="https://plus.google.com/+<?php echo $value; ?>"><?php echo $value; ?></a>
-<?php else: ?>
-<a target="_blank" href="<?php echo $value; ?>"><?php echo $value; ?></a>
-<?php endif; ?>
-
+<?php //website ?>
 <?php elseif (stripos($name, "website") !== false): ?>
+<?php //website - with http already?>
 <?php if (strpos($value, 'http') === 0): ?>
 <a target="_blank" href="<?php echo $value; ?>"><?php echo $value; ?></a>
+<?php //website - without http at all ?>
 <?php elseif (strpos($value, 'http') === false): ?>
 <a target="_blank" href="http://<?php echo $value; ?>"><?php echo $value; ?></a>
 <?php else: ?>
+<?php //website - can't determine or multiple urls ?>
 <?php echo $value; ?>
 <?php endif; ?>
-
+<?php //not marked as website but starts with http ?>
 <?php elseif (strpos($value, 'http') === 0): ?>
 <a target="_blank" href="<?php echo $value; ?>"><?php echo $value; ?></a>
 <?php
@@ -63,8 +35,19 @@ elseif ($type == 'datetime'):
     $dateHelper = new \Mautic\CoreBundle\Helper\DateTimeHelper($value);
     echo $dateHelper->toLocalString($dateFormats[$type]);
 ?>
-
 <?php else: ?>
-<?php echo $value; ?>
+<?php
+    if (isset($socialProfileUrls)) {
+        //test for social networking profiles
+        foreach ($socialProfileUrls as $network => $url) {
+            if (stripos($name, $network) !== false && (strpos($value, 'http') === false)) {
+                $url   = str_replace('%handle%', $value, $url);
+                $value = '<a href="'.$url.'" target="_blank">'.$value.'</a>';
+                break;
+            }
+        }
+    }
 
+    echo $value;
+?>
 <?php endif; ?>

@@ -13,83 +13,69 @@ use Mautic\SocialBundle\Helper\NetworkIntegrationHelper;
 
 class GooglePlusNetwork extends CommonNetwork
 {
-    private $userEmail = '';
-    private $userId    = false;
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return string
+     */
     public function getName()
     {
         return 'GooglePlus';
     }
 
     /**
-     * @param $email
-     * @return mixed|null
+     * {@inheritdoc}
+     *
+     * @return string
      */
-    private function findUserByEmail($email)
+    public function getIdentifierField()
     {
-        if ($email != $this->userEmail || empty($this->userId)) {
-            $this->userEmail = $email;
-            $email = urlencode($email);
-            $keys  = $this->settings->getApiKeys();
-            if (!empty($keys['key'])) {
-                $url  = "https://www.googleapis.com/plus/v1/people?query={$email}&key={$keys['key']}";
-                $data = $this->makeCall($url);
-
-                if (!empty($data) && isset($data->items) && count($data->items)) {
-                    $result = $data->items[0];
-                    $this->userId = $result->id;
-                    return $this->userId;
-                }
-            }
-        } elseif (!empty($this->userId)) {
-            return $this->userId;
-        }
-        return false;
+        return 'email';
     }
 
     /**
-     * Get public data
+     * {@inheritdoc}
      *
-     * @param $fields
+     * @param $identifier
+     * @param $socialCache
      * @return array
      */
-    public function getUserData($fields)
+    public function getUserData($identifier, &$socialCache)
     {
-        $userid = $this->getUserId($fields);
-        $keys   = $this->settings->getApiKeys();
+        $keys = $this->settings->getApiKeys();
 
-        if ($userid && !empty($keys['key'])) {
+        if (!empty($keys['key']) && $userid = $this->getUserId($identifier, $socialCache)) {
             $url                = "https://www.googleapis.com/plus/v1/people/{$userid}?key={$keys['key']}";
             $data               = $this->makeCall($url);
             $info               = $this->matchUpData($data);
-            $info['profileUrl'] = $data->url;
+            $info['profileHandle'] = $data->url;
             if (isset($data->image->url)) {
                 //remove the size from the end
                 $image = $data->image->url;
                 $image                   = preg_replace('/\?.*/', '', $image);
                 $info["profileImage"] = $image;
             }
-            return $info;
+            $socialCache['profile'] = $info;
+            $socialCache['updated'] = true;
         }
     }
 
     /**
-     * Retrieve public posts
+     * {@inheritdoc}
      *
-     * @param $fields
+     * @param $identifier
+     * @param $socialCache
      * @return array
      */
-    public function getPublicActivity($fields)
+    public function getPublicActivity($identifier, &$socialCache)
     {
-        $id    = $this->getUserId($fields);
-        $keys  = $this->settings->getApiKeys();
-        $posts = array();
-        if ($id && !empty($keys['key'])) {
-
+        $keys = $this->settings->getApiKeys();
+        if (!empty($keys['key']) && $id = $this->getUserId($identifier, $socialCache)) {
             $url  = "https://www.googleapis.com/plus/v1/people/$id/activities/public?key={$keys['key']}&maxResults=10";
             $data = $this->makeCall($url);
-
             if (!empty($data) && isset($data->items) && count($data->items)) {
+                $socialCache['activity'] = array();
                 foreach ($data->items as $page) {
                     $post = array(
                         'title'     => $page->title,
@@ -97,11 +83,11 @@ class GooglePlusNetwork extends CommonNetwork
                         'published' => $page->published,
                         'updated'   => $page->updated
                     );
-                    $posts[] = $post;
+                    $socialCache['activity'][] = $post;
                 }
+                $socialCache['updated'] = true;
             }
         }
-        return $posts;
     }
 
     /**
@@ -109,7 +95,7 @@ class GooglePlusNetwork extends CommonNetwork
      *
      * @param $data
      */
-    protected function matchUpData($data)
+    private function matchUpData($data)
     {
         $info       = array();
         $available  = $this->getAvailableFields();
@@ -136,24 +122,28 @@ class GooglePlusNetwork extends CommonNetwork
                     break;
                 case 'array_object':
                     if ($field == "urls") {
-                        $socialProfileUrls = NetworkIntegrationHelper::getSocialProfileUrls();
+                        $socialProfileUrls = NetworkIntegrationHelper::getSocialProfileUrlRegex();
                         foreach ($values as $k => $v) {
                             $socialMatch       = false;
-                            foreach ($socialProfileUrls as $service => $url) {
-                                if (is_array($url)) {
-                                    foreach ($url as $u) {
-                                        if (strpos($v->value, $u) !== false) {
-                                            $info[$service . 'ProfileUrl'] = $v->value;
-                                            $socialMatch                   = true;
+                            foreach ($socialProfileUrls as $service => $regex) {
+                                if (is_array($regex)) {
+                                    foreach ($regex as $r) {
+                                        preg_match($r, $v->value, $match);
+                                        if (!empty($match[1])) {
+                                            $info[$service . 'ProfileHandle'] = $match[1];
+                                            $socialMatch                      = true;
                                             break;
                                         }
                                     }
                                     if ($socialMatch)
                                         break;
-                                } elseif (strpos($v->value, $url) !== false) {
-                                    $info[$service . 'ProfileUrl'] = $v->value;
-                                    $socialMatch                   = true;
-                                    break;
+                                } else {
+                                    preg_match($regex, $v->value, $match);
+                                    if (!empty($match[1])) {
+                                        $info[$service . 'ProfileHandle'] = $match[1];
+                                        $socialMatch                      = true;
+                                        break;
+                                    }
                                 }
                             }
 
@@ -208,11 +198,15 @@ class GooglePlusNetwork extends CommonNetwork
         return $info;
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return array
+     */
     public function getAvailableFields()
     {
         return array(
-            "profileUrl"         => array("type" => "string"),
-            "profileImage"       => array("type" => "string"),
+            "profileHandle"      => array("type" => "string"),
             "nickname"           => array("type" => "string"),
             "occupation"         => array("type" => "string"),
             "skills"             => array("type" => "string"),
@@ -264,6 +258,11 @@ class GooglePlusNetwork extends CommonNetwork
         );
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return array
+     */
     public function getRequiredKeyFields()
     {
         return array(
@@ -271,34 +270,60 @@ class GooglePlusNetwork extends CommonNetwork
         );
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return array
+     */
     public function getSupportedFeatures()
     {
         return array(
-            'lead_fields',
             'public_activity',
-            'share_button'
+            'public_profile'
         );
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return string
+     */
     public function getAuthenticationType()
     {
         return 'key';
     }
 
-    private function getUserId($fields)
+    /**
+     * {@inheritdoc}
+     *
+     * @param $identifier
+     * @param $socialCache
+     * @return mixed|null
+     */
+    public function getUserId($identifier, &$socialCache)
     {
-        if (isset($fields['email'])) {
-            //from a lead profile
-            $email = $fields['email']['value'];
-        } elseif (isset($fields['field_email'])) {
-            //from creating a lead
-            $email = $fields['field_email'];
-        } else {
-
-            return null;
+        if (!empty($socialCache['id'])) {
+            return $socialCache['id'];
+        } elseif (empty($identifier)) {
+            return false;
         }
-        $id = $this->findUserByEmail($email);
 
-        return $id;
+        $email = $this->cleanIdentifier($identifier);
+        $keys  = $this->settings->getApiKeys();
+        if (!empty($keys['key'])) {
+            $url  = "https://www.googleapis.com/plus/v1/people?query={$email}&key={$keys['key']}";
+            $data = $this->makeCall($url);
+
+            if (!empty($data) && isset($data->items) && count($data->items)) {
+                $socialCache['id'] = $data->items[0]->id;
+
+                //mark the cache as needing to be updated
+                $socialCache['updated'] = true;
+
+                return $socialCache['id'];
+            }
+        }
+
+        return false;
     }
 }

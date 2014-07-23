@@ -62,10 +62,11 @@
                     </div>
                     <div class="col-xs-9 field-value">
                         <?php echo $view->render('MauticLeadBundle:Lead:info_value.html.php', array(
-                            'value'       => $field['value'],
-                            'name'        => $field['alias'],
-                            'type'        => $field['type'],
-                            'dateFormats' => $dateFormats
+                            'value'             => $field['value'],
+                            'name'              => $field['alias'],
+                            'type'              => $field['type'],
+                            'dateFormats'       => $dateFormats,
+                            'socialProfileUrls' => $socialProfileUrls
                         )); ?>
                     </div>
                 </div>

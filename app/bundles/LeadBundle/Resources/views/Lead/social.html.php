@@ -32,17 +32,17 @@
             <?php foreach ($socialProfiles as $network => $details): ?>
             <div class="tab-pane<?php echo ($count === 0) ? ' active': ''; ?>" id="<?php echo $network; ?>">
                 <?php $col = 12; ?>
-                <?php if (!empty($details['data']['profileImage'])): ?>
+                <?php if (!empty($details['profile']['profileImage'])): ?>
                 <div class="col-sm-3">
-                    <img class="img img-responsive img-thumbnail" src="<?php echo $details['data']['profileImage']; ?>" />
+                    <img class="img img-responsive img-thumbnail" src="<?php echo $details['profile']['profileImage']; ?>" />
                 </div>
                 <?php
-                    unset($details['data']['profileImage']);
+                    unset($details['profile']['profileImage']);
                     $col = 9; ?>
                 <?php endif; ?>
                 <div class="col-sm-<?php echo $col; ?>">
                     <ul class="nav nav-tabs" role="tablist">
-                        <?php if (!empty($details['data']) && !empty($details['activity'])): ?>
+                        <?php if (!empty($details['profile']) && !empty($details['activity'])): ?>
                         <?php $active = 'profile'; ?>
                         <li class="active">
                             <a href="#<?php echo $network; ?>Profile" role="tab" data-toggle="tab">
@@ -54,7 +54,7 @@
                                 <?php echo $view['translator']->trans('mautic.lead.lead.tab.socialactivity'); ?>
                             </a>
                         </li>
-                        <?php elseif (!empty($details['data'])): ?>
+                        <?php elseif (!empty($details['profile'])): ?>
                         <?php $active = 'profile'; ?>
                         <li class="active">
                             <a href="#<?php echo $network; ?>Profile" role="tab" data-toggle="tab">
@@ -72,39 +72,26 @@
                     </ul>
 
                     <div class="tab-content">
-                        <?php if (!empty($details['data'])): ?>
+                        <?php if (!empty($details['profile'])): ?>
                         <div class="tab-pane<?php echo ($active == 'profile') ? ' active': ''; ?>" id="<?php echo $network; ?>Profile">
-                            <?php foreach ($details['data'] as $l => $v): ?>
-                            <div class="row">
-                                <div class="col-xs-3">
-                                    <?php echo $view['translator']->trans('mautic.social.'.$network.'.'.$l); ?>
-                                </div>
-                                <div class="col-xs-9 field-value">
-                                    <?php echo $view->render('MauticLeadBundle:Lead:info_value.html.php', array(
-                                        'name'  => $l,
-                                        'value' => $v
-                                    )); ?>
-                                </div>
-                            </div>
-                            <?php endforeach; ?>
+                            <?php echo $view->render('MauticLeadBundle:Social/' . $network . ':profile.html.php', array(
+                                'lead'              => $lead,
+                                'profile'           => $details['profile'],
+                                'dateFormats'       => $dateFormats,
+                                'network'           => $network,
+                                'socialProfileUrls' => $socialProfileUrls
+                            )); ?>
                         </div>
                         <?php endif; ?>
 
                         <?php if (!empty($details['activity'])): ?>
                         <div class="tab-pane<?php echo ($active == 'activity') ? ' active': ''; ?>" id="<?php echo $network; ?>Activity">
-                            <ul>
-                                <?php foreach ($details['activity'] as $activity): ?>
-                                <li>
-
-                                    <a href="<?php echo $activity['url']; ?>" target="_blank">
-                                        <?php echo $view['translator']->trans('mautic.lead.lead.socialactivity.title',array(
-                                            '%title%' => $activity['title'],
-                                            '%date%'  => date($dateFormats['datetime'], strtotime($activity['published']))
-                                        )); ?>
-                                    </a>
-                                </li>
-                                <?php endforeach; ?>
-                            </ul>
+                            <?php echo $view->render('MauticLeadBundle:Social/' . $network . ':activity.html.php', array(
+                                    'lead'        => $lead,
+                                    'activity'    => $details['activity'],
+                                    'dateFormats' => $dateFormats,
+                                    'network'     => $network
+                            )); ?>
                         </div>
                         <?php endif; ?>
                     </div>
