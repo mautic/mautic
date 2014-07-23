@@ -34,9 +34,7 @@ class PageRepository extends CommonRepository
             ->select('p')
             ->leftJoin('p.category', 'c');
 
-        if (!$this->buildClauses($q, $args)) {
-            return array('totalCount' => 0);
-        }
+        $this->buildClauses($q, $args);
 
         $query = $q->getQuery();
 

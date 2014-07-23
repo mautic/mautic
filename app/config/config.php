@@ -46,7 +46,8 @@ $container->loadFromExtension('framework', array(
     'templating'           => array(
         'engines' => array(
             'twig',
-            'mautic'
+            'mautic',
+            'php'
         ),
         'form' => array(
             'resources' => array(

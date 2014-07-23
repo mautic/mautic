@@ -14,7 +14,7 @@ if ($tmpl == 'index') {
 <div class="bundle-list" id="form-page-tokens">
     <ul class="draggable scrollable">
         <?php
-        if ($items && count($items)):
+        if (count($items)):
         foreach ($items as $i):?>
             <li class="bundle-list-item has-click-event" id="form-<?php echo $i[0]->getId(); ?>">
                 <div class="padding-sm">

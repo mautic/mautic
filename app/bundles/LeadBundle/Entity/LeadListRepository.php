@@ -55,9 +55,7 @@ class LeadListRepository extends CommonRepository
         $q = $this
             ->createQueryBuilder('l');
 
-        if (!$this->buildClauses($q, $args)) {
-            return array();
-        }
+        $this->buildClauses($q, $args);
 
         $query = $q->getQuery();
         $result = new Paginator($query);

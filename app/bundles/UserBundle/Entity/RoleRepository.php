@@ -34,9 +34,7 @@ class RoleRepository extends CommonRepository
         $q = $this
             ->createQueryBuilder('r');
 
-        if (!$this->buildClauses($q, $args)) {
-            return array();
-        }
+        $this->buildClauses($q, $args);
 
         $query = $q->getQuery();
         $result = new Paginator($query);

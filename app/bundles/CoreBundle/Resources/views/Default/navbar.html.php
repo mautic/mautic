@@ -46,7 +46,7 @@
 
                         <!-- mustache template: used for update the `.media-list` requested from server-side -->
                         <script class="mustache-template" type="x-tmpl-mustache">
-                        
+
                             {{#data}}
                             <a href="page-message-rich.html" class="media border-dotted new">
                                 <span class="pull-left">
@@ -63,7 +63,7 @@
                                 </span>
                             </a>
                             {{/data}}
-                        
+
                         </script>
                         <!--/ mustache template -->
 
@@ -89,6 +89,7 @@
 
                                 <!-- Message list -->
                                 <div class="media-list">
+                                    <?php /*
                                     <a href="page-message-rich.html" class="media border-dotted read">
                                         <span class="pull-left">
                                             <img src="../image/avatar/avatar1.jpg" class="media-object img-circle" alt="">
@@ -171,6 +172,7 @@
                                             <!--/ meta icon -->
                                         </span>
                                     </a>
+                                    */?>
                                 </div>
                                 <!--/ Message list -->
                             </div><div class="scrollbar" style="width: 8px; position: absolute; top: 0px; opacity: 0.4; border-top-left-radius: 7px; border-top-right-radius: 7px; border-bottom-right-radius: 7px; border-bottom-left-radius: 7px; z-index: 99; right: 0px; display: block; background: rgb(0, 0, 0);"></div><div class="scrollrail" style="width: 8px; height: 100%; position: absolute; top: 0px; display: block; border-top-left-radius: 7px; border-top-right-radius: 7px; border-bottom-right-radius: 7px; border-bottom-left-radius: 7px; opacity: 0.2; z-index: 90; right: 0px; background: rgb(51, 51, 51);"></div></div>
@@ -190,7 +192,7 @@
 
                         <!-- mustache template: used for update the `.media-list` requested from server-side -->
                         <script class="mustache-template" type="x-tmpl-mustache">
-                        
+
                             {{#data}}
                             <a href="javascript:void(0);" class="media border-dotted new">
                                 <span class="media-object pull-left">
@@ -202,7 +204,7 @@
                                 </span>
                             </a>
                             {{/data}}
-                        
+
                         </script>
                         <!--/ mustache template -->
 

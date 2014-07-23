@@ -37,9 +37,7 @@ class FormRepository extends CommonRepository
 
         $q->select('f, ('.$sq->getDql().') as submissionCount');
 
-        if (!$this->buildClauses($q, $args)) {
-            return false;
-        }
+        $this->buildClauses($q, $args);
 
         $query = $q->getQuery();
         $results = new Paginator($query);

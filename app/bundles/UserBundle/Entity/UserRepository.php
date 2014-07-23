@@ -68,9 +68,7 @@ class UserRepository extends CommonRepository
             ->select('u, r')
             ->leftJoin('u.role', 'r');
 
-        if (!$this->buildClauses($q, $args)) {
-            return array();
-        }
+        $this->buildClauses($q, $args);
 
         $query = $q->getQuery();
         $result = new Paginator($query);

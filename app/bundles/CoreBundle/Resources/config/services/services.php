@@ -79,19 +79,6 @@ $container->setDefinition('mautic.assetic.loader',
 )
     ->addTag('assetic.formula_loader', array('alias' => 'mautic'));
 
-//Add an assetic alias for the custom engine/loader
-$container->setDefinition('mautic.assetic.helper',
-    new Definition(
-        'Symfony\Bundle\AsseticBundle\Templating\StaticAsseticHelper',
-        array(
-            new Reference('templating.helper.assets'),
-            new Reference('assetic.asset_factory')
-        )
-    )
-)
-    ->setScope('request')
-    ->addTag('templating.helper', array('alias' => 'assetic'));
-
 //Custom slots helper replacement
 $container->setDefinition('mautic.core.helper.templateblocks',
     new Definition(

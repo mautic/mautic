@@ -11,6 +11,7 @@ $value = $app->getSession()->get('mautic.global_search');
 ?>
 
 <div class="offcanvas-container" data-toggle="offcanvas" data-options="{&quot;openerClass&quot;:&quot;offcanvas-opener&quot;, &quot;closerClass&quot;:&quot;offcanvas-closer&quot;}">
+<?php /*
                 <!-- START Wrapper -->
                 <div class="offcanvas-wrapper">
                     <!-- Offcanvas Left -->
@@ -386,7 +387,7 @@ $value = $app->getSession()->get('mautic.global_search');
                 <!--/ END Wrapper -->
             </div>
 
-<?php 
+<?php
 /*
 <div class="right-panel-inner-wrapper">
     <div class="right-panel-header">
@@ -418,5 +419,5 @@ $value = $app->getSession()->get('mautic.global_search');
         );
         ?>
     </div>
-</div>
 */ ?>
+</div>

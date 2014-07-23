@@ -86,9 +86,7 @@ class LeadRepository extends CommonRepository
             ->leftJoin('l.ipAddresses', 'i')
             ->leftJoin('l.owner', 'u');
 
-        if (!$this->buildClauses($q, $args)) {
-            return array('totalCount' => 0);
-        }
+        $this->buildClauses($q, $args);
 
         $query = $q->getQuery();
         $results = new Paginator($query);

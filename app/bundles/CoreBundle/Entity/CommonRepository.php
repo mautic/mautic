@@ -155,9 +155,7 @@ class CommonRepository extends EntityRepository
 
     protected function buildClauses(QueryBuilder &$q, array $args)
     {
-        if (!$this->buildWhereClause($q, $args)) {
-            return false;
-        }
+        $this->buildWhereClause($q, $args);
         $this->buildOrderByClause($q, $args);
         $this->buildLimiterClauses($q, $args);
 
@@ -169,7 +167,6 @@ class CommonRepository extends EntityRepository
         $filter       = array_key_exists('filter', $args) ? $args['filter'] : '';
         $filterHelper = new SearchStringHelper();
         $string       = '';
-        $filterCount  = 0;
 
         if (!empty($filter)) {
             if (is_array($filter)) {
@@ -220,16 +217,13 @@ class CommonRepository extends EntityRepository
                 }
 
                 $filterCount = count($expressions->getParts());
-            }
 
-            if (!empty($filterCount)) {
-                $q->where($expressions)
-                    ->setParameters($parameters);
-            } else {
-                return false;
+                if (!empty($filterCount)) {
+                    $q->where($expressions)
+                        ->setParameters($parameters);
+                }
             }
         }
-        return true;
     }
 
     protected function getFilterExpr(QueryBuilder &$q, $filter)

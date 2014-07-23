@@ -33,9 +33,7 @@ class CategoryRepository extends CommonRepository
             ->createQueryBuilder('c')
             ->select('c');
 
-        if (!$this->buildClauses($q, $args)) {
-            return array('totalCount' => 0);
-        }
+        $this->buildClauses($q, $args);
 
         $query = $q->getQuery();
 
