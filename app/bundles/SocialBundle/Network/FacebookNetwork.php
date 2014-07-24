@@ -156,12 +156,14 @@ class FacebookNetwork extends CommonNetwork
             $url    = "https://graph.facebook.com/{$identifiers["twitter"]}?&fields=" . implode(',',$fields);
             $data   = $this->makeCall($url);
 
-            $socialCache['id'] = $data->id;
-            //mark the cache as needing to be updated
-            $socialCache['updated'] = true;
+            if (isset($data->id)) {
+                $socialCache['id'] = $data->id;
+                //mark the cache as needing to be updated
+                $socialCache['updated'] = true;
 
-            //return the entire data set if the function has been called from getUserData()
-            return ($this->preventDoubleCall) ? $data : $socialCache['id'];
+                //return the entire data set if the function has been called from getUserData()
+                return ($this->preventDoubleCall) ? $data : $socialCache['id'];
+            }
         }
 
         return false;
