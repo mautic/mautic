@@ -76,7 +76,6 @@ var Mautic = {
         container = typeof container !== 'undefined' ? container : 'body';
 
         //initiate links
-        /*
         mQuery(container + " a[data-toggle='ajax']").on('click.ajax', function (event) {
             event.preventDefault();
 
@@ -87,7 +86,6 @@ var Mautic = {
         mQuery(container + " form[data-toggle='ajax']").each(function (index) {
             Mautic.ajaxifyForm(mQuery(this).attr('name'));
         });
-         */
 
         mQuery(container + " *[data-toggle='livesearch']").each(function (index) {
             Mautic.activateLiveSearch(mQuery(this), "lastSearchStr", "liveCache");
@@ -473,20 +471,19 @@ var Mautic = {
 
             //update breadcrumbs
             if (response.breadcrumbs) {
-                mQuery(".main-panel-breadcrumbs").html(response.breadcrumbs);
+                mQuery("#breadcrumbs").html(response.breadcrumbs);
             }
 
             //update latest flashes
             if (response.flashes) {
                 mQuery(".main-panel-flash-msgs").html(response.flashes);
-                /*
+
                 //ajaxify links
                 mQuery(".main-panel-flash-msgs a[data-toggle='ajax']").click(function (event) {
                     event.preventDefault();
 
                     return Mautic.ajaxifyLink(this, event);
                 });
-                */
             }
 
             window.setTimeout(function() {
@@ -1159,7 +1156,6 @@ var Mautic = {
 
 };
 
-/*
 //prevent page navigation if in the middle of a form
 window.addEventListener("beforeunload", function (e) {
     if (mQuery(".prevent-nonsubmit-form-exit").length) {
@@ -1169,4 +1165,3 @@ window.addEventListener("beforeunload", function (e) {
         return msg;                                //Webkit, Safari, Chrome etc.
     }
 });
- */

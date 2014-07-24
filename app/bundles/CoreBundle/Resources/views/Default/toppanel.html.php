@@ -7,7 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
-<div class="page-header-section">
+<div class="page-header-section" id="breadcrumbs">
     <?php echo $view->render('MauticCoreBundle:Default:breadcrumbs.html.php'); ?>
 </div>
 
