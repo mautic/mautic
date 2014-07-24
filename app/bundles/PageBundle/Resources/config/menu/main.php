@@ -7,17 +7,24 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 $items = array(
-    'mautic.page.page.menu.index' => array(
-        'route'    => 'mautic_page_index',
+    'mautic.page.page.menu.root' => array(
         'linkAttributes' => array(
-            'data-toggle' => 'ajax'
+            'id' => 'mautic_page_root'
         ),
         'extras'=> array(
-            'iconClass' => 'fa-file-text-o',
-            'routeName' => 'mautic_page_index'
+            'iconClass' => 'fa-file-text-o'
         ),
         'display' => ($security->isGranted(array('page:pages:viewown', 'page:pages:viewother'), 'MATCH_ONE')) ? true : false,
         'children' => array(
+            'mautic.page.page.menu.index' => array(
+                'route'    => 'mautic_page_index',
+                'linkAttributes' => array(
+                    'data-toggle' => 'ajax'
+                ),
+                'extras'=> array(
+                    'routeName' => 'mautic_page_index'
+                ),
+            ),
             'mautic.page.page.menu.new' => array(
                 'route'    => 'mautic_page_action',
                 'routeParameters' => array("objectAction"  => "new"),
@@ -45,7 +52,6 @@ $items = array(
             'mautic.page.category.menu.index' => array(
                 'route'    => 'mautic_pagecategory_index',
                 'extras'  => array(
-                    'iconClass' => 'fa-folder-o',
                     'routeName' => 'mautic_pagecategory_index'
                 ),
                 'linkAttributes' => array(

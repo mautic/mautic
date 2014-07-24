@@ -25,17 +25,21 @@ $items = array(
 );
  */
 $items = array(
-    'mautic.lead.lead.menu.index' => array(
-        'route'    => 'mautic_lead_index',
+    'mautic.lead.lead.menu.root' => array(
         'linkAttributes' => array(
-            'data-toggle' => 'ajax'
+            'id' => 'menu_lead_parent'
         ),
         'extras'=> array(
-            'iconClass' => 'fa-user',
-            'routeName' => 'mautic_lead_index'
+            'iconClass' => 'fa-user'
         ),
         'display' => ($security->isGranted(array('lead:leads:viewown', 'lead:leads:viewother'), 'MATCH_ONE')) ? true : false,
         'children' => array(
+            'mautic.lead.lead.menu.index' => array(
+                'route'    => 'mautic_lead_index',
+                'linkAttributes' => array(
+                    'data-toggle' => 'ajax'
+                ),
+            ),
             'mautic.lead.lead.menu.new' => array(
                 'route'    => 'mautic_lead_action',
                 'routeParameters' => array("objectAction"  => "new"),

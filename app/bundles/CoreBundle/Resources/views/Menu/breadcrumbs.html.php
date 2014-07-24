@@ -31,7 +31,7 @@ $lastCrumb = count($crumbs) - 1;
         $route = ($crumb["label"] == "root") ? $view['router']->generate("mautic_core_index") : $crumb["uri"];
         ?>
         <li>
-            <?php if ($lastCrumb === $crumbCount): ?>
+            <?php if (empty($route) || $lastCrumb === $crumbCount): ?>
                 <?php echo $view['translator']->trans($label); ?>
             <?php else: ?>
                 <a id="bc_<?php echo $id; ?>"
