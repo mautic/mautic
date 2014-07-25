@@ -9,65 +9,23 @@
 
 namespace Mautic\CoreBundle\Factory;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
-use JMS\Serializer\Serializer;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
-use Mautic\CoreBundle\Helper\TemplateBlockHelper;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
-use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
-use Symfony\Component\Security\Core\SecurityContext;
-use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Validator\Validator;
 
 class MauticFactory
 {
 
-    private $dispatcher;
-    private $db;
-    private $requestStack;
-    private $securityContext;
-    private $security;
-    private $serializer;
-    private $session;
-    private $templating;
-    private $translator;
-    private $validator;
-    private $params;
-    private $router;
+    private $container;
 
-    public function __construct(
-        EventDispatcherInterface $dispatcher,
-        Registry $db,
-        RequestStack $requestStack,
-        SecurityContext $securityContext,
-        CorePermissions $mauticSecurity,
-        Serializer $serializer,
-        Session $session,
-        DelegatingEngine $templating,
-        TranslatorInterface $translator,
-        Validator $validator,
-        Router $router,
-        array $mauticParams
-    ) {
-        $this->dispatcher       = $dispatcher;
-        $this->db               = $db;
-        $this->requestStack     = $requestStack;
-        $this->securityContext  = $securityContext;
-        $this->security         = $mauticSecurity;
-        $this->serializer       = $serializer;
-        $this->session          = $session;
-        $this->templating       = $templating;
-        $this->translator       = $translator;
-        $this->validator        = $validator;
-        $this->router           = $router;
-        $this->params           = $mauticParams;
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
     }
 
     /**
@@ -102,7 +60,7 @@ class MauticFactory
      */
     public function getSecurity()
     {
-        return $this->security;
+        return $this->container->get('mautic.security');
     }
 
     /**
@@ -112,7 +70,7 @@ class MauticFactory
      */
     public function getSecurityContext()
     {
-        return $this->securityContext;
+        return $this->container->get('security.context');
     }
 
     /**
@@ -140,7 +98,7 @@ class MauticFactory
      */
     public function getSession()
     {
-        return $this->session;
+        return $this->container->get('session');
     }
 
     /**
@@ -150,7 +108,7 @@ class MauticFactory
      */
     public function getEntityManager()
     {
-        return $this->db->getManager();
+        return $this->container->get('doctrine')->getManager();
     }
 
     /**
@@ -160,7 +118,7 @@ class MauticFactory
      */
     public function getTranslator()
     {
-        return $this->translator;
+        return $this->container->get('translator');
     }
 
     /**
@@ -170,7 +128,7 @@ class MauticFactory
      */
     public function getSerializer()
     {
-        return $this->serializer;
+        return $this->container->get('jms_serializer');
     }
 
     /**
@@ -180,7 +138,7 @@ class MauticFactory
      */
     public function getTemplating()
     {
-        return $this->templating;
+        return $this->container->get('templating');
     }
 
     /**
@@ -190,7 +148,7 @@ class MauticFactory
      */
     public function getDispatcher()
     {
-        return $this->dispatcher;
+        return $this->container->get('event_dispatcher');
     }
 
     /**
@@ -200,7 +158,7 @@ class MauticFactory
      */
     public function getRequest()
     {
-        $request = $this->requestStack->getCurrentRequest();
+        $request = $this->container->get('request_stack')->getCurrentRequest();
         if (empty($request)) {
             //likely in a test as the request is not populated for outside the container
             $request = Request::createFromGlobals();
@@ -218,7 +176,7 @@ class MauticFactory
      */
     public function getValidator()
     {
-        return $this->validator;
+        return $this->container->get('validator');
     }
 
     /**
@@ -228,7 +186,7 @@ class MauticFactory
      */
     public function getSystemParameters()
     {
-        return $this->params;
+        return $this->container->getParameter('mautic.parameters');
     }
 
     /**
@@ -239,7 +197,9 @@ class MauticFactory
      */
     public function getParameter($id)
     {
-        return (isset($this->params[$id])) ? $this->params[$id] : false;
+        return ($this->container->hasParameter('mautic.' . $id)) ?
+            $this->container->getParameter('mautic.' . $id) :
+            false;
     }
 
     /**
@@ -273,6 +233,38 @@ class MauticFactory
      */
     public function getRouter()
     {
-        return $this->router;
+        return $this->container->get('router');
+    }
+
+    /**
+     * Get the full path to specified area
+     *
+     * @param string $name
+     * @param bool   $fullPath
+     */
+    public function getSystemPath($name, $fullPath = false)
+    {
+        $paths = $this->getParameter('paths');
+
+        if ($name == 'currentTheme') {
+            $theme = $this->getParameter('theme');
+            $path  = $paths['theme'] . "/$theme";
+        } elseif (isset($paths[$name])) {
+            $path  = $paths[$name];
+        } else {
+            throw new \InvalidArgumentException("$name does not exist.");
+        }
+
+        return ($fullPath) ? $paths['root'] . '/' . $path : $path;
+    }
+
+    /**
+     * Get the current environment
+     *
+     * @return mixed
+     */
+    public function getEnvironment()
+    {
+        return $this->container->getParameter('kernel.environment');
     }
 }

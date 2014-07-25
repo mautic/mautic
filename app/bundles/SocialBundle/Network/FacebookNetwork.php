@@ -156,7 +156,7 @@ class FacebookNetwork extends CommonNetwork
             $url    = "https://graph.facebook.com/{$identifiers["twitter"]}?&fields=" . implode(',',$fields);
             $data   = $this->makeCall($url);
 
-            if (isset($data->id)) {
+            if ($data && isset($data->id)) {
                 $socialCache['id'] = $data->id;
                 //mark the cache as needing to be updated
                 $socialCache['updated'] = true;

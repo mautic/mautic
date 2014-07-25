@@ -61,4 +61,16 @@ final class CoreEvents
      * @var string
      */
     const BUILD_COMMAND_LIST = 'mautic.build_command_list';
+
+    /**
+     * The mautic.load_class_metadata event is thrown from
+     * CoreBundle\EventListener\DoctrineEventsSubscriber::loadClassMetadata so that each bundle does not have to
+     * setup it's own Doctrine loadClassMetadata event.  Used in the example of creating dynamic tables.
+     *
+     * The event listener receives a
+     * Mautic\CoreBundle\Event\CommandListEvent instance.
+     *
+     * @var string
+     */
+    const LOAD_CLASS_METADATA = 'mautic.load_class_metadata';
 }

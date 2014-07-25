@@ -20,6 +20,7 @@ namespace Mautic\CoreBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Reference;
 
 class TemplatingPass implements CompilerPassInterface
 {
@@ -29,18 +30,18 @@ class TemplatingPass implements CompilerPassInterface
             return;
         }
 
-        if ($container->hasDefinition('templating.engine.mautic')) {
-            $helpers = array();
-            foreach ($container->findTaggedServiceIds('templating.helper') as $id => $attributes) {
-                if (isset($attributes[0]['alias'])) {
-                    $helpers[$attributes[0]['alias']] = $id;
-                }
-            }
+        if ($container->hasDefinition('templating.helper.assets')) {
+            //Add a addMethodCall to set factory
+            $container->getDefinition('templating.helper.assets')->addMethodCall(
+                'setFactory', array(new Reference('mautic.factory'))
+            );
+        }
 
-            if (count($helpers) > 0) {
-                $definition = $container->getDefinition('templating.engine.mautic');
-                $definition->addMethodCall('setHelpers', array($helpers));
-            }
+        if ($container->hasDefinition('templating.helper.slots')) {
+            //Add a addMethodCall to set assets helper
+            $container->getDefinition('templating.helper.slots')->addMethodCall(
+                'setAssetsHelper', array(new Reference('templating.helper.assets'))
+            )->setScope('request');
         }
     }
 }

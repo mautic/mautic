@@ -23,7 +23,7 @@ $setBundles = array();
 foreach ($mauticBundles as $bundle) {
     $setBundles[$bundle['base']] = $bundle;
 }
-//Core bundle should be first for assetic generation
+
 $coreBundle = $setBundles['Core'];
 unset($setBundles['Core']);
 $setBundles = array_merge(array('Core' => $coreBundle), $setBundles);
@@ -46,7 +46,6 @@ $container->loadFromExtension('framework', array(
     'templating'           => array(
         'engines' => array(
             'twig',
-            'mautic',
             'php'
         ),
         'form' => array(
@@ -54,12 +53,6 @@ $container->loadFromExtension('framework', array(
                 'MauticCoreBundle:Form',
             ),
         ),
-        /*
-        'assets_base_urls' => array(
-            'http' => array('/assets/'),
-            'ssl'  => array('/assets/')
-        )
-        */
     ),
     'default_locale'       => '%mautic.locale%',
     'translator'           => array(
@@ -109,8 +102,6 @@ $container->loadFromExtension('doctrine', array(
     )
 ));
 
-
-
 //Swiftmailer Configuration
 $container->loadFromExtension('swiftmailer', array(
     'transport' => '%mautic.mailer_transport%',
@@ -119,64 +110,6 @@ $container->loadFromExtension('swiftmailer', array(
     'password'  => '%mautic.mailer_password%',
     'spool'     => array(
         'type' => 'memory'
-    )
-));
-
-//Also Assetic does not allow variables when loading resources in templates because it renders the media at compilation time and thus
-//the appropriate variables are not populated.  In order to not have to manually add each bundles' media files to
-//MauticBaseBundle's base.html.php file, we are doing the following which works because of Symfony's caching.
-
-//For production, you must dump the assets via php app/console assetic:dump --env=prod
-
-$css    = array();
-$js     = array();
-
-foreach ($setBundles as $bundle => $details) {
-   $bundleDir = $details['directory'];
-    //define the function for use with CSS and JS files
-    $getFiles = function ($type) use ($bundleDir, &$css, &$js) {
-        $typeDir = "$bundleDir/Resources/public/$type/";
-
-        if (file_exists($typeDir)) {
-            $finder = new \Symfony\Component\Finder\Finder();
-            $finder->files()->in($typeDir)->name('*.'.$type)->depth('== 0');
-            foreach ($finder as $file) {
-                //add the file to be loaded
-                ${$type}[] = $file->getRealpath();
-            }
-        }
-    };
-
-    $getFiles('css');
-    $getFiles('js');
-}
-
-//Assetic Configuration
-$container->loadFromExtension('assetic', array(
-    'debug'          => '%kernel.debug%',
-    'use_controller' => false,
-    'read_from'      => '%kernel.root_dir%/../',
-    'write_to'       => '%kernel.root_dir%/../',
-    'filters'        => array(
-        'cssrewrite' => array(
-            'apply_to' => '\.css$',
-        )
-    ),
-    'assets'         => array(
-        'mautic_stylesheets' => array(
-            'inputs'  => $css,
-            'options' => array(
-                'combine' => true,
-                //'output'  => 'css/mautic.css'
-            )
-        ),
-        'mautic_javascripts' => array(
-            'inputs'  => $js,
-            'options' => array(
-                'combine' => true,
-                //'output'  => 'js/mautic.js'
-            )
-        )
     )
 ));
 

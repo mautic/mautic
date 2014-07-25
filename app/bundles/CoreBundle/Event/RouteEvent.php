@@ -9,7 +9,7 @@
 
 namespace Mautic\CoreBundle\Event;
 
-use Mautic\CoreBundle\Routing\RouteLoader;
+use Mautic\CoreBundle\Loader\RouteLoader;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Routing\RouteCollection;
 

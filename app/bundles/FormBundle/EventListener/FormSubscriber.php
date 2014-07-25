@@ -105,17 +105,6 @@ class FormSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param RouteEvent $event
-     */
-    public function onBuildApiRoute(RouteEvent $event)
-    {
-        /*
-        $path = __DIR__ . "/../Resources/config/routing/api.php";
-        $event->addRoutes($path);
-        */
-    }
-
-    /**
      * @param MauticEvents\CommandListEvent $event
      */
     public function onBuildCommandList(MauticEvents\CommandListEvent $event)

@@ -9,7 +9,6 @@
 
 namespace Mautic\CoreBundle\Controller;
 
-use Mautic\CoreBundle\Helper\TemplateBlockHelper;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;

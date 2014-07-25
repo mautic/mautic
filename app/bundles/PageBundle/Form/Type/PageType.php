@@ -109,7 +109,7 @@ class PageType extends AbstractType
 
         //build a list
         $finder    = new Finder();
-        $finder->directories()->in($this->templateDir);
+        $finder->directories()->in($this->templateDir)->ignoreDotFiles(true);
         $templates = array();
         foreach ($finder as $dir) {
             $template = $dir->getRelativePathname();

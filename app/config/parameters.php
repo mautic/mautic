@@ -12,8 +12,8 @@ $bundles = $container->getParameter('mautic.bundles');
 
 $mauticParams = array();
 foreach ($bundles as $bundle) {
-    if (file_exists($bundle['directory'].'/Resources/config/parameters.php')) {
-        $bundleParams = include $bundle['directory'].'/Resources/config/parameters.php';
+    if (file_exists($bundle['directory'].'/Config/parameters.php')) {
+        $bundleParams = include $bundle['directory'].'/Config/parameters.php';
         foreach ($bundleParams as $k => $v) {
             $mauticParams[$k] = $v;
         }
@@ -25,10 +25,14 @@ $mauticParams['supported_languages'] = array(
 );
 
 //load parameters array from local configuration
-include "local.php";
+include 'local.php';
 
 //override default with local
 $mauticParams = array_merge($mauticParams, $parameters);
+
+//include path settings
+require 'paths.php';
+$mauticParams['paths'] = $paths;
 
 foreach ($mauticParams as $k => $v) {
     //add to the container

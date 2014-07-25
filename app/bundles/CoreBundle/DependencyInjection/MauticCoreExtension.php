@@ -10,11 +10,14 @@
 namespace Mautic\CoreBundle\DependencyInjection;
 
 use Mautic\CoreBundle\Helper\ServiceLoaderHelper;
+use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Loader;
+use Symfony\Component\Validator\Tests\Fixtures\Reference;
 
 /**
  * Class MauticCoreExtension
@@ -33,13 +36,15 @@ class MauticCoreExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $mauticBundles = $container->getParameter('mautic.bundles');
-        foreach ($mauticBundles as $bundle) {
-            $serviceDir = $bundle['directory'].'/Resources/config/services';
-            if (file_exists($serviceDir)) {
-                $loader = new Loader\PhpFileLoader($container, new FileLocator($serviceDir));
+        $bundles = $container->getParameter('mautic.bundles');
+
+        foreach ($bundles as $name => $bundle) {
+            //load services
+            $directory = $bundle['directory'] . '/Config/services';
+            if (file_exists($directory)) {
+                $loader = new Loader\PhpFileLoader($container, new FileLocator($directory));
                 $finder = new Finder();
-                $finder->files()->in($serviceDir)->name('*.php');
+                $finder->files()->in($directory)->name('*.php');
 
                 foreach ($finder as $file) {
                     $loader->load($file->getFilename());

@@ -15,7 +15,6 @@ class AppKernel extends Kernel
             new Symfony\Bundle\SwiftmailerBundle\SwiftmailerBundle(),
             new Doctrine\Bundle\DoctrineBundle\DoctrineBundle(),
             new Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle(),
-            new Symfony\Bundle\AsseticBundle\AsseticBundle(),
             new Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle(),
             new Knp\Bundle\MenuBundle\KnpMenuBundle(),
             new FOS\OAuthServerBundle\FOSOAuthServerBundle(),
@@ -31,7 +30,7 @@ class AppKernel extends Kernel
             ->name('*Bundle.php');
 
         foreach ($finder as $file) {
-            $path       = substr($file->getRealpath(), strlen($searchPath) + 1, -4);
+            $path       = substr($file->getRealPath(), strlen($searchPath) + 1, -4);
             $parts      = explode('/', $path);
             $class      = array_pop($parts);
             $namespace  = "Mautic\\" . implode('\\', $parts);

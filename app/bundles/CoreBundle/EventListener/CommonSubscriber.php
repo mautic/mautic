@@ -9,6 +9,7 @@
 
 namespace Mautic\CoreBundle\EventListener;
 
+use Mautic\ApiBundle\Event as ApiEvents;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -55,7 +56,13 @@ class CommonSubscriber implements EventSubscriberInterface
      */
     public function onBuildMenu (MauticEvents\MenuEvent $event)
     {
-        $path  = $this->getSubscriberDirectory() . "/../Resources/config/menu/main.php";
+        //check common place
+        $path = $this->getSubscriberDirectory() . "/../Config/menu/main.php";
+        if (!file_exists($path)) {
+            //else check for just a menu.php file
+            $path = $this->getSubscriberDirectory() . "/../Config/menu.php";
+        }
+
         if (file_exists($path)) {
             $security = $event->getSecurity();
             $request  = $this->factory->getRequest();
@@ -69,7 +76,7 @@ class CommonSubscriber implements EventSubscriberInterface
      */
     public function onBuildAdminMenu (MauticEvents\MenuEvent $event)
     {
-        $path  = $this->getSubscriberDirectory() . "/../Resources/config/menu/admin.php";
+        $path  = $this->getSubscriberDirectory() . "/../Config/menu/admin.php";
         if (file_exists($path)) {
             $security = $event->getSecurity();
             $request  = $this->factory->getRequest();
@@ -83,16 +90,29 @@ class CommonSubscriber implements EventSubscriberInterface
      */
     public function onBuildRoute (MauticEvents\RouteEvent $event)
     {
-        $routing = $this->getSubscriberDirectory() .  "/../Resources/config/routing.php";
+        $routing = $this->getSubscriberDirectory() .  "/../Config/routing.php";
         if (file_exists($routing)) {
             $event->addRoutes($routing);
         } else {
-            $routing = $this->getSubscriberDirectory() .  "/../Resources/config/routing/routing.php";
+            $routing = $this->getSubscriberDirectory() .  "/../Config/routing/routing.php";
             if (file_exists($routing)) {
                 $event->addRoutes($routing);
             }
         }
     }
+
+    /**
+     * @param RouteEvent $event
+     */
+    public function onBuildApiRoute(ApiEvents\RouteEvent $event)
+    {
+        $routing = $this->getSubscriberDirectory() .  "/../Config/routing/api.php";
+        if (file_exists($routing)) {
+            $routing = $this->getSubscriberDirectory() .  "/../Config/routing/routing.php";
+            $event->addRoutes($routing);
+        }
+    }
+
 
     protected function getSubscriberDirectory()
     {
