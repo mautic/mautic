@@ -20,7 +20,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 /**
  * Class CategoryType
  *
- * @package Mautic\PageType\Form\Type
+ * @package Mautic\PageBundle\Form\Type
  */
 class CategoryType extends AbstractType
 {

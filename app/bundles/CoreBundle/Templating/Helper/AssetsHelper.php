@@ -40,6 +40,12 @@ class AssetsHelper extends BaseAssetsHelper
         }
     }
 
+    public function getSystemScripts()
+    {
+        $assets = $this->getAssets();
+        return $assets['js'];
+    }
+
     private function getAssets()
     {
         static $assets = array();

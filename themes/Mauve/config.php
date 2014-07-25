@@ -8,7 +8,10 @@
  */
 
 $config = array(
-    "name"        => "Muave",
+    "name"        => "Mauve",
+    "features"    => array(
+        "page"
+    ),
     "slots"       => array(
         "page" => array(
             "left1",

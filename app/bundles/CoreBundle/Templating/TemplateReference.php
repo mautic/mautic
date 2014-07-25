@@ -41,17 +41,33 @@ class TemplateReference extends BaseTemplateReference
     {
         $controller = str_replace('\\', '/', $this->get('controller'));
 
-        $path = (empty($controller) ? '' : $controller.'/').$this->get('name').'.'.$this->get('format').'.'.$this->get('engine');
-
-        //check for an override
-        $themeDir = $this->factory->getSystemPath('currentTheme', true);
+        $fileName = $this->get('name').'.'.$this->get('format').'.'.$this->get('engine');
+        $path     = (empty($controller) ? '' : $controller.'/').$fileName;
 
         if (!empty($this->parameters['bundle'])) {
-            if (!file_exists($template = $themeDir . '/html/' . $this->parameters['bundle'] . '/' . $path)) {
-                $template = '@' . $this->get('bundle') . '/Views/' . $path;
+            preg_match('/Mautic(.*?)Bundle/', $this->parameters['bundle'], $match);
+
+            if (!empty($match[1])) {
+                $theme = $this->factory->getTheme();
+                //check for an override and load it if there is
+                $themeDir = $theme->getThemePath(true);
+                if (!file_exists($template = $themeDir . '/html/' . $this->parameters['bundle'] . '/' . $path)) {
+                    $template = '@' . $this->get('bundle') . '/Views/' . $path;
+                }
             }
         } else {
-            $template = $themeDir . '/html/' . $path;
+            $themes = $this->factory->getInstalledThemes();
+            if (isset($themes[$controller])) {
+                //this is a file in a specific Mautic theme folder
+                $theme = $this->factory->getTheme($controller);
+
+                $template = $theme->getThemePath() . '/html/' . $fileName;
+            }
+        }
+
+        if (empty($template)) {
+            //try the parent
+            return parent::getPath();
         }
 
         return $template;
