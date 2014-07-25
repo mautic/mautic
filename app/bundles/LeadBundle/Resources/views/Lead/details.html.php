@@ -12,8 +12,8 @@
     <div class="col-sm-10">
         <h1 class="mt0"><?php echo $lead->getName(); ?></h1>
         <h4 class="mt0">
-            <?php if(isset($fields['position'])): ?>
-                <?php echo $fields['position']; ?>
+            <?php if(isset($fields['core']['position']['value'])): ?>
+                <?php  echo $fields['core']['position']['value']; ?>
             <?php endif; ?>
             at 
             <a href="#">Company Name</a></h4>
@@ -24,14 +24,25 @@
         </div>
     </div>
 </div>
-
 <div class="panel panel-default">
     <div class="panel-heading">
         <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.lead.lead.header.leadinfo'); ?></h3>
+        <div class="panel-toolbar">
+            <?php $groups = array_keys($fields); ?>
+            <ul class="nav nav-tabs" role="tablist">
+                <?php foreach ($groups as $k => $group): ?>
+                <li<?php echo ($k === 0) ? ' class="active"' : ''; ?>>
+                    <a href="#<?php echo $group; ?>" role="tab" data-toggle="tab">
+                        <?php echo $view['translator']->trans('mautic.lead.field.group.'.$group); ?>
+                    </a>
+                </li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
     </div>
     <div class="panel-body">
         <div class="col-sm-12">
-            <?php if ($lead->getOwner()): ?>
+            <?php /** if ($lead->getOwner()): ?>
                 <div class="row">
                     <div class="col-xs-3 field-label">
                         <?php echo $view['translator']->trans('mautic.lead.lead.field.owner'); ?>
@@ -51,14 +62,14 @@
                         </a>
                     </div>
                 </div>
-            <?php endif; ?>
+            <?php endif; **/ ?>
             <?php foreach ($fields['core'] as $field): ?>
                 <?php if (empty($field['value'])) continue; ?>
                 <div class="row">
-                    <div class="col-xs-3 field-label">
+                    <strong>
                         <?php echo $field['label']; ?>
-                    </div>
-                    <div class="col-xs-9 field-value">
+                    </strong><br />
+                    <div>
                         <?php echo $view->render('MauticLeadBundle:Lead:info_value.html.php', array(
                             'value'             => $field['value'],
                             'name'              => $field['alias'],
