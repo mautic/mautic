@@ -15,8 +15,7 @@ use Symfony\Component\DependencyInjection\Parameter;
 $container->setDefinition('mautic.form.type.page', new Definition(
     'Mautic\PageBundle\Form\Type\PageType',
     array(
-        new Reference('mautic.factory'),
-        '%kernel.root_dir%'
+        new Reference('mautic.factory')
     )
 ))
     ->addTag('form.type', array(

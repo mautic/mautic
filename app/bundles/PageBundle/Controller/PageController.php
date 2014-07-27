@@ -541,7 +541,8 @@ class PageController extends FormController
      */
     public function builderAction($objectId)
     {
-        $model  = $this->get('mautic.factory')->getModel('page.page');
+        $factory = $this->get('mautic.factory');
+        $model   = $factory->getModel('page.page');
 
         //permission check
         if (strpos($objectId, 'new') !== false) {
@@ -562,17 +563,7 @@ class PageController extends FormController
         }
 
         $template = InputHelper::clean($this->request->query->get('template'));
-
-        //get the slots from the config file
-        $kernelDir  = $this->container->getParameter('kernel.root_dir');
-        $configFile = $kernelDir . '/Resources/views/Templates/'.$template.'/config.php';
-
-        if (!file_exists($configFile)) {
-            return $this->accessDenied('mautic.page.page.error.template.notfound');
-        }
-
-        $tmplConfig = include_once $configFile;
-        $slots      = $tmplConfig['slots']['page'];
+        $slots    = $factory->getTheme($template)->getSlots('page');
 
         //merge any existing changes
         $newContent = $this->get('session')->get('mautic.pagebuilder.'.$objectId.'.content', array());

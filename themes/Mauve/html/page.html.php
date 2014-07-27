@@ -6,7 +6,7 @@
  * @link        http://mautic.com
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-$view->extend(':Templates/'.$template.':base.html.php');
+$view->extend(":$template:base.html.php");
 
 $view['slots']->set('pageTitle', $page->getTitle());
 ?>

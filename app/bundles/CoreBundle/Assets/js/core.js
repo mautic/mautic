@@ -1,12 +1,13 @@
 var MauticVars = {};
 var mQuery = jQuery.noConflict(true);
 
-(function ($) {
-    $("html").Core({
-        console: false
-    });
-}) (mQuery);
-
+if (typeof mauticContent !== 'undefined') {
+    (function ($) {
+        $("html").Core({
+            console: false
+        });
+    })(mQuery);
+}
 
 //Fix for back/forward buttons not loading ajax content with History.pushState()
 MauticVars.manualStateChange = true;

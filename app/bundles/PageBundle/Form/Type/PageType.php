@@ -12,7 +12,6 @@ namespace Mautic\PageBundle\Form\Type;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
-use Symfony\Component\Finder\Finder;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -21,20 +20,20 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 /**
  * Class PageType
  *
- * @package Mautic\PageType\Form\Type
+ * @package Mautic\PageBundle\Form\Type
  */
 class PageType extends AbstractType
 {
 
     private $translator;
-    private $templateDir;
+    private $themes;
 
     /**
      * @param MauticFactory $factory
      */
-    public function __construct(MauticFactory $factory, $kernelDir) {
-        $this->translator  = $factory->getTranslator();
-        $this->templateDir = $kernelDir . '/Resources/views/Templates';
+    public function __construct(MauticFactory $factory) {
+        $this->translator = $factory->getTranslator();
+        $this->themes     = $factory->getInstalledThemes('page');
     }
 
     /**
@@ -108,22 +107,8 @@ class PageType extends AbstractType
         }
 
         //build a list
-        $finder    = new Finder();
-        $finder->directories()->in($this->templateDir)->ignoreDotFiles(true);
-        $templates = array();
-        foreach ($finder as $dir) {
-            $template = $dir->getRelativePathname();
-
-            //get the config file
-            $tmplConfig = include_once $this->templateDir . '/' . $template . '/config.php';
-
-            if (isset($tmplConfig['slots']['page'])) {
-                //read the config file and get the name
-                $templates[$template] = $tmplConfig['name'];
-            }
-        }
         $builder->add('template', 'choice', array(
-            'choices'       => $templates,
+            'choices'       => $this->themes,
             'expanded'      => false,
             'multiple'      => false,
             'label'         => 'mautic.page.page.form.template',

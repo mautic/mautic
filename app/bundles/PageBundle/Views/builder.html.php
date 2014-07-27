@@ -8,7 +8,7 @@
  */
 
 //extend the template chosen
-$view->extend(':Templates/'.$template.':page.html.php');
+$view->extend(":$template:page.html.php");
 
 $view['slots']->addScriptDeclaration("var mauticBasePath = '$basePath';");
 

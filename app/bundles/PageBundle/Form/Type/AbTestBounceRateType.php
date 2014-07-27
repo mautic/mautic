@@ -18,7 +18,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 /**
  * Class VariantType
  *
- * @package Mautic\PageType\Form\Type
+ * @package Mautic\PageBundle\Form\Type
  */
 class VariantType extends AbstractType
 {

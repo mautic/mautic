@@ -11,7 +11,7 @@ $root  = $container->getParameter('kernel.root_dir');
 
 $paths = array(
     //customizable
-    'theme'   => 'themes',
+    'themes'  => 'themes',
     'assets'  => 'assets',
     'addons'  => 'addons',
     //fixed

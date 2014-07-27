@@ -10,10 +10,12 @@
 namespace Mautic\CoreBundle\Factory;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\CoreBundle\Templating\Helper\ThemeHelper;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
@@ -248,7 +250,7 @@ class MauticFactory
 
         if ($name == 'currentTheme') {
             $theme = $this->getParameter('theme');
-            $path  = $paths['theme'] . "/$theme";
+            $path  = $paths['themes'] . "/$theme";
         } elseif (isset($paths[$name])) {
             $path  = $paths[$name];
         } else {
@@ -266,5 +268,56 @@ class MauticFactory
     public function getEnvironment()
     {
         return $this->container->getParameter('kernel.environment');
+    }
+
+    /**
+     * returns a ThemeHelper instance for the given theme
+     *
+     * @param string $theme
+     * @return \Mautic\CoreBundle\Templating\Helper\ThemeHelper
+     */
+    public function getTheme($theme = 'current')
+    {
+        static $themeHelpers = array();
+
+        if (empty($themeHelpers[$theme])) {
+            $themeHelpers[$theme] = new ThemeHelper($this, $theme);
+        }
+
+        return $themeHelpers[$theme];
+    }
+
+    /**
+     * Gets a list of installed themes
+     *
+     * @param bool $specificFeature limits list to those that support a specific feature
+     * @return array
+     */
+    public function getInstalledThemes($specificFeature = 'all')
+    {
+        static $themes = array();
+
+        if (empty($themes[$specificFeature])) {
+            $dir = $this->getSystemPath('themes', true);
+
+            $finder = new Finder();
+            $finder->directories()->depth('0')->ignoreDotFiles(true)->in($dir);
+
+            $themes[$specificFeature] = array();
+            foreach ($finder as $theme) {
+                if (file_exists($theme->getRealPath() . '/config.php')) {
+                    $config = include $theme->getRealPath() . '/config.php';
+                    if ($specificFeature != 'all') {
+                        if (isset($config['features']) && in_array($specificFeature, $config['features'])) {
+                            $themes[$specificFeature][$theme->getBasename()] = $config['name'];
+                        }
+                    } else {
+                        $themes[$specificFeature][$theme->getBasename()] = $config['name'];
+                    }
+                }
+            }
+        }
+
+        return $themes[$specificFeature];
     }
 }

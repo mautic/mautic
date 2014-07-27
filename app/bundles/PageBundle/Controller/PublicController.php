@@ -202,21 +202,8 @@ class PublicController extends CommonFormController
 
             //all the checks pass so display the content
             $template   = $entity->getTemplate();
+            $slots      = $factory->getTheme($template)->getSlots('page');
 
-            $kernelDir  = $this->container->getParameter('kernel.root_dir');
-            $configFile = $kernelDir . '/Resources/views/Templates/'.$template.'/config.php';
-
-            if (!file_exists($configFile)) {
-                throw $this->createNotFoundException($translator->trans('mautic.page.page.error.template.notfound'));
-            }
-
-            $tmplConfig = include_once $configFile;
-
-            if (!isset($tmplConfig['slots']['page'])) {
-                throw $this->createNotFoundException($translator->trans('mautic.page.page.error.template.notfound'));
-            }
-
-            $slots      = $tmplConfig['slots']['page'];
             $dispatcher = $this->get('event_dispatcher');
             if ($dispatcher->hasListeners(PageEvents::PAGE_ON_DISPLAY)) {
                 $event = new PageEvent($entity);
