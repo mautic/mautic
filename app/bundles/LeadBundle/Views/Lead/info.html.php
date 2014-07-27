@@ -8,11 +8,13 @@
  */
 ?>
 
-<div class="panel">
-	<div class="panel-body text-center">
-	 	<img class="img-circle img" src="https://www.gravatar.com/avatar/<?php echo md5(strtolower(trim($fields['core']['email']['value']))); ?>?&s=150" />
+<div class="panel panel-primary">
+	<div class="panel-heading text-center pa15" style="min-height: 150px;">
+	</div>
+	<div class="panel-body text-center" style="margin-top: -60px">
+	 	<img class="img-circle img-bordered-primary" src="https://www.gravatar.com/avatar/<?php echo md5(strtolower(trim($fields['core']['email']['value']))); ?>?&s=100" />
 	 	<h1><?php echo $lead->getName(); ?></h1>
-        <h4 class="mt0">
+        <h4>
             <?php if(isset($fields['core']['position']['value'])): ?>
                 <?php  echo $fields['core']['position']['value']; ?>
             <?php endif; ?>
