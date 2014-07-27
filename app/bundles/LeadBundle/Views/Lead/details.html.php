@@ -9,7 +9,22 @@
 
 ?>
 <div class="row">
-    <div class="col-sm-12">
+    <div class="col-sm-3">
+        <div class="alert alert-success text-center pa15">
+            <h2 class="nm pa5">31</h2>
+        </div>
+    </div>
+    <div class="col-sm-3">
+        <div class="alert alert-success text-center pa15">
+            <h2 class="nm pa5">31</h2>
+        </div>
+    </div>
+    <div class="col-sm-3">
+        <div class="alert alert-success text-center pa15">
+            <h2 class="nm pa5">31</h2>
+        </div>
+    </div>
+    <div class="col-sm-3">
         <div class="alert alert-success text-center pa15">
             <h2 class="nm pa5">31</h2>
         </div>
