@@ -8,12 +8,31 @@
  */
 ?>
 
- <img class="img img-responsive" src="https://www.gravatar.com/avatar/<?php echo md5(strtolower(trim($fields['core']['email']['value']))); ?>?&s=250" />
- <hr />
-<strong>About</strong><br />
-<p><em>3 kids and counting, 1 wife and holding.</em></p>
+<div class="panel">
+	<div class="panel-body text-center">
+	 	<img class="img-circle img" src="https://www.gravatar.com/avatar/<?php echo md5(strtolower(trim($fields['core']['email']['value']))); ?>?&s=150" />
+	 	<h1><?php echo $lead->getName(); ?></h1>
+        <h4 class="mt0">
+            <?php if(isset($fields['core']['position']['value'])): ?>
+                <?php  echo $fields['core']['position']['value']; ?>
+            <?php endif; ?>
+            at
+            <?php if(isset($fields['core']['company']['value'])): 
+                echo $fields['core']['company']['value'];
+            endif; ?></h4>
+	 </div>
 
+	<div class="panel-footer">
+		<a class="btn btn-default"><span class="fa fa-twitter"></span></a>
+		<a class="btn btn-default"><span class="fa fa-facebook"></span></a>
+		<a class="btn btn-default"><span class="fa fa-linkedin"></span></a>
+		<a class="btn btn-default"><span class="fa fa-google"></span></a>
+	</div>
+</div>
 <br />
+
+<strong>About</strong><br />
+	<p><em>3 kids and counting, 1 wife and holding.</em></p>
 
 <address>
     <strong>Twitter, Inc.</strong><br>
@@ -23,7 +42,3 @@
 </span>
 </address>
 
-<span class="label label-teal"><span class="fa fa-twitter"></span></span> <a href="#">@dbhurley</a><br />
-<span class="label label-teal"><span class="fa fa-facebook"></span></span> <a href="#">@dbhurley</a><br />
-<span class="label label-teal"><span class="fa fa-linkedin"></span></span> <a href="#">@dbhurley</a><br />
-<span class="label label-teal"><span class="fa fa-google"></span></span> <a href="#">@dbhurley</a><br />

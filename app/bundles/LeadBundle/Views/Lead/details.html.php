@@ -9,18 +9,7 @@
 
 ?>
 <div class="row">
-    <div class="col-sm-10">
-        <h1 class="mt0"><?php echo $lead->getName(); ?></h1>
-        <h4 class="mt0">
-            <?php if(isset($fields['core']['position']['value'])): ?>
-                <?php  echo $fields['core']['position']['value']; ?>
-            <?php endif; ?>
-            at
-            <?php if(isset($fields['core']['company']['value'])): 
-                echo $fields['core']['company']['value'];
-            endif; ?></h4>
-    </div>
-    <div class="col-sm-2">
+    <div class="col-sm-12">
         <div class="alert alert-success text-center pa15">
             <h2 class="nm pa5">31</h2>
         </div>
