@@ -304,14 +304,16 @@ class PageModel extends FormModel
 
         //get a list of the languages the user prefers
         $browserLanguages = $request->server->get('HTTP_ACCEPT_LANGUAGE');
-        $languages        = explode(',', $browserLanguages);
-        foreach ($languages as $k => $l) {
-            if ($pos = strpos(';q=', $l) !== false) {
-                //remove weights
-                $languages[$k] = substr($l, 0, $pos);
+        if (!empty($browserLanguages)) {
+            $languages = explode(',', $browserLanguages);
+            foreach ($languages as $k => $l) {
+                if ($pos = strpos(';q=', $l) !== false) {
+                    //remove weights
+                    $languages[$k] = substr($l, 0, $pos);
+                }
             }
+            $hit->setBrowserLanguages($languages);
         }
-        $hit->setBrowserLanguages($languages);
 
         $pageURL = 'http';
         if ($request->server->get("HTTPS") == "on") {$pageURL .= "s";}

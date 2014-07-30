@@ -21,6 +21,7 @@ class PageEvent extends CommonEvent
 {
 
     private $content;
+    private $slotsHelper;
 
     /**
      * @param Page $page
@@ -71,5 +72,25 @@ class PageEvent extends CommonEvent
     public function setContent(array $content)
     {
         $this->content = $content;
+    }
+
+    /**
+     * Set the slots helper for content
+     *
+     * @param $slotsHelper
+     */
+    public function setSlotsHelper($slotsHelper)
+    {
+        $this->slotsHelper = $slotsHelper;
+    }
+
+    /**
+     * Get the slots helper that can be used to add scripts/stylesheets to the header
+     *
+     * @return mixed
+     */
+    public function getSlotsHelper()
+    {
+        return $this->slotsHelper;
     }
 }

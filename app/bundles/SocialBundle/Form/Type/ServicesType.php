@@ -42,7 +42,7 @@ class ServicesType extends AbstractType
 
             $builder->add($service, "socialmedia_details", array(
                 'label'       => false,
-                'sm_service'  => $service,
+                'sm_network'  => $service,
                 'sm_object'   => $object,
                 'lead_fields' => $options['lead_fields'],
                 'data'        => $options['data'][$service]

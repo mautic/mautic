@@ -9,7 +9,7 @@
 
 namespace Mautic\SocialBundle\Network;
 
-class FoursquareNetwork extends CommonNetwork
+class FoursquareNetwork extends AbstractNetwork
 {
 
     /**
@@ -20,6 +20,16 @@ class FoursquareNetwork extends CommonNetwork
     public function getName()
     {
         return 'Foursquare';
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return int|mixed
+     */
+    public function getPriority()
+    {
+        return 2;
     }
 
     /**

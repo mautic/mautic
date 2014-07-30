@@ -9,7 +9,7 @@
 
 namespace Mautic\SocialBundle\Network;
 
-class FacebookNetwork extends CommonNetwork
+class FacebookNetwork extends AbstractNetwork
 {
 
     /**
@@ -40,6 +40,20 @@ class FacebookNetwork extends CommonNetwork
             'twitter',
             'firstname',
             'lastname'
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return array
+     */
+    public function getSupportedFeatures()
+    {
+        return array(
+            'public_profile',
+            'share_button'
+
         );
     }
 
@@ -230,18 +244,6 @@ class FacebookNetwork extends CommonNetwork
             'name'       => array('type' => 'string'),
             'gender'     => array('type' => 'string'),
             'locale'     => array('type' => 'string')
-        );
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @return array
-     */
-    public function getSupportedFeatures()
-    {
-        return array(
-            'public_profile'
         );
     }
 }

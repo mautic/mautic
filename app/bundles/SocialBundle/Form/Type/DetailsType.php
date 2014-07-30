@@ -9,8 +9,6 @@
 
 namespace Mautic\SocialBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\SocialBundle\Helper\NetworkIntegrationHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -23,14 +21,6 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  */
 class DetailsType extends AbstractType
 {
-
-    /**
-     * @param MauticFactory $factory
-     */
-    public function __construct(MauticFactory $factory)
-    {
-        $this->factory = $factory;
-    }
 
     /**
      * @param FormBuilderInterface $builder
@@ -98,18 +88,16 @@ class DetailsType extends AbstractType
             ));
         }
 
-        //@todo - add event so that other bundles can plug in custom settings
-        $fields = NetworkIntegrationHelper::getAvailableFields($this->factory, $options['sm_service']);
-        if (!empty($fields)) {
-            $builder->add('leadFields', 'socialmedia_fields', array(
-                'label'       => 'mautic.social.fieldassignments',
-                'required'    => false,
-                'lead_fields' => $options['lead_fields'],
-                'sm_fields'   => $fields
-            ));
-        }
+        $builder->add('featureSettings', 'socialmedia_featuresettings', array(
+            'label'       => 'mautic.social.form.feature.settings',
+            'required'    => false,
+            'data'        => $options['data']->getFeatureSettings(),
+            'label_attr'  => array('class' => 'control-label'),
+            'sm_network'  => $options['sm_network'],
+            'lead_fields' => $options['lead_fields']
+        ));
 
-        $builder->add('name', 'hidden', array('data' => $options['sm_service']));
+        $builder->add('name', 'hidden', array('data' => $options['sm_network']));
     }
 
     /**
@@ -121,7 +109,7 @@ class DetailsType extends AbstractType
             'data_class' => 'Mautic\SocialBundle\Entity\SocialNetwork'
         ));
 
-        $resolver->setRequired(array('sm_service', 'sm_object', 'lead_fields'));
+        $resolver->setRequired(array('sm_network', 'sm_object', 'lead_fields'));
     }
 
     /**

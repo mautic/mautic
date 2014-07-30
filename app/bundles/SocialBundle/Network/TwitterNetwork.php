@@ -9,7 +9,7 @@
 
 namespace Mautic\SocialBundle\Network;
 
-class TwitterNetwork extends CommonNetwork
+class TwitterNetwork extends AbstractNetwork
 {
 
     /**
@@ -32,11 +32,36 @@ class TwitterNetwork extends CommonNetwork
     /**
      * {@inheritdoc}
      *
+     * @return int|mixed
+     */
+    public function getPriority()
+    {
+        return 5000;
+    }
+
+
+    /**
+     * {@inheritdoc}
+     *
      * @return string
      */
     public function getIdentifierField()
     {
         return 'twitter';
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return array
+     */
+    public function getSupportedFeatures()
+    {
+        return array(
+            'public_profile',
+            'public_activity',
+            'share_button'
+        );
     }
 
     /**
@@ -177,20 +202,6 @@ class TwitterNetwork extends CommonNetwork
     public function getAuthenticationType()
     {
         return 'oauth2';
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @return array
-     */
-    public function getSupportedFeatures()
-    {
-        return array(
-            'public_profile',
-            'public_activity',
-            'suggestion_matching'
-        );
     }
 
     /**

@@ -11,12 +11,6 @@ namespace Mautic\SocialBundle\Network;
 
 class InstagramNetwork extends CommonNetwork
 {
-   /**
-     * Used in getUserData to prevent a double user search call with getUserId
-     *
-     * @var bool
-     */
-    private $preventDoubleCall = false;
 
     /**
      * {@inheritdoc}

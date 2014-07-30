@@ -13,6 +13,7 @@ use Mautic\ApiBundle\Event\RouteEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\PageBundle\Event as Events;
 use Mautic\PageBundle\PageEvents;
+use Mautic\SocialBundle\Helper\NetworkIntegrationHelper;
 
 /**
  * Class BuilderSubscriber
@@ -65,61 +66,113 @@ class BuilderSubscriber extends CommonSubscriber
      */
     public function onPageDisplay(Events\PageEvent $event)
     {
-        $model    = $this->factory->getModel('page.page');
         $content  = $event->getContent();
         $page     = $event->getPage();
-        $parent   = $page->getTranslationParent();
-        $children = $page->getTranslationChildren();
 
-        //check to see if this page is grouped with another
-        if (empty($parent) && empty($children))
-            return;
+        foreach ($content as $slot => &$html) {
+            if (strpos($html, '{langbar}') !== false) {
+                $langbar = $this->renderLanguageBar($page);
+                $html    = str_ireplace('{langbar}', $langbar, $html);
+            }
 
-        $related = array();
-
-        //get a list of associated pages/languages
-        if (!empty($parent)) {
-            $children = $parent->getTranslationChildren();
-        } else {
-            $parent = $page; //parent is self
-        }
-
-        if (!empty($children)) {
-            $lang = $parent->getLanguage();
-            $trans = $this->translator->trans('mautic.page.lang.'.$lang);
-            if ($trans == 'mautic.page.lang.'.$lang)
-                $trans = $lang;
-            $related[$parent->getId()] = array(
-                "lang" => $trans,
-                "url"  => $model->generateUrl($parent, false)
-            );
-            foreach ($children as $c) {
-                $lang = $c->getLanguage();
-                $trans = $this->translator->trans('mautic.page.lang.'.$lang);
-                if ($trans == 'mautic.page.lang.'.$lang)
-                    $trans = $lang;
-                $related[$c->getId()] = array(
-                    "lang" => $trans,
-                    "url"  => $model->generateUrl($c, false)
-                );
+            if (strpos($html, '{sharebuttons}') !== false) {
+                $buttons = $this->renderSocialShareButtons($page, $event->getSlotsHelper());
+                $html    = str_ireplace('{sharebuttons}', $buttons, $html);
             }
         }
 
-        //sort by language
-        uasort($related, function($a, $b) {
-           return strnatcasecmp($a['lang'], $b['lang']);
-        });
-
-        if (empty($related)) {
-            return;
-        } else {
-            $langbar = $this->templating->render('MauticPageBundle:PageToken:langbar.html.php', array('pages' => $related));
-        }
-
-        foreach ($content as $slot => &$html) {
-            $html = str_ireplace('{langbar}', $langbar, $html);
-        }
-
         $event->setContent($content);
+    }
+
+    /**
+     * Renders the HTML for the social share buttons
+     *
+     * @param $page
+     *
+     * @return string
+     */
+    protected function renderSocialShareButtons($page, $slotsHelper)
+    {
+        static $content = "";
+
+        if (empty($content)) {
+            $shareButtons = NetworkIntegrationHelper::getShareButtons($this->factory);
+
+            $content = "<div class='share-buttons'>\n";
+            foreach ($shareButtons as $network => $html) {
+                $content .= $html;
+            }
+            $content .= "</div>\n";
+
+            //load the css into the header by calling the sharebtn_css view
+            $this->factory->getTemplating()->render('MauticPageBundle:PageToken:sharebtn_css.html.php');
+        }
+
+        return $content;
+    }
+
+    /**
+     * Renders the HTML for the language bar for a given page
+     *
+     * @param $page
+     *
+     * @return string
+     */
+    protected function renderLanguageBar($page)
+    {
+        static $langbar = '';
+
+        if (empty($langbar)) {
+            $model    = $this->factory->getModel('page.page');
+            $parent   = $page->getTranslationParent();
+            $children = $page->getTranslationChildren();
+
+            //check to see if this page is grouped with another
+            if (empty($parent) && empty($children))
+                return;
+
+            $related = array();
+
+            //get a list of associated pages/languages
+            if (!empty($parent)) {
+                $children = $parent->getTranslationChildren();
+            } else {
+                $parent = $page; //parent is self
+            }
+
+            if (!empty($children)) {
+                $lang  = $parent->getLanguage();
+                $trans = $this->translator->trans('mautic.page.lang.' . $lang);
+                if ($trans == 'mautic.page.lang.' . $lang)
+                    $trans = $lang;
+                $related[$parent->getId()] = array(
+                    "lang" => $trans,
+                    "url"  => $model->generateUrl($parent, false)
+                );
+                foreach ($children as $c) {
+                    $lang  = $c->getLanguage();
+                    $trans = $this->translator->trans('mautic.page.lang.' . $lang);
+                    if ($trans == 'mautic.page.lang.' . $lang)
+                        $trans = $lang;
+                    $related[$c->getId()] = array(
+                        "lang" => $trans,
+                        "url"  => $model->generateUrl($c, false)
+                    );
+                }
+            }
+
+            //sort by language
+            uasort($related, function ($a, $b) {
+                return strnatcasecmp($a['lang'], $b['lang']);
+            });
+
+            if (empty($related)) {
+                return;
+            } else {
+                $langbar = $this->templating->render('MauticPageBundle:PageToken:langbar.html.php', array('pages' => $related));
+            }
+        }
+
+        return $langbar;
     }
 }

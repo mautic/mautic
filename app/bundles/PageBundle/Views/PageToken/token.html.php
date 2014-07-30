@@ -21,5 +21,17 @@
                 <input type="hidden" class="page-token" value="{langbar}" />
             </div>
         </li>
+        <li class="bundle-list-item has-click-event">
+            <div class="padding-sm">
+                <span class="list-item-primary">
+                    <?php echo $view['translator']->trans('mautic.page.page.token.share'); ?>
+                </span>
+                <span class="list-item-secondary" data-toggle="tooltip" data-placement="bottom"
+                      title="<?php echo $view['translator']->trans('mautic.page.page.token.share.descr'); ?>">
+                    <?php echo substr($view['translator']->trans('mautic.page.page.token.share.descr'), 0, 30); ?>...
+                </span>
+                <input type="hidden" class="page-token" value="{sharebuttons}" />
+            </div>
+        </li>
     </ul>
 </div>

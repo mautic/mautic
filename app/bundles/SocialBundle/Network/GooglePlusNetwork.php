@@ -11,7 +11,7 @@ namespace Mautic\SocialBundle\Network;
 
 use Mautic\SocialBundle\Helper\NetworkIntegrationHelper;
 
-class GooglePlusNetwork extends CommonNetwork
+class GooglePlusNetwork extends AbstractNetwork
 {
 
     /**
@@ -27,11 +27,36 @@ class GooglePlusNetwork extends CommonNetwork
     /**
      * {@inheritdoc}
      *
+     * @return int|mixed
+     */
+    public function getPriority()
+    {
+        return 1;
+    }
+
+
+    /**
+     * {@inheritdoc}
+     *
      * @return string
      */
     public function getIdentifierField()
     {
         return 'email';
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return array
+     */
+    public function getSupportedFeatures()
+    {
+        return array(
+            'public_activity',
+            'public_profile',
+            'share_button'
+        );
     }
 
     /**
@@ -267,19 +292,6 @@ class GooglePlusNetwork extends CommonNetwork
     {
         return array(
             'key' => 'mautic.social.keyfield.api'
-        );
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @return array
-     */
-    public function getSupportedFeatures()
-    {
-        return array(
-            'public_activity',
-            'public_profile'
         );
     }
 

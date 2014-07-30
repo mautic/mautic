@@ -158,43 +158,48 @@ class PublicController extends CommonFormController
                     }
 
                     //get the browser preferred languages
-                    $langs = explode(',', $this->request->server->get('HTTP_ACCEPT_LANGUAGE'));
-                    foreach ($langs as $k => $l) {
-                        if ($pos = strpos($l, ';q=') !== false) {
-                            //remove weights
-                            $l = substr($l, 0, ($pos+1));
-                        }
-                        //change - to _
-                        $langs[$k] = str_replace('-', '_', $l);
-                    }
-
-                    //loop through the browser languages to ensure there is a generic option for each
-                    //dialect (i.e en if en_US is present)
-                    $userLangs = array();
-                    foreach ($langs as $k => $l) {
-                        $userLangs[] = $l;
-
-                        if (strpos($l, '_') !== false) {
-                            $base = substr($l, 0, 2);
-                            if (!in_array($base, $langs) && !in_array($base, $userLangs)) {
-                                $userLangs[] = $base;
+                    $browserLangs = $this->request->server->get('HTTP_ACCEPT_LANGUAGE');
+                    if (!empty($browserLangs)) {
+                        $langs = explode(',', $browserLangs);
+                        if (!empty($langs)) {
+                            foreach ($langs as $k => $l) {
+                                if ($pos = strpos($l, ';q=') !== false) {
+                                    //remove weights
+                                    $l = substr($l, 0, ($pos + 1));
+                                }
+                                //change - to _
+                                $langs[$k] = str_replace('-', '_', $l);
                             }
                         }
-                    }
 
-                    //get translations in order of browser preference
-                    $matches = array_intersect($userLangs, $pageLangs);
-                    if (!empty($matches)) {
-                        $preferred = reset($matches);
-                        $key       = array_search($preferred, $pageLangs);
-                        $pageId    = $pageIds[$key];
+                        //loop through the browser languages to ensure there is a generic option for each
+                        //dialect (i.e en if en_US is present)
+                        $userLangs = array();
+                        foreach ($langs as $k => $l) {
+                            $userLangs[] = $l;
 
-                        //redirect if not already on the correct page
-                        if ($pageId != $entity->getId()) {
-                            $page = ($pageId == $translationParent->getId()) ? $translationParent : $translationChildren[$pageId];
-                            $url  = $model->generateUrl($page, false);
-                            $model->hitPage($entity, $this->request, 302);
-                            return $this->redirect($url, 302);
+                            if (strpos($l, '_') !== false) {
+                                $base = substr($l, 0, 2);
+                                if (!in_array($base, $langs) && !in_array($base, $userLangs)) {
+                                    $userLangs[] = $base;
+                                }
+                            }
+                        }
+
+                        //get translations in order of browser preference
+                        $matches = array_intersect($userLangs, $pageLangs);
+                        if (!empty($matches)) {
+                            $preferred = reset($matches);
+                            $key       = array_search($preferred, $pageLangs);
+                            $pageId    = $pageIds[$key];
+
+                            //redirect if not already on the correct page
+                            if ($pageId != $entity->getId()) {
+                                $page = ($pageId == $translationParent->getId()) ? $translationParent : $translationChildren[$pageId];
+                                $url  = $model->generateUrl($page, false);
+                                $model->hitPage($entity, $this->request, 302);
+                                return $this->redirect($url, 302);
+                            }
                         }
                     }
                 }
@@ -207,6 +212,9 @@ class PublicController extends CommonFormController
             $dispatcher = $this->get('event_dispatcher');
             if ($dispatcher->hasListeners(PageEvents::PAGE_ON_DISPLAY)) {
                 $event = new PageEvent($entity);
+                $slotsHelper = $this->container->get('templating')
+                    ->getEngine('MauticPageBundle::public.html.php')->get('slots');
+                $event->setSlotsHelper($slotsHelper);
                 $dispatcher->dispatch(PageEvents::PAGE_ON_DISPLAY, $event);
                 $content = $event->getContent();
             } else {

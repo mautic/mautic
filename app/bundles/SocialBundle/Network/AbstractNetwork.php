@@ -12,7 +12,7 @@ namespace Mautic\SocialBundle\Network;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\SocialBundle\Entity\SocialNetwork;
 
-class CommonNetwork
+abstract class AbstractNetwork
 {
     protected $factory;
     protected $entity;
@@ -27,24 +27,29 @@ class CommonNetwork
     }
 
     /**
+     * Determines what priority the network should have against the other networks
+     *
+     * @return mixed
+     */
+    public function getPriority()
+    {
+        return 9999;
+    }
+
+
+    /**
      * Returns the name of the social network that must match the name of the file
      *
      * @return string
      */
-    public function getName()
-    {
-        throw new \InvalidArgumentException('Missing required getName() function');
-    }
+    abstract public function getName();
 
     /**
      * Returns the field the network needs in order to find the user
      *
      * @return mixed
      */
-    public function getIdentifierField()
-    {
-        throw new \InvalidArgumentException('Missing required getIdentifierField() function');
-    }
+    abstract public function getIdentifierField();
 
     /**
      * Set the social network entity
@@ -311,7 +316,7 @@ class CommonNetwork
      */
     public function getPublicActivity($identifier, &$socialCache)
     {
-
+        return array();
     }
 
     /**
@@ -323,6 +328,6 @@ class CommonNetwork
      */
     public function getUserData($identifier, &$socialCache)
     {
-
+        return array();
     }
 }

@@ -23,7 +23,7 @@ class SocialController extends FormController
             return $this->accessDenied();
         }
 
-        $networkObjects = NetworkIntegrationHelper::getNetworkObjects($factory);
+        $networkObjects = NetworkIntegrationHelper::getNetworkObjects($factory, null, null, true);
         $em             = $factory->getEntityManager();
         $services       = array();
         $currentKeys    = array(); //prevent overriding of secrets
@@ -38,7 +38,14 @@ class SocialController extends FormController
         );
         $leadFields = array();
         foreach ($fields as $f) {
-            $leadFields[$f->getId()] = $f->getLabel();
+            $leadFields['mautic.lead.field.group.'. $f->getGroup()][$f->getId()] = $f->getLabel();
+        }
+        //sort the groups
+        ksort($leadFields, SORT_NATURAL);
+        //sort each group by translation
+        foreach ($leadFields as $group => &$fieldGroup)
+        {
+            asort($fieldGroup, SORT_NATURAL);
         }
 
         //bind to the form

@@ -9,6 +9,7 @@
 
 namespace Mautic\SocialBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -27,6 +28,8 @@ class ConfigType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
+        $builder->addEventSubscriber(new CleanFormSubscriber());
+
         $builder->add('services', 'socialmedia_services', array(
             'label'        => false,
             'integrations' => $options['integrations'],

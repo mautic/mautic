@@ -42,9 +42,9 @@ class SocialNetwork
     private $apiKeys = array();
 
     /**
-     * @ORM\Column(type="array", name="lead_fields", nullable=true)
+     * @ORM\Column(type="array", name="feature_settings", nullable=true)
      */
-    private $leadFields = array();
+    private $featureSettings = array();
 
     /**
      * @return mixed
@@ -81,17 +81,17 @@ class SocialNetwork
     /**
      * @return mixed
      */
-    public function getLeadFields ()
+    public function getFeatureSettings ()
     {
-        return $this->leadFields;
+        return $this->featureSettings;
     }
 
     /**
-     * @param mixed $leadFields
+     * @param mixed $featureSettings
      */
-    public function setLeadFields (array $leadFields)
+    public function setFeatureSettings (array $featureSettings)
     {
-        $this->leadFields = $leadFields;
+        $this->featureSettings = $featureSettings;
     }
 
     /**

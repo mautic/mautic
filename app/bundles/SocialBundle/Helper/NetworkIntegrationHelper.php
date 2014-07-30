@@ -12,6 +12,7 @@ namespace Mautic\SocialBundle\Helper;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\SocialBundle\Entity\SocialNetwork;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 class NetworkIntegrationHelper
@@ -24,20 +25,25 @@ class NetworkIntegrationHelper
      *
      * @param MauticFactory $factory
      * @param null          $service
+     * @param null          $withFeatures
+     * @param bool          $alphabetical
+     *
      * @return mixed
      */
-    public static function getNetworkObjects(MauticFactory $factory, $service = null)
+    public static function getNetworkObjects(MauticFactory $factory, $service = null, $withFeatures = null, $alphabetical = false)
     {
         static $networks;
 
         static::$factory = $factory;
-        $available = array(
-            'GooglePlus',
-            'Foursquare',
-            'Twitter',
-            'Facebook',
-            'Instagram'
-        );
+        $finder = new Finder();
+        $finder->files()->name('*Network.php')->in(__DIR__ . '/../Network')->notName('AbstractNetwork.php');
+        if ($alphabetical) {
+            $finder->sortByName();
+        }
+        $available = array();
+        foreach ($finder as $file) {
+            $available[] = substr($file->getBaseName(), 0, -11);
+        }
 
         if (empty($networks)) {
             $networkSettings = self::getNetworkSettings();
@@ -53,6 +59,18 @@ class NetworkIntegrationHelper
                     $networks[$a]->setSettings($networkSettings[$a]);
                 }
             }
+            if (empty($alphabetical)) {
+                //sort by priority
+                uasort($networks, function ($a, $b) {
+                    $aP = (int)$a->getPriority();
+                    $bP = (int)$b->getPriority();
+
+                    if ($aP === $bP) {
+                        return 0;
+                    }
+                    return ($aP < $bP) ? -1 : 1;
+                });
+            }
         }
 
         if (!empty($service)) {
@@ -61,7 +79,22 @@ class NetworkIntegrationHelper
             } else {
                 throw new MethodNotAllowedHttpException($available);
             }
+        } elseif (!empty($withFeatures)) {
+            $specific = array();
+            foreach ($networks as $n => $d) {
+                $settings = $d->getSettings();
+                $features = $settings->getSupportedFeatures();
+
+                foreach ($withFeatures as $f) {
+                    if (in_array($f, $features)) {
+                        $specific[$n] = $d;
+                        break;
+                    }
+                }
+            }
+            return $specific;
         }
+
         return $networks;
     }
 
@@ -118,6 +151,7 @@ class NetworkIntegrationHelper
                             break;
                     }
                 }
+                asort($fields[$s], SORT_NATURAL);
             }
         }
 
@@ -201,7 +235,7 @@ class NetworkIntegrationHelper
             //regenerate from networks
 
             //check to see if there are social profiles activated
-            $socialNetworks = NetworkIntegrationHelper::getNetworkObjects($factory);
+            $socialNetworks = NetworkIntegrationHelper::getNetworkObjects($factory, null, array('public_profile', 'public_activity'));
 
             foreach ($socialNetworks as $network => $sn) {
                 $settings        = $sn->getSettings();
@@ -239,7 +273,7 @@ class NetworkIntegrationHelper
                 $factory->getEntityManager()->getRepository('MauticLeadBundle:Lead')->saveEntity($lead);
             }
         } elseif ($includeLeadFields) {
-            $socialNetworks = NetworkIntegrationHelper::getNetworkObjects($factory);
+            $socialNetworks = NetworkIntegrationHelper::getNetworkObjects($factory, null, array('public_profile', 'public_activity'));
             foreach ($socialNetworks as $network => $sn) {
                 $settings             = $sn->getSettings();
                 $leadFields[$network] = $settings->getLeadFields();
@@ -247,6 +281,34 @@ class NetworkIntegrationHelper
         }
 
         return ($includeLeadFields) ? array($socialCache, $leadFields) : $socialCache;
+    }
+
+    /**
+     * Gets an array of the HTML for share buttons
+     *
+     * @param $factory
+     */
+    public static function getShareButtons($factory)
+    {
+        static $shareBtns = array();
+
+        if (empty($shareBtns)) {
+            $socialNetworks = NetworkIntegrationHelper::getNetworkObjects($factory, null, array('share_button'), true);
+            $templating     = $factory->getTemplating();
+            foreach ($socialNetworks as $network => $details) {
+                $settings        = $details->getSettings();
+                $featureSettings = $settings->getFeatureSettings();
+                $apiKeys         = $settings->getApiKeys();
+                $shareSettings   = isset($featureSettings['shareButton']) ? $featureSettings['shareButton'] : array();
+
+                //add the api keys for use within the share buttons
+                $shareSettings['keys'] = $apiKeys;
+                $shareBtns[$network]   = $templating->render("MauticSocialBundle:Network/$network:share.html.php", array(
+                    'settings' => $shareSettings,
+                ));
+            }
+        }
+        return $shareBtns;
     }
 
     /**
