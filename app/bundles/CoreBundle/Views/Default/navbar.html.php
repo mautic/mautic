@@ -18,9 +18,9 @@
     <ul class="nav navbar-nav navbar-left">
                     <!-- Sidebar shrink -->
                     <li class="hidden-xs hidden-sm">
-                        <a href="javascript:void(0);" class="sidebar-minimize" data-toggle="minimize" title="Minimize sidebar">
+                        <a href="javascript:void(0);" data-toggle="minimize" title="Minimize sidebar">
                             <span class="meta">
-                                <span class="icon"></span>
+                                <span class="icon"><i class="fa fa-dedent"></i></span>
                             </span>
                         </a>
                     </li>
@@ -30,7 +30,7 @@
                     <li class="navbar-main hidden-lg hidden-md hidden-sm">
                         <a href="javascript:void(0);" data-toggle="sidebar" data-direction="ltr" rel="tooltip" title="Menu sidebar">
                             <span class="meta">
-                                <span class="icon"><i class="fa fa-paragraph-justify3"></i></span>
+                                <span class="icon"><i class="fa fa-indent"></i></span>
                             </span>
                         </a>
                     </li>

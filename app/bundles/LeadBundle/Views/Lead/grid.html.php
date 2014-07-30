@@ -15,38 +15,42 @@ if ($tmpl == 'index')
     <?php foreach ($items as $item): ?>
     <?php $fields = $model->organizeFieldsByGroup($item->getFields()); ?>
     <div class="shuffle shuffle-item grid margin-md-bottom col-sm-6 col-md-4">
-        <div class="body-white table-layout">
-            <div class="col-xs-4 padding-none">
-                <img class="img img-responsive"
-                     src="https://www.gravatar.com/avatar/<?php echo md5(strtolower(trim($fields['core']['email']['value']))); ?>?&s=250" />
-            </div>
-            <div class="col-xs-8 valign-middle">
-                <h5>
-                    <a href="<?php echo $view['router']->generate('mautic_lead_action',
-                        array("objectAction" => "view", "objectId" => $item->getId())); ?>"
-                       data-toggle="ajax">
-                        <span><?php echo $item->getPrimaryIdentifier(); ?></span>
-                    </a>
-                    <span class="badge"><?php echo $item->getScore(); ?></span>
-                </h5>
-                <div class="text-muted">
-                    <i class="fa fa-fw fa-building"></i><span class="padding-sm-left"><?php echo $fields['core']['company']['value']; ?></span>
+        <div class="panel widget">
+            <div class="table-layout nm">
+                <div class="col-xs-4 text-center">
+                    <img class="img img-responsive"
+                         src="https://www.gravatar.com/avatar/<?php echo md5(strtolower(trim($fields['core']['email']['value']))); ?>?&s=250" />
                 </div>
-                <div class="text-muted">
-                    <i class="fa fa-fw fa-envelope"></i><span class="padding-sm-left"><?php echo $fields['core']['email']['value']; ?></span>
-                </div>
-                <div class="text-muted">
-                    <i class="fa fa-fw fa-map-marker"></i><span class="padding-sm-left"><?php
-                    if (!empty($fields['core']['city']['value']) && !empty($fields['core']['state']['value']))
-                        echo $fields['core']['city']['value'] . ', ' . $fields['core']['state']['value'];
-                    elseif (!empty($fields['core']['city']['value']))
-                        echo $fields['core']['city']['value]'];
-                    elseif (!empty($fields['core']['state']['value']))
-                        echo $fields['core']['state']['value'];
-                    ?></span>
-                </div>
-                <div class="text-muted">
-                    <i class="fa fa-fw fa-globe"></i><span class="padding-sm-left"><?php echo $fields['core']['country']['value']; ?></span>
+                <div class="col-xs-8 valign-middle">
+                    <div class="panel-body">
+                        <h5>
+                            <a href="<?php echo $view['router']->generate('mautic_lead_action',
+                                array("objectAction" => "view", "objectId" => $item->getId())); ?>"
+                               data-toggle="ajax">
+                                <span><?php echo $item->getPrimaryIdentifier(); ?></span>
+                            </a>
+                            <span class="badge"><?php echo $item->getScore(); ?></span>
+                        </h5>
+                        <div class="text-muted">
+                            <i class="fa fa-fw fa-building"></i><span class="padding-sm-left"><?php echo $fields['core']['company']['value']; ?></span>
+                        </div>
+                        <div class="text-muted">
+                            <i class="fa fa-fw fa-envelope"></i><span class="padding-sm-left"><?php echo $fields['core']['email']['value']; ?></span>
+                        </div>
+                        <div class="text-muted">
+                            <i class="fa fa-fw fa-map-marker"></i><span class="padding-sm-left"><?php
+                            if (!empty($fields['core']['city']['value']) && !empty($fields['core']['state']['value']))
+                                echo $fields['core']['city']['value'] . ', ' . $fields['core']['state']['value'];
+                            elseif (!empty($fields['core']['city']['value']))
+                                echo $fields['core']['city']['value]'];
+                            elseif (!empty($fields['core']['state']['value']))
+                                echo $fields['core']['state']['value'];
+                            ?></span>
+                        </div>
+                        <div class="text-muted">
+                            <i class="fa fa-fw fa-globe"></i><span class="padding-sm-left"><?php echo $fields['core']['country']['value']; ?></span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

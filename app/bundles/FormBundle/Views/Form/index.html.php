@@ -16,14 +16,13 @@ $view['slots']->set('searchHelp', $view['translator']->trans('mautic.form.form.h
 
 <?php if ($permissions['form:forms:create']): ?>
     <?php $view['slots']->start("actions"); ?>
-    <li>
         <a href="<?php echo $this->container->get('router')->generate(
             'mautic_form_action', array("objectAction" => "new")); ?>"
            data-toggle="ajax"
+           class="btn btn-default"
            data-menu-link="#mautic_form_index">
-            <?php echo $view["translator"]->trans("mautic.form.form.menu.new"); ?>
+            <i class="fa fa-pencil"></i><?php // echo $view["translator"]->trans("mautic.form.form.menu.new"); ?>
         </a>
-    </li>
     <?php $view['slots']->stop(); ?>
 <?php endif; ?>
 

@@ -16,26 +16,21 @@ $view['slots']->set('searchHelp', $view['translator']->trans('mautic.lead.lead.h
 
 <?php if ($permissions['lead:leads:create']): ?>
     <?php $view['slots']->start("actions"); ?>
-    <li>
         <a href="<?php echo $this->container->get('router')->generate(
             'mautic_lead_action', array("objectAction" => "new")); ?>"
            data-toggle="ajax"
+           class="btn btn-default"
            data-menu-link="#mautic_lead_index">
-            <?php echo $view["translator"]->trans("mautic.lead.lead.menu.new"); ?>
+            <i class="fa fa-pencil"></i> <?php // echo $view["translator"]->trans("mautic.lead.lead.menu.new"); ?>
         </a>
-    </li>
+          <a href="<?php echo $view['router']->generate('mautic_lead_index', array('page' => $page, 'view' => 'list')); ?>"
+         data-toggle="ajax"
+         class="btn btn-default"><i class="fa fa-fw fa-list"></i></a>
+      <a href="<?php echo $view['router']->generate('mautic_lead_index', array('page' => $page, 'view' => 'grid')); ?>"
+         data-toggle="ajax"
+         class="btn btn-default"><i class="fa fa-fw fa-th-large"></i></a>
     <?php $view['slots']->stop(); ?>
-<?php endif; ?>
 
-<?php $view['slots']->start('toolbar'); ?>
-<div class="btn-group">
-    <a href="<?php echo $view['router']->generate('mautic_lead_index', array('page' => $page, 'view' => 'list')); ?>"
-       data-toggle="ajax"
-       class="btn btn-default"><i class="fa fa-fw fa-list"></i></a>
-    <a href="<?php echo $view['router']->generate('mautic_lead_index', array('page' => $page, 'view' => 'grid')); ?>"
-       data-toggle="ajax"
-       class="btn btn-default"><i class="fa fa-fw fa-th-large"></i></a>
-</div>
-<?php $view['slots']->stop(); ?>
+<?php endif; ?>
 
 <?php $view['slots']->output('_content'); ?>

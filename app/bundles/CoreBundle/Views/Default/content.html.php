@@ -14,7 +14,7 @@ endif;
 
 ?>
 <div class="main-panel-header">
-    <?php echo $view->render('MauticCoreBundle:Default:toolbar.html.php'); ?>
+    <?php //echo $view->render('MauticCoreBundle:Default:toolbar.html.php'); ?>
     <div class="clearfix"></div>
 </div>
 

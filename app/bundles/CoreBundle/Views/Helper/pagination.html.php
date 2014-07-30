@@ -53,7 +53,7 @@ $limitOptions = array(
 $formExit = (!empty($ignoreFormExit)) ? ' data-ignore-formexit="true"' : '';
 ?>
 <div class="clearfix"></div>
-<div class="pagination-wrapper">
+<div class="pagination-wrapper text-center">
     <ul class="pagination pagination-centered <?php echo $pageClass; ?>">
         <?php
         $urlPage = $page - $range;
