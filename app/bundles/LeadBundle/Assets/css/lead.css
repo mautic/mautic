@@ -58,3 +58,28 @@
 .col-leadscore-delta {
     width: 75px;
 }
+
+.panel-googleplus .panel-heading {
+    background: #dd4b39;
+    color: #FFFFFF;
+}
+
+.panel-foursquare .panel-heading {
+    background: #0072b1;
+    color: #FFFFFF;
+}
+
+.panel-facebook .panel-heading {
+    background: #3b5998;
+    color: #FFFFFF;
+}
+
+.panel-linkedin .panel-heding {
+    background: #007bb6;
+    color: #FFFFFF;
+}
+
+.panel-twitter .panel-heading {
+    background: #00aced;
+    color: #FFFFFF;
+}

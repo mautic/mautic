@@ -11,6 +11,9 @@
 <div class="panel panel-default">
     <div class="panel-heading">
         <h3 class="panel-title">Pages Visited</h3>
+        <div class="panel-toolbar text-right">
+            <a href="#" class="btn btn-xs btn-default"><i class="fa fa-code-fork"></i> <?php echo $view['translator']->trans('mautic.lead.lead.timeline'); ?></a>
+        </div>
     </div>
     <div class="table-responsive panel-collapse pull out">
             <table class="table table-hover table-bordered table-striped table-condensed">
