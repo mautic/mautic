@@ -9,7 +9,7 @@
 
 namespace Mautic\SocialBundle\Network;
 
-class InstagramNetwork extends CommonNetwork
+class InstagramNetwork extends AbstractNetwork
 {
 
     /**
