@@ -63,7 +63,7 @@ class IpAddress {
     {
         $this->ipAddress = $ipAddress;
 
-        if (empty($this->ipDetails)) {
+        if (empty($this->ipDetails) && $this->ipAddress != '127.0.0.1') {
             //@todo - configure other IP services
             if (!empty($params)) {
                 switch ($params['ip_lookup_service']) {
@@ -71,7 +71,7 @@ class IpAddress {
                         $data = $this->getRemoteIpData("http://www.telize.com/geoip/" . $this->getIpAddress());
 
                         $data = json_decode($data);
-                        if (is_object($data)) {
+                        if (is_object($data) && isset($data->city)) {
                             $ipData = array(
                                 'city'         => $data->city,
                                 'region'       => $data->region,

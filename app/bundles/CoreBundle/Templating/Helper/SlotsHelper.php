@@ -34,7 +34,7 @@ class SlotsHelper extends BaseSlotsHelper
     {
         //prevent the use of internally used keys
         if (in_array($name, array('scripts', 'scriptDeclarations', 'stylesheets',
-            'headDeclarations', 'styleDeclarations', 'customDeclaration'))) {
+            'headDeclarations', 'styleDeclarations', 'customDeclarations'))) {
             throw new \InvalidArgumentException($name . ' cannot be manually set.  Please use addScript, addScriptDeclaration, addStylesheet, addStyleDeclaration or addCustomDeclaration');
         }
 
@@ -170,12 +170,24 @@ class SlotsHelper extends BaseSlotsHelper
      *
      * @param $declaration
      */
-    public function addCustomDeclaration($declaration)
+    public function addCustomDeclaration($declaration, $location = 'head')
     {
-        $this->slots['headDeclaration'][] = array(
-            'type'        => 'custom',
-            'declaration' => $declaration
-        );
+        if ($location == 'head') {
+            $this->slots['headDeclarations'][] = array(
+                'type'        => 'custom',
+                'declaration' => $declaration
+            );
+        } else {
+            if (!isset($this->slots['customDeclarations'][$location])) {
+                $this->slots['customDeclarations'][$location] = array();
+            }
+
+            if (!in_array($declaration, $this->slots['customDeclarations'][$location])) {
+                $this->slots['customDeclarations'][$location][] = $declaration;
+            }
+        }
+
+
     }
 
     /**
@@ -218,8 +230,17 @@ class SlotsHelper extends BaseSlotsHelper
             }
             echo "</script>\n";
         }
+
+        if (isset($this->slots['customDeclarations'][$location])) {
+            foreach ($this->slots['customDeclarations'][$location] as $d) {
+                echo "$d\n";
+            }
+        }
     }
 
+    /**
+     * Output head scripts, stylesheets, and custom declarations
+     */
     public function outputHeadDeclarations()
     {
         $this->outputStyles();

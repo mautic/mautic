@@ -10,8 +10,6 @@
 namespace Mautic\CoreBundle\EventListener;
 
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
-use Mautic\CoreBundle\CoreEvents;
-use Mautic\CoreBundle\Factory\MauticFactory;
 
 /**
  * Class DoctrineEventsSubscriber
@@ -54,13 +52,6 @@ class DoctrineEventsSubscriber implements \Doctrine\Common\EventSubscriber
         }
 
         if (FALSE !== strpos($classMetadata->namespace, 'Mautic')) {
-            //allow bundles to make modifications to metadata without having to resubscribe to the same event
-            /*
-            $dispatcher = $this->factory->getDispatcher();
-            if ($dispatcher->has(CoreEvents::LOAD_CLASS_METADATA)) {
-                $dispatcher->dispatch(CoreEvents::LOAD_CLASS_METADATA, $args);
-            }
-*/
             $classMetadata->setPrimaryTable(array('name' => $this->prefix . $classMetadata->getTableName()));
 
             foreach ($classMetadata->getAssociationMappings() as $fieldName => $mapping) {
