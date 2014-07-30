@@ -6,6 +6,11 @@
  * @link        http://mautic.com
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+?>
 
-//@todo - write a layout!!!!
-echo "<pre>".print_r($activity, true) . "</pre>";
+<div class="panel-body">
+    <?php echo $view->render('MauticLeadBundle:Social/Facebook:profile.html.php', array(
+        'lead'      => $lead,
+        'profile'   => $details['profile']
+    )); ?>
+</div>

@@ -8,17 +8,17 @@
  */
 ?>
 
-<?php foreach ($profile as $l => $v): ?>
-    <div class="row">
-        <div class="col-xs-3">
-            <?php echo $view['translator']->trans('mautic.social.'.$network.'.'.$l); ?>
+<div class="media">
+    <?php if (isset($profile['profileImage'])): ?>
+        <div class="thumbnail pull-left">
+            <img src="<?php echo $profile['profileImage']; ?>" width="100px" class="media-object img-rounded" />
         </div>
-        <div class="col-xs-9 field-value">
-            <?php echo $view->render('MauticLeadBundle:Lead:info_value.html.php', array(
-                'name'              => $l,
-                'value'             => $v,
-                'socialProfileUrls' => $socialProfileUrls
-            )); ?>
-        </div>
+    <?php endif; ?>
+    <div class="media-body">
+        <h4 class="media-title"><?php echo $profile['name']; ?></h4>
+        <p><a href="https://twitter.com/<?php echo $profile['profileHandle']; ?>" target="_blank"><?php echo $profile['profileHandle']; ?></a></p>
+        <p class="text-muted">
+            <?php echo $profile['description']; ?>
+        </p>
     </div>
-<?php endforeach; ?>
+</div>

@@ -7,17 +7,15 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
-<?php foreach ($profile as $l => $v): ?>
-    <div class="row">
-        <div class="col-xs-3">
-            <?php echo $view['translator']->trans('mautic.social.'.$network.'.'.$l); ?>
-        </div>
-        <div class="col-xs-9 field-value">
-            <?php echo $view->render('MauticLeadBundle:Lead:info_value.html.php', array(
-                'name'              => $l,
-                'value'             => $v,
-                'socialProfileUrls' => $socialProfileUrls
-            )); ?>
-        </div>
+<div class="media">
+    <?php if (isset($profile['profileImage'])): ?>
+    <div class="pull-left thumbnail">
+        <img src="<?php echo $profile['profileImage']; ?>" width="100px" class="media-object img-rounded" />
     </div>
-<?php endforeach; ?>
+    <?php endif; ?>
+
+    <div class="media-body">
+        <h4 class="media-heading"><?php echo $profile['name']; ?></h4>
+        <p class="text-muted"><a href="https://facebook.com/<?php echo $profile['profileHandle']; ?>" target="_blank"><?php echo $profile['profileHandle']; ?></a></p>
+    </div>
+</div>

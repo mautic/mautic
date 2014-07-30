@@ -35,7 +35,8 @@ class NetworkIntegrationHelper
             'GooglePlus',
             'Foursquare',
             'Twitter',
-            'Facebook'
+            'Facebook',
+            'Instagram'
         );
 
         if (empty($networks)) {
