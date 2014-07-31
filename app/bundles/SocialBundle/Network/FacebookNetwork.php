@@ -137,7 +137,14 @@ class FacebookNetwork extends AbstractNetwork
 
             if (is_object($data) && !isset($data->error)) {
                 $info                  = $this->matchUpData($data);
-                $info['profileHandle'] = str_replace('https://www.facebook.com/', '', $data->link);
+                if (isset($data->username)) {
+                    $info['profileHandle'] = $data->username;
+                } elseif (isset($data->link)) {
+                    $info['profileHandle'] = str_replace('https://www.facebook.com/', '', $data->link);
+                } else {
+                    $info['profileHandle'] = $data->id;
+                }
+
                 $info['profileImage']  = "https://graph.facebook.com/{$data->id}/picture?type=large";
 
                 $socialCache['profile'] = $info;
