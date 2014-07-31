@@ -15,7 +15,7 @@ if (empty($pull))
     <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
         <i class="fa fa-angle-down"></i>
     </button>
-    <ul class="pull-<?php echo $pull; ?> bundle-list-actions dropdown-menu" role="menu">
+    <ul class="pull-<?php echo $pull; ?> page-list-actions dropdown-menu" role="menu">
         <?php if (!empty($edit)): ?>
             <li>
                 <a href="<?php echo $view['router']->generate('mautic_' . $routeBase . '_action',

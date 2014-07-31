@@ -7,7 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-$target = (!empty($target)) ? $target : '.bundle-list';
+$target = (!empty($target)) ? $target : '.page-list';
 $tmpl   = (!empty($tmpl)) ? $tmpl : 'list';
 
 if (!isset($limit)) {

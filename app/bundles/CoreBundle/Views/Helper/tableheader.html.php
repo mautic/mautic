@@ -11,7 +11,7 @@ $defaultOrder = (!empty($default)) ? $orderBy : "";
 $order        = (!empty($order)) ? $order : $app->getSession()->get("mautic.{$sessionVar}.orderby", $defaultOrder);
 $dir          = (!empty($dir))? $dir : $app->getSession()->get("mautic.{$sessionVar}.orderbydir", "ASC");
 $filters      = (!empty($filters)) ? $filters : $app->getSession()->get("mautic.{$sessionVar}.filters", array());
-$target       = (!empty($target)) ? $target : '.bundle-list';
+$target       = (!empty($target)) ? $target : '.page-list';
 $tmpl         = (!empty($tmpl)) ? $tmpl : 'list';
 ?>
 <th<?php echo (!empty($class)) ? ' class="' . $class . '"': ""; ?>>

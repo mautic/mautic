@@ -17,7 +17,7 @@ if (!isset($expanded))
 $fieldExpanded   = ($expanded == 'fields') ? ' in' : '';
 $actionExpanded  = (empty($fieldExpanded)) ? ' in' : '';
 ?>
-<div class="bundle-list">
+<div class="page-list">
     <div class="panel-group" id="form-components">
         <div class="panel panel-default">
             <div class="panel-heading">
@@ -33,7 +33,7 @@ $actionExpanded  = (empty($fieldExpanded)) ? ' in' : '';
                     <a data-toggle="ajax" data-ignore-formexit="true" href="<?php echo $view['router']->generate(
                         'mautic_formfield_action',
                         array('objectAction' => 'new', 'type' => $fieldType, 'tmpl' => 'field')); ?>">
-                        <div class="bundle-list-item">
+                        <div class="page-list-item">
                             <div class="padding-sm">
                                 <div class="pull-left padding-sm">
                                     <span class="list-item-primary"><?php echo $field; ?></span>
@@ -68,7 +68,7 @@ $actionExpanded  = (empty($fieldExpanded)) ? ' in' : '';
                         <a data-toggle="ajax" data-ignore-formexit="true" href="<?php echo $view['router']->generate(
                             'mautic_formaction_action',
                             array('objectAction' => 'new', 'type' => $k, 'tmpl' => 'action')); ?>">
-                            <div class="bundle-list-item">
+                            <div class="page-list-item">
                                 <div class="padding-sm">
                                     <div class="pull-left padding-sm">
                                         <span class="list-item-primary"><?php echo $view['translator']->trans($a['label']); ?></span>

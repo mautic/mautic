@@ -11,12 +11,12 @@ if ($tmpl == 'index') {
     $view->extend('MauticFormBundle:PageToken:index.html.php');
 }
 ?>
-<div class="bundle-list" id="form-page-tokens">
+<div class="page-list" id="form-page-tokens">
     <ul class="draggable scrollable">
         <?php
         if (count($items)):
         foreach ($items as $i):?>
-            <li class="bundle-list-item has-click-event" id="form-<?php echo $i[0]->getId(); ?>">
+            <li class="page-list-item has-click-event" id="form-<?php echo $i[0]->getId(); ?>">
                 <div class="padding-sm">
                     <span class="list-item-publish-status">
                         <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php',array(

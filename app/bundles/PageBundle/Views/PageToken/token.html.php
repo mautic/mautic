@@ -7,9 +7,9 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
-<div class="bundle-list" id="form-page-tokens">
+<div class="page-list" id="form-page-tokens">
     <ul class="draggable scrollable">
-        <li class="bundle-list-item has-click-event">
+        <li class="page-list-item has-click-event">
             <div class="padding-sm">
                 <span class="list-item-primary">
                     <?php echo $view['translator']->trans('mautic.page.page.token.lang'); ?>
@@ -21,7 +21,7 @@
                 <input type="hidden" class="page-token" value="{langbar}" />
             </div>
         </li>
-        <li class="bundle-list-item has-click-event">
+        <li class="page-list-item has-click-event">
             <div class="padding-sm">
                 <span class="list-item-primary">
                     <?php echo $view['translator']->trans('mautic.page.page.token.share'); ?>

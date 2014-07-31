@@ -10,7 +10,7 @@ if ($tmpl == 'index')
 $view->extend('MauticPageBundle:Page:index.html.php');
 ?>
 
-<div class="table-responsive scrollable body-white padding-sm bundle-list">
+<div class="table-responsive scrollable body-white padding-sm page-list">
     <?php if (count($items)): ?>
         <table class="table table-hover table-striped table-bordered page-list">
             <thead>

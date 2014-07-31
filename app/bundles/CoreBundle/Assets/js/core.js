@@ -1103,7 +1103,7 @@ var Mautic = {
      * @param id
      */
     activateListItem: function(prefix,id) {
-        mQuery('.bundle-list-item').removeClass('active');
+        mQuery('.page-list-item').removeClass('active');
         mQuery('#'+prefix+'-' + id).addClass('active');
     },
 

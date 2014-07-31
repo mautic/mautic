@@ -128,7 +128,7 @@ class FieldModel extends FormModel
         }
 
         //create the field as its own column in the leads table
-        $leadsSchema = $this->factory->getSchemaHelper('table', 'leads');
+        $leadsSchema = $this->factory->getSchemaHelper('column', 'leads');
         if ($isNew) {
             $leadsSchema->addColumn(array('name' => $alias));
             $leadsSchema->executeChanges();
@@ -159,7 +159,7 @@ class FieldModel extends FormModel
         parent::deleteEntity($entity);
 
         //remove the column from the leads table
-        $leadsSchema = $this->factory->getSchemaHelper('table', 'leads');
+        $leadsSchema = $this->factory->getSchemaHelper('column', 'leads');
         $leadsSchema->dropColumn($entity->getAlias());
         $leadsSchema->executeChanges();
     }

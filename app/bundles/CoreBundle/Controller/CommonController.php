@@ -184,18 +184,9 @@ class CommonController extends Controller implements MauticController{
                 }
             }
 
-            $breadcrumbs = $this->renderView("MauticCoreBundle:Default:breadcrumbs.html.php", $parameters);
-            $flashes     = trim($this->renderView("MauticCoreBundle:Default:flashes.html.php", $parameters));
-
             $updatedContent = array();
             if (!empty($newContent))
                 $updatedContent['newContent'] = $newContent;
-
-            if (!empty($breadcrumbs))
-                $updatedContent['breadcrumbs'] = $breadcrumbs;
-
-            if (!empty($flashes))
-                $updatedContent['flashes'] = $flashes;
 
             $dataArray = array_merge(
                 $updatedContent,

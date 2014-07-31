@@ -44,7 +44,7 @@ endif;
                                value="<?php echo $searchString; ?>"
                                autocomplete="off"
                                data-toggle="livesearch"
-                               data-target=".bundle-list"
+                               data-target=".page-list"
                                data-action="<?php echo $searchUri; ?>"
                                data-overlay-text="<?php echo $view['translator']->trans('mautic.core.search.livesearch'); ?>"
                                data-overlay-target="#main-content"

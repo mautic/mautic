@@ -10,7 +10,7 @@ if ($tmpl == 'index')
     $view->extend('MauticLeadBundle:Lead:index.html.php');
 ?>
 
-<div class="panel panel-default">
+<div class="panel panel-default page-list">
     <div class="panel-heading">
         <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.lead.lead.header.index'); ?></h3>
     </div>
@@ -32,7 +32,7 @@ if ($tmpl == 'index')
     </div>
     <div class="table-responsive panel-collapse pull out">
         <?php if (count($items)): ?>
-        <table class="table table-hover table-striped table-bordered role-list" id="leadTable">
+        <table class="table table-hover table-striped table-bordered" id="leadTable">
             <thead>
                 <tr>
                     <th class="col-lead-actions"></th>

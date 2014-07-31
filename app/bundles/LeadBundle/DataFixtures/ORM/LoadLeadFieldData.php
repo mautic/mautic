@@ -69,7 +69,7 @@ class LoadLeadFieldData extends AbstractFixture implements OrderedFixtureInterfa
             'skype'
         );
 
-        $leadsSchema = $this->container->get('mautic.factory')->getSchemaHelper('table', 'leads');
+        $leadsSchema = $this->container->get('mautic.factory')->getSchemaHelper('column', 'leads');
 
         foreach ($textfields as $key => $name) {
             $entity = new LeadField();

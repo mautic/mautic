@@ -12,7 +12,7 @@ if ($tmpl == 'index'):
     $view->extend('MauticUserBundle:User:index.html.php');
 endif;
 ?>
-<div class="table-responsive scrollable body-white padding-sm bundle-list">
+<div class="table-responsive scrollable body-white padding-sm page-list">
     <table class="table table-hover table-striped table-bordered user-list">
         <thead>
         <tr>
