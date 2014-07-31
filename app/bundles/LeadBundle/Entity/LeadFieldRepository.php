@@ -9,10 +9,8 @@
 
 namespace Mautic\LeadBundle\Entity;
 
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * LeadFieldRepository
@@ -22,6 +20,23 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class LeadFieldRepository extends CommonRepository
 {
+
+    /**
+     * Get a list of entities
+     *
+     * @param array      $args
+     * @return Paginator
+     */
+    public function getEntities($args = array())
+    {
+        $q = $this->_em
+            ->createQueryBuilder('f')
+            ->select('f')
+            ->from('MauticLeadBundle:LeadField', 'f', 'f.alias');
+        $results = $q->getQuery()->getResult();
+
+        return $results;
+    }
 
     /**
      * Retrieves array of aliases used to ensure unique alias for new fields

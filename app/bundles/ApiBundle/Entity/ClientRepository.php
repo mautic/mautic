@@ -9,10 +9,8 @@
 
 namespace Mautic\ApiBundle\Entity;
 
-use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use Doctrine\ORM\NoResultException;
 use Mautic\UserBundle\Entity\User;
 
 /**
@@ -48,13 +46,13 @@ class ClientRepository extends CommonRepository
         if (!$this->buildClauses($q, $args)) {
             return array();
         }
-        
+
         $query = $q->getQuery();
         $result = new Paginator($query);
         return $result;
     }
 
-    protected function addCatchAllWhereClause(QueryBuilder &$q, $filter)
+    protected function addCatchAllWhereClause(&$q, $filter)
     {
         $unique  = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
         $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
@@ -74,7 +72,7 @@ class ClientRepository extends CommonRepository
         );
     }
 
-    protected function addSearchCommandWhereClause(QueryBuilder &$q, $filter)
+    protected function addSearchCommandWhereClause(&$q, $filter)
     {
         $command         = $field = $filter->command;
         $unique          = $this->generateRandomParameterName();

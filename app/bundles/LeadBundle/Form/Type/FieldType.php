@@ -130,7 +130,7 @@ class FieldType extends AbstractType
                 'tooltip' => 'mautic.lead.field.help.alias',
             ),
             'required'   => false,
-            'disabled'   => $disabled
+            'disabled'   => ($disabled || !$new)
         ));
 
         $builder->add('isPublished', 'button_group', array(

@@ -25,4 +25,11 @@ class MauticCoreBundle extends Bundle
         $container->addCompilerPass(new Compiler\TemplatingPass());
         $container->addCompilerPass(new Compiler\TranslationsPass());
     }
+
+    public function boot()
+    {
+        //set the table prefix as a constant to be used in repositories requiring DBAL
+        $prefix = $this->container->getParameter('mautic.db_table_prefix');
+        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', $prefix);
+    }
 }

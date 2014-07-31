@@ -37,16 +37,16 @@ class EventHelper
         $properties = $action->getProperties();
 
         //set the mapped data
-        $leadFields = $fields = $factory->getModel('lead.field')->getEntities(
+        $leadFields = $factory->getModel('lead.field')->getEntities(
             array('filter' => array('isPublished' => true))
         );
-        $data   = array();
+        $data = array();
         foreach ($leadFields as $f) {
             $id    = $f->getId();
             $alias = $f->getAlias();
             $type  = $f->getType();
 
-            $data['field_'.$alias] = '';
+            $data[$alias] = '';
 
             if (!empty($properties['mappedFields'][$id])) {
                 $mappedTo = $properties['mappedFields'][$id];
@@ -54,11 +54,11 @@ class EventHelper
                     $fieldName = $fields[$mappedTo]['alias'];
                     if (isset($post[$fieldName])) {
                         $value = is_array($post[$fieldName]) ? implode(', ', $post[$fieldName]) : $post[$fieldName];
-                        $data['field_' . $alias] = $value;
+                        $data[$alias] = $value;
 
                         //update the lead rather than creating a new one if there is for sure identifier match
                         if ($type == 'email') {
-                            $leads = $em->getRepository('MauticLeadBundle:LeadFieldValue')->getLeadsByFieldValue(
+                            $leads = $em->getRepository('MauticLeadBundle:Lead')->getLeadsByFieldValue(
                                 $alias,
                                 $value
                             );
@@ -137,10 +137,9 @@ class EventHelper
             if (isset($post[$fieldName])) {
                 $model = $factory->getModel('lead.lead');
                 $em    = $factory->getEntityManager();
-                $leads = $em->getRepository('MauticLeadBundle:LeadFieldValue')->getLeadsByFieldValue(
+                $leads = $em->getRepository('MauticLeadBundle:Lead')->getLeadsByFieldValue(
                     $properties['leadField'],
-                    $post[$fieldName],
-                    true
+                    $fieldName
                 );
 
                 //check for existing IP address or add one if not exist

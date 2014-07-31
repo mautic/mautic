@@ -52,7 +52,7 @@ switch ($status) {
     </div>
     <div class="gs-user-avatar">
         <img class="img img-responsive img-thumbnail"
-             src="https://www.gravatar.com/avatar/<?php echo md5(strtolower(trim($user->getEmail()))); ?>?s=25" />
+             src="<?php echo \Mautic\SocialBundle\Helper\GravatarHelper::getGravatar($user->getEmail(), '25'); ?>" />
     </div>
     <div class="clearfix"></div>
     <?php endif; ?>

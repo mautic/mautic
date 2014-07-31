@@ -225,7 +225,7 @@ class ListModel extends FormModel
                     $properties['list'] = $properties['yes'].'|'.$properties['no'] . '||1|0';
                 }
             }
-            $choices["field_" . $field->getAlias()] = array(
+            $choices[$field->getAlias()] = array(
                 'label'      => $field->getLabel(),
                 'properties' => $properties
             );

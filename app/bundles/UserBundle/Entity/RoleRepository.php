@@ -70,7 +70,7 @@ class RoleRepository extends CommonRepository
         return $results;
     }
 
-    protected function addCatchAllWhereClause(QueryBuilder &$q, $filter)
+    protected function addCatchAllWhereClause(&$q, $filter)
     {
         $unique  = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
         $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
@@ -90,7 +90,7 @@ class RoleRepository extends CommonRepository
         );
     }
 
-    protected function addSearchCommandWhereClause(QueryBuilder &$q, $filter)
+    protected function addSearchCommandWhereClause(&$q, $filter)
     {
         $command         = $field = $filter->command;
         $string          = $filter->string;

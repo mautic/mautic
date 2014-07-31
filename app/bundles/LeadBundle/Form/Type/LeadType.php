@@ -69,16 +69,12 @@ class LeadType extends AbstractType
             array('filter' => array('isPublished' => true))
         );
         $fieldValues = (!empty($options['data'])) ? $options['data']->getFields() : array('filter' => array('isVisible' => true));
-        $values      = array();
-        foreach ($fieldValues as $v) {
-            $field = $v->getField();
-            $values[$field->getId()] = $v->getValue();
-        }
         foreach ($fields as $field) {
             $attr        = array('class' => 'form-control');
             $properties  = $field->getProperties();
             $type        = $field->getType();
             $required    = $field->isRequired();
+            $alias       = $field->getAlias();
             $constraints = array();
             if ($required) {
                 $constraints[] = new \Symfony\Component\Validator\Constraints\NotBlank(
@@ -91,12 +87,12 @@ class LeadType extends AbstractType
                 else
                     $properties['precision'] = (int) $properties['precision'];
 
-                $builder->add("field_{$field->getAlias()}", $type, array(
+                $builder->add($alias, $type, array(
                     'required'    => $field->getIsRequired(),
                     'label'       => $field->getLabel(),
                     'label_attr'  => array('class' => 'control-label'),
                     'attr'        => $attr,
-                    'data'        => (isset($values[$field->getId()])) ? (float) $values[$field->getId()] : (float) $field->getDefaultValue(),
+                    'data'        => (isset($values[$alias])) ? (float) $values[$alias] : (float) $field->getDefaultValue(),
                     'mapped'      => false,
                     'constraints' => $constraints,
                     'precision'   => $properties['precision'],
@@ -111,7 +107,7 @@ class LeadType extends AbstractType
                     'label_attr'        => array('class' => 'control-label'),
                     'widget'            => 'single_text',
                     'attr'              => $attr,
-                    'data'              => (isset($values[$field->getId()])) ? $values[$field->getId()] :
+                    'data'              => (isset($values[$alias])) ? $values[$alias] :
                         $field->getDefaultValue(),
                     'mapped'            => false,
                     'constraints'       => $constraints,
@@ -120,14 +116,14 @@ class LeadType extends AbstractType
 
                 if ($type == 'date' || $type == 'time') {
                     $opts['input'] = 'string';
-                    $builder->add("field_{$field->getAlias()}", $type, $opts);
+                    $builder->add($alias, $type, $opts);
                 } else {
                     $opts['model_timezone'] = 'UTC';
                     $opts['view_timezone']  = date_default_timezone_get();
                     $opts['format']         = 'yyyy-MM-dd HH:mm';
                 }
 
-                $builder->add("field_{$field->getAlias()}", $type, $opts);
+                $builder->add($alias, $type, $opts);
             } elseif ($type == 'select' || $type == 'boolean') {
                 $choices = array();
                 if ($type == 'select' && !empty($properties['list'])) {
@@ -145,12 +141,12 @@ class LeadType extends AbstractType
                 }
 
                 if (!empty($choices)) {
-                    $builder->add("field_{$field->getAlias()}", 'choice', array(
+                    $builder->add($alias, 'choice', array(
                         'choices'     => $choices,
                         'required'    => $required,
                         'label'       => $field->getLabel(),
                         'label_attr'  => array('class' => 'control-label'),
-                        'data'        => (isset($values[$field->getId()])) ? $values[$field->getId()] : $field->getDefaultValue(),
+                        'data'        => (isset($values[$alias])) ? $values[$alias] : $field->getDefaultValue(),
                         'attr'        => $attr,
                         'mapped'      => false,
                         'multiple'    => false,
@@ -169,12 +165,12 @@ class LeadType extends AbstractType
                         $attr['data-options'] = $properties['list'];
                     }
                 }
-                $builder->add("field_{$field->getAlias()}", $type, array(
+                $builder->add($alias, $type, array(
                     'required'    => $field->getIsRequired(),
                     'label'       => $field->getLabel(),
                     'label_attr'  => array('class' => 'control-label'),
                     'attr'        => $attr,
-                    'data'        => (isset($values[$field->getId()])) ? $values[$field->getId()] : $field->getDefaultValue(),
+                    'data'        => (isset($values[$alias])) ? $values[$alias] : $field->getDefaultValue(),
                     'mapped'      => false,
                     'constraints' => $constraints
                 ));

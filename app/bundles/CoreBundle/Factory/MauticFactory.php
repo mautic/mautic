@@ -114,6 +114,41 @@ class MauticFactory
     }
 
     /**
+     * Retrieves Doctrine db connection for DBAL use
+     *
+     * @return object
+     */
+    public function getDatabase()
+    {
+        return $this->container->get('database_connection');
+    }
+
+    /**
+     * Gets a schema helper for manipulating database schemas
+     * For now, only TableSchemaHelper is available
+     *
+     * @param      $type
+     * @param null $name Object name; i.e. table name
+     * @return mixed
+     */
+    public function getSchemaHelper($type, $name = null)
+    {
+        static $schemaHelpers = array();
+
+        if (empty($schemaHelpers[$type])) {
+            $className            = "\\Mautic\\CoreBundle\\Doctrine\Helper\\" . ucfirst($type).'SchemaHelper';
+            $schemaHelpers[$type] = new $className($this->getDatabase(), $this->getParameter('db_table_prefix'));
+        }
+
+        if ($name !== null) {
+            $setterName = "set" . ucfirst($type);
+            $schemaHelpers[$type]->$setterName($name);
+        }
+
+        return $schemaHelpers[$type];
+    }
+
+    /**
      * Retrieves Translator
      *
      * @return object
@@ -319,5 +354,10 @@ class MauticFactory
         }
 
         return $themes[$specificFeature];
+    }
+
+    public function getAssetsHelper()
+    {
+        return $this->container->get('templating.helper.assets');
     }
 }

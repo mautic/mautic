@@ -51,10 +51,6 @@ class AjaxController extends CommonAjaxController
         $field  = InputHelper::clean($request->query->get('field'));
         if (!empty($field)) {
             $dataArray = array();
-            //field_ is attached when looking up in list filters
-            if (strpos($field, 'field_') === 0) {
-                $field = str_replace('field_', '', $field);
-            }
             if ($field == 'company') {
                 $results = $this->get('mautic.factory')->getModel('lead.lead')->getLookupResults('company', $filter);
                 foreach ($results as $r) {
@@ -72,7 +68,7 @@ class AjaxController extends CommonAjaxController
             } else {
                 $results = $this->get('mautic.factory')->getModel('lead.field')->getLookupResults($field, $filter);
                 foreach ($results as $r) {
-                    $dataArray[] = array('value' => $r['value']);
+                    $dataArray[] = array('value' => $r[$field]);
                 }
             }
         }

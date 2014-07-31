@@ -9,7 +9,6 @@
 
 namespace Mautic\FormBundle\Entity;
 use Doctrine\ORM\Query;
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
@@ -39,7 +38,7 @@ class SubmissionRepository extends CommonRepository
         return $results;
     }
 
-    protected function getFilterExpr(QueryBuilder &$q, $filter)
+    protected function getFilterExpr(&$q, $filter)
     {
         if ($filter['column'] == 's.dateSubmitted') {
             $date = $this->factory->getDate($filter['value'], 'Y-m-d')->toUtcString();

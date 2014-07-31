@@ -72,15 +72,7 @@ class LeadApiController extends CommonApiController
         $results = $this->model->getEntities($args);
         //we have to convert them from paginated proxy functions to entities in order for them to be
         //returned by the serializer/rest bundle
-        $entities = array();
-        foreach ($results as $r) {
-            //set custom fields
-            $fields = $r->getFields();
-            foreach ($fields as $f) {
-                $r->addCustomField($f->getField()->getAlias(), $f->getValue());
-            }
-            $entities[] = $r;
-        }
+        $entities = $results->getIterator();
         $view = $this->view(array($this->entityNameMulti => $entities), Codes::HTTP_OK);
         $context = SerializationContext::create()->setGroups(array('limited'));
         $view->setSerializationContext($context);
@@ -116,12 +108,6 @@ class LeadApiController extends CommonApiController
 
         if (!$entity instanceof $this->entityClass) {
             throw new NotFoundHttpException($this->get('translator')->trans('mautic.api.call.notfound'));
-        }
-
-        //set custom fields
-        $fields = $entity->getFields();
-        foreach ($fields as $f) {
-            $entity->addCustomField($f->getField()->getAlias(), $f->getValue());
         }
 
         $view = $this->view(array($this->entityNameOne => $entity), Codes::HTTP_OK);
@@ -200,16 +186,7 @@ class LeadApiController extends CommonApiController
         }
 
         $parameters = $this->request->request->all();
-
-        if (isset($parameters['customFields'])) {
-            if (isset($parameters['customFields'])) {
-                foreach ($parameters['customFields'] as $alias => $value) {
-                    $parameters['field_'.$alias] = $value;
-                }
-                $this->model->setFieldValues($entity, $parameters);
-                unset($parameters['customFields']);
-            }
-        }
+        $this->model->setFieldValues($entity, $parameters);
 
         $this->serializerGroups = array("limited");
         return $this->processForm($entity, $parameters, 'POST');
@@ -263,12 +240,6 @@ class LeadApiController extends CommonApiController
             }
         }
 
-        if (isset($parameters['customFields'])) {
-            foreach ($parameters['customFields'] as $alias => $value) {
-                $parameters['field_'.$alias] = $value;
-            }
-            unset($parameters['customFields']);
-        }
         $this->model->setFieldValues($entity, $parameters);
 
         $this->serializerGroups = array("limited");

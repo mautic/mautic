@@ -12,14 +12,15 @@
 	<div class="panel-heading text-center pa15" style="min-height: 150px;">
 	</div>
 	<div class="panel-body text-center" style="margin-top: -60px">
-	 	<img class="img-circle img-bordered-primary" src="https://www.gravatar.com/avatar/<?php echo md5(strtolower(trim($fields['core']['email']['value']))); ?>?&s=100" />
+	 	<img class="img-circle img-bordered-primary" src="<?php
+        echo \Mautic\SocialBundle\Helper\GravatarHelper::getGravatar($fields['core']['email']['value'], '100'); ?>" />
 	 	<h1><?php echo $lead->getName(); ?></h1>
         <h4>
             <?php if(isset($fields['core']['position']['value'])): ?>
                 <?php  echo $fields['core']['position']['value']; ?>
             <?php endif; ?>
             at
-            <?php if(isset($fields['core']['company']['value'])): 
+            <?php if(isset($fields['core']['company']['value'])):
                 echo $fields['core']['company']['value'];
             endif; ?></h4>
 	 </div>

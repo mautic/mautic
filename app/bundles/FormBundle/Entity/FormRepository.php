@@ -10,7 +10,6 @@
 namespace Mautic\FormBundle\Entity;
 
 use Doctrine\ORM\Query\Expr\Join;
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
@@ -49,7 +48,7 @@ class FormRepository extends CommonRepository
      * @param              $filter
      * @return array
      */
-    protected function addCatchAllWhereClause(QueryBuilder &$q, $filter)
+    protected function addCatchAllWhereClause(&$q, $filter)
     {
         $unique  = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
         $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
@@ -74,7 +73,7 @@ class FormRepository extends CommonRepository
      * @param              $filter
      * @return array
      */
-    protected function addSearchCommandWhereClause(QueryBuilder &$q, $filter)
+    protected function addSearchCommandWhereClause(&$q, $filter)
     {
         $command         = $field = $filter->command;
         $string          = $filter->string;

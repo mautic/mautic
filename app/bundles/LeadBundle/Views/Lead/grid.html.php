@@ -19,7 +19,7 @@ if ($tmpl == 'index')
             <div class="table-layout nm">
                 <div class="col-xs-4 text-center">
                     <img class="img img-responsive"
-                         src="https://www.gravatar.com/avatar/<?php echo md5(strtolower(trim($fields['core']['email']['value']))); ?>?&s=250" />
+                         src="<?php echo \Mautic\SocialBundle\Helper\GravatarHelper::getGravatar($fields['core']['email']['value'], '250'); ?>" />
                 </div>
                 <div class="col-xs-8 valign-middle">
                     <div class="panel-body">

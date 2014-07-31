@@ -12,7 +12,6 @@ if ($tmpl == 'index'):
     $view->extend('MauticUserBundle:User:index.html.php');
 endif;
 ?>
-
 <div class="table-responsive scrollable body-white padding-sm bundle-list">
     <table class="table table-hover table-striped table-bordered user-list">
         <thead>
@@ -76,7 +75,7 @@ endif;
                 </td>
                 <td class="visible-md visible-lg">
                     <img class="img img-responsive img-thumbnail"
-                         src="https://www.gravatar.com/avatar/<?php echo md5(strtolower(trim($item->getEmail()))); ?>?&s=50" />
+                         src="<?php echo \Mautic\SocialBundle\Helper\GravatarHelper::getGravatar($item->getEmail(), '50'); ?>" />
                 </td>
                 <td>
                     <?php echo $item->getName(true); ?><br />

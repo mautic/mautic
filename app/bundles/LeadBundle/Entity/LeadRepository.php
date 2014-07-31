@@ -10,7 +10,6 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Query;
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
@@ -24,6 +23,81 @@ class LeadRepository extends CommonRepository
 {
 
     /**
+     * Gets a list of unique values from fields for autocompletes
+     * @param        $field
+     * @param string $search
+     * @param int    $limit
+     * @param int    $start
+     * @return array
+     */
+    public function getValueList($field, $search = '', $limit = 10, $start = 0)
+    {
+        $col = 'l.'.$field;
+        $q = $this->_em->getConnection()->createQueryBuilder()
+            ->select("DISTINCT $col")
+            ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l');
+
+        $q->where(
+            $q->expr()->andX(
+                $q->expr()->neq($col, $q->expr()->literal('')),
+                $q->expr()->isNotNull($col)
+            )
+        );
+
+        if (!empty($search)) {
+            $q->andWhere("$col LIKE :search")
+                ->setParameter('search', "{$search}%");
+        }
+
+        $q->orderBy($col);
+
+        if (!empty($limit)) {
+            $q->setFirstResult($start)
+                ->setMaxResults($limit);
+        }
+
+        $results = $q->execute()->fetchAll();
+
+        return $results;
+    }
+
+    /**
+     * Get a list of leads based on field value
+     *
+     * @param $field
+     * @param $value
+     * @return array
+     */
+    public function getLeadsByFieldValue($field, $value)
+    {
+        $col = 'l.'.$field;
+        $q = $this->_em->getConnection()->createQueryBuilder()
+        ->select('l.id')
+        ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
+        ->where("$col = :search")
+        ->setParameter("search", $value);
+        $results = $q->execute()->fetchAll();
+
+        if (count($results)) {
+            $ids = array();
+            foreach ($results as $r) {
+                $ids[] = $r['id'];
+            }
+
+            $q = $this->_em->createQueryBuilder()
+                ->select('l')
+                ->from('MauticLeadBundle:Lead', 'l');
+            $q->where(
+                $q->expr()->in('l.id', ':ids')
+            )
+            ->setParameter('ids', $ids)
+            ->orderBy('l.dateAdded', 'DESC');
+            $results = $q->getQuery()->getResult();
+        }
+
+        return $results;
+    }
+    /**
      * {@inheritdoc}
      *
      * @param $entity
@@ -34,13 +108,13 @@ class LeadRepository extends CommonRepository
     {
         $this->_em->persist($entity);
 
-        $fieldValues = $entity->getFieldValues();
-        foreach ($fieldValues as $field) {
-            $this->_em->persist($field);
-        }
-
         if ($flush)
             $this->_em->flush();
+
+        $fields = $entity->getFields();
+        if (!empty($fields)) {
+            $this->_em->getConnection()->update(MAUTIC_TABLE_PREFIX . 'leads', $fields, array('id' => $entity->getId()));
+        }
     }
 
     /**
@@ -54,9 +128,7 @@ class LeadRepository extends CommonRepository
         try {
             $entity = $this
                 ->createQueryBuilder('l')
-                ->select('l, f, v, u, i')
-                ->leftJoin('l.fields', 'v')
-                ->leftJoin('v.field', 'f')
+                ->select('l, u, i')
                 ->leftJoin('l.ipAddresses', 'i')
                 ->leftJoin('l.owner', 'u')
                 ->where('l.id = :leadId')
@@ -66,6 +138,19 @@ class LeadRepository extends CommonRepository
         } catch (\Exception $e) {
             $entity = null;
         }
+
+        if ($entity != null) {
+            //use DBAL to get entity fields
+            $q = $this->_em->getConnection()->createQueryBuilder();
+            $q->select('*')
+                ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
+                ->where('l.id = :leadId')
+                ->setParameter('leadId', $id);
+            $fields = $q->execute()->fetchAll();
+            $this->removeNonFieldColumns($fields[0]);
+            $entity->setFields($fields[0]);
+        }
+
         return $entity;
     }
 
@@ -78,20 +163,79 @@ class LeadRepository extends CommonRepository
      */
     public function getEntities($args = array())
     {
-        $q = $this
-            ->createQueryBuilder('l')
-            ->select('l, f, v, u, i')
-            ->leftJoin('l.fields', 'v')
-            ->leftJoin('v.field', 'f')
-            ->leftJoin('l.ipAddresses', 'i')
-            ->leftJoin('l.owner', 'u');
+        //DBAL
+        $dq = $this->_em->getConnection()->createQueryBuilder();
+        $dq->select('*')
+            ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l');
+        $this->buildClauses($dq, $args);
 
-        $this->buildClauses($q, $args);
+        //gets arrayed result
+        $results = $dq->execute()->fetchAll();
 
-        $query = $q->getQuery();
-        $results = new Paginator($query);
+        //loop over results to put fields in something that can be assigned to the entities
+        $fields = array();
+        foreach ($results as $r) {
+            $leadId = $r['id'];
+
+            //unset all the columns that are not fields
+            $this->removeNonFieldColumns($r);
+
+            //remaining values are fields; array(fieldAlias => value, fieldAlias2 => value,...)
+            $fields[$leadId] = $r;
+        }
+
+        //get an array of IDs for ORM query
+        $ids = array_keys($fields);
+
+        if (count($ids)) {
+            //ORM
+
+            //build the order by id since the order was applied above
+            //unfortunately, can't use MySQL's FIELD function since we have to be cross-platform
+            $order = '(CASE';
+            foreach ($ids as $count => $id) {
+                $order .= ' WHEN l.id = ' . $id . ' THEN ' . $count;
+                $count++;
+            }
+            $order .= ' ELSE ' . $count . ' END) AS HIDDEN ORD';
+
+            //ORM - generates lead entities
+            $q = $this
+                ->createQueryBuilder('l');
+            $q->select('l, u, i, ' . $order)
+                ->leftJoin('l.ipAddresses', 'i')
+                ->leftJoin('l.owner', 'u');
+
+            //only pull the leads as filtered via DBAL
+            $q->where(
+                $q->expr()->in('l.id', ':leadIds')
+            )->setParameter('leadIds', $ids);
+
+            $q->orderBy('ORD', 'ASC');
+            $query   = $q->getQuery();
+            $results = new Paginator($query);
+
+            //assign fields
+            foreach ($results as $r) {
+                $leadId = $r->getId();
+                $r->setFields($fields[$leadId]);
+            }
+        }
 
         return $results;
+    }
+
+    /**
+     * Function to remove non custom field columns from an arrayed lead row
+     *
+     * @param $r
+     */
+    protected function removeNonFieldColumns(&$r)
+    {
+        $baseCols = $this->getBaseColumns(true);
+        foreach ($baseCols as $c) {
+            unset($r[$c]);
+        }
     }
 
     /**
@@ -99,7 +243,7 @@ class LeadRepository extends CommonRepository
      * @param              $filter
      * @return array
      */
-    protected function addCatchAllWhereClause(QueryBuilder &$q, $filter)
+    protected function addCatchAllWhereClause(&$q, $filter)
     {
         $unique  = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
         $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
@@ -121,134 +265,82 @@ class LeadRepository extends CommonRepository
      * @param              $filter
      * @return array
      */
-    protected function addSearchCommandWhereClause(QueryBuilder &$q, $filter)
+    protected function addSearchCommandWhereClause(&$q, $filter)
     {
         $command         = $field = $filter->command;
         $string          = $filter->string;
         $unique          = $this->generateRandomParameterName();
         $returnParameter = true; //returning a parameter that is not used will lead to a Doctrine error
-        $ignoreGlobalNot = false; //do not set negative for special circumstances
         $expr            = false;
         $parameters      = array();
+
+        //DBAL QueryBuilder does not have an expr()->not() function; boo!!
+        if ($filter->not) {
+            $xFunc = "orX";
+            $xSubFunc = "andX";
+            $eqFunc   = "neq";
+            $nullFunc = "isNotNull";
+            $likeFunc = "notLike";
+        } else {
+            $xFunc = "andX";
+            $xSubFunc = "orX";
+            $eqFunc   = "eq";
+            $nullFunc = "isNull";
+            $likeFunc = "like";
+        }
 
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.is'):
                 switch($string) {
                     case $this->translator->trans('mautic.lead.lead.searchcommand.isanonymous'):
-                        $f = $this->generateRandomParameterName();
-                        $v = $this->generateRandomParameterName();
-                        $sq = $this->getEntityManager()->createQueryBuilder();
-                        $subquery = $sq->select("count({$v}.id)")
-                            ->from('MauticLeadBundle:LeadField', $f)
-                            ->leftJoin('MauticLeadBundle:LeadFieldValue', $v,
-                                Query\Expr\Join::WITH,
-                                $sq->expr()->eq($f, "{$v}.field")
+                        $expr = $q->expr()->$xFunc(
+                            $q->expr()->$xSubFunc(
+                                $q->expr()->$eqFunc("l.firstname", $q->expr()->literal('')),
+                                $q->expr()->$nullFunc("l.firstname")
+                            ),
+                            $q->expr()->$xSubFunc(
+                                $q->expr()->$eqFunc("l.lastname", $q->expr()->literal('')),
+                                $q->expr()->$nullFunc("l.lastname")
+                            ),
+                            $q->expr()->$xSubFunc(
+                                $q->expr()->$eqFunc("l.company", $q->expr()->literal('')),
+                                $q->expr()->$nullFunc("l.company")
+                            ),
+                            $q->expr()->$xSubFunc(
+                                $q->expr()->$eqFunc("l.email", $q->expr()->literal('')),
+                                $q->expr()->$nullFunc("l.email")
                             )
-                            ->where(
-                                $q->expr()->andX(
-                                    $q->expr()->in("{$f}.alias", array('firstname', 'lastname', 'company', 'email')),
-                                    $q->expr()->eq("{$v}.lead", 'l'),
-                                    $q->expr()->orX(
-                                        $q->expr()->eq("{$v}.value", $q->expr()->literal('')),
-                                        $q->expr()->isNull("{$v}.value")
-                                    )
-                                )
-                            )
-                            ->getDql();
-                        $expr = $q->expr()->eq(sprintf("(%s)",$subquery), 4);
+                        );
                         break;
                     case $this->translator->trans('mautic.core.searchcommand.ismine'):
-                        $expr = $q->expr()->eq("l.owner", $this->currentUser->getId());
+                        $expr = $q->expr()->$eqFunc("l.owner_id", $this->currentUser->getId());
                         break;
                     case $this->translator->trans('mautic.lead.lead.searchcommand.isunowned'):
-                        $expr = $q->expr()->orX(
-                            $q->expr()->eq("l.owner", 0),
-                            $q->expr()->isNull("l.owner")
+                        $expr = $q->expr()->$xFunc(
+                            $q->expr()->$eqFunc("l.owner_id", 0),
+                            $q->expr()->$nullFunc("l.owner_id")
                         );
                         break;
                 }
                 $returnParameter = false;
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.email'):
-                $f = $this->generateRandomParameterName();
-                $v = $this->generateRandomParameterName();
-                $sq = $this->getEntityManager()->createQueryBuilder();
-                $valueField = $q->expr()->like("{$v}.value", ':'.$unique);
-                if ($filter->not)
-                    $valueField = $q->expr()->not($valueField);
-
-                $where = $q->expr()->andX(
-                    $q->expr()->eq("{$f}.alias", $q->expr()->literal('email')),
-                    $q->expr()->eq("{$v}.lead", 'l')
-                );
-                $where->add($valueField);
-
-                $subquery = $sq->select("count({$v}.id)")
-                    ->from('MauticLeadBundle:LeadField', $f)
-                    ->leftJoin('MauticLeadBundle:LeadFieldValue', $v,
-                        Query\Expr\Join::WITH,
-                        $sq->expr()->eq($f, "{$v}.field")
-                    )
-                    ->where($where)
-                    ->getDql();
-                $expr = $q->expr()->eq(sprintf("(%s)",$subquery), 1);
-                $ignoreGlobalNot = true;
+                $expr = $q->expr()->$likeFunc('l.email', ":$unique");
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.company'):
-                $f = $this->generateRandomParameterName();
-                $v = $this->generateRandomParameterName();
-                $sq = $this->getEntityManager()->createQueryBuilder();
-                $valueField = $q->expr()->like("{$v}.value", ':'.$unique);
-                if ($filter->not)
-                    $valueField = $q->expr()->not($valueField);
-
-                $where = $q->expr()->andX(
-                    $q->expr()->eq("{$f}.alias", $q->expr()->literal('company')),
-                    $q->expr()->eq("{$v}.lead", 'l')
-                );
-                $where->add($valueField);
-
-                $subquery = $sq->select("count({$v}.id)")
-                    ->from('MauticLeadBundle:LeadField', $f)
-                    ->leftJoin('MauticLeadBundle:LeadFieldValue', $v,
-                        Query\Expr\Join::WITH,
-                        $sq->expr()->eq($f, "{$v}.field")
-                    )
-                    ->where($where)
-                    ->getDql();
-                $expr = $q->expr()->eq(sprintf("(%s)",$subquery), 1);
-                $ignoreGlobalNot = true;
+                $expr = $q->expr()->$likeFunc('l.company', ":$unique");
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.owner'):
-                $expr = $q->expr()->orX(
-                    $q->expr()->like('u.firstName', ':'.$unique),
-                    $q->expr()->like('u.lastName', ':'.$unique)
+                $expr = $q->expr()->$xFunc(
+                    $q->expr()->$likeFunc('u.firstName', ':'.$unique),
+                    $q->expr()->$likeFunc('u.lastName', ':'.$unique)
                 );
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
-                $f = $this->generateRandomParameterName();
-                $v = $this->generateRandomParameterName();
-                $sq = $this->getEntityManager()->createQueryBuilder();
-                $valueField = $q->expr()->like("{$v}.value", ':'.$unique);
-                if ($filter->not)
-                    $valueField = $q->expr()->not($valueField);
-
-                $where = $q->expr()->andX(
-                    $q->expr()->in("{$f}.alias", array('firstname', 'lastname')),
-                    $q->expr()->eq("{$v}.lead", 'l')
+                $expr = $q->expr()->$xFunc(
+                    $q->expr()->$likeFunc('l.firstname', ":$unique"),
+                    $q->expr()->$likeFunc('l.lastname', ":$unique")
                 );
-                $where->add($valueField);
-
-                $subquery = $sq->select("count({$v}.id)")
-                    ->from('MauticLeadBundle:LeadField', $f)
-                    ->leftJoin('MauticLeadBundle:LeadFieldValue', $v,
-                        Query\Expr\Join::WITH,
-                        $sq->expr()->eq($f, "{$v}.field")
-                    )
-                    ->where($where)
-                    ->getDql();
-                $expr = $q->expr()->gte(sprintf("(%s)",$subquery), 1);
-                $ignoreGlobalNot = true;
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.list'):
                 //obtain the list details
@@ -264,32 +356,22 @@ class LeadRepository extends CommonRepository
                         if (empty($details['glue']))
                             continue;
 
-                        $f = $this->generateRandomParameterName();
-                        $v = $this->generateRandomParameterName();
-
                         $uniqueFilter              = $this->generateRandomParameterName();
                         $parameters[$uniqueFilter] = $details['filter'];
 
                         $uniqueFilter              = ":$uniqueFilter";
-                        $func                      = $options[$details['operator']]['func'];
-                        $field                     = (strpos($details['field'], 'field_') === 0) ?
-                            str_replace("field_", "", $details['field'])
-                            : $details['field'];
-
-                        //add prefix
-                        if (in_array($field, array("owner", "score"))) {
-                            $field     = "l.".$field;
-                            $type      = "lead";
-                        } else {
-                            $type      = "field";
-                        }
+                        //DQL does not have a not() function so we have to use the opposite
+                        $func                      = (!$filter->not) ? $options[$details['operator']]['func'] :
+                            $options[$details['operator']]['oFunc'];
+                        $field                     = "l.{$details['field']}";
 
                         //the next one will determine the group
                         $glue = (isset($filters[$k + 1])) ? $filters[$k + 1]['glue'] : $details['glue'];
                         if ($glue == "or" || $details['glue'] == 'or') {
                             //create the group if it doesn't exist
-                            if ($group === false)
+                            if ($group === false) {
                                 $group = $q->expr()->orX();
+                            }
 
                             //set expression var to the grouped one
                             unset($useExpr);
@@ -306,60 +388,22 @@ class LeadRepository extends CommonRepository
                             unset($useExpr);
                             $useExpr =& $expr;
                         }
-                        if ($type == "lead") {
-                            if ($func == 'notEmpty') {
-                                $useExpr->add(
-                                    $q->expr()->andX(
-                                        $q->expr()->isNotNull($field, $uniqueFilter),
-                                        $q->expr()->neq($field, $q->expr()->literal(''))
-                                    )
-                                );
-                            } elseif ($func == 'empty') {
-                                $useExpr->add(
-                                    $q->expr()->orX(
-                                        $q->expr()->isNull($field, $uniqueFilter),
-                                        $q->expr()->eq($field, $q->expr()->literal(''))
-                                    )
-                                );
-                            } else {
-                                $useExpr->add($q->expr()->$func($field, $uniqueFilter));
-                            }
-                        } else {
-                            $sq = $this->getEntityManager()->createQueryBuilder();
-                            if ($func == 'notEmpty') {
-                                $valueField = $q->expr()->andX(
-                                    $q->expr()->isNotNull("{$v}.value", $uniqueFilter),
-                                    $q->expr()->neq("{$v}.value", $q->expr()->literal(''))
-                                );
-                            } elseif ($func == 'empty') {
-                                $valueField = $q->expr()->orX(
-                                    $q->expr()->isNull("{$v}.value", $uniqueFilter),
-                                    $q->expr()->eq("{$v}.value", $q->expr()->literal(''))
-                                );
-                            } else {
-                                $valueField = $q->expr()->$func("{$v}.value", $uniqueFilter);
-                            }
-
-                            if ($filter->not)
-                                $valueField = $q->expr()->not($valueField);
-
-                            $where = $q->expr()->andX(
-                                $q->expr()->eq("{$f}.alias", $q->expr()->literal($field)),
-                                $q->expr()->eq("{$v}.lead", 'l')
-                            );
-                            $where->add($valueField);
-
-                            $subquery = $sq->select("count({$v}.id)")
-                                ->from('MauticLeadBundle:LeadField', $f)
-                                ->leftJoin('MauticLeadBundle:LeadFieldValue', $v,
-                                    Query\Expr\Join::WITH,
-                                    $sq->expr()->eq($f, "{$v}.field")
+                        if ($func == 'notEmpty') {
+                            $useExpr->add(
+                                $q->expr()->andX(
+                                    $q->expr()->isNotNull($field, $uniqueFilter),
+                                    $q->expr()->neq($field, $q->expr()->literal(''))
                                 )
-                                ->where($where)
-                                ->getDql();
-                            $subexpr = $q->expr()->eq(sprintf("(%s)",$subquery), 1);
-                            $ignoreGlobalNot = true;
-                            $useExpr->add($subexpr);
+                            );
+                        } elseif ($func == 'empty') {
+                            $useExpr->add(
+                                $q->expr()->orX(
+                                    $q->expr()->isNull($field, $uniqueFilter),
+                                    $q->expr()->eq($field, $q->expr()->literal(''))
+                                )
+                            );
+                        } else {
+                            $useExpr->add($q->expr()->$func($field, $uniqueFilter));
                         }
                     }
                     if ($group !== false) {
@@ -379,10 +423,6 @@ class LeadRepository extends CommonRepository
             $parameters[$unique] = $string;
         }
 
-        if ($expr && !$ignoreGlobalNot && $filter->not) {
-            $expr = $q->expr()->not($expr);
-        }
-
         return array(
             $expr,
             ($returnParameter) ? $parameters : array()
@@ -396,57 +436,68 @@ class LeadRepository extends CommonRepository
             '='      =>
                 array(
                     'label' => 'mautic.lead.list.form.operator.equals',
-                    'func'  => 'eq'
+                    'func'  => 'eq',
+                    'oFunc' => 'neq'
                 ),
             '!='     =>
                 array(
                     'label' => 'mautic.lead.list.form.operator.notequals',
-                    'func'  => 'neq'
+                    'func'  => 'neq',
+                    'oFunc' => 'eq'
                 ),
             '&#62;'   =>
                 array(
                     'label' => 'mautic.lead.list.form.operator.greaterthan',
-                    'func'  => 'gt'
+                    'func'  => 'gt',
+                    'oFunc' => 'lt'
                 ),
             '&#62;='   =>
                 array(
                     'label' => 'mautic.lead.list.form.operator.greaterthanequals',
-                    'func'  => 'gte'
+                    'func'  => 'gte',
+                    'oFunc' => 'lt'
                 ),
             '&#60;'    =>
                 array(
                     'label' => 'mautic.lead.list.form.operator.lessthan',
-                    'func'  => 'lt'
+                    'func'  => 'lt',
+                    'oFunc' => 'gt'
                 ),
             '&#60;='   =>
                 array(
                     'label' => 'mautic.lead.list.form.operator.lessthanequals',
-                    'func'  => 'lte'
+                    'func'  => 'lte',
+                    'oFunc' => 'gt'
                 ),
             'empty'  =>
                 array(
                     'label' => 'mautic.lead.list.form.operator.isempty',
-                    'func'  => 'empty' //special case
+                    'func'  => 'empty', //special case
+                    'oFunc' => 'notEmpty'
                 ),
             '!empty' =>
                 array(
                     'label' => 'mautic.lead.list.form.operator.isnotempty',
-                    'func'  => 'notEmpty' //special case
+                    'func'  => 'notEmpty', //special case
+                    'oFunc' => 'empty'
                 ),
             'like'   =>
                 array(
                     'label' => 'mautic.lead.list.form.operator.islike',
-                    'func'  => 'like'
+                    'func'  => 'like',
+                    'oFunc' => 'notLike'
                 ),
             '!like'  =>
                 array(
                     'label' => 'mautic.lead.list.form.operator.isnotlike',
-                    'func'  => 'notLike'
+                    'func'  => 'notLike',
+                    'oFunc' => 'like'
                 )
         );
 
         return ($operator === null) ? $operatorOptions : $operatorOptions[$operator];
     }
+
     /**
      * @return array
      */
@@ -466,13 +517,43 @@ class LeadRepository extends CommonRepository
         );
     }
 
+    public function getBaseColumns($convertCamelCase = false)
+    {
+        static $baseCols = array();
+
+        if (empty($baseCols)) {
+            //get a list of properties from the Lead entity so that anything not listed is a custom field
+            $leadEntity = new Lead();
+            $reflect    = new \ReflectionClass($leadEntity);
+            $props      = $reflect->getProperties();
+
+            if ($parentClass = $reflect->getParentClass()) {
+                $parentProps = $parentClass->getProperties();
+                $props       = array_merge($parentProps, $props);
+            }
+
+            foreach ($props as $p) {
+                if (!in_array($p->name, $baseCols)) {
+                    $n = $p->name;
+                    if ($convertCamelCase) {
+                        $n = preg_replace('/(?<=\\w)(?=[A-Z])/',"_$1", $n);
+                        $n = strtolower($n);
+                    }
+                    $baseCols[] = $n;
+                }
+            }
+        }
+
+        return $baseCols;
+    }
+
     /**
      * @return string
      */
     protected function getDefaultOrder()
     {
        return array(
-           array('l.dateAdded', 'ASC')
+           array('l.date_added', 'ASC')
        );
     }
 }

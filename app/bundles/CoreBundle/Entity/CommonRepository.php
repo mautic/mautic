@@ -10,7 +10,6 @@ namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\SearchStringHelper;
@@ -55,6 +54,9 @@ class CommonRepository extends EntityRepository
         $this->currentUser = $user;
     }
 
+    /**
+     * @param MauticFactory $factory
+     */
     public function setFactory(MauticFactory $factory)
     {
         $this->factory = $factory;
@@ -153,7 +155,7 @@ class CommonRepository extends EntityRepository
             $this->_em->flush();
     }
 
-    protected function buildClauses(QueryBuilder &$q, array $args)
+    protected function buildClauses(&$q, array $args)
     {
         $this->buildWhereClause($q, $args);
         $this->buildOrderByClause($q, $args);
@@ -162,7 +164,7 @@ class CommonRepository extends EntityRepository
         return true;
     }
 
-    protected function buildWhereClause(QueryBuilder &$q, array $args)
+    protected function buildWhereClause(&$q, array $args)
     {
         $filter       = array_key_exists('filter', $args) ? $args['filter'] : '';
         $filterHelper = new SearchStringHelper();
@@ -216,7 +218,13 @@ class CommonRepository extends EntityRepository
                     $parameters  = $forceParameters;
                 }
 
-                $filterCount = count($expressions->getParts());
+                if ($expressions instanceof \Countable) {
+                    //dbal
+                    $filterCount = count($expressions);
+                } else {
+                    //orm
+                    $filterCount = count($expressions->getParts());
+                }
 
                 if (!empty($filterCount)) {
                     $q->where($expressions)
@@ -226,7 +234,7 @@ class CommonRepository extends EntityRepository
         }
     }
 
-    protected function getFilterExpr(QueryBuilder &$q, $filter)
+    protected function getFilterExpr(&$q, $filter)
     {
         $unique = $this->generateRandomParameterName();
         $func   = (!empty($filter['operator'])) ? $filter['operator'] : $filter['expr'];
@@ -245,7 +253,7 @@ class CommonRepository extends EntityRepository
         return  array($expr, $parameter);
     }
 
-    protected function addCatchAllWhereClause(QueryBuilder &$qb, $filter)
+    protected function addCatchAllWhereClause(&$qb, $filter)
     {
         return array(
             false,
@@ -253,7 +261,7 @@ class CommonRepository extends EntityRepository
         );
     }
 
-    protected function addAdvancedSearchWhereClause(QueryBuilder &$qb, $filters)
+    protected function addAdvancedSearchWhereClause(&$qb, $filters)
     {
         if (isset($filters->root)) {
             //function is determined by the second clause type
@@ -338,7 +346,7 @@ class CommonRepository extends EntityRepository
      * @param QueryBuilder $q
      * @param array        $args
      */
-    protected function buildOrderByClause(QueryBuilder &$q, array $args)
+    protected function buildOrderByClause(&$q, array $args)
     {
         $orderBy    = array_key_exists('orderBy', $args) ? $args['orderBy'] : '';
         $orderByDir = array_key_exists('orderByDir', $args) ? $args['orderByDir'] : '';
@@ -352,7 +360,7 @@ class CommonRepository extends EntityRepository
             //add direction after each column
             $parts = explode(',', $orderBy);
             foreach ($parts as $order) {
-                $q->orderBy($order, $orderByDir);
+                $q->addOrderBy($order, $orderByDir);
             }
         }
     }
@@ -362,7 +370,7 @@ class CommonRepository extends EntityRepository
         return array();
     }
 
-    protected function buildLimiterClauses(QueryBuilder &$q, array $args)
+    protected function buildLimiterClauses(&$q, array $args)
     {
         $start      = array_key_exists('start', $args) ? $args['start'] : 0;
         $limit      = array_key_exists('limit', $args) ? $args['limit'] : 30;

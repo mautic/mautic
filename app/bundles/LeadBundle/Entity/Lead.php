@@ -51,11 +51,6 @@ class Lead extends FormEntity
     private $score = 0;
 
     /**
-     * @ORM\OneToMany(targetEntity="LeadFieldValue", mappedBy="lead", indexBy="field", cascade={"all"})
-     */
-    private $fields;
-
-    /**
      * @ORM\OneToMany(targetEntity="ScoreChangeLog", mappedBy="lead", cascade={"all"}, orphanRemoval=true, fetch="EXTRA_LAZY")
      * @ORM\OrderBy({"dateAdded" = "DESC"})
      */
@@ -79,26 +74,18 @@ class Lead extends FormEntity
     private $internal = array();
 
     /**
-     * @ORM\Column(type="array", nullable=true)
+     * @ORM\Column(type="array", name="social_cache", nullable=true)
      */
     private $socialCache = array();
 
     /**
-     * Unmapped array used internally to update field values rather than creating new ones
-     *
-     * @var
-     */
-    private $fieldValues = array();
-
-    /**
-     * Unmapped array used by the API to return the custom fields and values in a decent format
-     *
+     * Used by Mautic to populate the fields pulled from the DB
      * @var array
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"limited"})
+     * @Serializer\Groups({"full", "limited"})
      */
-    private $customFields = array();
+    protected $fields = array();
 
     protected function isChanged($prop, $val)
     {
@@ -115,8 +102,6 @@ class Lead extends FormEntity
             }
         } elseif ($prop == 'ipAddresses') {
             $this->changes['ipAddresses'] = array('', $val->getIpAddress());
-        } elseif ($prop == 'fields') {
-            $this->changes['fields'][$val[0]] = $val[1];
         } elseif ($this->$getter() != $val) {
             $this->changes[$prop] = array($this->$getter(), $val);
         }
@@ -127,7 +112,6 @@ class Lead extends FormEntity
      */
     public function __construct()
     {
-        $this->fields = new ArrayCollection();
         $this->ipAddresses = new ArrayCollection();
     }
 
@@ -163,43 +147,6 @@ class Lead extends FormEntity
     public function getOwner()
     {
         return $this->owner;
-    }
-
-    /**
-     * Add fields
-     *
-     * @param \Mautic\LeadBundle\Entity\LeadFieldValue $fields
-     * @param $value
-     * @return Lead
-     */
-    public function addField(\Mautic\LeadBundle\Entity\LeadFieldValue $fields)
-    {
-        if ($changes = $fields->getChanges()) {
-            $this->isChanged('fields', array($fields->getField()->getAlias(), $changes));
-        }
-        $this->fields[] = $fields;
-
-        return $this;
-    }
-
-    /**
-     * Remove fields
-     *
-     * @param \Mautic\LeadBundle\Entity\LeadFieldValue $fields
-     */
-    public function removeField(\Mautic\LeadBundle\Entity\LeadFieldValue $fields)
-    {
-        $this->fields->removeElement($fields);
-    }
-
-    /**
-     * Get fields
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getFields()
-    {
-        return $this->fields;
     }
 
     /**
@@ -244,16 +191,15 @@ class Lead extends FormEntity
      */
     public function getName($lastFirst = false)
     {
-        $this->populateIdentifiers();
         $fullName = "";
-        if ($lastFirst && !empty($this->firstName) && !empty($this->lastName)) {
-            $fullName = $this->lastName . ", " . $this->firstName;
-        } elseif (!empty($this->firstName) && !empty($this->lastName)) {
-            $fullName = $this->firstName . " " . $this->lastName;
-        } elseif (!empty($this->firstName)) {
-            $fullName = $this->firstName;
-        } elseif (!empty($this->lastName)) {
-            $fullName = $this->lastName;
+        if ($lastFirst && !empty($this->fields['firstname']) && !empty($this->fields['lastname'])) {
+            $fullName = $this->fields['lastname'] . ", " . $this->fields['firstname'];
+        } elseif (!empty($this->fields['firstname']) && !empty($this->fields['lastname'])) {
+            $fullName = $this->fields['firstname'] . " " . $this->fields['lastname'];
+        } elseif (!empty($this->fields['firstname'])) {
+            $fullName = $this->fields['firstname'];
+        } elseif (!empty($this->fields['lastname'])) {
+            $fullName = $this->fields['lastname'];
         }
 
         return $fullName;
@@ -267,19 +213,19 @@ class Lead extends FormEntity
      */
     public function getPrimaryIdentifier($lastFirst = false)
     {
-        $this->populateIdentifiers();
         if ($name = $this->getName($lastFirst)) {
             return $name;
-        } elseif (!empty($this->company)) {
-            return $this->company;
-        } elseif (!empty($this->email)) {
-            return $this->email;
+        } elseif (!empty($this->fields['company'])) {
+            return $this->fields['company'];
+        } elseif (!empty($this->fields['email'])) {
+            return $this->fields['email'];
         } elseif (count($ips = $this->getIpAddresses())) {
             return $ips[0]->getIpAddress();
         } else {
             return 'mautic.lead.lead.anonymous';
         }
     }
+
 
     /**
      * Get the secondary identifier for the lead; mainly company
@@ -288,9 +234,8 @@ class Lead extends FormEntity
      */
     public function getSecondaryIdentifier()
     {
-        $this->populateIdentifiers();
-        if (!empty($this->company)) {
-            return $this->company;
+        if (!empty($this->fields['company'])) {
+            return $this->fields['company'];
         }
     }
 
@@ -326,52 +271,6 @@ class Lead extends FormEntity
     public function getFieldValues()
     {
         return $this->fieldValues;
-    }
-
-    /**
-     * Add a custom field for the API
-     *
-     * @param $name
-     * @param $value
-     */
-    public function addCustomField($name, $value)
-    {
-        $this->customFields[$name] = $value;
-    }
-
-    /**
-     * Get custom fields
-     *
-     * @return array
-     */
-    public function getCustomFields()
-    {
-        return $this->customFields;
-    }
-
-    private function populateIdentifiers()
-    {
-        foreach ($this->fields as $field) {
-            $alias = $field->getField()->getAlias();
-            if ($alias == 'firstname') {
-                $this->firstName = $field->getValue();
-            } elseif ($alias == 'lastname') {
-                $this->lastName = $field->getValue();
-            } elseif ($alias == 'company') {
-                $this->company = $field->getValue();
-            } elseif ($alias == 'email') {
-                $this->email = $field->getValue();
-            }
-        }
-
-        if (!isset($this->firstName))
-            $this->firstName = '';
-        if (!isset($this->lastName))
-            $this->lastName = '';
-        if (!isset($this->company))
-            $this->company = '';
-        if (!isset($this->email))
-            $this->email = '';
     }
 
     /**
@@ -445,5 +344,21 @@ class Lead extends FormEntity
     public function getSocialCache()
     {
         return $this->socialCache;
+    }
+
+    /**
+     * @param $fields
+     */
+    public function setFields($fields)
+    {
+        $this->fields = $fields;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFields()
+    {
+        return $this->fields;
     }
 }

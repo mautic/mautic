@@ -9,7 +9,6 @@
 
 namespace Mautic\PageBundle\Entity;
 
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
@@ -134,7 +133,7 @@ class PageRepository extends CommonRepository
      * @param              $filter
      * @return array
      */
-    protected function addCatchAllWhereClause(QueryBuilder&$q, $filter)
+    protected function addCatchAllWhereClause(&$q, $filter)
     {
         $unique  = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
         $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
@@ -157,7 +156,7 @@ class PageRepository extends CommonRepository
      * @param              $filter
      * @return array
      */
-    protected function addSearchCommandWhereClause(QueryBuilder &$q, $filter)
+    protected function addSearchCommandWhereClause(&$q, $filter)
     {
         $command         = $field = $filter->command;
         $string          = $filter->string;

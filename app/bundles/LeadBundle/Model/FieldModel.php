@@ -12,7 +12,6 @@ namespace Mautic\LeadBundle\Model;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\LeadField;
-use Mautic\LeadBundle\Entity\LeadFieldValue;
 use Mautic\LeadBundle\Event\LeadFieldEvent;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
@@ -72,20 +71,21 @@ class FieldModel extends FormModel
      */
     public function getEntities(array $args = array())
     {
-        $filter = (!empty($args['filter'])) ? $args['filter'] : array();
-        return $this->em->getRepository('MauticLeadBundle:LeadField')->findBy($filter, array('order'=>'asc'));
+        $args['orderBy']    = 'f.order';
+        $args['orderByDir'] = 'ASC';
+
+        return $this->em->getRepository('MauticLeadBundle:LeadField')->getEntities($args);
     }
 
     /**
      * @param       $entity
      * @param       $unlock
      * @return mixed
-     * @throws AccessDeniedException
      */
     public function saveEntity($entity, $unlock = true)
     {
-        if (!$entity instanceof LeadField && !$entity instanceof LeadFieldValue) {
-            throw new MethodNotAllowedHttpException(array('LeadEntity', 'LeadFieldEntity'), 'Entity must be of type LeadField or LeadFieldValue');
+        if (!$entity instanceof LeadField) {
+            throw new MethodNotAllowedHttpException(array('LeadEntity'));
         }
 
         $isNew = ($entity->getId()) ? false : true;
@@ -93,8 +93,7 @@ class FieldModel extends FormModel
         //set some defaults
         $this->setTimestamps($entity, $isNew, $unlock);
 
-        if ($entity instanceof LeadField) {
-
+        if ($isNew) {
             $alias = $entity->getAlias();
             if (empty($alias)) {
                 $alias = strtolower(InputHelper::alphanum($entity->getName()));
@@ -108,12 +107,12 @@ class FieldModel extends FormModel
             $repo      = $this->getRepository();
             $testAlias = $alias;
             $aliases   = $repo->getAliases($entity->getId());
-            $count     = (int) in_array($testAlias, $aliases);
+            $count     = (int)in_array($testAlias, $aliases);
             $aliasTag  = $count;
 
             while ($count) {
                 $testAlias = $alias . $aliasTag;
-                $count     = (int) in_array($testAlias, $aliases);
+                $count     = (int)in_array($testAlias, $aliases);
                 $aliasTag++;
             }
 
@@ -128,6 +127,19 @@ class FieldModel extends FormModel
             $entity->setIsListable(false);
         }
 
+        //create the field as its own column in the leads table
+        $leadsSchema = $this->factory->getSchemaHelper('table', 'leads');
+        if ($isNew) {
+            $leadsSchema->addColumn(array('name' => $alias));
+            $leadsSchema->executeChanges();
+        } else {
+            //ensure it exists and create it if it does not
+            if (!$leadsSchema->checkColumnExists($alias)) {
+                $leadsSchema->addColumn(array('name' => $alias));
+                $leadsSchema->executeChanges();
+            }
+        }
+
         $event = $this->dispatchEvent("pre_save", $entity, $isNew);
         $this->getRepository()->saveEntity($entity);
         $this->dispatchEvent("post_save", $entity, $isNew, $event);
@@ -135,6 +147,23 @@ class FieldModel extends FormModel
         //update order of other fields
         $this->reorderFieldsByEntity($entity);
     }
+
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param  $entity
+     */
+    public function deleteEntity($entity)
+    {
+        parent::deleteEntity($entity);
+
+        //remove the column from the leads table
+        $leadsSchema = $this->factory->getSchemaHelper('table', 'leads');
+        $leadsSchema->dropColumn($entity->getAlias());
+        $leadsSchema->executeChanges();
+    }
+
 
     /**
      * Reorder fields based on passed entity position
@@ -200,7 +229,7 @@ class FieldModel extends FormModel
      */
     public function getLookupResults($type, $filter = '', $limit = 10)
     {
-        return $this->em->getRepository('MauticLeadBundle:LeadFieldValue')->getValueList($type, $filter, $limit);
+        return $this->em->getRepository('MauticLeadBundle:Lead')->getValueList($type, $filter, $limit);
     }
 
     /**
