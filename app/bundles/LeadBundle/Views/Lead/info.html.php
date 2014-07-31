@@ -8,12 +8,11 @@
  */
 ?>
 
-<div class="panel panel-primary">
-	<div class="panel-heading text-center pa15" style="min-height: 150px;">
-	</div>
-	<div class="panel-body text-center" style="margin-top: -60px">
-	 	<img class="img-circle img-bordered-primary" src="<?php
-        echo \Mautic\SocialBundle\Helper\GravatarHelper::getGravatar($fields['core']['email']['value'], '100'); ?>" />
+<div class="panel">
+	<div class="panel-body text-center">
+		<p></p>
+	 	<img class="img-rounded img-bordered-primary" src="<?php
+	        echo \Mautic\SocialBundle\Helper\GravatarHelper::getGravatar($fields['core']['email']['value'], '100'); ?>" />
 	 	<h1><?php echo $lead->getName(); ?></h1>
         <h4>
             <?php if(isset($fields['core']['position']['value'])): ?>
@@ -23,6 +22,9 @@
             <?php if(isset($fields['core']['company']['value'])):
                 echo $fields['core']['company']['value'];
             endif; ?></h4>
+	 	<p class="text-center">
+			<strong>Current Points</strong> <span class="label label-success">32</span>
+	 	</p>
 	 </div>
 
 	<div class="panel-footer">
