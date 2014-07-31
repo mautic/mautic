@@ -18,7 +18,7 @@ class SocialController extends FormController
 
     public function indexAction()
     {
-        $factory        = $this->get('mautic.factory');
+        $factory = $this->get('mautic.factory');
 
         if (!$factory->getSecurity()->isGranted('social:config:full')) {
             return $this->accessDenied();
@@ -44,8 +44,7 @@ class SocialController extends FormController
         //sort the groups
         ksort($leadFields, SORT_NATURAL);
         //sort each group by translation
-        foreach ($leadFields as $group => &$fieldGroup)
-        {
+        foreach ($leadFields as $group => &$fieldGroup) {
             asort($fieldGroup, SORT_NATURAL);
         }
 
@@ -71,6 +70,18 @@ class SocialController extends FormController
                                 $entity->setApiKeys($newKeys);
                             }
                         }
+
+                        $features = $entity->getSupportedFeatures();
+                        if (in_array('public_profile', $features)) {
+                            //make sure now non-existent aren't saved
+                            $featureSettings               = $entity->getFeatureSettings();
+                            if (isset($featureSettings['leadFields'])) {
+                                $fields                        = NetworkIntegrationHelper::getAvailableFields($factory, $network);
+                                $featureSettings['leadFields'] = array_intersect_key($featureSettings['leadFields'], $fields);
+                                $entity->setFeatureSettings($featureSettings);
+                            }
+                        }
+
                         $em->persist($entity);
                     }
                     $em->flush();

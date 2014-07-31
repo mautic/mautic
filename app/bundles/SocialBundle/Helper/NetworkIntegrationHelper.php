@@ -115,19 +115,20 @@ class NetworkIntegrationHelper
                 $available  = $object->getAvailableFields();
 
                 foreach ($available as $field => $details) {
+                    $fn = $object->matchFieldName($field);
                     switch ($details['type']) {
                         case 'string':
                         case 'boolean':
-                            $fields[$s][$field] = $translator->trans("mautic.social.{$s}.{$field}");
+                            $fields[$s][$fn] = $translator->trans("mautic.social.{$s}.{$fn}");
                             break;
                         case 'object':
                             if (isset($details['fields'])) {
                                 foreach ($details['fields'] as $f) {
-                                    $name               = $f . ucfirst($field);
-                                    $fields[$s][$name] = $translator->trans("mautic.social.{$s}.{$name}");
+                                    $fn = $object->matchFieldName($field, $f);
+                                    $fields[$s][$fn] = $translator->trans("mautic.social.{$s}.{$fn}");
                                 }
                             } else {
-                                $fields[$s][$field] = $translator->trans("mautic.social.{$s}.{$field}");
+                                $fields[$s][$field] = $translator->trans("mautic.social.{$s}.{$fn}");
                             }
                             break;
                         case 'array_object':
@@ -142,11 +143,11 @@ class NetworkIntegrationHelper
                                 }
                             } elseif (isset($details['fields'])) {
                                 foreach ($details['fields'] as $f) {
-                                    $name = $f . ucfirst($field);
-                                    $fields[$s][$name] = $translator->trans("mautic.social.{$s}.{$name}");
+                                    $fn = $object->matchFieldName($field, $f);
+                                    $fields[$s][$fn] = $translator->trans("mautic.social.{$s}.{$fn}");
                                 }
                             } else {
-                                $fields[$s][$field] = $translator->trans("mautic.social.{$s}.{$field}");
+                                $fields[$s][$fn] = $translator->trans("mautic.social.{$s}.{$fn}");
                             }
                             break;
                     }
@@ -242,13 +243,13 @@ class NetworkIntegrationHelper
                 $features        = $settings->getSupportedFeatures();
                 $identifierField = self::getUserIdentifierField($sn, $fields);
 
+                if ($returnSettings) {
+                    $featureSettings[$network] = $settings->getFeatureSettings();
+                }
+
                 if ($identifierField && $settings->isPublished()) {
                     if (!isset($socialCache[$network])) {
                         $socialCache[$network] = array();
-                    }
-
-                    if ($returnSettings) {
-                        $featureSettings[$network] = $settings->getFeatureSettings();
                     }
 
                     if (!isset($socialCache[$network]['profile'])) {
@@ -256,7 +257,6 @@ class NetworkIntegrationHelper
                     }
                     if (in_array('public_profile', $features)) {
                         $sn->getUserData($identifierField, $socialCache[$network]);
-
                     }
 
                     if (!isset($socialCache[$network]['activity'])) {
@@ -338,9 +338,7 @@ class NetworkIntegrationHelper
                     $value = (is_array($fields[$f]) && isset($fields[$f]['value'])) ? $fields[$f]['value'] : $fields[$f];
 
                     if (!in_array($value, $identifier) && strpos($f, $idf) !== false) {
-                        //remove field prefix in case this is from a lead form so the network doesn't have to account for it
-                        $parsedField              = str_ireplace('field_', '', $f);
-                        $identifier[$parsedField] = $value;
+                        $identifier[$f] = $value;
                         if (count($identifier) === count($identifierField)) {
                             //found enough matches so break
                             $matchFound = true;

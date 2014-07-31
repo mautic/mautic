@@ -108,6 +108,7 @@ class TwitterNetwork extends AbstractNetwork
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_URL, $url);
 
         curl_setopt($ch, CURLOPT_HEADER, 1);
@@ -117,7 +118,7 @@ class TwitterNetwork extends AbstractNetwork
         ));
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, 'grant_type=client_credentials');
-
+        $curlError = curl_error($ch);
         $data = curl_exec($ch);
 
         //get the body response
@@ -126,8 +127,6 @@ class TwitterNetwork extends AbstractNetwork
 
         curl_close($ch);
 
-        $values = json_decode($body, true);
-
         //check to see if an entity exists
         $entity = $this->getSettings();
         if ($entity == null) {
@@ -135,14 +134,20 @@ class TwitterNetwork extends AbstractNetwork
             $entity->setName($this->getName());
         }
 
-        if (isset($values['access_token'])) {
-            $keys['access_token'] = $values['access_token'];
-            $error = false;
-        } else {
-            $error = $this->parseResponse($values);
-        }
+        if (empty($curlError)) {
+            $values = json_decode($body, true);
 
-        $entity->setApiKeys($keys);
+            if (isset($values['access_token'])) {
+                $keys['access_token'] = $values['access_token'];
+                $error                = false;
+            } else {
+                $error = $this->parseResponse($values);
+            }
+
+            $entity->setApiKeys($keys);
+        } else {
+            $error = $curlError;
+        }
 
         //save the data
         $em = $this->factory->getEntityManager();
@@ -244,6 +249,14 @@ class TwitterNetwork extends AbstractNetwork
             }
             $this->preventDoubleCall = false;
         }
+
+        if (empty($socialCache['profile'])) {
+            //populate empty data
+            $socialCache['profile'] = $this->matchUpData(array());
+            $socialCache['profile']['profileHandle'] = "";
+            $socialCache['profile']['profileImage']  = $this->factory->getAssetsHelper()->getUrl('assets/images/avatar.png');
+            $socialCache['updated'] = true;
+        }
     }
 
     /**
@@ -261,7 +274,10 @@ class TwitterNetwork extends AbstractNetwork
             $data = $this->makeCall($url);
 
             if (!empty($data) && count($data)) {
-                $socialCache['activity'] = array();
+                $socialCache['activity'] = array(
+                    'tweets' => array(),
+                    'photos' => array()
+                );
                 foreach ($data as $k => $d) {
                     if ($k == 10) {
                         break;
@@ -273,16 +289,19 @@ class TwitterNetwork extends AbstractNetwork
                         'published'   => $d['created_at'],
                         'coordinates' => $d['coordinates']
                     );
-                    $socialCache['activity'][] = $tweet;
+                    $socialCache['activity']['tweets'][] = $tweet;
                 }
                 $socialCache['updated']  = true;
             }
         }
-        if (empty($socialCache['profile'])) {
-            //populate empty data
-            $socialCache['profile'] = $this->matchUpData(array());
-            $socialCache['profile']['profileHandle'] = "";
-            $socialCache['profile']['profileImage']  = $this->factory->getAssetsHelper()->getUrl('assets/images/avatar.png');
+
+        if (empty($socialCache['activity'])) {
+            //ensure keys are present
+            $socialCache['updated']  = true;
+            $socialCache['activity'] = array(
+                'tweets' => array(),
+                'photos' => array()
+            );
         }
     }
 

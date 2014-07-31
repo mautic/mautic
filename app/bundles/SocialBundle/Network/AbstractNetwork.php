@@ -87,7 +87,7 @@ abstract class AbstractNetwork
         $url = $this->getAuthenticationUrl()
             . '?client_id={clientId}' //placeholder to be replaced by whatever is the field
             . '&response_type=code'
-            . '&redirect_uri=' . $callback
+            . '&redirect_uri=' . urlencode($callback)
             . '&state=' . $state; //set a state to protect against CSRF attacks
         $this->factory->getSession()->set($this->getName() . '_csrf_token', $state);
 
@@ -122,21 +122,16 @@ abstract class AbstractNetwork
         $url .= '?client_id='.$keys['clientId'];
         $url .= '&client_secret='.$keys['clientSecret'];
         $url .= '&grant_type=authorization_code';
-        $url .= '&redirect_uri=' . $callback;
+        $url .= '&redirect_uri=' . urlencode($callback);
         $url .= '&code='.$request->get('code');
 
-        if (function_exists('curl_init')) {
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_URL, $url);
-            $data = curl_exec($ch);
-            curl_close($ch);
-        } elseif (ini_get('allow_url_fopen')) {
-            $data = @file_get_contents($url);
-        }
-
-        //parse the response
-        $values = $this->parseCallbackResponse($data);
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_URL, $url);
+        $data = curl_exec($ch);
+        $curlError = curl_error($ch);
+        curl_close($ch);
 
         //check to see if an entity exists
         $entity = $this->getSettings();
@@ -145,18 +140,25 @@ abstract class AbstractNetwork
             $entity->setName($this->getName());
         }
 
-        if (is_array($values) && isset($values['access_token'])) {
-            $keys['access_token'] = $values['access_token'];
+        if (empty($curlError)) {
+            //parse the response
+            $values = $this->parseCallbackResponse($data);
 
-            if (isset($values['refresh_token'])) {
-                $keys['refresh_token'] = $values['refresh_token'];
+            if (is_array($values) && isset($values['access_token'])) {
+                $keys['access_token'] = $values['access_token'];
+
+                if (isset($values['refresh_token'])) {
+                    $keys['refresh_token'] = $values['refresh_token'];
+                }
+                $error = false;
+            } else {
+                $error = $this->getErrorsFromResponse($values);
             }
-            $error = false;
-        } else {
-            $error = $this->getErrorsFromResponse($values);
-        }
 
-        $entity->setApiKeys($keys);
+            $entity->setApiKeys($keys);
+        } else {
+            $error = $curlError;
+        }
 
         //save the data
         $em = $this->factory->getEntityManager();
@@ -339,5 +341,21 @@ abstract class AbstractNetwork
     protected function getRefererUrl()
     {
         return "http" . (($_SERVER['SERVER_PORT']==443) ? "s://" : "://") . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+    }
+
+    /**
+     * Used to match local field name with remote field name
+     *
+     * @param $field
+     * @param $subfield
+     * @return mixed
+     */
+    public function matchFieldName($field, $subfield = '')
+    {
+        if (!empty($field) && !empty($subfield)) {
+            return $subfield . ucfirst($field);
+        }
+
+        return $field;
     }
 }

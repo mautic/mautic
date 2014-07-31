@@ -21,6 +21,11 @@
                     <?php echo $view['translator']->trans('mautic.lead.lead.social.twitter.tweets'); ?>
                 </a>
             </li>
+            <li>
+                <a href="#TwitterPhotos" role="tab" data-toggle="tab">
+                    <?php echo $view['translator']->trans('mautic.lead.lead.social.twitter.photos'); ?>
+                </a>
+            </li>
         </ul>
     </div>
 </div>
@@ -33,9 +38,15 @@
     </div>
     <div class="tab-pane" id="TwitterTweets">
         <?php echo $view->render('MauticLeadBundle:Social/Twitter:tweets.html.php', array(
-            'lead'      => $lead,
-            'activity'   => $details['activity'],
+            'lead'        => $lead,
+            'activity'    => $details['activity']['tweets'],
             'dateFormats' => $dateFormats
+        )); ?>
+    </div>
+    <div class="tab-pane" id="TwitterPhotos">
+        <?php echo $view->render('MauticLeadBundle:Social/Twitter:photos.html.php', array(
+            'lead'      => $lead,
+             'activity' => $details['activity']['photos']
         )); ?>
     </div>
 </div>

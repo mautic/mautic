@@ -159,6 +159,7 @@ class LeadModel extends FormModel
         //update existing values
         foreach ($fields as $field) {
             $alias        = $field->getAlias();
+            $fieldId      = $field->getId();
             $currentValue = (isset($fieldValues[$alias])) ? $fieldValues[$alias] : "";
             $newValue     = (isset($data[$alias])) ? $data[$alias] : "";
             if ($currentValue !== $newValue && (!empty($newValue) || (empty($newValue) && $overwriteWithBlank))) {
@@ -169,11 +170,12 @@ class LeadModel extends FormModel
             if (empty($newValue) && !empty($socialCache)) {
                 foreach ($socialCache as $service => $details) {
                     //check to see if a field has been assigned
+
                     if (!empty($socialFeatureSettings[$service]['leadFields']) &&
-                        in_array($field->getId(), $socialFeatureSettings[$service]['leadFields'])) {
+                        in_array($fieldId, $socialFeatureSettings[$service]['leadFields'])) {
 
                         //check to see if the data is available
-                        $key = array_search($field->getId(), $socialFeatureSettings[$service]['leadFields']);
+                        $key = array_search($fieldId, $socialFeatureSettings[$service]['leadFields']);
                         if (isset($details['profile'][$key])) {
                             //Found!!
                             $fieldValues[$alias] = $details['profile'][$key];

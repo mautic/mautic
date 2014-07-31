@@ -37,9 +37,9 @@ class InstagramNetwork extends AbstractNetwork
      *
      * @return string
      */
-    public function getOAuthLoginUrl()
+    public function getAuthenticationUrl()
     {
-        return $this->factory->getRouter()->generate('mautic_social_callback', array('network' => $this->getName()));
+        return 'https://api.instagram.com/oauth/authorize';
     }
 
     /**
@@ -49,84 +49,7 @@ class InstagramNetwork extends AbstractNetwork
      */
     public function getAccessTokenUrl()
     {
-        return 'https://api.instagram.com/oauth2/token';
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @return array
-     */
-    public function oAuthCallback($clientId = '', $clientSecret = '')
-    {
-        $url      = $this->getAccessTokenUrl();
-        $keys     = $this->settings->getApiKeys();
-
-        if (!$url || !isset($keys['clientId']) || !isset($keys['clientSecret'])) {
-            return array(false, $this->factory->getTranslator()->trans('mautic.social.missingkeys'));
-        }
-
-        $bearer = $this->getBearerToken($keys);
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_URL, $url);
-
-        curl_setopt($ch, CURLOPT_HEADER, 1);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-            "Authorization: Basic {$bearer}",
-            "Content-Type: application/x-www-form-urlencoded;charset=UTF-8"
-        ));
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, 'grant_type=client_credentials');
-
-        $data = curl_exec($ch);
-
-        //get the body response
-        $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-        $body        = substr($data, $header_size);
-
-        curl_close($ch);
-
-        $values = json_decode($body, true);
-
-        //check to see if an entity exists
-        $entity = $this->getSettings();
-        if ($entity == null) {
-            $entity = new SocialNetwork();
-            $entity->setName($this->getName());
-        }
-
-        if (isset($values['access_token'])) {
-            $keys['access_token'] = $values['access_token'];
-            $error = false;
-        } else {
-            $error = $this->parseResponse($values);
-        }
-
-        $entity->setApiKeys($keys);
-
-        //save the data
-        $em = $this->factory->getEntityManager();
-        $em->persist($entity);
-        $em->flush();
-
-        return array($entity, $error);
-    }
-
-    /**
-     * Generate a Twitter bearer token
-     *
-     * @param $keys
-     * @return string
-     */
-    private function getBearerToken($keys)
-    {
-        //Per Twitter's recommendations
-        $consumer_key    = rawurlencode($keys['clientId']);
-        $consumer_secret = rawurlencode($keys['clientSecret']);
-
-        return base64_encode($consumer_key . ':' . $consumer_secret);
+        return 'https://api.instagram.com/oauth/access_token';
     }
 
     /**
@@ -181,8 +104,7 @@ class InstagramNetwork extends AbstractNetwork
     {
         return array(
             'public_profile',
-            'public_activity',
-            'suggestion_matching'
+            'public_activity'
         );
     }
 }

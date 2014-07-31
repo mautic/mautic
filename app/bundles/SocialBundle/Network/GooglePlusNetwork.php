@@ -42,7 +42,10 @@ class GooglePlusNetwork extends AbstractNetwork
      */
     public function getIdentifierField()
     {
-        return 'email';
+        return array(
+            'googleplus',
+            'email'
+        );
     }
 
     /**
@@ -89,6 +92,7 @@ class GooglePlusNetwork extends AbstractNetwork
             $socialCache['profile'] = $this->matchUpData($empty);
             $socialCache['profile']['profileHandle'] = "";
             $socialCache['profile']['profileImage']  = $this->factory->getAssetsHelper()->getUrl('assets/images/avatar.png');
+            $socialCache['updated'] = true;
         }
     }
 
@@ -133,6 +137,15 @@ class GooglePlusNetwork extends AbstractNetwork
                 }
                 $socialCache['updated'] = true;
             }
+        }
+
+        if (empty($socialCache['activity'])) {
+            //ensure keys are present
+            $socialCache['activity'] = array(
+                'posts' => array(),
+                'photos' => array()
+            );
+            $socialCache['updated'] = true;
         }
     }
 

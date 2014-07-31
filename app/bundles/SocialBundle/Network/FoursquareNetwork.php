@@ -39,7 +39,10 @@ class FoursquareNetwork extends AbstractNetwork
      */
     public function getIdentifierField()
     {
-        return 'email';
+        return array(
+            'foursquare',
+            'email'
+        );
     }
 
     /**
@@ -96,6 +99,7 @@ class FoursquareNetwork extends AbstractNetwork
     public function getUserData($identifier, &$socialCache)
     {
         $keys = $this->settings->getApiKeys();
+
         if (!empty($keys['access_token']) && $id = $this->getUserId($identifier, $socialCache)) {
             $url  = "https://api.foursquare.com/v2/users/{$id}?v=20140719&oauth_token={$keys['access_token']}";
             $data = $this->makeCall($url);
@@ -110,6 +114,15 @@ class FoursquareNetwork extends AbstractNetwork
                 //mark as updated
                 $socialCache['updated'] = true;
             }
+        }
+
+        if (empty($socialCache['profile'])) {
+            //populate empty data
+            $empty = new \stdClass();
+            $socialCache['profile'] = $this->matchUpData($empty);
+            $socialCache['profile']['profileHandle'] = "";
+            $socialCache['profile']['profileImage']  = $this->factory->getAssetsHelper()->getUrl('assets/images/avatar.png');
+            $socialCache['updated'] = true;
         }
     }
 
@@ -126,6 +139,11 @@ class FoursquareNetwork extends AbstractNetwork
         $keys = $this->settings->getApiKeys();
         if (!empty($keys['access_token']) && $id = $this->getUserId($identifier, $socialCache)) {
             $activity = array();
+            $socialCache['activity'] = array(
+                'mayorships' => array(),
+                'tips'       => array(),
+                'lists'      => array()
+            );
 
             //mayorships
             $url  = "https://api.foursquare.com/v2/users/{$id}/mayorships?v=20140719&oauth_token={$keys['access_token']}";
@@ -235,6 +253,16 @@ class FoursquareNetwork extends AbstractNetwork
                 $socialCache['activity'] = $activity;
                 $socialCache['updated']  = true;
             }
+
+            if (empty($socialCache['activity'])) {
+                //ensure the keys are present
+                $socialCache['activity'] = array(
+                    'mayorships' => array(),
+                    'tips'       => array(),
+                    'lists'      => array()
+                );
+                $socialCache['updated']  = true;
+            }
         }
     }
 
@@ -263,10 +291,10 @@ class FoursquareNetwork extends AbstractNetwork
         $available  = $this->getAvailableFields();
 
         foreach ($available as $field => $fieldDetails) {
-            if (!isset($data[$field])) {
+            if (!isset($data->$field)) {
                 $info[$field] = '';
             } else {
-                $values = $data[$field];
+                $values = $data->$field;
 
                 switch ($fieldDetails['type']) {
                     case 'string':
@@ -276,8 +304,8 @@ class FoursquareNetwork extends AbstractNetwork
                     case 'object':
                         foreach ($fieldDetails['fields'] as $f) {
                             if (isset($values->$f)) {
-                                $name        = ($f == 'twitter' || $f == 'facebook') ? $f . 'ProfileHandle' : $f . ucfirst($field);
-                                $info[$name] = $values->$f;
+                                $fn = $this->matchFieldName($field, $f);
+                                $info[$fn] = $values->$f;
                             }
                         }
                         break;
@@ -285,6 +313,22 @@ class FoursquareNetwork extends AbstractNetwork
             }
         }
         return $info;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param        $field
+     * @param string $subfield
+     * @return mixed|string
+     */
+    public function matchFieldName($field, $subfield = '')
+    {
+        if ($field == "contact" && in_array($subfield, array('facebook', 'twitter'))) {
+            return $subfield . 'ProfileHandle';
+        }
+
+        return parent::matchFieldName($field, $subfield);
     }
 
     /**

@@ -33,19 +33,19 @@
     <div class="tab-pane active" id="FoursquareMayor">
         <?php echo $view->render('MauticLeadBundle:Social/Foursquare:mayor.html.php', array(
             'lead'      => $lead,
-            // 'profile'   => $details['profile']
+            // 'profile'   => $details['activity']['mayorships']
         )); ?>
     </div>
     <div class="tab-pane" id="FoursquareLists">
         <?php echo $view->render('MauticLeadBundle:Social/Foursquare:lists.html.php', array(
             'lead'      => $lead,
-            // 'activity'   => $details['activity']
+            // 'activity'   => $details['activity']['lists']
         )); ?>
     </div>
     <div class="tab-pane" id="FoursquareTips">
         <?php echo $view->render('MauticLeadBundle:Social/Foursquare:tips.html.php', array(
             'lead'      => $lead,
-            // 'activity'   => $details['activity']
+            // 'activity'   => $details['activity']['tips']
         )); ?>
     </div>
 </div>

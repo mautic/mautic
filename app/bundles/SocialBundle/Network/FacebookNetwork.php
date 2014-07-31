@@ -37,9 +37,7 @@ class FacebookNetwork extends AbstractNetwork
     public function getIdentifierField()
     {
         return array(
-            'twitter',
-            'firstname',
-            'lastname'
+            'facebook'
         );
     }
 
@@ -159,6 +157,7 @@ class FacebookNetwork extends AbstractNetwork
             $socialCache['profile'] = $this->matchUpData($empty);
             $socialCache['profile']['profileHandle'] = "";
             $socialCache['profile']['profileImage']  = $this->factory->getAssetsHelper()->getUrl('assets/images/avatar.png');
+            $socialCache['updated'] = true;
         }
     }
 
