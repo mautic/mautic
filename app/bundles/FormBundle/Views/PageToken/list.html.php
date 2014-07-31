@@ -41,11 +41,10 @@ if ($tmpl == 'index') {
     </ul>
 
     <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
-        "items"           => $items,
+        "totalItems"      => count($items),
         "page"            => $page,
         "limit"           => $limit,
         "fixedLimit"      => true,
-        "totalItems"      => $totalCount,
         "baseUrl"         => $view['router']->generate('mautic_formtoken_index'),
         "paginationClass" => "xs",
         'sessionVar'      => 'formtoken',

@@ -68,7 +68,7 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
         </tbody>
     </table>
     <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
-        "items"      => $items,
+        "totalItems" => count($items),
         "page"       => $page,
         "limit"      => $limit,
         "baseUrl"    =>  $view['router']->generate('mautic_leadlist_index'),

@@ -115,7 +115,7 @@ CUSTOM
         <h4><?php echo $view['translator']->trans('mautic.core.noresults'); ?></h4>
     <?php endif; ?>
     <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
-        "items"           => $items,
+        "totalItems"      => count($items),
         "page"            => $page,
         "limit"           => $limit,
         "baseUrl"         => $view['router']->generate('mautic_form_index'),

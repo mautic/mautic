@@ -26,7 +26,6 @@ if ($page <= 0) {
 
 $baseUrl .= "/";
 
-$totalItems  = (!isset($totalItems)) ? count($items) : $totalItems;
 $totalPages = ($limit) ? (int) ceil($totalItems / $limit) : 1;
 
 $pageClass = (!isset($paginationClass)) ? "" : " pagination-$paginationClass";

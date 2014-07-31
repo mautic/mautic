@@ -63,7 +63,7 @@ endif;
         </tbody>
     </table>
     <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
-        "items"      => $items,
+        "totalItems" => count($items),
         "page"       => $page,
         "limit"      => $limit,
         "baseUrl"    =>  $view['router']->generate('mautic_client_index'),

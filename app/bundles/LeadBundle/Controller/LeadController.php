@@ -72,15 +72,21 @@ class LeadController extends FormController
             $filter['force'] .= " $isCommand:$mine";
         }
 
-        $leads = $model->getEntities(
+        $results = $model->getEntities(
             array(
-                'start'         => $start,
-                'limit'         => $limit,
-                'filter'        => $filter,
-                'orderBy'       => $orderBy,
-                'orderByDir'    => $orderByDir
+                'start'          => $start,
+                'limit'          => $limit,
+                'filter'         => $filter,
+                'orderBy'        => $orderBy,
+                'orderByDir'     => $orderByDir,
+                'withTotalCount' => true
             ));
-        $count = count($leads);
+        $count = $results['count'];
+        unset($results['count']);
+
+        $leads = $results['results'];
+        unset($results);
+
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page
             if ($count === 1) {
@@ -121,6 +127,7 @@ class LeadController extends FormController
             'items'       => $leads,
             'model'       => $model,
             'page'        => $page,
+            'totalItems'  => $count,
             'limit'       => $limit,
             'permissions' => $permissions,
             'tmpl'        => $tmpl,

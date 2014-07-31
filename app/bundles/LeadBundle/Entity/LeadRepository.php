@@ -165,11 +165,20 @@ class LeadRepository extends CommonRepository
     {
         //DBAL
         $dq = $this->_em->getConnection()->createQueryBuilder();
-        $dq->select('*')
+        $dq->select('count(*) as count')
             ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l');
-        $this->buildClauses($dq, $args);
+        $this->buildWhereClause($dq, $args);
 
-        //gets arrayed result
+        //get a total count
+        $result = $dq->execute()->fetchAll();
+        $total  = $result[0]['count'];
+
+        //now get the actual paginated results
+        $this->buildOrderByClause($dq, $args);
+        $this->buildLimiterClauses($dq, $args);
+
+        $dq->resetQueryPart('select');
+        $dq->select('*');
         $results = $dq->execute()->fetchAll();
 
         //loop over results to put fields in something that can be assigned to the entities
@@ -212,8 +221,7 @@ class LeadRepository extends CommonRepository
             )->setParameter('leadIds', $ids);
 
             $q->orderBy('ORD', 'ASC');
-            $query   = $q->getQuery();
-            $results = new Paginator($query);
+            $results   = $q->getQuery()->getResult();
 
             //assign fields
             foreach ($results as $r) {
@@ -222,7 +230,11 @@ class LeadRepository extends CommonRepository
             }
         }
 
-        return $results;
+        return (!empty($args['withTotalCount'])) ?
+            array(
+                'count' => $total,
+                'results' => $results
+            ) : $results;
     }
 
     /**

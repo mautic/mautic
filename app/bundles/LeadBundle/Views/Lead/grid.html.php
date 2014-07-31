@@ -63,7 +63,7 @@ if ($tmpl == 'index')
     <?php endif; ?>
 
     <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
-        "items"           => $items,
+        "totalItems"      => $totalItems,
         "page"            => $page,
         "limit"           => $limit,
         "menuLinkId"      => 'mautic_lead_index',

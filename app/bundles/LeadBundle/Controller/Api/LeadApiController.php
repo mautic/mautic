@@ -72,8 +72,8 @@ class LeadApiController extends CommonApiController
         $results = $this->model->getEntities($args);
         //we have to convert them from paginated proxy functions to entities in order for them to be
         //returned by the serializer/rest bundle
-        $entities = $results->getIterator();
-        $view = $this->view(array($this->entityNameMulti => $entities), Codes::HTTP_OK);
+
+        $view = $this->view(array($this->entityNameMulti => $results), Codes::HTTP_OK);
         $context = SerializationContext::create()->setGroups(array('limited'));
         $view->setSerializationContext($context);
         return $this->handleView($view);

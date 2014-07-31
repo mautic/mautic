@@ -65,7 +65,7 @@ $formId = $form->getId();
         </tbody>
     </table>
     <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
-        "items"      => $items,
+        "totalItems" => count($items),
         "page"       => $page,
         "limit"      => $limit,
         "baseUrl"    =>  $view['router']->generate('mautic_form_results', array('objectId' => $form->getId())),
