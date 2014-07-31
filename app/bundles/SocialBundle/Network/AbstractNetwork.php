@@ -78,24 +78,20 @@ abstract class AbstractNetwork
      */
     public function getOAuthLoginUrl()
     {
-        $keys     = $this->settings->getApiKeys();
         $callback = $this->factory->getRouter()->generate('mautic_social_callback',
             array('network' => $this->getName()),
             true //absolute
         );
-        if (isset($keys['clientId']) && isset($keys['clientSecret'])) {
-            $state = uniqid();
-            $url = $this->getAuthenticationUrl();
-            $url .= '?client_id=' . $keys['clientId'];
-            $url .= '&response_type=code';
-            $url .= '&redirect_uri=' . $callback;
-            //set a state to protect against CSRF attacks
-            $url .= '&state=' . $state;
-            $this->factory->getSession()->set($this->getName() . '_csrf_token', $state);
 
-            return $url;
-        }
-        return '#';
+        $state = uniqid();
+        $url = $this->getAuthenticationUrl()
+            . '?client_id={clientId}' //placeholder to be replaced by whatever is the field
+            . '&response_type=code'
+            . '&redirect_uri=' . $callback
+            . '&state=' . $state; //set a state to protect against CSRF attacks
+        $this->factory->getSession()->set($this->getName() . '_csrf_token', $state);
+
+        return $url;
     }
 
     /**
@@ -103,7 +99,7 @@ abstract class AbstractNetwork
      *
      * @return array
      */
-    public function oAuthCallback()
+    public function oAuthCallback($clientId = '', $clientSecret = '')
     {
         $request  = $this->factory->getRequest();
         $url      = $this->getAccessTokenUrl();
@@ -112,6 +108,13 @@ abstract class AbstractNetwork
             array('network' => $this->getName()),
             true //absolute
         );
+
+        if (!empty($clientId)) {
+            //callback from JS
+            $keys['clientId']     = $clientId;
+            $keys['clientSecret'] = $clientSecret;
+        }
+
         if (!$url || !isset($keys['clientId']) || !isset($keys['clientSecret'])) {
             return array(false, $this->factory->getTranslator()->trans('mautic.social.missingkeys'));
         }

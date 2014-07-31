@@ -89,10 +89,16 @@ class TwitterNetwork extends AbstractNetwork
      *
      * @return array
      */
-    public function oAuthCallback()
+    public function oAuthCallback($clientId = '', $clientSecret = '')
     {
         $url      = $this->getAccessTokenUrl();
         $keys     = $this->settings->getApiKeys();
+
+        if (!empty($clientId)) {
+            //callback from JS
+            $keys['clientId']     = $clientId;
+            $keys['clientSecret'] = $clientSecret;
+        }
 
         if (!$url || !isset($keys['clientId']) || !isset($keys['clientSecret'])) {
             return array(false, $this->factory->getTranslator()->trans('mautic.social.missingkeys'));

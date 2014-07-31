@@ -21,4 +21,8 @@ $collection->add('mautic_social_callback', new Route('/social/oauth2callback/{ne
     array('_controller' => 'MauticSocialBundle:Social:oAuth2Callback')
 ));
 
+$collection->add('mautic_social_postauth', new Route('/social/oauth2/status',
+    array('_controller' => 'MauticSocialBundle:Social:oAuthStatus')
+));
+
 return $collection;

@@ -54,17 +54,19 @@ class DetailsType extends AbstractType
             $keys     = $options['data']->getApiKeys();
             $disabled = false;
             $label    = (isset($keys['access_token'])) ? 'reauthorize' : 'authorize';
-            if (empty($keys['clientId']) || empty($keys['clientSecret'])) {
-                $disabled = true;
-                $builder->add('notice', 'spacer', array(
-                    'text' => 'mautic.social.form.savefirst',
-                    'class' => 'text-danger'
-                ));
+
+            //find what key is needed from the URL and pass it to the JS function
+            preg_match('/{(.*)}/', $url, $match);
+            if (!empty($match[1])) {
+                $key = $match[1];
+            } else {
+                $key = '';
             }
+
             $builder->add('authButton', 'standalone_button', array(
                 'attr'     => array(
                     'class'   => 'btn btn-primary',
-                    'onclick' => 'window.location="' . $url . '";'
+                    'onclick' => 'Mautic.loadAuthModal("' . $url . '", "'.$key.'", "' . $options['sm_network'] . '");'
                 ),
                 'label'    => 'mautic.social.form.' . $label,
                 'disabled' => $disabled

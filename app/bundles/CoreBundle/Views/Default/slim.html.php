@@ -10,17 +10,22 @@
 <!DOCTYPE html>
 <html>
     <?php echo $view->render('MauticCoreBundle:Default:head.html.php'); ?>
-    <body style="overflow: auto;">
-        <div class="container">
-            <?php if ($view['slots']->has("headerTitle")): ?>
-                <div  class="row">
-                    <h2><?php $view['slots']->output("headerTitle"); ?></h2>
-                </div>
-            <?php endif; ?>
+    <body>
+        <?php $view['slots']->outputScripts("bodyOpen"); ?>
+        <section id="main" role="main">
+            <div class="container-fluid" id="main-content">
+                <?php if ($view['slots']->has("headerTitle")): ?>
+                    <div  class="row">
+                        <h2><?php $view['slots']->output("headerTitle"); ?></h2>
+                    </div>
+                <?php endif; ?>
 
-            <div class="row">
-                <?php $view['slots']->output('_content'); ?>
+                <div class="row">
+                    <?php echo $view->render('MauticCoreBundle:Default:flashes.html.php'); ?>
+                    <?php $view['slots']->output('_content'); ?>
+                </div>
             </div>
-        </div>
+        </section>
     </body>
+    <?php echo $view->render('MauticCoreBundle:Default:script.html.php'); ?>
 </html>

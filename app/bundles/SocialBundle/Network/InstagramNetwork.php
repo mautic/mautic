@@ -57,7 +57,7 @@ class InstagramNetwork extends AbstractNetwork
      *
      * @return array
      */
-    public function oAuthCallback()
+    public function oAuthCallback($clientId = '', $clientSecret = '')
     {
         $url      = $this->getAccessTokenUrl();
         $keys     = $this->settings->getApiKeys();

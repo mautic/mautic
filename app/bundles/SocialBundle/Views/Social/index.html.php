@@ -8,7 +8,7 @@
  */
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
-$view['slots']->set('mauticContent', 'leadsocial');
+$view['slots']->set('mauticContent', 'social');
 $view['slots']->set("headerTitle", $view['translator']->trans('mautic.social.header.index'));
 ?>
 <div class="scrollable">
@@ -32,3 +32,12 @@ $view['slots']->set("headerTitle", $view['translator']->trans('mautic.social.hea
     <?php echo $view['form']->end($form); ?>
     <div class="footer-margin"></div>
 </div>
+
+<?php
+echo $view->render('MauticCoreBundle:Helper:modal.html.php', array(
+    'id'     => 'social_auth_modal',
+    'header' => $view['translator']->trans('mautic.social.auth'),
+    'body'   => $view->render('MauticSocialBundle:Social:authmodal.html.php'),
+    'size'   => 'lg'
+));
+?>
