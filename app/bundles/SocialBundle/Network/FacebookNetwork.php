@@ -148,7 +148,8 @@ class FacebookNetwork extends AbstractNetwork
 
         if (empty($socialCache['profile'])) {
             //populate empty data
-            $socialCache['profile'] = $this->matchUpData(array());
+            $empty = new \stdClass();
+            $socialCache['profile'] = $this->matchUpData($empty);
             $socialCache['profile']['profileHandle'] = "";
             $socialCache['profile']['profileImage']  = $this->factory->getAssetsHelper()->getUrl('assets/images/avatar.png');
         }

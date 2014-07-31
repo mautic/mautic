@@ -85,7 +85,8 @@ class GooglePlusNetwork extends AbstractNetwork
             $socialCache['updated'] = true;
         } elseif (empty($socialCache['profile'])) {
             //populate empty data
-            $socialCache['profile'] = $this->matchUpData(new stdClass());
+            $empty = new \stdClass();
+            $socialCache['profile'] = $this->matchUpData($empty);
             $socialCache['profile']['profileHandle'] = "";
             $socialCache['profile']['profileImage']  = $this->factory->getAssetsHelper()->getUrl('assets/images/avatar.png');
         }
