@@ -92,7 +92,7 @@ class LeadType extends AbstractType
                     'label'       => $field->getLabel(),
                     'label_attr'  => array('class' => 'control-label'),
                     'attr'        => $attr,
-                    'data'        => (isset($values[$alias])) ? (float) $values[$alias] : (float) $field->getDefaultValue(),
+                    'data'        => (isset($fieldValues[$alias])) ? (float) $fieldValues[$alias] : (float) $field->getDefaultValue(),
                     'mapped'      => false,
                     'constraints' => $constraints,
                     'precision'   => $properties['precision'],
@@ -107,7 +107,7 @@ class LeadType extends AbstractType
                     'label_attr'        => array('class' => 'control-label'),
                     'widget'            => 'single_text',
                     'attr'              => $attr,
-                    'data'              => (isset($values[$alias])) ? $values[$alias] :
+                    'data'              => (isset($fieldValues[$alias])) ? $fieldValues[$alias] :
                         $field->getDefaultValue(),
                     'mapped'            => false,
                     'constraints'       => $constraints,
@@ -146,7 +146,7 @@ class LeadType extends AbstractType
                         'required'    => $required,
                         'label'       => $field->getLabel(),
                         'label_attr'  => array('class' => 'control-label'),
-                        'data'        => (isset($values[$alias])) ? $values[$alias] : $field->getDefaultValue(),
+                        'data'        => (isset($fieldValues[$alias])) ? $fieldValues[$alias] : $field->getDefaultValue(),
                         'attr'        => $attr,
                         'mapped'      => false,
                         'multiple'    => false,
@@ -170,7 +170,7 @@ class LeadType extends AbstractType
                     'label'       => $field->getLabel(),
                     'label_attr'  => array('class' => 'control-label'),
                     'attr'        => $attr,
-                    'data'        => (isset($values[$alias])) ? $values[$alias] : $field->getDefaultValue(),
+                    'data'        => (isset($fieldValues[$alias])) ? $fieldValues[$alias] : $field->getDefaultValue(),
                     'mapped'      => false,
                     'constraints' => $constraints
                 ));

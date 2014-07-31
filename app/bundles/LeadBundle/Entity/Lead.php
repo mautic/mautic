@@ -102,6 +102,14 @@ class Lead extends FormEntity
             }
         } elseif ($prop == 'ipAddresses') {
             $this->changes['ipAddresses'] = array('', $val->getIpAddress());
+        } elseif ($prop == 'fields') {
+            $diff = array_diff_assoc($val, $this->fields);
+            if (count($diff)) {
+                foreach ($diff as $k => $v) {
+                    $this->changes['fields'][$k] = array($this->fields[$k], $v);
+                }
+
+            }
         } elseif ($this->$getter() != $val) {
             $this->changes[$prop] = array($this->$getter(), $val);
         }
@@ -351,6 +359,9 @@ class Lead extends FormEntity
      */
     public function setFields($fields)
     {
+        if (!empty($this->fields)) {
+            $this->isChanged('fields', $fields);
+        }
         $this->fields = $fields;
     }
 

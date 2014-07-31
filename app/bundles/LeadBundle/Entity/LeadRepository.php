@@ -248,6 +248,7 @@ class LeadRepository extends CommonRepository
         foreach ($baseCols as $c) {
             unset($r[$c]);
         }
+        unset($r['owner_id']);
     }
 
     /**

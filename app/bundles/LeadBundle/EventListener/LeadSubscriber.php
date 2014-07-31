@@ -80,13 +80,17 @@ class LeadSubscriber extends CommonSubscriber
                 $filter['force'] .= " $isCommand:$mine";
             }
 
-            $leads = $this->factory->getModel('lead.lead')->getEntities(
+            $results = $this->factory->getModel('lead.lead')->getEntities(
                 array(
-                    'limit'  => 5,
-                    'filter' => $filter
+                    'limit'          => 5,
+                    'filter'         => $filter,
+                    'withTotalCount' => true
                 ));
 
-            if (count($leads) > 0) {
+            $count = $results['count'];
+
+            if ($count > 0) {
+                $leads       = $results['results'];
                 $leadResults = array();
 
                 foreach ($leads as $lead) {

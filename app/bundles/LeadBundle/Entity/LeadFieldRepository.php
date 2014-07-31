@@ -58,6 +58,11 @@ class LeadFieldRepository extends CommonRepository
         foreach($results as $item) {
             $aliases[] = $item['alias'];
         }
+
+        //add lead main column names to prevent attempt to create a field with the same name
+        $leadRepo = $this->_em->getRepository('MauticLeadBundle:Lead')->getBaseColumns(true);
+        $aliases = array_merge($aliases, $leadRepo);
+
         return $aliases;
     }
 }
