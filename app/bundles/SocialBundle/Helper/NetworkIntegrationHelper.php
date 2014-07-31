@@ -221,15 +221,15 @@ class NetworkIntegrationHelper
      * @param $fields
      * @param $refresh
      * @param $persistLead
-     * @param $includeLeadFields
+     * @param $returnSettings
      *
      * @return array
      */
     public static function getUserProfiles($factory, $lead, $fields, $refresh = true, $persistLead = true,
-                                           $includeLeadFields = false)
+                                           $returnSettings = false)
     {
-        $socialCache  = $lead->getSocialCache();
-        $leadFields   = array();
+        $socialCache      = $lead->getSocialCache();
+        $featureSettings  = array();
 
         if ($refresh) {
             //regenerate from networks
@@ -247,8 +247,8 @@ class NetworkIntegrationHelper
                         $socialCache[$network] = array();
                     }
 
-                    if ($includeLeadFields) {
-                        $leadFields[$network] = $settings->getLeadFields();
+                    if ($returnSettings) {
+                        $featureSettings[$network] = $settings->getFeatureSettings();
                     }
 
                     if (!isset($socialCache[$network]['profile'])) {
@@ -279,15 +279,15 @@ class NetworkIntegrationHelper
                 $lead->setSocialCache($socialCache);
                 $factory->getEntityManager()->getRepository('MauticLeadBundle:Lead')->saveEntity($lead);
             }
-        } elseif ($includeLeadFields) {
+        } elseif ($returnSettings) {
             $socialNetworks = NetworkIntegrationHelper::getNetworkObjects($factory, null, array('public_profile', 'public_activity'));
             foreach ($socialNetworks as $network => $sn) {
-                $settings             = $sn->getSettings();
-                $leadFields[$network] = $settings->getLeadFields();
+                $settings                  = $sn->getSettings();
+                $featureSettings[$network] = $settings->getFeatureSettings();
             }
         }
 
-        return ($includeLeadFields) ? array($socialCache, $leadFields) : $socialCache;
+        return ($returnSettings) ? array($socialCache, $featureSettings) : $socialCache;
     }
 
     /**

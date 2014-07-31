@@ -146,7 +146,7 @@ class LeadModel extends FormModel
     public function setFieldValues(Lead &$lead, array $data, $overwriteWithBlank = true)
     {
         //generate the social cache
-        list($socialCache, $socialMediaFields) = NetworkIntegrationHelper::getUserProfiles($this->factory, $lead, $data, true, false, true);
+        list($socialCache, $socialFeatureSettings) = NetworkIntegrationHelper::getUserProfiles($this->factory, $lead, $data, true, false, true);
 
         //set the social cache while we have it
         $lead->setSocialCache($socialCache);
@@ -169,10 +169,11 @@ class LeadModel extends FormModel
             if (empty($newValue) && !empty($socialCache)) {
                 foreach ($socialCache as $service => $details) {
                     //check to see if a field has been assigned
-                    if (in_array($field->getId(), $socialMediaFields[$service])) {
+                    if (!empty($socialFeatureSettings[$service]['leadFields']) &&
+                        in_array($field->getId(), $socialFeatureSettings[$service]['leadFields'])) {
 
                         //check to see if the data is available
-                        $key = array_search($field->getId(), $socialMediaFields[$service]);
+                        $key = array_search($field->getId(), $socialFeatureSettings[$service]['leadFields']);
                         if (isset($details['profile'][$key])) {
                             //Found!!
                             $fieldValues[$alias] = $details['profile'][$key];
