@@ -272,6 +272,12 @@ class TwitterNetwork extends AbstractNetwork
                 $socialCache['updated']  = true;
             }
         }
+        if (empty($socialCache['profile'])) {
+            //populate empty data
+            $socialCache['profile'] = $this->matchUpData(array());
+            $socialCache['profile']['profileHandle'] = "";
+            $socialCache['profile']['profileImage']  = $this->factory->getAssetsHelper()->getUrl('assets/images/avatar.png');
+        }
     }
 
     /**
@@ -340,11 +346,12 @@ class TwitterNetwork extends AbstractNetwork
         $info       = array();
         $available  = $this->getAvailableFields();
 
-        foreach ($data as $field => $values) {
-            if (!isset($available[$field]))
-                continue;
-
-            $info[$field] = $values;
+        foreach ($available as $field => $fieldDetails) {
+            if (!isset($data[$field])) {
+                $info[$field] = '';
+            } else {
+                $info[$field] = $data[$field];;
+            }
         }
         return $info;
     }

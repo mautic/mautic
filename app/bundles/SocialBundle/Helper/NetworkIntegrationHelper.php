@@ -251,10 +251,17 @@ class NetworkIntegrationHelper
                         $leadFields[$network] = $settings->getLeadFields();
                     }
 
+                    if (!isset($socialCache[$network]['profile'])) {
+                        $socialCache[$network]['profile'] = array();
+                    }
                     if (in_array('public_profile', $features)) {
                         $sn->getUserData($identifierField, $socialCache[$network]);
+
                     }
 
+                    if (!isset($socialCache[$network]['activity'])) {
+                        $socialCache[$network]['activity'] = array();
+                    }
                     if (in_array('public_activity', $features)) {
                         $sn->getPublicActivity($identifierField, $socialCache[$network]);
                     }

@@ -83,6 +83,11 @@ class GooglePlusNetwork extends AbstractNetwork
             }
             $socialCache['profile'] = $info;
             $socialCache['updated'] = true;
+        } elseif (empty($socialCache['profile'])) {
+            //populate empty data
+            $socialCache['profile'] = $this->matchUpData(new stdClass());
+            $socialCache['profile']['profileHandle'] = "";
+            $socialCache['profile']['profileImage']  = $this->factory->getAssetsHelper()->getUrl('assets/images/avatar.png');
         }
     }
 
@@ -126,98 +131,99 @@ class GooglePlusNetwork extends AbstractNetwork
         $available  = $this->getAvailableFields();
         $translator = $this->factory->getTranslator();
 
-        foreach ($data as $field => $values) {
-            if (!isset($available[$field]))
-                continue;
+        foreach ($available as $field => $fieldDetails) {
+            if (!isset($data->$field)) {
+                $info[$field] = '';
+            } else {
+                $values = $data->$field;
 
-            $fieldDetails = $available[$field];
-
-            switch ($fieldDetails['type']) {
-                case 'string':
-                case 'boolean':
-                    $info[$field] = $values;
-                    break;
-                case 'object':
-                    foreach ($fieldDetails['fields'] as $f) {
-                        if (isset($values->$f)) {
-                            $name        = $f . ucfirst($field);
-                            $info[$name] = $values->$f;
+                switch ($fieldDetails['type']) {
+                    case 'string':
+                    case 'boolean':
+                        $info[$field] = $values;
+                        break;
+                    case 'object':
+                        foreach ($fieldDetails['fields'] as $f) {
+                            if (isset($values->$f)) {
+                                $name        = $f . ucfirst($field);
+                                $info[$name] = $values->$f;
+                            }
                         }
-                    }
-                    break;
-                case 'array_object':
-                    if ($field == "urls") {
-                        $socialProfileUrls = NetworkIntegrationHelper::getSocialProfileUrlRegex();
-                        foreach ($values as $k => $v) {
-                            $socialMatch       = false;
-                            foreach ($socialProfileUrls as $service => $regex) {
-                                if (is_array($regex)) {
-                                    foreach ($regex as $r) {
-                                        preg_match($r, $v->value, $match);
+                        break;
+                    case 'array_object':
+                        if ($field == "urls") {
+                            $socialProfileUrls = NetworkIntegrationHelper::getSocialProfileUrlRegex();
+                            foreach ($values as $k => $v) {
+                                $socialMatch = false;
+                                foreach ($socialProfileUrls as $service => $regex) {
+                                    if (is_array($regex)) {
+                                        foreach ($regex as $r) {
+                                            preg_match($r, $v->value, $match);
+                                            if (!empty($match[1])) {
+                                                $info[$service . 'ProfileHandle'] = $match[1];
+                                                $socialMatch                      = true;
+                                                break;
+                                            }
+                                        }
+                                        if ($socialMatch)
+                                            break;
+                                    } else {
+                                        preg_match($regex, $v->value, $match);
                                         if (!empty($match[1])) {
                                             $info[$service . 'ProfileHandle'] = $match[1];
                                             $socialMatch                      = true;
                                             break;
                                         }
                                     }
-                                    if ($socialMatch)
-                                        break;
-                                } else {
-                                    preg_match($regex, $v->value, $match);
-                                    if (!empty($match[1])) {
-                                        $info[$service . 'ProfileHandle'] = $match[1];
-                                        $socialMatch                      = true;
-                                        break;
+                                }
+
+                                if (!$socialMatch) {
+                                    $name = $v->type . 'Urls';
+                                    if (isset($info[$name])) {
+                                        $info[$name] .= ", {$v->label} ({$v->value})";
+                                    } else {
+                                        $info[$name] = "{$v->label} ({$v->value})";
                                     }
                                 }
                             }
+                        } elseif ($field == "organizations") {
+                            $organizations = array();
 
-                            if (!$socialMatch) {
-                                $name = $v->type . 'Urls';
-                                if (isset($info[$name])) {
-                                    $info[$name] .= ", {$v->label} ({$v->value})";
-                                } else {
-                                    $info[$name] = "{$v->label} ({$v->value})";
+                            foreach ($values as $k => $v) {
+                                if (!empty($v->name) && !empty($v->title))
+                                    $organization = $v->name . ', ' . $v->title;
+                                elseif (!empty($v->name)) {
+                                    $organization = $v->name;
+                                } elseif (!empty($v->title)) {
+                                    $organization = $v->title;
                                 }
-                            }
-                        }
-                    } elseif ($field == "organizations") {
-                        $organizations = array();
 
-                        foreach ($values as $k => $v) {
-                            if (!empty($v->name) && !empty($v->title))
-                                $organization = $v->name . ', ' . $v->title;
-                            elseif (!empty($v->name)) {
-                                $organization = $v->name;
-                            } elseif (!empty($v->title)) {
-                                $organization = $v->title;
-                            }
+                                if (!empty($v->startDate) && !empty($v->endDate)) {
+                                    $organization .= " " . $v->startDate . ' - ' . $v->endDate;
+                                } elseif (!empty($v->startDate)) {
+                                    $organization .= ' ' . $v->startDate;
+                                } elseif (!empty($v->endDate)) {
+                                    $organization .= ' ' . $v->endDate;
+                                }
 
-                            if (!empty($v->startDate) && !empty($v->endDate)) {
-                                $organization .= " " . $v->startDate . ' - ' . $v->endDate;
-                            } elseif (!empty($v->startDate)) {
-                                $organization .= ' ' . $v->startDate;
-                            } elseif (!empty($v->endDate)) {
-                                $organization .= ' ' . $v->endDate;
+                                if (!empty($v->primary)) {
+                                    $organization .= " (" . $translator->trans('mautic.lead.lead.primary') . ")";
+                                }
+                                $organizations[$v->type][] = $organization;
                             }
-
-                            if (!empty($v->primary)) {
-                                $organization .= " (" . $translator->trans('mautic.lead.lead.primary') . ")";
+                            foreach ($organizations as $type => $orgs) {
+                                $info[$type . "Organizations"] = implode("; ", $orgs);
                             }
-                            $organizations[$v->type][] = $organization;
+                        } elseif ($field == "placesLived") {
+                            $places = array();
+                            foreach ($values as $k => $v) {
+                                $primary  = (!empty($v->primary)) ? ' (' . $translator->trans('mautic.lead.lead.primary') . ')' : '';
+                                $places[] = $v->value . $primary;
+                            }
+                            $info[$field] = implode('; ', $places);
                         }
-                        foreach ($organizations as $type => $orgs) {
-                            $info[$type . "Organizations"] = implode("; ", $orgs);
-                        }
-                    } elseif ($field == "placesLived") {
-                        $places = array();
-                        foreach ($values as $k => $v) {
-                            $primary  = (!empty($v->primary)) ? ' (' . $translator->trans('mautic.lead.lead.primary') . ')' : '';
-                            $places[] = $v->value . $primary;
-                        }
-                        $info[$field] = implode('; ', $places);
-                    }
-                    break;
+                        break;
+                }
             }
         }
         return $info;

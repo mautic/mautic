@@ -262,25 +262,26 @@ class FoursquareNetwork extends AbstractNetwork
         $info       = array();
         $available  = $this->getAvailableFields();
 
-        foreach ($data as $field => $values) {
-            if (!isset($available[$field]))
-                continue;
+        foreach ($available as $field => $fieldDetails) {
+            if (!isset($data[$field])) {
+                $info[$field] = '';
+            } else {
+                $values = $data[$field];
 
-            $fieldDetails = $available[$field];
-
-            switch ($fieldDetails['type']) {
-                case 'string':
-                case 'boolean':
-                    $info[$field] = $values;
-                    break;
-                case 'object':
-                    foreach ($fieldDetails['fields'] as $f) {
-                        if (isset($values->$f)) {
-                            $name = ($f == 'twitter' || $f == 'facebook') ? $f . 'ProfileHandle' : $f . ucfirst($field);
-                            $info[$name] = $values->$f;
+                switch ($fieldDetails['type']) {
+                    case 'string':
+                    case 'boolean':
+                        $info[$field] = $values;
+                        break;
+                    case 'object':
+                        foreach ($fieldDetails['fields'] as $f) {
+                            if (isset($values->$f)) {
+                                $name        = ($f == 'twitter' || $f == 'facebook') ? $f . 'ProfileHandle' : $f . ucfirst($field);
+                                $info[$name] = $values->$f;
+                            }
                         }
-                    }
-                    break;
+                        break;
+                }
             }
         }
         return $info;
@@ -353,6 +354,13 @@ class FoursquareNetwork extends AbstractNetwork
 
                 return $socialCache['id'];
             }
+        }
+
+        if (empty($socialCache['profile'])) {
+            //populate empty data
+            $socialCache['profile'] = $this->matchUpData(array());
+            $socialCache['profile']['profileHandle'] = "";
+            $socialCache['profile']['profileImage']  = $this->factory->getAssetsHelper()->getUrl('assets/images/avatar.png');
         }
 
         return false;
