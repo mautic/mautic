@@ -78,7 +78,7 @@ class IpAddress {
                                 'country'      => $data->country,
                                 'latitude'     => $data->latitude,
                                 'longitude'    => $data->longitude,
-                                'isp'          => $data->isp,
+                                'isp'          => (isset($data->isp)) ? $data->isp : '',
                                 'organization' => '',
                                 'timezone'     => $data->timezone
                             );

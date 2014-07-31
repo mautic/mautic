@@ -50,6 +50,7 @@ class LoadLeadFieldData extends AbstractFixture implements OrderedFixtureInterfa
             'lastname',
             'company',
             'position',
+            'gender',
             'email',
             'title',
             'phone',
