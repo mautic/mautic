@@ -444,7 +444,7 @@ var Mautic = {
     processPageContent: function (response) {
         if (response) {
             if (!response.target) {
-                response.target = '#page-content';
+                response.target = '#main-content';
             }
 
             //update type of content displayed
@@ -470,25 +470,8 @@ var Mautic = {
                 }
             }
 
-            //update breadcrumbs
-            if (response.breadcrumbs) {
-                mQuery("#breadcrumbs").html(response.breadcrumbs);
-            }
-
-            //update latest flashes
-            if (response.flashes) {
-                mQuery(".main-panel-flash-msgs").html(response.flashes);
-
-                //ajaxify links
-                mQuery(".main-panel-flash-msgs a[data-toggle='ajax']").click(function (event) {
-                    event.preventDefault();
-
-                    return Mautic.ajaxifyLink(this, event);
-                });
-            }
-
             window.setTimeout(function() {
-                mQuery(".main-panel-flash-msgs .alert").fadeTo(500, 0).slideUp(500, function(){
+                mQuery("#flashes .alert").fadeTo(500, 0).slideUp(500, function(){
                     mQuery(this).remove();
                 });
             }, 7000);

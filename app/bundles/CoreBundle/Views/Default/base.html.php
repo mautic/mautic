@@ -28,13 +28,8 @@ $activePanelClasses  = ($app->getSession()->get('left-panel', 'default') == 'unp
             </div>
         </aside>
         <section id="main" role="main">
-            <div class="container-fluid">
-                <div class="page-header page-header-block">
-                    <?php echo $view->render('MauticCoreBundle:Default:toppanel.html.php'); ?>
-                </div>
-                <div id="page-content">
-                    <?php $view['slots']->output('_content'); ?>
-                </div>
+            <div class="container-fluid" id="main-content">
+                <?php $view['slots']->output('_content'); ?>
             </div>
         </section>
 

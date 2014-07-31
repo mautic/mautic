@@ -11,16 +11,12 @@ if (!$app->getRequest()->isXmlHttpRequest()):
     //load base template
     $view->extend('MauticCoreBundle:Default:base.html.php');
 endif;
-
 ?>
-<div class="main-panel-header">
-    <?php //echo $view->render('MauticCoreBundle:Default:toolbar.html.php'); ?>
-    <div class="clearfix"></div>
-</div>
 
-<div id="main-content" class="main-panel-content-wrapper">
+<?php echo $view->render('MauticCoreBundle:Default:pageheader.html.php'); ?>
+
+<div id="page-content">
     <?php $view['slots']->output('_content'); ?>
-    <div class="main-panel-footer"></div>
 </div>
 
 <?php $view['slots']->output('modal'); ?>
