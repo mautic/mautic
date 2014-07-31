@@ -40,13 +40,13 @@
     <div class="tab-pane" id="GooglePosts">
         <?php echo $view->render('MauticLeadBundle:Social/GooglePlus:posts.html.php', array(
             'lead'      => $lead,
-            // 'activity'   => $details['activity']
+            // 'activity'   => $details['activity']['posts']
         )); ?>
     </div>
     <div class="tab-pane" id="GooglePhotos">
         <?php echo $view->render('MauticLeadBundle:Social/GooglePlus:photos.html.php', array(
             'lead'      => $lead,
-            // 'activity'   => $details['activity']
+            // 'activity'   => $details['activity']['photos']
         )); ?>
     </div>
 </div>

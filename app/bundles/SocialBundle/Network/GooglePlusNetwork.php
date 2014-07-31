@@ -106,7 +106,10 @@ class GooglePlusNetwork extends AbstractNetwork
             $url  = "https://www.googleapis.com/plus/v1/people/$id/activities/public?key={$keys['key']}&maxResults=10";
             $data = $this->makeCall($url);
             if (!empty($data) && isset($data->items) && count($data->items)) {
-                $socialCache['activity'] = array();
+                $socialCache['activity'] = array(
+                    'posts'  => array(),
+                    'photos' => array()
+                );
                 foreach ($data->items as $page) {
                     $post = array(
                         'title'     => $page->title,
@@ -114,7 +117,19 @@ class GooglePlusNetwork extends AbstractNetwork
                         'published' => $page->published,
                         'updated'   => $page->updated
                     );
-                    $socialCache['activity'][] = $post;
+                    $socialCache['activity']['posts'][] = $post;
+
+                    if (isset($page->object->attachments)) {
+                        foreach ($page->object->attachments as $a) {
+                            if (isset($a->fullImage)) {
+                                $photo = array(
+                                    'url'  => $a->fullImage->url,
+                                    'type' => $a->fullImage->type
+                                );
+                                $socialCache['activity']['photos'][] = $photo;
+                            }
+                        }
+                    }
                 }
                 $socialCache['updated'] = true;
             }
