@@ -293,10 +293,7 @@ class TwitterNetwork extends AbstractNetwork
      * @return mixed
      */
     public function makeCall($url) {
-        $request     = $this->factory->getRequest();
-        $route       = $request->get('_route');
-        $routeParams = $request->get('_route_params');
-        $referrer     = $this->factory->getRouter()->generate($route, $routeParams, true);
+        $referer = $this->getRefererUrl();
 
         $keys = $this->settings->getApiKeys();
         if (empty($keys['access_token'])) {
@@ -305,7 +302,7 @@ class TwitterNetwork extends AbstractNetwork
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_REFERER, $referrer);
+        curl_setopt($ch, CURLOPT_REFERER, $referer);
         curl_setopt($ch, CURLOPT_HEADER, 1);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array(
             "Authorization: Bearer {$keys['access_token']}",

@@ -184,15 +184,12 @@ abstract class AbstractNetwork
      * @return mixed
      */
     public function makeCall($url) {
-        $request     = $this->factory->getRequest();
-        $route       = $request->get('_route');
-        $routeParams = $request->get('_route_params');
-        $referrer     = $this->factory->getRouter()->generate($route, $routeParams, true);
+        $referer  = $this->getRefererUrl();
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_REFERER, $referrer);
+        curl_setopt($ch, CURLOPT_REFERER, $referer);
         $data = @curl_exec($ch);
         curl_close($ch);
 
@@ -332,5 +329,15 @@ abstract class AbstractNetwork
     public function getUserData($identifier, &$socialCache)
     {
         return array();
+    }
+
+    /**
+     * Generates current URL to set as referer for curl calls
+     *
+     * @return string
+     */
+    protected function getRefererUrl()
+    {
+        return "http" . (($_SERVER['SERVER_PORT']==443) ? "s://" : "://") . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
     }
 }
