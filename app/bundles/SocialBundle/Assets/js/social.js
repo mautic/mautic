@@ -1,6 +1,6 @@
 /* SocialBundle */
 
-Mautic.loadAuthModal = function(url, keyType, network) {
+Mautic.loadAuthModal = function(url, keyType, network, popupMsg) {
     //get the key needed if required
     var base = '#socialmedia_config_services_'+network+'_apiKeys_';
 
@@ -12,6 +12,10 @@ Mautic.loadAuthModal = function(url, keyType, network) {
     }
 
     var generator = window.open(url, 'socialauth','height=400,width=500');
+
+    if(!generator || generator.closed || typeof generator.closed=='undefined') {
+        alert(popupMsg);
+    }
 };
 
 /**

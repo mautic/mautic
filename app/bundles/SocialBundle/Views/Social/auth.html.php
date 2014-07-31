@@ -9,6 +9,6 @@
 $view->extend('MauticCoreBundle:Default:slim.html.php');
 
 $js = <<<JS
-Mautic.handleCallback("$network", "$csrfToken", "$code", "$callbackUrl");
+Mautic.handleCallback("$network", "$csrfToken", "$code", "$callbackUrl", "{$view['translator']->trans('mautic.social.oauth.popupblocked')}");
 JS;
 $view['slots']->addScriptDeclaration($js, 'bodyClose');
