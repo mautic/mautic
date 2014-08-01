@@ -23,16 +23,15 @@ class FieldController extends FormController
      */
     public function indexAction()
     {
-        if (!$this->get('mautic.security')->isGranted('lead:fields:full')) {
+        if (!$this->factory->getSecurity()->isGranted('lead:fields:full')) {
             return $this->accessDenied();
         }
-        $factory = $this->get('mautic.factory');
-        $items   = $factory->getModel('lead.field')->getEntities();
+        $items = $this->factory->getModel('lead.field')->getEntities();
 
         return $this->delegateView(array(
             'viewParameters'  => array(
                 'items'      => $items,
-                'dateFormat' => $factory->getParameter('date_format_full')
+                'dateFormat' => $this->factory->getParameter('date_format_full')
             ),
             'contentTemplate' => 'MauticLeadBundle:Field:index.html.php',
             'passthroughVars' => array(
@@ -50,13 +49,13 @@ class FieldController extends FormController
      */
     public function newAction ()
     {
-        if (!$this->get('mautic.security')->isGranted('lead:fields:full')) {
+        if (!$this->factory->getSecurity()->isGranted('lead:fields:full')) {
             return $this->accessDenied();
         }
 
         //retrieve the entity
         $field     = new LeadField();
-        $model      = $this->get('mautic.factory')->getModel('lead.field');
+        $model      = $this->factory->getModel('lead.field');
         //set the return URL for post actions
         $returnUrl  = $this->generateUrl('mautic_leadfield_index');
         $action     = $this->generateUrl('mautic_leadfield_action', array('objectAction' => 'new'));
@@ -132,11 +131,11 @@ class FieldController extends FormController
      */
     public function editAction ($objectId, $ignorePost = false)
     {
-        if (!$this->get('mautic.security')->isGranted('lead:fields:full')) {
+        if (!$this->factory->getSecurity()->isGranted('lead:fields:full')) {
             return $this->accessDenied();
         }
 
-        $model   = $this->get('mautic.factory')->getModel('lead.field');
+        $model   = $this->factory->getModel('lead.field');
         $field   = $model->getEntity($objectId);
 
         //set the return URL
@@ -244,11 +243,11 @@ class FieldController extends FormController
      */
     public function cloneAction ($objectId)
     {
-        $model   = $this->get('mautic.factory')->getModel('lead.field');
+        $model   = $this->factory->getModel('lead.field');
         $entity  = $model->getEntity($objectId);
 
         if ($entity != null) {
-            if (!$this->get('mautic.security')->isGranted('lead:fields:full')) {
+            if (!$this->factory->getSecurity()->isGranted('lead:fields:full')) {
                 return $this->accessDenied();
             }
 
@@ -270,7 +269,7 @@ class FieldController extends FormController
      */
     public function deleteAction($objectId)
     {
-        if (!$this->get('mautic.security')->isGranted('lead:fields:full')) {
+        if (!$this->factory->getSecurity()->isGranted('lead:fields:full')) {
             return $this->accessDenied();
         }
 
@@ -287,7 +286,7 @@ class FieldController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
-            $model  = $this->get('mautic.factory')->getModel('lead.field');
+            $model  = $this->factory->getModel('lead.field');
             $field = $model->getEntity($objectId);
 
             if ($field === null) {

@@ -27,7 +27,7 @@ class UserApiController extends CommonApiController
 
     public function initialize(FilterControllerEvent $event)
     {
-        $this->model           = $this->get('mautic.factory')->getModel('user.user');
+        $this->model           = $this->factory->getModel('user.user');
         $this->entityClass     = 'Mautic\UserBundle\Entity\User';
         $this->entityNameOne   = 'user';
         $this->entityNameMulti = 'users';
@@ -55,7 +55,7 @@ class UserApiController extends CommonApiController
      */
     public function getEntitiesAction()
     {
-        if (!$this->container->get('mautic.security')->isGranted('user:users:view')) {
+        if (!$this->factory->getSecurity()->isGranted('user:users:view')) {
             return $this->accessDenied();
         }
         $this->serializerGroups = array('full');
@@ -80,7 +80,7 @@ class UserApiController extends CommonApiController
      */
     public function getEntityAction($id)
     {
-        if (!$this->container->get('mautic.security')->isGranted('user:users:view')) {
+        if (!$this->factory->getSecurity()->isGranted('user:users:view')) {
             return $this->accessDenied();
         }
         $this->serializerGroups = array('full');
@@ -126,7 +126,7 @@ class UserApiController extends CommonApiController
      */
     public function deleteEntityAction($id)
     {
-        if (!$this->container->get('mautic.security')->isGranted('user:users:delete')) {
+        if (!$this->factory->getSecurity()->isGranted('user:users:delete')) {
             return $this->accessDenied();
         }
         $this->serializerGroups = array('full');
@@ -151,7 +151,7 @@ class UserApiController extends CommonApiController
     {
         $entity = $this->model->getEntity();
 
-        if (!$this->container->get('mautic.security')->isGranted('user:users:create')) {
+        if (!$this->factory->getSecurity()->isGranted('user:users:create')) {
             return $this->accessDenied();
         }
 
@@ -195,13 +195,13 @@ class UserApiController extends CommonApiController
         $parameters = $this->request->request->all();
         $method     = $this->request->getMethod();
 
-        if (!$this->container->get('mautic.security')->isGranted('user:users:edit')) {
+        if (!$this->factory->getSecurity()->isGranted('user:users:edit')) {
             return $this->accessDenied();
         }
 
         if ($entity === null) {
             if ($method === "PATCH" ||
-                ($method === "PUT" && !$this->container->get('mautic.security')->isGranted('user:users:create'))
+                ($method === "PUT" && !$this->factory->getSecurity()->isGranted('user:users:create'))
             ) {
                 //PATCH requires that an entity exists or must have create access for PUT
                 throw new NotFoundHttpException($this->get('translator')->trans('mautic.api.call.notfound'));
@@ -275,7 +275,7 @@ class UserApiController extends CommonApiController
             $permissions = array($permissions);
         }
 
-        $return = $this->get('mautic.security')->isGranted($permissions, "RETURN_ARRAY", $entity);
+        $return = $this->factory->getSecurity()->isGranted($permissions, "RETURN_ARRAY", $entity);
         $view = $this->view($return, Codes::HTTP_OK);
         return $this->handleView($view);
     }
@@ -299,7 +299,7 @@ class UserApiController extends CommonApiController
      */
     public function getRolesAction()
     {
-        if (!$this->container->get('mautic.security')->isGranted(
+        if (!$this->factory->getSecurity()->isGranted(
             array('user:users:create', 'user:users:edit'),
             'MATCH_ONE'
         )) {
@@ -308,7 +308,7 @@ class UserApiController extends CommonApiController
 
         $filter = $this->request->query->get('filter', null);
         $limit  = $this->request->query->get('limit', null);
-        $roles = $this->get('mautic.factory')->getModel('user.user')->getLookupResults('role', $filter, $limit);
+        $roles = $this->factory->getModel('user.user')->getLookupResults('role', $filter, $limit);
 
         $view = $this->view($roles, Codes::HTTP_OK);
         $context = SerializationContext::create()->setGroups(array('limited'));

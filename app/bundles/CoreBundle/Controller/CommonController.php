@@ -9,6 +9,7 @@
 
 namespace Mautic\CoreBundle\Controller;
 
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,6 +25,11 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
  */
 class CommonController extends Controller implements MauticController{
     /**
+     * @var \Mautic\CoreBundle\Factory\MauticFactory
+     */
+    protected $factory;
+
+    /**
      * @var \Symfony\Component\HttpFoundation\Request
      */
     protected $request;
@@ -34,6 +40,11 @@ class CommonController extends Controller implements MauticController{
     public function setRequest(Request $request)
     {
         $this->request = $request;
+    }
+
+    public function setFactory(MauticFactory $factory)
+    {
+        $this->factory = $factory;
     }
 
     /**
@@ -101,7 +112,7 @@ class CommonController extends Controller implements MauticController{
         //set flashes
         if (!empty($flashes)) {
             foreach ($flashes as $flash) {
-                $this->get('session')->getFlashBag()->add(
+                $this->factory->getSession()->getFlashBag()->add(
                     $flash['type'],
                     $this->get('translator')->trans(
                         $flash['msg'],
@@ -227,7 +238,7 @@ class CommonController extends Controller implements MauticController{
      */
     public function accessDenied($msg = 'mautic.core.error.accessdenied')
     {
-        $user = $this->get('mautic.factory')->getUser();
+        $user = $this->factory->getUser();
         if (!$user instanceof User && !$user->getId()) {
             throw new AccessDeniedHttpException($this->get('translator')->trans('mautic.core.url.error.401'));
         } else {

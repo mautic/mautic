@@ -116,12 +116,13 @@ class CoreSubscriber extends CommonSubscriber
 
         //only affect Mautic controllers
         if ($controller[0] instanceof MauticController) {
-
-            //populate request attributes with  namespace, bundle, controller, and action names for use in bundle controllers and templates
             $request = $event->getRequest();
 
             //also set the request for easy access throughout controllers
             $controller[0]->setRequest($request);
+
+            //set the factory for easy use access throughout the controllers
+            $controller[0]->setFactory($this->factory);
 
             //run any initialize functions
             $controller[0]->initialize($event);

@@ -26,7 +26,7 @@ class LeadApiController extends CommonApiController
 
     public function initialize(FilterControllerEvent $event)
     {
-        $this->model           = $this->get('mautic.factory')->getModel('lead.lead');
+        $this->model           = $this->factory->getModel('lead.lead');
         $this->entityClass     = 'Mautic\LeadBundle\Entity\Lead';
         $this->entityNameOne   = 'lead';
         $this->entityNameMulti = 'leads';
@@ -54,7 +54,7 @@ class LeadApiController extends CommonApiController
      */
     public function getEntitiesAction()
     {
-        if (!$this->container->get('mautic.security')->isGranted(
+        if (!$this->factory->getSecurity()->isGranted(
             array('lead:leads:viewown', 'lead:leads:viewother'),
             'MATCH_ONE'
         )) {
@@ -63,7 +63,7 @@ class LeadApiController extends CommonApiController
 
         $args = array(
             'start'      => $this->request->query->get('start', 0),
-            'limit'      => $this->request->query->get('limit', $this->get('mautic.factory')->getParameter('default_pagelimit')),
+            'limit'      => $this->request->query->get('limit', $this->factory->getParameter('default_pagelimit')),
             'filter'     => $this->request->query->get('search', ''),
             'orderBy'    => $this->request->query->get('orderBy', ''),
             'orderByDir' => $this->request->query->get('orderByDir', 'ASC')
@@ -98,7 +98,7 @@ class LeadApiController extends CommonApiController
     public function getEntityAction($id)
     {
         $entity = $this->model->getEntity($id);
-        if (!$this->container->get('mautic.security')->hasEntityAccess(
+        if (!$this->factory->getSecurity()->hasEntityAccess(
             'lead:leads:viewown',
             'lead:leads:viewother',
             $entity
@@ -136,7 +136,7 @@ class LeadApiController extends CommonApiController
     {
         $entity = $this->model->getEntity($id);
 
-        if (!$this->container->get('mautic.security')->hasEntityAccess(
+        if (!$this->factory->getSecurity()->hasEntityAccess(
             'lead:leads:deleteown',
             'lead:leads:deleteother',
             $entity
@@ -181,7 +181,7 @@ class LeadApiController extends CommonApiController
     {
         $entity = $this->model->getEntity();
 
-        if (!$this->container->get('mautic.security')->isGranted('lead:leads:create')) {
+        if (!$this->factory->getSecurity()->isGranted('lead:leads:create')) {
             return $this->accessDenied();
         }
 
@@ -221,7 +221,7 @@ class LeadApiController extends CommonApiController
         $parameters = $this->request->request->all();
         $method     = $this->request->getMethod();
 
-        if (!$this->container->get('mautic.security')->hasEntityAccess(
+        if (!$this->factory->getSecurity()->hasEntityAccess(
             'lead:leads:editown',
             'lead:leads:editother',
             $entity
@@ -231,7 +231,7 @@ class LeadApiController extends CommonApiController
 
         if ($entity === null) {
             if ($method === "PATCH" ||
-                ($method === "PUT" && !$this->container->get('mautic.security')->isGranted('lead:leads:create'))
+                ($method === "PUT" && !$this->factory->getSecurity()->isGranted('lead:leads:create'))
             ) {
                 //PATCH requires that an entity exists or must have create access for PUT
                 throw new NotFoundHttpException($this->get('translator')->trans('mautic.api.call.notfound'));
@@ -279,7 +279,7 @@ class LeadApiController extends CommonApiController
      */
     public function getOwnersAction()
     {
-        if (!$this->container->get('mautic.security')->isGranted(
+        if (!$this->factory->getSecurity()->isGranted(
             array('lead:leads:create', 'lead:leads:editown', 'lead:leads:editother'),
             'MATCH_ONE'
         )) {
@@ -311,7 +311,7 @@ class LeadApiController extends CommonApiController
      */
     public function getListsAction()
     {
-        $lists = $this->get('mautic.factory')->getModel('lead.list')->getSmartLists();
+        $lists = $this->factory->getModel('lead.list')->getSmartLists();
         $view = $this->view($lists, Codes::HTTP_OK);
         $context = SerializationContext::create()->setGroups(array('limited'));
         $view->setSerializationContext($context);
@@ -333,14 +333,14 @@ class LeadApiController extends CommonApiController
      */
     public function getFieldsAction()
     {
-        if (!$this->container->get('mautic.security')->isGranted(
+        if (!$this->factory->getSecurity()->isGranted(
             array('lead:leads:editown','lead:leads:editother'),
             'MATCH_ONE'
         )) {
             return $this->accessDenied();
         }
 
-        $fields = $this->get('mautic.factory')->getModel('lead.field')->getEntities();
+        $fields = $this->factory->getModel('lead.field')->getEntities();
         $view = $this->view($fields, Codes::HTTP_OK);
         $context = SerializationContext::create()->setGroups(array('limited'));
         $view->setSerializationContext($context);

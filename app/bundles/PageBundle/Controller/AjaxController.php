@@ -28,7 +28,7 @@ class AjaxController extends CommonAjaxController
     protected function pageListAction(Request $request)
     {
         $filter    = InputHelper::clean($request->query->get('filter'));
-        $results   = $this->get('mautic.factory')->getModel('page.page')->getLookupResults('page', $filter);
+        $results   = $this->factory->getModel('page.page')->getLookupResults('page', $filter);
         $dataArray = array();
 
         foreach ($results as $r) {
@@ -47,7 +47,7 @@ class AjaxController extends CommonAjaxController
     protected function categoryListAction(Request $request)
     {
         $filter    = InputHelper::clean($request->query->get('filter'));
-        $results   = $this->get('mautic.factory')->getModel('page.page')->getLookupResults('category', $filter);
+        $results   = $this->factory->getModel('page.page')->getLookupResults('category', $filter);
         $dataArray = array();
         foreach ($results as $r) {
             $dataArray[] = array(
@@ -65,7 +65,7 @@ class AjaxController extends CommonAjaxController
         $slot       = InputHelper::clean($request->request->get('slot'));
         $dataArray  = array('success' => 0);
         if (!empty($page) && !empty($slot)) {
-            $session = $this->get('session');
+            $session = $this->factory->getSession();
             $content = $session->get('mautic.pagebuilder.'.$page.'.content', array());
             $content[$slot] = $newContent;
             $session->set('mautic.pagebuilder.'.$page.'.content', $content);

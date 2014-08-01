@@ -39,7 +39,7 @@ class AjaxController extends CommonController
     public function delegateAjaxAction()
     {
         //process ajax actions
-        $securityContext = $this->container->get('security.context');
+        $securityContext = $this->factory->getSecurityContext();
         $action          = (empty($ajaxAction)) ? $this->request->get("action") : $ajaxAction;
 
         if ($securityContext->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
@@ -129,7 +129,7 @@ class AjaxController extends CommonController
     {
         $dataArray = array('success' => 1);
         $searchStr = InputHelper::clean($request->query->get("global_search", ""));
-        $this->get('session')->set('mautic.global_search', $searchStr);
+        $this->factory->getSession()->set('mautic.global_search', $searchStr);
 
         $event = new GlobalSearchEvent($searchStr, $this->get('translator'));
         $this->get('event_dispatcher')->dispatch(CoreEvents::GLOBAL_SEARCH, $event);
@@ -143,7 +143,7 @@ class AjaxController extends CommonController
     protected function commandListAction(Request $request)
     {
         $model      = InputHelper::clean($request->query->get('model'));
-        $commands   = $this->get('mautic.factory')->getModel($model)->getCommandList();
+        $commands   = $this->factory->getModel($model)->getCommandList();
         $dataArray  = array();
         $translator = $this->get('translator');
         foreach ($commands as $k => $c) {
@@ -213,11 +213,11 @@ class AjaxController extends CommonController
         $dataArray = array('success' => 0);
         $name   = InputHelper::clean($request->request->get('model'));
         $id     = InputHelper::int($request->request->get('id'));
-        $model  = $this->get('mautic.factory')->getModel($name);
+        $model  = $this->factory->getModel($name);
         $entity = $model->getEntity($id);
         if ($entity !== null) {
             $permissionBase = $model->getPermissionBase();
-            if ($this->get('mautic.security')->hasEntityAccess(
+            if ($this->factory->getSecurity()->hasEntityAccess(
                 $permissionBase . ':publishown',
                 $permissionBase . ':publishother',
                 $entity->getCreatedBy()
@@ -226,7 +226,7 @@ class AjaxController extends CommonController
                 $dataArray['success'] = 1;
                 //toggle permission state
                 $model->togglePublishStatus($entity);
-                $dateFormat = $this->get('mautic.factory')->getParameter('date_format_full');
+                $dateFormat = $this->factory->getParameter('date_format_full');
                 //get updated icon HTML
                 $html = $this->renderView('MauticCoreBundle:Helper:publishstatus.html.php',array(
                     'item'       => $entity,

@@ -27,7 +27,7 @@ class AjaxController extends CommonAjaxController
     protected function roleListAction(Request $request)
     {
         $filter    = InputHelper::clean($request->query->get('filter'));
-        $results   = $this->get('mautic.factory')->getModel('user.user')->getLookupResults('role', $filter);
+        $results   = $this->factory->getModel('user.user')->getLookupResults('role', $filter);
         $dataArray = array();
         foreach ($results as $r) {
             $dataArray[] = array(
@@ -44,7 +44,7 @@ class AjaxController extends CommonAjaxController
     protected function positionListAction(Request $request)
     {
         $filter  = InputHelper::clean($request->query->get('filter'));
-        $results = $this->get('mautic.factory')->getModel('user.user')->getLookupResults('position', $filter);
+        $results = $this->factory->getModel('user.user')->getLookupResults('position', $filter);
         $dataArray = array();
         foreach ($results as $r) {
             $dataArray[] = array('value' => $r['position']);

@@ -60,10 +60,9 @@ class FormController extends CommonController
             urlencode($this->generateUrl('mautic_core_index'));
         $override  = '';
 
-        $factory      = $this->get('mautic.factory');
-        $model        = $factory->getModel($entityType);
+        $model        = $this->factory->getModel($entityType);
         $nameFunction = $model->getNameGetter();
-        if ($this->get('mautic.factory')->getUser()->isAdmin()) {
+        if ($this->factory->getUser()->isAdmin()) {
             $override = $this->get('translator')->trans('mautic.core.override.lock',array(
                 '%url%' => $this->generateUrl('mautic_core_form_action', array(
                         'objectAction' => 'unlock',
@@ -94,9 +93,9 @@ class FormController extends CommonController
                                 'returnUrl' => $returnUrl
                             )
                         ),
-                        '%date%'        => $date->format($factory->getParameter('date_format_dateonly')),
-                        '%time%'        => $date->format($factory->getParameter('date_format_timeonly')),
-                        '%datetime%'    => $date->format($factory->getParameter('date_format_full')),
+                        '%date%'        => $date->format($this->factory->getParameter('date_format_dateonly')),
+                        '%time%'        => $date->format($this->factory->getParameter('date_format_timeonly')),
+                        '%datetime%'    => $date->format($this->factory->getParameter('date_format_full')),
                         '%override%'    => $override
                     )
                 ))
@@ -109,12 +108,12 @@ class FormController extends CommonController
      */
     public function unlockAction($id, $model)
     {
-        if ($this->get('mautic.security')->isAdmin()) {
+        if ($this->factory->getSecurity()->isAdmin()) {
             $bundle = $object = $model;
             if (strpos($model, ':')) {
                 list($bundle, $object) = explode(':', $model);
             }
-            $model = $this->get('mautic.factory')->getModel($object);
+            $model = $this->factory->getModel($object);
 
             $entity = $model->getEntity($id);
             if ($entity !== null) {
@@ -139,7 +138,7 @@ class FormController extends CommonController
                         "details"   => $details,
                         "ipAddress" => $this->request->server->get('REMOTE_ADDR')
                     );
-                    $this->get('mautic.factory')->getModel('core.auditLog')->writeToLog($log);
+                    $this->factory->getModel('core.auditLog')->writeToLog($log);
 
                     $model->unlockEntity($entity);
                 }
@@ -148,7 +147,7 @@ class FormController extends CommonController
             if (empty($returnUrl)) {
                 $returnUrl = $this->generateUrl('mautic_core_index');
             }
-            $this->get('session')->getFlashBag()->add(
+            $this->factory->getSession()->getFlashBag()->add(
                 'notice',
                 $this->get('translator')->trans('mautic.core.action.entity.unlocked',
                     array('%name%' => urldecode($this->request->get('name'))),
@@ -172,7 +171,7 @@ class FormController extends CommonController
     protected function setFormTheme(Form $form, $template, $theme)
     {
         $formView = $form->createView();
-        $this->container->get('templating')->getEngine($template)->get('form')
+        $this->factory->getTemplating()->getEngine($template)->get('form')
             ->setTheme($formView, $theme);
         return $formView;
     }

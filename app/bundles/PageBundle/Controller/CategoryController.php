@@ -21,11 +21,10 @@ class CategoryController extends FormController
      */
     public function indexAction($page = 1)
     {
-        $factory = $this->get('mautic.factory');
-        $session = $this->get('session');
+        $session = $this->factory->getSession();
 
         //set some permissions
-        $permissions = $this->get('mautic.security')->isGranted(array(
+        $permissions = $this->factory->getSecurity()->isGranted(array(
             'page:categories:view',
             'page:categories:create',
             'page:categories:edit',
@@ -37,7 +36,7 @@ class CategoryController extends FormController
         }
 
         //set limits
-        $limit = $session->get('mautic.pagecategory.limit', $factory->getParameter('default_pagelimit'));
+        $limit = $session->get('mautic.pagecategory.limit', $this->factory->getParameter('default_pagelimit'));
         $start = ($page === 1) ? 0 : (($page-1) * $limit);
         if ($start < 0) {
             $start = 0;
@@ -47,10 +46,10 @@ class CategoryController extends FormController
         $session->set('mautic.pagecategory.filter', $search);
 
         $filter     = array('string' => $search, 'force' => array());
-        $orderBy    = $this->get('session')->get('mautic.pagecategory.orderby', 'c.title');
-        $orderByDir = $this->get('session')->get('mautic.pagecategory.orderbydir', 'DESC');
+        $orderBy    = $this->factory->getSession()->get('mautic.pagecategory.orderby', 'c.title');
+        $orderByDir = $this->factory->getSession()->get('mautic.pagecategory.orderbydir', 'DESC');
 
-        $entities = $factory->getModel('page.category')->getEntities(
+        $entities = $this->factory->getModel('page.category')->getEntities(
             array(
                 'start'      => $start,
                 'limit'      => $limit,
@@ -96,7 +95,7 @@ class CategoryController extends FormController
                 'limit'       => $limit,
                 'permissions' => $permissions,
                 'tmpl'        => $tmpl,
-                'dateFormat'  => $factory->getParameter('date_format_full')
+                'dateFormat'  => $this->factory->getParameter('date_format_full')
             ),
             'contentTemplate' => 'MauticPageBundle:Category:list.html.php',
             'passthroughVars' => array(
@@ -114,12 +113,11 @@ class CategoryController extends FormController
      */
     public function newAction ()
     {
-        $factory = $this->get('mautic.factory');
-        $session = $this->get('session');
-        $model   = $factory->getModel('page.category');
+        $session = $this->factory->getSession();
+        $model   = $this->factory->getModel('page.category');
         $entity  = $model->getEntity();
 
-        if (!$this->get('mautic.security')->isGranted('page:categories:create')) {
+        if (!$this->factory->getSecurity()->isGranted('page:categories:create')) {
             return $this->accessDenied();
         }
 
@@ -190,9 +188,8 @@ class CategoryController extends FormController
      */
     public function editAction ($objectId, $ignorePost = false)
     {
-        $factory = $this->get('mautic.factory');
-        $session = $this->get('session');
-        $model   = $factory->getModel('page.category');
+        $session = $this->factory->getSession();
+        $model   = $this->factory->getModel('page.category');
         $entity  = $model->getEntity($objectId);
         //set the page we came from
         $page    = $session->get('mautic.pagecategory.page', 1);
@@ -223,7 +220,7 @@ class CategoryController extends FormController
                     )
                 ))
             );
-        }  elseif (!$this->get('mautic.security')->isGranted('page:categories:view')) {
+        }  elseif (!$this->factory->getSecurity()->isGranted('page:categories:view')) {
             return $this->accessDenied();
         } elseif ($model->isLocked($entity)) {
             //deny access if the entity is locked
@@ -299,12 +296,11 @@ class CategoryController extends FormController
      */
     public function cloneAction ($objectId)
     {
-        $factory = $this->get('mautic.factory');
-        $model   = $factory->getModel('page.category');
+        $model   = $this->factory->getModel('page.category');
         $entity  = $model->getEntity($objectId);
 
         if ($entity != null) {
-            if (!$this->get('mautic.security')->isGranted('page:categories:create')) {
+            if (!$this->factory->getSecurity()->isGranted('page:categories:create')) {
                 return $this->accessDenied();
             }
 
@@ -324,8 +320,7 @@ class CategoryController extends FormController
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function deleteAction($objectId) {
-        $factory     = $this->get('mautic.factory');
-        $session     = $this->get('session');
+        $session     = $this->factory->getSession();
         $page        = $session->get('mautic.pagecategory.page', 1);
         $returnUrl   = $this->generateUrl('mautic_pagecategory_index', array('page' => $page));
         $flashes     = array();
@@ -341,7 +336,7 @@ class CategoryController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
-            $model  = $factory->getModel('page.category');
+            $model  = $this->factory->getModel('page.category');
             $entity = $model->getEntity($objectId);
 
             if ($entity === null) {
@@ -350,7 +345,7 @@ class CategoryController extends FormController
                     'msg'     => 'mautic.page.category.error.notfound',
                     'msgVars' => array('%id%' => $objectId)
                 );
-            } elseif (!$this->get('mautic.security')->isGranted('page:categories:delete')) {
+            } elseif (!$this->factory->getSecurity()->isGranted('page:categories:delete')) {
                 return $this->accessDenied();
             } elseif ($model->isLocked($entity)) {
                 return $this->isLocked($postActionVars, $entity, 'page.category');

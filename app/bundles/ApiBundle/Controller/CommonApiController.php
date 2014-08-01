@@ -32,6 +32,12 @@ class CommonApiController extends FOSRestController implements MauticController
     /**
      * @var
      */
+
+    protected $factory;
+
+    /**
+     * @var
+     */
     protected $security;
 
     /**
@@ -66,7 +72,7 @@ class CommonApiController extends FOSRestController implements MauticController
      */
     public function initialize(FilterControllerEvent $event)
     {
-        $this->security = $this->get('mautic.security');
+        $this->security = $this->factory->getSecurity();
     }
 
     /**
@@ -75,6 +81,14 @@ class CommonApiController extends FOSRestController implements MauticController
     public function setRequest(Request $request)
     {
         $this->request = $request;
+    }
+
+    /**
+     * @param MauticFactory $factory
+     */
+    public function setFactory(MauticFactory $factory)
+    {
+        $this->factory = $factory;
     }
 
     /**
@@ -100,7 +114,7 @@ class CommonApiController extends FOSRestController implements MauticController
     {
         $args = array(
             'start'      => $this->request->query->get('start', 0),
-            'limit'      => $this->request->query->get('limit', $this->get('mautic.factory')->getParameter('default_pagelimit')),
+            'limit'      => $this->request->query->get('limit', $this->factory->getParameter('default_pagelimit')),
             'filter'     => $this->request->query->get('search', ''),
             'orderBy'    => $this->request->query->get('orderBy', ''),
             'orderByDir' => $this->request->query->get('orderByDir', 'ASC')

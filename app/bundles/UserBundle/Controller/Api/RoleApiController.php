@@ -23,7 +23,7 @@ class RoleApiController extends CommonApiController
 
     public function initialize(FilterControllerEvent $event)
     {
-        $this->model           = $this->get('mautic.factory')->getModel('user.role');
+        $this->model           = $this->factory->getModel('user.role');
         $this->entityClass     = 'Mautic\UserBundle\Entity\Role';
         $this->entityNameOne   = 'role';
         $this->entityNameMulti = 'roles';
@@ -51,7 +51,7 @@ class RoleApiController extends CommonApiController
      */
     public function getEntitiesAction()
     {
-        if (!$this->container->get('mautic.security')->isGranted('user:roles:view')) {
+        if (!$this->factory->getSecurity()->isGranted('user:roles:view')) {
             return $this->accessDenied();
         }
         $this->serializerGroups = array('full');
@@ -76,7 +76,7 @@ class RoleApiController extends CommonApiController
      */
     public function getEntityAction($id)
     {
-        if (!$this->container->get('mautic.security')->isGranted('user:roles:view')) {
+        if (!$this->factory->getSecurity()->isGranted('user:roles:view')) {
             return $this->accessDenied();
         }
         $this->serializerGroups = array('full');

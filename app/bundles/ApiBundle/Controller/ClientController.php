@@ -30,24 +30,24 @@ class ClientController extends FormController
      */
     public function indexAction($page = 1)
     {
-        if (!$this->get('mautic.security')->isGranted('api:clients:view')) {
+        if (!$this->factory->getSecurity()->isGranted('api:clients:view')) {
             return $this->accessDenied();
         }
 
         //set limits
-        $limit = $this->get('session')->get('mautic.client.limit', $this->get('mautic.factory')->getParameter('default_pagelimit'));
+        $limit = $this->factory->getSession()->get('mautic.client.limit', $this->factory->getParameter('default_pagelimit'));
         $start = ($page === 1) ? 0 : (($page-1) * $limit);
         if ($start < 0) {
             $start = 0;
         }
 
-        $orderBy    = $this->get('session')->get('mautic.client.orderby', 'c.name');
-        $orderByDir = $this->get('session')->get('mautic.client.orderbydir', 'ASC');
-        $filter     = $this->request->get('search', $this->get('session')->get('mautic.client.filter', ''));
-        $this->get('session')->set('mautic.client.filter', $filter);
+        $orderBy    = $this->factory->getSession()->get('mautic.client.orderby', 'c.name');
+        $orderByDir = $this->factory->getSession()->get('mautic.client.orderbydir', 'ASC');
+        $filter     = $this->request->get('search', $this->factory->getSession()->get('mautic.client.filter', ''));
+        $this->factory->getSession()->set('mautic.client.filter', $filter);
         $tmpl       = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
-        $clients = $this->get('mautic.factory')->getModel('api.client')->getEntities(
+        $clients = $this->factory->getModel('api.client')->getEntities(
             array(
                 'start'      => $start,
                 'limit'      => $limit,
@@ -64,7 +64,7 @@ class ClientController extends FormController
             } else {
                 $lastPage = (floor($limit / $count)) ? : 1;
             }
-            $this->get('session')->set('mautic.client.page', $lastPage);
+            $this->factory->getSession()->set('mautic.client.page', $lastPage);
             $returnUrl   = $this->generateUrl('mautic_client_index', array('page' => $lastPage));
 
             return $this->postActionRedirect(array(
@@ -79,13 +79,13 @@ class ClientController extends FormController
         }
 
         //set what page currently on so that we can return here after form submission/cancellation
-        $this->get('session')->set('mautic.client.page', $page);
+        $this->factory->getSession()->set('mautic.client.page', $page);
 
         //set some permissions
         $permissions = array(
-            'create' => $this->get('mautic.security')->isGranted('api:clients:create'),
-            'edit'   => $this->get('mautic.security')->isGranted('api:clients:editother'),
-            'delete' => $this->get('mautic.security')->isGranted('api:clients:deleteother'),
+            'create' => $this->factory->getSecurity()->isGranted('api:clients:create'),
+            'edit'   => $this->factory->getSecurity()->isGranted('api:clients:editother'),
+            'delete' => $this->factory->getSecurity()->isGranted('api:clients:deleteother'),
         );
 
         $parameters = array(
@@ -113,7 +113,7 @@ class ClientController extends FormController
     public function authorizedClientsAction()
     {
         $me      = $this->get('security.context')->getToken()->getUser();
-        $clients = $this->get('mautic.factory')->getModel('api.client')->getUserClients($me);
+        $clients = $this->factory->getModel('api.client')->getUserClients($me);
 
         return $this->render('MauticApiBundle:Client:authorized.html.php', array('clients' => $clients));
     }
@@ -124,7 +124,7 @@ class ClientController extends FormController
         $flashes = array();
         if ($this->request->getMethod() == 'POST') {
             $me      = $this->get('security.context')->getToken()->getUser();
-            $model   = $this->get('mautic.factory')->getModel('api.client');
+            $model   = $this->factory->getModel('api.client');
             $client  = $model->getEntity($clientId);
 
             if ($client === null) {
@@ -168,11 +168,11 @@ class ClientController extends FormController
      */
     public function newAction ()
     {
-        if (!$this->get('mautic.security')->isGranted('api:clients:create')) {
+        if (!$this->factory->getSecurity()->isGranted('api:clients:create')) {
             return $this->accessDenied();
         }
 
-        $model = $this->get('mautic.factory')->getModel('api.client');
+        $model = $this->factory->getModel('api.client');
         //retrieve the entity
         $client = $model->getEntity();
         //set the return URL for post actions
@@ -242,10 +242,10 @@ class ClientController extends FormController
      */
     public function editAction ($objectId, $ignorePost = false)
     {
-        if (!$this->get('mautic.security')->isGranted('api:clients:editother')) {
+        if (!$this->factory->getSecurity()->isGranted('api:clients:editother')) {
             return $this->accessDenied();
         }
-        $model     = $this->get('mautic.factory')->getModel('api.client');
+        $model     = $this->factory->getModel('api.client');
         $client    = $model->getEntity($objectId);
         $returnUrl = $this->generateUrl('mautic_client_index');
 
@@ -329,7 +329,7 @@ class ClientController extends FormController
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function deleteAction($objectId) {
-        if (!$this->get('mautic.security')->isGranted('api:clients:delete')) {
+        if (!$this->factory->getSecurity()->isGranted('api:clients:delete')) {
             return $this->accessDenied();
         }
 
@@ -348,7 +348,7 @@ class ClientController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
-            $model  = $this->get('mautic.factory')->getModel('api.client');
+            $model  = $this->factory->getModel('api.client');
             $entity = $model->getEntity($objectId);
             if ($entity === null) {
                 $flashes[] = array(

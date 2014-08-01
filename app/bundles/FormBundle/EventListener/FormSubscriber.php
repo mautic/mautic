@@ -68,7 +68,7 @@ class FormSubscriber extends CommonSubscriber
             //only show own forms if the user does not have permission to view others
             if (!$permissions['form:forms:viewother']) {
                 $filter['force'] = array(
-                    array('column' => 'f.createdBy', 'expr' => 'eq', 'value' => $this->get('mautic.factory')->getUser())
+                    array('column' => 'f.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser())
                 );
             }
 

@@ -18,8 +18,7 @@ class PageTokenController extends CommonFormController
 
     public function indexAction($page = 1)
     {
-        $factory = $this->get('mautic.factory');
-        $tokenHelper = new PageTokenHelper($factory);
+        $tokenHelper = new PageTokenHelper($this->factory);
 
         $dataArray = array(
             'newContent'     => $tokenHelper->getTokenContent($page),

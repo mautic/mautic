@@ -28,7 +28,7 @@ class ActionController extends CommonFormController
         $success     = 0;
         $valid       = $cancelled = false;
         $method      = $this->request->getMethod();
-        $session     = $this->get('session');
+        $session     = $this->factory->getSession();
 
         if ($method == 'POST') {
             $formAction = $this->request->request->get('formaction');
@@ -41,13 +41,13 @@ class ActionController extends CommonFormController
         //ajax only for form fields
         if (!$actionType ||
             !$this->request->isXmlHttpRequest() ||
-            !$this->get('mautic.security')->isGranted(array('form:forms:editown', 'form:forms:editother', 'form:forms:create'), 'MATCH_ONE')
+            !$this->factory->getSecurity()->isGranted(array('form:forms:editown', 'form:forms:editother', 'form:forms:create'), 'MATCH_ONE')
         ) {
             return $this->accessDenied();
         }
 
         //fire the form builder event
-        $customComponents = $this->get('mautic.factory')->getModel('form.form')->getCustomComponents();
+        $customComponents = $this->factory->getModel('form.form')->getCustomComponents();
         $form = $this->get('form.factory')->create('formaction', $formAction, array(
             'action'    => $this->generateUrl('mautic_formaction_action', array('objectAction' => 'new')),
             'settings'  => $customComponents['actions'][$actionType]
@@ -138,7 +138,7 @@ class ActionController extends CommonFormController
      */
     public function editAction ($objectId)
     {
-        $session    = $this->get('session');
+        $session    = $this->factory->getSession();
         $method     = $this->request->getMethod();
         $actions    = $session->get('mautic.formactions.add', array());
         $success    = 0;
@@ -151,7 +151,7 @@ class ActionController extends CommonFormController
             //ajax only for form fields
             if (!$actionType ||
                 !$this->request->isXmlHttpRequest() ||
-                !$this->get('mautic.security')->isGranted(array('form:forms:editown', 'form:forms:editother', 'form:forms:create'), 'MATCH_ONE')
+                !$this->factory->getSecurity()->isGranted(array('form:forms:editown', 'form:forms:editother', 'form:forms:create'), 'MATCH_ONE')
             ) {
                 return $this->accessDenied();
             }
@@ -170,7 +170,7 @@ class ActionController extends CommonFormController
                         //form is valid so process the data
 
                         //save the properties to session
-                        $session           = $this->get('session');
+                        $session           = $this->factory->getSession();
                         $actions           = $session->get('mautic.formactions.add');
                         $formData          = $form->getData();
                         //overwrite with updated data
@@ -208,7 +208,7 @@ class ActionController extends CommonFormController
                 $tmpl = 'components';
 
                 //fire the form builder event
-                $customComponents = $this->get('mautic.factory')->getModel('form.form')->getCustomComponents();
+                $customComponents = $this->factory->getModel('form.form')->getCustomComponents();
 
                 $fieldHelper = new FormFieldHelper($this->get('translator'));
                 $viewParams['fields']   = $fieldHelper->getList($customComponents['fields']);
@@ -266,13 +266,13 @@ class ActionController extends CommonFormController
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function deleteAction($objectId) {
-        $session   = $this->get('session');
+        $session   = $this->factory->getSession();
         $actions   = $session->get('mautic.formactions.add', array());
         $delete    = $session->get('mautic.formactions.remove', array());
 
         //ajax only for form fields
         if (!$this->request->isXmlHttpRequest() ||
-            !$this->get('mautic.security')->isGranted(array('form:forms:editown', 'form:forms:editother', 'form:forms:create'), 'MATCH_ONE')
+            !$this->factory->getSecurity()->isGranted(array('form:forms:editown', 'form:forms:editother', 'form:forms:create'), 'MATCH_ONE')
         ){
             return $this->accessDenied();
         }
@@ -335,13 +335,13 @@ class ActionController extends CommonFormController
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function undeleteAction($objectId) {
-        $session   = $this->get('session');
+        $session   = $this->factory->getSession();
         $actions    = $session->get('mautic.formactions.add', array());
         $delete    = $session->get('mautic.formactions.remove', array());
 
         //ajax only for form fields
         if (!$this->request->isXmlHttpRequest() ||
-            !$this->get('mautic.security')->isGranted(array('form:forms:editown', 'form:forms:editother', 'form:forms:create'), 'MATCH_ONE')
+            !$this->factory->getSecurity()->isGranted(array('form:forms:editown', 'form:forms:editother', 'form:forms:create'), 'MATCH_ONE')
         ) {
             return $this->accessDenied();
         }

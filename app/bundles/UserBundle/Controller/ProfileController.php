@@ -32,16 +32,16 @@ class ProfileController extends FormController
     {
         //get current user
         $me    = $this->get('security.context')->getToken()->getUser();
-        $model = $this->get('mautic.factory')->getModel('user.user');
+        $model = $this->factory->getModel('user.user');
         //set some permissions
         $permissions = array(
-            'apiAccess'    => ($this->get('mautic.factory')->getParameter('api_enabled')) ?
-                $this->get('mautic.security')->isGranted('api:access:full')
+            'apiAccess'    => ($this->factory->getParameter('api_enabled')) ?
+                $this->factory->getSecurity()->isGranted('api:access:full')
                 : 0,
-            'editName'     => $this->get('mautic.security')->isGranted('user:profile:editname'),
-            'editUsername' => $this->get('mautic.security')->isGranted('user:profile:editusername'),
-            'editPosition' => $this->get('mautic.security')->isGranted('user:profile:editposition'),
-            'editEmail'    => $this->get('mautic.security')->isGranted('user:profile:editemail')
+            'editName'     => $this->factory->getSecurity()->isGranted('user:profile:editname'),
+            'editUsername' => $this->factory->getSecurity()->isGranted('user:profile:editusername'),
+            'editPosition' => $this->factory->getSecurity()->isGranted('user:profile:editposition'),
+            'editEmail'    => $this->factory->getSecurity()->isGranted('user:profile:editemail')
         );
 
         $action = $this->generateUrl('mautic_user_account');
@@ -145,9 +145,9 @@ class ProfileController extends FormController
         ));
 
         ///Check for a submitted form and process it
-        $submitted = $this->get('session')->get('formProcessed', 0);
+        $submitted = $this->factory->getSession()->get('formProcessed', 0);
         if ($this->request->getMethod() == "POST" && !$submitted) {
-            $this->get('session')->set('formProcessed', 1);
+            $this->factory->getSession()->set('formProcessed', 1);
 
             //check to see if the password needs to be rehashed
             $submittedPassword     = $this->request->request->get('user[plainPassword][password]', null, true);
@@ -179,11 +179,11 @@ class ProfileController extends FormController
                 ));
             }
         }
-        $this->get('session')->set('formProcessed', 0);
+        $this->factory->getSession()->set('formProcessed', 0);
 
 
         $formView = $form->createView();
-        $this->container->get('templating')->getEngine('MauticUserBundle:Profile:index.html.php')->get('form')
+        $this->factory->getTemplating()->getEngine('MauticUserBundle:Profile:index.html.php')->get('form')
             ->setTheme($formView, 'MauticUserBundle:FormProfile');
         $parameters = array(
             'permissions' => $permissions,

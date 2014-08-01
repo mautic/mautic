@@ -125,7 +125,6 @@ class MauticFactory
 
     /**
      * Gets a schema helper for manipulating database schemas
-     * For now, only TableSchemaHelper is available
      *
      * @param      $type
      * @param null $name Object name; i.e. table name
@@ -137,12 +136,18 @@ class MauticFactory
 
         if (empty($schemaHelpers[$type])) {
             $className            = "\\Mautic\\CoreBundle\\Doctrine\Helper\\" . ucfirst($type).'SchemaHelper';
-            $schemaHelpers[$type] = new $className($this->getDatabase(), $this->getParameter('db_table_prefix'));
+            if ($type == "table") {
+                //get the column helper as well
+                $columnHelper         = $this->getSchemaHelper('column');
+                $schemaHelpers[$type] = new $className($this->getDatabase(), $this->getParameter('db_table_prefix'), $columnHelper);
+            } else {
+                $schemaHelpers[$type] = new $className($this->getDatabase(), $this->getParameter('db_table_prefix'));
+            }
+
         }
 
         if ($name !== null) {
-            $setterName = "set" . ucfirst($type);
-            $schemaHelpers[$type]->$setterName($name);
+            $schemaHelpers[$type]->setName($name);
         }
 
         return $schemaHelpers[$type];

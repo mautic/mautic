@@ -35,7 +35,7 @@ class PublicController extends CommonFormController
         if (!isset($post['formid'])) {
             $error =  $translator->trans('mautic.form.submit.error.unavailable', array(), 'flashes');
         } else {
-            $formModel = $this->get('mautic.factory')->getModel('form.form');
+            $formModel = $this->factory->getModel('form.form');
             $form      = $formModel->getEntity($post['formid']);
 
             //check to see that the form was found
@@ -48,7 +48,7 @@ class PublicController extends CommonFormController
 
                //check to ensure the form is published
                 $status = $form->getPublishStatus();
-                $dateFormat = $this->get('mautic.factory')->getParameter('date_format_full');
+                $dateFormat = $this->factory->getParameter('date_format_full');
                 if ($status == 'pending') {
                     $error = $translator->trans('mautic.form.submit.error.pending', array(
                         '%date%' => $form->getPublishUp()->format($dateFormat)
@@ -60,7 +60,7 @@ class PublicController extends CommonFormController
                 } elseif ($status != 'published') {
                     $error = $translator->trans('mautic.form.submit.error.unavailable', array(), 'flashes');
                 } else {
-                    $errors = $this->get('mautic.factory')->getModel('form.submission')->saveSubmission($post, $server, $form);
+                    $errors = $this->factory->getModel('form.submission')->saveSubmission($post, $server, $form);
                     $error = ($errors) ?
                         $this->get('translator')->trans('mautic.form.submission.errors') . '<br /><ol><li>' .
                         implode("</li><li>", $errors) . '</li></ol>' : false;
@@ -103,7 +103,7 @@ class PublicController extends CommonFormController
     public function generateAction ()
     {
         $formId = InputHelper::int($this->request->get('id'));
-        $model  = $this->get('mautic.factory')->getModel('form.form');
+        $model  = $this->factory->getModel('form.form');
         $form   = $model->getEntity($formId);
         $js     = '';
 

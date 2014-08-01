@@ -11,6 +11,7 @@ namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\SocialBundle\Helper\NetworkIntegrationHelper;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -28,7 +29,7 @@ class AjaxController extends CommonAjaxController
     protected function userListAction(Request $request)
     {
         $filter    = InputHelper::clean($request->query->get('filter'));
-        $results   = $this->get('mautic.factory')->getModel('lead.lead')->getLookupResults('user', $filter);
+        $results   = $this->factory->getModel('lead.lead')->getLookupResults('user', $filter);
         $dataArray = array();
         foreach ($results as $r) {
             $name        = $r['firstName'] . ' ' . $r['lastName'];
@@ -52,12 +53,12 @@ class AjaxController extends CommonAjaxController
         if (!empty($field)) {
             $dataArray = array();
             if ($field == 'company') {
-                $results = $this->get('mautic.factory')->getModel('lead.lead')->getLookupResults('company', $filter);
+                $results = $this->factory->getModel('lead.lead')->getLookupResults('company', $filter);
                 foreach ($results as $r) {
                     $dataArray[] = array('value' => $r['company']);
                 }
             } elseif ($field == "owner") {
-                $results = $this->get('mautic.factory')->getModel('lead.lead')->getLookupResults('user', $filter);
+                $results = $this->factory->getModel('lead.lead')->getLookupResults('user', $filter);
                 foreach ($results as $r) {
                     $name = $r['firstName'] . ' ' . $r['lastName'];
                     $dataArray[] = array(
@@ -66,12 +67,50 @@ class AjaxController extends CommonAjaxController
                     );
                 }
             } else {
-                $results = $this->get('mautic.factory')->getModel('lead.field')->getLookupResults($field, $filter);
+                $results = $this->factory->getModel('lead.field')->getLookupResults($field, $filter);
                 foreach ($results as $r) {
                     $dataArray[] = array('value' => $r[$field]);
                 }
             }
         }
+        return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * Updates the cache and gets returns updated HTML
+     *
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    protected function updateSocialProfileAction(Request $request)
+    {
+        $dataArray = array('success' => 0);
+        $network = InputHelper::clean($request->request->get('network'));
+        $leadId  = InputHelper::clean($request->request->get('lead'));
+
+        if (!empty($network) && !empty($leadId)) {
+            //find the lead
+            $model = $this->factory->getModel('lead.lead');
+            $lead = $model->getEntity($leadId);
+
+            if ($lead !== null) {
+                $fields            = $model->organizeFieldsByGroup($lead->getFields());
+                $socialProfiles    = NetworkIntegrationHelper::getUserProfiles($this->factory, $lead, $fields, true, $network);
+                $socialProfileUrls = NetworkIntegrationHelper::getSocialProfileUrlRegex(false);
+
+                $newContent = $this->renderView('MauticLeadBundle:Social/' . $network . ':view.html.php', array(
+                    'lead'              => $lead,
+                    'details'           => $socialProfiles[$network],
+                    'network'           => $network,
+                    'socialProfileUrls' => $socialProfileUrls
+                ));
+
+                $dataArray['success']    = 1;
+                $dataArray['newContent'] = $newContent;
+            }
+        }
+
         return $this->sendJsonResponse($dataArray);
     }
 }

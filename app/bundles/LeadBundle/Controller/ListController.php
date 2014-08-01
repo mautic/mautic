@@ -24,7 +24,7 @@ class ListController extends FormController
     public function indexAction($page = 1)
     {
         //set some permissions
-        $permissions = $this->get('mautic.security')->isGranted(array(
+        $permissions = $this->factory->getSecurity()->isGranted(array(
             'lead:leads:viewown',
             'lead:leads:viewother',
             'lead:lists:viewother',
@@ -38,15 +38,15 @@ class ListController extends FormController
         }
 
         //set limits
-        $limit = $this->get('session')->get('mautic.leadlist.limit', $this->get('mautic.factory')->getParameter('default_pagelimit'));
+        $limit = $this->factory->getSession()->get('mautic.leadlist.limit', $this->factory->getParameter('default_pagelimit'));
         $start = ($page === 1) ? 0 : (($page-1) * $limit);
         if ($start < 0) {
             $start = 0;
         }
 
         $filter           = array();
-        $filter['string'] = $this->request->get('search', $this->get('session')->get('mautic.leadlist.filter', ''));
-        $this->get('session')->set('mautic.leadlist.filter', $filter['string']);
+        $filter['string'] = $this->request->get('search', $this->factory->getSession()->get('mautic.leadlist.filter', ''));
+        $this->factory->getSession()->set('mautic.leadlist.filter', $filter['string']);
         $tmpl       = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
         if (!$permissions['lead:lists:viewother']) {
@@ -57,7 +57,7 @@ class ListController extends FormController
             $filter["force"] = " ($isCommand:$mine or $isCommand:$global)";
         }
 
-        $items =$this->get('mautic.factory')->getModel('lead.list')->getEntities(
+        $items =$this->factory->getModel('lead.list')->getEntities(
             array(
                 'start'      => $start,
                 'limit'      => $limit,
@@ -72,7 +72,7 @@ class ListController extends FormController
             } else {
                 $lastPage = (floor($limit / $count)) ? : 1;
             }
-            $this->get('session')->set('mautic.leadlist.page', $lastPage);
+            $this->factory->getSession()->set('mautic.leadlist.page', $lastPage);
             $returnUrl   = $this->generateUrl('mautic_leadlist_index', array('page' => $lastPage));
 
             return $this->postActionRedirect(array(
@@ -90,16 +90,16 @@ class ListController extends FormController
         }
 
         //set what page currently on so that we can return here after form submission/cancellation
-        $this->get('session')->set('mautic.leadlist.page', $page);
+        $this->factory->getSession()->set('mautic.leadlist.page', $page);
 
         $parameters = array(
             'items'       => $items,
             'page'        => $page,
             'limit'       => $limit,
             'permissions' => $permissions,
-            'security'    => $this->get('mautic.security'),
+            'security'    => $this->factory->getSecurity(),
             'tmpl'        => $tmpl,
-            'currentUser' => $this->get('mautic.factory')->getUser()
+            'currentUser' => $this->factory->getUser()
         );
 
         return $this->delegateView(array(
@@ -121,15 +121,15 @@ class ListController extends FormController
      */
     public function newAction ()
     {
-        if (!$this->get('mautic.security')->isGranted('lead:leads:viewown')) {
+        if (!$this->factory->getSecurity()->isGranted('lead:leads:viewown')) {
             return $this->accessDenied();
         }
 
         //retrieve the entity
         $list     = new LeadList();
-        $model      =$this->get('mautic.factory')->getModel('lead.list');
+        $model      =$this->factory->getModel('lead.list');
         //set the page we came from
-        $page       = $this->get('session')->get('mautic.leadlist.page', 1);
+        $page       = $this->factory->getSession()->get('mautic.leadlist.page', 1);
         //set the return URL for post actions
         $returnUrl  = $this->generateUrl('mautic_leadlist_index', array('page' => $page));
         $action     = $this->generateUrl('mautic_leadlist_action', array('objectAction' => 'new'));
@@ -173,7 +173,7 @@ class ListController extends FormController
         }
 
         $formView = $form->createView();
-        $this->container->get('templating')->getEngine('MauticLeadBundle:List:form.html.php')->get('form')
+        $this->factory->getTemplating()->getEngine('MauticLeadBundle:List:form.html.php')->get('form')
             ->setTheme($formView, 'MauticLeadBundle:FormList');
 
         return $this->delegateView(array(
@@ -198,11 +198,11 @@ class ListController extends FormController
      */
     public function editAction ($objectId, $ignorePost = false)
     {
-        $model   =$this->get('mautic.factory')->getModel('lead.list');
+        $model   =$this->factory->getModel('lead.list');
         $list    = $model->getEntity($objectId);
 
         //set the page we came from
-        $page    = $this->get('session')->get('mautic.leadlist.page', 1);
+        $page    = $this->factory->getSession()->get('mautic.leadlist.page', 1);
 
         //set the return URL
         $returnUrl  = $this->generateUrl('mautic_leadlist_index', array('page' => $page));
@@ -229,7 +229,7 @@ class ListController extends FormController
                     )
                 ))
             );
-        } elseif (!$this->get('mautic.security')->hasEntityAccess(
+        } elseif (!$this->factory->getSecurity()->hasEntityAccess(
             true, 'lead:lists:editother', $list->getCreatedBy()
         )) {
             return $this->accessDenied();
@@ -278,7 +278,7 @@ class ListController extends FormController
             $model->lockEntity($list);
         }
         $formView = $form->createView();
-        $this->container->get('templating')->getEngine('MauticLeadBundle:List:form.html.php')->get('form')
+        $this->factory->getTemplating()->getEngine('MauticLeadBundle:List:form.html.php')->get('form')
             ->setTheme($formView, 'MauticLeadBundle:FormList');
 
         return $this->delegateView(array(
@@ -304,7 +304,7 @@ class ListController extends FormController
      */
     public function deleteAction($objectId)
     {
-        $page      = $this->get('session')->get('mautic.leadlist.page', 1);
+        $page      = $this->factory->getSession()->get('mautic.leadlist.page', 1);
         $returnUrl = $this->generateUrl('mautic_leadlist_index', array('page' => $page));
         $flashes   = array();
 
@@ -319,7 +319,7 @@ class ListController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
-            $model  =$this->get('mautic.factory')->getModel('lead.list');
+            $model  =$this->factory->getModel('lead.list');
             $list = $model->getEntity($objectId);
 
             if ($list === null) {
@@ -328,7 +328,7 @@ class ListController extends FormController
                     'msg'     => 'mautic.lead.list.error.notfound',
                     'msgVars' => array('%id%' => $objectId)
                 );
-            } elseif (!$this->get('mautic.security')->hasEntityAccess(
+            } elseif (!$this->factory->getSecurity()->hasEntityAccess(
                 true, 'lead:lists:deleteother', $list->getCreatedBy()
             )
             ) {

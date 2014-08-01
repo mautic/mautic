@@ -26,7 +26,7 @@ class LeadController extends FormController
     public function indexAction($page = 1)
     {
         //set some permissions
-        $permissions = $this->get('mautic.security')->isGranted(array(
+        $permissions = $this->factory->getSecurity()->isGranted(array(
             'lead:leads:viewown',
             'lead:leads:viewother',
             'lead:leads:create',
@@ -40,11 +40,10 @@ class LeadController extends FormController
             return $this->accessDenied();
         }
 
-        $factory = $this->get('mautic.factory');
-        $model   = $factory->getModel('lead.lead');
-        $session = $this->get('session');
+        $model   = $this->factory->getModel('lead.lead');
+        $session = $this->factory->getSession();
         //set limits
-        $limit = $session->get('mautic.lead.limit',$factory->getParameter('default_pagelimit'));
+        $limit = $session->get('mautic.lead.limit',$this->factory->getParameter('default_pagelimit'));
         $start = ($page === 1) ? 0 : (($page-1) * $limit);
         if ($start < 0) {
             $start = 0;
@@ -54,11 +53,11 @@ class LeadController extends FormController
         $session->set('mautic.lead.filter', $search);
 
         //do some default filtering
-        $orderBy     = $this->get('session')->get('mautic.lead.orderby', 'l.date_added');
-        $orderByDir  = $this->get('session')->get('mautic.lead.orderbydir', 'ASC');
+        $orderBy     = $this->factory->getSession()->get('mautic.lead.orderby', 'l.date_added');
+        $orderByDir  = $this->factory->getSession()->get('mautic.lead.orderbydir', 'ASC');
 
         $filter      = array('string' => $search, 'force' => '');
-        $translator  = $this->container->get('translator');
+        $translator  = $this->factory->getTranslator();
         $isCommand   = $translator->trans('mautic.core.searchcommand.is');
         $anonymous   = $translator->trans('mautic.lead.lead.searchcommand.isanonymous');
         $listCommand = $translator->trans('mautic.lead.lead.searchcommand.list');
@@ -114,11 +113,11 @@ class LeadController extends FormController
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
         $listArgs = array();
-        if (!$this->get('mautic.security')->isGranted('lead:lists:viewother')) {
+        if (!$this->factory->getSecurity()->isGranted('lead:lists:viewother')) {
             $listArgs["filter"]["force"] = " $isCommand:$mine";
         }
 
-        $lists     = $factory->getModel('lead.list')->getSmartLists();
+        $lists     = $this->factory->getModel('lead.list')->getSmartLists();
         $indexMode = $this->request->get('view', $session->get('mautic.lead.indexmode', 'list'));
         $session->set('mautic.lead.indexmode', $indexMode);
 
@@ -133,7 +132,7 @@ class LeadController extends FormController
             'tmpl'        => $tmpl,
             'indexMode'   => $indexMode,
             'lists'       => $lists,
-            'security'    => $factory->getSecurity()
+            'security'    => $this->factory->getSecurity()
         );
 
         return $this->delegateView(array(
@@ -156,14 +155,13 @@ class LeadController extends FormController
      */
     public function viewAction($objectId)
     {
-        $factory = $this->get('mautic.factory');
-        $model   = $factory->getModel('lead.lead');
+        $model   = $this->factory->getModel('lead.lead');
         $lead    = $model->getEntity($objectId);
         //set the page we came from
-        $page    = $this->get('session')->get('mautic.lead.page', 1);
+        $page    = $this->factory->getSession()->get('mautic.lead.page', 1);
 
         //set some permissions
-        $permissions = $this->get('mautic.security')->isGranted(array(
+        $permissions = $this->factory->getSecurity()->isGranted(array(
             'lead:leads:viewown',
             'lead:leads:viewother',
             'lead:leads:create',
@@ -195,7 +193,7 @@ class LeadController extends FormController
             ));
         }
 
-        if (!$this->get('mautic.security')->hasEntityAccess(
+        if (!$this->factory->getSecurity()->hasEntityAccess(
             'lead:leads:viewown', 'lead:leads:viewother', $lead->getOwner()
         )) {
             return $this->accessDenied();
@@ -208,7 +206,7 @@ class LeadController extends FormController
         );
 
         $fields            = $model->organizeFieldsByGroup($lead->getFields());
-        $socialProfiles    = NetworkIntegrationHelper::getUserProfiles($factory, $lead, $fields);
+        $socialProfiles    = NetworkIntegrationHelper::getUserProfiles($this->factory, $lead, $fields);
         $socialProfileUrls = NetworkIntegrationHelper::getSocialProfileUrlRegex(false);
 
         return $this->delegateView(array(
@@ -217,13 +215,8 @@ class LeadController extends FormController
                 'fields'            => $fields,
                 'socialProfiles'    => $socialProfiles,
                 'socialProfileUrls' => $socialProfileUrls,
-                'security'          => $this->get('mautic.factory')->getSecurity(),
-                'permissions'       => $permissions,
-                'dateFormats'       => array(
-                    'datetime' => $factory->getParameter('date_format_full'),
-                    'date'     => $factory->getParameter('date_format_dateonly'),
-                    'time'     => $factory->getParameter('date_format_timeonly'),
-                )
+                'security'          => $this->factory->getSecurity(),
+                'permissions'       => $permissions
             ),
             'contentTemplate' => $template,
             'passthroughVars' => array(
@@ -244,15 +237,15 @@ class LeadController extends FormController
      */
     public function newAction ()
     {
-        $model   = $this->get('mautic.factory')->getModel('lead.lead');
+        $model   = $this->factory->getModel('lead.lead');
         $lead    = $model->getEntity();
 
-        if (!$this->get('mautic.security')->isGranted('lead:leads:create')) {
+        if (!$this->factory->getSecurity()->isGranted('lead:leads:create')) {
             return $this->accessDenied();
         }
 
         //set the page we came from
-        $page    = $this->get('session')->get('mautic.lead.page', 1);
+        $page    = $this->factory->getSession()->get('mautic.lead.page', 1);
 
         $action = $this->generateUrl('mautic_lead_action', array('objectAction' => 'new'));
         $form   = $model->createForm($lead, $this->get('form.factory'), $action);
@@ -351,11 +344,11 @@ class LeadController extends FormController
      */
     public function editAction ($objectId, $ignorePost = false)
     {
-        $model   = $this->get('mautic.factory')->getModel('lead.lead');
+        $model   = $this->factory->getModel('lead.lead');
         $lead    = $model->getEntity($objectId);
 
         //set the page we came from
-        $page    = $this->get('session')->get('mautic.lead.page', 1);
+        $page    = $this->factory->getSession()->get('mautic.lead.page', 1);
 
         //set the return URL
         $returnUrl  = $this->generateUrl('mautic_lead_index', array('page' => $page));
@@ -382,7 +375,7 @@ class LeadController extends FormController
                     )
                 ))
             );
-        } elseif (!$this->get('mautic.security')->hasEntityAccess(
+        } elseif (!$this->factory->getSecurity()->hasEntityAccess(
         'lead:leads:editown', 'lead:leads:editother', $lead->getOwner()
         )) {
             return $this->accessDenied();
@@ -485,7 +478,7 @@ class LeadController extends FormController
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function deleteAction($objectId) {
-        $page        = $this->get('session')->get('mautic.lead.page', 1);
+        $page        = $this->factory->getSession()->get('mautic.lead.page', 1);
         $returnUrl   = $this->generateUrl('mautic_lead_index', array('page' => $page));
         $flashes     = array();
 
@@ -500,7 +493,7 @@ class LeadController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
-            $model  = $this->get('mautic.factory')->getModel('lead.lead');
+            $model  = $this->factory->getModel('lead.lead');
             $entity = $model->getEntity($objectId);
 
             if ($entity === null) {
@@ -509,7 +502,7 @@ class LeadController extends FormController
                     'msg'     => 'mautic.lead.lead.error.notfound',
                     'msgVars' => array('%id%' => $objectId)
                 );
-            } elseif (!$this->get('mautic.security')->hasEntityAccess(
+            } elseif (!$this->factory->getSecurity()->hasEntityAccess(
                 'lead:leads:deleteown', 'lead:leads:deleteother', $entity->getOwner()
             )) {
                 return $this->accessDenied();

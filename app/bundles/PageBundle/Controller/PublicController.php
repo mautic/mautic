@@ -20,9 +20,8 @@ class PublicController extends CommonFormController
     public function indexAction($slug1, $slug2 = '', $slug3 = '')
     {
         //find the page
-        $factory    = $this->get('mautic.factory');
-        $security   = $factory->getSecurity();
-        $model      = $factory->getModel('page.page');
+        $security   = $this->factory->getSecurity();
+        $model      = $this->factory->getModel('page.page');
         $translator = $this->get('translator');
         $entity     = $model->getEntityBySlugs($slug1, $slug2, $slug3);
 
@@ -122,7 +121,7 @@ class PublicController extends CommonFormController
             $translationParent   = $entity->getTranslationParent();
             $translationChildren = $entity->getTranslationChildren();
             if ($translationParent || count($translationChildren)) {
-                $session = $this->get('session');
+                $session = $this->factory->getSession();
                 if ($translationParent) {
                     $translationChildren = $translationParent->getTranslationChildren();
                 } else {
@@ -207,12 +206,12 @@ class PublicController extends CommonFormController
 
             //all the checks pass so display the content
             $template   = $entity->getTemplate();
-            $slots      = $factory->getTheme($template)->getSlots('page');
+            $slots      = $this->factory->getTheme($template)->getSlots('page');
 
             $dispatcher = $this->get('event_dispatcher');
             if ($dispatcher->hasListeners(PageEvents::PAGE_ON_DISPLAY)) {
                 $event = new PageEvent($entity);
-                $slotsHelper = $this->container->get('templating')
+                $slotsHelper = $this->factory->getTemplating()
                     ->getEngine('MauticPageBundle::public.html.php')->get('slots');
                 $event->setSlotsHelper($slotsHelper);
                 $dispatcher->dispatch(PageEvents::PAGE_ON_DISPLAY, $event);
@@ -223,7 +222,7 @@ class PublicController extends CommonFormController
 
             $model->hitPage($entity, $this->request, 200);
 
-            $googleAnalytics = $factory->getParameter('google_analytics');
+            $googleAnalytics = $this->factory->getParameter('google_analytics');
 
             return $this->render('MauticPageBundle::public.html.php', array(
                 'slots'           => $slots,
@@ -271,7 +270,7 @@ class PublicController extends CommonFormController
         }
 
         //Create page entry
-        $this->get('mautic.factory')->getModel('page.page')->hitPage(null, $this->request);
+        $this->factory->getModel('page.page')->hitPage(null, $this->request);
 
         return $response;
     }

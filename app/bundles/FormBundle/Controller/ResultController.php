@@ -21,10 +21,10 @@ class ResultController extends CommonFormController
      */
     public function indexAction($objectId, $page)
     {
-        $formModel = $this->get('mautic.factory')->getModel('form.form');
+        $formModel = $this->factory->getModel('form.form');
         $form      = $formModel->getEntity($objectId);
 
-        $formPage  = $this->get('session')->get('mautic.form.page', 1);
+        $formPage  = $this->factory->getSession()->get('mautic.form.page', 1);
         $returnUrl   = $this->generateUrl('mautic_form_index', array('page' => $formPage));
 
         if ($form === null) {
@@ -43,24 +43,24 @@ class ResultController extends CommonFormController
                     'msgVars' => array('%id%' => $objectId)
                 ))
             ));
-        } elseif (!$this->get('mautic.security')->hasEntityAccess(
+        } elseif (!$this->factory->getSecurity()->hasEntityAccess(
             'form:forms:viewown', 'form:forms:viewother', $form->getCreatedBy()
         ))  {
             return $this->accessDenied();
         }
 
         //set limits
-        $limit = $this->get('session')->get('mautic.formresult.'.$objectId.'.limit', $this->get('mautic.factory')->getParameter('default_pagelimit'));
+        $limit = $this->factory->getSession()->get('mautic.formresult.'.$objectId.'.limit', $this->factory->getParameter('default_pagelimit'));
 
         $start = ($page === 1) ? 0 : (($page-1) * $limit);
         if ($start < 0) {
             $start = 0;
         }
 
-        $orderBy    = $this->get('session')->get('mautic.formresult.'.$objectId.'.orderby', 's.dateSubmitted');
-        $orderByDir = $this->get('session')->get('mautic.formresult.'.$objectId.'.orderbydir', 'ASC');
+        $orderBy    = $this->factory->getSession()->get('mautic.formresult.'.$objectId.'.orderby', 's.dateSubmitted');
+        $orderByDir = $this->factory->getSession()->get('mautic.formresult.'.$objectId.'.orderbydir', 'ASC');
 
-        $filters    = $this->get('session')->get('mautic.formresult.'.$objectId.'.filters', array());
+        $filters    = $this->factory->getSession()->get('mautic.formresult.'.$objectId.'.filters', array());
         //add the form
         $filters[]  = array(
             'column' => 'IDENTITY(s.form)',
@@ -68,7 +68,7 @@ class ResultController extends CommonFormController
             'value'  => $form->getId()
         );
 
-        $model = $this->get('mautic.factory')->getModel('form.submission');
+        $model = $this->factory->getModel('form.submission');
 
         //get the results
         $results = $model->getEntities(
@@ -89,7 +89,7 @@ class ResultController extends CommonFormController
             } else {
                 $lastPage = (floor($limit / $count)) ? : 1;
             }
-            $this->get('session')->set('mautic.formresult.page', $lastPage);
+            $this->factory->getSession()->set('mautic.formresult.page', $lastPage);
             $returnUrl   = $this->generateUrl('mautic_form_results', array('objectId' => $objectId, 'page' => $lastPage));
 
             return $this->postActionRedirect(array(
@@ -104,7 +104,7 @@ class ResultController extends CommonFormController
         }
 
         //set what page currently on so that we can return here if need be
-        $this->get('session')->set('mautic.formresult.page', $page);
+        $this->factory->getSession()->set('mautic.formresult.page', $page);
 
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
         return $this->delegateView(array(
@@ -115,7 +115,7 @@ class ResultController extends CommonFormController
                 'page'        => $page,
                 'limit'       => $limit,
                 'tmpl'        => $tmpl,
-                'dateFormat'  => $this->get('mautic.factory')->getParameter('date_format_full')
+                'dateFormat'  => $this->factory->getParameter('date_format_full')
             ),
             'contentTemplate' => 'MauticFormBundle:Result:list.html.php',
             'passthroughVars' => array(
@@ -137,10 +137,10 @@ class ResultController extends CommonFormController
      */
     public function exportAction($objectId, $format = 'csv')
     {
-        $formModel  = $this->get('mautic.factory')->getModel('form.form');
+        $formModel  = $this->factory->getModel('form.form');
         $form       = $formModel->getEntity($objectId);
 
-        $formPage   = $this->get('session')->get('mautic.form.page', 1);
+        $formPage   = $this->factory->getSession()->get('mautic.form.page', 1);
         $returnUrl  = $this->generateUrl('mautic_form_index', array('page' => $formPage));
 
         if ($form === null) {
@@ -159,24 +159,24 @@ class ResultController extends CommonFormController
                     'msgVars' => array('%id%' => $objectId)
                 ))
             ));
-        } elseif (!$this->get('mautic.security')->hasEntityAccess(
+        } elseif (!$this->factory->getSecurity()->hasEntityAccess(
             'form:forms:viewown', 'form:forms:viewother', $form->getCreatedBy()
         ))  {
             return $this->accessDenied();
         }
 
-        $limit = $this->get('mautic.factory')->getParameter('default_pagelimit');
+        $limit = $this->factory->getParameter('default_pagelimit');
 
-        $page = $this->get('session')->get('mautic.formresult.page', 1);
+        $page = $this->factory->getSession()->get('mautic.formresult.page', 1);
         $start = ($page === 1) ? 0 : (($page-1) * $limit);
         if ($start < 0) {
             $start = 0;
         }
 
-        $orderBy    = $this->get('session')->get('mautic.formresult.'.$objectId.'.orderby', 's.dateSubmitted');
-        $orderByDir = $this->get('session')->get('mautic.formresult.'.$objectId.'.orderbydir', 'ASC');
+        $orderBy    = $this->factory->getSession()->get('mautic.formresult.'.$objectId.'.orderby', 's.dateSubmitted');
+        $orderByDir = $this->factory->getSession()->get('mautic.formresult.'.$objectId.'.orderbydir', 'ASC');
 
-        $filters    = $this->get('session')->get('mautic.formresult.'.$objectId.'.filters', array());
+        $filters    = $this->factory->getSession()->get('mautic.formresult.'.$objectId.'.filters', array());
 
         //add the form
         $filters[]  = array(
@@ -194,7 +194,7 @@ class ResultController extends CommonFormController
             'bypassPaginator' => true
         );
 
-        $model = $this->get('mautic.factory')->getModel('form.submission');
+        $model = $this->factory->getModel('form.submission');
 
         return $model->exportResults($format, $form, $args);
     }

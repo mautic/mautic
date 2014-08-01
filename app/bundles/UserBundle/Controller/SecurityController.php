@@ -68,7 +68,7 @@ class SecurityController extends CommonController
                 $msg = $error->getMessage();
             }
 
-            $this->get('session')->getFlashBag()->add(
+            $this->factory->getSession()->getFlashBag()->add(
                 'error',
                 $this->get("translator")->trans($msg, array(), 'flashes')
             );
