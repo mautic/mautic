@@ -119,16 +119,20 @@ abstract class AbstractNetwork
             return array(false, $this->factory->getTranslator()->trans('mautic.social.missingkeys'));
         }
 
-        $url .= '?client_id='.$keys['clientId'];
-        $url .= '&client_secret='.$keys['clientSecret'];
-        $url .= '&grant_type=authorization_code';
-        $url .= '&redirect_uri=' . urlencode($callback);
-        $url .= '&code='.$request->get('code');
+        $query = 'client_id='.$keys['clientId']
+                . '&client_secret='.$keys['clientSecret']
+                . '&grant_type=authorization_code'
+                . '&redirect_uri=' . urlencode($callback)
+                . '&code='.$request->get('code');
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_URL, $url);
+
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $query);
+
         $data = curl_exec($ch);
         $curlError = curl_error($ch);
         curl_close($ch);
@@ -153,6 +157,9 @@ abstract class AbstractNetwork
                 $error = false;
             } else {
                 $error = $this->getErrorsFromResponse($values);
+                if (empty($error)) {
+                    $error = $this->factory->getTranslator()->trans("mautic.social.error.genericerror", array(), "flashes");
+                }
             }
 
             $entity->setApiKeys($keys);
@@ -357,5 +364,57 @@ abstract class AbstractNetwork
         }
 
         return $field;
+    }
+
+
+    /**
+     * Convert and assign the data to assignable fields
+     *
+     * @param $data
+     */
+    protected function matchUpData($data)
+    {
+        $info       = array();
+        $available  = $this->getAvailableFields();
+
+        foreach ($available as $field => $fieldDetails) {
+            if (is_array($data)) {
+                if (!isset($data[$field])) {
+                    $info[$field] = '';
+                    continue;
+                } else {
+                    $values = $data[$field];
+                }
+            } else {
+                if (!isset($data->$field)) {
+                    $info[$field] = '';
+                } else {
+                    $values = $data->$field;
+                }
+            }
+
+            switch ($fieldDetails['type']) {
+                case 'string':
+                case 'boolean':
+                    $info[$field] = $values;
+                    break;
+                case 'object':
+                    foreach ($fieldDetails['fields'] as $f) {
+                        if (isset($values->$f)) {
+                            $fn = $this->matchFieldName($field, $f);
+                            $info[$fn] = $values->$f;
+                        }
+                    }
+                    break;
+                case 'array_object':
+                    $objects = array();
+                    foreach ($values as $k => $v) {
+                        $objects[] = $v->value;
+                    }
+                    $info[$field] = implode('; ', $objects);
+                    break;
+            }
+        }
+        return $info;
     }
 }

@@ -161,12 +161,12 @@ class SocialController extends FormController
             $session->remove($network . '_csrf_token');
 
             //make the callback the service to get the access code
-            $networkObject = NetworkIntegrationHelper::getNetworkObjects($this->factory, $network);
+            $networkObjects = NetworkIntegrationHelper::getNetworkObjects($this->factory, $network);
 
             $clientId     = $this->request->request->get('clientId');
             $clientSecret = $this->request->request->get('clientSecret');
 
-            list($entity, $error) = $networkObject->oAuthCallback($clientId, $clientSecret);
+            list($entity, $error) = $networkObjects[$network]->oAuthCallback($clientId, $clientSecret);
 
             //check for error
             if ($error) {

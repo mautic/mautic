@@ -71,10 +71,8 @@ class GooglePlusNetwork extends AbstractNetwork
      */
     public function getUserData($identifier, &$socialCache)
     {
-        $keys = $this->settings->getApiKeys();
-
-        if (!empty($keys['key']) && $userid = $this->getUserId($identifier, $socialCache)) {
-            $url                = "https://www.googleapis.com/plus/v1/people/{$userid}?key={$keys['key']}";
+        if ($userid = $this->getUserId($identifier, $socialCache)) {
+            $url                = $this->getApiUrl("people/{$userid}");
             $data               = $this->makeCall($url);
             $info               = $this->matchUpData($data);
             $info['profileHandle'] = $data->url;
@@ -103,14 +101,14 @@ class GooglePlusNetwork extends AbstractNetwork
      */
     public function getPublicActivity($identifier, &$socialCache)
     {
-        $keys = $this->settings->getApiKeys();
-        if (!empty($keys['key']) && $id = $this->getUserId($identifier, $socialCache)) {
-            $url  = "https://www.googleapis.com/plus/v1/people/$id/activities/public?key={$keys['key']}&maxResults=10";
+        if ($id = $this->getUserId($identifier, $socialCache)) {
+            $url  = $this->getApiUrl("people/$id/activities/public") . "&maxResults=10";
             $data = $this->makeCall($url);
             if (!empty($data) && isset($data->items) && count($data->items)) {
                 $socialCache['activity'] = array(
                     'posts'  => array(),
-                    'photos' => array()
+                    'photos' => array(),
+                    'tags'   => array()
                 );
                 foreach ($data->items as $page) {
                     $post = array(
@@ -121,12 +119,35 @@ class GooglePlusNetwork extends AbstractNetwork
                     );
                     $socialCache['activity']['posts'][] = $post;
 
+                    //extract hashtags from content
+                    if (isset($page->object->content)) {
+                        preg_match_all('/\<a rel="nofollow" class="ot-hashtag" href="(.*?)">#(.*?)\<\/a>/', $page->object->content, $tags);
+                        if (!empty($tags[2])) {
+                            foreach ($tags[2] as $k => $tag) {
+                                if (isset($socialCache['activity']['tags'][$tag])) {
+                                    $socialCache['activity']['tags'][$tag]['count']++;
+                                } else {
+                                    $socialCache['activity']['tags'][$tag] = array(
+                                        'count' => 1,
+                                        'url'   => $tags[1][$k]
+                                    );
+                                }
+                            }
+                        }
+                    }
+
+                    //images
                     if (isset($page->object->attachments)) {
                         foreach ($page->object->attachments as $a) {
-                            if (isset($a->fullImage)) {
+                            //use proxy image so that its SSL
+                            if (isset($a->image)) {
+                                //remove size limits
+                                $url = (isset($a->image->width)) ?
+                                    str_replace('=w' . $a->image->width . '-h' . $a->image->height, '', $a->image->url) :
+                                    $a->image->url;
+
                                 $photo = array(
-                                    'url'  => $a->fullImage->url,
-                                    'type' => $a->fullImage->type
+                                    'url'  => $url
                                 );
                                 $socialCache['activity']['photos'][] = $photo;
                             }
@@ -150,7 +171,7 @@ class GooglePlusNetwork extends AbstractNetwork
      *
      * @param $data
      */
-    private function matchUpData($data)
+    protected function matchUpData($data)
     {
         $info       = array();
         $available  = $this->getAvailableFields();
@@ -337,6 +358,18 @@ class GooglePlusNetwork extends AbstractNetwork
     }
 
     /**
+     * @param $endpoint
+     *
+     * @return string
+     */
+    public function getApiUrl($endpoint)
+    {
+        $keys = $this->settings->getApiKeys();
+        $key  = (isset($keys['key'])) ? $keys['key'] : '';
+        return "https://www.googleapis.com/plus/v1/$endpoint?key=" . $key;
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @param $identifier
@@ -357,9 +390,8 @@ class GooglePlusNetwork extends AbstractNetwork
         } elseif (!empty($cleaned['email'])) {
             $query = $cleaned['email'];
         }
-        $keys  = $this->settings->getApiKeys();
-        if (!empty($query) && !empty($keys['key'])) {
-            $url  = "https://www.googleapis.com/plus/v1/people?query={$query}&key={$keys['key']}";
+        if (!empty($query)) {
+            $url  = $this->getApiUrl('people') . "&query={$query}";
             $data = $this->makeCall($url);
 
             if (!empty($data) && isset($data->items) && count($data->items)) {

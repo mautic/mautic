@@ -216,6 +216,16 @@ class TwitterNetwork extends AbstractNetwork
     }
 
     /**
+     * @param $endpoint
+     *
+     * @return string
+     */
+    public function getApiUrl($endpoint)
+    {
+        return "https://api.twitter.com/1.1/$endpoint.json";
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @param $identifier
@@ -232,7 +242,7 @@ class TwitterNetwork extends AbstractNetwork
                 //getUserId has alread obtained the data
                 $data = $id;
             } else {
-                $url  = "https://api.twitter.com/1.1/users/lookup.json?user_id={$id}&include_entities=false";
+                $url  = $this->getApiUrl("users/lookup") . "?user_id={$id}&include_entities=false";
                 $data = $this->makeCall($url);
             }
 
@@ -268,14 +278,16 @@ class TwitterNetwork extends AbstractNetwork
     {
         if ($id = $this->getUserId($identifier, $socialCache)) {
             //due to the way Twitter filters, get more than 10 tweets
-            $url  = "https://api.twitter.com/1.1/statuses/user_timeline.json?user_id={$id}&exclude_replies=true&count=25&trim_user=true";
+            $url  = $this->getApiUrl("/statuses/user_timeline")  . "?user_id={$id}&exclude_replies=true&count=25&trim_user=true";
             $data = $this->makeCall($url);
 
             if (!empty($data) && count($data)) {
                 $socialCache['activity'] = array(
                     'tweets' => array(),
-                    'photos' => array()
+                    'photos' => array(),
+                    'tags'   => array()
                 );
+
                 foreach ($data as $k => $d) {
                     if ($k == 10) {
                         break;
@@ -288,6 +300,33 @@ class TwitterNetwork extends AbstractNetwork
                         'published'   => $d['created_at'],
                     );
                     $socialCache['activity']['tweets'][] = $tweet;
+
+                    //images
+                    if (isset($d['entities']['media'])) {
+                        foreach ($d['entities']['media'] as $m) {
+                            if ($m['type'] == 'photo') {
+                                $photo = array(
+                                    'url' => (isset($m['media_url_https']) ? $m['media_url_https'] : $m['media_url'])
+                                );
+
+                                $socialCache['activity']['photos'][] = $photo;
+                            }
+                        }
+                    }
+
+                    //hastags
+                    if (isset($d['entities']['hashtags'])) {
+                        foreach ($d['entities']['hashtags'] as $h) {
+                            if (isset($socialCache['activity']['tags'][$h['text']])) {
+                                $socialCache['activity']['tags'][$h['text']]['count']++;
+                            } else {
+                                $socialCache['activity']['tags'][$h['text']] = array(
+                                    'count' => 1,
+                                    'url'   => 'https://twitter.com/search?q=%23'.$h['text']
+                                );
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -355,26 +394,6 @@ class TwitterNetwork extends AbstractNetwork
     }
 
     /**
-     * Convert and assign the data to assignable fields
-     *
-     * @param $data
-     */
-    private function matchUpData($data)
-    {
-        $info       = array();
-        $available  = $this->getAvailableFields();
-
-        foreach ($available as $field => $fieldDetails) {
-            if (!isset($data[$field])) {
-                $info[$field] = '';
-            } else {
-                $info[$field] = $data[$field];;
-            }
-        }
-        return $info;
-    }
-
-    /**
      * Gets the ID of the user for the network
      *
      * @param $identifier
@@ -389,7 +408,7 @@ class TwitterNetwork extends AbstractNetwork
             return false;
         }
 
-        $url  = "https://api.twitter.com/1.1/users/lookup.json?screen_name={$identifier}&include_entities=false";
+        $url  = $this->getApiUrl("users/lookup") . "?screen_name={$identifier}&include_entities=false";
         $data = $this->makeCall($url);
         if (isset($data[0])) {
             $socialCache['id'] = $data[0]['id'];

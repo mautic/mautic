@@ -89,6 +89,18 @@ class FoursquareNetwork extends AbstractNetwork
     }
 
     /**
+     * @param $endpoint
+     *
+     * @return string
+     */
+    public function getApiUrl($endpoint)
+    {
+        $keys = $this->settings->getApiKeys();
+        $token = (isset($keys['access_token'])) ? $keys['access_token'] : '';
+        return "https://api.foursquare.com/v2/$endpoint?v=20140719&oauth_token={$token}";
+    }
+
+    /**
      * Get public data
      *
      * @param $identifier
@@ -98,10 +110,8 @@ class FoursquareNetwork extends AbstractNetwork
      */
     public function getUserData($identifier, &$socialCache)
     {
-        $keys = $this->settings->getApiKeys();
-
-        if (!empty($keys['access_token']) && $id = $this->getUserId($identifier, $socialCache)) {
-            $url  = "https://api.foursquare.com/v2/users/{$id}?v=20140719&oauth_token={$keys['access_token']}";
+        if ($id = $this->getUserId($identifier, $socialCache)) {
+            $url  = $this->getApiUrl("users/{$id}");
             $data = $this->makeCall($url);
             if (!empty($data) && isset($data->response->user)) {
                 $result = $data->response->user;
@@ -132,8 +142,7 @@ class FoursquareNetwork extends AbstractNetwork
      */
     public function getPublicActivity($identifier, &$socialCache)
     {
-        $keys = $this->settings->getApiKeys();
-        if (!empty($keys['access_token']) && $id = $this->getUserId($identifier, $socialCache)) {
+        if ($id = $this->getUserId($identifier, $socialCache)) {
             $activity = array();
             $socialCache['activity'] = array(
                 'mayorships' => array(),
@@ -142,7 +151,7 @@ class FoursquareNetwork extends AbstractNetwork
             );
 
             //mayorships
-            $url  = "https://api.foursquare.com/v2/users/{$id}/mayorships?v=20140719&oauth_token={$keys['access_token']}";
+            $url  = $this->getApiUrl("users/{$id}/mayorships");
             $data = $this->makeCall($url);
             if (isset($data->response->mayorships) && count($data->response->mayorships->items)) {
                 $limit = 5;
@@ -170,7 +179,7 @@ class FoursquareNetwork extends AbstractNetwork
             }
 
             //tips
-            $url  = "https://api.foursquare.com/v2/users/{$id}/tips?limit=5&sort=recent&v=20140719&oauth_token={$keys['access_token']}";
+            $url  = $this->getApiUrl("users/{$id}/tips") . "&limit=5&sort=recent";
             $data = $this->makeCall($url);
 
             if (isset($data->response->tips) && count($data->response->tips->items)) {
@@ -197,7 +206,7 @@ class FoursquareNetwork extends AbstractNetwork
             }
 
             //lists
-            $url  = "https://api.foursquare.com/v2/users/{$id}/lists?limit=5&group=created&v=20140719&oauth_token={$keys['access_token']}";
+            $url  = $this->getApiUrl("users/{$id}/lists") . "&limit=5&group=created";
             $data = $this->makeCall($url);
 
             if (isset($data->response->lists) && count($data->response->lists->items)) {
@@ -272,41 +281,6 @@ class FoursquareNetwork extends AbstractNetwork
             return $response->meta->errorDetail . ' (' . $response->meta->code . ')';
         }
         return '';
-    }
-
-    /**
-     * Convert and assign the data to assignable fields
-     *
-     * @param $data
-     */
-    protected function matchUpData($data)
-    {
-        $info       = array();
-        $available  = $this->getAvailableFields();
-
-        foreach ($available as $field => $fieldDetails) {
-            if (!isset($data->$field)) {
-                $info[$field] = '';
-            } else {
-                $values = $data->$field;
-
-                switch ($fieldDetails['type']) {
-                    case 'string':
-                    case 'boolean':
-                        $info[$field] = $values;
-                        break;
-                    case 'object':
-                        foreach ($fieldDetails['fields'] as $f) {
-                            if (isset($values->$f)) {
-                                $fn = $this->matchFieldName($field, $f);
-                                $info[$fn] = $values->$f;
-                            }
-                        }
-                        break;
-                }
-            }
-        }
-        return $info;
     }
 
     /**
@@ -389,7 +363,7 @@ class FoursquareNetwork extends AbstractNetwork
         $keys  = $this->settings->getApiKeys();
 
         if (!empty($query) && !empty($keys['access_token'])) {
-            $url  = "https://api.foursquare.com/v2/users/search?v=20140719&{$searchBy}={$query}&oauth_token={$keys['access_token']}";
+            $url  = $this->getApiUrl("users/search") . "&{$searchBy}={$query}";
             $data = $this->makeCall($url);
             if (!empty($data) && isset($data->response->results) && count($data->response->results)) {
                 $socialCache['id'] = $data->response->results[0]->id;

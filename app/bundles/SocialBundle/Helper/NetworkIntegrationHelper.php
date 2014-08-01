@@ -290,7 +290,12 @@ class NetworkIntegrationHelper
             }
         }
 
-        return ($returnSettings) ? array($socialCache, $featureSettings) : $socialCache;
+        if ($specificNetwork) {
+            return ($returnSettings) ? array(array($specificNetwork => $socialCache[$specificNetwork]), $featureSettings)
+                : array($specificNetwork => $socialCache[$specificNetwork]);
+        } else {
+            return ($returnSettings) ? array($socialCache, $featureSettings) : $socialCache;
+        }
     }
 
     /**

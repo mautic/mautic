@@ -111,6 +111,16 @@ class FacebookNetwork extends AbstractNetwork
     }
 
     /**
+     * @param $endpoint
+     *
+     * @return string
+     */
+    public function getApiUrl($endpoint)
+    {
+        return "https://graph.facebook.com/$endpoint";
+    }
+
+    /**
      * Get public data
      *
      * @param $identifier
@@ -129,7 +139,7 @@ class FacebookNetwork extends AbstractNetwork
                 $data = $id;
             } else {
                 $fields = array_merge(array_keys($this->getAvailableFields()), array('id', 'link'));
-                $url    = "https://graph.facebook.com/$id?fields=" . implode(',',$fields);
+                $url    = $this->getApiUrl("$id") . "?fields=" . implode(',',$fields);
                 $data   = $this->makeCall($url);
             }
 
@@ -177,9 +187,9 @@ class FacebookNetwork extends AbstractNetwork
         $identifiers = $this->cleanIdentifier($identifier);
 
         //try a global search first using the twitter handle if
-        if (isset($identifiers['twitter'])) {
+        if (isset($identifiers['facebook'])) {
             $fields = array_merge(array_keys($this->getAvailableFields()), array('id', 'link'));
-            $url    = "https://graph.facebook.com/{$identifiers["twitter"]}?&fields=" . implode(',',$fields);
+            $url    = $this->getApiUrl($identifiers["facebook"]) . "?fields=" . implode(',',$fields);
             $data   = $this->makeCall($url);
 
             if ($data && isset($data->id)) {
@@ -205,41 +215,6 @@ class FacebookNetwork extends AbstractNetwork
             return $response->error->message . ' (' . $response->error->code . ')';
         }
         return '';
-    }
-
-    /**
-     * Convert and assign the data to assignable fields
-     *
-     * @param $data
-     */
-    protected function matchUpData($data)
-    {
-        $info       = array();
-        $available  = $this->getAvailableFields();
-
-        foreach ($available as $field => $fieldDetails) {
-            if (!isset($data->$field)) {
-                $info[$field] = '';
-            } else {
-                $values = $data->$field;
-
-                switch ($fieldDetails['type']) {
-                    case 'string':
-                    case 'boolean':
-                        $info[$field] = $values;
-                        break;
-                    case 'object':
-                        foreach ($fieldDetails['fields'] as $f) {
-                            if (isset($values->$f)) {
-                                $name        = ($f == 'twitter' || $f == 'facebook') ? $f . 'ProfileHandle' : $f . ucfirst($field);
-                                $info[$name] = $values->$f;
-                            }
-                        }
-                        break;
-                }
-            }
-        }
-        return $info;
     }
 
     /**
