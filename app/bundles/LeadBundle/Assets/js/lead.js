@@ -393,7 +393,12 @@ Mautic.refreshLeadSocialProfile = function(network, leadId, event) {
         dataType: "json",
         success: function (response) {
             if (response.success) {
-                mQuery('#' + network + 'CompleteProfile').replaceWith(response.newContent);
+                //loop through each network
+                mQuery.each(response.profiles, function( index, value ){
+                    if (mQuery('#' + index + 'CompleteProfile').length) {
+                        mQuery('#' + index + 'CompleteProfile').replaceWith(value.newContent);
+                    }
+                });
             }
             Mautic.stopIconSpinPostEvent(event);
         },

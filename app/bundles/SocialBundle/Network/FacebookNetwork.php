@@ -146,7 +146,6 @@ class FacebookNetwork extends AbstractNetwork
                 $info['profileImage']  = "https://graph.facebook.com/{$data->id}/picture?type=large";
 
                 $socialCache['profile'] = $info;
-                $socialCache['updated'] = true;
             }
             $this->preventDoubleCall = false;
         }
@@ -157,7 +156,6 @@ class FacebookNetwork extends AbstractNetwork
             $socialCache['profile'] = $this->matchUpData($empty);
             $socialCache['profile']['profileHandle'] = "";
             $socialCache['profile']['profileImage']  = $this->factory->getAssetsHelper()->getUrl('assets/images/avatar.png');
-            $socialCache['updated'] = true;
         }
     }
 
@@ -186,8 +184,6 @@ class FacebookNetwork extends AbstractNetwork
 
             if ($data && isset($data->id)) {
                 $socialCache['id'] = $data->id;
-                //mark the cache as needing to be updated
-                $socialCache['updated'] = true;
 
                 //return the entire data set if the function has been called from getUserData()
                 return ($this->preventDoubleCall) ? $data : $socialCache['id'];

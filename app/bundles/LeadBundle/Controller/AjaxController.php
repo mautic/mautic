@@ -89,7 +89,7 @@ class AjaxController extends CommonAjaxController
         $network = InputHelper::clean($request->request->get('network'));
         $leadId  = InputHelper::clean($request->request->get('lead'));
 
-        if (!empty($network) && !empty($leadId)) {
+        if (!empty($leadId)) {
             //find the lead
             $model = $this->factory->getModel('lead.lead');
             $lead = $model->getEntity($leadId);
@@ -98,16 +98,18 @@ class AjaxController extends CommonAjaxController
                 $fields            = $model->organizeFieldsByGroup($lead->getFields());
                 $socialProfiles    = NetworkIntegrationHelper::getUserProfiles($this->factory, $lead, $fields, true, $network);
                 $socialProfileUrls = NetworkIntegrationHelper::getSocialProfileUrlRegex(false);
+                $networks = array();
+                foreach ($socialProfiles as $name => $details) {
+                    $networks[$name]['newContent'] = $this->renderView('MauticLeadBundle:Social/' . $name . ':view.html.php', array(
+                        'lead'              => $lead,
+                        'details'           => $details,
+                        'network'           => $name,
+                        'socialProfileUrls' => $socialProfileUrls
+                    ));
+                }
 
-                $newContent = $this->renderView('MauticLeadBundle:Social/' . $network . ':view.html.php', array(
-                    'lead'              => $lead,
-                    'details'           => $socialProfiles[$network],
-                    'network'           => $network,
-                    'socialProfileUrls' => $socialProfileUrls
-                ));
-
-                $dataArray['success']    = 1;
-                $dataArray['newContent'] = $newContent;
+                $dataArray['success']  = 1;
+                $dataArray['profiles'] = $networks;
             }
         }
 

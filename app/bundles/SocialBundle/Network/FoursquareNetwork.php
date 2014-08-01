@@ -110,9 +110,6 @@ class FoursquareNetwork extends AbstractNetwork
                     $socialCache['profile']['profileImage'] = $result->photo->prefix . '300x300' . $result->photo->suffix;
                 }
                 $socialCache['profile']['profileHandle'] = 'https://foursquare.com/user/' . $id;
-
-                //mark as updated
-                $socialCache['updated'] = true;
             }
         }
 
@@ -122,7 +119,6 @@ class FoursquareNetwork extends AbstractNetwork
             $socialCache['profile'] = $this->matchUpData($empty);
             $socialCache['profile']['profileHandle'] = "";
             $socialCache['profile']['profileImage']  = $this->factory->getAssetsHelper()->getUrl('assets/images/avatar.png');
-            $socialCache['updated'] = true;
         }
     }
 
@@ -251,7 +247,6 @@ class FoursquareNetwork extends AbstractNetwork
 
             if (!empty($activity)) {
                 $socialCache['activity'] = $activity;
-                $socialCache['updated']  = true;
             }
 
             if (empty($socialCache['activity'])) {
@@ -261,7 +256,6 @@ class FoursquareNetwork extends AbstractNetwork
                     'tips'       => array(),
                     'lists'      => array()
                 );
-                $socialCache['updated']  = true;
             }
         }
     }
@@ -399,9 +393,6 @@ class FoursquareNetwork extends AbstractNetwork
             $data = $this->makeCall($url);
             if (!empty($data) && isset($data->response->results) && count($data->response->results)) {
                 $socialCache['id'] = $data->response->results[0]->id;
-
-                //mark the cache as needing to be updated
-                $socialCache['updated'] = true;
 
                 return $socialCache['id'];
             }

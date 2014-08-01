@@ -85,14 +85,12 @@ class GooglePlusNetwork extends AbstractNetwork
                 $info["profileImage"] = $image;
             }
             $socialCache['profile'] = $info;
-            $socialCache['updated'] = true;
         } elseif (empty($socialCache['profile'])) {
             //populate empty data
             $empty = new \stdClass();
             $socialCache['profile'] = $this->matchUpData($empty);
             $socialCache['profile']['profileHandle'] = "";
             $socialCache['profile']['profileImage']  = $this->factory->getAssetsHelper()->getUrl('assets/images/avatar.png');
-            $socialCache['updated'] = true;
         }
     }
 
@@ -135,7 +133,6 @@ class GooglePlusNetwork extends AbstractNetwork
                         }
                     }
                 }
-                $socialCache['updated'] = true;
             }
         }
 
@@ -145,7 +142,6 @@ class GooglePlusNetwork extends AbstractNetwork
                 'posts' => array(),
                 'photos' => array()
             );
-            $socialCache['updated'] = true;
         }
     }
 
@@ -368,9 +364,6 @@ class GooglePlusNetwork extends AbstractNetwork
 
             if (!empty($data) && isset($data->items) && count($data->items)) {
                 $socialCache['id'] = $data->items[0]->id;
-
-                //mark the cache as needing to be updated
-                $socialCache['updated'] = true;
 
                 return $socialCache['id'];
             }

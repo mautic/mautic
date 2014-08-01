@@ -242,11 +242,11 @@ class NetworkIntegrationHelper
         $featureSettings  = array();
         if ($refresh) {
             //regenerate from networks
+            $now = new DateTimeHelper();
 
             //check to see if there are social profiles activated
             $socialNetworks = NetworkIntegrationHelper::getNetworkObjects($factory, $specificNetwork, array('public_profile', 'public_activity'));
             foreach ($socialNetworks as $network => $sn) {
-
                 $settings        = $sn->getSettings();
                 $features        = $settings->getSupportedFeatures();
                 $identifierField = self::getUserIdentifierField($sn, $fields);
@@ -274,12 +274,7 @@ class NetworkIntegrationHelper
                         $sn->getPublicActivity($identifierField, $socialCache[$network]);
                     }
 
-                    //regenerating all of the cache so remove update notice
-                    if (isset($socialCache[$network]['updated']) || empty($socialCache[$network]['lastRefresh'])) {
-                        $now = new DateTimeHelper();
-                        $socialCache[$network]['lastRefresh'] = $now->toUtcString();
-                        unset($socialCache[$network]['updated']);
-                    }
+                    $socialCache[$network]['lastRefresh'] = $now->toUtcString();
                 }
             }
 

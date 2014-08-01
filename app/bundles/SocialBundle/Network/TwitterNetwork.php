@@ -245,7 +245,6 @@ class TwitterNetwork extends AbstractNetwork
                 $info['profileImage'] = $image;
 
                 $socialCache['profile'] = $info;
-                $socialCache['updated'] = true;
             }
             $this->preventDoubleCall = false;
         }
@@ -255,7 +254,6 @@ class TwitterNetwork extends AbstractNetwork
             $socialCache['profile'] = $this->matchUpData(array());
             $socialCache['profile']['profileHandle'] = "";
             $socialCache['profile']['profileImage']  = $this->factory->getAssetsHelper()->getUrl('assets/images/avatar.png');
-            $socialCache['updated'] = true;
         }
     }
 
@@ -291,13 +289,11 @@ class TwitterNetwork extends AbstractNetwork
                     );
                     $socialCache['activity']['tweets'][] = $tweet;
                 }
-                $socialCache['updated']  = true;
             }
         }
 
         if (empty($socialCache['activity'])) {
             //ensure keys are present
-            $socialCache['updated']  = true;
             $socialCache['activity'] = array(
                 'tweets' => array(),
                 'photos' => array()
@@ -397,8 +393,6 @@ class TwitterNetwork extends AbstractNetwork
         $data = $this->makeCall($url);
         if (isset($data[0])) {
             $socialCache['id'] = $data[0]['id'];
-            //mark the cache as needing to be updated
-            $socialCache['updated'] = true;
 
             //return the entire data set if the function has been called from getUserData()
             return ($this->preventDoubleCall) ? $data : $socialCache['id'];
