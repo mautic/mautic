@@ -9,7 +9,7 @@
 
 //@todo generate score log view
 
-?>            
+?>
 
     <?php $count = 0; ?>
     <div class="row">
@@ -22,18 +22,20 @@
                     <div class="panel-toolbar text-right">
                         <!-- option -->
                         <div class="option">
-                            <button class="btn" data-toggle="panelrefresh"><i class="fa fa-refresh"></i></button>
+                            <button class="btn" data-toggle="panelrefresh"
+                                    onclick="Mautic.refreshLeadSocialProfile('<?php echo $network; ?>', '<?php echo $lead->getId(); ?>', event);">
+                                <i class="fa fa-refresh"></i>
+                            </button>
                             <button class="btn" data-toggle="panelcollapse"><i class="fa fa-angle-up"></i></button>
                             <button class="btn" data-toggle="panelremove" data-parent=".col-md-4"><i class="fa fa-times"></i></button>
                         </div>
                         <!--/ option -->
                     </div>
                 </div>
-                <div class="panel-collapse pull out">
+                 <div class="panel-collapse pull out" id="<?php echo "{$network}CompleteProfile"; ?>">
                     <?php echo $view->render('MauticLeadBundle:Social/' . $network . ':view.html.php', array(
                     'lead'              => $lead,
                     'details'           => $details,
-                    'dateFormats'       => $dateFormats,
                     'network'           => $network,
                     'socialProfileUrls' => $socialProfileUrls
                 )); ?>

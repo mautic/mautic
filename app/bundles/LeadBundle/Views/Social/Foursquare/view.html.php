@@ -9,6 +9,13 @@
 ?>
 
 <div class="panel-toolbar-wrapper">
+    <div class="text-right">
+        <span class="small">
+            <?php echo $view['translator']->trans('mautic.lead.lead.social.lastupdate', array(
+                "%datetime%" => $view['date']->toFullConcat($details['lastRefresh'], 'utc')
+            )); ?>
+        </span>
+    </div>
     <div class="panel-toolbar">
         <ul class="nav nav-tabs nav-justified">
             <li class="active">

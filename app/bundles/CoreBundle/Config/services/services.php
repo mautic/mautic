@@ -9,7 +9,6 @@
 
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\Parameter;
 
 //Factory class
 $factory = new Definition(
@@ -43,14 +42,6 @@ $container->setDefinition ('mautic.security',
     )
 );
 
-//Custom templating parser
-$container->setDefinition('mautic.templating.name_parser',
-    new Definition(
-        'Mautic\CoreBundle\Templating\TemplateNameParser',
-        array(new Reference('kernel'))
-    )
-);
-
 //Translation loader
 $container->setDefinition('mautic.translation.loader',
     new Definition(
@@ -59,8 +50,3 @@ $container->setDefinition('mautic.translation.loader',
             new Reference('mautic.factory'))
     ))
     ->addTag('translation.loader', array('alias' => 'mautic'));
-
-//Templating overrides
-$container->setParameter('templating.helper.assets.class', 'Mautic\CoreBundle\Templating\Helper\AssetsHelper');
-$container->setParameter('templating.helper.slots.class', 'Mautic\CoreBundle\Templating\Helper\SlotsHelper');
-$container->setParameter('templating.name_parser.class', 'Mautic\CoreBundle\Templating\TemplateNameParser');

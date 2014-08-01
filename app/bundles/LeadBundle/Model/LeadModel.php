@@ -146,7 +146,7 @@ class LeadModel extends FormModel
     public function setFieldValues(Lead &$lead, array $data, $overwriteWithBlank = true)
     {
         //generate the social cache
-        list($socialCache, $socialFeatureSettings) = NetworkIntegrationHelper::getUserProfiles($this->factory, $lead, $data, true, false, true);
+        list($socialCache, $socialFeatureSettings) = NetworkIntegrationHelper::getUserProfiles($this->factory, $lead, $data, true, null, false, true);
 
         //set the social cache while we have it
         $lead->setSocialCache($socialCache);

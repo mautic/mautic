@@ -32,8 +32,7 @@ if (empty($type)) {
 <a target="_blank" href="<?php echo $value; ?>"><?php echo $value; ?></a>
 <?php
 elseif ($type == 'datetime'):
-    $dateHelper = new \Mautic\CoreBundle\Helper\DateTimeHelper($value);
-    echo $dateHelper->toLocalString($dateFormats[$type]);
+    echo $view['date']->toFull($value);
 ?>
 <?php else: ?>
 <?php

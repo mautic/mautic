@@ -18,14 +18,12 @@ class SocialController extends FormController
 
     public function indexAction()
     {
-        $factory = $this->get('mautic.factory');
-
-        if (!$factory->getSecurity()->isGranted('social:config:full')) {
+        if (!$this->factory->getSecurity()->isGranted('social:config:full')) {
             return $this->accessDenied();
         }
 
-        $networkObjects = NetworkIntegrationHelper::getNetworkObjects($factory, null, null, true);
-        $em             = $factory->getEntityManager();
+        $networkObjects = NetworkIntegrationHelper::getNetworkObjects($this->factory, null, null, true);
+        $em             = $this->factory->getEntityManager();
         $services       = array();
         $currentKeys    = array(); //prevent overriding of secrets
         foreach ($networkObjects as $name => $service) {
@@ -34,7 +32,7 @@ class SocialController extends FormController
         }
 
         //get a list of custom form fields
-        $fields     = $factory->getModel('lead.field')->getEntities(
+        $fields     = $this->factory->getModel('lead.field')->getEntities(
             array('filter' => array('isPublished' => true))
         );
         $leadFields = array();
@@ -76,7 +74,7 @@ class SocialController extends FormController
                             //make sure now non-existent aren't saved
                             $featureSettings               = $entity->getFeatureSettings();
                             if (isset($featureSettings['leadFields'])) {
-                                $fields                        = NetworkIntegrationHelper::getAvailableFields($factory, $network);
+                                $fields                        = NetworkIntegrationHelper::getAvailableFields($this->factory, $network);
                                 $featureSettings['leadFields'] = array_intersect_key($featureSettings['leadFields'], $fields);
                                 $entity->setFeatureSettings($featureSettings);
                             }
@@ -136,7 +134,7 @@ class SocialController extends FormController
             }
         }
 
-        $session    = $this->get('mautic.factory')->getSession();
+        $session    = $this->factory->getSession();
         $state      = $session->get($network . '_csrf_token', false);
         $givenState = ($isAjax) ? $this->request->request->get('state') : $this->request->get('state');
         if ($state && $state !== $givenState) {
@@ -163,7 +161,7 @@ class SocialController extends FormController
             $session->remove($network . '_csrf_token');
 
             //make the callback the service to get the access code
-            $networkObject = NetworkIntegrationHelper::getNetworkObjects($this->get('mautic.factory'), $network);
+            $networkObject = NetworkIntegrationHelper::getNetworkObjects($this->factory, $network);
 
             $clientId     = $this->request->request->get('clientId');
             $clientSecret = $this->request->request->get('clientSecret');

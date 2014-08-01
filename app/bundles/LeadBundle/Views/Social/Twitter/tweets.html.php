@@ -11,7 +11,7 @@
      <?php foreach ($activity as $item): ?>
         <li class="list-group-item">
             <p><?php echo $item['tweet']; ?></p>
-            <span class="text-muted"><?php echo date($dateFormats['datetime'], strtotime($item['published'])); ?></span>
+            <span class="text-muted"><?php echo $view['date']->toFull($item['published']); ?></span>
         </li>
     <?php endforeach; ?>
 </ul>

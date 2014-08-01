@@ -355,10 +355,15 @@ class GooglePlusNetwork extends AbstractNetwork
             return false;
         }
 
-        $email = $this->cleanIdentifier($identifier);
+        $cleaned = $this->cleanIdentifier($identifier);
+        if (!empty($cleaned['googleplus'])) {
+            $query = $cleaned['googleplus'];
+        } elseif (!empty($cleaned['email'])) {
+            $query = $cleaned['email'];
+        }
         $keys  = $this->settings->getApiKeys();
-        if (!empty($keys['key'])) {
-            $url  = "https://www.googleapis.com/plus/v1/people?query={$email}&key={$keys['key']}";
+        if (!empty($query) && !empty($keys['key'])) {
+            $url  = "https://www.googleapis.com/plus/v1/people?query={$query}&key={$keys['key']}";
             $data = $this->makeCall($url);
 
             if (!empty($data) && isset($data->items) && count($data->items)) {

@@ -16,7 +16,7 @@
             <a href="<?php echo $item['url']; ?>" target="_blank">
                 <?php echo $view['translator']->trans('mautic.lead.lead.socialactivity.title',array(
                     '%title%' => $item['title'],
-                    '%date%'  => date($dateFormats['datetime'], strtotime($item['published']))
+                    '%date%'  => $view['date']->toFull($item['published'])
                 )); ?>
             </a>
         </li>

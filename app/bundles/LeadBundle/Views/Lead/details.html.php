@@ -73,7 +73,7 @@
                     </div>
                 <?php endif; **/ ?>
                 <div class="col-sm-6">
-                <?php $total = count($fields[$group]); 
+                <?php $total = count($fields[$group]);
                     $current = 1;
                 ?>
                 <?php foreach ($fields[$group] as $field): ?>
@@ -90,7 +90,6 @@
                                 'value'             => $field['value'],
                                 'name'              => $field['alias'],
                                 'type'              => $field['type'],
-                                'dateFormats'       => $dateFormats,
                                 'socialProfileUrls' => $socialProfileUrls
                             )); ?>
                         </div>

@@ -286,8 +286,8 @@ class TwitterNetwork extends AbstractNetwork
                     $tweet = array(
                         'tweet'       => $d['text'],
                         'url'         => "https://twitter.com/{$id}/status/{$d['id']}",
+                        'coordinates' => $d['coordinates'],
                         'published'   => $d['created_at'],
-                        'coordinates' => $d['coordinates']
                     );
                     $socialCache['activity']['tweets'][] = $tweet;
                 }

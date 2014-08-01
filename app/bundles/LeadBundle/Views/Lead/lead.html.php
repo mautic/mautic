@@ -44,7 +44,6 @@ $view['slots']->set("headerTitle",
       <?php
       echo $view->render('MauticLeadBundle:Lead:info.html.php', array(
           "lead"              => $lead,
-          'dateFormats'       => $dateFormats,
           'fields'            => $fields,
           'socialProfileUrls' => $socialProfileUrls
       ));
@@ -54,27 +53,23 @@ $view['slots']->set("headerTitle",
       <?php
       echo $view->render('MauticLeadBundle:Lead:details.html.php', array(
           "lead"              => $lead,
-          'dateFormats'       => $dateFormats,
           'fields'            => $fields,
           'socialProfileUrls' => $socialProfileUrls
       ));
 
       echo $view->render('MauticLeadBundle:Lead:visits.html.php', array(
           "lead"        => $lead,
-          'dateFormats' => $dateFormats,
           'fields'      => $fields
       ));
 
       echo $view->render('MauticLeadBundle:Lead:social.html.php', array(
           "lead"              => $lead,
-          'dateFormats'       => $dateFormats,
           'socialProfiles'    => $socialProfiles,
           'socialProfileUrls' => $socialProfileUrls
       ));
 
       echo $view->render('MauticLeadBundle:Lead:score_log.html.php', array(
-          "lead" => $lead,
-          'dateFormats' => $dateFormats
+          "lead" => $lead
       ));
 
       $ipAddresses = count($lead->getIpAddresses());

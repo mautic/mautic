@@ -261,7 +261,12 @@ class LeadRepository extends CommonRepository
         $unique  = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
         $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
 
-        $expr = $q->expr()->like('v.value',  ':'.$unique);
+        $expr = $q->expr()->orX(
+            $q->expr()->like('l.firstname', ":$unique"),
+            $q->expr()->like('l.lastname', ":$unique"),
+            $q->expr()->like('l.email', ":$unique"),
+            $q->expr()->like('l.company', ":$unique")
+        );
 
         if ($filter->not) {
             $q->expr()->not($expr);

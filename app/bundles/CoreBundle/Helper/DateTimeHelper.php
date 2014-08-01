@@ -26,6 +26,18 @@ class DateTimeHelper
      */
     public function __construct($string = '', $fromFormat = 'Y-m-d H:i:s', $timezone = 'UTC')
     {
+        $this->setDateTime($string, $fromFormat, $timezone);
+    }
+
+    /**
+     * Sets date/time
+     *
+     * @param string $datetime
+     * @param string $fromFormat
+     * @param string $timezone
+     */
+    public function setDateTime($datetime = '', $fromFormat = 'Y-m-d H:i:s', $timezone = 'local')
+    {
         if ($timezone == 'local') {
             $timezone = date_default_timezone_get();
         } elseif (empty($timezone)) {
@@ -38,17 +50,29 @@ class DateTimeHelper
         $this->utc   = new \DateTimeZone('UTC');
         $this->local = new \DateTimeZone(date_default_timezone_get());
 
-        if (empty($string)) {
+        if ($datetime instanceof \DateTime) {
+            $this->datetime = $datetime;
+            $this->string = $this->datetime->format($fromFormat);
+        } elseif (empty($datetime)) {
             $this->datetime = new \DateTime("now", new \DateTimeZone($this->timezone));
             $this->string = $this->datetime->format($fromFormat);
         } else {
-            $this->string = $string;
+            $this->string = $datetime;
 
             $this->datetime = \DateTime::createFromFormat(
                 $this->format,
                 $this->string,
                 new \DateTimeZone($this->timezone)
             );
+
+            if ($this->datetime === false) {
+                //the format does not match the string so let's attempt to fix that
+                $this->string = date($this->format, strtotime($datetime));
+                $this->datetime = \DateTime::createFromFormat(
+                    $this->format,
+                    $this->string
+                );
+            }
         }
     }
 

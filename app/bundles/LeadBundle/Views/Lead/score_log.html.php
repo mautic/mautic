@@ -29,8 +29,7 @@
                 <?php $log = $lead->getScoreChangeLog(); ?>
                 <?php if (!count($log)): ?>
                 <tr>
-                    <?php $date = $lead->getDateAdded(); ?>
-                    <td><?php echo $date->format($dateFormats['date']) . ' ' . $date->format($dateFormats['time']); ?></td>
+                    <td><?php echo $view['date']->toFullConcat($lead->getDateAdded()); ?></td>
                     <td><?php echo $view['translator']->trans('mautic.lead.lead.scoreevent.created'); ?></td>
                     <td></td>
                     <?php $delta = $lead->getScore(); ?>
@@ -52,8 +51,7 @@
                 <?php else: ?>
                 <?php foreach($log as $e): ?>
                 <tr>
-                    <?php $date = $e->getDateAdded(); ?>
-                    <td><?php echo $date->format($dateFormats['date']) . ' ' . $date->format($dateFormats['time']); ?></td>
+                    <td><?php echo $view['date']->toFullConcat($e->getDateAdded()); ?></td>
                     <td><?php echo $e->getEventName(); ?></td>
                     <td><?php echo $e->getActionName(); ?></td>
                     <?php $delta = $e->getDelta(); ?>

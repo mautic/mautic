@@ -24,13 +24,13 @@ class NetworkIntegrationHelper
      * Get a list of social network helper classes
      *
      * @param MauticFactory $factory
-     * @param null          $service
+     * @param null          $services
      * @param null          $withFeatures
      * @param bool          $alphabetical
      *
      * @return mixed
      */
-    public static function getNetworkObjects(MauticFactory $factory, $service = null, $withFeatures = null, $alphabetical = false)
+    public static function getNetworkObjects(MauticFactory $factory, $services = null, $withFeatures = null, $alphabetical = false)
     {
         static $networks;
 
@@ -73,9 +73,17 @@ class NetworkIntegrationHelper
             }
         }
 
-        if (!empty($service)) {
-            if (isset($networks[$service])) {
-                return $networks[$service];
+        if (!empty($services)) {
+            if (!is_array($services) && isset($networks[$services])) {
+                return array($services => $networks[$services]);
+            } elseif (is_array($services)) {
+                $specific = array();
+                foreach ($services as $s) {
+                    if (isset($networks[$s])) {
+                        $specific[$s] = $networks[$s];
+                    }
+                }
+                return $specific;
             } else {
                 throw new MethodNotAllowedHttpException($available);
             }
@@ -221,24 +229,24 @@ class NetworkIntegrationHelper
      * @param $lead
      * @param $fields
      * @param $refresh
+     * @param $specificNetwork
      * @param $persistLead
      * @param $returnSettings
      *
      * @return array
      */
-    public static function getUserProfiles($factory, $lead, $fields, $refresh = true, $persistLead = true,
-                                           $returnSettings = false)
+    public static function getUserProfiles($factory, $lead, $fields, $refresh = false, $specificNetwork = null,
+                                           $persistLead = true, $returnSettings = false)
     {
         $socialCache      = $lead->getSocialCache();
         $featureSettings  = array();
-
         if ($refresh) {
             //regenerate from networks
 
             //check to see if there are social profiles activated
-            $socialNetworks = NetworkIntegrationHelper::getNetworkObjects($factory, null, array('public_profile', 'public_activity'));
-
+            $socialNetworks = NetworkIntegrationHelper::getNetworkObjects($factory, $specificNetwork, array('public_profile', 'public_activity'));
             foreach ($socialNetworks as $network => $sn) {
+
                 $settings        = $sn->getSettings();
                 $features        = $settings->getSupportedFeatures();
                 $identifierField = self::getUserIdentifierField($sn, $fields);
@@ -267,7 +275,7 @@ class NetworkIntegrationHelper
                     }
 
                     //regenerating all of the cache so remove update notice
-                    if (isset($socialCache[$network]['updated'])) {
+                    if (isset($socialCache[$network]['updated']) || empty($socialCache[$network]['lastRefresh'])) {
                         $now = new DateTimeHelper();
                         $socialCache[$network]['lastRefresh'] = $now->toUtcString();
                         unset($socialCache[$network]['updated']);
@@ -280,7 +288,7 @@ class NetworkIntegrationHelper
                 $factory->getEntityManager()->getRepository('MauticLeadBundle:Lead')->saveEntity($lead);
             }
         } elseif ($returnSettings) {
-            $socialNetworks = NetworkIntegrationHelper::getNetworkObjects($factory, null, array('public_profile', 'public_activity'));
+            $socialNetworks = NetworkIntegrationHelper::getNetworkObjects($factory, $specificNetwork, array('public_profile', 'public_activity'));
             foreach ($socialNetworks as $network => $sn) {
                 $settings                  = $sn->getSettings();
                 $featureSettings[$network] = $settings->getFeatureSettings();

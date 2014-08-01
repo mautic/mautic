@@ -353,7 +353,7 @@ Mautic.leadlistOnLoad = function(container) {
     var grid   = mQuery("#shuffle-grid"),
         filter = mQuery("#shuffle-filter"),
         sizer  = grid.find("shuffle-sizer");
-    
+
     // instatiate shuffle
     grid.shuffle({
         itemSelector: ".shuffle",
@@ -382,3 +382,24 @@ Mautic.leadlistOnLoad = function(container) {
         .on("fa.sidebar.minimize", function () { grid.shuffle("update"); })
         .on("fa.sidebar.maximize", function () { grid.shuffle("update"); });
 };
+
+Mautic.refreshLeadSocialProfile = function(network, leadId, event) {
+    Mautic.startIconSpinOnEvent(event);
+    var query = "action=lead:updateSocialProfile&network=" + network + "&lead=" + leadId;
+    mQuery.ajax({
+        url: mauticAjaxUrl,
+        type: "POST",
+        data: query,
+        dataType: "json",
+        success: function (response) {
+            if (response.success) {
+                mQuery('#' + network + 'CompleteProfile').replaceWith(response.newContent);
+            }
+            Mautic.stopIconSpinPostEvent(event);
+        },
+        error: function (request, textStatus, errorThrown) {
+            alert(errorThrown);
+            Mautic.stopIconSpinPostEvent(event);
+        }
+    });
+}

@@ -40,8 +40,8 @@ class FoursquareNetwork extends AbstractNetwork
     public function getIdentifierField()
     {
         return array(
-            'foursquare',
-            'email'
+            'email',
+            'twitter' //foursquare allows searching directly by twitter handle
         );
     }
 
@@ -384,11 +384,18 @@ class FoursquareNetwork extends AbstractNetwork
             return false;
         }
 
-        $email = $this->cleanIdentifier($identifier);
+        $cleaned = $this->cleanIdentifier($identifier);
+        if (!empty($cleaned['email'])) {
+            $query = $cleaned['email'];
+            $searchBy = 'email';
+        } elseif (!empty($cleaned['twitter'])) {
+            $query = $cleaned['twitter'];
+            $searchBy = 'twitter';
+        }
         $keys  = $this->settings->getApiKeys();
 
-        if (!empty($keys['access_token'])) {
-            $url  = "https://api.foursquare.com/v2/users/search?v=20140719&email={$email}&oauth_token={$keys['access_token']}";
+        if (!empty($query) && !empty($keys['access_token'])) {
+            $url  = "https://api.foursquare.com/v2/users/search?v=20140719&{$searchBy}={$query}&oauth_token={$keys['access_token']}";
             $data = $this->makeCall($url);
             if (!empty($data) && isset($data->response->results) && count($data->response->results)) {
                 $socialCache['id'] = $data->response->results[0]->id;

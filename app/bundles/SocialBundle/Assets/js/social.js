@@ -27,17 +27,17 @@ Mautic.loadAuthModal = function(url, keyType, network, popupMsg) {
  */
 Mautic.handleCallback = function (network, token, code, callbackUrl) {
     //get the keys
-    var base = '#socialmedia_config_services_'+network+'_apiKeys_';
+    var base = '#socialmedia_config_services_' + network + '_apiKeys_';
 
-    var clientId     = window.opener.mQuery(base+'clientId').val();
-    var clientSecret = window.opener.mQuery(base+'clientSecret').val();
+    var clientId = window.opener.mQuery(base + 'clientId').val();
+    var clientSecret = window.opener.mQuery(base + 'clientSecret').val();
 
     //perform callback
     var query = 'clientId=' + clientId +
-                '&clientSecret=' + clientSecret +
-                '&code=' + code +
-                '&state=' + token +
-                '&' + network + '_csrf_token=' + token;
+        '&clientSecret=' + clientSecret +
+        '&code=' + code +
+        '&state=' + token +
+        '&' + network + '_csrf_token=' + token;
 
     mQuery.ajax({
         url: callbackUrl,
@@ -51,5 +51,4 @@ Mautic.handleCallback = function (network, token, code, callbackUrl) {
             alert(errorThrown);
         }
     });
-
 }
