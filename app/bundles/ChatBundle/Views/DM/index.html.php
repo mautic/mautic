@@ -6,8 +6,8 @@
  * @link        http://mautic.com
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-$lastMsg = array('id' => 0);
-
+$lastMsg  = array('id' => 0);
+$withUser = (isset($with)) ? $with->getId() : 0;
 if (!empty($inPopup)):
     $view->extend('MauticCoreBundle:Default:slim.html.php');
     $view['slots']->addScriptDeclaration("Mautic.activateChatInput('{$with->getId()}');", 'bodyClose');
@@ -28,7 +28,7 @@ if (!empty($inPopup)):
         <?php endif; ?>
     <?php endif; ?>
         <input type="hidden" id="ChatLastMessageId" value="<?php echo $lastMsg['id']; ?>" />
-        <input type="hidden" id="ChatWithUserId" value="<?php echo $with->getId(); ?>" />
+        <input type="hidden" id="ChatWithUserId" value="<?php echo $withUser; ?>" />
     </ul>
 
 <?php if (!empty($inPopup)): ?>

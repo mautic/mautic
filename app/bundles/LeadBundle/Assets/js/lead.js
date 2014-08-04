@@ -396,7 +396,7 @@ Mautic.refreshLeadSocialProfile = function(network, leadId, event) {
                 //loop through each network
                 mQuery.each(response.profiles, function( index, value ){
                     if (mQuery('#' + index + 'CompleteProfile').length) {
-                        mQuery('#' + index + 'CompleteProfile').replaceWith(value.newContent);
+                        mQuery('#' + index + 'CompleteProfile').html(value.newContent);
                     }
                 });
             }
