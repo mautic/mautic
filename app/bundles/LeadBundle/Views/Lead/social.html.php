@@ -22,8 +22,11 @@
                     <div class="panel-toolbar text-right">
                         <!-- option -->
                         <div class="option">
-                            <button class="btn" data-toggle="panelrefresh"
-                                    onclick="Mautic.refreshLeadSocialProfile('<?php echo $network; ?>', '<?php echo $lead->getId(); ?>', event);">
+                            <button class="btn" data-toggle="tooltip"
+                                    onclick="Mautic.refreshLeadSocialProfile('<?php echo $network; ?>', '<?php echo $lead->getId(); ?>', event);" title="<?php echo $view['translator']->trans('mautic.lead.lead.social.lastupdate', array(
+                "%datetime%" => $view['date']->toFullConcat($details['lastRefresh'], 'utc')
+            )); ?>
+">
                                 <i class="fa fa-refresh"></i>
                             </button>
                             <button class="btn" data-toggle="panelcollapse"><i class="fa fa-angle-up"></i></button>

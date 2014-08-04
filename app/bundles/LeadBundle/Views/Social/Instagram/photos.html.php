@@ -6,6 +6,7 @@
  * @link        http://mautic.com
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 ?>
 
 <div class="img-grid">
@@ -19,9 +20,13 @@
                     <div class="indicator"><span class="spinner"></span></div>
                     <!--/ indicator -->
                     <!-- toolbar overlay -->
-                    
+                            <div class="overlay">
+                                <div class="toolbar">
+                                    <a href="<?php echo $photos[0]['url']; ?>" data-toggle="modal" data-target="#bs-modal-sm" class="btn btn-teal"><i class="fa fa-search"></i></a>
+                                </div>
+                            </div>                    
                     <!--/ toolbar overlay -->
-                    <img data-toggle="unveil" src="../image/background/background8.jpg" data-src="../image/background/background8.jpg" alt="Photo" class="unveiled">
+                    <img data-toggle="unveil" src="<?php echo $photos[0]['url']; ?>" data-src="<?php echo $photos[0]['url']; ?>" alt="Photo" class="unveiled">
                 </div>
                 <!--/ media -->
             </div>
@@ -40,11 +45,11 @@
                             <!-- toolbar overlay -->
                             <div class="overlay">
                                 <div class="toolbar">
-                                    <a href="javascript:void(0);" class="btn btn-danger" title="love this collection"><i class="ico-heart6"></i></a>
+                                    <a href="<?php echo $photos[1]['url']; ?>" data-toggle="modal" data-target="#bs-modal-sm" class="btn btn-teal"><i class="fa fa-search"></i></a>
                                 </div>
                             </div>
                             <!--/ toolbar overlay -->
-                            <img data-toggle="unveil" src="../image/background/400x400/background5.jpg" data-src="../image/background/400x400/background5.jpg" alt="Photo" class="unveiled">
+                            <img data-toggle="unveil" src="<?php echo $photos[1]['url']; ?>" data-src="<?php echo $photos[1]['url']; ?>" alt="Photo" class="unveiled" width="100%">
                         </div>
                         <!--/ media -->
                     </div>
@@ -63,11 +68,11 @@
                             <!-- toolbar overlay -->
                             <div class="overlay">
                                 <div class="toolbar">
-                                    <a href="javascript:void(0);" class="btn btn-danger" title="love this collection"><i class="ico-heart6"></i></a>
+                                    <a href="<?php echo $photos[2]['url']; ?>" data-toggle="modal" data-target="#bs-modal-sm" class="btn btn-teal"><i class="fa fa-search"></i></a>
                                 </div>
                             </div>
                             <!--/ toolbar overlay -->
-                            <img data-toggle="unveil" src="../image/background/400x400/background6.jpg" data-src="../image/background/400x400/background6.jpg" alt="Photo" class="unveiled">
+                            <img data-toggle="unveil" src="<?php echo $photos[2]['url']; ?>" data-src="<?php echo $photos[2]['url']; ?>" alt="Photo" class="unveiled" width="100%">
                         </div>
                         <!--/ media -->
                     </div>
@@ -86,11 +91,11 @@
                             <!-- toolbar overlay -->
                             <div class="overlay">
                                 <div class="toolbar">
-                                    <a href="javascript:void(0);" class="btn btn-danger" title="love this collection"><i class="ico-heart6"></i></a>
+                                    <a href="<?php echo $photos[3]['url']; ?>" data-toggle="modal" data-target="#bs-modal-sm" class="btn btn-teal"><i class="fa fa-search"></i></a>
                                 </div>
                             </div>
                             <!--/ toolbar overlay -->
-                            <img data-toggle="unveil" src="../image/background/400x400/background7.jpg" data-src="../image/background/400x400/background7.jpg" alt="Photo" class="unveiled">
+                            <img data-toggle="unveil" src="<?php echo $photos[3]['url']; ?>" data-src="<?php echo $photos[3]['url']; ?>" alt="Photo" class="unveiled" width="100%">
                         </div>
                         <!--/ media -->
                     </div>
@@ -99,4 +104,13 @@
             </ul>
         </li>
     </ul>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="bs-modal-sm" tabindex="-1" role="dialog" aria-labelledby="bs-modal-sm" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        </div><!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
 </div>

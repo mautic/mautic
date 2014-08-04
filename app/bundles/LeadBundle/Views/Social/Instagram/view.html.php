@@ -9,15 +9,7 @@
 ?>
 
 <div class="panel-body">
-    <div class="text-right">
-        <span class="small">
-            <?php echo $view['translator']->trans('mautic.lead.lead.social.lastupdate', array(
-                "%datetime%" => $view['date']->toFullConcat($details['lastRefresh'], 'utc')
-            )); ?>
-        </span>
-    </div>
     <?php echo $view->render('MauticLeadBundle:Social/Instagram:photos.html.php', array(
-        'lead'      => $lead,
-        // 'profile'   => $details['profile']
+        'photos'   => $details['activity']['photos']
     )); ?>
 </div>
