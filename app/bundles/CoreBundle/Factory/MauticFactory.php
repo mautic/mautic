@@ -135,7 +135,7 @@ class MauticFactory
         static $schemaHelpers = array();
 
         if (empty($schemaHelpers[$type])) {
-            $className            = "\\Mautic\\CoreBundle\\Doctrine\Helper\\" . ucfirst($type).'SchemaHelper';
+            $className            = "\\Mautic\\CoreBundle\\Doctrine\\Helper\\" . ucfirst($type).'SchemaHelper';
             if ($type == "table") {
                 //get the column helper as well
                 $columnHelper         = $this->getSchemaHelper('column');
