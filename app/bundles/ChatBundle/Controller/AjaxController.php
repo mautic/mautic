@@ -45,9 +45,13 @@ class AjaxController extends CommonAjaxController
             ));
             $dataArray['withName'] = $user->getName();
             $dataArray['withId']   = $user->getId();
-            $dataArray['lastSeen'] = $user->getLastActive()->format(
-                $this->factory->getParameter('date_format_dateonly') . ' ' . $this->factory->getParameter('date_format_timeonly')
-            );
+            $lastActive = $user->getLastActive();
+            if (!empty($lastActive)) {
+                $dataArray['lastSeen'] = $lastActive->format(
+                    $this->factory->getParameter('date_format_dateonly') . ' ' . $this->factory->getParameter('date_format_timeonly')
+                );
+            }
+
             $dataArray['success'] = 1;
         }
 

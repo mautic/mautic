@@ -33,7 +33,9 @@ Mautic.startChatWith = function (userId, fromDate) {
         success: function (response) {
             if (response.success) {
                 mQuery('#ChatWith').html(response.withName);
-                mQuery('#LastSeen').html(response.lastSeen);
+                if (response.lastSeen) {
+                    mQuery('#LastSeen').html(response.lastSeen);
+                }
                 mQuery('#ChatConversation').html(response.conversationHtml);
                 mQuery('#ChatConversation').scrollTop(mQuery('#ChatConversation')[0].scrollHeight);
 
