@@ -145,6 +145,7 @@ class LeadModel extends FormModel
      */
     public function setFieldValues(Lead &$lead, array $data, $overwriteWithBlank = true)
     {
+        //@todo - add a catch to NOT do social gleaning if a lead is created via a form, etc as we do not want the user to experience the wait
         //generate the social cache
         list($socialCache, $socialFeatureSettings) = NetworkIntegrationHelper::getUserProfiles($this->factory, $lead, $data, true, null, false, true);
 

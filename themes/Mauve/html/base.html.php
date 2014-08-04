@@ -14,11 +14,11 @@
         <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
         <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" type="text/css" />
         <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
-        <?php $view['slots']->outputHeadDeclarations(); ?>
+        <?php $view['assets']->outputHeadDeclarations(); ?>
     </head>
     <body>
-        <?php $view['slots']->outputScripts("bodyOpen"); ?>
+        <?php $view['assets']->outputScripts("bodyOpen"); ?>
         <?php $view['slots']->output('_content'); ?>
-        <?php $view['slots']->outputScripts("bodyClose"); ?>
+        <?php $view['assets']->outputScripts("bodyClose"); ?>
     </body>
 </html>

@@ -127,22 +127,24 @@ class FieldModel extends FormModel
             $entity->setIsListable(false);
         }
 
-        //create the field as its own column in the leads table
-        $leadsSchema = $this->factory->getSchemaHelper('column', 'leads');
-        if ($isNew) {
-            $leadsSchema->addColumn(array('name' => $alias));
-            $leadsSchema->executeChanges();
-        } else {
-            //ensure it exists and create it if it does not
-            if (!$leadsSchema->checkColumnExists($alias)) {
-                $leadsSchema->addColumn(array('name' => $alias));
-                $leadsSchema->executeChanges();
-            }
-        }
-
         $event = $this->dispatchEvent("pre_save", $entity, $isNew);
         $this->getRepository()->saveEntity($entity);
         $this->dispatchEvent("post_save", $entity, $isNew, $event);
+
+        if ($entity->getId()) {
+            //create the field as its own column in the leads table
+            $leadsSchema = $this->factory->getSchemaHelper('column', 'leads');
+            if ($isNew || (!$isNew && !$leadsSchema->checkColumnExists($alias))) {
+                $leadsSchema->addColumn(array(
+                    'name' => $alias,
+                    'type' => 'text',
+                    'options' => array(
+                        'notnull' => false
+                    )
+                ));
+                $leadsSchema->executeChanges();
+            }
+        }
 
         //update order of other fields
         $this->reorderFieldsByEntity($entity);

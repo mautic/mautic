@@ -8,11 +8,11 @@
  */
 if (!empty($inPopup)) {
     $view->extend('MauticCoreBundle:Default:slim.html.php');
-    //$view['slots']->addScriptDeclaration("Mautic.activateChatInput('{$with->getId()}');", 'bodyClose');
+    //$view['assets']->addScriptDeclaration("Mautic.activateChatInput('{$with->getId()}');", 'bodyClose');
 }
 
 if (empty($contentOnly)) {
-    $view['slots']->addScriptDeclaration('Mautic.activateChatListUpdate();', 'bodyClose');
+    $view['assets']->addScriptDeclaration('Mautic.activateChatListUpdate();', 'bodyClose');
 }
 ?>
 <div id="ChatList">

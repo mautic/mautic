@@ -19,5 +19,5 @@ $language
     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
 })();
 JS;
-$view['slots']->addScriptDeclaration($js, 'bodyClose');?>
+$view['assets']->addScriptDeclaration($js, 'bodyClose');?>
 <div class="g-plus googleplus-share-button share-button layout-<?php echo $dataAnnotation; ?>" data-action="share" data-annotation="<?php echo $dataAnnotation ?>"<?php echo $dataHeight; ?>></div>

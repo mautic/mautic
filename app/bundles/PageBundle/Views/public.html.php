@@ -21,7 +21,7 @@ if ($googleAnalytics) {
 ga('create', '$googleAnalytics', 'auto');
 ga('send', 'pageview');
 GA;
-    $view['slots']->addScriptDeclaration($gCode);
+    $view['assets']->addScriptDeclaration($gCode);
 }
 
 //Set the slots

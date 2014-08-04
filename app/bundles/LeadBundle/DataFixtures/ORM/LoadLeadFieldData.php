@@ -117,7 +117,13 @@ class LoadLeadFieldData extends AbstractFixture implements OrderedFixtureInterfa
             $manager->flush();
 
             //add the column to the leads table
-            $leadsSchema->addColumn(array('name' => $name));
+            $leadsSchema->addColumn(array(
+                'name' => $name,
+                'type' => 'text',
+                'options' => array(
+                    'notnull' => false
+                )
+            ));
 
             $this->addReference('leadfield-'.$name, $entity);
         }

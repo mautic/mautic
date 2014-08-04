@@ -132,7 +132,7 @@ class ColumnSchemaHelper
 
         //now add the columns
         foreach ($columns as $column) {
-            $this->addColumn($column);
+            $this->addColumn($column, false);
         }
     }
 
@@ -141,18 +141,22 @@ class ColumnSchemaHelper
      *
      * @param array $column
      *  ['name']    string (required) unique name of column; cannot already exist
-     *  ['type']    string (optional) Doctrine type for column; defaults to string
+     *  ['type']    string (optional) Doctrine type for column; defaults to text
      *  ['options'] array  (optional) Defining options for column
+     * @param bool  $checkExists Check if table exists; pass false if this has already been done
+     *
      */
-    public function addColumn(array $column)
+    public function addColumn(array $column, $checkExists = true)
     {
         if (empty($column['name'])) {
             throw new \InvalidArgumentException('Column is missing required name key.');
         }
 
-        $this->checkColumnExists($column['name'], true);
+        if ($checkExists) {
+            $this->checkColumnExists($column['name'], true);
+        }
 
-        $type    = (isset($column['type'])) ? $column['type'] : 'string';
+        $type    = (isset($column['type'])) ? $column['type'] : 'text';
         $options = (isset($column['options'])) ? $column['options'] : array();
 
         $this->toTable->addColumn($column['name'], $type, $options);

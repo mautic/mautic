@@ -11,7 +11,7 @@
 <html>
     <?php echo $view->render('MauticCoreBundle:Default:head.html.php'); ?>
     <body>
-        <?php $view['slots']->outputScripts("bodyOpen"); ?>
+        <?php $view['assets']->outputScripts("bodyOpen"); ?>
         <section id="main" role="main">
             <div class="container-fluid" id="main-content">
                 <?php if ($view['slots']->has("headerTitle")): ?>

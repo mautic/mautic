@@ -36,12 +36,5 @@ class TemplatingPass implements CompilerPassInterface
                 'setFactory', array(new Reference('mautic.factory'))
             );
         }
-
-        if ($container->hasDefinition('templating.helper.slots')) {
-            //Add a addMethodCall to set assets helper
-            $container->getDefinition('templating.helper.slots')->addMethodCall(
-                'setAssetsHelper', array(new Reference('templating.helper.assets'))
-            )->setScope('request');
-        }
     }
 }

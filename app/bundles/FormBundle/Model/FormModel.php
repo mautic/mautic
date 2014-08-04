@@ -226,29 +226,29 @@ class FormModel extends CommonFormModel
      */
     public function saveEntity($entity, $unlock = true)
     {
-        $alias = $entity->getAlias();
-        if (empty($alias)) {
-            $alias = strtolower(InputHelper::alphanum($entity->getName(), true));
-        } else {
-            $alias = strtolower(InputHelper::alphanum($alias, true));
+        $isNew = ($entity->getId()) ? false : true;
+
+        if ($isNew) {
+            $alias = strtolower(InputHelper::alphanum($entity->getName()));
+
             //remove appended numbers
             $alias = preg_replace('#[0-9]+$#', '', $alias);
-        }
 
-        //make sure alias is not already taken
-        $testAlias = $alias;
-        $count     = $this->em->getRepository('MauticFormBundle:Form')->checkUniqueAlias($testAlias, $entity);
-        $aliasTag  = $count;
-
-        while ($count) {
-            $testAlias = $alias . $aliasTag;
+            //make sure alias is not already taken
+            $testAlias = $alias;
             $count     = $this->em->getRepository('MauticFormBundle:Form')->checkUniqueAlias($testAlias, $entity);
-            $aliasTag++;
+            $aliasTag  = $count;
+
+            while ($count) {
+                $testAlias = $alias . $aliasTag;
+                $count     = $this->em->getRepository('MauticFormBundle:Form')->checkUniqueAlias($testAlias, $entity);
+                $aliasTag++;
+            }
+            if ($testAlias != $alias) {
+                $alias = $testAlias;
+            }
+            $entity->setAlias($alias);
         }
-        if ($testAlias != $alias) {
-            $alias = $testAlias;
-        }
-        $entity->setAlias($alias);
 
         //save the form so that the ID is available for the form html
         parent::saveEntity($entity, $unlock);
@@ -286,6 +286,57 @@ class FormModel extends CommonFormModel
         $js = "document.write(\"".$html."\");";
         $entity->setCachedJs($js);
         $this->getRepository()->saveEntity($entity);
+
+        //now build the form table
+        if ($entity->getId()) {
+            //create the field as its own column in the leads table
+            $schemaHelper = $this->factory->getSchemaHelper('table');
+            $name         = "form_$alias";
+            if ($isNew || (!$isNew && !$schemaHelper->checkTableExists($name))) {
+                $columns = $this->generateFieldColumns($entity);
+                $schemaHelper->addTable(array(
+                    'name'    => $name,
+                    'columns' => $columns,
+                    'options' => array(
+                        'primaryKey' => array('id')
+                    )
+                ));
+                $schemaHelper->executeChanges();
+            }
+        }
+    }
+
+    /**
+     * Generate an array of columns from fields
+     *
+     * @param Form $form
+     *
+     * @return array
+     */
+    public function generateFieldColumns(Form $form)
+    {
+        $fields = $form->getFields();
+
+        $columns = array(
+            array(
+                'name' => 'id',
+                'type' => 'integer'
+            )
+        );
+        $ignoreTypes = array('button', 'freetext');
+        foreach ($fields as $f) {
+            if (!in_array($f->getType(), $ignoreTypes)) {
+                $columns[] = array(
+                    'name'    => $f->getAlias(),
+                    'type'    => 'text',
+                    'options' => array(
+                        'notnull' => false
+                    )
+                );
+            }
+        }
+
+        return $columns;
     }
 
     /**

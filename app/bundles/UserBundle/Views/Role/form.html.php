@@ -10,7 +10,7 @@
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'role');
 
-$view['slots']->addScriptDeclaration("MauticVars.permissionList = " . json_encode($permissionList), 'bodyClose');
+$view['assets']->addScriptDeclaration("MauticVars.permissionList = " . json_encode($permissionList), 'bodyClose');
 
 $objectId = $form->vars['data']->getId();
 if (!empty($objectId)) {

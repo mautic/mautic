@@ -16,5 +16,5 @@
     <?php echo $view['assets']->outputSystemStylesheets(); ?>
     <link rel="stylesheet" href="<?php echo $view['assets']->getUrl('assets/css/font-awesome/css/font-awesome.min.css'); ?>" />
 
-    <?php $view['slots']->outputHeadDeclarations(); ?>
+    <?php $view['assets']->outputHeadDeclarations(); ?>
 </head>

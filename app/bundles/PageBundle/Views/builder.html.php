@@ -10,11 +10,11 @@
 //extend the template chosen
 $view->extend(":$template:page.html.php");
 
-$view['slots']->addScriptDeclaration("var mauticBasePath = '$basePath';");
+$view['assets']->addScriptDeclaration("var mauticBasePath = '$basePath';");
 
-$view['slots']->addScript($view['assets']->getSystemScripts());
+$view['assets']->addScript($view['assets']->getSystemScripts());
 
-$view['slots']->addScript(array(
+$view['assets']->addScript(array(
     'assets/js/ckeditor/ckeditor.js',
     'assets/js/ckeditor/adapters/jquery.js'
 ));
@@ -49,14 +49,14 @@ mQuery(document).ready( function() {
     });
 });
 CUSTOM;
-$view['slots']->addScriptDeclaration($custom);
+$view['assets']->addScriptDeclaration($custom);
 
 $css = <<<CSS
 .mautic-editable { min-height: 75px; width: 100%; border: dashed 1px #000; margin-top: 3px; margin-bottom: 3px; }
 .mautic-content-placeholder { height: 100%; width: 100%; text-align: center; margin-top: 25px; }
 .mautic-editable.over-droppable { border: dashed 1px #ED9C28; }
 CSS;
-$view['slots']->addStyleDeclaration($css);
+$view['assets']->addStyleDeclaration($css);
 
 //Set the slots
 foreach ($slots as $slot) {

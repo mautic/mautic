@@ -13,7 +13,7 @@ $js = <<<js
     lang: $locale
 </script>
 js;
-$view['slots']->addCustomDeclaration($js, 'bodyClose');
+$view['assets']->addCustomDeclaration($js, 'bodyClose');
 
 $counter     = (!empty($settings['counter'])) ? $settings['counter'] : 'none';
 $dataCounter = ($counter != 'none') ? ' data-counter="'.$settings['counter'].'"' : '';

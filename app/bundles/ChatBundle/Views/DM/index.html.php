@@ -10,7 +10,7 @@ $lastMsg  = array('id' => 0);
 $withUser = (isset($with)) ? $with->getId() : 0;
 if (!empty($inPopup)):
     $view->extend('MauticCoreBundle:Default:slim.html.php');
-    $view['slots']->addScriptDeclaration("Mautic.activateChatInput('{$with->getId()}');", 'bodyClose');
+    $view['assets']->addScriptDeclaration("Mautic.activateChatInput('{$with->getId()}');", 'bodyClose');
 ?>
 <div id="ChatConversation">
 <?php endif; ?>

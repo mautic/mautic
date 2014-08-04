@@ -33,4 +33,4 @@
     });
     <?php endif; ?>
 </script>
-<?php $view['slots']->outputScripts("bodyClose"); ?>
+<?php $view['assets']->outputScripts("bodyClose"); ?>

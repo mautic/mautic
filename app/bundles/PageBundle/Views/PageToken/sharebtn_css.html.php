@@ -15,4 +15,4 @@ $css = <<<CSS
 .share-button.twitter-share-button.layout-horizontal { width: 75px !important; }
 CSS;
 
-$view['slots']->addStyleDeclaration($css);
+$view['assets']->addStyleDeclaration($css);
