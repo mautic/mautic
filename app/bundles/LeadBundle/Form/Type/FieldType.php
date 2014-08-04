@@ -76,7 +76,7 @@ class FieldType extends AbstractType
 
         $disabled = (!empty($options['data'])) ? $options['data']->isFixed() : false;
         $new      = (!empty($options['data']) && $options['data']->getAlias()) ? false : true;
-
+        $default  = ($new) ? 'text' : $options['data']->getType();
         $fieldHelper = new FormFieldHelper();
         $fieldHelper->setTranslator($this->translator);
         $builder->add('type', 'choice', array(
@@ -89,7 +89,8 @@ class FieldType extends AbstractType
             'attr'        => array(
                 'class'    => 'form-control',
                 'onchange' => 'Mautic.updateLeadFieldProperties(this.value);'
-            )
+            ),
+            'data'        => $default
         ));
 
         $builder->add('properties', 'collection', array(

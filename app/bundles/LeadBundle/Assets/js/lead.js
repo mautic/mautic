@@ -9,6 +9,8 @@ Mautic.leadOnLoad = function (container) {
             var options = mQuery(this).attr('data-options');
             Mautic.activateLeadFieldTypeahead(field, target, options);
         });
+
+        Mautic.updateLeadFieldProperties(mQuery('#leadfield_type').val());
     }
 
     if (mQuery(container + ' #list-search').length) {
