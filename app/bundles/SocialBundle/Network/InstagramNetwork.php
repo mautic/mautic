@@ -40,6 +40,16 @@ class InstagramNetwork extends AbstractNetwork
      *
      * @return string
      */
+    public function getAuthenticationType()
+    {
+        return 'oauth2';
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return string
+     */
     public function getIdentifierField()
     {
         return 'instagram';

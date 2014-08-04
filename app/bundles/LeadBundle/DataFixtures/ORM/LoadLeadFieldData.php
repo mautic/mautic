@@ -66,7 +66,8 @@ class LoadLeadFieldData extends AbstractFixture implements OrderedFixtureInterfa
             'twitter',
             'facebook',
             'googleplus',
-            'skype'
+            'skype',
+            'instagram'
         );
 
         $leadsSchema = $this->container->get('mautic.factory')->getSchemaHelper('column', 'leads');
