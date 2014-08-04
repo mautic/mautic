@@ -15,7 +15,7 @@ use Doctrine\DBAL\Schema\Comparator;
 /**
  * Class TableSchemaHelper
  *
- * Used to manipulate the schema of an existing table
+ * Used to manipulate creation/removal of tables
  *
  * @package Mautic\CoreBundle\Doctrine\Helper
  */
@@ -38,47 +38,20 @@ class TableSchemaHelper
     protected $prefix;
 
     /**
-     * @var
+     * @var ColumnSchemaHelper
      */
-    protected $tableName;
-
-    /**
-     * @var
-     */
-    protected $fromTable;
-
-    /**
-     * @var
-     */
-    protected $toTable;
+    protected $columnHelper;
 
     /**
      * @param Connection $db
      * @param            $prefix
      */
-    public function __construct(Connection $db, $prefix)
+    public function __construct(Connection $db, $prefix, ColumnSchemaHelper $columnHelper)
     {
         $this->db            = $db;
         $this->sm            = $db->getSchemaManager();
         $this->prefix        = $prefix;
-    }
-
-    /**
-     * Set the table to be manipulated
-     *
-     * @param      $table
-     * @param bool $addPrefix
-     */
-    public function setTable($table, $addPrefix = true)
-    {
-        $this->tableName = ($addPrefix) ? $this->prefix . $table : $table;
-
-        //make sure the table exists
-        $this->checkTableExists($this->tableName, true);
-
-        //use the to schema to get table details so that changes will be calculated
-        $this->fromTable = $this->sm->listTableDetails($this->tableName);
-        $this->toTable   = clone $this->fromTable;
+        $this->columnHelper  = $columnHelper;
     }
 
     /**
@@ -92,119 +65,6 @@ class TableSchemaHelper
     }
 
     /**
-     * Get table details
-     *
-     * @return \Doctrine\DBAL\Schema\Table
-     */
-    public function getTable()
-    {
-        return $this->toTable;
-    }
-
-    /**
-     * Get array of Doctrine\DBAL\Schema\Column instances for the table
-     *
-     * @return array
-     */
-    public function getColumns()
-    {
-        if (empty($this->columns)) {
-            $this->columns = $this->toTable->getColumns();
-        }
-        return $this->columns;
-    }
-
-    /**
-     * Add an array of columns to the table
-     *
-     * @param array $columns
-     */
-    public function addColumns(array $columns)
-    {
-        //ensure none of the columns exist before manipulating the schema
-        foreach ($columns as $column) {
-            if (empty($column['name'])) {
-                throw new \InvalidArgumentException('Column is missing required name key.');
-            }
-
-            $this->checkColumnExists($column['name'], true);
-        }
-
-        //now add the columns
-        foreach ($columns as $column) {
-            $this->addColumn($column);
-        }
-    }
-
-    /**
-     * Add a column to the table
-     *
-     * @param array $column
-     *  ['name']    string (required) unique name of column; cannot already exist
-     *  ['type']    string (optional) Doctrine type for column; defaults to string
-     *  ['options'] array  (optional) Defining options for column
-     */
-    public function addColumn(array $column)
-    {
-        if (empty($column['name'])) {
-            throw new \InvalidArgumentException('Column is missing required name key.');
-        }
-
-        $this->checkColumnExists($column['name'], true);
-
-        $type    = (isset($column['type'])) ? $column['type'] : 'string';
-        $options = (isset($column['options'])) ? $column['options'] : array();
-
-        $this->toTable->addColumn($column['name'], $type, $options);
-    }
-
-    /**
-     * Drops a column from table
-     *
-     * @param $columnName
-     */
-    public function dropColumn($columnName)
-    {
-        if ($this->checkColumnExists($columnName)) {
-            $this->toTable->dropColumn($columnName);
-        }
-    }
-
-    /**
-     * Computes and executes the changes
-     */
-    public function executeChanges()
-    {
-        //create a table diff
-        $comparator = new Comparator();
-        $diff       = $comparator->diffTable($this->fromTable, $this->toTable);
-
-        $this->sm->alterTable($diff);
-    }
-
-    /**
-     * Determine if a column already exists
-     *
-     * @param      $column
-     * @param bool $throwException
-     *
-     * @return bool
-     */
-    public function checkColumnExists($column, $throwException = false)
-    {
-        //check to ensure column doesn't exist
-        if ($this->toTable->hasColumn($column)) {
-            if ($throwException) {
-                throw new \InvalidArgumentException("The column {$column} already exists in {$this->tableName}");
-            } else {
-                return true;
-            }
-        } else {
-            return false;
-        }
-    }
-
-    /**
      * Determine if a table exists
      *
      * @param      $table
@@ -213,9 +73,9 @@ class TableSchemaHelper
      */
     public function checkTableExists($table, $throwException = false)
     {
-        if (!$this->sm->tablesExist($table)) {
+        if (!$this->sm->tablesExist($this->prefix . $table)) {
             if ($throwException) {
-                throw new \InvalidArgumentException("$table does not exist");
+                throw new \InvalidArgumentException($this->prefix . "$table does not exist");
             } else {
                 return false;
             }

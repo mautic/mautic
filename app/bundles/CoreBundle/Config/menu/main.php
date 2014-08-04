@@ -12,4 +12,7 @@ $items = array(
     'children'  => array()
 );
 
-return $items;
+return array(
+    'priority' => -1000,
+    'items'    => $items
+);

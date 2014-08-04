@@ -9,7 +9,7 @@
 
 namespace Mautic\CoreBundle\Event;
 
-use Mautic\CoreBundle\Loader\RouteLoader;
+use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -30,10 +30,10 @@ class RouteEvent extends Event
      */
     protected $collection;
 
-    public function __construct(RouteLoader &$loader, RouteCollection &$collection)
+    public function __construct(Loader &$loader)
     {
         $this->loader     =& $loader;
-        $this->collection =& $collection;
+        $this->collection = new RouteCollection();
     }
 
     /**
@@ -43,4 +43,13 @@ class RouteEvent extends Event
     {
         $this->collection->addCollection($this->loader->import($path));
     }
+
+    /**
+     * @return RouteCollection
+     */
+    public function getCollection()
+    {
+        return $this->collection;
+    }
+
 }

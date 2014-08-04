@@ -194,4 +194,18 @@ class UserModel extends FormModel
 
         return $results;
     }
+
+    /**
+     * Get a list of active users
+     *
+     * @param string $search
+     * @param int    $limit
+     * @param int    $start
+     *
+     * @return mixed
+     */
+    public function getActiveUsers($search = '', $limit = 10, $start = 0)
+    {
+        return $this->getRepository()->getActiveUsers($this->factory->getUser()->getId(), $search, $limit, $start);
+    }
 }

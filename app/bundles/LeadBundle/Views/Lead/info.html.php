@@ -12,7 +12,7 @@
 	<div class="panel-body text-center">
 		<p></p>
 	 	<img class="img-rounded img-bordered-primary" src="<?php
-	        echo \Mautic\SocialBundle\Helper\GravatarHelper::getGravatar($fields['core']['email']['value'], '100'); ?>" />
+	        echo $view['gravatar']->getImage($fields['core']['email']['value'], '100'); ?>" />
 	 	<h1><?php echo $lead->getName(); ?></h1>
         <h4>
             <?php if(isset($fields['core']['position']['value'])): ?>

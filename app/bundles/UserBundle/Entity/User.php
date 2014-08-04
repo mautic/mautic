@@ -122,6 +122,30 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
     private $locale   = 'en_US';
 
     /**
+     * @ORM\Column(type="datetime", name="last_login", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full", "limited"})
+     */
+    private $lastLogin;
+
+    /**
+     * @ORM\Column(type="datetime", name="last_active", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full", "limited"})
+     */
+    private $lastActive;
+
+    /**
+     * @ORM\Column(type="string", name="online_status", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full", "limited"})
+     */
+    private $onlineStatus;
+
+    /**
      * Stores active role permissions
      * @var
      * @Serializer\Expose
@@ -653,5 +677,59 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
         } else {
             return false;
         }
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLastLogin ()
+    {
+        return $this->lastLogin;
+    }
+
+    /**
+     * @param mixed $lastLogin
+     */
+    public function setLastLogin ($lastLogin = null)
+    {
+        if (empty($lastLogin)) {
+            $lastLogin = new \DateTime();
+        }
+        $this->lastLogin = $lastLogin;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLastActive ()
+    {
+        return $this->lastActive;
+    }
+
+    /**
+     * @param mixed $lastActive
+     */
+    public function setLastActive ($lastActive = null)
+    {
+        if (empty($lastActive)) {
+            $lastActive = new \DateTime();
+        }
+        $this->lastActive = $lastActive;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getOnlineStatus ()
+    {
+        return $this->onlineStatus;
+    }
+
+    /**
+     * @param mixed $status
+     */
+    public function setOnlineStatus ($status)
+    {
+        $this->onlineStatus = $status;
     }
 }

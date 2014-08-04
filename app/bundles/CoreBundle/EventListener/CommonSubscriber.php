@@ -9,7 +9,6 @@
 
 namespace Mautic\CoreBundle\EventListener;
 
-use Mautic\ApiBundle\Event as ApiEvents;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -49,75 +48,5 @@ class CommonSubscriber implements EventSubscriberInterface
     static public function getSubscribedEvents ()
     {
         return array();
-    }
-
-    /**
-     * @param MenuEvent $event
-     */
-    public function onBuildMenu (MauticEvents\MenuEvent $event)
-    {
-        //check common place
-        $path = $this->getSubscriberDirectory() . "/../Config/menu/main.php";
-        if (!file_exists($path)) {
-            //else check for just a menu.php file
-            $path = $this->getSubscriberDirectory() . "/../Config/menu.php";
-        }
-
-        if (file_exists($path)) {
-            $security = $event->getSecurity();
-            $request  = $this->factory->getRequest();
-            $items    = include $path;
-            $event->addMenuItems($items);
-        }
-    }
-
-    /**
-     * @param MenuEvent $event
-     */
-    public function onBuildAdminMenu (MauticEvents\MenuEvent $event)
-    {
-        $path  = $this->getSubscriberDirectory() . "/../Config/menu/admin.php";
-        if (file_exists($path)) {
-            $security = $event->getSecurity();
-            $request  = $this->factory->getRequest();
-            $items    = include $path;
-            $event->addMenuItems($items);
-        }
-    }
-
-    /**
-     * @param RouteEvent $event
-     */
-    public function onBuildRoute (MauticEvents\RouteEvent $event)
-    {
-        $routing = $this->getSubscriberDirectory() .  "/../Config/routing.php";
-        if (file_exists($routing)) {
-            $event->addRoutes($routing);
-        } else {
-            $routing = $this->getSubscriberDirectory() .  "/../Config/routing/routing.php";
-            if (file_exists($routing)) {
-                $event->addRoutes($routing);
-            }
-        }
-    }
-
-    /**
-     * @param RouteEvent $event
-     */
-    public function onBuildApiRoute(ApiEvents\RouteEvent $event)
-    {
-        $routing = $this->getSubscriberDirectory() .  "/../Config/routing/api.php";
-        if (file_exists($routing)) {
-            $routing = $this->getSubscriberDirectory() .  "/../Config/routing/routing.php";
-            $event->addRoutes($routing);
-        }
-    }
-
-
-    protected function getSubscriberDirectory()
-    {
-        $reflection = new \ReflectionClass($this);
-        $directory = dirname($reflection->getFileName());
-        return $directory;
     }
 }

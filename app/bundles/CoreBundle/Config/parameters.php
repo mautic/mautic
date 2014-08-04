@@ -31,6 +31,7 @@ $parameters = array(
     'default_pagelimit'     => 30,
     'default_timezone'      => 'UTC',
     'date_format_full'      => 'F j, Y g:i a T',
+    'date_format_short'     => 'D, M d',
     'date_format_dateonly'  => 'F j, Y',
     'date_format_timeonly'  => 'g:i a',
     'ip_lookup_service'     => 'telize',

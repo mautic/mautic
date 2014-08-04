@@ -35,11 +35,8 @@ class FormSubscriber extends CommonSubscriber
     static public function getSubscribedEvents()
     {
         return array(
-            CoreEvents::BUILD_MENU         => array('onBuildMenu', 0),
-            CoreEvents::BUILD_ROUTE        => array('onBuildRoute', 0),
             CoreEvents::GLOBAL_SEARCH      => array('onGlobalSearch', 0),
             CoreEvents::BUILD_COMMAND_LIST => array('onBuildCommandList', 0),
-            ApiEvents::BUILD_ROUTE         => array('onBuildApiRoute', 0),
             FormEvents::FORM_POST_SAVE     => array('onFormPostSave', 0),
             FormEvents::FORM_POST_DELETE   => array('onFormDelete', 0),
             PageEvents::PAGE_ON_DISPLAY    => array('onPageDisplay', 0),

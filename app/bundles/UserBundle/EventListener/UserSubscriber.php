@@ -31,12 +31,8 @@ class UserSubscriber extends CommonSubscriber
     static public function getSubscribedEvents()
     {
         return array(
-            CoreEvents::BUILD_MENU          => array('onBuildMenu', 9997),
-            CoreEvents::BUILD_ADMIN_MENU    => array('onBuildAdminMenu', 9997),
-            CoreEvents::BUILD_ROUTE         => array('onBuildRoute', 0),
             CoreEvents::GLOBAL_SEARCH       => array('onGlobalSearch', 0),
             CoreEvents::BUILD_COMMAND_LIST  => array('onBuildCommandList', 0),
-            ApiEvents::BUILD_ROUTE          => array('onBuildApiRoute', 0),
             UserEvents::USER_POST_SAVE      => array('onUserPostSave', 0),
             UserEvents::USER_POST_DELETE    => array('onUserDelete', 0),
             UserEvents::ROLE_POST_SAVE      => array('onRolePostSave', 0),

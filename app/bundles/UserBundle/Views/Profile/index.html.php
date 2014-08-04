@@ -16,7 +16,7 @@ $view['slots']->set("headerTitle", $view['translator']->trans('mautic.user.accou
         <div class="col-sm-3 col-xs-12">
             <div class="body-white padding-md profile-details rounded-corners text-center">
                 <img class="img img-responsive img-thumbnail"
-                     src="<?php echo \Mautic\SocialBundle\Helper\GravatarHelper::getGravatar($me->getEmail()); ?>" />
+                     src="<?php echo $view['gravatar']->getImage($me->getEmail()); ?>" />
                 <h3 class="margin-sm-sides margin-md-top"><?php echo $me->getName(); ?></h3>
                 <h4 class="margin-sm-sides"><?php echo $me->getPosition(); ?></h4>
             </div>

@@ -10,14 +10,11 @@
 namespace Mautic\CoreBundle\DependencyInjection;
 
 use Mautic\CoreBundle\Helper\ServiceLoaderHelper;
-use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Loader;
-use Symfony\Component\Validator\Tests\Fixtures\Reference;
 
 /**
  * Class MauticCoreExtension
@@ -42,12 +39,35 @@ class MauticCoreExtension extends Extension
             //load services
             $directory = $bundle['directory'] . '/Config/services';
             if (file_exists($directory)) {
-                $loader = new Loader\PhpFileLoader($container, new FileLocator($directory));
+
+                //PHP config files
                 $finder = new Finder();
                 $finder->files()->in($directory)->name('*.php');
+                if (count($finder)) {
+                    $loader = new Loader\PhpFileLoader($container, new FileLocator($directory));
+                    foreach ($finder as $file) {
+                        $loader->load($file->getFilename());
+                    }
+                }
 
-                foreach ($finder as $file) {
-                    $loader->load($file->getFilename());
+                //YAML config files
+                $finder = new Finder();
+                $finder->files()->in($directory)->name('*.yaml');
+                if (count($finder)) {
+                    $loader = new Loader\YamlFileLoader($container, new FileLocator($directory));
+                    foreach ($finder as $file) {
+                        $loader->load($file->getFilename());
+                    }
+                }
+
+                //XML config files
+                $finder = new Finder();
+                $finder->files()->in($directory)->name('*.xml');
+                if (count($finder)) {
+                    $loader = new Loader\XmlFileLoader($container, new FileLocator($directory));
+                    foreach ($finder as $file) {
+                        $loader->load($file->getFilename());
+                    }
                 }
             }
         }

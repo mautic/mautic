@@ -39,8 +39,8 @@ class MenuBuilder
      */
     public function __construct(FactoryInterface $knpFactory, MatcherInterface $matcher, MauticFactory $factory)
     {
-        $this->factory    =& $knpFactory;
-        $this->matcher    =& $matcher;
+        $this->factory    = $knpFactory;
+        $this->matcher    = $matcher;
         $this->security   = $factory->getSecurity();
         $this->dispatcher = $factory->getDispatcher();
         $this->request    = $factory->getRequest();

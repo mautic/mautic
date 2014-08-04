@@ -26,6 +26,16 @@ $container->setDefinition('mautic.core.template.helper.date',
     ->addTag('templating.helper', array('alias' => 'date'))
     ->setScope('request');
 
+$container->setDefinition('mautic.core.template.helper.gravatar',
+    new Definition(
+        'Mautic\CoreBundle\Templating\Helper\GravatarHelper',
+        array(
+            new Reference('mautic.factory')
+        )
+    ))
+    ->addTag('templating.helper', array('alias' => 'gravatar'))
+    ->setScope('request');
+
 //Custom templating parser
 $container->setDefinition('mautic.templating.name_parser',
     new Definition(

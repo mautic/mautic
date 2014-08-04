@@ -10,7 +10,7 @@
 namespace Mautic\ApiBundle\Routing;
 
 use Mautic\ApiBundle\ApiEvents;
-use Mautic\ApiBundle\Event\RouteEvent;
+use Mautic\CoreBundle\Event\RouteEvent;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\Routing\RouteCollection;
@@ -32,7 +32,7 @@ class RouteLoader extends Loader
      */
     public function __construct(MauticFactory $factory)
     {
-        $this->dispatcher  = $factory->getDispatcher();
+        $this->dispatcher = $factory->getDispatcher();
         $this->apiEnabled = $factory->getParameter('api_enabled');
     }
 
@@ -50,14 +50,15 @@ class RouteLoader extends Loader
             throw new \RuntimeException('Do not add the "mautic.api" loader twice');
         }
 
-        $collection = new RouteCollection();
         if (!empty($this->apiEnabled)) {
-            $event = new RouteEvent($this, $collection);
+            $event = new RouteEvent($this);
             $this->dispatcher->dispatch(ApiEvents::BUILD_ROUTE, $event);
+            $collection = $event->getCollection();
+        } else {
+            $collection = new RouteCollection();
         }
 
         $this->loaded = true;
-
 
         return $collection;
     }

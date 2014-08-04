@@ -32,9 +32,6 @@ class ApiSubscriber extends CommonSubscriber
     static public function getSubscribedEvents ()
     {
         return array(
-            CoreEvents::BUILD_MENU          => array('onBuildMenu', 9998),
-            CoreEvents::BUILD_ADMIN_MENU    => array('onBuildAdminMenu', 9996),
-            CoreEvents::BUILD_ROUTE         => array('onBuildRoute', 5),
             CoreEvents::GLOBAL_SEARCH       => array('onGlobalSearch', 0),
             CoreEvents::BUILD_COMMAND_LIST  => array('onBuildCommandList', 0),
             ApiEvents::CLIENT_POST_SAVE     => array('onClientPostSave', 0),

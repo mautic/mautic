@@ -8,15 +8,13 @@
  */
 
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\Parameter;
 
-//Mautic event listener
 $container->setDefinition(
-    'mautic.social.subscriber',
+    'mautic.form.type.chatchannel',
     new Definition(
-        'Mautic\SocialBundle\EventListener\SocialSubscriber',
-        array(new Reference('mautic.factory'))
+        'Mautic\ChatBundle\Form\Type\ChannelType'
     )
 )
-    ->addTag('kernel.event_subscriber');
+    ->addTag('form.type', array(
+        'alias' => 'chatchannel'
+    ));

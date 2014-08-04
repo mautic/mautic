@@ -12,11 +12,9 @@ namespace Mautic\CoreBundle\Security\Permissions;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class UserPermissions
- *
- * @package Mautic\UserBundle\Security\Permissions
+ * Class AbstractPermissions
  */
-class CommonPermissions {
+abstract class AbstractPermissions {
 
     protected  $permissions = array();
 
@@ -94,10 +92,7 @@ class CommonPermissions {
      *
      * @return string|void
      */
-    public function getName()
-    {
-        return 'undefined';
-    }
+    abstract public function getName();
 
     /**
      * Takes an array from PermissionRepository::getPermissionsByRole() and converts the bitwise integers to an array

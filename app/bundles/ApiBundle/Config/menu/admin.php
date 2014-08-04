@@ -24,7 +24,6 @@ $items = array(
     )
 );
  */
-$security = $event->getSecurity();
 $items = array();
 
 if ($security->isGranted('api:clients:view')) {

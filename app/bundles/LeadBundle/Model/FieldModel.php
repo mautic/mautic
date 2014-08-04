@@ -148,7 +148,6 @@ class FieldModel extends FormModel
         $this->reorderFieldsByEntity($entity);
     }
 
-
     /**
      * {@inheritdoc}
      *

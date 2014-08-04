@@ -10,14 +10,14 @@
 namespace Mautic\FormBundle\Security\Permissions;
 
 use Symfony\Component\Form\FormBuilderInterface;
-use Mautic\CoreBundle\Security\Permissions\CommonPermissions;
+use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 
 /**
  * Class FormPermissions
  *
  * @package Mautic\FormBundle\Security\Permissions
  */
-class FormPermissions extends CommonPermissions
+class FormPermissions extends AbstractPermissions
 {
 
     public function __construct($params)

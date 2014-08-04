@@ -10,14 +10,14 @@
 namespace Mautic\PageBundle\Security\Permissions;
 
 use Symfony\Component\Form\FormBuilderInterface;
-use Mautic\CoreBundle\Security\Permissions\CommonPermissions;
+use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 
 /**
  * Class PagePermissions
  *
  * @package Mautic\PageBundle\Security\Permissions
  */
-class PagePermissions extends CommonPermissions
+class PagePermissions extends AbstractPermissions
 {
 
     /**

@@ -48,13 +48,12 @@ class RouteLoader extends Loader
             throw new \RuntimeException('Do not add the "mautic" loader twice');
         }
 
-        $collection = new RouteCollection();
-
-        $event      = new RouteEvent($this, $collection);
+        $event = new RouteEvent($this);
         $this->dispatcher->dispatch(CoreEvents::BUILD_ROUTE, $event);
 
         $this->loaded = true;
 
+        $collection = $event->getCollection();
         return $collection;
     }
 

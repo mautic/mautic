@@ -7,11 +7,14 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\SocialBundle\Helper;
+namespace Mautic\CoreBundle\Templating\Helper;
 
-class GravatarHelper
+use Symfony\Component\Templating\Helper\Helper;
+
+class GravatarHelper extends Helper
 {
-    static public function getGravatar($email, $size = '250', $default = null)
+
+    static public function getImage($email, $size = '250', $default = 'mm')
     {
         $url = 'https://www.gravatar.com/avatar/' . md5(strtolower(trim($email))) . '?s='.$size;
 
@@ -20,10 +23,8 @@ class GravatarHelper
                 $default = 'assets/images/avatar.png';
             }
 
-            $url .= '&d=' .
-                urlencode(
-                    (strpos($default, 'http') !== 0) ? static::rel2abs($default) : $default
-                );
+            $default = (strpos($default, '.') !== false && strpos($default, 'http') !== 0) ? static::rel2abs($default) : $default;
+            $url    .= '&d=' . urlencode($default);
         }
 
         return $url;
@@ -75,5 +76,10 @@ class GravatarHelper
 
         /* absolute URL is ready! */
         return $scheme.'://'.$abs;
+    }
+
+    public function getName()
+    {
+        return 'gravatar';
     }
 }

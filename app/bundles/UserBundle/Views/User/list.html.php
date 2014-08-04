@@ -75,7 +75,7 @@ endif;
                 </td>
                 <td class="visible-md visible-lg">
                     <img class="img img-responsive img-thumbnail"
-                         src="<?php echo \Mautic\SocialBundle\Helper\GravatarHelper::getGravatar($item->getEmail(), '50'); ?>" />
+                         src="<?php echo $view['gravatar']->getImage($item->getEmail(), '50'); ?>" />
                 </td>
                 <td>
                     <?php echo $item->getName(true); ?><br />

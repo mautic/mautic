@@ -45,7 +45,7 @@ final class ApiEvents
      * The mautic.build_api_route event is thrown to build Mautic API routes
      *
      * The event listener receives a
-     * Mautic\ApiBundle\Event\RouteEvent instance.
+     * Mautic\CoreBundle\Event\RouteEvent instance.
      *
      * @var string
      */

@@ -123,4 +123,7 @@ $items = array(
     )
 );
 
-return $items;
+return array(
+    'priority' => 2,
+    'items'    => $items
+);

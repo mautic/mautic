@@ -43,4 +43,7 @@ $items = array(
     )
 );
 
-return $items;
+return array(
+    'priority' => 0,
+    'items'    => $items
+);
