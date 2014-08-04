@@ -66,7 +66,6 @@ class DateTimeHelper
             );
 
             if ($this->datetime === false) {
-                die(var_dump(debug_backtrace(true)));
                 //the format does not match the string so let's attempt to fix that
                 $this->string = date($this->format, strtotime($datetime));
                 $this->datetime = \DateTime::createFromFormat(
