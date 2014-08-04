@@ -33,6 +33,7 @@ class MauticFactory
     /**
      * @param $name
      * @return mixed
+     * @throws NotAcceptableHttpException
      */
     public function getModel($name)
     {
@@ -58,7 +59,7 @@ class MauticFactory
     /**
      * Retrieves Mautic's security object
      *
-     * @return object
+     * @return \Mautic\CoreBundle\Security\Permissions\CorePermissions
      */
     public function getSecurity()
     {
@@ -68,7 +69,7 @@ class MauticFactory
     /**
      * Retrieves Symfony's security context
      *
-     * @return object
+     * @return \Symfony\Component\Security\Core\SecurityContext
      */
     public function getSecurityContext()
     {
@@ -96,7 +97,7 @@ class MauticFactory
     /**
      * Retrieves session object
      *
-     * @return object
+     * @return \Symfony\Component\HttpFoundation\Session\Session
      */
     public function getSession()
     {
@@ -106,7 +107,7 @@ class MauticFactory
     /**
      * Retrieves Doctrine EntityManager
      *
-     * @return object
+     * @return \Doctrine\ORM\EntityManager
      */
     public function getEntityManager()
     {
@@ -116,7 +117,7 @@ class MauticFactory
     /**
      * Retrieves Doctrine db connection for DBAL use
      *
-     * @return object
+     * @return \Doctrine\DBAL\Connection
      */
     public function getDatabase()
     {
@@ -156,7 +157,7 @@ class MauticFactory
     /**
      * Retrieves Translator
      *
-     * @return object
+     * @return \Symfony\Bundle\FrameworkBundle\Translation\Translator
      */
     public function getTranslator()
     {
@@ -166,7 +167,7 @@ class MauticFactory
     /**
      * Retrieves serializer
      *
-     * @return object
+     * @return \JMS\Serializer\Serializer
      */
     public function getSerializer()
     {
@@ -176,7 +177,7 @@ class MauticFactory
     /**
      * Retrieves templating service
      *
-     * @return object
+     * @return \Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine
      */
     public function getTemplating()
     {
@@ -186,7 +187,7 @@ class MauticFactory
     /**
      * Retrieves event dispatcher
      *
-     * @return object
+     * @return \Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher
      */
     public function getDispatcher()
     {
@@ -196,7 +197,7 @@ class MauticFactory
     /**
      * Retrieves request
      *
-     * @return mixed
+     * @return \Symfony\Component\HttpFoundation\Request|null
      */
     public function getRequest()
     {
@@ -214,7 +215,7 @@ class MauticFactory
     /**
      * Retrieves Symfony's validator
      *
-     * @return object
+     * @return \Symfony\Component\Validator\Validator
      */
     public function getValidator()
     {
@@ -247,9 +248,10 @@ class MauticFactory
     /**
      * Get DateTimeHelper
      *
-     * @param null $string
-     * @param null $format
-     * @param null $tz
+     * @param string $string
+     * @param string $format
+     * @param string $tz
+     * @return DateTimeHelper
      */
     public function getDate($string = null, $format = null, $tz = 'local')
     {
@@ -283,6 +285,8 @@ class MauticFactory
      *
      * @param string $name
      * @param bool   $fullPath
+     * @return string
+     * @throws \InvalidArgumentException
      */
     public function getSystemPath($name, $fullPath = false)
     {
@@ -330,7 +334,7 @@ class MauticFactory
     /**
      * Gets a list of installed themes
      *
-     * @param bool $specificFeature limits list to those that support a specific feature
+     * @param string $specificFeature limits list to those that support a specific feature
      * @return array
      */
     public function getInstalledThemes($specificFeature = 'all')
@@ -361,6 +365,11 @@ class MauticFactory
         return $themes[$specificFeature];
     }
 
+    /**
+     * Get AssetsHelper
+     *
+     * @return \Mautic\CoreBundle\Templating\Helper\AssetsHelper
+     */
     public function getAssetsHelper()
     {
         return $this->container->get('templating.helper.assets');
