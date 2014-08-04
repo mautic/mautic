@@ -388,6 +388,7 @@ abstract class AbstractNetwork
             } else {
                 if (!isset($data->$field)) {
                     $info[$field] = '';
+                    continue;
                 } else {
                     $values = $data->$field;
                 }
