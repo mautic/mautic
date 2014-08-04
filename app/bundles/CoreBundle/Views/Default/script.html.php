@@ -19,7 +19,7 @@
     Mautic.onPageLoad();
     <?php if ($app->getEnvironment() === "dev"): ?>
     mQuery( document ).ajaxComplete(function(event, XMLHttpRequest, ajaxOption){
-        if(XMLHttpRequest.getResponseHeader('x-debug-token')) {
+        if(XMLHttpRequest.responseJSON && typeof XMLHttpRequest.responseJSON.ignore_wdt == 'undefined' && XMLHttpRequest.getResponseHeader('x-debug-token')) {
             MauticVars.showLoadingBar = false;
             mQuery('.sf-toolbar-block').remove();
             mQuery('.sf-minitoolbar').remove();

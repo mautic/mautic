@@ -6,27 +6,30 @@
  * @link        http://mautic.com
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+$lastMsg = array('id' => 0);
+
 if (!empty($inPopup)):
     $view->extend('MauticCoreBundle:Default:slim.html.php');
     $view['slots']->addScriptDeclaration("Mautic.activateChatInput('{$with->getId()}');", 'bodyClose');
 ?>
 <div id="ChatConversation">
 <?php endif; ?>
-<?php
-if (!empty($messages)):
-    $lastMsg = end($messages);
-    if (!empty($with)): ?>
     <ul class="media-list media-list-bubble" id="ChatMessages">
+    <?php
+    if (!empty($messages)):
+        $lastMsg = end($messages);
+        if (!empty($with)): ?>
         <?php echo $view->render('MauticChatBundle:DM:messages.html.php', array(
             'messages'            => $messages,
             'me'                  => $me,
             'with'                => $with,
             'insertUnreadDivider' => (!empty($insertUnreadDivider)) ? true : false
         )); ?>
-    </ul>
+        <?php endif; ?>
     <?php endif; ?>
-    <input type="hidden" id="ChatLastMessageId" value="<?php echo $lastMsg['id']; ?>" />
-<?php endif; ?>
+        <input type="hidden" id="ChatLastMessageId" value="<?php echo $lastMsg['id']; ?>" />
+        <input type="hidden" id="ChatWithUserId" value="<?php echo $with->getId(); ?>" />
+    </ul>
 
 <?php if (!empty($inPopup)): ?>
 </div>

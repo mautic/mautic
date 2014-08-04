@@ -36,8 +36,8 @@ Mautic.startChatWith = function (userId, fromDate) {
                 if (response.lastSeen) {
                     mQuery('#LastSeen').html(response.lastSeen);
                 }
-                mQuery('#ChatConversation').html(response.conversationHtml);
-                mQuery('#ChatConversation').scrollTop(mQuery('#ChatConversation')[0].scrollHeight);
+
+                Mautic.updateChatConversation(response);
 
                 Mautic.activateChatUpdater(response.withId);
                 Mautic.activateChatInput(response.withId);
@@ -105,7 +105,7 @@ Mautic.activateChatUpdater = function(userId) {
                 alert(errorThrown);
             }
         });
-    }, 5000);
+    }, 10000);
 };
 
 Mautic.sendChatMessage = function(toId) {
@@ -139,21 +139,28 @@ Mautic.updateChatConversation = function(response)
 {
     var dividerAppended = false;
     var contentUpdated  = false;
-    if (response.appendToGroup) {
-        if (!mQuery('.chat-new-divider').length && response.divider) {
-            dividerAppended = true;
-            mQuery('#ChatGroup' + response.groupId + ' .media-body').append(response.divider);
-        }
-        mQuery('#ChatGroup' + response.groupId + ' .media-body').append(response.appendToGroup);
-        contentUpdated = true;
+
+    if (response.conversationHtml) {
+        mQuery('#ChatConversation').html(response.conversationHtml);
     }
 
-    if (response.messages) {
-        if (!mQuery('.chat-new-divider').length && response.divider && !dividerAppended) {
-            mQuery('#ChatMessages').append(response.divider);
+    if (mQuery('#ChatWithUserId').val() == response.withId) {
+        if (response.appendToGroup) {
+            if (!mQuery('.chat-new-divider').length && response.divider) {
+                dividerAppended = true;
+                mQuery('#ChatGroup' + response.groupId + ' .media-body').append(response.divider);
+            }
+            mQuery('#ChatGroup' + response.groupId + ' .media-body').append(response.appendToGroup);
+            contentUpdated = true;
         }
-        mQuery('#ChatMessages').append(response.messages);
-        contentUpdated = true;
+
+        if (response.messages) {
+            if (!mQuery('.chat-new-divider').length && response.divider && !dividerAppended) {
+                mQuery('#ChatMessages').append(response.divider);
+            }
+            mQuery('#ChatMessages').append(response.messages);
+            contentUpdated = true;
+        }
     }
 
     if (contentUpdated) {
@@ -161,6 +168,10 @@ Mautic.updateChatConversation = function(response)
     }
 
     if (response.latestId) {
-        mQuery('#ChatLastMessageId').val(response.latestId);
+        var currentLastId = mQuery('#ChatLastMessageId').val();
+        if (response.latestId > currentLastId) {
+            //only update the latest ID if the given is higher than what's set incase JS gets a head of itself
+            mQuery('#ChatLastMessageId').val(response.latestId);
+        }
     }
 };

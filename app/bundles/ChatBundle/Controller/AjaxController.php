@@ -25,7 +25,7 @@ class AjaxController extends CommonAjaxController
 
     protected function startChatAction(Request $request, $userId = 0)
     {
-        $dataArray   = array('success' => 0);
+        $dataArray   = array('success' => 0, 'ignore_wdt' => 1);
 
         $currentUser = $this->factory->getUser();
         $userId      = InputHelper::int($request->request->get('user', $userId));
@@ -135,7 +135,8 @@ class AjaxController extends CommonAjaxController
                 'channels'    => $channels,
                 'users'       => $users,
                 'contentOnly' => true
-            ))
+            )),
+            'ignore_wdt' => 1
         );
 
         return $this->sendJsonResponse($dataArray);
@@ -143,6 +144,7 @@ class AjaxController extends CommonAjaxController
 
     private function getMessageContent(Request $request, $currentUser, $with, $fromAction ='')
     {
+        $dataArray = array('ignore_wdt' => 1);
         $lastId    = InputHelper::int($request->request->get('lastId'));
         $groupId   = InputHelper::int($request->request->get('groupId'));
         $chatModel = $this->factory->getModel('chat.chat');
@@ -150,8 +152,8 @@ class AjaxController extends CommonAjaxController
         $startId  = ($groupId && $groupId <= $lastId) ? $groupId - 1 : $lastId;
         $messages = $chatModel->getDirectMessages($with, $startId);
 
-        //group started by
-        $owner = ($groupId) ? $messages[$groupId]['fromUser']['id'] : 0;
+        //group started by; should be set unless something quirky happens with the HTML/JS/data
+        $owner = ($groupId && isset($messages[$groupId])) ? $messages[$groupId]['fromUser']['id'] : 0;
         //find out if html should be appended to the group or new groups created
         $newGroup = $sameGroup = array();
 
@@ -185,7 +187,7 @@ class AjaxController extends CommonAjaxController
 
             $dataArray['messages'] = $groupHtml;
         }
-
+        $dataArray['withId'] = $with->getId();
         if (!empty($divider)) {
             $dataArray['divider'] = $divider;
         }
