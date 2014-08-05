@@ -45,18 +45,18 @@ $collection->add('mautic_form_index', new Route('/forms/{page}',
     )
 ));
 
+$collection->add('mautic_form_export', new Route('/forms/results/{objectId}/export/{format}',
+    array(
+        '_controller' => 'MauticFormBundle:Result:export',
+        'format'      => 'csv'
+    )
+));
+
 $collection->add('mautic_form_results', new Route('/forms/results/{objectId}/{page}',
     array(
         '_controller' => 'MauticFormBundle:Result:index',
         'page'        => 1,
         'objectId'    => 0
-    )
-));
-
-$collection->add('mautic_form_export', new Route('/forms/results/{objectId}/export/{format}',
-    array(
-        '_controller' => 'MauticFormBundle:Result:export',
-        'format'      => 'csv'
     )
 ));
 

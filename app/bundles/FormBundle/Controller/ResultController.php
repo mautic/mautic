@@ -179,12 +179,12 @@ class ResultController extends CommonFormController
         $filters    = $this->factory->getSession()->get('mautic.formresult.'.$objectId.'.filters', array());
 
         $args = array(
-            'start'           => $start,
-            'limit'           => $limit,
-            'filter'          => array('force' => $filters),
-            'orderBy'         => $orderBy,
-            'orderByDir'      => $orderByDir,
-            'bypassPaginator' => true
+            'start'      => $start,
+            'limit'      => $limit,
+            'filter'     => array('force' => $filters),
+            'orderBy'    => $orderBy,
+            'orderByDir' => $orderByDir,
+            'form'       => $form
         );
 
         $model = $this->factory->getModel('form.submission');

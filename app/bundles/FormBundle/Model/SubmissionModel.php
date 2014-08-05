@@ -259,7 +259,7 @@ class SubmissionModel extends CommonFormModel
                     //build the header row
                     $fields = $form->getFields();
                     $header = array(
-                        '',
+                        $translator->trans('mautic.form.result.thead.id'),
                         $translator->trans('mautic.form.result.thead.date'),
                         $translator->trans('mautic.form.result.thead.ip'),
                         $translator->trans('mautic.form.result.thead.referer')
@@ -284,7 +284,7 @@ class SubmissionModel extends CommonFormModel
                             $s['referer']
                         );
                         foreach ($s['results'] as $k2 => $r) {
-                            if (in_array($r['field']['type'], array('button', 'freetext')))
+                            if (in_array($r['type'], array('button', 'freetext')))
                                 continue;
                             $row[] = $r['value'];
                             //free memory
@@ -343,7 +343,7 @@ class SubmissionModel extends CommonFormModel
                 $response->headers->set('Pragma', 'public');
                 return $response;
                 break;
-            case 'excel':
+            case 'xlsx':
                 if (class_exists('PHPExcel')) {
                    $response = new StreamedResponse(function () use ($results, $form, $translator, $name) {
                         $objPHPExcel = new \PHPExcel();
@@ -354,7 +354,7 @@ class SubmissionModel extends CommonFormModel
                         //build the header row
                         $fields = $form->getFields();
                         $header = array(
-                            '',
+                            $translator->trans('mautic.form.result.thead.id'),
                             $translator->trans('mautic.form.result.thead.date'),
                             $translator->trans('mautic.form.result.thead.ip'),
                             $translator->trans('mautic.form.result.thead.referer')
@@ -380,7 +380,7 @@ class SubmissionModel extends CommonFormModel
                                 $s['referer']
                             );
                             foreach ($s['results'] as $k2 => $r) {
-                                if (in_array($r['field']['type'], array('button', 'freetext')))
+                                if (in_array($r['type'], array('button', 'freetext')))
                                     continue;
                                 $row[] = $r['value'];
                                 //free memory

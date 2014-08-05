@@ -294,8 +294,8 @@ class FormModel extends CommonFormModel
             //create the field as its own column in the leads table
             $schemaHelper = $this->factory->getSchemaHelper('table');
             $name         = "form_results_$alias";
+            $columns      = $this->generateFieldColumns($entity);
             if ($isNew || (!$isNew && !$schemaHelper->checkTableExists($name))) {
-                $columns = $this->generateFieldColumns($entity);
                 $schemaHelper->addTable(array(
                     'name'    => $name,
                     'columns' => $columns,
@@ -304,6 +304,15 @@ class FormModel extends CommonFormModel
                         'uniqueIndex' => array('submission_id', 'form_id')
                     )
                 ));
+                $schemaHelper->executeChanges();
+            } else {
+                //check to make sure columns exist
+                $schemaHelper = $this->factory->getSchemaHelper('column', $name);
+                foreach ($columns as $c) {
+                    if (!$schemaHelper->checkColumnExists($c['name'])) {
+                        $schemaHelper->addColumn($c, false);
+                    }
+                }
                 $schemaHelper->executeChanges();
             }
         }

@@ -184,34 +184,6 @@ class SubmissionRepository extends CommonRepository
                 $q->expr()->lte('s.date_submitted', ":$date2")
             );
             return array($expr, $parameters);
-        } elseif (strpos($filter['column'], 'field.') !== false) {
-            //form field so change up the query
-            $idParam    = $this->generateRandomParameterName();
-            $valueParam = $this->generateRandomParameterName();
-            $sq = $this->getEntityManager()->createQueryBuilder();
-
-            $f = $this->generateRandomParameterName();
-            $r = $this->generateRandomParameterName();
-
-            $subquery = $sq->select("count($r.id)")
-                ->from('MauticFormBundle:Result', $r)
-                ->leftJoin('MauticFormBundle:Field', $f,
-                    Query\Expr\Join::WITH,
-                    $sq->expr()->eq($f, "$r.field")
-                )
-                ->where(
-                    $q->expr()->andX(
-                        $q->expr()->eq("IDENTITY($r.field)", ":$idParam"),
-                        $q->expr()->like("$r.value", ":$valueParam"),
-                        $q->expr()->eq("$r.submission", 's')
-                    )
-                )
-                ->getDql();
-            $expr = $q->expr()->eq(sprintf("(%s)",$subquery), 1);
-
-            $fieldId    = substr($filter['column'], 6);
-            $parameters = array($idParam => $fieldId, $valueParam => "%{$filter['value']}%");
-            return array($expr, $parameters);
         } else {
             return parent::getFilterExpr($q, $filter);
         }

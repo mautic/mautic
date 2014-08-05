@@ -43,9 +43,10 @@ $formId = $form->getId();
                         continue;
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                         'sessionVar' => 'formresult.'.$formId,
+                        'orderBy'    => 'r.' . $f->getAlias(),
                         'text'       => $f->getLabel(),
                         'class'      => 'col-formresult-field col-formresult-field'.$f->getId(),
-                        'filterBy'   => 'field.' . $f->getId()
+                        'filterBy'   => 'r.' . $f->getAlias(),
                     ));
                 endforeach;
                 ?>
