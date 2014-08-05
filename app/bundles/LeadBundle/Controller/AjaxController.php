@@ -95,7 +95,7 @@ class AjaxController extends CommonAjaxController
             $lead = $model->getEntity($leadId);
 
             if ($lead !== null) {
-                $fields            = $model->organizeFieldsByGroup($lead->getFields());
+                $fields            = $lead->getFields();
                 $socialProfiles    = NetworkIntegrationHelper::getUserProfiles($this->factory, $lead, $fields, true, $network);
                 $socialProfileUrls = NetworkIntegrationHelper::getSocialProfileUrlRegex(false);
                 $networks = array();

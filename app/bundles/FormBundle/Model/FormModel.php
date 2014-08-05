@@ -248,6 +248,8 @@ class FormModel extends CommonFormModel
                 $alias = $testAlias;
             }
             $entity->setAlias($alias);
+        } else {
+            $alias = $entity->getAlias();
         }
 
         //save the form so that the ID is available for the form html
@@ -291,18 +293,36 @@ class FormModel extends CommonFormModel
         if ($entity->getId()) {
             //create the field as its own column in the leads table
             $schemaHelper = $this->factory->getSchemaHelper('table');
-            $name         = "form_$alias";
+            $name         = "form_results_$alias";
             if ($isNew || (!$isNew && !$schemaHelper->checkTableExists($name))) {
                 $columns = $this->generateFieldColumns($entity);
                 $schemaHelper->addTable(array(
                     'name'    => $name,
                     'columns' => $columns,
                     'options' => array(
-                        'primaryKey' => array('id')
+                        'primaryKey'  => array('submission_id'),
+                        'uniqueIndex' => array('submission_id', 'form_id')
                     )
                 ));
                 $schemaHelper->executeChanges();
             }
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param  $entity
+     */
+    public function deleteEntity($entity)
+    {
+        parent::deleteEntity($entity);
+
+        if (!$entity->getId()) {
+            //delete the associated results table
+            $schemaHelper = $this->factory->getSchemaHelper('table');
+            $schemaHelper->deleteTable("form_results_" . $entity->getAlias());
+            $schemaHelper->executeChanges();
         }
     }
 
@@ -319,7 +339,11 @@ class FormModel extends CommonFormModel
 
         $columns = array(
             array(
-                'name' => 'id',
+                'name' => 'submission_id',
+                'type' => 'integer'
+            ),
+            array(
+                'name' => 'form_id',
                 'type' => 'integer'
             )
         );

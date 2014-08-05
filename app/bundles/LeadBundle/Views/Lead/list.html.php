@@ -71,7 +71,7 @@ if ($tmpl == 'index')
             </thead>
             <tbody>
             <?php foreach ($items as $item): ?>
-                <?php $fields = $model->organizeFieldsByGroup($item->getFields()); ?>
+                <?php $fields = $item->getFields(); ?>
                 <tr>
                     <td>
                         <?php

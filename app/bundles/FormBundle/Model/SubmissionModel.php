@@ -76,6 +76,7 @@ class SubmissionModel extends CommonFormModel
         $fields     = $form->getFields();
         $errors     = array();
         $fieldArray = array();
+        $results    = array();
         foreach ($fields as $f) {
             $id    = $f->getId();
             $type  = $f->getType();
@@ -151,20 +152,16 @@ class SubmissionModel extends CommonFormModel
                 $errors = array_merge($errors, $fieldHelper->validateFieldValue($type, $value));
             }
 
-            //save the result
-            $result = new Result();
-            $result->setField($f);
-            $result->setSubmission($submission);
-
             //convert array from checkbox groups and multiple selects
             if (is_array($value)) {
                 $value = implode(", ", $value);
             }
 
-            $result->setValue($value);
-
-            $submission->addResult($result);
+            //save the result
+            $results[$alias] = $value;
         }
+
+        $submission->setResults($results);
 
         //return errors
         if (!empty($errors)) {

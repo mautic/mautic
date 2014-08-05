@@ -38,7 +38,7 @@ class CategoryRepository extends CommonRepository
 
         if (isset($args['hydration_mode'])) {
             $mode = strtoupper($args['hydration_mode']);
-            $query->setHydrationMode(constant("Query::$mode"));
+            $query->setHydrationMode(constant("\\Doctrine\\ORM\\Query::$mode"));
         }
 
         $results = new Paginator($query);

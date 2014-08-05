@@ -57,16 +57,9 @@ class Submission
     private $page;
 
     /**
-     * @ORM\OneToMany(targetEntity="Result", mappedBy="submission", cascade={"persist", "remove", "refresh", "detach"}, fetch="EXTRA_LAZY")
+     * @var array
      */
-    private $results;
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        $this->results = new \Doctrine\Common\Collections\ArrayCollection();
-    }
+    private $results = array();
 
     /**
      * Get id
@@ -171,36 +164,23 @@ class Submission
     }
 
     /**
-     * Add results
+     * Get results
      *
-     * @param \Mautic\FormBundle\Entity\Result $results
-     * @return Submission
+     * @return array
      */
-    public function addResult(\Mautic\FormBundle\Entity\Result $results)
+    public function getResults()
     {
-        $this->results[] = $results;
-
-        return $this;
-    }
-
-    /**
-     * Remove results
-     *
-     * @param \Mautic\FormBundle\Entity\Result $results
-     */
-    public function removeResult(\Mautic\FormBundle\Entity\Result $results)
-    {
-        $this->results->removeElement($results);
+        return $this->results;
     }
 
     /**
      * Get results
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return Submission
      */
-    public function getResults()
+    public function setResults($results)
     {
-        return $this->results;
+        $this->results = $results;
     }
 
     /**

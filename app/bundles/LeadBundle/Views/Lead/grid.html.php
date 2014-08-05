@@ -13,7 +13,7 @@ if ($tmpl == 'index')
 <div class="shuffle grid row scrollable page-list" id="shuffle-grid">
     <?php if (count($items)): ?>
     <?php foreach ($items as $item): ?>
-    <?php $fields = $model->organizeFieldsByGroup($item->getFields()); ?>
+    <?php $fields = $item->getFields(); ?>
     <div class="shuffle shuffle-item grid margin-md-bottom col-sm-6 col-md-4">
         <div class="panel widget">
             <div class="table-layout nm">

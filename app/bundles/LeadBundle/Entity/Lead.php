@@ -79,6 +79,13 @@ class Lead extends FormEntity
     private $socialCache = array();
 
     /**
+     * Just a place to store updated field values so we don't have to loop through them again comparing
+     *
+     * @var array
+     */
+    private $updatedFields = array();
+
+    /**
      * Used by Mautic to populate the fields pulled from the DB
      * @var array
      * @Serializer\Expose
@@ -102,14 +109,6 @@ class Lead extends FormEntity
             }
         } elseif ($prop == 'ipAddresses') {
             $this->changes['ipAddresses'] = array('', $val->getIpAddress());
-        } elseif ($prop == 'fields') {
-            $diff = array_diff_assoc($val, $this->fields);
-            if (count($diff)) {
-                foreach ($diff as $k => $v) {
-                    $this->changes['fields'][$k] = array($this->fields[$k], $v);
-                }
-
-            }
         } elseif ($this->$getter() != $val) {
             $this->changes[$prop] = array($this->$getter(), $val);
         }
@@ -199,15 +198,17 @@ class Lead extends FormEntity
      */
     public function getName($lastFirst = false)
     {
+        $firstName = (isset($this->fields['core']['firstname']['value'])) ? $this->fields['core']['firstname']['value'] : '';
+        $lastName  = (isset($this->fields['core']['lastname']['value'])) ? $this->fields['core']['lastname']['value'] : '';
         $fullName = "";
-        if ($lastFirst && !empty($this->fields['firstname']) && !empty($this->fields['lastname'])) {
-            $fullName = $this->fields['lastname'] . ", " . $this->fields['firstname'];
-        } elseif (!empty($this->fields['firstname']) && !empty($this->fields['lastname'])) {
-            $fullName = $this->fields['firstname'] . " " . $this->fields['lastname'];
-        } elseif (!empty($this->fields['firstname'])) {
-            $fullName = $this->fields['firstname'];
-        } elseif (!empty($this->fields['lastname'])) {
-            $fullName = $this->fields['lastname'];
+        if ($lastFirst && !empty($firstName) && !empty($lastName)) {
+            $fullName = $lastName . ", " . $firstName;
+        } elseif (!empty($firstName) && !empty($lastName)) {
+            $fullName = $firstName . " " . $lastName;
+        } elseif (!empty($firstName)) {
+            $fullName = $firstName;
+        } elseif (!empty($lastName)) {
+            $fullName = $lastName;
         }
 
         return $fullName;
@@ -223,10 +224,10 @@ class Lead extends FormEntity
     {
         if ($name = $this->getName($lastFirst)) {
             return $name;
-        } elseif (!empty($this->fields['company'])) {
-            return $this->fields['company'];
-        } elseif (!empty($this->fields['email'])) {
-            return $this->fields['email'];
+        } elseif (!empty($this->fields['core']['company']['value'])) {
+            return $this->fields['core']['company']['value'];
+        } elseif (!empty($this->fields['core']['email']['value'])) {
+            return $this->fields['core']['email']['value'];
         } elseif (count($ips = $this->getIpAddresses())) {
             return $ips[0]->getIpAddress();
         } else {
@@ -242,8 +243,8 @@ class Lead extends FormEntity
      */
     public function getSecondaryIdentifier()
     {
-        if (!empty($this->fields['company'])) {
-            return $this->fields['company'];
+        if (!empty($this->fields['core']['company']['value'])) {
+            return $this->fields['core']['company']['value'];
         }
     }
 
@@ -269,16 +270,6 @@ class Lead extends FormEntity
     public function getScore()
     {
         return $this->score;
-    }
-
-    /**
-     * Get field values
-     *
-     * @return array
-     */
-    public function getFieldValues()
-    {
-        return $this->fieldValues;
     }
 
     /**
@@ -359,9 +350,6 @@ class Lead extends FormEntity
      */
     public function setFields($fields)
     {
-        if (!empty($this->fields)) {
-            $this->isChanged('fields', $fields);
-        }
         $this->fields = $fields;
     }
 
@@ -371,5 +359,27 @@ class Lead extends FormEntity
     public function getFields()
     {
         return $this->fields;
+    }
+
+    /**
+     * Add an updated field to persist to the DB and to note changes
+     *
+     * @param $alias
+     * @param $value
+     */
+    public function addUpdatedField($alias, $value)
+    {
+        $this->changes['fields'][$alias] = $value;
+        $this->updatedFields[$alias]     = $value;
+    }
+
+    /**
+     * Get the array of updated fields
+     *
+     * @return array
+     */
+    public function getUpdatedFields()
+    {
+        return $this->updatedFields;
     }
 }

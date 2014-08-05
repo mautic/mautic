@@ -18,33 +18,170 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 class SubmissionRepository extends CommonRepository
 {
 
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param $entity
+     * @param $flush true by default; use false if persisting in batches
+     * @return int
+     */
+    public function saveEntity($entity, $flush = true)
+    {
+        parent::saveEntity($entity, $flush);
+
+        //add the results
+        $results                  = $entity->getResults();
+        $results['submission_id'] = $entity->getId();
+        $form                     = $entity->getForm();
+        $results['form_id']       = $form->getId();
+        $alias                    = $form->getAlias();
+
+        $tableName                = MAUTIC_TABLE_PREFIX . 'form_results_' . $alias;
+        if (!empty($results)) {
+            $this->_em->getConnection()->insert($tableName, $results);
+        }
+    }
+
+    /**
+     * @param array $args
+     *
+     * @return Paginator
+     */
     public function getEntities($args = array())
     {
-        $q = $this->createQueryBuilder('s')
-            ->select('s, r, i')
-            ->leftJoin('s.results', 'r')
-            ->leftJoin('r.field', 'f')
-            ->leftJoin('s.ipAddress', 'i');
+        $form  = $args['form'];
+        $table = MAUTIC_TABLE_PREFIX . "form_results_" . $form->getAlias();
 
-        $this->buildClauses($q, $args);
+        //DBAL
 
-        $q->addOrderBy('f.order', 'ASC');
-        $query = $q->getQuery();
-        $query->setHydrationMode(Query::HYDRATE_ARRAY);
-        $results = new Paginator($query);
-        return $results;
+        //Get the list of custom fields
+        $fq = $this->_em->getConnection()->createQueryBuilder();
+        $fq->select('f.id, f.label, f.alias, f.type')
+            ->from(MAUTIC_TABLE_PREFIX . 'form_fields', 'f')
+            ->where('f.form_id = ' . $form->getId())
+            ->andWhere(
+                $fq->expr()->notIn('f.type', array("'button'", "'freetext'"))
+            );
+        $results = $fq->execute()->fetchAll();
+
+        $fields = array();
+        foreach ($results as $r) {
+            $fields[$r['alias']] = $r;
+        }
+        unset($results);
+        $fieldAliases = array_keys($fields);
+
+        $dq = $this->_em->getConnection()->createQueryBuilder();
+        $dq->select('count(*) as count')
+            ->from($table, 'r')
+            ->where('r.form_id = ' . $form->getId());
+
+        $this->buildWhereClause($dq, $args);
+
+        //get a total count
+        $result = $dq->execute()->fetchAll();
+        $total  = $result[0]['count'];
+
+        //now get the actual paginated results
+        $this->buildOrderByClause($dq, $args);
+        $this->buildLimiterClauses($dq, $args);
+
+        $dq->resetQueryPart('select');
+        $dq->select('r.submission_id,' . implode(',r.', $fieldAliases))
+            ->innerJoin('r', MAUTIC_TABLE_PREFIX . 'form_submissions', 's', 'r.submission_id = s.id')
+            ->leftJoin('s', MAUTIC_TABLE_PREFIX . 'ip_addresses', 'i', 's.ip_id = i.id');
+        $results = $dq->execute()->fetchAll();
+
+        //loop over results to put form submission results in something that can be assigned to the entities
+        $values = array();
+
+        foreach ($results as $result) {
+            $submissionId = $result['submission_id'];
+            unset($result['submission_id']);
+
+            $values[$submissionId] = array();
+            foreach ($result as $k => $r) {
+                if (isset($fields[$k])) {
+                    $values[$submissionId][$k] = $fields[$k];
+                    $values[$submissionId][$k]['value'] = $r;
+                }
+            }
+        }
+
+        //get an array of IDs for ORM query
+        $ids = array_keys($values);
+
+        if (count($ids)) {
+            //ORM
+
+            //build the order by id since the order was applied above
+            //unfortunately, can't use MySQL's FIELD function since we have to be cross-platform
+            $order = '(CASE';
+            foreach ($ids as $count => $id) {
+                $order .= ' WHEN s.id = ' . $id . ' THEN ' . $count;
+                $count++;
+            }
+            $order .= ' ELSE ' . $count . ' END) AS HIDDEN ORD';
+
+            //ORM - generates lead entities
+            $q = $this
+                ->createQueryBuilder('s');
+            $q->select('s, p, i,' . $order)
+                ->leftJoin('s.ipAddress', 'i')
+                ->leftJoin('s.page', 'p');
+
+            //only pull the submissions as filtered via DBAL
+            $q->where(
+                $q->expr()->in('s.id', ':ids')
+            )->setParameter('ids', $ids);
+
+            $q->orderBy('ORD', 'ASC');
+            $results = $q->getQuery()->getArrayResult();
+
+            foreach ($results as &$r) {
+                $r['results'] = $values[$r['id']];
+            }
+        }
+
+        return (!empty($args['withTotalCount'])) ?
+            array(
+                'count'   => $total,
+                'results' => $results
+            ) : $results;
+    }
+
+
+    public function getEntity($id = 0)
+    {
+        $entity = parent::getEntity($id);
+
+        if ($entity != null) {
+            $alias     = $entity->getForm()->getAlias();
+            $tableName = MAUTIC_TABLE_PREFIX . 'form_results_' . $alias;
+
+            //use DBAL to get entity fields
+            $q = $this->_em->getConnection()->createQueryBuilder();
+            $q->select('*')
+                ->from($tableName, 'r')
+                ->where('r.submission_id = :id')
+                ->setParameter('id', $id);
+            $results = $q->execute()->fetchAll();
+            unset($results[0]['submission_id']);
+            $entity->setResults($results[0]);
+        }
     }
 
     protected function getFilterExpr(&$q, $filter)
     {
-        if ($filter['column'] == 's.dateSubmitted') {
+        if ($filter['column'] == 's.date_submitted') {
             $date  = $this->factory->getDate($filter['value'], 'Y-m-d')->toUtcString();
             $date1 = $this->generateRandomParameterName();
             $date2 = $this->generateRandomParameterName();
             $parameters = array($date1 => $date . ' 00:00:00', $date2 => $date . ' 23:59:59');
             $expr = $q->expr()->andX(
-                $q->expr()->gte('s.dateSubmitted', ":$date1"),
-                $q->expr()->lte('s.dateSubmitted', ":$date2")
+                $q->expr()->gte('s.date_submitted', ":$date1"),
+                $q->expr()->lte('s.date_submitted', ":$date2")
             );
             return array($expr, $parameters);
         } elseif (strpos($filter['column'], 'field.') !== false) {
@@ -78,5 +215,15 @@ class SubmissionRepository extends CommonRepository
         } else {
             return parent::getFilterExpr($q, $filter);
         }
+    }
+
+    /**
+     * @return string
+     */
+    protected function getDefaultOrder()
+    {
+        return array(
+            array('s.date_submitted', 'ASC')
+        );
     }
 }

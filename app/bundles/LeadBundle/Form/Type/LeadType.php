@@ -64,17 +64,16 @@ class LeadType extends AbstractType
             'repository' => 'MauticUserBundle:User'
         ));
 
-        //get a list of fields
-        $fields = $this->factory->getModel('lead.field')->getEntities(
-            array('filter' => array('isPublished' => true))
-        );
         $fieldValues = (!empty($options['data'])) ? $options['data']->getFields() : array('filter' => array('isVisible' => true));
-        foreach ($fields as $field) {
+        foreach ($options['fields'] as $field) {
             $attr        = array('class' => 'form-control');
-            $properties  = $field->getProperties();
-            $type        = $field->getType();
-            $required    = $field->isRequired();
-            $alias       = $field->getAlias();
+            $properties  = $field['properties'];
+            $type        = $field['type'];
+            $required    = $field['isRequired'];
+            $alias       = $field['alias'];
+            $group       = $field['group'];
+            $value       = (isset($fieldValues[$group][$alias]['value'])) ?
+                $fieldValues[$group][$alias]['value'] : $field['defaultValue'];
             $constraints = array();
             if ($required) {
                 $constraints[] = new \Symfony\Component\Validator\Constraints\NotBlank(
@@ -88,11 +87,12 @@ class LeadType extends AbstractType
                     $properties['precision'] = (int) $properties['precision'];
 
                 $builder->add($alias, $type, array(
-                    'required'    => $field->getIsRequired(),
-                    'label'       => $field->getLabel(),
+                    'required'    => $required,
+                    'label'       => $field['label'],
                     'label_attr'  => array('class' => 'control-label'),
                     'attr'        => $attr,
-                    'data'        => (isset($fieldValues[$alias])) ? (float) $fieldValues[$alias] : (float) $field->getDefaultValue(),
+                    'data'        => (isset($fieldValues[$group][$alias]['value'])) ?
+                        (float) $fieldValues[$group][$alias]['value'] : (float) $field['defaultValue'],
                     'mapped'      => false,
                     'constraints' => $constraints,
                     'precision'   => $properties['precision'],
@@ -102,13 +102,12 @@ class LeadType extends AbstractType
                 $attr['data-toggle'] = $type;
 
                 $opts = array(
-                    'required'          => $field->getIsRequired(),
-                    'label'             => $field->getLabel(),
+                    'required'          => $required,
+                    'label'             => $field['label'],
                     'label_attr'        => array('class' => 'control-label'),
                     'widget'            => 'single_text',
                     'attr'              => $attr,
-                    'data'              => (isset($fieldValues[$alias])) ? $fieldValues[$alias] :
-                        $field->getDefaultValue(),
+                    'data'              => $value,
                     'mapped'            => false,
                     'constraints'       => $constraints,
                     'input'             => 'string'
@@ -144,9 +143,9 @@ class LeadType extends AbstractType
                     $builder->add($alias, 'choice', array(
                         'choices'     => $choices,
                         'required'    => $required,
-                        'label'       => $field->getLabel(),
+                        'label'       => $field['label'],
                         'label_attr'  => array('class' => 'control-label'),
-                        'data'        => (isset($fieldValues[$alias])) ? $fieldValues[$alias] : $field->getDefaultValue(),
+                        'data'        => $value,
                         'attr'        => $attr,
                         'mapped'      => false,
                         'multiple'    => false,
@@ -159,18 +158,18 @@ class LeadType extends AbstractType
                 if ($type == 'lookup') {
                     $type                = "text";
                     $attr['data-toggle'] = 'field-lookup';
-                    $attr['data-target'] = $field->getAlias();
+                    $attr['data-target'] = $alias;
 
                     if (!empty($properties['list'])) {
                         $attr['data-options'] = $properties['list'];
                     }
                 }
                 $builder->add($alias, $type, array(
-                    'required'    => $field->getIsRequired(),
-                    'label'       => $field->getLabel(),
+                    'required'    => $field['isRequired'],
+                    'label'       => $field['label'],
                     'label_attr'  => array('class' => 'control-label'),
                     'attr'        => $attr,
-                    'data'        => (isset($fieldValues[$alias])) ? $fieldValues[$alias] : $field->getDefaultValue(),
+                    'data'        => $value,
                     'mapped'      => false,
                     'constraints' => $constraints
                 ));
@@ -192,6 +191,8 @@ class LeadType extends AbstractType
         $resolver->setDefaults(array(
             'data_class' => 'Mautic\LeadBundle\Entity\Lead'
         ));
+
+        $resolver->setRequired(array('fields'));
     }
 
     /**

@@ -69,8 +69,10 @@ class LeadModel extends FormModel
         if (!$entity instanceof Lead) {
             throw new MethodNotAllowedHttpException(array('Lead'), 'Entity must be of class Lead()');
         }
-        $params = (!empty($action)) ? array('action' => $action) : array();
-        return $formFactory->create('lead', $entity, $params);
+        if (!empty($action))  {
+            $options['action'] = $action;
+        }
+        return $formFactory->create('lead', $entity, $options);
     }
 
     /**
@@ -154,33 +156,34 @@ class LeadModel extends FormModel
 
         //save the field values
         $fieldValues   = $lead->getFields();
-        $fieldModel    = $this->factory->getModel('lead.field');
-        $fields        = $fieldModel->getEntities();
 
         //update existing values
-        foreach ($fields as $field) {
-            $alias        = $field->getAlias();
-            $fieldId      = $field->getId();
-            $currentValue = (isset($fieldValues[$alias])) ? $fieldValues[$alias] : "";
-            $newValue     = (isset($data[$alias])) ? $data[$alias] : "";
-            if ($currentValue !== $newValue && (!empty($newValue) || (empty($newValue) && $overwriteWithBlank))) {
-                $fieldValues[$alias] = $newValue;
-            }
+        foreach ($fieldValues as $group => &$groupFields) {
+            foreach ($groupFields as $alias => &$field) {
+                $curValue = $field['value'];
+                $newValue = (isset($data[$alias])) ? $data[$alias] : "";
+                if ($curValue !== $newValue && (!empty($newValue) || (empty($newValue) && $overwriteWithBlank))) {
+                    $field['value'] = $newValue;
+                    $lead->addUpdatedField($alias, $newValue);
+                }
 
-            //if empty, check for social media data to plug the hole
-            if (empty($newValue) && !empty($socialCache)) {
-                foreach ($socialCache as $service => $details) {
-                    //check to see if a field has been assigned
+                //if empty, check for social media data to plug the hole
+                if (empty($newValue) && !empty($socialCache)) {
+                    foreach ($socialCache as $service => $details) {
+                        //check to see if a field has been assigned
 
-                    if (!empty($socialFeatureSettings[$service]['leadFields']) &&
-                        in_array($fieldId, $socialFeatureSettings[$service]['leadFields'])) {
+                        if (!empty($socialFeatureSettings[$service]['leadFields']) &&
+                            in_array($field['id'], $socialFeatureSettings[$service]['leadFields'])
+                        ) {
 
-                        //check to see if the data is available
-                        $key = array_search($fieldId, $socialFeatureSettings[$service]['leadFields']);
-                        if (isset($details['profile'][$key])) {
-                            //Found!!
-                            $fieldValues[$alias] = $details['profile'][$key];
-                            break;
+                            //check to see if the data is available
+                            $key = array_search($field['id'], $socialFeatureSettings[$service]['leadFields']);
+                            if (isset($details['profile'][$key])) {
+                                //Found!!
+                                $field['value'] = $details['profile'][$key];
+                                $lead->addUpdatedField($alias, $details['profile'][$key]);
+                                break;
+                            }
                         }
                     }
                 }
@@ -233,39 +236,5 @@ class LeadModel extends FormModel
     {
         $results = $this->em->getRepository('MauticUserBundle:User')->getUserList('', 0);
         return $results;
-    }
-
-    /**
-     * Reorganizes a field value persistent collection to be keyed by field's group then alias
-     *
-     * @param $fieldValues
-     * @return array
-     */
-    public function organizeFieldsByGroup($fieldValues)
-    {
-        //get the fields available
-        static $fields;
-
-        if (empty($fields)) {
-            $fields = $this->factory->getModel('lead.field')->getEntities();
-        }
-
-        $array = array();
-        foreach ($fieldValues as $alias => $value) {
-            if (isset($fields[$alias])) {
-                $field =& $fields[$alias];
-                if ($field->isPublished()) {
-                    $group                          = $field->getGroup();
-                    $alias                          = $field->getAlias();
-                    $array[$group][$alias]['id']    = $field->getId();
-                    $array[$group][$alias]['group'] = $group;
-                    $array[$group][$alias]['label'] = $field->getLabel();
-                    $array[$group][$alias]['alias'] = $alias;
-                    $array[$group][$alias]['value'] = $value;
-                    $array[$group][$alias]['type']  = $field->getType();
-                }
-            }
-        }
-        return $array;
     }
 }

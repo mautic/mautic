@@ -108,7 +108,7 @@ class LeadRepository extends CommonRepository
         if ($flush)
             $this->_em->flush();
 
-        $fields = $entity->getFields();
+        $fields = $entity->getUpdatedFields();
         if (!empty($fields)) {
             $this->_em->getConnection()->update(MAUTIC_TABLE_PREFIX . 'leads', $fields, array('id' => $entity->getId()));
         }
@@ -137,15 +137,37 @@ class LeadRepository extends CommonRepository
         }
 
         if ($entity != null) {
+            //Get the list of custom fields
+            $fq = $this->_em->getConnection()->createQueryBuilder();
+            $fq->select('f.id, f.label, f.alias, f.type, f.field_group as `group`')
+                ->from(MAUTIC_TABLE_PREFIX . 'lead_fields', 'f')
+                ->where('f.is_published = 1');
+            $results = $fq->execute()->fetchAll();
+
+            $field = array();
+            foreach ($results as $r) {
+                $fields[$r['alias']] = $r;
+            }
+
             //use DBAL to get entity fields
             $q = $this->_em->getConnection()->createQueryBuilder();
             $q->select('*')
                 ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
                 ->where('l.id = :leadId')
                 ->setParameter('leadId', $id);
-            $fields = $q->execute()->fetchAll();
-            $this->removeNonFieldColumns($fields[0]);
-            $entity->setFields($fields[0]);
+            $leadValues = $q->execute()->fetchAll();
+            $this->removeNonFieldColumns($leadValues[0]);
+
+            $fieldValues = array();
+
+            //loop over results to put fields in something that can be assigned to the entities
+            foreach ($leadValues[0] as $k => $r) {
+                if (isset($fields[$k])) {
+                    $fieldValues[$fields[$k]['group']][$fields[$k]['alias']] = $fields[$k];
+                    $fieldValues[$fields[$k]['group']][$fields[$k]['alias']]['value'] = $r;
+                }
+            }
+            $entity->setFields($fieldValues);
         }
 
         return $entity;
@@ -160,6 +182,18 @@ class LeadRepository extends CommonRepository
      */
     public function getEntities($args = array())
     {
+        //Get the list of custom fields
+        $fq = $this->_em->getConnection()->createQueryBuilder();
+        $fq->select('f.id, f.label, f.alias, f.type, f.field_group as `group`')
+            ->from(MAUTIC_TABLE_PREFIX . 'lead_fields', 'f')
+            ->where('f.is_published = 1');
+        $results = $fq->execute()->fetchAll();
+
+        $fields = array();
+        foreach ($results as $r) {
+            $fields[$r['alias']] = $r;
+        }
+
         //DBAL
         $dq = $this->_em->getConnection()->createQueryBuilder();
         $dq->select('count(*) as count')
@@ -179,19 +213,22 @@ class LeadRepository extends CommonRepository
         $results = $dq->execute()->fetchAll();
 
         //loop over results to put fields in something that can be assigned to the entities
-        $fields = array();
-        foreach ($results as $r) {
-            $leadId = $r['id'];
-
+        $fieldValues = array();
+        foreach ($results as $result) {
+            $leadId = $result['id'];
             //unset all the columns that are not fields
-            $this->removeNonFieldColumns($r);
+            $this->removeNonFieldColumns($result);
 
-            //remaining values are fields; array(fieldAlias => value, fieldAlias2 => value,...)
-            $fields[$leadId] = $r;
+            foreach ($result as $k => $r) {
+                if (isset($fields[$k])) {
+                    $fieldValues[$leadId][$fields[$k]['group']][$fields[$k]['alias']] = $fields[$k];
+                    $fieldValues[$leadId][$fields[$k]['group']][$fields[$k]['alias']]['value'] = $r;
+                }
+            }
         }
 
         //get an array of IDs for ORM query
-        $ids = array_keys($fields);
+        $ids = array_keys($fieldValues);
 
         if (count($ids)) {
             //ORM
@@ -223,7 +260,7 @@ class LeadRepository extends CommonRepository
             //assign fields
             foreach ($results as $r) {
                 $leadId = $r->getId();
-                $r->setFields($fields[$leadId]);
+                $r->setFields($fieldValues[$leadId]);
             }
         }
 

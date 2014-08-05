@@ -11,6 +11,7 @@ namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Doctrine\ORM\Query;
 
 /**
  * LeadFieldRepository
@@ -30,7 +31,14 @@ class LeadFieldRepository extends CommonRepository
             ->createQueryBuilder('f')
             ->select('f')
             ->from('MauticLeadBundle:LeadField', 'f', 'f.alias');
-        $results = $q->getQuery()->getResult();
+        $this->buildWhereClause($q, $args);
+
+        if (isset($args['hydration_mode'])) {
+            $mode = strtoupper($args['hydration_mode']);
+            $results = $q->getQuery()->getResult(constant("\\Doctrine\\ORM\\Query::$mode"));
+        } else {
+            $results = $q->getQuery()->getResult();
+        }
 
         return $results;
     }

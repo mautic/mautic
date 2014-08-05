@@ -57,31 +57,30 @@ class ResultController extends CommonFormController
             $start = 0;
         }
 
-        $orderBy    = $this->factory->getSession()->get('mautic.formresult.'.$objectId.'.orderby', 's.dateSubmitted');
+        $orderBy    = $this->factory->getSession()->get('mautic.formresult.'.$objectId.'.orderby', 's.date_submitted');
         $orderByDir = $this->factory->getSession()->get('mautic.formresult.'.$objectId.'.orderbydir', 'ASC');
 
         $filters    = $this->factory->getSession()->get('mautic.formresult.'.$objectId.'.filters', array());
-        //add the form
-        $filters[]  = array(
-            'column' => 'IDENTITY(s.form)',
-            'expr'   => 'eq',
-            'value'  => $form->getId()
-        );
 
         $model = $this->factory->getModel('form.submission');
 
         //get the results
-        $results = $model->getEntities(
+        $entities = $model->getEntities(
             array(
-                'start'      => $start,
-                'limit'      => $limit,
-                'filter'     => array('force' => $filters),
-                'orderBy'    => $orderBy,
-                'orderByDir' => $orderByDir
+                'start'          => $start,
+                'limit'          => $limit,
+                'filter'         => array('force' => $filters),
+                'orderBy'        => $orderBy,
+                'orderByDir'     => $orderByDir,
+                'form'           => $form,
+                'withTotalCount' => true
             )
         );
 
-        $count = count($results);
+        $count   = $entities['count'];
+        $results = $entities['results'];
+        unset($entities);
+
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page
             if ($count === 1) {
@@ -113,6 +112,7 @@ class ResultController extends CommonFormController
                 'filters'     => $filters,
                 'form'        => $form,
                 'page'        => $page,
+                'totalCount'  => $count,
                 'limit'       => $limit,
                 'tmpl'        => $tmpl,
                 'dateFormat'  => $this->factory->getParameter('date_format_full')
@@ -173,17 +173,10 @@ class ResultController extends CommonFormController
             $start = 0;
         }
 
-        $orderBy    = $this->factory->getSession()->get('mautic.formresult.'.$objectId.'.orderby', 's.dateSubmitted');
+        $orderBy    = $this->factory->getSession()->get('mautic.formresult.'.$objectId.'.orderby', 's.date_submitted');
         $orderByDir = $this->factory->getSession()->get('mautic.formresult.'.$objectId.'.orderbydir', 'ASC');
 
         $filters    = $this->factory->getSession()->get('mautic.formresult.'.$objectId.'.filters', array());
-
-        //add the form
-        $filters[]  = array(
-            'column' => 'IDENTITY(s.form)',
-            'expr'   => 'eq',
-            'value'  => $form->getId()
-        );
 
         $args = array(
             'start'           => $start,

@@ -124,7 +124,6 @@ class LeadController extends FormController
         $parameters = array(
             'searchValue' => $search,
             'items'       => $leads,
-            'model'       => $model,
             'page'        => $page,
             'totalItems'  => $count,
             'limit'       => $limit,
@@ -205,7 +204,7 @@ class LeadController extends FormController
             'objectId'     => $lead->getId())
         );
 
-        $fields            = $model->organizeFieldsByGroup($lead->getFields());
+        $fields            = $lead->getFields();
         $socialProfiles    = NetworkIntegrationHelper::getUserProfiles($this->factory, $lead, $fields);
         $socialProfileUrls = NetworkIntegrationHelper::getSocialProfileUrlRegex(false);
 
@@ -248,7 +247,11 @@ class LeadController extends FormController
         $page    = $this->factory->getSession()->get('mautic.lead.page', 1);
 
         $action = $this->generateUrl('mautic_lead_action', array('objectAction' => 'new'));
-        $form   = $model->createForm($lead, $this->get('form.factory'), $action);
+        $fields = $this->factory->getModel('lead.field')->getEntities(array(
+            'filter' => array('isPublished' => true),
+            'hydration_mode' => 'HYDRATE_ARRAY'
+        ));
+        $form   = $model->createForm($lead, $this->get('form.factory'), $action, array('fields' => $fields));
 
         ///Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
@@ -322,8 +325,9 @@ class LeadController extends FormController
 
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'form'  => $form->createView(),
-                'lead'  => $lead
+                'form'   => $form->createView(),
+                'lead'   => $lead,
+                'fields' => $lead->getFields() //just use lead fields as they are already organized by ['group']['alias']
             ),
             'contentTemplate' => 'MauticLeadBundle:Lead:form.html.php',
             'passthroughVars' => array(
@@ -385,7 +389,11 @@ class LeadController extends FormController
         }
 
         $action = $this->generateUrl('mautic_lead_action', array('objectAction' => 'edit', 'objectId' => $objectId));
-        $form   = $model->createForm($lead, $this->get('form.factory'), $action);
+        $fields = $this->factory->getModel('lead.field')->getEntities(array(
+            'filter' => array('isPublished' => true),
+            'hydration_mode' => 'HYDRATE_ARRAY'
+        ));
+        $form   = $model->createForm($lead, $this->get('form.factory'), $action, array('fields' => $fields));
 
         ///Check for a submitted form and process it
         if (!$ignorePost && $this->request->getMethod() == 'POST') {
@@ -456,8 +464,9 @@ class LeadController extends FormController
 
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'form'  => $form->createView(),
-                'lead'  => $lead
+                'form'   => $form->createView(),
+                'lead'   => $lead,
+                'fields' => $lead->getFields() //pass in the lead fields as they are already organized by ['group']['alias']
             ),
             'contentTemplate' => 'MauticLeadBundle:Lead:form.html.php',
             'passthroughVars' => array(

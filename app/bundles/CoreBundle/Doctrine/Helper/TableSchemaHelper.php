@@ -42,8 +42,15 @@ class TableSchemaHelper
      */
     protected $columnHelper;
 
-
+    /**
+     * @var \Doctrine\DBAL\Schema\Schema
+     */
     protected $schema;
+
+    /**
+     * @var
+     */
+    protected $dropTables;
 
     /**
      * @param Connection $db
@@ -55,7 +62,7 @@ class TableSchemaHelper
         $this->sm            = $db->getSchemaManager();
         $this->prefix        = $prefix;
         $this->columnHelper  = $columnHelper;
-        $this->schema        = new \Doctrine\DBAL\Schema\Schema();
+        $this->schema        = new \Doctrine\DBAL\Schema\Schema(array(), array(), $this->sm->createSchemaConfig());
     }
 
     /**
@@ -146,21 +153,42 @@ class TableSchemaHelper
 
         if (!empty($options)) {
             foreach ($options as $option => $value) {
-                $func = "set" . ucfirst($option);
+                $func = ($option == 'uniqueIndex' ? "add" : "set") . ucfirst($option);
                 $newTable->$func($value);
             }
         }
 
     }
 
+    /**
+     * @param $table
+     */
+    public function deleteTable($table)
+    {
+        if ($this->checkTableExists($table)) {
+            $this->dropTables[] = $table;
+        }
+    }
 
     /**
      * Executes the changes
      */
     public function executeChanges()
     {
-        $sql = $this->schema->toSql($this->db->getDatabasePlatform());
-        $this->db->executeUpdate($sql);
+        $platform = $this->db->getDatabasePlatform();
+
+        $sql = $this->schema->toSql($platform);
+        if (!empty($sql)) {
+            foreach ($sql as $s) {
+                $this->db->executeUpdate($s);
+            }
+        }
+
+        if (!empty($this->dropTables)) {
+            foreach ($this->dropTables as $t) {
+                $this->sm->dropTable($this->prefix . $t);
+            }
+        }
     }
 
     /**

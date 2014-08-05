@@ -20,20 +20,20 @@ $formId = $form->getId();
                 <?php
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'formresult.'.$formId,
-                    'orderBy'    => 's.dateSubmitted',
+                    'orderBy'    => 's.date_submitted',
                     'text'       => 'mautic.form.result.thead.date',
                     'class'      => 'col-formresult-date',
                     'default'    => true,
-                    'filterBy'   => 's.dateSubmitted',
+                    'filterBy'   => 's.date_submitted',
                     'dataToggle' => 'date'
                 ));
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'formresult.'.$formId,
-                    'orderBy'    => 'i.ipAddress',
+                    'orderBy'    => 'i.ip_address',
                     'text'       => 'mautic.form.result.thead.ip',
                     'class'      => 'col-formresult-ip',
-                    'filterBy'   => 'i.ipAddress'
+                    'filterBy'   => 'i.ip_address'
                 ));
 
                 $fields = $form->getFields();
