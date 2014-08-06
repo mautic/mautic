@@ -462,9 +462,13 @@ class LeadController extends FormController
             }
         }
 
+        $formView = $form->createView();
+        $this->factory->getTemplating()->getEngine('MauticLeadBundle:Lead:form.html.php')->get('form')
+            ->setTheme($formView, 'MauticLeadBundle:Lead');
+
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'form'   => $form->createView(),
+                'form'   => $formView,
                 'lead'   => $lead,
                 'fields' => $lead->getFields() //pass in the lead fields as they are already organized by ['group']['alias']
             ),

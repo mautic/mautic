@@ -42,7 +42,7 @@ if ($tmpl == 'index')
                             if (!empty($fields['core']['city']['value']) && !empty($fields['core']['state']['value']))
                                 echo $fields['core']['city']['value'] . ', ' . $fields['core']['state']['value'];
                             elseif (!empty($fields['core']['city']['value']))
-                                echo $fields['core']['city']['value]'];
+                                echo $fields['core']['city']['value'];
                             elseif (!empty($fields['core']['state']['value']))
                                 echo $fields['core']['state']['value'];
                             ?></span>
