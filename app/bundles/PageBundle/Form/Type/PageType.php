@@ -43,9 +43,7 @@ class PageType extends AbstractType
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(array('content' => 'html')));
-        $builder->addEventSubscriber(new FormExitSubscriber($this->translator->trans(
-            'mautic.core.form.inform'
-        )));
+        $builder->addEventSubscriber(new FormExitSubscriber('page.page', $options));
 
         $variantParent = $options['data']->getVariantParent();
         $isVariant     = !empty($variantParent);

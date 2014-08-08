@@ -238,4 +238,30 @@ class AjaxController extends CommonController
         }
         return $this->sendJsonResponse($dataArray);
     }
+
+    /**
+     * Unlock an entity locked by the current user
+     *
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
+    protected function unlockEntityAction(Request $request)
+    {
+        $dataArray   = array('success' => 0);
+        $name        = InputHelper::clean($request->request->get('model'));
+        $id          = InputHelper::int($request->request->get('id'));
+        $model       = $this->factory->getModel($name);
+        $entity      = $model->getEntity($id);
+        $currentUser = $this->factory->getUser();
+        $checkedOut  = $entity->getCheckedOutBy();
+
+        if ($entity !== null && !empty($checkedOut) && $checkedOut->getId() === $currentUser->getId()) {
+            //entity exists, is checked out, and is checked out by the current user so go ahead and unlock
+            $model->unlockEntity($entity);
+            $dataArray['success'] = 1;
+        }
+
+        return $this->sendJsonResponse($dataArray);
+    }
 }

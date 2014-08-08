@@ -44,9 +44,7 @@ class ListType extends AbstractType
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber());
-        $builder->addEventSubscriber(new FormExitSubscriber($this->translator->trans(
-            'mautic.core.form.inform'
-        )));
+        $builder->addEventSubscriber(new FormExitSubscriber('lead.list', $options));
 
         $builder->add('name', 'text', array(
             'label'      => 'mautic.lead.list.form.name',

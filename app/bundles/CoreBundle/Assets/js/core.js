@@ -570,14 +570,12 @@ var Mautic = {
 
     ajaxifyLink: function (el, event) {
         //prevent leaving if currently in a form
-        /*
-        if (mQuery(".prevent-nonsubmit-form-exit").length) {
+        if (mQuery(".form-exist-unlock-id").length) {
             if (mQuery(el).attr('data-ignore-formexit') != 'true') {
-                Mautic.showConfirmation(mQuery(".prevent-nonsubmit-form-exit").val());
-                return false;
+                Mautic.unlockEntity(mQuery('.form-exist-unlock-model').val(), mQuery('.form-exist-unlock-id').val());
             }
         }
-        */
+
         var route = mQuery(el).attr('href');
         if (route.indexOf('javascript')>=0) {
             return false;
@@ -1137,18 +1135,30 @@ var Mautic = {
 
         //clear filter
         mQuery(el).val('');
-    }
+    },
 
+    /**
+     * Unlock an entity
+     *
+     * @param model
+     * @param id
+     */
+    unlockEntity: function(model, id) {
+        mQuery.ajax({
+            url: mauticAjaxUrl,
+            type: "POST",
+            data: "action=unlockEntity&model=" + model + "&id=" + id,
+            dataType: "json"
+        });
+    }
 };
 
-//prevent page navigation if in the middle of a form
+/**
+ * Unlock an entity if applicable
+ */
 window.addEventListener("beforeunload", function (e) {
-    /*
-    if (mQuery(".prevent-nonsubmit-form-exit").length) {
-        var msg = mQuery(".prevent-nonsubmit-form-exit").val();
-
-        (e || window.event).returnValue = msg;     //Gecko + IE
-        return msg;                                //Webkit, Safari, Chrome etc.
-    }
-    */
+     //prevent leaving if currently in a form
+     if (mQuery(".form-exist-unlock-id").length) {
+        Mautic.unlockEntity(mQuery('.form-exist-unlock-model').val(), mQuery('.form-exist-unlock-id').val());
+     }
 });

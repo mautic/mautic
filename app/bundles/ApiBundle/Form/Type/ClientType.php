@@ -47,9 +47,7 @@ class ClientType extends AbstractType
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber());
-        $builder->addEventSubscriber(new FormExitSubscriber($this->translator->trans(
-            'mautic.core.form.inform'
-        )));
+        $builder->addEventSubscriber(new FormExitSubscriber('api.client', $options));
 
         $builder->add('name', 'text', array(
             'label'      => 'mautic.api.client.form.name',

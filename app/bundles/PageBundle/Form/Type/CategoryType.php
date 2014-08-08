@@ -41,9 +41,7 @@ class CategoryType extends AbstractType
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(array('content' => 'html')));
-        $builder->addEventSubscriber(new FormExitSubscriber($this->translator->trans(
-            'mautic.core.form.inform'
-        )));
+        $builder->addEventSubscriber(new FormExitSubscriber('page.category', $options));
 
         $builder->add('title', 'text', array(
             'label'      => 'mautic.page.category.form.title',

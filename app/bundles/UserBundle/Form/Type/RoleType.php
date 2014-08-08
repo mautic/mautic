@@ -44,9 +44,7 @@ class RoleType extends AbstractType
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber());
-        $builder->addEventSubscriber(new FormExitSubscriber($this->translator->trans(
-            'mautic.core.form.inform'
-        )));
+        $builder->addEventSubscriber(new FormExitSubscriber('user.role', $options));
 
         $builder->add('name', 'text', array(
             'label'      => 'mautic.user.role.form.name',

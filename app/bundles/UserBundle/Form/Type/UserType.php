@@ -49,12 +49,7 @@ class UserType extends AbstractType
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber());
-
-        if (!$options['ignore_formexit']) {
-            $builder->addEventSubscriber(new FormExitSubscriber($this->translator->trans(
-                'mautic.core.form.inform'
-            )));
-        }
+        $builder->addEventSubscriber(new FormExitSubscriber('user.user', $options));
 
         $builder->add('username', 'text', array(
             'label'      => 'mautic.user.user.form.username',

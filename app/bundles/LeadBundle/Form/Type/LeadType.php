@@ -44,9 +44,7 @@ class LeadType extends AbstractType
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber());
-        $builder->addEventSubscriber(new FormExitSubscriber($this->translator->trans(
-            'mautic.core.form.inform'
-        )));
+        $builder->addEventSubscriber(new FormExitSubscriber('lead.lead', $options));
 
         $builder->add('owner_lookup', 'text', array(
             'label'      => 'mautic.lead.lead.field.owner',

@@ -21,11 +21,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class FormExitSubscriber implements EventSubscriberInterface
 {
 
-    private $msg;
+    private $model;
+    private $options;
 
-    public function __construct($msg)
+    public function __construct($model, $options = array())
     {
-        $this->msg = $msg;
+        $this->model   = $model;
+        $this->options = $options;
     }
 
     public static function getSubscribedEvents()
@@ -35,14 +37,24 @@ class FormExitSubscriber implements EventSubscriberInterface
 
     public function preSetData(FormEvent $event)
     {
-        //add a hidden field that is used exclusively to warn a user to use save/cancel to exit a form
-        $form = $event->getForm();
+        $id = !empty($this->options['data']) ? $this->options['data']->getId() : 0;
+        if ($id && empty($this->options['ignore_formexit'])) {
+            //add a hidden field that is used exclusively to warn a user to use save/cancel to exit a form
+            $form = $event->getForm();
 
-        $form->add('inForm', 'hidden', array(
-            'data'     => $this->msg,
-            'required' => false,
-            'mapped'   => false,
-            'attr'     => array('class' => 'prevent-nonsubmit-form-exit')
-        ));
+            $form->add('unlockModel', 'hidden', array(
+                'data'     => $this->model,
+                'required' => false,
+                'mapped'   => false,
+                'attr'     => array('class' => 'form-exist-unlock-model')
+            ));
+
+            $form->add('unlockId', 'hidden', array(
+                'data'     => $id,
+                'required' => false,
+                'mapped'   => false,
+                'attr'     => array('class' => 'form-exist-unlock-id')
+            ));
+        }
     }
 }
