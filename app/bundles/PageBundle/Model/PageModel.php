@@ -246,7 +246,7 @@ class PageModel extends FormModel
         $hit->setDateHit(new \Datetime());
 
         //check for the tracking cookie
-       // $trackingId = $request->cookies->get('mautic_analytics_id');
+        $trackingId = $request->cookies->get('mautic_analytics_id');
         if (empty($trackingId)) {
             $trackingId = uniqid();
         }
@@ -327,7 +327,7 @@ class PageModel extends FormModel
         $hit->setUrl($pageURL);
 
         if ($this->dispatcher->hasListeners(PageEvents::PAGE_ON_HIT)) {
-            $event = new PageHitEvent($page, $request, $code);
+            $event = new PageHitEvent($hit, $request, $code);
             $this->dispatcher->dispatch(PageEvents::PAGE_ON_HIT, $event);
         }
 

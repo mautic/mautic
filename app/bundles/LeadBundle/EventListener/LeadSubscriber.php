@@ -9,16 +9,17 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
-
-use Mautic\ApiBundle\ApiEvents;
 use Mautic\ApiBundle\Event\RouteEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\FormEvents;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event as Events;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\PageBundle\Event\PageHitEvent;
+use Mautic\PageBundle\PageEvents;
 use Mautic\UserBundle\Event\UserEvent;
 use Mautic\UserBundle\UserEvents;
 
@@ -40,10 +41,11 @@ class LeadSubscriber extends CommonSubscriber
             CoreEvents::BUILD_COMMAND_LIST => array('onBuildCommandList', 0),
             LeadEvents::LEAD_POST_SAVE     => array('onLeadPostSave', 0),
             LeadEvents::LEAD_POST_DELETE   => array('onLeadDelete', 0),
-            LeadEvents::FIELD_POST_SAVE     => array('onFieldPostSave', 0),
-            LeadEvents::FIELD_POST_DELETE   => array('onFieldDelete', 0),
+            LeadEvents::FIELD_POST_SAVE    => array('onFieldPostSave', 0),
+            LeadEvents::FIELD_POST_DELETE  => array('onFieldDelete', 0),
             UserEvents::USER_PRE_DELETE    => array('onUserDelete', 0),
-            FormEvents::FORM_ON_BUILD      => array('onFormBuilder', 0)
+            FormEvents::FORM_ON_BUILD      => array('onFormBuilder', 0),
+            PageEvents::PAGE_ON_HIT        => array('onPageHit', 0)
         );
     }
 
@@ -251,5 +253,39 @@ class LeadSubscriber extends CommonSubscriber
         );
 
         $event->addSubmitAction('lead.scorechange', $action);
+    }
+
+    /**
+     * Generate an anonymous lead from page hit
+     *
+     * @param PageHitEvent $event
+     */
+    public function onPageHit(PageHitEvent $event)
+    {
+        //check to see if this person is already tracked as a lead
+        $hit        = $event->getHit();
+        $trackingId = $hit->getTrackingId();
+
+        $cookies = $event->getRequest()->cookies;
+        $leadId  = $cookies->get($trackingId);
+        $ip      = $hit->getIpAddress();
+        if (empty($leadId)) {
+            //this lead is not tracked yet so get leads by IP and track that lead or create a new one
+            $model = $this->factory->getModel('lead.lead');
+            $leads = $model->getLeadsByIp($ip->getIpAddress());
+
+            if (count($leads)) {
+                //just create a tracking cookie for the newest lead
+                $leadId = $leads[0]->getId();
+            } else {
+                //let's create a lead
+                $lead = new Lead();
+                $lead->addIpAddress($ip);
+                $model->saveEntity($lead);
+                $leadId = $lead->getId();
+            }
+        }
+
+        setcookie($trackingId, $leadId, time() + 1800);
     }
 }

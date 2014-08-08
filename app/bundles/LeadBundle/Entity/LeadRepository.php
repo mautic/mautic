@@ -94,6 +94,28 @@ class LeadRepository extends CommonRepository
 
         return $results;
     }
+
+    /**
+     * Get leads by IP address
+     *
+     * @param      $ip
+     * @param bool $byId
+     *
+     * @return array
+     */
+    public function getLeadsByIp($ip, $byId = false)
+    {
+        $q = $this->createQueryBuilder('l')
+            ->leftJoin('l.ipAddresses', 'i');
+        $col = ($byId) ? 'i.id' : 'i.ipAddress';
+        $q->where($col . ' = :ip')
+            ->setParameter('ip', $ip)
+            ->orderBy('l.dateAdded', 'DESC');
+        $results = $q->getQuery()->getResult();
+
+        return $results;
+    }
+
     /**
      * {@inheritdoc}
      *

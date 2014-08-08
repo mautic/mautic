@@ -10,6 +10,7 @@
 namespace Mautic\PageBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
+use Mautic\PageBundle\Entity\Analytics;
 use Mautic\PageBundle\Entity\Page;
 
 /**
@@ -22,13 +23,14 @@ class PageHitEvent extends CommonEvent
 
     private $request;
     private $code;
-
+    private $page;
     /**
      * @param Page $page
      */
-    public function __construct(Page $page, $request, $code)
+    public function __construct(Analytics $hit, $request, $code)
     {
-        $this->entity  = $page;
+        $this->entity  = $hit;
+        $this->page    = $hit->getPage();
         $this->request = $request;
         $this->code    = $code;
     }
@@ -40,7 +42,7 @@ class PageHitEvent extends CommonEvent
      */
     public function getPage()
     {
-        return $this->entity;
+        return $this->page;
     }
 
     /**
@@ -61,5 +63,13 @@ class PageHitEvent extends CommonEvent
     public function getCode()
     {
         return $this->code;
+    }
+
+    /**
+     * @return Analytics
+     */
+    public function getHit()
+    {
+        return $this->entity;
     }
 }

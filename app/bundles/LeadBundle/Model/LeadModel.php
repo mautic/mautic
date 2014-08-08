@@ -237,4 +237,16 @@ class LeadModel extends FormModel
         $results = $this->em->getRepository('MauticUserBundle:User')->getUserList('', 0);
         return $results;
     }
+
+    /**
+     * Obtains a list of leads based off IP
+     *
+     * @param $ip
+     *
+     * @return mixed
+     */
+    public function getLeadsByIp($ip)
+    {
+        return $this->getRepository()->getLeadsByIp($ip);
+    }
 }
