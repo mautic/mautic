@@ -21,7 +21,6 @@ if ($tmpl == 'index') {
                     <span class="list-item-publish-status">
                         <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php',array(
                             'item'          => $i[0],
-                            'dateFormat'    => (!empty($dateFormat)) ? $dateFormat : 'F j, Y g:i a',
                             'model'         => 'form.form',
                             'disableToggle' => true
                         )); ?>

@@ -85,7 +85,6 @@ CUSTOM
                     <td>
                         <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php',array(
                             'item'       => $i[0],
-                            'dateFormat' => (!empty($dateFormat)) ? $dateFormat : 'F j, Y g:i a',
                             'model'      => 'form.form'
                         )); ?>
                         <a href="<?php echo $view['router']->generate('mautic_form_action',

@@ -229,24 +229,7 @@ class FormModel extends CommonFormModel
         $isNew = ($entity->getId()) ? false : true;
 
         if ($isNew) {
-            $alias = strtolower(InputHelper::alphanum($entity->getName()));
-
-            //remove appended numbers
-            $alias = preg_replace('#[0-9]+$#', '', $alias);
-
-            //make sure alias is not already taken
-            $testAlias = $alias;
-            $count     = $this->em->getRepository('MauticFormBundle:Form')->checkUniqueAlias($testAlias, $entity);
-            $aliasTag  = $count;
-
-            while ($count) {
-                $testAlias = $alias . $aliasTag;
-                $count     = $this->em->getRepository('MauticFormBundle:Form')->checkUniqueAlias($testAlias, $entity);
-                $aliasTag++;
-            }
-            if ($testAlias != $alias) {
-                $alias = $testAlias;
-            }
+            $alias = substr(strtolower(InputHelper::alphanum($entity->getName())), 0, 10);
             $entity->setAlias($alias);
         } else {
             $alias = $entity->getAlias();
@@ -293,7 +276,7 @@ class FormModel extends CommonFormModel
         if ($entity->getId()) {
             //create the field as its own column in the leads table
             $schemaHelper = $this->factory->getSchemaHelper('table');
-            $name         = "form_results_$alias";
+            $name         = "form_results_" . $entity->getId() . "_$alias";
             $columns      = $this->generateFieldColumns($entity);
             if ($isNew || (!$isNew && !$schemaHelper->checkTableExists($name))) {
                 $schemaHelper->addTable(array(
@@ -330,7 +313,7 @@ class FormModel extends CommonFormModel
         if (!$entity->getId()) {
             //delete the associated results table
             $schemaHelper = $this->factory->getSchemaHelper('table');
-            $schemaHelper->deleteTable("form_results_" . $entity->getAlias());
+            $schemaHelper->deleteTable("form_results_" . $entity->deletedId . "_" . $entity->getAlias());
             $schemaHelper->executeChanges();
         }
     }

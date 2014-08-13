@@ -226,11 +226,9 @@ class AjaxController extends CommonController
                 $dataArray['success'] = 1;
                 //toggle permission state
                 $model->togglePublishStatus($entity);
-                $dateFormat = $this->factory->getParameter('date_format_full');
                 //get updated icon HTML
                 $html = $this->renderView('MauticCoreBundle:Helper:publishstatus.html.php',array(
                     'item'       => $entity,
-                    'dateFormat' => $dateFormat,
                     'model'      => $name
                 ));
                 $dataArray['statusHtml'] = $html;
