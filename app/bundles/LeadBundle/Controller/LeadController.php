@@ -251,6 +251,7 @@ class LeadController extends FormController
             'filter' => array('isPublished' => true),
             'hydration_mode' => 'HYDRATE_ARRAY'
         ));
+
         $form   = $model->createForm($lead, $this->get('form.factory'), $action, array('fields' => $fields));
 
         ///Check for a submitted form and process it
@@ -327,7 +328,7 @@ class LeadController extends FormController
             'viewParameters'  => array(
                 'form'   => $form->createView(),
                 'lead'   => $lead,
-                'fields' => $lead->getFields() //just use lead fields as they are already organized by ['group']['alias']
+                'fields' => $model->organizeFieldsByGroup($fields)
             ),
             'contentTemplate' => 'MauticLeadBundle:Lead:form.html.php',
             'passthroughVars' => array(

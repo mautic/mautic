@@ -11,6 +11,7 @@ namespace Mautic\LeadBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\SocialBundle\Helper\NetworkIntegrationHelper;
@@ -248,5 +249,38 @@ class LeadModel extends FormModel
     public function getLeadsByIp($ip)
     {
         return $this->getRepository()->getLeadsByIp($ip);
+    }
+
+    /**
+     * Reorganizes a field list to be keyed by field's group then alias
+     *
+     * @param $fields
+     * @return array
+     */
+    public function organizeFieldsByGroup($fields)
+    {
+        $array = array();
+        foreach ($fields as $alias => $field) {
+            if ($field instanceof LeadField) {
+                if ($field->isPublished()) {
+                    $group                          = $field->getGroup();
+                    $array[$group][$alias]['id']    = $field->getId();
+                    $array[$group][$alias]['group'] = $group;
+                    $array[$group][$alias]['label'] = $field->getLabel();
+                    $array[$group][$alias]['alias'] = $alias;
+                    $array[$group][$alias]['type']  = $field->getType();
+                }
+            } else {
+                if ($field['isPublished']) {
+                    $group = $field['group'];
+                    $array[$group][$alias]['id']    = $field['id'];
+                    $array[$group][$alias]['group'] = $group;
+                    $array[$group][$alias]['label'] = $field['label'];
+                    $array[$group][$alias]['alias'] = $alias;
+                    $array[$group][$alias]['type']  = $field['type'];
+                }
+            }
+        }
+        return $array;
     }
 }
