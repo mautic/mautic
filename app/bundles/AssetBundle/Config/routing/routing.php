@@ -30,7 +30,7 @@ $collection->add('mautic_assetcategory_action', new Route('/assets/categories/{o
 
 $collection->add('mautic_asset_index', new Route('/assets/{page}',
     array(
-        '_controller' => 'MauticAssetBundle:Page:index',
+        '_controller' => 'MauticAssetBundle:Asset:index',
         'page'        => 1,
     ), array(
         'page'    => '\d+'
@@ -39,7 +39,7 @@ $collection->add('mautic_asset_index', new Route('/assets/{page}',
 
 $collection->add('mautic_asset_action', new Route('/assets/{objectAction}/{objectId}',
     array(
-        '_controller' => 'MauticAssetBundle:Page:execute',
+        '_controller' => 'MauticAssetBundle:Asset:execute',
         "objectId"    => 0
     )
 ));
