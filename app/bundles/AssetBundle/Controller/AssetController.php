@@ -131,4 +131,331 @@ class AssetController extends FormController
             )
         ));
     }
+
+    /**
+     * Generates new form and processes post data
+     *
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function newAction ()
+    {
+        $model   = $this->factory->getModel('asset.asset');
+        $entity  = $model->getEntity();
+        $method  = $this->request->getMethod();
+        $session = $this->factory->getSession();
+        if (!$this->factory->getSecurity()->isGranted('asset:assets:create')) {
+            return $this->accessDenied();
+        }
+
+        //set the page we came from
+        $page   = $session->get('mautic.asset.page', 1);
+        $action = $this->generateUrl('mautic_asset_action', array('objectAction' => 'new'));
+
+        //create the form
+        $form = $model->createForm($entity, $this->get('form.factory'), $action);
+
+        ///Check for a submitted form and process it
+        if ($method == 'POST') {
+            $valid = false;
+            if (!$cancelled = $this->isFormCancelled($form)) {
+                if ($valid = $this->isFormValid($form)) {
+                    $session     = $this->factory->getSession();
+                    $contentName = 'mautic.pagebuilder.'.$entity->getSessionId().'.content';
+                    $content = $session->get($contentName, array());
+                    $entity->setContent($content);
+
+                    //form is valid so process the data
+                    $model->saveEntity($entity);
+
+                    //clear the session
+                    $session->remove($contentName);
+
+                    $this->request->getSession()->getFlashBag()->add(
+                        'notice',
+                        $this->get('translator')->trans('mautic.asset.asset.notice.created', array(
+                            '%name%' => $entity->getTitle(),
+                            '%url%'          => $this->generateUrl('mautic_asset_action', array(
+                                'objectAction' => 'edit',
+                                'objectId'     => $entity->getId()
+                            ))
+                        ), 'flashes')
+                    );
+
+                    if ($form->get('buttons')->get('save')->isClicked()) {
+                        $viewParameters = array(
+                            'objectAction' => 'view',
+                            'objectId'     => $entity->getId()
+                        );
+                        $returnUrl      = $this->generateUrl('mautic_asset_action', $viewParameters);
+                        $template       = 'MauticAssetBundle:Asset:view';
+                    } else {
+                        //return edit view so that all the session stuff is loaded
+                        return $this->editAction($entity->getId(), true);
+                    }
+                }
+            } else {
+                $viewParameters  = array('page' => $page);
+                $returnUrl = $this->generateUrl('mautic_asset_index', $viewParameters);
+                $template  = 'MauticAssetBundle:Asset:index';
+                //clear any modified content
+                $session->remove('mautic.assetbuilder.'.$entity->getSessionId().'.content', array());
+            }
+
+            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+                return $this->postActionRedirect(array(
+                    'returnUrl'       => $returnUrl,
+                    'viewParameters'  => $viewParameters,
+                    'contentTemplate' => $template,
+                    'passthroughVars' => array(
+                        'activeLink'    => 'mautic_asset_index',
+                        'mauticContent' => 'asset'
+                    )
+                ));
+            }
+        }
+
+        // $builderComponents    = $model->getBuilderComponents();
+        return $this->delegateView(array(
+            'viewParameters'  =>  array(
+                'form'        => $form->createView(),
+                // 'tokens'      => $builderComponents['assetTokens'],
+                'activeAsset'  => $entity
+            ),
+            'contentTemplate' => 'MauticAssetBundle:Asset:form.html.php',
+            'passthroughVars' => array(
+                'activeLink'    => '#mautic_asset_index',
+                'mauticContent' => 'asset',
+                'route'         => $this->generateUrl('mautic_asset_action', array(
+                    'objectAction' => 'new'
+                ))
+            )
+        ));
+    }
+
+    /**
+     * Generates edit form and processes post data
+     *
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function editAction ($objectId, $ignorePost = false)
+    {
+        $model      = $this->factory->getModel('asset.asset');
+        $entity     = $model->getEntity($objectId);
+        $session    = $this->factory->getSession();
+        $page       = $this->factory->getSession()->get('mautic.asset.page', 1);
+
+        //set the return URL
+        $returnUrl  = $this->generateUrl('mautic_asset_index', array('page' => $page));
+
+        $postActionVars = array(
+            'returnUrl'       => $returnUrl,
+            'viewParameters'  => array('page' => $page),
+            'contentTemplate' => 'MauticAssetBundle:Page:index',
+            'passthroughVars' => array(
+                'activeLink'    => 'mautic_asset_index',
+                'mauticContent' => 'asset'
+            )
+        );
+
+        //not found
+        if ($entity === null) {
+            return $this->postActionRedirect(
+                array_merge($postActionVars, array(
+                    'flashes' => array(
+                        array(
+                            'type' => 'error',
+                            'msg'  => 'mautic.asset.asset.error.notfound',
+                            'msgVars' => array('%id%' => $objectId)
+                        )
+                    )
+                ))
+            );
+        }  elseif (!$this->factory->getSecurity()->hasEntityAccess(
+            'asset:assets:viewown', 'asset:assets:viewother', $entity->getCreatedBy()
+        )) {
+            return $this->accessDenied();
+        } elseif ($model->isLocked($entity)) {
+            //deny access if the entity is locked
+            return $this->isLocked($postActionVars, $entity, 'asset.asset');
+        }
+
+        //Create the form
+        $action = $this->generateUrl('mautic_asset_action', array('objectAction' => 'edit', 'objectId' => $objectId));
+        $form   = $model->createForm($entity, $this->get('form.factory'), $action);
+
+        ///Check for a submitted form and process it
+        if (!$ignorePost && $this->request->getMethod() == 'POST') {
+            $valid = false;
+            if (!$cancelled = $this->isFormCancelled($form)) {
+                if ($valid = $this->isFormValid($form)) {
+                    $contentName     = 'mautic.assetbuilder.'.$entity->getSessionId().'.content';
+                    $existingContent = $entity->getContent();
+                    $newContent      = $session->get($contentName, array());
+                    $content         = array_merge($existingContent, $newContent);
+                    $entity->setContent($content);
+
+                    //form is valid so process the data
+                    $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
+
+                    //clear the session
+                    $session->remove($contentName);
+
+                    $this->request->getSession()->getFlashBag()->add(
+                        'notice',
+                        $this->get('translator')->trans('mautic.asset.asset.notice.updated', array(
+                            '%name%' => $entity->getTitle(),
+                            '%url%'  => $this->generateUrl('mautic_asset_action', array(
+                                'objectAction' => 'edit',
+                                'objectId'     => $entity->getId()
+                            ))
+                        ), 'flashes')
+                    );
+
+                    $returnUrl = $this->generateUrl('mautic_asset_action', array(
+                        'objectAction' => 'view',
+                        'objectId'     => $entity->getId()
+                    ));
+                    $viewParams = array('objectId' => $entity->getId());
+                    $template = 'MauticAssetBundle:Asset:view';
+                }
+            } else {
+                //clear any modified content
+                $session->remove('mautic.asestbuilder.'.$objectId.'.content', array());
+                //unlock the entity
+                $model->unlockEntity($entity);
+
+                $returnUrl = $this->generateUrl('mautic_asset_index', array('page' => $page));
+                $viewParams = array('page' => $page);
+                $template  = 'MauticAssetBundle:Asset:index';
+            }
+
+            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+                return $this->postActionRedirect(
+                    array_merge($postActionVars, array(
+                        'returnUrl'       => $returnUrl,
+                        'viewParameters'  => $viewParams,
+                        'contentTemplate' => $template
+                    ))
+                );
+            }
+        } else {
+            //lock the entity
+            $model->lockEntity($entity);
+
+            //set the lookup values
+            $parent = $entity->getTranslationParent();
+            if ($parent && isset($form['translationParent_lookup']))
+                $form->get('translationParent_lookup')->setData($parent->getTitle());
+            $category = $entity->getCategory();
+            if ($category && isset($form['category_lookup']))
+                $form->get('category_lookup')->setData($category->getTitle());
+        }
+
+        $formView = $this->setFormTheme($form, 'MauticAssetBundle:Asset:form.html.php', 'MauticAssetBundle:FormVariant');
+
+        // $getBuilderComponents    = $model->getBuilderComponents();
+        return $this->delegateView(array(
+            'viewParameters'  =>  array(
+                'form'        => $formView,
+                // 'tokens'      => $builderComponents['assetTokens'],
+                'activePage'  => $entity
+            ),
+            'contentTemplate' => 'MauticAssetBundle:Asset:form.html.php',
+            'passthroughVars' => array(
+                'activeLink'    => '#mautic_asset_index',
+                'mauticContent' => 'asset',
+                'route'         => $this->generateUrl('mautic_asset_action', array(
+                    'objectAction' => 'edit',
+                    'objectId'     => $entity->getId()
+                ))
+            )
+        ));
+    }
+
+    /**
+     * Clone an entity
+     *
+     * @param $objectId
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     */
+    public function cloneAction ($objectId)
+    {
+        $model   = $this->factory->getModel('asset.asset');
+        $entity  = $model->getEntity($objectId);
+
+        if ($entity != null) {
+            if (!$this->factory->getSecurity()->isGranted('asset:assets:create') ||
+                !$this->factory->getSecurity()->hasEntityAccess(
+                    'asset:assets:viewown', 'asset:assets:viewother', $entity->getCreatedBy()
+                )
+            ) {
+                return $this->accessDenied();
+            }
+
+            $clone = clone $entity;
+            $clone->setHits(0);
+            $clone->setRevision(0);
+            $clone->setIsPublished(false);
+            $model->saveEntity($clone);
+            $objectId = $clone->getId();
+        }
+
+        return $this->editAction($objectId);
+    }
+
+    /**
+     * Deletes the entity
+     *
+     * @param         $objectId
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function deleteAction($objectId) {
+        $page        = $this->factory->getSession()->get('mautic.asset.page', 1);
+        $returnUrl   = $this->generateUrl('mautic_asset_index', array('page' => $page));
+        $flashes     = array();
+
+        $postActionVars = array(
+            'returnUrl'       => $returnUrl,
+            'viewParameters'  => array('page' => $page),
+            'contentTemplate' => 'MauticAssetBundle:Page:index',
+            'passthroughVars' => array(
+                'activeLink'    => 'mautic_asset_index',
+                'mauticContent' => 'asset'
+            )
+        );
+
+        if ($this->request->getMethod() == 'POST') {
+            $model  = $this->factory->getModel('asset.asset');
+            $entity = $model->getEntity($objectId);
+
+            if ($entity === null) {
+                $flashes[] = array(
+                    'type'    => 'error',
+                    'msg'     => 'mautic.asset.asset.error.notfound',
+                    'msgVars' => array('%id%' => $objectId)
+                );
+            } elseif (!$this->factory->getSecurity()->isGranted('asset:assets:delete')) {
+                return $this->accessDenied();
+            } elseif ($model->isLocked($entity)) {
+                return $this->isLocked($postActionVars, $entity, 'asset.asset');
+            }
+
+            $model->deleteEntity($entity);
+
+            $flashes[] = array(
+                'type' => 'notice',
+                'msg'  => 'mautic.asset.asset.notice.deleted',
+                'msgVars' => array(
+                    '%name%' => $entity->getTitle(),
+                    '%id%'   => $objectId
+                )
+            );
+        } //else don't do anything
+
+        return $this->postActionRedirect(
+            array_merge($postActionVars, array(
+                'flashes' => $flashes
+            ))
+        );
+    }
 }

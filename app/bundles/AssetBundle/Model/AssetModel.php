@@ -12,6 +12,8 @@ namespace Mautic\AssetBundle\Model;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\AssetBundle\Entity\Asset;
+use Mautic\AssetBundle\AssetEvents;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
@@ -35,6 +37,44 @@ class AssetModel extends FormModel
     public function getNameGetter()
     {
         return "getTitle";
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param      $entity
+     * @param      $formFactory
+     * @param null $action
+     * @param array $options
+     * @return mixed
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    public function createForm($entity, $formFactory, $action = null, $options = array())
+    {
+        if (!$entity instanceof Asset) {
+            throw new MethodNotAllowedHttpException(array('Asset'));
+        }
+        $params = (!empty($action)) ? array('action' => $action) : array();
+        return $formFactory->create('asset', $entity, $params);
+    }
+
+    /**
+     * Get a specific entity or generate a new one if id is empty
+     *
+     * @param $id
+     * @return null|object
+     */
+    public function getEntity($id = null)
+    {
+        if ($id === null) {
+            $entity = new Asset();
+            $entity->setSessionId('new_' . uniqid());
+        } else {
+            $entity = parent::getEntity($id);
+            $entity->setSessionId($entity->getId());
+        }
+
+        return $entity;
     }
 
 // TODO (@Jan): I have a feeling that following commented methods will be needed
