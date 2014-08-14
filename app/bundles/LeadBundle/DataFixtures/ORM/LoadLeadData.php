@@ -13,6 +13,7 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Helper\CsvHelper;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Mautic\LeadBundle\Entity\Lead;
@@ -48,16 +49,20 @@ class LoadLeadData extends AbstractFixture implements OrderedFixtureInterface, C
         $leadRepo = $factory->getModel('lead.lead')->getRepository();
         $today    = new \DateTime();
 
-        $leads = $this->csv_to_array(__DIR__ . '/fakeleaddata.csv');
+        $leads = CsvHelper::csv_to_array(__DIR__ . '/fakeleaddata.csv');
         foreach ($leads as $count => $l) {
+            $key = $count+1;
             $lead = new Lead();
             $lead->setDateAdded($today);
             $ipAddress = new IpAddress();
             $ipAddress->setIpAddress($l['ip'], $factory->getSystemParameters());
+            $this->setReference('ipAddress-'.$key, $ipAddress);
             unset($l['ip']);
             $lead->addIpAddress($ipAddress);
             $lead->setOwner($this->getReference('sales-user'));
-            $lead->setFields($l);
+            foreach ($l as $col => $val) {
+                $lead->addUpdatedField($col, $val);
+            }
             $leadRepo->saveEntity($lead);
 
             $this->setReference('lead-'.$count, $lead);
@@ -70,25 +75,5 @@ class LoadLeadData extends AbstractFixture implements OrderedFixtureInterface, C
     public function getOrder()
     {
         return 5;
-    }
-
-    private function csv_to_array($filename='', $delimiter=',')
-    {
-        if(!file_exists($filename) || !is_readable($filename))
-            return FALSE;
-        $header = NULL;
-        $data = array();
-        if (($handle = fopen($filename, 'r')) !== FALSE)
-        {
-            while (($row = fgetcsv($handle, 1000, $delimiter)) !== FALSE)
-            {
-                if(!$header)
-                    $header = $row;
-                else
-                    $data[] = array_combine($header, $row);
-            }
-            fclose($handle);
-        }
-        return $data;
     }
 }

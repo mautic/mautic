@@ -152,15 +152,33 @@ class LeadModel extends FormModel
         //generate the social cache
         list($socialCache, $socialFeatureSettings) = NetworkIntegrationHelper::getUserProfiles($this->factory, $lead, $data, true, null, false, true);
 
+        $isNew = ($lead->getId()) ? false : true;
+
         //set the social cache while we have it
         $lead->setSocialCache($socialCache);
 
         //save the field values
-        $fieldValues   = $lead->getFields();
+        if (!$isNew) {
+            $fieldValues = $lead->getFields();
+        } else {
+            static $fields;
+            if (empty($fields)) {
+                $fields = $this->factory->getModel('lead.field')->getEntities(array(
+                    'filter'         => array('isPublished' => true),
+                    'hydration_mode' => 'HYDRATE_ARRAY'
+                ));
+                $fields = $this->organizeFieldsByGroup($fields);
+            }
+            $fieldValues = $fields;
+        }
 
         //update existing values
         foreach ($fieldValues as $group => &$groupFields) {
             foreach ($groupFields as $alias => &$field) {
+                if (!isset($field['value'])) {
+                    $field['value'] = null;
+                }
+
                 $curValue = $field['value'];
                 $newValue = (isset($data[$alias])) ? $data[$alias] : "";
                 if ($curValue !== $newValue && (!empty($newValue) || (empty($newValue) && $overwriteWithBlank))) {
