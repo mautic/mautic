@@ -14,7 +14,7 @@ $view['slots']->set('searchUri', $view['router']->generate('mautic_asset_index',
 $view['slots']->set('searchString', $app->getSession()->get('mautic.asset.filter'));
 $view['slots']->set('searchHelp', $view['translator']->trans('mautic.asset.asset.help.searchcommands'));
 ?>
-<h1>This is asset page</h1>
+
 <?php if ($permissions['asset:assets:create']): ?>
     <?php $view['slots']->start("actions"); ?>
     <li>
