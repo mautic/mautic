@@ -49,7 +49,7 @@ class CategoryController extends FormController
         $orderBy    = $this->factory->getSession()->get('mautic.assetcategory.orderby', 'c.title');
         $orderByDir = $this->factory->getSession()->get('mautic.assetcategory.orderbydir', 'DESC');
 
-        $entities = $this->factory->getModel('page.category')->getEntities(
+        $entities = $this->factory->getModel('asset.category')->getEntities(
             array(
                 'start'      => $start,
                 'limit'      => $limit,
@@ -189,7 +189,7 @@ class CategoryController extends FormController
     public function editAction ($objectId, $ignorePost = false)
     {
         $session = $this->factory->getSession();
-        $model   = $this->factory->getModel('page.category');
+        $model   = $this->factory->getModel('asset.category');
         $entity  = $model->getEntity($objectId);
         //set the page we came from
         $page    = $session->get('mautic.assetcategory.page', 1);
