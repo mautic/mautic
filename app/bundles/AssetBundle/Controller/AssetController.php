@@ -133,6 +133,162 @@ class AssetController extends FormController
     }
 
     /**
+     * Loads a specific form into the detailed panel
+     *
+     * @param $objectId
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function viewAction($objectId)
+    {
+        $model      = $this->factory->getModel('asset.asset');
+        $security   = $this->factory->getSecurity();
+        $activeAsset = $model->getEntity($objectId);
+        //set the asset we came from
+        $page = $this->factory->getSession()->get('mautic.asset.page', 1);
+
+        if ($activeAsset === null) {
+            //set the return URL
+            $returnUrl = $this->generateUrl('mautic_asset_index', array('page' => $page));
+
+            return $this->postActionRedirect(array(
+                'returnUrl'       => $returnUrl,
+                'viewParameters'  => array('page' => $page),
+                'contentTemplate' => 'MauticAssetBundle:Asset:index',
+                'passthroughVars' => array(
+                    'activeLink'    => '#mautic_asset_index',
+                    'mauticContent' => 'asset'
+                ),
+                'flashes'         => array(
+                    array(
+                        'type'    => 'error',
+                        'msg'     => 'mautic.asset.asset.error.notfound',
+                        'msgVars' => array('%id%' => $objectId)
+                    )
+                )
+            ));
+        } elseif (!$this->factory->getSecurity()->hasEntityAccess(
+            'asset:assets:viewown', 'asset:assets:viewother', $activeAsset->getCreatedBy()
+        )
+        ) {
+            return $this->accessDenied();
+        }
+
+        //get A/B test information
+        list($parent, $children) = $model->getVariants($activeAsset);
+        $properties = array();
+        if (count($children)) {
+            foreach ($children as $c) {
+                $variantSettings = $c->getVariantSettings();
+
+                if (is_array($variantSettings) && isset($variantSettings['winnerCriteria'])) {
+                    if (!isset($lastCriteria)) {
+                        $lastCriteria = $variantSettings['winnerCriteria'];
+                    }
+
+                    //make sure all the variants are configured with the same criteria
+                    if ($lastCriteria != $variantSettings['winnerCriteria']) {
+                        $variantError = $this->factory->getTranslator()->trans('mautic.asset.asset.variant.misconfiguration');
+                        break;
+                    }
+
+                    $properties[$c->getId()][] = $variantSettings;
+                }
+            }
+        }
+        $abTestResults = array();
+        if (!empty($lastCriteria)) {
+            //there is a criteria to compare the assets against so let's shoot the asset over to the criteria function to do its thing
+            $criteria = $model->getBuilderComponents('abTestWinnerCriteria');
+            if (isset($criteria['criteria'][$lastCriteria])) {
+                $testSettings = $criteria['criteria'][$lastCriteria];
+
+                $args = array(
+                    'factory'    => $this->factory,
+                    'asset'       => $activeAsset,
+                    'parent'     => $parent,
+                    'children'   => $children,
+                    'properties' => $properties
+                );
+
+                //execute the callback
+                if (is_callable($testSettings['callback'])) {
+                    if (is_array($testSettings['callback'])) {
+                        $reflection = new \ReflectionMethod($testSettings['callback'][0], $testSettings['callback'][1]);
+                    } elseif (strpos($testSettings['callback'], '::') !== false) {
+                        $parts      = explode('::', $testSettings['callback']);
+                        $reflection = new \ReflectionMethod($parts[0], $parts[1]);
+                    } else {
+                        new \ReflectionMethod(null, $testSettings['callback']);
+                    }
+
+                    $pass = array();
+                    foreach ($reflection->getParameters() as $param) {
+                        if (isset($args[$param->getName()])) {
+                            $pass[] = $args[$param->getName()];
+                        } else {
+                            $pass[] = null;
+                        }
+                    }
+                    $abTestResults = $reflection->invokeArgs($this, $pass);
+                }
+            }
+        }
+
+        //get related translations
+        list($translationParent, $translationChildren) = $model->getTranslations($activeAsset);
+
+        return $this->delegateView(array(
+            'returnUrl'       => $this->generateUrl('mautic_asset_action', array(
+                    'objectAction' => 'view',
+                    'objectId'     => $activeAsset->getId())
+            ),
+            'viewParameters'  => array(
+                'activeAsset'    => $activeAsset,
+                'variants'      => array(
+                    'parent'   => $parent,
+                    'children' => $children
+                ),
+                'translations'  => array(
+                    'parent'   => $translationParent,
+                    'children' => $translationChildren
+                ),
+                'permissions'   => $security->isGranted(array(
+                    'asset:assets:viewown',
+                    'asset:assets:viewother',
+                    'asset:assets:create',
+                    'asset:assets:editown',
+                    'asset:assets:editother',
+                    'asset:assets:deleteown',
+                    'asset:assets:deleteother',
+                    'asset:assets:publishown',
+                    'asset:assets:publishother'
+                ), "RETURN_ARRAY"),
+                'stats'         => array(
+                    // 'bounces'   => $model->getBounces($activeAsset),
+                    'hits'      => array(
+                        'total'  => $activeAsset->getHits(),
+                        'unique' => $activeAsset->getUniqueHits()
+                    ),
+                    // 'dwellTime' => $model->getDwellTimeStats($activeAsset)
+                ),
+                'abTestResults' => $abTestResults,
+                'security'      => $security,
+                'assetUrl'       => $model->generateUrl($activeAsset, true)
+            ),
+            'contentTemplate' => 'MauticAssetBundle:Asset:details.html.php',
+            'passthroughVars' => array(
+                'activeLink'    => '#mautic_asset_index',
+                'mauticContent' => 'asset'
+            )
+        ));
+    }
+
+    public function createUploadForm(Mautic\AssetBundle\Model\AssetModel $model)
+    {
+        return $model->createForm($entity, $this->get('form.factory'), $action);
+    }
+
+    /**
      * Generates new form and processes post data
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
@@ -152,7 +308,7 @@ class AssetController extends FormController
         $action = $this->generateUrl('mautic_asset_action', array('objectAction' => 'new'));
 
         //create the form
-        $form = $model->createForm($entity, $this->get('form.factory'), $action);
+        $form = $this->createUploadForm($model);
 
         ///Check for a submitted form and process it
         if ($method == 'POST') {
@@ -288,17 +444,9 @@ class AssetController extends FormController
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    $contentName     = 'mautic.assetbuilder.'.$entity->getSessionId().'.content';
-                    $existingContent = $entity->getContent();
-                    $newContent      = $session->get($contentName, array());
-                    $content         = array_merge($existingContent, $newContent);
-                    $entity->setContent($content);
 
                     //form is valid so process the data
                     $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
-
-                    //clear the session
-                    $session->remove($contentName);
 
                     $this->request->getSession()->getFlashBag()->add(
                         'notice',
