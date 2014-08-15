@@ -35,9 +35,7 @@ class SubmissionRepository extends CommonRepository
         $results['submission_id'] = $entity->getId();
         $form                     = $entity->getForm();
         $results['form_id']       = $form->getId();
-        $alias                    = $form->getAlias();
-
-        $tableName                = MAUTIC_TABLE_PREFIX . 'form_results_' . $alias;
+        $tableName                = MAUTIC_TABLE_PREFIX . 'form_results_' . $form->getId() . '_' . $form->getAlias();
         if (!empty($results)) {
             $this->_em->getConnection()->insert($tableName, $results);
         }
@@ -51,7 +49,7 @@ class SubmissionRepository extends CommonRepository
     public function getEntities($args = array())
     {
         $form  = $args['form'];
-        $table = MAUTIC_TABLE_PREFIX . "form_results_" . $form->getAlias();
+        $table = MAUTIC_TABLE_PREFIX . 'form_results_' . $form->getId() . '_' . $form->getAlias();
 
         //DBAL
 
@@ -157,8 +155,8 @@ class SubmissionRepository extends CommonRepository
         $entity = parent::getEntity($id);
 
         if ($entity != null) {
-            $alias     = $entity->getForm()->getAlias();
-            $tableName = MAUTIC_TABLE_PREFIX . 'form_results_' . $alias;
+            $form      = $entity->getForm();
+            $tableName = MAUTIC_TABLE_PREFIX . 'form_results_' . $form->getId() . '_' . $form->getAlias();
 
             //use DBAL to get entity fields
             $q = $this->_em->getConnection()->createQueryBuilder();
