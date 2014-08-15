@@ -97,9 +97,12 @@ class PageBuilderEvent extends Event
      *  'formType' => (optional) name of the form type SERVICE for the criteria
      *  'callback' => (required) callback function that will be passed the parent page for winner determination
      *      The callback function can receive the following arguments by name (via ReflectionMethod::invokeArgs())
-     *          array $properties - values saved from the formType as defined here
+     *          array $properties - values saved from the formType as defined here; keyed by page id in the case of
+     *              multiple variants
      *          Mautic\CoreBundle\Factory\MauticFactory $factory
      *          Mautic\FormBundle\Entity\Page $page
+     *          Mautic\FormBundle\Entity\Page $parent
+     *          Doctrine\Common\Collections\ArrayCollection $children
      */
     public function addAbTestWinnerCriteria($key, array $criteria)
     {

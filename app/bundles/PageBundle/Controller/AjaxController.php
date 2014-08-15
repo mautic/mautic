@@ -58,6 +58,11 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
+    /**
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
     protected function setBuilderContentAction(Request $request)
     {
         $newContent = InputHelper::html($request->request->get('content'));

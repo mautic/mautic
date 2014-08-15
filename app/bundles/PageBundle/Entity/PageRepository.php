@@ -76,7 +76,25 @@ class PageRepository extends CommonRepository
                         $ids[] = $child->getId();
                     }
                 }
-                $q->andWhere($q->expr()->in('e.id', $ids));
+                $q->andWhere($q->expr()->notIn('e.id', $ids));
+            }
+            $parent   = $entity->getVariantParent();
+            $children = $entity->getVariantChildren();
+            if ($parent || count($children)) {
+                //allow same alias among language group
+                $ids = array();
+
+                if (!empty($parent)) {
+                    $children = $parent->getVariantChildren();
+                    $ids[] = $parent->getId();
+                }
+
+                foreach ($children as $child) {
+                    if ($child->getId() != $entity->getId()) {
+                        $ids[] = $child->getId();
+                    }
+                }
+                $q->andWhere($q->expr()->notIn('e.id', $ids));
             }
             if ($entity->getId()) {
                 $q->andWhere('e.id != :id');
@@ -113,7 +131,7 @@ class PageRepository extends CommonRepository
             //only get top level pages
             $q->andWhere($q->expr()->isNull('p.translationParent'));
         } elseif ($topLevel == 'variation') {
-            $q->andWhere($q->expr()->isNull('p.variationParent'));
+            $q->andWhere($q->expr()->isNull('p.variantParent'));
         }
 
         $q->orderBy('p.title');

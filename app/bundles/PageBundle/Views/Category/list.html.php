@@ -60,7 +60,6 @@ if ($tmpl == 'index')
                     <td>
                         <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php',array(
                             'item'       => $item,
-                            'dateFormat' => (!empty($dateFormat)) ? $dateFormat : 'F j, Y g:i a',
                             'model'      => 'page.category'
                         )); ?>
                         <?php echo $item->getTitle(); ?> (<?php echo $item->getAlias(); ?>)

@@ -8,55 +8,52 @@
  */
 ?>
 
-<?php
-$parent = $page->getTranslationParent();
-$children = ($parent) ? $parent->getTranslationChildren() : $page->getTranslationChildren();
-?>
-<?php if (count($children)): ?>
-    <span class="bundle-main-item-secondary margin-sm-top">
-        <span class="has-click-event"  onclick="Mautic.toggleRelatedPages('translations');">
-            <i class="fa fa-language"></i>
-            <span class="margin-sm-left">
-                <em><?php echo $view['translator']->trans('mautic.page.page.translations'); ?>
-                    <i class="fa fa-chevron-circle-down related-translations-toggle"></i>
-                </em>
-            </span>
-        </span>
-        <ul class="no-bullet related-translations" style="display: none;">
-            <?php if ($parent): ?>
-                <li>
-                    <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php',array(
-                        'item'       => $parent,
-                        'dateFormat' => (!empty($dateFormat)) ? $dateFormat : 'F j, Y g:i a',
-                        'model'      => 'page.page'
-                    )); ?>
-                    <a href="<?php echo $view['router']->generate('mautic_page_action', array(
-                        'objectAction' => 'view', 'objectId' => $parent->getId())); ?>"
-                       data-toggle="ajax">
-                        <span><?php echo $parent->getLanguage(); ?></span>
-                        <span> | </span>
-                        <span><?php echo $parent->getTitle() . " (" . $parent->getAlias() . ")"; ?></span>
-                        <span><strong> [<?php echo $view['translator']->trans('mautic.page.page.parent'); ?>]</strong></span>
-                    </a>
-                </li>
-            <?php endif; ?>
-            <?php foreach ($children as $c): ?>
-                <?php if ($c->getId() == $page->getId()) continue; ?>
-                <li>
-                    <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php',array(
-                        'item'       => $c,
-                        'dateFormat' => (!empty($dateFormat)) ? $dateFormat : 'F j, Y g:i a',
-                        'model'      => 'page.page'
-                    )); ?>
-                    <a href="<?php echo $view['router']->generate('mautic_page_action', array(
-                        'objectAction' => 'view', 'objectId' => $c->getId())); ?>"
-                       data-toggle="ajax">
-                        <span><?php echo $c->getLanguage(); ?></span>
-                        <span> | </span>
-                        <span><?php echo $c->getTitle() . " (" . $c->getAlias() . ")"; ?></span>
-                    </a>
-                </li>
-            <?php endforeach; ?>
-        </ul>
-    </span>
+<?php if (count($translations['children'])): ?>
+<h4><?php echo $view['translator']->trans('mautic.page.page.translations'); ?></h4>
+
+<table class="table table-bordered table-stripped">
+    <?php if ($translations['parent']): ?>
+    <tr>
+        <td>
+            <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php',array(
+                'item'       => $translations['parent'],
+                'model'      => 'page.page'
+            )); ?>
+            <a href="<?php echo $view['router']->generate('mautic_page_action', array(
+                'objectAction' => 'view', 'objectId' => $translations['parent']->getId())); ?>"
+               data-toggle="ajax">
+                <span><?php echo $translations['parent']->getLanguage(); ?></span>
+                <span> | </span>
+                <span><?php echo $translations['parent']->getTitle() . " (" . $translations['parent']->getAlias() . ")"; ?></span>
+                <?php if ($translations['parent']->getId() === $page->getId()): ?>
+                <span><strong> [<?php echo $view['translator']->trans('mautic.page.page.current'); ?>]</strong></span>
+                <?php endif; ?>
+                <span><strong> [<?php echo $view['translator']->trans('mautic.page.page.parent'); ?>]</strong></span>
+            </a>
+        </td>
+    </tr>
+    <?php endif; ?>
+    <?php if (count($translations['children'])): ?>
+    <?php foreach ($translations['children'] as $c): ?>
+    <tr>
+        <td>
+            <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php',array(
+                'item'       => $c,
+                'model'      => 'page.page'
+            )); ?>
+            <a href="<?php echo $view['router']->generate('mautic_page_action', array(
+                'objectAction' => 'view', 'objectId' => $c->getId())); ?>"
+               data-toggle="ajax">
+                <span><?php echo $c->getLanguage(); ?></span>
+                <span> | </span>
+                <span><?php echo $c->getTitle() . " (" . $c->getAlias() . ")"; ?></span>
+                <?php if ($c->getId() === $page->getId()): ?>
+                    <span><strong> [<?php echo $view['translator']->trans('mautic.page.page.current'); ?>]</strong></span>
+                <?php endif; ?>
+            </a>
+        </td>
+    </tr>
+    <?php endforeach; ?>
+    <?php endif; ?>
+</table>
 <?php endif; ?>

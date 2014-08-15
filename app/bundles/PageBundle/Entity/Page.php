@@ -110,6 +110,14 @@ class Page extends FormEntity
     private $uniqueHits = 0;
 
     /**
+     * @ORM\Column(name="variant_hits", type="integer")
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full"})
+     */
+    private $variantHits = 0;
+
+    /**
      * @ORM\Column(name="revision", type="integer")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
@@ -134,32 +142,32 @@ class Page extends FormEntity
     private $category;
 
     /**
-     * @ORM\OneToMany(targetEntity="Page", mappedBy="translationParent", indexBy="id", fetch="EXTRA_LAZY")
+     * @ORM\OneToMany(targetEntity="Page", mappedBy="translationParent", indexBy="id")
      **/
     private $translationChildren;
 
     /**
      * @ORM\ManyToOne(targetEntity="Page", inversedBy="translationChildren")
-     * @ORM\JoinColumn(name="translation_parent_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="translation_parent_id", referencedColumnName="id", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})
      **/
-    private $translationParent;
+    private $translationParent = null;
 
     /**
-     * @ORM\OneToMany(targetEntity="Page", mappedBy="variantParent", indexBy="id", fetch="EXTRA_LAZY")
+     * @ORM\OneToMany(targetEntity="Page", mappedBy="variantParent", indexBy="id")
      **/
     private $variantChildren;
 
     /**
      * @ORM\ManyToOne(targetEntity="Page", inversedBy="variantChildren")
-     * @ORM\JoinColumn(name="variant_parent_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="variant_parent_id", referencedColumnName="id", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})
      **/
-    private $variantParent;
+    private $variantParent = null;
 
     /**
      * @ORM\Column(name="variant_settings", type="array", nullable=true)
@@ -168,6 +176,14 @@ class Page extends FormEntity
      * @Serializer\Groups({"full"})
      */
     private $variantSettings = array();
+
+    /**
+     * @ORM\Column(name="variant_start_date", type="datetime", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full"})
+     */
+    private $variantStartDate;
 
     /**
      * Used to identify the page for the builder
@@ -510,10 +526,12 @@ class Page extends FormEntity
 
         if ($prop == 'translationParent' || $prop == 'variantParent') {
             $currentId = ($current) ? $current->getId() : '';
-            $newId     = $val->getId();
-            if ($currentId != $newId)
+            $newId     = ($val) ? $val->getId() : null;
+            if ($currentId != $newId) {
                 $currentTitle = ($current) ? $current->getTitle() . " ($currentId)" : '';
-                $this->changes[$prop] = array($currentTitle, $val->getTitle() . " ($newId)");
+                $newTitle     = ($val) ? $val->getTitle() . " ($newId)" : '';
+                $this->changes[$prop] = array($currentTitle, $newTitle);
+            }
         } else {
             parent::isChanged($prop, $val);
         }
@@ -574,6 +592,15 @@ class Page extends FormEntity
     }
 
     /**
+     * Remove variant parent
+     */
+    public function removeVariantParent()
+    {
+        $this->isChanged('variantParent', '');
+        $this->variantParent = null;
+    }
+
+    /**
      * Get translationParent
      *
      * @return \Mautic\PageBundle\Entity\Page
@@ -631,6 +658,15 @@ class Page extends FormEntity
     }
 
     /**
+     * Remove translation parent
+     */
+    public function removeTranslationParent()
+    {
+        $this->isChanged('translationParent', '');
+        $this->translationParent = null;
+    }
+
+    /**
      * Get variantParent
      *
      * @return \Mautic\PageBundle\Entity\Page
@@ -680,10 +716,43 @@ class Page extends FormEntity
     /**
      * Get uniqueHits
      *
-     * @return integer 
+     * @return integer
      */
     public function getUniqueHits()
     {
         return $this->uniqueHits;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getVariantHits ()
+    {
+        return $this->variantHits;
+    }
+
+    /**
+     * @param mixed $variantHits
+     */
+    public function setVariantHits ($variantHits)
+    {
+        $this->variantHits = $variantHits;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getVariantStartDate ()
+    {
+        return $this->variantStartDate;
+    }
+
+    /**
+     * @param mixed $variantStartDate
+     */
+    public function setVariantStartDate ($variantStartDate)
+    {
+        $this->isChanged('variantStartDate', $variantStartDate);
+        $this->variantStartDate = $variantStartDate;
     }
 }

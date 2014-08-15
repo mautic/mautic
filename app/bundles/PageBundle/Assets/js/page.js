@@ -191,13 +191,3 @@ Mautic.pageEditorOnLoad = function (container) {
         cursorAt: {top: 15, left: 15}
     });
 };
-
-Mautic.toggleRelatedPages = function (related) {
-    if (mQuery('ul.related-' + related).css('display') == 'block') {
-        mQuery('.related-' + related + '-toggle').removeClass('fa-chevron-circle-up').addClass('fa-chevron-circle-down')
-        mQuery('ul.related-' + related).slideUp();
-    } else {
-        mQuery('.related-' + related + '-toggle').removeClass('fa-chevron-circle-down').addClass('fa-chevron-circle-up')
-        mQuery('ul.related-' + related).slideDown();
-    }
-};

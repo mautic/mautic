@@ -14,7 +14,6 @@ $view['slots']->set("headerTitle", $activePage->getTitle());?>
 
 <?php
 $view['slots']->start('actions');
-$variantParent = $activePage->getVariantParent();
 if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions['page:pages:editother'],
     $activePage->getCreatedBy())): ?>
     <li>
@@ -43,7 +42,7 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
         </a>
     </li>
 <?php endif; ?>
-<?php if (empty($variantParent) && $permissions['page:pages:create']): ?>
+<?php if (empty($variants['parent']) && $permissions['page:pages:create']): ?>
     <li>
         <a href="<?php echo $view['router']->generate('mautic_page_action',
            array("objectAction" => "abtest", "objectId" => $activePage->getId())); ?>"
@@ -59,7 +58,6 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
     <div class="bundle-main-header">
         <span class="bundle-main-item-primary">
             <?php
-
             if ($category = $activePage->getCategory()):
                 $catSearch = $view['translator']->trans('mautic.core.searchcommand.category') . ":" . $category->getAlias();
                 $catName = $category->getTitle();
@@ -104,20 +102,8 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
         </span>
     </div>
 
-    <?php
-    echo $view->render('MauticPageBundle:Page:translations.html.php', array(
-        'page' => $activePage,
-        'dateFormat' => $dateFormat
-    ));
-
-    echo $view->render('MauticPageBundle:Page:variants.html.php', array(
-        'page' => $activePage,
-        'dateFormat' => $dateFormat
-    ));
-    ?>
-
     <div class="form-group margin-md-top">
-        <?php if (!empty($variationParent)): ?>
+        <?php if (!empty($variants['parent'])): ?>
         <label><?php echo $view['translator']->trans('mautic.page.page.urlvariant'); ?></label>
         <?php else: ?>
         <label><?php echo $view['translator']->trans('mautic.page.page.url'); ?></label>
@@ -134,6 +120,21 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
     </div>
 
     <h3>@todo - landing page stats/analytics/AB test results will go here</h3>
+    <?php echo "<pre>".print_r($stats, true)."</pre>"; ?>
 
+    <?php
+    echo $view->render('MauticPageBundle:Page:translations.html.php', array(
+        'page'         => $activePage,
+        'translations' => $translations
+    ));
+    ?>
+
+    <?php if (!empty($variants['parent']) || !empty($variants['children'])): ?>
+    <?php echo $view->render('MauticPageBundle:AbTest:details.html.php', array(
+        'page'          => $activePage,
+        'abTestResults' => $abTestResults,
+        'variants'      => $variants
+    )); ?>
+    <?php endif; ?>
     <div class="footer-margin"></div>
 </div>

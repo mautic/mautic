@@ -141,15 +141,15 @@ class PageController extends FormController
      */
     public function viewAction($objectId)
     {
-        $model       = $this->factory->getModel('page.page');
-        $security    = $this->factory->getSecurity();
-        $activePage  = $model->getEntity($objectId);
+        $model      = $this->factory->getModel('page.page');
+        $security   = $this->factory->getSecurity();
+        $activePage = $model->getEntity($objectId);
         //set the page we came from
-        $page        = $this->factory->getSession()->get('mautic.page.page', 1);
+        $page = $this->factory->getSession()->get('mautic.page.page', 1);
 
         if ($activePage === null) {
             //set the return URL
-            $returnUrl  = $this->generateUrl('mautic_page_index', array('page' => $page));
+            $returnUrl = $this->generateUrl('mautic_page_index', array('page' => $page));
 
             return $this->postActionRedirect(array(
                 'returnUrl'       => $returnUrl,
@@ -161,17 +161,82 @@ class PageController extends FormController
                 ),
                 'flashes'         => array(
                     array(
-                        'type' => 'error',
-                        'msg'  => 'mautic.page.page.error.notfound',
+                        'type'    => 'error',
+                        'msg'     => 'mautic.page.page.error.notfound',
                         'msgVars' => array('%id%' => $objectId)
                     )
                 )
             ));
         } elseif (!$this->factory->getSecurity()->hasEntityAccess(
             'page:pages:viewown', 'page:pages:viewother', $activePage->getCreatedBy()
-        )) {
+        )
+        ) {
             return $this->accessDenied();
         }
+
+        //get A/B test information
+        list($parent, $children) = $model->getVariants($activePage);
+        $properties = array();
+        if (count($children)) {
+            foreach ($children as $c) {
+                $variantSettings = $c->getVariantSettings();
+
+                if (is_array($variantSettings) && isset($variantSettings['winnerCriteria'])) {
+                    if (!isset($lastCriteria)) {
+                        $lastCriteria = $variantSettings['winnerCriteria'];
+                    }
+
+                    //make sure all the variants are configured with the same criteria
+                    if ($lastCriteria != $variantSettings['winnerCriteria']) {
+                        $variantError = $this->factory->getTranslator()->trans('mautic.page.page.variant.misconfiguration');
+                        break;
+                    }
+
+                    $properties[$c->getId()][] = $variantSettings;
+                }
+            }
+        }
+        $abTestResults = array();
+        if (!empty($lastCriteria)) {
+            //there is a criteria to compare the pages against so let's shoot the page over to the criteria function to do its thing
+            $criteria = $model->getBuilderComponents('abTestWinnerCriteria');
+            if (isset($criteria['criteria'][$lastCriteria])) {
+                $testSettings = $criteria['criteria'][$lastCriteria];
+
+                $args = array(
+                    'factory'    => $this->factory,
+                    'page'       => $activePage,
+                    'parent'     => $parent,
+                    'children'   => $children,
+                    'properties' => $properties
+                );
+
+                //execute the callback
+                if (is_callable($testSettings['callback'])) {
+                    if (is_array($testSettings['callback'])) {
+                        $reflection = new \ReflectionMethod($testSettings['callback'][0], $testSettings['callback'][1]);
+                    } elseif (strpos($testSettings['callback'], '::') !== false) {
+                        $parts      = explode('::', $testSettings['callback']);
+                        $reflection = new \ReflectionMethod($parts[0], $parts[1]);
+                    } else {
+                        new \ReflectionMethod(null, $testSettings['callback']);
+                    }
+
+                    $pass = array();
+                    foreach ($reflection->getParameters() as $param) {
+                        if (isset($args[$param->getName()])) {
+                            $pass[] = $args[$param->getName()];
+                        } else {
+                            $pass[] = null;
+                        }
+                    }
+                    $abTestResults = $reflection->invokeArgs($this, $pass);
+                }
+            }
+        }
+
+        //get related translations
+        list($translationParent, $translationChildren) = $model->getTranslations($activePage);
 
         return $this->delegateView(array(
             'returnUrl'       => $this->generateUrl('mautic_page_action', array(
@@ -179,8 +244,16 @@ class PageController extends FormController
                     'objectId'     => $activePage->getId())
             ),
             'viewParameters'  => array(
-                'activePage' => $activePage,
-                'permissions' => $security->isGranted(array(
+                'activePage'    => $activePage,
+                'variants'      => array(
+                    'parent'   => $parent,
+                    'children' => $children
+                ),
+                'translations'  => array(
+                    'parent'   => $translationParent,
+                    'children' => $translationChildren
+                ),
+                'permissions'   => $security->isGranted(array(
                     'page:pages:viewown',
                     'page:pages:viewother',
                     'page:pages:create',
@@ -191,12 +264,17 @@ class PageController extends FormController
                     'page:pages:publishown',
                     'page:pages:publishother'
                 ), "RETURN_ARRAY"),
-                'stats'       => array(
-                    'bounces' => $model->getBounces($activePage)
+                'stats'         => array(
+                    'bounces'   => $model->getBounces($activePage),
+                    'hits'      => array(
+                        'total'  => $activePage->getHits(),
+                        'unique' => $activePage->getUniqueHits()
+                    ),
+                    'dwellTime' => $model->getDwellTimeStats($activePage)
                 ),
-                'security' => $security,
-                'dateFormat' => $this->factory->getParameter('date_format_full'),
-                'pageUrl'   => $model->generateUrl($activePage, true)
+                'abTestResults' => $abTestResults,
+                'security'      => $security,
+                'pageUrl'       => $model->generateUrl($activePage, true)
             ),
             'contentTemplate' => 'MauticPageBundle:Page:details.html.php',
             'passthroughVars' => array(
@@ -508,7 +586,11 @@ class PageController extends FormController
                     'msg'     => 'mautic.page.page.error.notfound',
                     'msgVars' => array('%id%' => $objectId)
                 );
-            } elseif (!$this->factory->getSecurity()->isGranted('page:pages:delete')) {
+            } elseif (!$this->factory->getSecurity()->hasEntityAccess(
+                'page:pages:deleteown',
+                'page:pages:deleteother',
+                $entity->getCreatedBy()
+            )) {
                 return $this->accessDenied();
             } elseif ($model->isLocked($entity)) {
                 return $this->isLocked($postActionVars, $entity, 'page.page');
@@ -606,5 +688,74 @@ class PageController extends FormController
         }
 
         return $this->editAction($objectId);
+    }
+
+    /**
+     * Make the variant the main
+     *
+     * @param $objectId
+     */
+    public function winnerAction($objectId)
+    {
+        //todo - add confirmation to button click
+        $page        = $this->factory->getSession()->get('mautic.page.page', 1);
+        $returnUrl   = $this->generateUrl('mautic_page_index', array('page' => $page));
+        $flashes     = array();
+
+        $postActionVars = array(
+            'returnUrl'       => $returnUrl,
+            'viewParameters'  => array('page' => $page),
+            'contentTemplate' => 'MauticPageBundle:Page:index',
+            'passthroughVars' => array(
+                'activeLink'    => 'mautic_page_index',
+                'mauticContent' => 'page'
+            )
+        );
+
+        if ($this->request->getMethod() == 'POST') {
+            $model  = $this->factory->getModel('page.page');
+            $entity = $model->getEntity($objectId);
+
+            if ($entity === null) {
+                $flashes[] = array(
+                    'type'    => 'error',
+                    'msg'     => 'mautic.page.page.error.notfound',
+                    'msgVars' => array('%id%' => $objectId)
+                );
+            } elseif (!$this->factory->getSecurity()->hasEntityAccess(
+                'page:pages:editown',
+                'page:pages:editother',
+                $entity->getCreatedBy()
+            )) {
+                return $this->accessDenied();
+            } elseif ($model->isLocked($entity)) {
+                return $this->isLocked($postActionVars, $entity, 'page.page');
+            }
+
+            $model->convertVariant($entity);
+
+            $flashes[] = array(
+                'type' => 'notice',
+                'msg'  => 'mautic.page.page.notice.activated',
+                'msgVars' => array(
+                    '%name%' => $entity->getTitle(),
+                    '%id%'   => $objectId
+                )
+            );
+
+            $postActionVars['viewParameters'] = array(
+                'objectAction' => 'view',
+                'objectId' => $objectId
+            );
+            $postActionVars['returnUrl']       = $this->generateUrl('mautic_page_action', $postActionVars['viewParameters']);
+            $postActionVars['contentTemplate'] = 'MauticPageBundle:Page:view';
+
+        } //else don't do anything
+
+        return $this->postActionRedirect(
+            array_merge($postActionVars, array(
+                'flashes' => $flashes
+            ))
+        );
     }
 }
