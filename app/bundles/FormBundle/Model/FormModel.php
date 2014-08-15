@@ -274,30 +274,42 @@ class FormModel extends CommonFormModel
 
         //now build the form table
         if ($entity->getId()) {
-            //create the field as its own column in the leads table
-            $schemaHelper = $this->factory->getSchemaHelper('table');
-            $name         = "form_results_" . $entity->getId() . "_$alias";
-            $columns      = $this->generateFieldColumns($entity);
-            if ($isNew || (!$isNew && !$schemaHelper->checkTableExists($name))) {
-                $schemaHelper->addTable(array(
-                    'name'    => $name,
-                    'columns' => $columns,
-                    'options' => array(
-                        'primaryKey'  => array('submission_id'),
-                        'uniqueIndex' => array('submission_id', 'form_id')
-                    )
-                ));
-                $schemaHelper->executeChanges();
-            } else {
-                //check to make sure columns exist
-                $schemaHelper = $this->factory->getSchemaHelper('column', $name);
-                foreach ($columns as $c) {
-                    if (!$schemaHelper->checkColumnExists($c['name'])) {
-                        $schemaHelper->addColumn($c, false);
-                    }
+            $this->createTableSchema($entity, $isNew);
+        }
+    }
+
+    /**
+     * Creates the table structure for form results
+     *
+     * @param Form $entity
+     * @param bool $isNew
+     * @param bool $dropExisting
+     */
+    public function createTableSchema(Form $entity, $isNew = false, $dropExisting = false)
+    {
+        //create the field as its own column in the leads table
+        $schemaHelper = $this->factory->getSchemaHelper('table');
+        $name         = "form_results_" . $entity->getId() . "_" . $entity->getAlias();
+        $columns      = $this->generateFieldColumns($entity);
+        if ($isNew || (!$isNew && !$schemaHelper->checkTableExists($name))) {
+            $schemaHelper->addTable(array(
+                'name'    => $name,
+                'columns' => $columns,
+                'options' => array(
+                    'primaryKey'  => array('submission_id'),
+                    'uniqueIndex' => array('submission_id', 'form_id')
+                )
+            ), true, $dropExisting);
+            $schemaHelper->executeChanges();
+        } else {
+            //check to make sure columns exist
+            $schemaHelper = $this->factory->getSchemaHelper('column', $name);
+            foreach ($columns as $c) {
+                if (!$schemaHelper->checkColumnExists($c['name'])) {
+                    $schemaHelper->addColumn($c, false);
                 }
-                $schemaHelper->executeChanges();
             }
+            $schemaHelper->executeChanges();
         }
     }
 
