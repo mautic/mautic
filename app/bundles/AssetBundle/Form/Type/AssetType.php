@@ -65,6 +65,12 @@ class AssetType extends AbstractType
             ));
         }
 
+        $builder->add('file', 'file', array(
+            'label'      => 'mautic.asset.asset.form.file.upload',
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array('class' => 'form-control')
+        ));
+
         $builder->add('title', 'text', array(
             'label'      => 'mautic.asset.asset.form.title',
             'label_attr' => array('class' => 'control-label'),
@@ -103,20 +109,6 @@ class AssetType extends AbstractType
                 'read_only'      => ($isVariant) ? true : false
             ));
         }
-
-        //build a list
-        $builder->add('template', 'choice', array(
-            'choices'       => $this->themes,
-            'expanded'      => false,
-            'multiple'      => false,
-            'label'         => 'mautic.asset.asset.form.template',
-            'empty_value'   => false,
-            'required'      => false,
-            'attr'       => array(
-                'class'   => 'form-control',
-                'tooltip' => 'mautic.asset.asset.form.template.help'
-            )
-        ));
 
         if (!$isVariant) {
             $builder->add('language', 'locale', array(
@@ -185,24 +177,11 @@ class AssetType extends AbstractType
             ));
         }
 
-        $builder->add('metaDescription', 'textarea', array(
-            'label'      => 'mautic.asset.asset.form.metadescription',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control', 'maxlength' => 160),
-            'required'   => false
-        ));
-
         $builder->add('sessionId', 'hidden');
 
         if ($isVariant) {
 
             $builder->add("details-panel-end", 'panel_end');
-
-            $builder->add("abtest-panel-start", 'panel_start', array(
-                'label' => 'mautic.asset.asset.panel.abtest',
-                'dataParent' => '#asset-panel',
-                'bodyId'     => 'abtest-panel'
-            ));
 
             $builder->add('publishUp', 'datetime', array(
                 'widget'     => 'single_text',
@@ -233,24 +212,10 @@ class AssetType extends AbstractType
                 'asset_entity' => $options['data']
             ));
 
-            $builder->add("abtest-panel-end", 'panel_end');
-
             $builder->add("assetvariant-panel-wrapper-end", 'panel_wrapper_end');
         }
 
-        $builder->add('buttons', 'form_buttons', array(
-            'pre_extra_buttons' => array(
-                array(
-                    'name'  => 'builder',
-                    'label' => 'mautic.asset.asset.launch.builder',
-                    'attr'  => array(
-                        'class'   => 'btn btn-warning',
-                        'icon'    => 'fa fa-file-text-o padding-sm-right',
-                        'onclick' => "Mautic.launchAssetEditor();"
-                    )
-                )
-            )
-        ));
+        $builder->add('buttons', 'form_buttons', array());
 
         if (!empty($options["action"])) {
             $builder->setAction($options["action"]);

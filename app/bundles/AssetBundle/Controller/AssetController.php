@@ -88,7 +88,7 @@ class AssetController extends FormController
             } else {
                 $lastAsset = (floor($limit / $count)) ? : 1;
             }
-            $this->factory->getSession()->set('mautic.asset.asset', $lastasset);
+            $this->factory->getSession()->set('mautic.asset.asset', $lastAsset);
             $returnUrl   = $this->generateUrl('mautic_asset_index', array('asset' => $lastAsset));
 
             return $this->postActionRedirect(array(
@@ -115,7 +115,7 @@ class AssetController extends FormController
                 'searchValue' => $search,
                 'items'       => $assets,
                 'categories'  => $categories,
-                'asset'        => $asset,
+                'asset'       => $asset,
                 'limit'       => $limit,
                 'permissions' => $permissions,
                 'model'       => $model,
@@ -159,16 +159,16 @@ class AssetController extends FormController
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    $session     = $this->factory->getSession();
-                    $contentName = 'mautic.pagebuilder.'.$entity->getSessionId().'.content';
-                    $content = $session->get($contentName, array());
-                    $entity->setContent($content);
+                    // $session     = $this->factory->getSession();
+                    // $contentName = 'mautic.pagebuilder.'.$entity->getSessionId().'.content';
+                    // $content = $session->get($contentName, array());
+                    // $entity->setContent($content);
 
                     //form is valid so process the data
                     $model->saveEntity($entity);
 
                     //clear the session
-                    $session->remove($contentName);
+                    // $session->remove($contentName);
 
                     $this->request->getSession()->getFlashBag()->add(
                         'notice',
@@ -358,7 +358,7 @@ class AssetController extends FormController
             'viewParameters'  =>  array(
                 'form'        => $formView,
                 // 'tokens'      => $builderComponents['assetTokens'],
-                'activePage'  => $entity
+                'activeAsset'  => $entity
             ),
             'contentTemplate' => 'MauticAssetBundle:Asset:form.html.php',
             'passthroughVars' => array(
