@@ -48,14 +48,14 @@ class PublicController extends CommonFormController
 
                //check to ensure the form is published
                 $status = $form->getPublishStatus();
-                $dateFormat = $this->factory->getParameter('date_format_full');
+                $dateTemplateHelper = $this->get('mautic.core.template.helper.date');
                 if ($status == 'pending') {
                     $error = $translator->trans('mautic.form.submit.error.pending', array(
-                        '%date%' => $form->getPublishUp()->format($dateFormat)
+                        '%date%' => $dateTemplateHelper->toFull($form->getPublishUp())
                     ), 'flashes');
                 } elseif ($status == 'expired') {
                     $error = $translator->trans('mautic.form.submit.error.expired', array(
-                        '%date%' => $form->getPublishDown()->format($dateFormat)
+                        '%date%' => $dateTemplateHelper->toFull($form->getPublishDown())
                     ), 'flashes');
                 } elseif ($status != 'published') {
                     $error = $translator->trans('mautic.form.submit.error.unavailable', array(), 'flashes');

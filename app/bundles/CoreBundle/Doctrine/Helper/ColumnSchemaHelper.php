@@ -183,7 +183,9 @@ class ColumnSchemaHelper
         $comparator = new Comparator();
         $diff       = $comparator->diffTable($this->fromTable, $this->toTable);
 
-        $this->sm->alterTable($diff);
+        if ($diff) {
+            $this->sm->alterTable($diff);
+        }
     }
 
     /**

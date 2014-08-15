@@ -12,7 +12,7 @@ namespace Mautic\PageBundle\Model;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel;
-use Mautic\PageBundle\Entity\Analytics;
+use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageEvent;
@@ -52,30 +52,36 @@ class PageModel extends FormModel
      */
     public function saveEntity($entity, $unlock = true)
     {
-        $alias = $entity->getAlias();
-        if (empty($alias)) {
-            $alias = strtolower(InputHelper::alphanum($entity->getTitle(), true));
-        } else {
-            $alias = strtolower(InputHelper::alphanum($alias, true));
-            //remove appended numbers
-            $alias = preg_replace('#[0-9]+$#', '', $alias);
-        }
+        //note for later
+        $parent = $entity->getVariantParent();
+        $parentId = ($parent) ? $parent->getId() : 0;
 
-        //make sure alias is not already taken
-        $repo      = $this->getRepository();
-        $testAlias = $alias;
-        $count     = $repo->checkUniqueAlias($testAlias, $entity);
-        $aliasTag  = $count;
+        if (empty($this->inConversion)) {
+            $alias = $entity->getAlias();
+            if (empty($alias)) {
+                $alias = strtolower(InputHelper::alphanum($entity->getTitle(), true));
+            } else {
+                $alias = strtolower(InputHelper::alphanum($alias, true));
+            }
 
-        while ($count) {
-            $testAlias = $alias . $aliasTag;
+            //make sure alias is not already taken
+            $repo      = $this->getRepository();
+            $testAlias = $alias;
             $count     = $repo->checkUniqueAlias($testAlias, $entity);
-            $aliasTag++;
+            $aliasTag  = $count;
+
+            while ($count) {
+                $testAlias = $alias . $aliasTag;
+                $count     = $repo->checkUniqueAlias($testAlias, $entity);
+                $aliasTag++;
+            }
+            if ($testAlias != $alias) {
+                $alias = $testAlias;
+            }
+            $entity->setAlias($alias);
         }
-        if ($testAlias != $alias) {
-            $alias = $testAlias;
-        }
-        $entity->setAlias($alias);
+
+        $now = new \DateTime();
 
         //set the author for new pages
         if ($entity->isNew()) {
@@ -86,9 +92,60 @@ class PageModel extends FormModel
             $revision = $entity->getRevision();
             $revision++;
             $entity->setRevision($revision);
+
+            //reset the variant hit and start date if there are any changes
+            $changes = $entity->getChanges();
+            if (!empty($changes) && empty($this->inConversion)) {
+                $entity->setVariantHits(0);
+                $entity->setVariantStartDate($now);
+            }
         }
 
         parent::saveEntity($entity, $unlock);
+
+        //also reset variants if applicable due to changes
+        if (!empty($changes) && empty($this->inConversion)) {
+            $parent   = $entity->getVariantParent();
+            $children = (!empty($parent)) ? $parent->getVariantChildren() : $entity->getVariantChildren();
+
+            $variants = array();
+            if (!empty($parent)) {
+                $parent->setVariantHits(0);
+                $parent->setVariantStartDate($now);
+                $variants[] = $parent;
+            }
+
+            if (count($children)) {
+                foreach ($children as $child) {
+                    $child->setVariantHits(0);
+                    $child->setVariantStartDate($now);
+                    $variants[] = $child;
+                }
+            }
+
+            //if the parent was changed, then that parent/children must also be reset
+            if (isset($changes['variantParent']) && $parentId) {
+                $parent = $this->getEntity($parentId);
+                if (!empty($parent)) {
+                    $parent->setVariantHits(0);
+                    $parent->setVariantStartDate($now);
+                    $variants[] = $parent;
+
+                    $children = $parent->getVariantChildren();
+                    if (count($children)) {
+                        foreach ($children as $child) {
+                            $child->setVariantHits(0);
+                            $child->setVariantStartDate($now);
+                            $variants[] = $child;
+                        }
+                    }
+                }
+            }
+
+            if (!empty($variants)) {
+                $this->saveEntities($variants, false);
+            }
+        }
     }
 
     /**
@@ -240,19 +297,32 @@ class PageModel extends FormModel
         return $pageUrl;
     }
 
+    /**
+     * @param        $page
+     * @param        $request
+     * @param string $code
+     */
     public function hitPage($page, $request, $code = '200')
     {
-        $hit = new Analytics();
+        $hit = new Hit();
         $hit->setDateHit(new \Datetime());
 
         //check for the tracking cookie
-        $trackingId = $request->cookies->get('mautic_analytics_id');
+        $trackingId = $request->cookies->get('mautic_session_id');
         if (empty($trackingId)) {
             $trackingId = uniqid();
+        } else {
+            $lastHit = $request->cookies->get('mautic_referer_id');
+            if (!empty($lastHit)) {
+                //this is not a new session so update the last hit if applicable with the date/time the user left
+                $repo = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit');
+                $repo->updateHitDateLeft($lastHit);
+            }
         }
+
         //create a tracking cookie
         $expire = time() + 1800;
-        setcookie('mautic_analytics_id', $trackingId, $expire);
+        setcookie('mautic_session_id', $trackingId, $expire);
         $hit->setTrackingId($trackingId);
 
         if (!empty($page)) {
@@ -264,11 +334,15 @@ class PageModel extends FormModel
 
             //check for a hit from tracking id
             $countById = $this->em
-                ->getRepository('MauticPageBundle:Analytics')->getHitCountForTrackingId($page->getId(), $trackingId);
+                ->getRepository('MauticPageBundle:Hit')->getHitCountForTrackingId($page->getId(), $trackingId);
             if (empty($countById)) {
                 $uniqueHitCount = $page->getUniqueHits();
                 $uniqueHitCount++;
                 $page->setUniqueHits($uniqueHitCount);
+
+                $variantHitCount = $page->getVariantHits();
+                $variantHitCount++;
+                $page->setVariantHits($variantHitCount);
             }
 
             $this->em->persist($page);
@@ -333,14 +407,19 @@ class PageModel extends FormModel
 
         $this->em->persist($hit);
         $this->em->flush();
+
+        //save hit to the cookie to use to update the exit time
+        setcookie('mautic_referer_id', $hit->getId(), $expire);
     }
 
     /**
      * Get array of page builder tokens from bundles subscribed PageEvents::PAGE_ON_BUILD
      *
+     * @param $component null | pageTokens | abTestWinnerCriteria
+     *
      * @return mixed
      */
-    public function getBuilderComponents()
+    public function getBuilderComponents($component = null)
     {
         static $components;
 
@@ -349,14 +428,139 @@ class PageModel extends FormModel
             $event      = new PageBuilderEvent($this->translator);
             $this->dispatcher->dispatch(PageEvents::PAGE_ON_BUILD, $event);
             $components['pageTokens']           = $event->getTokenSections();
-            $components['abTestWinnerCriteria'] = $event->getAbTestWinnerCriteria();;
+            $components['abTestWinnerCriteria'] = $event->getAbTestWinnerCriteria();
         }
 
-        return $components;
+        return ($component !== null && isset($components[$component])) ? $components[$component] : $components;
     }
 
+    /**
+     * Get number of page bounces
+     *
+     * @param Page $page
+     *
+     * @return int
+     */
     public function getBounces(Page $page)
     {
-        return $this->em->getRepository('MauticPageBundle:Analytics')->getBounces($page->getId());
+        return $this->em->getRepository('MauticPageBundle:Hit')->getBounces($page->getId());
+    }
+
+
+    /**
+     * Get number of page bounces
+     *
+     * @param Page $page
+     *
+     * @return int
+     */
+    public function getDwellTimeStats(Page $page)
+    {
+        return $this->em->getRepository('MauticPageBundle:Hit')->getDwellTimes($page->getId());
+    }
+
+    /**
+     * Get the variant parent/children
+     *
+     * @param Page $page
+     *
+     * @return array
+     */
+    public function getVariants(Page $page)
+    {
+        $parent = $page->getVariantParent();
+
+        if (!empty($parent)) {
+            $children = $parent->getVariantChildren();
+        } else {
+            $parent   = $page;
+            $children = $page->getVariantChildren();
+        }
+
+        if (empty($children)) {
+            $children = false;
+        }
+
+        return array($parent, $children);
+    }
+
+    /**
+     * Get translation parent/children
+     *
+     * @param Page $page
+     *
+     * @return array
+     */
+    public function getTranslations(Page $page)
+    {
+        $parent = $page->getTranslationParent();
+
+        if (!empty($parent)) {
+            $children = $parent->getTranslationChildren();
+        } else {
+            $parent   = $page;
+            $children = $page->getTranslationChildren();
+        }
+
+        if (empty($children)) {
+            $children = false;
+        }
+
+        return array($parent, $children);
+    }
+
+    /**
+     * Converts a variant to the main page and the main page a variant
+     *
+     * @param Page $page
+     */
+    public function convertVariant(Page $page)
+    {
+        //let saveEntities() know it does not need to set variant start dates
+        $this->inConversion = true;
+
+        list($parent, $children) = $this->getVariants($page);
+
+        $save = array();
+
+        //set this page as the parent for the original parent and children
+        if ($parent) {
+            if ($parent->getId() != $page->getId()) {
+                $parent->setIsPublished(false);
+                $page->addVariantChild($parent);
+                $parent->setVariantParent($page);
+            }
+
+            $parent->setVariantStartDate(null);
+            $parent->setVariantHits(0);
+
+            foreach ($children as $child) {
+                //capture child before it's removed from collection
+                $save[] = $child;
+
+                $parent->removeVariantChild($child);
+            }
+        }
+
+        if (count($save)) {
+            foreach ($save as $child) {
+                if ($child->getId() != $page->getId()) {
+                    $child->setIsPublished(false);
+                    $page->addVariantChild($child);
+                    $child->setVariantParent($page);
+                } else {
+                    $child->removeVariantParent();
+                }
+
+                $child->setVariantHits(0);
+                $child->setVariantStartDate(null);
+            }
+        }
+
+        $save[] = $parent;
+        $save[] = $page;
+
+        //save the entities
+        $this->saveEntities($save, false);
     }
 }

@@ -117,15 +117,20 @@ class TableSchemaHelper
      *          'primaryKey' => array(),
      *          'uniqueIndex' => array()
      *      )
+     * @param $checkExists
+     * @param $dropExisting
      */
-    public function addTable(array $table, $checkExists = true)
+    public function addTable(array $table, $checkExists = true, $dropExisting = false)
     {
         if (empty($table['name'])) {
             throw new \InvalidArgumentException('Table is missing required name key.');
         }
 
-        if ($checkExists) {
-            $this->checkTableExists($table['name'], true);
+        if ($checkExists || $dropExisting) {
+            $throwException = ($dropExisting) ? false : true;
+            if ($this->checkTableExists($table['name'], $throwException) && $dropExisting) {
+                $this->deleteTable($table['name']);
+            }
         }
 
         $options = (isset($table['options'])) ? $table['options'] : array();
@@ -177,16 +182,16 @@ class TableSchemaHelper
     {
         $platform = $this->db->getDatabasePlatform();
 
+        if (!empty($this->dropTables)) {
+            foreach ($this->dropTables as $t) {
+                $this->sm->dropTable($this->prefix . $t);
+            }
+        }
+
         $sql = $this->schema->toSql($platform);
         if (!empty($sql)) {
             foreach ($sql as $s) {
                 $this->db->executeUpdate($s);
-            }
-        }
-
-        if (!empty($this->dropTables)) {
-            foreach ($this->dropTables as $t) {
-                $this->sm->dropTable($this->prefix . $t);
             }
         }
     }

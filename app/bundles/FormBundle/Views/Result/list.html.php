@@ -56,7 +56,7 @@ $formId = $form->getId();
         <?php foreach ($items as $item):?>
             <tr>
                 <td><?php echo $item['id']; ?></td>
-                <td><?php echo $item['dateSubmitted']->format($dateFormat); ?></td>
+                <td><?php echo $view['date']->toFull($item['dateSubmitted']); ?></td>
                 <td><?php echo $item['ipAddress']['ipAddress']; ?></td>
                 <?php foreach($item['results'] as $r):?>
                     <td><?php echo $r['value']; ?></td>

@@ -7,8 +7,9 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 $view->extend(":$template:base.html.php");
-
-$view['slots']->set('pageTitle', $page->getTitle());
+$parentVariant = $page->getVariantParent();
+$title         = (!empty($parentVariant)) ? $parentVariant->getTitle() : $page->getTitle();
+$view['slots']->set('pageTitle', $title);
 ?>
 <div class="container-fluid">
     <div class="row">

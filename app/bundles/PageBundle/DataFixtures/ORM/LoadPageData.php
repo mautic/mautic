@@ -1,0 +1,81 @@
+<?php
+/**
+ * @package     Mautic
+ * @copyright   2014 Mautic, NP. All rights reserved.
+ * @author      Mautic
+ * @link        http://mautic.com
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
+namespace Mautic\PageBundle\DataFixtures\ORM;
+
+use Doctrine\Common\DataFixtures\AbstractFixture;
+use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
+use Doctrine\Common\Persistence\ObjectManager;
+use Mautic\CoreBundle\Helper\CsvHelper;
+use Mautic\PageBundle\Entity\Page;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
+/**
+ * Class LoadPageData
+ *
+ * @package Mautic\PageBundle\DataFixtures\ORM
+ */
+class LoadPageData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
+{
+
+    /**
+     * @var ContainerInterface
+     */
+    private $container;
+
+    /**
+     * {@inheritdoc}
+     */
+
+    public function setContainer(ContainerInterface $container = null)
+    {
+        $this->container = $container;
+    }
+
+    /**
+     * @param ObjectManager $manager
+     */
+    public function load(ObjectManager $manager)
+    {
+        $factory = $this->container->get('mautic.factory');
+        $repo    = $factory->getModel('page.page')->getRepository();
+        $pages = CsvHelper::csv_to_array(__DIR__ . '/fakepagedata.csv');
+        foreach ($pages as $count => $rows) {
+            $page = new Page();
+            $key = $count+1;
+            foreach ($rows as $col => $val) {
+                if ($val != "NULL") {
+                    $setter = "set" . ucfirst($col);
+                    if (in_array($col, array('translationParent', 'variantParent'))) {
+                        $page->$setter($this->getReference('page-' . $val));
+                    } elseif (in_array($col, array('dateAdded', 'variantStartDate'))) {
+                        $page->$setter(new \DateTime($val));
+                    } elseif (in_array($col, array('content','variantSettings'))) {
+                        $val = unserialize(stripslashes($val));
+                        $page->$setter($val);
+                    } else {
+                        $page->$setter($val);
+                    }
+                }
+            }
+            $repo->saveEntity($page);
+
+            $this->setReference('page-'.$key, $page);
+        }
+    }
+
+    /**
+     * @return int
+     */
+    public function getOrder()
+    {
+        return 7;
+    }
+}

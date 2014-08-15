@@ -180,7 +180,7 @@ class CorePermissions {
                 );
             }
 
-            $activePermissions = $userEntity->getActivePermissions();
+            $activePermissions =  ($userEntity instanceof User) ? $userEntity->getActivePermissions() : array();
 
             //ensure consistency by forcing lowercase
             array_walk($parts, function (&$v) {
@@ -197,7 +197,10 @@ class CorePermissions {
                 );
             }
 
-            if ($userEntity->isAdmin()) {
+            if ($userEntity == "anon.") {
+                //anon user or session timeout
+                $permissions[$permission] = false;
+            } elseif ($userEntity->isAdmin()) {
                 //admin user has access to everything
                 $permissions[$permission] = true;
             } elseif (!isset($activePermissions[$parts[0]])) {

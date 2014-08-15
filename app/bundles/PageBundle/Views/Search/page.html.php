@@ -20,13 +20,13 @@ switch ($status) {
     case 'expired':
         $icon = " fa-clock-o text-danger";
         $text = $view['translator']->trans('mautic.core.form.expired', array(
-            '%date%' => $item->getPublishDown()->format($dateFormat)
+            '%date%' => $view['date']->toFull($item->getPublishDown())
         ));
         break;
     case 'pending':
         $icon = " fa-clock-o text-warning";
         $text = $view['translator']->trans('mautic.core.form.pending', array(
-            '%date%' => $item->getPublishUp()->format($dateFormat)
+            '%date%' => $view['date']->toFull($item->getPublishUp())
         ));
         break;
 }

@@ -51,7 +51,6 @@ $view['slots']->set("headerTitle", $view['translator']->trans('mautic.lead.field
                 <td>
                     <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php',array(
                         'item'       => $item,
-                        'dateFormat' => (!empty($dateFormat)) ? $dateFormat : 'F j, Y g:i a',
                         'model'      => 'lead.field'
                     )); ?>
                     <?php echo $item->getLabel(); ?>

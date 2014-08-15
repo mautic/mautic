@@ -40,7 +40,7 @@ class Field
     private $label;
 
     /**
-     * @ORM\Column(type="boolean", nullable=true)
+     * @ORM\Column(name="show_label", type="boolean", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})

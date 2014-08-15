@@ -13,12 +13,12 @@ use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 
 /**
- * Class Analytics
- * @ORM\Table(name="page_analytics")
- * @ORM\Entity(repositoryClass="Mautic\PageBundle\Entity\AnalyticsRepository")
+ * Class Hit
+ * @ORM\Table(name="page_hits")
+ * @ORM\Entity(repositoryClass="Mautic\PageBundle\Entity\HitRepository")
  * @Serializer\ExclusionPolicy("all")
  */
-class Analytics
+class Hit
 {
 
     /**
@@ -38,6 +38,14 @@ class Analytics
      * @Serializer\Groups({"full"})
      */
     private $dateHit;
+
+    /**
+     * @ORM\Column(name="date_left", type="datetime", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full"})
+     */
+    private $dateLeft;
 
     /**
      * @ORM\ManyToOne(targetEntity="Page")
@@ -153,9 +161,8 @@ class Analytics
      */
     private $browserLanguages = array();
 
-
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", name="tracking_id")
      **/
     private $trackingId;
 
@@ -173,7 +180,7 @@ class Analytics
      * Set dateHit
      *
      * @param \DateTime $dateHit
-     * @return Analytics
+     * @return Hit
      */
     public function setDateHit($dateHit)
     {
@@ -193,10 +200,26 @@ class Analytics
     }
 
     /**
+     * @return mixed
+     */
+    public function getDateLeft ()
+    {
+        return $this->dateLeft;
+    }
+
+    /**
+     * @param mixed $dateLeft
+     */
+    public function setDateLeft ($dateLeft)
+    {
+        $this->dateLeft = $dateLeft;
+    }
+
+    /**
      * Set country
      *
      * @param string $country
-     * @return Analytics
+     * @return Hit
      */
     public function setCountry($country)
     {
@@ -219,7 +242,7 @@ class Analytics
      * Set region
      *
      * @param string $region
-     * @return Analytics
+     * @return Hit
      */
     public function setRegion($region)
     {
@@ -242,7 +265,7 @@ class Analytics
      * Set city
      *
      * @param string $city
-     * @return Analytics
+     * @return Hit
      */
     public function setCity($city)
     {
@@ -265,7 +288,7 @@ class Analytics
      * Set isp
      *
      * @param string $isp
-     * @return Analytics
+     * @return Hit
      */
     public function setIsp($isp)
     {
@@ -288,7 +311,7 @@ class Analytics
      * Set organization
      *
      * @param string $organization
-     * @return Analytics
+     * @return Hit
      */
     public function setOrganization($organization)
     {
@@ -311,7 +334,7 @@ class Analytics
      * Set code
      *
      * @param integer $code
-     * @return Analytics
+     * @return Hit
      */
     public function setCode($code)
     {
@@ -334,7 +357,7 @@ class Analytics
      * Set referer
      *
      * @param string $referer
-     * @return Analytics
+     * @return Hit
      */
     public function setReferer($referer)
     {
@@ -357,7 +380,7 @@ class Analytics
      * Set url
      *
      * @param string $url
-     * @return Analytics
+     * @return Hit
      */
     public function setUrl($url)
     {
@@ -380,7 +403,7 @@ class Analytics
      * Set userAgent
      *
      * @param string $userAgent
-     * @return Analytics
+     * @return Hit
      */
     public function setUserAgent($userAgent)
     {
@@ -403,7 +426,7 @@ class Analytics
      * Set remoteHost
      *
      * @param string $remoteHost
-     * @return Analytics
+     * @return Hit
      */
     public function setRemoteHost($remoteHost)
     {
@@ -426,7 +449,7 @@ class Analytics
      * Set page
      *
      * @param \Mautic\PageBundle\Entity\Page $page
-     * @return Analytics
+     * @return Hit
      */
     public function setPage(\Mautic\PageBundle\Entity\Page $page = null)
     {
@@ -449,7 +472,7 @@ class Analytics
      * Set ipAddress
      *
      * @param \Mautic\CoreBundle\Entity\IpAddress $ipAddress
-     * @return Analytics
+     * @return Hit
      */
     public function setIpAddress(\Mautic\CoreBundle\Entity\IpAddress $ipAddress)
     {
@@ -496,7 +519,7 @@ class Analytics
      * Set pageLanguage
      *
      * @param string $pageLanguage
-     * @return Analytics
+     * @return Hit
      */
     public function setPageLanguage($pageLanguage)
     {
@@ -519,7 +542,7 @@ class Analytics
      * Set browserLanguages
      *
      * @param string $browserLanguages
-     * @return Analytics
+     * @return Hit
      */
     public function setBrowserLanguages($browserLanguages)
     {

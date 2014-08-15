@@ -78,6 +78,7 @@ $view->extend('MauticPageBundle:Page:index.html.php');
                                 $permissions['page:pages:editother'],
                                 $item->getCreatedBy()
                             ),
+                            'clone'     => $permissions['page:pages:create'],
                             'delete'    => $security->hasEntityAccess(
                                 $permissions['page:pages:deleteown'],
                                 $permissions['page:pages:deleteother'],
@@ -92,7 +93,6 @@ $view->extend('MauticPageBundle:Page:index.html.php');
                     <td>
                         <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php',array(
                             'item'       => $item,
-                            'dateFormat' => (!empty($dateFormat)) ? $dateFormat : 'F j, Y g:i a',
                             'model'      => 'page.page'
                         )); ?>
                         <a href="<?php echo $view['router']->generate('mautic_page_action',

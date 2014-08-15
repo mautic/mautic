@@ -56,7 +56,7 @@ class PublicController extends CommonFormController
             $parentVariant   = $entity->getVariantParent();
             $childrenVariant = $entity->getVariantChildren();
 
-            $userAccess = $security->hasEntityAccess('page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy());
+            $userAccess      = $security->hasEntityAccess('page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy());
 
             //is this a variant of another? If so, the parent URL should be used unless a user is logged in and previewing
             if ($parentVariant && !$userAccess) {
@@ -68,15 +68,16 @@ class PublicController extends CommonFormController
             if (!$userAccess) {
                 //check to see if a variant should be shown versus the parent but ignore if a user is previewing
                 if (count($childrenVariant)) {
+
                     $variants      = array();
                     $variantWeight = 0;
-                    $totalHits     = $entity->getUniqueHits();
+                    $totalHits     = $entity->getVariantHits();
                     foreach ($childrenVariant as $id => $child) {
                         if ($child->isPublished()) {
                             $variantSettings = $child->getVariantSettings();
                             $variants[$id]   = array(
                                 'weight' => ($variantSettings['weight'] / 100),
-                                'hits'   => $child->getUniqueHits()
+                                'hits'   => $child->getVariantHits()
                             );
                             $variantWeight += $variantSettings['weight'];
                             $totalHits     += $variants[$id]['hits'];
@@ -96,7 +97,7 @@ class PublicController extends CommonFormController
                             //add parent weight
                             $variants[$entity->getId()] = array(
                                 'weight' => ((100 - $variantWeight)/100),
-                                'hits'   => $entity->getUniqueHits()
+                                'hits'   => $entity->getVariantHits()
                             );
 
                             //determine variant to show
