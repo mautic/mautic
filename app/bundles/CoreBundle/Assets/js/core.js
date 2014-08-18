@@ -342,7 +342,9 @@ var Mautic = {
                 }
             },
             error: function (request, textStatus, errorThrown) {
-                alert(errorThrown);
+                if (mauticEnv == 'dev') {
+                    alert(errorThrown);
+                }
             }
         });
 
@@ -432,7 +434,9 @@ var Mautic = {
                 callback(data);
             },
             error: function (request, textStatus, errorThrown) {
-                alert(errorThrown);
+                if (mauticEnv == 'dev') {
+                    alert(errorThrown);
+                }
             }
         });
     },
@@ -494,11 +498,6 @@ var Mautic = {
 
                 //add current_ancestor classes
                 mQuery(parent).parentsUntil(".side-panel-nav", "li").addClass("current_ancestor");
-            }
-
-            //close sidebar if necessary
-            if (mQuery(".left-side-bar-pin i").hasClass("unpinned") && !mQuery(".page-wrapper").hasClass("hide-left")) {
-                mQuery(".page-wrapper").addClass("hide-left");
             }
 
             //scroll to the top
@@ -775,7 +774,9 @@ var Mautic = {
                 }
             },
             error: function (request, textStatus, errorThrown) {
-                alert(errorThrown);
+                if (mauticEnv == 'dev') {
+                    alert(errorThrown);
+                }
             }
         });
     },
@@ -802,7 +803,9 @@ var Mautic = {
                 }
             },
             error: function (request, textStatus, errorThrown) {
-                alert(errorThrown);
+                if (mauticEnv == 'dev') {
+                    alert(errorThrown);
+                }
             }
         });
     },
@@ -821,7 +824,9 @@ var Mautic = {
                 }
             },
             error: function (request, textStatus, errorThrown) {
-                alert(errorThrown);
+                if (mauticEnv == 'dev') {
+                    alert(errorThrown);
+                }
             }
         });
     },
@@ -840,7 +845,9 @@ var Mautic = {
                 Mautic.processPageContent(response);
             },
             error: function (request, textStatus, errorThrown) {
-                alert(errorThrown);
+                if (mauticEnv == 'dev') {
+                    alert(errorThrown);
+                }
             }
         });
     },
@@ -1037,7 +1044,9 @@ var Mautic = {
                         MauticVars.searchIsActive = false;
                     },
                     error: function (request, textStatus, errorThrown) {
-                        alert(errorThrown);
+                        if (mauticEnv == 'dev') {
+                            alert(errorThrown);
+                        }
                     }
                 });
             }
@@ -1090,7 +1099,9 @@ var Mautic = {
                 }
             },
             error: function (request, textStatus, errorThrown) {
-                alert(errorThrown);
+                if (mauticEnv == 'dev') {
+                    alert(errorThrown);
+                }
             }
         });
     },
@@ -1152,13 +1163,3 @@ var Mautic = {
         });
     }
 };
-
-/**
- * Unlock an entity if applicable
- */
-window.addEventListener("beforeunload", function (e) {
-     //prevent leaving if currently in a form
-     if (mQuery(".form-exist-unlock-id").length) {
-        Mautic.unlockEntity(mQuery('.form-exist-unlock-model').val(), mQuery('.form-exist-unlock-id').val());
-     }
-});

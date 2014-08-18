@@ -23,12 +23,20 @@ use Symfony\Component\HttpFoundation\Request;
 class AjaxController extends CommonAjaxController
 {
 
-    protected function startChatAction(Request $request, $userId = 0)
+    /**
+     * Initiates a chat between two users
+     *
+     * @param Request $request
+     * @param int     $userId
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    protected function startUserChatAction(Request $request, $userId = 0)
     {
         $dataArray   = array('success' => 0, 'ignore_wdt' => 1);
 
         $currentUser = $this->factory->getUser();
-        $userId      = InputHelper::int($request->request->get('user', $userId));
+        $userId      = InputHelper::int($request->request->get('chatId', $userId));
         $userModel   = $this->factory->getModel('user.user');
         $user        = $userModel->getEntity($userId);
 
@@ -37,7 +45,7 @@ class AjaxController extends CommonAjaxController
             $messages  = $chatModel->getDirectMessages($user);
 
             //get the HTML
-            $dataArray['conversationHtml'] = $this->renderView('MauticChatBundle:DM:index.html.php', array(
+            $dataArray['conversationHtml'] = $this->renderView('MauticChatBundle:User:index.html.php', array(
                 'messages'            => $messages,
                 'me'                  => $currentUser,
                 'with'                => $user,
@@ -51,75 +59,183 @@ class AjaxController extends CommonAjaxController
                     $this->factory->getParameter('date_format_dateonly') . ' ' . $this->factory->getParameter('date_format_timeonly')
                 );
             }
-
+            $dataArray['mauticContent'] = 'chat';
             $dataArray['success'] = 1;
         }
 
         return $this->sendJsonResponse($dataArray);
     }
 
-    protected function sendMessageAction(Request $request)
+    /**
+     * Initiates a channel chat
+     *
+     * @param Request $request
+     * @param int     $channelId
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    protected function startChannelChatAction(Request $request, $channelId = 0)
     {
-        $dataArray   = array('success' => 0);
+        $dataArray   = array('success' => 0, 'ignore_wdt' => 1);
 
         $currentUser = $this->factory->getUser();
-        $userId      = InputHelper::int($request->request->get('user'));
-        $userModel   = $this->factory->getModel('user.user');
-        $user        = $userModel->getEntity($userId);
+        $channelId   = InputHelper::int($request->request->get('chatId', $channelId));
+        $model       = $this->factory->getModel('chat.channel');
+        $channel     = $model->getEntity($channelId);
+
+        if ($channel !== null) {
+            $messages  = $model->getGroupMessages($channel);
+            $lastRead  = $model->getUserChannelStats($channel);
+
+            //get the HTML
+            $dataArray['conversationHtml'] = $this->renderView('MauticChatBundle:Channel:index.html.php', array(
+                'messages' => $messages,
+                'me'       => $currentUser,
+                'channel'  => $channel
+            ));
+            $dataArray['channelId']   = $channel->getId();
+            $dataArray['channelName'] = $this->renderview('MauticChatBundle:Channel:header.html.php', array(
+                'channel' => $channel
+            ));
+            $dataArray['channelDesc'] = $channel->getDescription();
+            if ($lastRead)  {
+                $dataArray['lastReadId'] = $lastRead['lastRead'];
+            }
+            if ($messages) {
+                $lastMsg = end($messages);
+                $dataArray['latestId'] = $lastMsg['id'];
+            }
+            $dataArray['divider'] = $this->renderView('MauticChatBundle:User:newdivider.html.php', array('tag' => 'div'));;
+            $dataArray['success'] = 1;
+            $dataArray['mauticContent'] = 'chatchannel';
+        }
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * Record a chat message
+     *
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    protected function sendMessageAction(Request $request)
+    {
+        $dataArray   = array('success' => 0, 'ignore_wdt' => 1);
+
+        $currentUser = $this->factory->getUser();
+        $chatId      = InputHelper::int($request->request->get('chatId'));
+        $chatType    = InputHelper::clean($request->request->get('chatType'));
         $message     = htmlspecialchars($request->request->get('msg'));
 
-        if (!empty($message) && $user instanceof User && $userId !== $currentUser->getId()) {
+        if (!empty($message)) {
             //save the message
             $entity = new Chat();
             $entity->setDateSent(new \DateTime());
             $entity->setFromUser($currentUser);
-            $entity->setToUser($user);
             $entity->setMessage($message);
-            $em = $this->factory->getEntityManager();
-            $em->persist($entity);
-            $em->flush();
 
-            return $this->getMessageContent($request, $currentUser, $user, 'send');
+            if ($chatType == 'user') {
+                $userModel = $this->factory->getModel('user.user');
+                $recipient = $userModel->getEntity($chatId);
+                if ($recipient !== null && $chatId !== $currentUser->getId()) {
+                    $repo = $userModel->getRepository();
+                    $entity->setToUser($recipient);
+                }
+            } elseif ($chatType == 'channel') {
+                $channelModel = $this->factory->getModel('chat.channel');
+                $recipient    = $channelModel->getEntity($chatId);
+                if ($recipient !== null) {
+                    $repo = $channelModel->getRepository();
+                    $entity->setChannel($recipient);
+                }
+            }
+
+            if ($recipient !== null) {
+                $repo->saveEntity($entity);
+                return $this->getMessageContent($request, $currentUser, $recipient, $chatType, 'send');
+            }
         }
 
         return $this->sendJsonResponse($dataArray);
     }
 
+    /**
+     * Get new messages
+     *
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
     protected function getMessagesAction(Request $request)
     {
-        $dataArray   = array('success' => 0);
+        $dataArray   = array('success' => 0, 'ignore_wdt' => 1);
 
         $currentUser = $this->factory->getUser();
-        $userId      = InputHelper::int($request->request->get('user'));
-        $userModel   = $this->factory->getModel('user.user');
-        $user        = $userModel->getEntity($userId);
+        $chatId      = InputHelper::int($request->request->get('chatId'));
+        $chatType    = InputHelper::clean($request->request->get('chatType'));
 
-        if ($user instanceof User && $userId !== $currentUser->getId()) {
-           return $this->getMessageContent($request, $currentUser, $user, 'update');
+        if ($chatType == 'user') {
+            if ($chatId !== $currentUser->getId()) {
+                $userModel = $this->factory->getModel('user.user');
+                $recipient = $userModel->getEntity($chatId);
+            } else {
+                $recipient = null;
+            }
+        } elseif ($chatType == 'channel') {
+            $channelModel = $this->factory->getModel('chat.channel');
+            $recipient    = $channelModel->getEntity($chatId);
+        }
+
+        if ($recipient !== null) {
+            return $this->getMessageContent($request, $currentUser, $recipient, $chatType, 'update');
         }
 
         return $this->sendJsonResponse($dataArray);
     }
 
+    /**
+     * Mark messages as read
+     *
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
     protected function markReadAction (Request $request)
     {
-        $dataArray   = array('success' => 0);
+        $dataArray   = array('success' => 0, 'ignore_wdt' => 1);
 
         $currentUser = $this->factory->getUser();
-        $userId      = InputHelper::int($request->request->get('user'));
-        $userModel   = $this->factory->getModel('user.user');
-        $user        = $userModel->getEntity($userId);
+        $chatId      = InputHelper::int($request->request->get('chatId'));
+        $chatType    = InputHelper::clean($request->request->get('chatType'));
+        $lastId      = InputHelper::int($request->request->get('lastId'));
 
-        if ($user instanceof User && $userId !== $currentUser->getId()) {
-            $lastId = InputHelper::int($request->request->get('lastId'));
-            $chatModel = $this->factory->getModel('chat.chat');
-            $chatModel->markMessagesRead($userId, $lastId);
+        if ($chatType == 'user') {
+            if ($chatId !== $currentUser->getId()) {
+                $userModel = $this->factory->getModel('user.user');
+                $recipient = $userModel->getEntity($chatId);
+                $chatModel = $this->factory->getModel('chat.chat');
+                $chatModel->markMessagesRead($recipient, $lastId);
+                $dataArray['success'] = 1;
+            }
+        } elseif ($chatType == 'channel') {
+            $channelModel = $this->factory->getModel('chat.channel');
+            $recipient    = $channelModel->getEntity($chatId);
+            $channelModel->markMessagesRead($recipient, $lastId);
             $dataArray['success'] = 1;
         }
 
         return $this->sendJsonResponse($dataArray);
     }
 
+    /**
+     * Update the channel and user lists
+     *
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
     public function updateListAction(Request $request)
     {
         //get a list of channels
@@ -136,65 +252,109 @@ class AjaxController extends CommonAjaxController
                 'users'       => $users,
                 'contentOnly' => true
             )),
-            'ignore_wdt' => 1
+            'ignore_wdt' => 1,
+            'mauticContent' => 'chat'
         );
 
         return $this->sendJsonResponse($dataArray);
     }
 
-    private function getMessageContent(Request $request, $currentUser, $with, $fromAction ='')
+    /**
+     * @param Request $request
+     * @param         $currentUser
+     * @param         $recipient
+     * @param string  $fromAction
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    private function getMessageContent(Request $request, $currentUser, $recipient, $chatType, $fromAction ='')
     {
         $dataArray = array('ignore_wdt' => 1);
         $lastId    = InputHelper::int($request->request->get('lastId'));
         $groupId   = InputHelper::int($request->request->get('groupId'));
-        $chatModel = $this->factory->getModel('chat.chat');
 
         $startId  = ($groupId && $groupId <= $lastId) ? $groupId - 1 : $lastId;
-        $messages = $chatModel->getDirectMessages($with, $startId);
+
+        if ($chatType == 'user') {
+            $chatModel = $this->factory->getModel('chat.chat');
+            $messages  = $chatModel->getDirectMessages($recipient, $startId);
+        } else {
+            $channelModel = $this->factory->getModel('chat.channel');
+            $messages     = $channelModel->getGroupMessages($recipient, $startId);
+
+            $lastRead = $channelModel->getUserChannelStats($recipient);
+            if ($lastRead)  {
+                $dataArray['lastReadId'] = $lastRead['lastRead'];
+            }
+        }
 
         //group started by; should be set unless something quirky happens with the HTML/JS/data
         $owner = ($groupId && isset($messages[$groupId])) ? $messages[$groupId]['fromUser']['id'] : 0;
         //find out if html should be appended to the group or new groups created
         $newGroup = $sameGroup = array();
 
+        $groupCount = 0;
         foreach ($messages as $id => $msg) {
             if ($id > $lastId) {
-                if ($msg['fromUser']['id'] !== $owner) {
-                    $newGroup[$id] = $msg;
+                if (!isset($firstMessage)) {
+                    $firstMessage = $msg;
+                }
+
+                if ($owner && $msg['fromUser']['id'] === $owner) {
+                    //this should be part of the same group
+                    $sameGroup[] = $this->renderView('MauticChatBundle:User:message.html.php', array('message' => $msg));
                 } else {
-                    $sameGroup[] = $this->renderView('MauticChatBundle:DM:message.html.php', array('message' => $msg));
+                    //start or append to a new group
+                    $owner                      = false;
+                    $newGroup[$groupCount][$id] = $msg;
+
+                    $next = next($messages);
+                    if ($next && $next['fromUser']['id'] !== $msg['fromUser']['id']) {
+                        $groupCount++;
+                    }
                 }
             }
         }
 
         if (!empty($sameGroup)) {
-            $divider = ($owner === $with->getId() && $fromAction == 'update') ? $this->renderView('MauticChatBundle:DM:newdivider.html.php',
-                array('tag' => 'div')
-            ) : '';
             $dataArray['appendToGroup'] = implode("\n", $sameGroup);
             $dataArray['groupId']       = $groupId;
         }
 
         if (!empty($newGroup)) {
-            $groupHtml = $this->renderView('MauticChatBundle:DM:messages.html.php', array(
-                'messages' => $newGroup,
-                'me'       => $currentUser,
-                'with'     => $with
-            ));
+            $groupHtml = "";
 
             //add a new message divider
-            $divider = ($fromAction == 'update') ? $this->renderView('MauticChatBundle:DM:newdivider.html.php') : '';
+            $divider = ($fromAction == 'update') ? $this->renderView('MauticChatBundle:User:newdivider.html.php') : '';
+
+            foreach ($newGroup as $g) {
+                if ($chatType == 'user') {
+                    $groupHtml = $this->renderView('MauticChatBundle:User:messages.html.php', array(
+                        'messages' => $g,
+                        'me'       => $currentUser,
+                        'with'     => $recipient
+                    ));
+                } else {
+                    $groupHtml = $this->renderView('MauticChatBundle:Channel:messages.html.php', array(
+                        'messages' => $g,
+                        'me'       => $currentUser,
+                        'channel'  => $recipient
+                    ));
+                }
+            }
 
             $dataArray['messages'] = $groupHtml;
         }
-        $dataArray['withId'] = $with->getId();
-        if (!empty($divider)) {
-            $dataArray['divider'] = $divider;
-        }
+        $dataArray['withId'] = $recipient->getId();
+        $divider             = ($fromAction == 'update') ? $this->renderView('MauticChatBundle:User:newdivider.html.php',
+            array('tag' => 'div')
+        ) : '';
+        $dataArray['divider'] = $divider;
 
-        $lastMessage = end($messages);
+        $lastMessage           = end($messages);
         $dataArray['latestId'] = $lastMessage['id'];
-        $dataArray['success'] = 1;
+        $dataArray['firstId']  = (isset($firstMessage)) ? $firstMessage['id'] : 0;
+        $dataArray['success']  = 1;
 
         return $this->sendJsonResponse($dataArray);
     }

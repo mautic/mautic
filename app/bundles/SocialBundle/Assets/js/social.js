@@ -48,7 +48,9 @@ Mautic.handleCallback = function (network, token, code, callbackUrl) {
             window.location = response.url;
         },
         error: function (request, textStatus, errorThrown) {
-            alert(errorThrown);
+            if (mauticEnv == 'dev') {
+                alert(errorThrown);
+            }
         }
     });
 }

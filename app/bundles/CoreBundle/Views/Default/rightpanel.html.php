@@ -77,12 +77,12 @@ $value = $app->getSession()->get('mautic.global_search');
             <div class="header pl0 pr0">
                 <ul class="list-table nm">
                     <li style="width:50px;">
-                        <a href="javascript:void(0);" onclick="Mautic.updateChatList();" class="btn btn-link text-default offcanvas-closer"><i class="fa fa-lg fa-fw fa-arrow-circle-left"></i></a>
+                        <a href="javascript:void(0);" onclick="Mautic.updateChatList(true);" class="btn btn-link text-default offcanvas-closer"><i class="fa fa-lg fa-fw fa-arrow-circle-left"></i></a>
                     </li>
                     <li class="text-center">
                         <h5 class="semibold nm">
-                            <p class="nm" id="ChatWith"></p>
-                            <small id="LastSeen"></small>
+                            <p class="nm" id="ChatHeader"></p>
+                            <small id="ChatSubHeader"></small>
                         </h5>
                     </li>
                     <li style="width:50px;" class="text-right"></li>
@@ -92,7 +92,7 @@ $value = $app->getSession()->get('mautic.global_search');
                 <?php echo $view['actions']->render(new ControllerReference('MauticChatBundle:Default:dm')); ?>
             </div>
 
-            <?php echo $view->render('MauticChatBundle:DM:footer.html.php'); ?>
+            <?php echo $view->render('MauticChatBundle:User:footer.html.php'); ?>
         </div>
     </div>
 </div>

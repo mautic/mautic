@@ -9,10 +9,12 @@
 ?>
 <ul class="topmenu" id="ChatChannels">
     <?php foreach ($channels as $channel): ?>
+    <?php $hasUnread = (!empty($channel['stats']['unread'])) ? ' text-warning' : ''; ?>
     <li>
-        <a href="javascript:void(0);">
-            <span class="text"># <?php echo $channel['name']; ?></span>
+        <a href="javascript:void(0);" onclick="Mautic.startChannelChat('<?php echo $channel['id']; ?>');" class="media offcanvas-opener offcanvas-open-rtl">
+            <span class="media-heading<?php echo $hasUnread; ?>"># <?php echo $channel['name']; ?></span>
+            <?php if ($hasUnread): ?><span class="badge"><?php echo $channel['stats']['unread']; ?></span><?php endif; ?>
         </a>
     </li>
-<?php endforeach; ?>
+    <?php endforeach; ?>
 </ul>

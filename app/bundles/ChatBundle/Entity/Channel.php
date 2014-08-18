@@ -13,7 +13,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
  * Class Channel
@@ -47,7 +49,7 @@ class Channel extends FormEntity
     private $isPrivate = false;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Mautic\UserBundle\Entity\User", fetch="EXTRA_LAZY")
+     * @ORM\ManyToMany(targetEntity="Mautic\UserBundle\Entity\User", fetch="EXTRA_LAZY", indexBy="id")
      * @ORM\JoinTable(name="chat_channel_users")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=true)
      */
@@ -66,6 +68,11 @@ class Channel extends FormEntity
         $metadata->addPropertyConstraint('name', new NotBlank(
             array('message' => 'mautic.chat.channel.name.notblank')
         ));
+
+        $metadata->addConstraint(new UniqueEntity(array(
+            'fields'  => array('name'),
+            'message' => 'mautic.chat.channel.name.unique'
+        )));
     }
 
     /**

@@ -53,11 +53,6 @@ class Chat
     private $message;
 
     /**
-     * @ORM\OneToMany(targetEntity="ChatStats", mappedBy="chat", fetch="EXTRA_LAZY")
-     */
-    private $readBy;
-
-    /**
      * @ORM\Column(name="is_read", type="boolean")
      */
     private $isRead = false;

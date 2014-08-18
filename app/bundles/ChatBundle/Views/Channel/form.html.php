@@ -9,5 +9,8 @@
 if (!empty($inPopup)):
     $view->extend('MauticCoreBundle:Default:slim.html.php');
 endif;
+?>
 
-echo $view['form']->form($form);
+<div class="container-fluid">
+    <?php echo $view['form']->form($form); ?>
+</div>

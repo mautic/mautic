@@ -2,3 +2,7 @@
     text-align: center;
     color: #00b6ad;
 }
+
+#ChatConversation .chat-group {
+    padding-top: 0 !important;
+}

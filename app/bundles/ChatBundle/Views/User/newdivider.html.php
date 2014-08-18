@@ -6,9 +6,8 @@
  * @link        http://mautic.com
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
-//use a placeholder to use for the prototype
-$text = (empty($message)) ? '[message]' : $message['message'];
+$tag = (empty($tag)) ? 'li' : $tag;
 ?>
-<p class="media-text"><?php echo $text; ?></p>
-<span class="clearfix"></span>
+<<?php echo $tag; ?> class="chat-new-divider">
+  <span><?php echo $view['translator']->trans('mautic.chat.chat.new.messages'); ?></span>
+</<?php echo $tag; ?>>

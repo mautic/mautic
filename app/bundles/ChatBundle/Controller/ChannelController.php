@@ -19,9 +19,54 @@ use Mautic\CoreBundle\Controller\FormController;
 class ChannelController extends FormController
 {
 
+    public function indexAction($channelId)
+    {
+        $currentUser = $this->factory->getUser();
+        $model       = $this->factory->getModel('chat.channel');
+        $entity      = $model->getEntity($channelId);
+
+        if ($entity === null) {
+            return $this->forward('MauticChatBundle:Default:index');
+        }
+
+        //make sure user is part of the chat if it is private
+        if ($entity->isPrivate()) {
+            $privateMembers = $entity->getPrivateUsers();
+            if (!$privateMembers->contains($currentUser)) {
+                //access denied
+                $this->factory->getSession()->getFlashBag()->add(
+                    'error',
+                    $this->get('translator')->trans(
+                        'mautic.core.error.accessdenied',
+                        array(),
+                        'flashes'
+                    )
+                );
+                return $this->forward('MauticChatBundle:Default:index');
+            }
+        }
+
+        $messages = $model->getGroupMessages($entity);
+
+        //get the HTML
+        return $this->delegateView(array(
+            'viewParameters'  => array(
+                'messages'            => $messages,
+                'me'                  => $currentUser,
+                'channel'             => $entity,
+                'insertUnreadDivider' => true
+            ),
+            'contentTemplate' => 'MauticChatBundle:Channel:index.html.php',
+            'passthroughVars' => array(
+                'mauticContent' => 'chatchannel',
+                'target'        => '#ChatConversation'
+            )
+        ));
+    }
+
     public function newAction()
     {
-        if (!$this->factory->getSecurity()->isGranted('chat:channel:create')) {
+        if (!$this->factory->getSecurity()->isGranted('chat:channels:create')) {
             return $this->accessDenied();
         }
 
@@ -37,38 +82,26 @@ class ChannelController extends FormController
                 if ($valid) {
                     $model->saveEntity($entity);
 
-                    return $this->delegateView(array(
-                        'viewParameters'  => array(
-                            'channel'     => $entity,
-                            'contentOnly' => false
-                        ),
-                        'contentTemplate' => 'MauticChatBundle:Channel:index.html.php',
-                        'passthroughVars' => array(
-                            'mauticContent' => 'chatchannel'
-                        )
+                    return $this->forward('MauticChatBundle:Channel:index', array(
+                        'channelId' => $entity->getId()
                     ));
                 }
             } else {
-                return $this->delegateView(array(
-                    'viewParameters'  => array(
-                        'contentOnly' => false
-                    ),
-                    'contentTemplate' => 'MauticChatBundle:Default:index.html.php',
-                    'passthroughVars' => array(
-                        'mauticContent' => 'chat'
-                    )
-                ));
+                return $this->forward('MauticChatBundle:Default:index');
             }
         }
 
+        $formView = $this->setFormTheme($form, 'MauticChatBundle:Channel:form.html.php', 'MauticChatBundle:FormChannel');
+
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'form'        => $form->createView(),
+                'form'        => $formView,
                 'contentOnly' => false
             ),
             'contentTemplate' => 'MauticChatBundle:Channel:form.html.php',
             'passthroughVars' => array(
-                'mauticContent' => 'chatchannel'
+                'mauticContent' => 'chatchannel',
+                'target'        => '#ChatList'
             )
         ));
     }
@@ -78,18 +111,9 @@ class ChannelController extends FormController
         $model  = $this->factory->getModel('chat.channel');
         $entity = $model->getEntity($objectId);
 
-        //set the return URL
-        $returnUrl  = $this->generateUrl('mautic_chat_index');
-
         //not found
         if ($entity === null) {
-            return $this->postActionRedirect(array(
-                'returnUrl'       => $returnUrl,
-                'contentTemplate' => 'MauticChatBundle:Default:index',
-                'passthroughVars' => array(
-                    'mauticContent' => 'chat'
-                )
-            ));
+            return $this->forward('MauticChatBundle:Default:index');
         }  elseif (!$this->factory->getSecurity()->hasEntityAccess(
             true, 'chat:channels:editother', $entity->getCreatedBy()
         )) {
@@ -108,33 +132,26 @@ class ChannelController extends FormController
                 if ($valid) {
                     $model->saveEntity($entity);
 
-                    return $this->postActionRedirect(array(
-                        'viewParameters'  => array('channel' => $entity),
-                        'contentTemplate' => 'MauticChatBundle:Channel:index.html.php',
-                        'passthroughVars' => array(
-                            'mauticContent' => 'chatchannel'
-                        )
+                    return $this->forward('MauticChatBundle:Channel:index', array(
+                        'channelId' => $entity->getId()
                     ));
                 }
             } else {
-                return $this->postActionRedirect(array(
-                    'contentTemplate' => 'MauticChatBundle:Default:index.html.php',
-                    'passthroughVars' => array(
-                        'mauticContent' => 'chatchannel'
-                    )
-                ));
+                return $this->forward('MauticChatBundle:Default:index');
             }
         }
 
+        $formView = $this->setFormTheme($form, 'MauticChatBundle:Channel:form.html.php', 'MauticChatBundle:FormChannel');
+
         return $this->delegateView(array(
-            'viewParameters'  => array('form' => $form->createView()),
+            'viewParameters'  => array('form' => $formView),
             'contentTemplate' => 'MauticChatBundle:Channel:form.html.php',
             'passthroughVars' => array(
-                'mauticContent' => 'chatchannel'
+                'mauticContent' => 'chatchannel',
+                'target'        => '#ChatConversation'
             )
         ));
     }
-
 
     /**
      * Archive the channel
@@ -150,7 +167,8 @@ class ChannelController extends FormController
             'returnUrl'       => $returnUrl,
             'contentTemplate' => 'MauticChatBundle:Default:index',
             'passthroughVars' => array(
-                'mauticContent' => 'chat'
+                'mauticContent' => 'chat',
+                'target'        => '#ChatConversation'
             )
         );
 

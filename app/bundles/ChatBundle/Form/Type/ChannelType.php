@@ -29,7 +29,6 @@ class ChannelType extends AbstractType
     {
         $builder->addEventSubscriber(new CleanFormSubscriber());
 
-
         $builder->add('name', 'text', array(
             'label'      => 'mautic.chat.channel.form.name',
             'label_attr' => array('class' => 'control-label'),
@@ -50,6 +49,8 @@ class ChannelType extends AbstractType
             'required'   => false
         ));
 
+
+        /*
         $builder->add('isPrivate', 'button_group', array(
             'choice_list' => new ChoiceList(
                 array(false, true),
@@ -63,9 +64,17 @@ class ChannelType extends AbstractType
             'required'      => false
         ));
 
+        $builder->add('privateUsers', 'collection', array(
+            'allow_add'    => true,
+            'by_reference' => false,
+            'prototype'    => true
+        ));
+        */
+
         $builder->add('buttons', 'form_buttons', array(
-            'apply_text' => false,
-            'save_text'  => 'mautic.core.form.save'
+            'apply_text'      => false,
+            'save_text'       => 'mautic.core.form.save',
+            'container_class' => 'chat-channel-buttons'
         ));
 
         if (!empty($options["action"])) {

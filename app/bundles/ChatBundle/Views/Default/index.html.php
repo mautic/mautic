@@ -16,7 +16,18 @@ if (empty($contentOnly)) {
 }
 ?>
 <div id="ChatList">
-    <h5 class="heading"><?php echo $view['translator']->trans('mautic.chat.chat.channels'); ?></h5>
+    <h5 class="heading">
+        <?php echo $view['translator']->trans('mautic.chat.chat.channels'); ?>
+        <span class="small">
+            <a href="<?php echo $view['router']->generate('mautic_chatchannel_action', array('objectAction' => 'new')); ?>"
+               data-toggle="ajax"
+               data-method="post"
+               data-ignore-formexit="true">
+                <?php echo $view['translator']->trans('mautic.chat.channel.new'); ?>
+            </a>
+        </span>
+    </h5>
+
     <?php echo $view->render('MauticChatBundle:Default:channels.html.php', array('channels' => $channels)); ?>
 
     <h5 class="heading"><?php echo $view['translator']->trans('mautic.chat.chat.users'); ?></h5>

@@ -11,7 +11,7 @@ $showDate = (!empty($showDate)) ? true : false;
 
 $dividerInserted = false;
 if (!empty($insertUnreadDivider) && !$firstMsg['isRead']) {
-    echo $view->render('MauticChatBundle:DM:newdivider.html.php');
+    echo $view->render('MauticChatBundle:User:newdivider.html.php');
     $dividerInserted = true;
 }
 ?>
@@ -24,10 +24,10 @@ if (!empty($insertUnreadDivider) && !$firstMsg['isRead']) {
         <?php
         foreach ($messages as $message):
             if (!empty($insertUnreadDivider) && !$dividerInserted && !$message['isRead']):
-                echo $view->render('MauticChatBundle:DM:newdivider.html.php', array('tag' => 'div'));
+                echo $view->render('MauticChatBundle:User:newdivider.html.php', array('tag' => 'div'));
                 $dividerInserted = true;
             endif;
-            echo $view->render('MauticChatBundle:DM:message.html.php', array('message' => $message));
+            echo $view->render('MauticChatBundle:User:message.html.php', array('message' => $message));
         endforeach;
         ?>
         <?php if ($showDate): ?>

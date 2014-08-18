@@ -405,7 +405,9 @@ Mautic.refreshLeadSocialProfile = function(network, leadId, event) {
             Mautic.stopIconSpinPostEvent(event);
         },
         error: function (request, textStatus, errorThrown) {
-            alert(errorThrown);
+            if (mauticEnv == 'dev') {
+                alert(errorThrown);
+            }
             Mautic.stopIconSpinPostEvent(event);
         }
     });

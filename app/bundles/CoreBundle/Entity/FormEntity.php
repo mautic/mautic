@@ -63,8 +63,29 @@ class FormEntity
      */
     private $checkedOutBy;
 
+    /**
+     * @var
+     */
     protected $changes;
 
+    /**
+     * Wrapper function for isProperty methods
+     *
+     * @param $name
+     * @param $arguments
+     */
+    public function __call($name, $arguments)
+    {
+        if (strpos($name, 'is') === 0 && method_exists($this, 'get' . ucfirst($name))) {
+            return $this->{'get' . ucfirst($name)}();
+        }
+        throw new \InvalidArgumentException('Method ' . $name . ' not exists');
+    }
+
+    /**
+     * @param $prop
+     * @param $val
+     */
     protected function isChanged($prop, $val)
     {
         $getter  = "get" . ucfirst($prop);
@@ -248,17 +269,6 @@ class FormEntity
     }
 
     /**
-     * Proxy function to getIsPublished()
-     *
-     * @return bool
-     */
-    public function isPublished()
-    {
-        return $this->getIsPublished();
-    }
-
-
-    /**
      * Check the publish status of an entity based on publish up and down datetimes
      *
      * @return string early|expired|published|unpublished
@@ -266,27 +276,23 @@ class FormEntity
      */
     public function getPublishStatus()
     {
-        if (method_exists($this, 'isPublished')) {
-            $dt      = new DateTimeHelper();
-            $current = $dt->getLocalDateTime();
-            if (!$this->isPublished()) {
-                return 'unpublished';
-            } else {
-                $status  =  'published';
-                if (method_exists($this, 'getPublishUp')) {
-                    $up = $this->getPublishUp();
-                    if (!empty($up) && $current <= $up)
-                        $status = 'pending';
-                }
-                if (method_exists($this, 'getPublishDown')) {
-                    $down = $this->getPublishDown();
-                    if (!empty($down) && $current >= $down)
-                        $status = 'expired';
-                }
-                return $status;
-            }
+        $dt      = new DateTimeHelper();
+        $current = $dt->getLocalDateTime();
+        if (!$this->isPublished()) {
+            return 'unpublished';
         } else {
-            throw new \BadMethodCallException('This entity does not have a isPublished method');
+            $status  =  'published';
+            if (method_exists($this, 'getPublishUp')) {
+                $up = $this->getPublishUp();
+                if (!empty($up) && $current <= $up)
+                    $status = 'pending';
+            }
+            if (method_exists($this, 'getPublishDown')) {
+                $down = $this->getPublishDown();
+                if (!empty($down) && $current >= $down)
+                    $status = 'expired';
+            }
+            return $status;
         }
     }
 

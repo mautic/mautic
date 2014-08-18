@@ -73,9 +73,10 @@
                 if (!isset($labelAttributes['class'])):
                     $labelAttributes['class'] = 'nav-item-name';
                 endif;
+                $labelAttributes['class'] .= ' text';
                 ?>
 
-                <span class="text" <?php echo $view["menu_helper"]->parseAttributes($labelAttributes); ?> >
+                <span <?php echo $view["menu_helper"]->parseAttributes($labelAttributes); ?> >
                     <?php echo $view['translator']->trans($child->getLabel());?>
                 </span>
 

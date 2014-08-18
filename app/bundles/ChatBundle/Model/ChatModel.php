@@ -48,29 +48,6 @@ class ChatModel extends FormModel
     }
 
     /**
-     * Get a list of users for chat
-     *
-     * @param string $search
-     * @param int    $limit
-     * @param int    $start
-     *
-     * @return mixed
-     */
-    public function getUserList($search = '', $limit = 10, $start = 0)
-    {
-        $repo  = $this->getRepository();
-        $users = $repo->getUsers($this->factory->getUser()->getId(), $search, $limit, $start);
-
-        //get users unread messages
-        $unread = $repo->getUnreadMessageCount($this->factory->getUser()->getId(), array_keys($users));
-        foreach ($unread as $u) {
-            $users[$u['userId']]['unread'] = $u['unread'];
-        }
-
-        return $users;
-    }
-
-    /**
      * @param User $chattingWith
      *
      * @return \Mautic\CoreBundle\Helper\DateTimeHelper
@@ -92,8 +69,35 @@ class ChatModel extends FormModel
         return $fromDate->getUtcDateTime();
     }
 
+    /**
+     * @param     $chattingWithId
+     * @param int $lastId
+     */
     public function markMessagesRead($chattingWithId, $lastId = 0)
     {
         $this->getRepository()->markRead($this->factory->getUser()->getId(), $chattingWithId, $lastId);
+    }
+
+    /**
+     * Get a list of users for chat
+     *
+     * @param string $search
+     * @param int    $limit
+     * @param int    $start
+     *
+     * @return mixed
+     */
+    public function getUserList($search = '', $limit = 10, $start = 0)
+    {
+        $repo  = $this->getRepository();
+        $users = $repo->getUsers($this->factory->getUser()->getId(), $search, $limit, $start);
+
+        //get users unread messages
+        $unread = $repo->getUnreadMessageCount($this->factory->getUser()->getId(), array_keys($users));
+        foreach ($unread as $u) {
+            $users[$u['userId']]['unread'] = $u['unread'];
+        }
+
+        return $users;
     }
 }

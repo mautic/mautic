@@ -28,7 +28,7 @@ class DefaultController extends FormController
 
         $chatModel = $this->factory->getModel('chat.chat');
         //get a list of  users
-        $users      = $chatModel->getUserList();
+        $users     = $chatModel->getUserList();
 
         return $this->delegateView(array(
             'viewParameters'  => array(
@@ -37,7 +37,9 @@ class DefaultController extends FormController
             ),
             'contentTemplate' => 'MauticChatBundle:Default:index.html.php',
             'passthroughVars' => array(
-                'mauticContent' => 'chat'
+                'mauticContent'  => 'chat',
+                'target'         => '#ChatList',
+                'replaceContent' => 'true'
             )
         ));
     }
@@ -62,7 +64,7 @@ class DefaultController extends FormController
                         'with'                => $user,
                         'insertUnreadDivider' => true
                     ),
-                    'contentTemplate' => 'MauticChatBundle:DM:index.html.php',
+                    'contentTemplate' => 'MauticChatBundle:User:index.html.php',
                     'passthroughVars' => array(
                         'mauticContent' => 'chat'
                     )
@@ -71,7 +73,7 @@ class DefaultController extends FormController
         } else {
             //blank
             return $this->delegateView(array(
-                'contentTemplate' => 'MauticChatBundle:DM:index.html.php',
+                'contentTemplate' => 'MauticChatBundle:User:index.html.php',
                 'passthroughVars' => array(
                     'mauticContent' => 'chat'
                 )

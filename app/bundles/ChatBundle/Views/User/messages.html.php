@@ -11,13 +11,12 @@ $withId  = $with->getId();
 $grouped = array();
 
 foreach ($messages as $num => $dm) {
+    //get the next for comparison
+    $next = (isset($messages[$num+1])) ? $messages[$num+1] : false;
+
     if (empty($grouped)) {
         //first DM of the group
-        if (isset($messages[$num + 1])) {
-            $nextDate = $view['date']->toShort($messages[$num + 1]['dateSent']);
-        } else {
-            $nextDate = $view['date']->toShort($dm['dateSent']);
-        }
+        $nextDate = ($next) ? $view['date']->toShort($next['dateSent']) : $view['date']->toShort($dm['dateSent']);
 
         if ($dm['fromUser']['id'] === $myId) {
             $direction = '';
@@ -32,11 +31,11 @@ foreach ($messages as $num => $dm) {
     //add the dm
     $grouped[] = $dm;
 
-    if (!isset($messages[$num + 1]) || $messages[$num + 1]['fromUser']['id'] !== $groupId || $msgDate != $nextDate) {
+    if (!$next || $next['fromUser']['id'] !== $groupId || $msgDate != $nextDate) {
         //last message or new group
 
         //now render the messages
-        echo $view->render('MauticChatBundle:DM:group.html.php', array(
+        echo $view->render('MauticChatBundle:User:group.html.php', array(
             'direction'           => $direction,
             'messages'            => $grouped,
             'user'                => $dm['fromUser'],

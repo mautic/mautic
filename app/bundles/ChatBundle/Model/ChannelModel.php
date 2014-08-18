@@ -78,7 +78,6 @@ class ChannelModel extends FormModel
         return $entity;
     }
 
-
     /**
      * @param       $entity
      * @param       $unlock
@@ -97,8 +96,6 @@ class ChannelModel extends FormModel
 
         $name = $entity->getName();
         $name = strtolower(InputHelper::alphanum($name));
-            //remove appended numbers
-        $name = preg_replace('#[0-9]+$#', '', $name);
 
         //make sure alias is not already taken
         $repo      = $this->getRepository();
@@ -131,5 +128,63 @@ class ChannelModel extends FormModel
     public function archiveChannel($entity)
     {
         $this->getRepository()->archiveChannel($entity->getId());
+    }
+
+    /**
+     * Get messages in chat
+     *
+     * @param User      $withUser
+     * @param null      $lastId
+     * @param \DateTime $fromDate
+     *
+     * @return mixed
+     */
+    public function getGroupMessages(Channel $channel, $lastId = null, \DateTime $fromDate = null)
+    {
+        if ($fromDate == null) {
+            $fromDate  = $this->getChatHistoryDate($channel->getId());
+        }
+        return $this->getRepository()->getChannelConversation($channel, $lastId, $fromDate);
+    }
+
+    /**
+     * @param int $channelId
+     *
+     * @return \Mautic\CoreBundle\Helper\DateTimeHelper
+     */
+    public function getChatHistoryDate($channelId)
+    {
+        //save the from date from history so that the user doesn't have to wait to scroll back again
+        $session = $this->factory->getSession();
+
+        $fromDate = $session->get('mautic.chatchannel.history.' . $channelId);
+        if (empty($fromDate)) {
+            //get today's chats only
+            $fromDate = $this->factory->getDate(date('Y-m-d') . ' 00:00:00');
+        } else {
+            $fromDate = $this->factory->getDate(date('Y-m-d', strtotime($fromDate)) . ' 00:00:00');
+        }
+        $session->set('mautic.chatchannel.history.' . $channelId, $fromDate->toLocalString());
+
+        return $fromDate->getUtcDateTime();
+    }
+
+    /**
+     * @param Channel
+     * @param int $lastId
+     */
+    public function markMessagesRead($channel, $lastId = 0)
+    {
+        $this->getRepository()->markRead($this->factory->getUser(), $channel, $lastId);
+    }
+
+    /**
+     * @param Channel $channel
+     *
+     * @return array
+     */
+    public function getUserChannelStats(Channel $channel)
+    {
+        return $this->getRepository()->getChannelStatForUser($this->factory->getUser(), $channel);
     }
 }

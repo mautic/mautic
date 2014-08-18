@@ -6,14 +6,31 @@
  * @link        http://mautic.com
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+$lastMsg   = array('id' => 0);
+$channelId = (isset($channel)) ? $channel->getId() : 0;
 if (!empty($inPopup)):
     $view->extend('MauticCoreBundle:Default:slim.html.php');
-endif;
+    $view['assets']->addScriptDeclaration("Mautic.activateChatInput('{$channelId->getId()}', 'channel');", 'bodyClose');
 ?>
+<div id="ChatConversation">
+<?php endif; ?>
+    <ul class="media-list media-list-bubble" id="ChatMessages">
+    <?php
+    if (!empty($messages)):
+        $lastMsg = end($messages);
+        if (!empty($channelId)): ?>
+        <?php echo $view->render('MauticChatBundle:Channel:messages.html.php', array(
+            'messages'            => $messages,
+            'me'                  => $me,
+            'channel'             => $channel,
+            'insertUnreadDivider' => (!empty($insertUnreadDivider)) ? true : false
+        )); ?>
+        <?php endif; ?>
+    <?php endif; ?>
+    </ul>
+    <input type="hidden" id="ChatLastMessageId" value="<?php echo $lastMsg['id']; ?>" />
+    <input type="hidden" id="ChatChannelId" value="<?php echo $channelId; ?>" />
 
-<div class="footer">
-    <div class="has-icon">
-        <input class="form-control" type="text" placeholder="<?php echo $view['translator']->trans('mautic.chat.chat.input.placeholder'); ?>" />
-        <i class="fa fa-send form-control-icon"></i>
-    </div>
+<?php if (!empty($inPopup)): ?>
 </div>
+<?php endif; ?>

@@ -64,9 +64,10 @@ class ChatRepository extends CommonRepository
 
         $results = $q->getQuery()->getArrayResult();
 
+        $this->generateOnlineStatuses($results, array('fromUser', 'toUser'));
+
         return $results;
     }
-
 
     /**
      * Returns a list of users that can be used in chat, etc
@@ -80,12 +81,8 @@ class ChatRepository extends CommonRepository
     {
         $q = $this->_em->createQueryBuilder();
 
-        $dt = new DateTimeHelper(strtotime('15 minutes ago'), 'U', 'local');
-        $delay = $dt->getUtcDateTime();
-
-        $q->select('u.id, u.firstName, u.lastName, u.email, u.lastActive, (CASE WHEN (u.onlineStatus = \'\' or u.onlineStatus IS NULL) and u.lastActive >= :delay THEN \'online\' ELSE \'offline\' END) as onlineStatus')
-            ->from('MauticUserBundle:User', 'u', 'u.id')
-            ->setParameter('delay', $delay);
+        $q->select('u.id, u.firstName, u.lastName, u.email, u.lastActive, u.onlineStatus')
+            ->from('MauticUserBundle:User', 'u', 'u.id');
         if (!empty($currentUserId)) {
             $q->where('u.id != :currentUser')
                 ->setParameter('currentUser', $currentUserId);
@@ -119,7 +116,48 @@ class ChatRepository extends CommonRepository
         }
 
         $results = $q->getQuery()->getArrayResult();
+
+        $this->generateOnlineStatuses($results);
+
         return $results;
+    }
+
+    private function generateOnlineStatuses(&$results, $key = null)
+    {
+        //fix online statuses
+        $dt    = new DateTimeHelper(strtotime('15 minutes ago'), 'U', 'local');
+        $delay = $dt->getUtcDateTime();
+        foreach ($results as &$r) {
+            if (is_array($key)) {
+                foreach ($key as $k) {
+                    if ($k === null) {
+                        $use =& $r;
+                    } else {
+                        $use =& $r[$k];
+                    }
+
+                    if (empty($use['onlineStatus'])) {
+                        $use['onlineStatus'] = ($use['lastActive'] >= $delay) ? 'online' : 'offline';
+                    } elseif (!empty($use['onlineStatus']) && $use['lastActive'] < $delay) {
+                        $use['onlineStatus'] = 'offline';
+                    }
+                    unset($use);
+                }
+            } else {
+                if ($key === null) {
+                    $use =& $r;
+                } else {
+                    $use =& $r[$key];
+                }
+
+                if (empty($use['onlineStatus'])) {
+                    $use['onlineStatus'] = ($use['lastActive'] >= $delay) ? 'online' : 'offline';
+                } elseif (!empty($use['onlineStatus']) && $use['lastActive'] < $delay) {
+                    $use['onlineStatus'] = 'offline';
+                }
+                unset($use);
+            }
+        }
     }
 
     /**

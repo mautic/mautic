@@ -23,7 +23,8 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
  *
  * @package Mautic\CoreBundle\Controller
  */
-class CommonController extends Controller implements MauticController{
+class CommonController extends Controller implements MauticController
+{
     /**
      * @var \Mautic\CoreBundle\Factory\MauticFactory
      */
@@ -143,10 +144,6 @@ class CommonController extends Controller implements MauticController{
         $contentTemplate = array_key_exists('contentTemplate', $args) ? $args['contentTemplate'] : '';
         $passthrough     = array_key_exists('passthroughVars', $args) ? $args['passthroughVars'] : array();
         $forward         = array_key_exists('forwardController', $args) ? $args['forwardController'] : false;
-
-        if (empty($contentTemplate)) {
-            $contentTemplate = 'Mautic'. $this->request->get('bundle') . 'Bundle:Default:index.html.php';
-        }
 
         //set the route to the returnUrl
         if (empty($passthrough["route"]) && !empty($args["returnUrl"])) {
