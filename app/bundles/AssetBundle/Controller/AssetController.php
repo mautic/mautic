@@ -283,11 +283,6 @@ class AssetController extends FormController
         ));
     }
 
-    public function createUploadForm(Mautic\AssetBundle\Model\AssetModel $model)
-    {
-        return $model->createForm($entity, $this->get('form.factory'), $action);
-    }
-
     /**
      * Generates new form and processes post data
      *
@@ -308,7 +303,7 @@ class AssetController extends FormController
         $action = $this->generateUrl('mautic_asset_action', array('objectAction' => 'new'));
 
         //create the form
-        $form = $this->createUploadForm($model);
+        $form   = $model->createForm($entity, $this->get('form.factory'), $action);
 
         ///Check for a submitted form and process it
         if ($method == 'POST') {
@@ -444,6 +439,8 @@ class AssetController extends FormController
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
+
+                    $entity->upload();
 
                     //form is valid so process the data
                     $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
