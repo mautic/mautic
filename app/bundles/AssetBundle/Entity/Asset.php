@@ -43,6 +43,14 @@ class Asset extends FormEntity
     private $title;
 
     /**
+     * @ORM\Column(name="path", type="string", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full"})
+     */
+    private $path;
+
+    /**
      * @Assert\File(maxSize="6000000")
      */
     private $file;
@@ -218,6 +226,30 @@ class Asset extends FormEntity
     public function getTitle()
     {
         return $this->title;
+    }
+
+    /**
+     * Set path
+     *
+     * @param string $path
+     * @return Asset
+     */
+    public function setPath($path)
+    {
+        $this->isChanged('path', $path);
+        $this->path = $path;
+
+        return $this;
+    }
+
+    /**
+     * Get path
+     *
+     * @return string
+     */
+    public function getPath()
+    {
+        return $this->path;
     }
 
     /**
@@ -629,7 +661,7 @@ class Asset extends FormEntity
             return;
         }
 
-        // use the original file name here but you should
+        // TODO: use the original file name here but you should
         // sanitize it at least to avoid any security issues
 
         // move takes the target directory and then the
@@ -646,6 +678,11 @@ class Asset extends FormEntity
         $this->file = null;
     }
 
+    /**
+     * Returns absolut path to the file.
+     * 
+     * @return string
+     */
     public function getAbsolutePath()
     {
         return null === $this->path
@@ -653,6 +690,11 @@ class Asset extends FormEntity
             : $this->getUploadRootDir().'/'.$this->path;
     }
 
+    /**
+     * Returns relative path to the file.
+     * 
+     * @return string
+     */
     public function getWebPath()
     {
         return null === $this->path
@@ -660,17 +702,23 @@ class Asset extends FormEntity
             : $this->getUploadDir().'/'.$this->path;
     }
 
+    /**
+     * Returns absolut path to upload dir.
+     * 
+     * @return string
+     */
     protected function getUploadRootDir()
     {
-        // the absolute directory path where uploaded
-        // documents should be saved
-        return __DIR__.'/../../../../web/'.$this->getUploadDir();
+        return __DIR__.'/../../../../'.$this->getUploadDir();
     }
 
+    /**
+     * Returns relative path to upload dir.
+     * 
+     * @return string 
+     */
     protected function getUploadDir()
     {
-        // get rid of the __DIR__ so it doesn't screw up
-        // when displaying uploaded doc/image in the view.
-        return 'uploads/documents';
+        return 'assets/files';
     }
 }
