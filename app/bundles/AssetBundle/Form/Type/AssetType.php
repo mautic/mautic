@@ -42,7 +42,7 @@ class AssetType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber(array('content' => 'html')));
+        $builder->addEventSubscriber(new CleanFormSubscriber(array('content' => 'html', 'file' => 'raw')));
         $builder->addEventSubscriber(new FormExitSubscriber('asset.asset', $options));
 
         $variantParent = $options['data']->getVariantParent();

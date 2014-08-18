@@ -177,23 +177,23 @@ class AssetController extends FormController
         list($parent, $children) = $model->getVariants($activeAsset);
         $properties = array();
         if (count($children)) {
-            foreach ($children as $c) {
-                $variantSettings = $c->getVariantSettings();
+            // foreach ($children as $c) {
+            //     $variantSettings = $c->getVariantSettings();
 
-                if (is_array($variantSettings) && isset($variantSettings['winnerCriteria'])) {
-                    if (!isset($lastCriteria)) {
-                        $lastCriteria = $variantSettings['winnerCriteria'];
-                    }
+            //     if (is_array($variantSettings) && isset($variantSettings['winnerCriteria'])) {
+            //         if (!isset($lastCriteria)) {
+            //             $lastCriteria = $variantSettings['winnerCriteria'];
+            //         }
 
-                    //make sure all the variants are configured with the same criteria
-                    if ($lastCriteria != $variantSettings['winnerCriteria']) {
-                        $variantError = $this->factory->getTranslator()->trans('mautic.asset.asset.variant.misconfiguration');
-                        break;
-                    }
+            //         //make sure all the variants are configured with the same criteria
+            //         if ($lastCriteria != $variantSettings['winnerCriteria']) {
+            //             $variantError = $this->factory->getTranslator()->trans('mautic.asset.asset.variant.misconfiguration');
+            //             break;
+            //         }
 
-                    $properties[$c->getId()][] = $variantSettings;
-                }
-            }
+            //         $properties[$c->getId()][] = $variantSettings;
+            //     }
+            // }
         }
         $abTestResults = array();
         if (!empty($lastCriteria)) {
