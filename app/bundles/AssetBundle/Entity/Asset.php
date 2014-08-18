@@ -12,6 +12,8 @@ namespace Mautic\AssetBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Entity\FormEntity;
 use JMS\Serializer\Annotation as Serializer;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Class Asset
@@ -41,17 +43,25 @@ class Asset extends FormEntity
     private $title;
 
     /**
+     * @ORM\Column(name="path", type="string", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full"})
+     */
+    private $path;
+
+    /**
+     * @Assert\File(maxSize="6000000")
+     */
+    private $file;
+
+    /**
      * @ORM\Column(name="alias", type="string")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})
      */
     private $alias;
-
-    /**
-     * @ORM\Column(type="string")
-     */
-    private $template;
 
     /**
      * @ORM\Column(name="author", type="string", nullable=true)
@@ -68,14 +78,6 @@ class Asset extends FormEntity
      * @Serializer\Groups({"full"})
      */
     private $language = 'en';
-
-    /**
-     * @ORM\Column(name="content", type="array")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
-     */
-    private $content = array();
 
     /**
      * @ORM\Column(name="publish_up", type="datetime", nullable=true)
@@ -116,14 +118,6 @@ class Asset extends FormEntity
      * @Serializer\Groups({"full"})
      */
     private $revision = 1;
-
-    /**
-     * @ORM\Column(name="meta_description", type="string", nullable=true, length=160)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
-     */
-    private $metaDescription;
 
     /**
      * @ORM\ManyToOne(targetEntity="Category", inversedBy="assets")
@@ -191,6 +185,26 @@ class Asset extends FormEntity
     }
 
     /**
+     * Sets file.
+     *
+     * @param UploadedFile $file
+     */
+    public function setFile(UploadedFile $file = null)
+    {
+        $this->file = $file;
+    }
+
+    /**
+     * Get file.
+     *
+     * @return UploadedFile
+     */
+    public function getFile()
+    {
+        return $this->file;
+    }
+
+    /**
      * Set title
      *
      * @param string $title
@@ -215,6 +229,30 @@ class Asset extends FormEntity
     }
 
     /**
+     * Set path
+     *
+     * @param string $path
+     * @return Asset
+     */
+    public function setPath($path)
+    {
+        $this->isChanged('path', $path);
+        $this->path = $path;
+
+        return $this;
+    }
+
+    /**
+     * Get path
+     *
+     * @return string
+     */
+    public function getPath()
+    {
+        return $this->path;
+    }
+
+    /**
      * Set alias
      *
      * @param string $alias
@@ -236,30 +274,6 @@ class Asset extends FormEntity
     public function getAlias()
     {
         return $this->alias;
-    }
-
-    /**
-     * Set content
-     *
-     * @param string $content
-     * @return Asset
-     */
-    public function setContent($content)
-    {
-        $this->isChanged('content', $content);
-        $this->content = $content;
-
-        return $this;
-    }
-
-    /**
-     * Get content
-     *
-     * @return string
-     */
-    public function getContent()
-    {
-        return $this->content;
     }
 
     /**
@@ -357,30 +371,6 @@ class Asset extends FormEntity
     }
 
     /**
-     * Set metaDescription
-     *
-     * @param string $metaDescription
-     * @return Asset
-     */
-    public function setMetaDescription($metaDescription)
-    {
-        $this->isChanged('metaDescription', $metaDescription);
-        $this->metaDescription = $metaDescription;
-
-        return $this;
-    }
-
-    /**
-     * Get metaDescription
-     *
-     * @return string
-     */
-    public function getMetaDescription()
-    {
-        return $this->metaDescription;
-    }
-
-    /**
      * Set language
      *
      * @param string $language
@@ -473,30 +463,6 @@ class Asset extends FormEntity
     public function getSessionId()
     {
         return $this->sessionId;
-    }
-
-    /**
-     * Set template
-     *
-     * @param string $template
-     * @return Asset
-     */
-    public function setTemplate($template)
-    {
-        $this->isChanged('template', $template);
-        $this->template = $template;
-
-        return $this;
-    }
-
-    /**
-     * Get template
-     *
-     * @return string
-     */
-    public function getTemplate()
-    {
-        return $this->template;
     }
 
     /**
@@ -685,5 +651,74 @@ class Asset extends FormEntity
     public function getUniqueHits()
     {
         return $this->uniqueHits;
+    }
+
+    public function upload()
+    {
+
+        // the file property can be empty if the field is not required
+        if (null === $this->getFile()) {
+            return;
+        }
+
+        // TODO: use the original file name here but you should
+        // sanitize it at least to avoid any security issues
+
+        // move takes the target directory and then the
+        // target filename to move to
+        $this->getFile()->move(
+            $this->getUploadRootDir(),
+            $this->getFile()->getClientOriginalName()
+        );
+
+        // set the path property to the filename where you've saved the file
+        $this->path = $this->getFile()->getClientOriginalName();
+
+        // clean up the file property as you won't need it anymore
+        $this->file = null;
+    }
+
+    /**
+     * Returns absolut path to the file.
+     * 
+     * @return string
+     */
+    public function getAbsolutePath()
+    {
+        return null === $this->path
+            ? null
+            : $this->getUploadRootDir().'/'.$this->path;
+    }
+
+    /**
+     * Returns relative path to the file.
+     * 
+     * @return string
+     */
+    public function getWebPath()
+    {
+        return null === $this->path
+            ? null
+            : $this->getUploadDir().'/'.$this->path;
+    }
+
+    /**
+     * Returns absolut path to upload dir.
+     * 
+     * @return string
+     */
+    protected function getUploadRootDir()
+    {
+        return __DIR__.'/../../../../'.$this->getUploadDir();
+    }
+
+    /**
+     * Returns relative path to upload dir.
+     * 
+     * @return string 
+     */
+    protected function getUploadDir()
+    {
+        return 'assets/files';
     }
 }

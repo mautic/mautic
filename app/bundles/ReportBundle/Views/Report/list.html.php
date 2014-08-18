@@ -7,56 +7,56 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 if ($tmpl == 'index')
-$view->extend('MauticAssetBundle:Asset:index.html.php');
+$view->extend('MauticReportBundle:Report:index.html.php');
 ?>
 
 <div class="table-responsive scrollable body-white padding-sm page-list">
-    <?php if (count($items)): ?>
-        <table class="table table-hover table-striped table-bordered asset-list">
+    <?php if (/*count($items)*/ true == false): ?>
+        <table class="table table-hover table-striped table-bordered page-list">
             <thead>
             <tr>
-                <th class="col-asset-actions"></th>
+                <th class="col-page-actions"></th>
                 <?php
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
-                    'sessionVar' => 'asset',
+                    'sessionVar' => 'page',
                     'orderBy'    => 'p.title',
-                    'text'       => 'mautic.asset.asset.thead.title',
+                    'text'       => 'mautic.report.report.thead.title',
                     'class'      => 'col-page-title',
                     'default'    => true
                 ));
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
-                    'sessionVar' => 'asset',
+                    'sessionVar' => 'page',
                     'orderBy'    => 'c.title',
-                    'text'       => 'mautic.asset.asset.thead.category',
+                    'text'       => 'mautic.report.report.thead.category',
                     'class'      => 'visible-md visible-lg col-page-category'
                 ));
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
-                    'sessionVar' => 'asset',
+                    'sessionVar' => 'page',
                     'orderBy'    => 'p.author',
-                    'text'       => 'mautic.asset.asset.thead.author',
+                    'text'       => 'mautic.report.report.thead.author',
                     'class'      => 'visible-md visible-lg col-page-author'
                 ));
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
-                    'sessionVar' => 'asset',
+                    'sessionVar' => 'page',
                     'orderBy'    => 'p.language',
-                    'text'       => 'mautic.asset.asset.thead.language',
+                    'text'       => 'mautic.report.report.thead.language',
                     'class'      => 'visible-md visible-lg col-page-lang'
                 ));
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
-                    'sessionVar' => 'asset',
+                    'sessionVar' => 'page',
                     'orderBy'    => 'p.hits',
-                    'text'       => 'mautic.asset.asset.thead.hits',
+                    'text'       => 'mautic.report.report.thead.hits',
                     'class'      => 'col-page-hits'
                 ));
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
-                    'sessionVar' => 'asset',
+                    'sessionVar' => 'page',
                     'orderBy'    => 'p.id',
-                    'text'       => 'mautic.asset.asset.thead.id',
+                    'text'       => 'mautic.report.report.thead.id',
                     'class'      => 'col-page-id'
                 ));
                 ?>
@@ -74,17 +74,18 @@ $view->extend('MauticAssetBundle:Asset:index.html.php');
                         echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
                             'item'      => $item,
                             'edit'      => $security->hasEntityAccess(
-                                $permissions['asset:assets:editown'],
-                                $permissions['asset:assets:editother'],
+                                $permissions['report:reports:editown'],
+                                $permissions['report:reports:editother'],
                                 $item->getCreatedBy()
                             ),
+                            'clone'     => $permissions['report:reports:create'],
                             'delete'    => $security->hasEntityAccess(
-                                $permissions['asset:assets:deleteown'],
-                                $permissions['asset:assets:deleteother'],
+                                $permissions['report:reports:deleteown'],
+                                $permissions['report:reports:deleteother'],
                                 $item->getCreatedBy()),
-                            'routeBase' => 'asset',
-                            'menuLink'  => 'mautic_asset_index',
-                            'langVar'   => 'asset.asset',
+                            'routeBase' => 'report',
+                            'menuLink'  => 'mautic_report_index',
+                            'langVar'   => 'report.report',
                             'nameGetter' => 'getTitle'
                         ));
                         ?>
@@ -92,14 +93,13 @@ $view->extend('MauticAssetBundle:Asset:index.html.php');
                     <td>
                         <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php',array(
                             'item'       => $item,
-                            'dateFormat' => (!empty($dateFormat)) ? $dateFormat : 'F j, Y g:i a',
-                            'model'      => 'asset.asset'
+                            'model'      => 'report.report'
                         )); ?>
-                        <!-- <a href="<?php echo $view['router']->generate('mautic_asset_action',
+                        <a href="<?php echo $view['router']->generate('mautic_report_action',
                             array("objectAction" => "view", "objectId" => $item->getId())); ?>"
-                           data-toggle="ajax"> -->
+                           data-toggle="ajax">
                             <?php echo $item->getTitle(); ?> (<?php echo $item->getAlias(); ?>)
-                        <!-- </a> -->
+                        </a>
                         <?php
                         $hasVariants   = count($variantChildren);
                         $hasTranslations = count($translationChildren);
@@ -130,5 +130,13 @@ $view->extend('MauticAssetBundle:Asset:index.html.php');
     <?php else: ?>
         <h4><?php echo $view['translator']->trans('mautic.core.noresults'); ?></h4>
     <?php endif; ?>
+    <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
+        "totalItems"      => /*count($items)*/ 0,
+        "page"            => $page,
+        "limit"           => /*$limit*/ 0,
+        "menuLinkId"      => 'mautic_report_index',
+        "baseUrl"         => $view['router']->generate('mautic_report_index'),
+        'sessionVar'      => 'page'
+    )); ?>
     <div class="footer-margin"></div>
 </div>

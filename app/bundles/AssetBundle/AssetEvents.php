@@ -30,14 +30,14 @@ final class AssetEvents
 
 
     /**
-     * The mautic.asset_on_build event is thrown before displaying the asset builder form to allow adding of tokens
+     * The mautic.asset_on_upload event is thrown before uploading a file
      *
      * The event listener receives a
      * Mautic\AssetBundle\Event\AssetEvent instance.
      *
      * @var string
      */
-    const ASSET_ON_BUILD   = 'mautic.asset_on_build';
+    const ASSET_ON_UPLOAD   = 'mautic.asset_on_upload';
 
     /*
      * The mautic.asset_on_display event is thrown before displaying the asset content

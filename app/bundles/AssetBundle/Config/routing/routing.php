@@ -44,4 +44,12 @@ $collection->add('mautic_asset_action', new Route('/assets/{objectAction}/{objec
     )
 ));
 
+$collection->add('mautic_asset_public', new Route('/p/asset/{slug1}/{slug2}/{slug3}',
+    array(
+        '_controller' => 'MauticAssetBundle:Public:index',
+        "slug2"       => '',
+        "slug3"       => ''
+    )
+));
+
 return $collection;

@@ -136,18 +136,68 @@ class AssetModel extends FormModel
     {
         $results = array();
         switch ($type) {
-            case 'page':
-                $viewOther = $this->security->isGranted('page:pages:viewother');
+            case 'asset':
+                $viewOther = $this->security->isGranted('asset:assets:viewother');
                 $repo      = $this->getRepository();
                 $repo->setCurrentUser($this->factory->getUser());
-                $results = $repo->getPageList($filter, $limit, 0, $viewOther);
+                $results = $repo->getAssetList($filter, $limit, 0, $viewOther);
                 break;
             case 'category':
-                $results = $this->factory->getModel('page.category')->getRepository()->getCategoryList($filter, $limit, 0);
+                $results = $this->factory->getModel('asset.category')->getRepository()->getCategoryList($filter, $limit, 0);
                 break;
         }
 
         return $results;
+    }
+
+    /**
+     * Get the variant parent/children
+     *
+     * @param Asset $asset
+     *
+     * @return array
+     */
+    public function getVariants(Asset $asset)
+    {
+        $parent = $asset->getVariantParent();
+
+        if (!empty($parent)) {
+            $children = $parent->getVariantChildren();
+        } else {
+            $parent   = $asset;
+            $children = $asset->getVariantChildren();
+        }
+
+        if (empty($children)) {
+            $children = false;
+        }
+
+        return array($parent, $children);
+    }
+
+    /**
+     * Get translation parent/children
+     *
+     * @param Asset $asset
+     *
+     * @return array
+     */
+    public function getTranslations(Asset $asset)
+    {
+        $parent = $asset->getTranslationParent();
+
+        if (!empty($parent)) {
+            $children = $parent->getTranslationChildren();
+        } else {
+            $parent   = $asset;
+            $children = $asset->getTranslationChildren();
+        }
+
+        if (empty($children)) {
+            $children = false;
+        }
+
+        return array($parent, $children);
     }
 
     /**
@@ -157,36 +207,36 @@ class AssetModel extends FormModel
      * @param $absolute
      * @return mixed
      */
-    // public function generateUrl($entity, $absolute = true)
-    // {
-    //     $pageSlug = $entity->getId() . ':' . $entity->getAlias();
+    public function generateUrl($entity, $absolute = true)
+    {
+        $assetSlug = $entity->getId() . ':' . $entity->getAlias();
 
-    //     //should the url include the category
-    //     $catInUrl    = $this->factory->getParameter('cat_in_page_url');
-    //     if ($catInUrl) {
-    //         $category = $entity->getCategory();
-    //         $catSlug = (!empty($category)) ? $category->getId() . ':' . $category->getAlias() :
-    //             $this->translator->trans('mautic.core.url.uncategorized');
-    //     }
+        //should the url include the category
+        $catInUrl    = $this->factory->getParameter('cat_in_asset_url');
+        if ($catInUrl) {
+            $category = $entity->getCategory();
+            $catSlug = (!empty($category)) ? $category->getId() . ':' . $category->getAlias() :
+                $this->translator->trans('mautic.core.url.uncategorized');
+        }
 
-    //     $parent = $entity->getTranslationParent();
-    //     if ($parent) {
-    //         //multiple languages so tak on the language
-    //         $slugs = array(
-    //             'slug1' => $entity->getLanguage(),
-    //             'slug2' => (!empty($catSlug)) ? $catSlug : $pageSlug,
-    //             'slug3' => (!empty($catSlug)) ? $pageSlug : ''
-    //         );
-    //     } else {
-    //         $slugs = array(
-    //             'slug1' => (!empty($catSlug)) ? $catSlug : $pageSlug,
-    //             'slug2' => (!empty($catSlug)) ? $pageSlug : '',
-    //             'slug3' => ''
-    //         );
-    //     }
+        $parent = $entity->getTranslationParent();
+        if ($parent) {
+            //multiple languages so tak on the language
+            $slugs = array(
+                'slug1' => $entity->getLanguage(),
+                'slug2' => (!empty($catSlug)) ? $catSlug : $assetSlug,
+                'slug3' => (!empty($catSlug)) ? $assetSlug : ''
+            );
+        } else {
+            $slugs = array(
+                'slug1' => (!empty($catSlug)) ? $catSlug : $assetSlug,
+                'slug2' => (!empty($catSlug)) ? $assetSlug : '',
+                'slug3' => ''
+            );
+        }
 
-    //     $pageUrl  = $this->factory->getRouter()->generate('mautic_page_public', $slugs, $absolute);
+        $assetUrl  = $this->factory->getRouter()->generate('mautic_asset_public', $slugs, $absolute);
 
-    //     return $pageUrl;
-    // }
+        return $assetUrl;
+    }
 }

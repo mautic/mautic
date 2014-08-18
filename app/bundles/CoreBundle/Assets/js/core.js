@@ -418,22 +418,24 @@ var Mautic = {
     },
 
     /**
-     * Posts a form and returns the output
+     * Posts a form and returns the output.
+     * Uses jQuery form plugin so it handles files as well.
      * @param form
      * @param callback
      */
     postForm: function (form, callback) {
+        var form = mQuery(form);
         var action = form.attr('action');
-       // var ajaxRoute = action + ((/\?/i.test(action)) ? "&ajax=1" : "?ajax=1");
-        mQuery.ajax({
-            type: form.attr('method'),
-            url: action,
-            data: form.serialize(),
-            dataType: "json",
-            success: function (data) {
+
+        form.attr('action', action + ((/\?/i.test(action)) ? "&ajax=1" : "?ajax=1"));
+        form.ajaxSubmit({
+            success: function(data) {
                 callback(data);
             },
-            error: function (request, textStatus, errorThrown) {
+            error: function(info, type, errorThrown) {
+                if ('console' in window) {
+                    console.log('form error log', info);
+                }
                 if (mauticEnv == 'dev') {
                     alert(errorThrown);
                 }
