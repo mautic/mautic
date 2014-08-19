@@ -12,6 +12,8 @@ namespace Mautic\PageBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Entity\FormEntity;
 use JMS\Serializer\Annotation as Serializer;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
  * Class Page
@@ -195,6 +197,17 @@ class Page extends FormEntity
     public function __clone() {
         $this->id = null;
     }
+
+    /**
+     * @param ClassMetadata $metadata
+     */
+    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    {
+        $metadata->addPropertyConstraint('title', new NotBlank(array(
+            'message' => 'mautic.page.page.title.notblank'
+        )));
+    }
+
 
     /**
      * Get id

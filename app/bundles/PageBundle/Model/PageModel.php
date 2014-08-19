@@ -479,7 +479,7 @@ class PageModel extends FormModel
         }
 
         if (empty($children)) {
-            $children = false;
+            $children = array();
         }
 
         return array($parent, $children);
