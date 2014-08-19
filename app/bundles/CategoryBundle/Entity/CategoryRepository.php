@@ -7,7 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\PageBundle\Entity;
+namespace Mautic\CategoryBundle\Entity;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -15,7 +15,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * Class CategoryRepository
  *
- * @package Mautic\PageBundle\Entity
+ * @package Mautic\CategoryBundle\Entity
  */
 class CategoryRepository extends CommonRepository
 {
@@ -73,7 +73,6 @@ class CategoryRepository extends CommonRepository
         $results = $q->getQuery()->getArrayResult();
         return $results;
     }
-
 
     /**
      * @param QueryBuilder $q

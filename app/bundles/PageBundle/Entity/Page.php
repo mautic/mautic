@@ -134,7 +134,7 @@ class Page extends FormEntity
     private $metaDescription;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Category", inversedBy="pages")
+     * @ORM\ManyToOne(targetEntity="Mautic\CategoryBundle\Entity\Category")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})
@@ -423,10 +423,10 @@ class Page extends FormEntity
     /**
      * Set category
      *
-     * @param \Mautic\PageBundle\Entity\Category $category
+     * @param \Mautic\CategoryBundle\Entity\Category $category
      * @return Page
      */
-    public function setCategory(\Mautic\PageBundle\Entity\Category $category = null)
+    public function setCategory(\Mautic\CategoryBundle\Entity\Category $category = null)
     {
         $this->isChanged('category', $category);
         $this->category = $category;
@@ -437,7 +437,7 @@ class Page extends FormEntity
     /**
      * Get category
      *
-     * @return \Mautic\PageBundle\Entity\Category
+     * @return \Mautic\CategoryBundle\Entity\Category
      */
     public function getCategory()
     {

@@ -1075,7 +1075,7 @@ var Mautic = {
      * @param model
      * @param id
      */
-    togglePublishStatus: function (event, el, model, id) {
+    togglePublishStatus: function (event, el, model, id, extra) {
         event.preventDefault();
 
         //destroy tooltips so it can be regenerated
@@ -1087,10 +1087,13 @@ var Mautic = {
         //start icon spin
         Mautic.startIconSpinOnEvent(event);
 
+        if (extra) {
+            extra = '&' + extra;
+        }
         mQuery.ajax({
             url: mauticAjaxUrl,
             type: "POST",
-            data: "action=togglePublishStatus&model=" + model + '&id=' + id,
+            data: "action=togglePublishStatus&model=" + model + '&id=' + id + extra,
             dataType: "json",
             success: function (response) {
                 Mautic.stopIconSpinPostEvent();

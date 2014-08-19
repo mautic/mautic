@@ -7,7 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\PageBundle\Entity;
+namespace Mautic\CategoryBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Entity\FormEntity;
@@ -15,8 +15,8 @@ use JMS\Serializer\Annotation as Serializer;
 
 /**
  * Class Category
- * @ORM\Table(name="page_categories")
- * @ORM\Entity(repositoryClass="Mautic\PageBundle\Entity\CategoryRepository")
+ * @ORM\Table(name="categories")
+ * @ORM\Entity(repositoryClass="Mautic\CategoryBundle\Entity\CategoryRepository")
  * @Serializer\ExclusionPolicy("all")
  */
 class Category extends FormEntity
@@ -56,20 +56,16 @@ class Category extends FormEntity
     private $description;
 
     /**
-     * @ORM\OneToMany(targetEntity="Page", mappedBy="category")
-     **/
-    private $pages;
-
-    public function __clone() {
-        $this->id = null;
-    }
-
-    /**
-     * Constructor
+     * @ORM\Column(type="string", length=50)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full"})
      */
-    public function __construct()
+    private $bundle;
+
+    public function __clone()
     {
-        $this->pages = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->id = null;
     }
 
     /**
@@ -152,35 +148,18 @@ class Category extends FormEntity
     }
 
     /**
-     * Add pages
-     *
-     * @param \Mautic\PageBundle\Entity\Page $pages
-     * @return Category
+     * @return mixed
      */
-    public function addPage(\Mautic\PageBundle\Entity\Page $pages)
+    public function getBundle ()
     {
-        $this->pages[] = $pages;
-
-        return $this;
+        return $this->bundle;
     }
 
     /**
-     * Remove pages
-     *
-     * @param \Mautic\PageBundle\Entity\Page $pages
+     * @param mixed $bundle
      */
-    public function removePage(\Mautic\PageBundle\Entity\Page $pages)
+    public function setBundle ($bundle)
     {
-        $this->pages->removeElement($pages);
-    }
-
-    /**
-     * Get pages
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getPages()
-    {
-        return $this->pages;
+        $this->bundle = $bundle;
     }
 }

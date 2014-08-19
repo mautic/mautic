@@ -7,7 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\PageBundle\Controller;
+namespace Mautic\CategoryBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -16,40 +16,70 @@ class CategoryController extends FormController
 {
 
     /**
-     * @param int    $page
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @param        $bundle
+     * @param        $objectAction
+     * @param int    $objectId
+     * @param string $objectModel
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function indexAction($page = 1)
+    public function executeCategoryAction($bundle, $objectAction, $objectId = 0, $objectModel = '') {
+        if (method_exists($this, "{$objectAction}Action")) {
+            return $this->{"{$objectAction}Action"}($bundle, $objectId, $objectModel);
+        } else {
+            return $this->accessDenied();
+        }
+    }
+
+    /**
+     * @param     $bundle
+     * @param int $page
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function indexAction($bundle, $page = 1)
     {
         $session = $this->factory->getSession();
 
         //set some permissions
         $permissions = $this->factory->getSecurity()->isGranted(array(
-            'page:categories:view',
-            'page:categories:create',
-            'page:categories:edit',
-            'page:categories:delete'
+            $bundle.':categories:view',
+            $bundle.':categories:create',
+            $bundle.':categories:edit',
+            $bundle.':categories:delete'
         ), "RETURN_ARRAY");
 
-        if (!$permissions['page:categories:view']) {
+        if (!$permissions[$bundle.':categories:view']) {
             return $this->accessDenied();
         }
 
+        $viewParams = array(
+            'page'   => $page,
+            'bundle' => $bundle
+        );
+
         //set limits
-        $limit = $session->get('mautic.pagecategory.limit', $this->factory->getParameter('default_pagelimit'));
+        $limit = $session->get('mautic.category.limit', $this->factory->getParameter('default_pagelimit'));
         $start = ($page === 1) ? 0 : (($page-1) * $limit);
         if ($start < 0) {
             $start = 0;
         }
 
-        $search = $this->request->get('search', $session->get('mautic.pagecategory.filter', ''));
-        $session->set('mautic.pagecategory.filter', $search);
+        $search = $this->request->get('search', $session->get('mautic.category.filter', ''));
+        $session->set('mautic.category.filter', $search);
 
-        $filter     = array('string' => $search, 'force' => array());
-        $orderBy    = $this->factory->getSession()->get('mautic.pagecategory.orderby', 'c.title');
-        $orderByDir = $this->factory->getSession()->get('mautic.pagecategory.orderbydir', 'DESC');
+        $filter     = array('string' => $search, 'force' => array(
+            array(
+                'column' => 'c.bundle',
+                'expr'   => 'eq',
+                'value'  => $bundle
+            )
+        ));
 
-        $entities = $this->factory->getModel('page.category')->getEntities(
+        $orderBy    = $this->factory->getSession()->get('mautic.category.orderby', 'c.title');
+        $orderByDir = $this->factory->getSession()->get('mautic.category.orderbydir', 'DESC');
+
+        $entities = $this->factory->getModel('category.category')->getEntities(
             array(
                 'start'      => $start,
                 'limit'      => $limit,
@@ -66,41 +96,41 @@ class CategoryController extends FormController
             } else {
                 $lastPage = (floor($limit / $count)) ? : 1;
             }
-            $session->set('mautic.pagecategory.page', $lastPage);
-            $returnUrl   = $this->generateUrl('mautic_pagecategory_index', array('page' => $lastPage));
+            $viewParams['page'] = $lastPage;
+            $session->set('mautic.category.page', $lastPage);
+            $returnUrl   = $this->generateUrl('mautic_category_index', $viewParams);
 
             return $this->postActionRedirect(array(
                 'returnUrl'       => $returnUrl,
                 'viewParameters'  => array('page' => $lastPage),
-                'contentTemplate' => 'MauticPageBundle:Category:index',
+                'contentTemplate' => 'MauticCategoryBundle:Category:index',
                 'passthroughVars' => array(
-                    'activeLink'    => '#mautic_pagecategory_index',
-                    'mauticContent' => 'pagecategory'
+                    'activeLink'    => '#mautic_'.$bundle.'category_index',
+                    'mauticContent' => 'category'
                 )
             ));
         }
 
         //set what page currently on so that we can return here after form submission/cancellation
-        $session->set('mautic.pagecategory.page', $page);
+        $session->set('mautic.category.page', $page);
 
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
-
         return $this->delegateView(array(
-            'returnUrl'       => $this->generateUrl('mautic_pagecategory_index', array('page' => $page)),
+            'returnUrl'       => $this->generateUrl('mautic_category_index', $viewParams),
             'viewParameters'  => array(
+                'bundle'      => $bundle,
                 'searchValue' => $search,
                 'items'       => $entities,
                 'page'        => $page,
                 'limit'       => $limit,
                 'permissions' => $permissions,
-                'tmpl'        => $tmpl,
-                'dateFormat'  => $this->factory->getParameter('date_format_full')
+                'tmpl'        => $tmpl
             ),
-            'contentTemplate' => 'MauticPageBundle:Category:list.html.php',
+            'contentTemplate' => 'MauticCategoryBundle:Category:list.html.php',
             'passthroughVars' => array(
-                'activeLink'     => '#mautic_pagecategory_index',
-                'mauticContent'  => 'pagecategory',
+                'activeLink'     => '#mautic_'.$bundle.'category_index',
+                'mauticContent'  => 'category',
                 'replaceContent' => ($tmpl == 'list') ? 'true': 'false'
             )
         ));
@@ -111,22 +141,25 @@ class CategoryController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function newAction ()
+    public function newAction ($bundle)
     {
         $session = $this->factory->getSession();
-        $model   = $this->factory->getModel('page.category');
+        $model   = $this->factory->getModel('category.category');
         $entity  = $model->getEntity();
 
-        if (!$this->factory->getSecurity()->isGranted('page:categories:create')) {
+        if (!$this->factory->getSecurity()->isGranted($bundle.':categories:create')) {
             return $this->accessDenied();
         }
 
         //set the page we came from
-        $page   = $session->get('mautic.pagecategory.page', 1);
-        $action = $this->generateUrl('mautic_pagecategory_action', array('objectAction' => 'new'));
+        $page   = $session->get('mautic.category.page', 1);
+        $action = $this->generateUrl('mautic_category_action', array(
+            'objectAction' => 'new',
+            'bundle'       => $bundle
+        ));
 
         //create the form
-        $form = $model->createForm($entity, $this->get('form.factory'), $action);
+        $form = $model->createForm($entity, $this->get('form.factory'), $action, array('bundle' => $bundle));
 
         ///Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
@@ -138,11 +171,12 @@ class CategoryController extends FormController
 
                     $this->request->getSession()->getFlashBag()->add(
                         'notice',
-                        $this->get('translator')->trans('mautic.page.category.notice.created', array(
+                        $this->get('translator')->trans('mautic.category.notice.created', array(
                             '%name%' => $entity->getTitle(),
-                            '%url%'          => $this->generateUrl('mautic_pagecategory_action', array(
+                            '%url%'          => $this->generateUrl('mautic_category_action', array(
                                 'objectAction' => 'edit',
-                                'objectId'     => $entity->getId()
+                                'objectId'     => $entity->getId(),
+                                'bundle'       => $bundle
                             ))
                         ), 'flashes')
                     );
@@ -155,14 +189,17 @@ class CategoryController extends FormController
             }
 
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
-                $viewParameters  = array('page' => $page);
+                $viewParameters  = array(
+                    'page'   => $page,
+                    'bundle' => $bundle
+                );
                 return $this->postActionRedirect(array(
-                    'returnUrl'       => $this->generateUrl('mautic_pagecategory_index', $viewParameters),
+                    'returnUrl'       => $this->generateUrl('mautic_category_index', $viewParameters),
                     'viewParameters'  => $viewParameters,
-                    'contentTemplate' => 'MauticPageBundle:Category:index',
+                    'contentTemplate' => 'MauticCategoryBundle:Category:index',
                     'passthroughVars' => array(
-                        'activeLink'    => 'mautic_pagecategory_index',
-                        'mauticContent' => 'pagecategory'
+                        'activeLink'    => 'mautic_'.$bundle.'category_index',
+                        'mauticContent' => 'category'
                     )
                 ));
             }
@@ -170,13 +207,17 @@ class CategoryController extends FormController
 
         return $this->delegateView(array(
             'viewParameters' => array(
-                'form'           => $form->createView()
+                'form'   => $form->createView(),
+                'bundle' => $bundle,
             ),
-            'contentTemplate' => 'MauticPageBundle:Category:form.html.php',
+            'contentTemplate' => 'MauticCategoryBundle:Category:form.html.php',
             'passthroughVars' => array(
-                'activeLink'    => '#mautic_page_index',
+                'activeLink'    => 'mautic_'.$bundle.'category_index',
                 'mauticContent' => 'page',
-                'route'         => $this->generateUrl('mautic_pagecategory_action', array('objectAction' => 'new'))
+                'route'         => $this->generateUrl('mautic_category_action', array(
+                    'objectAction' => 'new',
+                    'bundle'       => $bundle
+                ))
             )
         ));
     }
@@ -186,24 +227,27 @@ class CategoryController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function editAction ($objectId, $ignorePost = false)
+    public function editAction ($bundle, $objectId, $ignorePost = false)
     {
-        $session = $this->factory->getSession();
-        $model   = $this->factory->getModel('page.category');
-        $entity  = $model->getEntity($objectId);
+        $session    = $this->factory->getSession();
+        $model      = $this->factory->getModel('category.category');
+        $entity     = $model->getEntity($objectId);
         //set the page we came from
-        $page    = $session->get('mautic.pagecategory.page', 1);
-
+        $page       = $session->get('mautic.category.page', 1);
+        $viewParams = array(
+            'page'   => $page,
+            'bundle' => $bundle
+        );
         //set the return URL
-        $returnUrl  = $this->generateUrl('mautic_pagecategory_index', array('page' => $page));
+        $returnUrl  = $this->generateUrl('mautic_category_index', $viewParams);
 
         $postActionVars = array(
             'returnUrl'       => $returnUrl,
-            'viewParameters'  => array('page' => $page),
-            'contentTemplate' => 'MauticPageBundle:Category:index',
+            'viewParameters'  => $viewParams,
+            'contentTemplate' => 'MauticCategoryBundle:Category:index',
             'passthroughVars' => array(
-                'activeLink'    => 'mautic_pagecategory_index',
-                'mauticContent' => 'pagecategory'
+                'activeLink'    => 'mautic_'.$bundle.'category_index',
+                'mauticContent' => 'category'
             )
         );
 
@@ -214,22 +258,26 @@ class CategoryController extends FormController
                     'flashes' => array(
                         array(
                             'type' => 'error',
-                            'msg'  => 'mautic.page.category.error.notfound',
+                            'msg'  => 'mautic.category.error.notfound',
                             'msgVars' => array('%id%' => $objectId)
                         )
                     )
                 ))
             );
-        }  elseif (!$this->factory->getSecurity()->isGranted('page:categories:view')) {
+        }  elseif (!$this->factory->getSecurity()->isGranted($bundle.':categories:view')) {
             return $this->accessDenied();
         } elseif ($model->isLocked($entity)) {
             //deny access if the entity is locked
-            return $this->isLocked($postActionVars, $entity, 'page.category');
+            return $this->isLocked($postActionVars, $entity, 'category.category');
         }
 
         //Create the form
-        $action = $this->generateUrl('mautic_pagecategory_action', array('objectAction' => 'edit', 'objectId' => $objectId));
-        $form   = $model->createForm($entity, $this->get('form.factory'), $action);
+        $action = $this->generateUrl('mautic_category_action', array(
+            'objectAction' => 'edit',
+            'objectId'     => $objectId,
+            'bundle'       => $bundle
+        ));
+        $form = $model->createForm($entity, $this->get('form.factory'), $action, array('bundle' => $bundle));
 
         ///Check for a submitted form and process it
         if (!$ignorePost && $this->request->getMethod() == 'POST') {
@@ -241,11 +289,12 @@ class CategoryController extends FormController
 
                     $this->request->getSession()->getFlashBag()->add(
                         'notice',
-                        $this->get('translator')->trans('mautic.page.category.notice.updated', array(
+                        $this->get('translator')->trans('mautic.category.notice.updated', array(
                             '%name%' => $entity->getTitle(),
-                            '%url%'  => $this->generateUrl('mautic_pagecategory_action', array(
+                            '%url%'  => $this->generateUrl('mautic_category_action', array(
                                 'objectAction' => 'edit',
-                                'objectId'     => $entity->getId()
+                                'objectId'     => $entity->getId(),
+                                'bundle'       => $bundle
                             ))
                         ), 'flashes')
                     );
@@ -258,11 +307,9 @@ class CategoryController extends FormController
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 return $this->postActionRedirect(
                     array_merge($postActionVars, array(
-                        'returnUrl'       => $this->generateUrl('mautic_pagecategory_index', array(
-                            'page' => $page
-                        )),
-                        'viewParameters'  => array('page' => $page),
-                        'contentTemplate' => 'MauticPageBundle:Category:index'
+                        'returnUrl'       => $this->generateUrl('mautic_category_index', $viewParams),
+                        'viewParameters'  => $viewParams,
+                        'contentTemplate' => 'MauticCategoryBundle:Category:index'
                     ))
                 );
             }
@@ -274,16 +321,18 @@ class CategoryController extends FormController
         return $this->delegateView(array(
             'viewParameters' => array(
                 'form'           => $form->createView(),
-                'activeCategory' => $entity
+                'activeCategory' => $entity,
+                'bundle'         => $bundle
             ),
-            'contentTemplate' => 'MauticPageBundle:Category:form.html.php',
+            'contentTemplate' => 'MauticCategoryBundle:Category:form.html.php',
             'passthroughVars' => array(
                 'activeLink'    => '#mautic_page_index',
                 'mauticContent' => 'page',
-                'route'         => $this->generateUrl('mautic_pagecategory_action', array(
+                'route'         => $this->generateUrl('mautic_category_action', array(
                     'objectAction' => 'edit',
-                    'objectId'     => $entity->getId())
-                )
+                    'objectId'     => $entity->getId(),
+                    'bundle'       => $bundle
+                ))
             )
         ));
     }
@@ -294,13 +343,13 @@ class CategoryController extends FormController
      * @param $objectId
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function cloneAction ($objectId)
+    public function cloneAction ($bundle, $objectId)
     {
-        $model   = $this->factory->getModel('page.category');
+        $model   = $this->factory->getModel('category.category');
         $entity  = $model->getEntity($objectId);
 
         if ($entity != null) {
-            if (!$this->factory->getSecurity()->isGranted('page:categories:create')) {
+            if (!$this->factory->getSecurity()->isGranted($bundle.':categories:create')) {
                 return $this->accessDenied();
             }
 
@@ -310,7 +359,7 @@ class CategoryController extends FormController
             $objectId = $clone->getId();
         }
 
-        return $this->editAction($objectId);
+        return $this->editAction($bundle, $objectId);
     }
 
     /**
@@ -319,43 +368,47 @@ class CategoryController extends FormController
      * @param         $objectId
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function deleteAction($objectId) {
+    public function deleteAction($bundle, $objectId) {
         $session     = $this->factory->getSession();
-        $page        = $session->get('mautic.pagecategory.page', 1);
-        $returnUrl   = $this->generateUrl('mautic_pagecategory_index', array('page' => $page));
+        $page        = $session->get('mautic.category.page', 1);
+        $viewParams = array(
+            'page'   => $page,
+            'bundle' => $bundle
+        );
+        $returnUrl   = $this->generateUrl('mautic_category_index', $viewParams);
         $flashes     = array();
 
         $postActionVars = array(
             'returnUrl'       => $returnUrl,
-            'viewParameters'  => array('page' => $page),
-            'contentTemplate' => 'MauticPageBundle:Category:index',
+            'viewParameters'  => $viewParams,
+            'contentTemplate' => 'MauticCategoryBundle:Category:index',
             'passthroughVars' => array(
-                'activeLink'    => 'mautic_pagecategory_index',
-                'mauticContent' => 'pagecategory'
+                'activeLink'    => 'mautic_'.$bundle.'category_index',
+                'mauticContent' => 'category'
             )
         );
 
         if ($this->request->getMethod() == 'POST') {
-            $model  = $this->factory->getModel('page.category');
+            $model  = $this->factory->getModel('category.category');
             $entity = $model->getEntity($objectId);
 
             if ($entity === null) {
                 $flashes[] = array(
                     'type'    => 'error',
-                    'msg'     => 'mautic.page.category.error.notfound',
+                    'msg'     => 'mautic.category.error.notfound',
                     'msgVars' => array('%id%' => $objectId)
                 );
-            } elseif (!$this->factory->getSecurity()->isGranted('page:categories:delete')) {
+            } elseif (!$this->factory->getSecurity()->isGranted($bundle.':categories:delete')) {
                 return $this->accessDenied();
             } elseif ($model->isLocked($entity)) {
-                return $this->isLocked($postActionVars, $entity, 'page.category');
+                return $this->isLocked($postActionVars, $entity, 'category.category');
             }
 
             $model->deleteEntity($entity);
 
             $flashes[] = array(
                 'type' => 'notice',
-                'msg'  => 'mautic.page.category.notice.deleted',
+                'msg'  => 'mautic.category.notice.deleted',
                 'msgVars' => array(
                     '%name%' => $entity->getTitle(),
                     '%id%'   => $objectId

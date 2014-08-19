@@ -7,12 +7,13 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\PageBundle\Model;
+namespace Mautic\CategoryBundle\Model;
 
+use Mautic\CategoryBundle\Event\CategoryEvent;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel;
-use Mautic\PageBundle\Entity\Category;
-use Mautic\PageBundle\PageEvents;
+use Mautic\CategoryBundle\Entity\Category;
+use Mautic\CategoryBundle\CategoryEvents;
 
 /**
  * Class CategoryModel
@@ -24,17 +25,19 @@ class CategoryModel extends FormModel
 {
     public function getRepository()
     {
-        return $this->em->getRepository('MauticPageBundle:Category');
-    }
-
-    public function getPermissionBase()
-    {
-        return 'page:categories';
+        return $this->em->getRepository('MauticCategoryBundle:Category');
     }
 
     public function getNameGetter()
     {
         return "getTitle";
+    }
+
+    public function getPermissionBase()
+    {
+        $request = $this->factory->getRequest();
+        $bundle  = $request->get('bundle');
+        return $bundle.':categories';
     }
 
     /**
@@ -87,8 +90,10 @@ class CategoryModel extends FormModel
         if (!$entity instanceof Category) {
             throw new MethodNotAllowedHttpException(array('Category'));
         }
-        $params = (!empty($action)) ? array('action' => $action) : array();
-        return $formFactory->create('pagecategory', $entity, $params);
+        if (!empty($action)) {
+            $options['action'] = $action;
+        }
+        return $formFactory->create('category', $entity, $options);
     }
 
     /**
@@ -126,16 +131,16 @@ class CategoryModel extends FormModel
 
         switch ($action) {
             case "pre_save":
-                $name = PageEvents::CATEGORY_PRE_SAVE;
+                $name = CategoryEvents::CATEGORY_PRE_SAVE;
                 break;
             case "post_save":
-                $name = PageEvents::CATEGORY_POST_SAVE;
+                $name = CategoryEvents::CATEGORY_POST_SAVE;
                 break;
             case "pre_delete":
-                $name = PageEvents::CATEGORY_PRE_DELETE;
+                $name = CategoryEvents::CATEGORY_PRE_DELETE;
                 break;
             case "post_delete":
-                $name = PageEvents::CATEGORY_POST_DELETE;
+                $name = CategoryEvents::CATEGORY_POST_DELETE;
                 break;
             default:
                 return false;
@@ -143,7 +148,7 @@ class CategoryModel extends FormModel
 
         if ($this->dispatcher->hasListeners($name)) {
             if (empty($event)) {
-                $event = new PageEvent($entity, $isNew);
+                $event = new CategoryEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
 
@@ -162,14 +167,34 @@ class CategoryModel extends FormModel
      */
     public function deleteEntity($entity)
     {
-        //uncategorize pages
-        $pages = $entity->getPages();
-        foreach ($pages as $page) {
-            $page->setCategory(null);
+        $bundle = $entity->getBundle();
+
+        //if it doesn't have a dot, then assume the model will be $bundle.$bundle
+        $modelName = (strpos($bundle, '.') === false) ? $bundle.'.'.$bundle : $bundle;
+        $model     = $this->factory->getModel($modelName);
+
+        $repo       = $model->getRepository();
+        $tableAlias = $repo->getTableAlias();
+
+        $entities = $model->getEntities(array(
+            'filter' => array(
+                'force' => array(
+                    array(
+                        'column' => $tableAlias.'.category',
+                        'expr'   => 'eq',
+                        'value'  => $entity->getId()
+                    )
+                )
+            )
+        ));
+
+        if (!empty($entities)) {
+            foreach ($entities as $e) {
+                $e->setCategory(null);
+            }
+            $model->saveEntities($entities, false);
         }
-        $this->factory->getModel('page.page')->saveEntities($pages);
 
         parent::deleteEntity($entity);
     }
-
 }

@@ -250,7 +250,7 @@ class PageModel extends FormModel
                 $results = $repo->getPageList($filter, $limit, 0, $viewOther);
                 break;
             case 'category':
-                $results = $this->factory->getModel('page.category')->getRepository()->getCategoryList($filter, $limit, 0);
+                $results = $this->factory->getModel('category.category')->getRepository()->getCategoryList($filter, $limit, 0);
                 break;
         }
 

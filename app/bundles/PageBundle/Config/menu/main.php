@@ -49,29 +49,36 @@ $items = array(
                 ),
                 'display' => false //only used for breadcrumb generation
             ),
-            'mautic.page.category.menu.index' => array(
-                'route'    => 'mautic_pagecategory_index',
+            'mautic.category.menu.index' => array(
+                'route'    => 'mautic_category_index',
+                'routeParameters' => array("bundle"  => "page"),
                 'extras'  => array(
-                    'routeName' => 'mautic_pagecategory_index'
+                    'routeName' => 'mautic_category_index'
                 ),
                 'linkAttributes' => array(
                     'data-toggle' => 'ajax'
                 ),
                 'display' => $security->isGranted('page:categories:view') ? true : false,
                 'children' => array(
-                    'mautic.page.category.menu.new' => array(
-                        'route'    => 'mautic_pagecategory_action',
-                        'routeParameters' => array("objectAction"  => "new"),
+                    'mautic.category.menu.new' => array(
+                        'route'    => 'mautic_category_action',
+                        'routeParameters' => array(
+                            "objectAction"  => "new",
+                            "bundle"        => "page"
+                        ),
                         'extras'  => array(
-                            'routeName' => 'mautic_pagecategory_action|new'
+                            'routeName' => 'mautic_category_action|page|new'
                         ),
                         'display' => false //only used for breadcrumb generation
                     ),
-                    'mautic.page.category.menu.edit' => array(
-                        'route'           => 'mautic_pagecategory_action',
-                        'routeParameters' => array("objectAction"  => "edit"),
+                    'mautic.category.menu.edit' => array(
+                        'route'           => 'mautic_category_action',
+                        'routeParameters' => array(
+                            "objectAction"  => "edit",
+                            "bundle"        => "page"
+                        ),
                         'extras'  => array(
-                            'routeName' => 'mautic_pagecategory_action|edit'
+                            'routeName' => 'mautic_category_action|page|edit'
                         ),
                         'display' => false //only used for breadcrumb generation
                     )

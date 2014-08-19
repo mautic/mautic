@@ -65,6 +65,7 @@ class LoadPageData extends AbstractFixture implements OrderedFixtureInterface, C
                     }
                 }
             }
+            $page->setCategory($this->getReference('page-cat-1'));
             $repo->saveEntity($page);
 
             $this->setReference('page-'.$key, $page);

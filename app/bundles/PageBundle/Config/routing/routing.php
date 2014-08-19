@@ -12,22 +12,6 @@ use Symfony\Component\Routing\Route;
 
 $collection = new RouteCollection();
 
-$collection->add('mautic_pagecategory_index', new Route('/pages/categories/{page}',
-    array(
-        '_controller' => 'MauticPageBundle:Category:index',
-        'page'        => 1,
-    ), array(
-        'page'    => '\d+'
-    )
-));
-
-$collection->add('mautic_pagecategory_action', new Route('/pages/categories/{objectAction}/{objectId}',
-    array(
-        '_controller' => 'MauticPageBundle:Category:execute',
-        "objectId"    => 0
-    )
-));
-
 $collection->add('mautic_page_index', new Route('/pages/{page}',
     array(
         '_controller' => 'MauticPageBundle:Page:index',

@@ -7,7 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\PageBundle\Form\Type;
+namespace Mautic\CategoryBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
@@ -20,7 +20,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 /**
  * Class CategoryType
  *
- * @package Mautic\PageBundle\Form\Type
+ * @package Mautic\CategoryBundle\Form\Type
  */
 class CategoryType extends AbstractType
 {
@@ -41,27 +41,27 @@ class CategoryType extends AbstractType
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(array('content' => 'html')));
-        $builder->addEventSubscriber(new FormExitSubscriber('page.category', $options));
+        $builder->addEventSubscriber(new FormExitSubscriber('category.category', $options));
 
         $builder->add('title', 'text', array(
-            'label'      => 'mautic.page.category.form.title',
+            'label'      => 'mautic.category.form.title',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control')
         ));
 
         $builder->add('description', 'text', array(
-            'label'      => 'mautic.page.category.form.description',
+            'label'      => 'mautic.category.form.description',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control'),
             'required'   => false
         ));
 
         $builder->add('alias', 'text', array(
-            'label'      => 'mautic.page.category.form.alias',
+            'label'      => 'mautic.category.form.alias',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
                 'class'   => 'form-control',
-                'tooltip' => 'mautic.page.category.form.alias.help',
+                'tooltip' => 'mautic.category.form.alias.help',
             ),
             'required'   => false
         ));
@@ -78,6 +78,10 @@ class CategoryType extends AbstractType
             'required'      => false
         ));
 
+        $builder->add('bundle', 'hidden', array(
+            'data' => $options['bundle']
+        ));
+
         $builder->add('buttons', 'form_buttons');
 
         if (!empty($options["action"])) {
@@ -91,14 +95,16 @@ class CategoryType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'Mautic\PageBundle\Entity\Category'
+            'data_class' => 'Mautic\CategoryBundle\Entity\Category'
         ));
+
+        $resolver->setRequired(array('bundle'));
     }
 
     /**
      * @return string
      */
     public function getName() {
-        return "pagecategory";
+        return "category";
     }
 }

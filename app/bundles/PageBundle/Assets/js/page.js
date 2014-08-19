@@ -100,12 +100,6 @@ Mautic.pageUnLoad = function() {
     mQuery('.page-builder').remove();
 };
 
-Mautic.pagecategoryOnLoad = function (container) {
-    if (mQuery(container + ' #list-search').length) {
-        Mautic.activateSearchAutocomplete('list-search', 'page.category');
-    }
-};
-
 Mautic.launchPageEditor = function () {
     var src = mQuery('#pageBuilderUrl').val();
     src += '?template=' + mQuery('#page_template').val();

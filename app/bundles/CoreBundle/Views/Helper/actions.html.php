@@ -8,8 +8,13 @@
  */
 
 $nameGetter = (!empty($nameGetter)) ? $nameGetter : 'getName';
-if (empty($pull))
+if (empty($pull)) {
     $pull = 'left';
+}
+if (!isset($extra)) {
+    $extra = array();
+}
+
 ?>
 <div class="btn-group">
     <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
@@ -19,7 +24,7 @@ if (empty($pull))
         <?php if (!empty($edit)): ?>
             <li>
                 <a href="<?php echo $view['router']->generate('mautic_' . $routeBase . '_action',
-                    array("objectAction" => "edit", "objectId" => $item->getId())); ?>"
+                    array_merge(array("objectAction" => "edit", "objectId" => $item->getId()), $extra)); ?>"
                    data-toggle="ajax"
                     <?php if (isset($menuLink)):?>
                     data-menu-link="<?php echo $menuLink; ?>"
@@ -32,7 +37,7 @@ if (empty($pull))
         if (!empty($clone)): ?>
         <li>
             <a href="<?php echo $view['router']->generate('mautic_' . $routeBase . '_action',
-                   array("objectAction" => "clone", "objectId" => $item->getId())); ?>"
+                   array_merge(array("objectAction" => "clone", "objectId" => $item->getId()), $extra)); ?>"
                data-toggle="ajax"
                 <?php if (isset($menuLink)):?>
                 data-menu-link="<?php echo $menuLink; ?>"
@@ -51,7 +56,7 @@ if (empty($pull))
                    '<?php echo $view->escape($view["translator"]->trans("mautic.core.form.delete"), 'js'); ?>',
                    'executeAction',
                    ['<?php echo $view['router']->generate('mautic_' . $routeBase . '_action',
-                        array("objectAction" => "delete", "objectId" => $item->getId())); ?>',
+                        array_merge(array("objectAction" => "delete", "objectId" => $item->getId()), $extra)); ?>',
                    '#<?php echo $menuLink; ?>'],
                    '<?php echo $view->escape($view["translator"]->trans("mautic.core.form.cancel"), 'js'); ?>','',[]);">
                 <span><i class="fa fa-trash-o"></i><?php echo $view['translator']->trans('mautic.core.form.delete'); ?></span>

@@ -12,13 +12,9 @@ namespace Mautic\PageBundle\DataFixtures\ORM;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
-use Mautic\CoreBundle\Entity\IpAddress;
-use Mautic\CoreBundle\Helper\CsvHelper;
-use Mautic\PageBundle\Entity\Category;
-use Mautic\PageBundle\Entity\Page;
+use Mautic\CategoryBundle\Entity\Category;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Mautic\LeadBundle\Entity\Lead;
 
 /**
  * Class LoadPageCategoryData
@@ -49,10 +45,11 @@ class LoadPageCategoryData extends AbstractFixture implements OrderedFixtureInte
     {
         $trans   = $this->container->get('translator');
         $factory = $this->container->get('mautic.factory');
-        $repo    = $factory->getModel('page.category')->getRepository();
+        $repo    = $factory->getModel('category.category')->getRepository();
         $today   = new \DateTime();
 
         $cat    = new Category();
+        $cat->setBundle('page');
         $events = $trans->trans('mautic.page.category.events', array(), 'fixtures');
 
         $cat->setDateAdded($today);

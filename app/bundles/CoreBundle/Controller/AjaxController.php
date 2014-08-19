@@ -212,11 +212,24 @@ class AjaxController extends CommonController
     {
         $dataArray = array('success' => 0);
         $name   = InputHelper::clean($request->request->get('model'));
+        if (strpos($name, '.') === false) {
+            $name = "$name.$name";
+        }
         $id     = InputHelper::int($request->request->get('id'));
         $model  = $this->factory->getModel($name);
+
+        $post = $request->request->all();
+        unset($post['model'], $post['id'], $post['action']);
+        if (!empty($post)) {
+            $extra = http_build_query($post);
+        } else {
+            $extra = '';
+        }
+
         $entity = $model->getEntity($id);
         if ($entity !== null) {
             $permissionBase = $model->getPermissionBase();
+
             if ($this->factory->getSecurity()->hasEntityAccess(
                 $permissionBase . ':publishown',
                 $permissionBase . ':publishother',
@@ -229,7 +242,9 @@ class AjaxController extends CommonController
                 //get updated icon HTML
                 $html = $this->renderView('MauticCoreBundle:Helper:publishstatus.html.php',array(
                     'item'       => $entity,
-                    'model'      => $name
+                    'model'      => $name,
+                    'extra'      => $extra
+
                 ));
                 $dataArray['statusHtml'] = $html;
             }

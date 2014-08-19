@@ -98,7 +98,7 @@ class PageType extends AbstractType
 
             $builder->add('category', 'hidden_entity', array(
                 'required'       => false,
-                'repository'     => 'MauticPageBundle:Category',
+                'repository'     => 'MauticCategoryBundle:Category',
                 'error_bubbling' => false,
                 'read_only'      => ($isVariant) ? true : false
             ));
