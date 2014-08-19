@@ -237,9 +237,10 @@ class PageModel extends FormModel
      * @param $type
      * @param $filter
      * @param $limit
+     * @paran $bundle - for categories
      * @return array
      */
-    public function getLookupResults($type, $filter = '', $limit = 10)
+    public function getLookupResults($type, $filter = '', $limit = 10, $bundle = '')
     {
         $results = array();
         switch ($type) {
@@ -250,7 +251,7 @@ class PageModel extends FormModel
                 $results = $repo->getPageList($filter, $limit, 0, $viewOther);
                 break;
             case 'category':
-                $results = $this->factory->getModel('category.category')->getRepository()->getCategoryList($filter, $limit, 0);
+                $results = $this->factory->getModel('category.category')->getRepository()->getCategoryList($bundle, $filter, $limit, 0);
                 break;
         }
 
