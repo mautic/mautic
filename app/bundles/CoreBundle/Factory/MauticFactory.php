@@ -39,6 +39,11 @@ class MauticFactory
     {
         static $models = array();
 
+        //shortcut for models with same name as bundle
+        if (strpos($name, '.') === false) {
+            $name = "$name.$name";
+        }
+
         if (!array_key_exists($name, $models)) {
             $parts = explode('.', $name);
             if (count($parts) == 2) {
