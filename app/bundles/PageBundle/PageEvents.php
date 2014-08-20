@@ -89,45 +89,4 @@ final class PageEvents
      * @var string
      */
     const PAGE_POST_DELETE   = 'mautic.page_post_delete';
-
-    /**
-     * The mautic.category_pre_save event is thrown right before a category is persisted.
-     *
-     * The event listener receives a
-     * Mautic\PageBundle\Event\CategoryEvent instance.
-     *
-     * @var string
-     */
-    const CATEGORY_PRE_SAVE   = 'mautic.category_pre_save';
-
-    /**
-     * The mautic.category_post_save event is thrown right after a category is persisted.
-     *
-     * The event listener receives a
-     * Mautic\PageBundle\Event\CategoryEvent instance.
-     *
-     * @var string
-     */
-    const CATEGORY_POST_SAVE   = 'mautic.category_post_save';
-
-    /**
-     * The mautic.category_pre_delete event is thrown prior to when a category is deleted.
-     *
-     * The event listener receives a
-     * Mautic\PageBundle\Event\CategoryEvent instance.
-     *
-     * @var string
-     */
-    const CATEGORY_PRE_DELETE   = 'mautic.category_pre_delete';
-
-
-    /**
-     * The mautic.category_post_delete event is thrown after a category is deleted.
-     *
-     * The event listener receives a
-     * Mautic\PageBundle\Event\CategoryEvent instance.
-     *
-     * @var string
-     */
-    const CATEGORY_POST_DELETE   = 'mautic.category_post_delete';
 }

@@ -199,6 +199,15 @@ class Page extends FormEntity
     }
 
     /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->translationChildren = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->variantChildren = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
      * @param ClassMetadata $metadata
      */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
@@ -207,7 +216,6 @@ class Page extends FormEntity
             'message' => 'mautic.page.page.title.notblank'
         )));
     }
-
 
     /**
      * Get id
@@ -537,24 +545,15 @@ class Page extends FormEntity
         $getter  = "get" . ucfirst($prop);
         $current = $this->$getter();
 
-        if ($prop == 'translationParent' || $prop == 'variantParent') {
+        if ($prop == 'translationParent' || $prop == 'variantParent' || $prop == 'category') {
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {
-                $currentTitle = ($current) ? $current->getTitle() . " ($currentId)" : '';
-                $newTitle     = ($val) ? $val->getTitle() . " ($newId)" : '';
-                $this->changes[$prop] = array($currentTitle, $newTitle);
+                $this->changes[$prop] = array($currentId, $newId);
             }
         } else {
             parent::isChanged($prop, $val);
         }
-    }
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        $this->translationChildren = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
     /**

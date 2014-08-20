@@ -207,7 +207,7 @@ class PageRepository extends CommonRepository
                 $expr = $q->expr()->like('c.alias', ":$unique");
                 $filter->strict = true;
                 break;
-            case $this->translator->trans('mautic.page.page.searchcommand.lang'):
+            case $this->translator->trans('mautic.core.searchcommand.lang'):
                 $langUnique       = $this->generateRandomParameterName();
                 $langValue        = $filter->string . "_%";
                 $forceParameters = array(
@@ -250,7 +250,7 @@ class PageRepository extends CommonRepository
                 'mautic.core.searchcommand.ismine',
             ),
             'mautic.core.searchcommand.category',
-            'mautic.page.page.searchcommand.lang'
+            'mautic.core.searchcommand.lang'
         );
     }
 

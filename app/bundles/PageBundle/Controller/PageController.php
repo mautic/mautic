@@ -64,7 +64,7 @@ class PageController extends FormController
         //do not list variants in the main list
         $filter['force'][] = array('column' => 'p.variantParent', 'expr' => 'isNull');
 
-        $langSearchCommand = $translator->trans('mautic.page.page.searchcommand.lang');
+        $langSearchCommand = $translator->trans('mautic.core.searchcommand.lang');
         if (strpos($search, "{$langSearchCommand}:") === false) {
             $filter['force'][] = array('column' => 'p.translationParent', 'expr' => 'isNull');
         }
@@ -546,7 +546,10 @@ class PageController extends FormController
 
             $clone = clone $entity;
             $clone->setHits(0);
+            $clone->setUniqueHits(0);
             $clone->setRevision(0);
+            $clone->setVariationStartDate(null);
+            $clone->setVariationHits(null);
             $clone->setIsPublished(false);
             $model->saveEntity($clone);
             $objectId = $clone->getId();
@@ -680,6 +683,9 @@ class PageController extends FormController
             //reset
             $clone->setHits(0);
             $clone->setRevision(0);
+            $clone->setVariationHits(0);
+            $clone->setUniqueHits(0);
+            $clone->setVariationStartDate(null);
             $clone->setIsPublished(false);
             $clone->setVariantParent($entity);
 

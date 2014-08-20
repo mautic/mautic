@@ -145,45 +145,4 @@ class PageSubscriber extends CommonSubscriber
         );
         $this->factory->getModel('core.auditLog')->writeToLog($log);
     }
-
-
-    /**
-     * Add an entry to the audit log
-     *
-     * @param Events\CategoryEvent $event
-     */
-    public function onCategoryPostSave(Events\CategoryEvent $event)
-    {
-        $category = $event->getCategory();
-        if ($details = $event->getChanges()) {
-            $log = array(
-                "bundle"    => "category",
-                "object"    => "category",
-                "objectId"  => $category->getId(),
-                "action"    => ($event->isNew()) ? "create" : "update",
-                "details"   => $details,
-                "ipAddress" => $this->request->server->get('REMOTE_ADDR')
-            );
-            $this->factory->getModel('core.auditLog')->writeToLog($log);
-        }
-    }
-
-    /**
-     * Add a delete entry to the audit log
-     *
-     * @param Events\CategoryEvent $event
-     */
-    public function onCategoryDelete(Events\CategoryEvent $event)
-    {
-        $category = $event->getCategory();
-        $log = array(
-            "bundle"     => "category",
-            "object"     => "category",
-            "objectId"   => $category->deletedId,
-            "action"     => "delete",
-            "details"    => array('name' => $category->getTitle()),
-            "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
-        );
-        $this->factory->getModel('core.auditLog')->writeToLog($log);
-    }
 }

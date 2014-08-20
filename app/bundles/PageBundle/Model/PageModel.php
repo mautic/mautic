@@ -52,10 +52,6 @@ class PageModel extends FormModel
      */
     public function saveEntity($entity, $unlock = true)
     {
-        //note for later
-        $parent = $entity->getVariantParent();
-        $parentId = ($parent) ? $parent->getId() : 0;
-
         if (empty($this->inConversion)) {
             $alias = $entity->getAlias();
             if (empty($alias)) {
@@ -124,8 +120,8 @@ class PageModel extends FormModel
             }
 
             //if the parent was changed, then that parent/children must also be reset
-            if (isset($changes['variantParent']) && $parentId) {
-                $parent = $this->getEntity($parentId);
+            if (isset($changes['variantParent'])) {
+                $parent = $this->getEntity($changes['variantParent'][0]);
                 if (!empty($parent)) {
                     $parent->setVariantHits(0);
                     $parent->setVariantStartDate($now);
@@ -237,10 +233,9 @@ class PageModel extends FormModel
      * @param $type
      * @param $filter
      * @param $limit
-     * @paran $bundle - for categories
      * @return array
      */
-    public function getLookupResults($type, $filter = '', $limit = 10, $bundle = '')
+    public function getLookupResults($type, $filter = '', $limit = 10)
     {
         $results = array();
         switch ($type) {
@@ -251,7 +246,7 @@ class PageModel extends FormModel
                 $results = $repo->getPageList($filter, $limit, 0, $viewOther);
                 break;
             case 'category':
-                $results = $this->factory->getModel('category.category')->getRepository()->getCategoryList($bundle, $filter, $limit, 0);
+                $results = $this->factory->getModel('category.category')->getRepository()->getCategoryList('page', $filter, $limit, 0);
                 break;
         }
 
@@ -363,7 +358,7 @@ class PageModel extends FormModel
 
         $hit->setIpAddress($ipAddress);
 
-        //gleam info from the IP address
+        //glean info from the IP address
         if ($details = $ipAddress->getIpDetails()) {
             $hit->setCountry($details['country']);
             $hit->setRegion($details['region']);

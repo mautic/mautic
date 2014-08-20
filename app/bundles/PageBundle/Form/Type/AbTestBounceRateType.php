@@ -56,7 +56,7 @@ class VariantType extends AbstractType
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array(
                     'class'    => 'form-control',
-                    'onchange' => 'Mautic.toggleAbTestWinnerDetails(this);'
+                    'onchange' => 'Mautic.togglePageAbTestWinnerDetails(this);'
                 ),
                 'expanded'   => false,
                 'multiple'   => false,

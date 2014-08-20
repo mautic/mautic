@@ -93,7 +93,7 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
             </span>
             <span> | </span>
             <span>
-            <?php $langSearch = $view['translator']->trans('mautic.page.page.searchcommand.lang').":".$activePage->getLanguage(); ?>
+            <?php $langSearch = $view['translator']->trans('mautic.core.searchcommand.lang').":".$activePage->getLanguage(); ?>
                 <a href="<?php echo $view['router']->generate('mautic_page_index', array('search' => $langSearch)); ?>"
                    data-toggle="ajax">
                     <?php echo $activePage->getLanguage(); ?>

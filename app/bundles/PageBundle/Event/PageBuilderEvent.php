@@ -56,16 +56,6 @@ class PageBuilderEvent extends Event
     }
 
     /**
-     * Get page entity
-     *
-     * @return null
-     */
-    public function getPage()
-    {
-        return $this->page;
-    }
-
-    /**
      * Get list of AB Test winner criteria
      *
      * @return array
