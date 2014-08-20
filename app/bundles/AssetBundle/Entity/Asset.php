@@ -120,7 +120,7 @@ class Asset extends FormEntity
     private $revision = 1;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Category", inversedBy="assets")
+     * @ORM\ManyToOne(targetEntity="Mautic\CategoryBundle\Entity\Category")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})

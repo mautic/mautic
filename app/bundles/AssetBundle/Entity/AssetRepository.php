@@ -245,4 +245,9 @@ class AssetRepository extends CommonRepository
             array('p.title', 'ASC')
         );
     }
+
+    public function getTableAlias()
+    {
+        return 'p';
+    }
 }
