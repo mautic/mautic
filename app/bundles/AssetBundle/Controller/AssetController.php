@@ -440,6 +440,7 @@ class AssetController extends FormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
 
+                    $entity->setUploadDir($this->factory->getParameter('upload_dir'));
                     $entity->upload();
 
                     //form is valid so process the data

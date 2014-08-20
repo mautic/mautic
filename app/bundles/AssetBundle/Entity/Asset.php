@@ -56,6 +56,11 @@ class Asset extends FormEntity
     private $file;
 
     /**
+     * 
+     */
+    private $uploadDir;
+
+    /**
      * @ORM\Column(name="alias", type="string")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
@@ -719,6 +724,25 @@ class Asset extends FormEntity
      */
     protected function getUploadDir()
     {
-        return 'assets/files';
+        if ($this->uploadDir) {
+            return $this->uploadDir;
+        } else {
+            return 'assets/files';
+        }
+
+        
+    }
+
+    /**
+     * Set uploadDir
+     *
+     * @param string $uploadDir
+     * @return Asset
+     */
+    public function setUploadDir($uploadDir)
+    {
+        $this->uploadDir = $uploadDir;
+
+        return $this;
     }
 }
