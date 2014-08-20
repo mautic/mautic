@@ -190,22 +190,24 @@ var Mautic = {
             //hide the toolbar actions if applicable
             mQuery('.toolbar-action-buttons').addClass('hide');
 
-            //hide the bottom buttons
-            mQuery('.bottom-form-buttons').addClass('hide');
-            var buttons = mQuery(container + " .bottom-form-buttons").html();
-            mQuery(buttons).filter("button").each(function(i, v) {
-                //get the ID
-                var id = mQuery(this).attr('id');
-                var button = mQuery("<button type='button' />")
-                    .addClass(mQuery(this).attr('class'))
-                    .html(mQuery(this).html())
-                    .appendTo('.toolbar-form-buttons')
-                    .click( function(event) {
-                        event.preventDefault();
-                        mQuery('#' + id).click();
-                    });
-            });
-            mQuery('.toolbar-form-buttons').removeClass('hide');
+            if (mQuery('.toolbar-form-buttons').hasClass('hide')) {
+                //hide the bottom buttons
+                mQuery('.bottom-form-buttons').addClass('hide');
+                var buttons = mQuery(container + " .bottom-form-buttons").html();
+                mQuery(buttons).filter("button").each(function (i, v) {
+                    //get the ID
+                    var id = mQuery(this).attr('id');
+                    var button = mQuery("<button type='button' />")
+                        .addClass(mQuery(this).attr('class'))
+                        .html(mQuery(this).html())
+                        .appendTo('.toolbar-form-buttons')
+                        .click(function (event) {
+                            event.preventDefault();
+                            mQuery('#' + id).click();
+                        });
+                });
+                mQuery('.toolbar-form-buttons').removeClass('hide');
+            }
         }
 
         //Activate hidden shelves
