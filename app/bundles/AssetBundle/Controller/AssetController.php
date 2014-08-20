@@ -321,6 +321,9 @@ class AssetController extends FormController
                     //clear the session
                     // $session->remove($contentName);
 
+                    $entity->setUploadDir($this->factory->getParameter('upload_dir'));
+                    $entity->upload();
+
                     $this->request->getSession()->getFlashBag()->add(
                         'notice',
                         $this->get('translator')->trans('mautic.asset.asset.notice.created', array(

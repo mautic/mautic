@@ -95,11 +95,11 @@ $view->extend('MauticAssetBundle:Asset:index.html.php');
                             'dateFormat' => (!empty($dateFormat)) ? $dateFormat : 'F j, Y g:i a',
                             'model'      => 'asset.asset'
                         )); ?>
-                        <!-- <a href="<?php echo $view['router']->generate('mautic_asset_action',
+                        <a href="<?php echo $view['router']->generate('mautic_asset_action',
                             array("objectAction" => "view", "objectId" => $item->getId())); ?>"
-                           data-toggle="ajax"> -->
+                           data-toggle="ajax">
                             <?php echo $item->getTitle(); ?> (<?php echo $item->getAlias(); ?>)
-                        <!-- </a> -->
+                        </a>
                         <?php
                         $hasVariants   = count($variantChildren);
                         $hasTranslations = count($translationChildren);

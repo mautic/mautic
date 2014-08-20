@@ -23,6 +23,106 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
  */
 class AssetModel extends FormModel
 {
+    /**
+     * {@inheritdoc}
+     *
+     * @param       $entity
+     * @param       $unlock
+     * @return mixed
+     */
+    public function saveEntity($entity, $unlock = true)
+    {
+        if (empty($this->inConversion)) {
+            $alias = $entity->getAlias();
+            if (empty($alias)) {
+                $alias = strtolower(InputHelper::alphanum($entity->getTitle(), true));
+            } else {
+                $alias = strtolower(InputHelper::alphanum($alias, true));
+            }
+
+            //make sure alias is not already taken
+            $repo      = $this->getRepository();
+            $testAlias = $alias;
+            $count     = $repo->checkUniqueAlias($testAlias, $entity);
+            $aliasTag  = $count;
+
+            while ($count) {
+                $testAlias = $alias . $aliasTag;
+                $count     = $repo->checkUniqueAlias($testAlias, $entity);
+                $aliasTag++;
+            }
+            if ($testAlias != $alias) {
+                $alias = $testAlias;
+            }
+            $entity->setAlias($alias);
+        }
+
+        $now = new \DateTime();
+
+        //set the author for new asset
+        if ($entity->isNew()) {
+            $user = $this->factory->getUser();
+            $entity->setAuthor($user->getName());
+        } else {
+            //increase the revision
+            $revision = $entity->getRevision();
+            $revision++;
+            $entity->setRevision($revision);
+
+            //reset the variant hit and start date if there are any changes
+            $changes = $entity->getChanges();
+            if (!empty($changes) && empty($this->inConversion)) {
+                // $entity->setVariantHits(0);
+                // $entity->setVariantStartDate($now);
+            }
+        }
+
+        parent::saveEntity($entity, $unlock);
+
+        //also reset variants if applicable due to changes
+        if (!empty($changes) && empty($this->inConversion)) {
+            $parent   = $entity->getVariantParent();
+            $children = (!empty($parent)) ? $parent->getVariantChildren() : $entity->getVariantChildren();
+
+            $variants = array();
+            if (!empty($parent)) {
+                $parent->setVariantHits(0);
+                $parent->setVariantStartDate($now);
+                $variants[] = $parent;
+            }
+
+            if (count($children)) {
+                foreach ($children as $child) {
+                    $child->setVariantHits(0);
+                    $child->setVariantStartDate($now);
+                    $variants[] = $child;
+                }
+            }
+
+            //if the parent was changed, then that parent/children must also be reset
+            if (isset($changes['variantParent'])) {
+                $parent = $this->getEntity($changes['variantParent'][0]);
+                if (!empty($parent)) {
+                    $parent->setVariantHits(0);
+                    $parent->setVariantStartDate($now);
+                    $variants[] = $parent;
+
+                    $children = $parent->getVariantChildren();
+                    if (count($children)) {
+                        foreach ($children as $child) {
+                            $child->setVariantHits(0);
+                            $child->setVariantStartDate($now);
+                            $variants[] = $child;
+                        }
+                    }
+                }
+            }
+
+            if (!empty($variants)) {
+                $this->saveEntities($variants, false);
+            }
+        }
+    }
 
     public function getRepository()
     {
