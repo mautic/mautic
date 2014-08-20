@@ -133,42 +133,6 @@ class Asset extends FormEntity
     private $category;
 
     /**
-     * @ORM\OneToMany(targetEntity="Asset", mappedBy="translationParent", indexBy="id", fetch="EXTRA_LAZY")
-     **/
-    private $translationChildren;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="Asset", inversedBy="translationChildren")
-     * @ORM\JoinColumn(name="translation_parent_id", referencedColumnName="id")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
-     **/
-    private $translationParent;
-
-    /**
-     * @ORM\OneToMany(targetEntity="Asset", mappedBy="variantParent", indexBy="id", fetch="EXTRA_LAZY")
-     **/
-    private $variantChildren;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="Asset", inversedBy="variantChildren")
-     * @ORM\JoinColumn(name="variant_parent_id", referencedColumnName="id")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
-     **/
-    private $variantParent;
-
-    /**
-     * @ORM\Column(name="variant_settings", type="array", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
-     */
-    private $variantSettings = array();
-
-    /**
      * Used to identify the page for the builder
      *
      * @var
@@ -479,15 +443,7 @@ class Asset extends FormEntity
         $getter  = "get" . ucfirst($prop);
         $current = $this->$getter();
 
-        if ($prop == 'translationParent' || $prop == 'variantParent') {
-            $currentId = ($current) ? $current->getId() : '';
-            $newId     = $val->getId();
-            if ($currentId != $newId)
-                $currentTitle = ($current) ? $current->getTitle() . " ($currentId)" : '';
-                $this->changes[$prop] = array($currentTitle, $val->getTitle() . " ($newId)");
-        } else {
-            parent::isChanged($prop, $val);
-        }
+        parent::isChanged($prop, $val);
     }
     /**
      * Constructor
@@ -495,144 +451,6 @@ class Asset extends FormEntity
     public function __construct()
     {
         $this->translationChildren = new \Doctrine\Common\Collections\ArrayCollection();
-    }
-
-    /**
-     * Add translationChildren
-     *
-     * @param \Mautic\AssetBundle\Entity\Asset $translationChildren
-     * @return Asset
-     */
-    public function addTranslationChild(\Mautic\AssetBundle\Entity\Asset $translationChildren)
-    {
-        $this->translationChildren[] = $translationChildren;
-
-        return $this;
-    }
-
-    /**
-     * Remove translationChildren
-     *
-     * @param \Mautic\AssetBundle\Entity\Asset $translationChildren
-     */
-    public function removeTranslationChild(\Mautic\AssetBundle\Entity\Asset $translationChildren)
-    {
-        $this->translationChildren->removeElement($translationChildren);
-    }
-
-    /**
-     * Get translationChildren
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getTranslationChildren()
-    {
-        return $this->translationChildren;
-    }
-
-    /**
-     * Set translationParent
-     *
-     * @param \Mautic\AssetBundle\Entity\Asset $translationParent
-     * @return Asset
-     */
-    public function setTranslationParent(\Mautic\AssetBundle\Entity\Asset $translationParent = null)
-    {
-        $this->isChanged('translationParent', $translationParent);
-        $this->translationParent = $translationParent;
-
-        return $this;
-    }
-
-    /**
-     * Get translationParent
-     *
-     * @return \Mautic\AssetBundle\Entity\Asset
-     */
-    public function getTranslationParent()
-    {
-        return $this->translationParent;
-    }
-
-    /**
-     * Add variantChildren
-     *
-     * @param \Mautic\AssetBundle\Entity\Asset $variantChildren
-     * @return Asset
-     */
-    public function addVariantChild(\Mautic\AssetBundle\Entity\Asset $variantChildren)
-    {
-        $this->variantChildren[] = $variantChildren;
-
-        return $this;
-    }
-
-    /**
-     * Remove variantChildren
-     *
-     * @param \Mautic\AssetBundle\Entity\Asset $variantChildren
-     */
-    public function removeVariantChild(\Mautic\AssetBundle\Entity\Asset $variantChildren)
-    {
-        $this->variantChildren->removeElement($variantChildren);
-    }
-
-    /**
-     * Get variantChildren
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getVariantChildren()
-    {
-        return $this->variantChildren;
-    }
-
-    /**
-     * Set variantParent
-     *
-     * @param \Mautic\AssetBundle\Entity\Asset $variantParent
-     * @return Asset
-     */
-    public function setVariantParent(\Mautic\AssetBundle\Entity\Asset $variantParent = null)
-    {
-        $this->isChanged('variantParent', $variantParent);
-        $this->variantParent = $variantParent;
-
-        return $this;
-    }
-
-    /**
-     * Get variantParent
-     *
-     * @return \Mautic\AssetBundle\Entity\Asset
-     */
-    public function getVariantParent()
-    {
-        return $this->variantParent;
-    }
-
-    /**
-     * Set variantSettings
-     *
-     * @param array $variantSettings
-     * @return Asset
-     */
-    public function setVariantSettings($variantSettings)
-    {
-        $this->isChanged('variantSettings', $variantSettings);
-        $this->variantSettings = $variantSettings;
-
-        return $this;
-    }
-
-    /**
-     * Get variantSettings
-     *
-     * @return array
-     */
-    public function getVariantSettings()
-    {
-        return $this->variantSettings;
     }
 
     /**

@@ -68,60 +68,9 @@ class AssetModel extends FormModel
             $revision = $entity->getRevision();
             $revision++;
             $entity->setRevision($revision);
-
-            //reset the variant hit and start date if there are any changes
-            $changes = $entity->getChanges();
-            if (!empty($changes) && empty($this->inConversion)) {
-                // $entity->setVariantHits(0);
-                // $entity->setVariantStartDate($now);
-            }
         }
 
         parent::saveEntity($entity, $unlock);
-
-        //also reset variants if applicable due to changes
-        if (!empty($changes) && empty($this->inConversion)) {
-            $parent   = $entity->getVariantParent();
-            $children = (!empty($parent)) ? $parent->getVariantChildren() : $entity->getVariantChildren();
-
-            $variants = array();
-            if (!empty($parent)) {
-                $parent->setVariantHits(0);
-                $parent->setVariantStartDate($now);
-                $variants[] = $parent;
-            }
-
-            if (count($children)) {
-                foreach ($children as $child) {
-                    $child->setVariantHits(0);
-                    $child->setVariantStartDate($now);
-                    $variants[] = $child;
-                }
-            }
-
-            //if the parent was changed, then that parent/children must also be reset
-            if (isset($changes['variantParent'])) {
-                $parent = $this->getEntity($changes['variantParent'][0]);
-                if (!empty($parent)) {
-                    $parent->setVariantHits(0);
-                    $parent->setVariantStartDate($now);
-                    $variants[] = $parent;
-
-                    $children = $parent->getVariantChildren();
-                    if (count($children)) {
-                        foreach ($children as $child) {
-                            $child->setVariantHits(0);
-                            $child->setVariantStartDate($now);
-                            $variants[] = $child;
-                        }
-                    }
-                }
-            }
-
-            if (!empty($variants)) {
-                $this->saveEntities($variants, false);
-            }
-        }
     }
 
     public function getRepository()
@@ -251,56 +200,6 @@ class AssetModel extends FormModel
     }
 
     /**
-     * Get the variant parent/children
-     *
-     * @param Asset $asset
-     *
-     * @return array
-     */
-    public function getVariants(Asset $asset)
-    {
-        $parent = $asset->getVariantParent();
-
-        if (!empty($parent)) {
-            $children = $parent->getVariantChildren();
-        } else {
-            $parent   = $asset;
-            $children = $asset->getVariantChildren();
-        }
-
-        if (empty($children)) {
-            $children = false;
-        }
-
-        return array($parent, $children);
-    }
-
-    /**
-     * Get translation parent/children
-     *
-     * @param Asset $asset
-     *
-     * @return array
-     */
-    public function getTranslations(Asset $asset)
-    {
-        $parent = $asset->getTranslationParent();
-
-        if (!empty($parent)) {
-            $children = $parent->getTranslationChildren();
-        } else {
-            $parent   = $asset;
-            $children = $asset->getTranslationChildren();
-        }
-
-        if (empty($children)) {
-            $children = false;
-        }
-
-        return array($parent, $children);
-    }
-
-    /**
      * Generate url for a page
      *
      * @param $entity
@@ -319,21 +218,11 @@ class AssetModel extends FormModel
                 $this->translator->trans('mautic.core.url.uncategorized');
         }
 
-        $parent = $entity->getTranslationParent();
-        if ($parent) {
-            //multiple languages so tak on the language
-            $slugs = array(
-                'slug1' => $entity->getLanguage(),
-                'slug2' => (!empty($catSlug)) ? $catSlug : $assetSlug,
-                'slug3' => (!empty($catSlug)) ? $assetSlug : ''
-            );
-        } else {
-            $slugs = array(
-                'slug1' => (!empty($catSlug)) ? $catSlug : $assetSlug,
-                'slug2' => (!empty($catSlug)) ? $assetSlug : '',
-                'slug3' => ''
-            );
-        }
+        $slugs = array(
+            'slug1' => (!empty($catSlug)) ? $catSlug : $assetSlug,
+            'slug2' => (!empty($catSlug)) ? $assetSlug : '',
+            'slug3' => ''
+        );
 
         $assetUrl  = $this->factory->getRouter()->generate('mautic_asset_public', $slugs, $absolute);
 

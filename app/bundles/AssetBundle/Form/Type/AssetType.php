@@ -45,25 +45,6 @@ class AssetType extends AbstractType
         $builder->addEventSubscriber(new CleanFormSubscriber(array('content' => 'html', 'file' => 'raw')));
         $builder->addEventSubscriber(new FormExitSubscriber('asset.asset', $options));
 
-        $variantParent = $options['data']->getVariantParent();
-        $isVariant     = !empty($variantParent);
-
-        if ($isVariant) {
-
-            $builder->add("assetvariant-panel-wrapper-start", 'panel_wrapper_start', array(
-                'attr' => array(
-                    'id' => "asset-panel"
-                )
-            ));
-
-            //details
-            $builder->add("details-panel-start", 'panel_start', array(
-                'label'      => 'mautic.asset.asset.panel.variantdetails',
-                'dataParent' => '#asset-panel',
-                'bodyId'     => 'details-panel',
-                'bodyAttr'   => array('class' => 'in')
-            ));
-        }
 
         $builder->add('file', 'file', array(
             'label'      => 'mautic.asset.asset.form.file.upload',
@@ -77,67 +58,44 @@ class AssetType extends AbstractType
             'attr'       => array('class' => 'form-control')
         ));
 
-        if (!$isVariant) {
-            $builder->add('alias', 'text', array(
-                'label'      => 'mautic.asset.asset.form.alias',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array(
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.asset.asset.help.alias',
-                ),
-                'required'   => false
-            ));
-        }
+        $builder->add('alias', 'text', array(
+            'label'      => 'mautic.asset.asset.form.alias',
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array(
+                'class'   => 'form-control',
+                'tooltip' => 'mautic.asset.asset.help.alias',
+            ),
+            'required'   => false
+        ));
 
-        if (!$isVariant) {
-            $builder->add('category_lookup', 'text', array(
-                'label'      => 'mautic.asset.asset.form.category',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array(
-                    'class'       => 'form-control',
-                    'tooltip'     => 'mautic.core.help.autocomplete',
-                    'placeholder' => $this->translator->trans('mautic.core.form.uncategorized')
-                ),
-                'mapped'     => false,
-                'required'   => false
-            ));
+        $builder->add('category_lookup', 'text', array(
+            'label'      => 'mautic.asset.asset.form.category',
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array(
+                'class'       => 'form-control',
+                'tooltip'     => 'mautic.core.help.autocomplete',
+                'placeholder' => $this->translator->trans('mautic.core.form.uncategorized')
+            ),
+            'mapped'     => false,
+            'required'   => false
+        ));
 
-            $builder->add('category', 'hidden_entity', array(
-                'required'       => false,
-                'repository'     => 'MauticCategoryBundle:Category',
-                'error_bubbling' => false,
-                'read_only'      => ($isVariant) ? true : false
-            ));
-        }
+        $builder->add('category', 'hidden_entity', array(
+            'required'       => false,
+            'repository'     => 'MauticCategoryBundle:Category',
+            'error_bubbling' => false,
+            'read_only'      => false
+        ));
 
-        if (!$isVariant) {
-            $builder->add('language', 'locale', array(
-                'label'      => 'mautic.asset.asset.form.language',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array(
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.asset.asset.form.language.help',
-                ),
-                'required'   => false
-            ));
-
-            $builder->add('translationParent_lookup', 'text', array(
-                'label'      => 'mautic.asset.asset.form.translationparent',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array(
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.asset.asset.form.translationparent.help'
-                ),
-                'mapped'     => false,
-                'required'   => false
-            ));
-
-            $builder->add('translationParent', 'hidden_entity', array(
-                'required'       => false,
-                'repository'     => 'MauticAssetBundle:Asset',
-                'error_bubbling' => false
-            ));
-        }
+        $builder->add('language', 'locale', array(
+            'label'      => 'mautic.asset.asset.form.language',
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array(
+                'class'   => 'form-control',
+                'tooltip' => 'mautic.asset.asset.form.language.help',
+            ),
+            'required'   => false
+        ));
 
         $builder->add('isPublished', 'button_group', array(
             'choice_list' => new ChoiceList(
@@ -151,69 +109,31 @@ class AssetType extends AbstractType
             'required'      => false
         ));
 
-        if (!$isVariant) {
-            $builder->add('publishUp', 'datetime', array(
-                'widget'     => 'single_text',
-                'label'      => 'mautic.core.form.publishup',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array(
-                    'class'       => 'form-control',
-                    'data-toggle' => 'datetime'
-                ),
-                'format'     => 'yyyy-MM-dd HH:mm',
-                'required'   => false
-            ));
+        $builder->add('publishUp', 'datetime', array(
+            'widget'     => 'single_text',
+            'label'      => 'mautic.core.form.publishup',
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array(
+                'class'       => 'form-control',
+                'data-toggle' => 'datetime'
+            ),
+            'format'     => 'yyyy-MM-dd HH:mm',
+            'required'   => false
+        ));
 
-            $builder->add('publishDown', 'datetime', array(
-                'widget'     => 'single_text',
-                'label'      => 'mautic.core.form.publishdown',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array(
-                    'class'       => 'form-control',
-                    'data-toggle' => 'datetime'
-                ),
-                'format'     => 'yyyy-MM-dd HH:mm',
-                'required'   => false
-            ));
-        }
+        $builder->add('publishDown', 'datetime', array(
+            'widget'     => 'single_text',
+            'label'      => 'mautic.core.form.publishdown',
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array(
+                'class'       => 'form-control',
+                'data-toggle' => 'datetime'
+            ),
+            'format'     => 'yyyy-MM-dd HH:mm',
+            'required'   => false
+        ));
 
         $builder->add('sessionId', 'hidden');
-
-        if ($isVariant) {
-
-            $builder->add("details-panel-end", 'panel_end');
-
-            $builder->add('publishUp', 'datetime', array(
-                'widget'     => 'single_text',
-                'label'      => 'mautic.core.form.publishup',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array(
-                    'class'       => 'form-control',
-                    'data-toggle' => 'datetime'
-                ),
-                'format'     => 'yyyy-MM-dd HH:mm',
-                'required'   => false
-            ));
-
-            $builder->add('publishDown', 'datetime', array(
-                'widget'     => 'single_text',
-                'label'      => 'mautic.core.form.publishdown',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array(
-                    'class'       => 'form-control',
-                    'data-toggle' => 'datetime'
-                ),
-                'format'     => 'yyyy-MM-dd HH:mm',
-                'required'   => false
-            ));
-
-            $builder->add('variant_settings', 'assetvariant', array(
-                'label'       => false,
-                'asset_entity' => $options['data']
-            ));
-
-            $builder->add("assetvariant-panel-wrapper-end", 'panel_wrapper_end');
-        }
 
         $builder->add('buttons', 'form_buttons', array());
 

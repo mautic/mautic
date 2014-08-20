@@ -42,16 +42,7 @@ if ($security->hasEntityAccess($permissions['asset:assets:editown'], $permission
         </a>
     </li>
 <?php endif; ?>
-<?php if (empty($variants['parent']) && $permissions['asset:assets:create']): ?>
-    <li>
-        <a href="<?php echo $view['router']->generate('mautic_asset_action',
-           array("objectAction" => "abtest", "objectId" => $activeAsset->getId())); ?>"
-        data-toggle="ajax"
-        data-menu-link="mautic_asset_index">
-        <span><i class="fa fa-sitemap"></i><?php echo $view['translator']->trans('mautic.asset.asset.form.abtest'); ?></span>
-        </a>
-    </li>
-<?php endif; ?>
+
 <?php $view['slots']->stop(); ?>
 
 <div class="scrollable">
@@ -103,11 +94,7 @@ if ($security->hasEntityAccess($permissions['asset:assets:editown'], $permission
     </div>
 
     <div class="form-group margin-md-top">
-        <?php if (!empty($variants['parent'])): ?>
-        <label><?php echo $view['translator']->trans('mautic.asset.asset.urlvariant'); ?></label>
-        <?php else: ?>
         <label><?php echo $view['translator']->trans('mautic.asset.asset.url'); ?></label>
-        <?php endif; ?>
         <div class="input-group">
             <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly
                    value="<?php echo $assetUrl; ?>" />
@@ -119,15 +106,8 @@ if ($security->hasEntityAccess($permissions['asset:assets:editown'], $permission
         </div>
     </div>
 
-    <h3>@todo - landing asset stats/analytics/AB test results will go here</h3>
+    <h3>@todo - landing asset stats/analytics will go here</h3>
     <?php echo "<pre>".print_r($stats, true)."</pre>"; ?>
-
-    <?php
-    echo $view->render('MauticAssetBundle:Asset:translations.html.php', array(
-        'asset'         => $activeAsset,
-        'translations' => $translations
-    ));
-    ?>
     
     <div class="footer-margin"></div>
 </div>

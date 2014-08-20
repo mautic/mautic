@@ -10,11 +10,7 @@
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'asset');
 
-$variantParent = $activeAsset->getVariantParent();
-$subheader = ($variantParent) ? '<span class="small"> - ' . $view['translator']->trans('mautic.asset.asset.header.editvariant', array(
-    '%name%' => $activeAsset->getTitle(),
-    '%parent%' => $variantParent->getTitle()
-)) . '</span>' : '';
+$subheader = '';
 
 $header = ($activeAsset->getId()) ?
     $view['translator']->trans('mautic.asset.asset.header.edit',

@@ -59,15 +59,6 @@ class AssetController extends FormController
                 array('column' => 'p.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser());
         }
 
-        $translator = $this->get('translator');
-        //do not list variants in the main list
-        $filter['force'][] = array('column' => 'p.variantParent', 'expr' => 'isNull');
-
-        $langSearchCommand = $translator->trans('mautic.asset.asset.searchcommand.lang');
-        if (strpos($search, "{$langSearchCommand}:") === false) {
-            $filter['force'][] = array('column' => 'p.translationParent', 'expr' => 'isNull');
-        }
-
         $orderBy     = $this->factory->getSession()->get('mautic.asset.orderby', 'p.title');
         $orderByDir  = $this->factory->getSession()->get('mautic.asset.orderbydir', 'DESC');
 
@@ -173,69 +164,7 @@ class AssetController extends FormController
             return $this->accessDenied();
         }
 
-        //get A/B test information
-        list($parent, $children) = $model->getVariants($activeAsset);
         $properties = array();
-        if (count($children)) {
-            // foreach ($children as $c) {
-            //     $variantSettings = $c->getVariantSettings();
-
-            //     if (is_array($variantSettings) && isset($variantSettings['winnerCriteria'])) {
-            //         if (!isset($lastCriteria)) {
-            //             $lastCriteria = $variantSettings['winnerCriteria'];
-            //         }
-
-            //         //make sure all the variants are configured with the same criteria
-            //         if ($lastCriteria != $variantSettings['winnerCriteria']) {
-            //             $variantError = $this->factory->getTranslator()->trans('mautic.asset.asset.variant.misconfiguration');
-            //             break;
-            //         }
-
-            //         $properties[$c->getId()][] = $variantSettings;
-            //     }
-            // }
-        }
-        $abTestResults = array();
-        if (!empty($lastCriteria)) {
-            //there is a criteria to compare the assets against so let's shoot the asset over to the criteria function to do its thing
-            $criteria = $model->getBuilderComponents('abTestWinnerCriteria');
-            if (isset($criteria['criteria'][$lastCriteria])) {
-                $testSettings = $criteria['criteria'][$lastCriteria];
-
-                $args = array(
-                    'factory'    => $this->factory,
-                    'asset'       => $activeAsset,
-                    'parent'     => $parent,
-                    'children'   => $children,
-                    'properties' => $properties
-                );
-
-                //execute the callback
-                if (is_callable($testSettings['callback'])) {
-                    if (is_array($testSettings['callback'])) {
-                        $reflection = new \ReflectionMethod($testSettings['callback'][0], $testSettings['callback'][1]);
-                    } elseif (strpos($testSettings['callback'], '::') !== false) {
-                        $parts      = explode('::', $testSettings['callback']);
-                        $reflection = new \ReflectionMethod($parts[0], $parts[1]);
-                    } else {
-                        new \ReflectionMethod(null, $testSettings['callback']);
-                    }
-
-                    $pass = array();
-                    foreach ($reflection->getParameters() as $param) {
-                        if (isset($args[$param->getName()])) {
-                            $pass[] = $args[$param->getName()];
-                        } else {
-                            $pass[] = null;
-                        }
-                    }
-                    $abTestResults = $reflection->invokeArgs($this, $pass);
-                }
-            }
-        }
-
-        //get related translations
-        list($translationParent, $translationChildren) = $model->getTranslations($activeAsset);
 
         return $this->delegateView(array(
             'returnUrl'       => $this->generateUrl('mautic_asset_action', array(
@@ -244,14 +173,6 @@ class AssetController extends FormController
             ),
             'viewParameters'  => array(
                 'activeAsset'    => $activeAsset,
-                'variants'      => array(
-                    'parent'   => $parent,
-                    'children' => $children
-                ),
-                'translations'  => array(
-                    'parent'   => $translationParent,
-                    'children' => $translationChildren
-                ),
                 'permissions'   => $security->isGranted(array(
                     'asset:assets:viewown',
                     'asset:assets:viewother',
@@ -264,14 +185,11 @@ class AssetController extends FormController
                     'asset:assets:publishother'
                 ), "RETURN_ARRAY"),
                 'stats'         => array(
-                    // 'bounces'   => $model->getBounces($activeAsset),
                     'hits'      => array(
                         'total'  => $activeAsset->getHits(),
                         'unique' => $activeAsset->getUniqueHits()
-                    ),
-                    // 'dwellTime' => $model->getDwellTimeStats($activeAsset)
+                    )
                 ),
-                'abTestResults' => $abTestResults,
                 'security'      => $security,
                 'assetUrl'       => $model->generateUrl($activeAsset, true)
             ),
@@ -315,14 +233,16 @@ class AssetController extends FormController
                     // $content = $session->get($contentName, array());
                     // $entity->setContent($content);
 
+                    $entity->setUploadDir($this->factory->getParameter('upload_dir'));
+                    $entity->upload();
+
                     //form is valid so process the data
                     $model->saveEntity($entity);
 
                     //clear the session
                     // $session->remove($contentName);
 
-                    $entity->setUploadDir($this->factory->getParameter('upload_dir'));
-                    $entity->upload();
+                    
 
                     $this->request->getSession()->getFlashBag()->add(
                         'notice',
@@ -492,9 +412,6 @@ class AssetController extends FormController
             $model->lockEntity($entity);
 
             //set the lookup values
-            $parent = $entity->getTranslationParent();
-            if ($parent && isset($form['translationParent_lookup']))
-                $form->get('translationParent_lookup')->setData($parent->getTitle());
             $category = $entity->getCategory();
             if ($category && isset($form['category_lookup']))
                 $form->get('category_lookup')->setData($category->getTitle());
