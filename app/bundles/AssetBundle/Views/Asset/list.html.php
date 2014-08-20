@@ -100,6 +100,7 @@ $view->extend('MauticAssetBundle:Asset:index.html.php');
                            data-toggle="ajax">
                             <?php echo $item->getTitle(); ?> (<?php echo $item->getAlias(); ?>)
                         </a>
+                        <i class="<?php echo $item->getIconClass(); ?>"></i>
                         <?php
                         $hasVariants   = count($variantChildren);
                         $hasTranslations = count($translationChildren);

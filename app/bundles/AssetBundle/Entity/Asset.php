@@ -13,6 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Entity\FormEntity;
 use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -55,10 +56,9 @@ class Asset extends FormEntity
      */
     private $file;
 
-    /**
-     * 
-     */
     private $uploadDir;
+
+    private $fileType;
 
     /**
      * @ORM\Column(name="alias", type="string")
@@ -742,5 +742,148 @@ class Asset extends FormEntity
         $this->uploadDir = $uploadDir;
 
         return $this;
+    }
+
+    /**
+     * Returns file extension
+     * 
+     * @return string 
+     */
+    public function getFileType()
+    {
+        if ($this->loadFile() === null) {
+            return '';
+        }
+
+        return $this->loadFile()->getExtension();
+    }
+
+    /**
+     * Returns Font Awesome icon class based on file type.
+     * 
+     * @return string 
+     */
+    public function getIconClass()
+    {
+        $fileType = $this->getFileType();
+
+        // return missing file icon if file type is empty
+        if (!$fileType) {
+            return 'fa fa-ban';
+        }
+
+        $fileTypes = $this->getFileExtensions();
+
+        // Search for icon name by file extension.
+        foreach ($fileTypes as $icon => $extensions) {
+            if (in_array($fileType, $extensions)) {
+                return 'fa fa-file-' . $icon . '-o';
+            }
+        }
+
+        // File extension is unknown, display general file icon.
+        return 'fa fa-file-o'; 
+    }
+
+    /**
+     * Returns array of common extensions
+     * 
+     * @return string 
+     */
+    public function getFileExtensions()
+    {
+        return array(
+            'excel' => array(
+                'xlsx',
+                'xlsm',
+                'xlsb',
+                'xltx',
+                'xltm',
+                'xls',
+                'xlt'
+                ),
+            'word' => array(
+                'doc',
+                'docx',
+                'docm',
+                'dotx'
+                ),
+            'pdf' => array(
+                'pdf'
+                ),
+            'audio' => array(
+                'mp3'
+                ),
+            'archive' => array(
+                'zip',
+                'rar',
+                'iso',
+                'tar',
+                'gz',
+                '7z'
+                ),
+            'image' => array(
+                'jpg',
+                'jpeg',
+                'png',
+                'gif',
+                'ico',
+                'bmp',
+                'psd'
+                ),
+            'text' => array(
+                'txt',
+                'pub'
+                ),
+            'code' => array(
+                'php',
+                'js',
+                'json',
+                'yaml',
+                'xml',
+                'html',
+                'htm',
+                'sql'
+                ),
+            'powerpoint' => array(
+                'ppt',
+                'pptx',
+                'pptm',
+                'xps',
+                'potm',
+                'potx',
+                'pot',
+                'pps',
+                'odp'
+                ),
+            'video' => array(
+                'wmv',
+                'avi',
+                'mp4',
+                'mkv',
+                'mpeg'
+                )
+            );
+    }
+
+    /**
+     * Load a file from it's path.
+     * 
+     * @return Symfony\Component\HttpFoundation\File\File or null
+     */
+    public function loadFile()
+    {
+        if (!$this->getAbsolutePath())
+        {
+            return null;
+        }
+
+        try {
+            $file = new File($this->getAbsolutePath());
+        } catch (FileNotFoundException $e) {
+            $file = null;
+        }
+
+        return $file;
     }
 }
