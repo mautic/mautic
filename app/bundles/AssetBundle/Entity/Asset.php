@@ -405,7 +405,7 @@ class Asset extends FormEntity
      * @param \Mautic\AssetBundle\Entity\Category $category
      * @return Asset
      */
-    public function setCategory(\Mautic\AssetBundle\Entity\Category $category = null)
+    public function setCategory(\Mautic\CategoryBundle\Entity\Category $category = null)
     {
         $this->isChanged('category', $category);
         $this->category = $category;
@@ -729,8 +729,6 @@ class Asset extends FormEntity
         } else {
             return 'assets/files';
         }
-
-        
     }
 
     /**
