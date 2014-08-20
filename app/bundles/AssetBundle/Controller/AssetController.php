@@ -234,6 +234,7 @@ class AssetController extends FormController
                     // $entity->setContent($content);
 
                     $entity->setUploadDir($this->factory->getParameter('upload_dir'));
+                    $entity->preUpload();
                     $entity->upload();
 
                     //form is valid so process the data
@@ -364,6 +365,7 @@ class AssetController extends FormController
                 if ($valid = $this->isFormValid($form)) {
 
                     $entity->setUploadDir($this->factory->getParameter('upload_dir'));
+                    $entity->preUpload();
                     $entity->upload();
 
                     //form is valid so process the data
@@ -483,7 +485,7 @@ class AssetController extends FormController
         $postActionVars = array(
             'returnUrl'       => $returnUrl,
             'viewParameters'  => array('page' => $page),
-            'contentTemplate' => 'MauticAssetBundle:Page:index',
+            'contentTemplate' => 'MauticAssetBundle:Asset:index',
             'passthroughVars' => array(
                 'activeLink'    => 'mautic_asset_index',
                 'mauticContent' => 'asset'
@@ -500,12 +502,17 @@ class AssetController extends FormController
                     'msg'     => 'mautic.asset.asset.error.notfound',
                     'msgVars' => array('%id%' => $objectId)
                 );
-            } elseif (!$this->factory->getSecurity()->isGranted('asset:assets:delete')) {
+            } elseif (!$this->factory->getSecurity()->hasEntityAccess(
+                'page:pages:deleteown',
+                'page:pages:deleteother',
+                $entity->getCreatedBy()
+            )) {
                 return $this->accessDenied();
             } elseif ($model->isLocked($entity)) {
                 return $this->isLocked($postActionVars, $entity, 'asset.asset');
             }
 
+            $entity->removeUpload();
             $model->deleteEntity($entity);
 
             $flashes[] = array(

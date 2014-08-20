@@ -56,9 +56,22 @@ class Asset extends FormEntity
      */
     private $file;
 
+    /**
+     * Holds upload directory
+     */
     private $uploadDir;
 
+    /**
+     * Holds file type (file extension)
+     */
     private $fileType;
+
+    /**
+     * Temporary location when asset file is beeing updated.
+     * We need to keep the old file till we are sure the new 
+     * one is stored correctly.
+     */
+    private $temp;
 
     /**
      * @ORM\Column(name="alias", type="string")
@@ -161,6 +174,13 @@ class Asset extends FormEntity
     public function setFile(UploadedFile $file = null)
     {
         $this->file = $file;
+
+        // check if we have an old asset path
+        if (isset($this->path)) {
+            // store the old name to delete after the update
+            $this->temp = $this->path;
+            $this->path = null;
+        }
     }
 
     /**
@@ -450,7 +470,7 @@ class Asset extends FormEntity
      */
     public function __construct()
     {
-        $this->translationChildren = new \Doctrine\Common\Collections\ArrayCollection();
+
     }
 
     /**
@@ -476,6 +496,14 @@ class Asset extends FormEntity
         return $this->uniqueHits;
     }
 
+    public function preUpload()
+    {
+        if (null !== $this->getFile()) {
+            $filename = sha1(uniqid(mt_rand(), true));
+            $this->path = $filename.'.'.$this->getFile()->guessExtension();
+        }
+    }
+
     public function upload()
     {
 
@@ -484,21 +512,27 @@ class Asset extends FormEntity
             return;
         }
 
-        // TODO: use the original file name here but you should
-        // sanitize it at least to avoid any security issues
-
         // move takes the target directory and then the
         // target filename to move to
-        $this->getFile()->move(
-            $this->getUploadRootDir(),
-            $this->getFile()->getClientOriginalName()
-        );
+        $this->getFile()->move($this->getUploadRootDir(), $this->path);
 
-        // set the path property to the filename where you've saved the file
-        $this->path = $this->getFile()->getClientOriginalName();
+        // check if we have an old asset
+        if (isset($this->temp)) {
+            // delete the old asset
+            unlink($this->getUploadRootDir().'/'.$this->temp);
+            // clear the temp asset path
+            $this->temp = null;
+        }
 
         // clean up the file property as you won't need it anymore
         $this->file = null;
+    }
+
+    public function removeUpload()
+    {
+        if ($file = $this->getAbsolutePath()) {
+            unlink($file);
+        }
     }
 
     /**
@@ -573,7 +607,7 @@ class Asset extends FormEntity
             return '';
         }
 
-        return $this->loadFile()->getExtension();
+        return $this->loadFile()->guessExtension();
     }
 
     /**
@@ -691,7 +725,7 @@ class Asset extends FormEntity
      */
     public function loadFile()
     {
-        if (!$this->getAbsolutePath())
+        if (!$this->getAbsolutePath() || !file_exists($this->getAbsolutePath()))
         {
             return null;
         }
