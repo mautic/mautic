@@ -22,7 +22,7 @@ use Mautic\CoreBundle\Entity\FormEntity;
 class Report extends FormEntity
 {
     /**
-     * @ORM\Column(name="id", type="integer")
+     * @ORM\Column(type="integer")
      * @ORM\Id()
      * @ORM\GeneratedValue(strategy="AUTO")
      * @Serializer\Expose
@@ -32,12 +32,20 @@ class Report extends FormEntity
     private $id;
 
     /**
-     * @ORM\Column(name="title", type="string")
+     * @ORM\Column(type="string")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})
      */
     private $title;
+
+    /**
+     * @ORM\Column(type="integer")
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full", "limited"})
+     */
+    private $system = 0;
 
     /**
      * Get id
@@ -71,5 +79,29 @@ class Report extends FormEntity
     public function getTitle()
     {
         return $this->title;
+    }
+
+    /**
+     * Set system
+     *
+     * @param string $system
+     * @return Report
+     */
+    public function setSystem($system)
+    {
+        $this->isChanged('system', $system);
+        $this->system = $system;
+
+        return $this;
+    }
+
+    /**
+     * Get system
+     *
+     * @return integer
+     */
+    public function getSystem()
+    {
+        return $this->system;
     }
 }
