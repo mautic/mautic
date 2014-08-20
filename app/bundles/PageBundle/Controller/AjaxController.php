@@ -42,24 +42,6 @@ class AjaxController extends CommonAjaxController
 
     /**
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    protected function categoryListAction(Request $request)
-    {
-        $filter    = InputHelper::clean($request->query->get('filter'));
-        $results   = $this->factory->getModel('page.page')->getLookupResults('category', $filter, 10);
-        $dataArray = array();
-        foreach ($results as $r) {
-            $dataArray[] = array(
-                "label" => $r['title'] . " ({$r['id']})",
-                "value" => $r['id']
-            );
-        }
-        return $this->sendJsonResponse($dataArray);
-    }
-
-    /**
-     * @param Request $request
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
@@ -75,6 +57,25 @@ class AjaxController extends CommonAjaxController
             $content[$slot] = $newContent;
             $session->set('mautic.pagebuilder.'.$page.'.content', $content);
             $dataArray['success'] = 1;
+        }
+        return $this->sendJsonResponse($dataArray);
+    }
+
+
+    /**
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    protected function categoryListAction(Request $request)
+    {
+        $filter    = InputHelper::clean($request->query->get('filter'));
+        $results   = $this->factory->getModel('page.page')->getLookupResults('category', $filter, 10);
+        $dataArray = array();
+        foreach ($results as $r) {
+            $dataArray[] = array(
+                "label" => $r['title'] . " ({$r['id']})",
+                "value" => $r['id']
+            );
         }
         return $this->sendJsonResponse($dataArray);
     }

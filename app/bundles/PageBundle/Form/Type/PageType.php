@@ -110,6 +110,7 @@ class PageType extends AbstractType
             'expanded'      => false,
             'multiple'      => false,
             'label'         => 'mautic.page.page.form.template',
+            'label_attr'    => array('class' => 'control-label'),
             'empty_value'   => false,
             'required'      => false,
             'attr'       => array(

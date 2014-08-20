@@ -197,4 +197,18 @@ class CategoryModel extends FormModel
 
         parent::deleteEntity($entity);
     }
+
+    /**
+     * Get list of entities for autopopulate fields
+     *
+     * @param $bundle
+     * @param $filter
+     * @param $limit
+     * @return array
+     */
+    public function getLookupResults($bundle, $filter = '', $limit = 10)
+    {
+        $results = $this->getRepository()->getCategoryList($bundle, $filter, $limit, 0);
+        return $results;
+    }
 }

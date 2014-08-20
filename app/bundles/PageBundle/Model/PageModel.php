@@ -245,9 +245,6 @@ class PageModel extends FormModel
                 $repo->setCurrentUser($this->factory->getUser());
                 $results = $repo->getPageList($filter, $limit, 0, $viewOther);
                 break;
-            case 'category':
-                $results = $this->factory->getModel('category.category')->getRepository()->getCategoryList('page', $filter, $limit, 0);
-                break;
         }
 
         return $results;
