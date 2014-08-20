@@ -163,7 +163,7 @@ class HitRepository extends CommonRepository
             );
         }
 
-        return (!is_array($pageIds)) ? $stats[$pageIds] : $stats;
+        return (!is_array($pageIds) && array_key_exists('$pageIds', $stats)) ? $stats[$pageIds] : $stats;
     }
 
     /**
