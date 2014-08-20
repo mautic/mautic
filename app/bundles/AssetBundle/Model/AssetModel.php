@@ -143,7 +143,7 @@ class AssetModel extends FormModel
                 $results = $repo->getAssetList($filter, $limit, 0, $viewOther);
                 break;
             case 'category':
-                $results = $this->factory->getModel('asset.category')->getRepository()->getCategoryList($filter, $limit, 0);
+                $results = $this->factory->getModel('category.category')->getRepository()->getCategoryList($filter, $limit, 0);
                 break;
         }
 
