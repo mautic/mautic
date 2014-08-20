@@ -16,6 +16,9 @@ $showSupport = (isset($abTestResults['supportTemplate']) && isset($abTestResults
             <?php echo $view['translator']->trans('mautic.page.page.abtest.stats'); ?>
         </button>
     <?php endif; ?>
+    <?php if (!empty($abTestResults['error'])): ?>
+    <span class="text-danger"><?php echo $abTestResults['error']; ?></span>
+    <?php endif; ?>
 </h4>
 <table class="table table-bordered table-stripped">
     <?php if ($variants['parent']): ?>

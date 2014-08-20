@@ -176,7 +176,8 @@ class PageController extends FormController
 
         //get A/B test information
         list($parent, $children) = $model->getVariants($activePage);
-        $properties = array();
+        $properties   = array();
+        $variantError = '';
         if (count($children)) {
             foreach ($children as $c) {
                 $variantSettings = $c->getVariantSettings();
@@ -197,7 +198,7 @@ class PageController extends FormController
             }
         }
         $abTestResults = array();
-        if (!empty($lastCriteria)) {
+        if (!empty($lastCriteria) && empty($variantError)) {
             //there is a criteria to compare the pages against so let's shoot the page over to the criteria function to do its thing
             $criteria = $model->getBuilderComponents('abTestWinnerCriteria');
             if (isset($criteria['criteria'][$lastCriteria])) {
@@ -233,6 +234,8 @@ class PageController extends FormController
                     $abTestResults = $reflection->invokeArgs($this, $pass);
                 }
             }
+        } else {
+            $abTestResults['error'] = $variantError;
         }
 
         //get related translations
