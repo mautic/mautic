@@ -22,16 +22,16 @@ $container->setDefinition(
         'alias' => 'lead',
     ));
 
-//Lead list form
+//Lead list choice form
 $container->setDefinition(
-    'mautic.form.type.leadlist',
+    'mautic.form.type.leadlist_choices',
     new Definition(
-        'Mautic\LeadBundle\Form\Type\ListType',
+        'Mautic\LeadBundle\Form\Type\LeadListType',
         array(new Reference('mautic.factory'))
     )
 )
     ->addTag('form.type', array(
-        'alias' => 'leadlist',
+        'alias' => 'leadlist_choices',
     ));
 
 
@@ -45,7 +45,6 @@ $container->setDefinition(
         'alias' => 'leadlist_filters',
     ));
 
-
 //Lead field form
 $container->setDefinition(
     'mautic.form.type.leadfield',
@@ -58,6 +57,17 @@ $container->setDefinition(
         'alias' => 'leadfield',
     ));
 
+//Lead list
+$container->setDefinition(
+    'mautic.form.type.leadfield',
+    new Definition(
+        'Mautic\LeadBundle\Form\Type\FieldType',
+        array(new Reference('mautic.factory'))
+    )
+)
+    ->addTag('form.type', array(
+        'alias' => 'leadfield',
+    ));
 
 //Form submit action forms
 $container->setDefinition(
@@ -80,7 +90,6 @@ $container->setDefinition(
     ->addTag('form.type', array(
         'alias' => 'lead_submitaction_mappedfields',
     ));
-
 
 $container->setDefinition(
     'mautic.form.type.lead.submitaction.scorechange',
