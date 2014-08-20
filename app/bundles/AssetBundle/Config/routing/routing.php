@@ -12,22 +12,6 @@ use Symfony\Component\Routing\Route;
 
 $collection = new RouteCollection();
 
-$collection->add('mautic_assetcategory_index', new Route('/assets/categories/{page}',
-    array(
-        '_controller' => 'MauticAssetBundle:Category:index',
-        'page'        => 1,
-    ), array(
-        'page'    => '\d+'
-    )
-));
-
-$collection->add('mautic_assetcategory_action', new Route('/assets/categories/{objectAction}/{objectId}',
-    array(
-        '_controller' => 'MauticAssetBundle:Category:execute',
-        "objectId"    => 0
-    )
-));
-
 $collection->add('mautic_asset_index', new Route('/assets/{page}',
     array(
         '_controller' => 'MauticAssetBundle:Asset:index',
