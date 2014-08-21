@@ -52,6 +52,14 @@ class Asset extends FormEntity
     private $path;
 
     /**
+     * @ORM\Column(name="original_file_name", type="string", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full"})
+     */
+    private $originalFileName;
+
+    /**
      * @Assert\File(maxSize="6000000")
      */
     private $file;
@@ -215,6 +223,30 @@ class Asset extends FormEntity
     public function getTitle()
     {
         return $this->title;
+    }
+
+    /**
+     * Set originalFileName
+     *
+     * @param string $originalFileName
+     * @return Asset
+     */
+    public function setOriginalFileName($originalFileName)
+    {
+        $this->isChanged('originalFileName', $originalFileName);
+        $this->originalFileName = $originalFileName;
+
+        return $this;
+    }
+
+    /**
+     * Get originalFileName
+     *
+     * @return string
+     */
+    public function getOriginalFileName()
+    {
+        return $this->originalFileName;
     }
 
     /**
@@ -498,7 +530,8 @@ class Asset extends FormEntity
 
     public function preUpload()
     {
-        if (null !== $this->getFile()) {
+        if (null !== $this->getFile($this->getFile()->guessExtension())) {
+            $this->setOriginalFileName($this->getFile()->getClientOriginalName());
             $filename = sha1(uniqid(mt_rand(), true));
             $this->path = $filename.'.'.$this->getFile()->guessExtension();
         }
