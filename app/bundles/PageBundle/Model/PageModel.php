@@ -90,8 +90,9 @@ class PageModel extends FormModel
             $entity->setRevision($revision);
 
             //reset the variant hit and start date if there are any changes
-            $changes = $entity->getChanges();
-            if (!empty($changes) && empty($this->inConversion)) {
+            $changes   = $entity->getChanges();
+            $isVariant = $entity->getVariantStartDate();
+            if ($isVariant !== null && !empty($changes) && empty($this->inConversion)) {
                 $entity->setVariantHits(0);
                 $entity->setVariantStartDate($now);
             }
@@ -176,7 +177,9 @@ class PageModel extends FormModel
             $entity->setSessionId('new_' . uniqid());
         } else {
             $entity = parent::getEntity($id);
-            $entity->setSessionId($entity->getId());
+            if ($entity !== null) {
+                $entity->setSessionId($entity->getId());
+            }
         }
 
         return $entity;
