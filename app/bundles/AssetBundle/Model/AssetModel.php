@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\AssetBundle\Entity\Asset;
+use Mautic\AssetBundle\Entity\Download;
 use Mautic\AssetBundle\AssetEvents;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -73,6 +74,73 @@ class AssetModel extends FormModel
         parent::saveEntity($entity, $unlock);
     }
 
+    /**
+     * @param        $asset
+     * @param        $request
+     * @param string $code
+     */
+    public function trackDownload($asset, $request, $code = '200')
+    {
+        $download = new Download();
+        $download->setDateDownload(new \Datetime());
+
+        //check for the tracking cookie
+        $trackingId = $request->cookies->get('mautic_session_id');
+
+        if (empty($trackingId)) {
+            $trackingId = uniqid();
+        }
+
+        //create a tracking cookie
+        $expire = time() + 1800;
+        setcookie('mautic_session_id', $trackingId, $expire);
+        $download->setTrackingId($trackingId);
+
+        if (!empty($asset)) {
+            $download->setAsset($asset);
+
+            $downloadCount = $asset->getDownloadCount();
+            $downloadCount++;
+            $asset->setDownloadCount($downloadCount);
+
+            //check for a download count from tracking id
+            $countById = $this->em
+                ->getRepository('MauticAssetBundle:Download')->getDownloadCountForTrackingId($asset->getId(), $trackingId);
+            if (empty($countById)) {
+                $uniqueDownloadCount = $asset->getUniqueDownloadCount();
+                $uniqueDownloadCount++;
+                $asset->setUniqueDownloadCount($uniqueDownloadCount);
+            }
+
+            $this->em->persist($asset);
+        }
+
+        //check for existing IP
+        $ip = $request->server->get('REMOTE_ADDR');
+        $ipAddress = $this->em->getRepository('MauticCoreBundle:IpAddress')
+            ->findOneByIpAddress($ip);
+
+        if ($ipAddress === null) {
+            $ipAddress = new IpAddress();
+            $ipAddress->setIpAddress($ip, $this->factory->getSystemParameters());
+        }
+
+        $download->setCode($code);
+        $download->setIpAddress($ipAddress);
+        $download->setReferer($request->server->get('HTTP_REFERER'));
+
+        if ($this->dispatcher->hasListeners(AssetEvents::ASSET_ON_DOWNLOAD)) {
+            $event = new AssetDownloadEvent($asset, $request, $code);
+            $this->dispatcher->dispatch(AssetEvents::ASSET_ON_DOWNLOAD, $event);
+        }
+
+        $this->em->persist($download);
+        $this->em->flush();
+
+        //save download to the cookie to use to update the exit time
+        setcookie('mautic_referer_id', $download->getId(), $expire);
+    }
+
     public function getRepository()
     {
         return $this->em->getRepository('MauticAssetBundle:Asset');
@@ -117,10 +185,8 @@ class AssetModel extends FormModel
     {
         if ($id === null) {
             $entity = new Asset();
-            $entity->setSessionId('new_' . uniqid());
         } else {
             $entity = parent::getEntity($id);
-            $entity->setSessionId($entity->getId());
         }
 
         return $entity;

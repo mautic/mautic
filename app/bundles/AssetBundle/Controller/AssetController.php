@@ -185,9 +185,9 @@ class AssetController extends FormController
                     'asset:assets:publishother'
                 ), "RETURN_ARRAY"),
                 'stats'         => array(
-                    'hits'      => array(
-                        'total'  => $activeAsset->getHits(),
-                        'unique' => $activeAsset->getUniqueHits()
+                    'downloads'      => array(
+                        'total'  => $activeAsset->getDownloadCount(),
+                        'unique' => $activeAsset->getUniqueDownloadCount()
                     )
                 ),
                 'security'      => $security,
@@ -228,10 +228,6 @@ class AssetController extends FormController
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    // $session     = $this->factory->getSession();
-                    // $contentName = 'mautic.pagebuilder.'.$entity->getSessionId().'.content';
-                    // $content = $session->get($contentName, array());
-                    // $entity->setContent($content);
 
                     $entity->setUploadDir($this->factory->getParameter('upload_dir'));
                     $entity->preUpload();
@@ -239,11 +235,6 @@ class AssetController extends FormController
 
                     //form is valid so process the data
                     $model->saveEntity($entity);
-
-                    //clear the session
-                    // $session->remove($contentName);
-
-                    
 
                     $this->request->getSession()->getFlashBag()->add(
                         'notice',
@@ -272,8 +263,6 @@ class AssetController extends FormController
                 $viewParameters  = array('page' => $page);
                 $returnUrl = $this->generateUrl('mautic_asset_index', $viewParameters);
                 $template  = 'MauticAssetBundle:Asset:index';
-                //clear any modified content
-                $session->remove('mautic.assetbuilder.'.$entity->getSessionId().'.content', array());
             }
 
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
@@ -289,11 +278,9 @@ class AssetController extends FormController
             }
         }
 
-        // $builderComponents    = $model->getBuilderComponents();
         return $this->delegateView(array(
             'viewParameters'  =>  array(
                 'form'        => $form->createView(),
-                // 'tokens'      => $builderComponents['assetTokens'],
                 'activeAsset'  => $entity
             ),
             'contentTemplate' => 'MauticAssetBundle:Asset:form.html.php',
@@ -461,7 +448,8 @@ class AssetController extends FormController
             }
 
             $clone = clone $entity;
-            $clone->setHits(0);
+            $clone->setDownloadCounts(0);
+            $clone->setUniqueDownloadCounts(0);
             $clone->setRevision(0);
             $clone->setIsPublished(false);
             $model->saveEntity($clone);
