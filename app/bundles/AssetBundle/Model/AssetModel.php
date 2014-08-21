@@ -210,21 +210,11 @@ class AssetModel extends FormModel
     {
         $assetSlug = $entity->getId() . ':' . $entity->getAlias();
 
-        //should the url include the category
-        $catInUrl    = $this->factory->getParameter('cat_in_asset_url');
-        if ($catInUrl) {
-            $category = $entity->getCategory();
-            $catSlug = (!empty($category)) ? $category->getId() . ':' . $category->getAlias() :
-                $this->translator->trans('mautic.core.url.uncategorized');
-        }
-
         $slugs = array(
-            'slug1' => (!empty($catSlug)) ? $catSlug : $assetSlug,
-            'slug2' => (!empty($catSlug)) ? $assetSlug : '',
-            'slug3' => ''
+            'slug' => $assetSlug
         );
 
-        $assetUrl  = $this->factory->getRouter()->generate('mautic_asset_public', $slugs, $absolute);
+        $assetUrl  = $this->factory->getRouter()->generate('mautic_asset_download', $slugs, $absolute);
 
         return $assetUrl;
     }

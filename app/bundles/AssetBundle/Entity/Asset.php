@@ -650,6 +650,20 @@ class Asset extends FormEntity
     }
 
     /**
+     * Returns file mime type
+     * 
+     * @return string 
+     */
+    public function getFileMimeType()
+    {
+        if ($this->loadFile() === null) {
+            return '';
+        }
+
+        return $this->loadFile()->getMimeType();
+    }
+
+    /**
      * Returns Font Awesome icon class based on file type.
      * 
      * @return string 
@@ -758,7 +772,7 @@ class Asset extends FormEntity
     }
 
     /**
-     * Load a file from it's path.
+     * Load the file object from it's path.
      * 
      * @return Symfony\Component\HttpFoundation\File\File or null
      */
@@ -776,5 +790,15 @@ class Asset extends FormEntity
         }
 
         return $file;
+    }
+
+    /**
+     * Load content of the file from it's path.
+     * 
+     * @return string
+     */
+    public function getFileContents()
+    {
+        return file_get_contents($this->getAbsolutePath());
     }
 }

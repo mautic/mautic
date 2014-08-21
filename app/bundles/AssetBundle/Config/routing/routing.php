@@ -28,11 +28,10 @@ $collection->add('mautic_asset_action', new Route('/assets/{objectAction}/{objec
     )
 ));
 
-$collection->add('mautic_asset_public', new Route('/p/asset/{slug1}/{slug2}/{slug3}',
+$collection->add('mautic_asset_download', new Route('/p/asset/{slug}',
     array(
-        '_controller' => 'MauticAssetBundle:Public:index',
-        "slug2"       => '',
-        "slug3"       => ''
+        '_controller' => 'MauticAssetBundle:Public:download',
+        "slug"    => ''
     )
 ));
 
