@@ -197,7 +197,6 @@ var Mautic = {
                 mQuery(buttons).filter("button").each(function (i, v) {
                     //get the ID
                     var id = mQuery(this).attr('id');
-                    console.log(id);
                     var button = mQuery("<button type='button' />")
                         .addClass(mQuery(this).attr('class'))
                         .html(mQuery(this).html())
