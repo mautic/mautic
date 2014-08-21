@@ -45,7 +45,7 @@ class ReportController extends FormController
         }
 
         //set limits
-        /*$limit = $this->factory->getSession()->get('mautic.report.limit', $this->factory->getParameter('default_pagelimit'));
+        $limit = $this->factory->getSession()->get('mautic.report.limit', $this->factory->getParameter('default_pagelimit'));
         $start = ($page === 1) ? 0 : (($page-1) * $limit);
         if ($start < 0) {
             $start = 0;
@@ -58,20 +58,20 @@ class ReportController extends FormController
 
         if (!$permissions['report:reports:viewother']) {
             $filter['force'][] =
-                array('column' => 'p.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser());
-        }*/
+                array('column' => 'r.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser());
+        }
 
 	    /* @type \Symfony\Bundle\FrameworkBundle\Translation\Translator $translator */
-        /*$translator = $this->get('translator');
+        $translator = $this->get('translator');
         //do not list variants in the main list
-        $filter['force'][] = array('column' => 'p.variantParent', 'expr' => 'isNull');
+        //$filter['force'][] = array('column' => 'r.variantParent', 'expr' => 'isNull');
 
         $langSearchCommand = $translator->trans('mautic.report.report.searchcommand.lang');
         if (strpos($search, "{$langSearchCommand}:") === false) {
-            $filter['force'][] = array('column' => 'p.translationParent', 'expr' => 'isNull');
+            //$filter['force'][] = array('column' => 'r.translationParent', 'expr' => 'isNull');
         }
 
-        $orderBy     = $this->factory->getSession()->get('mautic.report.orderby', 'p.title');
+        $orderBy     = $this->factory->getSession()->get('mautic.report.orderby', 'r.title');
         $orderByDir  = $this->factory->getSession()->get('mautic.report.orderbydir', 'DESC');
 
         $reports = $model->getEntities(
@@ -103,7 +103,7 @@ class ReportController extends FormController
                     'mauticContent' => 'page'
                 )
             ));
-        }*/
+        }
 
         //set what page currently on so that we can return here after form submission/cancellation
         $this->factory->getSession()->set('mautic.report.report', $page);
@@ -112,10 +112,10 @@ class ReportController extends FormController
 
         return $this->delegateView(array(
             'viewParameters'  =>  array(
-                //'searchValue' => $search,
-                //'items'       => $reports,
+                'searchValue' => $search,
+                'items'       => $reports,
                 'page'        => $page,
-                //'limit'       => $limit,
+                'limit'       => $limit,
                 'permissions' => $permissions,
                 'model'       => $model,
                 'tmpl'        => $tmpl,

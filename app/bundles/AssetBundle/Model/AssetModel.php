@@ -23,6 +23,55 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
  */
 class AssetModel extends FormModel
 {
+    /**
+     * {@inheritdoc}
+     *
+     * @param       $entity
+     * @param       $unlock
+     * @return mixed
+     */
+    public function saveEntity($entity, $unlock = true)
+    {
+        if (empty($this->inConversion)) {
+            $alias = $entity->getAlias();
+            if (empty($alias)) {
+                $alias = strtolower(InputHelper::alphanum($entity->getTitle(), true));
+            } else {
+                $alias = strtolower(InputHelper::alphanum($alias, true));
+            }
+
+            //make sure alias is not already taken
+            $repo      = $this->getRepository();
+            $testAlias = $alias;
+            $count     = $repo->checkUniqueAlias($testAlias, $entity);
+            $aliasTag  = $count;
+
+            while ($count) {
+                $testAlias = $alias . $aliasTag;
+                $count     = $repo->checkUniqueAlias($testAlias, $entity);
+                $aliasTag++;
+            }
+            if ($testAlias != $alias) {
+                $alias = $testAlias;
+            }
+            $entity->setAlias($alias);
+        }
+
+        $now = new \DateTime();
+
+        //set the author for new asset
+        if ($entity->isNew()) {
+            $user = $this->factory->getUser();
+            $entity->setAuthor($user->getName());
+        } else {
+            //increase the revision
+            $revision = $entity->getRevision();
+            $revision++;
+            $entity->setRevision($revision);
+        }
+
+        parent::saveEntity($entity, $unlock);
+    }
 
     public function getRepository()
     {
@@ -143,61 +192,11 @@ class AssetModel extends FormModel
                 $results = $repo->getAssetList($filter, $limit, 0, $viewOther);
                 break;
             case 'category':
-                $results = $this->factory->getModel('asset.category')->getRepository()->getCategoryList($filter, $limit, 0);
+                $results = $this->factory->getModel('category.category')->getRepository()->getCategoryList($filter, $limit, 0);
                 break;
         }
 
         return $results;
-    }
-
-    /**
-     * Get the variant parent/children
-     *
-     * @param Asset $asset
-     *
-     * @return array
-     */
-    public function getVariants(Asset $asset)
-    {
-        $parent = $asset->getVariantParent();
-
-        if (!empty($parent)) {
-            $children = $parent->getVariantChildren();
-        } else {
-            $parent   = $asset;
-            $children = $asset->getVariantChildren();
-        }
-
-        if (empty($children)) {
-            $children = false;
-        }
-
-        return array($parent, $children);
-    }
-
-    /**
-     * Get translation parent/children
-     *
-     * @param Asset $asset
-     *
-     * @return array
-     */
-    public function getTranslations(Asset $asset)
-    {
-        $parent = $asset->getTranslationParent();
-
-        if (!empty($parent)) {
-            $children = $parent->getTranslationChildren();
-        } else {
-            $parent   = $asset;
-            $children = $asset->getTranslationChildren();
-        }
-
-        if (empty($children)) {
-            $children = false;
-        }
-
-        return array($parent, $children);
     }
 
     /**
@@ -211,31 +210,11 @@ class AssetModel extends FormModel
     {
         $assetSlug = $entity->getId() . ':' . $entity->getAlias();
 
-        //should the url include the category
-        $catInUrl    = $this->factory->getParameter('cat_in_asset_url');
-        if ($catInUrl) {
-            $category = $entity->getCategory();
-            $catSlug = (!empty($category)) ? $category->getId() . ':' . $category->getAlias() :
-                $this->translator->trans('mautic.core.url.uncategorized');
-        }
+        $slugs = array(
+            'slug' => $assetSlug
+        );
 
-        $parent = $entity->getTranslationParent();
-        if ($parent) {
-            //multiple languages so tak on the language
-            $slugs = array(
-                'slug1' => $entity->getLanguage(),
-                'slug2' => (!empty($catSlug)) ? $catSlug : $assetSlug,
-                'slug3' => (!empty($catSlug)) ? $assetSlug : ''
-            );
-        } else {
-            $slugs = array(
-                'slug1' => (!empty($catSlug)) ? $catSlug : $assetSlug,
-                'slug2' => (!empty($catSlug)) ? $assetSlug : '',
-                'slug3' => ''
-            );
-        }
-
-        $assetUrl  = $this->factory->getRouter()->generate('mautic_asset_public', $slugs, $absolute);
+        $assetUrl  = $this->factory->getRouter()->generate('mautic_asset_download', $slugs, $absolute);
 
         return $assetUrl;
     }

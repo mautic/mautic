@@ -19,13 +19,13 @@ $view->extend('MauticReportBundle:Report:index.html.php');
                 <?php
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'page',
-                    'orderBy'    => 'p.title',
+                    'orderBy'    => 'r.title',
                     'text'       => 'mautic.report.report.thead.title',
                     'class'      => 'col-page-title',
                     'default'    => true
                 ));
 
-                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                /*echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'page',
                     'orderBy'    => 'c.title',
                     'text'       => 'mautic.report.report.thead.category',
@@ -51,11 +51,11 @@ $view->extend('MauticReportBundle:Report:index.html.php');
                     'orderBy'    => 'p.hits',
                     'text'       => 'mautic.report.report.thead.hits',
                     'class'      => 'col-page-hits'
-                ));
+                ));*/
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'page',
-                    'orderBy'    => 'p.id',
+                    'orderBy'    => 'r.id',
                     'text'       => 'mautic.report.report.thead.id',
                     'class'      => 'col-page-id'
                 ));
@@ -131,9 +131,9 @@ $view->extend('MauticReportBundle:Report:index.html.php');
         <h4><?php echo $view['translator']->trans('mautic.core.noresults'); ?></h4>
     <?php endif; ?>
     <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
-        "totalItems"      => /*count($items)*/ 0,
+        "totalItems"      => count($items),
         "page"            => $page,
-        "limit"           => /*$limit*/ 0,
+        "limit"           => $limit,
         "menuLinkId"      => 'mautic_report_index',
         "baseUrl"         => $view['router']->generate('mautic_report_index'),
         'sessionVar'      => 'page'

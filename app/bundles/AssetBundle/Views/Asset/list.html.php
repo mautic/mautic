@@ -64,10 +64,6 @@ $view->extend('MauticAssetBundle:Asset:index.html.php');
             </thead>
             <tbody>
             <?php foreach ($items as $item): ?>
-                <?php
-                $variantChildren     = $item->getVariantChildren();
-                $translationChildren = $item->getTranslationChildren();
-                ?>
                 <tr>
                     <td>
                         <?php
@@ -95,24 +91,12 @@ $view->extend('MauticAssetBundle:Asset:index.html.php');
                             'dateFormat' => (!empty($dateFormat)) ? $dateFormat : 'F j, Y g:i a',
                             'model'      => 'asset.asset'
                         )); ?>
-                        <!-- <a href="<?php echo $view['router']->generate('mautic_asset_action',
+                        <a href="<?php echo $view['router']->generate('mautic_asset_action',
                             array("objectAction" => "view", "objectId" => $item->getId())); ?>"
-                           data-toggle="ajax"> -->
+                           data-toggle="ajax">
                             <?php echo $item->getTitle(); ?> (<?php echo $item->getAlias(); ?>)
-                        <!-- </a> -->
-                        <?php
-                        $hasVariants   = count($variantChildren);
-                        $hasTranslations = count($translationChildren);
-                        if ($hasVariants || $hasTranslations): ?>
-                        <span>
-                            <?php if ($hasVariants): ?>
-                                <i class="fa fa-fw fa-sitemap"></i>
-                            <?php endif; ?>
-                            <?php if ($hasTranslations): ?>
-                                <i class="fa fa-fw fa-language"></i>
-                            <?php endif; ?>
-                        </span>
-                    <?php endif; ?>
+                        </a>
+                        <i class="<?php echo $item->getIconClass(); ?>"></i>
                     </td>
                     <td class="visible-md visible-lg">
                         <?php $catName = ($category = $item->getCategory()) ? $category->getTitle() :

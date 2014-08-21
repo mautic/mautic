@@ -54,7 +54,7 @@ class CommonModel
     /**
      * {@inheritdoc}
      *
-     * @return string
+     * @return \Mautic\CoreBundle\Entity\CommonRepository
      */
     public function getRepository()
     {

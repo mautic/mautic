@@ -13,6 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Entity\FormEntity;
 use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -51,9 +52,34 @@ class Asset extends FormEntity
     private $path;
 
     /**
+     * @ORM\Column(name="original_file_name", type="string", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full"})
+     */
+    private $originalFileName;
+
+    /**
      * @Assert\File(maxSize="6000000")
      */
     private $file;
+
+    /**
+     * Holds upload directory
+     */
+    private $uploadDir;
+
+    /**
+     * Holds file type (file extension)
+     */
+    private $fileType;
+
+    /**
+     * Temporary location when asset file is beeing updated.
+     * We need to keep the old file till we are sure the new 
+     * one is stored correctly.
+     */
+    private $temp;
 
     /**
      * @ORM\Column(name="alias", type="string")
@@ -120,48 +146,12 @@ class Asset extends FormEntity
     private $revision = 1;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Category", inversedBy="assets")
+     * @ORM\ManyToOne(targetEntity="Mautic\CategoryBundle\Entity\Category")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})
      **/
     private $category;
-
-    /**
-     * @ORM\OneToMany(targetEntity="Asset", mappedBy="translationParent", indexBy="id", fetch="EXTRA_LAZY")
-     **/
-    private $translationChildren;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="Asset", inversedBy="translationChildren")
-     * @ORM\JoinColumn(name="translation_parent_id", referencedColumnName="id")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
-     **/
-    private $translationParent;
-
-    /**
-     * @ORM\OneToMany(targetEntity="Asset", mappedBy="variantParent", indexBy="id", fetch="EXTRA_LAZY")
-     **/
-    private $variantChildren;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="Asset", inversedBy="variantChildren")
-     * @ORM\JoinColumn(name="variant_parent_id", referencedColumnName="id")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
-     **/
-    private $variantParent;
-
-    /**
-     * @ORM\Column(name="variant_settings", type="array", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
-     */
-    private $variantSettings = array();
 
     /**
      * Used to identify the page for the builder
@@ -192,6 +182,13 @@ class Asset extends FormEntity
     public function setFile(UploadedFile $file = null)
     {
         $this->file = $file;
+
+        // check if we have an old asset path
+        if (isset($this->path)) {
+            // store the old name to delete after the update
+            $this->temp = $this->path;
+            $this->path = null;
+        }
     }
 
     /**
@@ -226,6 +223,30 @@ class Asset extends FormEntity
     public function getTitle()
     {
         return $this->title;
+    }
+
+    /**
+     * Set originalFileName
+     *
+     * @param string $originalFileName
+     * @return Asset
+     */
+    public function setOriginalFileName($originalFileName)
+    {
+        $this->isChanged('originalFileName', $originalFileName);
+        $this->originalFileName = $originalFileName;
+
+        return $this;
+    }
+
+    /**
+     * Get originalFileName
+     *
+     * @return string
+     */
+    public function getOriginalFileName()
+    {
+        return $this->originalFileName;
     }
 
     /**
@@ -400,7 +421,7 @@ class Asset extends FormEntity
      * @param \Mautic\AssetBundle\Entity\Category $category
      * @return Asset
      */
-    public function setCategory(\Mautic\AssetBundle\Entity\Category $category = null)
+    public function setCategory(\Mautic\CategoryBundle\Entity\Category $category = null)
     {
         $this->isChanged('category', $category);
         $this->category = $category;
@@ -474,160 +495,14 @@ class Asset extends FormEntity
         $getter  = "get" . ucfirst($prop);
         $current = $this->$getter();
 
-        if ($prop == 'translationParent' || $prop == 'variantParent') {
-            $currentId = ($current) ? $current->getId() : '';
-            $newId     = $val->getId();
-            if ($currentId != $newId)
-                $currentTitle = ($current) ? $current->getTitle() . " ($currentId)" : '';
-                $this->changes[$prop] = array($currentTitle, $val->getTitle() . " ($newId)");
-        } else {
-            parent::isChanged($prop, $val);
-        }
+        parent::isChanged($prop, $val);
     }
     /**
      * Constructor
      */
     public function __construct()
     {
-        $this->translationChildren = new \Doctrine\Common\Collections\ArrayCollection();
-    }
 
-    /**
-     * Add translationChildren
-     *
-     * @param \Mautic\AssetBundle\Entity\Asset $translationChildren
-     * @return Asset
-     */
-    public function addTranslationChild(\Mautic\AssetBundle\Entity\Asset $translationChildren)
-    {
-        $this->translationChildren[] = $translationChildren;
-
-        return $this;
-    }
-
-    /**
-     * Remove translationChildren
-     *
-     * @param \Mautic\AssetBundle\Entity\Asset $translationChildren
-     */
-    public function removeTranslationChild(\Mautic\AssetBundle\Entity\Asset $translationChildren)
-    {
-        $this->translationChildren->removeElement($translationChildren);
-    }
-
-    /**
-     * Get translationChildren
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getTranslationChildren()
-    {
-        return $this->translationChildren;
-    }
-
-    /**
-     * Set translationParent
-     *
-     * @param \Mautic\AssetBundle\Entity\Asset $translationParent
-     * @return Asset
-     */
-    public function setTranslationParent(\Mautic\AssetBundle\Entity\Asset $translationParent = null)
-    {
-        $this->isChanged('translationParent', $translationParent);
-        $this->translationParent = $translationParent;
-
-        return $this;
-    }
-
-    /**
-     * Get translationParent
-     *
-     * @return \Mautic\AssetBundle\Entity\Asset
-     */
-    public function getTranslationParent()
-    {
-        return $this->translationParent;
-    }
-
-    /**
-     * Add variantChildren
-     *
-     * @param \Mautic\AssetBundle\Entity\Asset $variantChildren
-     * @return Asset
-     */
-    public function addVariantChild(\Mautic\AssetBundle\Entity\Asset $variantChildren)
-    {
-        $this->variantChildren[] = $variantChildren;
-
-        return $this;
-    }
-
-    /**
-     * Remove variantChildren
-     *
-     * @param \Mautic\AssetBundle\Entity\Asset $variantChildren
-     */
-    public function removeVariantChild(\Mautic\AssetBundle\Entity\Asset $variantChildren)
-    {
-        $this->variantChildren->removeElement($variantChildren);
-    }
-
-    /**
-     * Get variantChildren
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getVariantChildren()
-    {
-        return $this->variantChildren;
-    }
-
-    /**
-     * Set variantParent
-     *
-     * @param \Mautic\AssetBundle\Entity\Asset $variantParent
-     * @return Asset
-     */
-    public function setVariantParent(\Mautic\AssetBundle\Entity\Asset $variantParent = null)
-    {
-        $this->isChanged('variantParent', $variantParent);
-        $this->variantParent = $variantParent;
-
-        return $this;
-    }
-
-    /**
-     * Get variantParent
-     *
-     * @return \Mautic\AssetBundle\Entity\Asset
-     */
-    public function getVariantParent()
-    {
-        return $this->variantParent;
-    }
-
-    /**
-     * Set variantSettings
-     *
-     * @param array $variantSettings
-     * @return Asset
-     */
-    public function setVariantSettings($variantSettings)
-    {
-        $this->isChanged('variantSettings', $variantSettings);
-        $this->variantSettings = $variantSettings;
-
-        return $this;
-    }
-
-    /**
-     * Get variantSettings
-     *
-     * @return array
-     */
-    public function getVariantSettings()
-    {
-        return $this->variantSettings;
     }
 
     /**
@@ -653,6 +528,21 @@ class Asset extends FormEntity
         return $this->uniqueHits;
     }
 
+    public function preUpload()
+    {
+        if (null !== $this->getFile()) {
+            $this->setOriginalFileName($this->getFile()->getClientOriginalName());
+
+            // set the asset title as original file name if title is missing
+            if (null === $this->getTitle()) {
+                $this->setTitle($this->getFile()->getClientOriginalName());
+            }
+
+            $filename = sha1(uniqid(mt_rand(), true));
+            $this->path = $filename.'.'.$this->getFile()->guessExtension();
+        }
+    }
+
     public function upload()
     {
 
@@ -661,21 +551,27 @@ class Asset extends FormEntity
             return;
         }
 
-        // TODO: use the original file name here but you should
-        // sanitize it at least to avoid any security issues
-
         // move takes the target directory and then the
         // target filename to move to
-        $this->getFile()->move(
-            $this->getUploadRootDir(),
-            $this->getFile()->getClientOriginalName()
-        );
+        $this->getFile()->move($this->getUploadRootDir(), $this->path);
 
-        // set the path property to the filename where you've saved the file
-        $this->path = $this->getFile()->getClientOriginalName();
+        // check if we have an old asset
+        if (isset($this->temp)) {
+            // delete the old asset
+            unlink($this->getUploadRootDir().'/'.$this->temp);
+            // clear the temp asset path
+            $this->temp = null;
+        }
 
         // clean up the file property as you won't need it anymore
         $this->file = null;
+    }
+
+    public function removeUpload()
+    {
+        if ($file = $this->getAbsolutePath()) {
+            unlink($file);
+        }
     }
 
     /**
@@ -719,6 +615,204 @@ class Asset extends FormEntity
      */
     protected function getUploadDir()
     {
-        return 'assets/files';
+        if ($this->uploadDir) {
+            return $this->uploadDir;
+        } else {
+            return 'assets/files';
+        }
+    }
+
+    /**
+     * Set uploadDir
+     *
+     * @param string $uploadDir
+     * @return Asset
+     */
+    public function setUploadDir($uploadDir)
+    {
+        $this->uploadDir = $uploadDir;
+
+        return $this;
+    }
+
+    /**
+     * Returns file extension
+     * 
+     * @return string 
+     */
+    public function getFileType()
+    {
+        if ($this->loadFile() === null) {
+            return '';
+        }
+
+        return $this->loadFile()->guessExtension();
+    }
+
+    /**
+     * Returns file mime type
+     * 
+     * @return string 
+     */
+    public function getFileMimeType()
+    {
+        if ($this->loadFile() === null) {
+            return '';
+        }
+
+        return $this->loadFile()->getMimeType();
+    }
+
+    /**
+     * Returns file size in kB
+     * 
+     * @return int 
+     */
+    public function getFileSize()
+    {
+        if ($this->loadFile() === null) {
+            return '';
+        }
+
+        return round($this->loadFile()->getSize() / 1000);
+    }
+
+    /**
+     * Returns Font Awesome icon class based on file type.
+     * 
+     * @return string 
+     */
+    public function getIconClass()
+    {
+        $fileType = $this->getFileType();
+
+        // return missing file icon if file type is empty
+        if (!$fileType) {
+            return 'fa fa-ban';
+        }
+
+        $fileTypes = $this->getFileExtensions();
+
+        // Search for icon name by file extension.
+        foreach ($fileTypes as $icon => $extensions) {
+            if (in_array($fileType, $extensions)) {
+                return 'fa fa-file-' . $icon . '-o';
+            }
+        }
+
+        // File extension is unknown, display general file icon.
+        return 'fa fa-file-o'; 
+    }
+
+    /**
+     * Returns array of common extensions
+     * 
+     * @return string 
+     */
+    public function getFileExtensions()
+    {
+        return array(
+            'excel' => array(
+                'xlsx',
+                'xlsm',
+                'xlsb',
+                'xltx',
+                'xltm',
+                'xls',
+                'xlt'
+                ),
+            'word' => array(
+                'doc',
+                'docx',
+                'docm',
+                'dotx'
+                ),
+            'pdf' => array(
+                'pdf'
+                ),
+            'audio' => array(
+                'mp3'
+                ),
+            'archive' => array(
+                'zip',
+                'rar',
+                'iso',
+                'tar',
+                'gz',
+                '7z'
+                ),
+            'image' => array(
+                'jpg',
+                'jpeg',
+                'png',
+                'gif',
+                'ico',
+                'bmp',
+                'psd'
+                ),
+            'text' => array(
+                'txt',
+                'pub'
+                ),
+            'code' => array(
+                'php',
+                'js',
+                'json',
+                'yaml',
+                'xml',
+                'html',
+                'htm',
+                'sql'
+                ),
+            'powerpoint' => array(
+                'ppt',
+                'pptx',
+                'pptm',
+                'xps',
+                'potm',
+                'potx',
+                'pot',
+                'pps',
+                'odp'
+                ),
+            'video' => array(
+                'wmv',
+                'avi',
+                'mp4',
+                'mkv',
+                'mpeg'
+                )
+            );
+    }
+
+    /**
+     * Load the file object from it's path.
+     * 
+     * @return Symfony\Component\HttpFoundation\File\File or null
+     */
+    public function loadFile()
+    {
+        if (!$this->getAbsolutePath() || !file_exists($this->getAbsolutePath()))
+        {
+            return null;
+        }
+
+        try {
+            $file = new File($this->getAbsolutePath());
+        } catch (FileNotFoundException $e) {
+            $file = null;
+        }
+
+        return $file;
+    }
+
+    /**
+     * Load content of the file from it's path.
+     * 
+     * @return string
+     */
+    public function getFileContents()
+    {
+        return file_get_contents($this->getAbsolutePath());
     }
 }

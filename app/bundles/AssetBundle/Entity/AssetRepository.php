@@ -60,24 +60,6 @@ class AssetRepository extends CommonRepository
         $q->setParameter('alias', $alias);
 
         if (!empty($entity)) {
-            $parent   = $entity->getTranslationParent();
-            $children = $entity->getTranslationChildren();
-            if ($parent || count($children)) {
-                //allow same alias among language group
-                $ids = array();
-
-                if (!empty($parent)) {
-                    $children = $parent->getTranslationChildren();
-                    $ids[] = $parent->getId();
-                }
-
-                foreach ($children as $child) {
-                    if ($child->getId() != $entity->getId()) {
-                        $ids[] = $child->getId();
-                    }
-                }
-                $q->andWhere($q->expr()->in('e.id', $ids));
-            }
             if ($entity->getId()) {
                 $q->andWhere('e.id != :id');
                 $q->setParameter('id', $entity->getId());
@@ -107,13 +89,6 @@ class AssetRepository extends CommonRepository
         if (!$viewOther) {
             $q->andWhere($q->expr()->eq('IDENTITY(p.createdBy)', ':id'))
                 ->setParameter('id', $this->currentUser->getId());
-        }
-
-        if ($topLevel == 'translation') {
-            //only get top level assets
-            $q->andWhere($q->expr()->isNull('p.translationParent'));
-        } elseif ($topLevel == 'variation') {
-            $q->andWhere($q->expr()->isNull('p.variationParent'));
         }
 
         $q->orderBy('p.title');
@@ -244,5 +219,10 @@ class AssetRepository extends CommonRepository
         return array(
             array('p.title', 'ASC')
         );
+    }
+
+    public function getTableAlias()
+    {
+        return 'p';
     }
 }
