@@ -11,7 +11,7 @@ $view->extend('MauticReportBundle:Report:index.html.php');
 ?>
 
 <div class="table-responsive scrollable body-white padding-sm page-list">
-    <?php if (/*count($items)*/ true == false): ?>
+    <?php if (count($items)): ?>
         <table class="table table-hover table-striped table-bordered page-list">
             <thead>
             <tr>
@@ -64,10 +64,6 @@ $view->extend('MauticReportBundle:Report:index.html.php');
             </thead>
             <tbody>
             <?php foreach ($items as $item): ?>
-                <?php
-                $variantChildren     = $item->getVariantChildren();
-                $translationChildren = $item->getTranslationChildren();
-                ?>
                 <tr>
                     <td>
                         <?php
@@ -98,30 +94,9 @@ $view->extend('MauticReportBundle:Report:index.html.php');
                         <a href="<?php echo $view['router']->generate('mautic_report_action',
                             array("objectAction" => "view", "objectId" => $item->getId())); ?>"
                            data-toggle="ajax">
-                            <?php echo $item->getTitle(); ?> (<?php echo $item->getAlias(); ?>)
+                            <?php echo $item->getTitle(); ?>
                         </a>
-                        <?php
-                        $hasVariants   = count($variantChildren);
-                        $hasTranslations = count($translationChildren);
-                        if ($hasVariants || $hasTranslations): ?>
-                        <span>
-                            <?php if ($hasVariants): ?>
-                                <i class="fa fa-fw fa-sitemap"></i>
-                            <?php endif; ?>
-                            <?php if ($hasTranslations): ?>
-                                <i class="fa fa-fw fa-language"></i>
-                            <?php endif; ?>
-                        </span>
-                    <?php endif; ?>
                     </td>
-                    <td class="visible-md visible-lg">
-                        <?php $catName = ($category = $item->getCategory()) ? $category->getTitle() :
-                            $view['translator']->trans('mautic.core.form.uncategorized'); ?>
-                        <span><?php echo $catName; ?></span>
-                    </td>
-                    <td class="visible-md visible-lg"><?php echo $item->getAuthor(); ?></td>
-                    <td class="visible-md visible-lg"><?php echo $item->getLanguage(); ?></td>
-                    <td class="visible-md visible-lg"><?php echo $item->getHits(); ?></td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 </tr>
             <?php endforeach; ?>

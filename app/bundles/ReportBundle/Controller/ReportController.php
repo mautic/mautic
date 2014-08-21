@@ -81,7 +81,8 @@ class ReportController extends FormController
                 'filter'     => $filter,
                 'orderBy'    => $orderBy,
                 'orderByDir' => $orderByDir
-            ));
+            )
+        );
 
         $count = count($reports);
         if ($count && $count < ($start + 1)) {
@@ -100,7 +101,7 @@ class ReportController extends FormController
                 'contentTemplate' => 'MauticReportBundle:Report:index',
                 'passthroughVars' => array(
                     'activeLink'    => '#mautic_report_index',
-                    'mauticContent' => 'page'
+                    'mauticContent' => 'report'
                 )
             ));
         }
@@ -124,8 +125,8 @@ class ReportController extends FormController
             'contentTemplate' => 'MauticReportBundle:Report:list.html.php',
             'passthroughVars' => array(
                 'activeLink'     => '#mautic_report_index',
-                'mauticContent'  => 'page',
-                'route'          => $this->generateUrl('mautic_report_index', array('report' => $page)),
+                'mauticContent'  => 'report',
+                'route'          => $this->generateUrl('mautic_report_index', array('page' => $page)),
                 'replaceContent' => ($tmpl == 'list') ? 'true' : 'false'
             )
         ));
