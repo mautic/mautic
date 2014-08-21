@@ -102,7 +102,10 @@ class ClientType extends AbstractType
             )
         ));
 
-        $builder->addEventListener(FormEvents::POST_SUBMIT, function(FormEvent $event) {
+        $translator = $this->translator;
+        $validator  = $this->validator;
+
+        $builder->addEventListener(FormEvents::POST_SUBMIT, function(FormEvent $event) use ($translator, $validator) {
             $form = $event->getForm();
             $data = $event->getData();
 
@@ -111,13 +114,13 @@ class ClientType extends AbstractType
                     $urlConstraint = new Assert\Url(array(
                         'protocols' => array('https')
                     ));
-                    $urlConstraint->message = $this->translator->trans(
+                    $urlConstraint->message = $translator->trans(
                         'mautic.api.client.redirecturl.invalid',
                         array('%url%' => $uri),
                         'validators'
                     );
 
-                    $errors = $this->validator->validateValue(
+                    $errors = $validator->validateValue(
                         $uri,
                         $urlConstraint
                     );
