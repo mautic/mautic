@@ -197,11 +197,12 @@ var Mautic = {
                 mQuery(buttons).filter("button").each(function (i, v) {
                     //get the ID
                     var id = mQuery(this).attr('id');
+                    console.log(id);
                     var button = mQuery("<button type='button' />")
                         .addClass(mQuery(this).attr('class'))
                         .html(mQuery(this).html())
                         .appendTo('.toolbar-form-buttons')
-                        .click(function (event) {
+                        .on('click.ajaxform', function (event) {
                             event.preventDefault();
                             mQuery('#' + id).click();
                         });
@@ -429,7 +430,10 @@ var Mautic = {
         var form = mQuery(form);
         var action = form.attr('action');
 
-        form.attr('action', action + ((/\?/i.test(action)) ? "&ajax=1" : "?ajax=1"));
+        if (action.indexOf("ajax=1") == -1) {
+            form.attr('action', action + ((/\?/i.test(action)) ? "&ajax=1" : "?ajax=1"));
+        }
+
         form.ajaxSubmit({
             success: function(data) {
                 callback(data);
@@ -530,7 +534,8 @@ var Mautic = {
      */
     ajaxifyForm: function (formName) {
         //prevent enter submitting form and instead jump to next line
-        mQuery('form[name="' + formName + '"] input').keydown(function (e) {
+        mQuery('form[name="' + formName + '"] input').off('keydown.ajaxform');
+        mQuery('form[name="' + formName + '"] input').on('keydown.ajaxform', function (e) {
             if (e.keyCode == 13) {
                 var inputs = mQuery(this).parents("form").eq(0).find(":input");
                 if (inputs[inputs.index(this) + 1] != null) {
@@ -543,7 +548,8 @@ var Mautic = {
 
         //activate the submit buttons so symfony knows which were clicked
         mQuery('form[name="' + formName + '"] :submit').each(function () {
-            mQuery(this).click(function () {
+            mQuery(this).off('click.ajaxform');
+            mQuery(this).on('click.ajaxform', function () {
                 if (mQuery(this).attr('name')) {
                     mQuery('form[name="' + formName + '"]').append(
                         mQuery("<input type='hidden'>").attr({
@@ -560,7 +566,8 @@ var Mautic = {
             });
         });
         //activate the forms
-        mQuery('form[name="' + formName + '"]').submit(function (e) {
+        mQuery('form[name="' + formName + '"]').off('submit.ajaxform');
+        mQuery('form[name="' + formName + '"]').on('submit.ajaxform', (function (e) {
             e.preventDefault();
 
             Mautic.postForm(mQuery(this), function (response) {
@@ -568,7 +575,7 @@ var Mautic = {
             });
 
             return false;
-        });
+        }));
     },
 
     ajaxifyLink: function (el, event) {
