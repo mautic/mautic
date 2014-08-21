@@ -322,14 +322,15 @@ class SubmissionModel extends CommonFormModel
                 return new Response($content);
                 break;
             case 'pdf':
-                $response = new StreamedResponse(function () use ($results, $form, $translator, $name) {
+                $factory  = $this->factory;
+                $response = new StreamedResponse(function () use ($results, $form, $translator, $name, $factory) {
                     $mpdf    = new \mPDF();
-                    $content = $this->factory->getTemplating()->renderResponse(
+                    $content = $factory->getTemplating()->renderResponse(
                         'MauticFormBundle:Result:export.html.php',
                         array(
                             'form'       => $form,
                             'results'    => $results,
-                            'dateFormat' => $this->factory->getParameter('date_format_full'),
+                            'dateFormat' => $factory->getParameter('date_format_full'),
                             'pageTitle'  => $name
                         )
                     )->getContent();
