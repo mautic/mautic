@@ -67,13 +67,14 @@ class ReportGenerator
      *
      * @param string $reportId Report ID
      *
-     * @return mixed
+     * @return \Doctrine\ORM\Query
      *
      * @author r1pp3rj4ck <attila.bukor@gmail.com>
      */
     public function getQuery($reportId)
     {
         $builder = $this->getBuilder($reportId);
+
         return $builder->getQuery();
     }
 
@@ -81,17 +82,18 @@ class ReportGenerator
      * Gets form
      *
      * @param string $reportId Report ID
+     * @param array  $options  Parameters set by the caller
      *
      * @return \Symfony\Component\Form\Form
      *
      * @author r1pp3rj4ck <attila.bukor@gmail.com>
      */
-    public function getForm($reportId)
+    public function getForm($reportId, $options)
     {
         $builder    = $this->getBuilder($reportId);
         $parameters = $builder->getParameters();
 
-        return $this->formBuilder->getForm($parameters);
+        return $this->formBuilder->getForm($parameters, $options);
     }
 
     /**
@@ -115,7 +117,7 @@ class ReportGenerator
      *
      * @param string $reportId Report ID
      *
-     * @return object
+     * @return \Mautic\ReportBundle\Builder\ReportBuilderInterface
      * @throws \Symfony\Component\DependencyInjection\Exception\RuntimeException
      *
      * @author r1pp3rj4ck <attila.bukor@gmail.com>
@@ -123,6 +125,11 @@ class ReportGenerator
     protected function getBuilder($reportId)
     {
         $className  = '\\Mautic\\ReportBundle\\Report\\' . $reportId . 'Report';
+
+        if (!class_exists($className)) {
+            throw new RuntimeException(sprintf("A ReportBuilder does not exist for the %s report.", $reportId));
+        }
+
         $reflection = new \ReflectionClass($className);
         if ($reflection->implementsInterface($this->validInterface)) {
             $builder = $reflection->newInstanceArgs(array($this->entityManager->createQueryBuilder(), $this->securityContext));

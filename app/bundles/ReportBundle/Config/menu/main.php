@@ -24,7 +24,23 @@ $items = array(
                 'extras'=> array(
                     'routeName' => 'mautic_report_index'
                 )
-            )
+            ),
+            'mautic.report.report.menu.new' => array(
+                'route'    => 'mautic_report_action',
+                'routeParameters' => array("objectAction"  => "new"),
+                'extras'  => array(
+                    'routeName' => 'mautic_report_action|new'
+                ),
+                'display' => false //only used for breadcrumb generation
+            ),
+            'mautic.report.report.menu.edit' => array(
+                'route'           => 'mautic_report_action',
+                'routeParameters' => array("objectAction"  => "edit"),
+                'extras'  => array(
+                    'routeName' => 'mautic_report_action|edit'
+                ),
+                'display' => false //only used for breadcrumb generation
+            ),
         )
     )
 );

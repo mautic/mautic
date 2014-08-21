@@ -25,7 +25,7 @@ class ReportController extends FormController
     public function indexAction($page = 1)
     {
 	    /* @type \Mautic\ReportBundle\Model\ReportModel $model */
-        $model = $this->factory->getModel('report.report');
+        $model = $this->factory->getModel('report');
 
         //set some permissions
         $permissions = $this->factory->getSecurity()->isGranted(array(
@@ -128,6 +128,129 @@ class ReportController extends FormController
                 'mauticContent'  => 'report',
                 'route'          => $this->generateUrl('mautic_report_index', array('page' => $page)),
                 'replaceContent' => ($tmpl == 'list') ? 'true' : 'false'
+            )
+        ));
+    }
+
+    /**
+     * Generates edit form and processes post data
+     *
+     * @param integer $objectId   Item ID
+     * @param boolean $ignorePost Flag to ignore POST data
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function editAction ($objectId, $ignorePost = false)
+    {
+        /* @type \Mautic\ReportBundle\Model\ReportModel $model */
+        $model      = $this->factory->getModel('report');
+        $entity     = $model->getEntity($objectId);
+        $session    = $this->factory->getSession();
+        $page       = $session->get('mautic.report.report', 1);
+
+        //set the return URL
+        $returnUrl  = $this->generateUrl('mautic_report_index', array('page' => $page));
+
+        $postActionVars = array(
+            'returnUrl'       => $returnUrl,
+            'viewParameters'  => array('page' => $page),
+            'contentTemplate' => 'MauticReportBundle:Report:index',
+            'passthroughVars' => array(
+                'activeLink'    => 'mautic_report_index',
+                'mauticContent' => 'report'
+            )
+        );
+
+        //not found
+        if ($entity === null) {
+            return $this->postActionRedirect(
+                array_merge($postActionVars, array(
+                    'flashes' => array(
+                        array(
+                            'type' => 'error',
+                            'msg'  => 'mautic.report.report.error.notfound',
+                            'msgVars' => array('%id%' => $objectId)
+                        )
+                    )
+                ))
+            );
+        }  elseif (!$this->factory->getSecurity()->hasEntityAccess(
+            'report:reports:viewown', 'report:reports:viewother', $entity->getCreatedBy()
+        )) {
+            return $this->accessDenied();
+        } elseif ($model->isLocked($entity)) {
+            //deny access if the entity is locked
+            return $this->isLocked($postActionVars, $entity, 'report.report');
+        }
+
+        //Create the form
+        $action = $this->generateUrl('mautic_report_action', array('objectAction' => 'edit', 'objectId' => $objectId));
+        $form   = $model->createForm($entity, $this->get('form.factory'), $action);
+
+        ///Check for a submitted form and process it
+        if (!$ignorePost && $this->request->getMethod() == 'POST') {
+            $valid = false;
+            if (!$cancelled = $this->isFormCancelled($form)) {
+                if ($valid = $this->isFormValid($form)) {
+                    //form is valid so process the data
+                    $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
+
+                    //clear the session
+                    $session->remove($contentName);
+
+                    $this->request->getSession()->getFlashBag()->add(
+                        'notice',
+                        $this->get('translator')->trans('mautic.report.report.notice.updated', array(
+                            '%name%' => $entity->getTitle(),
+                            '%url%'  => $this->generateUrl('mautic_report_action', array(
+                                'objectAction' => 'edit',
+                                'objectId'     => $entity->getId()
+                            ))
+                        ), 'flashes')
+                    );
+
+                    $returnUrl = $this->generateUrl('mautic_report_action', array(
+                        'objectAction' => 'view',
+                        'objectId'     => $entity->getId()
+                    ));
+                    $viewParams = array('objectId' => $entity->getId());
+                    $template = 'MauticReportBundle:Report:view';
+                }
+            } else {
+                //unlock the entity
+                $model->unlockEntity($entity);
+
+                $returnUrl = $this->generateUrl('mautic_report_index', array('page' => $page));
+                $viewParams = array('report' => $page);
+                $template  = 'MauticReportBundle:Report:index';
+            }
+
+            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+                return $this->postActionRedirect(
+                    array_merge($postActionVars, array(
+                        'returnUrl'       => $returnUrl,
+                        'viewParameters'  => $viewParams,
+                        'contentTemplate' => $template
+                    ))
+                );
+            }
+        } else {
+            //lock the entity
+            $model->lockEntity($entity);
+        }
+
+        return $this->delegateView(array(
+            'viewParameters'  =>  array(
+                'report'      => $entity,
+                'form'        => $form->createView()
+            ),
+            'contentTemplate' => 'MauticReportBundle:Report:form.html.php',
+            'passthroughVars' => array(
+                'activeLink'    => '#mautic_report_index',
+                'mauticContent' => 'report',
+                'route'         => $this->generateUrl('mautic_report_action', array(
+                    'objectAction' => 'edit',
+                    'objectId'     => $entity->getId()
+                ))
             )
         ));
     }

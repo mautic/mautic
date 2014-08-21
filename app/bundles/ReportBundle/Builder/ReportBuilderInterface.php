@@ -18,7 +18,7 @@ interface ReportBuilderInterface
     /**
      * Gets the query instance with default parameters
      *
-     * @return mixed
+     * @return \Doctrine\ORM\Query
      */
     function getQuery();
 

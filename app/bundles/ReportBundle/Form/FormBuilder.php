@@ -22,31 +22,32 @@ use Symfony\Component\Validator\Constraints\Collection;
 class FormBuilder implements FormBuilderInterface
 {
     /**
-     * @var \Mautic\CoreBundle\Factory\MauticFactory
+     * @var \Symfony\Component\Form\FormFactoryInterface
      */
-    private $factory;
+    private $formFactory;
 
     /**
      * Constructor
      *
-     * @param \Mautic\CoreBundle\Factory\MauticFactory $factory Mautic factory
+     * @param \Symfony\Component\Form\FormFactoryInterface $formFactory Form factory
      *
      * @author   r1pp3rj4ck <attila.bukor@gmail.com>
      */
-    public function __construct(\Mautic\CoreBundle\Factory\MauticFactory $factory)
+    public function __construct(\Symfony\Component\Form\FormFactoryInterface $formFactory)
     {
-        $this->factory = $factory;
+        $this->formFactory = $formFactory;
     }
 
     /**
      * Gets a form
      *
      * @param array $parameters Parameters
+     * @param array $options    Options
      *
      * @return \Symfony\Component\Form\Form
      * @author r1pp3rj4ck <attila.bukor@gmail.com>
      */
-    public function getForm(array $parameters)
+    public function getForm(array $parameters, array $options)
     {
         $formData        = array();
         $validationArray = array();
@@ -54,12 +55,8 @@ class FormBuilder implements FormBuilderInterface
             if (isset($value['value'])) {
                 $formData[$key] = $value['value'];
             }
-            if (isset($value['validation'])) {
-                $validationArray[$key] = $value['validation'];
-            }
         }
-        $validationConstraint = new Collection($validationArray);
-        $form = $this->getFormFactory()->createBuilder('form', $formData, array('validation_constraint' => $validationConstraint));
+        $form = $this->getFormFactory()->createBuilder('report', $formData, $options);
 
         foreach ($parameters as $key => $value) {
             if (isset($value['options'])) {
@@ -80,6 +77,6 @@ class FormBuilder implements FormBuilderInterface
      */
     public function getFormFactory()
     {
-        return $this->factory->get('form.factory');
+        return $this->formFactory;
     }
 }

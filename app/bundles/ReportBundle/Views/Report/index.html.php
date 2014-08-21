@@ -8,7 +8,7 @@
  */
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
-$view['slots']->set('mauticContent', 'page');
+$view['slots']->set('mauticContent', 'report');
 $view['slots']->set("headerTitle", $view['translator']->trans('mautic.report.report.header.index'));
 $view['slots']->set('searchUri', $view['router']->generate('mautic_report_index', array('page' => $page)));
 $view['slots']->set('searchString', $app->getSession()->get('mautic.report.filter'));

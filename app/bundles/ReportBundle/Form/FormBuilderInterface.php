@@ -18,8 +18,9 @@ interface FormBuilderInterface
      * Gets the query instance with default parameters
      *
      * @param array $parameters Parameters
+     * @param array $options    Options
      *
      * @return \Symfony\Component\Form\Form
      */
-    function getForm(array $parameters);
+    function getForm(array $parameters, array $options);
 }
