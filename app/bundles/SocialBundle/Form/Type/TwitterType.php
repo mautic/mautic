@@ -49,7 +49,6 @@ class TwitterType extends AbstractType
             'label_attr'    => array('class' => 'control-label'),
             'label'         => 'mautic.social.Twitter.share.text',
             'required'      => false,
-            'label_attr'    => array('class' => 'control-label'),
             'attr'          => array(
                 'class'       => 'form-control',
                 'placeholder' => 'mautic.social.Twitter.share.text.pagetitle'
@@ -60,7 +59,6 @@ class TwitterType extends AbstractType
             'label_attr'    => array('class' => 'control-label'),
             'label'         => 'mautic.social.Twitter.share.via',
             'required'      => false,
-            'label_attr'    => array('class' => 'control-label'),
             'attr'          => array(
                 'class'       => 'form-control',
                 'placeholder' => 'mautic.social.Twitter.share.username',
@@ -72,7 +70,6 @@ class TwitterType extends AbstractType
             'label_attr'    => array('class' => 'control-label'),
             'label'         => 'mautic.social.Twitter.share.related',
             'required'      => false,
-            'label_attr'    => array('class' => 'control-label'),
             'attr'          => array(
                 'class'       => 'form-control',
                 'placeholder' => 'mautic.social.Twitter.share.username',
@@ -84,7 +81,6 @@ class TwitterType extends AbstractType
             'label_attr'    => array('class' => 'control-label'),
             'label'         => 'mautic.social.Twitter.share.hashtag',
             'required'      => false,
-            'label_attr'    => array('class' => 'control-label'),
             'attr'          => array(
                 'class'       => 'form-control',
                 'placeholder' => 'mautic.social.Twitter.share.hashtag.placeholder',

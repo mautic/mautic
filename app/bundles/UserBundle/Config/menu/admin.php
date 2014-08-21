@@ -64,16 +64,13 @@ if ($security->isGranted("user:roles:view")) {
     $items['mautic.user.role.menu.index'] = array(
         'route'           => 'mautic_role_index',
         'extras'          => array(
+            'iconClass' => 'fa-lock',
             'routeName' => 'mautic_role_index'
         ),
         'linkAttributes'  => array(
             'data-toggle'    => 'ajax',
             'data-menu-link' => '#mautic_role_index',
             'id'             => 'mautic_role_index'
-        ),
-        'extras'          => array(
-            'iconClass' => 'fa-lock',
-            'routeName' => 'mautic_lead_index'
         ),
         'children'        => array(
             'mautic.user.role.menu.new'  => array(
