@@ -115,7 +115,7 @@ class Download
      * Set code
      *
      * @param integer $code
-     * @return Hit
+     * @return Download
      */
     public function setCode($code)
     {
@@ -184,7 +184,7 @@ class Download
      * Set ipAddress
      *
      * @param \Mautic\CoreBundle\Entity\IpAddress $ipAddress
-     * @return Hit
+     * @return Download
      */
     public function setIpAddress(\Mautic\CoreBundle\Entity\IpAddress $ipAddress)
     {

@@ -192,8 +192,6 @@ class AssetModel extends FormModel
         return $entity;
     }
 
-// TODO (@Jan): I have a feeling that following commented methods will be needed
-
     /**
      * {@inheritdoc}
      *
@@ -203,41 +201,41 @@ class AssetModel extends FormModel
      * @param $isNew
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    // protected function dispatchEvent($action, &$entity, $isNew = false, $event = false)
-    // {
-    //     if (!$entity instanceof Page) {
-    //         throw new MethodNotAllowedHttpException(array('Page'));
-    //     }
+    protected function dispatchEvent($action, &$entity, $isNew = false, $event = false)
+    {
+        if (!$entity instanceof Asset) {
+            throw new MethodNotAllowedHttpException(array('Asset'));
+        }
 
-    //     switch ($action) {
-    //         case "pre_save":
-    //             $name = PageEvents::PAGE_PRE_SAVE;
-    //             break;
-    //         case "post_save":
-    //             $name = PageEvents::PAGE_POST_SAVE;
-    //             break;
-    //         case "pre_delete":
-    //             $name = PageEvents::PAGE_PRE_DELETE;
-    //             break;
-    //         case "post_delete":
-    //             $name = PageEvents::PAGE_POST_DELETE;
-    //             break;
-    //         default:
-    //             return false;
-    //     }
+        switch ($action) {
+            case "pre_save":
+                $name = AssetEvents::ASSET_PRE_SAVE;
+                break;
+            case "post_save":
+                $name = AssetEvents::ASSET_POST_SAVE;
+                break;
+            case "pre_delete":
+                $name = AssetEvents::ASSET_PRE_DELETE;
+                break;
+            case "post_delete":
+                $name = AssetEvents::ASSET_POST_DELETE;
+                break;
+            default:
+                return false;
+        }
 
-    //     if ($this->dispatcher->hasListeners($name)) {
-    //         if (empty($event)) {
-    //             $event = new PageEvent($entity, $isNew);
-    //             $event->setEntityManager($this->em);
-    //         }
+        if ($this->dispatcher->hasListeners($name)) {
+            if (empty($event)) {
+                $event = new AssetEvent($entity, $isNew);
+                $event->setEntityManager($this->em);
+            }
 
-    //         $this->dispatcher->dispatch($name, $event);
-    //         return $event;
-    //     } else {
-    //         return false;
-    //     }
-    // }
+            $this->dispatcher->dispatch($name, $event);
+            return $event;
+        } else {
+            return false;
+        }
+    }
 
     /**
      * Get list of entities for autopopulate fields
@@ -266,7 +264,7 @@ class AssetModel extends FormModel
     }
 
     /**
-     * Generate url for a page
+     * Generate url for an asset
      *
      * @param $entity
      * @param $absolute
