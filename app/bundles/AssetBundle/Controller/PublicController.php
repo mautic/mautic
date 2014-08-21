@@ -10,7 +10,7 @@
 namespace Mautic\AssetBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
-use Mautic\AssetBundle\Event\AssetEvent;
+use Mautic\AssetBundle\AssetEvents;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
@@ -56,27 +56,23 @@ class PublicController extends CommonFormController
             $userAccess = $security->hasEntityAccess('asset:assets:viewown', 'asset:assets:viewother', $entity->getCreatedBy());
 
             //all the checks pass so provide the asset for download
-            $response = new Response();
+            
+            $dispatcher = $this->get('event_dispatcher');
 
-            // @TODO get listeners working
-            // $dispatcher = $this->get('event_dispatcher');
-            // if ($dispatcher->hasListeners(PageEvents::PAGE_ON_DISPLAY)) {
-            //     $event = new PageEvent($entity);
-            //     $slotsHelper = $this->factory->getTemplating()
-            //         ->getEngine('MauticPageBundle::public.html.php')->get('slots');
-            //     $event->setSlotsHelper($slotsHelper);
-            //     $dispatcher->dispatch(PageEvents::PAGE_ON_DISPLAY, $event);
-            //     $content = $event->getContent();
-            // } else {
-            //     $content = $entity->getContent();
-            // }
+            if ($dispatcher->hasListeners(AssetEvents::ASSET_ON_DOWNLOAD)) {
+                $event = new AssetEvent($entity);
+                $dispatcher->dispatch(AssetEvents::ASSET_ON_DOWNLOAD, $event);
+                $content = $event->getFileContents();
+            } else {
+                $content = $entity->getFileContents();
+            }
 
             $model->trackDownload($entity, $this->request, 200);
 
+            $response = new Response();
             $response->headers->set('Content-Type', $entity->getFileMimeType());
             $response->headers->set('Content-Disposition', 'attachment;filename="'.$entity->getOriginalFileName());
-
-            $response->setContent($entity->getFileContents());
+            $response->setContent($content);
 
             return $response;
 
