@@ -93,6 +93,8 @@ if ($security->hasEntityAccess($permissions['asset:assets:editown'], $permission
         </span>
     </div>
 
+    <h1><i class="<?php echo $activeAsset->getIconClass(); ?>"></i> <?php echo $activeAsset->getTitle(); ?></h1>
+
     <div class="form-group margin-md-top">
         <label><?php echo $view['translator']->trans('mautic.asset.asset.url'); ?></label>
         <div class="input-group">
@@ -103,6 +105,19 @@ if ($security->hasEntityAccess($permissions['asset:assets:editown'], $permission
                     <i class="fa fa-external-link"></i>
                 </button>
             </span>
+        </div>
+
+        <label><?php echo $view['translator']->trans('mautic.asset.asset.path.relative'); ?></label>
+        <div class="input-group">
+            <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly
+                   value="/<?php echo $activeAsset->getWebPath(); ?>" />
+        </div>
+
+        <label><?php echo $view['translator']->trans('mautic.asset.asset.size'); ?></label>
+        <div class="input-group">
+            <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly
+                   value="<?php echo $activeAsset->getFileSize(); ?>" />
+            <span class="input-group-addon">kB</span>
         </div>
     </div>
 

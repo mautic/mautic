@@ -664,6 +664,20 @@ class Asset extends FormEntity
     }
 
     /**
+     * Returns file size in kB
+     * 
+     * @return int 
+     */
+    public function getFileSize()
+    {
+        if ($this->loadFile() === null) {
+            return '';
+        }
+
+        return round($this->loadFile()->getSize() / 1000);
+    }
+
+    /**
      * Returns Font Awesome icon class based on file type.
      * 
      * @return string 
