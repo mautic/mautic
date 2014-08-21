@@ -530,8 +530,14 @@ class Asset extends FormEntity
 
     public function preUpload()
     {
-        if (null !== $this->getFile($this->getFile()->guessExtension())) {
+        if (null !== $this->getFile()) {
             $this->setOriginalFileName($this->getFile()->getClientOriginalName());
+
+            // set the asset title as original file name if title is missing
+            if (null === $this->getTitle()) {
+                $this->setTitle($this->getFile()->getClientOriginalName());
+            }
+
             $filename = sha1(uniqid(mt_rand(), true));
             $this->path = $filename.'.'.$this->getFile()->guessExtension();
         }
