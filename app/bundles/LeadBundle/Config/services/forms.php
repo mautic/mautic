@@ -101,3 +101,15 @@ $container->setDefinition(
     ->addTag('form.type', array(
         'alias' => 'lead_submitaction_scorechange',
     ));
+
+//Lead note form
+$container->setDefinition(
+    'mautic.form.type.leadnote',
+    new Definition(
+        'Mautic\LeadBundle\Form\Type\NoteType',
+        array(new Reference('mautic.factory'))
+    )
+)
+    ->addTag('form.type', array(
+        'alias' => 'leadnote',
+    ));
