@@ -30,11 +30,9 @@ class TopViewedPagesReport extends BaseReportBuilder
     protected function configureBuilder(QueryBuilder $queryBuilder)
     {
         $queryBuilder
-            ->select('p.name, p.price, c.checkoutDate')
-            ->from('Cart', 'c')
-            ->join('c.items', 'i')
-            ->join('i.product', 'p')
-            ->add('where', 'c.checkoutDate > :from AND c.checkoutDate < :to');
+            ->select('p.title, p.hits')
+            ->from('MauticPageBundle:Page', 'p', 'p.id')
+            ->orderBy('p.hits', 'DESC');
         return $queryBuilder;
     }
 
@@ -49,6 +47,9 @@ class TopViewedPagesReport extends BaseReportBuilder
      */
     protected function configureParameters()
     {
+        return array();
+
+        // Kept for reference, this array adds form fields to the edit view
         $parameters = array(
             'from' => array(
                 'value'   => new \DateTime('yesterday'), // default value

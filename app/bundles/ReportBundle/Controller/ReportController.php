@@ -12,7 +12,8 @@
 namespace Mautic\ReportBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
-use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\ReportBundle\Form\FormBuilder;
+use Mautic\ReportBundle\Generator\ReportGenerator;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class ReportController extends FormController
@@ -249,6 +250,101 @@ class ReportController extends FormController
                 'mauticContent' => 'report',
                 'route'         => $this->generateUrl('mautic_report_action', array(
                     'objectAction' => 'edit',
+                    'objectId'     => $entity->getId()
+                ))
+            )
+        ));
+    }
+
+    /**
+     * Shows a report
+     *
+     * @param string $reportId Report ID
+     *
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     *
+     * @author r1pp3rj4ck <attila.bukor@gmail.com>
+     */
+    public function viewAction($reportId)
+    {
+        /* @type \Mautic\ReportBundle\Model\ReportModel $model */
+        $model      = $this->factory->getModel('report');
+        $entity     = $model->getEntity($reportId);
+
+        //set the report we came from
+        $page = $this->factory->getSession()->get('mautic.report.report', 1);
+
+        if ($entity === null) {
+            //set the return URL
+            $returnUrl = $this->generateUrl('mautic_report_index', array('page' => $page));
+
+            return $this->postActionRedirect(array(
+                'returnUrl'       => $returnUrl,
+                'viewParameters'  => array('page' => $page),
+                'contentTemplate' => 'MauticReportBundle:Report:index',
+                'passthroughVars' => array(
+                    'activeLink'    => '#mautic_report_index',
+                    'mauticContent' => 'report'
+                ),
+                'flashes'         => array(
+                    array(
+                        'type'    => 'error',
+                        'msg'     => 'mautic.report.report.error.notfound',
+                        'msgVars' => array('%id%' => $objectId)
+                    )
+                )
+            ));
+        } elseif (!$this->factory->getSecurity()->hasEntityAccess(
+            'report:reports:viewown', 'report:reports:viewother', $entity->getCreatedBy()
+        )
+        ) {
+            return $this->accessDenied();
+        }
+
+        $reportGenerator = new ReportGenerator(
+            $this->factory->getEntityManager(), $this->factory->getSecurityContext(), new FormBuilder($this->container->get('form.factory'))
+        );
+
+        // The report builder is referencing reports by name right now, get it
+        $reportName = str_replace(' ', '', $entity->getTitle());
+
+        $query = $reportGenerator->getQuery($reportName);
+
+        $form = $reportGenerator->getForm($reportName, array('read_only' => true));
+
+        if ($this->request->getMethod() == 'POST') {
+            $form->bindRequest($this->request);
+//            if ($form->isValid()) {
+            $query->setParameters($form->getData());
+//            }
+
+            $query->setParameters($form->getData());
+        }
+
+        $modifiers = $reportGenerator->getModifiers($reportName);
+
+        $result = $query->getResult();
+
+        foreach ($result as &$outer) {
+                foreach ($outer as $key => &$value) {
+                    if (array_key_exists($key, $modifiers) && $value) {
+                        $value = call_user_func_array(array($value, $modifiers[$key]['method']), $modifiers[$key]['params']);
+                }
+            }
+        }
+
+        return $this->delegateView(array(
+            'viewParameters'  =>  array(
+                'form'   => $form->createView(),
+                'result' => $result,
+                'report' => $entity
+            ),
+            'contentTemplate' => 'MauticReportBundle:Report:details.html.php',
+            'passthroughVars' => array(
+                'activeLink'     => '#mautic_report_index',
+                'mauticContent'  => 'report',
+                'route'         => $this->generateUrl('mautic_report_action', array(
+                    'objectAction' => 'view',
                     'objectId'     => $entity->getId()
                 ))
             )

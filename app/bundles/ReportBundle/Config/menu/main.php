@@ -41,6 +41,14 @@ $items = array(
                 ),
                 'display' => false //only used for breadcrumb generation
             ),
+            'mautic.report.report.menu.view' => array(
+                'route'           => 'mautic_report_action',
+                'routeParameters' => array("objectAction"  => "view"),
+                'extras'  => array(
+                    'routeName' => 'mautic_report_action|view'
+                ),
+                'display' => false //only used for breadcrumb generation
+            ),
         )
     )
 );

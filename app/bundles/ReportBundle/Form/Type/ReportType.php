@@ -45,25 +45,28 @@ class ReportType extends AbstractType
         $builder->addEventSubscriber(new CleanFormSubscriber(array('content' => 'html')));
         //$builder->addEventSubscriber(new FormExitSubscriber('report.report', $options));
 
-        $builder->add('title', 'text', array(
-            'label'      => 'mautic.report.report.form.title',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
-        ));
+        // Only add these fields if we're in edit mode
+        if (!$options['read_only']) {
+            $builder->add('title', 'text', array(
+                'label'      => 'mautic.report.report.form.title',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array('class' => 'form-control')
+            ));
 
-        $builder->add('isPublished', 'button_group', array(
-            'choice_list' => new ChoiceList(
-                array(false, true),
-                array('mautic.core.form.no', 'mautic.core.form.yes')
-            ),
-            'expanded'      => true,
-            'multiple'      => false,
-            'label'         => 'mautic.core.form.ispublished',
-            'empty_value'   => false,
-            'required'      => false
-        ));
+            $builder->add('isPublished', 'button_group', array(
+                'choice_list' => new ChoiceList(
+                    array(false, true),
+                    array('mautic.core.form.no', 'mautic.core.form.yes')
+                ),
+                'expanded'      => true,
+                'multiple'      => false,
+                'label'         => 'mautic.core.form.ispublished',
+                'empty_value'   => false,
+                'required'      => false
+            ));
 
-        $builder->add('buttons', 'form_buttons');
+            $builder->add('buttons', 'form_buttons');
+        }
 
         if (!empty($options["action"])) {
             $builder->setAction($options["action"]);
