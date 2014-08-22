@@ -290,7 +290,7 @@ class ReportController extends FormController
                     array(
                         'type'    => 'error',
                         'msg'     => 'mautic.report.report.error.notfound',
-                        'msgVars' => array('%id%' => $objectId)
+                        'msgVars' => array('%id%' => $reportId)
                     )
                 )
             ));
@@ -314,9 +314,6 @@ class ReportController extends FormController
 
         if ($this->request->getMethod() == 'POST') {
             $form->bindRequest($this->request);
-//            if ($form->isValid()) {
-            $query->setParameters($form->getData());
-//            }
 
             $query->setParameters($form->getData());
         }
@@ -335,7 +332,6 @@ class ReportController extends FormController
 
         return $this->delegateView(array(
             'viewParameters'  =>  array(
-                'form'   => $form->createView(),
                 'result' => $result,
                 'report' => $entity
             ),
