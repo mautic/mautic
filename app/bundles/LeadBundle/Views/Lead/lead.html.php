@@ -16,14 +16,15 @@ $view['slots']->set("headerTitle",
 ?>
 <?php $view['slots']->start("actions"); ?>
 <?php if ($security->hasEntityAccess($permissions['lead:leads:editown'], $permissions['lead:leads:editother'], $lead->getOwner())): ?>
-    <!-- Note Modal -->
-    <div id="note-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="noteModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-        </div>
-      </div> 
-    </div>
-    <!-- /Note Modal -->
+    <?php
+    $view['slots']->start('modal');
+    echo $view->render('MauticCoreBundle:Helper:modal.html.php', array(
+        'id'     => 'note-modal',
+        'header' => $view['translator']->trans('mautic.lead.note.header.new'),
+        'body'   => $view['translator']->trans('mautic.core.loading')
+    ));
+    $view['slots']->stop();
+    ?>
     <a class="btn btn-default" href="<?php echo $this->container->get('router')->generate(
         'mautic_lead_action', array("objectAction" => "edit", "objectId" => $lead->getId())); ?>"
        data-toggle="ajax"

@@ -110,6 +110,8 @@ class NoteController extends FormController
             }
         }
 
+        $formView = $this->setFormTheme($form, 'MauticLeadBundle:Note:form.html.php', 'MauticLeadBundle:FormNote');
+
         return $this->delegateView(array(
             'viewParameters'  => array(
                 'form'            => $form->createView()

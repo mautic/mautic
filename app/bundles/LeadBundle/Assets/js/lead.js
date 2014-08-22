@@ -13,6 +13,8 @@ Mautic.leadOnLoad = function (container) {
         Mautic.updateLeadFieldProperties(mQuery('#leadfield_type').val());
     }
 
+    Mautic.loadRemoteContentToModal('note-modal');
+
     if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'lead.lead');
     }
@@ -410,5 +412,12 @@ Mautic.refreshLeadSocialProfile = function(network, leadId, event) {
             }
             Mautic.stopIconSpinPostEvent(event);
         }
+    });
+}
+
+Mautic.loadRemoteContentToModal = function(elementId) {
+    mQuery('#'+elementId).on('loaded.bs.modal', function (e) {
+        var remoteContent = mQuery.parseJSON(e.target.textContent).newContent;
+        mQuery(this).find('.modal-content').html(remoteContent);
     });
 }
