@@ -61,6 +61,7 @@ class ReportType extends AbstractType
                 'expanded'      => true,
                 'multiple'      => false,
                 'label'         => 'mautic.core.form.ispublished',
+                'label_attr'    => array('class' => 'control-label'),
                 'empty_value'   => false,
                 'required'      => false
             ));
