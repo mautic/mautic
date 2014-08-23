@@ -417,7 +417,27 @@ Mautic.refreshLeadSocialProfile = function(network, leadId, event) {
 
 Mautic.loadRemoteContentToModal = function(elementId) {
     mQuery('#'+elementId).on('loaded.bs.modal', function (e) {
+        // take HTML content from JSON and place it back
         var remoteContent = mQuery.parseJSON(e.target.textContent).newContent;
         mQuery(this).find('.modal-content').html(remoteContent);
+
+        // form submit
+        mQuery(this).find('form').ajaxForm({ 
+            beforeSubmit: function(formData) {
+                // cancel form if cancel button was hit
+                var submitForm = true;
+                mQuery.each(formData, function( index, value ) {
+                    if (value.type === 'submit' && value.name.indexOf('[buttons][cancel]') >= 0) {
+                        submitForm = false;
+                    }
+                });
+
+                if (submitForm) {
+                    return true;
+                } else {
+                    mQuery('#'+elementId).modal('hide');
+                }
+            }
+        });
     });
 }
