@@ -421,9 +421,17 @@ Mautic.loadRemoteContentToModal = function(elementId) {
         var remoteContent = mQuery.parseJSON(e.target.textContent).newContent;
         mQuery(this).find('.modal-content').html(remoteContent);
 
+        var modalForm = mQuery(this).find('form');
+
         // form submit
-        mQuery(this).find('form').ajaxForm({ 
+        modalForm.ajaxForm({ 
             beforeSubmit: function(formData) {
+                // disable buttons while sending data
+                modalForm.find('button').prop('disabled', true);
+
+                // show work in progress
+                Mautic.showModalAlert('<i class="fa fa-spinner fa-spin"></i> Saving...', 'info');
+
                 // cancel form if cancel button was hit
                 var submitForm = true;
                 mQuery.each(formData, function( index, value ) {
@@ -437,7 +445,22 @@ Mautic.loadRemoteContentToModal = function(elementId) {
                 } else {
                     mQuery('#'+elementId).modal('hide');
                 }
+            },
+            success: function(response) {
+                modalForm.find('button').prop('disabled', false);
+                Mautic.showModalAlert('Saved successfully: '+response.statusText, 'success');
+            },
+            error: function(response) {
+                modalForm.find('button').prop('disabled', false);
+                Mautic.showModalAlert(response.statusText, 'danger');
             }
         });
     });
+}
+
+Mautic.showModalAlert = function(msg, type) {
+    mQuery('.alert-modal').hide('fast').remove();
+    mQuery('.bottom-form-buttons')
+        .before('<div class="alert alert-modal alert-'+type+'" role="alert">'+msg+'</div>')
+        .hide().show('fast');
 }
