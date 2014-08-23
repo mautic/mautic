@@ -448,7 +448,7 @@ Mautic.loadRemoteContentToModal = function(elementId) {
             },
             success: function(response) {
                 modalForm.find('button').prop('disabled', false);
-                Mautic.showModalAlert('Saved successfully: '+response.statusText, 'success');
+                Mautic.showModalAlert('Saved successfully.', 'success');
             },
             error: function(response) {
                 modalForm.find('button').prop('disabled', false);

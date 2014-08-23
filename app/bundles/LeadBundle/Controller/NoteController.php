@@ -82,16 +82,16 @@ class NoteController extends FormController
                         //form is valid so process the data
                         $model->saveEntity($note);
 
-                        $this->request->getSession()->getFlashBag()->add(
-                            'notice',
-                            $this->get('translator')->trans('mautic.lead.note.notice.created',  array(
-                                '%name%' => $note->getLabel(),
-                                '%url%'          => $this->generateUrl('mautic_leadnote_action', array(
-                                    'objectAction' => 'edit',
-                                    'objectId'     => $note->getId()
-                                ))
-                            ), 'flashes')
-                        );
+                        // $this->request->getSession()->getFlashBag()->add(
+                        //     'notice',
+                        //     $this->get('translator')->trans('mautic.lead.note.notice.created',  array(
+                        //         '%name%' => $note->getName(),
+                        //         '%url%'          => $this->generateUrl('mautic_leadnote_action', array(
+                        //             'objectAction' => 'edit',
+                        //             'objectId'     => $note->getId()
+                        //         ))
+                        //     ), 'flashes')
+                        // );
                     }
                 }
             }

@@ -52,7 +52,7 @@ class LeadNote extends FormEntity
     private $text;
 
     /**
-     * @ORM\Column(type="string", length=50)
+     * @ORM\Column(type="string", length=50, nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full", "limited"})
