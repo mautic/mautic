@@ -137,13 +137,17 @@ class CoreSubscriber extends CommonSubscriber
         }
 
         //update the user's activity marker
-        $user = $this->factory->getUser();
-        //slight delay to prevent too many updates
-        //note that doctrine will return in current timezone so we do not have to worry about that
-        $delay = new \DateTime();
-        $delay->setTimestamp(strtotime('2 minutes ago'));
-        if ($user instanceof User && $user->getLastActive() < $delay) {
-            $this->factory->getModel('user.user')->getRepository()->setLastActive($user);
+        if (!defined('MAUTIC_ACTIVITY_CHECKED')) {
+            //prevent multiple updates
+            $user = $this->factory->getUser();
+            //slight delay to prevent too many updates
+            //note that doctrine will return in current timezone so we do not have to worry about that
+            $delay = new \DateTime();
+            $delay->setTimestamp(strtotime('2 minutes ago'));
+            if ($user instanceof User && $user->getLastActive() < $delay) {
+                $this->factory->getModel('user.user')->getRepository()->setLastActive($user);
+            }
+            define('MAUTIC_ACTIVITY_CHECKED', 1);
         }
     }
 

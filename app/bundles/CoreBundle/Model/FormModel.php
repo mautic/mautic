@@ -137,7 +137,6 @@ class FormModel extends CommonModel
         $this->dispatchEvent("post_save", $entity, $isNew, $event);
     }
 
-
     /**
      * Save an array of entities
      *
