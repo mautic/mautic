@@ -44,12 +44,6 @@ $container->loadFromExtension("monolog", array(
     )
 ));
 
-/*
-$container->loadFromExtension("swiftmailer", array(
-    "delivery_address" => "me@example.com"
-));
-*/
-
 if ($container->getParameter('mautic.api_enabled')) {
     //Load API doc
     $container->loadFromExtension('nelmio_api_doc', array());
@@ -92,3 +86,9 @@ $container->setDefinition(
     'mautic.kernel.listener.command_terminate',
     $definitionConsoleExceptionListener
 );
+
+
+if (file_exists(__DIR__ . '/config_local.php')) {
+    //to allow local settings without committing to git such as swift mailer delivery address overrides
+    $loader->import("config_local.php");
+}
