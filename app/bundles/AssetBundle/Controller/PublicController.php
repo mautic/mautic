@@ -10,8 +10,7 @@
 namespace Mautic\AssetBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
-use Mautic\AssetBundle\Event\AssetEvent;
-// use Mautic\AssetBundle\AssetEvents;
+use Mautic\AssetBundle\AssetEvents;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
@@ -34,8 +33,7 @@ class PublicController extends CommonFormController
             if ((!$catPublished || !$published) && (!$security->hasEntityAccess(
                     'asset:assets:viewown', 'asset:assets:viewother', $entity->getCreatedBy()))
             ) {
-                // @TODO track download count
-                // $model->hitPage($entity, $this->request, 401);
+                $model->trackDownload($entity, $this->request, 401);
                 throw new AccessDeniedHttpException($translator->trans('mautic.core.url.error.401'));
             }
 
@@ -44,47 +42,42 @@ class PublicController extends CommonFormController
             $requestUri = $this->request->getRequestUri();
             //remove query
             $query      = $this->request->getQueryString();
+
             if (!empty($query)) {
                 $requestUri = str_replace("?{$query}", '', $url);
             }
+
             //redirect if they don't match
             if ($requestUri != $url) {
-                // @TODO track download count
-                // $model->hitPage($entity, $this->request, 301);
+                $model->trackDownload($entity, $this->request, 301);
                 return $this->redirect($url, 301);
             }
 
             $userAccess = $security->hasEntityAccess('asset:assets:viewown', 'asset:assets:viewother', $entity->getCreatedBy());
 
             //all the checks pass so provide the asset for download
+            
+            $dispatcher = $this->get('event_dispatcher');
+
+            if ($dispatcher->hasListeners(AssetEvents::ASSET_ON_DOWNLOAD)) {
+                $event = new AssetEvent($entity);
+                $dispatcher->dispatch(AssetEvents::ASSET_ON_DOWNLOAD, $event);
+                $content = $event->getFileContents();
+            } else {
+                $content = $entity->getFileContents();
+            }
+
+            $model->trackDownload($entity, $this->request, 200);
+
             $response = new Response();
-
-            // @TODO get listeners working
-            // $dispatcher = $this->get('event_dispatcher');
-            // if ($dispatcher->hasListeners(PageEvents::PAGE_ON_DISPLAY)) {
-            //     $event = new PageEvent($entity);
-            //     $slotsHelper = $this->factory->getTemplating()
-            //         ->getEngine('MauticPageBundle::public.html.php')->get('slots');
-            //     $event->setSlotsHelper($slotsHelper);
-            //     $dispatcher->dispatch(PageEvents::PAGE_ON_DISPLAY, $event);
-            //     $content = $event->getContent();
-            // } else {
-            //     $content = $entity->getContent();
-            // }
-
-            // @TODO track download count
-            // $model->hitPage($entity, $this->request, 200);
-
             $response->headers->set('Content-Type', $entity->getFileMimeType());
             $response->headers->set('Content-Disposition', 'attachment;filename="'.$entity->getOriginalFileName());
-
-            $response->setContent($entity->getFileContents());
+            $response->setContent($content);
 
             return $response;
 
         }
-        // @TODO track download count
-        // $model->hitPage($entity, $this->request, 404);
+        $model->trackDownload($entity, $this->request, 404);
         throw $this->createNotFoundException($translator->trans('mautic.core.url.error.404'));
     }
 }

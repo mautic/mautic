@@ -13,6 +13,8 @@ Mautic.leadOnLoad = function (container) {
         Mautic.updateLeadFieldProperties(mQuery('#leadfield_type').val());
     }
 
+    Mautic.loadRemoteContentToModal('note-modal');
+
     if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'lead.lead');
     }
@@ -411,4 +413,54 @@ Mautic.refreshLeadSocialProfile = function(network, leadId, event) {
             Mautic.stopIconSpinPostEvent(event);
         }
     });
+}
+
+Mautic.loadRemoteContentToModal = function(elementId) {
+    mQuery('#'+elementId).on('loaded.bs.modal', function (e) {
+        // take HTML content from JSON and place it back
+        var remoteContent = mQuery.parseJSON(e.target.textContent).newContent;
+        mQuery(this).find('.modal-content').html(remoteContent);
+
+        var modalForm = mQuery(this).find('form');
+
+        // form submit
+        modalForm.ajaxForm({ 
+            beforeSubmit: function(formData) {
+                // disable buttons while sending data
+                modalForm.find('button').prop('disabled', true);
+
+                // show work in progress
+                Mautic.showModalAlert('<i class="fa fa-spinner fa-spin"></i> Saving...', 'info');
+
+                // cancel form if cancel button was hit
+                var submitForm = true;
+                mQuery.each(formData, function( index, value ) {
+                    if (value.type === 'submit' && value.name.indexOf('[buttons][cancel]') >= 0) {
+                        submitForm = false;
+                    }
+                });
+
+                if (submitForm) {
+                    return true;
+                } else {
+                    mQuery('#'+elementId).modal('hide');
+                }
+            },
+            success: function(response) {
+                modalForm.find('button').prop('disabled', false);
+                Mautic.showModalAlert('Saved successfully.', 'success');
+            },
+            error: function(response) {
+                modalForm.find('button').prop('disabled', false);
+                Mautic.showModalAlert(response.statusText, 'danger');
+            }
+        });
+    });
+}
+
+Mautic.showModalAlert = function(msg, type) {
+    mQuery('.alert-modal').hide('fast').remove();
+    mQuery('.bottom-form-buttons')
+        .before('<div class="alert alert-modal alert-'+type+'" role="alert">'+msg+'</div>')
+        .hide().show('fast');
 }

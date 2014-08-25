@@ -48,9 +48,9 @@ $view->extend('MauticAssetBundle:Asset:index.html.php');
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'asset',
-                    'orderBy'    => 'p.hits',
-                    'text'       => 'mautic.asset.asset.thead.hits',
-                    'class'      => 'col-page-hits'
+                    'orderBy'    => 'p.download_count',
+                    'text'       => 'mautic.asset.asset.thead.download.count',
+                    'class'      => 'col-page-download-count'
                 ));
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
@@ -105,7 +105,7 @@ $view->extend('MauticAssetBundle:Asset:index.html.php');
                     </td>
                     <td class="visible-md visible-lg"><?php echo $item->getAuthor(); ?></td>
                     <td class="visible-md visible-lg"><?php echo $item->getLanguage(); ?></td>
-                    <td class="visible-md visible-lg"><?php echo $item->getHits(); ?></td>
+                    <td class="visible-md visible-lg"><?php echo $item->getDownloadCount(); ?></td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 </tr>
             <?php endforeach; ?>

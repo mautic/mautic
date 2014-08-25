@@ -19,14 +19,14 @@ final class AssetEvents
 {
 
     /**
-     * The mautic.asset_on_hit event is thrown when a public asset is browsed and a hit recorded in the analytics table
+     * The mautic.asset_on_download event is thrown when a public asset is being downloaded and a download tracked.
      *
      * The event listener receives a
-     * Mautic\AssetBundle\Event\AssetHitEvent instance.
+     * Mautic\AssetBundle\Event\AssetDownloadEvent instance.
      *
      * @var string
      */
-    const ASSET_ON_HIT   = 'mautic.asset_on_hit';
+    const ASSET_ON_DOWNLOAD   = 'mautic.asset_on_download';
 
 
     /**

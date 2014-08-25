@@ -122,20 +122,20 @@ class Asset extends FormEntity
     private $publishDown;
 
     /**
-     * @ORM\Column(name="hits", type="integer")
+     * @ORM\Column(name="download_count", type="integer")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})
      */
-    private $hits = 0;
+    private $downloadCount = 0;
 
     /**
-     * @ORM\Column(name="unique_hits", type="integer")
+     * @ORM\Column(name="unique_download_count", type="integer")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})
      */
-    private $uniqueHits = 0;
+    private $uniqueDownloadCount = 0;
 
     /**
      * @ORM\Column(name="revision", type="integer")
@@ -152,13 +152,6 @@ class Asset extends FormEntity
      * @Serializer\Groups({"full"})
      **/
     private $category;
-
-    /**
-     * Used to identify the page for the builder
-     *
-     * @var
-     */
-    private $sessionId;
 
     public function __clone() {
         $this->id = null;
@@ -346,26 +339,26 @@ class Asset extends FormEntity
     }
 
     /**
-     * Set hits
+     * Set downloadCount
      *
-     * @param \DateTime $hits
+     * @param \DateTime $downloadCount
      * @return Asset
      */
-    public function setHits($hits)
+    public function setDownloadCount($downloadCount)
     {
-        $this->hits = $hits;
+        $this->downloadCount = $downloadCount;
 
         return $this;
     }
 
     /**
-     * Get hits
+     * Get downloadCount
      *
      * @return \DateTime
      */
-    public function getHits()
+    public function getDownloadCount()
     {
-        return $this->hits;
+        return $this->downloadCount;
     }
 
     /**
@@ -464,29 +457,6 @@ class Asset extends FormEntity
     }
 
     /**
-     * Set sessionId
-     *
-     * @param string $id
-     * @return Asset
-     */
-    public function setSessionId($id)
-    {
-        $this->sessionId = $id;
-
-        return $this;
-    }
-
-    /**
-     * Get sessionId
-     *
-     * @return string
-     */
-    public function getSessionId()
-    {
-        return $this->sessionId;
-    }
-
-    /**
      * @param $prop
      * @param $val
      */
@@ -506,26 +476,26 @@ class Asset extends FormEntity
     }
 
     /**
-     * Set uniqueHits
+     * Set uniqueDownloadCount
      *
-     * @param integer $uniqueHits
+     * @param integer $uniqueDownloadCount
      * @return Asset
      */
-    public function setUniqueHits($uniqueHits)
+    public function setUniqueDownloadCount($uniqueDownloadCount)
     {
-        $this->uniqueHits = $uniqueHits;
+        $this->uniqueDownloadCount = $uniqueDownloadCount;
 
         return $this;
     }
 
     /**
-     * Get uniqueHits
+     * Get uniqueDownloadCount
      *
      * @return integer 
      */
-    public function getUniqueHits()
+    public function getUniqueDownloadCount()
     {
-        return $this->uniqueHits;
+        return $this->uniqueDownloadCount;
     }
 
     public function preUpload()

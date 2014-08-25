@@ -133,8 +133,6 @@ class AssetType extends AbstractType
             'required'   => false
         ));
 
-        $builder->add('sessionId', 'hidden');
-
         $builder->add('buttons', 'form_buttons', array());
 
         if (!empty($options["action"])) {
