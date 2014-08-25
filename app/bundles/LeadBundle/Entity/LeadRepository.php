@@ -137,6 +137,66 @@ class LeadRepository extends CommonRepository
     }
 
     /**
+     * @param $id
+     */
+    public function getLead($id)
+    {
+        $fq = $this->_em->getConnection()->createQueryBuilder();
+        $fq->select('l.*')
+            ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
+            ->where('l.id = ' . $id);
+        $results = $fq->execute()->fetchAll();
+        return (isset($results[0])) ? $results[0] : array();
+    }
+
+    /**
+     * Get a list of fields and values
+     *
+     * @param $id
+     *
+     * @return array
+     */
+    public function getFieldValues($id, $byGroup = true)
+    {
+        //Get the list of custom fields
+        $fq = $this->_em->getConnection()->createQueryBuilder();
+        $fq->select('f.id, f.label, f.alias, f.type, f.field_group as `group`')
+            ->from(MAUTIC_TABLE_PREFIX . 'lead_fields', 'f')
+            ->where('f.is_published = 1');
+        $results = $fq->execute()->fetchAll();
+
+        $fields = array();
+        foreach ($results as $r) {
+            $fields[$r['alias']] = $r;
+        }
+
+        //use DBAL to get entity fields
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->select('*')
+            ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
+            ->where('l.id = :leadId')
+            ->setParameter('leadId', $id);
+        $leadValues = $q->execute()->fetchAll();
+        $this->removeNonFieldColumns($leadValues[0]);
+
+        $fieldValues = array();
+
+        //loop over results to put fields in something that can be assigned to the entities
+        foreach ($leadValues[0] as $k => $r) {
+            if (isset($fields[$k])) {
+                if ($byGroup) {
+                    $fieldValues[$fields[$k]['group']][$fields[$k]['alias']]          = $fields[$k];
+                    $fieldValues[$fields[$k]['group']][$fields[$k]['alias']]['value'] = $r;
+                } else {
+                    $fieldValues[$fields[$k]['alias']]          = $fields[$k];
+                    $fieldValues[$fields[$k]['alias']]['value'] = $r;
+                }
+            }
+        }
+        return $fieldValues;
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @param int $id
@@ -159,36 +219,7 @@ class LeadRepository extends CommonRepository
         }
 
         if ($entity != null) {
-            //Get the list of custom fields
-            $fq = $this->_em->getConnection()->createQueryBuilder();
-            $fq->select('f.id, f.label, f.alias, f.type, f.field_group as `group`')
-                ->from(MAUTIC_TABLE_PREFIX . 'lead_fields', 'f')
-                ->where('f.is_published = 1');
-            $results = $fq->execute()->fetchAll();
-
-            $field = array();
-            foreach ($results as $r) {
-                $fields[$r['alias']] = $r;
-            }
-
-            //use DBAL to get entity fields
-            $q = $this->_em->getConnection()->createQueryBuilder();
-            $q->select('*')
-                ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
-                ->where('l.id = :leadId')
-                ->setParameter('leadId', $id);
-            $leadValues = $q->execute()->fetchAll();
-            $this->removeNonFieldColumns($leadValues[0]);
-
-            $fieldValues = array();
-
-            //loop over results to put fields in something that can be assigned to the entities
-            foreach ($leadValues[0] as $k => $r) {
-                if (isset($fields[$k])) {
-                    $fieldValues[$fields[$k]['group']][$fields[$k]['alias']] = $fields[$k];
-                    $fieldValues[$fields[$k]['group']][$fields[$k]['alias']]['value'] = $r;
-                }
-            }
+            $fieldValues = $this->getFieldValues($id);
             $entity->setFields($fieldValues);
         }
 
@@ -420,70 +451,7 @@ class LeadRepository extends CommonRepository
                 //obtain the list details
                 $list = $this->_em->getRepository("MauticLeadBundle:LeadList")->findOneByAlias($string);
                 if (!empty($list)) {
-                    $filters     = $list->getFilters();
-                    $group       = false;
-                    $options     = $this->getFilterExpressionFunctions();
-                    $expr        = $q->expr()->andX();
-                    $useExpr     =& $expr;
-
-                    foreach ($filters as $k => $details) {
-                        if (empty($details['glue']))
-                            continue;
-
-                        $uniqueFilter              = $this->generateRandomParameterName();
-                        $parameters[$uniqueFilter] = $details['filter'];
-
-                        $uniqueFilter              = ":$uniqueFilter";
-                        //DQL does not have a not() function so we have to use the opposite
-                        $func                      = (!$filter->not) ? $options[$details['operator']]['func'] :
-                            $options[$details['operator']]['oFunc'];
-                        $field                     = "l.{$details['field']}";
-
-                        //the next one will determine the group
-                        $glue = (isset($filters[$k + 1])) ? $filters[$k + 1]['glue'] : $details['glue'];
-                        if ($glue == "or" || $details['glue'] == 'or') {
-                            //create the group if it doesn't exist
-                            if ($group === false) {
-                                $group = $q->expr()->orX();
-                            }
-
-                            //set expression var to the grouped one
-                            unset($useExpr);
-                            $useExpr =& $group;
-                        } else {
-                            if ($group !== false) {
-                                //add the group
-                                $expr->add($group);
-                                //reset the group
-                                $group = false;
-                            }
-
-                            //reset the expression var to be used
-                            unset($useExpr);
-                            $useExpr =& $expr;
-                        }
-                        if ($func == 'notEmpty') {
-                            $useExpr->add(
-                                $q->expr()->andX(
-                                    $q->expr()->isNotNull($field, $uniqueFilter),
-                                    $q->expr()->neq($field, $q->expr()->literal(''))
-                                )
-                            );
-                        } elseif ($func == 'empty') {
-                            $useExpr->add(
-                                $q->expr()->orX(
-                                    $q->expr()->isNull($field, $uniqueFilter),
-                                    $q->expr()->eq($field, $q->expr()->literal(''))
-                                )
-                            );
-                        } else {
-                            $useExpr->add($q->expr()->$func($field, $uniqueFilter));
-                        }
-                    }
-                    if ($group !== false) {
-                        //add the group if not added yet
-                        $expr->add($group);
-                    }
+                    $expr = $this->getListFilterExpr($list->getFilters(), $parameters, $q, $filter->not);
                 } else {
                     //force a bad expression as the list doesn't exist
                     $expr = $q->expr()->eq('l.id', 0);
@@ -502,6 +470,82 @@ class LeadRepository extends CommonRepository
             ($returnParameter) ? $parameters : array()
         );
 
+    }
+
+    /**
+     * @param      $filters
+     * @param      $parameters
+     * @param      $q
+     * @param bool $not
+     *
+     * @return mixed
+     */
+    public function getListFilterExpr($filters, &$parameters, &$q, $not = false)
+    {
+        $group       = false;
+        $options     = $this->getFilterExpressionFunctions();
+        $expr        = $q->expr()->andX();
+        $useExpr     =& $expr;
+
+        foreach ($filters as $k => $details) {
+            if (empty($details['glue']))
+                continue;
+
+            $uniqueFilter              = $this->generateRandomParameterName();
+            $parameters[$uniqueFilter] = $details['filter'];
+
+            $uniqueFilter              = ":$uniqueFilter";
+            //DQL does not have a not() function so we have to use the opposite
+            $func                      = (!$not) ? $options[$details['operator']]['func'] :
+                $options[$details['operator']]['oFunc'];
+            $field                     = "l.{$details['field']}";
+
+            //the next one will determine the group
+            $glue = (isset($filters[$k + 1])) ? $filters[$k + 1]['glue'] : $details['glue'];
+            if ($glue == "or" || $details['glue'] == 'or') {
+                //create the group if it doesn't exist
+                if ($group === false) {
+                    $group = $q->expr()->orX();
+                }
+
+                //set expression var to the grouped one
+                unset($useExpr);
+                $useExpr =& $group;
+            } else {
+                if ($group !== false) {
+                    //add the group
+                    $expr->add($group);
+                    //reset the group
+                    $group = false;
+                }
+
+                //reset the expression var to be used
+                unset($useExpr);
+                $useExpr =& $expr;
+            }
+            if ($func == 'notEmpty') {
+                $useExpr->add(
+                    $q->expr()->andX(
+                        $q->expr()->isNotNull($field, $uniqueFilter),
+                        $q->expr()->neq($field, $q->expr()->literal(''))
+                    )
+                );
+            } elseif ($func == 'empty') {
+                $useExpr->add(
+                    $q->expr()->orX(
+                        $q->expr()->isNull($field, $uniqueFilter),
+                        $q->expr()->eq($field, $q->expr()->literal(''))
+                    )
+                );
+            } else {
+                $useExpr->add($q->expr()->$func($field, $uniqueFilter));
+            }
+        }
+        if ($group !== false) {
+            //add the group if not added yet
+            $expr->add($group);
+        }
+        return $expr;
     }
 
     public function getFilterExpressionFunctions($operator = null)

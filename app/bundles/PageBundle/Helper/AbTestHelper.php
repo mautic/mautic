@@ -16,8 +16,8 @@ class AbTestHelper
      * Determines the winner of A/B test based on bounce rates
      *
      * @param $factory
-     * @param $page
-     * @param $properties
+     * @param $parent
+     * @param $children
      *
      * @return array
      */
@@ -76,7 +76,7 @@ class AbTestHelper
      * Determines the winner of A/B test based on dwell time rates
      *
      * @param $factory
-     * @param $page
+     * @param $parent
      * @param $properties
      *
      * @return array

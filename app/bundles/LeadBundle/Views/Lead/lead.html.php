@@ -16,11 +16,26 @@ $view['slots']->set("headerTitle",
 ?>
 <?php $view['slots']->start("actions"); ?>
 <?php if ($security->hasEntityAccess($permissions['lead:leads:editown'], $permissions['lead:leads:editother'], $lead->getOwner())): ?>
+    <?php
+    $view['slots']->start('modal');
+    echo $view->render('MauticCoreBundle:Helper:modal.html.php', array(
+        'id'     => 'note-modal',
+        'header' => $view['translator']->trans('mautic.lead.note.header.new'),
+        'body'   => $view['translator']->trans('mautic.core.loading')
+    ));
+    $view['slots']->stop();
+    ?>
     <a class="btn btn-default" href="<?php echo $this->container->get('router')->generate(
         'mautic_lead_action', array("objectAction" => "edit", "objectId" => $lead->getId())); ?>"
        data-toggle="ajax"
        data-menu-link="#mautic_lead_index">
         <?php echo $view["translator"]->trans("mautic.core.form.edit"); ?>
+    </a>
+    <a class="btn btn-default" href="<?php echo $this->container->get('router')->generate(
+        'mautic_leadnote_action', array("leadId" => $lead->getId(), "objectAction" => "new", null)); ?>"
+        data-toggle="modal"
+        data-target="#note-modal">
+        <?php echo $view["translator"]->trans("mautic.lead.add.note"); ?>
     </a>
 <?php endif; ?>
 <?php if ($security->hasEntityAccess($permissions['lead:leads:deleteown'], $permissions['lead:leads:deleteother'], $lead->getOwner())): ?>

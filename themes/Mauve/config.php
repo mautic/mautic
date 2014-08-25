@@ -10,7 +10,8 @@
 $config = array(
     "name"        => "Mauve",
     "features"    => array(
-        "page"
+        "page",
+        "email"
     ),
     "slots"       => array(
         "page" => array(
@@ -27,6 +28,10 @@ $config = array(
             "bottom1",
             "bottom2",
             "bottom3",
+            "footer"
+        ),
+        "email" => array(
+            "body",
             "footer"
         )
     )

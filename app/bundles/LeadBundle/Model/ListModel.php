@@ -238,13 +238,15 @@ class ListModel extends FormModel
     }
 
     /**
+     * @param bool $withCounts
+     *
      * @return mixed
      */
-    public function getSmartLists()
+    public function getSmartLists($withCounts = false)
     {
         $user = (!$this->security->isGranted('lead:lists:viewother')) ?
             $this->factory->getUser() : false;
-        $lists = $this->em->getRepository('MauticLeadBundle:LeadList')->getUserSmartLists($user);
+        $lists = $this->em->getRepository('MauticLeadBundle:LeadList')->getUserSmartLists($user, '', '', $withCounts);
         return $lists;
     }
 }

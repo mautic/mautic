@@ -24,7 +24,7 @@ class InstallDataCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this->setName('mautic:install:data');
-        $this->addOption('--force', InputOption::VALUE_OPTIONAL);
+        $this->addOption('--force', null, InputOption::VALUE_OPTIONAL);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -102,11 +102,10 @@ class InstallDataCommand extends ContainerAwareCommand
         }
 
         $output->setVerbosity($verbosity);
-        if (!isset($args['quiet'])) {
-            $output->writeln(
-                $translator->trans('mautic.core.command.install_data_success')
-            );
-        }
+        $output->writeln(
+            $translator->trans('mautic.core.command.install_data_success')
+        );
+
         return 0;
     }
 

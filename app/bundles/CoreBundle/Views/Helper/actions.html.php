@@ -29,7 +29,7 @@ if (!isset($extra)) {
                     <?php if (isset($menuLink)):?>
                     data-menu-link="<?php echo $menuLink; ?>"
                     <?php endif; ?>>
-                    <span><i class="fa fa-pencil-square-o"></i><?php echo $view['translator']->trans('mautic.core.form.edit'); ?></span>
+                    <span><i class="fa fa-fw fa-pencil-square-o"></i><?php echo $view['translator']->trans('mautic.core.form.edit'); ?></span>
                 </a>
             </li>
         <?php
@@ -42,7 +42,7 @@ if (!isset($extra)) {
                 <?php if (isset($menuLink)):?>
                 data-menu-link="<?php echo $menuLink; ?>"
                 <?php endif; ?>>
-                <span><i class="fa fa-copy"></i><?php echo $view['translator']->trans('mautic.core.form.clone'); ?></span>
+                <span><i class="fa fa-fw fa-copy"></i><?php echo $view['translator']->trans('mautic.core.form.clone'); ?></span>
             </a>
         </li>
         <?php
@@ -59,7 +59,7 @@ if (!isset($extra)) {
                         array_merge(array("objectAction" => "delete", "objectId" => $item->getId()), $extra)); ?>',
                    '#<?php echo $menuLink; ?>'],
                    '<?php echo $view->escape($view["translator"]->trans("mautic.core.form.cancel"), 'js'); ?>','',[]);">
-                <span><i class="fa fa-trash-o"></i><?php echo $view['translator']->trans('mautic.core.form.delete'); ?></span>
+                <span><i class="fa fa-fw fa-trash-o"></i><?php echo $view['translator']->trans('mautic.core.form.delete'); ?></span>
             </a>
         </li>
         <?php endif; ?>

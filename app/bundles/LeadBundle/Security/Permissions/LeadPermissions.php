@@ -42,7 +42,17 @@ class LeadPermissions extends AbstractPermissions
             ),
             'fields' => array(
                 'full'        => 1024
-            )
+            ),
+            'notes' => array(
+                'viewown'     => 1,
+                'viewother'   => 2,
+                'editown'     => 4,
+                'editother'   => 8,
+                'create'      => 16,
+                'deleteown'   => 32,
+                'deleteother' => 64,
+                'full'        => 1024
+            ),
         );
     }
 
@@ -113,6 +123,26 @@ class LeadPermissions extends AbstractPermissions
             ),
             'data'     => (!empty($data['fields']) ? $data['fields'] : array())
         ));
+
+        $builder->add('lead:notes', 'button_group', array(
+            'choices'  => array(
+                'viewown'     => 'mautic.core.permissions.viewown',
+                'viewother'   => 'mautic.core.permissions.viewother',
+                'editown'     => 'mautic.core.permissions.editown',
+                'editother'   => 'mautic.core.permissions.editother',
+                'create'      => 'mautic.core.permissions.create',
+                'deleteown'   => 'mautic.core.permissions.deleteown',
+                'deleteother' => 'mautic.core.permissions.deleteother',
+                'full'        => 'mautic.core.permissions.full'
+            ),
+            'label'    => 'mautic.lead.permissions.notes',
+            'expanded' => true,
+            'multiple' => true,
+            'attr'     => array(
+                'onclick' => 'Mautic.onPermissionChange(this, event, \'lead\')'
+            ),
+            'data'     => (!empty($data['notes']) ? $data['notes'] : array())
+        ));
     }
 
     /**
@@ -126,8 +156,10 @@ class LeadPermissions extends AbstractPermissions
 
         $leadPermissions = (isset($permissions['lead:leads'])) ? $permissions['lead:leads'] : array();
 
-        //make sure the user has access to own leads as well if they have access to lists or fields
-        if ((array_key_exists("lead:lists", $permissions) || array_key_exists("lead:fields", $permissions)) &&
+        //make sure the user has access to own leads as well if they have access to lists, notes or fields
+        if ((array_key_exists("lead:lists", $permissions) || 
+            array_key_exists("lead:fields", $permissions) ||
+            array_key_exists("lead:notes", $permissions)) &&
             (!in_array("full", $leadPermissions) && !in_array("viewown", $leadPermissions) &&
                 !in_array("viewother", $leadPermissions))) {
                 $permissions['lead:leads'][] = 'viewown';

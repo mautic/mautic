@@ -301,4 +301,14 @@ class LeadModel extends FormModel
         }
         return $array;
     }
+
+    /**
+     * Returns flat array for single lead
+     *
+     * @param $leadId
+     */
+    public function getLead($leadId)
+    {
+        return $this->getRepository()->getLead($leadId);
+    }
 }

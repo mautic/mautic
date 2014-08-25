@@ -10,6 +10,7 @@
 namespace Mautic\CoreBundle\Factory;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\CoreBundle\Helper\MailHelper;
 use Mautic\CoreBundle\Templating\Helper\ThemeHelper;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
@@ -378,5 +379,17 @@ class MauticFactory
     public function getAssetsHelper()
     {
         return $this->container->get('templating.helper.assets');
+    }
+
+    /**
+     * Returns MailHelper wrapper for Swift_Message via $helper->message
+     *
+     * @return MailHelper
+     */
+    public function getMailer()
+    {
+        return new MailHelper($this, $this->container->get('mailer'), array(
+            $this->getParameter('mailer_from_email') => $this->getParameter('mailer_from_name')
+        ));
     }
 }

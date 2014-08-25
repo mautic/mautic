@@ -12,7 +12,7 @@ $view->extend('MauticPageBundle:Page:index.html.php');
 
 <div class="table-responsive scrollable body-white padding-sm page-list">
     <?php if (count($items)): ?>
-        <table class="table table-hover table-striped table-bordered page-list">
+        <table class="table table-hover table-striped table-bordered pagetable-list">
             <thead>
             <tr>
                 <th class="col-page-actions"></th>

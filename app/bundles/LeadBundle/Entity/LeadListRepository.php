@@ -9,6 +9,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
@@ -63,14 +64,13 @@ class LeadListRepository extends CommonRepository
      * @param object|boolean $user
      * @param string $alias
      * @param int    $id
-     * @param int    $limit
-     * @param int    $start
+     * @param false $withCounts
      */
     public function getUserSmartLists($user = false, $alias = '', $id = '')
     {
         $q = $this->_em->createQueryBuilder()
             ->select('l.name, l.id, l.alias')
-            ->from('MauticLeadBundle:LeadList', 'l');
+            ->from('MauticLeadBundle:LeadList', 'l', 'l.id');
         $q->where($q->expr()->eq('l.isPublished', true));
 
         if (!empty($user)) {
@@ -94,7 +94,69 @@ class LeadListRepository extends CommonRepository
         $q->orderBy('l.name');
 
         $results = $q->getQuery()->getArrayResult();
+
         return $results;
+    }
+
+    /**
+     * Get a count of leads that belong to the list
+     *
+     * @param array $filters
+     */
+    public function getLeadCount($filters)
+    {
+        $leadRepo = $this->_em->getRepository('MauticLeadBundle:Lead');
+        $q    = $this->_em->getConnection()->createQueryBuilder();
+        $parameters = array();
+        $expr = $leadRepo->getListFilterExpr($filters, $parameters, $q);
+        $q->select('count(*) as recipientCount')
+            ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
+            ->where($expr);
+        foreach ($parameters as $k => $v) {
+            $q->setParameter($k, $v);
+        }
+        $result = $q->execute()->fetchAll();
+        return (!empty($result[0])) ? $result[0]['recipientCount'] : 0;
+    }
+
+    /**
+     * @param $list
+     */
+    public function getLeadsByList($list)
+    {
+        static $leads = array();
+
+        if (!$list instanceof PersistentCollection && !is_array($list)) {
+            $list = array($list);
+        }
+
+        $return   = array();
+        $leadRepo = $this->_em->getRepository('MauticLeadBundle:Lead');
+        foreach ($list as $l) {
+            $id = $l->getId();
+            if (!isset($leads[$id])) {
+                $filters    = $l->getFilters();
+                $parameters = array();
+                $q          = $this->_em->getConnection()->createQueryBuilder();
+                $expr       = $leadRepo->getListFilterExpr($filters, $parameters, $q);
+
+                $q->select('l.*')
+                    ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
+                    ->where($expr);
+                foreach ($parameters as $k => $v) {
+                    $q->setParameter($k, $v);
+                }
+
+                $results = $q->execute()->fetchAll();
+                $leads[$id] = array();
+                foreach ($results as $r) {
+                    $leads[$id][$r['id']] = $r;
+                }
+                unset($filters, $parameters, $q, $expr);
+            }
+            $return[$id] = $leads[$id];
+        }
+        return $return;
     }
 
     /**

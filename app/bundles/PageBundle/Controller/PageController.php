@@ -234,7 +234,7 @@ class PageController extends FormController
                     $abTestResults = $reflection->invokeArgs($this, $pass);
                 }
             }
-        } else {
+        } elseif (!empty($variantError)) {
             $abTestResults['error'] = $variantError;
         }
 

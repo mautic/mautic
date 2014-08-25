@@ -15,6 +15,7 @@ use JMS\Serializer\Annotation as Serializer;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * Class LeadNote
@@ -52,7 +53,7 @@ class LeadNote extends FormEntity
     private $text;
 
     /**
-     * @ORM\Column(type="string", length=50)
+     * @ORM\Column(type="string", length=50, nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full", "limited"})
@@ -175,5 +176,16 @@ class LeadNote extends FormEntity
     public function getDate()
     {
         return $this->date;
+    }
+
+    /**
+     * Form validation rules
+     * @param ClassMetadata $metadata
+     */
+    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    {
+        $metadata->addPropertyConstraint('text', new NotBlank(
+            array('message' => 'mautic.lead.note.text.notblank')
+        ));
     }
 }

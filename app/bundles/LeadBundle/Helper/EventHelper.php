@@ -116,6 +116,16 @@ class EventHelper
         //create a new lead
         $model->saveEntity($lead, false);
 
+        //create tracking cookies
+        $cookies   = $factory->getRequest()->cookies;
+        $sessionId = $cookies->get('mautic_session_id');
+        $expire    = time() + 1800;
+        if (empty($sessionId)) {
+            $sessionId = uniqid();
+            setcookie('mautic_session_id', $sessionId, $expire);
+        }
+        setcookie($sessionId, $lead->getId(), $expire);
+
         //return the lead so it can be used elsewhere
         return array('lead' => $lead);
     }
