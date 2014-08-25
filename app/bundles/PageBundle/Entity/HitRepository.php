@@ -143,7 +143,6 @@ class HitRepository extends CommonRepository
         $q->orderBy('h.date_hit', 'ASC');
         $results = $q->execute()->fetchAll();
 
-
         //loop to structure
         $times = array();
         foreach ($results as $r) {
