@@ -109,8 +109,11 @@ $container->loadFromExtension('swiftmailer', array(
     'username'  => '%mautic.mailer_user%',
     'password'  => '%mautic.mailer_password%',
     'spool'     => array(
-        'type' => 'memory'
-    )
+        'type' => '%mautic.mailer_spool_type%',
+        'path' => '%mautic.mailer_spool_path%'
+    ),
+    'encryption' => '%mautic.mailer_encryption%',
+    'auth_mode'  => '%mautic.mailer_auth_mode%'
 ));
 
 //KnpMenu Configuration

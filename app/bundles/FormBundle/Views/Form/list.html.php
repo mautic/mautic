@@ -74,7 +74,7 @@ if ($tmpl == 'index')
        data-toggle="ajax"
        data-menu-link="mautic_form_index">
         <span>
-            <i class="fa fa-database"></i>{$view['translator']->trans('mautic.form.form.results')}
+            <i class="fa fa-fw fa-database"></i>{$view['translator']->trans('mautic.form.form.results')}
         </span>
    </a>
 </li>
