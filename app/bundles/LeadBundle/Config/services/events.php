@@ -20,3 +20,12 @@ $container->setDefinition(
     )
 )
     ->addTag('kernel.event_subscriber');
+
+$container->setDefinition(
+    'mautic.lead.emailbundle.subscriber',
+    new Definition(
+        'Mautic\LeadBundle\EventListener\EmailSubscriber',
+        array(new Reference('mautic.factory'))
+    )
+)
+    ->addTag('kernel.event_subscriber');

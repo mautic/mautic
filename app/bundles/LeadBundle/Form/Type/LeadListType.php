@@ -9,7 +9,9 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
+use Doctrine\ORM\EntityRepository;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\DataTransformer\StringToDatetimeTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
@@ -39,16 +41,17 @@ class LeadListType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $model = $this->factory->getModel('lead.list');
-        $lists = $model->getSmartLists();
-
-        $choices = array();
-        foreach ($lists as $l) {
-            $choices[$l['id']] = $l['name'];
-        }
-
         $resolver->setDefaults(array(
-            'choices' => $choices
+            'property' => 'name', // Assuming that the entity has a "name" property
+            'class'    => 'MauticLeadBundle:LeadList',
+            'query_builder' => function(EntityRepository $er) {
+                return $er->createQueryBuilder('l')
+                    ->where('l.isPublished = 1')
+                    ->andWhere('l.isGlobal = 1')
+                    ->orWhere('l.createdBy = :user')
+                    ->setParameter('user', $this->factory->getUser())
+                    ->orderBy('l.name');
+            }
         ));
     }
 
@@ -57,7 +60,7 @@ class LeadListType extends AbstractType
      */
     public function getParent()
     {
-        return 'choice';
+        return 'entity';
     }
 
     /**

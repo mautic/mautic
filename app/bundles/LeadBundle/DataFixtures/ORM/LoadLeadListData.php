@@ -47,18 +47,18 @@ class LoadLeadListData extends AbstractFixture implements OrderedFixtureInterfac
         $adminUser  = $this->getReference('admin-user');
 
         $list = new LeadList();
-        $list->setName($translator->trans('mautic.lead.list.mylist', array(), 'fixtures'));
-        $list->setAlias($translator->trans('mautic.lead.list.mylistalias', array(), 'fixtures'));
+        $list->setName($translator->trans('mautic.lead.list.us', array(), 'fixtures'));
+        $list->setAlias($translator->trans('mautic.lead.list.usalias', array(), 'fixtures'));
         $list->setCreatedBy($adminUser);
         $list->setIsGlobal(false);
         $list->setFilters(array(
             array(
                 'glue'      => 'and',
                 'type'      => 'lookup',
-                'field'     => 'owner',
+                'field'     => 'country',
                 'operator'  => '=',
-                'filter'    => $adminUser->getId(),
-                'display'   => $adminUser->getName()
+                'filter'    => 'United States',
+                'display'   => ''
             )
         ));
 
