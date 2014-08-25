@@ -6,7 +6,7 @@
  * @link        http://mautic.com
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  *
- * This file was originally distributed as part of VelvelReportBundle (C) 2012 Velvel IT Solutions
+ * This file is based on VelvelReportBundle (C) 2012 Velvel IT Solutions
  * and distributed under the GNU Lesser General Public License version 3.
  */
 
@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Constraints\Collection;
  *
  * @author r1pp3rj4ck <attila.bukor@gmail.com>
  */
-class FormBuilder implements FormBuilderInterface
+class FormBuilder
 {
     /**
      * @var \Symfony\Component\Form\FormFactoryInterface
@@ -30,8 +30,6 @@ class FormBuilder implements FormBuilderInterface
      * Constructor
      *
      * @param \Symfony\Component\Form\FormFactoryInterface $formFactory Form factory
-     *
-     * @author   r1pp3rj4ck <attila.bukor@gmail.com>
      */
     public function __construct(\Symfony\Component\Form\FormFactoryInterface $formFactory)
     {
@@ -41,31 +39,14 @@ class FormBuilder implements FormBuilderInterface
     /**
      * Gets a form
      *
-     * @param array $parameters Parameters
-     * @param array $options    Options
+     * @param \Mautic\ReportBundle\Entity\Report $entity  Report Entity
+     * @param array                              $options Options
      *
      * @return \Symfony\Component\Form\Form
-     * @author r1pp3rj4ck <attila.bukor@gmail.com>
      */
-    public function getForm(array $parameters, array $options)
+    public function getForm(\Mautic\ReportBundle\Entity\Report $entity, array $options)
     {
-        $formData        = array();
-        $validationArray = array();
-        foreach ($parameters as $key => $value) {
-            if (isset($value['value'])) {
-                $formData[$key] = $value['value'];
-            }
-        }
-        $form = $this->getFormFactory()->createBuilder('report', $formData, $options);
-
-        foreach ($parameters as $key => $value) {
-            if (isset($value['options'])) {
-                $form->add($key, $value['type'], $value['options']);
-            }
-            else {
-                $form->add($key, $value['type']);
-            }
-        }
+        $form = $this->getFormFactory()->createBuilder('report', $entity, $options);
 
         return $form->getForm();
     }

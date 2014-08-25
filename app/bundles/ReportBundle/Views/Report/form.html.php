@@ -21,57 +21,11 @@ $view['slots']->set("headerTitle", $header);
 ?>
 
 <div class="scrollable">
-    <?php //echo $view['form']->form($form); ?>
+    <h1>Live Form</h1>
+    <?php echo $view['form']->form($form); ?>
+    <h1>Form Mockup</h1>
     <form novalidate="" autocomplete="off" data-toggle="ajax" role="form" name="report" method="post" action="/index_dev.php/reporting/edit/1">
         <div id="report">
-            <div class="row">
-                <div class="form-group col-xs-12 col-sm-8 col-md-6">
-                    <label class="control-label required" for="report_title">Report Name</label>
-                    <input type="text" id="report_title" name="report[title]" required="required" class="form-control" value="Top Hit Pages"></div>
-            </div>
-            <div class="row">
-                <div class="form-group  col-xs-12">
-                    <label class="control-label">Published?</label>
-
-                    <div class="choice-wrapper">
-                        <div id="report_isPublished" class="btn-group btn-block" data-toggle="buttons">
-                            <label class="btn btn-success">
-                                <input type="radio" id="report_isPublished_0" name="report[isPublished]" value="0"> No </label>
-                            <label class="btn btn-success active">
-                                <input type="radio" id="report_isPublished_1" name="report[isPublished]" value="1" checked="checked"> Yes </label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="form-group  col-xs-12">
-                    <label class="control-label">System Report?</label>
-
-                    <div class="choice-wrapper">
-                        <div id="report_isSystem" class="btn-group btn-block" data-toggle="buttons">
-                            <label class="btn btn-success">
-                                <input type="radio" id="report_isSystem_0" name="report[isSystem]" value="0"> No </label>
-                            <label class="btn btn-success active">
-                                <input type="radio" id="report_isSystem_1" name="report[isSystem]" value="1" checked="checked"> Yes </label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="form-group  col-xs-12 col-sm-8 col-md-6">
-                    <label class="control-label" for="report_source">Data Source</label>
-                    <span data-toggle="tooltip" data-container="body" data-placement="top" data-original-title="Choose the data source to use for this report">
-                        <i class="fa fa-question-circle"></i>
-                    </span>
-
-                    <div class="choice-wrapper">
-                        <select id="report_source" name="report[source]" class="form-control">
-                            <option value="Page" selected="selected">Pages</option>
-                            <option value="Lead">Leads</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
             <div class="row">
                 <div class="form-group  col-xs-12 col-sm-8 col-md-6">
                     <label class="control-label">Columns to Include in Report</label>

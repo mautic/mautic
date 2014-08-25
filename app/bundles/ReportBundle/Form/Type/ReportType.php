@@ -24,16 +24,23 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  */
 class ReportType extends AbstractType
 {
-
+    /**
+     * Translator object
+     *
+     * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
+     */
     private $translator;
-    private $themes;
+
+    private $tableOptions = array(
+        'Page' => 'Pages',
+        'Lead' => 'Leads'
+    );
 
     /**
      * @param MauticFactory $factory
      */
     public function __construct(MauticFactory $factory) {
         $this->translator = $factory->getTranslator();
-        $this->themes     = $factory->getInstalledThemes('report');
     }
 
     /**
@@ -43,14 +50,15 @@ class ReportType extends AbstractType
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(array('content' => 'html')));
-        //$builder->addEventSubscriber(new FormExitSubscriber('report.report', $options));
+        $builder->addEventSubscriber(new FormExitSubscriber('report.report', $options));
 
         // Only add these fields if we're in edit mode
         if (!$options['read_only']) {
             $builder->add('title', 'text', array(
                 'label'      => 'mautic.report.report.form.title',
                 'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control')
+                'attr'       => array('class' => 'form-control'),
+                'required'   => true
             ));
 
             $builder->add('isPublished', 'button_group', array(
@@ -64,6 +72,34 @@ class ReportType extends AbstractType
                 'label_attr'    => array('class' => 'control-label'),
                 'empty_value'   => false,
                 'required'      => false
+            ));
+
+            $builder->add('system', 'button_group', array(
+                'choice_list' => new ChoiceList(
+                    array(false, true),
+                    array('mautic.core.form.no', 'mautic.core.form.yes')
+                ),
+                'expanded'      => true,
+                'multiple'      => false,
+                'label'         => 'mautic.report.report.form.issystem',
+                'label_attr'    => array('class' => 'control-label'),
+                'empty_value'   => false,
+                'required'      => false
+            ));
+
+            // Build a list of data sources
+            $builder->add('source', 'choice', array(
+                'choices'       => $this->tableOptions,
+                'expanded'      => false,
+                'multiple'      => false,
+                'label'         => 'mautic.report.report.form.source',
+                'label_attr'    => array('class' => 'control-label'),
+                'empty_value'   => false,
+                'required'      => true,
+                'attr'       => array(
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.report.report.form.source.help'
+                )
             ));
 
             $builder->add('buttons', 'form_buttons');
@@ -80,7 +116,7 @@ class ReportType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
-            //'data_class' => 'Mautic\ReportBundle\Entity\Report'
+            'data_class' => 'Mautic\ReportBundle\Entity\Report'
         ));
     }
 

@@ -48,6 +48,22 @@ class Report extends FormEntity
     private $system = 0;
 
     /**
+     * @ORM\Column(type="string")
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full", "limited"})
+     */
+    private $source;
+
+    /**
+     * @ORM\Column(name="data", type="array")
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full"})
+     */
+    private $data = array();
+
+    /**
      * Get id
      *
      * @return integer
@@ -103,5 +119,53 @@ class Report extends FormEntity
     public function getSystem()
     {
         return $this->system;
+    }
+
+    /**
+     * Set source
+     *
+     * @param string $source
+     * @return Report
+     */
+    public function setSource($source)
+    {
+        $this->isChanged('source', $source);
+        $this->source = $source;
+
+        return $this;
+    }
+
+    /**
+     * Get source
+     *
+     * @return string
+     */
+    public function getSource()
+    {
+        return $this->source;
+    }
+
+    /**
+     * Set data
+     *
+     * @param string $data
+     * @return Report
+     */
+    public function setData($data)
+    {
+        $this->isChanged('content', $data);
+        $this->data = $data;
+
+        return $this;
+    }
+
+    /**
+     * Get data
+     *
+     * @return string
+     */
+    public function getData()
+    {
+        return $this->data;
     }
 }

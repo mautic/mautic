@@ -26,16 +26,31 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 class ReportModel extends FormModel
 {
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return \Mautic\ReportBundle\Entity\ReportRepository
+     */
     public function getRepository()
     {
         return $this->em->getRepository('MauticReportBundle:Report');
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return string
+     */
     public function getPermissionBase()
     {
         return 'report:reports';
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return string
+     */
     public function getNameGetter()
     {
         return "getTitle";
@@ -63,7 +78,7 @@ class ReportModel extends FormModel
 
         $reportGenerator = new ReportGenerator($this->em, $this->factory->getSecurityContext(), new FormBuilder($formFactory));
 
-        return $reportGenerator->getForm(str_replace(' ', '', $entity->getTitle()), $params);
+        return $reportGenerator->getForm(str_replace(' ', '', $entity->getTitle()), $params, $entity);
     }
 
     /**

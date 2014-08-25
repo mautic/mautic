@@ -81,19 +81,20 @@ class ReportGenerator
     /**
      * Gets form
      *
-     * @param string $reportId Report ID
-     * @param array  $options  Parameters set by the caller
+     * @param string                             $reportId Report ID
+     * @param array                              $options  Parameters set by the caller
+     * @param \Mautic\ReportBundle\Entity\Report $entity   Report Entity
      *
      * @return \Symfony\Component\Form\Form
      *
      * @author r1pp3rj4ck <attila.bukor@gmail.com>
      */
-    public function getForm($reportId, $options)
+    public function getForm($reportId, $options, $entity)
     {
-        $builder    = $this->getBuilder($reportId);
-        $parameters = $builder->getParameters();
+        // $builder    = $this->getBuilder($reportId);
+        // $parameters = $builder->getParameters();
 
-        return $this->formBuilder->getForm($parameters, $options);
+        return $this->formBuilder->getForm($entity, $options);
     }
 
     /**
