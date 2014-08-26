@@ -25,12 +25,24 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 class ReportType extends AbstractType
 {
     /**
+     * Factory object
+     *
+     * @var \Mautic\CoreBundle\Factory\MauticFactory
+     */
+    private $factory;
+
+    /**
      * Translator object
      *
      * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
      */
     private $translator;
 
+    /**
+     * Allowed tables to generate reports from
+     *
+     * @var array
+     */
     private $tableOptions = array(
         'Page' => 'Pages',
         'Lead' => 'Leads'
@@ -41,6 +53,7 @@ class ReportType extends AbstractType
      */
     public function __construct(MauticFactory $factory) {
         $this->translator = $factory->getTranslator();
+        $this->factory    = $factory;
     }
 
     /**
@@ -100,6 +113,17 @@ class ReportType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.report.report.form.source.help'
                 )
+            ));
+
+            $source  = $options['data']->getSource();
+            $columns = $this->factory->getEntityManager()->getClassMetadata('Mautic\\' . $source . 'Bundle\\Entity\\' . $source)->getFieldNames();
+
+            // Build the column selector
+            $builder->add('columns', 'column_selector', array(
+                'columnList' => $columns,
+                'label'      => 'mautic.report.report.form.columnselector',
+                'label_attr' => array('class' => 'control-label'),
+                'required'   => true
             ));
 
             $builder->add('buttons', 'form_buttons');

@@ -56,12 +56,12 @@ class Report extends FormEntity
     private $source;
 
     /**
-     * @ORM\Column(name="data", type="array")
+     * @ORM\Column(type="array")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})
      */
-    private $data = array();
+    private $columns = array();
 
     /**
      * Get id
@@ -146,26 +146,26 @@ class Report extends FormEntity
     }
 
     /**
-     * Set data
+     * Set columns
      *
-     * @param string $data
+     * @param string $columns
      * @return Report
      */
-    public function setData($data)
+    public function setColumns($columns)
     {
-        $this->isChanged('content', $data);
-        $this->data = $data;
+        $this->isChanged('columns', $columns);
+        $this->columns = $columns;
 
         return $this;
     }
 
     /**
-     * Get data
+     * Get columns
      *
      * @return string
      */
-    public function getData()
+    public function getColumns()
     {
-        return $this->data;
+        return $this->columns;
     }
 }

@@ -239,10 +239,12 @@ class ReportController extends FormController
             $model->lockEntity($entity);
         }
 
+        $formView = $this->setFormTheme($form, 'MauticReportBundle:Report:form.html.php', 'MauticReportBundle:FormColumnSelector');
+
         return $this->delegateView(array(
             'viewParameters'  =>  array(
                 'report'      => $entity,
-                'form'        => $form->createView()
+                'form'        => $formView
             ),
             'contentTemplate' => 'MauticReportBundle:Report:form.html.php',
             'passthroughVars' => array(
@@ -310,7 +312,7 @@ class ReportController extends FormController
 
         $query = $reportGenerator->getQuery($reportName);
 
-        $form = $reportGenerator->getForm($reportName, array('read_only' => true));
+        $form = $reportGenerator->getForm($reportName, array('read_only' => true), $entity);
 
         if ($this->request->getMethod() == 'POST') {
             $form->bindRequest($this->request);

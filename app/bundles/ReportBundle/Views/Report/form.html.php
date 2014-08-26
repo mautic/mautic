@@ -28,36 +28,6 @@ $view['slots']->set("headerTitle", $header);
         <div id="report">
             <div class="row">
                 <div class="form-group  col-xs-12 col-sm-8 col-md-6">
-                    <label class="control-label">Columns to Include in Report</label>
-                    <div class="row">
-                        <div class="choice-wrapper col-xs-5">
-                            <select id="report_available_columns" name="report[available_columns]" class="form-control" multiple="multiple" size="5">
-                                <option value="id">ID</option>
-                                <option value="created_by">Created By</option>
-                                <option value="category">Category</option>
-                                <option value="is_published">Published</option>
-                                <option value="lang">Language</option>
-                            </select>
-                        </div>
-                        <div class="col-xs-2">
-                            <div class="text-center" style="margin-bottom: 10px; padding-top: 18px;">
-                                <button class="btn btn-sm btn-default"><i class="fa fa-caret-square-o-left"></i></button>
-                            </div>
-                            <div class="text-center">
-                                <button class="btn btn-sm btn-default"><i class="fa fa-caret-square-o-right"></i></button>
-                            </div>
-                        </div>
-                        <div class="choice-wrapper col-xs-5">
-                            <select id="report_selected_columns" name="report[selected_columns]" class="form-control" multiple="multiple" size="5">
-                                <option value="title">Title</option>
-                                <option value="hits">Hits</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="form-group  col-xs-12 col-sm-8 col-md-6">
                     <label class="control-label">Filters</label>
                     <div class="row">
                         <div class="choice-wrapper col-xs-4">
