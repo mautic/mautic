@@ -25,10 +25,12 @@ $mauticParams['supported_languages'] = array(
 );
 
 //load parameters array from local configuration
-include 'local.php';
+if (file_exists(__DIR__ . '/local.php')) {
+    include 'local.php';
 
-//override default with local
-$mauticParams = array_merge($mauticParams, $parameters);
+    //override default with local
+    $mauticParams = array_merge($mauticParams, $parameters);
+}
 
 //include path settings
 require 'paths.php';

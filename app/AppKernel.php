@@ -31,7 +31,7 @@ class AppKernel extends Kernel
 
         foreach ($finder as $file) {
             $path       = substr($file->getRealPath(), strlen($searchPath) + 1, -4);
-            $parts      = explode('/', $path);
+            $parts      = explode(DIRECTORY_SEPARATOR, $path);
             $class      = array_pop($parts);
             $namespace  = "Mautic\\" . implode('\\', $parts);
             $class      = $namespace.'\\'.$class;
