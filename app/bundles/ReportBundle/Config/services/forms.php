@@ -29,3 +29,10 @@ $container->setDefinition('mautic.form.type.column_selector', new Definition(
     ->addTag('form.type', array(
         'alias' => 'column_selector',
     ));
+
+$container->setDefinition('mautic.form.type.filter_selector', new Definition(
+    'Mautic\ReportBundle\Form\Type\FilterSelectorType'
+))
+    ->addTag('form.type', array(
+        'alias' => 'filter_selector',
+    ));

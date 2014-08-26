@@ -126,6 +126,14 @@ class ReportType extends AbstractType
                 'required'   => true
             ));
 
+            // Build the filter selector
+            $builder->add('filters', 'filter_selector', array(
+                'columnList' => $columns,
+                'label'      => 'mautic.report.report.form.filterselector',
+                'label_attr' => array('class' => 'control-label'),
+                'required'   => true
+            ));
+
             $builder->add('buttons', 'form_buttons');
         }
 

@@ -64,6 +64,14 @@ class Report extends FormEntity
     private $columns = array();
 
     /**
+     * @ORM\Column(type="array")
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full"})
+     */
+    private $filters = array();
+
+    /**
      * Get id
      *
      * @return integer
@@ -167,5 +175,29 @@ class Report extends FormEntity
     public function getColumns()
     {
         return $this->columns;
+    }
+
+    /**
+     * Set filters
+     *
+     * @param string $filters
+     * @return Report
+     */
+    public function setFilters($filters)
+    {
+        $this->isChanged('filters', $filters);
+        $this->filters = $filters;
+
+        return $this;
+    }
+
+    /**
+     * Get filters
+     *
+     * @return string
+     */
+    public function getFilters()
+    {
+        return $this->filters;
     }
 }

@@ -239,7 +239,7 @@ class ReportController extends FormController
             $model->lockEntity($entity);
         }
 
-        $formView = $this->setFormTheme($form, 'MauticReportBundle:Report:form.html.php', 'MauticReportBundle:FormColumnSelector');
+        $formView = $this->setFormTheme($form, 'MauticReportBundle:Report:form.html.php', 'MauticReportBundle:Form');
 
         return $this->delegateView(array(
             'viewParameters'  =>  array(
