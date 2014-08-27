@@ -12,7 +12,7 @@ $labelClass = (empty($form->vars['label_attr']['class'])) ? 'control-label' : $f
         <?php foreach ($setFilters as $key => $filter) { ?>
         <div class="row">
             <div class="choice-wrapper col-xs-4">
-                <label class="<?php echo $labelClass; ?>" for="<?php echo $form->vars['full_name'] . '[' . $key . '][column]'; ?>"><?php echo $view['translator']->trans('mautic.report.report.label.filtercolumn'); ?></label>
+                <label class="<?php echo $labelClass; ?>" for="<?php echo $form->vars['id'] . '_' . $key . '_column'; ?>"><?php echo $view['translator']->trans('mautic.report.report.label.filtercolumn'); ?></label>
                 <select id="<?php echo $form->vars['id'] . '_' . $key . '_column'; ?>" name="<?php echo $form->vars['full_name'] . '[' . $key . '][column]'; ?>" class="form-control">
                     <?php foreach ($columnList as $column) { ?>
                     <option value="<?php echo $column; ?>"<?php echo ($column == $filter['column']) ? ' selected' : ''; ?>><?php echo $column; ?></option>
@@ -20,7 +20,7 @@ $labelClass = (empty($form->vars['label_attr']['class'])) ? 'control-label' : $f
                 </select>
             </div>
             <div class="choice-wrapper col-xs-2">
-                <label class="<?php echo $labelClass; ?>" for="<?php echo $form->vars['full_name'] . '[' . $key . '][condition]'; ?>"><?php echo $view['translator']->trans('mautic.report.report.label.filtercondition'); ?></label>
+                <label class="<?php echo $labelClass; ?>" for="<?php echo $form->vars['id'] . '_' . $key . '_condition'; ?>"><?php echo $view['translator']->trans('mautic.report.report.label.filtercondition'); ?></label>
                 <select id="<?php echo $form->vars['id'] . '_' . $key . '_condition'; ?>" name="<?php echo $form->vars['full_name'] . '[' . $key . '][condition]'; ?>" class="form-control">
                     <?php foreach ($conditionArray as $condition) { ?>
                     <option value="<?php echo $condition; ?>"<?php echo ($condition == $filter['condition']) ? ' selected' : '' ?>><?php echo $condition; ?></option>
@@ -35,7 +35,7 @@ $labelClass = (empty($form->vars['label_attr']['class'])) ? 'control-label' : $f
             </div>
             <div class="choice-wrapper col-xs-4">
                 <div class="form-group">
-                    <label class="<?php echo $labelClass; ?>" for="<?php echo $form->vars['full_name'] . '[' . $key . '][value]'; ?>"><?php echo $view['translator']->trans('mautic.report.report.label.filtervalue'); ?></label>
+                    <label class="<?php echo $labelClass; ?>" for="<?php echo $form->vars['id'] . '_' . $key . '_value'; ?>"><?php echo $view['translator']->trans('mautic.report.report.label.filtervalue'); ?></label>
                     <input type="text" id="<?php echo $form->vars['id'] . '_' . $key . '_value'; ?>" name="<?php echo $form->vars['full_name'] . '[' . $key . '][value]'; ?>" required="required" class="form-control" value="<?php echo $filter['value']; ?>" />
                 </div>
             </div>

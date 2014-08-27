@@ -9,7 +9,7 @@ $labelClass = (empty($form->vars['label_attr']['class'])) ? 'control-label' : $f
         <label class="<?php echo $labelClass; ?>"><?php echo $view['translator']->trans($form->vars['label']); ?></label>
         <div class="row">
             <div class="choice-wrapper col-xs-5">
-                <label class="<?php echo $labelClass; ?>" for="<?php echo $form->vars['id'] . '[available]'; ?>"><?php echo $view['translator']->trans('mautic.report.report.label.availablecolumns'); ?></label>
+                <label class="<?php echo $labelClass; ?>" for="<?php echo $form->vars['id'] . '_available'; ?>"><?php echo $view['translator']->trans('mautic.report.report.label.availablecolumns'); ?></label>
                 <select id="<?php echo $form->vars['id'] . '_available'; ?>" name="<?php echo $form->vars['id'] . '[available]'; ?>" class="form-control" multiple="multiple" size="5">
                     <?php foreach ($columnList as $column) { ?>
                     <?php if (!in_array($column, $selectedColumns)) { ?>
@@ -27,7 +27,7 @@ $labelClass = (empty($form->vars['label_attr']['class'])) ? 'control-label' : $f
                 </div>
             </div>
             <div class="choice-wrapper col-xs-5">
-                <label class="<?php echo $labelClass; ?>" for="<?php echo $form->vars['full_name']; ?>"><?php echo $view['translator']->trans('mautic.report.report.label.selectedcolumns'); ?></label>
+                <label class="<?php echo $labelClass; ?>" for="<?php echo $form->vars['id']; ?>"><?php echo $view['translator']->trans('mautic.report.report.label.selectedcolumns'); ?></label>
                 <select id="<?php echo $form->vars['id']; ?>" name="<?php echo $form->vars['full_name']; ?>" class="form-control" multiple="multiple" size="5">
                     <?php foreach ($selectedColumns as $column) { ?>
                     <option value="<?php echo $column; ?>"><?php echo $column; ?></option>
