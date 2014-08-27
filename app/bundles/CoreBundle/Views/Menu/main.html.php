@@ -11,7 +11,7 @@
 
 <?php if ($item->hasChildren() && $options["depth"] !== 0 && $item->getDisplayChildren()): ?>
     <?php if ($item->isRoot()): ?>
-        <ul class="nav" data-toggle="menu">
+        <ul class="nav mt-sm" data-toggle="menu">
         <li class="nav-heading hidden-sm">MAIN MENU</li>
     <?php else: ?>
         <ul<?php echo $view["menu_helper"]->parseAttributes($item->getChildrenAttributes()); ?>>
