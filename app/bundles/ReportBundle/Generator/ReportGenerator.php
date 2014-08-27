@@ -13,10 +13,9 @@
 namespace Mautic\ReportBundle\Generator;
 
 use Doctrine\ORM\EntityManager;
-use Symfony\Component\Security\Core\SecurityContextInterface;
-use Mautic\ReportBundle\Form\FormBuilder;
-
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Security\Core\SecurityContextInterface;
 
 /**
  * Report generator
@@ -36,9 +35,9 @@ class ReportGenerator
     private $securityContext;
 
     /**
-     * @var \Mautic\ReportBundle\Form\FormBuilder
+     * @var \Symfony\Component\Form\FormFactoryInterface
      */
-    private $formBuilder;
+    private $formFactory;
 
     /**
      * @var string
@@ -50,15 +49,15 @@ class ReportGenerator
      *
      * @param \Doctrine\ORM\EntityManager                               $entityManager   Entity manager
      * @param \Symfony\Component\Security\Core\SecurityContextInterface $securityContext Security context
-     * @param \Mautic\ReportBundle\Form\FormBuilder                     $formBuilder     Form builder
+     * @param \Symfony\Component\Form\FormFactoryInterface              $formFactory Form factory
      *
      * @author r1pp3rj4ck <attila.bukor@gmail.com>
      */
-    public function __construct(EntityManager $entityManager, SecurityContextInterface $securityContext, FormBuilder $formBuilder)
+    public function __construct(EntityManager $entityManager, SecurityContextInterface $securityContext, FormFactoryInterface $formFactory)
     {
         $this->entityManager   = $entityManager;
         $this->securityContext = $securityContext;
-        $this->formBuilder     = $formBuilder;
+        $this->formFactory     = $formFactory;
         $this->validInterface  = "Mautic\\ReportBundle\\Builder\\ReportBuilderInterface";
     }
 
@@ -81,20 +80,16 @@ class ReportGenerator
     /**
      * Gets form
      *
-     * @param string                             $reportId Report ID
-     * @param array                              $options  Parameters set by the caller
-     * @param \Mautic\ReportBundle\Entity\Report $entity   Report Entity
+     * @param \Mautic\ReportBundle\Entity\Report $entity  Report Entity
+     * @param array                              $options Parameters set by the caller
      *
      * @return \Symfony\Component\Form\Form
      *
      * @author r1pp3rj4ck <attila.bukor@gmail.com>
      */
-    public function getForm($reportId, $options, $entity)
+    public function getForm($entity, $options)
     {
-        // $builder    = $this->getBuilder($reportId);
-        // $parameters = $builder->getParameters();
-
-        return $this->formBuilder->getForm($entity, $options);
+        return $this->formFactory->createBuilder('report', $entity, $options)->getForm();
     }
 
     /**

@@ -12,7 +12,6 @@
 namespace Mautic\ReportBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
-use Mautic\ReportBundle\Form\FormBuilder;
 use Mautic\ReportBundle\Generator\ReportGenerator;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -304,7 +303,7 @@ class ReportController extends FormController
         }
 
         $reportGenerator = new ReportGenerator(
-            $this->factory->getEntityManager(), $this->factory->getSecurityContext(), new FormBuilder($this->container->get('form.factory'))
+            $this->factory->getEntityManager(), $this->factory->getSecurityContext(), $this->container->get('form.factory')
         );
 
         // The report builder is referencing reports by name right now, get it
@@ -312,7 +311,7 @@ class ReportController extends FormController
 
         $query = $reportGenerator->getQuery($reportName);
 
-        $form = $reportGenerator->getForm($reportName, array('read_only' => true), $entity);
+        $form = $reportGenerator->getForm($entity, array('read_only' => true));
 
         if ($this->request->getMethod() == 'POST') {
             $form->bindRequest($this->request);

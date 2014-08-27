@@ -13,7 +13,6 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportEvent;
-use Mautic\ReportBundle\Form\FormBuilder;
 use Mautic\ReportBundle\Generator\ReportGenerator;
 use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -65,7 +64,6 @@ class ReportModel extends FormModel
      * @param array                                        $options
      * @return \Symfony\Component\Form\Form
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     * @todo Hook into the FormBuilder
      */
     public function createForm($entity, $formFactory, $action = null, $options = array())
     {
@@ -76,9 +74,9 @@ class ReportModel extends FormModel
         $params = (!empty($action)) ? array('action' => $action) : array();
         $params['read_only'] = false;
 
-        $reportGenerator = new ReportGenerator($this->em, $this->factory->getSecurityContext(), new FormBuilder($formFactory));
+        $reportGenerator = new ReportGenerator($this->em, $this->factory->getSecurityContext(), $formFactory);
 
-        return $reportGenerator->getForm(str_replace(' ', '', $entity->getTitle()), $params, $entity);
+        return $reportGenerator->getForm($entity, $params);
     }
 
     /**
