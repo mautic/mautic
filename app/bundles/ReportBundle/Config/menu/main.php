@@ -12,7 +12,7 @@ $items = array(
             'id' => 'mautic_report_root'
         ),
         'extras'=> array(
-            'iconClass' => 'fa-suitcase'
+            'iconClass' => 'fa-line-chart'
         ),
         'display' => ($security->isGranted(array('report:reports:viewown', 'report:reports:viewother'), 'MATCH_ONE')) ? true : false,
         'children' => array(
