@@ -11,6 +11,10 @@
 ?>
 <section class="content slimscroll">
     <?php echo $view['knp_menu']->render('main', array("menu" => "main")); ?>
+    <ul class="nav">
+        <li class="nav-divider"></li>
+        <li class="nav-heading">OTHER STUFF</li>
+    </ul>
 </section>
 
 <?php /*

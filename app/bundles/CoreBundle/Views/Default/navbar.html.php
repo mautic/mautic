@@ -19,7 +19,10 @@
     <!--/ sidebar toggle button -->
 
     <!-- brand -->
-    <a class="navbar-brand" href="#">{{app.name}}</a>
+    <a class="navbar-brand" href="#">
+        <span class="navbar-brand-logo"></span>
+        <span class="navbar-brand-text">Mautic</span>
+    </a>
     <!--/ brand -->
 </div>
 <!--/ end: Brand and toggle -->
