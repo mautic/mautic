@@ -105,7 +105,5 @@
             ?>
         </li>
         <?php endforeach; ?>
-        <li class="nav-divider"></li>
-        <li class="nav-heading hidden-sm">OTHER STUFF</li>
     </ul>
 <?php endif; ?>
