@@ -21,7 +21,7 @@ Mautic.activateCategoryLookup = function (formName, bundlePrefix) {
                 }
             },
             remote: {
-                url: mauticAjaxUrl + "?action=category:categoryList&bundle=" + bundlePrefix + "filter=%QUERY",
+                url: mauticAjaxUrl + "?action=category:categoryList&bundle=" + bundlePrefix + "&filter=%QUERY",
                 ajax: {
                     beforeSend: function () {
                         MauticVars.showLoadingBar = false;

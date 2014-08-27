@@ -60,6 +60,14 @@ class Form extends FormEntity
     private $description;
 
     /**
+     * @ORM\ManyToOne(targetEntity="Mautic\CategoryBundle\Entity\Category")
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full"})
+     **/
+    private $category;
+
+    /**
      * @ORM\Column(name="cached_html", type="text", nullable=true)
      */
     private $cachedHtml;
@@ -530,5 +538,21 @@ class Form extends FormEntity
     public function getActions()
     {
         return $this->actions;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCategory ()
+    {
+        return $this->category;
+    }
+
+    /**
+     * @param mixed $category
+     */
+    public function setCategory ($category)
+    {
+        $this->category = $category;
     }
 }

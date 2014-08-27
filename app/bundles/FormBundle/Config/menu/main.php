@@ -26,55 +26,71 @@ $items = array(
  */
 
 $items = array(
-    'mautic.form.form.menu.index' => array(
-        'route'    => 'mautic_form_index',
+    'mautic.form.form.menu.root' => array(
         'linkAttributes' => array(
-            'data-toggle' => 'ajax'
+            'id' => 'mautic_form_root'
         ),
         'extras'=> array(
             'iconClass' => 'fa-pencil-square-o',
-            'routeName' => 'mautic_form_index'
         ),
-        'display' => $security->isGranted(array('form:forms:viewown', 'form:forms:viewother'), 'MATCH_ONE') ? true : false,
+        'display' => ($security->isGranted(array('form:forms:viewown', 'form:forms:viewother'), 'MATCH_ONE')) ? true : false,
         'children' => array(
-            'mautic.form.form.menu.new' => array(
-                'route'    => 'mautic_form_action',
-                'routeParameters' => array("objectAction"  => "new"),
-                'extras'  => array(
-                    'routeName' => 'mautic_form_action|new'
+            'mautic.form.form.menu.index' => array(
+                'route'    => 'mautic_form_index',
+                'linkAttributes' => array(
+                    'data-toggle' => 'ajax'
                 ),
-                'display' => false //only used for breadcrumb generation
-            ),
-            'mautic.form.form.menu.edit' => array(
-                'route'           => 'mautic_form_action',
-                'routeParameters' => array("objectAction"  => "edit"),
-                'extras'  => array(
-                    'routeName' => 'mautic_form_action|edit'
+                'extras'=> array(
+                    'routeName' => 'mautic_form_index'
                 ),
-                'display' => false //only used for breadcrumb generation
-            ),
-            'mautic.form.form.menu.view' => array(
-                'route'           => 'mautic_form_action',
-                'routeParameters' => array(
-                    "objectAction"  => "view",
-                    "objectId"      => $request->get('objectId')
-                ),
-                'extras'  => array(
-                    'routeName' => 'mautic_form_action|view'
-                ),
-                'display' => false, //only used for breadcrumb generation
                 'children' => array(
-                    'mautic.form.result.menu.index' => array(
-                        'route'           => 'mautic_form_results',
+                    'mautic.form.form.menu.new' => array(
+                        'route'    => 'mautic_form_action',
+                        'routeParameters' => array("objectAction"  => "new"),
                         'extras'  => array(
-                            'routeName' => 'mautic_form_results'
+                            'routeName' => 'mautic_form_action|new'
                         ),
                         'display' => false //only used for breadcrumb generation
+                    ),
+                    'mautic.form.form.menu.edit' => array(
+                        'route'           => 'mautic_form_action',
+                        'routeParameters' => array("objectAction"  => "edit"),
+                        'extras'  => array(
+                            'routeName' => 'mautic_form_action|edit'
+                        ),
+                        'display' => false //only used for breadcrumb generation
+                    ),
+                    'mautic.form.form.menu.view' => array(
+                        'route'           => 'mautic_form_action',
+                        'routeParameters' => array(
+                            "objectAction"  => "view",
+                            "objectId"      => $request->get('objectId')
+                        ),
+                        'extras'  => array(
+                            'routeName' => 'mautic_form_action|view'
+                        ),
+                        'display' => false, //only used for breadcrumb generation
+                        'children' => array(
+                            'mautic.form.result.menu.index' => array(
+                                'route'           => 'mautic_form_results',
+                                'extras'  => array(
+                                    'routeName' => 'mautic_form_results'
+                                ),
+                                'display' => false //only used for breadcrumb generation
+                            )
+                        )
                     )
                 )
             )
         )
     )
+);
+
+//add category level
+\Mautic\CategoryBundle\Helper\MenuHelper::addCategoryMenuItems(
+    $items['mautic.form.form.menu.root']['children'],
+    'form',
+    $security
 );
 
 return $items;

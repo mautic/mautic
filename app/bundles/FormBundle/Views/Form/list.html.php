@@ -34,6 +34,13 @@ if ($tmpl == 'index')
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'form',
+                    'orderBy'    => 'c.title',
+                    'text'       => 'mautic.form.form.thead.category',
+                    'class'      => 'visible-md visible-lg col-form-category'
+                ));
+
+                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                    'sessionVar' => 'form',
                     'orderBy'    => 'submissionCount',
                     'text'       => 'mautic.form.form.thead.submissions',
                     'class'      => 'visible-md visible-lg col-form-submissions'
@@ -98,6 +105,11 @@ CUSTOM
                         </a>
                     </td>
                     <td class="visible-md visible-lg"><?php echo $i[0]->getDescription(); ?></td>
+                    <td class="visible-md visible-lg">
+                        <?php $catName = ($category = $i[0]->getCategory()) ? $category->getTitle() :
+                            $view['translator']->trans('mautic.core.form.uncategorized'); ?>
+                        <span><?php echo $catName; ?></span>
+                    </td>
                     <td class="visible-md visible-lg">
                         <a href="<?php echo $view['router']->generate('mautic_form_action', array('objectAction' => 'results', 'objectId' => $i[0]->getId())); ?>"
                            data-toggle="ajax"

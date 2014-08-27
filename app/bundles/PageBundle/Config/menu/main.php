@@ -48,44 +48,16 @@ $items = array(
                     'routeName' => 'mautic_page_action|view'
                 ),
                 'display' => false //only used for breadcrumb generation
-            ),
-            'mautic.category.menu.index' => array(
-                'route'    => 'mautic_category_index',
-                'routeParameters' => array("bundle"  => "page"),
-                'extras'  => array(
-                    'routeName' => 'mautic_category_index'
-                ),
-                'linkAttributes' => array(
-                    'data-toggle' => 'ajax'
-                ),
-                'display' => $security->isGranted('page:categories:view') ? true : false,
-                'children' => array(
-                    'mautic.category.menu.new' => array(
-                        'route'    => 'mautic_category_action',
-                        'routeParameters' => array(
-                            "objectAction"  => "new",
-                            "bundle"        => "page"
-                        ),
-                        'extras'  => array(
-                            'routeName' => 'mautic_category_action|page|new'
-                        ),
-                        'display' => false //only used for breadcrumb generation
-                    ),
-                    'mautic.category.menu.edit' => array(
-                        'route'           => 'mautic_category_action',
-                        'routeParameters' => array(
-                            "objectAction"  => "edit",
-                            "bundle"        => "page"
-                        ),
-                        'extras'  => array(
-                            'routeName' => 'mautic_category_action|page|edit'
-                        ),
-                        'display' => false //only used for breadcrumb generation
-                    )
-                )
             )
         )
     )
+);
+
+//add category level
+\Mautic\CategoryBundle\Helper\MenuHelper::addCategoryMenuItems(
+    $items['mautic.page.page.menu.root']['children'],
+    'page',
+    $security
 );
 
 return $items;

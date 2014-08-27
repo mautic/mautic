@@ -4,6 +4,10 @@ Mautic.formOnLoad = function (container) {
         Mautic.activateSearchAutocomplete('list-search', 'form.form');
     }
 
+    if (mQuery(container + ' form[name="mauticform"]').length) {
+        Mautic.activateCategoryLookup('mauticform', 'form');
+    }
+
     if (mQuery('#mauticforms_fields')) {
         //make the fields sortable
         mQuery('#mauticforms_fields').sortable({
