@@ -26,8 +26,8 @@ class ReportRepository extends CommonRepository
     public function getEntities($args = array())
     {
         $q = $this
-            ->createQueryBuilder('r')
-            ->select('r');
+            ->createQueryBuilder('p')
+            ->select('p');
 
         $this->buildClauses($q, $args);
 
