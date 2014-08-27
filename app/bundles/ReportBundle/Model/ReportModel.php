@@ -105,22 +105,22 @@ class ReportModel extends FormModel
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, $event = false)
     {
-        if (!$entity instanceof Page) {
-            throw new MethodNotAllowedHttpException(array('Page'));
+        if (!$entity instanceof Report) {
+            throw new MethodNotAllowedHttpException(array('Report'));
         }
 
         switch ($action) {
             case "pre_save":
-                $name = ReportEvents::PAGE_PRE_SAVE;
+                $name = ReportEvents::REPORT_PRE_SAVE;
                 break;
             case "post_save":
-                $name = ReportEvents::PAGE_POST_SAVE;
+                $name = ReportEvents::REPORT_POST_SAVE;
                 break;
             case "pre_delete":
-                $name = ReportEvents::PAGE_PRE_DELETE;
+                $name = ReportEvents::REPORT_PRE_DELETE;
                 break;
             case "post_delete":
-                $name = ReportEvents::PAGE_POST_DELETE;
+                $name = ReportEvents::REPORT_POST_DELETE;
                 break;
             default:
                 return false;
@@ -155,7 +155,7 @@ class ReportModel extends FormModel
                 $viewOther = $this->security->isGranted('report:reports:viewother');
                 $repo      = $this->getRepository();
                 $repo->setCurrentUser($this->factory->getUser());
-                $results = $repo->getPageList($filter, $limit, 0, $viewOther);
+                $results = $repo->getReportList($filter, $limit, 0, $viewOther);
                 break;
         }
 

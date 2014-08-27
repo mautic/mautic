@@ -61,16 +61,6 @@ class ReportController extends FormController
                 array('column' => 'r.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser());
         }
 
-	    /* @type \Symfony\Bundle\FrameworkBundle\Translation\Translator $translator */
-        $translator = $this->get('translator');
-        //do not list variants in the main list
-        //$filter['force'][] = array('column' => 'r.variantParent', 'expr' => 'isNull');
-
-        $langSearchCommand = $translator->trans('mautic.report.report.searchcommand.lang');
-        if (strpos($search, "{$langSearchCommand}:") === false) {
-            //$filter['force'][] = array('column' => 'r.translationParent', 'expr' => 'isNull');
-        }
-
         $orderBy     = $this->factory->getSession()->get('mautic.report.orderby', 'r.title');
         $orderByDir  = $this->factory->getSession()->get('mautic.report.orderbydir', 'DESC');
 
@@ -193,9 +183,6 @@ class ReportController extends FormController
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
                     $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
-
-                    //clear the session
-                    $session->remove($contentName);
 
                     $this->request->getSession()->getFlashBag()->add(
                         'notice',
