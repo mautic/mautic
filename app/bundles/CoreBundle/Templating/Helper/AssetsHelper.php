@@ -11,7 +11,7 @@ namespace Mautic\CoreBundle\Templating\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Finder\Finder;
-use \Symfony\Component\Templating\Helper\CoreAssetsHelper as BaseAssetsHelper;
+use Symfony\Component\Templating\Helper\CoreAssetsHelper as BaseAssetsHelper;
 
 class AssetsHelper extends BaseAssetsHelper
 {
@@ -336,23 +336,29 @@ class AssetsHelper extends BaseAssetsHelper
         $rootPath     = $this->factory->getSystemPath('root') . '/';
         $directories  = new Finder();
         $directories->directories()->exclude('*less')->depth('0')->ignoreDotFiles(true)->in($dir);
-
         if (count($directories)) {
             foreach ($directories as $directory) {
                 $files = new Finder();
-                $files->files()->depth('0')->name('*.'.$ext)->in($directory->getRealPath())->sortByName();
+                $thisDirectory = str_replace('\\', '/', $directory->getRealPath());
+                $files->files()->depth('0')->name('*.'.$ext)->in($thisDirectory)->sortByName();
                 $key = $directory->getBasename();
-
                 foreach ($files as $file) {
+                    $path = str_replace($rootPath, '', $file->getPathname());
+                    if (strpos($path, '/') === 0) {
+                        $path =  substr($path, 1);
+                    }
+
                     if ($env == 'prod') {
-                        $assets[$ext][$key][] = str_replace($rootPath, '', $file->getPathname());
+                        $assets[$ext][$key][] = $path;
                     } else {
-                        $assets[$ext][] = str_replace($rootPath, '', $file->getPathname());
+                        $assets[$ext][] = $path;
                     }
                 }
+                unset($files);
             }
         }
 
+        unset($directories);
         $files = new Finder();
         $files->files()->depth('0')->ignoreDotFiles(true)->name('*.'.$ext)->in($dir)->sortByName();
         foreach ($files as $file) {
@@ -362,6 +368,7 @@ class AssetsHelper extends BaseAssetsHelper
                 $assets[$ext][] = str_replace($rootPath, '', $file->getPathname());
             }
         }
+        unset($files);
     }
 
     protected function findOverrides($env, &$assets)
