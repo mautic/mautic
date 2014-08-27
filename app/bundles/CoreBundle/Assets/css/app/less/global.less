@@ -1,0 +1,38 @@
+// Global
+// --------------------------------------------------
+
+// html + body
+// ----------------------------
+html {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+
+  // Sidebar open class
+  // ----------------------------
+  &.sidebar-left-open {
+    overflow: hidden;
+  }
+}
+body {
+  width: 100%;
+  height: 100%;
+
+  // Wrapper
+  // ----------------------------
+  > section#app-wrapper {
+    position: relative;
+    height: auto;
+    min-height: 100%;
+    width: 100%;
+  }
+}
+
+// Links
+// ----------------------------
+a {
+  &:hover,
+  &:focus {
+    text-decoration: none;
+  }
+}

@@ -1,0 +1,50 @@
+//
+// Progress bars
+// --------------------------------------------------
+
+// Progress Itself
+// -------------------------
+.progress {
+  background-color: darken(@body-bg, 10%);
+  .box-shadow(none);
+
+  // Sizing
+  &.progress-md {
+    height: (@line-height-computed - 4);
+    border-radius: @border-radius-small;
+  }
+  &.progress-sm {
+    height: (@line-height-computed - 8);
+    border-radius: @border-radius-small;
+  }
+  &.progress-xs {
+    height: (@line-height-computed - 12);
+    border-radius: (@border-radius-small);
+  }
+}
+.progress-bar {
+  .box-shadow(none);
+}
+
+// Variations
+// -------------------------
+.progress-bar-success {
+  .progress-bar-variant(@progress-bar-success-bg);
+}
+.progress-bar-info {
+  .progress-bar-variant(@progress-bar-info-bg);
+}
+.progress-bar-warning {
+  .progress-bar-variant(@progress-bar-warning-bg);
+}
+.progress-bar-danger {
+  .progress-bar-variant(@progress-bar-danger-bg);
+}
+
+// Progress inside sidebar
+// -------------------------
+aside.sidebar {
+  .progress {
+    background-color: fade(contrast(@sidebar-bg-color), 5%);
+  }
+}

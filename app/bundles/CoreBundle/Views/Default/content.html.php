@@ -13,10 +13,12 @@ if (!$app->getRequest()->isXmlHttpRequest() && $view['slots']->get('contentOnly'
 endif;
 ?>
 
-<?php echo $view->render('MauticCoreBundle:Default:pageheader.html.php'); ?>
+<div class="content-body" id="main-content">
+    <?php echo $view->render('MauticCoreBundle:Default:pageheader.html.php'); ?>
 
-<div id="page-content">
-    <?php $view['slots']->output('_content'); ?>
+    <div class="container-fluid">
+        <?php $view['slots']->output('_content'); ?>
+    </div>
 </div>
 
 <?php $view['slots']->output('modal'); ?>

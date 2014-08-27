@@ -12,56 +12,79 @@ $activePanelClasses  = ($app->getSession()->get('left-panel', 'default') == 'unp
 <!DOCTYPE html>
 <html>
     <?php echo $view->render('MauticCoreBundle:Default:head.html.php'); ?>
-    <body>
-        <?php $view['assets']->outputScripts("bodyOpen"); ?>
-        <div class="loading-message hidden">
-            <div class="loading-message-inner-wrapper bg-success">
-                <?php echo $view['translator']->trans('mautic.core.loading'); ?>
+    <body class="header-fixed">
+        <!-- start: app-wrapper -->
+        <section id="app-wrapper">
+            <?php $view['assets']->outputScripts("bodyOpen"); ?>
+
+            <!-- start: loading-message -->
+            <div class="loading-message hidden">
+                <div class="loading-message-inner-wrapper bg-success">
+                    <?php echo $view['translator']->trans('mautic.core.loading'); ?>
+                </div>
             </div>
-        </div>
-        <header id="header" class="navbar navbar-fixed-top">
-           <?php echo $view->render('MauticCoreBundle:Default:navbar.html.php'); ?>
-        </header>
-        <aside class="sidebar sidebar-left sidebar-menu">
-            <div class="viewport">
+            <!--/ end: loading-message -->
+
+            <!-- start: app-header -->
+            <header id="app-header" class="navbar">
+               <?php echo $view->render('MauticCoreBundle:Default:navbar.html.php'); ?>
+            </header>
+            <!--/ end: app-header -->
+
+            <!-- start: app-sidebar(left) -->
+            <aside class="app-sidebar sidebar-left">
                 <?php echo $view->render('MauticCoreBundle:Default:leftpanel.html.php'); ?>
-            </div>
-        </aside>
-        <section id="main" role="main">
-            <div class="container-fluid" id="main-content">
+            </aside>
+            <!--/ end: app-sidebar(left) -->
+
+            <!-- start: app-content -->
+            <section id="app-content">
                 <?php $view['slots']->output('_content'); ?>
-            </div>
-        </section>
+            </section>
+            <!--/ end: app-content -->
 
-        <?php /*
-        <div class="page-wrapper<?php echo $activePanelClasses; ?>">
-            <div class="loading-bar progress">
-                <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>
-            </div>
-            <div class="main-panel-wrapper">
+            <?php /*
+            <div class="page-wrapper<?php echo $activePanelClasses; ?>">
+                <div class="loading-bar progress">
+                    <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>
                 </div>
-                <div class="main-panel">
-                    <a href="#" id="main-panel-top"></a>
-                    <div class="main-panel-flash-msgs">
-                        <?php echo $view->render('MauticCoreBundle:Default:flashes.html.php'); ?>
+                <div class="main-panel-wrapper">
                     </div>
-                    <div id="page-content" class="main-panel-content container-fluid">
-                        <?php $view['slots']->output('_content'); ?>
+                    <div class="main-panel">
+                        <a href="#" id="main-panel-top"></a>
+                        <div class="main-panel-flash-msgs">
+                            <?php echo $view->render('MauticCoreBundle:Default:flashes.html.php'); ?>
+                        </div>
+                        <div id="page-content" class="main-panel-content container-fluid">
+                            <?php $view['slots']->output('_content'); ?>
+                        </div>
                     </div>
                 </div>
-            </div>
-            */ ?>
+            </div> */ ?>
 
-           <aside class="sidebar sidebar-right">
+            <!-- start: app-sidebar(right) -->
+            <aside class="app-sidebar sidebar-right">
                 <?php echo $view->render('MauticCoreBundle:Default:rightpanel.html.php'); ?>
-           </aside>
+            </aside>
+            <!--/ end: app-sidebar(right) -->
 
            <?php /*
             <div class="right-panel scrollable">
                 <?php echo $view->render('MauticCoreBundle:Default:rightpanel.html.php'); ?>
             </div>
             */ ?>
-        </div>
+
+            <!-- start: app-footer -->
+            <footer id="app-footer">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-xs-6">Copyright Mautic 2014</div>
+                    </div>
+                </div>
+            </footer>
+            <!--/ end: app-content -->
+        </section>
+        <!--/ end: app-wrapper -->
 
         <?php echo $view->render('MauticCoreBundle:Default:script.html.php'); ?>
     </body>

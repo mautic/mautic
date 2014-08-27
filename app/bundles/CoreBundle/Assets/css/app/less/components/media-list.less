@@ -1,0 +1,24 @@
+//
+// Media objects
+// --------------------------------------------------
+
+// Common styles
+// -------------------------
+
+.media {
+  &.read {
+    opacity: .8;
+    a {
+      color: lighten(@text-color, 5%);
+    }
+  }
+  &.new {
+    background-color: lighten(@brand-light, 10%);
+  }
+}
+
+.media-heading {
+  > .bullet {
+    margin-top: -1px;
+  }
+}

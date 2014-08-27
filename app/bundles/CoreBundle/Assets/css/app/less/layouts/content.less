@@ -1,0 +1,69 @@
+// Layout Content
+// --------------------------------------------------
+
+// fixed header option
+.header-fixed {
+  section#app-content {
+    padding-top: @header-height;
+
+    // breakpoint screen-sm and up
+    // -------------------------
+    @media (min-width: @screen-sm-min) {
+      padding-top: @header-height-sm;
+    }
+  }
+}
+
+section#app-content {
+  position: relative;
+  z-index: @content-zindex;
+  height: 100%;
+  padding-bottom: @footer-height;
+  .box-sizing(border-box);
+  .clearfix();
+
+  // content body
+  // -------------------------
+  > .content-body {
+    width: 100%;
+    float: left;
+
+    // container
+    // -------------------------
+    .container-fluid,
+    .container {
+      width: 100%;
+      padding: 15px;
+
+      &.container-xs {
+        padding: 5px;
+      }
+      &.container-sm {
+        padding: 10px;
+      }
+      &.container-md {
+        padding: 15px;
+      }
+      &.container-lg {
+        padding: 20px;
+      }
+    }
+  }
+
+  // breakpoint screen-sm and up
+  // -------------------------
+  @media (min-width: @screen-sm-min) {
+
+    // breakpoint screen-sm only
+    // -------------------------
+    @media (max-width: @screen-sm-max) {
+      margin-left: @sidebar-width-sm;
+    }
+  }
+
+  // breakpoint screen-md and up
+  // -------------------------
+  @media (min-width: @screen-md-min) {
+    margin-left: @sidebar-width;
+  }
+}

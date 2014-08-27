@@ -1,0 +1,96 @@
+//
+// Typography
+// --------------------------------------------------
+
+// Headings
+// -------------------------
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+  margin-top: 0;
+  margin-bottom: 0;
+  color: inherit;
+}
+
+// Ellipsis
+// -------------------------
+.ellipsis {
+  .text-overflow();
+}
+
+// font size
+// -------------------------
+.fs-base { font-size: @font-size-base; }
+.fs-2 { font-size: 2px }
+.fs-4 { font-size: 4px }
+.fs-6 { font-size: 6px }
+.fs-8 { font-size: 8px }
+.fs-10 { font-size: 10px }
+.fs-12 { font-size: 12px }
+.fs-14 { font-size: 14px !important; }
+.fs-16 { font-size: 16px }
+.fs-18 { font-size: 18px }
+.fs-20 { font-size: 20px }
+.fs-22 { font-size: 22px }
+.fs-24 { font-size: 24px }
+.fs-26 { font-size: 26px }
+.fs-28 { font-size: 28px }
+.fs-30 { font-size: 30px }
+.fs-32 { font-size: 32px }
+.fs-34 { font-size: 34px }
+.fs-36 { font-size: 36px }
+.fs-38 { font-size: 38px }
+.fs-40 { font-size: 40px }
+.fs-42 { font-size: 42px }
+.fs-44 { font-size: 44px }
+.fs-46 { font-size: 46px }
+
+// Page Header
+// -------------------------
+.page-header {
+  background-color: lighten(@body-bg, 2.5%);
+  padding: 20px 15px;
+  margin: 0;
+  border-bottom: 0;
+  border-bottom: 1px solid darken(@body-bg, 3%);
+
+  // breadcrumb
+  .breadcrumb {
+    padding: 0;
+    background-color: inherit;
+    border-radius: 0;
+  }
+}
+// page header inside container reset
+.container {
+  .page-header {
+    margin: -15px -15px 15px -15px;
+  }
+  &.container-xs {
+    .page-header { margin: -5px -5px 5px -5px; }
+  }
+  &.container-sm {
+    .page-header { margin: -10px -10px 10px -10px; }
+  }
+  &.container-md {
+    .page-header { margin: -15px -15px 15px -15px; }
+  }
+  &.container-lg {
+    .page-header { margin: -20px -20px 20px -20px; }
+  }
+}
+
+// Font weight
+// -------------------------
+.fw-b { font-weight: 700; }
+.fw-sb { font-weight: 600; }
+.fw-n { font-weight: 400; }
+.fw-t { font-weight: 300; }
+
+// Contextual colors
+// -------------------------
+.text-muted { .text-emphasis-variant(@subtext-color); }
+.text-primary { .text-emphasis-variant(@brand-primary); }
+.text-success { .text-emphasis-variant(@brand-success); }
+.text-warning { .text-emphasis-variant(@brand-warning); }
+.text-danger { .text-emphasis-variant(@brand-danger); }
+.text-info { .text-emphasis-variant(@brand-info); }
