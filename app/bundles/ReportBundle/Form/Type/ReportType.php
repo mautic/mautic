@@ -60,7 +60,7 @@ class ReportType extends AbstractType
      * @param FormBuilderInterface $builder
      * @param array                $options
      */
-    public function buildForm (FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(array('content' => 'html')));
         $builder->addEventSubscriber(new FormExitSubscriber('report.report', $options));
@@ -148,7 +148,8 @@ class ReportType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'Mautic\ReportBundle\Entity\Report'
+            'data_class'         => 'Mautic\ReportBundle\Entity\Report',
+            'allow_extra_fields' => true
         ));
     }
 

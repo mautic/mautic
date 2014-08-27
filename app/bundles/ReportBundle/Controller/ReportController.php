@@ -58,10 +58,10 @@ class ReportController extends FormController
 
         if (!$permissions['report:reports:viewother']) {
             $filter['force'][] =
-                array('column' => 'r.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser());
+                array('column' => 'p.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser());
         }
 
-        $orderBy     = $this->factory->getSession()->get('mautic.report.orderby', 'r.title');
+        $orderBy     = $this->factory->getSession()->get('mautic.report.orderby', 'p.title');
         $orderByDir  = $this->factory->getSession()->get('mautic.report.orderbydir', 'DESC');
 
         $reports = $model->getEntities(
