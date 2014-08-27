@@ -40,12 +40,12 @@ class Report extends FormEntity
     private $title;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="boolean")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full", "limited"})
      */
-    private $system = 0;
+    private $system = false;
 
     /**
      * @ORM\Column(type="string")
