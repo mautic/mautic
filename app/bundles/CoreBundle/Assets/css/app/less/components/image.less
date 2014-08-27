@@ -1,0 +1,34 @@
+//
+// Image
+// --------------------------------------------------
+
+// Image wrapper
+// ------------------------
+.img-wrapper {
+  display: block;
+  position: relative;
+  overflow: hidden;
+
+  // inset shadow
+  &:after {
+    position: absolute;
+    content: "";
+    z-index: 1;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border-radius: inherit;
+    .box-shadow(inset 0 0 3px 0 rgba(0,0,0,0.5));
+  }
+
+  img {
+    .img-responsive();
+  }
+}
+
+// Image rounded
+// ------------------------
+.img-rounded {
+  border-radius: @border-radius-base;
+}

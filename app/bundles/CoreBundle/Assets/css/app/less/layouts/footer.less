@@ -1,0 +1,44 @@
+//
+// Layout Footer
+// --------------------------------------------------
+
+footer#app-footer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: @footer-zindex;
+  height: @footer-height;
+  line-height: @footer-height;
+  background-color: @footer-bg-color;
+  //border-top: 1px solid darken(@body-bg, 3%);
+
+  &:after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    left: 0;
+    right: 0;
+    top: -1px;
+    border-top: 1px solid darken(@body-bg, 3%);
+    height: inherit;
+    border-top: 1px solid @border-base-color;
+  }
+
+  // breakpoint screen-sm and up
+  // -------------------------
+  @media (min-width: @screen-sm-min) {
+
+    // breakpoint screen-sm only
+    // -------------------------
+    @media (max-width: @screen-sm-max) {
+      left: @sidebar-width-sm;
+    }
+  }
+
+  // breakpoint screen-md and up
+  // -------------------------
+  @media (min-width: @screen-md-min) {
+    left: @sidebar-width;
+  }
+}

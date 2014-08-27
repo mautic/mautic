@@ -14,7 +14,7 @@
     <link rel="apple-touch-icon" href="<?php echo $view['assets']->getUrl('assets/images/apple-touch-icon.png') ?>" />
 
     <?php echo $view['assets']->outputSystemStylesheets(); ?>
-    <link rel="stylesheet" href="<?php echo $view['assets']->getUrl('assets/css/font-awesome/css/font-awesome.min.css'); ?>" />
+    <link rel="stylesheet" href="<?php echo $view['assets']->getUrl('assets/css/font-awesome.min.css'); ?>" />
 
     <?php $view['assets']->outputHeadDeclarations(); ?>
 </head>

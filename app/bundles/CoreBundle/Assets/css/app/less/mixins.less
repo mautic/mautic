@@ -1,0 +1,102 @@
+//
+// Mixins
+// --------------------------------------------------
+
+// Switch size
+// ------------------------
+.switch-size(@height) {
+  font-size: @height;
+  input {
+    + span {
+      height: @height;
+      width: (@height * 1.6);
+      border-radius: @height;
+      
+      &:after {
+        border-radius: @height;
+        height: @height;
+        width: @height;
+      }
+    }
+  }
+}
+
+// Switch color
+// ------------------------
+.switch-color(@color) {
+  input {
+    &:checked {
+      + span {
+        border-color: @color;
+        box-shadow: inset 0 0 0 0.6em @color;
+        &:after { border-color: @color; }
+      }
+    }
+  }
+}
+
+// Custom checkbox & radio color
+// ------------------------
+.checkbox-radio-color(@color) {
+  label {
+    input {
+      + span {
+        &:after {
+          background-color: @color;
+        }
+      }
+      // checked state
+      &:checked {
+        + span {
+          border: 1px solid @color;
+        }
+      }
+    }
+    // hover state
+    &:hover {
+      input {
+        + span {
+          border: 1px solid rgba(0,0,0,0.3);
+        }
+        &:checked {
+          + span {
+            border: 1px solid @color;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Panel color variant
+// ------------------------
+.panel-variants(@border; @heading-text-color; @heading-bg-color; @heading-border) {
+  border-color: @border;
+
+  & > .panel-heading {
+    color: @heading-text-color;
+    background-color: @heading-bg-color;
+    border-color: @heading-border;
+
+    + .panel-collapse > .panel-body {
+      border-top-color: @border;
+    }
+    .badge {
+      color: @heading-bg-color;
+      background-color: @heading-text-color;
+    }
+    a.btn {
+      color: fadeout(@heading-text-color, 10%);
+
+      &:hover,
+      &:focus {
+        color: @heading-text-color;
+      }
+    }
+  }
+  & > .panel-footer {
+    + .panel-collapse > .panel-body {
+      border-bottom-color: @border;
+    }
+  }
+}

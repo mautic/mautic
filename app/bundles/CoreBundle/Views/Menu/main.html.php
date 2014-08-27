@@ -11,7 +11,8 @@
 
 <?php if ($item->hasChildren() && $options["depth"] !== 0 && $item->getDisplayChildren()): ?>
     <?php if ($item->isRoot()): ?>
-        <ul class="topmenu topmenu-responsive" data-toggle="menu">
+        <ul class="nav" data-toggle="menu">
+        <li class="nav-heading hidden-sm">MAIN MENU</li>
     <?php else: ?>
         <ul<?php echo $view["menu_helper"]->parseAttributes($item->getChildrenAttributes()); ?>>
     <?php endif; ?>
@@ -32,7 +33,7 @@
             endif;
         ?>
 
-        <li <?php echo $view["menu_helper"]->parseAttributes($liAttributes); ?> >
+        <li class="nav-group" <?php echo $view["menu_helper"]->parseAttributes($liAttributes); ?> >
 
             <?php
 
@@ -80,7 +81,7 @@
                     <?php echo $view['translator']->trans($child->getLabel());?>
                 </span>
 
-                <span class="arrow"></span>
+                <!--<span class="arrow"></span>-->
             </a>
 
             <?php
@@ -89,7 +90,7 @@
                 $options["depth"]         = ($options["depth"]) ? $options["depth"]-- : "";
                 $options["matchingDepth"] = ($options["matchingDepth"]) ? $options["matchingDepth"]-- : "";
 
-                $levelClass = $isAncestor? "submenu collapse in" : "submenu collapse";
+                $levelClass = $isAncestor? "nav-submenu collapse in" : "nav-submenu collapse";
 
                 //set the class
                 $child->setChildrenAttribute("class", $levelClass);
@@ -104,5 +105,7 @@
             ?>
         </li>
         <?php endforeach; ?>
+        <li class="nav-divider"></li>
+        <li class="nav-heading hidden-sm">OTHER STUFF</li>
     </ul>
 <?php endif; ?>

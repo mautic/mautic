@@ -1,0 +1,30 @@
+// Layout Backdrop
+// --------------------------------------------------
+
+#backdrop {
+  display: none;
+  opacity: 0;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  // sidebar backdrop
+  // ----------------------
+  &.sidebar {
+    display: block;
+    background-color: #000;
+    opacity: 0.5;
+    z-index: (@sidebar-zindex - 1);
+  }
+
+  // sidebar backdrop
+  // ----------------------
+  &.searchbar {
+    display: block;
+    background-color: #fff;
+    opacity: 0.01;
+    z-index: (@header-zindex - 1);
+  }
+}
