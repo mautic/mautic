@@ -33,13 +33,13 @@ class FormBuilderEvent extends Event
      *
      * @param string $key - a unique identifier; it is recommended that it be namespaced i.e. lead.action
      * @param array $action - can contain the following keys:
-     *  'group'    => (required) translation string to group actions by
-     *  'label'    => (required) what to display in the list
-     *  'descr'    => (optional) short description of event
-     *  'template' => (optional) template to use for the action's HTML in the form builder
+     *  'group'       => (required) translation string to group actions by
+     *  'label'       => (required) what to display in the list
+     *  'description' => (optional) short description of event
+     *  'template'    => (optional) template to use for the action's HTML in the form builder
      *      i.e AcmeMyBundle:FormAction:theaction.html.php
-     *  'formType' => (required) name of the form type SERVICE for the action
-     *  'callback' => (required) callback function that will be passed the results upon a form submit.
+     *  'formType'    => (required) name of the form type SERVICE for the action
+     *  'callback'    => (required) callback function that will be passed the results upon a form submit.
      *      The callback function can receive the following arguments by name (via ReflectionMethod::invokeArgs())
      *          array $fields - form fields with keys id, type and alias
      *          array $properties - values saved from the formType as defined here

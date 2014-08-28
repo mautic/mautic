@@ -43,9 +43,7 @@ class LeadSubscriber extends CommonSubscriber
             LeadEvents::LEAD_POST_DELETE   => array('onLeadDelete', 0),
             LeadEvents::FIELD_POST_SAVE    => array('onFieldPostSave', 0),
             LeadEvents::FIELD_POST_DELETE  => array('onFieldDelete', 0),
-            UserEvents::USER_PRE_DELETE    => array('onUserDelete', 0),
-            FormEvents::FORM_ON_BUILD      => array('onFormBuilder', 0),
-            PageEvents::PAGE_ON_HIT        => array('onPageHit', 0)
+            UserEvents::USER_PRE_DELETE    => array('onUserDelete', 0)
         );
     }
 
@@ -73,6 +71,7 @@ class LeadSubscriber extends CommonSubscriber
             array('lead:leads:viewown', 'lead:leads:viewother'),
             'RETURN_ARRAY'
         );
+
         if ($permissions['lead:leads:viewown'] || $permissions['lead:leads:viewother']) {
             //only show own leads if the user does not have permission to view others
             if (!$permissions['lead:leads:viewother']) {
@@ -223,69 +222,5 @@ class LeadSubscriber extends CommonSubscriber
     public function onUserDelete(UserEvent $event)
     {
         $this->factory->getModel('lead.lead')->disassociateOwner($event->getUser()->getId());
-    }
-
-    /**
-     * Add a lead generation action to available form submit actions
-     *
-     * @param FormBuilderEvent $event
-     */
-    public function onFormBuilder(FormBuilderEvent $event)
-    {
-        //add lead generation submit action
-        $action = array(
-            'group'     => 'mautic.lead.lead.submitaction.group',
-            'label'     => 'mautic.lead.lead.submitaction.createlead',
-            'descr'     => 'mautic.lead.lead.submitaction.createlead_descr',
-            'formType'  => 'lead_submitaction_createlead',
-            'callback'  => '\Mautic\LeadBundle\Helper\EventHelper::createLeadOnFormSubmit'
-        );
-
-        $event->addSubmitAction('lead.create', $action);
-
-        //add lead generation submit action
-        $action = array(
-            'group'     => 'mautic.lead.lead.submitaction.group',
-            'label'     => 'mautic.lead.lead.submitaction.changescore',
-            'descr'     => 'mautic.lead.lead.submitaction.changescore_descr',
-            'formType'  => 'lead_submitaction_scorechange',
-            'callback'  => '\Mautic\LeadBundle\Helper\EventHelper::changeScoreOnFormSubmit'
-        );
-
-        $event->addSubmitAction('lead.scorechange', $action);
-    }
-
-    /**
-     * Generate an anonymous lead from page hit
-     *
-     * @param PageHitEvent $event
-     */
-    public function onPageHit(PageHitEvent $event)
-    {
-        //check to see if this person is already tracked as a lead
-        $hit        = $event->getHit();
-        $trackingId = $hit->getTrackingId();
-
-        $cookies = $event->getRequest()->cookies;
-        $leadId  = $cookies->get($trackingId);
-        $ip      = $hit->getIpAddress();
-        if (empty($leadId)) {
-            //this lead is not tracked yet so get leads by IP and track that lead or create a new one
-            $model = $this->factory->getModel('lead.lead');
-            $leads = $model->getLeadsByIp($ip->getIpAddress());
-
-            if (count($leads)) {
-                //just create a tracking cookie for the newest lead
-                $leadId = $leads[0]->getId();
-            } else {
-                //let's create a lead
-                $lead = new Lead();
-                $lead->addIpAddress($ip);
-                $model->saveEntity($lead);
-                $leadId = $lead->getId();
-            }
-        }
-
-        setcookie($trackingId, $leadId, time() + 1800);
     }
 }
