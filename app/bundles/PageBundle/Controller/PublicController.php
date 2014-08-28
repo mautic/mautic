@@ -104,7 +104,7 @@ class PublicController extends CommonFormController
                             //determine variant to show
                             $byWeight = array();
                             foreach ($variants as $id => $v) {
-                                $byWeight[$id] = ($v['hits'] / $totalHits) - $v['weight'];
+                                $byWeight[$id] = ($totalHits) ? ($v['hits'] / $totalHits) - $v['weight'] : 0;
                             }
 
                             //find the one with the most difference from weight

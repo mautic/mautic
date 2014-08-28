@@ -98,7 +98,7 @@ class FormType extends AbstractType
                 $options['data']->getCreatedBy()
             );
 
-            $data = $options['data']->isPublished();
+            $data = $options['data']->isPublished(false);
         } elseif (!$this->security->isGranted('form:forms:publishown')) {
             $readonly = true;
             $data     = false;
