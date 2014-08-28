@@ -78,8 +78,25 @@ class FormEntity
     {
         if (strpos($name, 'is') === 0 && method_exists($this, 'get' . ucfirst($name))) {
             return $this->{'get' . ucfirst($name)}();
+        } elseif ($name == 'getName' && method_exists($this, 'getTitle')) {
+            return $this->getTitle();
         }
+
         throw new \InvalidArgumentException('Method ' . $name . ' not exists');
+    }
+
+    /**
+     * Check publish status with option to check against publish up and down dates
+     *
+     * @param bool $checkPublishStatus
+     */
+    public function isPublished($checkPublishStatus = true)
+    {
+        if ($checkPublishStatus && method_exists($this, 'getPublishUp')) {
+            return ($this->getPublishStatus() == 'published') ? true : false;
+        } else {
+            return $this->getIsPublished();
+        }
     }
 
     /**
@@ -278,19 +295,21 @@ class FormEntity
     {
         $dt      = new DateTimeHelper();
         $current = $dt->getLocalDateTime();
-        if (!$this->isPublished()) {
+        if (!$this->isPublished(false)) {
             return 'unpublished';
         } else {
             $status  =  'published';
             if (method_exists($this, 'getPublishUp')) {
                 $up = $this->getPublishUp();
-                if (!empty($up) && $current <= $up)
+                if (!empty($up) && $current <= $up) {
                     $status = 'pending';
+                }
             }
             if (method_exists($this, 'getPublishDown')) {
                 $down = $this->getPublishDown();
-                if (!empty($down) && $current >= $down)
+                if (!empty($down) && $current >= $down) {
                     $status = 'expired';
+                }
             }
             return $status;
         }

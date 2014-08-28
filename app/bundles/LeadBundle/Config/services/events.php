@@ -29,3 +29,21 @@ $container->setDefinition(
     )
 )
     ->addTag('kernel.event_subscriber');
+
+$container->setDefinition(
+    'mautic.lead.pagebundle.subscriber',
+    new Definition(
+        'Mautic\LeadBundle\EventListener\PageSubscriber',
+        array(new Reference('mautic.factory'))
+    )
+)
+    ->addTag('kernel.event_subscriber');
+
+$container->setDefinition(
+    'mautic.lead.formbundle.subscriber',
+    new Definition(
+        'Mautic\LeadBundle\EventListener\FormSubscriber',
+        array(new Reference('mautic.factory'))
+    )
+)
+    ->addTag('kernel.event_subscriber');

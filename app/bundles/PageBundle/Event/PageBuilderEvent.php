@@ -78,7 +78,7 @@ class PageBuilderEvent extends Event
     }
 
     /**
-     * Adds a submit action to the list of available actions.
+     * Adds an A/B test winner criteria option
      *
      * @param string $key - a unique identifier; it is recommended that it be namespaced i.e. lead.score
      * @param array $criteria - can contain the following keys:

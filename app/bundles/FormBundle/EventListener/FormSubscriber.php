@@ -183,7 +183,7 @@ class FormSubscriber extends CommonSubscriber
                     $form = $model->getEntity($id);
                     if ($form !== null &&
                         (
-                            $form->isPublished() ||
+                            $form->isPublished(false) ||
                             $this->security->hasEntityAccess(
                                 'form:forms:viewown', 'form:forms:viewother', $form->getCreatedBy()
                             )

@@ -72,8 +72,8 @@ $actionExpanded  = (empty($fieldExpanded)) ? ' in' : '';
                                 <div class="padding-sm">
                                     <div class="pull-left padding-sm">
                                         <span class="list-item-primary"><?php echo $view['translator']->trans($a['label']); ?></span>
-                                        <?php if (isset($a['descr'])): ?>
-                                        <span class="list-item-secondary"><?php echo  $view['translator']->trans($a['descr']); ?></span>
+                                        <?php if (isset($a['description'])): ?>
+                                        <span class="list-item-secondary"><?php echo  $view['translator']->trans($a['description']); ?></span>
                                         <?php endif; ?>
                                     </div>
                                     <div class="pull-right padding-sm">

@@ -35,7 +35,7 @@ class FormRepository extends CommonRepository
         $q = $this->createQueryBuilder('f');
 
         $q->select('f, ('.$sq->getDql().') as submissionCount');
-
+        $q->leftJoin('f.category', 'c');
         $this->buildClauses($q, $args);
 
         $query = $q->getQuery();
@@ -89,6 +89,12 @@ class FormRepository extends CommonRepository
                     case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
                         $expr = $q->expr()->eq("f.isPublished", 0);
                         break;
+                    case $this->translator->trans('mautic.core.searchcommand.isuncategorized'):
+                        $expr = $q->expr()->orX(
+                            $q->expr()->isNull('f.category'),
+                            $q->expr()->eq('f.category', $q->expr()->literal(''))
+                        );
+                        break;
                     case $this->translator->trans('mautic.core.searchcommand.ismine'):
                         $expr = $q->expr()->eq("f.createdBy", $this->currentUser->getId());
                         break;
@@ -130,6 +136,10 @@ class FormRepository extends CommonRepository
                 }
                 $returnParameter = false;
                 break;
+            case $this->translator->trans('mautic.core.searchcommand.category'):
+                $expr = $q->expr()->like('c.alias', ":$unique");
+                $filter->strict = true;
+                break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
                 $q->expr()->like('f.name', ':'.$unique);
                 break;
@@ -154,6 +164,7 @@ class FormRepository extends CommonRepository
             'mautic.core.searchcommand.is' => array(
                 'mautic.core.searchcommand.ispublished',
                 'mautic.core.searchcommand.isunpublished',
+                'mautic.core.searchcommand.isuncategorized',
                 'mautic.core.searchcommand.ismine',
                 'mautic.form.form.searchcommand.isexpired',
                 'mautic.form.form.searchcommand.ispending'
@@ -161,6 +172,7 @@ class FormRepository extends CommonRepository
             'mautic.core.searchcommand.has' => array(
                 'mautic.form.form.searchcommand.hasresults'
             ),
+            'mautic.core.searchcommand.category',
             'mautic.core.searchcommand.name',
         );
 
@@ -174,5 +186,13 @@ class FormRepository extends CommonRepository
         return array(
             array('f.name', 'ASC')
         );
+    }
+
+    /**
+     * @return string
+     */
+    public function getTableAlias()
+    {
+        return 'f';
     }
 }

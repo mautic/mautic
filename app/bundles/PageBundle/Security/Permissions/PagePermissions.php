@@ -9,6 +9,7 @@
 
 namespace Mautic\PageBundle\Security\Permissions;
 
+use Mautic\CategoryBundle\Helper\PermissionHelper;
 use Symfony\Component\Form\FormBuilderInterface;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 
@@ -27,14 +28,6 @@ class PagePermissions extends AbstractPermissions
     {
         parent::__construct($params);
         $this->permissions = array(
-            'categories' => array(
-                'view'          => 1,
-                'edit'          => 4,
-                'create'        => 8,
-                'delete'        => 32,
-                'publish'       => 64,
-                'full'          => 1024
-            ),
             'pages' => array(
                 'viewown'      => 2,
                 'viewother'    => 4,
@@ -48,6 +41,8 @@ class PagePermissions extends AbstractPermissions
                 'full'         => 1024
             )
         );
+
+        PermissionHelper::addCategoryPermissions($this->permissions);
     }
 
     /**
@@ -67,24 +62,7 @@ class PagePermissions extends AbstractPermissions
      */
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {
-        $builder->add('page:categories', 'button_group', array(
-            'choices'    => array(
-                'view'    => 'mautic.core.permissions.view',
-                'edit'    => 'mautic.core.permissions.edit',
-                'create'  => 'mautic.core.permissions.create',
-                'publish' => 'mautic.core.permissions.publish',
-                'delete'  => 'mautic.core.permissions.delete',
-                'full'    => 'mautic.core.permissions.full'
-            ),
-            'label'      => 'mautic.page.permissions.categories',
-            'label_attr' => array('class' => 'control-label'),
-            'expanded'   => true,
-            'multiple'   => true,
-            'attr'       => array(
-                'onclick' => 'Mautic.onPermissionChange(this, event, \'page\')'
-            ),
-            'data'      => (!empty($data['categories']) ? $data['categories'] : array())
-        ));
+        PermissionHelper::buildForm('page', $builder, $data);
 
         $builder->add('page:pages', 'button_group', array(
             'choices'  => array(
@@ -118,25 +96,7 @@ class PagePermissions extends AbstractPermissions
      */
     protected function getSynonym($name, $level) {
         if ($name == "categories") {
-            //set some synonyms
-            switch ($level) {
-                case "viewown":
-                case "viewother":
-                    $level = "view";
-                    break;
-                case "editown":
-                case "editother":
-                    $level = "edit";
-                    break;
-                case "deleteown":
-                case "deleteother":
-                    $level = "delete";
-                    break;
-                case "publishown":
-                case "publishother":
-                    $level = "publish";
-                    break;
-            }
+            $level = PermissionHelper::getSynonym($level);
         }
 
         return array($name, $level);
@@ -151,12 +111,6 @@ class PagePermissions extends AbstractPermissions
     {
         parent::analyzePermissions($permissions);
 
-        $pagePermissions = (isset($permissions['page:pages'])) ? $permissions['page:pages'] : array();
-        $catPermissions  = (isset($permissions['page:categories'])) ? $permissions['page:categories'] : array();
-        //make sure the user has access to view categories if they have access to view pages
-        if ((isset($pagePermissions['viewown']) || isset($pagePermissions['viewother']))
-            && !isset($catPermissions['view'])) {
-            $permissions['page:categories'][] = 'view';
-        }
+        PermissionHelper::analyzePermissions('page', 'pages', $permissions);
     }
 }

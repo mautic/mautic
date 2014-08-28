@@ -35,13 +35,15 @@ class AppKernel extends Kernel
             $class      = array_pop($parts);
             $namespace  = "Mautic\\" . implode('\\', $parts);
             $class      = $namespace.'\\'.$class;
-            $bundleInstance = new $class();
-            if (method_exists($bundleInstance, 'isEnabled')) {
-                if ($bundleInstance->isEnabled()) {
-                    $bundles[]  = $bundleInstance;
+            if (class_exists($class)) {
+                $bundleInstance = new $class();
+                if (method_exists($bundleInstance, 'isEnabled')) {
+                    if ($bundleInstance->isEnabled()) {
+                        $bundles[] = $bundleInstance;
+                    }
+                } else {
+                    $bundles[] = $bundleInstance;
                 }
-            } else {
-                $bundles[]  = $bundleInstance;
             }
         }
 
