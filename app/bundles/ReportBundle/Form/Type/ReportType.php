@@ -57,8 +57,7 @@ class ReportType extends AbstractType
     }
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
+     * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -108,7 +107,7 @@ class ReportType extends AbstractType
                 'label'         => 'mautic.report.report.form.source',
                 'label_attr'    => array('class' => 'control-label'),
                 'empty_value'   => false,
-                'required'      => true,
+                'required'      => false,
                 'attr'       => array(
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.report.report.form.source.help'
@@ -127,11 +126,19 @@ class ReportType extends AbstractType
             ));
 
             // Build the filter selector
-            $builder->add('filters', 'filter_selector', array(
-                'columnList' => $columns,
-                'label'      => 'mautic.report.report.form.filterselector',
-                'label_attr' => array('class' => 'control-label'),
-                'required'   => true
+            $builder->add('filters', 'collection', array(
+                'type'         => 'filter_selector',
+                'label'        => 'mautic.report.report.form.filterselector',
+                'label_attr'   => array('class' => 'control-label'),
+                'options'      => array(
+                    'columnList' => $columns,
+                    'required'   => false,
+                    'data'       => $options['data']->getFilters()
+                ),
+                'allow_add'    => true,
+                'allow_delete' => true,
+                'prototype'    => true,
+                'required'     => false
             ));
 
             $builder->add('buttons', 'form_buttons');
@@ -143,7 +150,7 @@ class ReportType extends AbstractType
     }
 
     /**
-     * @param OptionsResolverInterface $resolver
+     * {@inheritdoc}
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
@@ -154,7 +161,7 @@ class ReportType extends AbstractType
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getName() {
         return "report";
