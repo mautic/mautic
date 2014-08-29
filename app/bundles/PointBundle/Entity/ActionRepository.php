@@ -9,18 +9,12 @@
 
 namespace Mautic\PointBundle\Entity;
 
-use Doctrine\ORM\Query;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Class PointRepository
- *
- * @package Mautic\PointBundle\Entity
+ * ActionRepository
  */
-class PointRepository extends CommonRepository
+class ActionRepository extends CommonRepository
 {
-    public function getTableAlias()
-    {
-        return 'p';
-    }
+
 }

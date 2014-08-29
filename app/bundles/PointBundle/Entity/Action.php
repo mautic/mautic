@@ -9,19 +9,17 @@
 
 namespace Mautic\PointBundle\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
-use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * Class Point
- * @ORM\Table(name="points")
- * @ORM\Entity(repositoryClass="Mautic\PointBundle\Entity\PointRepository")
+ * Class Action
+ * @ORM\Table(name="point_actions")
+ * @ORM\Entity(repositoryClass="Mautic\PointBundle\Entity\ActionRepository")
  * @Serializer\ExclusionPolicy("all")
  */
-class Point extends FormEntity
+class Action
 {
 
     /**
@@ -59,15 +57,7 @@ class Point extends FormEntity
     private $description;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Mautic\CategoryBundle\Entity\Category")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
-     **/
-    private $category;
-
-    /**
-     * @ORM\Column(name="point_order", type="integer")
+     * @ORM\Column(name="action_order", type="integer")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})
@@ -91,45 +81,23 @@ class Point extends FormEntity
     private $settings = array();
 
     /**
-     * @ORM\Column(name="publish_up", type="datetime", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @ORM\ManyToOne(targetEntity="Point", inversedBy="actions")
+     * @ORM\JoinColumn(name="point_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      */
-    private $publishUp;
+    private $point;
 
-    /**
-     * @ORM\Column(name="publish_down", type="datetime", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
-     */
-    private $publishDown;
+    private $changes;
 
-    /**
-     * @ORM\OneToMany(targetEntity="Action", mappedBy="form", cascade={"all"}, indexBy="id", fetch="EXTRA_LAZY")
-     * @ORM\OrderBy({"order" = "ASC"})
-     */
-    private $actions;
-
-    /**
-     * Constructor
-     */
-    public function __construct()
+    private function isChanged($prop, $val)
     {
-        $this->actions = new ArrayCollection();
+        if ($this->$prop != $val) {
+            $this->changes[$prop] = array($this->$prop, $val);
+        }
     }
 
-    protected function isChanged($prop, $val)
+    public function getChanges()
     {
-        $getter  = "get" . ucfirst($prop);
-        $current = $this->$getter();
-        if ($prop == 'actions') {
-            //changes are already computed so just add them
-            $this->changes[$prop][$val[0]] = $val[1];
-        } elseif ($current != $val) {
-            $this->changes[$prop] = array($current, $val);
-        }
+        return $this->changes;
     }
 
     /**
@@ -190,6 +158,29 @@ class Point extends FormEntity
     public function getProperties()
     {
         return $this->properties;
+    }
+
+    /**
+     * Set form
+     *
+     * @param \Mautic\PointBundle\Entity\Point $form
+     * @return Action
+     */
+    public function setPoint(\Mautic\PointBundle\Entity\Point $form)
+    {
+        $this->form = $form;
+
+        return $this;
+    }
+
+    /**
+     * Get form
+     *
+     * @return \Mautic\PointBundle\Entity\Point
+     */
+    public function getPoint()
+    {
+        return $this->form;
     }
 
     /**
@@ -296,107 +287,5 @@ class Point extends FormEntity
     public function getName()
     {
         return $this->name;
-    }
-
-    /**
-     * Add actions
-     *
-     * @param $key
-     * @param \Mautic\PointBundle\Entity\Action $actions
-     * @return Point
-     */
-    public function addAction($key, Action $action)
-    {
-        if ($changes = $action->getChanges()) {
-            $this->isChanged('actions', array($key, $changes));
-        }
-        $this->actions[$key] = $action;
-
-        return $this;
-    }
-
-    /**
-     * Remove actions
-     *
-     * @param \Mautic\FormBundle\Entity\Action $actions
-     */
-    public function removeAction(\Mautic\FormBundle\Entity\Action $actions)
-    {
-        $this->actions->removeElement($actions);
-    }
-
-    /**
-     * Get actions
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getActions()
-    {
-        return $this->actions;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getCategory ()
-    {
-        return $this->category;
-    }
-
-    /**
-     * @param mixed $category
-     */
-    public function setCategory ($category)
-    {
-        $this->category = $category;
-    }
-
-
-    /**
-     * Set publishUp
-     *
-     * @param \DateTime $publishUp
-     * @return Point
-     */
-    public function setPublishUp($publishUp)
-    {
-        $this->isChanged('publishUp', $publishUp);
-        $this->publishUp = $publishUp;
-
-        return $this;
-    }
-
-    /**
-     * Get publishUp
-     *
-     * @return \DateTime
-     */
-    public function getPublishUp()
-    {
-        return $this->publishUp;
-    }
-
-    /**
-     * Set publishDown
-     *
-     * @param \DateTime $publishDown
-     * @return Point
-     */
-    public function setPublishDown($publishDown)
-    {
-        $this->isChanged('publishDown', $publishDown);
-        $this->publishDown = $publishDown;
-
-        return $this;
-    }
-
-    /**
-     * Get publishDown
-     *
-     * @return \DateTime
-     */
-    public function getPublishDown()
-    {
-        return $this->publishDown;
     }
 }

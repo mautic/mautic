@@ -9,24 +9,178 @@
 
 namespace Mautic\PointBundle\Model;
 
-use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
+use Mautic\PointBundle\Entity\Action;
+use Mautic\PointBundle\Entity\Point;
+use Mautic\PointBundle\Event\PointBuilderEvent;
+use Mautic\PointBundle\PointEvents;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
  * Class PointModel
- *
  * {@inheritdoc}
  * @package Mautic\CoreBundle\Model\FormModel
  */
-class PointModel extends FormModel
+class PointModel extends CommonFormModel
 {
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return string
+     */
     public function getRepository()
     {
         return $this->em->getRepository('MauticPointBundle:Point');
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return string
+     */
     public function getPermissionBase()
     {
         return 'point:points';
+    }
+
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param      $entity
+     * @param      $formFactory
+     * @param null $action
+     * @param array $options
+     * @return mixed
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    public function createForm($entity, $formFactory, $action = null, $options = array())
+    {
+        if (!$entity instanceof Point) {
+            throw new MethodNotAllowedHttpException(array('Point'));
+        }
+        $params = (!empty($action)) ? array('action' => $action) : array();
+        return $formFactory->create('point', $entity, $params);
+    }
+
+    /**
+     * Get a specific entity or generate a new one if id is empty
+     *
+     * @param $id
+     * @return null|object
+     */
+    public function getEntity($id = null)
+    {
+        if ($id === null) {
+            return new Point();
+        }
+
+        $entity = parent::getEntity($id);
+
+        return $entity;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param $action
+     * @param $event
+     * @param $entity
+     * @param $isNew
+     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     */
+    protected function dispatchEvent($action, &$entity, $isNew = false, $event = false)
+    {
+        if (!$entity instanceof Point) {
+            throw new MethodNotAllowedHttpException(array('Form'));
+        }
+
+        switch ($action) {
+            case "pre_save":
+                $name = PointEvents::POINT_PRE_SAVE;
+                break;
+            case "post_save":
+                $name = PointEvents::POINT_POST_SAVE;
+                break;
+            case "pre_delete":
+                $name = PointEvents::POINT_PRE_DELETE;
+                break;
+            case "post_delete":
+                $name = PointEvents::POINT_POST_DELETE;
+                break;
+            default:
+                return false;
+        }
+
+        if ($this->dispatcher->hasListeners($name)) {
+            if (empty($event)) {
+                $event = new PointEvent($entity, $isNew);
+                $event->setEntityManager($this->em);
+            }
+
+            $this->dispatcher->dispatch($name, $event);
+            return $event;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * @param Point $entity
+     * @param       $sessionActions
+     */
+    public function setActions(Point &$entity, $sessionActions)
+    {
+        $order   = 1;
+        $existingActions = $entity->getActions();
+
+        foreach ($sessionActions as $properties) {
+            $isNew = (!empty($properties['id']) && isset($existingActions[$properties['id']])) ? false : true;
+            $action = !$isNew ? $existingActions[$properties['id']] : new Action();
+
+            foreach ($properties as $f => $v) {
+                if (in_array($f, array('id', 'order')))
+                    continue;
+
+                $func = "set" .  ucfirst($f);
+                if (method_exists($action, $func)) {
+                    $action->$func($v);
+                }
+                $action->setForm($entity);
+            }
+            $action->setOrder($order);
+            $order++;
+            $entity->addAction($properties['id'], $action);
+        }
+    }
+
+    /**
+     * Gets array of custom actions from bundles subscribed PointEvents::POINT_ON_BUILD
+     * @return mixed
+     */
+    public function getCustomComponents()
+    {
+        $session          = $this->factory->getSession();
+        $customComponents = $session->get('mautic.pointcomponents.custom');
+        if (empty($customComponents)) {
+            //build them
+            $customComponents = array();
+            $event            = new PointBuilderEvent($this->translator);
+            $this->dispatcher->dispatch(PointEvents::POINT_ON_BUILD, $event);
+            $customComponents['actions'] = $event->getActions();
+            $session->set('mautic.pointcomponents.custom', $customComponents);
+        }
+        return $customComponents;
+    }
+
+    /**
+     * Triggers a specific point change
+     *
+     * @param $type
+     */
+    public function triggerAction($type)
+    {
+
     }
 }

@@ -12,6 +12,13 @@ use Symfony\Component\Routing\Route;
 
 $collection = new RouteCollection();
 
+$collection->add('mautic_pointaction_action', new Route('/points/action/{objectId}',
+    array(
+        '_controller' => 'MauticPointBundle:Action:execute',
+        "objectId"    => 0
+    )
+));
+
 $collection->add('mautic_point_index', new Route('/points/{page}',
     array(
         '_controller' => 'MauticPointBundle:Point:index',
