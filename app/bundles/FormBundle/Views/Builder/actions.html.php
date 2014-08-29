@@ -18,7 +18,7 @@ else:
 endif;
 
 if (empty($route))
-    $route = 'mautic_formfield_action';
+    $route = 'mautic_formaction_action';
 ?>
 
 <div class="form-buttons hide">

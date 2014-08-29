@@ -86,7 +86,6 @@ class FormPermissions extends AbstractPermissions
         ));
     }
 
-
     /**
      * {@inheritdoc}
      *

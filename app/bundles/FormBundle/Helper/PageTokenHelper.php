@@ -75,12 +75,11 @@ class PageTokenHelper
             $session->set('mautic.formtoken.page', $page);
         }
 
-        $content = $this->factory->getTemplating()->render('MauticFormBundle:PageToken:list.html.php', array(
+        $content = $this->factory->getTemplating()->render('MauticFormBundle:SubscribedEvents\PageToken:list.html.php', array(
             'items'       => $forms,
             'page'        => $page,
             'limit'       => $limit,
             'totalCount'  => $count,
-            'dateFormat'  => $this->factory->getParameter('date_format_full'),
             'tmpl'        => $request->get('tmpl', 'index'),
             'searchValue' => $search
         ));

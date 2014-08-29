@@ -30,8 +30,7 @@ class FieldController extends FormController
 
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'items'      => $items,
-                'dateFormat' => $this->factory->getParameter('date_format_full')
+                'items'      => $items
             ),
             'contentTemplate' => 'MauticLeadBundle:Field:index.html.php',
             'passthroughVars' => array(

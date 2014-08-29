@@ -231,8 +231,6 @@ class FormModel extends CommonFormModel
         if ($isNew) {
             $alias = substr(strtolower(InputHelper::alphanum($entity->getName())), 0, 10);
             $entity->setAlias($alias);
-        } else {
-            $alias = $entity->getAlias();
         }
 
         //save the form so that the ID is available for the form html

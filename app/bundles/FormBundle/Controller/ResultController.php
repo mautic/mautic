@@ -114,8 +114,7 @@ class ResultController extends CommonFormController
                 'page'        => $page,
                 'totalCount'  => $count,
                 'limit'       => $limit,
-                'tmpl'        => $tmpl,
-                'dateFormat'  => $this->factory->getParameter('date_format_full')
+                'tmpl'        => $tmpl
             ),
             'contentTemplate' => 'MauticFormBundle:Result:list.html.php',
             'passthroughVars' => array(

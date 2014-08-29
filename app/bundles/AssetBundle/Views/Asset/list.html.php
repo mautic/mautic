@@ -88,7 +88,6 @@ $view->extend('MauticAssetBundle:Asset:index.html.php');
                     <td>
                         <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php',array(
                             'item'       => $item,
-                            'dateFormat' => (!empty($dateFormat)) ? $dateFormat : 'F j, Y g:i a',
                             'model'      => 'asset.asset'
                         )); ?>
                         <a href="<?php echo $view['router']->generate('mautic_asset_action',
