@@ -110,7 +110,6 @@ class FormController extends CommonFormController
                 'limit'       => $limit,
                 'permissions' => $permissions,
                 'tmpl'        => $tmpl,
-                'dateFormat'  => $this->factory->getParameter('date_format_full'),
                 'security'    => $this->factory->getSecurity()
             ),
             'contentTemplate' => 'MauticFormBundle:Form:list.html.php',

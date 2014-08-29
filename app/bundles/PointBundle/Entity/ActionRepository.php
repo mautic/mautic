@@ -6,13 +6,15 @@
  * @link        http://mautic.com
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-?>
 
-<div class="bundle-form">
-    <div class="bundle-form-header">
-        <h3><?php echo $actionHeader; ?></h3>
-    </div>
+namespace Mautic\PointBundle\Entity;
 
-    <?php echo $view['form']->form($form); ?>
-    <div class="footer-margin"></div>
-</div>
+use Mautic\CoreBundle\Entity\CommonRepository;
+
+/**
+ * ActionRepository
+ */
+class ActionRepository extends CommonRepository
+{
+
+}

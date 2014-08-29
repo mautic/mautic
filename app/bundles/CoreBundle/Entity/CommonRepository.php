@@ -86,9 +86,10 @@ class CommonRepository extends EntityRepository
      */
     public function getEntities($args = array())
     {
+        $alias = (method_exists($this, 'getTableAlias')) ? $this->getTableAlias() : 'e';
         $q = $this
-            ->createQueryBuilder('e')
-            ->select('e');
+            ->createQueryBuilder($alias)
+            ->select($alias);
 
         $this->buildOrderByClause($q, $args);
         $this->buildLimiterClauses($q, $args);

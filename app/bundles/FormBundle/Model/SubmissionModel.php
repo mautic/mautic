@@ -315,7 +315,6 @@ class SubmissionModel extends CommonFormModel
                     array(
                         'form'  => $form,
                         'results' => $results,
-                        'dateFormat' => $this->factory->getParameter('date_format_full'),
                         'pageTitle'  => $name
                     )
                 )->getContent();
@@ -330,7 +329,6 @@ class SubmissionModel extends CommonFormModel
                         array(
                             'form'       => $form,
                             'results'    => $results,
-                            'dateFormat' => $factory->getParameter('date_format_full'),
                             'pageTitle'  => $name
                         )
                     )->getContent();

@@ -19,5 +19,8 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class PointRepository extends CommonRepository
 {
-
+    public function getTableAlias()
+    {
+        return 'p';
+    }
 }

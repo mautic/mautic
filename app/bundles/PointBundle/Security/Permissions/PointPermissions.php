@@ -9,6 +9,7 @@
 
 namespace Mautic\PointBundle\Security\Permissions;
 
+use Mautic\CategoryBundle\Helper\PermissionHelper;
 use Symfony\Component\Form\FormBuilderInterface;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 
@@ -35,9 +36,13 @@ class PointPermissions extends AbstractPermissions
                 'create'       => 32,
                 'deleteown'    => 64,
                 'deleteother'  => 128,
+                'publishown'   => 256,
+                'publishother' => 512,
                 'full'         => 1024
             )
         );
+
+        PermissionHelper::addCategoryPermissions($this->permissions);
     }
 
     /**
@@ -58,6 +63,7 @@ class PointPermissions extends AbstractPermissions
      */
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {
+        PermissionHelper::buildForm('point', $builder, $data);
         $builder->add('point:points', 'button_group', array(
             'choices'  => array(
                 'viewown'      => 'mautic.core.permissions.viewown',
@@ -67,6 +73,8 @@ class PointPermissions extends AbstractPermissions
                 'create'       => 'mautic.core.permissions.create',
                 'deleteown'    => 'mautic.core.permissions.deleteown',
                 'deleteother'  => 'mautic.core.permissions.deleteother',
+                'publishown'   => 'mautic.core.permissions.publishown',
+                'publishother' => 'mautic.core.permissions.publishother',
                 'full'         => 'mautic.core.permissions.full'
             ),
             'label'    => 'mautic.point.permissions.points',
@@ -78,5 +86,33 @@ class PointPermissions extends AbstractPermissions
             'data'     => (!empty($data['points']) ? $data['points'] : array())
             )
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param $name
+     * @param $level
+     * @return array
+     */
+    protected function getSynonym($name, $level) {
+        if ($name == "categories") {
+            $level = PermissionHelper::getSynonym($level);
+        }
+
+        return array($name, $level);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param array $permissions
+     */
+    public function analyzePermissions (array &$permissions)
+    {
+        parent::analyzePermissions($permissions);
+
+        //analyze category permissions
+        PermissionHelper::analyzePermissions('point', 'points', $permissions);
     }
 }

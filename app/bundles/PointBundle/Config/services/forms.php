@@ -9,23 +9,24 @@
 
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\Parameter;
 
-//Mautic event listener
 $container->setDefinition(
-    'mautic.form.subscriber',
+    'mautic.point.type.form',
     new Definition(
-        'Mautic\FormBundle\EventListener\FormSubscriber',
+        'Mautic\PointBundle\Form\Type\PointType',
         array(new Reference('mautic.factory'))
     )
 )
-    ->addTag('kernel.event_subscriber');
+    ->addTag('form.type', array(
+        'alias' => 'point'
+    ));
 
 $container->setDefinition(
-    'mautic.form.pagebundle.subscriber',
+    'mautic.point.type.action',
     new Definition(
-        'Mautic\FormBundle\EventListener\PageSubscriber',
-        array(new Reference('mautic.factory'))
+        'Mautic\PointBundle\Form\Type\ActionType'
     )
 )
-    ->addTag('kernel.event_subscriber');
+    ->addTag('form.type', array(
+        'alias' => 'pointaction'
+    ));

@@ -1,0 +1,54 @@
+<?php
+/**
+ * @package     Mautic
+ * @copyright   2014 Mautic, NP. All rights reserved.
+ * @author      Mautic
+ * @link        http://mautic.com
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
+namespace Mautic\PageBundle\EventListener;
+
+use Mautic\ApiBundle\ApiEvents;
+use Mautic\ApiBundle\Event\RouteEvent;
+use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\CoreEvents;
+use Mautic\CoreBundle\Event as MauticEvents;
+use Mautic\PageBundle\Event as Events;
+use Mautic\PageBundle\PageEvents;
+use Mautic\PointBundle\Event\PointBuilderEvent;
+use Mautic\PointBundle\Event\PointEvent;
+use Mautic\PointBundle\PointEvents;
+
+/**
+ * Class PointSubscriber
+ *
+ * @package Mautic\PageBundle\EventListener
+ */
+class PointSubscriber extends CommonSubscriber
+{
+
+    /**
+     * @return array
+     */
+    static public function getSubscribedEvents()
+    {
+        return array(
+            PointEvents::POINT_ON_BUILD => array('onPointBuild', 0)
+        );
+    }
+
+    /**
+     * @param PointBuilderEvent $event
+     */
+    public function onPointBuild(PointBuilderEvent $event)
+    {
+        $action = array(
+            'group'       => 'mautic.page.point.action.group',
+            'label'       => 'mautic.page.point.action.pagehit',
+            'description' => 'mautic.page.point.action.pagehit_descr'
+        );
+
+        $event->addAction('page.hit', $action);
+    }
+}

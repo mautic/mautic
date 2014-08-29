@@ -13,18 +13,9 @@ use Symfony\Component\DependencyInjection\Parameter;
 
 //Mautic event listener
 $container->setDefinition(
-    'mautic.form.subscriber',
+    'mautic.point.subscriber',
     new Definition(
-        'Mautic\FormBundle\EventListener\FormSubscriber',
-        array(new Reference('mautic.factory'))
-    )
-)
-    ->addTag('kernel.event_subscriber');
-
-$container->setDefinition(
-    'mautic.form.pagebundle.subscriber',
-    new Definition(
-        'Mautic\FormBundle\EventListener\PageSubscriber',
+        'Mautic\PointBundle\EventListener\PointSubscriber',
         array(new Reference('mautic.factory'))
     )
 )
