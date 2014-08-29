@@ -20,28 +20,16 @@ class ColumnSelectorType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildView(FormView $view, FormInterface $form, array $options)
-    {
-        $view->vars = array_replace($view->vars, array(
-            'columnList' => $options['columnList']
-        ));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return 'column_selector';
     }
 
     /**
-     * @param OptionsResolverInterface $resolver
+     * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function getParent()
     {
-        $resolver->setDefaults(array(
-            'columnList' => array()
-        ));
+        return 'choice';
     }
 }

@@ -108,7 +108,7 @@ class ReportType extends AbstractType
                 'label_attr'    => array('class' => 'control-label'),
                 'empty_value'   => false,
                 'required'      => false,
-                'attr'       => array(
+                'attr'          => array(
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.report.report.form.source.help'
                 )
@@ -119,10 +119,16 @@ class ReportType extends AbstractType
 
             // Build the column selector
             $builder->add('columns', 'column_selector', array(
-                'columnList' => $columns,
+                'choices'    => $columns,
                 'label'      => 'mautic.report.report.form.columnselector',
                 'label_attr' => array('class' => 'control-label'),
-                'required'   => true
+                'required'   => true,
+                'multiple'   => true,
+                'expanded'   => true,
+                'attr'       => array(
+                    'class' => 'form-control',
+                    'size'  => '5'
+                )
             ));
 
             // Build the filter selector

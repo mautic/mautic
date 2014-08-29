@@ -36,10 +36,3 @@ $container->setDefinition('mautic.form.type.filter_selector', new Definition(
     ->addTag('form.type', array(
         'alias' => 'filter_selector',
     ));
-
-$container
-    ->setDefinition('mautic.validator.report', new Definition(
-        'Mautic\ReportBundle\Form\Validator\Constraints\ReportValidator'
-    ))
-    ->addTag('validator.constraint_validator', array('alias' => 'report'));
-

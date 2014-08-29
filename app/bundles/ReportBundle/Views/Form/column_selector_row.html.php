@@ -1,6 +1,5 @@
 <?php
-$columnList = $form->vars['columnList'];
-$selectedColumns = $form->vars['data'];
+$selectedColumns = $form->vars['value'];
 
 $labelClass = (empty($form->vars['label_attr']['class'])) ? 'control-label' : $form->vars['label_attr']['class'];
 ?>
@@ -10,10 +9,10 @@ $labelClass = (empty($form->vars['label_attr']['class'])) ? 'control-label' : $f
         <div class="row">
             <div class="choice-wrapper col-xs-5">
                 <label class="<?php echo $labelClass; ?>" for="<?php echo $form->vars['id'] . '_available'; ?>"><?php echo $view['translator']->trans('mautic.report.report.label.availablecolumns'); ?></label>
-                <select id="<?php echo $form->vars['id'] . '_available'; ?>" name="<?php echo $form->vars['id'] . '[available]'; ?>" class="form-control" multiple="multiple" size="5">
-                    <?php foreach ($columnList as $column) { ?>
-                    <?php if (!in_array($column, $selectedColumns)) { ?>
-                    <option value="<?php echo $column; ?>"><?php echo $column; ?></option>
+                <select id="<?php echo $form->vars['id'] . '_available'; ?>" name="<?php echo $form->vars['id'] . '[available]'; ?>" class="<?php echo $form->vars['attr']['class'] ?>"<?php if ($form->vars['multiple']) echo ' multiple="multiple"'; ?> size="<?php echo $form->vars['attr']['size'] ?>">
+                    <?php foreach ($form->vars['choices'] as $choice) { ?>
+                    <?php if (!$selectedColumns[$choice->value]) { ?>
+                    <option value="<?php echo $choice->value; ?>"><?php echo $choice->label; ?></option>
                     <?php } ?>
                     <?php } ?>
                 </select>
@@ -28,9 +27,11 @@ $labelClass = (empty($form->vars['label_attr']['class'])) ? 'control-label' : $f
             </div>
             <div class="choice-wrapper col-xs-5">
                 <label class="<?php echo $labelClass; ?>" for="<?php echo $form->vars['id']; ?>"><?php echo $view['translator']->trans('mautic.report.report.label.selectedcolumns'); ?></label>
-                <select id="<?php echo $form->vars['id']; ?>" name="<?php echo $form->vars['full_name']; ?>" class="form-control" multiple="multiple" size="5">
-                    <?php foreach ($selectedColumns as $column) { ?>
-                    <option value="<?php echo $column; ?>"><?php echo $column; ?></option>
+                <select id="<?php echo $form->vars['id']; ?>" name="<?php echo $form->vars['full_name']; ?>[]" class="<?php echo $form->vars['attr']['class'] ?>"<?php if ($form->vars['multiple']) echo ' multiple="multiple"'; ?> size="<?php echo $form->vars['attr']['size'] ?>">
+                    <?php foreach ($form->vars['choices'] as $choice) { ?>
+                    <?php if ($selectedColumns[$choice->value]) { ?>
+                    <option value="<?php echo $choice->value; ?>"><?php echo $choice->label; ?></option>
+                    <?php } ?>
                     <?php } ?>
                 </select>
             </div>
