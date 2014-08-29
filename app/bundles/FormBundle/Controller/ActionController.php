@@ -97,14 +97,14 @@ class ActionController extends CommonFormController
                 ->setTheme($formView, 'MauticFormBundle:FormComponent');
             $viewParams['form'] = $formView;
             $header = $formAction['settings']['label'];
-            $viewParams['fieldHeader'] = $this->get('translator')->trans($header);
+            $viewParams['actionHeader'] = $this->get('translator')->trans($header);
         }
         $viewParams['tmpl'] = $tmpl;
 
         $passthroughVars = array(
             'mauticContent' => 'formaction',
             'success'       => $success,
-            'target'        => '.bundle-side-inner-wrapper',
+            'target'        => '#actionList',
             'route'         => false
         );
 
@@ -220,14 +220,14 @@ class ActionController extends CommonFormController
                 $this->get('templating')->getEngine('MauticFormBundle:Form:index.html.php')->get('form')
                     ->setTheme($formView, 'MauticFormBundle:FormComponent');
                 $viewParams['form']        = $formView;
-                $viewParams['fieldHeader'] = $this->get('translator')->trans($formAction['settings']['label']);
+                $viewParams['actionHeader'] = $this->get('translator')->trans($formAction['settings']['label']);
             }
             $viewParams['tmpl'] = $tmpl;
 
             $passthroughVars = array(
                 'mauticContent' => 'formaction',
                 'success'       => $success,
-                'target'        => '.bundle-side-inner-wrapper',
+                'target'        => '#builderComponents',
                 'route'         => false
             );
 

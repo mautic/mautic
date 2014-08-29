@@ -8,7 +8,7 @@
  */
 
 if ($tmpl == 'index') {
-    $view->extend('MauticFormBundle:PageToken:index.html.php');
+    $view->extend('MauticFormBundle:SubscribedEvents\PageToken:index.html.php');
 }
 ?>
 <div class="page-list" id="form-page-tokens">

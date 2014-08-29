@@ -9,17 +9,12 @@
 
 namespace Mautic\FormBundle\EventListener;
 
-use Mautic\ApiBundle\ApiEvents;
 use Mautic\ApiBundle\Event\RouteEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\FormBundle\Event as Events;
 use Mautic\FormBundle\FormEvents;
-use Mautic\FormBundle\Helper\PageTokenHelper;
-use Mautic\PageBundle\Event\PageBuilderEvent;
-use Mautic\PageBundle\Event\PageEvent;
-use Mautic\PageBundle\PageEvents;
 
 /**
  * Class FormSubscriber
@@ -38,9 +33,7 @@ class FormSubscriber extends CommonSubscriber
             CoreEvents::GLOBAL_SEARCH      => array('onGlobalSearch', 0),
             CoreEvents::BUILD_COMMAND_LIST => array('onBuildCommandList', 0),
             FormEvents::FORM_POST_SAVE     => array('onFormPostSave', 0),
-            FormEvents::FORM_POST_DELETE   => array('onFormDelete', 0),
-            PageEvents::PAGE_ON_DISPLAY    => array('onPageDisplay', 0),
-            PageEvents::PAGE_ON_BUILD      => array('OnPageBuild', 0)
+            FormEvents::FORM_POST_DELETE   => array('onFormDelete', 0)
         );
     }
 
@@ -90,8 +83,7 @@ class FormSubscriber extends CommonSubscriber
                         array(
                             'showMore'     => true,
                             'searchString' => $str,
-                            'remaining'    => (count($forms) - 5),
-                            'dateFormat'   => $dateForm
+                            'remaining'    => (count($forms) - 5)
                         )
                     )->getContent();
                 }
@@ -152,62 +144,5 @@ class FormSubscriber extends CommonSubscriber
             "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
         );
         $this->factory->getModel('core.auditLog')->writeToLog($log);
-    }
-
-    /**
-     * Add forms to available page tokens
-     *
-     * @param PageBuilderEvent $event
-     */
-    public function onPageBuild(PageBuilderEvent $event)
-    {
-        $tokenHelper = new PageTokenHelper($this->factory);
-        $event->addTokenSection('form.pagetokens', 'mautic.form.form.header.index', $tokenHelper->getTokenContent());
-    }
-
-    /**
-     * @param PageEvent $event
-     */
-    public function onPageDisplay(PageEvent $event)
-    {
-        $content = $event->getContent();
-        $page    = $event->getPage();
-        foreach ($content as $slot => &$html) {
-            $regex = '/{form=(.*?)}/i';
-
-            preg_match_all($regex, $html, $matches);
-
-            if (count($matches[0])) {
-                $model = $this->factory->getModel('form.form');
-                foreach ($matches[1] as $k => $id) {
-                    $form = $model->getEntity($id);
-                    if ($form !== null &&
-                        (
-                            $form->isPublished(false) ||
-                            $this->security->hasEntityAccess(
-                                'form:forms:viewown', 'form:forms:viewother', $form->getCreatedBy()
-                            )
-                        )
-                    ) {
-                        $formHtml   = $form->getCachedHtml();
-                        $formStatus = $form->getPublishStatus();
-                        if ($formStatus !== 'published') {
-                            $formHtml .= '<div class="mauticform-error">' .
-                                $this->translator->trans('mautic.form.form.pagetoken.notpublished') .
-                                '</div>';
-                        }
-
-                        //add the hidden page input
-                        $pageInput = "\n<input type=\"hidden\" name=\"mauticform[mauticpage]\" value=\"{$page->getId()}\" />\n";
-                        $formHtml  = preg_replace("#</form>#", $pageInput . "</form>", $formHtml);
-
-                        $html      = preg_replace('#{form='.$id.'}#', $formHtml, $html);
-                    } else {
-                        $html = preg_replace("#{form=".$id."}#", "", $html);
-                    }
-                }
-            }
-        }
-        $event->setContent($content);
     }
 }

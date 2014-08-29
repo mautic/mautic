@@ -20,3 +20,12 @@ $container->setDefinition(
     )
 )
     ->addTag('kernel.event_subscriber');
+
+$container->setDefinition(
+    'mautic.form.pagebundle.subscriber',
+    new Definition(
+        'Mautic\FormBundle\EventListener\PageSubscriber',
+        array(new Reference('mautic.factory'))
+    )
+)
+    ->addTag('kernel.event_subscriber');
