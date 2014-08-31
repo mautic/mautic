@@ -52,13 +52,7 @@ class SubmissionModel extends CommonFormModel
         $submission->setDateSubmitted(new \DateTime());
         $submission->setForm($form);
 
-        $ip         = $server['REMOTE_ADDR'];
-        //does the IP address exist in the database?
-        $ipAddress  = $this->em->getRepository('MauticCoreBundle:IpAddress')->findOneByIpAddress($ip);
-        if ($ipAddress === null) {
-            $ipAddress = new IpAddress();
-            $ipAddress->setIpAddress($ip, $this->factory->getSystemParameters());
-        }
+        $ipAddress = $this->factory->getIpAddress();
         $submission->setIpAddress($ipAddress);
 
         if (!empty($post['return'])) {
