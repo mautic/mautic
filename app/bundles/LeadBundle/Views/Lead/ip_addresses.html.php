@@ -42,9 +42,11 @@
                             <?php endif; ?>
                             <?php
                             $info = "";
-                            foreach ($details as $k => $d):
-                                $info .= "$k: $d<br />";
-                            endforeach;
+                            if (!empty($details)):
+                                foreach ($details as $k => $d):
+                                    $info .= "$k: $d<br />";
+                                endforeach;
+                            endif;
                             ?>
                             <i class="fa fa-info-circle"
                                data-toggle="tooltip"
