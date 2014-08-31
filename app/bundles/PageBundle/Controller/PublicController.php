@@ -195,11 +195,14 @@ class PublicController extends CommonFormController
                             $pageId    = $pageIds[$key];
 
                             //redirect if not already on the correct page
-                            if ($pageId != $entity->getId()) {
+                            if ($pageId && $pageId != $entity->getId()) {
                                 $page = ($pageId == $translationParent->getId()) ? $translationParent : $translationChildren[$pageId];
-                                $url  = $model->generateUrl($page, false);
-                                $model->hitPage($entity, $this->request, 302);
-                                return $this->redirect($url, 302);
+                                if ($page !== null) {
+                                    $url = $model->generateUrl($page, false);
+                                    $model->hitPage($entity, $this->request, 302);
+
+                                    return $this->redirect($url, 302);
+                                }
                             }
                         }
                     }
