@@ -11,6 +11,7 @@ namespace Mautic\PageBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
+use Mautic\LeadBundle\Entity\Lead;
 
 /**
  * Class Hit
@@ -55,6 +56,15 @@ class Hit
      * @Serializer\Groups({"full"})
      */
     private $page;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Mautic\LeadBundle\Entity\Lead")
+     * @ORM\JoinColumn(name="lead_id", referencedColumnName="id", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full"})
+     */
+    private $lead;
 
     /**
      * @ORM\ManyToOne(targetEntity="Mautic\CoreBundle\Entity\IpAddress", cascade={"merge", "persist", "refresh", "detach"})
@@ -559,5 +569,21 @@ class Hit
     public function getBrowserLanguages()
     {
         return $this->browserLanguages;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLead ()
+    {
+        return $this->lead;
+    }
+
+    /**
+     * @param mixed $lead
+     */
+    public function setLead (Lead $lead)
+    {
+        $this->lead = $lead;
     }
 }

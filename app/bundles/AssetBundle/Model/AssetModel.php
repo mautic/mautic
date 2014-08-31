@@ -84,17 +84,8 @@ class AssetModel extends FormModel
         $download = new Download();
         $download->setDateDownload(new \Datetime());
 
-        //check for the tracking cookie
-        $trackingId = $request->cookies->get('mautic_session_id');
-
-        if (empty($trackingId)) {
-            $trackingId = uniqid();
-        }
-
-        //create a tracking cookie
-        $expire = time() + 1800;
-        setcookie('mautic_session_id', $trackingId, $expire);
-        $download->setTrackingId($trackingId);
+        list($lead, $trackingId, $generated) = $this->factory->getModel('lead')->getCurrentLead();
+        $download->setLead($lead);
 
         if (!empty($asset)) {
             $download->setAsset($asset);
@@ -136,9 +127,6 @@ class AssetModel extends FormModel
 
         $this->em->persist($download);
         $this->em->flush();
-
-        //save download to the cookie to use to update the exit time
-        setcookie('mautic_referer_id', $download->getId(), $expire);
     }
 
     public function getRepository()

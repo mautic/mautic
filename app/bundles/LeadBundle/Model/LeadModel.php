@@ -311,4 +311,85 @@ class LeadModel extends FormModel
     {
         return $this->getRepository()->getLead($leadId);
     }
+
+    /**
+     * Get the current lead; if $returnTracking = true then array with lead, trackingId, and boolean of if trackingId
+     * was just generated or not
+     *
+     * @return Lead|array
+     */
+    public function getCurrentLead($returnTracking = false)
+    {
+        $request = $this->factory->getRequest();
+        $cookies = $request->cookies;
+
+        list($trackingId, $generated) = $this->getTrackingCookie();
+
+        $leadId  = $cookies->get($trackingId);
+        $ip      = $this->factory->getIpAddress();
+        if (empty($leadId)) {
+
+            //this lead is not tracked yet so get leads by IP and track that lead or create a new one
+            $leads = $this->getLeadsByIp($ip->getIpAddress());
+
+            if (count($leads)) {
+                //just create a tracking cookie for the newest lead
+                $lead   = $leads[0];
+                $leadId = $lead->getId();
+            } else {
+                //let's create a lead
+                $lead = new Lead();
+                $lead->addIpAddress($ip);
+                $this->saveEntity($lead);
+                $leadId = $lead->getId();
+            }
+        } else {
+            $lead = $this->getEntity($leadId);
+            if ($lead === null) {
+                //let's create a lead
+                $lead = new Lead();
+                $lead->addIpAddress($ip);
+                $this->saveEntity($lead);
+                $leadId = $lead->getId();
+            }
+        }
+        $this->setLeadCookie($leadId);
+        return ($returnTracking) ? array($lead, $trackingId, $generated) : $lead;
+    }
+
+    /**
+     * Get or generate the tracking ID for the current session
+     *
+     * @return array
+     */
+    public function getTrackingCookie()
+    {
+        $request = $this->factory->getRequest();
+        $cookies = $request->cookies;
+
+        //check for the tracking cookie
+        $trackingId = $cookies->get('mautic_session_id');
+        $generated  = false;
+        if (empty($trackingId)) {
+            $trackingId = uniqid();
+            $generated  = true;
+        }
+
+        //create a tracking cookie
+        $expire = time() + 1800;
+        setcookie('mautic_session_id', $trackingId, $expire);
+
+        return array($trackingId, $generated);
+    }
+
+    /**
+     * Sets the leadId for the current session
+     *
+     * @param $leadId
+     */
+    public function setLeadCookie($leadId)
+    {
+        list($trackingId, $generated) = $this->getTrackingCookie();
+        setcookie($trackingId, $leadId, time() + 1800);
+    }
 }

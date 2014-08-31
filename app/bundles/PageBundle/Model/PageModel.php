@@ -303,11 +303,11 @@ class PageModel extends FormModel
         $hit = new Hit();
         $hit->setDateHit(new \Datetime());
 
-        //check for the tracking cookie
-        $trackingId = $request->cookies->get('mautic_session_id');
-        if (empty($trackingId)) {
-            $trackingId = uniqid();
-        } else {
+        list($lead, $trackingId, $generated) = $this->factory->getModel('lead')->getCurrentLead(true);
+        $hit->setTrackingId($trackingId);
+        $hit->setLead($lead);
+
+        if (!$generated) {
             $lastHit = $request->cookies->get('mautic_referer_id');
             if (!empty($lastHit)) {
                 //this is not a new session so update the last hit if applicable with the date/time the user left
@@ -315,11 +315,6 @@ class PageModel extends FormModel
                 $repo->updateHitDateLeft($lastHit);
             }
         }
-
-        //create a tracking cookie
-        $expire = time() + 1800;
-        setcookie('mautic_session_id', $trackingId, $expire);
-        $hit->setTrackingId($trackingId);
 
         if (!empty($page)) {
             $hit->setPage($page);
@@ -405,7 +400,7 @@ class PageModel extends FormModel
         $this->em->flush();
 
         //save hit to the cookie to use to update the exit time
-        setcookie('mautic_referer_id', $hit->getId(), $expire);
+        setcookie('mautic_referer_id', $hit->getId(), time() + 1800);
     }
 
     /**
