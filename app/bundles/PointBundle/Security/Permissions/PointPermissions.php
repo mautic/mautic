@@ -9,7 +9,6 @@
 
 namespace Mautic\PointBundle\Security\Permissions;
 
-use Mautic\CategoryBundle\Helper\PermissionHelper;
 use Symfony\Component\Form\FormBuilderInterface;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 
@@ -41,8 +40,6 @@ class PointPermissions extends AbstractPermissions
                 'full'         => 1024
             )
         );
-
-        PermissionHelper::addCategoryPermissions($this->permissions);
     }
 
     /**
@@ -63,7 +60,6 @@ class PointPermissions extends AbstractPermissions
      */
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {
-        PermissionHelper::buildForm('point', $builder, $data);
         $builder->add('point:points', 'button_group', array(
             'choices'  => array(
                 'viewown'      => 'mautic.core.permissions.viewown',
@@ -86,33 +82,5 @@ class PointPermissions extends AbstractPermissions
             'data'     => (!empty($data['points']) ? $data['points'] : array())
             )
         );
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @param $name
-     * @param $level
-     * @return array
-     */
-    protected function getSynonym($name, $level) {
-        if ($name == "categories") {
-            $level = PermissionHelper::getSynonym($level);
-        }
-
-        return array($name, $level);
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @param array $permissions
-     */
-    public function analyzePermissions (array &$permissions)
-    {
-        parent::analyzePermissions($permissions);
-
-        //analyze category permissions
-        PermissionHelper::analyzePermissions('point', 'points', $permissions);
     }
 }

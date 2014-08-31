@@ -41,10 +41,23 @@ class PointBuilderEvent extends Event
      *  'callback'    => (optional) callback function that will be passed when the action is triggered; default
      *                         will be to change point score only
      *      The callback function can receive the following arguments by name (via ReflectionMethod::invokeArgs())
-     *          array $properties - values saved from the formType as defined here
      *          Mautic\CoreBundle\Factory\MauticFactory $factory
-     *          Mautic\PointBundle\Entity\Action $action
-     *          Mautic\PointBundle\Entity\Point $point
+     *          Mautic\LeadBundle\Entity\Lead $lead
+     *          array $action = array(
+     *              'id' => int
+     *              'type' => string
+     *              'name' => string
+     *              'properties' => array()
+     *              'settings' => array(
+     *                  'group' => string
+     *                  'label' => string
+     *                  'description' => string
+     *              )
+     *              'point' => array(
+     *                  'id' => int
+     *                  'name' => string 'test2'
+     *              )
+     *         )
      */
     public function addAction($key, array $action)
     {

@@ -11,7 +11,6 @@
 namespace Mautic\PointBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
-use Mautic\FormBundle\Helper\FormFieldHelper;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -129,11 +128,11 @@ class PointController extends FormController
      */
     public function viewAction($objectId)
     {
-        $activeForm  = $this->factory->getModel('point')->getEntity($objectId);
+        $entity  = $this->factory->getModel('point')->getEntity($objectId);
         //set the page we came from
         $page        = $this->factory->getSession()->get('mautic.point.page', 1);
 
-        if ($activeForm === null) {
+        if ($entity === null) {
             //set the return URL
             $returnUrl  = $this->generateUrl('mautic_point_index', array('page' => $page));
 
@@ -154,7 +153,7 @@ class PointController extends FormController
                 )
             ));
         } elseif (!$this->factory->getSecurity()->hasEntityAccess(
-            'point:points:viewown', 'point:points:viewother', $activeForm->getCreatedBy()
+            'point:points:viewown', 'point:points:viewother', $entity->getCreatedBy()
         )) {
             return $this->accessDenied();
         }
@@ -174,7 +173,7 @@ class PointController extends FormController
 
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'activeForm'  => $activeForm,
+                'entity'      => $entity,
                 'page'        => $page,
                 'permissions' => $permissions,
                 'security'    => $this->factory->getSecurity()
@@ -185,11 +184,11 @@ class PointController extends FormController
                 'mauticContent' => 'point',
                 'route'         => $this->generateUrl('mautic_point_action', array(
                         'objectAction' => 'view',
-                        'objectId'     => $activeForm->getId())
+                        'objectId'     => $entity->getId())
                 )
             )
         ));
-        return $this->indexAction($page, 'view', $activeForm);
+        return $this->indexAction($page, 'view', $entity);
     }
 
     /**
@@ -416,12 +415,6 @@ class PointController extends FormController
                 $viewParameters  = array('page' => $page);
                 $returnUrl = $this->generateUrl('mautic_point_index', $viewParameters);
                 $template  = 'MauticPointBundle:Point:index';
-
-                //set the lookup values
-                $category = $entity->getCategory();
-                if ($category && isset($form['category_lookup'])) {
-                    $form->get('category_lookup')->setData($category->getName());
-                }
             }
 
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
@@ -468,7 +461,7 @@ class PointController extends FormController
         return $this->delegateView(array(
             'viewParameters'  => array(
                 'actions'        => $customComponents['actions'],
-                'pointActions'   => $addActions,
+                'pointActions'   => $pointActions,
                 'deletedActions' => $deletedActions,
                 'tmpl'           => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                 'entity'         => $entity,

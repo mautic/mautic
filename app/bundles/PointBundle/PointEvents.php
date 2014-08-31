@@ -65,5 +65,15 @@ final class PointEvents
      *
      * @var string
      */
-    const POINT_ON_BUILD   = 'mautic.point_on_build';
+    const POINT_ON_BUILD  = 'mautic.point_on_build';
+
+    /**
+     * The mautic.point_on_action event is thrown to execute a point action
+     *
+     * The event listener receives a
+     * Mautic\PointBundle\Event\PointActionEvent instance.
+     *
+     * @var string
+     */
+    const POINT_ON_ACTION   = 'mautic.point_on_action';
 }

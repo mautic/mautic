@@ -26,8 +26,6 @@ $view['slots']->set("headerTitle", $header);
             echo $view['form']->row($form['details-panel-start']);
             echo $view['form']->row($form['name']);
             echo $view['form']->row($form['description']);
-            echo $view['form']->row($form['category_lookup']);
-            echo $view['form']->row($form['category']);
             echo $view['form']->row($form['isPublished']);
             echo $view['form']->row($form['publishUp']);
             echo $view['form']->row($form['publishDown']);

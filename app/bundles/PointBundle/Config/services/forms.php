@@ -30,3 +30,13 @@ $container->setDefinition(
     ->addTag('form.type', array(
         'alias' => 'pointaction'
     ));
+
+$container->setDefinition(
+    'mautic.point.type.genericpoint_settings',
+    new Definition(
+        'Mautic\PointBundle\Form\Type\GenericPointSettingsType'
+    )
+)
+    ->addTag('form.type', array(
+        'alias' => 'genericpoint_settings'
+    ));

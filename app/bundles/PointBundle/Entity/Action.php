@@ -166,9 +166,9 @@ class Action
      * @param \Mautic\PointBundle\Entity\Point $form
      * @return Action
      */
-    public function setPoint(\Mautic\PointBundle\Entity\Point $form)
+    public function setPoint(\Mautic\PointBundle\Entity\Point $point)
     {
-        $this->form = $form;
+        $this->point = $point;
 
         return $this;
     }
@@ -180,7 +180,7 @@ class Action
      */
     public function getPoint()
     {
-        return $this->form;
+        return $this->point;
     }
 
     /**

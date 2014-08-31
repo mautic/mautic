@@ -20,12 +20,12 @@ use Mautic\PointBundle\Entity\Point;
 class PointEvent extends CommonEvent
 {
     /**
-     * @param Point $form
+     * @param Point $point
      * @param bool $isNew
      */
-    public function __construct(Point &$form, $isNew = false)
+    public function __construct(Point &$point, $isNew = false)
     {
-        $this->entity  =& $form;
+        $this->entity  =& $point;
         $this->isNew = $isNew;
     }
 
@@ -42,10 +42,10 @@ class PointEvent extends CommonEvent
     /**
      * Sets the Point entity
      *
-     * @param Point $form
+     * @param Point $point
      */
-    public function setPoint(Point $form)
+    public function setPoint(Point $point)
     {
-        $this->entity = $form;
+        $this->entity = $point;
     }
 }

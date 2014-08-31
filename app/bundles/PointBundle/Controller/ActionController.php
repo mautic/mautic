@@ -85,8 +85,6 @@ class ActionController extends CommonFormController
         if ($cancelled || $valid) {
             $tmpl                   = 'components';
             $viewParams['actions']  = $customComponents['actions'];
-            $viewParams['expanded'] = 'actions';
-
         } else {
             $tmpl     = 'action';
             $formView = $form->createView();
@@ -94,7 +92,7 @@ class ActionController extends CommonFormController
                 ->setTheme($formView, 'MauticPointBundle:PointComponent');
             $viewParams['form'] = $formView;
             $header = $pointAction['settings']['label'];
-            $viewParams['fieldHeader'] = $this->get('translator')->trans($header);
+            $viewParams['actionHeader'] = $this->get('translator')->trans($header);
         }
         $viewParams['tmpl'] = $tmpl;
 
@@ -192,14 +190,13 @@ class ActionController extends CommonFormController
                 //fire the form builder event
                 $customComponents = $this->factory->getModel('point')->getCustomComponents();
                 $viewParams['actions']  = $customComponents['actions'];
-                $viewParams['expanded'] = 'actions';
             } else {
                 $tmpl     = 'action';
                 $formView = $form->createView();
                 $this->get('templating')->getEngine('MauticPointBundle:Point:index.html.php')->get('form')
                     ->setTheme($formView, 'MauticPointBundle:PointComponent');
                 $viewParams['form']        = $formView;
-                $viewParams['fieldHeader'] = $this->get('translator')->trans($pointAction['settings']['label']);
+                $viewParams['actionHeader'] = $this->get('translator')->trans($pointAction['settings']['label']);
             }
             $viewParams['tmpl'] = $tmpl;
 
@@ -276,7 +273,7 @@ class ActionController extends CommonFormController
             $dataArray  = array(
                 'mauticContent'  => 'pointaction',
                 'success'        => 1,
-                'target'         => '#mauticform_'.$objectId,
+                'target'         => '#point_'.$objectId,
                 'route'          => false,
                 'actionId'        => $objectId,
                 'replaceContent' => true,

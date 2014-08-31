@@ -35,14 +35,6 @@ class Point extends FormEntity
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=50)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
-     */
-    private $type;
-
-    /**
      * @ORM\Column(type="string", length=50, nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
@@ -57,38 +49,6 @@ class Point extends FormEntity
      * @Serializer\Groups({"full"})
      */
     private $description;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="Mautic\CategoryBundle\Entity\Category")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
-     **/
-    private $category;
-
-    /**
-     * @ORM\Column(name="point_order", type="integer")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
-     */
-    private $order = 0;
-
-    /**
-     * @ORM\Column(type="array")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
-     */
-    private $properties = array();
-
-    /**
-     * @ORM\Column(type="array")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
-     */
-    private $settings = array();
 
     /**
      * @ORM\Column(name="publish_up", type="datetime", nullable=true)
@@ -107,7 +67,7 @@ class Point extends FormEntity
     private $publishDown;
 
     /**
-     * @ORM\OneToMany(targetEntity="Action", mappedBy="form", cascade={"all"}, indexBy="id", fetch="EXTRA_LAZY")
+     * @ORM\OneToMany(targetEntity="Action", mappedBy="point", cascade={"all"}, indexBy="id", fetch="EXTRA_LAZY")
      * @ORM\OrderBy({"order" = "ASC"})
      */
     private $actions;
@@ -141,114 +101,6 @@ class Point extends FormEntity
     {
         return $this->id;
     }
-
-    /**
-     * Set order
-     *
-     * @param integer $order
-     * @return Action
-     */
-    public function setOrder($order)
-    {
-        $this->isChanged('order', $order);
-
-        $this->order = $order;
-
-        return $this;
-    }
-
-    /**
-     * Get order
-     *
-     * @return integer
-     */
-    public function getOrder()
-    {
-        return $this->order;
-    }
-
-    /**
-     * Set properties
-     *
-     * @param array $properties
-     * @return Action
-     */
-    public function setProperties($properties)
-    {
-        $this->isChanged('properties', $properties);
-
-        $this->properties = $properties;
-
-        return $this;
-    }
-
-    /**
-     * Get properties
-     *
-     * @return array
-     */
-    public function getProperties()
-    {
-        return $this->properties;
-    }
-
-    /**
-     * Set type
-     *
-     * @param string $type
-     * @return Action
-     */
-    public function setType($type)
-    {
-        $this->isChanged('type', $type);
-        $this->type = $type;
-
-        return $this;
-    }
-
-    /**
-     * Get type
-     *
-     * @return string
-     */
-    public function getType()
-    {
-        return $this->type;
-    }
-
-    /**
-     * Set settings
-     *
-     * @param array $settings
-     * @return Action
-     */
-    public function setSettings($settings)
-    {
-        $this->isChanged('settings', $settings);
-
-        $this->settings = $settings;
-
-        return $this;
-    }
-
-    /**
-     * Get settings
-     *
-     * @return array
-     */
-    public function getSettings()
-    {
-        return $this->settings;
-    }
-
-    /**
-     * @return array
-     */
-    public function convertToArray()
-    {
-        return get_object_vars($this);
-    }
-
 
     /**
      * Set description
@@ -334,23 +186,6 @@ class Point extends FormEntity
     {
         return $this->actions;
     }
-
-    /**
-     * @return mixed
-     */
-    public function getCategory ()
-    {
-        return $this->category;
-    }
-
-    /**
-     * @param mixed $category
-     */
-    public function setCategory ($category)
-    {
-        $this->category = $category;
-    }
-
 
     /**
      * Set publishUp

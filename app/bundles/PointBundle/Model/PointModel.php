@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\PointBundle\Entity\Action;
 use Mautic\PointBundle\Entity\Point;
 use Mautic\PointBundle\Event\PointBuilderEvent;
+use Mautic\PointBundle\Event\PointEvent;
 use Mautic\PointBundle\PointEvents;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -147,7 +148,7 @@ class PointModel extends CommonFormModel
                 if (method_exists($action, $func)) {
                     $action->$func($v);
                 }
-                $action->setForm($entity);
+                $action->setPoint($entity);
             }
             $action->setOrder($order);
             $order++;
@@ -181,6 +182,56 @@ class PointModel extends CommonFormModel
      */
     public function triggerAction($type)
     {
+        //find all the actions for published points
+        $pointActions = $this->em->getRepository('MauticPointBundle:Action')->getPublishedByType($type);
+        $leadModel    = $this->factory->getModel('lead');
+        $lead         = $leadModel->getCurrentLead();
+        $ipAddress    = $this->factory->getIpAddress();
 
+        foreach ($pointActions as $action) {
+            $args = array(
+                'action'   => $action,
+                'lead'     => $lead,
+                'factory'  => $this->factory,
+            );
+
+            $callback = (isset($action['settings']['callback'])) ? $action['settings']['callback'] :
+                array('\\Mautic\\PointBundle\\Helper\\EventHelper', 'engagePointAction');
+
+            if (is_callable($callback)) {
+                if (is_array($callback)) {
+                    $reflection = new \ReflectionMethod($callback[0], $callback[1]);
+                } elseif (strpos($callback, '::') !== false) {
+                    $parts = explode('::', $callback);
+                    $reflection = new \ReflectionMethod($parts[0], $parts[1]);
+                } else {
+                    new \ReflectionMethod(null, $callback);
+                }
+
+                $pass = array();
+                foreach($reflection->getParameters() as $param) {
+                    if(isset($args[$param->getName()])) {
+                        $pass[] = $args[$param->getName()];
+                    } else {
+                        $pass[] = null;
+                    }
+                }
+                $scoreChange = $reflection->invokeArgs($this, $pass);
+                if ($scoreChange) {
+                    $lead->addToScore($scoreChange);
+                    $parsed = explode('.', $action['type']);
+                    $lead->addScoreChangeLogEntry(
+                        $parsed[0],
+                        $action['point']['name'],
+                        $action['name'],
+                        $scoreChange,
+                        $ipAddress
+                    );
+                }
+            }
+        }
+
+        //save the lead
+        $leadModel->saveEntity($lead);
     }
 }
