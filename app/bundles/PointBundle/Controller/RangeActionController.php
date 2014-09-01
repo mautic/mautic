@@ -14,11 +14,11 @@ class RangeActionController extends CommonActionController
 
     public function __construct()
     {
-        $this->permissionName = "points";
-        $this->actionVar = "pointactions";
-        $this->modelName = "point";
-        $this->formName = "pointaction";
-        $this->templateVar = "Point";
-        $this->mauticContent = "pointAction";
+        $this->permissionName = "ranges";
+        $this->actionVar = "pointrangeactions";
+        $this->modelName = "point.range";
+        $this->formName = "pointrangeaction";
+        $this->templateVar = "Range";
+        $this->mauticContent = "pointRangeAction";
     }
 }

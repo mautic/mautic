@@ -8,7 +8,7 @@
  */
 
 if ($tmpl == 'index') {
-    $view->extend('MauticPointBundle:Builder:index.html.php');
+    $view->extend('MauticPointBundle:RangeBuilder:index.html.php');
 }
 ?>
 

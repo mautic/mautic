@@ -14,12 +14,12 @@ use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * Class Action
- * @ORM\Table(name="point_actions")
- * @ORM\Entity(repositoryClass="Mautic\PointBundle\Entity\ActionRepository")
+ * Class RangeAction
+ * @ORM\Table(name="point_range_actions")
+ * @ORM\Entity(repositoryClass="Mautic\PointBundle\Entity\RangeActionRepository")
  * @Serializer\ExclusionPolicy("all")
  */
-class Action
+class RangeAction
 {
 
     /**
@@ -81,14 +81,14 @@ class Action
     private $settings = array();
 
     /**
-     * @ORM\ManyToOne(targetEntity="Point", inversedBy="actions")
-     * @ORM\JoinColumn(name="point_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
+     * @ORM\ManyToOne(targetEntity="Range", inversedBy="actions")
+     * @ORM\JoinColumn(name="range_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      */
-    private $point;
+    private $range;
 
     /**
      * @ORM\ManyToMany(targetEntity="Mautic\LeadBundle\Entity\Lead", fetch="EXTRA_LAZY")
-     * @ORM\JoinTable(name="point_action_lead_xref")
+     * @ORM\JoinTable(name="point_range_action_lead_xref")
      * @ORM\JoinColumn(name="lead_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      */
     private $leads;
@@ -168,26 +168,26 @@ class Action
     }
 
     /**
-     * Set rage
+     * Set range
      *
-     * @param \Mautic\PointBundle\Entity\Point $point
-     * @return Action
+     * @param \Mautic\PointBundle\Entity\Range $range
+     * @return RangeAction
      */
-    public function setPoint(\Mautic\PointBundle\Entity\Point $point)
+    public function setRange(\Mautic\PointBundle\Entity\Range $range)
     {
-        $this->point = $point;
+        $this->range = $range;
 
         return $this;
     }
 
     /**
-     * Get rage
+     * Get range
      *
-     * @return \Mautic\PointBundle\Entity\Point
+     * @return \Mautic\PointBundle\Entity\Range
      */
-    public function getPoint()
+    public function getRange()
     {
-        return $this->point;
+        return $this->range;
     }
 
     /**

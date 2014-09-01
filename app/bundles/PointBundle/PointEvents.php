@@ -76,4 +76,64 @@ final class PointEvents
      * @var string
      */
     const POINT_ON_ACTION   = 'mautic.point_on_action';
+
+    /**
+     * The mautic.point_pre_save event is thrown right before a form is persisted.
+     *
+     * The event listener receives a
+     * Mautic\PointBundle\Event\PointEvent instance.
+     *
+     * @var string
+     */
+    const RANGE_PRE_SAVE   = 'mautic.range_pre_save';
+
+    /**
+     * The mautic.range_post_save event is thrown right after a form is persisted.
+     *
+     * The event listener receives a
+     * Mautic\PointBundle\Event\PointEvent instance.
+     *
+     * @var string
+     */
+    const RANGE_POST_SAVE   = 'mautic.range_post_save';
+
+    /**
+     * The mautic.range_pre_delete event is thrown before a form is deleted.
+     *
+     * The event listener receives a
+     * Mautic\PointBundle\Event\PointEvent instance.
+     *
+     * @var string
+     */
+    const RANGE_PRE_DELETE   = 'mautic.range_pre_delete';
+
+    /**
+     * The mautic.range_post_delete event is thrown after a form is deleted.
+     *
+     * The event listener receives a
+     * Mautic\PointBundle\Event\PointEvent instance.
+     *
+     * @var string
+     */
+    const RANGE_POST_DELETE   = 'mautic.range_post_delete';
+
+    /**
+     * The mautic.range_on_build event is thrown before displaying the range builder form to allow adding of custom actions
+     *
+     * The event listener receives a
+     * Mautic\PointBundle\Event\PointBuilderEvent instance.
+     *
+     * @var string
+     */
+    const RANGE_ON_BUILD  = 'mautic.range_on_build';
+
+    /**
+     * The mautic.range_on_action event is thrown to execute a range action
+     *
+     * The event listener receives a
+     * Mautic\PointBundle\Event\PointActionEvent instance.
+     *
+     * @var string
+     */
+    const RANGE_ON_ACTION   = 'mautic.range_on_action';
 }

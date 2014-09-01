@@ -13,11 +13,11 @@ use Symfony\Component\Process\Exception\InvalidArgumentException;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Class PointBuilderEvent
+ * Class RangeBuilderEvent
  *
  * @package Mautic\PointBundle\Event
  */
-class PointBuilderEvent extends Event
+class RangeBuilderEvent extends Event
 {
     private $actions = array();
     private $translator;
@@ -37,9 +37,8 @@ class PointBuilderEvent extends Event
      *  'description' => (optional) short description of event
      *  'template'    => (optional) template to use for the action's HTML in the point builder
      *      i.e AcmeMyBundle:PointAction:theaction.html.php
-     *  'formType'    => (optional) name of the form type SERVICE for the action; will use a default form with point change only
-     *  'callback'    => (optional) callback function that will be passed when the action is triggered; default
-     *                         will be to change point score only; THIS SHOULD RETURN THE SCORE DELTA
+     *  'formType'    => (optional) name of the form type SERVICE for the action
+     *  'callback'    => (required) callback function that will be passed when the action is triggered
      *      The callback function can receive the following arguments by name (via ReflectionMethod::invokeArgs())
      *          Mautic\CoreBundle\Factory\MauticFactory $factory
      *          Mautic\LeadBundle\Entity\Lead $lead
@@ -54,9 +53,12 @@ class PointBuilderEvent extends Event
      *                  'label' => string
      *                  'description' => string
      *              )
-     *              'point' => array(
+     *              'range' => array(
      *                  'id' => int
-     *                  'name' => string
+     *                  'name' => string,
+     *                  'startScore' => int,
+     *                  'endScore'   => int,
+     *                  'color'      => string
      *              )
      *         )
      */
@@ -68,7 +70,7 @@ class PointBuilderEvent extends Event
 
         //check for required keys and that given functions are callable
         $this->verifyComponent(
-            array('group', 'label'),
+            array('group', 'label', 'callback'),
             array('callback'),
             $action
         );

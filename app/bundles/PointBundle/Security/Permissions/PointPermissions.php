@@ -38,6 +38,18 @@ class PointPermissions extends AbstractPermissions
                 'publishown'   => 256,
                 'publishother' => 512,
                 'full'         => 1024
+            ),
+            'ranges' => array(
+                'viewown'      => 2,
+                'viewother'    => 4,
+                'editown'      => 8,
+                'editother'    => 16,
+                'create'       => 32,
+                'deleteown'    => 64,
+                'deleteother'  => 128,
+                'publishown'   => 256,
+                'publishother' => 512,
+                'full'         => 1024
             )
         );
     }
@@ -80,6 +92,29 @@ class PointPermissions extends AbstractPermissions
                 'onclick' => 'Mautic.onPermissionChange(this, event, \'point\')'
             ),
             'data'     => (!empty($data['points']) ? $data['points'] : array())
+            )
+        );
+
+        $builder->add('point:ranges', 'button_group', array(
+                'choices'  => array(
+                    'viewown'      => 'mautic.core.permissions.viewown',
+                    'viewother'    => 'mautic.core.permissions.viewother',
+                    'editown'      => 'mautic.core.permissions.editown',
+                    'editother'    => 'mautic.core.permissions.editother',
+                    'create'       => 'mautic.core.permissions.create',
+                    'deleteown'    => 'mautic.core.permissions.deleteown',
+                    'deleteother'  => 'mautic.core.permissions.deleteother',
+                    'publishown'   => 'mautic.core.permissions.publishown',
+                    'publishother' => 'mautic.core.permissions.publishother',
+                    'full'         => 'mautic.core.permissions.full'
+                ),
+                'label'    => 'mautic.point.permissions.ranges',
+                'expanded' => true,
+                'multiple' => true,
+                'attr'     => array(
+                    'onclick' => 'Mautic.onPermissionChange(this, event, \'point\')'
+                ),
+                'data'     => (!empty($data['ranges']) ? $data['ranges'] : array())
             )
         );
     }

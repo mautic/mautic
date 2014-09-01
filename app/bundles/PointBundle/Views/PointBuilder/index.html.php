@@ -41,7 +41,8 @@ $view['slots']->set("headerTitle", $header);
                         'action'  => $action,
                         'inForm'  => true,
                         'id'      => $action['id'],
-                        'deleted' => in_array($action['id'], $deletedActions)
+                        'deleted' => in_array($action['id'], $deletedActions),
+                        'builderType' => 'Point'
                     ));
                 endforeach;
                 ?>

@@ -175,6 +175,11 @@ var Mautic = {
             scrollInput: false
         });
 
+        mQuery(container + " input[data-toggle='color']").spectrum({
+            allowEmpty: true,
+            showInput: true
+        });
+
         //Set the height of containers
         var windowWidth  = mQuery(window).width();
         if (windowWidth > 765) {

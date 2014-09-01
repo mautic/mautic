@@ -32,6 +32,27 @@ $container->setDefinition(
     ));
 
 $container->setDefinition(
+    'mautic.pointrange.type.form',
+    new Definition(
+        'Mautic\PointBundle\Form\Type\RangeType',
+        array(new Reference('mautic.factory'))
+    )
+)
+    ->addTag('form.type', array(
+        'alias' => 'pointrange'
+    ));
+
+$container->setDefinition(
+    'mautic.pointrange.type.action',
+    new Definition(
+        'Mautic\PointBundle\Form\Type\RangeActionType'
+    )
+)
+    ->addTag('form.type', array(
+        'alias' => 'pointrangeaction'
+    ));
+
+$container->setDefinition(
     'mautic.point.type.genericpoint_settings',
     new Definition(
         'Mautic\PointBundle\Form\Type\GenericPointSettingsType'

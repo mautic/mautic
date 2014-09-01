@@ -10,19 +10,18 @@
 namespace Mautic\PointBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
-use Mautic\PointBundle\Entity\Action;
-use Mautic\PointBundle\Entity\Point;
-use Mautic\PointBundle\Event\PointBuilderEvent;
-use Mautic\PointBundle\Event\PointEvent;
+use Mautic\PointBundle\Entity\Range;
+use Mautic\PointBundle\Entity\RangeAction;
+use Mautic\PointBundle\Event\RangeBuilderEvent;
 use Mautic\PointBundle\PointEvents;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
- * Class PointModel
+ * Class RangeModel
  * {@inheritdoc}
  * @package Mautic\CoreBundle\Model\FormModel
  */
-class PointModel extends CommonFormModel
+class RangeModel extends CommonFormModel
 {
 
     /**
@@ -32,7 +31,7 @@ class PointModel extends CommonFormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticPointBundle:Point');
+        return $this->em->getRepository('MauticPointBundle:Range');
     }
 
     /**
@@ -42,7 +41,7 @@ class PointModel extends CommonFormModel
      */
     public function getPermissionBase()
     {
-        return 'point:points';
+        return 'point:ranges';
     }
 
     /**
@@ -57,11 +56,11 @@ class PointModel extends CommonFormModel
      */
     public function createForm($entity, $formFactory, $action = null, $options = array())
     {
-        if (!$entity instanceof Point) {
-            throw new MethodNotAllowedHttpException(array('Point'));
+        if (!$entity instanceof Range) {
+            throw new MethodNotAllowedHttpException(array('Range'));
         }
         $params = (!empty($action)) ? array('action' => $action) : array();
-        return $formFactory->create('point', $entity, $params);
+        return $formFactory->create('pointrange', $entity, $params);
     }
 
     /**
@@ -73,7 +72,7 @@ class PointModel extends CommonFormModel
     public function getEntity($id = null)
     {
         if ($id === null) {
-            return new Point();
+            return new Range();
         }
 
         $entity = parent::getEntity($id);
@@ -92,22 +91,22 @@ class PointModel extends CommonFormModel
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, $event = false)
     {
-        if (!$entity instanceof Point) {
-            throw new MethodNotAllowedHttpException(array('Point'));
+        if (!$entity instanceof Range) {
+            throw new MethodNotAllowedHttpException(array('Range'));
         }
 
         switch ($action) {
             case "pre_save":
-                $name = PointEvents::POINT_PRE_SAVE;
+                $name = PointEvents::RANGE_PRE_SAVE;
                 break;
             case "post_save":
-                $name = PointEvents::POINT_POST_SAVE;
+                $name = PointEvents::RANGE_POST_SAVE;
                 break;
             case "pre_delete":
-                $name = PointEvents::POINT_PRE_DELETE;
+                $name = PointEvents::RANGE_PRE_DELETE;
                 break;
             case "post_delete":
-                $name = PointEvents::POINT_POST_DELETE;
+                $name = PointEvents::RANGE_POST_DELETE;
                 break;
             default:
                 return false;
@@ -115,7 +114,7 @@ class PointModel extends CommonFormModel
 
         if ($this->dispatcher->hasListeners($name)) {
             if (empty($event)) {
-                $event = new PointEvent($entity, $isNew);
+                $event = new RangeEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
 
@@ -127,17 +126,17 @@ class PointModel extends CommonFormModel
     }
 
     /**
-     * @param Point $entity
+     * @param Range $entity
      * @param       $sessionActions
      */
-    public function setActions(Point &$entity, $sessionActions)
+    public function setActions(Range &$entity, $sessionActions)
     {
         $order   = 1;
         $existingActions = $entity->getActions();
 
         foreach ($sessionActions as $properties) {
             $isNew = (!empty($properties['id']) && isset($existingActions[$properties['id']])) ? false : true;
-            $action = !$isNew ? $existingActions[$properties['id']] : new Action();
+            $action = !$isNew ? $existingActions[$properties['id']] : new RangeAction();
 
             foreach ($properties as $f => $v) {
                 if (in_array($f, array('id', 'order')))
@@ -147,7 +146,7 @@ class PointModel extends CommonFormModel
                 if (method_exists($action, $func)) {
                     $action->$func($v);
                 }
-                $action->setPoint($entity);
+                $action->setRange($entity);
             }
             $action->setOrder($order);
             $order++;
@@ -166,8 +165,8 @@ class PointModel extends CommonFormModel
         if (empty($components)) {
             //build them
             $customComponents = array();
-            $event            = new PointBuilderEvent($this->translator);
-            $this->dispatcher->dispatch(PointEvents::POINT_ON_BUILD, $event);
+            $event            = new RangeBuilderEvent($this->translator);
+            $this->dispatcher->dispatch(PointEvents::RANGE_ON_BUILD, $event);
             $customComponents['actions'] = $event->getActions();
         }
         return $customComponents;
@@ -187,11 +186,10 @@ class PointModel extends CommonFormModel
         }
 
         //find all the actions for published points
-        $repo         = $this->em->getRepository('MauticPointBundle:Action');
-        $pointActions = $repo->getPublishedByType($type);
+        $repo         = $this->em->getRepository('MauticPointBundle:RangeAction');
+        $rangeActions = $repo->getPublishedByType($type);
         $leadModel    = $this->factory->getModel('lead');
         $lead         = $leadModel->getCurrentLead();
-        $ipAddress    = $this->factory->getIpAddress();
 
         //get a list of actions that has already been performed on this lead
         $completedActions = $repo->getCompletedLeadActions($type, $lead->getId());
@@ -200,9 +198,8 @@ class PointModel extends CommonFormModel
             return;
         }
 
-        $persist = array();
-        foreach ($pointActions as $action) {
-            $point    = $action->getPoint();
+        foreach ($rangeActions as $action) {
+            $range    = $action->getRange();
             $settings = $action->getSettings();
             $args     = array(
                 'action'      => array(
@@ -211,9 +208,12 @@ class PointModel extends CommonFormModel
                     'name'       => $action->getName(),
                     'properties' => $action->getProperties(),
                     'settings'   => $settings,
-                    'point'      => array(
-                        'id'   => $point->getId(),
-                        'name' => $point->getName()
+                    'range'      => array(
+                        'id'         => $range->getId(),
+                        'name'       => $range->getName(),
+                        'startScore' => $range->getStartScore(),
+                        'endScore'   => $range->getEndScore(),
+                        'color'      => $range->getColor()
                     )
                 ),
                 'lead'        => $lead,
@@ -221,17 +221,14 @@ class PointModel extends CommonFormModel
                 'passthrough' => $passthrough
             );
 
-            $callback = (isset($settings['callback'])) ? $settings['callback'] :
-                array('\\Mautic\\PointBundle\\Helper\\EventHelper', 'engagePointAction');
-
-            if (is_callable($callback)) {
-                if (is_array($callback)) {
-                    $reflection = new \ReflectionMethod($callback[0], $callback[1]);
-                } elseif (strpos($callback, '::') !== false) {
-                    $parts      = explode('::', $callback);
+            if (is_callable($settings['callback'])) {
+                if (is_array($settings['callback'])) {
+                    $reflection = new \ReflectionMethod($settings['callback'][0], $settings['callback'][1]);
+                } elseif (strpos($settings['callback'], '::') !== false) {
+                    $parts      = explode('::', $settings['callback']);
                     $reflection = new \ReflectionMethod($parts[0], $parts[1]);
                 } else {
-                    new \ReflectionMethod(null, $callback);
+                    new \ReflectionMethod(null, $settings['callback']);
                 }
 
                 $pass = array();
@@ -242,30 +239,8 @@ class PointModel extends CommonFormModel
                         $pass[] = null;
                     }
                 }
-                $scoreChange = $reflection->invokeArgs($this, $pass);
-
-                if ($scoreChange) {
-                    $lead->addToScore($scoreChange);
-                    $parsed = explode('.', $action->getType());
-                    $lead->addScoreChangeLogEntry(
-                        $parsed[0],
-                        $point->getName(),
-                        $action->getName(),
-                        $scoreChange,
-                        $ipAddress
-                    );
-                    $action->addLead($lead);
-                    $persist[] = $action;
-                }
+                $reflection->invokeArgs($this, $pass);
             }
-        }
-
-        //save the lead
-        $leadModel->saveEntity($lead);
-
-        //persist the action xref
-        if (!empty($persist)) {
-            $this->getRepository()->saveEntities($persist);
         }
     }
 }
