@@ -315,4 +315,13 @@ class CorePermissions {
         }
         return $this->user;
     }
+
+    /**
+     * @return bool
+     */
+    public function isAnonymous()
+    {
+        $userEntity = $this->getUser();
+        return ($userEntity instanceof User) ? false : true;
+    }
 }
