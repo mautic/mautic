@@ -162,15 +162,14 @@ class PointModel extends CommonFormModel
      */
     public function getCustomComponents()
     {
-        $session          = $this->factory->getSession();
-        $customComponents = $session->get('mautic.pointcomponents.custom');
-        if (empty($customComponents)) {
+        static $components;
+
+        if (empty($components)) {
             //build them
             $customComponents = array();
             $event            = new PointBuilderEvent($this->translator);
             $this->dispatcher->dispatch(PointEvents::POINT_ON_BUILD, $event);
             $customComponents['actions'] = $event->getActions();
-            $session->set('mautic.pointcomponents.custom', $customComponents);
         }
         return $customComponents;
     }
@@ -179,59 +178,95 @@ class PointModel extends CommonFormModel
      * Triggers a specific point change
      *
      * @param $type
+     * @param mixed $passsthrough passthrough from function triggering action to the callback function
      */
-    public function triggerAction($type)
+    public function triggerAction($type, $passthrough = null)
     {
+        //only trigger actions for anonymous users
+        if (!$this->security->isAnonymous()) {
+            return;
+        }
+
         //find all the actions for published points
-        $pointActions = $this->em->getRepository('MauticPointBundle:Action')->getPublishedByType($type);
+        $repo         = $this->em->getRepository('MauticPointBundle:Action');
+        $pointActions = $repo->getPublishedByType($type);
         $leadModel    = $this->factory->getModel('lead');
         $lead         = $leadModel->getCurrentLead();
         $ipAddress    = $this->factory->getIpAddress();
 
+        //get a list of actions that has already been performed on this lead
+        $completedActions = $repo->getCompletedLeadActions($type, $lead->getId());
+        //if it's already been done, then skip it
+        if (in_array($type, $completedActions)) {
+            return;
+        }
+
+        $persist = array();
         foreach ($pointActions as $action) {
-            $args = array(
-                'action'   => $action,
-                'lead'     => $lead,
-                'factory'  => $this->factory,
+            $point    = $action->getPoint();
+            $settings = $action->getSettings();
+            $args     = array(
+                'action'      => array(
+                    'id'         => $action->getId(),
+                    'type'       => $action->getType(),
+                    'name'       => $action->getName(),
+                    'properties' => $action->getProperties(),
+                    'settings'   => $settings,
+                    'point'      => array(
+                        'id'   => $point->getId(),
+                        'name' => $point->getName()
+                    )
+                ),
+                'lead'        => $lead,
+                'factory'     => $this->factory,
+                'passthrough' => $passthrough
             );
 
-            $callback = (isset($action['settings']['callback'])) ? $action['settings']['callback'] :
+            $callback = (isset($settings['callback'])) ? $settings['callback'] :
                 array('\\Mautic\\PointBundle\\Helper\\EventHelper', 'engagePointAction');
 
             if (is_callable($callback)) {
                 if (is_array($callback)) {
                     $reflection = new \ReflectionMethod($callback[0], $callback[1]);
                 } elseif (strpos($callback, '::') !== false) {
-                    $parts = explode('::', $callback);
+                    $parts      = explode('::', $callback);
                     $reflection = new \ReflectionMethod($parts[0], $parts[1]);
                 } else {
                     new \ReflectionMethod(null, $callback);
                 }
 
                 $pass = array();
-                foreach($reflection->getParameters() as $param) {
-                    if(isset($args[$param->getName()])) {
+                foreach ($reflection->getParameters() as $param) {
+                    if (isset($args[$param->getName()])) {
                         $pass[] = $args[$param->getName()];
                     } else {
                         $pass[] = null;
                     }
                 }
                 $scoreChange = $reflection->invokeArgs($this, $pass);
+
                 if ($scoreChange) {
                     $lead->addToScore($scoreChange);
-                    $parsed = explode('.', $action['type']);
+                    $parsed = explode('.', $action->getType());
                     $lead->addScoreChangeLogEntry(
                         $parsed[0],
-                        $action['point']['name'],
-                        $action['name'],
+                        $point->getName(),
+                        $action->getName(),
                         $scoreChange,
                         $ipAddress
                     );
+                    $action->addLead($lead);
+                    $persist[] = $action;
                 }
             }
         }
 
         //save the lead
         $leadModel->saveEntity($lead);
+
+        //persist the action xref
+        if (!empty($persist)) {
+            $this->getRepository()->saveEntities($persist);
+        }
     }
 }

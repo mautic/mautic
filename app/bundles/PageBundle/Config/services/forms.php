@@ -29,3 +29,11 @@ $container->setDefinition('mautic.form.type.pagevariant', new Definition(
     ->addTag('form.type', array(
         'alias' => 'pagevariant',
     ));
+
+$container->setDefinition('mautic.form.type.pointaction_pointhit', new Definition(
+    'Mautic\PageBundle\Form\Type\PointActionPageHitType',
+    array(new Reference('mautic.factory'))
+))
+    ->addTag('form.type', array(
+        'alias' => 'pointaction_pagehit',
+    ));

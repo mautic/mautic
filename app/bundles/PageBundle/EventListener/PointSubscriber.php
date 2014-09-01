@@ -47,7 +47,9 @@ class PointSubscriber extends CommonSubscriber
         $action = array(
             'group'       => 'mautic.page.point.action.group',
             'label'       => 'mautic.page.point.action.pagehit',
-            'description' => 'mautic.page.point.action.pagehit_descr'
+            'description' => 'mautic.page.point.action.pagehit_descr',
+            'callback'    => array('\\Mautic\\PageBundle\\Helper\\PointActionHelper', 'onPageHit'),
+            'formType'    => 'pointaction_pagehit'
         );
 
         $event->addAction('page.hit', $action);
@@ -60,6 +62,6 @@ class PointSubscriber extends CommonSubscriber
      */
     public function onPageHit(Events\PageHitEvent $event)
     {
-        $this->factory->getModel('point')->triggerAction('page.hit');
+        $this->factory->getModel('point')->triggerAction('page.hit', $event->getHit());
     }
 }
