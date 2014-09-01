@@ -9,6 +9,7 @@
 
 namespace Mautic\AssetBundle\Model;
 
+use Mautic\AssetBundle\Event\AssetEvent;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel;
@@ -84,8 +85,9 @@ class AssetModel extends FormModel
         $download = new Download();
         $download->setDateDownload(new \Datetime());
 
-        list($lead, $trackingId, $generated) = $this->factory->getModel('lead')->getCurrentLead();
+        list($lead, $trackingId, $generated) = $this->factory->getModel('lead')->getCurrentLead(true);
         $download->setLead($lead);
+        $download->setTrackingId($trackingId);
 
         if (!empty($asset)) {
             $download->setAsset($asset);
@@ -119,11 +121,6 @@ class AssetModel extends FormModel
         $download->setCode($code);
         $download->setIpAddress($ipAddress);
         $download->setReferer($request->server->get('HTTP_REFERER'));
-
-        if ($this->dispatcher->hasListeners(AssetEvents::ASSET_ON_DOWNLOAD)) {
-            $event = new AssetDownloadEvent($asset, $request, $code);
-            $this->dispatcher->dispatch(AssetEvents::ASSET_ON_DOWNLOAD, $event);
-        }
 
         $this->em->persist($download);
         $this->em->flush();

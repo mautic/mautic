@@ -7,18 +7,18 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\PageBundle\Form\Type;
+namespace Mautic\AssetBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class PointActionPageHitType
+ * Class PointActionFormSubmitType
  *
- * @package Mautic\PageBundle\Form\Type
+ * @package Mautic\AssetBundle\Form\Type
  */
-class PointActionPageHitType extends AbstractType
+class PointActionAssetDownloadType extends AbstractType
 {
 
     private $choices = array();
@@ -27,11 +27,11 @@ class PointActionPageHitType extends AbstractType
      * @param MauticFactory $factory
      */
     public function __construct(MauticFactory $factory) {
-        $viewOther = $factory->getSecurity()->isGranted('page:pages:viewother');
-        $choices = $factory->getModel('page')->getRepository()
-            ->getPageList('', 0, 0, $viewOther, 'variant');
-        foreach ($choices as $page) {
-            $this->choices[$page['language']][$page['id']] = $page['id'] . ':' . $page['title'] . ' (' . $page['alias'] . ')';
+        $viewOther = $factory->getSecurity()->isGranted('asset:assets:viewother');
+        $choices = $factory->getModel('asset')->getRepository()
+            ->getAssetList('', 0, 0, $viewOther);
+        foreach ($choices as $asset) {
+            $this->choices[$asset['id']] = $asset['id'] . ':' . $asset['title'];
         }
 
         //sort by language
@@ -57,17 +57,17 @@ class PointActionPageHitType extends AbstractType
             'data'       => $default
         ));
 
-        $builder->add('pages', 'choice', array(
+        $builder->add('assets', 'choice', array(
             'choices'       => $this->choices,
             'expanded'      => false,
             'multiple'      => true,
-            'label'         => 'mautic.page.point.action.form.pages',
+            'label'         => 'mautic.asset.point.action.assets',
             'label_attr'    => array('class' => 'control-label'),
             'empty_value'   => false,
             'required'      => false,
             'attr'       => array(
                 'class'   => 'form-control',
-                'tooltip' => 'mautic.page.point.action.form.pages.descr'
+                'tooltip' => 'mautic.asset.point.action.assets.descr'
             )
         ));
     }
@@ -76,6 +76,6 @@ class PointActionPageHitType extends AbstractType
      * @return string
      */
     public function getName() {
-        return "pointaction_pagehit";
+        return "pointaction_assetdownload";
     }
 }

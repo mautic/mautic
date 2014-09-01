@@ -21,7 +21,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 class PointActionFormSubmitType extends AbstractType
 {
 
-    private $choices;
+    private $choices = array();
 
     /**
      * @param MauticFactory $factory

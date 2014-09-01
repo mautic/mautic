@@ -9,6 +9,7 @@
 
 namespace Mautic\AssetBundle\Controller;
 
+use Mautic\AssetBundle\Event\AssetEvent;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\AssetBundle\AssetEvents;
 use Symfony\Component\HttpFoundation\Response;
@@ -56,15 +57,12 @@ class PublicController extends CommonFormController
             $userAccess = $security->hasEntityAccess('asset:assets:viewown', 'asset:assets:viewother', $entity->getCreatedBy());
 
             //all the checks pass so provide the asset for download
-            
+
             $dispatcher = $this->get('event_dispatcher');
 
             if ($dispatcher->hasListeners(AssetEvents::ASSET_ON_DOWNLOAD)) {
                 $event = new AssetEvent($entity);
                 $dispatcher->dispatch(AssetEvents::ASSET_ON_DOWNLOAD, $event);
-                $content = $event->getFileContents();
-            } else {
-                $content = $entity->getFileContents();
             }
 
             $model->trackDownload($entity, $this->request, 200);
@@ -72,7 +70,7 @@ class PublicController extends CommonFormController
             $response = new Response();
             $response->headers->set('Content-Type', $entity->getFileMimeType());
             $response->headers->set('Content-Disposition', 'attachment;filename="'.$entity->getOriginalFileName());
-            $response->setContent($content);
+            $response->setContent($entity->getFileContents());
 
             return $response;
 
