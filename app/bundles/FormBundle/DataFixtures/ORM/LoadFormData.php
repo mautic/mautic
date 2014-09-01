@@ -110,6 +110,10 @@ class LoadFormData extends AbstractFixture implements OrderedFixtureInterface, C
                         $action->$setter($this->getReference('form-'.$val));
                     }  elseif (in_array($col, array('properties','settings'))) {
                         $val = unserialize(stripslashes($val));
+                        if ($col == 'settings') {
+                            $val['callback'] = stripslashes($val['callback']);
+                        }
+
                         $action->$setter($val);
                     } else {
                         $action->$setter($val);

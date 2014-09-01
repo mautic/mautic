@@ -9,11 +9,12 @@
 
 namespace Mautic\FormBundle\Model;
 
-use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\FormBundle\Entity\Result;
 use Mautic\FormBundle\Entity\Submission;
+use Mautic\FormBundle\Event\SubmissionEvent;
+use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -170,6 +171,11 @@ class SubmissionModel extends CommonFormModel
         }
 
         $this->saveEntity($submission);
+
+        if ($this->dispatcher->hasListeners(FormEvents::FORM_ON_SUBMIT)) {
+            $event = new SubmissionEvent($submission, $post, $server);
+            $this->dispatcher->dispatch(FormEvents::FORM_ON_SUBMIT, $event);
+        }
 
         //execute submit actions
         $actions = $form->getActions();

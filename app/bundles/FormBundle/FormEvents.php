@@ -67,4 +67,14 @@ final class FormEvents
      * @var string
      */
     const FORM_ON_BUILD   = 'mautic.form_on_build';
+
+    /**
+     * The mautic.form_on_submit event is thrown when a new submission is fired
+     *
+     * The event listener receives a
+     * Mautic\FormBundle\Event\SubmissionEvent instance.
+     *
+     * @var string
+     */
+    const FORM_ON_SUBMIT = 'mautic.form_on_submit';
 }

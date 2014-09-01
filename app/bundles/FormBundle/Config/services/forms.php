@@ -91,3 +91,11 @@ $container->setDefinition(
     ->addTag('form.type', array(
         'alias' => 'formfield_captcha'
     ));
+
+$container->setDefinition('mautic.form.type.pointaction_formsubmit', new Definition(
+    'Mautic\FormBundle\Form\Type\PointActionFormSubmitType',
+    array(new Reference('mautic.factory'))
+))
+    ->addTag('form.type', array(
+        'alias' => 'pointaction_formsubmit',
+    ));

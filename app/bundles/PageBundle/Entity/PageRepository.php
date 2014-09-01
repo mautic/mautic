@@ -145,7 +145,6 @@ class PageRepository extends CommonRepository
         return $results;
     }
 
-
     /**
      * @param QueryBuilder $q
      * @param              $filter

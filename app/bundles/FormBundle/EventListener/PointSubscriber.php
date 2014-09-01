@@ -7,11 +7,11 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\PageBundle\EventListener;
+namespace Mautic\FormBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\PageBundle\Event as Events;
-use Mautic\PageBundle\PageEvents;
+use Mautic\FormBundle\Event\SubmissionEvent;
+use Mautic\FormBundle\FormEvents;
 use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\PointEvents;
 
@@ -30,7 +30,7 @@ class PointSubscriber extends CommonSubscriber
     {
         return array(
             PointEvents::POINT_ON_BUILD => array('onPointBuild', 0),
-            PageEvents::PAGE_ON_HIT     => array('onPageHit', 0)
+            FormEvents::FORM_ON_SUBMIT  => array('onFormSubmit', 0)
         );
     }
 
@@ -40,23 +40,23 @@ class PointSubscriber extends CommonSubscriber
     public function onPointBuild(PointBuilderEvent $event)
     {
         $action = array(
-            'group'       => 'mautic.page.point.action.group',
-            'label'       => 'mautic.page.point.action.pagehit',
-            'description' => 'mautic.page.point.action.pagehit_descr',
-            'callback'    => array('\\Mautic\\PageBundle\\Helper\\PointActionHelper', 'onPageHit'),
-            'formType'    => 'pointaction_pagehit'
+            'group'       => 'mautic.form.point.action.group',
+            'label'       => 'mautic.form.point.action.submit',
+            'description' => 'mautic.form.point.action.submit_descr',
+            'callback'    => array('\\Mautic\\FormBundle\\Helper\\PointActionHelper', 'onFormSubmit'),
+            'formType'    => 'pointaction_formsubmit'
         );
 
-        $event->addAction('page.hit', $action);
+        $event->addAction('form.submit', $action);
     }
 
     /**
-     * Trigger point actions for page hits
+     * Trigger point actions for form submit
      *
-     * @param Events\PageHitEvent $event
+     * @param SubmissionEvent $event
      */
-    public function onPageHit(Events\PageHitEvent $event)
+    public function onFormSubmit(SubmissionEvent $event)
     {
-        $this->factory->getModel('point')->triggerAction('page.hit', $event->getHit());
+        $this->factory->getModel('point')->triggerAction('form.submit', $event->getSubmission());
     }
 }

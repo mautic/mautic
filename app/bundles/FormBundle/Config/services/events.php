@@ -29,3 +29,12 @@ $container->setDefinition(
     )
 )
     ->addTag('kernel.event_subscriber');
+
+$container->setDefinition(
+    'mautic.form.pointbundle.subscriber',
+    new Definition(
+        'Mautic\FormBundle\EventListener\PointSubscriber',
+        array(new Reference('mautic.factory'))
+    )
+)
+    ->addTag('kernel.event_subscriber');
