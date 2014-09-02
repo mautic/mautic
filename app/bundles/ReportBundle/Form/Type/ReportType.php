@@ -114,6 +114,7 @@ class ReportType extends AbstractType
                 )
             ));
 
+            // TODO - Rethink how the source is stored
             $source  = (!is_null($options['data']->getSource())) ? $options['data']->getSource() : key($this->tableOptions);
             $columns = $this->factory->getEntityManager()->getClassMetadata('Mautic\\' . $source . 'Bundle\\Entity\\' . $source)->getFieldNames();
 

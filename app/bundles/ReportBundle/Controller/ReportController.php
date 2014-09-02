@@ -379,13 +379,10 @@ class ReportController extends FormController
         }
 
         $reportGenerator = new ReportGenerator(
-            $this->factory->getEntityManager(), $this->factory->getSecurityContext(), $this->container->get('form.factory')
+            $this->factory->getEntityManager(), $this->factory->getSecurityContext(), $this->container->get('form.factory'), $entity
         );
 
-        // The report builder is referencing reports by name right now, get it
-        $reportName = str_replace(' ', '', $entity->getTitle());
-
-        $query = $reportGenerator->getQuery($reportName);
+        $query = $reportGenerator->getQuery();
 
         $form = $reportGenerator->getForm($entity, array('read_only' => true));
 
@@ -395,17 +392,7 @@ class ReportController extends FormController
             $query->setParameters($form->getData());
         }
 
-        $modifiers = $reportGenerator->getModifiers($reportName);
-
         $result = $query->getResult();
-
-        foreach ($result as &$outer) {
-                foreach ($outer as $key => &$value) {
-                    if (array_key_exists($key, $modifiers) && $value) {
-                        $value = call_user_func_array(array($value, $modifiers[$key]['method']), $modifiers[$key]['params']);
-                }
-            }
-        }
 
         return $this->delegateView(array(
             'viewParameters'  =>  array(

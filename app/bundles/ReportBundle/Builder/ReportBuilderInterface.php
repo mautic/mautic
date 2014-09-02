@@ -14,25 +14,10 @@ namespace Mautic\ReportBundle\Builder;
 
 interface ReportBuilderInterface
 {
-
     /**
      * Gets the query instance with default parameters
      *
      * @return \Doctrine\ORM\Query
      */
     function getQuery();
-
-    /**
-     * Gets query parameters
-     *
-     * @return array
-     */
-    function getParameters();
-
-    /**
-     * Gets modifiers
-     *
-     * @return array
-     */
-    function getModifiers();
 }

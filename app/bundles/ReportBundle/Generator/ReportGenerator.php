@@ -13,6 +13,7 @@
 namespace Mautic\ReportBundle\Generator;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\ReportBundle\Entity\Report;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
@@ -40,39 +41,43 @@ class ReportGenerator
     private $formFactory;
 
     /**
+     * @var \Mautic\ReportBundle\Entity\Report
+     */
+    private $entity;
+
+    /**
      * @var string
      */
-    private $validInterface;
+    private $validInterface = "Mautic\\ReportBundle\\Builder\\ReportBuilderInterface";
 
     /**
      * Constructor
      *
      * @param \Doctrine\ORM\EntityManager                               $entityManager   Entity manager
      * @param \Symfony\Component\Security\Core\SecurityContextInterface $securityContext Security context
-     * @param \Symfony\Component\Form\FormFactoryInterface              $formFactory Form factory
+     * @param \Symfony\Component\Form\FormFactoryInterface              $formFactory     Form factory
+     * @param \Mautic\ReportBundle\Entity\Report                        $entity          Report entity
      *
      * @author r1pp3rj4ck <attila.bukor@gmail.com>
      */
-    public function __construct(EntityManager $entityManager, SecurityContextInterface $securityContext, FormFactoryInterface $formFactory)
+    public function __construct(EntityManager $entityManager, SecurityContextInterface $securityContext, FormFactoryInterface $formFactory, Report $entity)
     {
         $this->entityManager   = $entityManager;
         $this->securityContext = $securityContext;
         $this->formFactory     = $formFactory;
-        $this->validInterface  = "Mautic\\ReportBundle\\Builder\\ReportBuilderInterface";
+        $this->entity          = $entity;
     }
 
     /**
      * Gets query
      *
-     * @param string $reportId Report ID
-     *
      * @return \Doctrine\ORM\Query
      *
      * @author r1pp3rj4ck <attila.bukor@gmail.com>
      */
-    public function getQuery($reportId)
+    public function getQuery()
     {
-        $builder = $this->getBuilder($reportId);
+        $builder = $this->getBuilder();
 
         return $builder->getQuery();
     }
@@ -87,48 +92,30 @@ class ReportGenerator
      *
      * @author r1pp3rj4ck <attila.bukor@gmail.com>
      */
-    public function getForm($entity, $options)
+    public function getForm(Report $entity, $options)
     {
         return $this->formFactory->createBuilder('report', $entity, $options)->getForm();
     }
 
     /**
-     * Gets modifiers
-     *
-     * @param string $reportId Report ID
-     *
-     * @return array
-     *
-     * @author r1pp3rj4ck <attila.bukor@gmail.com>
-     */
-    public function getModifiers($reportId)
-    {
-        $builder = $this->getBuilder($reportId);
-
-        return $builder->getModifiers();
-    }
-
-    /**
      * Gets report builder
-     *
-     * @param string $reportId Report ID
      *
      * @return \Mautic\ReportBundle\Builder\ReportBuilderInterface
      * @throws \Symfony\Component\DependencyInjection\Exception\RuntimeException
      *
      * @author r1pp3rj4ck <attila.bukor@gmail.com>
      */
-    protected function getBuilder($reportId)
+    protected function getBuilder()
     {
-        $className  = '\\Mautic\\ReportBundle\\Report\\' . $reportId . 'Report';
+        $className  = '\\Mautic\\ReportBundle\\Builder\\MauticReportBuilder';
 
         if (!class_exists($className)) {
-            throw new RuntimeException(sprintf("A ReportBuilder does not exist for the %s report.", $reportId));
+            throw new RuntimeException("The MauticReportBuilder does not exist.");
         }
 
         $reflection = new \ReflectionClass($className);
         if ($reflection->implementsInterface($this->validInterface)) {
-            $builder = $reflection->newInstanceArgs(array($this->entityManager->createQueryBuilder(), $this->securityContext));
+            $builder = $reflection->newInstanceArgs(array($this->entityManager, $this->securityContext, $this->entity));
         }
         else {
             throw new RuntimeException(sprintf("ReportBuilders have to implement %s, and %s doesn't implement it", $this->validInterface, $className));
