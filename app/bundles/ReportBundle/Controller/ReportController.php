@@ -287,9 +287,9 @@ class ReportController extends FormController
 
                     $returnUrl = $this->generateUrl('mautic_report_action', array(
                         'objectAction' => 'view',
-                        'objectId'     => $entity->getId()
+                        'reportId'     => $entity->getId()
                     ));
-                    $viewParams = array('objectId' => $entity->getId());
+                    $viewParams = array('reportId' => $entity->getId());
                     $template = 'MauticReportBundle:Report:view';
                 }
             } else {
@@ -439,7 +439,8 @@ class ReportController extends FormController
         $entity     = $model->getEntity($reportId);
 
         //set the page we came from
-        $page = $this->factory->getSession()->get('mautic.report.page', 1);
+        $page       = $this->factory->getSession()->get('mautic.report.page', 1);
+        $reportPage = $this->request->get('reportPage', 1);
 
         if ($entity === null) {
             //set the return URL
@@ -468,11 +469,28 @@ class ReportController extends FormController
             return $this->accessDenied();
         }
 
+        $orderBy     = $this->factory->getSession()->get('mautic.report.' . $entity->getId() . '.orderby', '');
+        $orderByDir  = $this->factory->getSession()->get('mautic.report.' . $entity->getId() . '.orderbydir', 'ASC');
+
+        $limit = $this->factory->getSession()->get('mautic.report.' . $entity->getId() . '.limit', $this->factory->getParameter('default_pagelimit'));
+        $start = ($reportPage === 1) ? 0 : (($reportPage-1) * $limit);
+        if ($start < 0) {
+            $start = 0;
+        }
+
         $reportGenerator = new ReportGenerator(
             $this->factory->getEntityManager(), $this->factory->getSecurityContext(), $this->container->get('form.factory'), $entity
         );
 
-        $query = $reportGenerator->getQuery();
+        // Build the options array to pass into the query
+        $options = array(
+            'start'      => $start,
+            'limit'      => $limit,
+            'orderBy'    => $orderBy,
+            'orderByDir' => $orderByDir
+        );
+
+        $query = $reportGenerator->getQuery($options);
 
         $form = $reportGenerator->getForm($entity, array('read_only' => true));
 
@@ -484,18 +502,27 @@ class ReportController extends FormController
 
         $result = $query->getResult();
 
+        //set what page currently on so that we can return here after form submission/cancellation
+        $this->factory->getSession()->set('mautic.report.' . $entity->getId() . '.page', $reportPage);
+
+        $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
+
         return $this->delegateView(array(
             'viewParameters'  =>  array(
-                'result' => $result,
-                'report' => $entity
+                'result'     => $result,
+                'report'     => $entity,
+                'reportPage' => $page,
+                'tmpl'       => $tmpl,
+                'limit'      => $limit,
             ),
             'contentTemplate' => 'MauticReportBundle:Report:details.html.php',
             'passthroughVars' => array(
                 'activeLink'     => '#mautic_report_index',
                 'mauticContent'  => 'report',
-                'route'         => $this->generateUrl('mautic_report_action', array(
+                'route'          => $this->generateUrl('mautic_report_action', array(
                     'objectAction' => 'view',
-                    'objectId'     => $entity->getId()
+                    'objectId'     => $entity->getId(),
+                    'reportPage'   => $reportPage
                 ))
             )
         ));

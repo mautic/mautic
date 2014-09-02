@@ -71,15 +71,17 @@ class ReportGenerator
     /**
      * Gets query
      *
+     * @param array $options Optional options array for the query
+     *
      * @return \Doctrine\ORM\Query
      *
      * @author r1pp3rj4ck <attila.bukor@gmail.com>
      */
-    public function getQuery()
+    public function getQuery(array $options = array())
     {
         $builder = $this->getBuilder();
 
-        return $builder->getQuery();
+        return $builder->getQuery($options);
     }
 
     /**

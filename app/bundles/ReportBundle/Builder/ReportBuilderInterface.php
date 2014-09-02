@@ -17,7 +17,9 @@ interface ReportBuilderInterface
     /**
      * Gets the query instance with default parameters
      *
+     * @param array $options Options array
+     *
      * @return \Doctrine\ORM\Query
      */
-    function getQuery();
+    function getQuery(array $options);
 }

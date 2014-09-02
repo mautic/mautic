@@ -12,50 +12,22 @@ $view->extend('MauticReportBundle:Report:index.html.php');
 
 <div class="table-responsive scrollable body-white padding-sm page-list">
     <?php if (count($items)): ?>
-        <table class="table table-hover table-striped table-bordered page-list">
+        <table class="table table-hover table-striped table-bordered report-list">
             <thead>
             <tr>
                 <th class="col-page-actions"></th>
                 <?php
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
-                    'sessionVar' => 'page',
-                    'orderBy'    => 'r.title',
+                    'sessionVar' => 'report',
+                    'orderBy'    => 'p.title',
                     'text'       => 'mautic.report.report.thead.title',
                     'class'      => 'col-page-title',
                     'default'    => true
                 ));
 
-                /*echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
-                    'sessionVar' => 'page',
-                    'orderBy'    => 'c.title',
-                    'text'       => 'mautic.report.report.thead.category',
-                    'class'      => 'visible-md visible-lg col-page-category'
-                ));
-
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
-                    'sessionVar' => 'page',
-                    'orderBy'    => 'p.author',
-                    'text'       => 'mautic.report.report.thead.author',
-                    'class'      => 'visible-md visible-lg col-page-author'
-                ));
-
-                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
-                    'sessionVar' => 'page',
-                    'orderBy'    => 'p.language',
-                    'text'       => 'mautic.report.report.thead.language',
-                    'class'      => 'visible-md visible-lg col-page-lang'
-                ));
-
-                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
-                    'sessionVar' => 'page',
-                    'orderBy'    => 'p.hits',
-                    'text'       => 'mautic.report.report.thead.hits',
-                    'class'      => 'col-page-hits'
-                ));*/
-
-                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
-                    'sessionVar' => 'page',
-                    'orderBy'    => 'r.id',
+                    'sessionVar' => 'report',
+                    'orderBy'    => 'p.id',
                     'text'       => 'mautic.report.report.thead.id',
                     'class'      => 'col-page-id'
                 ));

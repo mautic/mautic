@@ -56,14 +56,16 @@ final class MauticReportBuilder implements ReportBuilderInterface
     /**
      * Gets the query instance with default parameters
      *
+     * @param array $options Options array
+     *
      * @return \Doctrine\ORM\Query
      * @throws InvalidReportQueryException
      *
      * @author r1pp3rj4ck <attila.bukor@gmail.com>
      */
-    public function getQuery()
+    public function getQuery(array $options)
     {
-        $queryBuilder = $this->configureBuilder($this->entityManager->createQueryBuilder());
+        $queryBuilder = $this->configureBuilder($this->entityManager->createQueryBuilder(), $options);
 
         if ($queryBuilder->getType() === \Doctrine\DBAL\Query\QueryBuilder::SELECT) {
             $query = $queryBuilder->getQuery();
@@ -81,10 +83,11 @@ final class MauticReportBuilder implements ReportBuilderInterface
      * a configured Doctrine QueryBuilder.
      *
      * @param \Doctrine\ORM\QueryBuilder $queryBuilder Doctrine ORM query builder
+     * @param array                      $options      Options array
      *
      * @return \Doctrine\ORM\QueryBuilder
      */
-    protected function configureBuilder(QueryBuilder $queryBuilder)
+    protected function configureBuilder(QueryBuilder $queryBuilder, array $options)
     {
         // TODO - Rethink how the source is stored
         $source   = $this->entity->getSource();
@@ -127,6 +130,18 @@ final class MauticReportBuilder implements ReportBuilderInterface
             }
 
             $queryBuilder->where($and);
+        }
+
+        // TODO - We might not always want to apply these options, expand the array to make the options optional
+        if ($options['orderBy'] != '' && $options['orderByDir'] != '') {
+            $queryBuilder->orderBy($options['orderBy'], $options['orderByDir']);
+        } else {
+            $queryBuilder->orderBy('r.' . $key, 'ASC');
+        }
+
+        if ($options['limit'] > 0) {
+            $queryBuilder->setFirstResult($options['start'])
+                ->setMaxResults($options['limit']);
         }
 
         return $queryBuilder;
