@@ -10,7 +10,7 @@
 
 <div class="bundle-form">
     <div class="bundle-form-header">
-        <h3><?php echo $fieldHeader; ?></h3>
+        <h3><?php echo $actionHeader; ?></h3>
     </div>
 
     <?php echo $view['form']->form($form); ?>

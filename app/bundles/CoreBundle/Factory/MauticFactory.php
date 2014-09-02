@@ -9,6 +9,7 @@
 
 namespace Mautic\CoreBundle\Factory;
 
+use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\MailHelper;
 use Mautic\CoreBundle\Templating\Helper\ThemeHelper;
@@ -391,5 +392,30 @@ class MauticFactory
         return new MailHelper($this, $this->container->get('mailer'), array(
             $this->getParameter('mailer_from_email') => $this->getParameter('mailer_from_name')
         ));
+    }
+
+    /**
+     * Get an IpAddress entity for current session
+     *
+     * @return IpAddress
+     */
+    public function getIpAddress()
+    {
+        static $ipAddress;
+
+        if (empty($ipAddress)) {
+            $request = $this->getRequest();
+            $ip      = $request->server->get('REMOTE_ADDR');
+
+            $ipAddress = $this->getEntityManager()->getRepository('MauticCoreBundle:IpAddress')
+                ->findOneByIpAddress($ip);
+
+            if ($ipAddress === null) {
+                $ipAddress = new IpAddress();
+                $ipAddress->setIpAddress($ip, $this->getSystemParameters());
+            }
+        }
+
+        return $ipAddress;
     }
 }

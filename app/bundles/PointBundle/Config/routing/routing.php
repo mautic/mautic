@@ -12,9 +12,33 @@ use Symfony\Component\Routing\Route;
 
 $collection = new RouteCollection();
 
-$collection->add('mautic_pointaction_action', new Route('/points/action/{objectId}',
+
+$collection->add('mautic_pointaction_action', new Route('/points/action/{objectAction}/{objectId}',
     array(
         '_controller' => 'MauticPointBundle:Action:execute',
+        "objectId"    => 0
+    )
+));
+
+$collection->add('mautic_pointrangeaction_action', new Route('/points/ranges/action/{objectAction}/{objectId}',
+    array(
+        '_controller' => 'MauticPointBundle:RangeAction:execute',
+        "objectId"    => 0
+    )
+));
+
+$collection->add('mautic_pointrange_index', new Route('/points/ranges/{page}',
+    array(
+        '_controller' => 'MauticPointBundle:Range:index',
+        'page'        => 1,
+    ), array(
+        'page'    => '\d+'
+    )
+));
+
+$collection->add('mautic_pointrange_action', new Route('/points/ranges/{objectAction}/{objectId}',
+    array(
+        '_controller' => 'MauticPointBundle:Range:execute',
         "objectId"    => 0
     )
 ));

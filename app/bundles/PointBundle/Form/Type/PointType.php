@@ -71,24 +71,6 @@ class PointType extends AbstractType
             'required'   => false
         ));
 
-        $builder->add('category_lookup', 'text', array(
-            'label'      => 'mautic.point.form.category',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array(
-                'class'       => 'form-control',
-                'tooltip'     => 'mautic.core.help.autocomplete',
-                'placeholder' => $this->translator->trans('mautic.core.form.uncategorized')
-            ),
-            'mapped'     => false,
-            'required'   => false
-        ));
-
-        $builder->add('category', 'hidden_entity', array(
-            'required'       => false,
-            'repository'     => 'MauticCategoryBundle:Category',
-            'error_bubbling' => false
-        ));
-
         if (!empty($options['data']) && $options['data']->getId()) {
             $readonly = !$this->security->hasEntityAccess(
                 'point:points:publishown',

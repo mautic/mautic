@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\PointBundle\Entity\Action;
 use Mautic\PointBundle\Entity\Point;
 use Mautic\PointBundle\Event\PointBuilderEvent;
+use Mautic\PointBundle\Event\PointEvent;
 use Mautic\PointBundle\PointEvents;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -43,7 +44,6 @@ class PointModel extends CommonFormModel
     {
         return 'point:points';
     }
-
 
     /**
      * {@inheritdoc}
@@ -93,7 +93,7 @@ class PointModel extends CommonFormModel
     protected function dispatchEvent($action, &$entity, $isNew = false, $event = false)
     {
         if (!$entity instanceof Point) {
-            throw new MethodNotAllowedHttpException(array('Form'));
+            throw new MethodNotAllowedHttpException(array('Point'));
         }
 
         switch ($action) {
@@ -147,7 +147,7 @@ class PointModel extends CommonFormModel
                 if (method_exists($action, $func)) {
                     $action->$func($v);
                 }
-                $action->setForm($entity);
+                $action->setPoint($entity);
             }
             $action->setOrder($order);
             $order++;
@@ -161,15 +161,14 @@ class PointModel extends CommonFormModel
      */
     public function getCustomComponents()
     {
-        $session          = $this->factory->getSession();
-        $customComponents = $session->get('mautic.pointcomponents.custom');
-        if (empty($customComponents)) {
+        static $components;
+
+        if (empty($components)) {
             //build them
             $customComponents = array();
             $event            = new PointBuilderEvent($this->translator);
             $this->dispatcher->dispatch(PointEvents::POINT_ON_BUILD, $event);
             $customComponents['actions'] = $event->getActions();
-            $session->set('mautic.pointcomponents.custom', $customComponents);
         }
         return $customComponents;
     }
@@ -178,9 +177,95 @@ class PointModel extends CommonFormModel
      * Triggers a specific point change
      *
      * @param $type
+     * @param mixed $passsthrough passthrough from function triggering action to the callback function
      */
-    public function triggerAction($type)
+    public function triggerAction($type, $passthrough = null)
     {
+        //only trigger actions for anonymous users
+        if (!$this->security->isAnonymous()) {
+            return;
+        }
 
+        //find all the actions for published points
+        $repo         = $this->em->getRepository('MauticPointBundle:Action');
+        $pointActions = $repo->getPublishedByType($type);
+        $leadModel    = $this->factory->getModel('lead');
+        $lead         = $leadModel->getCurrentLead();
+        $ipAddress    = $this->factory->getIpAddress();
+
+        //get a list of actions that has already been performed on this lead
+        $completedActions = $repo->getCompletedLeadActions($type, $lead->getId());
+        //if it's already been done, then skip it
+        if (in_array($type, $completedActions)) {
+            return;
+        }
+
+        $persist = array();
+        foreach ($pointActions as $action) {
+            $point    = $action->getPoint();
+            $settings = $action->getSettings();
+            $args     = array(
+                'action'      => array(
+                    'id'         => $action->getId(),
+                    'type'       => $action->getType(),
+                    'name'       => $action->getName(),
+                    'properties' => $action->getProperties(),
+                    'settings'   => $settings,
+                    'point'      => array(
+                        'id'   => $point->getId(),
+                        'name' => $point->getName()
+                    )
+                ),
+                'lead'        => $lead,
+                'factory'     => $this->factory,
+                'passthrough' => $passthrough
+            );
+
+            $callback = (isset($settings['callback'])) ? $settings['callback'] :
+                array('\\Mautic\\PointBundle\\Helper\\EventHelper', 'engagePointAction');
+
+            if (is_callable($callback)) {
+                if (is_array($callback)) {
+                    $reflection = new \ReflectionMethod($callback[0], $callback[1]);
+                } elseif (strpos($callback, '::') !== false) {
+                    $parts      = explode('::', $callback);
+                    $reflection = new \ReflectionMethod($parts[0], $parts[1]);
+                } else {
+                    new \ReflectionMethod(null, $callback);
+                }
+
+                $pass = array();
+                foreach ($reflection->getParameters() as $param) {
+                    if (isset($args[$param->getName()])) {
+                        $pass[] = $args[$param->getName()];
+                    } else {
+                        $pass[] = null;
+                    }
+                }
+                $scoreChange = $reflection->invokeArgs($this, $pass);
+
+                if ($scoreChange) {
+                    $lead->addToScore($scoreChange);
+                    $parsed = explode('.', $action->getType());
+                    $lead->addScoreChangeLogEntry(
+                        $parsed[0],
+                        $point->getName(),
+                        $action->getName(),
+                        $scoreChange,
+                        $ipAddress
+                    );
+                    $action->addLead($lead);
+                    $persist[] = $action;
+                }
+            }
+        }
+
+        //save the lead
+        $leadModel->saveEntity($lead);
+
+        //persist the action xref
+        if (!empty($persist)) {
+            $this->getRepository()->saveEntities($persist);
+        }
     }
 }

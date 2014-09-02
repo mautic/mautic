@@ -9,15 +9,10 @@
 
 namespace Mautic\PageBundle\EventListener;
 
-use Mautic\ApiBundle\ApiEvents;
-use Mautic\ApiBundle\Event\RouteEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\CoreEvents;
-use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\PageBundle\Event as Events;
 use Mautic\PageBundle\PageEvents;
 use Mautic\PointBundle\Event\PointBuilderEvent;
-use Mautic\PointBundle\Event\PointEvent;
 use Mautic\PointBundle\PointEvents;
 
 /**
@@ -34,7 +29,8 @@ class PointSubscriber extends CommonSubscriber
     static public function getSubscribedEvents()
     {
         return array(
-            PointEvents::POINT_ON_BUILD => array('onPointBuild', 0)
+            PointEvents::POINT_ON_BUILD => array('onPointBuild', 0),
+            PageEvents::PAGE_ON_HIT     => array('onPageHit', 0)
         );
     }
 
@@ -46,9 +42,21 @@ class PointSubscriber extends CommonSubscriber
         $action = array(
             'group'       => 'mautic.page.point.action.group',
             'label'       => 'mautic.page.point.action.pagehit',
-            'description' => 'mautic.page.point.action.pagehit_descr'
+            'description' => 'mautic.page.point.action.pagehit_descr',
+            'callback'    => array('\\Mautic\\PageBundle\\Helper\\PointActionHelper', 'onPageHit'),
+            'formType'    => 'pointaction_pagehit'
         );
 
         $event->addAction('page.hit', $action);
+    }
+
+    /**
+     * Trigger point actions for page hits
+     *
+     * @param Events\PageHitEvent $event
+     */
+    public function onPageHit(Events\PageHitEvent $event)
+    {
+        $this->factory->getModel('point')->triggerAction('page.hit', $event->getHit());
     }
 }

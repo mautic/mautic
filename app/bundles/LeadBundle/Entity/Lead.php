@@ -13,6 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Doctrine\Common\Collections\ArrayCollection;
 use JMS\Serializer\Annotation as Serializer;
+use Mautic\CoreBundle\Entity\IpAddress;
 
 /**
  * Class Lead
@@ -249,6 +250,17 @@ class Lead extends FormEntity
     }
 
     /**
+     * Adds/substracts from current score
+     *
+     * @param $score
+     */
+    public function addToScore($score)
+    {
+        $newScore = $this->score + $score;
+        $this->setScore($newScore);
+    }
+
+    /**
      * Set score
      *
      * @param integer $score
@@ -270,6 +282,29 @@ class Lead extends FormEntity
     public function getScore()
     {
         return $this->score;
+    }
+
+    /**
+     * Creates a score change entry
+     *
+     * @param $type
+     * @param $name
+     * @param $action
+     * @param $scoreDelta
+     * @param IpAddress $ip
+     */
+    public function addScoreChangeLogEntry($type, $name, $action, $scoreDelta, IpAddress $ip)
+    {
+        //create a new score change event
+        $event = new ScoreChangeLog();
+        $event->setType($type);
+        $event->setEventName($name);
+        $event->setActionName($action);
+        $event->setDateAdded(new \DateTime());
+        $event->setDelta($scoreDelta);
+        $event->setIpAddress($ip);
+        $event->setLead($this);
+        $this->addScoreChangeLog($event);
     }
 
     /**

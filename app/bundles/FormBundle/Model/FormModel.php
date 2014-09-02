@@ -372,16 +372,16 @@ class FormModel extends CommonFormModel
      */
     public function getCustomComponents()
     {
-        $session = $this->factory->getSession();
-        $customComponents = $session->get('mautic.formcomponents.custom');
+        static $customComponents;
+
         if (empty($customComponents)) {
             //build them
             $event = new FormBuilderEvent($this->translator);
             $this->dispatcher->dispatch(FormEvents::FORM_ON_BUILD, $event);
             $customComponents['fields']  = $event->getFormFields();
             $customComponents['actions'] = $event->getSubmitActions();
-            $session->set('mautic.formcomponents.custom', $customComponents);
         }
+
         return $customComponents;
     }
 }

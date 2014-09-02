@@ -72,6 +72,10 @@ class EventHelper
             }
         }
 
+
+        //check for existing IP address
+        $ipAddress = $factory->getIpAddress($server['REMOTE_ADDR']);
+
         //no lead was found by a mapped email field so create a new one
         if (empty($lead)) {
             $lead = new Lead();
@@ -79,29 +83,19 @@ class EventHelper
             $ipAddresses = false;
 
             //create a new score change event
-            $event = new ScoreChangeLog();
-            $event->setType('form');
-            $event->setEventName($form->getId() . ":" . $form->getName());
-            $event->setActionName($action->getName());
-            $event->setDateAdded(new \DateTime());
-            $event->setDelta($properties['score']);
-            $event->setLead($lead);
+            $lead->addScoreChangeLogEntry(
+                'form',
+                $form->getId() . ":" . $form->getName(),
+                $action->getName(),
+                $properties['score'],
+                $ipAddress
+            );
         } else {
             $ipAddresses = $lead->getIpAddresses();
         }
 
         //set the mapped fields
         $model->setFieldValues($lead, $data, false);
-
-        //check for existing IP address
-        $ip        = $server['REMOTE_ADDR'];
-        $ipAddress = $em->getRepository('MauticCoreBundle:IpAddress')
-            ->findOneByIpAddress($ip);
-
-        if ($ipAddress === null) {
-            $ipAddress = new IpAddress();
-            $ipAddress->setIpAddress($ip, $factory->getSystemParameters());
-        }
 
         //add the IP if the lead is not already associated with it
         if (!$ipAddresses || !$ipAddresses->contains($ipAddress)) {
@@ -116,15 +110,8 @@ class EventHelper
         //create a new lead
         $model->saveEntity($lead, false);
 
-        //create tracking cookies
-        $cookies   = $factory->getRequest()->cookies;
-        $sessionId = $cookies->get('mautic_session_id');
-        $expire    = time() + 1800;
-        if (empty($sessionId)) {
-            $sessionId = uniqid();
-            setcookie('mautic_session_id', $sessionId, $expire);
-        }
-        setcookie($sessionId, $lead->getId(), $expire);
+        //set the tracking cookies
+        $model->setLeadCookie($lead->getId());
 
         //return the lead so it can be used elsewhere
         return array('lead' => $lead);

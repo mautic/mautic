@@ -58,6 +58,15 @@ class Download
     private $ipAddress;
 
     /**
+     * @ORM\ManyToOne(targetEntity="Mautic\LeadBundle\Entity\Lead")
+     * @ORM\JoinColumn(name="lead_id", referencedColumnName="id", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full"})
+     */
+    private $lead;
+
+    /**
      * @ORM\Column(type="integer")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
@@ -224,5 +233,21 @@ class Download
     public function getTrackingId()
     {
         return $this->trackingId;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLead ()
+    {
+        return $this->lead;
+    }
+
+    /**
+     * @param mixed $lead
+     */
+    public function setLead ($lead)
+    {
+        $this->lead = $lead;
     }
 }

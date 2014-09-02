@@ -9,11 +9,12 @@
 
 namespace Mautic\FormBundle\Model;
 
-use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\FormBundle\Entity\Result;
 use Mautic\FormBundle\Entity\Submission;
+use Mautic\FormBundle\Event\SubmissionEvent;
+use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -52,13 +53,7 @@ class SubmissionModel extends CommonFormModel
         $submission->setDateSubmitted(new \DateTime());
         $submission->setForm($form);
 
-        $ip         = $server['REMOTE_ADDR'];
-        //does the IP address exist in the database?
-        $ipAddress  = $this->em->getRepository('MauticCoreBundle:IpAddress')->findOneByIpAddress($ip);
-        if ($ipAddress === null) {
-            $ipAddress = new IpAddress();
-            $ipAddress->setIpAddress($ip, $this->factory->getSystemParameters());
-        }
+        $ipAddress = $this->factory->getIpAddress();
         $submission->setIpAddress($ipAddress);
 
         if (!empty($post['return'])) {
@@ -176,6 +171,11 @@ class SubmissionModel extends CommonFormModel
         }
 
         $this->saveEntity($submission);
+
+        if ($this->dispatcher->hasListeners(FormEvents::FORM_ON_SUBMIT)) {
+            $event = new SubmissionEvent($submission, $post, $server);
+            $this->dispatcher->dispatch(FormEvents::FORM_ON_SUBMIT, $event);
+        }
 
         //execute submit actions
         $actions = $form->getActions();

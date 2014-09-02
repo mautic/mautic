@@ -12,7 +12,7 @@ $containerClass = (!empty($deleted)) ? ' bg-danger' : '';
 <div class="point-row <?php echo $containerClass; ?>" id="point_action_<?php echo $id; ?>">
     <?php
     if (!empty($inForm))
-        echo $view->render('MauticPointBundle:Builder:actions.html.php', array(
+        echo $view->render('MauticPointBundle:'.$builderType.'Builder:actions.html.php', array(
             'deleted'  => (!empty($deleted)) ? $deleted : false,
             'id'       => $id,
             'route'   => 'mautic_pointaction_action'

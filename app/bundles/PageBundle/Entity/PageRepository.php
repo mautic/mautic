@@ -130,7 +130,7 @@ class PageRepository extends CommonRepository
         if ($topLevel == 'translation') {
             //only get top level pages
             $q->andWhere($q->expr()->isNull('p.translationParent'));
-        } elseif ($topLevel == 'variation') {
+        } elseif ($topLevel == 'variant') {
             $q->andWhere($q->expr()->isNull('p.variantParent'));
         }
 
@@ -144,7 +144,6 @@ class PageRepository extends CommonRepository
         $results = $q->getQuery()->getArrayResult();
         return $results;
     }
-
 
     /**
      * @param QueryBuilder $q

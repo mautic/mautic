@@ -44,7 +44,8 @@ class ActionType extends AbstractType
             'required'   => false
         ));
 
-        $formType = $options['settings']['formType'];
+        $formType = (!empty($options['settings']['formType'])) ? $options['settings']['formType'] :
+            'genericpoint_settings';
 
         $properties = (!empty($options['data']['properties'])) ? $options['data']['properties'] : null;
         $builder->add('properties', $formType, array(

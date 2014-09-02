@@ -141,6 +141,25 @@ class CommonRepository extends EntityRepository
     }
 
     /**
+     * Persist an array of entities
+     *
+     * @param $entities
+     */
+    public function saveEntities($entities)
+    {
+        //iterate over the results so the events are dispatched on each delete
+        $batchSize = 20;
+        foreach ($entities as $k => $entity) {
+            $this->saveEntity($entity, false);
+
+            if ((($k + 1) % $batchSize) === 0) {
+                $this->_em->flush();
+            }
+        }
+        $this->_em->flush();
+    }
+
+    /**
      * Delete an entity through the repository
      *
      * @param $entity

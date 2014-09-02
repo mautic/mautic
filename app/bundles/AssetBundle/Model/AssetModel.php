@@ -9,6 +9,7 @@
 
 namespace Mautic\AssetBundle\Model;
 
+use Mautic\AssetBundle\Event\AssetEvent;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel;
@@ -84,16 +85,8 @@ class AssetModel extends FormModel
         $download = new Download();
         $download->setDateDownload(new \Datetime());
 
-        //check for the tracking cookie
-        $trackingId = $request->cookies->get('mautic_session_id');
-
-        if (empty($trackingId)) {
-            $trackingId = uniqid();
-        }
-
-        //create a tracking cookie
-        $expire = time() + 1800;
-        setcookie('mautic_session_id', $trackingId, $expire);
+        list($lead, $trackingId, $generated) = $this->factory->getModel('lead')->getCurrentLead(true);
+        $download->setLead($lead);
         $download->setTrackingId($trackingId);
 
         if (!empty($asset)) {
@@ -129,16 +122,8 @@ class AssetModel extends FormModel
         $download->setIpAddress($ipAddress);
         $download->setReferer($request->server->get('HTTP_REFERER'));
 
-        if ($this->dispatcher->hasListeners(AssetEvents::ASSET_ON_DOWNLOAD)) {
-            $event = new AssetDownloadEvent($asset, $request, $code);
-            $this->dispatcher->dispatch(AssetEvents::ASSET_ON_DOWNLOAD, $event);
-        }
-
         $this->em->persist($download);
         $this->em->flush();
-
-        //save download to the cookie to use to update the exit time
-        setcookie('mautic_referer_id', $download->getId(), $expire);
     }
 
     public function getRepository()

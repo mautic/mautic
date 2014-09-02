@@ -76,22 +76,22 @@ class AssetRepository extends CommonRepository
      * @param int    $start
      * @param bool   $viewOther
      */
-    public function getAssetList($search = '', $limit = 10, $start = 0, $viewOther = false, $topLevel = false)
+    public function getAssetList($search = '', $limit = 10, $start = 0, $viewOther = false)
     {
-        $q = $this->createQueryBuilder('p');
-        $q->select('partial p.{id, title, language, alias}');
+        $q = $this->createQueryBuilder('a');
+        $q->select('partial a.{id, title, path, alias}');
 
         if (!empty($search)) {
-            $q->andWhere($q->expr()->like('p.title', ':search'))
+            $q->andWhere($q->expr()->like('a.title', ':search'))
                 ->setParameter('search', "{$search}%");
         }
 
         if (!$viewOther) {
-            $q->andWhere($q->expr()->eq('IDENTITY(p.createdBy)', ':id'))
+            $q->andWhere($q->expr()->eq('IDENTITY(a.createdBy)', ':id'))
                 ->setParameter('id', $this->currentUser->getId());
         }
 
-        $q->orderBy('p.title');
+        $q->orderBy('a.title');
 
         if (!empty($limit)) {
             $q->setFirstResult($start)

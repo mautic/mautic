@@ -86,6 +86,13 @@ class Action
      */
     private $point;
 
+    /**
+     * @ORM\ManyToMany(targetEntity="Mautic\LeadBundle\Entity\Lead", fetch="EXTRA_LAZY")
+     * @ORM\JoinTable(name="point_action_lead_xref")
+     * @ORM\JoinColumn(name="lead_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
+     */
+    private $leads;
+
     private $changes;
 
     private function isChanged($prop, $val)
@@ -161,26 +168,26 @@ class Action
     }
 
     /**
-     * Set form
+     * Set rage
      *
-     * @param \Mautic\PointBundle\Entity\Point $form
+     * @param \Mautic\PointBundle\Entity\Point $point
      * @return Action
      */
-    public function setPoint(\Mautic\PointBundle\Entity\Point $form)
+    public function setPoint(\Mautic\PointBundle\Entity\Point $point)
     {
-        $this->form = $form;
+        $this->point = $point;
 
         return $this;
     }
 
     /**
-     * Get form
+     * Get rage
      *
      * @return \Mautic\PointBundle\Entity\Point
      */
     public function getPoint()
     {
-        return $this->form;
+        return $this->point;
     }
 
     /**
@@ -287,5 +294,38 @@ class Action
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * Add lead
+     *
+     * @param \Mautic\LeadBundle\Entity\Lead $lead
+     * @return Lead
+     */
+    public function addLead(\Mautic\LeadBundle\Entity\Lead $lead)
+    {
+        $this->leads[] = $lead;
+
+        return $this;
+    }
+
+    /**
+     * Remove lead
+     *
+     * @param \Mautic\LeadBundle\Entity\Lead $lead
+     */
+    public function removeLead(\Mautic\LeadBundle\Entity\Lead $lead)
+    {
+        $this->leads->removeElement($lead);
+    }
+
+    /**
+     * Get leads
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getLeads()
+    {
+        return $this->leads;
     }
 }
