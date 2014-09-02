@@ -17,14 +17,17 @@ $collection->add('mautic_report_index', new Route('/reporting/{page}',
         '_controller' => 'MauticReportBundle:Report:index',
         'page'        => 1,
     ), array(
-        'page'    => '\d+'
+        'page' => '\d+'
     )
 ));
 
-$collection->add('mautic_report_action', new Route('/reporting/{objectAction}/{objectId}',
+$collection->add('mautic_report_action', new Route('/reporting/{objectAction}/{objectId}/{reportPage}',
     array(
         '_controller' => 'MauticReportBundle:Report:execute',
-        "objectId"    => 0
+        'objectId'    => 0,
+        'reportPage'  => 1
+    ), array(
+        'reportPage' => '\d+'
     )
 ));
 

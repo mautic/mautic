@@ -8,7 +8,7 @@
  */
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
-$view['slots']->set('mauticContent', 'page');
+$view['slots']->set('mauticContent', 'report');
 $view['slots']->set("headerTitle", $view['translator']->trans('mautic.report.report.header.index'));
 $view['slots']->set('searchUri', $view['router']->generate('mautic_report_index', array('page' => $page)));
 $view['slots']->set('searchString', $app->getSession()->get('mautic.report.filter'));
@@ -17,14 +17,13 @@ $view['slots']->set('searchHelp', $view['translator']->trans('mautic.report.repo
 
 <?php if ($permissions['report:reports:create']): ?>
     <?php $view['slots']->start("actions"); ?>
-    <li>
         <a href="<?php echo $this->container->get('router')->generate(
             'mautic_report_action', array("objectAction" => "new")); ?>"
-           data-toggle="ajax"
-           data-menu-link="#mautic_report_index">
-            <?php echo $view["translator"]->trans("mautic.report.report.menu.new"); ?>
+            data-toggle="ajax"
+            class="btn btn-default"
+            data-menu-link="#mautic_report_index">
+            <i class="fa fa-pencil"></i> <?php //echo $view["translator"]->trans("mautic.report.report.menu.new"); ?>
         </a>
-    </li>
     <?php $view['slots']->stop(); ?>
 <?php endif; ?>
 

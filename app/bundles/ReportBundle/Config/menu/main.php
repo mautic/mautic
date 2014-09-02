@@ -12,7 +12,7 @@ $items = array(
             'id' => 'mautic_report_root'
         ),
         'extras'=> array(
-            'iconClass' => 'fa-suitcase'
+            'iconClass' => 'fa-line-chart'
         ),
         'display' => ($security->isGranted(array('report:reports:viewown', 'report:reports:viewother'), 'MATCH_ONE')) ? true : false,
         'children' => array(
@@ -24,7 +24,31 @@ $items = array(
                 'extras'=> array(
                     'routeName' => 'mautic_report_index'
                 )
-            )
+            ),
+            'mautic.report.report.menu.new' => array(
+                'route'    => 'mautic_report_action',
+                'routeParameters' => array("objectAction"  => "new"),
+                'extras'  => array(
+                    'routeName' => 'mautic_report_action|new'
+                ),
+                'display' => false //only used for breadcrumb generation
+            ),
+            'mautic.report.report.menu.edit' => array(
+                'route'           => 'mautic_report_action',
+                'routeParameters' => array("objectAction"  => "edit"),
+                'extras'  => array(
+                    'routeName' => 'mautic_report_action|edit'
+                ),
+                'display' => false //only used for breadcrumb generation
+            ),
+            'mautic.report.report.menu.view' => array(
+                'route'           => 'mautic_report_action',
+                'routeParameters' => array("objectAction"  => "view"),
+                'extras'  => array(
+                    'routeName' => 'mautic_report_action|view'
+                ),
+                'display' => false //only used for breadcrumb generation
+            ),
         )
     )
 );

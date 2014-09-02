@@ -161,7 +161,7 @@ class FormController extends CommonController
     }
 
     /**
-     * Sets a specific them for the form
+     * Sets a specific theme for the form
      *
      * @param $form
      * @param $template

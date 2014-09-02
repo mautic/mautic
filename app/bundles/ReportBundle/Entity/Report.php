@@ -40,12 +40,36 @@ class Report extends FormEntity
     private $title;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="boolean")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full", "limited"})
      */
-    private $system = 0;
+    private $system = false;
+
+    /**
+     * @ORM\Column(type="string")
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full", "limited"})
+     */
+    private $source;
+
+    /**
+     * @ORM\Column(type="array")
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full"})
+     */
+    private $columns = array();
+
+    /**
+     * @ORM\Column(type="array")
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full"})
+     */
+    private $filters = array();
 
     /**
      * Get id
@@ -103,5 +127,77 @@ class Report extends FormEntity
     public function getSystem()
     {
         return $this->system;
+    }
+
+    /**
+     * Set source
+     *
+     * @param string $source
+     * @return Report
+     */
+    public function setSource($source)
+    {
+        $this->isChanged('source', $source);
+        $this->source = $source;
+
+        return $this;
+    }
+
+    /**
+     * Get source
+     *
+     * @return string
+     */
+    public function getSource()
+    {
+        return $this->source;
+    }
+
+    /**
+     * Set columns
+     *
+     * @param string $columns
+     * @return Report
+     */
+    public function setColumns($columns)
+    {
+        $this->isChanged('columns', $columns);
+        $this->columns = $columns;
+
+        return $this;
+    }
+
+    /**
+     * Get columns
+     *
+     * @return string
+     */
+    public function getColumns()
+    {
+        return $this->columns;
+    }
+
+    /**
+     * Set filters
+     *
+     * @param string $filters
+     * @return Report
+     */
+    public function setFilters($filters)
+    {
+        $this->isChanged('filters', $filters);
+        $this->filters = $filters;
+
+        return $this;
+    }
+
+    /**
+     * Get filters
+     *
+     * @return string
+     */
+    public function getFilters()
+    {
+        return $this->filters;
     }
 }
