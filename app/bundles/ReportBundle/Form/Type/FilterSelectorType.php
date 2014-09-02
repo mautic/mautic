@@ -41,19 +41,9 @@ class FilterSelectorType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $path = $builder->getOption('property_path');
-
-        if (is_null($path)) {
-            $data = array('column' => '', 'condition' => '', 'value' => '');
-        } else {
-            $index = str_replace(array('[', ']'), '', $path);
-            $data  = $options['data'][$index];
-        }
-
         // Build a list of columns
         $builder->add('column', 'choice', array(
             'choices'     => $options['columnList'],
-            'data'        => $data['column'],
             'expanded'    => false,
             'multiple'    => false,
             'label'       => 'mautic.report.report.label.filtercolumn',
@@ -61,14 +51,13 @@ class FilterSelectorType extends AbstractType
             'empty_value' => false,
             'required'    => false,
             'attr'        => array(
-                'class' => 'form-control',
+                'class' => 'form-control'
             )
         ));
 
         // Build a list of condition values
         $builder->add('condition', 'choice', array(
             'choices'     => $this->conditionArray,
-            'data'        => $data['condition'],
             'expanded'    => false,
             'multiple'    => false,
             'label'       => 'mautic.report.report.label.filtercondition',
@@ -76,7 +65,7 @@ class FilterSelectorType extends AbstractType
             'empty_value' => false,
             'required'    => false,
             'attr'        => array(
-                'class' => 'form-control',
+                'class' => 'form-control'
             )
         ));
 
@@ -84,8 +73,7 @@ class FilterSelectorType extends AbstractType
             'label'      => 'mautic.report.report.label.filtervalue',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control'),
-            'required'   => false,
-            'data'       => $data['value']
+            'required'   => false
         ));
     }
 

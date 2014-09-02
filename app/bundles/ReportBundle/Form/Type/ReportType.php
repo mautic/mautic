@@ -138,8 +138,7 @@ class ReportType extends AbstractType
                 'label_attr'   => array('class' => 'control-label'),
                 'options'      => array(
                     'columnList' => $columns,
-                    'required'   => false,
-                    'data'       => $options['data']->getFilters()
+                    'required'   => false
                 ),
                 'allow_add'    => true,
                 'allow_delete' => true,
