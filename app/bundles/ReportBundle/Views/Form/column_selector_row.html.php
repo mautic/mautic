@@ -32,10 +32,8 @@ $labelClass = (empty($form->vars['label_attr']['class'])) ? 'control-label' : $f
                     <i class="fa fa-question-circle"></i>
                 </span>
                 <select id="<?php echo $form->vars['id']; ?>" name="<?php echo $form->vars['full_name']; ?>[]" class="<?php echo $form->vars['attr']['class'] ?>"<?php if ($form->vars['multiple']) echo ' multiple="multiple"'; ?> size="<?php echo $form->vars['attr']['size'] ?>">
-                    <?php foreach ($form->vars['choices'] as $choice) { ?>
-                    <?php if ($selectedColumns[$choice->value]) { ?>
-                    <option value="<?php echo $choice->value; ?>"><?php echo $choice->label; ?></option>
-                    <?php } ?>
+                    <?php foreach ($form->vars['data'] as $selected) { ?>
+                    <option value="<?php echo $form->vars['choices'][$selected]->value; ?>"><?php echo $form->vars['choices'][$selected]->label; ?></option>
                     <?php } ?>
                 </select>
             </div>
