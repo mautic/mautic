@@ -15,6 +15,6 @@ $feedbackClass = ($app->getRequest()->getMethod() == 'POST' && !empty($hasErrors
         <?php echo $view['form']->errors($form) ?>
     </div>
     <div class="col-xs-12">
-        <button class="btn btn-primary"><?php echo $view['translator']->trans('mautic.report.report.label.addfilter'); ?></button>
+        <button type="button" class="btn btn-primary"><?php echo $view['translator']->trans('mautic.report.report.label.addfilter'); ?></button>
     </div>
 </div>

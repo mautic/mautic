@@ -82,7 +82,7 @@ class ReportController extends FormController
             } else {
                 $lastPage = (floor($limit / $count)) ? : 1;
             }
-            $this->factory->getSession()->set('mautic.report.report', $lastPage);
+            $this->factory->getSession()->set('mautic.report.page', $lastPage);
             $returnUrl   = $this->generateUrl('mautic_report_index', array('page' => $lastPage));
 
             return $this->postActionRedirect(array(
@@ -97,7 +97,7 @@ class ReportController extends FormController
         }
 
         //set what page currently on so that we can return here after form submission/cancellation
-        $this->factory->getSession()->set('mautic.report.report', $page);
+        $this->factory->getSession()->set('mautic.report.page', $page);
 
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
@@ -135,7 +135,7 @@ class ReportController extends FormController
         $model      = $this->factory->getModel('report');
         $entity     = $model->getEntity($objectId);
         $session    = $this->factory->getSession();
-        $page       = $session->get('mautic.report.report', 1);
+        $page       = $session->get('mautic.report.page', 1);
 
         //set the return URL
         $returnUrl  = $this->generateUrl('mautic_report_index', array('page' => $page));
@@ -245,6 +245,95 @@ class ReportController extends FormController
     }
 
     /**
+     * Generates new form and processes post data
+     *
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function newAction()
+    {
+        if (!$this->factory->getSecurity()->isGranted('report:reports:create')) {
+            return $this->accessDenied();
+        }
+
+        /* @type \Mautic\ReportBundle\Model\ReportModel $model */
+        $model   = $this->factory->getModel('report');
+        $entity  = $model->getEntity();
+        $method  = $this->request->getMethod();
+        $session = $this->factory->getSession();
+        $page    = $session->get('mautic.report.page', 1);
+
+        $action = $this->generateUrl('mautic_report_action', array('objectAction' => 'new'));
+        $form   = $model->createForm($entity, $this->get('form.factory'), $action);
+
+        ///Check for a submitted form and process it
+        if ($method == 'POST') {
+            $valid = false;
+            if (!$cancelled = $this->isFormCancelled($form)) {
+                if ($valid = $this->isFormValid($form)) {
+                    //form is valid so process the data
+                    $model->saveEntity($entity);
+
+                    $this->request->getSession()->getFlashBag()->add(
+                        'notice',
+                        $this->get('translator')->trans('mautic.report.report.notice.created', array(
+                            '%name%' => $entity->getTitle(),
+                            '%url%'          => $this->generateUrl('mautic_report_action', array(
+                                'objectAction' => 'edit',
+                                'objectId'     => $entity->getId()
+                            ))
+                        ), 'flashes')
+                    );
+
+                    if ($form->get('buttons')->get('save')->isClicked()) {
+                        $viewParameters = array(
+                            'objectAction' => 'view',
+                            'objectId'     => $entity->getId()
+                        );
+                        $returnUrl      = $this->generateUrl('mautic_report_action', $viewParameters);
+                        $template       = 'MauticReportBundle:Report:index';
+                    } else {
+                        //return edit view so that all the session stuff is loaded
+                        return $this->editAction($entity->getId(), true);
+                    }
+                }
+            } else {
+                $viewParameters  = array('page' => $page);
+                $returnUrl = $this->generateUrl('mautic_report_index', $viewParameters);
+                $template  = 'MauticReportBundle:Report:index';
+            }
+
+            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+                return $this->postActionRedirect(array(
+                    'returnUrl'       => $returnUrl,
+                    'viewParameters'  => $viewParameters,
+                    'contentTemplate' => $template,
+                    'passthroughVars' => array(
+                        'activeLink'    => 'mautic_asset_index',
+                        'mauticContent' => 'asset'
+                    )
+                ));
+            }
+        }
+
+        $formView = $this->setFormTheme($form, 'MauticReportBundle:Report:form.html.php', 'MauticReportBundle:Form');
+
+        return $this->delegateView(array(
+            'viewParameters'  => array(
+                'report'      => $entity,
+                'form'        => $formView
+            ),
+            'contentTemplate' => 'MauticReportBundle:Report:form.html.php',
+            'passthroughVars' => array(
+                'activeLink'    => '#mautic_report_index',
+                'mauticContent' => 'report',
+                'route'         => $this->generateUrl('mautic_report_action', array(
+                    'objectAction' => 'new'
+                ))
+            )
+        ));
+    }
+
+    /**
      * Shows a report
      *
      * @param string $reportId Report ID
@@ -259,8 +348,8 @@ class ReportController extends FormController
         $model      = $this->factory->getModel('report');
         $entity     = $model->getEntity($reportId);
 
-        //set the report we came from
-        $page = $this->factory->getSession()->get('mautic.report.report', 1);
+        //set the page we came from
+        $page = $this->factory->getSession()->get('mautic.report.page', 1);
 
         if ($entity === null) {
             //set the return URL

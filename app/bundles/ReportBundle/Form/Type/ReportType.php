@@ -114,7 +114,7 @@ class ReportType extends AbstractType
                 )
             ));
 
-            $source  = $options['data']->getSource();
+            $source  = (!is_null($options['data']->getSource())) ? $options['data']->getSource() : key($this->tableOptions);
             $columns = $this->factory->getEntityManager()->getClassMetadata('Mautic\\' . $source . 'Bundle\\Entity\\' . $source)->getFieldNames();
 
             // Build the column selector

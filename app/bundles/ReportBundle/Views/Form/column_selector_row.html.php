@@ -19,10 +19,10 @@ $labelClass = (empty($form->vars['label_attr']['class'])) ? 'control-label' : $f
             </div>
             <div class="col-xs-2">
                 <div class="text-center" style="margin-bottom: 10px; padding-top: 18px;">
-                    <button id="column-move-left" class="btn btn-sm btn-default"><i class="fa fa-caret-square-o-left"></i></button>
+                    <button type="button" id="column-move-left" class="btn btn-sm btn-default"><i class="fa fa-caret-square-o-left"></i></button>
                 </div>
                 <div class="text-center">
-                    <button id="column-move-right" class="btn btn-sm btn-default"><i class="fa fa-caret-square-o-right"></i></button>
+                    <button type="button" id="column-move-right" class="btn btn-sm btn-default"><i class="fa fa-caret-square-o-right"></i></button>
                 </div>
             </div>
             <div class="choice-wrapper col-xs-5">
