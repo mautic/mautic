@@ -110,7 +110,25 @@ final class MauticReportBuilder implements ReportBuilderInterface
             ->select(implode(', ', $selectColumns))
             ->from($entityName, 'r', 'r.' . $key);
 
-        // TODO - Need to build the WHERE clauses still
+        // Add filters as AND values to the WHERE clause if present
+        $filters = $this->entity->getFilters();
+
+        // Also need the Connection object to quote the user input
+        $connection = $this->entityManager->getConnection();
+
+        if (count($filters)) {
+            $expr = $queryBuilder->expr();
+            $and  = $expr->andX();
+
+            foreach ($filters as $filter) {
+                $and->add(
+                    $expr->{$filter['condition']}('r.' . $columns[$filter['column']], $connection->quote($filter['value']))
+                );
+            }
+
+            $queryBuilder->where($and);
+        }
+
         return $queryBuilder;
     }
 }
