@@ -153,6 +153,66 @@ class ReportController extends FormController
     }
 
     /**
+     * Deletes the entity
+     *
+     * @param         $objectId
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function deleteAction($objectId) {
+        $page        = $this->factory->getSession()->get('mautic.report.page', 1);
+        $returnUrl   = $this->generateUrl('mautic_report_index', array('page' => $page));
+        $flashes     = array();
+
+        $postActionVars = array(
+            'returnUrl'       => $returnUrl,
+            'viewParameters'  => array('page' => $page),
+            'contentTemplate' => 'MauticReportBundle:Report:index',
+            'passthroughVars' => array(
+                'activeLink'    => '#mautic_report_index',
+                'mauticContent' => 'report'
+            )
+        );
+
+        if ($this->request->getMethod() == 'POST') {
+            /* @type \Mautic\ReportBundle\Model\ReportModel $model */
+            $model  = $this->factory->getModel('report');
+            $entity = $model->getEntity($objectId);
+
+            if ($entity === null) {
+                $flashes[] = array(
+                    'type'    => 'error',
+                    'msg'     => 'mautic.report.report.error.notfound',
+                    'msgVars' => array('%id%' => $objectId)
+                );
+            } elseif (!$this->factory->getSecurity()->hasEntityAccess(
+                'report:reports:deleteown', 'report:reports:deleteother', $entity->getCreatedBy()
+            )) {
+                return $this->accessDenied();
+            } elseif ($model->isLocked($entity)) {
+                return $this->isLocked($postActionVars, $entity, 'report.report');
+            } else {
+                $model->deleteEntity($entity);
+
+                $identifier = $this->get('translator')->trans($entity->getTitle());
+                $flashes[] = array(
+                    'type' => 'notice',
+                    'msg'  => 'mautic.report.report.notice.deleted',
+                    'msgVars' => array(
+                        '%name%' => $identifier,
+                        '%id%'   => $objectId
+                    )
+                );
+            }
+        } //else don't do anything
+
+        return $this->postActionRedirect(
+            array_merge($postActionVars, array(
+                'flashes' => $flashes
+            ))
+        );
+    }
+
+    /**
      * Generates edit form and processes post data
      *
      * @param integer $objectId   Item ID
