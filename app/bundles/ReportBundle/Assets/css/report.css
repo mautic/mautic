@@ -1,0 +1,9 @@
+/* ReportBundle */
+
+.columnSelectorButtons {
+	padding-top: 40px;
+}
+
+.columnSelectorButtons div:not(:last-child) {
+	margin-bottom: 10px;
+}
