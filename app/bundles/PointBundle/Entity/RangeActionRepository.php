@@ -29,22 +29,22 @@ class RangeActionRepository extends CommonRepository
     {
         $now = new \DateTime();
         $q = $this->createQueryBuilder('a')
-            ->select('partial a.{id, type, name, properties, settings}, partial p.{id, name}')
-            ->join('a.point', 'p')
+            ->select('partial a.{id, type, name, properties, settings}, partial r.{id, name, fromScore, toScore, color}')
+            ->join('a.range', 'r')
             ->orderBy('a.order');
 
         //make sure the published up and down dates are good
         $q->where(
             $q->expr()->andX(
                 $q->expr()->eq('a.type', ':type'),
-                $q->expr()->eq('p.isPublished', true),
+                $q->expr()->eq('r.isPublished', true),
                 $q->expr()->orX(
-                    $q->expr()->isNull('p.publishUp'),
-                    $q->expr()->gte('p.publishUp', ':now')
+                    $q->expr()->isNull('r.publishUp'),
+                    $q->expr()->gte('r.publishUp', ':now')
                 ),
                 $q->expr()->orX(
-                    $q->expr()->isNull('p.publishDown'),
-                    $q->expr()->lte('p.publishDown', ':now')
+                    $q->expr()->isNull('r.publishDown'),
+                    $q->expr()->lte('r.publishDown', ':now')
                 )
             )
         )
@@ -68,20 +68,20 @@ class RangeActionRepository extends CommonRepository
             ->select('a.type')
             ->from(MAUTIC_TABLE_PREFIX . 'point_range_action_lead_xref', 'x')
             ->innerJoin('x', MAUTIC_TABLE_PREFIX . 'point_range_actions', 'a', 'x.action_id = a.id')
-            ->innerJoin('a', MAUTIC_TABLE_PREFIX . 'point_ranges', 'p', 'a.range_id = p.id');
+            ->innerJoin('a', MAUTIC_TABLE_PREFIX . 'point_ranges', 'p', 'a.range_id = r.id');
 
         //make sure the published up and down dates are good
         $q->where(
             $q->expr()->andX(
                 $q->expr()->eq('a.type', ':type'),
-                $q->expr()->eq('p.is_published', 1),
+                $q->expr()->eq('r.is_published', 1),
                 $q->expr()->orX(
-                    $q->expr()->isNull('p.publish_up'),
-                    $q->expr()->gte('p.publish_up', ':now')
+                    $q->expr()->isNull('r.publish_up'),
+                    $q->expr()->gte('r.publish_up', ':now')
                 ),
                 $q->expr()->orX(
-                    $q->expr()->isNull('p.publish_down'),
-                    $q->expr()->lte('p.publish_down', ':now')
+                    $q->expr()->isNull('r.publish_down'),
+                    $q->expr()->lte('r.publish_down', ':now')
                 ),
                 $q->expr()->eq('x.lead_id', $leadId)
             )

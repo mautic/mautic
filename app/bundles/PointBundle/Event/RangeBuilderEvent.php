@@ -56,8 +56,8 @@ class RangeBuilderEvent extends Event
      *              'range' => array(
      *                  'id' => int
      *                  'name' => string,
-     *                  'startScore' => int,
-     *                  'endScore'   => int,
+     *                  'fromScore' => int,
+     *                  'toScore'   => int,
      *                  'color'      => string
      *              )
      *         )

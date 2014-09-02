@@ -61,3 +61,7 @@ $container->setDefinition(
     ->addTag('form.type', array(
         'alias' => 'genericpoint_settings'
     ));
+
+$container
+    ->register('mautic.validator.point.rangesequence', 'Mautic\PointBundle\Form\Validator\RangeSequenceValidator')
+    ->addTag('validator.constraint_validator', array('alias' => 'point_range_sequence'));

@@ -13,7 +13,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\PointBundle\Form\Validator\RangeSequence;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
  * Class Range
@@ -67,29 +69,28 @@ class Range extends FormEntity
     private $publishDown;
 
     /**
-     * @ORM\Column(name="start_score", type="integer")
+     * @ORM\Column(name="from_score", type="integer")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})
      */
-    private $startScore = 0;
+    private $fromScore = 0;
 
     /**
-     * @ORM\Column(name="end_score", type="integer")
+     * @ORM\Column(name="to_score", type="integer")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})
      */
-    private $endScore = 0;
+    private $toScore = 0;
 
     /**
-     * @ORM\Column(name="color", type="string")
+     * @ORM\Column(name="color", type="string", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})
      */
     private $color;
-
 
     /**
      * @ORM\OneToMany(targetEntity="RangeAction", mappedBy="range", cascade={"all"}, indexBy="id", fetch="EXTRA_LAZY")
@@ -103,6 +104,18 @@ class Range extends FormEntity
     public function __construct()
     {
         $this->actions = new ArrayCollection();
+    }
+
+    /**
+     * @param ClassMetadata $metadata
+     */
+    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    {
+        $metadata->addPropertyConstraint('name', new Assert\NotBlank(array(
+            'message' => 'mautic.point.range.name.notblank'
+        )));
+
+        $metadata->addConstraint(new RangeSequence());
     }
 
     protected function isChanged($prop, $val)
@@ -263,35 +276,35 @@ class Range extends FormEntity
     /**
      * @return mixed
      */
-    public function getEndScore ()
+    public function getToScore ()
     {
-        return $this->endScore;
+        return $this->toScore;
     }
 
     /**
-     * @param mixed $endScore
+     * @param mixed $toScore
      */
-    public function setEndScore ($endScore)
+    public function setToScore ($toScore)
     {
-        $this->isChanged('endScore', $endScore);
-        $this->endScore = $endScore;
+        $this->isChanged('toScore', $toScore);
+        $this->toScore = $toScore;
     }
 
     /**
      * @return mixed
      */
-    public function getStartScore ()
+    public function getFromScore ()
     {
-        return $this->startScore;
+        return $this->fromScore;
     }
 
     /**
-     * @param mixed $startScore
+     * @param mixed $fromScore
      */
-    public function setStartScore ($startScore)
+    public function setFromScore ($fromScore)
     {
-        $this->isChanged('startScore', $startScore);
-        $this->startScore = $startScore;
+        $this->isChanged('fromScore', $fromScore);
+        $this->fromScore = $fromScore;
     }
 
     /**

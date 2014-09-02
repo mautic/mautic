@@ -18,7 +18,7 @@ $view->extend('MauticPointBundle:Range:index.html.php');
                 <th class="col-pointrange-actions"></th>
                 <?php
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
-                    'sessionVar' => 'point',
+                    'sessionVar' => 'pointrange',
                     'orderBy'    => 'r.name',
                     'text'       => 'mautic.point.range.thead.name',
                     'class'      => 'col-pointrange-name',
@@ -26,14 +26,23 @@ $view->extend('MauticPointBundle:Range:index.html.php');
                 ));
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
-                    'sessionVar' => 'point',
+                    'sessionVar' => 'pointrange',
                     'orderBy'    => 'r.description',
                     'text'       => 'mautic.point.range.thead.description',
                     'class'      => 'col-pointrange-description'
                 ));
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
-                    'sessionVar' => 'point',
+                    'sessionVar' => 'pointrange',
+                    'orderBy'    => 'r.fromScore',
+                    'text'       => 'mautic.point.range.thead.scorerange',
+                    'class'      => 'col-pointrange-scorerange'
+                ));
+
+                echo "<th class='col-pointrange-color'>" . $view['translator']->trans('mautic.point.range.thead.color') . '</th>';
+
+                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                    'sessionVar' => 'pointrange',
                     'orderBy'    => 'r.id',
                     'text'       => 'mautic.point.range.thead.id',
                     'class'      => 'col-pointrange-id'
@@ -76,6 +85,12 @@ $view->extend('MauticPointBundle:Range:index.html.php');
                         </a>
                     </td>
                     <td class="visible-md visible-lg"><?php echo $item->getDescription(); ?></td>
+                    <td class="visible-md visible-lg"><?php echo $item->getFromScore() . ' - ' . $item->getToScore(); ?></td>
+                    <?php
+                    $color = $item->getColor();
+                    $colorStyle = ($color) ? ' style="background-color: ' . $color . '"' : '';
+                    ?>
+                    <td<?php echo $colorStyle; ?> class="visible-md visible-lg"></td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 </tr>
             <?php endforeach; ?>

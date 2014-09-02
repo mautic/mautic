@@ -235,10 +235,10 @@ class CommonController extends FormController
                     $actions  = array_diff_key($addActions, array_flip($deletedActions));
 
                     //make sure that at least one action is selected
-                    if (empty($actions)) {
+                    if ($this->modelName == 'point' && empty($actions)) {
                         //set the error
                         $form->addError(new FormError(
-                            $this->get('translator')->trans('mautic.'.$this->translationVar.'.form.actions.notempty', array(), 'validators')
+                            $this->get('translator')->trans('mautic.point.form.actions.notempty', array(), 'validators')
                         ));
                         $valid = false;
                     } else {
@@ -382,10 +382,10 @@ class CommonController extends FormController
 
                 if ($valid = $this->isFormValid($form)) {
                     //make sure that at least one field is selected
-                    if (empty($addActions)) {
+                    if ($this->modelName == 'point' && empty($addActions)) {
                         //set the error
                         $form->addError(new FormError(
-                            $this->get('translator')->trans('mautic.'.$this->translationVar.'.form.actions.notempty', array(), 'validators')
+                            $this->get('translator')->trans('mautic.point.form.actions.notempty', array(), 'validators')
                         ));
                         $valid = false;
                     } else {

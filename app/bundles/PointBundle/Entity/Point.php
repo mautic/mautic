@@ -14,6 +14,7 @@ use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
  * Class Point
@@ -78,6 +79,16 @@ class Point extends FormEntity
     public function __construct()
     {
         $this->actions = new ArrayCollection();
+    }
+
+    /**
+     * @param ClassMetadata $metadata
+     */
+    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    {
+        $metadata->addPropertyConstraint('name', new Assert\NotBlank(array(
+            'message' => 'mautic.point.name.notblank'
+        )));
     }
 
     protected function isChanged($prop, $val)

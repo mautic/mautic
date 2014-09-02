@@ -87,14 +87,14 @@ class RangeType extends AbstractType
             $data     = true;
         }
 
-        $builder->add('startScore', 'number', array(
-            'label'      => 'mautic.point.range.form.startscore',
+        $builder->add('fromScore', 'number', array(
+            'label'      => 'mautic.point.range.form.fromscore',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control')
         ));
 
-        $builder->add('endScore', 'number', array(
-            'label'      => 'mautic.point.range.form.endscore',
+        $builder->add('toScore', 'number', array(
+            'label'      => 'mautic.point.range.form.toscore',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control')
         ));

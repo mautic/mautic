@@ -211,8 +211,8 @@ class RangeModel extends CommonFormModel
                     'range'      => array(
                         'id'         => $range->getId(),
                         'name'       => $range->getName(),
-                        'startScore' => $range->getStartScore(),
-                        'endScore'   => $range->getEndScore(),
+                        'fromScore' => $range->getFromScore(),
+                        'toScore'   => $range->getToScore(),
                         'color'      => $range->getColor()
                     )
                 ),

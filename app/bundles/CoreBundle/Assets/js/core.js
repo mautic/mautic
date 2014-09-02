@@ -177,7 +177,8 @@ var Mautic = {
 
         mQuery(container + " input[data-toggle='color']").spectrum({
             allowEmpty: true,
-            showInput: true
+            showInput: true,
+            preferredFormat: 'hex'
         });
 
         //Set the height of containers
