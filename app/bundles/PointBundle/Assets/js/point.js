@@ -30,7 +30,7 @@ Mautic.pointOnLoad = function (container) {
     }
 };
 
-Mautic.pointactionOnLoad = function (container, response) {
+Mautic.pointActionOnLoad = function (container, response) {
     //new action created so append it to the form
     if (response.actionHtml) {
         var newHtml = response.actionHtml;

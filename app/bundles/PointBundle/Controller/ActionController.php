@@ -9,16 +9,18 @@
 
 namespace Mautic\PointBundle\Controller;
 
-class RangeActionController extends CommonActionController
+class ActionController extends CommonActionController
 {
 
     public function __construct()
     {
         $this->permissionName = "points";
-        $this->actionVar = "pointactions";
-        $this->modelName = "point";
-        $this->formName = "pointaction";
-        $this->templateVar = "Point";
-        $this->mauticContent = "pointAction";
+        $this->actionVar      = "pointaction";
+        $this->modelName      = "point";
+        $this->formName       = "pointaction";
+        $this->templateVar    = "Point";
+        $this->mauticContent  = "pointAction";
+        $this->routeVar       = "pointaction";
+        $this->entityClass    = "Action";
     }
 }

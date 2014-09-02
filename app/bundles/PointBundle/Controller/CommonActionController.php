@@ -10,7 +10,6 @@
 namespace Mautic\PointBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
-use Mautic\PointBundle\Entity as PointEntities;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class CommonActionController extends CommonFormController
@@ -22,6 +21,7 @@ class CommonActionController extends CommonFormController
     protected $formName;
     protected $templateVar;
     protected $mauticContent;
+    protected $routeVar;
 
     /**
      * Generates new form and processes post data
@@ -57,7 +57,7 @@ class CommonActionController extends CommonFormController
 
         //fire the builder event
         $customComponents = $this->factory->getModel($this->modelName)->getCustomComponents();
-        $form = $this->get('form.factory')->create($this->formVar, $pointAction, array(
+        $form = $this->get('form.factory')->create($this->formName, $pointAction, array(
             'action'    => $this->generateUrl('mautic_'.$this->routeVar.'_action', array('objectAction' => 'new')),
             'settings'  => $customComponents['actions'][$actionType]
         ));
@@ -114,18 +114,21 @@ class CommonActionController extends CommonFormController
 
         if (!empty($keyId) ) {
             //prevent undefined errors
-            $class = "PointEntities\\{$this->entityClass}";
-            $entity    = new $class();
-            $blank     = $entity->convertToArray();
+            $class       = "\\Mautic\\PointBundle\\Entity\\{$this->entityClass}";
+            $entity      = new $class();
+            $blank       = $entity->convertToArray();
             $pointAction = array_merge($blank, $pointAction);
 
-            $template = (!empty($pointAction['settings']['template'])) ? $pointAction['settings']['template'] :
-                'MauticPointBundle:Action:generic.html.php';
+            $template = (empty($pointAction['settings']['template'])) ? 'MauticPointBundle:Action:generic.html.php'
+                : $pointAction['settings']['template'];
+
+
             $passthroughVars['actionId']   = $keyId;
             $passthroughVars['actionHtml'] = $this->renderView($template, array(
-                'inForm' => true,
-                'action' => $pointAction,
-                'id'     => $keyId
+                'inForm'      => true,
+                'action'      => $pointAction,
+                'id'          => $keyId,
+                'builderType' => $this->templateVar
             ));
         }
 
@@ -165,7 +168,7 @@ class CommonActionController extends CommonFormController
                 return $this->accessDenied();
             }
 
-            $form = $this->get('form.factory')->create($this->formVar, $pointAction, array(
+            $form = $this->get('form.factory')->create($this->formName, $pointAction, array(
                 'action'   => $this->generateUrl('mautic_'.$this->routeVar.'_action', array('objectAction' => 'edit', 'objectId' => $objectId)),
                 'settings' => $pointAction['settings']
             ));
@@ -225,15 +228,20 @@ class CommonActionController extends CommonFormController
                 $passthroughVars['actionId'] = $keyId;
 
                 //prevent undefined errors
-                $entity     = new $this->entityClass();
+                $class      = "\\Mautic\\PointBundle\\Entity\\{$this->entityClass}";
+                $entity     = new $class();
                 $blank      = $entity->convertToArray();
                 $pointAction = array_merge($blank, $pointAction);
-                $template   = (!empty($pointAction['settings']['template'])) ? $pointAction['settings']['template'] :
-                    'MauticPointBundle:Action:generic.html.php';
+                $template = (empty($pointAction['settings']['template'])) ? 'MauticPointBundle:Action:generic.html.php'
+                    : $pointAction['settings']['template'];
+
+
+                $passthroughVars['actionId']   = $keyId;
                 $passthroughVars['actionHtml'] = $this->renderView($template, array(
-                    'inForm' => true,
-                    'action'  => $pointAction,
-                    'id'     => $keyId
+                    'inForm'      => true,
+                    'action'      => $pointAction,
+                    'id'          => $keyId,
+                    'builderType' => $this->templateVar
                 ));
             }
 
@@ -277,29 +285,31 @@ class CommonActionController extends CommonFormController
             //add the field to the delete list
             if (!in_array($objectId, $delete)) {
                 $delete[] = $objectId;
-                $session->set('mautic.'.$this->actionVar.'.remove', $delete);
+                $session->set('mautic.' . $this->actionVar . '.remove', $delete);
             }
 
-            $template = (!empty($pointAction['settings']['template'])) ? $pointAction['settings']['template'] :
-                'MauticPointBundle:Action:generic.html.php';
+            $template = (empty($pointAction['settings']['template'])) ? 'MauticPointBundle:Action:generic.html.php'
+                : $pointAction['settings']['template'];
 
             //prevent undefined errors
-            $entity    = new $this->entityClass();
-            $blank     = $entity->convertToArray();
+            $class       = "\\Mautic\\PointBundle\\Entity\\{$this->entityClass}";
+            $entity      = new $class();
+            $blank       = $entity->convertToArray();
             $pointAction = array_merge($blank, $pointAction);
 
-            $dataArray  = array(
+            $dataArray = array(
                 'mauticContent'  => $this->mauticContent,
                 'success'        => 1,
-                'target'         => '#action_'.$objectId,
+                'target'         => '#action_' . $objectId,
                 'route'          => false,
-                'actionId'        => $objectId,
+                'actionId'       => $objectId,
                 'replaceContent' => true,
-                'actionHtml'      => $this->renderView($template, array(
-                    'inForm'  => true,
-                    'action'  => $pointAction,
-                    'id'      => $objectId,
-                    'deleted' => true
+                'actionHtml'     => $this->renderView($template, array(
+                    'inForm'      => true,
+                    'action'      => $pointAction,
+                    'id'          => $objectId,
+                    'deleted'     => true,
+                    'builderType' => $this->templateVar
                 ))
             );
         } else {
@@ -341,29 +351,31 @@ class CommonActionController extends CommonFormController
             if (in_array($objectId, $delete)) {
                 $key = array_search($objectId, $delete);
                 unset($delete[$key]);
-                $session->set('mautic.'.$this->actionVar.'.remove', $delete);
+                $session->set('mautic.' . $this->actionVar . '.remove', $delete);
             }
 
-            $template = (!empty($pointAction['settings']['template'])) ? $pointAction['settings']['template'] :
-                'MauticPointBundle:Action:generic.html.php';
+            $template = (empty($pointAction['settings']['template'])) ? 'MauticPointBundle:Action:generic.html.php'
+                : $pointAction['settings']['template'];
 
             //prevent undefined errors
-            $entity      = new $this->entityClass();
+            $class       = "\\Mautic\\PointBundle\\Entity\\{$this->entityClass}";
+            $entity      = new $class();
             $blank       = $entity->convertToArray();
             $pointAction = array_merge($blank, $pointAction);
 
-            $dataArray  = array(
+            $dataArray = array(
                 'mauticContent'  => $this->mauticContent,
                 'success'        => 1,
-                'target'         => '#action_'.$objectId,
+                'target'         => '#action_' . $objectId,
                 'route'          => false,
                 'actionId'       => $objectId,
                 'replaceContent' => true,
                 'actionHtml'     => $this->renderView($template, array(
-                    'inForm'  => true,
-                    'action'  => $pointAction,
-                    'id'      => $objectId,
-                    'deleted' => false
+                    'inForm'      => true,
+                    'action'      => $pointAction,
+                    'id'          => $objectId,
+                    'deleted'     => false,
+                    'builderType' => $this->templateVar
                 ))
             );
         } else {

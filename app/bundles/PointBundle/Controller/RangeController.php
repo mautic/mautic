@@ -17,7 +17,7 @@ class RangeController extends CommonController
         $this->modelName      = "point.range";
         $this->sessionVar     = "pointrange";
         $this->translationVar = "point.range";
-        $this->routerVar      = "pointrange";
+        $this->routeVar       = "pointrange";
         $this->templateVar    = "Range";
         $this->actionVar      = "pointrangeaction";
         $this->mauticContent  = "pointRange";

@@ -22,7 +22,7 @@ class CommonController extends FormController
     protected $modelName;
     protected $sessionVar;
     protected $translationVar;
-    protected $routerVar;
+    protected $routeVar;
     protected $templateVar;
     protected $actionVar;
     protected $mauticContent;
@@ -92,14 +92,14 @@ class CommonController extends FormController
                 $lastPage = (floor($limit / $count)) ? : 1;
             }
             $this->factory->getSession()->set('mautic.'.$this->sessionVar.'.page', $lastPage);
-            $returnUrl   = $this->generateUrl('mautic_'.$this->routerVar.'_index', array('page' => $lastPage));
+            $returnUrl   = $this->generateUrl('mautic_'.$this->routeVar.'_index', array('page' => $lastPage));
 
             return $this->postActionRedirect(array(
                 'returnUrl'       => $returnUrl,
                 'viewParameters'  => array('page' => $lastPage),
                 'contentTemplate' => 'MauticPointBundle:'.$this->templateVar.':index',
                 'passthroughVars' => array(
-                    'activeLink'    => '#mautic_'.$this->routerVar.'_index',
+                    'activeLink'    => '#mautic_'.$this->routeVar.'_index',
                     'mauticContent' => $this->mauticContent
                 )
             ));
@@ -122,9 +122,9 @@ class CommonController extends FormController
             ),
             'contentTemplate' => 'MauticPointBundle:'.$this->templateVar.':list.html.php',
             'passthroughVars' => array(
-                'activeLink'     => '#mautic_'.$this->routerVar.'_index',
+                'activeLink'     => '#mautic_'.$this->routeVar.'_index',
                 'mauticContent'  => $this->mauticContent,
-                'route'          => $this->generateUrl('mautic_'.$this->routerVar.'_index', array('page' => $page)),
+                'route'          => $this->generateUrl('mautic_'.$this->routeVar.'_index', array('page' => $page)),
                 'replaceContent' => ($tmpl == 'list') ? 'true' : 'false'
             )
         ));
@@ -144,14 +144,14 @@ class CommonController extends FormController
 
         if ($entity === null) {
             //set the return URL
-            $returnUrl  = $this->generateUrl('mautic_'.$this->routerVar.'_index', array('page' => $page));
+            $returnUrl  = $this->generateUrl('mautic_'.$this->routeVar.'_index', array('page' => $page));
 
             return $this->postActionRedirect(array(
                 'returnUrl'       => $returnUrl,
                 'viewParameters'  => array('page' => $page),
                 'contentTemplate' => 'MauticPointBundle:'.$this->templateVar.':index',
                 'passthroughVars' => array(
-                    'activeLink'    => '#mautic_'.$this->routerVar.'_index',
+                    'activeLink'    => '#mautic_'.$this->routeVar.'_index',
                     'mauticContent' => $this->mauticContent
                 ),
                 'flashes'         =>array(
@@ -190,9 +190,9 @@ class CommonController extends FormController
             ),
             'contentTemplate' => 'MauticPointBundle:'.$this->templateVar.':details.html.php',
             'passthroughVars' => array(
-                'activeLink'    => '#mautic_'.$this->routerVar.'_index',
+                'activeLink'    => '#mautic_'.$this->routeVar.'_index',
                 'mauticContent' => $this->mauticContent,
-                'route'         => $this->generateUrl('mautic_'.$this->routerVar.'_action', array(
+                'route'         => $this->generateUrl('mautic_'.$this->routeVar.'_action', array(
                         'objectAction' => 'view',
                         'objectId'     => $entity->getId())
                 )
@@ -223,7 +223,7 @@ class CommonController extends FormController
         $addActions     = $session->get('mautic.'.$this->actionVar.'.add', array());
         $deletedActions = $session->get('mautic.'.$this->actionVar.'.remove', array());
 
-        $action = $this->generateUrl('mautic_'.$this->routerVar.'_action', array('objectAction' => 'new'));
+        $action = $this->generateUrl('mautic_'.$this->routeVar.'_action', array('objectAction' => 'new'));
         $form   = $model->createForm($entity, $this->get('form.factory'), $action);
 
         ///Check for a submitted form and process it
@@ -251,7 +251,7 @@ class CommonController extends FormController
                             'notice',
                             $this->get('translator')->trans('mautic.'.$this->translationVar.'.notice.created', array(
                                 '%name%' => $entity->getName(),
-                                '%url%'          => $this->generateUrl('mautic_'.$this->routerVar.'_action', array(
+                                '%url%'          => $this->generateUrl('mautic_'.$this->routeVar.'_action', array(
                                     'objectAction' => 'edit',
                                     'objectId'     => $entity->getId()
                                 ))
@@ -263,7 +263,7 @@ class CommonController extends FormController
                                 'objectAction' => 'view',
                                 'objectId'     => $entity->getId()
                             );
-                            $returnUrl      = $this->generateUrl('mautic_'.$this->routerVar.'_action', $viewParameters);
+                            $returnUrl      = $this->generateUrl('mautic_'.$this->routeVar.'_action', $viewParameters);
                             $template       = 'MauticPointBundle:'.$this->templateVar.':view';
                         } else {
                             //return edit view so that all the session stuff is loaded
@@ -273,7 +273,7 @@ class CommonController extends FormController
                 }
             } else {
                 $viewParameters  = array('page' => $page);
-                $returnUrl = $this->generateUrl('mautic_'.$this->routerVar.'_index', $viewParameters);
+                $returnUrl = $this->generateUrl('mautic_'.$this->routeVar.'_index', $viewParameters);
                 $template  = 'MauticPointBundle:'.$this->templateVar.':index';
             }
 
@@ -286,7 +286,7 @@ class CommonController extends FormController
                     'viewParameters'  => $viewParameters,
                     'contentTemplate' => $template,
                     'passthroughVars' => array(
-                        'activeLink'    => '#mautic_'.$this->routerVar.'_index',
+                        'activeLink'    => '#mautic_'.$this->routeVar.'_index',
                         'mauticContent' => $this->mauticContent
                     )
                 ));
@@ -310,9 +310,9 @@ class CommonController extends FormController
             ),
             'contentTemplate' => 'MauticPointBundle:'.$this->templateVar.'Builder:components.html.php',
             'passthroughVars' => array(
-                'activeLink'    => '#mautic_'.$this->routerVar.'_index',
+                'activeLink'    => '#mautic_'.$this->routeVar.'_index',
                 'mauticContent' => $this->mauticContent,
-                'route'         => $this->generateUrl('mautic_'.$this->routerVar.'_action', array(
+                'route'         => $this->generateUrl('mautic_'.$this->routeVar.'_action', array(
                     'objectAction' => (!empty($valid) ? 'edit' : 'new'), //valid means a new form was applied
                     'objectId'     => $entity->getId())
                 )
@@ -335,14 +335,14 @@ class CommonController extends FormController
         $page    = $this->factory->getSession()->get('mautic.'.$this->sessionVar.'.page', 1);
 
         //set the return URL
-        $returnUrl  = $this->generateUrl('mautic_'.$this->routerVar.'_index', array('page' => $page));
+        $returnUrl  = $this->generateUrl('mautic_'.$this->routeVar.'_index', array('page' => $page));
 
         $postActionVars = array(
             'returnUrl'       => $returnUrl,
             'viewParameters'  => array('page' => $page),
             'contentTemplate' => 'MauticPointBundle:'.$this->templateVar.':index',
             'passthroughVars' => array(
-                'activeLink'    => '#mautic_'.$this->routerVar.'_index',
+                'activeLink'    => '#mautic_'.$this->routeVar.'_index',
                 'mauticContent' => $this->mauticContent
             )
         );
@@ -368,7 +368,7 @@ class CommonController extends FormController
             return $this->isLocked($postActionVars, $entity, $this->modelName);
         }
 
-        $action = $this->generateUrl('mautic_'.$this->routerVar.'_action', array('objectAction' => 'edit', 'objectId' => $objectId));
+        $action = $this->generateUrl('mautic_'.$this->routeVar.'_action', array('objectAction' => 'edit', 'objectId' => $objectId));
         $form   = $model->createForm($entity, $this->get('form.factory'), $action);
 
         ///Check for a submitted form and process it
@@ -401,7 +401,7 @@ class CommonController extends FormController
                             'notice',
                             $this->get('translator')->trans('mautic.'.$this->translationVar.'.notice.updated', array(
                                 '%name%' => $entity->getName(),
-                                '%url%'  => $this->generateUrl('mautic_'.$this->routerVar.'_action', array(
+                                '%url%'  => $this->generateUrl('mautic_'.$this->routeVar.'_action', array(
                                     'objectAction' => 'edit',
                                     'objectId'     => $entity->getId()
                                 ))
@@ -413,7 +413,7 @@ class CommonController extends FormController
                                 'objectAction' => 'view',
                                 'objectId'     => $entity->getId()
                             );
-                            $returnUrl      = $this->generateUrl('mautic_'.$this->routerVar.'_action', $viewParameters);
+                            $returnUrl      = $this->generateUrl('mautic_'.$this->routeVar.'_action', $viewParameters);
                             $template       = 'MauticPointBundle:'.$this->templateVar.':view';
                         }
                     }
@@ -423,7 +423,7 @@ class CommonController extends FormController
                 $model->unlockEntity($entity);
 
                 $viewParameters  = array('page' => $page);
-                $returnUrl = $this->generateUrl('mautic_'.$this->routerVar.'_index', $viewParameters);
+                $returnUrl = $this->generateUrl('mautic_'.$this->routeVar.'_index', $viewParameters);
                 $template  = 'MauticPointBundle:'.$this->templateVar.':index';
             }
 
@@ -479,9 +479,9 @@ class CommonController extends FormController
             ),
             'contentTemplate' => 'MauticPointBundle:'.$this->templateVar.'Builder:components.html.php',
             'passthroughVars' => array(
-                'activeLink'    => '#mautic_'.$this->routerVar.'_index',
+                'activeLink'    => '#mautic_'.$this->routeVar.'_index',
                 'mauticContent' => $this->mauticContent,
-                'route'         => $this->generateUrl('mautic_'.$this->routerVar.'_action', array(
+                'route'         => $this->generateUrl('mautic_'.$this->routeVar.'_action', array(
                     'objectAction' => 'edit',
                     'objectId'     => $entity->getId())
                 )
@@ -526,7 +526,7 @@ class CommonController extends FormController
      */
     public function deleteAction($objectId) {
         $page        = $this->factory->getSession()->get('mautic.'.$this->sessionVar.'.page', 1);
-        $returnUrl   = $this->generateUrl('mautic_'.$this->routerVar.'_index', array('page' => $page));
+        $returnUrl   = $this->generateUrl('mautic_'.$this->routeVar.'_index', array('page' => $page));
         $flashes     = array();
 
         $postActionVars = array(
@@ -534,7 +534,7 @@ class CommonController extends FormController
             'viewParameters'  => array('page' => $page),
             'contentTemplate' => 'MauticPointBundle:'.$this->templateVar.':index',
             'passthroughVars' => array(
-                'activeLink'    => '#mautic_'.$this->routerVar.'_index',
+                'activeLink'    => '#mautic_'.$this->routeVar.'_index',
                 'mauticContent' => $this->mauticContent
             )
         );

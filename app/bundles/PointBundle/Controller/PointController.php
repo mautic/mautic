@@ -17,7 +17,7 @@ class PointController extends CommonController
         $this->modelName      = "point";
         $this->sessionVar     = "point";
         $this->translationVar = "point";
-        $this->routerVar      = "point";
+        $this->routeVar       = "point";
         $this->templateVar    = "Point";
         $this->actionVar      = "pointaction";
         $this->mauticContent  = "point";
