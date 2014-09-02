@@ -146,7 +146,10 @@ class ReportType extends AbstractType
                 'required'     => false
             ));
 
-            $builder->add('buttons', 'form_buttons');
+            $builder->add('buttons', 'form_buttons', array(
+                'apply_onclick' => 'Mautic.preprocessSaveReportForm("form[name=report]");',
+                'save_onclick'  => 'Mautic.preprocessSaveReportForm("form[name=report]");'
+            ));
         }
 
         if (!empty($options["action"])) {
