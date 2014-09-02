@@ -123,6 +123,36 @@ class ReportController extends FormController
     }
 
     /**
+     * Clone an entity
+     *
+     * @param $objectId
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     */
+    public function cloneAction ($objectId)
+    {
+        /* @type \Mautic\ReportBundle\Model\ReportModel $model */
+        $model   = $this->factory->getModel('report');
+        $entity  = $model->getEntity($objectId);
+
+        if ($entity != null) {
+            if (!$this->factory->getSecurity()->isGranted('report:reports:create') ||
+                !$this->factory->getSecurity()->hasEntityAccess(
+                    'report:reports:viewown', 'report:reports:viewother', $entity->getCreatedBy()
+                )
+            ) {
+                return $this->accessDenied();
+            }
+
+            $clone = clone $entity;
+            $clone->setIsPublished(false);
+            $model->saveEntity($clone);
+            $objectId = $clone->getId();
+        }
+
+        return $this->editAction($objectId);
+    }
+
+    /**
      * Generates edit form and processes post data
      *
      * @param integer $objectId   Item ID

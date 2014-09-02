@@ -74,7 +74,7 @@ class ReportModel extends FormModel
         $params = (!empty($action)) ? array('action' => $action) : array();
         $params['read_only'] = false;
 
-        $reportGenerator = new ReportGenerator($this->em, $this->factory->getSecurityContext(), $formFactory);
+        $reportGenerator = new ReportGenerator($this->em, $this->factory->getSecurityContext(), $formFactory, $entity);
 
         return $reportGenerator->getForm($entity, $params);
     }
