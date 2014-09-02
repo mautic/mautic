@@ -50,10 +50,10 @@ class ReportRepository extends CommonRepository
      * @param bool   $viewOther
      * @return array
      */
-    public function getAssetList($search = '', $limit = 10, $start = 0, $viewOther = false)
+    public function getReportList($search = '', $limit = 10, $start = 0, $viewOther = false)
     {
         $q = $this->createQueryBuilder('p');
-        $q->select('partial p.{id, title, language, alias}');
+        $q->select('partial p.{id, title}');
 
         if (!empty($search)) {
             $q->andWhere($q->expr()->like('p.title', ':search'))
@@ -86,8 +86,7 @@ class ReportRepository extends CommonRepository
         $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
 
         $expr = $q->expr()->orX(
-            $q->expr()->like('p.title',  ":$unique"),
-            $q->expr()->like('p.alias',  ":$unique")
+            $q->expr()->like('p.title',  ":$unique")
         );
         if ($filter->not) {
             $expr = $q->expr()->not($expr);
