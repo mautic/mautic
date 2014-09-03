@@ -487,7 +487,8 @@ class ReportController extends FormController
             'start'      => $start,
             'limit'      => $limit,
             'orderBy'    => $orderBy,
-            'orderByDir' => $orderByDir
+            'orderByDir' => $orderByDir,
+            'table_list' => $model->getTableData()
         );
 
         $query = $reportGenerator->getQuery($options);

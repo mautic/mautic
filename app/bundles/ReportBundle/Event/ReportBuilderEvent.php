@@ -36,7 +36,7 @@ class ReportBuilderEvent extends Event
      */
     public function addTable($tableName, array $columns)
     {
-        $this->tableArray[$table] = $columns;
+        $this->tableArray[$tableName] = $columns;
     }
 
     /**

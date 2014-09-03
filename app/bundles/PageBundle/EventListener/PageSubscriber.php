@@ -9,13 +9,15 @@
 
 namespace Mautic\PageBundle\EventListener;
 
-use Mautic\ApiBundle\ApiEvents;
 use Mautic\ApiBundle\Event\RouteEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\PageBundle\Event as Events;
 use Mautic\PageBundle\PageEvents;
+use Mautic\ReportBundle\Event\ReportBuilderEvent;
+use Mautic\ReportBundle\ReportEvents;
+
 /**
  * Class PageSubscriber
  *
@@ -33,7 +35,8 @@ class PageSubscriber extends CommonSubscriber
             CoreEvents::GLOBAL_SEARCH      => array('onGlobalSearch', 0),
             CoreEvents::BUILD_COMMAND_LIST => array('onBuildCommandList', 0),
             PageEvents::PAGE_POST_SAVE     => array('onPagePostSave', 0),
-            PageEvents::PAGE_POST_DELETE   => array('onPageDelete', 0)
+            PageEvents::PAGE_POST_DELETE   => array('onPageDelete', 0),
+            ReportEvents::REPORT_ON_BUILD  => array('onReportBuilder', 0)
         );
     }
 
@@ -144,5 +147,19 @@ class PageSubscriber extends CommonSubscriber
             "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
         );
         $this->factory->getModel('core.auditLog')->writeToLog($log);
+    }
+
+    /**
+     * Add available tables and columns to the report builder lookup
+     *
+     * @param ReportBuilderEvent $event
+     *
+     * @return void
+     */
+    public function onReportBuilder(ReportBuilderEvent $event)
+    {
+        $fields = $this->factory->getEntityManager()->getClassMetadata('Mautic\\PageBundle\\Entity\\Page')->getFieldNames();
+
+        $event->addTable('pages', $fields);
     }
 }

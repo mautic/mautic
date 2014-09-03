@@ -89,10 +89,10 @@ final class MauticReportBuilder implements ReportBuilderInterface
      */
     protected function configureBuilder(QueryBuilder $queryBuilder, array $options)
     {
-        // TODO - Rethink how the source is stored
+        echo 'Temporarily unavailable';die;
         $source   = $this->entity->getSource();
         $metadata = $this->entityManager->getClassMetadata('Mautic\\' . $source . 'Bundle\\Entity\\' . $source);
-        $columns  = $metadata->getFieldNames();
+        $columns  = $options['table_list'][$source];
         $fields   = $this->entity->getColumns();
         $key      = $metadata->getSingleIdentifierFieldName();
 
