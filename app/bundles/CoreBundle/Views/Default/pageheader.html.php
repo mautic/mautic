@@ -27,7 +27,7 @@ endif;
                 <?php $view['slots']->output('actions'); ?>
 
                 <div class="toolbar-bundle-buttons pull-left"><?php $view['slots']->output('toolbar'); ?></div>
-                <div class="toolbar-form-buttons hide pull-right"></div>
+                <div class="toolbar-form-buttons hide pull-right btn-group"></div>
                 <div class="pull-right toolbar <?php echo $searchClass; ?>">
                     <div class="input-group toolbar-action-buttons">
                         <?php if (!empty($searchUri)): ?>
