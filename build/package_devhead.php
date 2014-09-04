@@ -46,4 +46,6 @@ system('rm -rf packaging/app/logs');
 
 // Step 5 - ZIP it up
 echo "Packaging Mautic\n";
-system('zip -r packages/mautic-head.zip addons/ app/ assets/ bin/ themes/ vendor/ .htaccess index.php LICENSE.txt robots.txt');
+chdir(__DIR__ . '/packaging');
+system('find . -type d -name .git -exec rm -rf {} \\; > /dev/null');
+system('zip -r ../packages/mautic-head.zip addons/ app/ assets/ bin/ themes/ vendor/ .htaccess index.php LICENSE.txt robots.txt > /dev/null');
