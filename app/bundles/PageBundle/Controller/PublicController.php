@@ -27,12 +27,10 @@ class PublicController extends CommonFormController
         $entity     = $model->getEntityBySlugs($slug1, $slug2, $slug3);
 
         if (!empty($entity)) {
-            $category     = $entity->getCategory();
-            $catPublished = (!empty($category)) ? $category->isPublished() : true;
             $published    = $entity->isPublished();
 
             //make sure the page is published or deny access if not
-            if ((!$catPublished || !$published) && (!$security->hasEntityAccess(
+            if ((!$published) && (!$security->hasEntityAccess(
                     'page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy()))
             ) {
                 $model->hitPage($entity, $this->request, 401);

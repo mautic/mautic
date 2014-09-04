@@ -26,12 +26,10 @@ class PublicController extends CommonFormController
         $entity     = $model->getEntityBySlugs($slug);
 
         if (!empty($entity)) {
-            $category     = $entity->getCategory();
-            $catPublished = (!empty($category)) ? $category->isPublished() : true;
             $published    = $entity->isPublished();
 
             //make sure the asset is published or deny access if not
-            if ((!$catPublished || !$published) && (!$security->hasEntityAccess(
+            if ((!$published) && (!$security->hasEntityAccess(
                     'asset:assets:viewown', 'asset:assets:viewother', $entity->getCreatedBy()))
             ) {
                 $model->trackDownload($entity, $this->request, 401);
