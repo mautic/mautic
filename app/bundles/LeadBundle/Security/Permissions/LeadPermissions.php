@@ -23,17 +23,8 @@ class LeadPermissions extends AbstractPermissions
     public function __construct($params)
     {
         parent::__construct($params);
+
         $this->permissions = array(
-            'leads' => array(
-                'viewown'     => 1,
-                'viewother'   => 2,
-                'editown'     => 4,
-                'editother'   => 8,
-                'create'      => 16,
-                'deleteown'   => 32,
-                'deleteother' => 64,
-                'full'        => 1024
-            ),
             'lists' => array(
                 'viewother'   => 2,
                 'editother'   => 8,
@@ -42,18 +33,10 @@ class LeadPermissions extends AbstractPermissions
             ),
             'fields' => array(
                 'full'        => 1024
-            ),
-            'notes' => array(
-                'viewown'     => 1,
-                'viewother'   => 2,
-                'editown'     => 4,
-                'editother'   => 8,
-                'create'      => 16,
-                'deleteown'   => 32,
-                'deleteother' => 64,
-                'full'        => 1024
-            ),
+            )
         );
+        $this->addExtendedPermissions('leads', false);
+        $this->addExtendedPermissions('notes', false);
     }
 
     /**
@@ -75,25 +58,7 @@ class LeadPermissions extends AbstractPermissions
      */
     public function buildForm (FormBuilderInterface &$builder, array $options, array $data)
     {
-        $builder->add('lead:leads', 'button_group', array(
-            'choices'  => array(
-                'viewown'     => 'mautic.core.permissions.viewown',
-                'viewother'   => 'mautic.core.permissions.viewother',
-                'editown'     => 'mautic.core.permissions.editown',
-                'editother'   => 'mautic.core.permissions.editother',
-                'create'      => 'mautic.core.permissions.create',
-                'deleteown'   => 'mautic.core.permissions.deleteown',
-                'deleteother' => 'mautic.core.permissions.deleteother',
-                'full'        => 'mautic.core.permissions.full'
-            ),
-            'label'    => 'mautic.lead.permissions.leads',
-            'expanded' => true,
-            'multiple' => true,
-            'attr'     => array(
-                'onclick' => 'Mautic.onPermissionChange(this, event, \'lead\')'
-            ),
-            'data'     => (!empty($data['leads']) ? $data['leads'] : array())
-        ));
+        $this->addExtendedFormFields('lead', 'leads', $builder, $data, false);
 
         $builder->add('lead:lists', 'button_group', array(
             'choices'  => array(
@@ -124,25 +89,7 @@ class LeadPermissions extends AbstractPermissions
             'data'     => (!empty($data['fields']) ? $data['fields'] : array())
         ));
 
-        $builder->add('lead:notes', 'button_group', array(
-            'choices'  => array(
-                'viewown'     => 'mautic.core.permissions.viewown',
-                'viewother'   => 'mautic.core.permissions.viewother',
-                'editown'     => 'mautic.core.permissions.editown',
-                'editother'   => 'mautic.core.permissions.editother',
-                'create'      => 'mautic.core.permissions.create',
-                'deleteown'   => 'mautic.core.permissions.deleteown',
-                'deleteother' => 'mautic.core.permissions.deleteother',
-                'full'        => 'mautic.core.permissions.full'
-            ),
-            'label'    => 'mautic.lead.permissions.notes',
-            'expanded' => true,
-            'multiple' => true,
-            'attr'     => array(
-                'onclick' => 'Mautic.onPermissionChange(this, event, \'lead\')'
-            ),
-            'data'     => (!empty($data['notes']) ? $data['notes'] : array())
-        ));
+        $this->addExtendedFormFields('lead', 'notes', $builder, $data, false);
     }
 
     /**
@@ -157,7 +104,7 @@ class LeadPermissions extends AbstractPermissions
         $leadPermissions = (isset($permissions['lead:leads'])) ? $permissions['lead:leads'] : array();
 
         //make sure the user has access to own leads as well if they have access to lists, notes or fields
-        if ((array_key_exists("lead:lists", $permissions) || 
+        if ((array_key_exists("lead:lists", $permissions) ||
             array_key_exists("lead:fields", $permissions) ||
             array_key_exists("lead:notes", $permissions)) &&
             (!in_array("full", $leadPermissions) && !in_array("viewown", $leadPermissions) &&

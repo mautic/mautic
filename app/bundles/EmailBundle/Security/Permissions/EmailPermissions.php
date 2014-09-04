@@ -26,28 +26,8 @@ class EmailPermissions extends AbstractPermissions
     public function __construct($params)
     {
         parent::__construct($params);
-        $this->permissions = array(
-            'categories' => array(
-                'view'          => 1,
-                'edit'          => 4,
-                'create'        => 8,
-                'delete'        => 32,
-                'publish'       => 64,
-                'full'          => 1024
-            ),
-            'emails' => array(
-                'viewown'      => 2,
-                'viewother'    => 4,
-                'editown'      => 8,
-                'editother'    => 16,
-                'create'       => 32,
-                'deleteown'    => 64,
-                'deleteother'  => 128,
-                'publishown'   => 256,
-                'publishother' => 512,
-                'full'         => 1024
-            )
-        );
+        $this->addStandardPermissions('categories');
+        $this->addExtendedPermissions('emails');
     }
 
     /**
@@ -67,79 +47,8 @@ class EmailPermissions extends AbstractPermissions
      */
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {
-        $builder->add('email:categories', 'button_group', array(
-            'choices'    => array(
-                'view'    => 'mautic.core.permissions.view',
-                'edit'    => 'mautic.core.permissions.edit',
-                'create'  => 'mautic.core.permissions.create',
-                'publish' => 'mautic.core.permissions.publish',
-                'delete'  => 'mautic.core.permissions.delete',
-                'full'    => 'mautic.core.permissions.full'
-            ),
-            'label'      => 'mautic.email.permissions.categories',
-            'label_attr' => array('class' => 'control-label'),
-            'expanded'   => true,
-            'multiple'   => true,
-            'attr'       => array(
-                'onclick' => 'Mautic.onPermissionChange(this, event, \'email\')'
-            ),
-            'data'      => (!empty($data['categories']) ? $data['categories'] : array())
-        ));
-
-        $builder->add('email:emails', 'button_group', array(
-            'choices'  => array(
-                'viewown'      => 'mautic.core.permissions.viewown',
-                'viewother'    => 'mautic.core.permissions.viewother',
-                'editown'      => 'mautic.core.permissions.editown',
-                'editother'    => 'mautic.core.permissions.editother',
-                'create'       => 'mautic.core.permissions.create',
-                'deleteown'    => 'mautic.core.permissions.deleteown',
-                'deleteother'  => 'mautic.core.permissions.deleteother',
-                'publishown'   => 'mautic.core.permissions.publishown',
-                'publishother' => 'mautic.core.permissions.publishother',
-                'full'         => 'mautic.core.permissions.full'
-            ),
-            'label'    => 'mautic.email.permissions.emails',
-            'expanded' => true,
-            'multiple' => true,
-            'attr'     => array(
-                'onclick' => 'Mautic.onPermissionChange(this, event, \'email\')'
-            ),
-            'data'     => (!empty($data['emails']) ? $data['emails'] : array())
-        ));
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @param $name
-     * @param $level
-     * @return array
-     */
-    protected function getSynonym($name, $level) {
-        if ($name == "categories") {
-            //set some synonyms
-            switch ($level) {
-                case "viewown":
-                case "viewother":
-                    $level = "view";
-                    break;
-                case "editown":
-                case "editother":
-                    $level = "edit";
-                    break;
-                case "deleteown":
-                case "deleteother":
-                    $level = "delete";
-                    break;
-                case "publishown":
-                case "publishother":
-                    $level = "publish";
-                    break;
-            }
-        }
-
-        return array($name, $level);
+        $this->addStandardFormFields('email', 'categories', $builder, $data);
+        $this->addExtendedFormFields('email', 'emails', $builder, $data);
     }
 
     /**

@@ -9,6 +9,7 @@
 
 namespace Mautic\CoreBundle\Security\Permissions;
 
+use Mautic\CategoryBundle\Helper\PermissionHelper;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
@@ -142,6 +143,24 @@ abstract class AbstractPermissions {
      * @return array
      */
     protected function getSynonym($name, $level) {
+        if (in_array($level, array('viewown', 'viewother'))) {
+            if (isset($this->permissions[$name]['view'])) {
+                $level = 'view';
+            }
+        } elseif (in_array($level, array('editown', 'editother'))) {
+            if (isset($this->permissions[$name]['edit'])) {
+                $level = 'edit';
+            }
+        } elseif (in_array($level, array('deleteown', 'deleteother'))) {
+            if (isset($this->permissions[$name]['delete'])) {
+                $level = 'delete';
+            }
+        } elseif (in_array($level, array('publishown', 'publishother'))) {
+            if (isset($this->permissions[$name]['publish']))  {
+                $level = 'publish';
+            }
+        }
+
         return array($name, $level);
     }
 
@@ -214,6 +233,7 @@ abstract class AbstractPermissions {
                     }
                 }
             }
+
             $perms = $updatedPerms;
         }
     }
@@ -264,5 +284,152 @@ abstract class AbstractPermissions {
     public function parseForJavascript(array &$perms)
     {
         //...
+    }
+
+    /**
+     * Adds the standard permission set of view, edit, create, delete, publish and full
+     *
+     * @param $permissionNames
+     * @param $includePublish
+     */
+    protected function addStandardPermissions($permissionNames, $includePublish = true) {
+        if (!is_array($permissionNames)) {
+            $permissionNames = array($permissionNames);
+        }
+
+        foreach ($permissionNames as $p) {
+            $this->permissions[$p] = array(
+                'view'    => 4,
+                'edit'    => 16,
+                'create'  => 32,
+                'delete'  => 128,
+                'full'    => 1024
+            );
+            if ($includePublish) {
+                $this->permissions[$p]['publish'] = 512;
+            }
+        }
+    }
+
+    /**
+     * Adds the standard permission set of view, edit, create, delete, publish and full to the form builder
+     *
+     * @param $bundle
+     * @param $level
+     * @param $builder
+     * @param $data
+     * @param $includePublish
+     */
+    protected function addStandardFormFields($bundle, $level, &$builder, $data, $includePublish = true)
+    {
+        $choices =  $includePublish ?
+            array(
+                'view'    => 'mautic.core.permissions.view',
+                'edit'    => 'mautic.core.permissions.edit',
+                'create'  => 'mautic.core.permissions.create',
+                'delete'  => 'mautic.core.permissions.delete',
+                'publish' => 'mautic.core.permissions.publish',
+                'full'    => 'mautic.core.permissions.full'
+            ) :
+            array(
+                'view'    => 'mautic.core.permissions.view',
+                'edit'    => 'mautic.core.permissions.edit',
+                'create'  => 'mautic.core.permissions.create',
+                'delete'  => 'mautic.core.permissions.delete',
+                'full'    => 'mautic.core.permissions.full'
+            );
+
+        $label = ($level == "categories") ? "mautic.category.permissions.categories" : "mautic.$bundle.permissions.$level";
+        $builder->add("$bundle:$level", 'button_group', array(
+                'choices'  => $choices,
+                'label'    => $label,
+                'expanded' => true,
+                'multiple' => true,
+                'attr'     => array(
+                    'onclick' => 'Mautic.onPermissionChange(this, event, \''.$bundle.'\')'
+                ),
+                'data'     => (!empty($data[$level]) ? $data[$level] : array())
+            )
+        );
+    }
+
+
+    /**
+     * Adds the standard permission set of viewown, viewother, editown, editother, create, deleteown, deleteother,
+     * publishown, publishother and full
+     *
+     * @param $permissionNames
+     * @param $includePublish
+     */
+    protected function addExtendedPermissions($permissionNames, $includePublish = true) {
+        if (!is_array($permissionNames)) {
+            $permissionNames = array($permissionNames);
+        }
+
+        foreach ($permissionNames as $p) {
+            $this->permissions[$p] = array(
+                'viewown'      => 2,
+                'viewother'    => 4,
+                'editown'      => 8,
+                'editother'    => 16,
+                'create'       => 32,
+                'deleteown'    => 64,
+                'deleteother'  => 128,
+                'full'         => 1024
+            );
+            if ($includePublish) {
+                $this->permissions[$p]['publishown']   = 256;
+                $this->permissions[$p]['publishother'] = 512;
+            }
+        }
+    }
+
+    /**
+     * Adds the standard permission set of viewown, viewother, editown, editother, create, deleteown, deleteother,
+     * publishown, publishother and full to the form builder
+     *
+     * @param $bundle
+     * @param $level
+     * @param $builder
+     * @param $data
+     * @param $includePublish
+     */
+    protected function addExtendedFormFields($bundle, $level, &$builder, $data, $includePublish = true)
+    {
+        $choices =  $includePublish ?
+            array(
+                'viewown'      => 'mautic.core.permissions.viewown',
+                'viewother'    => 'mautic.core.permissions.viewother',
+                'editown'      => 'mautic.core.permissions.editown',
+                'editother'    => 'mautic.core.permissions.editother',
+                'create'       => 'mautic.core.permissions.create',
+                'deleteown'    => 'mautic.core.permissions.deleteown',
+                'deleteother'  => 'mautic.core.permissions.deleteother',
+                'publishown'   => 'mautic.core.permissions.publishown',
+                'publishother' => 'mautic.core.permissions.publishother',
+                'full'         => 'mautic.core.permissions.full'
+            ) :
+            array(
+                'viewown'      => 'mautic.core.permissions.viewown',
+                'viewother'    => 'mautic.core.permissions.viewother',
+                'editown'      => 'mautic.core.permissions.editown',
+                'editother'    => 'mautic.core.permissions.editother',
+                'create'       => 'mautic.core.permissions.create',
+                'deleteown'    => 'mautic.core.permissions.deleteown',
+                'deleteother'  => 'mautic.core.permissions.deleteother',
+                'full'         => 'mautic.core.permissions.full'
+            );
+
+        $builder->add("$bundle:$level", 'button_group', array(
+                'choices'  => $choices,
+                'label'    => "mautic.$bundle.permissions.$level",
+                'expanded' => true,
+                'multiple' => true,
+                'attr'     => array(
+                    'onclick' => 'Mautic.onPermissionChange(this, event, \''.$bundle.'\')'
+                ),
+                'data'     => (!empty($data[$level]) ? $data[$level] : array())
+            )
+        );
     }
 }

@@ -28,15 +28,9 @@ class ApiPermissions extends AbstractPermissions
         $this->permissions = array(
             'access' => array(
                 'full'     => 1024
-            ),
-            'clients' => array(
-                'view'   => 1,
-                'edit'   => 4,
-                'create' => 8,
-                'delete' => 32,
-                'full'   => 1024
             )
         );
+        $this->addStandardPermissions('clients', false);
     }
 
     /**
@@ -70,23 +64,7 @@ class ApiPermissions extends AbstractPermissions
             'data'     => (!empty($data['access']) ? $data['access'] : array())
         ));
 
-        $builder->add('api:clients', 'button_group', array(
-            'choices'    => array(
-                'view'   => 'mautic.core.permissions.view',
-                'edit'   => 'mautic.core.permissions.edit',
-                'create' => 'mautic.core.permissions.create',
-                'delete' => 'mautic.core.permissions.delete',
-                'full'   => 'mautic.core.permissions.full'
-            ),
-            'label'      => 'mautic.api.permissions.clients',
-            'label_attr' => array('class' => 'control-label'),
-            'expanded'   => true,
-            'multiple'   => true,
-            'attr'       => array(
-                'onclick' => 'Mautic.onPermissionChange(this, event, \'api\')'
-            ),
-            'data'      => (!empty($data['clients']) ? $data['clients'] : array())
-        ));
+        $this->addStandardFormFields('api', 'clients', $builder, $data, false);
     }
 
     /**
@@ -123,24 +101,9 @@ class ApiPermissions extends AbstractPermissions
      */
     protected function getSynonym($name, $level) {
         if ($name == "access" && $level == "granted") {
-            $level = "full";
-        } elseif ($name == "clients") {
-            switch ($level) {
-                case "viewown":
-                case "viewother":
-                    $level = "view";
-                    break;
-                case "editother":
-                case "editown":
-                    $level = "edit";
-                    break;
-                case "deleteother":
-                case "deleteown":
-                    $level = "delete";
-                    break;
-            }
+            return array($name, "full");
+        } else {
+            return parent::getSynonym($name, $level);
         }
-
-        return array($name, $level);
     }
 }
