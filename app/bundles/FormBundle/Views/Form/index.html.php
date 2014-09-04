@@ -21,7 +21,7 @@ $view['slots']->set('searchHelp', $view['translator']->trans('mautic.form.form.h
            data-toggle="ajax"
            class="btn btn-default"
            data-menu-link="#mautic_form_index">
-            <i class="fa fa-pencil"></i><?php // echo $view["translator"]->trans("mautic.form.form.menu.new"); ?>
+            <i class="fa fa-plus"></i> <?php echo $view["translator"]->trans("mautic.form.form.menu.new"); ?>
         </a>
     <?php $view['slots']->stop(); ?>
 <?php endif; ?>

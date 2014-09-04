@@ -13,6 +13,9 @@ if ($tmpl == 'index')
 <div class="panel panel-default page-list">
     <div class="panel-heading">
         <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.lead.lead.header.index'); ?></h3>
+        <div class="panel-toolbar text-right">
+            <?php echo $view->render('MauticCoreBundle:Default:search.html.php'); ?>
+        </div>
     </div>
     <div class="panel-toolbar-wrapper">
         <div class="panel-toolbar">
