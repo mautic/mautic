@@ -11,11 +11,13 @@ $view['slots']->set('mauticContent', 'leadfield');
 $view['slots']->set("headerTitle", $view['translator']->trans('mautic.lead.field.header.index'));
 ?>
 <?php $view['slots']->start("actions"); ?>
-<li><a href="<?php echo $this->container->get('router')->generate(
-        'mautic_leadfield_action', array("objectAction" => "new")); ?>" data-toggle="ajax">
-        <?php echo $view["translator"]->trans("mautic.lead.field.menu.new"); ?>
+    <a href="<?php echo $this->container->get('router')->generate(
+        'mautic_leadfield_action', array("objectAction" => "new")); ?>"
+        data-toggle="ajax"
+        class="btn btn-default"
+        data-menu-link="#mautic_lead_index">
+        <i class="fa fa-plus"></i> <?php echo $view["translator"]->trans("mautic.lead.field.menu.new"); ?>
     </a>
-</li>
 <?php $view['slots']->stop(); ?>
 
 <div class="table-responsive scrollable body-white padding-sm">
