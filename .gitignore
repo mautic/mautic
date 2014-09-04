@@ -33,3 +33,6 @@
 /js
 /adminre
 /node_modules
+/build/packaging
+/build/packages/*
+!/build/packages/.placeholder
