@@ -9,6 +9,7 @@
 
 namespace Mautic\EmailBundle\Security\Permissions;
 
+use Mautic\CategoryBundle\Helper\PermissionHelper;
 use Symfony\Component\Form\FormBuilderInterface;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 
@@ -60,12 +61,6 @@ class EmailPermissions extends AbstractPermissions
     {
         parent::analyzePermissions($permissions);
 
-        $emailPermissions = (isset($permissions['email:emails'])) ? $permissions['email:emails'] : array();
-        $catPermissions  = (isset($permissions['email:categories'])) ? $permissions['email:categories'] : array();
-        //make sure the user has access to view categories if they have access to view emails
-        if ((isset($emailPermissions['viewown']) || isset($emailPermissions['viewother']))
-            && !isset($catPermissions['view'])) {
-            $permissions['email:categories'][] = 'view';
-        }
+        PermissionHelper::analyzePermissions('email', 'emails', $permissions);
     }
 }

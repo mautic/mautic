@@ -9,6 +9,7 @@
 
 namespace Mautic\AssetBundle\Form\Type;
 
+use Mautic\CategoryBundle\Helper\FormHelper;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
@@ -68,24 +69,7 @@ class AssetType extends AbstractType
             'required'   => false
         ));
 
-        $builder->add('category_lookup', 'text', array(
-            'label'      => 'mautic.asset.asset.form.category',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array(
-                'class'       => 'form-control',
-                'tooltip'     => 'mautic.core.help.autocomplete',
-                'placeholder' => $this->translator->trans('mautic.core.form.uncategorized')
-            ),
-            'mapped'     => false,
-            'required'   => false
-        ));
-
-        $builder->add('category', 'hidden_entity', array(
-            'required'       => false,
-            'repository'     => 'MauticCategoryBundle:Category',
-            'error_bubbling' => false,
-            'read_only'      => false
-        ));
+        FormHelper::buildForm($this->translator, $builder);
 
         $builder->add('language', 'locale', array(
             'label'      => 'mautic.asset.asset.form.language',
