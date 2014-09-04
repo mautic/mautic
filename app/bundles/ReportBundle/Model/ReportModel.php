@@ -12,6 +12,7 @@ namespace Mautic\ReportBundle\Model;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\ReportBundle\Entity\Report;
+use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportEvent;
 use Mautic\ReportBundle\Generator\ReportGenerator;
 use Mautic\ReportBundle\ReportEvents;
@@ -73,6 +74,9 @@ class ReportModel extends FormModel
 
         $params = (!empty($action)) ? array('action' => $action) : array();
         $params['read_only'] = false;
+
+        // Fire the REPORT_ON_BUILD event off to get the table/column data
+        $params['table_list'] = $this->getTableData();
 
         $reportGenerator = new ReportGenerator($this->em, $this->factory->getSecurityContext(), $formFactory, $entity);
 
@@ -160,5 +164,24 @@ class ReportModel extends FormModel
         }
 
         return $results;
+    }
+
+    /**
+     * Builds the table lookup data for the report forms
+     *
+     * @return array
+     */
+    public function getTableData()
+    {
+        static $tableData;
+
+        if (empty($tableData)) {
+            //build them
+            $event = new ReportBuilderEvent();
+            $this->dispatcher->dispatch(ReportEvents::REPORT_ON_BUILD, $event);
+            $tableData = $event->getTables();
+        }
+
+        return $tableData;
     }
 }

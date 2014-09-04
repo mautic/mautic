@@ -39,16 +39,6 @@ class ReportType extends AbstractType
     private $translator;
 
     /**
-     * Allowed tables to generate reports from
-     *
-     * @var array
-     */
-    private $tableOptions = array(
-        'Page' => 'Pages',
-        'Lead' => 'Leads'
-    );
-
-    /**
      * @param MauticFactory $factory
      */
     public function __construct(MauticFactory $factory) {
@@ -99,9 +89,12 @@ class ReportType extends AbstractType
                 'required'      => false
             ));
 
+            // Quickly build the table source list for use in the selector
+            $tables = $this->buildTableSourceList($options['table_list']);
+
             // Build a list of data sources
             $builder->add('source', 'choice', array(
-                'choices'       => $this->tableOptions,
+                'choices'       => $tables,
                 'expanded'      => false,
                 'multiple'      => false,
                 'label'         => 'mautic.report.report.form.source',
@@ -114,9 +107,8 @@ class ReportType extends AbstractType
                 )
             ));
 
-            // TODO - Rethink how the source is stored
-            $source  = (!is_null($options['data']->getSource())) ? $options['data']->getSource() : key($this->tableOptions);
-            $columns = $this->factory->getEntityManager()->getClassMetadata('Mautic\\' . $source . 'Bundle\\Entity\\' . $source)->getFieldNames();
+            $source  = (!is_null($options['data']->getSource()) && $options['data']->getSource() != '') ? $options['data']->getSource() : key($tables);
+            $columns = $options['table_list'][$source];
 
             // Build the column selector
             $builder->add('columns', 'column_selector', array(
@@ -164,15 +156,37 @@ class ReportType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class'         => 'Mautic\ReportBundle\Entity\Report',
-            'allow_extra_fields' => true
+            'data_class' => 'Mautic\ReportBundle\Entity\Report',
+            'table_list' => array()
         ));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName() {
+    public function getName()
+    {
         return "report";
+    }
+
+    /**
+     * Extracts the keys from the table_list option and builds an array of tables for the select list
+     *
+     * @param array $tables Array with the table list and columns
+     *
+     * @return array
+     */
+    private function buildTableSourceList($tables)
+    {
+        $temp = array_keys($tables);
+
+        // Create an array of tables, the key is the value stored in the database and the value is what the user sees
+        $list = array();
+
+        foreach ($temp as $table) {
+            $list[$table] = ucfirst($table);
+        }
+
+        return $list;
     }
 }

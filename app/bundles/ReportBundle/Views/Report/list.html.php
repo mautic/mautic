@@ -7,32 +7,47 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 if ($tmpl == 'index')
-$view->extend('MauticReportBundle:Report:index.html.php');
+    $view->extend('MauticReportBundle:Report:index.html.php');
 ?>
 
-<div class="table-responsive scrollable body-white padding-sm page-list">
-    <?php if (count($items)): ?>
-        <table class="table table-hover table-striped table-bordered report-list">
+<div class="panel panel-default page-list">
+    <div class="panel-heading">
+        <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.report.report.header.index'); ?></h3>
+    </div>
+    <div class="panel-toolbar-wrapper">
+        <div class="panel-toolbar">
+            <div class="checkbox custom-checkbox pull-left">
+                <input type="checkbox" id="customcheckbox-one0" value="1" data-toggle="checkall" data-target="#reportTable">
+                <label for="customcheckbox-one0"><?php echo $view['translator']->trans('mautic.core.table.selectall'); ?></label>
+            </div>
+        </div>
+        <div class="panel-toolbar text-right">
+            <button type="button" class="btn btn-sm btn-danger"><i class="fa fa-trash-o"></i></button>
+        </div>
+    </div>
+    <div class="table-responsive panel-collapse pull out page-list">
+        <?php if (count($items)): ?>
+        <table class="table table-hover table-striped table-bordered report-list" id="reportTable">
             <thead>
-            <tr>
-                <th class="col-page-actions"></th>
-                <?php
-                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
-                    'sessionVar' => 'report',
-                    'orderBy'    => 'p.title',
-                    'text'       => 'mautic.report.report.thead.title',
-                    'class'      => 'col-page-title',
-                    'default'    => true
-                ));
+                <tr>
+                    <th class="col-page-actions"></th>
+                    <?php
+                    echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                        'sessionVar' => 'report',
+                        'orderBy'    => 'p.title',
+                        'text'       => 'mautic.report.report.thead.title',
+                        'class'      => 'col-page-title',
+                        'default'    => true
+                    ));
 
-                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
-                    'sessionVar' => 'report',
-                    'orderBy'    => 'p.id',
-                    'text'       => 'mautic.report.report.thead.id',
-                    'class'      => 'col-page-id'
-                ));
-                ?>
-            </tr>
+                    echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                        'sessionVar' => 'report',
+                        'orderBy'    => 'p.id',
+                        'text'       => 'mautic.report.report.thead.id',
+                        'class'      => 'col-page-id'
+                    ));
+                    ?>
+                </tr>
             </thead>
             <tbody>
             <?php foreach ($items as $item): ?>
@@ -74,16 +89,19 @@ $view->extend('MauticReportBundle:Report:index.html.php');
             <?php endforeach; ?>
             </tbody>
         </table>
-    <?php else: ?>
+        <?php else: ?>
         <h4><?php echo $view['translator']->trans('mautic.core.noresults'); ?></h4>
-    <?php endif; ?>
-    <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
-        "totalItems"      => count($items),
-        "page"            => $page,
-        "limit"           => $limit,
-        "menuLinkId"      => 'mautic_report_index',
-        "baseUrl"         => $view['router']->generate('mautic_report_index'),
-        'sessionVar'      => 'page'
-    )); ?>
-    <div class="footer-margin"></div>
+        <?php endif; ?>
+        <div class="panel-footer">
+        <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
+            "totalItems"      => count($items),
+            "page"            => $page,
+            "limit"           => $limit,
+            "menuLinkId"      => 'mautic_report_index',
+            "baseUrl"         => $view['router']->generate('mautic_report_index'),
+            'sessionVar'      => 'page'
+        )); ?>
+        </div>
+        <div class="footer-margin"></div>
+    </div>
 </div>
