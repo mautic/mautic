@@ -79,7 +79,7 @@ class AssetRepository extends CommonRepository
     public function getAssetList($search = '', $limit = 10, $start = 0, $viewOther = false)
     {
         $q = $this->createQueryBuilder('a');
-        $q->select('partial a.{id, title, path, alias}');
+        $q->select('partial a.{id, title, path, alias, language}');
 
         if (!empty($search)) {
             $q->andWhere($q->expr()->like('a.title', ':search'))

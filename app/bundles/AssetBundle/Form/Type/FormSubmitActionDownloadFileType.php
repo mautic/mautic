@@ -14,11 +14,11 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class PointActionFormSubmitType
+ * Class FormSubmitActionDownloadFileType
  *
  * @package Mautic\AssetBundle\Form\Type
  */
-class PointActionAssetDownloadType extends AbstractType
+class FormSubmitActionDownloadFileType extends AbstractType
 {
 
     private $choices = array();
@@ -44,30 +44,26 @@ class PointActionAssetDownloadType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        $default = (empty($options['data']['delta'])) ? 0 : (int) $options['data']['delta'];
-        $builder->add('delta', 'number', array(
-            'label'      => 'mautic.point.action.delta',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       =>
-                array(
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.point.action.delta.help'
-                ),
-            'precision'  => 0,
-            'data'       => $default
-        ));
-
-        $builder->add('assets', 'choice', array(
+        $builder->add('asset', 'choice', array(
             'choices'       => $this->choices,
             'expanded'      => false,
-            'multiple'      => true,
-            'label'         => 'mautic.asset.point.action.assets',
+            'multiple'      => false,
+            'label'         => 'mautic.asset.form.submit.assets',
             'label_attr'    => array('class' => 'control-label'),
             'empty_value'   => false,
             'required'      => false,
             'attr'       => array(
                 'class'   => 'form-control',
-                'tooltip' => 'mautic.asset.point.action.assets.descr'
+                'tooltip' => 'mautic.asset.form.submit.assets_descr'
+            )
+        ));
+
+        $builder->add('message', 'textarea', array(
+            'label'         => 'mautic.asset.form.submit.message',
+            'label_attr'    => array('class' => 'control-label'),
+            'attr'       => array(
+                'class'   => 'form-control',
+                'tooltip' => 'mautic.asset.form.submit.message_descr'
             )
         ));
     }
@@ -76,6 +72,6 @@ class PointActionAssetDownloadType extends AbstractType
      * @return string
      */
     public function getName() {
-        return "pointaction_assetdownload";
+        return "asset_submitaction_downloadfile";
     }
 }
