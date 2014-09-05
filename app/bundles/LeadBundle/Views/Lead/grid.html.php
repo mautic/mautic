@@ -23,23 +23,20 @@ if ($tmpl == 'index')
                 </div>
                 <div class="col-xs-8 valign-middle">
                     <div class="panel-body">
+                        <?php
+                        $color = $item->getColor();
+                        $style = !empty($color) ? ' style="background-color: ' . $color . ' !important;"' : '';
+                        ?>
+                        <span class="pull-right label label-default"<?php echo $style; ?>><?php echo $item->getScore(); ?></span>
                         <h5>
                             <a href="<?php echo $view['router']->generate('mautic_lead_action',
                                 array("objectAction" => "view", "objectId" => $item->getId())); ?>"
                                data-toggle="ajax">
                                 <span><?php echo $item->getPrimaryIdentifier(); ?></span>
                             </a>
-                            <?php
-                            $color = $item->getColor();
-                            $style = !empty($color) ? ' style="background-color: ' . $color . ' !important;"' : '';
-                            ?>
-                            <span class="badge"<?php echo $style; ?>><?php echo $item->getScore(); ?></span>
                         </h5>
                         <div class="text-muted">
                             <i class="fa fa-fw fa-building"></i><span class="padding-sm-left"><?php echo $fields['core']['company']['value']; ?></span>
-                        </div>
-                        <div class="text-muted">
-                            <i class="fa fa-fw fa-envelope"></i><span class="padding-sm-left"><?php echo $fields['core']['email']['value']; ?></span>
                         </div>
                         <div class="text-muted">
                             <i class="fa fa-fw fa-map-marker"></i><span class="padding-sm-left"><?php

@@ -9,9 +9,6 @@
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'lead');
 $view['slots']->set("headerTitle", $view['translator']->trans('mautic.lead.lead.header.index'));
-$view['slots']->set('searchUri', $view['router']->generate('mautic_lead_index', array('page' => $page)));
-$view['slots']->set('searchString', $app->getSession()->get('mautic.lead.filter'));
-$view['slots']->set('searchHelp', $view['translator']->trans('mautic.lead.lead.help.searchcommands'));
 ?>
 
 <?php if ($permissions['lead:leads:create']): ?>
@@ -21,14 +18,16 @@ $view['slots']->set('searchHelp', $view['translator']->trans('mautic.lead.lead.h
            data-toggle="ajax"
            class="btn btn-default"
            data-menu-link="#mautic_lead_index">
-            <i class="fa fa-pencil"></i> <?php // echo $view["translator"]->trans("mautic.lead.lead.menu.new"); ?>
+            <i class="fa fa-plus"></i> <?php echo $view["translator"]->trans("mautic.lead.lead.menu.new"); ?>
         </a>
+        <div class="btn-group">
           <a href="<?php echo $view['router']->generate('mautic_lead_index', array('page' => $page, 'view' => 'list')); ?>"
-         data-toggle="ajax"
-         class="btn btn-default"><i class="fa fa-fw fa-list"></i></a>
-      <a href="<?php echo $view['router']->generate('mautic_lead_index', array('page' => $page, 'view' => 'grid')); ?>"
-         data-toggle="ajax"
-         class="btn btn-default"><i class="fa fa-fw fa-th-large"></i></a>
+           data-toggle="ajax"
+           class="btn btn-default"><i class="fa fa-fw fa-table"></i></a>
+          <a href="<?php echo $view['router']->generate('mautic_lead_index', array('page' => $page, 'view' => 'grid')); ?>"
+           data-toggle="ajax"
+           class="btn btn-default"><i class="fa fa-fw fa-th-large"></i></a>
+        </div>
     <?php $view['slots']->stop(); ?>
 
 <?php endif; ?>
