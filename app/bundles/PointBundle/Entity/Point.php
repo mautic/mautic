@@ -9,6 +9,7 @@
 
 namespace Mautic\PointBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use Mautic\CoreBundle\Entity\FormEntity;
@@ -91,11 +92,9 @@ class Point extends FormEntity
     private $properties = array();
 
     /**
-     * @ORM\ManyToMany(targetEntity="Mautic\LeadBundle\Entity\Lead", fetch="EXTRA_LAZY")
-     * @ORM\JoinTable(name="point_action_lead_xref")
-     * @ORM\JoinColumn(name="lead_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
+     * @ORM\OneToMany(targetEntity="LeadPointLog", mappedBy="point", fetch="EXTRA_LAZY", cascade={"persist", "remove"})
      */
-    private $leads;
+    private $log;
 
     /**
      * @ORM\ManyToOne(targetEntity="Mautic\CategoryBundle\Entity\Category")
@@ -104,6 +103,11 @@ class Point extends FormEntity
      * @Serializer\Groups({"full"})
      **/
     private $category;
+
+    public function __construct()
+    {
+        $this->log = new ArrayCollection();
+    }
 
     /**
      * @param ClassMetadata $metadata
@@ -284,36 +288,36 @@ class Point extends FormEntity
     }
 
     /**
-     * Add lead
+     * Add log
      *
-     * @param \Mautic\LeadBundle\Entity\Lead $lead
-     * @return Lead
+     * @param LeadPointLog $log
+     * @return Log
      */
-    public function addLead(\Mautic\LeadBundle\Entity\Lead $lead)
+    public function addLog(LeadPointLog $log)
     {
-        $this->leads[] = $lead;
+        $this->log[] = $log;
 
         return $this;
     }
 
     /**
-     * Remove lead
+     * Remove log
      *
-     * @param \Mautic\LeadBundle\Entity\Lead $lead
+     * @param LeadPointLog $log
      */
-    public function removeLead(\Mautic\LeadBundle\Entity\Lead $lead)
+    public function removeLog(LeadPointLog $log)
     {
-        $this->leads->removeElement($lead);
+        $this->log->removeElement($log);
     }
 
     /**
-     * Get leads
+     * Get log
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getLeads()
+    public function getLog()
     {
-        return $this->leads;
+        return $this->log;
     }
 
     /**

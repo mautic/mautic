@@ -11,6 +11,7 @@ namespace Mautic\PointBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\PointBundle\Entity\LeadTriggerLog;
 use Mautic\PointBundle\Entity\Trigger;
 use Mautic\PointBundle\Entity\TriggerEvent;
 use Mautic\PointBundle\Event as Events;
@@ -83,8 +84,11 @@ class TriggerModel extends CommonFormModel
 
         //should we trigger for existing leads?
         if ($entity->getTriggerExistingLeads() && $entity->isPublished()) {
-            $events = $entity->getEvents();
-            $repo   = $this->getRepository();
+            $events    = $entity->getEvents();
+            $repo      = $this->getRepository();
+            $persist   = array();
+            $ipAddress = $this->factory->getIpAddress();
+
             foreach ($events as $event) {
                 $dateTime  = $this->factory->getDate($entity->getDateAdded());
                 $filter = array('force' => array(
@@ -120,8 +124,20 @@ class TriggerModel extends CommonFormModel
                 ));
 
                 foreach ($leads as $l) {
-                    $this->triggerEvent($event, $l, false);
+                    if ($this->triggerEvent($event, $l, false)) {
+                        $log = new LeadTriggerLog();
+                        $log->setIpAddress($ipAddress);
+                        $log->setEvent($event);
+                        $log->setLead($l);
+                        $log->setDateFired(new \DateTime());
+                        $event->addLog($log);
+                        $persist[] = $event;
+                    }
                 }
+            }
+
+            if (!empty($persist)) {
+                $this->getEventRepository()->saveEntities($persist);
             }
         }
     }
@@ -240,12 +256,14 @@ class TriggerModel extends CommonFormModel
      *
      * @param TriggerEvent $event
      * @param Lead $lead
+     * @param bool $checkApplied
+     * @return bool Was event triggered
      */
-    public function triggerEvent(TriggerEvent $event, Lead $lead = null)
+    public function triggerEvent(TriggerEvent $event, Lead $lead = null, $checkApplied = true)
     {
         //only trigger events for anonymous users
         if (!$this->security->isAnonymous()) {
-            return;
+            return false;
         }
 
         if ($lead == null) {
@@ -253,18 +271,20 @@ class TriggerModel extends CommonFormModel
             $lead      = $leadModel->getCurrentLead();
         }
 
-        //get a list of events that has already been performed on this lead
-        $appliedEvents = $this->getEventRepository()->getLeadTriggeredEvents($lead->getId());
+        if ($checkApplied) {
+            //get a list of events that has already been performed on this lead
+            $appliedEvents = $this->getEventRepository()->getLeadTriggeredEvents($lead->getId());
 
-        //if it's already been done, then skip it
-        if (isset($appliedEvents[$event->getId()])) {
-            return;
+            //if it's already been done, then skip it
+            if (isset($appliedEvents[$event->getId()])) {
+                return false;
+            }
         }
 
         //make sure the event still exists
         $trigger  = $event->getTrigger();
         if (!isset($availableEvents[$trigger->getType()])) {
-            return;
+            return false;
         }
 
         $settings = $availableEvents[$trigger->getType()];
@@ -304,7 +324,11 @@ class TriggerModel extends CommonFormModel
                 }
             }
             $reflection->invokeArgs($this, $pass);
+
+            return true;
         }
+
+        return false;
     }
 
     /**
@@ -318,9 +342,11 @@ class TriggerModel extends CommonFormModel
 
         //find all published triggers that is applicable to this points
         /** @var \Mautic\PointBundle\Entity\TriggerEventRepository $repo */
-        $repo   = $this->getEventRepository();
-        $events = $repo->getPublishedByPointTotal($points);
-
+        $repo      = $this->getEventRepository();
+        $events    = $repo->getPublishedByPointTotal($points);
+        /** @var \Mautic\CoreBundle\Entity\IpAddress $ipAddress */
+        $ipAddress = $this->factory->getIpAddress();
+        $persist   = array();
         if (!empty($events)) {
             //get a list of actions that has already been applied to this lead
             $appliedEvents = $repo->getLeadTriggeredEvents($lead->getId());
@@ -331,8 +357,21 @@ class TriggerModel extends CommonFormModel
                     continue;
                 }
 
-                $this->triggerEvent($event, $lead);
+                if ($this->triggerEvent($event, $lead, false)) {
+                    $log = new LeadTriggerLog();
+                    $log->setIpAddress($ipAddress);
+                    $log->setEvent($event);
+                    $log->setLead($lead);
+                    $log->setDateFired(new \DateTime());
+
+                    $event->addLog($log);
+                    $persist[] = $event;
+                }
             }
+        }
+
+        if (!empty($persist)) {
+            $this->getEventRepository()->saveEntities($persist);
         }
     }
 
