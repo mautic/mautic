@@ -501,7 +501,7 @@ class ReportController extends FormController
             $query->setParameters($form->getData());
         }
 
-        $result = $query->getResult();
+        $result = $query->getConnection()->executeQuery((string) $query)->fetchAll();
 
         //set what page currently on so that we can return here after form submission/cancellation
         $this->factory->getSession()->set('mautic.report.' . $entity->getId() . '.page', $reportPage);

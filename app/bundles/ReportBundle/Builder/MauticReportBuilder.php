@@ -12,8 +12,8 @@
 
 namespace Mautic\ReportBundle\Builder;
 
+use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\QueryBuilder;
 use Mautic\ReportBundle\Entity\Report;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
@@ -54,54 +54,42 @@ final class MauticReportBuilder implements ReportBuilderInterface
     }
 
     /**
-     * Gets the query instance with default parameters
+     * Gets the QueryBuilder instance with the report query prepared
      *
      * @param array $options Options array
      *
-     * @return \Doctrine\ORM\Query
+     * @return \Doctrine\DBAL\Query\QueryBuilder
      * @throws InvalidReportQueryException
      *
      * @author r1pp3rj4ck <attila.bukor@gmail.com>
      */
     public function getQuery(array $options)
     {
-        $queryBuilder = $this->configureBuilder($this->entityManager->createQueryBuilder(), $options);
+        $queryBuilder = $this->configureBuilder($this->entityManager->getConnection()->createQueryBuilder(), $options);
 
-        if ($queryBuilder->getType() === \Doctrine\DBAL\Query\QueryBuilder::SELECT) {
-            $query = $queryBuilder->getQuery();
-        }
-        else {
+        if ($queryBuilder->getType() !== QueryBuilder::SELECT) {
             throw new InvalidReportQueryException('Only SELECT statements are valid');
         }
-        return $query;
+
+        return $queryBuilder;
     }
 
     /**
      * Configures builder
      *
      * This method configures the ReportBuilder. It has to return
-     * a configured Doctrine QueryBuilder.
+     * a configured Doctrine DBAL QueryBuilder.
      *
-     * @param \Doctrine\ORM\QueryBuilder $queryBuilder Doctrine ORM query builder
-     * @param array                      $options      Options array
+     * @param \Doctrine\DBAL\Query\QueryBuilder $queryBuilder Doctrine ORM query builder
+     * @param array                             $options      Options array
      *
-     * @return \Doctrine\ORM\QueryBuilder
+     * @return \Doctrine\DBAL\Query\QueryBuilder
      */
     protected function configureBuilder(QueryBuilder $queryBuilder, array $options)
     {
-        echo 'Temporarily unavailable';die;
         $source   = $this->entity->getSource();
-        $metadata = $this->entityManager->getClassMetadata('Mautic\\' . $source . 'Bundle\\Entity\\' . $source);
-        $columns  = $options['table_list'][$source];
+        $columns  = $options['table_list'][$source]['columns'];
         $fields   = $this->entity->getColumns();
-        $key      = $metadata->getSingleIdentifierFieldName();
-
-        // Getting creative to build the entity name
-        // Explode the FQCN of the entity into an array, should be 4 elements in the form of Mautic\PageBundle\Entity\Page
-        $fullEntityName = explode('\\', $metadata->name);
-
-        // Build the entity reference for the FROM clause by creating <0><1>:<3> (or MauticPageBundle:Page)
-        $entityName = $fullEntityName[0] . $fullEntityName[1] . ':' . $fullEntityName[3];
 
         $selectColumns = array();
 
@@ -111,13 +99,13 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
         $queryBuilder
             ->select(implode(', ', $selectColumns))
-            ->from($entityName, 'r', 'r.' . $key);
+            ->from(MAUTIC_TABLE_PREFIX . $source, 'r');
 
         // Add filters as AND values to the WHERE clause if present
         $filters = $this->entity->getFilters();
 
         // Also need the Connection object to quote the user input
-        $connection = $this->entityManager->getConnection();
+        $connection = $queryBuilder->getConnection();
 
         if (count($filters)) {
             $expr = $queryBuilder->expr();
@@ -136,7 +124,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
         if ($options['orderBy'] != '' && $options['orderByDir'] != '') {
             $queryBuilder->orderBy($options['orderBy'], $options['orderByDir']);
         } else {
-            $queryBuilder->orderBy('r.' . $key, 'ASC');
+            $queryBuilder->orderBy($selectColumns[0], 'ASC');
         }
 
         if ($options['limit'] > 0) {

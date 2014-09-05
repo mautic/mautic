@@ -73,7 +73,7 @@ class ReportGenerator
      *
      * @param array $options Optional options array for the query
      *
-     * @return \Doctrine\ORM\Query
+     * @return \Doctrine\DBAL\Query\QueryBuilder
      *
      * @author r1pp3rj4ck <attila.bukor@gmail.com>
      */
