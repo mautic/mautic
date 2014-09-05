@@ -12,7 +12,7 @@ $view['slots']->set('mauticContent', 'point');
 $view['slots']->set("headerTitle", $view['translator']->trans('mautic.point.header.index'));
 $view['slots']->set('searchUri', $view['router']->generate('mautic_point_index', array('page' => $page)));
 $view['slots']->set('searchString', $app->getSession()->get('mautic.point.filter'));
-$view['slots']->set('searchHelp', $view['translator']->trans('mautic.point.help.searchcommands'));
+$view['slots']->set('searchHelp', $view['translator']->trans('mautic.core.help.searchcommands'));
 ?>
 
 <?php if ($permissions['point:points:create']): ?>

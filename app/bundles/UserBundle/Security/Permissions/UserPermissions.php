@@ -27,20 +27,6 @@ class UserPermissions extends AbstractPermissions
     {
         parent::__construct($params);
         $this->permissions = array(
-            'users' => array(
-                'view'          => 1,
-                'edit'          => 4,
-                'create'        => 8,
-                'delete'        => 32,
-                'full'          => 1024
-            ),
-            'roles' => array(
-                'view'          => 1,
-                'edit'          => 4,
-                'create'        => 8,
-                'delete'        => 32,
-                'full'          => 1024
-            ),
             'profile' => array(
                 'editusername'  => 1,
                 'editemail'     => 2,
@@ -49,6 +35,9 @@ class UserPermissions extends AbstractPermissions
                 'full'          => 1024
             )
         );
+        $this->addStandardPermissions('users', false);
+        $this->addStandardPermissions('roles', false);
+
     }
 
     /**
@@ -68,41 +57,8 @@ class UserPermissions extends AbstractPermissions
      */
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {
-        $builder->add('user:users', 'button_group', array(
-            'choices'    => array(
-                'view'    => 'mautic.core.permissions.view',
-                'edit'    => 'mautic.core.permissions.edit',
-                'create'  => 'mautic.core.permissions.create',
-                'delete'  => 'mautic.core.permissions.delete',
-                'full'    => 'mautic.core.permissions.full'
-            ),
-            'label'      => 'mautic.user.permissions.users',
-            'label_attr' => array('class' => 'control-label'),
-            'expanded'   => true,
-            'multiple'   => true,
-            'attr'       => array(
-                'onclick' => 'Mautic.onPermissionChange(this, event, \'user\')'
-            ),
-            'data'      => (!empty($data['users']) ? $data['users'] : array())
-        ));
-
-        $builder->add('user:roles', 'button_group', array(
-            'choices'    => array(
-                'view'   => 'mautic.core.permissions.view',
-                'edit'   => 'mautic.core.permissions.edit',
-                'create' => 'mautic.core.permissions.create',
-                'delete' => 'mautic.core.permissions.delete',
-                'full'   => 'mautic.core.permissions.full'
-            ),
-            'label'      => 'mautic.user.permissions.roles',
-            'label_attr' => array('class' => 'control-label'),
-            'expanded'   => true,
-            'multiple'   => true,
-            'attr'       => array(
-                'onclick' => 'Mautic.onPermissionChange(this, event, \'user\')'
-            ),
-            'data'       => (!empty($data['roles']) ? $data['roles'] : array())
-        ));
+        $this->addStandardFormFields('user', 'users', $builder, $data, false);
+        $this->addStandardFormFields('user', 'roles', $builder, $data, false);
 
         $builder->add('user:profile', 'button_group', array(
             'choices'    => array(
@@ -121,32 +77,5 @@ class UserPermissions extends AbstractPermissions
             ),
             'data'       => (!empty($data['profile']) ? $data['profile'] : array())
         ));
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @param $name
-     * @param $level
-     * @return array
-     */
-    protected function getSynonym($name, $level) {
-        //set some synonyms
-        switch ($level) {
-            case "viewown":
-            case "viewother":
-                $level = "view";
-                break;
-            case "editown":
-            case "editother":
-                $level = "edit";
-                break;
-            case "deleteown":
-            case "deleteother":
-                $level = "delete";
-                break;
-        }
-
-        return array($name, $level);
     }
 }

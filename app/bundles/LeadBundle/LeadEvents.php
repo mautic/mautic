@@ -38,14 +38,14 @@ final class LeadEvents
     const LEAD_POST_SAVE   = 'mautic.lead_post_save';
 
     /**
-     * The mautic.lead_score_change event is thrown if a lead's score changes.
+     * The mautic.lead_points_change event is thrown if a lead's points changes.
      *
      * The event listener receives a
-     * Mautic\LeadBundle\Event\ScoreChangeEvent instance.
+     * Mautic\LeadBundle\Event\PointsChangeEvent instance.
      *
      * @var string
      */
-    const LEAD_SCORE_CHANGE   = 'mautic.lead_score_change';
+    const LEAD_POINTS_CHANGE   = 'mautic.lead_points_change';
 
     /**
      * The mautic.lead_pre_delete event is thrown before a lead is deleted.

@@ -606,18 +606,6 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
     }
 
     /**
-     * Sets the Date/Time for new entities
-     *
-     * @ORM\PrePersist
-     */
-    public function onPrePersistSetDefaults()
-    {
-        if ($this->getIsPublished() === null) {
-            $this->setIsPublished(true);
-        }
-    }
-
-    /**
      * Set timezone
      *
      * @param string $timezone

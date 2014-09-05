@@ -32,6 +32,8 @@ $view->extend('MauticPointBundle:Point:index.html.php');
                     'class'      => 'col-point-description'
                 ));
 
+                echo '<th class="col-point-action">' . $view['translator']->trans('mautic.point.thead.action') . '</th>';
+
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'point',
                     'orderBy'    => 'p.id',
@@ -48,16 +50,9 @@ $view->extend('MauticPointBundle:Point:index.html.php');
                         <?php
                         echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
                             'item'      => $item,
-                            'edit'      => $security->hasEntityAccess(
-                                $permissions['point:points:editown'],
-                                $permissions['point:points:editother'],
-                                $item->getCreatedBy()
-                            ),
+                            'edit'      => $permissions['point:points:edit'],
                             'clone'     => $permissions['point:points:create'],
-                            'delete'    => $security->hasEntityAccess(
-                                $permissions['point:points:deleteown'],
-                                $permissions['point:points:deleteother'],
-                                $item->getCreatedBy()),
+                            'delete'    => $permissions['point:points:delete'],
                             'routeBase' => 'point',
                             'menuLink'  => 'mautic_point_index',
                             'langVar'   => 'point'
@@ -76,6 +71,11 @@ $view->extend('MauticPointBundle:Point:index.html.php');
                         </a>
                     </td>
                     <td class="visible-md visible-lg"><?php echo $item->getDescription(); ?></td>
+                    <?php
+                    $type   = $item->getType();
+                    $action = (isset($actions[$type])) ? $actions[$type]['label'] : '';
+                    ?>
+                    <td class="visible-md visible-lg"><?php echo $view['translator']->trans($action); ?></td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 </tr>
             <?php endforeach; ?>

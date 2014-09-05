@@ -143,7 +143,7 @@ class EmailRepository extends CommonRepository
                 $expr = $q->expr()->like('e.alias', ":$unique");
                 $filter->strict = true;
                 break;
-            case $this->translator->trans('mautic.page.page.searchcommand.lang'):
+            case $this->translator->trans('mautic.email.searchcommand.lang'):
                 $langUnique       = $this->generateRandomParameterName();
                 $langValue        = $filter->string . "_%";
                 $forceParameters = array(

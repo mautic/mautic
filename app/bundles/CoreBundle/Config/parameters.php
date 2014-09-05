@@ -51,7 +51,8 @@ $parameters = array(
     //ipinfodb (paid; api key required)
     //geoips (paid; api key required)
     //maxmind_country, maxmind_precision, or maxmind_omni (paid; username/license key required)
-    'ip_lookup_auth'               => ''
+    'ip_lookup_auth'               => '',
+    'default_theme'                => 'Mauve'
 );
 
 return $parameters;

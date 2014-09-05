@@ -60,8 +60,10 @@ class PointModel extends CommonFormModel
         if (!$entity instanceof Point) {
             throw new MethodNotAllowedHttpException(array('Point'));
         }
-        $params = (!empty($action)) ? array('action' => $action) : array();
-        return $formFactory->create('point', $entity, $params);
+        if (!empty($action)) {
+            $options['action'] = $action;
+        }
+        return $formFactory->create('point', $entity, $options);
     }
 
     /**
@@ -127,50 +129,23 @@ class PointModel extends CommonFormModel
     }
 
     /**
-     * @param Point $entity
-     * @param       $sessionActions
-     */
-    public function setActions(Point &$entity, $sessionActions)
-    {
-        $order   = 1;
-        $existingActions = $entity->getActions();
-
-        foreach ($sessionActions as $properties) {
-            $isNew = (!empty($properties['id']) && isset($existingActions[$properties['id']])) ? false : true;
-            $action = !$isNew ? $existingActions[$properties['id']] : new Action();
-
-            foreach ($properties as $f => $v) {
-                if (in_array($f, array('id', 'order')))
-                    continue;
-
-                $func = "set" .  ucfirst($f);
-                if (method_exists($action, $func)) {
-                    $action->$func($v);
-                }
-                $action->setPoint($entity);
-            }
-            $action->setOrder($order);
-            $order++;
-            $entity->addAction($properties['id'], $action);
-        }
-    }
-
-    /**
      * Gets array of custom actions from bundles subscribed PointEvents::POINT_ON_BUILD
      * @return mixed
      */
-    public function getCustomComponents()
+    public function getPointActions()
     {
-        static $components;
+        static $actions;
 
-        if (empty($components)) {
+        if (empty($actions)) {
             //build them
-            $customComponents = array();
-            $event            = new PointBuilderEvent($this->translator);
+            $actions = array();
+            $event = new PointBuilderEvent($this->translator);
             $this->dispatcher->dispatch(PointEvents::POINT_ON_BUILD, $event);
-            $customComponents['actions'] = $event->getActions();
+            $actions['actions'] = $event->getActions();
+            $actions['list']    = $event->getActionList();
         }
-        return $customComponents;
+
+        return $actions;
     }
 
     /**
@@ -187,34 +162,38 @@ class PointModel extends CommonFormModel
         }
 
         //find all the actions for published points
-        $repo         = $this->em->getRepository('MauticPointBundle:Action');
-        $pointActions = $repo->getPublishedByType($type);
+        /** @var \Mautic\PointBundle\Entity\PointRepository $repo */
+        $repo         = $this->getRepository();
+        $availablePoints = $repo->getPublishedByType($type);
         $leadModel    = $this->factory->getModel('lead');
         $lead         = $leadModel->getCurrentLead();
         $ipAddress    = $this->factory->getIpAddress();
 
+        //get available actions
+        $availableActions = $this->getPointActions();
+
         //get a list of actions that has already been performed on this lead
         $completedActions = $repo->getCompletedLeadActions($type, $lead->getId());
-        //if it's already been done, then skip it
-        if (in_array($type, $completedActions)) {
-            return;
-        }
 
         $persist = array();
-        foreach ($pointActions as $action) {
-            $point    = $action->getPoint();
-            $settings = $action->getSettings();
-            $args     = array(
+        foreach ($availablePoints as $action) {
+            //if it's already been done, then skip it
+            if (isset($completedActions[$action->getId()])) {
+                continue;
+            }
+
+            //make sure the action still exists
+            if (!isset($availableActions['actions'][$action->getType()])) {
+                continue;
+            }
+            $settings = $availableActions['actions'][$action->getType()];
+
+            $args = array(
                 'action'      => array(
                     'id'         => $action->getId(),
                     'type'       => $action->getType(),
                     'name'       => $action->getName(),
                     'properties' => $action->getProperties(),
-                    'settings'   => $settings,
-                    'point'      => array(
-                        'id'   => $point->getId(),
-                        'name' => $point->getName()
-                    )
                 ),
                 'lead'        => $lead,
                 'factory'     => $this->factory,
@@ -242,16 +221,16 @@ class PointModel extends CommonFormModel
                         $pass[] = null;
                     }
                 }
-                $scoreChange = $reflection->invokeArgs($this, $pass);
+                $pointsChange = $reflection->invokeArgs($this, $pass);
 
-                if ($scoreChange) {
-                    $lead->addToScore($scoreChange);
+                if ($pointsChange) {
+                    $lead->addToPoints($pointsChange);
                     $parsed = explode('.', $action->getType());
-                    $lead->addScoreChangeLogEntry(
+                    $lead->addPointsChangeLogEntry(
                         $parsed[0],
-                        $point->getName(),
-                        $action->getName(),
-                        $scoreChange,
+                        $action->getId() . ": " . $action->getName(),
+                        $parsed[1],
+                        $pointsChange,
                         $ipAddress
                     );
                     $action->addLead($lead);

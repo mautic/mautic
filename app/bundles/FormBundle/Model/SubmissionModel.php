@@ -32,7 +32,7 @@ class SubmissionModel extends CommonFormModel
      *
      * @return string
      */
-    public function getRepository()
+    public function getRepository ()
     {
         return $this->em->getRepository('MauticFormBundle:Submission');
     }
@@ -44,7 +44,7 @@ class SubmissionModel extends CommonFormModel
      *
      * @return boolean|string false if no error was encountered; otherwise the error message
      */
-    public function saveSubmission(&$post, &$server, &$form)
+    public function saveSubmission (&$post, &$server, &$form)
     {
         $fieldHelper = new FormFieldHelper($this->translator);
 
@@ -72,6 +72,7 @@ class SubmissionModel extends CommonFormModel
         $errors     = array();
         $fieldArray = array();
         $results    = array();
+
         foreach ($fields as $f) {
             $id    = $f->getId();
             $type  = $f->getType();
@@ -109,7 +110,8 @@ class SubmissionModel extends CommonFormModel
                         '%label%' => $f->getLabel()
                     ));
                 }
-                return $msg;
+
+                return array('errors' => array($msg));
             }
 
             //clean and validate the input
@@ -131,7 +133,7 @@ class SubmissionModel extends CommonFormModel
                 }
 
                 if (isset($params['valueConstraints']) && is_callable($params['valueConstraints'])) {
-                    $customErrors =  call_user_func_array($params['valueConstraints'], array($f, $value));
+                    $customErrors = call_user_func_array($params['valueConstraints'], array($f, $value));
                     if (is_array($customErrors)) {
                         $errors = array_merge($errors, $customErrors);
                     } else {
@@ -160,12 +162,12 @@ class SubmissionModel extends CommonFormModel
 
         //return errors
         if (!empty($errors)) {
-            return $errors;
+            return array('errors' => $errors);
         }
 
         //set the landing page the form was submitted from if applicable
         if (!empty($post['mauticpage'])) {
-            $page = $this->factory->getModel('page.page')->getEntity((int) $post['mauticpage']);
+            $page = $this->factory->getModel('page.page')->getEntity((int)$post['mauticpage']);
             if ($page != null)
                 $submission->setPage($page);
         }
@@ -180,6 +182,10 @@ class SubmissionModel extends CommonFormModel
         //execute submit actions
         $actions = $form->getActions();
 
+        //get post submit actions to make sure it still exists
+        $components       = $this->factory->getModel('form')->getCustomComponents();
+        $availableActions = $components['actions'];
+
         $args = array(
             'post'     => $post,
             'server'   => $server,
@@ -190,31 +196,42 @@ class SubmissionModel extends CommonFormModel
         );
 
         foreach ($actions as $action) {
+            $key = $action->getType();
+            if (!isset($availableActions[$key])) {
+                continue;
+            }
+
+            $settings       = $availableActions[$key];
             $args['action'] = $action;
-            $key            = $action->getType();
-            $settings       = $action->getSettings();
             $callback       = $settings['callback'];
             if (is_callable($callback)) {
 
-                if (is_array($callback)){
+                if (is_array($callback)) {
                     $reflection = new \ReflectionMethod($callback[0], $callback[1]);
                 } elseif (strpos($callback, '::') !== false) {
-                    $parts = explode('::', $callback);
+                    $parts      = explode('::', $callback);
                     $reflection = new \ReflectionMethod($parts[0], $parts[1]);
                 } else {
                     new \ReflectionMethod(null, $callback);
                 }
 
                 $pass = array();
-                foreach($reflection->getParameters() as $param) {
-                    if(isset($args[$param->getName()])) {
+                foreach ($reflection->getParameters() as $param) {
+                    if (isset($args[$param->getName()])) {
                         $pass[] = $args[$param->getName()];
                     } else {
                         $pass[] = null;
                     }
                 }
-                $returned = $reflection->invokeArgs($this, $pass);
+                $returned               = $reflection->invokeArgs($this, $pass);
                 $args['feedback'][$key] = $returned;
+            }
+        }
+
+        //last round of callback commands from the submit actions; first come first serve
+        foreach ($args['feedback'] as $k => $data) {
+            if (!empty($data['callback'])) {
+                return array('callback' => $data);
             }
         }
 
@@ -226,12 +243,14 @@ class SubmissionModel extends CommonFormModel
      * {@inheritdoc}
      *
      * @param array $args
+     *
      * @return mixed|void
      */
-    public function getEntities(array $args = array())
+    public function getEntities (array $args = array())
     {
         $repo = $this->getRepository();
         $repo->setFactory($this->factory);
+
         return $repo->getEntities($args);
     }
 
@@ -241,15 +260,16 @@ class SubmissionModel extends CommonFormModel
      * @param $format
      * @param $form
      * @param $queryArgs
+     *
      * @return StreamedResponse
      */
-    public function exportResults($format, $form, $queryArgs)
+    public function exportResults ($format, $form, $queryArgs)
     {
-        $results = $this->getEntities($queryArgs);
+        $results    = $this->getEntities($queryArgs);
         $translator = $this->translator;
 
         $date = $this->factory->getDate()->toLocalString();
-        $name = str_replace(' ' , '_', $date) . '_' . $form->getAlias();
+        $name = str_replace(' ', '_', $date) . '_' . $form->getAlias();
 
         switch ($format) {
             case 'csv':
@@ -313,11 +333,12 @@ class SubmissionModel extends CommonFormModel
                 $content = $this->factory->getTemplating()->renderResponse(
                     'MauticFormBundle:Result:export.html.php',
                     array(
-                        'form'  => $form,
-                        'results' => $results,
-                        'pageTitle'  => $name
+                        'form'      => $form,
+                        'results'   => $results,
+                        'pageTitle' => $name
                     )
                 )->getContent();
+
                 return new Response($content);
                 break;
             case 'pdf':
@@ -327,9 +348,9 @@ class SubmissionModel extends CommonFormModel
                     $content = $factory->getTemplating()->renderResponse(
                         'MauticFormBundle:Result:export.html.php',
                         array(
-                            'form'       => $form,
-                            'results'    => $results,
-                            'pageTitle'  => $name
+                            'form'      => $form,
+                            'results'   => $results,
+                            'pageTitle' => $name
                         )
                     )->getContent();
                     $mpdf->WriteHTML($content);
@@ -340,11 +361,12 @@ class SubmissionModel extends CommonFormModel
                 $response->headers->set('Expires', 0);
                 $response->headers->set('Cache-Control', 'must-revalidate');
                 $response->headers->set('Pragma', 'public');
+
                 return $response;
                 break;
             case 'xlsx':
                 if (class_exists('PHPExcel')) {
-                   $response = new StreamedResponse(function () use ($results, $form, $translator, $name) {
+                    $response = new StreamedResponse(function () use ($results, $form, $translator, $name) {
                         $objPHPExcel = new \PHPExcel();
                         $objPHPExcel->getProperties()->setTitle($name);
 
@@ -398,7 +420,7 @@ class SubmissionModel extends CommonFormModel
                         $objWriter = \PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
                         $objWriter->setPreCalculateFormulas(false);
 
-                       $objWriter->save('php://output');
+                        $objWriter->save('php://output');
                     });
                     $response->headers->set('Content-Type', 'application/force-download');
                     $response->headers->set('Content-Type', 'application/octet-stream');

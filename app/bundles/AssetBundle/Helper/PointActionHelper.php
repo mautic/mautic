@@ -29,7 +29,7 @@ class PointActionHelper
         $limitToAssets = $action['properties']['assets'];
 
         if (!empty($limitToAssets) && !in_array($assetId, $limitToAssets)) {
-            //no score change
+            //no points change
             return 0;
         }
 

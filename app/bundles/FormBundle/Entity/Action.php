@@ -73,14 +73,6 @@ class Action
     private $properties = array();
 
     /**
-     * @ORM\Column(type="array")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
-     */
-    private $settings = array();
-
-    /**
      * @ORM\ManyToOne(targetEntity="Form", inversedBy="actions")
      * @ORM\JoinColumn(name="form_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      */
@@ -205,31 +197,6 @@ class Action
     public function getType()
     {
         return $this->type;
-    }
-
-    /**
-     * Set settings
-     *
-     * @param array $settings
-     * @return Action
-     */
-    public function setSettings($settings)
-    {
-        $this->isChanged('settings', $settings);
-
-        $this->settings = $settings;
-
-        return $this;
-    }
-
-    /**
-     * Get settings
-     *
-     * @return array
-     */
-    public function getSettings()
-    {
-        return $this->settings;
     }
 
     /**

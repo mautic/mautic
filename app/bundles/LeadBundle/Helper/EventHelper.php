@@ -11,7 +11,7 @@ namespace Mautic\LeadBundle\Helper;
 
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Entity\ScoreChangeLog;
+use Mautic\LeadBundle\Entity\PointsChangeLog;
 
 /**
  * Class EventHelper
@@ -79,15 +79,15 @@ class EventHelper
         //no lead was found by a mapped email field so create a new one
         if (empty($lead)) {
             $lead = new Lead();
-            $lead->setScore($properties['score']);
+            $lead->setPoints($properties['points']);
             $ipAddresses = false;
 
-            //create a new score change event
-            $lead->addScoreChangeLogEntry(
+            //create a new points change event
+            $lead->addPointsChangeLogEntry(
                 'form',
                 $form->getId() . ":" . $form->getName(),
                 $action->getName(),
-                $properties['score'],
+                $properties['points'],
                 $ipAddress
             );
         } else {
@@ -104,7 +104,7 @@ class EventHelper
 
         if (!empty($event)) {
             $event->setIpAddress($ipAddress);
-            $lead->addScoreChangeLog($event);
+            $lead->addPointsChangeLog($event);
         }
 
         //create a new lead
@@ -125,7 +125,7 @@ class EventHelper
      * @param       $action
      * @param       $form
      */
-    public static function changeScoreOnFormSubmit(array $post, array $server,  $fields, $factory, $action, $form)
+    public static function changePointsOnFormSubmit(array $post, array $server,  $fields, $factory, $action, $form)
     {
         $properties = $action->getProperties();
 
@@ -149,8 +149,8 @@ class EventHelper
                     $ipAddress->setIpAddress($ip, $factory->getSystemParameters());
                 }
 
-                //create a new score change event
-                $event = new ScoreChangeLog();
+                //create a new points change event
+                $event = new PointsChangeLog();
                 $event->setType('form');
                 $event->setEventName($form->getId() . ":" . $form->getName());
                 $event->setActionName($action->getName());
@@ -158,12 +158,12 @@ class EventHelper
                 $event->setDateAdded(new \DateTime());
 
                 if ($count = count($leads) === 1) {
-                    //good to go so update the score
+                    //good to go so update the points
                     $lead = $leads[0];
                 } else {
                     switch ($properties['matchMode']) {
                         case 'strict':
-                            //no score change since more than one lead matched
+                            //no points change since more than one lead matched
                             $lead = false;
                             break;
                         case 'newest':
@@ -178,10 +178,10 @@ class EventHelper
                             $lead = false;
 
                             foreach ($leads as &$l) {
-                                $delta = self::updateScore($l, $properties['operator'], $properties['score']);
+                                $delta = self::updatePoints($l, $properties['operator'], $properties['points']);
                                 $event->setDelta($delta);
                                 $event->setLead($l);
-                                $l->addScoreChangeLog($event);
+                                $l->addPointsChangeLog($event);
 
                                 $ipAddresses = $l->getIpAddresses();
                                 //add the IP if the lead is not already associated with it
@@ -196,10 +196,10 @@ class EventHelper
                 }
 
                 if ($lead) {
-                    $delta = self::updateScore($lead, $properties['operator'], $properties['score']);
+                    $delta = self::updatePoints($lead, $properties['operator'], $properties['points']);
                     $event->setDelta($delta);
                     $event->setLead($lead);
-                    $lead->addScoreChangeLog($event);
+                    $lead->addPointsChangeLog($event);
 
                     $ipAddresses = $lead->getIpAddresses();
                     //add the IP if the lead is not already associated with it
@@ -218,27 +218,27 @@ class EventHelper
      * @param $operator
      * @param $delta
      */
-    private static function updateScore(&$lead, $operator, $delta)
+    private static function updatePoints(&$lead, $operator, $delta)
     {
-        $newScore = $originalScore = $lead->getScore();
+        $newPoints = $originalPoints = $lead->getPoints();
 
         switch ($operator) {
             case 'plus':
-                $newScore += $delta;
+                $newPoints += $delta;
                 break;
             case 'minus':
-                $newScore -= $delta;
+                $newPoints -= $delta;
                 break;
             case 'times':
-                $newScore *= $delta;
+                $newPoints *= $delta;
                 break;
             case 'divide':
-                $newScore /= $delta;
+                $newPoints /= $delta;
                 break;
         }
 
-        $lead->setScore($newScore);
+        $lead->setPoints($newPoints);
 
-        return $newScore - $originalScore;
+        return $newPoints - $originalPoints;
     }
 }

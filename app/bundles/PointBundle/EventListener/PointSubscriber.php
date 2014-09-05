@@ -31,8 +31,8 @@ class PointSubscriber extends CommonSubscriber
         return array(
             PointEvents::POINT_POST_SAVE     => array('onPointPostSave', 0),
             PointEvents::POINT_POST_DELETE   => array('onPointDelete', 0),
-            PointEvents::RANGE_POST_SAVE     => array('onRangePostSave', 0),
-            PointEvents::RANGE_POST_DELETE   => array('onRangeDelete', 0)
+            PointEvents::TRIGGER_POST_SAVE     => array('onTriggerPostSave', 0),
+            PointEvents::TRIGGER_POST_DELETE   => array('onTriggerDelete', 0)
         );
     }
 
@@ -79,11 +79,11 @@ class PointSubscriber extends CommonSubscriber
     /**
      * Add an entry to the audit log
      *
-     * @param Events\RangeEvent $event
+     * @param Events\TriggerEvent $event
      */
-    public function onRangePostSave(Events\RangeEvent $event)
+    public function onTriggerPostSave(Events\TriggerEvent $event)
     {
-        $range = $event->getRange();
+        $range = $event->getTrigger();
         if ($details = $event->getChanges()) {
             $log = array(
                 "bundle"    => "point",
@@ -100,11 +100,11 @@ class PointSubscriber extends CommonSubscriber
     /**
      * Add a delete entry to the audit log
      *
-     * @param Events\RangeEvent $event
+     * @param Events\TriggerEvent $event
      */
-    public function onRangeDelete(Events\RangeEvent $event)
+    public function onTriggerDelete(Events\TriggerEvent $event)
     {
-        $range = $event->getRange();
+        $range = $event->getTrigger();
         $log = array(
             "bundle"     => "point",
             "object"     => "range",

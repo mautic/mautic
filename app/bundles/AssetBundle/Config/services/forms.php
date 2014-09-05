@@ -30,11 +30,18 @@ $container->setDefinition('mautic.form.type.assetcategory', new Definition(
         'alias' => 'assetcategory',
     ));
 
-
 $container->setDefinition('mautic.form.type.pointaction_assetdownload', new Definition(
     'Mautic\AssetBundle\Form\Type\PointActionAssetDownloadType',
     array(new Reference('mautic.factory'))
 ))
     ->addTag('form.type', array(
         'alias' => 'pointaction_assetdownload',
+    ));
+
+$container->setDefinition('mautic.form.type.formsubmit_assetdownload', new Definition(
+    'Mautic\AssetBundle\Form\Type\FormSubmitActionDownloadFileType',
+    array(new Reference('mautic.factory'))
+))
+    ->addTag('form.type', array(
+        'alias' => 'asset_submitaction_downloadfile',
     ));

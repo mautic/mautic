@@ -60,10 +60,37 @@ class PublicController extends CommonFormController
                 } elseif ($status != 'published') {
                     $error = $translator->trans('mautic.form.submit.error.unavailable', array(), 'flashes');
                 } else {
-                    $errors = $this->factory->getModel('form.submission')->saveSubmission($post, $server, $form);
-                    $error = ($errors) ?
-                        $this->get('translator')->trans('mautic.form.submission.errors') . '<br /><ol><li>' .
-                        implode("</li><li>", $errors) . '</li></ol>' : false;
+                    $result = $this->factory->getModel('form.submission')->saveSubmission($post, $server, $form);
+                    if (!empty($result['errors'])) {
+                        $error = ($result['errors']) ?
+                            $this->get('translator')->trans('mautic.form.submission.errors') . '<br /><ol><li>' .
+                            implode("</li><li>", $result['errors']) . '</li></ol>' : false;
+                    } elseif (!empty($result['callback'])) {
+                        $callback = $result['callback']['callback'];
+                        if (is_callable($callback)) {
+                            if (is_array($callback)) {
+                                $reflection = new \ReflectionMethod($callback[0], $callback[1]);
+                            } elseif (strpos($callback, '::') !== false) {
+                                $parts      = explode('::', $callback);
+                                $reflection = new \ReflectionMethod($parts[0], $parts[1]);
+                            } else {
+                                new \ReflectionMethod(null, $callback);
+                            }
+
+                            //add the factory to the arguments
+                            $result['callback']['factory'] = $this->factory;
+
+                            $pass = array();
+                            foreach ($reflection->getParameters() as $param) {
+                                if (isset($result['callback'][$param->getName()])) {
+                                    $pass[] = $result['callback'][$param->getName()];
+                                } else {
+                                    $pass[] = null;
+                                }
+                            }
+                            return $reflection->invokeArgs($this, $pass);
+                        }
+                    }
                 }
             }
         }
@@ -72,7 +99,8 @@ class PublicController extends CommonFormController
             if ($return) {
                 return $this->redirect($return . $query . 'mauticError=' . rawurlencode($error));
             } else {
-                $html = "<h3>$error</h3>";
+                $msg     = $error;
+                $msgType = 'error';
             }
         } elseif ($postAction == 'redirect') {
             return $this->redirect($postActionProperty);
@@ -83,17 +111,17 @@ class PublicController extends CommonFormController
                 }
                 return $this->redirect($return);
             } else {
-                $html = "<h3>" . $this->get('translator')->trans('mautic.form.submission.thankyou') . '</h3>';
+                $msg = $this->get('translator')->trans('mautic.form.submission.thankyou');
             }
         } else {
-            $html = "<h3>" . $postActionProperty . '</h3>';
+            $msg = $postActionProperty;
         }
 
-        $response = new Response();
-        $response->setContent('<html><body>'.$html.'</body></html>');
-        $response->setStatusCode(Response::HTTP_OK);
-        $response->headers->set('Content-Type', 'text/html');
-        return $response;
+        return $this->render('MauticEmailBundle::message.html.php', array(
+            'message'  => $msg,
+            'type'     => (empty($msgType)) ? 'notice' : $msgType,
+            'template' => $this->factory->getParameter('default_theme')
+        ));
     }
 
 

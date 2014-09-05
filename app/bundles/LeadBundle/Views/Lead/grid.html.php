@@ -23,7 +23,11 @@ if ($tmpl == 'index')
                 </div>
                 <div class="col-xs-8 valign-middle">
                     <div class="panel-body">
-                        <span class="pull-right label label-default"><?php echo $item->getScore(); ?></span>
+                        <?php
+                        $color = $item->getColor();
+                        $style = !empty($color) ? ' style="background-color: ' . $color . ' !important;"' : '';
+                        ?>
+                        <span class="pull-right label label-default"<?php echo $style; ?>><?php echo $item->getPoints(); ?></span>
                         <h5>
                             <a href="<?php echo $view['router']->generate('mautic_lead_action',
                                 array("objectAction" => "view", "objectId" => $item->getId())); ?>"

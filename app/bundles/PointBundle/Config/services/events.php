@@ -20,3 +20,13 @@ $container->setDefinition(
     )
 )
     ->addTag('kernel.event_subscriber');
+
+
+$container->setDefinition(
+    'mautic.point.leadbundle.subscriber',
+    new Definition(
+        'Mautic\PointBundle\EventListener\LeadSubscriber',
+        array(new Reference('mautic.factory'))
+    )
+)
+    ->addTag('kernel.event_subscriber');

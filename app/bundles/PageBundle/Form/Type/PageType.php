@@ -9,6 +9,7 @@
 
 namespace Mautic\PageBundle\Form\Type;
 
+use Mautic\CategoryBundle\Helper\FormHelper;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
@@ -27,13 +28,15 @@ class PageType extends AbstractType
 
     private $translator;
     private $themes;
+    private $defaultTheme;
 
     /**
      * @param MauticFactory $factory
      */
     public function __construct(MauticFactory $factory) {
-        $this->translator = $factory->getTranslator();
-        $this->themes     = $factory->getInstalledThemes('page');
+        $this->translator   = $factory->getTranslator();
+        $this->themes       = $factory->getInstalledThemes('page');
+        $this->defaultTheme = $factory->getParameter('default_theme');
     }
 
     /**
@@ -84,27 +87,16 @@ class PageType extends AbstractType
         }
 
         if (!$isVariant) {
-            $builder->add('category_lookup', 'text', array(
-                'label'      => 'mautic.page.page.form.category',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array(
-                    'class'       => 'form-control',
-                    'tooltip'     => 'mautic.core.help.autocomplete',
-                    'placeholder' => $this->translator->trans('mautic.core.form.uncategorized')
-                ),
-                'mapped'     => false,
-                'required'   => false
-            ));
+            //add category
+            FormHelper::buildForm($this->translator, $builder);
 
-            $builder->add('category', 'hidden_entity', array(
-                'required'       => false,
-                'repository'     => 'MauticCategoryBundle:Category',
-                'error_bubbling' => false,
-                'read_only'      => ($isVariant) ? true : false
-            ));
         }
 
         //build a list
+        $template = $options['data']->getTemplate();
+        if (empty($template)) {
+            $template = $this->defaultTheme;
+        }
         $builder->add('template', 'choice', array(
             'choices'       => $this->themes,
             'expanded'      => false,
@@ -116,7 +108,8 @@ class PageType extends AbstractType
             'attr'       => array(
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.page.page.form.template.help'
-            )
+            ),
+            'data'          => $template
         ));
 
         if (!$isVariant) {

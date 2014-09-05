@@ -9,6 +9,7 @@
 
 namespace Mautic\PointBundle\Security\Permissions;
 
+use Mautic\CategoryBundle\Helper\PermissionHelper;
 use Symfony\Component\Form\FormBuilderInterface;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 
@@ -26,32 +27,10 @@ class PointPermissions extends AbstractPermissions
     public function __construct($params)
     {
         parent::__construct($params);
-        $this->permissions = array(
-            'points' => array(
-                'viewown'      => 2,
-                'viewother'    => 4,
-                'editown'      => 8,
-                'editother'    => 16,
-                'create'       => 32,
-                'deleteown'    => 64,
-                'deleteother'  => 128,
-                'publishown'   => 256,
-                'publishother' => 512,
-                'full'         => 1024
-            ),
-            'ranges' => array(
-                'viewown'      => 2,
-                'viewother'    => 4,
-                'editown'      => 8,
-                'editother'    => 16,
-                'create'       => 32,
-                'deleteown'    => 64,
-                'deleteother'  => 128,
-                'publishown'   => 256,
-                'publishother' => 512,
-                'full'         => 1024
-            )
-        );
+
+        $this->addStandardPermissions('points');
+        $this->addStandardPermissions('triggers');
+        $this->addStandardPermissions('categories');
     }
 
     /**
@@ -72,50 +51,21 @@ class PointPermissions extends AbstractPermissions
      */
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {
-        $builder->add('point:points', 'button_group', array(
-            'choices'  => array(
-                'viewown'      => 'mautic.core.permissions.viewown',
-                'viewother'    => 'mautic.core.permissions.viewother',
-                'editown'      => 'mautic.core.permissions.editown',
-                'editother'    => 'mautic.core.permissions.editother',
-                'create'       => 'mautic.core.permissions.create',
-                'deleteown'    => 'mautic.core.permissions.deleteown',
-                'deleteother'  => 'mautic.core.permissions.deleteother',
-                'publishown'   => 'mautic.core.permissions.publishown',
-                'publishother' => 'mautic.core.permissions.publishother',
-                'full'         => 'mautic.core.permissions.full'
-            ),
-            'label'    => 'mautic.point.permissions.points',
-            'expanded' => true,
-            'multiple' => true,
-            'attr'     => array(
-                'onclick' => 'Mautic.onPermissionChange(this, event, \'point\')'
-            ),
-            'data'     => (!empty($data['points']) ? $data['points'] : array())
-            )
-        );
+        $this->addStandardFormFields('point', 'categories', $builder, $data);
+        $this->addStandardFormFields('point', 'points', $builder, $data);
+        $this->addStandardFormFields('point', 'triggers', $builder, $data);
+    }
 
-        $builder->add('point:ranges', 'button_group', array(
-                'choices'  => array(
-                    'viewown'      => 'mautic.core.permissions.viewown',
-                    'viewother'    => 'mautic.core.permissions.viewother',
-                    'editown'      => 'mautic.core.permissions.editown',
-                    'editother'    => 'mautic.core.permissions.editother',
-                    'create'       => 'mautic.core.permissions.create',
-                    'deleteown'    => 'mautic.core.permissions.deleteown',
-                    'deleteother'  => 'mautic.core.permissions.deleteother',
-                    'publishown'   => 'mautic.core.permissions.publishown',
-                    'publishother' => 'mautic.core.permissions.publishother',
-                    'full'         => 'mautic.core.permissions.full'
-                ),
-                'label'    => 'mautic.point.permissions.ranges',
-                'expanded' => true,
-                'multiple' => true,
-                'attr'     => array(
-                    'onclick' => 'Mautic.onPermissionChange(this, event, \'point\')'
-                ),
-                'data'     => (!empty($data['ranges']) ? $data['ranges'] : array())
-            )
-        );
+    /**
+     * {@inheritdoc}
+     *
+     * @param array $permissions
+     */
+    public function analyzePermissions (array &$permissions)
+    {
+        parent::analyzePermissions($permissions);
+
+        PermissionHelper::analyzePermissions('point', 'points', $permissions);
+        PermissionHelper::analyzePermissions('point', 'triggers', $permissions);
     }
 }

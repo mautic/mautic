@@ -83,15 +83,10 @@ class ActionController extends CommonFormController
 
         $viewParams = array('type' => $actionType);
         if ($cancelled || $valid) {
-            $tmpl = 'components';
-
-            $fieldHelper = new FormFieldHelper($this->get('translator'));
-            $viewParams['fields']   = $fieldHelper->getList($customComponents['fields']);
-            $viewParams['actions']  = $customComponents['actions'];
-            $viewParams['expanded'] = 'actions';
-
+            $closeModal = true;
         } else {
-            $tmpl     = 'action';
+            $closeModal = false;
+            $viewParams['tmpl'] = 'action';
             $formView = $form->createView();
             $this->get('templating')->getEngine('MauticFormBundle:Form:index.html.php')->get('form')
                 ->setTheme($formView, 'MauticFormBundle:FormComponent');
@@ -99,12 +94,10 @@ class ActionController extends CommonFormController
             $header = $formAction['settings']['label'];
             $viewParams['actionHeader'] = $this->get('translator')->trans($header);
         }
-        $viewParams['tmpl'] = $tmpl;
 
         $passthroughVars = array(
-            'mauticContent' => 'formaction',
+            'mauticContent' => 'formAction',
             'success'       => $success,
-            'target'        => '#actionList',
             'route'         => false
         );
 
@@ -124,11 +117,19 @@ class ActionController extends CommonFormController
             ));
         }
 
-        return $this->ajaxAction(array(
-            'contentTemplate' => 'MauticFormBundle:Builder:' . $tmpl . '.html.php',
-            'viewParameters'  => $viewParams,
-            'passthroughVars' => $passthroughVars
-        ));
+        if ($closeModal) {
+            //just close the modal
+            $passthroughVars['closeModal'] = 1;
+            $response  = new JsonResponse($passthroughVars);
+            $response->headers->set('Content-Length', strlen($response->getContent()));
+            return $response;
+        } else {
+            return $this->ajaxAction(array(
+                'contentTemplate' => 'MauticFormBundle:Builder:' . $viewParams['tmpl'] . '.html.php',
+                'viewParameters'  => $viewParams,
+                'passthroughVars' => $passthroughVars
+            ));
+        }
     }
 
     /**
@@ -147,6 +148,8 @@ class ActionController extends CommonFormController
 
         if ($formAction !== null) {
             $actionType  = $formAction['type'];
+            $customComponents = $this->factory->getModel('form.form')->getCustomComponents();
+            $formAction['settings'] = $customComponents['actions'][$actionType];
 
             //ajax only for form fields
             if (!$actionType ||
@@ -205,16 +208,9 @@ class ActionController extends CommonFormController
 
             $viewParams = array('type' => $actionType);
             if ($cancelled || $valid) {
-                $tmpl = 'components';
-
-                //fire the form builder event
-                $customComponents = $this->factory->getModel('form.form')->getCustomComponents();
-
-                $fieldHelper = new FormFieldHelper($this->get('translator'));
-                $viewParams['fields']   = $fieldHelper->getList($customComponents['fields']);
-                $viewParams['actions']  = $customComponents['actions'];
-                $viewParams['expanded'] = 'actions';
+               $closeModal = true;
             } else {
+                $closeModal = false;
                 $tmpl     = 'action';
                 $formView = $form->createView();
                 $this->get('templating')->getEngine('MauticFormBundle:Form:index.html.php')->get('form')
@@ -225,9 +221,8 @@ class ActionController extends CommonFormController
             $viewParams['tmpl'] = $tmpl;
 
             $passthroughVars = array(
-                'mauticContent' => 'formaction',
+                'mauticContent' => 'formAction',
                 'success'       => $success,
-                'target'        => '#builderComponents',
                 'route'         => false
             );
 
@@ -247,11 +242,19 @@ class ActionController extends CommonFormController
                 ));
             }
 
-            return $this->ajaxAction(array(
-                'contentTemplate' => 'MauticFormBundle:Builder:' . $tmpl . '.html.php',
-                'viewParameters'  => $viewParams,
-                'passthroughVars' => $passthroughVars
-            ));
+            if ($closeModal) {
+                //just close the modal
+                $passthroughVars['closeModal'] = 1;
+                $response  = new JsonResponse($passthroughVars);
+                $response->headers->set('Content-Length', strlen($response->getContent()));
+                return $response;
+            } else {
+                return $this->ajaxAction(array(
+                    'contentTemplate' => 'MauticFormBundle:Builder:' . $tmpl . '.html.php',
+                    'viewParameters'  => $viewParams,
+                    'passthroughVars' => $passthroughVars
+                ));
+            }
         } else {
             $response  = new JsonResponse(array('success' => 0));
             $response->headers->set('Content-Length', strlen($response->getContent()));
@@ -306,7 +309,7 @@ class ActionController extends CommonFormController
             $formAction = array_merge($blank, $formAction);
 
             $dataArray  = array(
-                'mauticContent'  => 'formaction',
+                'mauticContent'  => 'formAction',
                 'success'        => 1,
                 'target'         => '#mauticform_'.$objectId,
                 'route'          => false,
@@ -376,7 +379,7 @@ class ActionController extends CommonFormController
             $formAction = array_merge($blank, $formAction);
 
             $dataArray  = array(
-                'mauticContent'  => 'formaction',
+                'mauticContent'  => 'formAction',
                 'success'        => 1,
                 'target'         => '#mauticform_'.$objectId,
                 'route'          => false,

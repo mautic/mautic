@@ -70,13 +70,10 @@ class PageSubscriber extends CommonSubscriber
                             )
                         )
                     ) {
-                        $formHtml   = $form->getCachedHtml();
-                        $formStatus = $form->getPublishStatus();
-                        if ($formStatus !== 'published') {
-                            $formHtml .= '<div class="mauticform-error">' .
-                                $this->translator->trans('mautic.form.form.pagetoken.notpublished') .
-                                '</div>';
-                        }
+                        $formHtml = ($form->isPublished()) ? $form->getCachedHtml() :
+                            '<div class="mauticform-error">' .
+                            $this->translator->trans('mautic.form.form.pagetoken.notpublished') .
+                            '</div>';
 
                         //add the hidden page input
                         $pageInput = "\n<input type=\"hidden\" name=\"mauticform[mauticpage]\" value=\"{$page->getId()}\" />\n";

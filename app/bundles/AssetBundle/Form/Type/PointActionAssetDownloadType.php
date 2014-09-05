@@ -31,7 +31,7 @@ class PointActionAssetDownloadType extends AbstractType
         $choices = $factory->getModel('asset')->getRepository()
             ->getAssetList('', 0, 0, $viewOther);
         foreach ($choices as $asset) {
-            $this->choices[$asset['id']] = $asset['id'] . ':' . $asset['title'];
+            $this->choices[$asset['language']][$asset['id']] = $asset['id'] . ':' . $asset['title'];
         }
 
         //sort by language

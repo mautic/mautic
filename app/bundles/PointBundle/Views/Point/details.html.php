@@ -12,8 +12,7 @@ $view['slots']->set('mauticContent', 'point');
 $view['slots']->set("headerTitle", $entity->getName());
 ?>
 <?php $view['slots']->start("actions"); ?>
-<?php if ($security->hasEntityAccess($permissions['point:points:editown'], $permissions['point:points:editother'],
-    $entity->getCreatedBy())): ?>
+<?php if ($permissions['point:points:edit']): ?>
     <li>
         <a href="<?php echo $this->container->get('router')->generate(
             'mautic_point_action', array("objectAction" => "edit", "objectId" => $entity->getId())); ?>"
@@ -23,8 +22,7 @@ $view['slots']->set("headerTitle", $entity->getName());
         </a>
     </li>
 <?php endif; ?>
-<?php if ($security->hasEntityAccess($permissions['point:points:deleteown'], $permissions['point:points:deleteother'],
-    $entity->getCreatedBy())): ?>
+<?php if ($permissions['point:points:delete']): ?>
 <li>
     <a href="javascript:void(0);"
        onclick="Mautic.showConfirmation(

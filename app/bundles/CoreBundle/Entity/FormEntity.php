@@ -86,14 +86,25 @@ class FormEntity
     }
 
     /**
-     * Check publish status with option to check against publish up and down dates
+     * Check publish status with option to check against category, publish up and down dates
      *
      * @param bool $checkPublishStatus
+     * @param bool $checkCategoryStatus
      */
-    public function isPublished($checkPublishStatus = true)
+    public function isPublished($checkPublishStatus = true, $checkCategoryStatus = true)
     {
         if ($checkPublishStatus && method_exists($this, 'getPublishUp')) {
-            return ($this->getPublishStatus() == 'published') ? true : false;
+            $status = $this->getPublishStatus();
+            if ($status == 'published') {
+                //check to see if there is a category to check
+                if ($checkCategoryStatus && method_exists($this, 'getCategory')) {
+                    $category = $this->getCategory();
+                    if ($category !== null && !$category->isPublished()) {
+                        return false;
+                    }
+                }
+            }
+            return ($status == 'published') ? true : false;
         } else {
             return $this->getIsPublished();
         }

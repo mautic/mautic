@@ -9,6 +9,7 @@
 
 namespace Mautic\PointBundle\Form\Type;
 
+use Mautic\CategoryBundle\Helper\FormHelper;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
@@ -20,7 +21,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 /**
  * Class PointType
  *
- * @package Mautic\FormBundle\Form\Type
+ * @package Mautic\PointBundle\Form\Type
  */
 class PointType extends AbstractType
 {
@@ -44,20 +45,6 @@ class PointType extends AbstractType
         $builder->addEventSubscriber(new CleanFormSubscriber());
         $builder->addEventSubscriber(new FormExitSubscriber('point', $options));
 
-        $builder->add("points-panel-wrapper-start", 'panel_wrapper_start', array(
-            'attr' => array(
-                'id' => "points-panel"
-            )
-        ));
-
-        //details
-        $builder->add("details-panel-start", 'panel_start', array(
-            'label'      => 'mautic.point.form.panel.details',
-            'dataParent' => '#points-panel',
-            'bodyId'     => 'details-panel',
-            'bodyAttr'   => array('class' => 'in')
-        ));
-
         $builder->add('name', 'text', array(
             'label'      => 'mautic.point.form.name',
             'label_attr' => array('class' => 'control-label'),
@@ -70,6 +57,27 @@ class PointType extends AbstractType
             'attr'       => array('class' => 'form-control'),
             'required'   => false
         ));
+
+        $builder->add('type', 'choice', array(
+            'choices' => $options['pointActions']['list'],
+            'empty_value' => '',
+            'label'       => 'mautic.point.form.type',
+            'label_attr'  => array('class' => 'control-label'),
+            'attr'        => array(
+                'class' => 'form-control',
+                'onchange' => 'Mautic.getPointActionPropertiesForm(this.value);'
+            ),
+        ));
+
+        $type = (!empty($options['actionType'])) ? $options['actionType'] : $options['data']->getType();
+        if ($type) {
+            $formType   =  (!empty($options['pointActions']['actions'][$type]['formType'])) ?
+                $options['pointActions']['actions'][$type]['formType'] : 'genericpoint_settings';
+
+            $builder->add('properties', $formType, array(
+                'label' => false
+            ));
+        }
 
         if (!empty($options['data']) && $options['data']->getId()) {
             $readonly = !$this->security->hasEntityAccess(
@@ -125,22 +133,8 @@ class PointType extends AbstractType
             'required'   => false
         ));
 
-        $builder->add("details-panel-end", 'panel_end');
-
-        //actions
-        $builder->add("actions-panel-start", 'panel_start', array(
-            'label' => 'mautic.point.form.panel.actions',
-            'dataParent' => '#points-panel',
-            'bodyId'     => 'actions-panel'
-        ));
-
-        $builder->add("actions-panel-end", 'panel_end');
-
-        $builder->add("points-panel-wrapper-end", 'panel_wrapper_end');
-
-        $builder->add('tempId', 'hidden', array(
-            'mapped' => false
-        ));
+        //add category
+        FormHelper::buildForm($this->translator, $builder);
 
         $builder->add('buttons', 'form_buttons');
 
@@ -157,6 +151,10 @@ class PointType extends AbstractType
         $resolver->setDefaults(array(
             'data_class' => 'Mautic\PointBundle\Entity\Point',
         ));
+
+        $resolver->setRequired(array('pointActions'));
+
+        $resolver->setOptional(array('actionType'));
     }
 
     /**

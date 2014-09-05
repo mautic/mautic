@@ -403,7 +403,7 @@ a:focus {
     margin-left: -15px;
     font-weight: 700;
     color: rgba(255, 255, 255, 0.8);
-    text-shadow: 0px 1px 0px rgba(117, 117, 117, 0.6);
+    text-shadow: 0px 1px 0px rgba(118, 118, 118, 0.6);
   }
   #app-header.navbar .navbar-header a.navbar-brand:hover > .navbar-brand-text,
   #app-header.navbar .navbar-header a.navbar-brand:focus > .navbar-brand-text {
@@ -415,7 +415,7 @@ a:focus {
   }
   #app-header.navbar .navbar-header {
     width: 220px;
-    background-color: #4c5e9e;
+    background-color: #4e5e9e;
   }
   #app-header.navbar .navbar-header .navbar-toggle {
     display: none;
@@ -519,7 +519,7 @@ aside.app-sidebar:before {
   top: 0;
   bottom: 0;
   width: inherit;
-  background-color: #36474f;
+  background-color: #25284e;
   border: inherit;
 }
 aside.app-sidebar.sidebar-left {
@@ -634,12 +634,12 @@ aside.app-sidebar .content .nav li a > .arrow:before {
 }
 aside.app-sidebar .content .nav li a:focus,
 aside.app-sidebar .content .nav li a:hover {
-  background-color: #34444c;
+  background-color: #23274a;
 }
 aside.app-sidebar .content .nav li .nav-submenu {
   position: relative;
   overflow: hidden;
-  background-color: #34444c;
+  background-color: #23274a;
   padding-left: 45px;
 }
 aside.app-sidebar .content .nav li .nav-submenu li {
@@ -653,7 +653,7 @@ aside.app-sidebar .content .nav li .nav-submenu li:last-child {
 }
 aside.app-sidebar .content .nav li.active > a,
 aside.app-sidebar .content .nav li.open > a {
-  background-color: #34444c;
+  background-color: #23274a;
   color: rgba(255, 255, 255, 0.85);
 }
 aside.app-sidebar .content .nav li.active > a > .arrow:before,
@@ -662,7 +662,7 @@ aside.app-sidebar .content .nav li.open > a > .arrow:before {
 }
 aside.app-sidebar .content .nav > li > a > .text {
   font-weight: 600;
-  text-shadow: 0px -1px 0px #314047;
+  text-shadow: 0px -1px 0px #202445;
 }
 @media (min-width: 768px) {
   aside.app-sidebar {
@@ -724,13 +724,13 @@ aside.app-sidebar .content .nav > li > a > .text {
     box-shadow: 4px 4px 0 -1px rgba(0, 0, 0, 0.1);
   }
   aside.app-sidebar .content .nav > li.open a {
-    background-color: #36474f;
+    background-color: #25284e;
   }
   aside.app-sidebar .content .nav > li.open .nav-submenu {
     display: none;
   }
   aside.app-sidebar .content .nav > li.hover a {
-    background-color: #34444c;
+    background-color: #23274a;
   }
   aside.app-sidebar .content .nav > li.hover .nav-submenu {
     display: block;
@@ -961,16 +961,16 @@ h6,
   font-weight: 300;
 }
 .text-muted {
-  color: #819ba8;
+  color: #6169b5;
 }
 a.text-muted:hover {
-  color: #648391;
+  color: #48509a;
 }
 .text-primary {
-  color: #4c5e9e;
+  color: #4e5e9e;
 }
 a.text-primary:hover {
-  color: #3b4a7c;
+  color: #3d4a7c;
 }
 .text-success {
   color: #63c29d;
@@ -1027,7 +1027,7 @@ a.text-info:hover {
   border-width: 2px;
 }
 .btn.btn-outline.btn-primary {
-  color: #4c5e9e;
+  color: #4e5e9e;
 }
 .btn.btn-outline.btn-success {
   color: #63c29d;
@@ -1045,7 +1045,7 @@ a.text-info:hover {
   opacity: .8;
 }
 .media.read a {
-  color: #4f6873;
+  color: #383e77;
 }
 .media.new {
   background-color: #fafafa;
@@ -1066,7 +1066,7 @@ a.text-info:hover {
   background-color: #e0e0e0;
 }
 .bullet.bullet-primary {
-  background-color: #4c5e9e;
+  background-color: #4e5e9e;
 }
 .bullet.bullet-success {
   background-color: #63c29d;
@@ -1214,7 +1214,7 @@ a.text-info:hover {
   position: absolute;
   top: 2px;
   left: 2px;
-  background-color: #455a64;
+  background-color: #303566;
   height: 10px;
   width: 10px;
   border-radius: 2px;
@@ -1254,7 +1254,7 @@ a.text-info:hover {
 .radio[class^="custom"] label input:checked + span,
 .checkbox-inline[class^="custom"] label input:checked + span,
 .radio-inline[class^="custom"] label input:checked + span {
-  border: 1px solid #455a64;
+  border: 1px solid #303566;
 }
 .checkbox[class*=" custom"] label input:checked + span:after,
 .radio[class*=" custom"] label input:checked + span:after,
@@ -1290,19 +1290,19 @@ a.text-info:hover {
 .radio[class^="custom"] label:hover input:checked + span,
 .checkbox-inline[class^="custom"] label:hover input:checked + span,
 .radio-inline[class^="custom"] label:hover input:checked + span {
-  border: 1px solid #455a64;
+  border: 1px solid #303566;
 }
 .checkbox.custom-primary label input + span:after,
 .radio.custom-primary label input + span:after,
 .checkbox-inline.custom-primary label input + span:after,
 .radio-inline.custom-primary label input + span:after {
-  background-color: #4c5e9e;
+  background-color: #4e5e9e;
 }
 .checkbox.custom-primary label input:checked + span,
 .radio.custom-primary label input:checked + span,
 .checkbox-inline.custom-primary label input:checked + span,
 .radio-inline.custom-primary label input:checked + span {
-  border: 1px solid #4c5e9e;
+  border: 1px solid #4e5e9e;
 }
 .checkbox.custom-primary label:hover input + span,
 .radio.custom-primary label:hover input + span,
@@ -1314,7 +1314,7 @@ a.text-info:hover {
 .radio.custom-primary label:hover input:checked + span,
 .checkbox-inline.custom-primary label:hover input:checked + span,
 .radio-inline.custom-primary label:hover input:checked + span {
-  border: 1px solid #4c5e9e;
+  border: 1px solid #4e5e9e;
 }
 .checkbox.custom-info label input + span:after,
 .radio.custom-info label input + span:after,
@@ -1628,7 +1628,7 @@ aside.sidebar .progress {
 .panel-heading .panel-toolbar > .btn {
   border: 0;
   padding: 5px;
-  color: #455a64;
+  color: #303566;
   -webkit-box-shadow: none;
   box-shadow: none;
   -webkit-transition: color 0.3s ease;
@@ -1637,7 +1637,7 @@ aside.sidebar .progress {
 }
 .panel-heading .panel-toolbar > .btn:hover,
 .panel-heading .panel-toolbar > .btn:focus {
-  color: #455a64;
+  color: #303566;
   -webkit-transition: color 0.3s ease;
   -o-transition: color 0.3s ease;
   transition: color 0.3s ease;
@@ -1704,11 +1704,11 @@ aside.sidebar .progress {
   transition: border .25s, left .15s .25s, right .25s .175s;
 }
 .switch.switch-primary input:checked + span {
-  border-color: #4c5e9e;
-  box-shadow: inset 0 0 0 0.6em #4c5e9e;
+  border-color: #4e5e9e;
+  box-shadow: inset 0 0 0 0.6em #4e5e9e;
 }
 .switch.switch-primary input:checked + span:after {
-  border-color: #4c5e9e;
+  border-color: #4e5e9e;
 }
 .switch.switch-info input:checked + span {
   border-color: #31b6ba;
@@ -1818,10 +1818,10 @@ aside.sidebar .progress {
   margin-left: 5px;
 }
 .step .steps.active {
-  color: #819ba8;
+  color: #6169b5;
 }
 .step .steps.active > .steps-figure {
-  border-color: #455a64;
+  border-color: #303566;
 }
 .step a.steps:hover,
 .step a.steps:focus {
@@ -1833,11 +1833,11 @@ aside.sidebar .progress {
 }
 .bg-white {
   background-color: #fff;
-  color: #455a64;
+  color: #303566;
 }
 .bg-light {
   background-color: #f8f8f8;
-  color: #455a64;
+  color: #303566;
 }
 .va-t {
   vertical-align: top !important;

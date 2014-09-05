@@ -30,7 +30,7 @@ class PointActionHelper
         $limitToForms = $action['properties']['forms'];
 
         if (!empty($limitToForms) && !in_array($formId, $limitToForms)) {
-            //no score change
+            //no points change
             return 0;
         }
 

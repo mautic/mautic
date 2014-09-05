@@ -83,7 +83,7 @@ $view['slots']->set("headerTitle",
           'socialProfileUrls' => $socialProfileUrls
       ));
 
-      echo $view->render('MauticLeadBundle:Lead:score_log.html.php', array(
+      echo $view->render('MauticLeadBundle:Lead:points_log.html.php', array(
           "lead" => $lead
       ));
 

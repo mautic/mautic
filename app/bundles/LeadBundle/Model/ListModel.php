@@ -199,8 +199,8 @@ class ListModel extends FormModel
                     'callback' => 'activateLeadFieldTypeahead'
                 )
             ),
-            'score'     => array(
-                'label'      => $this->translator->trans('mautic.lead.list.filter.score'),
+            'points'     => array(
+                'label'      => $this->translator->trans('mautic.lead.list.filter.points'),
                 'properties' => array('type' => 'number')
             )
         );

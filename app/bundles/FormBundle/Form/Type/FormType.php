@@ -9,6 +9,7 @@
 
 namespace Mautic\FormBundle\Form\Type;
 
+use Mautic\CategoryBundle\Helper\FormHelper;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
@@ -73,23 +74,9 @@ class FormType extends AbstractType
             'required'   => false
         ));
 
-        $builder->add('category_lookup', 'text', array(
-            'label'      => 'mautic.form.form.category',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array(
-                'class'       => 'form-control',
-                'tooltip'     => 'mautic.core.help.autocomplete',
-                'placeholder' => $this->translator->trans('mautic.core.form.uncategorized')
-            ),
-            'mapped'     => false,
-            'required'   => false
-        ));
+        //add category
+        FormHelper::buildForm($this->translator, $builder);
 
-        $builder->add('category', 'hidden_entity', array(
-            'required'       => false,
-            'repository'     => 'MauticCategoryBundle:Category',
-            'error_bubbling' => false
-        ));
 
         if (!empty($options['data']) && $options['data']->getId()) {
             $readonly = !$this->security->hasEntityAccess(

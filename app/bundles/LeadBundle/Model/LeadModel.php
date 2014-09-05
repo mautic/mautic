@@ -58,6 +58,21 @@ class LeadModel extends FormModel
     /**
      * {@inheritdoc}
      *
+     * @param array $args [start, limit, filter, orderBy, orderByDir]
+     * @return mixed
+     */
+    public function getEntities(array $args = array())
+    {
+        //set the point trigger model in order to get the color code for the lead
+        $repo = $this->getRepository();
+        $repo->setTriggerModel($this->factory->getModel('point.trigger'));
+
+        return parent::getEntities($args);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
      * @param      $entity
      * @param      $formFactory
      * @param null $action

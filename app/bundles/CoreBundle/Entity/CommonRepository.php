@@ -91,8 +91,7 @@ class CommonRepository extends EntityRepository
             ->createQueryBuilder($alias)
             ->select($alias);
 
-        $this->buildOrderByClause($q, $args);
-        $this->buildLimiterClauses($q, $args);
+        $this->buildClauses($q, $args);
         $query = $q->getQuery();
 
         if (isset($args['hydration_mode'])) {
@@ -405,5 +404,105 @@ class CommonRepository extends EntityRepository
     {
         $alpha_numeric = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
         return substr(str_shuffle($alpha_numeric), 0, 8);
+    }
+
+    /**
+     * @param QueryBuilder $q
+     * @param              $filter
+     * @return array
+     */
+    protected function addStandardCatchAllWhereClause(&$q, $filter, array $columns)
+    {
+        $unique  = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
+        $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
+
+        $expr = $q->expr()->orX();
+        foreach ($columns as $col) {
+            $expr->add(
+                $q->expr()->like($col,  ":$unique")
+            );
+        }
+
+        if ($filter->not) {
+            $expr = $q->expr()->not($expr);
+        }
+        return array(
+            $expr,
+            array("$unique" => $string)
+        );
+    }
+
+    /**
+     * @param QueryBuilder $q
+     * @param              $filter
+     * @return array
+     */
+    protected function addStandardSearchCommandWhereClause(&$q, $filter)
+    {
+        $command         = $field = $filter->command;
+        $string          = $filter->string;
+        $unique          = $this->generateRandomParameterName();
+        $returnParameter = true; //returning a parameter that is not used will lead to a Doctrine error
+        $expr            = false;
+        $prefix          = $this->getTableAlias();
+
+        switch ($command) {
+            case $this->translator->trans('mautic.core.searchcommand.is'):
+                switch($string) {
+                    case $this->translator->trans('mautic.core.searchcommand.ispublished'):
+                        $expr = $q->expr()->eq("$prefix.isPublished", 1);
+                        break;
+                    case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
+                        $expr = $q->expr()->eq("$prefix.isPublished", 0);
+                        break;
+                    case $this->translator->trans('mautic.core.searchcommand.isuncategorized'):
+                        $expr = $q->expr()->orX(
+                            $q->expr()->isNull("$prefix.category"),
+                            $q->expr()->eq("$prefix.category", $q->expr()->literal(''))
+                        );
+                        break;
+                    case $this->translator->trans('mautic.core.searchcommand.ismine'):
+                        $expr = $q->expr()->eq("IDENTITY($prefix.createdBy)", $this->currentUser->getId());
+                        break;
+
+                }
+                $returnParameter = false;
+                break;
+            case $this->translator->trans('mautic.core.searchcommand.category'):
+                $expr = $q->expr()->like("c.alias", ":$unique");
+                $filter->strict = true;
+                break;
+        }
+
+        if ($expr && $filter->not) {
+            $expr = $q->expr()->not($expr);
+        }
+
+        if (!empty($forceParameters)) {
+            $parameters = $forceParameters;
+        } elseif (!$returnParameter) {
+            $parameters = array();
+        } else {
+            $string     = ($filter->strict) ? $filter->string : "%{$filter->string}%";
+            $parameters = array("$unique" => $string);
+        }
+
+        return array( $expr, $parameters );
+    }
+
+    /**
+     * @return array
+     */
+    public function getStandardSearchCommands()
+    {
+        return array(
+            'mautic.core.searchcommand.is' => array(
+                'mautic.core.searchcommand.ispublished',
+                'mautic.core.searchcommand.isunpublished',
+                'mautic.core.searchcommand.isuncategorized',
+                'mautic.core.searchcommand.ismine',
+            ),
+            'mautic.core.searchcommand.category'
+        );
     }
 }

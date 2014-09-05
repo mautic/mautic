@@ -64,9 +64,9 @@ if ($tmpl == 'index')
 
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                         'sessionVar' => 'lead',
-                        'orderBy'    => 'l.score',
-                        'text'       => 'mautic.lead.lead.thead.score',
-                        'class'      => 'col-lead-score'
+                        'orderBy'    => 'l.points',
+                        'text'       => 'mautic.lead.lead.thead.points',
+                        'class'      => 'col-lead-points'
                     ));
                     ?>
 
@@ -114,7 +114,11 @@ if ($tmpl == 'index')
                         ?>
                     </td>
                     <td class="text-center">
-                        <?php echo $item->getScore(); ?>
+                        <?php
+                        $color = $item->getColor();
+                        $style = !empty($color) ? ' style="background-color: ' . $color . ' !important;"' : '';
+                        ?>
+                        <span class="badge"<?php echo $style; ?>><?php echo $item->getPoints(); ?></span>
                     </td>
                 </tr>
             <?php endforeach; ?>

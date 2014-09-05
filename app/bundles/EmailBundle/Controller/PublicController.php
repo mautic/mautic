@@ -33,12 +33,10 @@ class PublicController extends CommonFormController
             //the lead needs to have fields populated
             $lead = $this->factory->getModel('lead')->getLead($statLead->getId());
 
-            $category     = $entity->getCategory();
-            $catPublished = (!empty($category)) ? $category->isPublished() : true;
             $published    = $entity->isPublished();
 
             //make sure the page is published or deny access if not
-            if ((!$catPublished || !$published) && (!$security->hasEntityAccess(
+            if ((!$published) && (!$security->hasEntityAccess(
                     'email:emails:viewown', 'email:emails:viewother', $entity->getCreatedBy()))
             ) {
                 throw new AccessDeniedHttpException($translator->trans('mautic.core.url.error.401'));

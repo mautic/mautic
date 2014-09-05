@@ -39,7 +39,7 @@ class PointBuilderEvent extends Event
      *      i.e AcmeMyBundle:PointAction:theaction.html.php
      *  'formType'    => (optional) name of the form type SERVICE for the action; will use a default form with point change only
      *  'callback'    => (optional) callback function that will be passed when the action is triggered; default
-     *                         will be to change point score only; THIS SHOULD RETURN THE SCORE DELTA
+     *                         will be to change point points only; THIS SHOULD RETURN THE POINTS DELTA
      *      The callback function can receive the following arguments by name (via ReflectionMethod::invokeArgs())
      *          Mautic\CoreBundle\Factory\MauticFactory $factory
      *          Mautic\LeadBundle\Entity\Lead $lead
@@ -49,15 +49,6 @@ class PointBuilderEvent extends Event
      *              'type' => string
      *              'name' => string
      *              'properties' => array()
-     *              'settings' => array(
-     *                  'group' => string
-     *                  'label' => string
-     *                  'description' => string
-     *              )
-     *              'point' => array(
-     *                  'id' => int
-     *                  'name' => string
-     *              )
      *         )
      */
     public function addAction($key, array $action)
@@ -90,6 +81,19 @@ class PointBuilderEvent extends Event
                 $a['group'], $b['group']);
         });
         return $this->actions;
+    }
+
+    /*
+     * Gets a list of actions supported by the choice form field
+     */
+    public function getActionList()
+    {
+        $list = array();
+        $actions = $this->getActions();
+        foreach ($actions as $k => $a) {
+            $list[$a['group']][$k] = $a['label'];
+        }
+        return $list;
     }
 
     /**

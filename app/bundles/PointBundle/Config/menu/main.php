@@ -51,36 +51,36 @@ $items = array(
                     )
                 )
             ),
-            'mautic.point.range.menu.index' => array(
-                'route'    => 'mautic_pointrange_index',
+            'mautic.point.trigger.menu.index' => array(
+                'route'    => 'mautic_pointtrigger_index',
                 'linkAttributes' => array(
                     'data-toggle' => 'ajax'
                 ),
                 'extras'=> array(
-                    'routeName' => 'mautic_pointrange_index'
+                    'routeName' => 'mautic_pointtrigger_index'
                 ),
                 'children' => array(
-                    'mautic.point.range.menu.new' => array(
-                        'route'    => 'mautic_pointrange_action',
+                    'mautic.point.trigger.menu.new' => array(
+                        'route'    => 'mautic_pointtrigger_action',
                         'routeParameters' => array("objectAction"  => "new"),
                         'extras'  => array(
-                            'routeName' => 'mautic_pointrange_action|new'
+                            'routeName' => 'mautic_pointtrigger_action|new'
                         ),
                         'display' => false //only used for breadcrumb generation
                     ),
-                    'mautic.point.range.menu.edit' => array(
-                        'route'           => 'mautic_pointrange_action',
+                    'mautic.point.trigger.menu.edit' => array(
+                        'route'           => 'mautic_pointtrigger_action',
                         'routeParameters' => array("objectAction"  => "edit"),
                         'extras'  => array(
-                            'routeName' => 'mautic_pointrange_action|edit'
+                            'routeName' => 'mautic_pointtrigger_action|edit'
                         ),
                         'display' => false //only used for breadcrumb generation
                     ),
-                    'mautic.point.range.menu.view' => array(
-                        'route'           => 'mautic_pointrange_action',
+                    'mautic.point.trigger.menu.view' => array(
+                        'route'           => 'mautic_pointtrigger_action',
                         'routeParameters' => array("objectAction"  => "view"),
                         'extras'  => array(
-                            'routeName' => 'mautic_pointrange_action|view'
+                            'routeName' => 'mautic_pointtrigger_action|view'
                         ),
                         'display' => false //only used for breadcrumb generation
                     )
@@ -88,6 +88,13 @@ $items = array(
             )
         )
     )
+);
+
+//add category level
+\Mautic\CategoryBundle\Helper\MenuHelper::addCategoryMenuItems(
+    $items['mautic.points.menu.root']['children'],
+    'point',
+    $security
 );
 
 return $items;

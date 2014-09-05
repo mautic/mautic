@@ -1,8 +1,8 @@
-.col-point-actions, .col-pointrange-actions {
+.col-point-actions, .col-pointtrigger-actions {
     width: 25px;
 }
 
-.col-point-id, .col-pointrange-id {
+.col-point-id, .col-pointtrigger-id {
     width: 75px;
 }
 
