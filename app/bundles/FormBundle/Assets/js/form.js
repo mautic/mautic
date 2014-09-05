@@ -51,7 +51,7 @@ Mautic.formOnLoad = function (container) {
     }
 };
 
-Mautic.formfieldOnLoad = function (container, response) {
+Mautic.formFieldOnLoad = function (container, response) {
     //new field created so append it to the form
     if (response.fieldHtml) {
         var newHtml = response.fieldHtml;
@@ -95,7 +95,7 @@ Mautic.formfieldOnLoad = function (container, response) {
     }
 };
 
-Mautic.formactionOnLoad = function (container, response) {
+Mautic.formActionOnLoad = function (container, response) {
     //new action created so append it to the form
     if (response.actionHtml) {
         var newHtml = response.actionHtml;

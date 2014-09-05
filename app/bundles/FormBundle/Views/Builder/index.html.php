@@ -94,4 +94,13 @@ $view['slots']->set("headerTitle", $header);
             <?php $view['slots']->output('_content'); ?>
         </div>
     </div>
+
+    <?php
+    $view['slots']->start('modal');
+    echo $this->render('MauticCoreBundle:Helper:modal.html.php', array(
+        'id'     => 'formComponentModal',
+        'header' => $view['translator']->trans('mautic.form.form.modalheader'),
+    ));
+    $view['slots']->stop();
+    ?>
 </div>

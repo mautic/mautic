@@ -88,6 +88,13 @@ var Mautic = {
             Mautic.ajaxifyForm(mQuery(this).attr('name'));
         });
 
+        //initialize ajax'd modals
+        mQuery(container + " *[data-toggle='ajaxmodal']").on('click.ajaxmodal', function (event) {
+            event.preventDefault();
+
+            Mautic.ajaxifyModal(this, event);
+        });
+
         mQuery(container + " *[data-toggle='livesearch']").each(function (index) {
             Mautic.activateLiveSearch(mQuery(this), "lastSearchStr", "liveCache");
         });
@@ -234,8 +241,9 @@ var Mautic = {
         });
 
         //run specific on loads
-        if (typeof Mautic[mauticContent + "OnLoad"] == 'function') {
-            Mautic[mauticContent + "OnLoad"](container, response);
+        var contentSpecific = (response && response.mauticContent) ? response.mauticContent : mauticContent;
+        if (typeof Mautic[contentSpecific + "OnLoad"] == 'function') {
+            Mautic[contentSpecific + "OnLoad"](container, response);
         }
 
         if (container == 'body') {
@@ -574,9 +582,16 @@ var Mautic = {
         mQuery('form[name="' + formName + '"]').off('submit.ajaxform');
         mQuery('form[name="' + formName + '"]').on('submit.ajaxform', (function (e) {
             e.preventDefault();
+            var form = this;
 
             Mautic.postForm(mQuery(this), function (response) {
-                Mautic.processPageContent(response);
+                var isInModal = mQuery(form).parents('.modal');
+                if (typeof isInModal == 'undefined') {
+                    Mautic.processPageContent(response);
+                } else {
+                    var target = '#' + isInModal.attr('id');
+                    Mautic.processModalContent(response, target);
+                }
             });
 
             return false;
@@ -619,6 +634,68 @@ var Mautic = {
         }
 
         Mautic.loadContent(route, link, method, null, event);
+    },
+
+    /**
+     * Load a modal with ajax content
+     *
+     * @param el
+     * @param event
+     * @returns {boolean}
+     */
+    ajaxifyModal: function (el, event) {
+        var target = mQuery(el).attr('data-target');
+
+        MauticVars.showLoadingBar = false;
+
+        var route = mQuery(el).attr('href');
+        if (route.indexOf('javascript')>=0) {
+            return false;
+        }
+
+        var method = mQuery(el).attr('data-method');
+        if (!method) {
+            method = 'GET'
+        }
+
+        mQuery.ajax({
+            url: route,
+            type: method,
+            dataType: "json",
+            success: function (response) {
+                if (response) {
+                    Mautic.processModalContent(response, target);
+
+                    //move the modal to the body tag to get around positioned div issues
+                    mQuery(target).on('show.bs.modal', function () {
+                        mQuery(target).appendTo("body");
+                    });
+
+                    //show the modal
+                    mQuery(target).modal('show');
+                }
+            },
+            error: function (request, textStatus, errorThrown) {
+                if (mauticEnv == 'dev') {
+                    alert(errorThrown);
+                }
+            }
+        });
+    },
+
+    processModalContent: function (response, target) {
+        //load the content
+        mQuery(target + " .modal-body").html(response.newContent);
+
+        //inactive tooltips, etc
+        Mautic.onPageUnload(target, response);
+
+        //activate content specific stuff
+        Mautic.onPageLoad(target, response);
+
+        if (response.closeModal) {
+            mQuery(target).modal('hide');
+        }
     },
 
     /**

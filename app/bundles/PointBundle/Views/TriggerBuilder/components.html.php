@@ -18,7 +18,7 @@ if ($tmpl == 'index') {
             <div class="trigger-event-group-header"><?php echo $e['group']; ?></div>
             <div class="trigger-event-group-body">
         <?php endif; ?>
-        <a data-toggle="ajax" data-ignore-formexit="true" href="<?php echo $view['router']->generate(
+        <a data-toggle="ajaxmodal" data-target="#triggerEventModal" href="<?php echo $view['router']->generate(
             'mautic_pointaction_action',
             array('objectAction' => 'new', 'type' => $k, 'tmpl' => 'action')); ?>">
             <div class="page-list-item">

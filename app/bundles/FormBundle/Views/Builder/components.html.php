@@ -30,7 +30,7 @@ $actionExpanded  = (empty($fieldExpanded)) ? ' in' : '';
             <div id="form-fields" class="panel-collapse collapse<?php echo $fieldExpanded; ?>">
                 <div class="panel-body">
                     <?php foreach ($fields as $fieldType => $field): ?>
-                    <a data-toggle="ajax" data-ignore-formexit="true" href="<?php echo $view['router']->generate(
+                    <a data-toggle="ajaxmodal" data-target="#formComponentModal" href="<?php echo $view['router']->generate(
                         'mautic_formfield_action',
                         array('objectAction' => 'new', 'type' => $fieldType, 'tmpl' => 'field')); ?>">
                         <div class="page-list-item">
@@ -65,7 +65,7 @@ $actionExpanded  = (empty($fieldExpanded)) ? ' in' : '';
                     <div class="form-submitaction-group-header"><?php echo $a['group']; ?></div>
                     <div class="form-submitaction-group-body">
                     <?php endif; ?>
-                        <a data-toggle="ajax" data-ignore-formexit="true" href="<?php echo $view['router']->generate(
+                        <a data-toggle="ajaxmodal" data-target="#formComponentModal" href="<?php echo $view['router']->generate(
                             'mautic_formaction_action',
                             array('objectAction' => 'new', 'type' => $k, 'tmpl' => 'action')); ?>">
                             <div class="page-list-item">

@@ -94,13 +94,10 @@ class FieldController extends CommonFormController
 
         $viewParams = array('type' => $fieldType);
         if ($cancelled || $valid) {
-            $tmpl = 'components';
-
-            $fieldHelper = new FormFieldHelper($this->get('translator'));
-            $viewParams['fields']  = $fieldHelper->getList($customComponents['fields']);
-            $viewParams['actions'] = $customComponents['actions'];
+            $closeModal = true;
         } else {
-            $tmpl     = 'field';
+            $closeModal = false;
+            $viewParams['tmpl'] = 'field';
             $formView = $form->createView();
             $this->get('templating')->getEngine('MauticFormBundle:Form:index.html.php')->get('form')
                 ->setTheme($formView, 'MauticFormBundle:FormComponent');
@@ -108,12 +105,10 @@ class FieldController extends CommonFormController
             $header = (!empty($customParams)) ? $customParams['label'] : 'mautic.form.field.type.'.$fieldType;
             $viewParams['fieldHeader'] = $this->get('translator')->trans($header);
         }
-        $viewParams['tmpl'] = $tmpl;
 
         $passthroughVars = array(
-            'mauticContent' => 'formfield',
+            'mauticContent' => 'formField',
             'success'       => $success,
-            'target'        => '.bundle-side-inner-wrapper',
             'route'         => false
         );
 
@@ -132,11 +127,19 @@ class FieldController extends CommonFormController
             ));
         }
 
-        return $this->ajaxAction(array(
-            'contentTemplate' => 'MauticFormBundle:Builder:' . $tmpl . '.html.php',
-            'viewParameters'  => $viewParams,
-            'passthroughVars' => $passthroughVars
-        ));
+        if ($closeModal) {
+            //just close the modal
+            $passthroughVars['closeModal'] = 1;
+            $response  = new JsonResponse($passthroughVars);
+            $response->headers->set('Content-Length', strlen($response->getContent()));
+            return $response;
+        } else {
+            return $this->ajaxAction(array(
+                'contentTemplate' => 'MauticFormBundle:Builder:' . $viewParams['tmpl'] . '.html.php',
+                'viewParameters'  => $viewParams,
+                'passthroughVars' => $passthroughVars
+            ));
+        }
     }
 
     /**
@@ -208,16 +211,10 @@ class FieldController extends CommonFormController
 
             $viewParams = array('type' => $fieldType);
             if ($cancelled || $valid) {
-                $tmpl = 'components';
-
-                //fire the form builder event
-                $customComponents = $this->factory->getModel('form.form')->getCustomComponents();
-
-                $fieldHelper = new FormFieldHelper($this->get('translator'));
-                $viewParams['fields']  = $fieldHelper->getList($customComponents['fields']);
-                $viewParams['actions'] = $customComponents['actions'];
+                $closeModal = true;
             } else {
-                $tmpl     = 'field';
+                $closeModal = false;
+                $viewParams['tmpl'] = 'field';
                 $formView = $form->createView();
                 $this->get('templating')->getEngine('MauticFormBundle:Form:index.html.php')->get('form')
                     ->setTheme($formView, 'MauticFormBundle:FormComponent');
@@ -225,12 +222,10 @@ class FieldController extends CommonFormController
                 $header = (!empty($customParams)) ? $customParams['label'] : 'mautic.form.field.type.'.$fieldType;
                 $viewParams['fieldHeader'] = $this->get('translator')->trans($header);
             }
-            $viewParams['tmpl'] = $tmpl;
 
             $passthroughVars = array(
-                'mauticContent' => 'formfield',
+                'mauticContent' => 'formField',
                 'success'       => $success,
-                'target'        => '.bundle-side-inner-wrapper',
                 'route'         => false
             );
 
@@ -252,11 +247,19 @@ class FieldController extends CommonFormController
                 'id'     => $objectId
             ));
 
-            return $this->ajaxAction(array(
-                'contentTemplate' => 'MauticFormBundle:Builder:' . $tmpl . '.html.php',
-                'viewParameters'  => $viewParams,
-                'passthroughVars' => $passthroughVars
-            ));
+            if ($closeModal) {
+                //just close the modal
+                $passthroughVars['closeModal'] = 1;
+                $response  = new JsonResponse($passthroughVars);
+                $response->headers->set('Content-Length', strlen($response->getContent()));
+                return $response;
+            } else {
+                return $this->ajaxAction(array(
+                    'contentTemplate' => 'MauticFormBundle:Builder:' . $viewParams['tmpl'] . '.html.php',
+                    'viewParameters'  => $viewParams,
+                    'passthroughVars' => $passthroughVars
+                ));
+            }
         } else {
             $response  = new JsonResponse(array('success' => 0));
             $response->headers->set('Content-Length', strlen($response->getContent()));
@@ -317,7 +320,7 @@ class FieldController extends CommonFormController
             $formField = array_merge($blank, $formField);
 
             $dataArray  = array(
-                'mauticContent'  => 'formfield',
+                'mauticContent'  => 'formField',
                 'success'        => 1,
                 'target'         => '#mauticform_'.$objectId,
                 'route'          => false,
@@ -392,7 +395,7 @@ class FieldController extends CommonFormController
             $formField = array_merge($blank, $formField);
 
             $dataArray  = array(
-                'mauticContent'  => 'formfield',
+                'mauticContent'  => 'formField',
                 'success'        => 1,
                 'target'         => '#mauticform_'.$objectId,
                 'route'          => false,

@@ -83,10 +83,10 @@ class TriggerEventController extends CommonFormController
 
         $viewParams = array('type' => $eventType);
         if ($cancelled || $valid) {
-            $tmpl                  = 'components';
-            $viewParams['events']  = $events;
+            $closeModal = true;
         } else {
-            $tmpl     = 'action';
+            $closeModal = false;
+            $viewParams['tmpl'] = 'action';
             $formView = $form->createView();
             $this->get('templating')->getEngine('MauticPointBundle:Trigger:index.html.php')->get('form')
                 ->setTheme($formView, 'MauticPointBundle:PointComponent');
@@ -94,12 +94,10 @@ class TriggerEventController extends CommonFormController
             $header = $triggerEvent['settings']['label'];
             $viewParams['actionHeader'] = $this->get('translator')->trans($header);
         }
-        $viewParams['tmpl'] = $tmpl;
 
         $passthroughVars = array(
             'mauticContent' => 'pointTriggerEvent',
             'success'       => $success,
-            'target'        => '.bundle-side-inner-wrapper',
             'route'         => false
         );
 
@@ -121,11 +119,19 @@ class TriggerEventController extends CommonFormController
             ));
         }
 
-        return $this->ajaxAction(array(
-            'contentTemplate' => 'MauticPointBundle:TriggerBuilder:' . $tmpl . '.html.php',
-            'viewParameters'  => $viewParams,
-            'passthroughVars' => $passthroughVars
-        ));
+        if ($closeModal) {
+            //just close the modal
+            $passthroughVars['closeModal'] = 1;
+            $response  = new JsonResponse($passthroughVars);
+            $response->headers->set('Content-Length', strlen($response->getContent()));
+            return $response;
+        } else {
+            return $this->ajaxAction(array(
+                'contentTemplate' => 'MauticPointBundle:TriggerBuilder:' . $viewParams['tmpl'] . '.html.php',
+                'viewParameters'  => $viewParams,
+                'passthroughVars' => $passthroughVars
+            ));
+        }
     }
 
     /**
@@ -190,24 +196,20 @@ class TriggerEventController extends CommonFormController
 
             $viewParams = array('type' => $eventType);
             if ($cancelled || $valid) {
-                $tmpl = 'components';
-
-                //fire the form builder event
-                $viewParams['events'] = $this->factory->getModel('point.trigger')->getEvents();
+                $closeModal = true;
             } else {
-                $tmpl     = 'action';
+                $closeModal = false;
+                $viewParams['tmpl'] = 'action';
                 $formView = $form->createView();
                 $this->get('templating')->getEngine('MauticPointBundle:Trigger:index.html.php')->get('form')
                     ->setTheme($formView, 'MauticPointBundle:PointComponent');
                 $viewParams['form']        = $formView;
                 $viewParams['actionHeader'] = $this->get('translator')->trans($triggerEvent['settings']['label']);
             }
-            $viewParams['tmpl'] = $tmpl;
 
             $passthroughVars = array(
                 'mauticContent' => 'pointTriggerEvent',
                 'success'       => $success,
-                'target'        => '.bundle-side-inner-wrapper',
                 'route'         => false
             );
 
@@ -229,11 +231,20 @@ class TriggerEventController extends CommonFormController
                 ));
             }
 
-            return $this->ajaxAction(array(
-                'contentTemplate' => 'MauticPointBundle:'.$this->templateVar . 'Builder:' . $tmpl . '.html.php',
-                'viewParameters'  => $viewParams,
-                'passthroughVars' => $passthroughVars
-            ));
+
+            if ($closeModal) {
+                //just close the modal
+                $passthroughVars['closeModal'] = 1;
+                $response  = new JsonResponse($passthroughVars);
+                $response->headers->set('Content-Length', strlen($response->getContent()));
+                return $response;
+            } else {
+                return $this->ajaxAction(array(
+                    'contentTemplate' => 'MauticPointBundle:TriggerBuilder:' . $viewParams['tmpl'] . '.html.php',
+                    'viewParameters'  => $viewParams,
+                    'passthroughVars' => $passthroughVars
+                ));
+            }
         } else {
             $response  = new JsonResponse(array('success' => 0));
             $response->headers->set('Content-Length', strlen($response->getContent()));
@@ -282,7 +293,7 @@ class TriggerEventController extends CommonFormController
             $dataArray = array(
                 'mauticContent'  => 'pointTriggerEvent',
                 'success'        => 1,
-                'target'         => '#action_' . $objectId,
+                'target'         => '#triggerEvent' . $objectId,
                 'route'          => false,
                 'actionId'       => $objectId,
                 'replaceContent' => true,
@@ -345,7 +356,7 @@ class TriggerEventController extends CommonFormController
             $dataArray = array(
                 'mauticContent'  => 'pointTriggerEvent',
                 'success'        => 1,
-                'target'         => '#action_' . $objectId,
+                'target'         => '#triggerEvent' . $objectId,
                 'route'          => false,
                 'actionId'       => $objectId,
                 'replaceContent' => true,

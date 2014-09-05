@@ -9,6 +9,8 @@
 
 $size  = (empty($size)) ? '' : ' modal-'.$size;
 $class = (!empty($class)) ? " $class" : "";
+$body  = (empty($body)) ? "" : $body;
+$header = (empty($header)) ? "" : $header;
 ?>
 
 <div class="modal fade" id="<?php echo $id; ?>" tabindex="-1" role="dialog" aria-labelledby="<?php echo $id; ?>-label" aria-hidden="true">
