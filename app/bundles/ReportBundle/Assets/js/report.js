@@ -1,9 +1,9 @@
 //ReportBundle
 Mautic.reportOnLoad = function (container) {
 	// Activate search if the container exists
-    if (mQuery(container + ' #list-search').length) {
-        Mautic.activateSearchAutocomplete('list-search', 'reportOnLoad');
-    }
+	if (mQuery(container + ' #list-search').length) {
+		Mautic.activateSearchAutocomplete('list-search', 'reportOnLoad');
+	}
 
 	// Append an index of the number of filters on the edit form
 	if (mQuery('div[id=report_filters]').length) {
@@ -61,3 +61,37 @@ Mautic.addFilterRow = function() {
 Mautic.removeFilterRow = function(container) {
 	mQuery('#' + container).remove();
 }
+
+Mautic.updateColumnList = function () {
+	var table = mQuery('select[id=report_source] option:selected').val();
+
+	mQuery.ajax({
+		type: "POST",
+		url: mauticAjaxUrl + "?action=report:updateColumns",
+		data: {table: table},
+		dataType: "json",
+		success: function (response) {
+			// Remove the existing options in the column display section
+			mQuery('#report_columns_available').find('option').remove().end();
+			mQuery('#report_columns').find('option').remove().end();
+
+			// Append the new options into the select list
+			mQuery.each(response.columns, function(key, value) {
+				mQuery('#report_columns_available')
+					.append(mQuery('<option>')
+						.attr('value', key)
+						.text(value));
+			});
+
+			// Remove any filters, they're no longer valid with different column lists
+			mQuery('#report_filters').find('div').remove().end();
+
+			// TODO - Need to parse the prototype and replace the options in the column list for filters too
+		},
+		error: function (request, textStatus, errorThrown) {
+			if (mauticEnv == 'dev') {
+				alert(errorThrown);
+			}
+		}
+	});
+};

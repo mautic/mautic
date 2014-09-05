@@ -102,8 +102,9 @@ class ReportType extends AbstractType
                 'empty_value'   => false,
                 'required'      => false,
                 'attr'          => array(
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.report.report.form.source.help'
+                    'class'    => 'form-control',
+                    'tooltip'  => 'mautic.report.report.form.source.help',
+                    'onchange' => 'Mautic.updateColumnList()'
                 )
             ));
 
