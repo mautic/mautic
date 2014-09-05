@@ -29,7 +29,11 @@ if ($tmpl == 'index')
                                data-toggle="ajax">
                                 <span><?php echo $item->getPrimaryIdentifier(); ?></span>
                             </a>
-                            <span class="badge"><?php echo $item->getScore(); ?></span>
+                            <?php
+                            $color = $item->getColor();
+                            $style = !empty($color) ? ' style="background-color: ' . $color . ' !important;"' : '';
+                            ?>
+                            <span class="badge"<?php echo $style; ?>><?php echo $item->getScore(); ?></span>
                         </h5>
                         <div class="text-muted">
                             <i class="fa fa-fw fa-building"></i><span class="padding-sm-left"><?php echo $fields['core']['company']['value']; ?></span>

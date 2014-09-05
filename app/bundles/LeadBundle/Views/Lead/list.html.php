@@ -111,7 +111,11 @@ if ($tmpl == 'index')
                         ?>
                     </td>
                     <td class="text-center">
-                        <?php echo $item->getScore(); ?>
+                        <?php
+                        $color = $item->getColor();
+                        $style = !empty($color) ? ' style="background-color: ' . $color . ' !important;"' : '';
+                        ?>
+                        <span class="badge"<?php echo $style; ?>><?php echo $item->getScore(); ?></span>
                     </td>
                 </tr>
             <?php endforeach; ?>

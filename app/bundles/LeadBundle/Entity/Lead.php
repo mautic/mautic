@@ -87,6 +87,13 @@ class Lead extends FormEntity
     private $updatedFields = array();
 
     /**
+     * Used to populate trigger color
+     *
+     * @var
+     */
+    private $color;
+
+    /**
      * Used by Mautic to populate the fields pulled from the DB
      * @var array
      * @Serializer\Expose
@@ -416,5 +423,21 @@ class Lead extends FormEntity
     public function getUpdatedFields()
     {
         return $this->updatedFields;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getColor ()
+    {
+        return $this->color;
+    }
+
+    /**
+     * @param mixed $color
+     */
+    public function setColor ($color)
+    {
+        $this->color = $color;
     }
 }

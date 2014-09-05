@@ -12,12 +12,23 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\PointBundle\Model\TriggerModel;
 
 /**
  * LeadRepository
  */
 class LeadRepository extends CommonRepository
 {
+    /**
+     * Required to get the color based on a lead's points
+     * @var
+     */
+    private $triggerModel;
+
+    public function setTriggerModel (TriggerModel $triggerModel)
+    {
+        $this->triggerModel = $triggerModel;
+    }
 
     /**
      * Gets a list of unique values from fields for autocompletes
@@ -219,6 +230,10 @@ class LeadRepository extends CommonRepository
         }
 
         if ($entity != null) {
+            if (!empty($this->triggerModel)) {
+                $entity->setColor($this->triggerModel->getColorForLeadPoints($entity->getScore()));
+            }
+
             $fieldValues = $this->getFieldValues($id);
             $entity->setFields($fieldValues);
         }
@@ -312,6 +327,10 @@ class LeadRepository extends CommonRepository
 
             //assign fields
             foreach ($results as $r) {
+                if (!empty($this->triggerModel)) {
+                    $r->setColor($this->triggerModel->getColorForLeadPoints($r->getScore()));
+                }
+
                 $leadId = $r->getId();
                 $r->setFields($fieldValues[$leadId]);
             }
