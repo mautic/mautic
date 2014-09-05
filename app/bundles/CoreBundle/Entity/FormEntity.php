@@ -99,7 +99,7 @@ class FormEntity
                 //check to see if there is a category to check
                 if ($checkCategoryStatus && method_exists($this, 'getCategory')) {
                     $category = $this->getCategory();
-                    if (!$category->isPublished()) {
+                    if ($category !== null && !$category->isPublished()) {
                         return false;
                     }
                 }
