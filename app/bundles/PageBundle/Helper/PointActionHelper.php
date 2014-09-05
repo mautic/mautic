@@ -43,7 +43,7 @@ class PointActionHelper
         $limitToPages = $action['properties']['pages'];
 
         if (!empty($limitToPages) && !in_array($pageHitId, $limitToPages)) {
-            //no score change
+            //no points change
             return 0;
         }
 

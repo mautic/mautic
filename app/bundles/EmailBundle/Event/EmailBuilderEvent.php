@@ -81,7 +81,7 @@ class EmailBuilderEvent extends Event
     /**
      * Adds an A/B test winner criteria option
      *
-     * @param string $key - a unique identifier; it is recommended that it be namespaced i.e. lead.score
+     * @param string $key - a unique identifier; it is recommended that it be namespaced i.e. lead.points
      * @param array $criteria - can contain the following keys:
      *  'group'    => (required) translation string to group criteria by in the dropdown select list
      *  'label'    => (required) what to display in the list

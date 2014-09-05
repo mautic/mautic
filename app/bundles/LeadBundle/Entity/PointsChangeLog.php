@@ -12,11 +12,11 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Class ScoreChangeLog
- * @ORM\Table(name="lead_score_change_log")
+ * Class PointsChangeLog
+ * @ORM\Table(name="lead_points_change_log")
  * @ORM\Entity
  */
-class ScoreChangeLog
+class PointsChangeLog
 {
     /**
      * @ORM\Column(type="integer")
@@ -26,7 +26,7 @@ class ScoreChangeLog
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Lead", inversedBy="scoreChangeLog")
+     * @ORM\ManyToOne(targetEntity="Lead", inversedBy="pointsChangeLog")
      * @ORM\JoinColumn(name="lead_id", referencedColumnName="id", nullable=false)
      */
     private $lead;
@@ -67,7 +67,7 @@ class ScoreChangeLog
     /**
      * Get id
      *
-     * @return integer 
+     * @return integer
      */
     public function getId()
     {
@@ -78,7 +78,7 @@ class ScoreChangeLog
      * Set type
      *
      * @param string $type
-     * @return ScoreChangeLog
+     * @return PointsChangeLog
      */
     public function setType($type)
     {
@@ -90,7 +90,7 @@ class ScoreChangeLog
     /**
      * Get type
      *
-     * @return string 
+     * @return string
      */
     public function getType()
     {
@@ -101,7 +101,7 @@ class ScoreChangeLog
      * Set eventName
      *
      * @param string $eventName
-     * @return ScoreChangeLog
+     * @return PointsChangeLog
      */
     public function setEventName($eventName)
     {
@@ -113,7 +113,7 @@ class ScoreChangeLog
     /**
      * Get eventName
      *
-     * @return string 
+     * @return string
      */
     public function getEventName()
     {
@@ -124,7 +124,7 @@ class ScoreChangeLog
      * Set actionName
      *
      * @param string $actionName
-     * @return ScoreChangeLog
+     * @return PointsChangeLog
      */
     public function setActionName($actionName)
     {
@@ -136,7 +136,7 @@ class ScoreChangeLog
     /**
      * Get actionName
      *
-     * @return string 
+     * @return string
      */
     public function getActionName()
     {
@@ -147,7 +147,7 @@ class ScoreChangeLog
      * Set delta
      *
      * @param integer $delta
-     * @return ScoreChangeLog
+     * @return PointsChangeLog
      */
     public function setDelta($delta)
     {
@@ -159,7 +159,7 @@ class ScoreChangeLog
     /**
      * Get delta
      *
-     * @return integer 
+     * @return integer
      */
     public function getDelta()
     {
@@ -170,7 +170,7 @@ class ScoreChangeLog
      * Set dateAdded
      *
      * @param \DateTime $dateAdded
-     * @return ScoreChangeLog
+     * @return PointsChangeLog
      */
     public function setDateAdded($dateAdded)
     {
@@ -182,7 +182,7 @@ class ScoreChangeLog
     /**
      * Get dateAdded
      *
-     * @return \DateTime 
+     * @return \DateTime
      */
     public function getDateAdded()
     {
@@ -193,7 +193,7 @@ class ScoreChangeLog
      * Set lead
      *
      * @param \Mautic\LeadBundle\Entity\Lead $lead
-     * @return ScoreChangeLog
+     * @return PointsChangeLog
      */
     public function setLead(\Mautic\LeadBundle\Entity\Lead $lead)
     {
@@ -205,7 +205,7 @@ class ScoreChangeLog
     /**
      * Get lead
      *
-     * @return \Mautic\LeadBundle\Entity\Lead 
+     * @return \Mautic\LeadBundle\Entity\Lead
      */
     public function getLead()
     {
@@ -216,7 +216,7 @@ class ScoreChangeLog
      * Set ipAddress
      *
      * @param \Mautic\CoreBundle\Entity\IpAddress $ipAddress
-     * @return ScoreChangeLog
+     * @return PointsChangeLog
      */
     public function setIpAddress(\Mautic\CoreBundle\Entity\IpAddress $ipAddress)
     {
@@ -228,7 +228,7 @@ class ScoreChangeLog
     /**
      * Get ipAddress
      *
-     * @return \Mautic\CoreBundle\Entity\IpAddress 
+     * @return \Mautic\CoreBundle\Entity\IpAddress
      */
     public function getIpAddress()
     {

@@ -49,13 +49,13 @@ class Lead extends FormEntity
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full", "limited"})
      */
-    private $score = 0;
+    private $points = 0;
 
     /**
-     * @ORM\OneToMany(targetEntity="ScoreChangeLog", mappedBy="lead", cascade={"all"}, orphanRemoval=true, fetch="EXTRA_LAZY")
+     * @ORM\OneToMany(targetEntity="PointsChangeLog", mappedBy="lead", cascade={"all"}, orphanRemoval=true, fetch="EXTRA_LAZY")
      * @ORM\OrderBy({"dateAdded" = "DESC"})
      */
-    private $scoreChangeLog;
+    private $pointsChangeLog;
 
     /**
      * @ORM\ManyToMany(targetEntity="Mautic\CoreBundle\Entity\IpAddress", cascade={"merge", "persist", "refresh", "detach"}, fetch="EXTRA_LAZY")
@@ -257,94 +257,94 @@ class Lead extends FormEntity
     }
 
     /**
-     * Adds/substracts from current score
+     * Adds/substracts from current points
      *
-     * @param $score
+     * @param $points
      */
-    public function addToScore($score)
+    public function addToPoints($points)
     {
-        $newScore = $this->score + $score;
-        $this->setScore($newScore);
+        $newPoints = $this->points + $points;
+        $this->setPoints($newPoints);
     }
 
     /**
-     * Set score
+     * Set points
      *
-     * @param integer $score
+     * @param integer $points
      * @return Lead
      */
-    public function setScore($score)
+    public function setPoints($points)
     {
-        $this->isChanged('score', $score);
-        $this->score = $score;
+        $this->isChanged('points', $points);
+        $this->points = $points;
 
         return $this;
     }
 
     /**
-     * Get score
+     * Get points
      *
      * @return integer
      */
-    public function getScore()
+    public function getPoints()
     {
-        return $this->score;
+        return $this->points;
     }
 
     /**
-     * Creates a score change entry
+     * Creates a points change entry
      *
      * @param $type
      * @param $name
      * @param $action
-     * @param $scoreDelta
+     * @param $pointsDelta
      * @param IpAddress $ip
      */
-    public function addScoreChangeLogEntry($type, $name, $action, $scoreDelta, IpAddress $ip)
+    public function addPointsChangeLogEntry($type, $name, $action, $pointsDelta, IpAddress $ip)
     {
-        //create a new score change event
-        $event = new ScoreChangeLog();
+        //create a new points change event
+        $event = new PointsChangeLog();
         $event->setType($type);
         $event->setEventName($name);
         $event->setActionName($action);
         $event->setDateAdded(new \DateTime());
-        $event->setDelta($scoreDelta);
+        $event->setDelta($pointsDelta);
         $event->setIpAddress($ip);
         $event->setLead($this);
-        $this->addScoreChangeLog($event);
+        $this->addPointsChangeLog($event);
     }
 
     /**
-     * Add scoreChangeLog
+     * Add pointsChangeLog
      *
-     * @param \Mautic\LeadBundle\Entity\ScoreChangeLog $scoreChangeLog
+     * @param \Mautic\LeadBundle\Entity\PointsChangeLog $pointsChangeLog
      * @return Lead
      */
-    public function addScoreChangeLog(\Mautic\LeadBundle\Entity\ScoreChangeLog $scoreChangeLog)
+    public function addPointsChangeLog(\Mautic\LeadBundle\Entity\PointsChangeLog $pointsChangeLog)
     {
-        $this->scoreChangeLog[] = $scoreChangeLog;
+        $this->pointsChangeLog[] = $pointsChangeLog;
 
         return $this;
     }
 
     /**
-     * Remove scoreChangeLog
+     * Remove pointsChangeLog
      *
-     * @param \Mautic\LeadBundle\Entity\ScoreChangeLog $scoreChangeLog
+     * @param \Mautic\LeadBundle\Entity\PointsChangeLog $pointsChangeLog
      */
-    public function removeScoreChangeLog(\Mautic\LeadBundle\Entity\ScoreChangeLog $scoreChangeLog)
+    public function removePointsChangeLog(\Mautic\LeadBundle\Entity\PointsChangeLog $pointsChangeLog)
     {
-        $this->scoreChangeLog->removeElement($scoreChangeLog);
+        $this->pointsChangeLog->removeElement($pointsChangeLog);
     }
 
     /**
-     * Get scoreChangeLog
+     * Get pointsChangeLog
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getScoreChangeLog()
+    public function getPointsChangeLog()
     {
-        return $this->scoreChangeLog;
+        return $this->pointsChangeLog;
     }
 
     /**

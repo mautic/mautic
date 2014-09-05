@@ -52,10 +52,10 @@
     overflow: auto;
 }
 
-.col-leadscore-date {
+.col-leadpoints-date {
     width: 175px;
 }
-.col-leadscore-delta {
+.col-leadpoints-delta {
     width: 75px;
 }
 

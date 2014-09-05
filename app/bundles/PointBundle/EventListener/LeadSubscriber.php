@@ -27,7 +27,7 @@ class LeadSubscriber extends CommonSubscriber
     static public function getSubscribedEvents()
     {
         return array(
-            LeadEvents::LEAD_SCORE_CHANGE => array('onLeadScoreChange', 0)
+            LeadEvents::LEAD_POINTS_CHANGE => array('onLeadPointsChange', 0)
         );
     }
 
@@ -36,7 +36,7 @@ class LeadSubscriber extends CommonSubscriber
      *
      * @param LeadEvent $event
      */
-    public function onLeadScoreChange(LeadEvent $event)
+    public function onLeadPointsChange(LeadEvent $event)
     {
         /** @var \Mautic\PointBundle\Model\TriggerModel */
         $model = $this->factory->getModel('point.trigger');

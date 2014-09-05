@@ -231,7 +231,7 @@ class LeadRepository extends CommonRepository
 
         if ($entity != null) {
             if (!empty($this->triggerModel)) {
-                $entity->setColor($this->triggerModel->getColorForLeadPoints($entity->getScore()));
+                $entity->setColor($this->triggerModel->getColorForLeadPoints($entity->getPoints()));
             }
 
             $fieldValues = $this->getFieldValues($id);
@@ -328,7 +328,7 @@ class LeadRepository extends CommonRepository
             //assign fields
             foreach ($results as $r) {
                 if (!empty($this->triggerModel)) {
-                    $r->setColor($this->triggerModel->getColorForLeadPoints($r->getScore()));
+                    $r->setColor($this->triggerModel->getColorForLeadPoints($r->getPoints()));
                 }
 
                 $leadId = $r->getId();

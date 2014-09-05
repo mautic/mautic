@@ -145,11 +145,11 @@ class LeadSubscriber extends CommonSubscriber
             );
             $this->factory->getModel('core.auditLog')->writeToLog($log);
 
-            //trigger the score change event
-            if (isset($this->changes["score"])) {
-                if (!$event->isNew() && $this->dispatcher->hasListeners(LeadEvents::LEAD_SCORE_CHANGE)) {
-                    $scoreEvent = new Events\ScoreChangeEvent($lead, $this->changes['score'][0], $this->changes['score'][0]);
-                    $this->dispatcher->dispatch(LeadEvents::LEAD_SCORE_CHANGE, $scoreEvent);
+            //trigger the points change event
+            if (isset($this->changes["points"])) {
+                if (!$event->isNew() && $this->dispatcher->hasListeners(LeadEvents::LEAD_POINTS_CHANGE)) {
+                    $pointsEvent = new Events\PointsChangeEvent($lead, $this->changes['points'][0], $this->changes['points'][0]);
+                    $this->dispatcher->dispatch(LeadEvents::LEAD_POINTS_CHANGE, $pointsEvent);
                 }
             }
         }

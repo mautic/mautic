@@ -45,7 +45,7 @@ class LeadApiController extends CommonApiController
      *      {"name"="start", "dataType"="integer", "required"=false, "description"="Set the record to start with."},
      *      {"name"="limit", "dataType"="integer", "required"=false, "description"="Limit the number of records to retrieve."},
      *      {"name"="filter", "dataType"="string", "required"=false, "description"="A string in which to filter the results by."},
-     *      {"name"="orderBy", "dataType"="string", "required"=false, "pattern"="(id|firstName|lastName|email|company|score|phone)", "description"="Table column in which to sort the results by."},
+     *      {"name"="orderBy", "dataType"="string", "required"=false, "pattern"="(id|firstName|lastName|email|company|points|phone)", "description"="Table column in which to sort the results by."},
      *      {"name"="orderByDir", "dataType"="string", "required"=false, "pattern"="(ASC|DESC)", "description"="Direction in which to sort results by."}
      *   }
      * )

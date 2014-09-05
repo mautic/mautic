@@ -13,11 +13,11 @@ use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Entity\Lead;
 
 /**
- * Class ScoreChangeEvent
+ * Class PointsChangeEvent
  *
  * @package Mautic\LeadBundle\Event
  */
-class ScoreChangeEvent extends CommonEvent
+class PointsChangeEvent extends CommonEvent
 {
 
     protected $old;
@@ -45,21 +45,21 @@ class ScoreChangeEvent extends CommonEvent
     }
 
     /**
-     * Returns the new score
+     * Returns the new points
      *
      * @return int
      */
-    public function getNewScore()
+    public function getNewPoints()
     {
         return $this->new;
     }
 
     /**
-     * Returns the old score
+     * Returns the old points
      *
      * @return int
      */
-    public function getOldScore()
+    public function getOldPoints()
     {
         return $this->old;
     }

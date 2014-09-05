@@ -26,12 +26,12 @@ class FormSubmitActionCreateLeadType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        $default = (empty($options['data']['score'])) ? 0 : (int) $options['data']['score'];
-        $builder->add('score', 'number', array(
-            'label'      => 'mautic.lead.lead.submitaction.startingscore',
+        $default = (empty($options['data']['points'])) ? 0 : (int) $options['data']['points'];
+        $builder->add('points', 'number', array(
+            'label'      => 'mautic.lead.lead.submitaction.startingpoints',
             'attr'       => array(
                 'class' => 'form-control',
-                'tooltip' => 'mautic.lead.lead.submitaction.startingscore.help'
+                'tooltip' => 'mautic.lead.lead.submitaction.startingpoints.help'
             ),
             'label_attr' => array('class' => 'control-label'),
             'precision'  => 0,

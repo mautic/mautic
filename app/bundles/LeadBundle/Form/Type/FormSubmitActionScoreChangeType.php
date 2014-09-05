@@ -15,11 +15,11 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
- * Class FormSubmitActionScoreChangeType
+ * Class FormSubmitActionPointsChangeType
  *
  * @package Mautic\LeadBundle\Form\Type
  */
-class FormSubmitActionScoreChangeType extends AbstractType
+class FormSubmitActionPointsChangeType extends AbstractType
 {
     private $factory;
 
@@ -48,9 +48,9 @@ class FormSubmitActionScoreChangeType extends AbstractType
             )
         ));
 
-        $default = (empty($options['data']['score'])) ? 0 : (int) $options['data']['score'];
-        $builder->add('score', 'number', array(
-            'label'      => 'mautic.lead.lead.submitaction.score',
+        $default = (empty($options['data']['points'])) ? 0 : (int) $options['data']['points'];
+        $builder->add('points', 'number', array(
+            'label'      => 'mautic.lead.lead.submitaction.points',
             'attr'       => array('class' => 'form-control'),
             'label_attr' => array('class' => 'control-label'),
             'precision'  => 0,
@@ -137,6 +137,6 @@ class FormSubmitActionScoreChangeType extends AbstractType
      * @return string
      */
     public function getName() {
-        return "lead_submitaction_scorechange";
+        return "lead_submitaction_pointschange";
     }
 }

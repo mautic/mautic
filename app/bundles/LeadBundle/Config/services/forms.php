@@ -92,14 +92,14 @@ $container->setDefinition(
     ));
 
 $container->setDefinition(
-    'mautic.form.type.lead.submitaction.scorechange',
+    'mautic.form.type.lead.submitaction.pointschange',
     new Definition(
-        'Mautic\LeadBundle\Form\Type\FormSubmitActionScoreChangeType',
+        'Mautic\LeadBundle\Form\Type\FormSubmitActionPointsChangeType',
         array(new Reference('mautic.factory'))
     )
 )
     ->addTag('form.type', array(
-        'alias' => 'lead_submitaction_scorechange',
+        'alias' => 'lead_submitaction_pointschange',
     ));
 
 //Lead note form

@@ -221,16 +221,16 @@ class PointModel extends CommonFormModel
                         $pass[] = null;
                     }
                 }
-                $scoreChange = $reflection->invokeArgs($this, $pass);
+                $pointsChange = $reflection->invokeArgs($this, $pass);
 
-                if ($scoreChange) {
-                    $lead->addToScore($scoreChange);
+                if ($pointsChange) {
+                    $lead->addToPoints($pointsChange);
                     $parsed = explode('.', $action->getType());
-                    $lead->addScoreChangeLogEntry(
+                    $lead->addPointsChangeLogEntry(
                         $parsed[0],
                         $action->getId() . ": " . $action->getName(),
                         $parsed[1],
-                        $scoreChange,
+                        $pointsChange,
                         $ipAddress
                     );
                     $action->addLead($lead);

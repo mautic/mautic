@@ -94,7 +94,7 @@ class TriggerModel extends CommonFormModel
                         'value'  => $dateTime->toUtcString()
                     ),
                     array(
-                        'column' => 'l.score',
+                        'column' => 'l.points',
                         'expr'   => 'gte',
                         'value'  => $entity->getPoints()
                     )
@@ -314,12 +314,12 @@ class TriggerModel extends CommonFormModel
      */
     public function triggerEvents(Lead $lead)
     {
-        $score = $lead->getScore();
+        $points = $lead->getPoints();
 
-        //find all published triggers that is applicable to this score
+        //find all published triggers that is applicable to this points
         /** @var \Mautic\PointBundle\Entity\TriggerEventRepository $repo */
         $repo   = $this->getEventRepository();
-        $events = $repo->getPublishedByPointTotal($score);
+        $events = $repo->getPublishedByPointTotal($points);
 
         if (!empty($events)) {
             //get a list of actions that has already been applied to this lead

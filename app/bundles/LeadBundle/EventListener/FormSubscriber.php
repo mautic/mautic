@@ -52,12 +52,12 @@ class FormSubscriber extends CommonSubscriber
         //add lead generation submit action
         $action = array(
             'group'       => 'mautic.lead.lead.submitaction.group',
-            'label'       => 'mautic.lead.lead.submitaction.changescore',
-            'description' => 'mautic.lead.lead.submitaction.changescore_descr',
-            'formType'    => 'lead_submitaction_scorechange',
-            'callback'    => '\Mautic\LeadBundle\Helper\EventHelper::changeScoreOnFormSubmit'
+            'label'       => 'mautic.lead.lead.submitaction.changepoints',
+            'description' => 'mautic.lead.lead.submitaction.changepoints_descr',
+            'formType'    => 'lead_submitaction_pointschange',
+            'callback'    => '\Mautic\LeadBundle\Helper\EventHelper::changePointsOnFormSubmit'
         );
 
-        $event->addSubmitAction('lead.scorechange', $action);
+        $event->addSubmitAction('lead.pointschange', $action);
     }
 }

@@ -22,8 +22,8 @@
         <span class="gs-lead-primary-identifier"><?php echo $lead->getPrimaryIdentifier(true); ?></span>
         <span class="gs-lead-secondary-identifier"><?php echo $lead->getSecondaryIdentifier(); ?></span>
         <span class="badge alert-success gs-count-badge" data-toggle="tooltip" data-placement="left"
-             title="<?php echo $view['translator']->trans('mautic.lead.lead.scorecount'); ?>">
-        <?php echo $lead->getScore(); ?>
+             title="<?php echo $view['translator']->trans('mautic.lead.lead.pointscount'); ?>">
+        <?php echo $lead->getPoints(); ?>
         </span>
     </a>
 <?php endif; ?>
