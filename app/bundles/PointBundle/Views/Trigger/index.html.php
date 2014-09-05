@@ -8,21 +8,21 @@
  */
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
-$view['slots']->set('mauticContent', 'point');
-$view['slots']->set("headerTitle", $view['translator']->trans('mautic.point.header.index'));
-$view['slots']->set('searchUri', $view['router']->generate('mautic_point_index', array('page' => $page)));
-$view['slots']->set('searchString', $app->getSession()->get('mautic.point.filter'));
+$view['slots']->set('mauticContent', 'pointTrigger');
+$view['slots']->set("headerTitle", $view['translator']->trans('mautic.point.trigger.header.index'));
+$view['slots']->set('searchUri', $view['router']->generate('mautic_pointtrigger_index', array('page' => $page)));
+$view['slots']->set('searchString', $app->getSession()->get('mautic.point.trigger.filter'));
 $view['slots']->set('searchHelp', $view['translator']->trans('mautic.core.help.searchcommands'));
 ?>
 
-<?php if ($permissions['point:points:create']): ?>
+<?php if ($permissions['point:triggers:create']): ?>
     <?php $view['slots']->start("actions"); ?>
     <li>
         <a href="<?php echo $this->container->get('router')->generate(
-            'mautic_point_action', array("objectAction" => "new")); ?>"
+            'mautic_pointtrigger_action', array("objectAction" => "new")); ?>"
            data-toggle="ajax"
-           data-menu-link="#mautic_point_index">
-            <?php echo $view["translator"]->trans("mautic.point.menu.new"); ?>
+           data-menu-link="#mautic_pointtrigger_index">
+            <?php echo $view["translator"]->trans("mautic.point.trigger.menu.new"); ?>
         </a>
     </li>
     <?php $view['slots']->stop(); ?>

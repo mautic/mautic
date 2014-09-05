@@ -12,33 +12,25 @@ use Symfony\Component\Routing\Route;
 
 $collection = new RouteCollection();
 
-
-$collection->add('mautic_pointaction_action', new Route('/points/action/{objectAction}/{objectId}',
-    array(
-        '_controller' => 'MauticPointBundle:Action:execute',
-        "objectId"    => 0
-    )
-));
-
-$collection->add('mautic_pointrangeaction_action', new Route('/points/ranges/action/{objectAction}/{objectId}',
+$collection->add('mautic_pointtriggerevent_action', new Route('/points/triggers/events/{objectAction}/{objectId}',
     array(
         '_controller' => 'MauticPointBundle:RangeAction:execute',
         "objectId"    => 0
     )
 ));
 
-$collection->add('mautic_pointrange_index', new Route('/points/ranges/{page}',
+$collection->add('mautic_pointtrigger_index', new Route('/points/triggers/{page}',
     array(
-        '_controller' => 'MauticPointBundle:Range:index',
+        '_controller' => 'MauticPointBundle:Trigger:index',
         'page'        => 1,
     ), array(
         'page'    => '\d+'
     )
 ));
 
-$collection->add('mautic_pointrange_action', new Route('/points/ranges/{objectAction}/{objectId}',
+$collection->add('mautic_pointtrigger_action', new Route('/points/triggers/{objectAction}/{objectId}',
     array(
-        '_controller' => 'MauticPointBundle:Range:execute',
+        '_controller' => 'MauticPointBundle:Trigger:execute',
         "objectId"    => 0
     )
 ));

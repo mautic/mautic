@@ -13,13 +13,13 @@ use Symfony\Component\Process\Exception\InvalidArgumentException;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Class PointBuilderEvent
+ * Class TriggerBuilderEvent
  *
  * @package Mautic\PointBundle\Event
  */
-class PointBuilderEvent extends Event
+class TriggerBuilderEvent extends Event
 {
-    private $actions = array();
+    private $events = array();
     private $translator;
 
     public function __construct($translator)
@@ -32,68 +32,59 @@ class PointBuilderEvent extends Event
      *
      * @param string $key - a unique identifier; it is recommended that it be namespaced i.e. lead.action
      * @param array $action - can contain the following keys:
-     *  'group'       => (required) translation string to group actions by
+     *  'group'       => (required) translation string to group events by
      *  'label'       => (required) what to display in the list
      *  'description' => (optional) short description of event
      *  'template'    => (optional) template to use for the action's HTML in the point builder
      *      i.e AcmeMyBundle:PointAction:theaction.html.php
-     *  'formType'    => (optional) name of the form type SERVICE for the action; will use a default form with point change only
-     *  'callback'    => (optional) callback function that will be passed when the action is triggered; default
-     *                         will be to change point score only; THIS SHOULD RETURN THE SCORE DELTA
+     *  'formType'    => (optional) name of the form type SERVICE for the action
+     *  'callback'    => (required) callback function that will be passed when the action is triggered
      *      The callback function can receive the following arguments by name (via ReflectionMethod::invokeArgs())
      *          Mautic\CoreBundle\Factory\MauticFactory $factory
      *          Mautic\LeadBundle\Entity\Lead $lead
-     *          $passthrough - variable sent from firing function to call back function
-     *          array $action = array(
+     *          array $event = array(
      *              'id' => int
      *              'type' => string
      *              'name' => string
      *              'properties' => array()
+     *              'trigger' => array(
+     *                  'id'     => int
+     *                  'name'   => string,
+     *                  'points' => int
+     *                  'color'  => string
+     *              )
      *         )
      */
-    public function addAction($key, array $action)
+    public function addEvent($key, array $action)
     {
-        if (array_key_exists($key, $this->actions)) {
+        if (array_key_exists($key, $this->events)) {
             throw new InvalidArgumentException("The key, '$key' is already used by another action. Please use a different key.");
         }
 
         //check for required keys and that given functions are callable
         $this->verifyComponent(
-            array('group', 'label'),
+            array('group', 'label', 'callback'),
             array('callback'),
             $action
         );
 
         //translate the group
         $action['group'] = $this->translator->trans($action['group']);
-        $this->actions[$key] = $action;
+        $this->events[$key] = $action;
     }
 
     /**
-     * Get actions
+     * Get events
      *
      * @return array
      */
-    public function getActions()
+    public function getEvents()
     {
-        uasort($this->actions, function ($a, $b) {
+        uasort($this->events, function ($a, $b) {
             return strnatcasecmp(
                 $a['group'], $b['group']);
         });
-        return $this->actions;
-    }
-
-    /*
-     * Gets a list of actions supported by the choice form field
-     */
-    public function getActionList()
-    {
-        $list = array();
-        $actions = $this->getActions();
-        foreach ($actions as $k => $a) {
-            $list[$a['group']][$k] = $a['label'];
-        }
-        return $list;
+        return $this->events;
     }
 
     /**

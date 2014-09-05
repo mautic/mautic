@@ -11,7 +11,7 @@ Mautic.pointOnLoad = function (container) {
     if (mQuery('#point_actions')) {
         //make the fields sortable
         mQuery('#point_actions').sortable({
-            items: '.point-row',
+            items: '.trigger-event-row',
             handle: '.reorder-handle',
             stop: function(i) {
                 MauticVars.showLoadingBar = false;
@@ -22,7 +22,7 @@ Mautic.pointOnLoad = function (container) {
             }
         });
 
-        mQuery('#point_actions .point-row').on('mouseover.pointactions', function() {
+        mQuery('#point_actions .trigger-event-row').on('mouseover.pointactions', function() {
             mQuery(this).find('.form-buttons').removeClass('hide');
         }).on('mouseout.pointactions', function() {
             mQuery(this).find('.form-buttons').addClass('hide');
@@ -30,18 +30,49 @@ Mautic.pointOnLoad = function (container) {
     }
 };
 
-Mautic.pointActionOnLoad = function (container, response) {
+Mautic.pointTriggerOnLoad = function (container) {
+    if (mQuery(container + ' #list-search').length) {
+        Mautic.activateSearchAutocomplete('list-search', 'point.trigger');
+    }
+
+    if (mQuery(container + ' form[name="pointtrigger"]').length) {
+        Mautic.activateCategoryLookup('pointtrigger', 'point');
+    }
+
+    if (mQuery('#triggerEvents')) {
+        //make the fields sortable
+        mQuery('#triggerEvents').sortable({
+            items: '.trigger-event-row',
+            handle: '.reorder-handle',
+            stop: function(i) {
+                MauticVars.showLoadingBar = false;
+                mQuery.ajax({
+                    type: "POST",
+                    url: mauticAjaxUrl + "?action=point:reorderTriggerEvents",
+                    data: mQuery('#triggerEvents').sortable("serialize")});
+            }
+        });
+
+        mQuery('#triggerEvents .trigger-event-row').on('mouseover.triggerevents', function() {
+            mQuery(this).find('.form-buttons').removeClass('hide');
+        }).on('mouseout.triggerevents', function() {
+            mQuery(this).find('.form-buttons').addClass('hide');
+        });
+    }
+};
+
+Mautic.pointTriggerEventLoad = function (container, response) {
     //new action created so append it to the form
     if (response.actionHtml) {
         var newHtml = response.actionHtml;
-        var actionId = '#point_action_' + response.actionId;
+        var actionId = '#triggerEvent' + response.actionId;
         if (mQuery(actionId).length) {
             //replace content
             mQuery(actionId).replaceWith(newHtml);
             var newField = false;
         } else {
             //append content
-            mQuery(newHtml).appendTo('#point_actions');
+            mQuery(newHtml).appendTo('#triggerEvents');
             var newField = true;
         }
         //activate new stuff
@@ -52,20 +83,46 @@ Mautic.pointActionOnLoad = function (container, response) {
         //initialize tooltips
         mQuery(actionId + " *[data-toggle='tooltip']").tooltip({html: true});
 
-        mQuery('#point_actions .point-row').off(".point");
-        mQuery('#point_actions .point-row').on('mouseover.pointactions', function() {
+        mQuery('#triggerEvents .trigger-event-row').off(".triggerevents");
+        mQuery('#triggerEvents .trigger-event-row').on('mouseover.triggerevents', function() {
             mQuery(this).find('.form-buttons').removeClass('hide');
-        }).on('mouseout.pointactions', function() {
+        }).on('mouseout.triggerevents', function() {
             mQuery(this).find('.form-buttons').addClass('hide');
         });
 
-        //show actions panel
-        if (!mQuery('#actions-panel').hasClass('in')) {
-            mQuery('a[href="#actions-panel"]').trigger('click');
+        //show events panel
+        if (!mQuery('#events-panel').hasClass('in')) {
+            mQuery('a[href="#events-panel"]').trigger('click');
         }
 
-        if (mQuery('#point-action-placeholder').length) {
-            mQuery('#point-action-placeholder').remove();
+        if (mQuery('#trigger-event-placeholder').length) {
+            mQuery('#trigger-event-placeholder').remove();
         }
     }
+};
+
+Mautic.getPointActionPropertiesForm = function(actionType) {
+    var labelSpinner = mQuery("label[for='point_type']");
+    var spinner = mQuery('<i class="fa fa-fw fa-spinner fa-spin"></i>');
+    labelSpinner.append(spinner);
+    var query = "action=point:getActionForm&actionType=" + actionType;
+    mQuery.ajax({
+        url: mauticAjaxUrl,
+        type: "POST",
+        data: query,
+        dataType: "json",
+        success: function (response) {
+            if (typeof response.html != 'undefined') {
+                mQuery('#pointActionProperties').html(response.html);
+                Mautic.onPageLoad('#pointActionProperties', response);
+            }
+            spinner.remove();
+        },
+        error: function (request, textStatus, errorThrown) {
+            if (mauticEnv == 'dev') {
+                alert(errorThrown);
+            }
+            spinner.remove();
+        }
+    });
 };

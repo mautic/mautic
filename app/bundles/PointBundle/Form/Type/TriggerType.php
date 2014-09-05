@@ -19,11 +19,11 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * Class PointType
+ * Class TriggerType
  *
  * @package Mautic\PointBundle\Form\Type
  */
-class PointType extends AbstractType
+class TriggerType extends AbstractType
 {
 
     private $translator;
@@ -45,49 +45,67 @@ class PointType extends AbstractType
         $builder->addEventSubscriber(new CleanFormSubscriber());
         $builder->addEventSubscriber(new FormExitSubscriber('point', $options));
 
+        $builder->add("triggers-panel-wrapper-start", 'panel_wrapper_start', array(
+            'attr' => array(
+                'id' => "triggers-panel"
+            )
+        ));
+
+        //details
+        $builder->add("details-panel-start", 'panel_start', array(
+            'label'      => 'mautic.point.trigger.form.panel.details',
+            'dataParent' => '#triggers-panel',
+            'bodyId'     => 'details-panel',
+            'bodyAttr'   => array('class' => 'in')
+        ));
+
         $builder->add('name', 'text', array(
-            'label'      => 'mautic.point.form.name',
+            'label'      => 'mautic.point.trigger.form.name',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control')
         ));
 
         $builder->add('description', 'text', array(
-            'label'      => 'mautic.point.form.description',
+            'label'      => 'mautic.point.trigger.form.description',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control'),
             'required'   => false
         ));
 
-        $builder->add('type', 'choice', array(
-            'choices' => $options['pointActions']['list'],
-            'empty_value' => '',
-            'label'       => 'mautic.point.form.type',
-            'label_attr'  => array('class' => 'control-label'),
-            'attr'        => array(
-                'class' => 'form-control',
-                'onchange' => 'Mautic.getPointActionPropertiesForm(this.value);'
-            ),
+        //add category
+        FormHelper::buildForm($this->translator, $builder);
+
+        $builder->add('points', 'number', array(
+            'label'      => 'mautic.point.trigger.form.points',
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array('class' => 'form-control')
         ));
 
-        $type = (!empty($options['actionType'])) ? $options['actionType'] : $options['data']->getType();
-        if ($type) {
-            $formType   =  (!empty($options['pointActions']['actions'][$type]['formType'])) ?
-                $options['pointActions']['actions'][$type]['formType'] : 'genericpoint_settings';
+        $builder->add('color', 'text', array(
+            'label'      => 'mautic.point.trigger.form.color',
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array(
+                'class'       => 'form-control',
+                'data-toggle' => 'color'
+            )
+        ));
 
-            $builder->add('properties', $formType, array(
-                'label' => false
-            ));
-        }
+        $builder->add('triggerExistingLeads', 'button_group', array(
+            'choice_list' => new ChoiceList(
+                array(false, true),
+                array('mautic.core.form.no', 'mautic.core.form.yes')
+            ),
+            'expanded'    => true,
+            'multiple'    => false,
+            'label'       => 'mautic.point.trigger.form.existingleads',
+            'empty_value' => false,
+            'required'    => false
+        ));
 
         if (!empty($options['data']) && $options['data']->getId()) {
-            $readonly = !$this->security->hasEntityAccess(
-                'point:points:publishown',
-                'point:points:publishother',
-                $options['data']->getCreatedBy()
-            );
-
+            $readonly = !$this->security->isGranted('point:triggers:publish');
             $data = $options['data']->isPublished(false);
-        } elseif (!$this->security->isGranted('point:points:publishown')) {
+        } elseif (!$this->security->isGranted('point:triggers:publish')) {
             $readonly = true;
             $data     = false;
         } else {
@@ -100,13 +118,13 @@ class PointType extends AbstractType
                 array(false, true),
                 array('mautic.core.form.no', 'mautic.core.form.yes')
             ),
-            'expanded'      => true,
-            'multiple'      => false,
-            'label'         => 'mautic.point.form.ispublished',
-            'empty_value'   => false,
-            'required'      => false,
-            'read_only'     => $readonly,
-            'data'          => $data
+            'expanded'    => true,
+            'multiple'    => false,
+            'label'       => 'mautic.point.trigger.form.ispublished',
+            'empty_value' => false,
+            'required'    => false,
+            'read_only'   => $readonly,
+            'data'        => $data
         ));
 
         $builder->add('publishUp', 'datetime', array(
@@ -114,10 +132,10 @@ class PointType extends AbstractType
             'label'      => 'mautic.core.form.publishup',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
-                'class' => 'form-control',
+                'class'       => 'form-control',
                 'data-toggle' => 'datetime'
             ),
-            'format'  => 'yyyy-MM-dd HH:mm',
+            'format'     => 'yyyy-MM-dd HH:mm',
             'required'   => false
         ));
 
@@ -126,15 +144,29 @@ class PointType extends AbstractType
             'label'      => 'mautic.core.form.publishdown',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
-                'class' => 'form-control',
+                'class'       => 'form-control',
                 'data-toggle' => 'datetime'
             ),
-            'format'  => 'yyyy-MM-dd HH:mm',
+            'format'     => 'yyyy-MM-dd HH:mm',
             'required'   => false
         ));
 
-        //add category
-        FormHelper::buildForm($this->translator, $builder);
+        $builder->add("details-panel-end", 'panel_end');
+
+        //actions
+        $builder->add("events-panel-start", 'panel_start', array(
+            'label'      => 'mautic.point.trigger.form.panel.events',
+            'dataParent' => '#triggers-panel',
+            'bodyId'     => 'events-panel'
+        ));
+
+        $builder->add("events-panel-end", 'panel_end');
+
+        $builder->add("triggers-panel-wrapper-end", 'panel_wrapper_end');
+
+        $builder->add('tempId', 'hidden', array(
+            'mapped' => false
+        ));
 
         $builder->add('buttons', 'form_buttons');
 
@@ -149,18 +181,14 @@ class PointType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'Mautic\PointBundle\Entity\Point',
+            'data_class' => 'Mautic\PointBundle\Entity\Trigger',
         ));
-
-        $resolver->setRequired(array('pointActions'));
-
-        $resolver->setOptional(array('actionType'));
     }
 
     /**
      * @return string
      */
     public function getName() {
-        return "point";
+        return "pointtrigger";
     }
 }

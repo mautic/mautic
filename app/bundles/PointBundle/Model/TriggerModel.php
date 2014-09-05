@@ -1,0 +1,362 @@
+<?php
+/**
+ * @package     Mautic
+ * @copyright   2014 Mautic, NP. All rights reserved.
+ * @author      Mautic
+ * @link        http://mautic.com
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
+namespace Mautic\PointBundle\Model;
+
+use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\PointBundle\Entity\Trigger;
+use Mautic\PointBundle\Entity\TriggerEvent;
+use Mautic\PointBundle\Event as Events;
+use Mautic\PointBundle\PointEvents;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+
+/**
+ * Class TriggerModel
+ * {@inheritdoc}
+ * @package Mautic\CoreBundle\Model\FormModel
+ */
+class TriggerModel extends CommonFormModel
+{
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return string
+     */
+    public function getRepository()
+    {
+        return $this->em->getRepository('MauticPointBundle:Trigger');
+    }
+
+    public function getEventRepository()
+    {
+        return $this->em->getRepository('MauticPointBundle:TriggerEvent');
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return string
+     */
+    public function getPermissionBase()
+    {
+        return 'point:triggers';
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param      $entity
+     * @param      $formFactory
+     * @param null $action
+     * @param array $options
+     * @return mixed
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    public function createForm($entity, $formFactory, $action = null, $options = array())
+    {
+        if (!$entity instanceof Trigger) {
+            throw new MethodNotAllowedHttpException(array('Trigger'));
+        }
+        $params = (!empty($action)) ? array('action' => $action) : array();
+        return $formFactory->create('pointtrigger', $entity, $params);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param  \Mautic\PointBundle\Entity\Trigger $entity
+     * @param  bool                               $unlock
+     */
+    public function saveEntity($entity, $unlock = true)
+    {
+        $isNew = ($entity->getId()) ? false : true;
+
+        parent::saveEntity($entity, $unlock);
+
+        //should we trigger for existing leads?
+        if ($entity->getTriggerExistingLeads() && $entity->isPublished()) {
+            $events = $entity->getEvents();
+            $repo   = $this->getRepository();
+            foreach ($events as $event) {
+                $dateTime  = $this->factory->getDate($entity->getDateAdded());
+                $filter = array('force' => array(
+                    array(
+                        'column' => 'l.date_added',
+                        'expr'   => 'lte',
+                        'value'  => $dateTime->toUtcString()
+                    ),
+                    array(
+                        'column' => 'l.score',
+                        'expr'   => 'gte',
+                        'value'  => $entity->getPoints()
+                    )
+                ));
+
+                if (!$isNew) {
+                    //get a list of leads that has already had this event applied
+                    $leadIds = $repo->getLeadsForEvent($event->getId());
+                    if (!empty($leadIds)) {
+                        $filter['force'][] = array(
+                            'column' => 'l.id',
+                            'expr'   => 'notIn',
+                            'value'  => implode(',', $leadIds)
+                        );
+                    }
+                }
+
+                //get a list of leads that are before the trigger's date_added and trigger if not already done so
+                /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+                $leadModel = $this->factory->getModel('lead');
+                $leads     = $leadModel->getEntities(array(
+                    'filter' => $filter
+                ));
+
+                foreach ($leads as $l) {
+                    $this->triggerEvent($event, $l, false);
+                }
+            }
+        }
+    }
+
+    /**
+     * Get a specific entity or generate a new one if id is empty
+     *
+     * @param $id
+     * @return null|object
+     */
+    public function getEntity($id = null)
+    {
+        if ($id === null) {
+            return new Trigger();
+        }
+
+        $entity = parent::getEntity($id);
+
+        return $entity;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param $action
+     * @param $event
+     * @param $entity
+     * @param $isNew
+     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     */
+    protected function dispatchEvent($action, &$entity, $isNew = false, $event = false)
+    {
+        if (!$entity instanceof Trigger) {
+            throw new MethodNotAllowedHttpException(array('Trigger'));
+        }
+
+        switch ($action) {
+            case "pre_save":
+                $name = PointEvents::TRIGGER_PRE_SAVE;
+                break;
+            case "post_save":
+                $name = PointEvents::TRIGGER_POST_SAVE;
+                break;
+            case "pre_delete":
+                $name = PointEvents::TRIGGER_PRE_DELETE;
+                break;
+            case "post_delete":
+                $name = PointEvents::TRIGGER_POST_DELETE;
+                break;
+            default:
+                return false;
+        }
+
+        if ($this->dispatcher->hasListeners($name)) {
+            if (empty($event)) {
+                $event = new Events\TriggerEvent($entity, $isNew);
+            }
+
+            $this->dispatcher->dispatch($name, $event);
+            return $event;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * @param Trigger $entity
+     * @param       $sessionEvents
+     */
+    public function setEvents(Trigger &$entity, $sessionEvents)
+    {
+        $order   = 1;
+        $existingActions = $entity->getEvents();
+
+        foreach ($sessionEvents as $properties) {
+            $isNew = (!empty($properties['id']) && isset($existingActions[$properties['id']])) ? false : true;
+            $event = !$isNew ? $existingActions[$properties['id']] : new TriggerEvent();
+
+            foreach ($properties as $f => $v) {
+                if (in_array($f, array('id', 'order')))
+                    continue;
+
+                $func = "set" .  ucfirst($f);
+                if (method_exists($event, $func)) {
+                    $event->$func($v);
+                }
+                $event->setTrigger($entity);
+            }
+            $event->setOrder($order);
+            $order++;
+            $entity->addTriggerEvent($properties['id'], $event);
+        }
+    }
+
+    /**
+     * Gets array of custom events from bundles subscribed PointEvents::POINT_ON_BUILD
+     * @return mixed
+     */
+    public function getEvents()
+    {
+        static $events;
+
+        if (empty($events)) {
+            //build them
+            $events = array();
+            $event  = new Events\TriggerBuilderEvent($this->translator);
+            $this->dispatcher->dispatch(PointEvents::TRIGGER_ON_BUILD, $event);
+            $events = $event->getEvents();
+        }
+        return $events;
+    }
+
+
+    /**
+     * Triggers a specific event
+     *
+     * @param TriggerEvent $event
+     * @param Lead $lead
+     */
+    public function triggerEvent(TriggerEvent $event, Lead $lead = null)
+    {
+        //only trigger events for anonymous users
+        if (!$this->security->isAnonymous()) {
+            return;
+        }
+
+        if ($lead == null) {
+            $leadModel = $this->factory->getModel('lead');
+            $lead      = $leadModel->getCurrentLead();
+        }
+
+        //get a list of events that has already been performed on this lead
+        $appliedEvents = $this->getEventRepository()->getLeadTriggeredEvents($lead->getId());
+
+        //if it's already been done, then skip it
+        if (isset($appliedEvents[$event->getId()])) {
+            return;
+        }
+
+        //make sure the event still exists
+        $trigger  = $event->getTrigger();
+        if (!isset($availableEvents[$trigger->getType()])) {
+            return;
+        }
+
+        $settings = $availableEvents[$trigger->getType()];
+        $args     = array(
+            'event'      => array(
+                'id'         => $event->getId(),
+                'type'       => $event->getType(),
+                'name'       => $event->getName(),
+                'properties' => $event->getProperties(),
+                'trigger'      => array(
+                    'id'        => $trigger->getId(),
+                    'name'      => $trigger->getName(),
+                    'points'    => $trigger->getPoints(),
+                    'color'     => $trigger->getColor()
+                )
+            ),
+            'lead'        => $lead,
+            'factory'     => $this->factory
+        );
+
+        if (is_callable($settings['callback'])) {
+            if (is_array($settings['callback'])) {
+                $reflection = new \ReflectionMethod($settings['callback'][0], $settings['callback'][1]);
+            } elseif (strpos($settings['callback'], '::') !== false) {
+                $parts      = explode('::', $settings['callback']);
+                $reflection = new \ReflectionMethod($parts[0], $parts[1]);
+            } else {
+                new \ReflectionMethod(null, $settings['callback']);
+            }
+
+            $pass = array();
+            foreach ($reflection->getParameters() as $param) {
+                if (isset($args[$param->getName()])) {
+                    $pass[] = $args[$param->getName()];
+                } else {
+                    $pass[] = null;
+                }
+            }
+            $reflection->invokeArgs($this, $pass);
+        }
+    }
+
+    /**
+     * Trigger events for the current lead
+     *
+     * @param Lead $lead
+     */
+    public function triggerEvents(Lead $lead)
+    {
+        $score = $lead->getScore();
+
+        //find all published triggers that is applicable to this score
+        /** @var \Mautic\PointBundle\Entity\TriggerEventRepository $repo */
+        $repo   = $this->getEventRepository();
+        $events = $repo->getPublishedByPointTotal($score);
+
+        if (!empty($events)) {
+            //get a list of actions that has already been applied to this lead
+            $appliedEvents = $repo->getLeadTriggeredEvents($lead->getId());
+
+            foreach ($events as $event) {
+                if (isset($appliedEvents[$event->getId()])) {
+                    //don't apply the event to the lead if it's already been done
+                    continue;
+                }
+
+                $this->triggerEvent($event, $lead);
+            }
+        }
+    }
+
+    /**
+     * Returns configured color based on passed in $points
+     *
+     * @param $points
+     *
+     * @return string
+     */
+    public function getColorForLeadPoints($points)
+    {
+        static $triggers = array();
+
+        if (empty($triggers)) {
+            $triggers = $this->getRepository()->getTriggerColors();
+        }
+
+        foreach ($triggers as $trigger) {
+            if ($points >= $trigger['points']) {
+                return $trigger['color'];
+            }
+        }
+
+        return '';
+    }
+}

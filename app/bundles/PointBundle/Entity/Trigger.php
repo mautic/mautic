@@ -9,6 +9,7 @@
 
 namespace Mautic\PointBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use Mautic\CoreBundle\Entity\FormEntity;
@@ -16,12 +17,12 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
- * Class Point
- * @ORM\Table(name="points")
- * @ORM\Entity(repositoryClass="Mautic\PointBundle\Entity\PointRepository")
+ * Class Trigger
+ * @ORM\Table(name="point_triggers")
+ * @ORM\Entity(repositoryClass="Mautic\PointBundle\Entity\TriggerRepository")
  * @Serializer\ExclusionPolicy("all")
  */
-class Point extends FormEntity
+class Trigger extends FormEntity
 {
 
     /**
@@ -33,14 +34,6 @@ class Point extends FormEntity
      * @Serializer\Groups({"full"})
      */
     private $id;
-
-    /**
-     * @ORM\Column(type="string", length=50)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
-     */
-    private $type;
 
     /**
      * @ORM\Column(type="string", length=50, nullable=true)
@@ -75,27 +68,28 @@ class Point extends FormEntity
     private $publishDown;
 
     /**
-     * @ORM\Column(name="action_order", type="integer")
+     * @ORM\Column(name="points", type="integer")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})
      */
-    private $order = 0;
+    private $points = 0;
 
     /**
-     * @ORM\Column(type="array")
+     * @ORM\Column(name="color", type="string", length=7)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})
      */
-    private $properties = array();
+    private $color;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Mautic\LeadBundle\Entity\Lead", fetch="EXTRA_LAZY")
-     * @ORM\JoinTable(name="point_action_lead_xref")
-     * @ORM\JoinColumn(name="lead_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
+     * @ORM\Column(name="trigger_existing_leads", type="boolean")
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full"})
      */
-    private $leads;
+    private $triggerExistingLeads = false;
 
     /**
      * @ORM\ManyToOne(targetEntity="Mautic\CategoryBundle\Entity\Category")
@@ -106,17 +100,39 @@ class Point extends FormEntity
     private $category;
 
     /**
+     * @ORM\OneToMany(targetEntity="TriggerEvent", mappedBy="trigger", cascade={"all"}, indexBy="id", fetch="EXTRA_LAZY")
+     * @ORM\OrderBy({"order" = "ASC"})
+     */
+    private $events;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->events = new ArrayCollection();
+    }
+
+    /**
      * @param ClassMetadata $metadata
      */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank(array(
-            'message' => 'mautic.point.name.notblank'
+            'message' => 'mautic.point.trigger.name.notblank'
         )));
+    }
 
-        $metadata->addPropertyConstraint('type', new Assert\NotBlank(array(
-            'message' => 'mautic.point.type.notblank'
-        )));
+    protected function isChanged($prop, $val)
+    {
+        $getter  = "get" . ucfirst($prop);
+        $current = $this->$getter();
+        if ($prop == 'events') {
+            //changes are already computed so just add them
+            $this->changes[$prop][$val[0]] = $val[1];
+        } elseif ($current != $val) {
+            $this->changes[$prop] = array($current, $val);
+        }
     }
 
     /**
@@ -130,116 +146,10 @@ class Point extends FormEntity
     }
 
     /**
-     * Set order
-     *
-     * @param integer $order
-     * @return Action
-     */
-    public function setOrder($order)
-    {
-        $this->isChanged('order', $order);
-
-        $this->order = $order;
-
-        return $this;
-    }
-
-    /**
-     * Get order
-     *
-     * @return integer
-     */
-    public function getOrder()
-    {
-        return $this->order;
-    }
-
-    /**
-     * Set properties
-     *
-     * @param array $properties
-     * @return Action
-     */
-    public function setProperties($properties)
-    {
-        $this->isChanged('properties', $properties);
-
-        $this->properties = $properties;
-
-        return $this;
-    }
-
-    /**
-     * Get properties
-     *
-     * @return array
-     */
-    public function getProperties()
-    {
-        return $this->properties;
-    }
-
-    /**
-     * Set rage
-     *
-     * @param \Mautic\PointBundle\Entity\Point $point
-     * @return Action
-     */
-    public function setPoint(\Mautic\PointBundle\Entity\Point $point)
-    {
-        $this->point = $point;
-
-        return $this;
-    }
-
-    /**
-     * Get rage
-     *
-     * @return \Mautic\PointBundle\Entity\Point
-     */
-    public function getPoint()
-    {
-        return $this->point;
-    }
-
-    /**
-     * Set type
-     *
-     * @param string $type
-     * @return Action
-     */
-    public function setType($type)
-    {
-        $this->isChanged('type', $type);
-        $this->type = $type;
-
-        return $this;
-    }
-
-    /**
-     * Get type
-     *
-     * @return string
-     */
-    public function getType()
-    {
-        return $this->type;
-    }
-
-    /**
-     * @return array
-     */
-    public function convertToArray()
-    {
-        return get_object_vars($this);
-    }
-
-
-    /**
      * Set description
      *
      * @param string $description
-     * @return Action
+     * @return Trigger
      */
     public function setDescription($description)
     {
@@ -263,7 +173,7 @@ class Point extends FormEntity
      * Set name
      *
      * @param string $name
-     * @return Action
+     * @return Trigger
      */
     public function setName($name)
     {
@@ -284,36 +194,40 @@ class Point extends FormEntity
     }
 
     /**
-     * Add lead
+     * Add events
      *
-     * @param \Mautic\LeadBundle\Entity\Lead $lead
-     * @return Lead
+     * @param $key
+     * @param \Mautic\PointBundle\Entity\TriggerEvent $event
+     * @return Point
      */
-    public function addLead(\Mautic\LeadBundle\Entity\Lead $lead)
+    public function addTriggerEvent($key, TriggerEvent $event)
     {
-        $this->leads[] = $lead;
+        if ($changes = $event->getChanges()) {
+            $this->isChanged('events', array($key, $changes));
+        }
+        $this->events[$key] = $event;
 
         return $this;
     }
 
     /**
-     * Remove lead
+     * Remove events
      *
-     * @param \Mautic\LeadBundle\Entity\Lead $lead
+     * @param \Mautic\PointBundle\Entity\TriggerEvent $event
      */
-    public function removeLead(\Mautic\LeadBundle\Entity\Lead $lead)
+    public function removeTriggerEvent(\Mautic\PointBundle\Entity\TriggerEvent $event)
     {
-        $this->leads->removeElement($lead);
+        $this->events->removeElement($event);
     }
 
     /**
-     * Get leads
+     * Get events
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getLeads()
+    public function getEvents()
     {
-        return $this->leads;
+        return $this->events;
     }
 
     /**
@@ -362,6 +276,55 @@ class Point extends FormEntity
     public function getPublishDown()
     {
         return $this->publishDown;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPoints()
+    {
+        return $this->points;
+    }
+
+    /**
+     * @param mixed $points
+     */
+    public function setPoints ($points)
+    {
+        $this->isChanged('points', $points);
+        $this->points = $points;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getColor ()
+    {
+        return $this->color;
+    }
+
+    /**
+     * @param mixed $color
+     */
+    public function setColor ($color)
+    {
+        $this->color = $color;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTriggerExistingLeads ()
+    {
+        return $this->triggerExistingLeads;
+    }
+
+    /**
+     * @param mixed $triggerExistingLeads
+     */
+    public function setTriggerExistingLeads ($triggerExistingLeads)
+    {
+        $this->triggerExistingLeads = $triggerExistingLeads;
     }
 
     /**

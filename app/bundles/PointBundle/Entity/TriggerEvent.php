@@ -11,17 +11,15 @@ namespace Mautic\PointBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
-use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
- * Class Point
- * @ORM\Table(name="points")
- * @ORM\Entity(repositoryClass="Mautic\PointBundle\Entity\PointRepository")
+ * Class TriggerEvent
+ * @ORM\Table(name="point_trigger_events")
+ * @ORM\Entity(repositoryClass="Mautic\PointBundle\Entity\TriggerEventRepository")
  * @Serializer\ExclusionPolicy("all")
  */
-class Point extends FormEntity
+class TriggerEvent
 {
 
     /**
@@ -59,22 +57,6 @@ class Point extends FormEntity
     private $description;
 
     /**
-     * @ORM\Column(name="publish_up", type="datetime", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
-     */
-    private $publishUp;
-
-    /**
-     * @ORM\Column(name="publish_down", type="datetime", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
-     */
-    private $publishDown;
-
-    /**
      * @ORM\Column(name="action_order", type="integer")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
@@ -91,32 +73,30 @@ class Point extends FormEntity
     private $properties = array();
 
     /**
+     * @ORM\ManyToOne(targetEntity="Trigger", inversedBy="events")
+     * @ORM\JoinColumn(name="trigger_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
+     */
+    private $trigger;
+
+    /**
      * @ORM\ManyToMany(targetEntity="Mautic\LeadBundle\Entity\Lead", fetch="EXTRA_LAZY")
-     * @ORM\JoinTable(name="point_action_lead_xref")
+     * @ORM\JoinTable(name="point_trigger_event_lead_xref")
      * @ORM\JoinColumn(name="lead_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      */
     private $leads;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="Mautic\CategoryBundle\Entity\Category")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
-     **/
-    private $category;
+    private $changes;
 
-    /**
-     * @param ClassMetadata $metadata
-     */
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    private function isChanged($prop, $val)
     {
-        $metadata->addPropertyConstraint('name', new Assert\NotBlank(array(
-            'message' => 'mautic.point.name.notblank'
-        )));
+        if ($this->$prop != $val) {
+            $this->changes[$prop] = array($this->$prop, $val);
+        }
+    }
 
-        $metadata->addPropertyConstraint('type', new Assert\NotBlank(array(
-            'message' => 'mautic.point.type.notblank'
-        )));
+    public function getChanges()
+    {
+        return $this->changes;
     }
 
     /**
@@ -133,7 +113,7 @@ class Point extends FormEntity
      * Set order
      *
      * @param integer $order
-     * @return Action
+     * @return TriggerEvent
      */
     public function setOrder($order)
     {
@@ -158,7 +138,7 @@ class Point extends FormEntity
      * Set properties
      *
      * @param array $properties
-     * @return Action
+     * @return TriggerEvent
      */
     public function setProperties($properties)
     {
@@ -180,33 +160,33 @@ class Point extends FormEntity
     }
 
     /**
-     * Set rage
+     * Set trigger
      *
-     * @param \Mautic\PointBundle\Entity\Point $point
-     * @return Action
+     * @param \Mautic\PointBundle\Entity\Trigger $trigger
+     * @return TriggerTriggerEvent
      */
-    public function setPoint(\Mautic\PointBundle\Entity\Point $point)
+    public function setTrigger(\Mautic\PointBundle\Entity\Trigger $trigger)
     {
-        $this->point = $point;
+        $this->trigger = $trigger;
 
         return $this;
     }
 
     /**
-     * Get rage
+     * Get trigger
      *
-     * @return \Mautic\PointBundle\Entity\Point
+     * @return \Mautic\PointBundle\Entity\Trigger
      */
-    public function getPoint()
+    public function getTrigger()
     {
-        return $this->point;
+        return $this->trigger;
     }
 
     /**
      * Set type
      *
      * @param string $type
-     * @return Action
+     * @return TriggerEvent
      */
     public function setType($type)
     {
@@ -239,7 +219,7 @@ class Point extends FormEntity
      * Set description
      *
      * @param string $description
-     * @return Action
+     * @return TriggerEvent
      */
     public function setDescription($description)
     {
@@ -263,7 +243,7 @@ class Point extends FormEntity
      * Set name
      *
      * @param string $name
-     * @return Action
+     * @return TriggerEvent
      */
     public function setName($name)
     {
@@ -314,69 +294,5 @@ class Point extends FormEntity
     public function getLeads()
     {
         return $this->leads;
-    }
-
-    /**
-     * Set publishUp
-     *
-     * @param \DateTime $publishUp
-     * @return Point
-     */
-    public function setPublishUp($publishUp)
-    {
-        $this->isChanged('publishUp', $publishUp);
-        $this->publishUp = $publishUp;
-
-        return $this;
-    }
-
-    /**
-     * Get publishUp
-     *
-     * @return \DateTime
-     */
-    public function getPublishUp()
-    {
-        return $this->publishUp;
-    }
-
-    /**
-     * Set publishDown
-     *
-     * @param \DateTime $publishDown
-     * @return Point
-     */
-    public function setPublishDown($publishDown)
-    {
-        $this->isChanged('publishDown', $publishDown);
-        $this->publishDown = $publishDown;
-
-        return $this;
-    }
-
-    /**
-     * Get publishDown
-     *
-     * @return \DateTime
-     */
-    public function getPublishDown()
-    {
-        return $this->publishDown;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getCategory ()
-    {
-        return $this->category;
-    }
-
-    /**
-     * @param mixed $category
-     */
-    public function setCategory ($category)
-    {
-        $this->category = $category;
     }
 }

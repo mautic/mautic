@@ -23,18 +23,59 @@ class AjaxController extends CommonAjaxController
 
     /**
      * @param Request $request
-     * @param string  $name
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    protected function reorderActionsAction (Request $request)
+    protected function reorderTriggerEventsAction (Request $request)
     {
         $dataArray  = array('success' => 0);
         $session    = $this->factory->getSession();
-        $order      = InputHelper::clean($request->request->get('point'));
-        $components = $session->get('mautic.pointactions.add');
+        $order      = InputHelper::clean($request->request->get('pointtrigger'));
+        $components = $session->get('mautic.pointtriggers.add');
         if (!empty($order) && !empty($components)) {
             $components = array_replace(array_flip($order), $components);
-            $session->set('mautic.pointactions.add', $components);
+            $session->set('mautic.pointtriggers.add', $components);
             $dataArray['success'] = 1;
+        }
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    protected function getActionFormAction(Request $request)
+    {
+        $dataArray = array(
+            'success' => 0,
+            'html'    => ''
+        );
+        $type      = InputHelper::clean($request->request->get('actionType'));
+
+        if (!empty($type)) {
+            //get the HTML for the form
+            /** @var \Mautic\PointBundle\Model\PointModel $model */
+            $model   = $this->factory->getModel('point');
+            $actions = $model->getPointActions();
+
+            if (isset($actions['actions'][$type])) {
+                $formType = (!empty($actions['actions'][$type]['formType'])) ? $actions['actions'][$type]['formType'] :
+                    'genericpoint_settings';
+
+                $form = $this->get('form.factory')->create('pointaction', array(), array('formType' => $formType));
+                $formView = $form->createView();
+                $this->factory->getTemplating()->getEngine('MauticPointBundle:Point:actionform.html.php')->get('form')
+                    ->setTheme($formView, 'MauticPointBundle:PointForm');
+                $html = $this->renderView('MauticPointBundle:Point:actionform.html.php', array(
+                    'form' => $formView
+                ));
+                //replace pointaction with point
+                $html = str_replace('pointaction', 'point', $html);
+                $dataArray['html']    = $html;
+                $dataArray['success'] = 1;
+            }
         }
 
         return $this->sendJsonResponse($dataArray);

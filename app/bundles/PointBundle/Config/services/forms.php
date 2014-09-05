@@ -24,7 +24,7 @@ $container->setDefinition(
 $container->setDefinition(
     'mautic.point.type.action',
     new Definition(
-        'Mautic\PointBundle\Form\Type\ActionType'
+        'Mautic\PointBundle\Form\Type\PointActionType'
     )
 )
     ->addTag('form.type', array(
@@ -32,24 +32,24 @@ $container->setDefinition(
     ));
 
 $container->setDefinition(
-    'mautic.pointrange.type.form',
+    'mautic.pointtrigger.type.form',
     new Definition(
-        'Mautic\PointBundle\Form\Type\RangeType',
+        'Mautic\PointBundle\Form\Type\TriggerType',
         array(new Reference('mautic.factory'))
     )
 )
     ->addTag('form.type', array(
-        'alias' => 'pointrange'
+        'alias' => 'pointtrigger'
     ));
 
 $container->setDefinition(
     'mautic.pointrange.type.action',
     new Definition(
-        'Mautic\PointBundle\Form\Type\RangeActionType'
+        'Mautic\PointBundle\Form\Type\TriggerEventType'
     )
 )
     ->addTag('form.type', array(
-        'alias' => 'pointrangeaction'
+        'alias' => 'pointtriggerevent'
     ));
 
 $container->setDefinition(
@@ -61,7 +61,3 @@ $container->setDefinition(
     ->addTag('form.type', array(
         'alias' => 'genericpoint_settings'
     ));
-
-$container
-    ->register('mautic.validator.point.rangesequence', 'Mautic\PointBundle\Form\Validator\RangeSequenceValidator')
-    ->addTag('validator.constraint_validator', array('alias' => 'point_range_sequence'));
