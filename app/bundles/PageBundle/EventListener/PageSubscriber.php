@@ -160,6 +160,11 @@ class PageSubscriber extends CommonSubscriber
     {
         $fields = $this->factory->getEntityManager()->getClassMetadata('Mautic\\PageBundle\\Entity\\Page')->getFieldNames();
 
-        $event->addTable('pages', $fields);
+        $data = array(
+            'display_name' => 'mautic.page.page.report.table',
+            'columns'      => $fields
+        );
+
+        $event->addTable('pages', $data);
     }
 }

@@ -108,7 +108,7 @@ class ReportType extends AbstractType
             ));
 
             $source  = (!is_null($options['data']->getSource()) && $options['data']->getSource() != '') ? $options['data']->getSource() : key($tables);
-            $columns = $options['table_list'][$source];
+            $columns = $options['table_list'][$source]['columns'];
 
             // Build the column selector
             $builder->add('columns', 'column_selector', array(
@@ -184,7 +184,7 @@ class ReportType extends AbstractType
         $list = array();
 
         foreach ($temp as $table) {
-            $list[$table] = ucfirst($table);
+            $list[$table] = $tables[$table]['display_name'];
         }
 
         return $list;

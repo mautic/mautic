@@ -27,16 +27,20 @@ class ReportBuilderEvent extends Event
     private $tableArray = array();
 
     /**
-     * Add a table with the specified columns to the lookup
+     * Add a table with the specified columns to the lookup.
+     *
+     * The data should be an associative array with the following data:
+     * 'display_name' => The translation key to display in the select list
+     * 'columns'      => An array containing the table's columns
      *
      * @param string $tableName Table to add
-     * @param array  $columns   Array of columns to add
+     * @param array  $data      Data array for the table
      *
      * @return void
      */
-    public function addTable($tableName, array $columns)
+    public function addTable($tableName, array $data)
     {
-        $this->tableArray[$tableName] = $columns;
+        $this->tableArray[$tableName] = $data;
     }
 
     /**
@@ -78,7 +82,7 @@ class ReportBuilderEvent extends Event
             throw new InvalidArgumentException(sprintf('The %s table is not set.', $tableName));
         }
 
-        $this->tableArray[$table][] = $column;
+        $this->tableArray[$table]['columns'][] = $column;
     }
 
     /**
@@ -91,8 +95,8 @@ class ReportBuilderEvent extends Event
      */
     public function removeColumn($tableName, $column)
     {
-        if (($key = array_search($column, $this->tableArray[$tableName])) !== false) {
-            unset($this->tableArray[$tableName][$key]);
+        if (($key = array_search($column, $this->tableArray[$tableName]['columns'])) !== false) {
+            unset($this->tableArray[$tableName]['columns'][$key]);
         }
     }
 }
