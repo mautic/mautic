@@ -39,7 +39,7 @@ $view->extend('MauticPointBundle:Trigger:index.html.php');
                     'class'      => 'col-pointtrigger-points'
                 ));
 
-                echo "<th class='col-pointrange-color'>" . $view['translator']->trans('mautic.point.trigger.thead.color') . '</th>';
+                echo "<th class='col-pointtrigger-color'>" . $view['translator']->trans('mautic.point.trigger.thead.color') . '</th>';
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'pointtrigger',

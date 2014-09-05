@@ -83,12 +83,12 @@ class PointSubscriber extends CommonSubscriber
      */
     public function onTriggerPostSave(Events\TriggerEvent $event)
     {
-        $range = $event->getTrigger();
+        $trigger = $event->getTrigger();
         if ($details = $event->getChanges()) {
             $log = array(
                 "bundle"    => "point",
-                "object"    => "range",
-                "objectId"  => $range->getId(),
+                "object"    => "trigger",
+                "objectId"  => $trigger->getId(),
                 "action"    => ($event->isNew()) ? "create" : "update",
                 "details"   => $details,
                 "ipAddress" => $this->request->server->get('REMOTE_ADDR')
@@ -104,13 +104,13 @@ class PointSubscriber extends CommonSubscriber
      */
     public function onTriggerDelete(Events\TriggerEvent $event)
     {
-        $range = $event->getTrigger();
+        $trigger = $event->getTrigger();
         $log = array(
             "bundle"     => "point",
-            "object"     => "range",
-            "objectId"   => $range->deletedId,
+            "object"     => "trigger",
+            "objectId"   => $trigger->deletedId,
             "action"     => "delete",
-            "details"    => array('name' => $range->getName()),
+            "details"    => array('name' => $trigger->getName()),
             "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
         );
         $this->factory->getModel('core.auditLog')->writeToLog($log);

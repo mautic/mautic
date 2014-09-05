@@ -92,6 +92,6 @@ class RangeActionType extends AbstractType
      * @return string
      */
     public function getName() {
-        return "pointrangeaction";
+        return "pointtriggerevent";
     }
 }

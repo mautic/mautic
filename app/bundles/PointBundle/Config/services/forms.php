@@ -43,7 +43,7 @@ $container->setDefinition(
     ));
 
 $container->setDefinition(
-    'mautic.pointrange.type.action',
+    'mautic.pointtrigger.type.action',
     new Definition(
         'Mautic\PointBundle\Form\Type\TriggerEventType'
     )
