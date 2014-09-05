@@ -28,13 +28,15 @@ class EmailType extends AbstractType
 
     private $translator;
     private $themes;
+    private $defaultTheme;
 
     /**
      * @param MauticFactory $factory
      */
     public function __construct(MauticFactory $factory) {
-        $this->translator = $factory->getTranslator();
-        $this->themes     = $factory->getInstalledThemes('email');
+        $this->translator   = $factory->getTranslator();
+        $this->themes       = $factory->getInstalledThemes('email');
+        $this->defaultTheme = $factory->getParameter('default_theme');
     }
 
     /**
@@ -86,6 +88,10 @@ class EmailType extends AbstractType
         }
 
         //build a list
+        $template = $options['data']->getTemplate();
+        if (empty($template)) {
+            $template = $this->defaultTheme;
+        }
         $builder->add('template', 'choice', array(
             'choices'       => $this->themes,
             'expanded'      => false,
@@ -97,7 +103,8 @@ class EmailType extends AbstractType
             'attr'          => array(
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.email.form.template.help'
-            )
+            ),
+            'data'          => $template
         ));
 
         if (!$isVariant) {
