@@ -22,7 +22,7 @@ if (empty($route))
 ?>
 
 <div class="form-buttons hide">
-    <a data-menu-link="mautic_form_index" data-toggle="ajax" data-ignore-formexit="true"
+    <a data-toggle="ajaxmodal" data-target="#formComponentModal"
        href="<?php echo $view['router']->generate($route,
         array('objectAction' => 'edit', 'objectId' => $id)); ?>" class="btn btn-primary btn-xs">
         <i class="fa fa-pencil-square-o"></i>

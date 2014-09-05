@@ -646,6 +646,12 @@ var Mautic = {
     ajaxifyModal: function (el, event) {
         var target = mQuery(el).attr('data-target');
 
+        //little animation to let the user know that something is happening
+        if (typeof event != 'undefined' && event.target) {
+            Mautic.startIconSpinOnEvent(event);
+        }
+
+
         MauticVars.showLoadingBar = false;
 
         var route = mQuery(el).attr('href');
@@ -674,11 +680,13 @@ var Mautic = {
                     //show the modal
                     mQuery(target).modal('show');
                 }
+                Mautic.stopIconSpinPostEvent();
             },
             error: function (request, textStatus, errorThrown) {
                 if (mauticEnv == 'dev') {
                     alert(errorThrown);
                 }
+                Mautic.stopIconSpinPostEvent();
             }
         });
     },

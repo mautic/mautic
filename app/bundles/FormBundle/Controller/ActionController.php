@@ -148,6 +148,8 @@ class ActionController extends CommonFormController
 
         if ($formAction !== null) {
             $actionType  = $formAction['type'];
+            $customComponents = $this->factory->getModel('form.form')->getCustomComponents();
+            $formAction['settings'] = $customComponents['actions'][$actionType];
 
             //ajax only for form fields
             if (!$actionType ||

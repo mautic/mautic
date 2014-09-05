@@ -111,7 +111,7 @@ class SubmissionModel extends CommonFormModel
                     ));
                 }
 
-                return $msg;
+                return array('errors' => array($msg));
             }
 
             //clean and validate the input
@@ -162,7 +162,7 @@ class SubmissionModel extends CommonFormModel
 
         //return errors
         if (!empty($errors)) {
-            return $errors;
+            return array('errors' => $errors);
         }
 
         //set the landing page the form was submitted from if applicable
@@ -225,6 +225,13 @@ class SubmissionModel extends CommonFormModel
                 }
                 $returned               = $reflection->invokeArgs($this, $pass);
                 $args['feedback'][$key] = $returned;
+            }
+        }
+
+        //last round of callback commands from the submit actions; first come first serve
+        foreach ($args['feedback'] as $k => $data) {
+            if (!empty($data['callback'])) {
+                return array('callback' => $data);
             }
         }
 
