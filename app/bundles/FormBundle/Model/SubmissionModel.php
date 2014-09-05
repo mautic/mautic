@@ -344,7 +344,7 @@ class SubmissionModel extends CommonFormModel
             case 'pdf':
                 $factory  = $this->factory;
                 $response = new StreamedResponse(function () use ($results, $form, $translator, $name, $factory) {
-                    $mpdf    = new \mPDF();
+                    $mpdf    = new \mPDF('c');
                     $content = $factory->getTemplating()->renderResponse(
                         'MauticFormBundle:Result:export.html.php',
                         array(

@@ -275,6 +275,8 @@ system('rm vendor/monolog/monolog/phpunit.xml.dist');
 system('rm vendor/monolog/monolog/README.mdown');
 
 // mpdf/mpdf
+system('rm -rf vendor/mpdf/mpdf/examples');
+system('rm vendor/mpdf/mpdf/ttfonts/*');
 system('rm vendor/mpdf/mpdf/ADDED\ INFO\ FONTS.txt');
 system('rm vendor/mpdf/mpdf/CHANGELOG.txt');
 system('rm vendor/mpdf/mpdf/composer.json');
