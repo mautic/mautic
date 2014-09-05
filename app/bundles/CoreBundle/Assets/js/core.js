@@ -582,14 +582,14 @@ var Mautic = {
         mQuery('form[name="' + formName + '"]').off('submit.ajaxform');
         mQuery('form[name="' + formName + '"]').on('submit.ajaxform', (function (e) {
             e.preventDefault();
-            var form = this;
 
             Mautic.postForm(mQuery(this), function (response) {
-                var isInModal = mQuery(form).parents('.modal');
-                if (typeof isInModal == 'undefined') {
+                var modalParent = mQuery('form[name="' + formName + '"]').closest('.modal');
+                var isInModal   = modalParent.length > 0 ? true : false;
+                if (!isInModal) {
                     Mautic.processPageContent(response);
                 } else {
-                    var target = '#' + isInModal.attr('id');
+                    var target = '#' + modalParent.attr('id');
                     Mautic.processModalContent(response, target);
                 }
             });
