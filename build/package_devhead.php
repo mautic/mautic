@@ -182,15 +182,112 @@ system('rm vendor/ircmaxell/password-compat/phpunit.xml.dist');
 system('rm vendor/ircmaxell/password-compat/README.md');
 system('rm vendor/ircmaxell/password-compat/version-test.php');
 
-// jdorn/sqlformatter
-system('rm -rf vendor/jdorn/sqlformatter/examples');
-system('rm -rf vendor/jdorn/sqlformatter/tests');
-system('rm vendor/jdorn/sqlformatter/.gitignore');
-system('rm vendor/jdorn/sqlformatter/.travis.yml');
-system('rm vendor/jdorn/sqlformatter/composer.json');
-system('rm vendor/jdorn/sqlformatter/composer.lock');
-system('rm vendor/jdorn/sqlformatter/phpunit.xml.dist');
-system('rm vendor/jdorn/sqlformatter/README.md');
+// jdorn/sql-formatter
+system('rm -rf vendor/jdorn/sql-formatter/examples');
+system('rm -rf vendor/jdorn/sql-formatter/tests');
+system('rm vendor/jdorn/sql-formatter/.gitignore');
+system('rm vendor/jdorn/sql-formatter/.travis.yml');
+system('rm vendor/jdorn/sql-formatter/composer.json');
+system('rm vendor/jdorn/sql-formatter/composer.lock');
+system('rm vendor/jdorn/sql-formatter/phpunit.xml.dist');
+system('rm vendor/jdorn/sql-formatter/README.md');
+
+// jms/metadata
+system('rm -rf vendor/jms/metadata/tests');
+system('rm vendor/jms/metadata/.gitignore');
+system('rm vendor/jms/metadata/.travis.yml');
+system('rm vendor/jms/metadata/CHANGELOG.md');
+system('rm vendor/jms/metadata/composer.json');
+system('rm vendor/jms/metadata/composer.lock');
+system('rm vendor/jms/metadata/phpunit.xml.dist');
+system('rm vendor/jms/metadata/README.rst');
+
+// jms/parser-lib
+system('rm -rf vendor/jms/parser-lib/doc');
+system('rm -rf vendor/jms/parser-lib/tests');
+system('rm vendor/jms/parser-lib/.gitignore');
+system('rm vendor/jms/parser-lib/.jms.yml');
+system('rm vendor/jms/parser-lib/.travis.yml');
+system('rm vendor/jms/parser-lib/composer.json');
+system('rm vendor/jms/parser-lib/composer.lock');
+system('rm vendor/jms/parser-lib/phpunit.xml.dist');
+system('rm vendor/jms/parser-lib/README.md');
+
+// jms/serializer
+system('rm -rf vendor/jms/serializer/doc');
+system('rm -rf vendor/jms/serializer/tests');
+system('rm vendor/jms/serializer/.gitignore');
+system('rm vendor/jms/serializer/.travis.yml');
+system('rm vendor/jms/serializer/CHANGELOG.md');
+system('rm vendor/jms/serializer/composer.json');
+system('rm vendor/jms/serializer/composer.lock');
+system('rm vendor/jms/serializer/phpunit.xml.dist');
+system('rm vendor/jms/serializer/README.md');
+system('rm vendor/jms/serializer/UPGRADING.md');
+
+// jms/serializer-bundle
+system('rm -rf vendor/jms/serializer-bundle/JMS/SerializerBundle/Tests');
+system('rm vendor/jms/serializer-bundle/JMS/SerializerBundle/.gitignore');
+system('rm vendor/jms/serializer-bundle/JMS/SerializerBundle/.travis.yml');
+system('rm vendor/jms/serializer-bundle/JMS/SerializerBundle/composer.json');
+system('rm vendor/jms/serializer-bundle/JMS/SerializerBundle/phpunit.xml.dist');
+system('rm vendor/jms/serializer-bundle/JMS/SerializerBundle/README.md');
+system('rm vendor/jms/serializer-bundle/JMS/SerializerBundle/UPGRADING.md');
+
+// knplabs/knp-menu
+system('rm -rf vendor/knplabs/knp-menu/doc');
+system('rm -rf vendor/knplabs/knp-menu/tests');
+system('rm vendor/knplabs/knp-menu/.gitignore');
+system('rm vendor/knplabs/knp-menu/.travis.yml');
+system('rm vendor/knplabs/knp-menu/CHANGELOG.md');
+system('rm vendor/knplabs/knp-menu/composer.json');
+system('rm vendor/knplabs/knp-menu/phpunit.xml.dist');
+system('rm vendor/knplabs/knp-menu/README.markdown');
+
+// knplabs/knp-menu-bundle
+system('rm -rf vendor/knplabs/knp-menu-bundle/Knp/Bundle/MenuBundle/Tests');
+system('rm vendor/knplabs/knp-menu-bundle/Knp/Bundle/MenuBundle/.gitignore');
+system('rm vendor/knplabs/knp-menu-bundle/Knp/Bundle/MenuBundle/.travis.yml');
+system('rm vendor/knplabs/knp-menu-bundle/Knp/Bundle/MenuBundle/CHANGELOG.md');
+system('rm vendor/knplabs/knp-menu-bundle/Knp/Bundle/MenuBundle/composer.json');
+system('rm vendor/knplabs/knp-menu-bundle/Knp/Bundle/MenuBundle/phpunit.xml.dist');
+system('rm vendor/knplabs/knp-menu-bundle/Knp/Bundle/MenuBundle/README.md');
+
+// liip/functional-test-bundle
+system('rm -rf vendor/liip/functional-test-bundle/Liip/FunctionalTestBundle/ExampleTests');
+system('rm -rf vendor/liip/functional-test-bundle/Liip/FunctionalTestBundle/Test');
+system('rm vendor/liip/functional-test-bundle/Liip/FunctionalTestBundle/composer.json');
+system('rm vendor/liip/functional-test-bundle/Liip/FunctionalTestBundle/README.md');
+
+// michelf/php-markdown
+system('rm vendor/michelf/php-markdown/composer.json');
+system('rm vendor/michelf/php-markdown/Readme.md');
+system('rm vendor/michelf/php-markdown/Readme.php');
+
+// monolog/monolog
+system('rm -rf vendor/monolog/monolog/doc');
+system('rm -rf vendor/monolog/monolog/tests');
+system('rm vendor/monolog/monolog/CHANGELOG.mdown');
+system('rm vendor/monolog/monolog/composer.json');
+system('rm vendor/monolog/monolog/phpunit.xml.dist');
+system('rm vendor/monolog/monolog/README.mdown');
+
+// mpdf/mpdf
+system('rm vendor/mpdf/mpdf/ADDED\ INFO\ FONTS.txt');
+system('rm vendor/mpdf/mpdf/CHANGELOG.txt');
+system('rm vendor/mpdf/mpdf/composer.json');
+system('rm vendor/mpdf/mpdf/CREDITS.txt');
+system('rm vendor/mpdf/mpdf/FONT\ INFO.txt');
+system('rm vendor/mpdf/mpdf/README.txt');
+
+// nelmio/api-doc-bundle
+system('rm -rf vendor/nelmio/api-doc-bundle/Nelmio/ApiDocBundle/Tests');
+system('rm vendor/nelmio/api-doc-bundle/Nelmio/ApiDocBundle/.gitignore');
+system('rm vendor/nelmio/api-doc-bundle/Nelmio/ApiDocBundle/.travis.yml');
+system('rm vendor/nelmio/api-doc-bundle/Nelmio/ApiDocBundle/composer.json');
+system('rm vendor/nelmio/api-doc-bundle/Nelmio/ApiDocBundle/CONTRIBUTING.md');
+system('rm vendor/nelmio/api-doc-bundle/Nelmio/ApiDocBundle/phpunit.xml.dist');
+system('rm vendor/nelmio/api-doc-bundle/Nelmio/ApiDocBundle/README.md');
 
 // Step 5 - ZIP it up
 echo "Packaging Mautic\n";
