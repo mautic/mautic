@@ -11,15 +11,17 @@
  * Build a "production" package from the current development HEAD, this should be run after a 'composer install'
  */
 
+$baseDir = __DIR__;
+
 // Step 1 - Remove previous packages
 echo "Preparing environment\n";
 umask(022);
-chdir(__DIR__);
+chdir($baseDir);
 system('rm -rf packaging');
-@unlink(__DIR__ . '/packages/mautic-head.zip');
+@unlink($baseDir . '/packages/mautic-head.zip');
 
 // Step 2 - Provision packaging space
-mkdir(__DIR__ . '/packaging');
+mkdir($baseDir . '/packaging');
 
 // Step 3 - Copy files to packaging space
 echo "Copying files\n";
@@ -36,14 +38,14 @@ system('cp ../robots.txt packaging/');
 
 // Step 4 - Remove stuff that shouldn't be distro'ed
 echo "Removing extra files\n";
-chdir(__DIR__ . '/packaging');
+chdir($baseDir . '/packaging');
 system('rm app/bootstrap*');
 system('rm app/phpunit.*');
 system('rm app/tests.bootstrap*');
 system('rm app/config/config_local.php*');
 system('rm app/config/local.php*');
-system('rm -rf packaging/app/cache');
-system('rm -rf packaging/app/logs');
+system('rm -rf app/cache');
+system('rm -rf app/logs');
 
 // doctrine/annotations
 system('rm -rf vendor/doctrine/annotations/tests');
@@ -289,7 +291,179 @@ system('rm vendor/nelmio/api-doc-bundle/Nelmio/ApiDocBundle/CONTRIBUTING.md');
 system('rm vendor/nelmio/api-doc-bundle/Nelmio/ApiDocBundle/phpunit.xml.dist');
 system('rm vendor/nelmio/api-doc-bundle/Nelmio/ApiDocBundle/README.md');
 
+// phpcollection/phpcollection
+system('rm -rf vendor/phpcollection/phpcollection/doc');
+system('rm -rf vendor/phpcollection/phpcollection/tests');
+system('rm vendor/phpcollection/phpcollection/.gitignore');
+system('rm vendor/phpcollection/phpcollection/.travis.yml');
+system('rm vendor/phpcollection/phpcollection/composer.json');
+system('rm vendor/phpcollection/phpcollection/composer.lock');
+system('rm vendor/phpcollection/phpcollection/phpunit.xml.dist');
+system('rm vendor/phpcollection/phpcollection/README.md');
+
+// phpoffice/phpexcel
+system('rm -rf vendor/phpoffice/phpexcel/Examples');
+system('rm -rf vendor/phpoffice/phpexcel/unitTests');
+system('rm vendor/phpoffice/phpexcel/.gitattributes');
+system('rm vendor/phpoffice/phpexcel/.gitignore');
+system('rm vendor/phpoffice/phpexcel/.travis.yml');
+system('rm vendor/phpoffice/phpexcel/changelog.txt');
+system('rm vendor/phpoffice/phpexcel/composer.json');
+system('rm vendor/phpoffice/phpexcel/install.txt');
+
+// phpoption/phpoption
+system('rm -rf vendor/phpoption/phpoption/tests');
+system('rm vendor/phpoption/phpoption/.gitignore');
+system('rm vendor/phpoption/phpoption/.travis.yml');
+system('rm vendor/phpoption/phpoption/composer.json');
+system('rm vendor/phpoption/phpoption/phpunit.xml.dist');
+system('rm vendor/phpoption/phpoption/README.md');
+
+// psr/log
+system('rm vendor/psr/log/.gitignore');
+system('rm vendor/psr/log/composer.json');
+system('rm vendor/psr/log/README.md');
+
+// sensio/distribution-bundle
+system('rm -rf vendor/sensio/distribution-bundle/Sensio/Bundle/DistributionBundle/Resources/bin');
+system('rm vendor/sensio/distribution-bundle/Sensio/Bundle/DistributionBundle/.gitignore');
+system('rm vendor/sensio/distribution-bundle/Sensio/Bundle/DistributionBundle/.travis.yml');
+system('rm vendor/sensio/distribution-bundle/Sensio/Bundle/DistributionBundle/composer.json');
+
+// sensio/framework-extra-bundle
+system('rm -rf vendor/sensio/framework-extra-bundle/Sensio/Bundle/FrameworkExtraBundle/Resources/doc');
+system('rm -rf vendor/sensio/framework-extra-bundle/Sensio/Bundle/FrameworkExtraBundle/Tests');
+system('rm vendor/sensio/framework-extra-bundle/Sensio/Bundle/FrameworkExtraBundle/.gitignore');
+system('rm vendor/sensio/framework-extra-bundle/Sensio/Bundle/FrameworkExtraBundle/.travis.yml');
+system('rm vendor/sensio/framework-extra-bundle/Sensio/Bundle/FrameworkExtraBundle/CHANGELOG.md');
+system('rm vendor/sensio/framework-extra-bundle/Sensio/Bundle/FrameworkExtraBundle/composer.json');
+system('rm vendor/sensio/framework-extra-bundle/Sensio/Bundle/FrameworkExtraBundle/phpunit.xml.dist');
+system('rm vendor/sensio/framework-extra-bundle/Sensio/Bundle/FrameworkExtraBundle/README.md');
+system('rm vendor/sensio/framework-extra-bundle/Sensio/Bundle/FrameworkExtraBundle/UPGRADE.md');
+
+// sensio/generator-bundle
+system('rm -rf vendor/sensio/generator-bundle/Sensio/Bundle/GeneratorBundle/Resources/doc');
+system('rm -rf vendor/sensio/generator-bundle/Sensio/Bundle/GeneratorBundle/Tests');
+system('rm vendor/sensio/generator-bundle/Sensio/Bundle/GeneratorBundle/.gitignore');
+system('rm vendor/sensio/generator-bundle/Sensio/Bundle/GeneratorBundle/.travis.yml');
+system('rm vendor/sensio/generator-bundle/Sensio/Bundle/GeneratorBundle/composer.json');
+system('rm vendor/sensio/generator-bundle/Sensio/Bundle/GeneratorBundle/phpunit.xml.dist');
+system('rm vendor/sensio/generator-bundle/Sensio/Bundle/GeneratorBundle/README.md');
+
+// swiftmailer/swiftmailer
+system('rm -rf vendor/swiftmailer/swiftmailer/doc');
+system('rm -rf vendor/swiftmailer/swiftmailer/notes');
+system('rm -rf vendor/swiftmailer/swiftmailer/tests');
+system('rm vendor/swiftmailer/swiftmailer/.gitattributes');
+system('rm vendor/swiftmailer/swiftmailer/.gitignore');
+system('rm vendor/swiftmailer/swiftmailer/.travis.yml');
+system('rm vendor/swiftmailer/swiftmailer/CHANGES');
+system('rm vendor/swiftmailer/swiftmailer/composer.json');
+system('rm vendor/swiftmailer/swiftmailer/phpunit.xml.dist');
+system('rm vendor/swiftmailer/swiftmailer/README');
+
+// symfony/finder
+system('rm -rf vendor/symfony/finder/Symfony/Component/Finder/Tests');
+system('rm vendor/symfony/finder/Symfony/Component/Finder/.gitignore');
+system('rm vendor/symfony/finder/Symfony/Component/Finder/CHANGELOG.md');
+system('rm vendor/symfony/finder/Symfony/Component/Finder/composer.json');
+system('rm vendor/symfony/finder/Symfony/Component/Finder/phpunit.xml.dist');
+system('rm vendor/symfony/finder/Symfony/Component/Finder/README.md');
+
+// symfony/icu
+system('rm -rf vendor/symfony/icu/Symfony/Component/Icu/Tests');
+system('rm vendor/symfony/icu/Symfony/Component/Icu/.gitignore');
+system('rm vendor/symfony/icu/Symfony/Component/Icu/composer.json');
+system('rm vendor/symfony/icu/Symfony/Component/Icu/phpunit.xml.dist');
+system('rm vendor/symfony/icu/Symfony/Component/Icu/README.md');
+
+// symfony/monolog-bundle
+system('rm -rf vendor/symfony/monolog-bundle/Tests');
+system('rm vendor/symfony/monolog-bundle/.gitignore');
+system('rm vendor/symfony/monolog-bundle/.travis.yml');
+system('rm vendor/symfony/monolog-bundle/composer.json');
+system('rm vendor/symfony/monolog-bundle/phpunit.xml.dist');
+system('rm vendor/symfony/monolog-bundle/README.md');
+
+// symfony/swiftmailer-bundle
+system('rm -rf vendor/symfony/swiftmailer-bundle/Symfony/Bundle/SwiftmailerBundle/Tests');
+system('rm vendor/symfony/swiftmailer-bundle/Symfony/Bundle/SwiftmailerBundle/.gitignore');
+system('rm vendor/symfony/swiftmailer-bundle/Symfony/Bundle/SwiftmailerBundle/.travis.yml');
+system('rm vendor/symfony/swiftmailer-bundle/Symfony/Bundle/SwiftmailerBundle/composer.json');
+system('rm vendor/symfony/swiftmailer-bundle/Symfony/Bundle/SwiftmailerBundle/phpunit.xml.dist');
+
+// symfony/symfony
+system('rm vendor/symfony/symfony/*.md');
+system('rm vendor/symfony/symfony/.editorconfig');
+system('rm vendor/symfony/symfony/.gitignore');
+system('rm vendor/symfony/symfony/.travis.yml');
+system('rm vendor/symfony/symfony/autoload.php.dist');
+system('rm vendor/symfony/symfony/composer.json');
+system('rm vendor/symfony/symfony/phpunit.xml.dist');
+
+// symfony/symfony/src/Symfony/Bridge
+chdir($baseDir . '/packaging/vendor/symfony/symfony/src/Symfony/Bridge');
+system('rm -rf Doctrine/Test');
+system('rm -rf */Tests');
+system('rm */.gitignore');
+system('rm */CHANGELOG.md');
+system('rm */composer.json');
+system('rm */phpunit.xml.dist');
+system('rm */README.md');
+
+// symfony/symfony/src/Symfony/Bundle
+chdir($baseDir . '/packaging/vendor/symfony/symfony/src/Symfony/Bundle');
+system('rm -rf FrameworkBundle/Test');
+system('rm -rf */Tests');
+system('rm */.gitignore');
+system('rm */CHANGELOG.md');
+system('rm */composer.json');
+system('rm */phpunit.xml.dist');
+
+// symfony/symfony/src/Symfony/Component
+chdir($baseDir . '/packaging/vendor/symfony/symfony/src/Symfony/Component');
+system('rm -rf */Tests');
+system('rm */.gitignore');
+system('rm */CHANGELOG.md');
+system('rm */composer.json');
+system('rm */phpunit.xml.dist');
+system('rm */README.md');
+system('rm -rf Console/Resources');
+
+// twig/twig
+chdir($baseDir . '/packaging');
+system('rm -rf vendor/twig/twig/doc');
+system('rm -rf vendor/twig/twig/ext');
+system('rm -rf vendor/twig/twig/test');
+system('rm vendor/twig/twig/.editorconfig');
+system('rm vendor/twig/twig/.gitignore');
+system('rm vendor/twig/twig/.travis.yml');
+system('rm vendor/twig/twig/CHANGELOG');
+system('rm vendor/twig/twig/composer.json');
+system('rm vendor/twig/twig/phpunit.xml.dist');
+system('rm vendor/twig/twig/README.rst');
+
+// willdurand/jsonp-callback-validator
+system('rm -rf vendor/willdurand/jsonp-callback-validator/tests');
+system('rm vendor/willdurand/jsonp-callback-validator/.gitignore');
+system('rm vendor/willdurand/jsonp-callback-validator/.travis.yml');
+system('rm vendor/willdurand/jsonp-callback-validator/composer.json');
+system('rm vendor/willdurand/jsonp-callback-validator/CONTRIBUTING.md');
+system('rm vendor/willdurand/jsonp-callback-validator/phpunit.xml.dist');
+system('rm vendor/willdurand/jsonp-callback-validator/README.md');
+
+// willdurand/negotiation
+system('rm -rf vendor/willdurand/negotiation/tests');
+system('rm vendor/willdurand/negotiation/.gitignore');
+system('rm vendor/willdurand/negotiation/.travis.yml');
+system('rm vendor/willdurand/negotiation/composer.json');
+system('rm vendor/willdurand/negotiation/CONTRIBUTING.md');
+system('rm vendor/willdurand/negotiation/phpunit.xml.dist');
+system('rm vendor/willdurand/negotiation/README.md');
+
+// Find any .git directories and nuke them
+system('find . -type d -name .git -exec rm -rf {} \\;');
+
 // Step 5 - ZIP it up
 echo "Packaging Mautic\n";
-system('find . -type d -name .git -exec rm -rf {} \\; > /dev/null');
 system('zip -r ../packages/mautic-head.zip addons/ app/ assets/ bin/ themes/ vendor/ .htaccess index.php LICENSE.txt robots.txt > /dev/null');
