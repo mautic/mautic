@@ -14,10 +14,10 @@ $view['slots']->set('searchString', $app->getSession()->get('mautic.leadlist.fil
 $view['slots']->set('searchHelp', $view['translator']->trans('mautic.lead.list.help.searchcommands'));
 ?>
 <?php $view['slots']->start("actions"); ?>
-<li><a href="<?php echo $this->container->get('router')->generate(
+<a class="btn btn-default" href="<?php echo $this->container->get('router')->generate(
         'mautic_leadlist_action', array("objectAction" => "new")); ?>" data-toggle="ajax">
+        <i class="fa fa-plus"></i> 
         <?php echo $view["translator"]->trans("mautic.lead.list.menu.new"); ?>
-    </a>
-</li>
+</a>
 <?php $view['slots']->stop(); ?>
 <?php $view['slots']->output('_content'); ?>

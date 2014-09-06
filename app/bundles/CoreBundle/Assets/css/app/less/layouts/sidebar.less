@@ -231,7 +231,8 @@ aside.app-sidebar {
           // -------------------------
           &:focus,
           &:hover {
-            background-color: darken(@sidebar-bg-color, 1%);
+            background-color: @sidebar-bg-color;
+            color: fade(contrast(@sidebar-bg-color), 85%);
           }
         }
 
@@ -240,7 +241,7 @@ aside.app-sidebar {
         .nav-submenu {
           position: relative;
           overflow: hidden;
-          background-color: darken(@sidebar-bg-color, 1%);
+          background-color: darken(@sidebar-bg-color, 5%);
           padding-left: 45px;
 
           li {
@@ -248,6 +249,14 @@ aside.app-sidebar {
             // anchor
             a { 
               padding: 1px 15px; 
+            
+              // Focus state reset
+              // -------------------------
+              &:focus,
+              &:hover {
+                background-color: darken(@sidebar-bg-color, 5%);
+              }
+
             }
 
             // last item
@@ -260,7 +269,7 @@ aside.app-sidebar {
         &.active,
         &.open {
           > a {
-            background-color: darken(@sidebar-bg-color, 1%);
+            background-color: lighten(@sidebar-bg-color, 3%);
             color: fade(contrast(@sidebar-bg-color), 85%);
 
             // Menu link - arrow
@@ -270,6 +279,11 @@ aside.app-sidebar {
                 content: "\f107";
               }
             }
+
+            > .figure {
+              color: @brand-secondary;
+            }
+
           }
 
           // 2nd level menu
