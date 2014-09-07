@@ -48,7 +48,7 @@ class TriggerEventController extends CommonFormController
 
         //fire the builder event
         $events = $this->factory->getModel('point.trigger')->getEvents();
-        $form = $this->get('form.factory')->create('pointtriggeraction', $triggerEvent, array(
+        $form = $this->get('form.factory')->create('pointtriggerevent', $triggerEvent, array(
             'action'    => $this->generateUrl('mautic_pointtriggerevent_action', array('objectAction' => 'new')),
             'settings'  => $events[$eventType]
         ));
@@ -162,7 +162,7 @@ class TriggerEventController extends CommonFormController
                 return $this->accessDenied();
             }
 
-            $form = $this->get('form.factory')->create('pointtriggeraction', $triggerEvent, array(
+            $form = $this->get('form.factory')->create('pointtriggerevent', $triggerEvent, array(
                 'action'   => $this->generateUrl('mautic_pointtriggerevent_action', array('objectAction' => 'edit', 'objectId' => $objectId)),
                 'settings' => $triggerEvent['settings']
             ));

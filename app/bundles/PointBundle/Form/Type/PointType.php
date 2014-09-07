@@ -103,6 +103,7 @@ class PointType extends AbstractType
             'expanded'      => true,
             'multiple'      => false,
             'label'         => 'mautic.point.form.ispublished',
+            'label_attr'    => array('class' => 'control-label'),
             'empty_value'   => false,
             'required'      => false,
             'read_only'     => $readonly,

@@ -98,6 +98,7 @@ class TriggerType extends AbstractType
             'expanded'    => true,
             'multiple'    => false,
             'label'       => 'mautic.point.trigger.form.existingleads',
+            'label_attr'  => array('class' => 'control-label'),
             'empty_value' => false,
             'required'    => false
         ));
@@ -121,6 +122,7 @@ class TriggerType extends AbstractType
             'expanded'    => true,
             'multiple'    => false,
             'label'       => 'mautic.point.trigger.form.ispublished',
+            'label_attr'  => array('class' => 'control-label'),
             'empty_value' => false,
             'required'    => false,
             'read_only'   => $readonly,

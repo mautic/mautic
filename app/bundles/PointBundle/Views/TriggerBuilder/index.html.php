@@ -39,6 +39,7 @@ $view['slots']->set("headerTitle", $header);
             ?>
             <div id="triggerEvents">
                 <?php
+                if (!count($triggerEvents)):
                 foreach ($triggerEvents as $event):
                     $template = (isset($event['settings']['template'])) ? $event['settings']['template'] :
                         'MauticPointBundle:Event:generic.html.php';
@@ -49,8 +50,8 @@ $view['slots']->set("headerTitle", $header);
                         'deleted' => in_array($event['id'], $deletedEvents)
                     ));
                 endforeach;
+                else:
                 ?>
-                <?php if (!count($triggerEvents)): ?>
                     <h3 id='trigger-event-placeholder'><?php echo $view['translator']->trans('mautic.point.trigger.form.addevent'); ?></h3>
                 <?php endif; ?>
             </div>

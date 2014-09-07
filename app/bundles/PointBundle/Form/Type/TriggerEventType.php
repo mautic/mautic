@@ -15,11 +15,11 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * Class RangeActionType
+ * Class TriggerEventType
  *
  * @package Mautic\PointBundle\Form\Type
  */
-class RangeActionType extends AbstractType
+class TriggerEventType extends AbstractType
 {
 
     /**
@@ -67,7 +67,7 @@ class RangeActionType extends AbstractType
             'save_text' => $btnValue,
             'save_icon' => $btnIcon,
             'apply_text' => false,
-            'container_class' => 'bottom-pointaction-buttons'
+            'container_class' => 'bottom-triggerevent-buttons'
         ));
 
         if (!empty($options["action"])) {
