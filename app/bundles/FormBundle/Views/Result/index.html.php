@@ -15,37 +15,29 @@ $view['slots']->set("headerTitle", $view['translator']->trans('mautic.form.resul
 ?>
 
 <?php $view['slots']->start("actions"); ?>
-<li>
-    <a href="<?php echo $this->container->get('router')->generate(
-        'mautic_form_export', array("objectId" => $form->getId(), "format" => "csv")); ?>"
-       data-toggle="download">
-        <?php echo $view["translator"]->trans("mautic.form.result.export.csv"); ?>
-    </a>
-</li>
+<a class="btn btn-default" href="<?php echo $this->container->get('router')->generate(
+    'mautic_form_export', array("objectId" => $form->getId(), "format" => "csv")); ?>"
+   data-toggle="download">
+    <?php echo $view["translator"]->trans("mautic.form.result.export.csv"); ?>
+</a>
 <?php if (class_exists('PHPExcel')): ?>
-<li>
-    <a href="<?php echo $this->container->get('router')->generate(
-        'mautic_form_export', array("objectId" => $form->getId(), "format" => "xlsx")); ?>"
-       data-toggle="download">
-        <?php echo $view["translator"]->trans("mautic.form.result.export.xlsx"); ?>
-    </a>
-</li>
+<a class="btn btn-default" href="<?php echo $this->container->get('router')->generate(
+    'mautic_form_export', array("objectId" => $form->getId(), "format" => "xlsx")); ?>"
+   data-toggle="download">
+    <?php echo $view["translator"]->trans("mautic.form.result.export.xlsx"); ?>
+</a>
 <?php endif; ?>
-<li>
-    <a href="<?php echo $this->container->get('router')->generate(
-        'mautic_form_export', array("objectId" => $form->getId(), "format" => "html")); ?>"
-       target="_blank">
-        <?php echo $view["translator"]->trans("mautic.form.result.export.html"); ?>
-    </a>
-</li>
+<a class="btn btn-default" href="<?php echo $this->container->get('router')->generate(
+    'mautic_form_export', array("objectId" => $form->getId(), "format" => "html")); ?>"
+   target="_blank">
+    <?php echo $view["translator"]->trans("mautic.form.result.export.html"); ?>
+</a>
 <?php if (class_exists('mPDF')): ?>
-<li>
-    <a href="<?php echo $this->container->get('router')->generate(
-        'mautic_form_export', array("objectId" => $form->getId(), "format" => "pdf")); ?>"
-       target="_blank">
-        <?php echo $view["translator"]->trans("mautic.form.result.export.pdf"); ?>
-    </a>
-</li>
+<a class="btn btn-default" href="<?php echo $this->container->get('router')->generate(
+    'mautic_form_export', array("objectId" => $form->getId(), "format" => "pdf")); ?>"
+   target="_blank">
+    <?php echo $view["translator"]->trans("mautic.form.result.export.pdf"); ?>
+</a>
 <?php endif; ?>
 <?php $view['slots']->stop(); ?>
 
