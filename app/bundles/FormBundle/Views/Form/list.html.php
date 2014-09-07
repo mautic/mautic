@@ -16,6 +16,18 @@ if ($tmpl == 'index')
             <?php echo $view['translator']->trans('mautic.form.form.header.index'); ?>
         </h3>
     </div>
+    <div class="panel-toolbar-wrapper">
+        <div class="panel-toolbar">
+            <div class="checkbox custom-checkbox pull-left">
+                <input type="checkbox" id="customcheckbox-one0" value="1" data-toggle="checkall" data-target="#reportTable">
+                <label for="customcheckbox-one0"><?php echo $view['translator']->trans('mautic.core.table.selectall'); ?></label>
+            </div>
+        </div>
+        <div class="panel-toolbar text-right">
+            <button type="button" class="btn btn-sm btn-warning"><i class="fa fa-files-o"></i></button>
+            <button type="button" class="btn btn-sm btn-danger"><i class="fa fa-trash-o"></i></button>
+        </div>
+    </div>
     <div class="table-responsive scrollable body-white padding-sm page-list">
         <?php if (count($items)): ?>
             <table class="table table-hover table-striped table-bordered form-list">
@@ -131,6 +143,7 @@ CUSTOM
         <?php else: ?>
             <h4><?php echo $view['translator']->trans('mautic.core.noresults'); ?></h4>
         <?php endif; ?>
+        <div class="panel-footer">
         <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
             "totalItems"      => count($items),
             "page"            => $page,
@@ -138,6 +151,6 @@ CUSTOM
             "baseUrl"         => $view['router']->generate('mautic_form_index'),
             'sessionVar'      => 'form'
         )); ?>
-        <div class="footer-margin"></div>
+        </div>
     </div>
 </div>

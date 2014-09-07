@@ -19,18 +19,17 @@ $view['slots']->set('searchHelp', $view['translator']->trans('mautic.category.he
 ?>
 
 <?php if ($permissions[$bundle.':categories:create']): ?>
-    <?php $view['slots']->start("actions"); ?>
-    <li>
-        <a href="<?php echo $this->container->get('router')->generate(
-            'mautic_category_action', array(
-                "objectAction" => "new",
-                "bundle"       => $bundle
-            )); ?>"
-           data-toggle="ajax"
-           data-menu-link="#mautic_category_index">
-            <?php echo $view["translator"]->trans("mautic.category.menu.new"); ?>
-        </a>
-    </li>
+<?php $view['slots']->start("actions"); ?>
+    <a class="btn btn-default" href="<?php echo $this->container->get('router')->generate(
+        'mautic_category_action', array(
+            "objectAction" => "new",
+            "bundle"       => $bundle
+        )); ?>"
+       data-toggle="ajax"
+       data-menu-link="#mautic_category_index">
+        <i class="fa fa-plus"></i> 
+        <?php echo $view["translator"]->trans("mautic.category.menu.new"); ?>
+    </a>
     <?php $view['slots']->stop(); ?>
 <?php endif; ?>
 

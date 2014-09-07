@@ -17,6 +17,9 @@ body > section#app-wrapper {
   min-height: 100%;
   width: 100%;
 }
+a {
+  color: #4e5e9e;
+}
 a:hover,
 a:focus {
   text-decoration: none;
@@ -519,7 +522,7 @@ aside.app-sidebar:before {
   top: 0;
   bottom: 0;
   width: inherit;
-  background-color: #25284e;
+  background-color: #272727;
   border: inherit;
 }
 aside.app-sidebar.sidebar-left {
@@ -634,12 +637,13 @@ aside.app-sidebar .content .nav li a > .arrow:before {
 }
 aside.app-sidebar .content .nav li a:focus,
 aside.app-sidebar .content .nav li a:hover {
-  background-color: #23274a;
+  background-color: #272727;
+  color: rgba(255, 255, 255, 0.85);
 }
 aside.app-sidebar .content .nav li .nav-submenu {
   position: relative;
   overflow: hidden;
-  background-color: #23274a;
+  background-color: #1a1a1a;
   padding-left: 45px;
 }
 aside.app-sidebar .content .nav li .nav-submenu li {
@@ -648,21 +652,29 @@ aside.app-sidebar .content .nav li .nav-submenu li {
 aside.app-sidebar .content .nav li .nav-submenu li a {
   padding: 1px 15px;
 }
+aside.app-sidebar .content .nav li .nav-submenu li a:focus,
+aside.app-sidebar .content .nav li .nav-submenu li a:hover {
+  background-color: #1a1a1a;
+}
 aside.app-sidebar .content .nav li .nav-submenu li:last-child {
   padding-bottom: 5px;
 }
 aside.app-sidebar .content .nav li.active > a,
 aside.app-sidebar .content .nav li.open > a {
-  background-color: #23274a;
+  background-color: #2f2f2f;
   color: rgba(255, 255, 255, 0.85);
 }
 aside.app-sidebar .content .nav li.active > a > .arrow:before,
 aside.app-sidebar .content .nav li.open > a > .arrow:before {
   content: "\f107";
 }
+aside.app-sidebar .content .nav li.active > a > .figure,
+aside.app-sidebar .content .nav li.open > a > .figure {
+  color: #fdb933;
+}
 aside.app-sidebar .content .nav > li > a > .text {
   font-weight: 600;
-  text-shadow: 0px -1px 0px #202445;
+  text-shadow: 0px -1px 0px #212121;
 }
 @media (min-width: 768px) {
   aside.app-sidebar {
@@ -724,13 +736,13 @@ aside.app-sidebar .content .nav > li > a > .text {
     box-shadow: 4px 4px 0 -1px rgba(0, 0, 0, 0.1);
   }
   aside.app-sidebar .content .nav > li.open a {
-    background-color: #25284e;
+    background-color: #272727;
   }
   aside.app-sidebar .content .nav > li.open .nav-submenu {
     display: none;
   }
   aside.app-sidebar .content .nav > li.hover a {
-    background-color: #23274a;
+    background-color: #252525;
   }
   aside.app-sidebar .content .nav > li.hover .nav-submenu {
     display: block;
@@ -961,10 +973,10 @@ h6,
   font-weight: 300;
 }
 .text-muted {
-  color: #6169b5;
+  color: #797979;
 }
 a.text-muted:hover {
-  color: #48509a;
+  color: #5f5f5f;
 }
 .text-primary {
   color: #4e5e9e;
@@ -1045,7 +1057,7 @@ a.text-info:hover {
   opacity: .8;
 }
 .media.read a {
-  color: #383e77;
+  color: #464646;
 }
 .media.new {
   background-color: #fafafa;
@@ -1214,7 +1226,7 @@ a.text-info:hover {
   position: absolute;
   top: 2px;
   left: 2px;
-  background-color: #303566;
+  background-color: #393939;
   height: 10px;
   width: 10px;
   border-radius: 2px;
@@ -1254,7 +1266,7 @@ a.text-info:hover {
 .radio[class^="custom"] label input:checked + span,
 .checkbox-inline[class^="custom"] label input:checked + span,
 .radio-inline[class^="custom"] label input:checked + span {
-  border: 1px solid #303566;
+  border: 1px solid #393939;
 }
 .checkbox[class*=" custom"] label input:checked + span:after,
 .radio[class*=" custom"] label input:checked + span:after,
@@ -1290,7 +1302,7 @@ a.text-info:hover {
 .radio[class^="custom"] label:hover input:checked + span,
 .checkbox-inline[class^="custom"] label:hover input:checked + span,
 .radio-inline[class^="custom"] label:hover input:checked + span {
-  border: 1px solid #303566;
+  border: 1px solid #393939;
 }
 .checkbox.custom-primary label input + span:after,
 .radio.custom-primary label input + span:after,
@@ -1628,7 +1640,7 @@ aside.sidebar .progress {
 .panel-heading .panel-toolbar > .btn {
   border: 0;
   padding: 5px;
-  color: #303566;
+  color: #393939;
   -webkit-box-shadow: none;
   box-shadow: none;
   -webkit-transition: color 0.3s ease;
@@ -1637,7 +1649,7 @@ aside.sidebar .progress {
 }
 .panel-heading .panel-toolbar > .btn:hover,
 .panel-heading .panel-toolbar > .btn:focus {
-  color: #303566;
+  color: #393939;
   -webkit-transition: color 0.3s ease;
   -o-transition: color 0.3s ease;
   transition: color 0.3s ease;
@@ -1818,10 +1830,10 @@ aside.sidebar .progress {
   margin-left: 5px;
 }
 .step .steps.active {
-  color: #6169b5;
+  color: #797979;
 }
 .step .steps.active > .steps-figure {
-  border-color: #303566;
+  border-color: #393939;
 }
 .step a.steps:hover,
 .step a.steps:focus {
@@ -1833,11 +1845,11 @@ aside.sidebar .progress {
 }
 .bg-white {
   background-color: #fff;
-  color: #303566;
+  color: #393939;
 }
 .bg-light {
   background-color: #f8f8f8;
-  color: #303566;
+  color: #393939;
 }
 .va-t {
   vertical-align: top !important;

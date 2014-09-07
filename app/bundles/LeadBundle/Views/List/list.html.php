@@ -13,69 +13,88 @@ endif;
 
 $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list');
 ?>
-
-<div class="table-responsive scrollable body-white padding-sm page-list">
-    <?php if (count($items)): ?>
-    <table class="table table-hover table-striped table-bordered leadlist-list">
-        <thead>
-        <tr>
-            <th class="col-leadlist-actions"></th>
-            <th class="col-leadlist-name"><?php echo $view['translator']->trans('mautic.lead.list.thead.name'); ?></th>
-            <th class="visible-md visible-lg col-leadlist-descr"><?php echo $view['translator']->trans('mautic.lead.list.thead.descr'); ?></th>
-            <th class="visible-md visible-lg col-leadlist-id"><?php echo $view['translator']->trans('mautic.lead.list.thead.id'); ?></th>
-        </tr>
-        </thead>
-        <tbody>
-        <?php foreach ($items as $item):?>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">
+            <?php echo $view['translator']->trans('mautic.lead.list.header.index'); ?>
+        </h3>
+    </div>
+    <div class="panel-toolbar-wrapper">
+        <div class="panel-toolbar">
+            <div class="checkbox custom-checkbox pull-left">
+                <input type="checkbox" id="customcheckbox-one0" value="1" data-toggle="checkall" data-target="#reportTable">
+                <label for="customcheckbox-one0"><?php echo $view['translator']->trans('mautic.core.table.selectall'); ?></label>
+            </div>
+        </div>
+        <div class="panel-toolbar text-right">
+            <button type="button" class="btn btn-sm btn-warning"><i class="fa fa-files-o"></i></button>
+            <button type="button" class="btn btn-sm btn-danger"><i class="fa fa-trash-o"></i></button>
+        </div>
+    </div>
+    <div class="table-responsive scrollable body-white padding-sm page-list">
+        <?php if (count($items)): ?>
+        <table class="table table-hover table-striped table-bordered leadlist-list">
+            <thead>
             <tr>
-                <td>
-                    <?php
-                    echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
-                        'item'      => $item,
-                        'edit'      => $security->hasEntityAccess(
-                            true,
-                            $permissions['lead:lists:editother'],
-                            $item->getCreatedBy()
-                        ),
-                        'delete'    => $security->hasEntityAccess(
-                            true,
-                            $permissions['lead:lists:deleteother'],
-                            $item->getCreatedBy()
-                        ),
-                        'routeBase' => 'leadlist',
-                        'menuLink'  => 'mautic_leadlist_index',
-                        'langVar'   => 'lead.list'
-                    ))  ;
-                    ?>
-                </td>
-                <td>
-                    <?php if ($item->isGlobal()): ?>
-                    <i class="fa fa-fw fa-globe"></i>
-                    <?php endif; ?>
-                    <a href="<?php echo $view['router']->generate('mautic_lead_index', array('search' => "$listCommand:{$item->getAlias()}")); ?>"
-                       data-toggle="ajax">
-                        <?php echo $item->getName(); ?> (<?php echo $item->getAlias(); ?>)
-                    </a>
-                    <?php if (!$item->isGlobal() && $currentUser->getId() != $item->getCreatedBy()->getId()): ?>
-                    <br />
-                    <span class="small">(<?php echo $item->getCreatedBy()->getName(); ?>)</span>
-                    <?php endif; ?>
-                </td>
-                <td class="visible-md visible-lg"><?php echo $item->getDescription(); ?></td>
-                <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
+                <th class="col-leadlist-actions"></th>
+                <th class="col-leadlist-name"><?php echo $view['translator']->trans('mautic.lead.list.thead.name'); ?></th>
+                <th class="visible-md visible-lg col-leadlist-descr"><?php echo $view['translator']->trans('mautic.lead.list.thead.descr'); ?></th>
+                <th class="visible-md visible-lg col-leadlist-id"><?php echo $view['translator']->trans('mautic.lead.list.thead.id'); ?></th>
             </tr>
-        <?php endforeach; ?>
-        </tbody>
-    </table>
-    <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
-        "totalItems" => count($items),
-        "page"       => $page,
-        "limit"      => $limit,
-        "baseUrl"    =>  $view['router']->generate('mautic_leadlist_index'),
-        'sessionVar' => 'leadlist'
-    )); ?>
-    <?php else: ?>
+            </thead>
+            <tbody>
+            <?php foreach ($items as $item):?>
+                <tr>
+                    <td>
+                        <?php
+                        echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
+                            'item'      => $item,
+                            'edit'      => $security->hasEntityAccess(
+                                true,
+                                $permissions['lead:lists:editother'],
+                                $item->getCreatedBy()
+                            ),
+                            'delete'    => $security->hasEntityAccess(
+                                true,
+                                $permissions['lead:lists:deleteother'],
+                                $item->getCreatedBy()
+                            ),
+                            'routeBase' => 'leadlist',
+                            'menuLink'  => 'mautic_leadlist_index',
+                            'langVar'   => 'lead.list'
+                        ))  ;
+                        ?>
+                    </td>
+                    <td>
+                        <?php if ($item->isGlobal()): ?>
+                        <i class="fa fa-fw fa-globe"></i>
+                        <?php endif; ?>
+                        <a href="<?php echo $view['router']->generate('mautic_lead_index', array('search' => "$listCommand:{$item->getAlias()}")); ?>"
+                           data-toggle="ajax">
+                            <?php echo $item->getName(); ?> (<?php echo $item->getAlias(); ?>)
+                        </a>
+                        <?php if (!$item->isGlobal() && $currentUser->getId() != $item->getCreatedBy()->getId()): ?>
+                        <br />
+                        <span class="small">(<?php echo $item->getCreatedBy()->getName(); ?>)</span>
+                        <?php endif; ?>
+                    </td>
+                    <td class="visible-md visible-lg"><?php echo $item->getDescription(); ?></td>
+                    <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
+                </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+        <div class="panel-footer">
+            <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
+                "totalItems" => count($items),
+                "page"       => $page,
+                "limit"      => $limit,
+                "baseUrl"    =>  $view['router']->generate('mautic_leadlist_index'),
+                'sessionVar' => 'leadlist'
+            )); ?>
+        </div>
+        <?php else: ?>
         <h4><?php echo $view['translator']->trans('mautic.core.noresults'); ?></h4>
     <?php endif; ?>
-    <div class="footer-margin"></div>
+    </div>
 </div>
