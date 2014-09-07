@@ -3,7 +3,7 @@
         <?php $class =
             (!empty($child->vars['checked']) ? ' active' : '') .
             (!empty($child->vars['disabled']) || !empty($child->vars['read_only']) ? ' disabled' : ''); ?>
-        <label class="btn btn-success<?php echo $class; ?>">
+        <label class="btn btn-default<?php echo $class; ?>">
             <?php echo $view['form']->widget($child); ?>
             <?php echo $view['translator']->trans($child->vars['label']); ?>
         </label>

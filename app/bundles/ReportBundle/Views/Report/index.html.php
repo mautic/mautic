@@ -22,7 +22,8 @@ $view['slots']->set('searchHelp', $view['translator']->trans('mautic.report.repo
             data-toggle="ajax"
             class="btn btn-default"
             data-menu-link="#mautic_report_index">
-            <i class="fa fa-pencil"></i> <?php //echo $view["translator"]->trans("mautic.report.report.menu.new"); ?>
+            	<i class="fa fa-plus"></i> 
+            	<?php echo $view["translator"]->trans("mautic.report.report.menu.new"); ?>
         </a>
     <?php $view['slots']->stop(); ?>
 <?php endif; ?>
