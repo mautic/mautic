@@ -7,7 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\FormBundle\Form\Type;
+namespace Mautic\CampaignBundle\Form\Type;
 
 use Mautic\CategoryBundle\Helper\FormHelper;
 use Mautic\CoreBundle\Factory\MauticFactory;
@@ -16,16 +16,14 @@ use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * Class FormType
+ * Class CampaignType
  *
- * @package Mautic\FormBundle\Form\Type
+ * @package Mautic\CampaignBundle\Form\Type
  */
-class FormType extends AbstractType
+class CampaignType extends AbstractType
 {
 
     private $translator;
@@ -45,30 +43,30 @@ class FormType extends AbstractType
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber());
-        $builder->addEventSubscriber(new FormExitSubscriber('form.form', $options));
+        $builder->addEventSubscriber(new FormExitSubscriber('campaign', $options));
 
-        $builder->add("forms-panel-wrapper-start", 'panel_wrapper_start', array(
+        $builder->add("campaigns-panel-wrapper-start", 'panel_wrapper_start', array(
             'attr' => array(
-                'id' => "forms-panel"
+                'id' => "campaigns-panel"
             )
         ));
 
         //details
         $builder->add("details-panel-start", 'panel_start', array(
-            'label'      => 'mautic.form.form.panel.details',
-            'dataParent' => '#forms-panel',
+            'label'      => 'mautic.campaign.form.panel.details',
+            'dataParent' => '#campaigns-panel',
             'bodyId'     => 'details-panel',
             'bodyAttr'   => array('class' => 'in')
         ));
 
         $builder->add('name', 'text', array(
-            'label'      => 'mautic.form.form.name',
+            'label'      => 'mautic.campaign.form.name',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control')
         ));
 
         $builder->add('description', 'text', array(
-            'label'      => 'mautic.form.form.description',
+            'label'      => 'mautic.campaign.form.description',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control'),
             'required'   => false
@@ -77,16 +75,23 @@ class FormType extends AbstractType
         //add category
         FormHelper::buildForm($this->translator, $builder);
 
+        $builder->add('triggerExistingLeads', 'button_group', array(
+            'choice_list' => new ChoiceList(
+                array(false, true),
+                array('mautic.core.form.no', 'mautic.core.form.yes')
+            ),
+            'expanded'    => true,
+            'multiple'    => false,
+            'label'       => 'mautic.campaign.form.existingleads',
+            'label_attr'  => array('class' => 'control-label'),
+            'empty_value' => false,
+            'required'    => false
+        ));
 
         if (!empty($options['data']) && $options['data']->getId()) {
-            $readonly = !$this->security->hasEntityAccess(
-                'form:forms:publishown',
-                'form:forms:publishother',
-                $options['data']->getCreatedBy()
-            );
-
+            $readonly = !$this->security->isGranted('campaign:campaigns:publish');
             $data = $options['data']->isPublished(false);
-        } elseif (!$this->security->isGranted('form:forms:publishown')) {
+        } elseif (!$this->security->isGranted('campaign:campaigns:publish')) {
             $readonly = true;
             $data     = false;
         } else {
@@ -99,14 +104,14 @@ class FormType extends AbstractType
                 array(false, true),
                 array('mautic.core.form.no', 'mautic.core.form.yes')
             ),
-            'expanded'      => true,
-            'multiple'      => false,
-            'label'         => 'mautic.form.form.ispublished',
-            'label_attr'    => array('class' => 'control-label'),
-            'empty_value'   => false,
-            'required'      => false,
-            'read_only'     => $readonly,
-            'data'          => $data
+            'expanded'    => true,
+            'multiple'    => false,
+            'label_attr'  => array('class' => 'control-label'),
+            'label'       => 'mautic.campaign.form.ispublished',
+            'empty_value' => false,
+            'required'    => false,
+            'read_only'   => $readonly,
+            'data'        => $data
         ));
 
         $builder->add('publishUp', 'datetime', array(
@@ -114,10 +119,10 @@ class FormType extends AbstractType
             'label'      => 'mautic.core.form.publishup',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
-                'class' => 'form-control',
+                'class'       => 'form-control',
                 'data-toggle' => 'datetime'
             ),
-            'format'  => 'yyyy-MM-dd HH:mm',
+            'format'     => 'yyyy-MM-dd HH:mm',
             'required'   => false
         ));
 
@@ -126,59 +131,25 @@ class FormType extends AbstractType
             'label'      => 'mautic.core.form.publishdown',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
-                'class' => 'form-control',
+                'class'       => 'form-control',
                 'data-toggle' => 'datetime'
             ),
-            'format'  => 'yyyy-MM-dd HH:mm',
+            'format'     => 'yyyy-MM-dd HH:mm',
             'required'   => false
-        ));
-
-        $builder->add('postAction', 'choice', array(
-            'choices' => array(
-                'return'   => 'mautic.form.form.postaction.return',
-                'redirect' => 'mautic.form.form.postaction.redirect',
-                'message'  => 'mautic.form.form.postaction.message'
-            ),
-            'label'      => 'mautic.form.form.postaction',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array(
-                'class'    => 'form-control',
-                'onchange' => 'Mautic.onPostSubmitActionChange(this.value);'
-            ),
-            'required' => false,
-            'empty_value' => false
-        ));
-
-        $postAction = (isset($options['data'])) ? $options['data']->getPostAction() : '';
-        $required   = (in_array($postAction, array('redirect', 'message'))) ? true : false;
-        $builder->add('postActionProperty', 'text', array(
-            'label'      => 'mautic.form.form.postactionproperty',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control'),
-            'required'   => $required
         ));
 
         $builder->add("details-panel-end", 'panel_end');
 
-        //fields
-        $builder->add("fields-panel-start", 'panel_start', array(
-            'label' => 'mautic.form.form.panel.fields',
-            'dataParent' => '#forms-panel',
-            'bodyId'     => 'fields-panel'
+        //actions
+        $builder->add("events-panel-start", 'panel_start', array(
+            'label'      => 'mautic.campaign.form.panel.events',
+            'dataParent' => '#campaigns-panel',
+            'bodyId'     => 'events-panel'
         ));
 
-        $builder->add("fields-panel-end", 'panel_end');
+        $builder->add("events-panel-end", 'panel_end');
 
-        //submit actions
-        $builder->add("actions-panel-start", 'panel_start', array(
-            'label' => 'mautic.form.form.panel.actions',
-            'dataParent' => '#forms-panel',
-            'bodyId'     => 'actions-panel'
-        ));
-
-        $builder->add("actions-panel-end", 'panel_end');
-
-        $builder->add("forms-panel-wrapper-end", 'panel_wrapper_end');
+        $builder->add("campaigns-panel-wrapper-end", 'panel_wrapper_end');
 
         $builder->add('tempId', 'hidden', array(
             'mapped' => false
@@ -197,11 +168,7 @@ class FormType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'Mautic\FormBundle\Entity\Form',
-            'validation_groups' => array(
-                'Mautic\FormBundle\Entity\Form',
-                'determineValidationGroups',
-            )
+            'data_class' => 'Mautic\CampaignBundle\Entity\Campaign',
         ));
     }
 
@@ -209,6 +176,6 @@ class FormType extends AbstractType
      * @return string
      */
     public function getName() {
-        return "mauticform";
+        return "campaign";
     }
 }

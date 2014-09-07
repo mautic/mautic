@@ -118,7 +118,13 @@ class FormEntity
     {
         $getter  = "get" . ucfirst($prop);
         $current = $this->$getter();
-        if ($current != $val) {
+        if ($prop == 'category') {
+            $currentId = ($current) ? $current->getId() : '';
+            $newId     = ($val) ? $val->getId() : null;
+            if ($currentId != $newId) {
+                $this->changes[$prop] = array($currentId, $newId);
+            }
+        } elseif ($current != $val) {
             $this->changes[$prop] = array($current, $val);
         }
     }
