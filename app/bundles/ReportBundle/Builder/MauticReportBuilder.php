@@ -104,16 +104,13 @@ final class MauticReportBuilder implements ReportBuilderInterface
         // Add filters as AND values to the WHERE clause if present
         $filters = $this->entity->getFilters();
 
-        // Also need the Connection object to quote the user input
-        $connection = $queryBuilder->getConnection();
-
         if (count($filters)) {
             $expr = $queryBuilder->expr();
             $and  = $expr->andX();
 
             foreach ($filters as $filter) {
                 $and->add(
-                    $expr->{$filter['condition']}('r.' . $columns[$filter['column']], $connection->quote($filter['value']))
+                    $expr->{$filter['condition']}('r.' . $columns[$filter['column']], $expr->literal($filter['value']))
                 );
             }
 
