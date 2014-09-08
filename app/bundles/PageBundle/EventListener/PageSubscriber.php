@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\PageBundle\Event as Events;
 use Mautic\PageBundle\PageEvents;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
+use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\ReportEvents;
 
 /**
@@ -32,11 +33,12 @@ class PageSubscriber extends CommonSubscriber
     static public function getSubscribedEvents()
     {
         return array(
-            CoreEvents::GLOBAL_SEARCH      => array('onGlobalSearch', 0),
-            CoreEvents::BUILD_COMMAND_LIST => array('onBuildCommandList', 0),
-            PageEvents::PAGE_POST_SAVE     => array('onPagePostSave', 0),
-            PageEvents::PAGE_POST_DELETE   => array('onPageDelete', 0),
-            ReportEvents::REPORT_ON_BUILD  => array('onReportBuilder', 0)
+            CoreEvents::GLOBAL_SEARCH        => array('onGlobalSearch', 0),
+            CoreEvents::BUILD_COMMAND_LIST   => array('onBuildCommandList', 0),
+            PageEvents::PAGE_POST_SAVE       => array('onPagePostSave', 0),
+            PageEvents::PAGE_POST_DELETE     => array('onPageDelete', 0),
+            ReportEvents::REPORT_ON_BUILD    => array('onReportBuilder', 0),
+            ReportEvents::REPORT_ON_GENERATE => array('onReportGenerate', 0)
         );
     }
 
@@ -173,5 +175,28 @@ class PageSubscriber extends CommonSubscriber
         );
 
         $event->addTable('pages', $data);
+    }
+
+    /**
+     * Initialize the QueryBuilder object to generate reports from
+     *
+     * @param ReportGeneratorEvent $event
+     *
+     * @return void
+     */
+    public function onReportGenerate(ReportGeneratorEvent $event)
+    {
+        // Context check, we only want to fire for Page reports
+        if ($event->getContext() != 'pages')
+        {
+            return;
+        }
+
+        $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+
+        // TODO - Still need to update some code to enable unique aliases, for now we require 'r'
+        $queryBuilder->from(MAUTIC_TABLE_PREFIX . 'pages', 'r');
+
+        $event->setQueryBuilder($queryBuilder);
     }
 }

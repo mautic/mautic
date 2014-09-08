@@ -12,7 +12,6 @@
 
 namespace Mautic\ReportBundle\Generator;
 
-use Doctrine\ORM\EntityManager;
 use Mautic\ReportBundle\Entity\Report;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -25,11 +24,6 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
  */
 class ReportGenerator
 {
-    /**
-     * @var \Doctrine\ORM\EntityManager
-     */
-    private $entityManager;
-
     /**
      * @var \Symfony\Component\Security\Core\SecurityContextInterface
      */
@@ -53,16 +47,14 @@ class ReportGenerator
     /**
      * Constructor
      *
-     * @param \Doctrine\ORM\EntityManager                               $entityManager   Entity manager
      * @param \Symfony\Component\Security\Core\SecurityContextInterface $securityContext Security context
      * @param \Symfony\Component\Form\FormFactoryInterface              $formFactory     Form factory
      * @param \Mautic\ReportBundle\Entity\Report                        $entity          Report entity
      *
      * @author r1pp3rj4ck <attila.bukor@gmail.com>
      */
-    public function __construct(EntityManager $entityManager, SecurityContextInterface $securityContext, FormFactoryInterface $formFactory, Report $entity)
+    public function __construct(SecurityContextInterface $securityContext, FormFactoryInterface $formFactory, Report $entity)
     {
-        $this->entityManager   = $entityManager;
         $this->securityContext = $securityContext;
         $this->formFactory     = $formFactory;
         $this->entity          = $entity;
@@ -117,7 +109,7 @@ class ReportGenerator
 
         $reflection = new \ReflectionClass($className);
         if ($reflection->implementsInterface($this->validInterface)) {
-            $builder = $reflection->newInstanceArgs(array($this->entityManager, $this->securityContext, $this->entity));
+            $builder = $reflection->newInstanceArgs(array($this->securityContext, $this->entity));
         }
         else {
             throw new RuntimeException(sprintf("ReportBuilders have to implement %s, and %s doesn't implement it", $this->validInterface, $className));

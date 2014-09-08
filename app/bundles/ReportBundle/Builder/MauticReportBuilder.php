@@ -13,8 +13,9 @@
 namespace Mautic\ReportBundle\Builder;
 
 use Doctrine\DBAL\Query\QueryBuilder;
-use Doctrine\ORM\EntityManager;
 use Mautic\ReportBundle\Entity\Report;
+use Mautic\ReportBundle\Event\ReportGeneratorEvent;
+use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
 /**
@@ -22,11 +23,6 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
  */
 final class MauticReportBuilder implements ReportBuilderInterface
 {
-    /**
-     * @var \Doctrine\ORM\EntityManager
-     */
-    private $entityManager;
-
     /**
      * @var \Symfony\Component\Security\Core\SecurityContextInterface
      */
@@ -40,15 +36,13 @@ final class MauticReportBuilder implements ReportBuilderInterface
     /**
      * Constructor
      *
-     * @param \Doctrine\ORM\EntityManager                               $entityManager   Doctrine ORM Entity Manager
      * @param \Symfony\Component\Security\Core\SecurityContextInterface $securityContext Symfony Core Security Context
      * @param \Mautic\ReportBundle\Entity\Report                        $entity          Report entity
      *
      * @author r1pp3rj4ck <attila.bukor@gmail.com>
      */
-    public function __construct(EntityManager $entityManager, SecurityContextInterface $securityContext, Report $entity)
+    public function __construct(SecurityContextInterface $securityContext, Report $entity)
     {
-        $this->entityManager   = $entityManager;
         $this->securityContext = $securityContext;
         $this->entity          = $entity;
     }
@@ -65,7 +59,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
      */
     public function getQuery(array $options)
     {
-        $queryBuilder = $this->configureBuilder($this->entityManager->getConnection()->createQueryBuilder(), $options);
+        $queryBuilder = $this->configureBuilder($options);
 
         if ($queryBuilder->getType() !== QueryBuilder::SELECT) {
             throw new InvalidReportQueryException('Only SELECT statements are valid');
@@ -80,26 +74,31 @@ final class MauticReportBuilder implements ReportBuilderInterface
      * This method configures the ReportBuilder. It has to return
      * a configured Doctrine DBAL QueryBuilder.
      *
-     * @param \Doctrine\DBAL\Query\QueryBuilder $queryBuilder Doctrine ORM query builder
-     * @param array                             $options      Options array
+     * @param array $options Options array
      *
      * @return \Doctrine\DBAL\Query\QueryBuilder
      */
-    protected function configureBuilder(QueryBuilder $queryBuilder, array $options)
+    protected function configureBuilder(array $options)
     {
         $source   = $this->entity->getSource();
-        $columns  = $options['table_list'][$source]['columns'];
         $fields   = $this->entity->getColumns();
 
         $selectColumns = array();
 
         foreach ($fields as $field) {
-            $selectColumns[] = 'r.' . $columns[$field];
+            $selectColumns[] = 'r.' . $field;
         }
 
+        // Trigger the REPORT_ON_GENERATE event to initialize the QueryBuilder
+        /** @type \Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher $dispatcher */
+        $dispatcher = $options['dispatcher'];
+
+        $event = new ReportGeneratorEvent($source);
+        $dispatcher->dispatch(ReportEvents::REPORT_ON_GENERATE, $event);
+        $queryBuilder = $event->getQueryBuilder();
+
         $queryBuilder
-            ->select(implode(', ', $selectColumns))
-            ->from(MAUTIC_TABLE_PREFIX . $source, 'r');
+            ->select(implode(', ', $selectColumns));
 
         // Add filters as AND values to the WHERE clause if present
         $filters = $this->entity->getFilters();
@@ -111,21 +110,21 @@ final class MauticReportBuilder implements ReportBuilderInterface
             foreach ($filters as $filter) {
                 if ($filter['condition'] == 'notEmpty') {
                     $and->add(
-                        $expr->isNotNull('r.' . $columns[$filter['column']])
+                        $expr->isNotNull('r.' . $filter['column'])
                     );
                     $and->add(
-                        $expr->neq('r.' . $columns[$filter['column']], $expr->literal(''))
+                        $expr->neq('r.' . $filter['column'], $expr->literal(''))
                     );
                 } elseif ($filter['condition'] == 'empty') {
                     $and->add(
-                        $expr->isNull('r.' . $columns[$filter['column']])
+                        $expr->isNull('r.' . $filter['column'])
                     );
                     $and->add(
-                        $expr->eq('r.' . $columns[$filter['column']], $expr->literal(''))
+                        $expr->eq('r.' . $filter['column'], $expr->literal(''))
                     );
                 } else {
                     $and->add(
-                        $expr->{$filter['condition']}('r.' . $columns[$filter['column']], $expr->literal($filter['value']))
+                        $expr->{$filter['condition']}('r.' . $filter['column'], $expr->literal($filter['value']))
                     );
                 }
             }
