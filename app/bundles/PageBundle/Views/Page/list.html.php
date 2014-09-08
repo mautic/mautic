@@ -15,6 +15,18 @@ $view->extend('MauticPageBundle:Page:index.html.php');
             <?php echo $view['translator']->trans('mautic.page.page.header.index'); ?>
         </h3>
     </div>
+    <div class="panel-toolbar-wrapper">
+        <div class="panel-toolbar">
+            <div class="checkbox custom-checkbox pull-left">
+                <input type="checkbox" id="customcheckbox-one0" value="1" data-toggle="checkall" data-target="#reportTable">
+                <label for="customcheckbox-one0"><?php echo $view['translator']->trans('mautic.core.table.selectall'); ?></label>
+            </div>
+        </div>
+        <div class="panel-toolbar text-right">
+            <button type="button" class="btn btn-sm btn-warning"><i class="fa fa-files-o"></i></button>
+            <button type="button" class="btn btn-sm btn-danger"><i class="fa fa-trash-o"></i></button>
+        </div>
+    </div>
     <div class="table-responsive scrollable body-white padding-sm page-list">
         <?php if (count($items)): ?>
             <table class="table table-hover table-striped table-bordered pagetable-list">
