@@ -78,7 +78,7 @@ class ReportModel extends FormModel
         // Fire the REPORT_ON_BUILD event off to get the table/column data
         $params['table_list'] = $this->getTableData();
 
-        $reportGenerator = new ReportGenerator($this->factory->getSecurityContext(), $formFactory, $entity, $this->dispatcher);
+        $reportGenerator = new ReportGenerator($this->factory->getSecurityContext(), $formFactory, $entity);
 
         return $reportGenerator->getForm($entity, $params);
     }
