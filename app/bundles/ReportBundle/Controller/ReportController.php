@@ -478,9 +478,7 @@ class ReportController extends FormController
             $start = 0;
         }
 
-        $reportGenerator = new ReportGenerator(
-            $this->factory->getEntityManager(), $this->factory->getSecurityContext(), $this->container->get('form.factory'), $entity
-        );
+        $reportGenerator = new ReportGenerator($this->factory->getSecurityContext(), $this->container->get('form.factory'), $entity);
 
         // Build the options array to pass into the query
         $options = array(
@@ -488,7 +486,7 @@ class ReportController extends FormController
             'limit'      => $limit,
             'orderBy'    => $orderBy,
             'orderByDir' => $orderByDir,
-            'table_list' => $model->getTableData()
+            'dispatcher' => $this->factory->getDispatcher()
         );
 
         $query = $reportGenerator->getQuery($options);
