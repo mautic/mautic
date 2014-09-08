@@ -495,12 +495,6 @@ class ReportController extends FormController
 
         $form = $reportGenerator->getForm($entity, array('read_only' => true));
 
-        if ($this->request->getMethod() == 'POST') {
-            $form->bindRequest($this->request);
-
-            $query->setParameters($form->getData());
-        }
-
         $result = $query->getConnection()->executeQuery((string) $query)->fetchAll();
 
         //set what page currently on so that we can return here after form submission/cancellation
