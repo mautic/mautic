@@ -22,6 +22,18 @@ $container->setDefinition(
         'alias' => 'lead',
     ));
 
+//Lead list forms
+$container->setDefinition(
+    'mautic.form.type.leadlist',
+    new Definition(
+        'Mautic\LeadBundle\Form\Type\ListType',
+        array(new Reference('mautic.factory'))
+    )
+)
+    ->addTag('form.type', array(
+        'alias' => 'leadlist',
+    ));
+
 //Lead list choice form
 $container->setDefinition(
     'mautic.form.type.leadlist_choices',
