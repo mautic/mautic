@@ -60,7 +60,7 @@ Mautic.addFilterRow = function() {
 
 Mautic.removeFilterRow = function(container) {
 	mQuery('#' + container).remove();
-}
+};
 
 Mautic.updateColumnList = function () {
 	var table = mQuery('select[id=report_source] option:selected').val();
@@ -94,4 +94,16 @@ Mautic.updateColumnList = function () {
 			}
 		}
 	});
+};
+
+Mautic.checkReportCondition = function(selector) {
+	var option = mQuery('#' + selector + ' option:selected').val();
+	var valueInput = selector.replace('condition', 'value');
+
+	// Disable the value input if the condition is empty or notEmpty
+	if (option == 'empty' || option == 'notEmpty') {
+		mQuery('#' + valueInput).prop('disabled', true);
+	} else {
+		mQuery('#' + valueInput).prop('disabled', false);
+	}
 };

@@ -109,9 +109,25 @@ final class MauticReportBuilder implements ReportBuilderInterface
             $and  = $expr->andX();
 
             foreach ($filters as $filter) {
-                $and->add(
-                    $expr->{$filter['condition']}('r.' . $columns[$filter['column']], $expr->literal($filter['value']))
-                );
+                if ($filter['condition'] == 'notEmpty') {
+                    $and->add(
+                        $expr->isNotNull('r.' . $columns[$filter['column']])
+                    );
+                    $and->add(
+                        $expr->neq('r.' . $columns[$filter['column']], $expr->literal(''))
+                    );
+                } elseif ($filter['condition'] == 'empty') {
+                    $and->add(
+                        $expr->isNull('r.' . $columns[$filter['column']])
+                    );
+                    $and->add(
+                        $expr->eq('r.' . $columns[$filter['column']], $expr->literal(''))
+                    );
+                } else {
+                    $and->add(
+                        $expr->{$filter['condition']}('r.' . $columns[$filter['column']], $expr->literal($filter['value']))
+                    );
+                }
             }
 
             $queryBuilder->where($and);
