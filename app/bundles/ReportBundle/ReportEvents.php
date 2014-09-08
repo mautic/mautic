@@ -68,4 +68,14 @@ final class ReportEvents
      * @var string
      */
     const REPORT_ON_BUILD = 'mautic.report_on_build';
+
+    /**
+     * The mautic.report_on_generate event is thrown when generating a report to build the base query
+     *
+     * The event listener receives a
+     * Mautic\ReportBundle\Event\ReportGeneratorEvent instance.
+     *
+     * @var string
+     */
+    const REPORT_ON_GENERATE = 'mautic.report_on_generate';
 }
