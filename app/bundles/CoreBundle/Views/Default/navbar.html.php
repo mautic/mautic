@@ -21,7 +21,6 @@
     <!-- brand -->
     <a class="navbar-brand" href="#">
         <span class="navbar-brand-logo"></span>
-        <span class="navbar-brand-text">Mautic</span>
     </a>
     <!--/ brand -->
 </div>
