@@ -10,6 +10,7 @@
 namespace Mautic\CoreBundle\Form\DataTransformer;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\PersistentCollection;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
@@ -36,15 +37,21 @@ class IdToEntityModelTransformer implements DataTransformerInterface
     private $id;
 
     /**
+     * @var bool
+     */
+    private $isArray;
+
+    /**
      * @param EntityManager $em
      * @param string        $repo
      * @param string        $identifier
      */
-    public function __construct(EntityManager $em, $repo = '', $identifier = 'id')
+    public function __construct(EntityManager $em, $repo = '', $identifier = 'id', $isArray = false)
     {
         $this->em         = $em;
         $this->repository = $repo;
         $this->id         = $identifier;
+        $this->isArray    = $isArray;
     }
 
     /**
@@ -56,11 +63,24 @@ class IdToEntityModelTransformer implements DataTransformerInterface
     public function transform($entity)
     {
         $func = 'get' . ucfirst($this->id);
-        if (is_null($entity) || !is_object($entity) || !method_exists($entity, $func)) {
-            return '';
-        }
 
-        return $entity->$func();
+        if (!$this->isArray) {
+            if (is_null($entity) || !is_object($entity) || !method_exists($entity, $func)) {
+                return '';
+            }
+
+            return $entity->$func();
+        } else {
+            if (is_null($entity) && !is_array($entity) && !$entity instanceof PersistentCollection) {
+                return array();
+            }
+
+            $return = array();
+            foreach ($entity as $e) {
+                $return[] = $e->$func();
+            }
+            return $return;
+        }
     }
 
     /**
@@ -74,23 +94,52 @@ class IdToEntityModelTransformer implements DataTransformerInterface
      */
     public function reverseTransform($id)
     {
-        if (!$id) {
-            return null;
-        }
+        if (!$this->isArray) {
+            if (!$id) {
+                return null;
+            }
 
-        $entity = $this->em
-            ->getRepository($this->repository)
-            ->findOneBy(array($this->id => $id))
-        ;
+            $entity = $this->em
+                ->getRepository($this->repository)
+                ->findOneBy(array($this->id => $id))
+            ;
 
-        if ($entity === null) {
-            throw new TransformationFailedException(sprintf(
-                'An entity with a/an ' . $this->id . ' of "%s" does not exist!',
-                $id
+            if ($entity === null) {
+                throw new TransformationFailedException(sprintf(
+                    'An entity with a/an ' . $this->id . ' of "%s" does not exist!',
+                    $id
+                ));
+            }
+
+            return $entity;
+        } else {
+            if (!is_array($id)) {
+                return array();
+            }
+            $repo   = $this->em->getRepository($this->repository);
+            $prefix = $repo->getTableAlias();
+
+            $entities = $repo->getEntities(array(
+                'filter' => array(
+                    'force' => array(
+                        array(
+                            'column' => $prefix . '.' . $this->id,
+                            'expr'   => 'in',
+                            'value'  => $id
+                        )
+                    )
+                )
             ));
-        }
 
-        return $entity;
+            if (!count($entities)) {
+                throw new TransformationFailedException(sprintf(
+                    'Entities with a/an ' . $this->id . ' of "%s" does not exist!',
+                    $id
+                ));
+            }
+
+            return $entities;
+        }
     }
 
     /**

@@ -29,6 +29,7 @@ class EmailType extends AbstractType
     private $translator;
     private $themes;
     private $defaultTheme;
+    private $em;
 
     /**
      * @param MauticFactory $factory
@@ -37,6 +38,7 @@ class EmailType extends AbstractType
         $this->translator   = $factory->getTranslator();
         $this->themes       = $factory->getInstalledThemes('email');
         $this->defaultTheme = $factory->getParameter('default_theme');
+        $this->em           = $factory->getEntityManager();
     }
 
     /**
@@ -75,16 +77,24 @@ class EmailType extends AbstractType
         if (!$isVariant) {
             //add category
             FormHelper::buildForm($this->translator, $builder);
-
-            $builder->add('lists', 'leadlist_choices', array(
-                'label'      => 'mautic.email.form.list',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array(
-                    'class'       => 'form-control'
-                ),
-                'multiple' => true,
-                'expanded' => false
-            ));
+            $transformer = new \Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer(
+                $this->em,
+                'MauticLeadBundle:LeadList',
+                'id',
+                true
+            );
+            $builder->add(
+                $builder->create('lists', 'leadlist_choices', array(
+                    'label'      => 'mautic.email.form.list',
+                    'label_attr' => array('class' => 'control-label'),
+                    'attr'       => array(
+                        'class' => 'form-control'
+                    ),
+                    'multiple' => true,
+                    'expanded' => false
+                ))
+                    ->addModelTransformer($transformer)
+            );
         }
 
         //build a list
