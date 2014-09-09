@@ -79,7 +79,7 @@ class TriggerEvent
     private $trigger;
 
     /**
-     * @ORM\OneToMany(targetEntity="LeadTriggerLog", mappedBy="point", fetch="EXTRA_LAZY", cascade={"persist", "remove"})
+     * @ORM\OneToMany(targetEntity="LeadTriggerLog", mappedBy="event", fetch="EXTRA_LAZY", cascade={"persist", "remove"})
      */
     private $log;
 
