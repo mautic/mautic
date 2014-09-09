@@ -149,8 +149,14 @@ var Mautic = {
         //little hack to move modal windows outside of positioned divs
         mQuery(container + " *[data-toggle='modal']").each(function (index) {
             var target = mQuery(this).attr('data-target');
+
+            //move the modal to the body tag to get around positioned div issues
+            mQuery(target).off('show.bs.modal');
             mQuery(target).on('show.bs.modal', function () {
-                mQuery(target).appendTo("body");
+                if (!mQuery(target).hasClass('modal-moved')) {
+                    mQuery(target).appendTo("body");
+                    mQuery(target).addClass('modal-moved');
+                }
             });
         });
 
@@ -298,6 +304,16 @@ var Mautic = {
         //unload tinymce editor so that it can be reloaded if needed with new ajax content
         mQuery(container + " textarea[data-toggle='editor']").each(function (index) {
             mQuery(this).tinymce().remove();
+        });
+
+        //unload lingering modals from body so that there will not be multiple modals generated from new ajaxed content
+        mQuery(container + " *[data-toggle='modal']").each(function (index) {
+            var target = mQuery(this).attr('data-target');
+            mQuery(target).remove();
+        });
+        mQuery(container + " *[data-toggle='ajaxmodal']").each(function (index) {
+            var target = mQuery(this).attr('data-target');
+            mQuery(target).remove();
         });
 
         //run specific unloads
@@ -677,9 +693,11 @@ var Mautic = {
 
         //move the modal to the body tag to get around positioned div issues
         mQuery(target).on('show.bs.modal', function () {
-            mQuery(target).appendTo("body");
+            if (!mQuery(target).hasClass('modal-moved')) {
+                mQuery(target).appendTo("body");
+                mQuery(target).addClass('modal-moved');
+            }
         });
-
         mQuery(target).modal('show');
 
         mQuery.ajax({
@@ -703,7 +721,13 @@ var Mautic = {
 
     processModalContent: function (response, target) {
         //load the content
-        mQuery(target + " .modal-body").html(response.newContent);
+        if (mQuery(target + ' .loading-placeholder').length) {
+            mQuery(target + ' .loading-placeholder').addClass('hide');
+            mQuery(target + " .modal-body-content").html(response.newContent);
+            mQuery(target + " .modal-body-content").removeClass('hide');
+        } else {
+            mQuery(target + " .modal-body").html(response.newContent);
+        }
 
         //inactive tooltips, etc
         Mautic.onPageUnload(target, response);
