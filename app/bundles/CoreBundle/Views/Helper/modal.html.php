@@ -7,10 +7,11 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-$size  = (empty($size)) ? '' : ' modal-'.$size;
-$class = (!empty($class)) ? " $class" : "";
-$body  = (empty($body)) ? "" : $body;
-$header = (empty($header)) ? "" : $header;
+$size            = (empty($size)) ? '' : ' modal-'.$size;
+$class           = (!empty($class)) ? " $class" : "";
+$body            = (empty($body)) ? "" : $body;
+$hidePlaceholder = (empty($body)) ? false : true;
+$header          = (empty($header)) ? "" : $header;
 ?>
 
 <div class="modal fade" id="<?php echo $id; ?>" tabindex="-1" role="dialog" aria-labelledby="<?php echo $id; ?>-label" aria-hidden="true">
@@ -26,7 +27,12 @@ $header = (empty($header)) ? "" : $header;
                 </h4>
             </div>
             <div class="modal-body">
-                <?php echo $body; ?>
+                <div class="loading-placeholder<?php echo $hidePlaceholder; ?>">
+                    <?php echo $view['translator']->trans('mautic.core.loading'); ?>
+                </div>
+                <div class="modal-body-content">
+                    <?php echo $body; ?>
+                </div>
             </div>
         </div>
     </div>
