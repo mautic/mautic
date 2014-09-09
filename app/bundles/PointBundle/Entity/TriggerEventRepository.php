@@ -31,7 +31,7 @@ class TriggerEventRepository extends CommonRepository
 
         $q = $this->createQueryBuilder('a')
             ->select('partial a.{id, type, name, properties, settings}, partial r.{id, name, points, color}')
-            ->leftJoin('a.range', 'r')
+            ->leftJoin('a.trigger', 'r')
             ->orderBy('a.order');
 
         //make sure the published up and down dates are good
@@ -65,23 +65,23 @@ class TriggerEventRepository extends CommonRepository
     public function getPublishedByType($type)
     {
         $now = new \DateTime();
-        $q = $this->createQueryBuilder('a')
-            ->select('partial a.{id, type, name, properties, settings}, partial r.{id, name, points, color}')
-            ->join('a.range', 'r')
-            ->orderBy('a.order');
+        $q = $this->createQueryBuilder('e')
+            ->select('partial e.{id, type, name, properties, settings}, partial t.{id, name, points, color}')
+            ->join('e.trigger', 't')
+            ->orderBy('e.order');
 
         //make sure the published up and down dates are good
         $q->where(
             $q->expr()->andX(
-                $q->expr()->eq('a.type', ':type'),
-                $q->expr()->eq('r.isPublished', true),
+                $q->expr()->eq('e.type', ':type'),
+                $q->expr()->eq('t.isPublished', true),
                 $q->expr()->orX(
-                    $q->expr()->isNull('r.publishUp'),
-                    $q->expr()->gte('r.publishUp', ':now')
+                    $q->expr()->isNull('t.publishUp'),
+                    $q->expr()->gte('t.publishUp', ':now')
                 ),
                 $q->expr()->orX(
-                    $q->expr()->isNull('r.publishDown'),
-                    $q->expr()->lte('r.publishDown', ':now')
+                    $q->expr()->isNull('t.publishDown'),
+                    $q->expr()->lte('t.publishDown', ':now')
                 )
             )
         )
@@ -102,7 +102,7 @@ class TriggerEventRepository extends CommonRepository
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select('e')
-            ->from(MAUTIC_TABLE_PREFIX . 'point_trigger_event_lead_xref', 'x')
+            ->from(MAUTIC_TABLE_PREFIX . 'point_lead_event_log', 'x')
             ->innerJoin('x', MAUTIC_TABLE_PREFIX . 'point_trigger_events', 'e', 'x.triggerevent_id = e.id')
             ->innerJoin('e', MAUTIC_TABLE_PREFIX . 'point_triggers', 't', 'e.trigger_id = t.id');
 
@@ -130,7 +130,7 @@ class TriggerEventRepository extends CommonRepository
     {
         $results = $this->_em->getConnection()->createQueryBuilder()
             ->select('e.lead_id')
-            ->from(MAUTIC_TABLE_PREFIX.'point_trigger_event_lead_xref', 'e')
+            ->from(MAUTIC_TABLE_PREFIX.'point_lead_event_log', 'e')
             ->where('e.triggerevent_id = ' . (int) $eventId)
             ->execute()
             ->fetchAll();

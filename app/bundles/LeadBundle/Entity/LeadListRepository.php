@@ -56,6 +56,22 @@ class LeadListRepository extends CommonRepository
 
         $query = $q->getQuery();
         $result = new Paginator($query);
+
+        if (!empty($args['includeLeadIds'])) {
+            $return = array(
+                'total' => count($result)
+            );
+
+            $iterator = $result->getIterator();
+            foreach ($iterator as &$i) {
+                $leadLists = $this->getLeadsByList($i, true);
+                $i->setLeads($leadLists[$i['id']]);
+            }
+
+            $return['lists'] = $iterator;
+            return $return;
+        }
+
         return $result;
     }
 
@@ -66,11 +82,20 @@ class LeadListRepository extends CommonRepository
      * @param int    $id
      * @param false $withCounts
      */
-    public function getUserSmartLists($user = false, $alias = '', $id = '')
+    public function getLists($user = false, $alias = '', $id = '', $withLeads = false)
     {
+
         $q = $this->_em->createQueryBuilder()
-            ->select('l.name, l.id, l.alias')
             ->from('MauticLeadBundle:LeadList', 'l', 'l.id');
+
+        if ($withLeads) {
+            $q->select('partial l.{id, name, alias, filters}, partial il.{id}, partial el.{id}')
+                ->leftJoin('l.includedLeads', 'il')
+                ->leftJoin('l.excludedLeads', 'el');
+        } else {
+            $q->select('partial l.{id, name, alias}');
+        }
+
         $q->where($q->expr()->eq('l.isPublished', true));
 
         if (!empty($user)) {
@@ -95,6 +120,13 @@ class LeadListRepository extends CommonRepository
 
         $results = $q->getQuery()->getArrayResult();
 
+        if ($withLeads) {
+            foreach ($results as &$i) {
+                $leadLists = $this->getLeadsByList($i, true);
+                $i['leads'] = $leadLists[$i['id']];
+            }
+        }
+
         return $results;
     }
 
@@ -103,12 +135,12 @@ class LeadListRepository extends CommonRepository
      *
      * @param array $filters
      */
-    public function getLeadCount($filters)
+    public function getLeadCount($filters, $list = null)
     {
-        $leadRepo = $this->_em->getRepository('MauticLeadBundle:Lead');
-        $q    = $this->_em->getConnection()->createQueryBuilder();
+        $leadRepo   = $this->_em->getRepository('MauticLeadBundle:Lead');
+        $q          = $this->_em->getConnection()->createQueryBuilder();
         $parameters = array();
-        $expr = $leadRepo->getListFilterExpr($filters, $parameters, $q);
+        $expr       = $leadRepo->getListFilterExpr($filters, $parameters, $q, false, $list);
         $q->select('count(*) as recipientCount')
             ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
             ->where($expr);
@@ -116,31 +148,40 @@ class LeadListRepository extends CommonRepository
             $q->setParameter($k, $v);
         }
         $result = $q->execute()->fetchAll();
+
         return (!empty($result[0])) ? $result[0]['recipientCount'] : 0;
     }
 
     /**
-     * @param $list
+     * @param $lists
+     * @param $idOnly
      */
-    public function getLeadsByList($list)
+    public function getLeadsByList($lists, $idOnly = false)
     {
         static $leads = array();
 
-        if (!$list instanceof PersistentCollection && !is_array($list)) {
-            $list = array($list);
+        if (!$lists instanceof PersistentCollection && !is_array($lists) || isset($lists['id'])) {
+            $lists = array($lists);
         }
 
         $return   = array();
         $leadRepo = $this->_em->getRepository('MauticLeadBundle:Lead');
-        foreach ($list as $l) {
-            $id = $l->getId();
+        foreach ($lists as $l) {
+            if ($l instanceof LeadList) {
+                $id      = $l->getId();
+                $filters = $l->getFilters();
+            } else {
+                $id      = $l['id'];
+                $filters = $l['filters'];
+            }
+
             if (!isset($leads[$id])) {
-                $filters    = $l->getFilters();
                 $parameters = array();
                 $q          = $this->_em->getConnection()->createQueryBuilder();
-                $expr       = $leadRepo->getListFilterExpr($filters, $parameters, $q);
+                $expr       = $leadRepo->getListFilterExpr($filters, $parameters, $q, false, $l);
 
-                $q->select('l.*')
+                $select = ($idOnly) ? 'l.id' : 'l.*';
+                $q->select($select)
                     ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
                     ->where($expr);
                 foreach ($parameters as $k => $v) {
@@ -150,7 +191,12 @@ class LeadListRepository extends CommonRepository
                 $results = $q->execute()->fetchAll();
                 $leads[$id] = array();
                 foreach ($results as $r) {
-                    $leads[$id][$r['id']] = $r;
+                    if ($idOnly) {
+                        $leads[$id][] = $r['id'];
+                    } else {
+                        $leads[$id][$r['id']] = $r;
+                    }
+
                 }
                 unset($filters, $parameters, $q, $expr);
             }

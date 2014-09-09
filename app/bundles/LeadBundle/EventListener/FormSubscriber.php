@@ -44,9 +44,8 @@ class FormSubscriber extends CommonSubscriber
             'label'        => 'mautic.lead.lead.submitaction.createlead',
             'description'  => 'mautic.lead.lead.submitaction.createlead_descr',
             'formType'     => 'lead_submitaction_createlead',
-            'callback'     => '\Mautic\LeadBundle\Helper\EventHelper::createLeadOnFormSubmit'
+            'callback'     => '\Mautic\LeadBundle\Helper\FormSubmitHelper::createLead'
         );
-
         $event->addSubmitAction('lead.create', $action);
 
         //add lead generation submit action
@@ -55,9 +54,19 @@ class FormSubscriber extends CommonSubscriber
             'label'       => 'mautic.lead.lead.submitaction.changepoints',
             'description' => 'mautic.lead.lead.submitaction.changepoints_descr',
             'formType'    => 'lead_submitaction_pointschange',
-            'callback'    => '\Mautic\LeadBundle\Helper\EventHelper::changePointsOnFormSubmit'
+            'callback'    => '\Mautic\LeadBundle\Helper\FormSubmitHelper::changePoints'
         );
-
         $event->addSubmitAction('lead.pointschange', $action);
+
+        //add to lead list
+        $action = array(
+            'group'        => 'mautic.lead.lead.submitaction.group',
+            'label'        => 'mautic.lead.lead.submitaction.changelist',
+            'description'  => 'mautic.lead.lead.submitaction.changelist_descr',
+            'formType'     => 'lead_submitaction_leadlist',
+            'callback'     => '\Mautic\LeadBundle\Helper\FormSubmitHelper::changeLists'
+        );
+        $event->addSubmitAction('lead.addtolist', $action);
+
     }
 }

@@ -7,27 +7,6 @@ Mautic.pointOnLoad = function (container) {
     if (mQuery(container + ' form[name="point"]').length) {
         Mautic.activateCategoryLookup('point', 'point');
     }
-
-    if (mQuery('#point_actions')) {
-        //make the fields sortable
-        mQuery('#point_actions').sortable({
-            items: '.trigger-event-row',
-            handle: '.reorder-handle',
-            stop: function(i) {
-                MauticVars.showLoadingBar = false;
-                mQuery.ajax({
-                    type: "POST",
-                    url: mauticAjaxUrl + "?action=point:reorderActions",
-                    data: mQuery('#point_actions').sortable("serialize")});
-            }
-        });
-
-        mQuery('#point_actions .trigger-event-row').on('mouseover.pointactions', function() {
-            mQuery(this).find('.form-buttons').removeClass('hide');
-        }).on('mouseout.pointactions', function() {
-            mQuery(this).find('.form-buttons').addClass('hide');
-        });
-    }
 };
 
 Mautic.pointTriggerOnLoad = function (container) {

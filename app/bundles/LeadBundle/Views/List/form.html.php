@@ -89,7 +89,7 @@ $timezones = $tz->getTimezones();
                             <i class="fa fa-fw fa-ellipsis-v sortable-handle"></i><i class="fa fa-fw fa-trash-o remove-selected"></i>
                             <?php echo $choices[$filter['field']]['label']; ?>
                             <div class="filter-container">
-                                <div class="col-xs-6 col-sm-2 padding-none">
+                                <div class="col-xs-6 col-sm-3 padding-none">
                                     <select name="leadlist[filters][glue][]" class="form-control ">
                                         <?php
                                         foreach ($glueOptions as $v => $l):
@@ -109,7 +109,7 @@ $timezones = $tz->getTimezones();
                                         <?php endforeach; ?>
                                     </select>
                                 </div>
-                                <div class="col-xs-12 col-sm-7 padding-none">
+                                <div class="col-xs-12 col-sm-6 padding-none">
                                     <?php switch ($choices[$filter['field']]['properties']['type']):
                                     case 'lookup':
                                     case 'select':

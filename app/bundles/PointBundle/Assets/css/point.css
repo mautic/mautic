@@ -6,36 +6,36 @@
     width: 75px;
 }
 
-.point-action-group-header {
+.trigger-event-group-header {
     font-size: 1.1em;
     font-weight: bold;
 }
 
-#point_actions .point-row {
+#trigger-events .trigger-event {
     padding: 20px;
     margin-bottom: 0 !important;
     border: 1px solid #ecf0f1;
 }
 
-#point_actions .point-row .action-label {
+#trigger-events .trigger-event .event-label {
     font-size: 1.1em;
     font-weight: bold;
     display: block;
 }
 
-#point_actions .point-row .action-descr {
+#trigger-events .trigger-event .event-descr {
     font-size: 0.9em;
     display: block;
 }
 
-#point_actions .point-row:hover {
+#trigger-events .trigger-event:hover {
     background-color: #ecf0f1;
 }
 
-#point_actions .point-row.bg-danger:hover {
+#trigger-events .trigger-event.bg-danger:hover {
     background-color: #f2d4d2;
 }
 
-#point_actions .form-buttons {
+#trigger-events .form-buttons {
     float: right;
 }

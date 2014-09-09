@@ -105,7 +105,7 @@ class FieldController extends FormController
                         'mauticContent' => 'leadfield'
                     )
                 ));
-            } elseif (!$cancelled) {
+            } elseif ($valid && !$cancelled) {
                 return $this->editAction($field->getId(), true);
             }
         }

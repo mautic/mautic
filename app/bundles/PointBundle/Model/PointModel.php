@@ -11,6 +11,7 @@ namespace Mautic\PointBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\PointBundle\Entity\Action;
+use Mautic\PointBundle\Entity\LeadPointLog;
 use Mautic\PointBundle\Entity\Point;
 use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Event\PointEvent;
@@ -233,7 +234,14 @@ class PointModel extends CommonFormModel
                         $pointsChange,
                         $ipAddress
                     );
-                    $action->addLead($lead);
+
+                    $log = new LeadPointLog();
+                    $log->setIpAddress($ipAddress);
+                    $log->setPoint($action);
+                    $log->setLead($lead);
+                    $log->setDateFired(new \DateTime());
+
+                    $action->addLog($log);
                     $persist[] = $action;
                 }
             }

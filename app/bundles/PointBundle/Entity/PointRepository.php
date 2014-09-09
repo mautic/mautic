@@ -71,7 +71,7 @@ class PointRepository extends CommonRepository
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select('p.*')
-            ->from(MAUTIC_TABLE_PREFIX . 'point_action_lead_xref', 'x')
+            ->from(MAUTIC_TABLE_PREFIX . 'point_lead_action_log', 'x')
             ->innerJoin('x', MAUTIC_TABLE_PREFIX . 'points', 'p', 'x.point_id = p.id');
 
         //make sure the published up and down dates are good

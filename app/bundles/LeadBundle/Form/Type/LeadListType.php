@@ -41,17 +41,16 @@ class LeadListType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
+        $model  = $this->factory->getModel('lead.list');
+        $lists  = $model->getUserLists();
+
+        $choices = array();
+        foreach ($lists as $l) {
+            $choices[$l['id']] = $l['name'];
+        }
+
         $resolver->setDefaults(array(
-            'property' => 'name', // Assuming that the entity has a "name" property
-            'class'    => 'MauticLeadBundle:LeadList',
-            'query_builder' => function(EntityRepository $er) {
-                return $er->createQueryBuilder('l')
-                    ->where('l.isPublished = 1')
-                    ->andWhere('l.isGlobal = 1')
-                    ->orWhere('l.createdBy = :user')
-                    ->setParameter('user', $this->factory->getUser())
-                    ->orderBy('l.name');
-            }
+            'choices' => $choices
         ));
     }
 
@@ -60,7 +59,7 @@ class LeadListType extends AbstractType
      */
     public function getParent()
     {
-        return 'entity';
+        return 'choice';
     }
 
     /**

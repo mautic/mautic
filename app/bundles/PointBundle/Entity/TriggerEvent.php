@@ -79,13 +79,16 @@ class TriggerEvent
     private $trigger;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Mautic\LeadBundle\Entity\Lead", fetch="EXTRA_LAZY")
-     * @ORM\JoinTable(name="point_trigger_event_lead_xref")
-     * @ORM\JoinColumn(name="lead_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
+     * @ORM\OneToMany(targetEntity="LeadTriggerLog", mappedBy="event", fetch="EXTRA_LAZY", cascade={"persist", "remove"})
      */
-    private $leads;
+    private $log;
 
     private $changes;
+
+    public function __construct()
+    {
+        $this->log = new ArrayCollection();
+    }
 
     private function isChanged($prop, $val)
     {
@@ -264,35 +267,35 @@ class TriggerEvent
     }
 
     /**
-     * Add lead
+     * Add log
      *
-     * @param \Mautic\LeadBundle\Entity\Lead $lead
-     * @return Lead
+     * @param LeadPointLog $log
+     * @return Log
      */
-    public function addLead(\Mautic\LeadBundle\Entity\Lead $lead)
+    public function addLog(LeadPointLog $log)
     {
-        $this->leads[] = $lead;
+        $this->log[] = $log;
 
         return $this;
     }
 
     /**
-     * Remove lead
+     * Remove log
      *
-     * @param \Mautic\LeadBundle\Entity\Lead $lead
+     * @param LeadPointLog $log
      */
-    public function removeLead(\Mautic\LeadBundle\Entity\Lead $lead)
+    public function removeLog(LeadPointLog $log)
     {
-        $this->leads->removeElement($lead);
+        $this->log->removeElement($log);
     }
 
     /**
-     * Get leads
+     * Get log
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getLeads()
+    public function getLog()
     {
-        return $this->leads;
+        return $this->log;
     }
 }

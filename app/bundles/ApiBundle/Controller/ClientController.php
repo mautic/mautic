@@ -219,7 +219,7 @@ class ClientController extends FormController
                         'mauticContent' => 'client'
                     )
                 ));
-            } elseif (!$cancelled) {
+            } elseif ($valid && !$cancelled) {
                 return $this->editAction($client->getId(), false);
             }
         }

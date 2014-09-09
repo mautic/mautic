@@ -102,6 +102,7 @@ class FormType extends AbstractType
             'expanded'      => true,
             'multiple'      => false,
             'label'         => 'mautic.form.form.ispublished',
+            'label_attr'    => array('class' => 'control-label'),
             'empty_value'   => false,
             'required'      => false,
             'read_only'     => $readonly,

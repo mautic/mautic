@@ -36,7 +36,7 @@ class UniqueUserAliasValidator extends ConstraintValidator
         }
 
         if ($list->getAlias()) {
-            $lists = $this->em->getRepository('MauticLeadBundle:LeadList')->getUserSmartLists(
+            $lists = $this->em->getRepository('MauticLeadBundle:LeadList')->getLists(
                 $this->currentUser,
                 $list->getAlias(),
                 $list->getId()

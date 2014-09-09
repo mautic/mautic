@@ -34,7 +34,7 @@ class LeadListAccessValidator extends ConstraintValidator
     public function validate($value, Constraint $constraint)
     {
         $listModel = $this->factory->getModel('lead.list');
-        $lists     = $listModel->getSmartLists();
+        $lists     = $listModel->getUserLists();
 
         if (!count($value)) {
             $this->context->addViolation(

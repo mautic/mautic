@@ -311,7 +311,7 @@ class LeadApiController extends CommonApiController
      */
     public function getListsAction()
     {
-        $lists = $this->factory->getModel('lead.list')->getSmartLists();
+        $lists = $this->factory->getModel('lead.list')->getUserLists();
         $view = $this->view($lists, Codes::HTTP_OK);
         $context = SerializationContext::create()->setGroups(array('limited'));
         $view->setSerializationContext($context);

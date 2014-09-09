@@ -93,17 +93,19 @@ if ($tmpl == 'index')
                                 'routeBase' => 'form',
                                 'menuLink'  => 'mautic_form_index',
                                 'langVar'   => 'form',
-                                'custom'    => <<<CUSTOM
-    <li>
-        <a href="{$view['router']->generate('mautic_form_action', array('objectAction' => 'results', 'objectId' => $i[0]->getId()))}"
-           data-toggle="ajax"
-           data-menu-link="mautic_form_index">
-            <span>
-                <i class="fa fa-fw fa-database"></i>{$view['translator']->trans('mautic.form.form.results')}
-            </span>
-       </a>
-    </li>
-CUSTOM
+                                'custom'    => array(
+                                    array(
+                                        'attr' => array(
+                                            'data-toggle' => 'ajax',
+                                            'href'        => $view['router']->generate('mautic_form_action', array(
+                                                'objectAction' => 'results',
+                                                'objectId' => $i[0]->getId()
+                                            )),
+                                        ),
+                                        'icon' => 'fa-database',
+                                        'label' => 'mautic.form.form.results'
+                                    )
+                                )
                             ));
                             ?>
                         </td>

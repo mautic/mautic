@@ -14,11 +14,11 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 
 /**
- * Class EventHelper
+ * Class FormSubmitHelper
  *
  * @package Mautic\LeadBundle\Helper
  */
-class EventHelper
+class FormSubmitHelper
 {
 
     /**
@@ -28,9 +28,10 @@ class EventHelper
      * @param array $server
      * @param       $factory
      * @param array $fields
+     *
      * @return array
      */
-    public static function createLeadOnFormSubmit($action, $form, array $post, array $server, $factory, array $fields)
+    public static function createLead ($action, $form, array $post, array $server, $factory, array $fields)
     {
         $model      = $factory->getModel('lead.lead');
         $em         = $factory->getEntityManager();
@@ -40,7 +41,7 @@ class EventHelper
         $leadFields = $factory->getModel('lead.field')->getEntities(
             array('filter' => array('isPublished' => true))
         );
-        $data = array();
+        $data       = array();
         foreach ($leadFields as $f) {
             $id    = $f->getId();
             $alias = $f->getAlias();
@@ -53,7 +54,7 @@ class EventHelper
                 if (isset($fields[$mappedTo])) {
                     $fieldName = $fields[$mappedTo]['alias'];
                     if (isset($post[$fieldName])) {
-                        $value = is_array($post[$fieldName]) ? implode(', ', $post[$fieldName]) : $post[$fieldName];
+                        $value        = is_array($post[$fieldName]) ? implode(', ', $post[$fieldName]) : $post[$fieldName];
                         $data[$alias] = $value;
 
                         //update the lead rather than creating a new one if there is for sure identifier match
@@ -125,7 +126,7 @@ class EventHelper
      * @param       $action
      * @param       $form
      */
-    public static function changePointsOnFormSubmit(array $post, array $server,  $fields, $factory, $action, $form)
+    public static function changePoints (array $post, array $server, $fields, $factory, $action, $form)
     {
         $properties = $action->getProperties();
 
@@ -218,7 +219,7 @@ class EventHelper
      * @param $operator
      * @param $delta
      */
-    private static function updatePoints(&$lead, $operator, $delta)
+    private static function updatePoints (&$lead, $operator, $delta)
     {
         $newPoints = $originalPoints = $lead->getPoints();
 
@@ -240,5 +241,28 @@ class EventHelper
         $lead->setPoints($newPoints);
 
         return $newPoints - $originalPoints;
+    }
+
+    /**
+     * @param $action
+     * @param $factory
+     */
+    public static function changeLists ($action, $factory)
+    {
+        $properties = $action->getProperties();
+
+        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+        $leadModel  = $factory->getModel('lead');
+        $lead       = $leadModel->getCurrentLead();
+        $addTo      = $properties['addToLists'];
+        $removeFrom = $properties['removeFromLists'];
+
+        if (!empty($addTo)) {
+            $leadModel->addToLists($lead, $addTo);
+        }
+
+        if (!empty($removeFrom)) {
+            $leadModel->removeFromLists($lead, $removeFrom);
+        }
     }
 }

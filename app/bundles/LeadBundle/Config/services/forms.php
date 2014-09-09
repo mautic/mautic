@@ -71,14 +71,14 @@ $container->setDefinition(
 
 //Lead list
 $container->setDefinition(
-    'mautic.form.type.leadfield',
+    'mautic.form.type.leadlist',
     new Definition(
-        'Mautic\LeadBundle\Form\Type\FieldType',
+        'Mautic\LeadBundle\Form\Type\ListType',
         array(new Reference('mautic.factory'))
     )
 )
     ->addTag('form.type', array(
-        'alias' => 'leadfield',
+        'alias' => 'leadlist',
     ));
 
 //Form submit action forms
@@ -112,6 +112,17 @@ $container->setDefinition(
 )
     ->addTag('form.type', array(
         'alias' => 'lead_submitaction_pointschange',
+    ));
+
+$container->setDefinition(
+    'mautic.form.type.lead.submitaction.changelist',
+    new Definition(
+        'Mautic\LeadBundle\Form\Type\FormSubmitActionListType',
+        array(new Reference('mautic.factory'))
+    )
+)
+    ->addTag('form.type', array(
+        'alias' => 'lead_submitaction_leadlist',
     ));
 
 //Lead note form

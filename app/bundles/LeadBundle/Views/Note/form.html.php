@@ -15,18 +15,6 @@ if (!empty($userId)) {
     $header = $view['translator']->trans('mautic.lead.note.header.new');
 }
 ?>
-<div class="modal-header">
-	<button type="button" class="close" data-dismiss="modal">
-		<span aria-hidden="true">&times;</span>
-		<span class="sr-only"><?php echo $view['translator']->trans('mautic.core.close'); ?></span>
-	</button>
-	<h4 class="modal-title">
-		<?php echo $header; ?>
-	</h4>
-</div>
-<div class="modal-body">
-	<?php echo $view['form']->start($form); ?>
-	<?php echo $view['form']->row($form['text']); ?>
-	<?php echo $view['form']->end($form); ?>
-	<div class="footer-margin"></div>
-</div>
+<?php echo $view['form']->start($form); ?>
+<?php echo $view['form']->row($form['text']); ?>
+<?php echo $view['form']->end($form); ?>
