@@ -115,7 +115,7 @@ class DoctrineStep implements StepInterface
      */
     public function getTemplate()
     {
-        return 'SensioDistributionBundle:Configurator/Step:doctrine.html.twig';
+        return 'MauticInstallBundle:Step:doctrine.html.php';
     }
 
     /**

@@ -182,7 +182,7 @@ class Configurator
             return array();
         }
 
-        include_once $this->filename;
+        include $this->filename;
 
         // Return the $parameters array defined in the file
         return $parameters;

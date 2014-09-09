@@ -11,7 +11,7 @@
 
 namespace Mautic\InstallBundle\Controller;
 
-use Symfony\Component\DependencyInjection\ContainerAware;
+use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class InstallController extends ContainerAware
+class InstallController extends CommonController
 {
     /**
      * @return Response A Response instance
@@ -49,11 +49,23 @@ class InstallController extends ContainerAware
             }
         }
 
-        return $this->container->get('templating')->renderResponse($step->getTemplate(), array(
-            'form'    => $form->createView(),
-            'index'   => $index,
-            'count'   => $configurator->getStepCount(),
-            'version' => $this->getVersion(),
+        $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
+
+        return $this->delegateView(array(
+            'viewParameters'  =>  array(
+                'form'    => $form->createView(),
+                'index'   => $index,
+                'count'   => $configurator->getStepCount(),
+                'version' => $this->getVersion(),
+                'tmpl'        => $tmpl,
+            ),
+            'contentTemplate' => $step->getTemplate(),
+            'passthroughVars' => array(
+                'activeLink'     => '#mautic_install_index',
+                'mauticContent'  => 'report',
+                'route'          => $this->generateUrl('mautic_installer_step', array('index' => $index)),
+                'replaceContent' => ($tmpl == 'list') ? 'true' : 'false'
+            )
         ));
     }
 
