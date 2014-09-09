@@ -26,7 +26,7 @@ class NoteController extends FormController
         if (!$this->factory->getSecurity()->isGranted('lead:notes:full')) {
             return $this->accessDenied();
         }
-        $items = $this->factory->getModel('lead.notes')->getEntities();
+        $items = $this->factory->getModel('lead.note')->getEntities();
 
         return $this->delegateView(array(
             'viewParameters'  => array(
@@ -105,7 +105,7 @@ class NoteController extends FormController
                         'mauticContent' => 'leadnote'
                     )
                 ));
-            } elseif (!$cancelled) {
+            } elseif ($valid && !$cancelled) {
                 return $this->editAction($note->getId(), true);
             }
         }

@@ -167,7 +167,7 @@ class ListController extends FormController
                         'mauticContent' => 'leadlist'
                     )
                 ));
-            } elseif (!$cancelled) {
+            } elseif ($valid && !$cancelled) {
                 return $this->editAction($list->getId(), true);
             }
         }
@@ -198,7 +198,7 @@ class ListController extends FormController
      */
     public function editAction ($objectId, $ignorePost = false)
     {
-        $model   =$this->factory->getModel('lead.list');
+        $model   = $this->factory->getModel('lead.list');
         $list    = $model->getEntity($objectId);
 
         //set the page we came from
@@ -347,6 +347,108 @@ class ListController extends FormController
                     '%id%'   => $objectId
                 )
             );
+        } //else don't do anything
+
+        return $this->postActionRedirect(
+            array_merge($postActionVars, array(
+                'flashes' => $flashes
+            ))
+        );
+    }
+
+    /**
+     * @param $objectId
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function removeleadAction($objectId)
+    {
+        return $this->changeList($objectId, 'remove');
+    }
+
+    /**
+     * @param $objectId
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function addleadAction($objectId)
+    {
+        return $this->changeList($objectId, 'add');
+    }
+
+    /**
+     * @param $listId
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    protected function changeList($listId, $action) {
+        $page        = $this->factory->getSession()->get('mautic.lead.page', 1);
+        $returnUrl   = $this->generateUrl('mautic_lead_index', array('page' => $page));
+        $flashes     = array();
+
+        $postActionVars = array(
+            'returnUrl'       => $returnUrl,
+            'viewParameters'  => array('page' => $page),
+            'contentTemplate' => 'MauticLeadBundle:Lead:index',
+            'passthroughVars' => array(
+                'activeLink'    => '#mautic_lead_index',
+                'mauticContent' => 'lead'
+            )
+        );
+
+        $leadId = $this->request->get('leadId');
+        if (!empty($leadId) && $this->request->getMethod() == 'POST') {
+            /** @var \Mautic\LeadBundle\Model\ListModel $model */
+            $model  = $this->factory->getModel('lead.list');
+            /** @var \Mautic\LeadBundle\Entity\LeadList $model */
+            $list   = $model->getEntity($listId);
+
+            /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+            $leadModel = $this->factory->getModel('lead');
+            $lead      = $leadModel->getEntity($leadId);
+
+            if ($lead === null) {
+                $flashes[] = array(
+                    'type'    => 'error',
+                    'msg'     => 'mautic.lead.lead.error.notfound',
+                    'msgVars' => array('%id%' => $listId)
+                );
+            } elseif (!$this->factory->getSecurity()->hasEntityAccess(
+                'lead:leads:editown', 'lead:leads:editother', $lead->getOwner()
+            )) {
+                return $this->accessDenied();
+            } elseif ($list === null) {
+                $flashes[] = array(
+                    'type'    => 'error',
+                    'msg'     => 'mautic.lead.list.error.notfound',
+                    'msgVars' => array('%id%' => $list->getId())
+                );
+            } elseif (!$list->isGlobal() && !$this->factory->getSecurity()->hasEntityAccess(
+                true, 'lead:lists:viewother', $list->getCreatedBy()
+            )) {
+                return $this->accessDenied();
+            } elseif ($model->isLocked($lead)) {
+                return $this->isLocked($postActionVars, $lead, 'lead');
+            } else {
+                $function = ($action == 'remove') ? 'removeLead' : 'addLead';
+                $model->$function($lead, $list);
+
+                $identifier = $this->get('translator')->trans($lead->getPrimaryIdentifier());
+                $flashes[]  = array(
+                    'type'    => 'notice',
+                    'msg'     => ($action == 'remove') ? 'mautic.lead.lead.notice.removedfromlists' :
+                        'mautic.lead.lead.notice.addedtolists',
+                    'msgVars' => array(
+                        '%name%' => $identifier,
+                        '%id%'   => $leadId,
+                        '%list%' => $list->getName(),
+                        '%url%'  => $this->generateUrl('mautic_lead_action', array(
+                            'objectAction' => 'edit',
+                            'objectId'     => $leadId
+                        ))
+                    )
+                );
+            }
         } //else don't do anything
 
         return $this->postActionRedirect(

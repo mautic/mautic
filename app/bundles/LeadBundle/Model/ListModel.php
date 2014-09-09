@@ -68,13 +68,13 @@ class ListModel extends FormModel
         $repo      = $this->getRepository();
         $testAlias = $alias;
         $user      = $this->factory->getUser();
-        $existing  = $repo->getUserSmartLists($user, $testAlias, $entity->getId());
+        $existing  = $repo->getLists($user, $testAlias, $entity->getId());
         $count     = count($existing);
         $aliasTag  = $count;
 
         while ($count) {
             $testAlias = $alias . $aliasTag;
-            $existing  = $repo->getUserSmartLists($user, $testAlias, $entity->getId());
+            $existing  = $repo->getLists($user, $testAlias, $entity->getId());
             $count     = count($existing);
             $aliasTag++;
         }
@@ -120,7 +120,6 @@ class ListModel extends FormModel
         }
 
         $entity = parent::getEntity($id);
-
 
         return $entity;
     }
@@ -238,15 +237,34 @@ class ListModel extends FormModel
     }
 
     /**
-     * @param bool $withCounts
+     * @param string $alias
+     * @param bool $withLeads
      *
      * @return mixed
      */
-    public function getSmartLists($withCounts = false)
+    public function getUserLists($alias = '', $withLeads = false)
     {
-        $user = (!$this->security->isGranted('lead:lists:viewother')) ?
+        $user  = (!$this->security->isGranted('lead:lists:viewother')) ?
             $this->factory->getUser() : false;
-        $lists = $this->em->getRepository('MauticLeadBundle:LeadList')->getUserSmartLists($user, '', '', $withCounts);
+        $lists = $this->em->getRepository('MauticLeadBundle:LeadList')->getLists($user, $alias, '', $withLeads);
         return $lists;
+    }
+
+    /**
+     * @param $lead
+     * @param $lists
+     */
+    public function addLead($lead, $lists)
+    {
+        $this->factory->getModel('lead')->addToLists($lead, $lists);
+    }
+
+    /**
+     * @param $lead
+     * @param $lists
+     */
+    public function removeLead($lead, $lists)
+    {
+        $this->factory->getModel('lead')->removeFromLists($lead, $lists);
     }
 }

@@ -115,4 +115,33 @@ class AjaxController extends CommonAjaxController
 
         return $this->sendJsonResponse($dataArray);
     }
+
+    /**
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    protected function toggleLeadListAction(Request $request)
+    {
+        $dataArray = array('success' => 0);
+        $leadId    = InputHelper::int($request->request->get('leadId'));
+        $listId    = InputHelper::int($request->request->get('listId'));
+        $action    = InputHelper::clean($request->request->get('listAction'));
+
+        if (!empty($leadId) && !empty($listId) && in_array($action, array('remove', 'add'))) {
+            $leadModel = $this->factory->getModel('lead');
+            $listModel = $this->factory->getModel('lead.list');
+
+            $lead = $leadModel->getEntity($leadId);
+            $list = $listModel->getEntity($listId);
+
+            if ($lead !== null && $list !== null) {
+                $class = "{$action}Lead";
+                $listModel->$class($lead, $list);
+                $dataArray['success'] = 1;
+            }
+        }
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
 }

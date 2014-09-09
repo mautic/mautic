@@ -49,8 +49,12 @@ class CommonRepository extends EntityRepository
      *
      * @param User $user
      */
-    public function setCurrentUser(User $user)
+    public function setCurrentUser($user)
     {
+        if (!$user instanceof User) {
+            //just create a blank user entity
+            $user = new User();
+        }
         $this->currentUser = $user;
     }
 
@@ -255,12 +259,13 @@ class CommonRepository extends EntityRepository
 
     protected function getFilterExpr(&$q, $filter)
     {
-        $unique = $this->generateRandomParameterName();
-        $func   = (!empty($filter['operator'])) ? $filter['operator'] : $filter['expr'];
-
+        $unique    = $this->generateRandomParameterName();
+        $func      = (!empty($filter['operator'])) ? $filter['operator'] : $filter['expr'];
+        $parameter = false;
         if (in_array($func, array('isNull', 'isNotNull'))) {
-            $expr = $q->expr()->{$func}($filter['column']);
-            $parameter = false;
+            $expr      = $q->expr()->{$func}($filter['column']);
+        } elseif (in_array($func, array('in', 'notIn'))) {
+            $expr = $q->expr()->{$func}($filter['column'], $filter['value']);
         } else {
             if (isset($filter['strict']) && !$filter['strict'])
                 $filter['value'] = "%{$filter['value']}%";

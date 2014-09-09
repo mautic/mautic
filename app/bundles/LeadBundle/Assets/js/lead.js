@@ -18,6 +18,40 @@ Mautic.leadOnLoad = function (container) {
     if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'lead.lead');
     }
+
+    // Shuffle
+    // ================================
+    var grid   = mQuery("#shuffle-grid"),
+        filter = mQuery("#shuffle-filter"),
+        sizer  = grid.find("shuffle-sizer");
+
+    // instatiate shuffle
+    grid.shuffle({
+        itemSelector: ".shuffle",
+        sizer: sizer
+    });
+
+    // Filter options
+    (function () {
+        filter.on("keyup change", function () {
+            var val = this.value.toLowerCase();
+            grid.shuffle("shuffle", function (el, shuffle) {
+
+                // Only search elements in the current group
+                if (shuffle.group !== "all" && mQuery.inArray(shuffle.group, el.data("groups")) === -1) {
+                    return false;
+                }
+
+                var text = mQuery.trim(el.find(".panel-body > h5").text()).toLowerCase();
+                return text.indexOf(val) !== -1;
+            });
+        });
+    })();
+
+    // Update shuffle on sidebar minimize/maximize
+    mQuery("html")
+        .on("fa.sidebar.minimize", function () { grid.shuffle("update"); })
+        .on("fa.sidebar.maximize", function () { grid.shuffle("update"); });
 };
 
 Mautic.activateLeadFieldTypeahead = function(field, target, options) {
@@ -351,42 +385,6 @@ Mautic.updateLeadFieldProperties = function(selectedVal) {
     }
 };
 
-Mautic.leadlistOnLoad = function(container) {
-    // Shuffle
-    // ================================
-    var grid   = mQuery("#shuffle-grid"),
-        filter = mQuery("#shuffle-filter"),
-        sizer  = grid.find("shuffle-sizer");
-
-    // instatiate shuffle
-    grid.shuffle({
-        itemSelector: ".shuffle",
-        sizer: sizer
-    });
-
-    // Filter options
-    (function () {
-        filter.on("keyup change", function () {
-            var val = this.value.toLowerCase();
-            grid.shuffle("shuffle", function (el, shuffle) {
-
-                // Only search elements in the current group
-                if (shuffle.group !== "all" && mQuery.inArray(shuffle.group, el.data("groups")) === -1) {
-                    return false;
-                }
-
-                var text = mQuery.trim(el.find(".panel-body > h5").text()).toLowerCase();
-                return text.indexOf(val) !== -1;
-            });
-        });
-    })();
-
-    // Update shuffle on sidebar minimize/maximize
-    mQuery("html")
-        .on("fa.sidebar.minimize", function () { grid.shuffle("update"); })
-        .on("fa.sidebar.maximize", function () { grid.shuffle("update"); });
-};
-
 Mautic.refreshLeadSocialProfile = function(network, leadId, event) {
     Mautic.startIconSpinOnEvent(event);
     var query = "action=lead:updateSocialProfile&network=" + network + "&lead=" + leadId;
@@ -424,7 +422,7 @@ Mautic.loadRemoteContentToModal = function(elementId) {
         var modalForm = mQuery(this).find('form');
 
         // form submit
-        modalForm.ajaxForm({ 
+        modalForm.ajaxForm({
             beforeSubmit: function(formData) {
                 // disable buttons while sending data
                 modalForm.find('button').prop('disabled', true);
@@ -463,4 +461,46 @@ Mautic.showModalAlert = function(msg, type) {
     mQuery('.bottom-form-buttons')
         .before('<div class="alert alert-modal alert-'+type+'" role="alert">'+msg+'</div>')
         .hide().show('fast');
+}
+
+Mautic.toggleLeadList = function(toggleId, leadId, listId) {
+    var toggleOn  = 'fa-toggle-on text-success';
+    var toggleOff = 'fa-toggle-off text-danger';
+
+    var action = mQuery('#' + toggleId).hasClass('fa-toggle-on') ? 'remove' : 'add';
+    var query = "action=lead:toggleLeadList&leadId=" + leadId + "&listId=" + listId + "&listAction=" + action;
+
+    if (action == 'remove') {
+        //switch it on
+        mQuery('#' + toggleId).removeClass(toggleOn).addClass(toggleOff);
+    } else {
+        mQuery('#' + toggleId).removeClass(toggleOff).addClass(toggleOn);
+    }
+
+    mQuery.ajax({
+        url: mauticAjaxUrl,
+        type: "POST",
+        data: query,
+        dataType: "json",
+        success: function (response) {
+            if (!response.success) {
+                //return the icon back
+                if (action == 'remove') {
+                    //switch it on
+                    mQuery('#' + toggleId).addClass(toggleOff).addClass(toggleOn);
+                } else {
+                    mQuery('#' + toggleId).removeClass(toggleOn).addClass(toggleOff);
+                }
+            }
+        },
+        error: function (request, textStatus, errorThrown) {
+            //return the icon back
+            if (action == 'remove') {
+                //switch it on
+                mQuery('#' + toggleId).addClass(toggleOff).addClass(toggleOn);
+            } else {
+                mQuery('#' + toggleId).removeClass(toggleOn).addClass(toggleOff);
+            }
+        }
+    });
 }

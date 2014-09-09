@@ -464,7 +464,7 @@ class EmailModel extends FormModel
             $statRepo = $this->em->getRepository('MauticEmailBundle:Stat');
             foreach ($lists as $l) {
                 $filters          = $l->getFilters();
-                $recipientCount   = $listRepo->getLeadCount($filters);
+                $recipientCount   = $listRepo->getLeadCount($filters, $l);
                 $counts['combined']['total'] += $recipientCount;
 
                 $sentCount        = $statRepo->getSentCount($entity->getId(), $l->getId());

@@ -78,20 +78,41 @@ if ($tmpl == 'index')
                 <tr>
                     <td>
                         <?php
+                        $hasEditAccess = $security->hasEntityAccess(
+                            $permissions['lead:leads:editown'],
+                            $permissions['lead:leads:editother'],
+                            $item->getOwner()
+                        );
+
+                        $custom = array();
+                        if ($hasEditAccess && !empty($currentList)) {
+                            //this lead was manually added to a list so give an option to remove them
+                            $custom[] = array(
+                                'attr' => array(
+                                    'href' => $view['router']->generate('mautic_leadlist_action', array(
+                                        "objectAction" => "removelead",
+                                        "objectId" => $currentList['id'],
+                                        "leadId"   => $item->getId()
+                                    )),
+                                    'data-toggle' => "ajax",
+                                    'data-method' => 'POST'
+                                ),
+                                'label' => 'mautic.lead.lead.remove.fromlist',
+                                'icon'  => 'fa-remove'
+                            );
+                        }
+
                         echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
                             'item'      => $item,
-                            'edit'      => $security->hasEntityAccess(
-                                $permissions['lead:leads:editown'],
-                                $permissions['lead:leads:editother'],
-                                $item->getOwner()
-                            ),
+                            'edit'      => $hasEditAccess,
                             'delete'    => $security->hasEntityAccess(
                                 $permissions['lead:leads:deleteown'],
                                 $permissions['lead:leads:deleteother'],
                                 $item->getOwner()),
                             'routeBase' => 'lead',
                             'menuLink'  => 'mautic_lead_index',
-                            'langVar'   => 'lead.lead'
+                            'langVar'   => 'lead.lead',
+                            'custom'    => $custom
                         ));
                         ?>
                     </td>

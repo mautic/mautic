@@ -9,6 +9,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\LeadBundle\Form\Constraints\UniqueUserAlias;
@@ -75,6 +76,29 @@ class LeadList extends FormEntity
     private $isGlobal = false;
 
     /**
+     * @ORM\ManyToMany(targetEntity="Lead", fetch="EXTRA_LAZY")
+     * @ORM\JoinTable(name="lead_lists_included_leads")
+     */
+    private $includedLeads;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="Lead", fetch="EXTRA_LAZY")
+     * @ORM\JoinTable(name="lead_lists_excluded_leads")
+     */
+    private $excludedLeads;
+
+    /**
+     * @var array Used to populate the IDs of included Leads
+     */
+    private $leads;
+
+    public function __construct()
+    {
+        $this->includedLeads = new ArrayCollection();
+        $this->excludedLeads = new ArrayCollection();
+    }
+
+    /**
      * @param ClassMetadata $metadata
      */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
@@ -87,13 +111,7 @@ class LeadList extends FormEntity
             'field'   => 'alias',
             'message' => 'mautic.lead.list.alias.unique'
         )));
-
-        $metadata->addPropertyConstraint('filters', new Assert\Count(array(
-            'min'        => 1,
-            'minMessage' => 'mautic.lead.list.filters.notblank'
-        )));
     }
-
 
     /**
      * Get id
@@ -233,5 +251,107 @@ class LeadList extends FormEntity
     public function getAlias()
     {
         return $this->alias;
+    }
+
+    /**
+     * Add lead
+     *
+     * @param \Mautic\LeadBundle\Entity\Lead $lead
+     * @return Channel
+     */
+    public function addLead(\Mautic\LeadBundle\Entity\Lead $lead)
+    {
+        $this->includedLeads[] = $lead;
+
+        if ($this->excludedLeads->contains($lead)) {
+            $this->removeExcludedLead($lead);
+        }
+        return $this;
+    }
+
+    /**
+     * Remove lead
+     *
+     * @param \Mautic\LeadBundle\Entity\Lead $users
+     */
+    public function removeLead(\Mautic\LeadBundle\Entity\Lead $lead)
+    {
+        $this->includedLeads->removeElement($lead);
+
+        if (!$this->includedLeads->contains($lead)) {
+            $this->excludeLead($lead);
+        }
+    }
+
+    /**
+     * Get manual leads
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getIncludedLeads()
+    {
+        return $this->includedLeads;
+    }
+
+    /**
+     * Add lead
+     *
+     * @param \Mautic\LeadBundle\Entity\Lead $lead
+     * @return Channel
+     */
+    public function excludeLead(\Mautic\LeadBundle\Entity\Lead $lead)
+    {
+        $this->excludedLeads[] = $lead;
+
+        if ($this->includedLeads->contains($lead)) {
+            $this->removeLead($lead);
+        }
+        return $this;
+    }
+
+    /**
+     * Remove lead
+     *
+     * @param \Mautic\LeadBundle\Entity\Lead $users
+     */
+    public function removeExcludedLead(\Mautic\LeadBundle\Entity\Lead $lead)
+    {
+        $this->excludedLeads->removeElement($lead);
+    }
+
+    /**
+     * Get manual leads
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getExcludedLeads()
+    {
+        return $this->excludedLeads;
+    }
+
+    /**
+     * @return array
+     */
+    public function getLeads ()
+    {
+        return $this->leads;
+    }
+
+    /**
+     * @param array $leads
+     */
+    public function setLeads (array $leads)
+    {
+        $this->leads = $leads;
+    }
+
+    public function setIncludedLeads($leads)
+    {
+        $this->includedLeads = $leads;
+    }
+
+    public function setExcludedLeads($leads)
+    {
+        $this->excludedLeads = $leads;
     }
 }

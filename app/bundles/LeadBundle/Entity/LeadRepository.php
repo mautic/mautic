@@ -470,7 +470,7 @@ class LeadRepository extends CommonRepository
                 //obtain the list details
                 $list = $this->_em->getRepository("MauticLeadBundle:LeadList")->findOneByAlias($string);
                 if (!empty($list)) {
-                    $expr = $this->getListFilterExpr($list->getFilters(), $parameters, $q, $filter->not);
+                    $expr = $this->getListFilterExpr($list->getFilters(), $parameters, $q, $filter->not, $list);
                 } else {
                     //force a bad expression as the list doesn't exist
                     $expr = $q->expr()->eq('l.id', 0);
@@ -496,14 +496,15 @@ class LeadRepository extends CommonRepository
      * @param      $parameters
      * @param      $q
      * @param bool $not
+     * @param null|List|array $list
      *
      * @return mixed
      */
-    public function getListFilterExpr($filters, &$parameters, &$q, $not = false)
+    public function getListFilterExpr($filters, &$parameters, &$q, $not = false, $list = null)
     {
         $group       = false;
         $options     = $this->getFilterExpressionFunctions();
-        $expr        = $q->expr()->andX();
+        $expr        = $q->expr()->orX();
         $useExpr     =& $expr;
 
         foreach ($filters as $k => $details) {
@@ -564,6 +565,48 @@ class LeadRepository extends CommonRepository
             //add the group if not added yet
             $expr->add($group);
         }
+
+        //add manually added leads
+        if ($list !== null) {
+            if ($list instanceof LeadList) {
+                $includedLeads = $list->getIncludedLeads();
+                $excludedLeads = $list->getExcludedLeads();
+            } else {
+                $includedLeads = $list['includedLeads'];
+                $excludedLeads = $list['excludedLeads'];
+            }
+
+            $includeIds  = array();
+            foreach ($includedLeads as $lead) {
+                $includeIds[] = ($lead instanceof Lead) ? $lead->getId() : $lead['id'];
+            }
+
+            $excludeIds    = array();
+            foreach ($excludedLeads as $lead) {
+                $excludeIds[] = ($lead instanceof Lead) ? $lead->getId() : $lead['id'];
+            }
+
+            $manualExpr = $q->expr()->andX();
+            if (!empty($includeIds)) {
+                $manualExpr->add(
+                    $q->expr()->in('l.id', $includeIds)
+                );
+            }
+
+            if (!empty($excludeIds)) {
+                $manualExpr->add(
+                    $q->expr()->notIn('l.id', $excludeIds)
+                );
+            }
+
+            if ($manualExpr->count()) {
+                $returnExpr = $q->expr()->orX();
+                $returnExpr->add($expr);
+                $returnExpr->add($manualExpr);
+                return $returnExpr;
+            }
+        }
+
         return $expr;
     }
 

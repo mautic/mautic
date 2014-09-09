@@ -12,6 +12,7 @@ namespace Mautic\LeadBundle\Model;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\SocialBundle\Helper\NetworkIntegrationHelper;
@@ -406,5 +407,87 @@ class LeadModel extends FormModel
     {
         list($trackingId, $generated) = $this->getTrackingCookie();
         setcookie($trackingId, $leadId, time() + 1800);
+    }
+
+    /**
+     * @param $lead
+     * @param $lists
+     */
+    public function addToLists($lead, $lists)
+    {
+        $leadListRepo = $this->factory->getModel('lead.list')->getRepository();
+
+        if (!$lists instanceof LeadList) {
+            if (!is_array($lists)) {
+                $lists = array($lists);
+            }
+
+            //make sure they are ints
+            foreach ($lists as &$l) {
+                $l = (int) $l;
+            }
+
+            $listEntities = $this->getEntities(array(
+                'filter' => array(
+                    'force' => array(
+                        array(
+                            'column' => 'l.id',
+                            'expr'   => 'in',
+                            'value'  => $lists
+                        )
+                    )
+                )
+            ));
+
+            foreach ($listEntities as $list) {
+                $list->addLead($lead);
+            }
+            $leadListRepo->saveEntities($listEntities, false);
+        } else {
+            $lists->addLead($lead);
+            $leadListRepo->saveEntity($lists);
+        }
+    }
+
+    /**
+     * @param $lead
+     * @param $lists
+     */
+    public function removeFromLists($lead, $lists)
+    {
+        $leadListRepo = $this->factory->getModel('lead.list')->getRepository();
+
+        if (!$lists instanceof LeadList) {
+
+            if (!is_array($lists)) {
+                $lists = array($lists);
+
+                //make sure they are ints
+                foreach ($lists as &$l) {
+                    $l = (int)$l;
+                }
+
+                $listEntities = $this->getEntities(array(
+                    'filter' => array(
+                        'force' => array(
+                            array(
+                                'column' => 'l.id',
+                                'expr'   => 'in',
+                                'value'  => $lists
+                            )
+                        )
+                    )
+                ));
+
+                foreach ($listEntities as $list) {
+                    $list->removeLead($lead);
+                }
+
+                $this->saveEntities($listEntities, false);
+            }
+        } else {
+            $lists->removeLead($lead);
+            $leadListRepo->saveEntity($lists);
+        }
     }
 }

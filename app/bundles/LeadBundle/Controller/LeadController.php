@@ -117,21 +117,40 @@ class LeadController extends FormController
             $listArgs["filter"]["force"] = " $isCommand:$mine";
         }
 
-        $lists     = $this->factory->getModel('lead.list')->getSmartLists();
+        $lists     = $this->factory->getModel('lead.list')->getUserLists();
         $indexMode = $this->request->get('view', $session->get('mautic.lead.indexmode', 'list'));
         $session->set('mautic.lead.indexmode', $indexMode);
 
+        //check to see if in a single list
+        $inSingleList = (substr_count($search, "$listCommand:") === 1) ? true : false;
+        $list         = array();
+        if ($inSingleList) {
+            preg_match("/$listCommand:(.*?)(?=\s|$)/", $search, $matches);
+
+            if (!empty($matches[1])) {
+                $alias = $matches[1];
+                foreach ($lists as $l) {
+                    if ($alias === $l['alias']) {
+                        $list = $l;
+                        break;
+                    }
+                }
+            }
+        }
+
         $parameters = array(
-            'searchValue' => $search,
-            'items'       => $leads,
-            'page'        => $page,
-            'totalItems'  => $count,
-            'limit'       => $limit,
-            'permissions' => $permissions,
-            'tmpl'        => $tmpl,
-            'indexMode'   => $indexMode,
-            'lists'       => $lists,
-            'security'    => $this->factory->getSecurity()
+            'searchValue'  => $search,
+            'items'        => $leads,
+            'page'         => $page,
+            'totalItems'   => $count,
+            'limit'        => $limit,
+            'permissions'  => $permissions,
+            'tmpl'         => $tmpl,
+            'indexMode'    => $indexMode,
+            'lists'        => $lists,
+            'currentList'  => $list,
+            'security'     => $this->factory->getSecurity(),
+            'inSingleList' => $inSingleList
         );
 
         return $this->delegateView(array(
@@ -522,19 +541,19 @@ class LeadController extends FormController
                 return $this->accessDenied();
             } elseif ($model->isLocked($entity)) {
                 return $this->isLocked($postActionVars, $entity, 'lead.lead');
+            } else {
+                $model->deleteEntity($entity);
+
+                $identifier = $this->get('translator')->trans($entity->getPrimaryIdentifier());
+                $flashes[]  = array(
+                    'type'    => 'notice',
+                    'msg'     => 'mautic.lead.lead.notice.deleted',
+                    'msgVars' => array(
+                        '%name%' => $identifier,
+                        '%id%'   => $objectId
+                    )
+                );
             }
-
-            $model->deleteEntity($entity);
-
-            $identifier = $this->get('translator')->trans($entity->getPrimaryIdentifier());
-            $flashes[] = array(
-                'type' => 'notice',
-                'msg'  => 'mautic.lead.lead.notice.deleted',
-                'msgVars' => array(
-                    '%name%' => $identifier,
-                    '%id%'   => $objectId
-                )
-            );
         } //else don't do anything
 
         return $this->postActionRedirect(
@@ -542,5 +561,34 @@ class LeadController extends FormController
                 'flashes' => $flashes
             ))
         );
+    }
+
+    /**
+     * Add/remove lead from a list
+     *
+     * @param $objectId
+     */
+    public function listAction($objectId)
+    {
+        $model   = $this->factory->getModel('lead.lead');
+        $lead    = $model->getEntity($objectId);
+
+        if ($lead != null && $this->factory->getSecurity()->hasEntityAccess(
+            'lead:leads:editown', 'lead:leads:editother', $lead->getOwner()
+        )) {
+            /** @var \Mautic\LeadBundle\Model\ListModel $listModel */
+            $listModel = $this->factory->getModel('lead.list');
+            $lists = $listModel->getUserLists('', true);
+        } else {
+            $lists = array();
+        }
+
+        return $this->delegateView(array(
+            'viewParameters'  => array(
+                'lists'  => $lists,
+                'lead'   => $lead
+            ),
+            'contentTemplate' => 'MauticLeadBundle:LeadLists:index.html.php'
+        ));
     }
 }

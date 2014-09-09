@@ -664,6 +664,24 @@ var Mautic = {
             method = 'GET'
         }
 
+        //show the modal
+        if (mQuery(target + ' .loading-placeholder').length) {
+            mQuery(target + ' .loading-placeholder').removeClass('hide');
+            mQuery(target + ' .modal-body-content').addClass('hide');
+        }
+
+        var header = mQuery(el).attr('data-header');
+        if (header) {
+            mQuery(target + " .modal-title").html(header);
+        }
+
+        //move the modal to the body tag to get around positioned div issues
+        mQuery(target).on('show.bs.modal', function () {
+            mQuery(target).appendTo("body");
+        });
+
+        mQuery(target).modal('show');
+
         mQuery.ajax({
             url: route,
             type: method,
@@ -671,14 +689,6 @@ var Mautic = {
             success: function (response) {
                 if (response) {
                     Mautic.processModalContent(response, target);
-
-                    //move the modal to the body tag to get around positioned div issues
-                    mQuery(target).on('show.bs.modal', function () {
-                        mQuery(target).appendTo("body");
-                    });
-
-                    //show the modal
-                    mQuery(target).modal('show');
                 }
                 Mautic.stopIconSpinPostEvent();
             },

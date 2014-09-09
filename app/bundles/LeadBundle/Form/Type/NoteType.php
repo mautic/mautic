@@ -103,7 +103,9 @@ class NoteType extends AbstractType
         //     'required'   => false
         // ));
 
-        $builder->add('buttons', 'form_buttons');
+        $builder->add('buttons', 'form_buttons', array(
+            'container_class' => 'lead-note-buttons'
+        ));
 
         if (!empty($options["action"])) {
             $builder->setAction($options["action"]);
