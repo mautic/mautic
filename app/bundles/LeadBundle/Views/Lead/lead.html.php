@@ -27,6 +27,7 @@ if ($hasEditAccess): ?>
         'mautic_lead_action', array("objectAction" => "edit", "objectId" => $lead->getId())); ?>"
        data-toggle="ajax"
        data-menu-link="#mautic_lead_index">
+       <i class="fa fa-pencil-square-o"></i> 
         <?php echo $view["translator"]->trans("mautic.core.form.edit"); ?>
     </a>
 <?php endif; ?>
@@ -41,6 +42,7 @@ if ($hasEditAccess): ?>
            array("objectAction" => "delete", "objectId" => $lead->getId())); ?>',
            '#mautic_lead_index'],
            '<?php echo $view->escape($view["translator"]->trans("mautic.core.form.cancel"), 'js'); ?>','',[]);">
+        <i class="fa fa-trash text-danger"></i>
         <span><?php echo $view['translator']->trans('mautic.core.form.delete'); ?></span>
     </a>
 <?php endif; ?>
@@ -54,6 +56,7 @@ if ($hasEditAccess): ?>
        data-header="<?php echo $view['translator']->trans('mautic.lead.lead.header.lists', array(
                '%name%' => $lead->getPrimaryIdentifier())
        ); ?>">
+       <i class="fa fa-list"></i> 
         <?php echo $view["translator"]->trans("mautic.lead.lead.lists"); ?>
     </a>
 
@@ -62,6 +65,7 @@ if ($hasEditAccess): ?>
        data-toggle="ajaxmodal"
        data-target="#leadModal"
        data-header="<?php $view['translator']->trans('mautic.lead.note.header.new'); ?>">
+       <i class="fa fa-file-o"></i> 
         <?php echo $view["translator"]->trans("mautic.lead.add.note"); ?>
     </a>
 <?php
