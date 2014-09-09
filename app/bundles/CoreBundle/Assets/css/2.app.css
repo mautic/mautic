@@ -932,7 +932,7 @@ h6,
 }
 .page-header {
   background-color: #f8f8f8;
-  padding: 20px 15px;
+  padding: 15px;
   margin: 0;
   border-bottom: 0;
   border-bottom: 1px solid #eaeaea;
@@ -941,6 +941,9 @@ h6,
   padding: 0;
   background-color: inherit;
   border-radius: 0;
+}
+.page-header .table-layout {
+  margin-bottom: 0px;
 }
 .container .page-header {
   margin: -15px -15px 15px -15px;
@@ -1004,6 +1007,9 @@ a.text-danger:hover {
 }
 a.text-info:hover {
   color: #268f92;
+}
+.pagination-limit {
+  width: 55px;
 }
 .no-touch .scrollrail {
   border-radius: 0 !important;

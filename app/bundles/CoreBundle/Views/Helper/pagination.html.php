@@ -51,9 +51,25 @@ $limitOptions = array(
 
 $formExit = (!empty($ignoreFormExit)) ? ' data-ignore-formexit="true"' : '';
 ?>
-<div class="clearfix"></div>
-<div class="pagination-wrapper text-center">
-    <ul class="pagination pagination-centered <?php echo $pageClass; ?>">
+<?php if (empty($fixedLimit)): ?>
+    <div class="pull-right">
+        <?php $class = (!empty($paginationClass)) ? " input-{$paginationClass}" : ""; ?>
+        <select autocomplete="off" class="form-control pagination-limit<?php echo $class; ?>" onchange="Mautic.limitTableData(
+            '<?php echo $sessionVar; ?>',
+            this.value,
+            '<?php echo $tmpl; ?>',
+            '<?php echo $target; ?>'
+            );">
+            <?php foreach ($limitOptions as $value => $label): ?>
+            <?php $selected = ($limit === $value) ? ' selected="selected"': '';?>
+            <option<?php echo $selected; ?> value="<?php echo $value; ?>"><?php echo $view['translator']->trans('mautic.core.pagination.'.$label); ?></option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+<?php endif; ?>
+
+<div class="pagination-wrapper pull-left">
+    <ul class="pagination nm <?php echo $pageClass; ?>">
         <?php
         $urlPage = $page - $range;
         $url     = ($urlPage > 0) ? $baseUrl . $urlPage . $queryString : 'javascript: void(0);';
@@ -130,22 +146,6 @@ $formExit = (!empty($ignoreFormExit)) ? ' data-ignore-formexit="true"' : '';
                 <i class="fa fa-angle-double-right"></i>
             </a>
         </li>
-        <?php if (empty($fixedLimit)): ?>
-        <li>
-            <?php $class = (!empty($paginationClass)) ? " input-{$paginationClass}" : ""; ?>
-            <select autocomplete="off" class="form-control pagination-limit<?php echo $class; ?>" onchange="Mautic.limitTableData(
-                '<?php echo $sessionVar; ?>',
-                this.value,
-                '<?php echo $tmpl; ?>',
-                '<?php echo $target; ?>'
-                );">
-                <?php foreach ($limitOptions as $value => $label): ?>
-                <?php $selected = ($limit === $value) ? ' selected="selected"': '';?>
-                <option<?php echo $selected; ?> value="<?php echo $value; ?>"><?php echo $view['translator']->trans('mautic.core.pagination.'.$label); ?></option>
-                <?php endforeach; ?>
-            </select>
-        </li>
-        <?php endif; ?>
     </ul>
     <div class="clearfix"></div>
 </div>
