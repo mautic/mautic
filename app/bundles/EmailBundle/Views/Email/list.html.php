@@ -94,22 +94,25 @@ $view->extend('MauticEmailBundle:Email:index.html.php');
                             'menuLink'  => 'mautic_email_index',
                             'langVar'   => 'email',
                             'nameGetter' => 'getSubject',
-                            'custom'    => <<<CUSTOM
-<li>
-    <a href="javascript:void(0);"
-       onclick="Mautic.showConfirmation(
-           '{$view->escape($view["translator"]->trans("mautic.email.form.confirmsend",
-           array("%name%" => $item->getSubject() . " (" . $item->getId() . ")")), 'js')}',
-           '{$view->escape($view["translator"]->trans("mautic.email.send"), 'js')}',
-           'executeAction',
-           ['{$view['router']->generate('mautic_email_action',
-           array("objectAction" => "send", "objectId" => $item->getId()))}',
-           '#mautic_email_index'],
-           '{$view->escape($view["translator"]->trans("mautic.core.form.cancel"), 'js')}','',[]);">
-        <span><i class="fa fa-fw fa-send"></i>{$view['translator']->trans('mautic.email.sendmanual')}</span>
-    </a>
-</li>
-CUSTOM
+                            'custom'    => array(
+                                array(
+                                    'attr' => array(
+                                        'href'   => 'javascript: void(0);',
+                                        'onlick' =>
+                                            "Mautic.showConfirmation(
+                                               '{$view->escape($view["translator"]->trans("mautic.email.form.confirmsend",
+                                               array("%name%" => $item->getSubject() . " (" . $item->getId() . ")")), 'js')}',
+                                               '{$view->escape($view["translator"]->trans("mautic.email.send"), 'js')}',
+                                               'executeAction',
+                                               ['{$view['router']->generate('mautic_email_action',
+                                               array("objectAction" => "send", "objectId" => $item->getId()))}',
+                                               '#mautic_email_index'],
+                                               '{$view->escape($view["translator"]->trans("mautic.core.form.cancel"), 'js')}','',[]);"
+                                    ),
+                                    'icon' => 'fa-send',
+                                    'label' => 'mautic.email.sendmanual'
+                                )
+                            )
                         ));
                         ?>
                     </td>

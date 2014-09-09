@@ -63,8 +63,33 @@ if (!isset($extra)) {
             </a>
         </li>
         <?php endif; ?>
-        <?php if (!empty($custom)): ?>
-        <?php echo $custom; ?>
-        <?php endif; ?>
+        <?php
+        if (!empty($custom)):
+            foreach ($custom as $c): ?>
+                <li>
+                    <?php
+                    $attr = '';
+                    if (isset($menuLink)):
+                        $attr .= ' data-menu-link="' . $menuLink . '"';
+                    endif;
+                    if (isset($c['attr'])):
+                        foreach ($c['attr'] as $k => $v):
+                            $attr .= " $k=" . '"' . $v . '"';
+                        endforeach;
+                    endif;
+                    ?>
+                    <a<?php echo $attr; ?>>
+                        <span>
+                            <?php if (isset($c['icon'])): ?>
+                            <i class="fa fa-fw <?php echo $c['icon']; ?>"></i>
+                            <?php endif; ?>
+                            <?php echo $view['translator']->trans($c['label']); ?>
+                        </span>
+                    </a>
+                </li>
+            <?php
+            endforeach;
+        endif;
+        ?>
     </ul>
 </div>
