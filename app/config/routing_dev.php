@@ -21,6 +21,11 @@ $profiler = $loader->import("@WebProfilerBundle/Resources/config/routing/profile
 $profiler->addPrefix('/_profiler');
 $collection->addCollection($profiler);
 
+//configurator
+$configurator = $loader->import("@SensioDistributionBundle/Resources/config/routing/webconfigurator.xml");
+$configurator->addPrefix('/_configurator');
+$collection->addCollection($configurator);
+
 //error pages
 //$errors = $loader->import("@WebfactoryExceptionsBundle/Resources/config/routing.yml");
 //$collection->addCollection($errors);
