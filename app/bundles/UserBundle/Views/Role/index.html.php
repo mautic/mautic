@@ -18,13 +18,13 @@ $view['slots']->set('searchHelp', $view['translator']->trans('mautic.user.role.h
 
 <?php if ($permissions['create']): ?>
     <?php $view['slots']->start("actions"); ?>
-    <li><a class="new-entity-action"
-           href="<?php echo $this->container->get('router')->generate(
-               'mautic_role_action', array("objectAction" => "new")); ?>"
-            data-toggle="ajax" data-menu-link="#mautic_role_index">
-            <?php echo $view["translator"]->trans("mautic.user.role.menu.new"); ?>
-        </a>
-    </li>
+	<a class="btn btn-default new-entity-action"
+	   href="<?php echo $this->container->get('router')->generate(
+	       'mautic_role_action', array("objectAction" => "new")); ?>"
+	    data-toggle="ajax" data-menu-link="#mautic_role_index">
+	    <i class="fa fa-plus"></i> 
+	    <?php echo $view["translator"]->trans("mautic.user.role.menu.new"); ?>
+	</a>
     <?php $view['slots']->stop(); ?>
 <?php endif; ?>
 

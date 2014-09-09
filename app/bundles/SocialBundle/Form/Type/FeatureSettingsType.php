@@ -37,9 +37,9 @@ class FeatureSettingsType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        $network = strtolower($options['sm_network']);
+        $network = $options['sm_network'];
         if (class_exists('\\Mautic\\SocialBundle\\Form\\Type\\' . $network . 'Type')) {
-            $builder->add('shareButton', 'socialmedia_'.$network, array(
+            $builder->add('shareButton', 'socialmedia_'.strtolower($network), array(
                 'label'       => false,
                 'required'    => false
             ));

@@ -32,7 +32,6 @@
 </div>
 <div class="panel panel-default">
     <div class="panel-heading">
-        <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.lead.lead.header.leadinfo'); ?></h3>
         <div class="panel-toolbar">
             <?php $groups = array_keys($fields); ?>
             <ul class="nav nav-tabs" role="tablist">

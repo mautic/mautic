@@ -22,7 +22,13 @@ if (!empty($objectId)) {
 $view['slots']->set("headerTitle", $header);
 ?>
 
-<div class="scrollable">
-    <?php echo $view['form']->form($form); ?>
-    <div class="footer-margin"></div>
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<h3 class="panel-title">
+			<?php echo $header; ?>
+		</h3>
+	</div>
+	<div class="panel-body">
+    	<?php echo $view['form']->form($form); ?>
+    </div>
 </div>

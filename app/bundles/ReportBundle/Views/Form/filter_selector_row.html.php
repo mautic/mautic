@@ -1,8 +1,4 @@
 <?php
-$conditionArray = array('=', '>', '>=', '<', '<=', '!=');
-$columnList = $form->vars['columnList'];
-$setFilters = $form->vars['value'];
-
 $labelClass = (empty($form->vars['label_attr']['class'])) ? 'control-label' : $form->vars['label_attr']['class'];
 ?>
 <div id="<?php echo $form->vars['id']; ?>_container" class="row">

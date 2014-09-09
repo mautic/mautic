@@ -48,7 +48,7 @@ h1, h2, h3, h4, h5, h6,
 // -------------------------
 .page-header {
   background-color: lighten(@body-bg, 2.5%);
-  padding: 20px 15px;
+  padding: 15px;
   margin: 0;
   border-bottom: 0;
   border-bottom: 1px solid darken(@body-bg, 3%);
@@ -58,6 +58,10 @@ h1, h2, h3, h4, h5, h6,
     padding: 0;
     background-color: inherit;
     border-radius: 0;
+  }
+
+  .table-layout {
+    margin-bottom: 0px;
   }
 }
 // page header inside container reset
@@ -94,3 +98,7 @@ h1, h2, h3, h4, h5, h6,
 .text-warning { .text-emphasis-variant(@brand-warning); }
 .text-danger { .text-emphasis-variant(@brand-danger); }
 .text-info { .text-emphasis-variant(@brand-info); }
+
+.pagination-limit {
+  width: 55px;
+}

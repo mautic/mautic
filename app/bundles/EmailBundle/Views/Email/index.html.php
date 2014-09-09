@@ -17,14 +17,13 @@ $view['slots']->set('searchHelp', $view['translator']->trans('mautic.email.help.
 
 <?php if ($permissions['email:emails:create']): ?>
     <?php $view['slots']->start("actions"); ?>
-    <li>
-        <a href="<?php echo $this->container->get('router')->generate(
-            'mautic_email_action', array("objectAction" => "new")); ?>"
-           data-toggle="ajax"
-           data-menu-link="#mautic_email_index">
-            <?php echo $view["translator"]->trans("mautic.email.menu.new"); ?>
-        </a>
-    </li>
+    <a class="btn btn-default" href="<?php echo $this->container->get('router')->generate(
+        'mautic_email_action', array("objectAction" => "new")); ?>"
+       data-toggle="ajax"
+       data-menu-link="#mautic_email_index">
+        <i class="fa fa-plus"></i> 
+        <?php echo $view["translator"]->trans("mautic.email.menu.new"); ?>
+    </a>
     <?php $view['slots']->stop(); ?>
 <?php endif; ?>
 

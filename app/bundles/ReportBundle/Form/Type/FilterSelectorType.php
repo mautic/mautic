@@ -28,14 +28,16 @@ class FilterSelectorType extends AbstractType
      * @var array
      */
     private $conditionArray = array(
-        'eq'      => '=',
-        'gt'      => '>',
-        'gte'     => '>=',
-        'lt'      => '<',
-        'lte'     => '<=',
-        'neq'     => '!=',
-        'like'    => 'LIKE',
-        'notLike' => 'NOT LIKE'
+        'eq'       => '=',
+        'gt'       => '>',
+        'gte'      => '>=',
+        'lt'       => '<',
+        'lte'      => '<=',
+        'neq'      => '!=',
+        'like'     => 'LIKE',
+        'notLike'  => 'NOT LIKE',
+        'empty'    => 'EMPTY',
+        'notEmpty' => 'NOT EMPTY'
     );
 
     /**

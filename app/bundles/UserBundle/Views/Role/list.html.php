@@ -11,70 +11,77 @@ if ($tmpl == 'index'):
     $view->extend('MauticUserBundle:Role:index.html.php');
 endif;
 ?>
-
-<div class="table-responsive scrollable body-white padding-sm page-list">
-    <table class="table table-hover table-striped table-bordered role-list">
-        <thead>
-        <tr>
-            <th class="col-role-actions"></th>
-            <?php
-            echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
-                'sessionVar' => 'role',
-                'orderBy'    => 'r.name',
-                'text'       => 'mautic.user.role.thead.name',
-                'class'      => 'col-role-name',
-                'default'    => true
-            ));
-            echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
-                'sessionVar' => 'role',
-                'orderBy'    => 'r.description',
-                'text'       => 'mautic.user.role.thead.description',
-                'class'      => 'visible-md visible-lg col-role-desc'
-            ));
-            echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
-                'sessionVar' => 'role',
-                'orderBy'    => 'r.id',
-                'text'       => 'mautic.user.role.thead.id',
-                'class'      => 'visible-md visible-lg col-role-id'
-            ));
-            ?>
-        </tr>
-        </thead>
-        <tbody>
-        <?php foreach ($items as $item): ?>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">
+            <?php echo $view['translator']->trans('mautic.user.role.header.index'); ?>
+        </h3>
+    </div>
+    <div class="table-responsive scrollable body-white padding-sm page-list">
+        <table class="table table-hover table-striped table-bordered role-list">
+            <thead>
             <tr>
-                <td>
-                    <?php
-                    echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
-                        'item'      => $item,
-                        'edit'      => $permissions['edit'],
-                        'delete'    => $permissions['delete'],
-                        'routeBase' => 'role',
-                        'menuLink'  => 'mautic_role_index',
-                        'langVar'   => 'user.role',
-                        'pull'      => 'left'
-                    ));
-                    ?>
-                </td>
-                <td>
-                    <a href="<?php echo $view['router']->generate('mautic_user_index',
-                        array("search" => $view['translator']->trans('mautic.user.user.searchcommand.role') . ':' .  $item->getName())); ?>"
-                       data-toggle="ajax">
-                        <?php echo $item->getName(); ?>
-                    </a>
-                </td>
-                <td class="visible-md visible-lg"><?php echo $item->getDescription(); ?></td>
-                <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
+                <th class="col-role-actions"></th>
+                <?php
+                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                    'sessionVar' => 'role',
+                    'orderBy'    => 'r.name',
+                    'text'       => 'mautic.user.role.thead.name',
+                    'class'      => 'col-role-name',
+                    'default'    => true
+                ));
+                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                    'sessionVar' => 'role',
+                    'orderBy'    => 'r.description',
+                    'text'       => 'mautic.user.role.thead.description',
+                    'class'      => 'visible-md visible-lg col-role-desc'
+                ));
+                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                    'sessionVar' => 'role',
+                    'orderBy'    => 'r.id',
+                    'text'       => 'mautic.user.role.thead.id',
+                    'class'      => 'visible-md visible-lg col-role-id'
+                ));
+                ?>
             </tr>
-        <?php endforeach; ?>
-        </tbody>
-    </table>
-    <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
-        "totalItems" => count($items),
-        "page"       => $page,
-        "limit"      => $limit,
-        "baseUrl"    =>  $view['router']->generate('mautic_role_index'),
-        'sessionVar' => 'role'
-    )); ?>
-    <div class="footer-margin"></div>
+            </thead>
+            <tbody>
+            <?php foreach ($items as $item): ?>
+                <tr>
+                    <td>
+                        <?php
+                        echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
+                            'item'      => $item,
+                            'edit'      => $permissions['edit'],
+                            'delete'    => $permissions['delete'],
+                            'routeBase' => 'role',
+                            'menuLink'  => 'mautic_role_index',
+                            'langVar'   => 'user.role',
+                            'pull'      => 'left'
+                        ));
+                        ?>
+                    </td>
+                    <td>
+                        <a href="<?php echo $view['router']->generate('mautic_user_index',
+                            array("search" => $view['translator']->trans('mautic.user.user.searchcommand.role') . ':' .  $item->getName())); ?>"
+                           data-toggle="ajax">
+                            <?php echo $item->getName(); ?>
+                        </a>
+                    </td>
+                    <td class="visible-md visible-lg"><?php echo $item->getDescription(); ?></td>
+                    <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
+                </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <div class="panel-footer">
+        <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
+            "totalItems" => count($items),
+            "page"       => $page,
+            "limit"      => $limit,
+            "baseUrl"    =>  $view['router']->generate('mautic_role_index'),
+            'sessionVar' => 'role'
+        )); ?>
+    </div>
 </div>

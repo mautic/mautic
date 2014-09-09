@@ -12,6 +12,7 @@ namespace Mautic\ReportBundle\Form\Type;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
+use Mautic\ReportBundle\Form\DataTransformer\ColumnSelectTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -108,22 +109,27 @@ class ReportType extends AbstractType
                 )
             ));
 
-            $source  = (!is_null($options['data']->getSource()) && $options['data']->getSource() != '') ? $options['data']->getSource() : key($tables);
-            $columns = $options['table_list'][$source]['columns'];
+            $source     = (!is_null($options['data']->getSource()) && $options['data']->getSource() != '') ? $options['data']->getSource() : key($tables);
+            $columns    = $options['table_list'][$source]['columns'];
+            $columnList = $this->buildColumnSelectList($columns);
 
             // Build the column selector
-            $builder->add('columns', 'column_selector', array(
-                'choices'    => $columns,
-                'label'      => 'mautic.report.report.form.columnselector',
-                'label_attr' => array('class' => 'control-label'),
-                'required'   => true,
-                'multiple'   => true,
-                'expanded'   => true,
-                'attr'       => array(
-                    'class' => 'form-control',
-                    'size'  => '5'
+            $builder->add(
+                $builder->create('columns', 'column_selector', array(
+                    'choices'    => $columnList,
+                    'label'      => 'mautic.report.report.form.columnselector',
+                    'label_attr' => array('class' => 'control-label'),
+                    'required'   => true,
+                    'multiple'   => true,
+                    'expanded'   => true,
+                    'attr'       => array(
+                        'class' => 'form-control',
+                        'size'  => '5'
+                        )
+                    )
                 )
-            ));
+                ->addViewTransformer(new ColumnSelectTransformer($columnList))
+            );
 
             // Build the filter selector
             $builder->add('filters', 'collection', array(
@@ -131,7 +137,7 @@ class ReportType extends AbstractType
                 'label'        => 'mautic.report.report.form.filterselector',
                 'label_attr'   => array('class' => 'control-label'),
                 'options'      => array(
-                    'columnList' => $columns,
+                    'columnList' => $columnList,
                     'required'   => false
                 ),
                 'allow_add'    => true,
@@ -168,6 +174,25 @@ class ReportType extends AbstractType
     public function getName()
     {
         return "report";
+    }
+
+    /**
+     * Builds an array for the column selectors
+     *
+     * @param array $columns Array with the column list
+     *
+     * @return array
+     */
+    private function buildColumnSelectList($columns)
+    {
+        // Create an array of columns, the key is the column value stored in the database and the value is what the user sees
+        $list = array();
+
+        foreach ($columns as $column => $data) {
+            $list[$column] = $data['label'];
+        }
+
+        return $list;
     }
 
     /**
