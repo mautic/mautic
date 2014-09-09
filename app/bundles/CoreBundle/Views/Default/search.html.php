@@ -17,7 +17,7 @@ $searchClass   = (!empty($searchString) ? 'show-search' : 'hide-search');
 ?>
 
 <div class="row">
-	<div class="col-sm-6 pull-right">
+	<div class="col-sm-6 pull-right nm pa5">
 		<div class="input-group">
 			<?php	// $view['slots']->set('searchHelp', $view['translator']->trans('mautic.lead.lead.help.searchcommands')); ?>
 		<!--     <div class="input-group-btn">

@@ -62,15 +62,17 @@ if ($tmpl == 'index')
             <h4><?php echo $view['translator']->trans('mautic.core.noresults'); ?></h4>
         </div>
     <?php endif; ?>
-
-    <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
-        "totalItems"      => $totalItems,
-        "page"            => $page,
-        "limit"           => $limit,
-        "menuLinkId"      => 'mautic_lead_index',
-        "baseUrl"         => $view['router']->generate('mautic_lead_index'),
-        "tmpl"            => $indexMode,
-        'sessionVar'      => 'lead'
-    )); ?>
-    <div class="footer-margin"></div>
 </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
+                "totalItems"      => $totalItems,
+                "page"            => $page,
+                "limit"           => $limit,
+                "menuLinkId"      => 'mautic_lead_index',
+                "baseUrl"         => $view['router']->generate('mautic_lead_index'),
+                "tmpl"            => $indexMode,
+                'sessionVar'      => 'lead'
+            )); ?>
+        </div>
+    </div>
