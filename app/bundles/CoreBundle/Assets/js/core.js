@@ -77,6 +77,7 @@ var Mautic = {
         container = typeof container !== 'undefined' ? container : 'body';
 
         //initiate links
+        mQuery(container + " a[data-toggle='ajax']").off('click.ajax');
         mQuery(container + " a[data-toggle='ajax']").on('click.ajax', function (event) {
             event.preventDefault();
 
@@ -89,6 +90,7 @@ var Mautic = {
         });
 
         //initialize ajax'd modals
+        mQuery(container + " *[data-toggle='ajaxmodal']").off('click.ajaxmodal');
         mQuery(container + " *[data-toggle='ajaxmodal']").on('click.ajaxmodal', function (event) {
             event.preventDefault();
 
@@ -134,6 +136,7 @@ var Mautic = {
             });
         });
 
+        mQuery(container + " a[data-toggle='download']").off('click.download');
         mQuery(container + " a[data-toggle='download']").on('click.download', function (event) {
             event.preventDefault();
 
@@ -235,6 +238,7 @@ var Mautic = {
             var handle   = mQuery(this).find('.shelf-handle').first();
             var contents = mQuery(this).find('.shelf-contents').first();
 
+            mQuery(handle).off('click.shelf');
             mQuery(handle).on('click.shelf', function(event) {
                 if (mQuery(contents).css('display') == 'block') {
                     mQuery(handle).find('i').removeClass('fa-chevron-circle-up').addClass('fa-chevron-circle-down')

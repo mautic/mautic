@@ -40,33 +40,32 @@ class FormSubscriber extends CommonSubscriber
     {
         //add lead generation submit action
         $action = array(
-            'group'        => 'mautic.lead.lead.submitaction.group',
+            'group'        => 'mautic.lead.lead.events.group',
             'label'        => 'mautic.lead.lead.submitaction.createlead',
             'description'  => 'mautic.lead.lead.submitaction.createlead_descr',
             'formType'     => 'lead_submitaction_createlead',
-            'callback'     => '\Mautic\LeadBundle\Helper\FormSubmitHelper::createLead'
+            'callback'     => '\Mautic\LeadBundle\Helper\FormEventHelper::createLead'
         );
         $event->addSubmitAction('lead.create', $action);
 
         //add lead generation submit action
         $action = array(
-            'group'       => 'mautic.lead.lead.submitaction.group',
+            'group'       => 'mautic.lead.lead.events.group',
             'label'       => 'mautic.lead.lead.submitaction.changepoints',
             'description' => 'mautic.lead.lead.submitaction.changepoints_descr',
             'formType'    => 'lead_submitaction_pointschange',
-            'callback'    => '\Mautic\LeadBundle\Helper\FormSubmitHelper::changePoints'
+            'callback'    => '\Mautic\LeadBundle\Helper\FormEventHelper::changePoints'
         );
         $event->addSubmitAction('lead.pointschange', $action);
 
         //add to lead list
         $action = array(
-            'group'        => 'mautic.lead.lead.submitaction.group',
-            'label'        => 'mautic.lead.lead.submitaction.changelist',
-            'description'  => 'mautic.lead.lead.submitaction.changelist_descr',
-            'formType'     => 'lead_submitaction_leadlist',
-            'callback'     => '\Mautic\LeadBundle\Helper\FormSubmitHelper::changeLists'
+            'group'        => 'mautic.lead.lead.events.group',
+            'label'        => 'mautic.lead.lead.events.changelist',
+            'description'  => 'mautic.lead.lead.events.changelist_descr',
+            'formType'     => 'lead_event_leadlist',
+            'callback'     => '\Mautic\LeadBundle\Helper\FormEventHelper::changeLists'
         );
-        $event->addSubmitAction('lead.addtolist', $action);
-
+        $event->addSubmitAction('lead.changelist', $action);
     }
 }

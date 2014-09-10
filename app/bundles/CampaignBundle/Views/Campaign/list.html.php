@@ -34,15 +34,6 @@ $view->extend('MauticCampaignBundle:Campaign:index.html.php');
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'campaign',
-                    'orderBy'    => 't.campaigns',
-                    'text'       => 'mautic.campaign.thead.campaigns',
-                    'class'      => 'col-campaign-campaigns'
-                ));
-
-                echo "<th class='col-campaignrange-color'>" . $view['translator']->trans('mautic.campaign.thead.color') . '</th>';
-
-                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
-                    'sessionVar' => 'campaign',
                     'orderBy'    => 't.id',
                     'text'       => 'mautic.campaign.thead.id',
                     'class'      => 'col-campaign-id'
@@ -78,12 +69,6 @@ $view->extend('MauticCampaignBundle:Campaign:index.html.php');
                         </a>
                     </td>
                     <td class="visible-md visible-lg"><?php echo $item->getDescription(); ?></td>
-                    <td class="visible-md visible-lg"><?php echo $item->getCampaigns(); ?></td>
-                    <?php
-                    $color = $item->getColor();
-                    $colorStyle = ($color) ? ' style="background-color: ' . $color . '"' : '';
-                    ?>
-                    <td<?php echo $colorStyle; ?> class="visible-md visible-lg"></td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 </tr>
             <?php endforeach; ?>

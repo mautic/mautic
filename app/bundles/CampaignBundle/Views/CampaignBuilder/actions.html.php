@@ -22,7 +22,7 @@ if (empty($route))
 ?>
 
 <div class="form-buttons hide">
-    <a data-toggle="ajaxmodal" data-target="#triggerEventModal"
+    <a data-toggle="ajaxmodal" data-target="#campaignEventModal"
        href="<?php echo $view['router']->generate($route,
         array('objectAction' => 'edit', 'objectId' => $id)); ?>" class="btn btn-primary btn-xs">
         <i class="fa fa-pencil-square-o"></i>

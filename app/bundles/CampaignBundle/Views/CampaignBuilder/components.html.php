@@ -13,13 +13,13 @@ if ($tmpl == 'index') {
 ?>
 
 <div id="campaign-events">
-    <?php foreach ($events as $k => $a): ?>
+    <?php foreach ($events as $k => $e): ?>
         <?php if ($newGroup = (empty($lastGroup) || $lastGroup != $e['group'])): ?>
             <div class="campaign-event-group-header"><?php echo $e['group']; ?></div>
             <div class="campaign-event-group-body">
         <?php endif; ?>
         <a data-toggle="ajaxmodal" data-target="#campaignEventModal" href="<?php echo $view['router']->generate(
-            'mautic_campaignaction_action',
+            'mautic_campaignevent_action',
             array('objectAction' => 'new', 'type' => $k, 'tmpl' => 'action')); ?>">
             <div class="page-list-item">
                 <div class="padding-sm">

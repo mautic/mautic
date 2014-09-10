@@ -9,21 +9,30 @@ Mautic.campaignOnLoad = function (container) {
         Mautic.activateCategoryLookup('campaign', 'campaign');
     }
 
-    if (mQuery('#triggerEvents')) {
+    if (mQuery('#campaignEvents').length) {
         //make the fields sortable
-        mQuery('#triggerEvents').sortable({
-            items: '.campaign-event-row',
+        mQuery('#campaignEvents').nestedSortable({
+            items: 'li',
             handle: '.reorder-handle',
+            toleranceElement: '> div',
+            isTree: true,
+            placeholder: "campaign-event-placeholder",
+            helper: function() {
+                return mQuery('<div><i class="fa fa-lg fa-crosshairs"></i></div>');
+            },
+            cursorAt: {top: 15, left: 15},
+            tabSize: 10,
             stop: function(i) {
                 MauticVars.showLoadingBar = false;
                 mQuery.ajax({
                     type: "POST",
                     url: mauticAjaxUrl + "?action=campaign:reorderCampaignEvents",
-                    data: mQuery('#triggerEvents').sortable("serialize")});
+                    data: mQuery('#campaignEvents').nestedSortable("serialize")
+                });
             }
         });
 
-        mQuery('#triggerEvents .campaign-event-row').on('mouseover.campaignevents', function() {
+        mQuery('#campaignEvents .campaign-event-details').on('mouseover.campaignevents', function() {
             mQuery(this).find('.form-buttons').removeClass('hide');
         }).on('mouseout.campaignevents', function() {
             mQuery(this).find('.form-buttons').addClass('hide');
@@ -31,30 +40,30 @@ Mautic.campaignOnLoad = function (container) {
     }
 };
 
-Mautic.campaignEventLoad = function (container, response) {
+Mautic.campaignEventOnLoad = function (container, response) {
     //new action created so append it to the form
-    if (response.actionHtml) {
-        var newHtml = response.actionHtml;
-        var actionId = '#triggerEvent' + response.actionId;
-        if (mQuery(actionId).length) {
+    if (response.eventHtml) {
+        var newHtml = response.eventHtml;
+        var eventId = '#campaignEvents' + response.eventId;
+        if (mQuery(eventId).length) {
             //replace content
-            mQuery(actionId).replaceWith(newHtml);
+            mQuery(eventId).replaceWith(newHtml);
             var newField = false;
         } else {
             //append content
-            mQuery(newHtml).appendTo('#triggerEvents');
+            mQuery(newHtml).appendTo('#campaignEvents');
             var newField = true;
         }
         //activate new stuff
-        mQuery(actionId + " a[data-toggle='ajax']").click(function (event) {
+        mQuery(eventId + " a[data-toggle='ajax']").click(function (event) {
             event.preventDefault();
             return Mautic.ajaxifyLink(this, event);
         });
         //initialize tooltips
-        mQuery(actionId + " *[data-toggle='tooltip']").tooltip({html: true});
+        mQuery(eventId + " *[data-toggle='tooltip']").tooltip({html: true});
 
-        mQuery('#triggerEvents .campaign-event-row').off(".campaignevents");
-        mQuery('#triggerEvents .campaign-event-row').on('mouseover.campaignevents', function() {
+        mQuery('#campaignEvents .campaign-event-row').off(".campaignevents");
+        mQuery('#campaignEvents .campaign-event-row').on('mouseover.campaignevents', function() {
             mQuery(this).find('.form-buttons').removeClass('hide');
         }).on('mouseout.campaignevents', function() {
             mQuery(this).find('.form-buttons').addClass('hide');
@@ -62,7 +71,7 @@ Mautic.campaignEventLoad = function (container, response) {
 
         //show events panel
         if (!mQuery('#events-panel').hasClass('in')) {
-            mQuery('a[href="#events-panel"]').campaign('click');
+            mQuery('a[href="#events-panel"]').trigger('click');
         }
 
         if (mQuery('#campaign-event-placeholder').length) {

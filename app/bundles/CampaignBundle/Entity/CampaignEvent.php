@@ -58,7 +58,7 @@ class CampaignEvent
     private $description;
 
     /**
-     * @ORM\Column(name="action_order", type="integer")
+     * @ORM\Column(name="event_order", type="decimal", precision=2)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})
@@ -94,7 +94,7 @@ class CampaignEvent
     private $parent = null;
 
     /**
-     * @ORM\OneToMany(targetEntity="LeadEventLog", mappedBy="campaign", fetch="EXTRA_LAZY", cascade={"persist", "remove"})
+     * @ORM\OneToMany(targetEntity="LeadEventLog", mappedBy="event", fetch="EXTRA_LAZY", cascade={"persist", "remove"})
      */
     private $log;
 

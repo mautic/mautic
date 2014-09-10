@@ -11,40 +11,50 @@ $levelInitiated = false;
 if (!isset($level)) {
     $level = 1;
 }
-
-$levelClass  = 'nestedSortableLevel' . $level;
-$levelClass .= ($level === 1) ? '  nestedSortable' : '';
 ?>
-<?php if (!$levelInitiated): ?>
-<ol class="<?php echo $levelClass; ?>">
-<?php endif; ?>
-    <?php foreach ($events as $event): ?>
-    <?php
-    $parent    = $event['parent'];
-    $attr      = 'id="event'.$event['id'].'"';
-    $attr     .= (!empty($parent)) ? ' data-parent="'.$parent.'"' : '';
-    $children  = $event['children'];
-    $template  = (isset($event['settings']['template'])) ? $event['settings']['template'] :
-        'MauticCampaignBundle:Event:generic.html.php';
+<?php if (!$levelInitiated && $level > 1): ?>
+<ol>
+<?php
+endif;
 
-    echo $view->render($template, array(
-        'event'   => $event,
-        'inForm'  => (isset($inForm)) ? $inForm : false,
-        'id'      => $event['id'],
-        'deleted' => in_array($event['id'], $deletedEvents)
-    ));
+    foreach ($events as $event):
+        if ($event instanceof \Mautic\CampaignBundle\Entity\CampaignEvent) {
+            $parent   = $event->getParent();
+            $id       = $event->getId();
+            $children = $event->getChildren();
+            $type     = $event->getType();
+        } else {
+            $parent   = $event['parent'];
+            $id       = $event['id'];
+            $children = $event['children'];
+            $type     = $event['type'];
+        }
+        $settings = $eventTriggers[$type];
 
-    if (!empty($children)):
-        echo $view->render('MauticCampaignBundle:CampaignBuilder:events.html.php', array(
-            'events'        => $event['children'],
-            'level'         => $level + 1,
-            'deletedEvents' => $deletedEvents,
-            'inForm'        => $inForm
+        $attr      = 'id="event'.$id.'"';
+        $attr     .= (!empty($parent)) ? ' data-parent="'.$parent->getId().'"' : '';
+
+        $template  = (isset($settings['template'])) ? $settings['template'] :
+            'MauticCampaignBundle:Event:generic.html.php';
+
+        echo $view->render($template, array(
+            'event'   => $event,
+            'inForm'  => (isset($inForm)) ? $inForm : false,
+            'id'      => $id,
+            'deleted' => in_array($id, $deletedEvents)
         ));
-    endif;
-    ?>
-    <?php endforeach; ?>
-<?php if (!$levelInitiated): ?>
+
+        if (!empty($children)):
+            echo $view->render('MauticCampaignBundle:CampaignBuilder:events.html.php', array(
+                'events'        => $children,
+                'level'         => $level + 1,
+                'deletedEvents' => $deletedEvents,
+                'inForm'        => $inForm,
+                'eventTriggers' => $eventTriggers
+            ));
+        endif;
+     endforeach;
+if (!$levelInitiated && $level > 1): ?>
 </ol>
 <?php $levelInitiated = true; ?>
 <?php endif; ?>

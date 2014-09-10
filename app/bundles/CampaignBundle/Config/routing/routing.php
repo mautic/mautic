@@ -14,7 +14,7 @@ $collection = new RouteCollection();
 
 $collection->add('mautic_campaignevent_action', new Route('/campaigns/campaigns/events/{objectAction}/{objectId}',
     array(
-        '_controller' => 'MauticCampaignBundle:RangeAction:execute',
+        '_controller' => 'MauticCampaignBundle:CampaignEvent:execute',
         "objectId"    => 0
     )
 ));

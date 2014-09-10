@@ -272,7 +272,6 @@ class LeadListRepository extends CommonRepository
             $expr,
             ($returnParameter) ? array("$unique" => $string) : array()
         );
-
     }
 
     /**
@@ -299,5 +298,10 @@ class LeadListRepository extends CommonRepository
         return array(
             array('l.name', 'ASC')
         );
+    }
+
+    public function getTableAlias()
+    {
+        return 'l';
     }
 }

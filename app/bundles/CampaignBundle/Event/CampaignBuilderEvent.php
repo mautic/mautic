@@ -36,7 +36,7 @@ class CampaignBuilderEvent extends Event
      *  'label'       => (required) what to display in the list
      *  'description' => (optional) short description of event
      *  'template'    => (optional) template to use for the action's HTML in the campaign builder
-     *      i.e AcmeMyBundle:CampaignAction:theaction.html.php
+     *      i.e AcmeMyBundle:CampaignEvent:theaction.html.php
      *  'formType'    => (optional) name of the form type SERVICE for the action
      *  'callback'    => (required) callback function that will be passed when the action is campaigned
      *      The callback function can receive the following arguments by name (via ReflectionMethod::invokeArgs())

@@ -31,14 +31,14 @@ class CampaignEventType extends AbstractType
         $builder->addEventSubscriber(new CleanFormSubscriber());
 
         $builder->add('name', 'text', array(
-            'label'      => 'mautic.campaign.action.name',
+            'label'      => 'mautic.campaign.event.name',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control'),
             'required'   => false
         ));
 
         $builder->add('description', 'text', array(
-            'label'      => 'mautic.campaign.action.description',
+            'label'      => 'mautic.campaign.event.description',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control'),
             'required'   => false

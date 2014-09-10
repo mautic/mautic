@@ -6,36 +6,51 @@
     width: 75px;
 }
 
-.campaign-action-group-header {
+.campaign-event-group-header {
     font-size: 1.1em;
     font-weight: bold;
 }
 
-#campaign_actions .campaign-row {
-    padding: 20px;
-    margin-bottom: 0 !important;
-    border: 1px solid #ecf0f1;
-}
-
-#campaign_actions .campaign-row .action-label {
+#campaignEvents .campaign-event-row .campaign-event-label {
     font-size: 1.1em;
     font-weight: bold;
     display: block;
 }
 
-#campaign_actions .campaign-row .action-descr {
+#campaignEvents .campaign-event-row .campaign-event-descr {
     font-size: 0.9em;
     display: block;
 }
 
-#campaign_actions .campaign-row:hover {
+#campaignEvents li ol {
+    margin: 10px 0 !important;
+}
+
+/* Level One */
+#campaignEvents .campaign-event-details {
+    padding: 20px;
+    margin-bottom: 0 !important;
+    border: 1px solid #ecf0f1;
+    list-style-image: none;
+}
+
+#campaignEvents .campaign-event-details:hover {
     background-color: #ecf0f1;
 }
 
-#campaign_actions .campaign-row.bg-danger:hover {
+#campaignEvents .campaign-event-details.bg-danger:hover {
     background-color: #f2d4d2;
 }
 
-#campaign_actions .form-buttons {
+#campaignEvents .campaign-event-details.bg-danger:hover {
+    background-color: #f2d4d2;
+}
+
+#campaignEvents li.campaign-event-placeholder {
+    border: dashed 1px #000;
+    padding: 20px;
+}
+
+#campaignEvents .form-buttons {
     float: right;
 }

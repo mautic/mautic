@@ -206,15 +206,18 @@ class CampaignModel extends CommonFormModel
     /**
      * @param Campaign $entity
      * @param       $sessionEvents
+     * @param       $sessionOrder
      */
-    public function setEvents(Campaign &$entity, $sessionEvents)
+    public function setEvents(Campaign &$entity, $sessionEvents, $sessionOrder)
     {
-        $order   = 1;
-        $existingActions = $entity->getEvents();
+        $existingEvents = $entity->getEvents();
 
-        foreach ($sessionEvents as $properties) {
-            $isNew = (!empty($properties['id']) && isset($existingActions[$properties['id']])) ? false : true;
-            $event = !$isNew ? $existingActions[$properties['id']] : new CampaignEvent();
+        $events = array();
+        $order  = 1;
+
+        foreach ($sessionEvents as $id => $properties) {
+            $isNew = (!empty($properties['id']) && isset($existingEvents[$properties['id']])) ? false : true;
+            $event = !$isNew ? $existingEvents[$properties['id']] : new CampaignEvent();
 
             foreach ($properties as $f => $v) {
                 if (in_array($f, array('id', 'order')))
@@ -226,9 +229,54 @@ class CampaignModel extends CommonFormModel
                 }
                 $event->setCampaign($entity);
             }
-            $event->setOrder($order);
-            $order++;
-            $entity->addCampaignEvent($properties['id'], $event);
+
+            if (empty($sessionOrder)) {
+                //no order has been set so assume its a straight shot
+                $event->setOrder($order);
+                $order++;
+                $entity->addCampaignEvent($id, $event);
+            } else {
+                //its been rearranged so use the set order
+                $events[$id] = $event;
+            }
+        }
+
+        if (!empty($sessionOrder)) {
+            $orders = array();
+            foreach ($sessionOrder as $child => $parent) {
+                if (!isset($events[$child])) {
+                    //likely a deleted event
+                    continue;
+                }
+
+                //set the parent order
+                if ($parent == 'null') {
+                    if (!isset($orders[$parent])) {
+                        $orders[$parent] = 1;
+                    } else {
+                        $orders[$parent]++;
+                    }
+
+                    if (!isset($orders[$child])) {
+                        $orders[$child] = 1;
+                    }
+                } else {
+                    $orders[$parent] += 0.01;
+                }
+
+                $events[$child]->setOrder($orders[$parent]);
+
+                if ($parent != 'null') {
+                    if (!isset($events[$parent])) {
+                        //something went wrong and the id isn't available
+                        continue;
+                    }
+                    $events[$child]->setParent($events[$parent]);
+                }
+
+                $entity->addCampaignEvent($child, $events[$child]);
+
+            }
         }
     }
 
@@ -296,9 +344,7 @@ class CampaignModel extends CommonFormModel
                 'properties' => $event->getProperties(),
                 'campaign'      => array(
                     'id'        => $campaign->getId(),
-                    'name'      => $campaign->getName(),
-                    'campaigns'    => $campaign->getCampaigns(),
-                    'color'     => $campaign->getColor()
+                    'name'      => $campaign->getName()
                 )
             ),
             'lead'        => $lead,

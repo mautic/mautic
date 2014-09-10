@@ -209,14 +209,15 @@ class CampaignController extends FormController
                     $events = array_diff_key($addEvents, array_flip($deletedEvents));
 
                     //make sure that at least one action is selected
-                    if ('campaign' == 'campaign' && empty($events)) {
+                    if (empty($events)) {
                         //set the error
                         $form->addError(new FormError(
                             $this->get('translator')->trans('mautic.campaign.form.events.notempty', array(), 'validators')
                         ));
                         $valid = false;
                     } else {
-                        $model->setEvents($entity, $events);
+                        $order = $session->get('mautic.campaigns.order');
+                        $model->setEvents($entity, $events, $order);
 
                         //form is valid so process the data
                         $model->saveEntity($entity);
@@ -351,14 +352,15 @@ class CampaignController extends FormController
 
                 if ($valid = $this->isFormValid($form)) {
                     //make sure that at least one field is selected
-                    if ('campaign' == 'campaign' && empty($addEvents)) {
+                    if ( empty($addEvents)) {
                         //set the error
                         $form->addError(new FormError(
                             $this->get('translator')->trans('mautic.campaign.form.events.notempty', array(), 'validators')
                         ));
                         $valid = false;
                     } else {
-                        $model->setEvents($entity, $events);
+                        $order = $session->get('mautic.campaigns.order');
+                        $model->setEvents($entity, $events, $order);
 
                         //form is valid so process the data
                         $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
@@ -549,5 +551,6 @@ class CampaignController extends FormController
         $session = $this->factory->getSession();
         $session->remove('mautic.campaigns.add');
         $session->remove('mautic.campaigns.remove');
+        $session->remove('mautic.campaigns.order');
     }
 }

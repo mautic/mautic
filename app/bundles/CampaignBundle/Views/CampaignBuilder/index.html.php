@@ -35,22 +35,18 @@ $view['slots']->set("headerTitle", $header);
             echo $view['form']->row($form['details-panel-end']);
             echo $view['form']->row($form['events-panel-start']);
             ?>
-            <div id="campaignEvents">
+            <div>
+                <ol id="campaignEvents">
                 <?php
                 $level = 1;
                 if (count($campaignEvents)):
-                foreach ($campaignEvents as $event):
-                    $template = (isset($event['settings']['template'])) ? $event['settings']['template'] :
-                        'MauticCampaignBundle:Event:generic.html.php';
-                    echo $view->render($template, array(
-                        'event'  => $event,
-                        'inForm'  => true,
-                        'id'      => $event['id'],
-                        'deleted' => in_array($event['id'], $deletedEvents)
+                    echo $view->render('MauticCampaignBundle:CampaignBuilder:events.html.php', array(
+                        'events'        => $campaignEvents,
+                        'inForm'        => true,
+                        'deletedEvents' => $deletedEvents,
+                        'eventTriggers' => $events
                     ));
-                endforeach;
-                else:
-                ?>
+                else: ?>
                 <h3 id='campaign-event-placeholder'><?php echo $view['translator']->trans('mautic.campaign.form.addevent'); ?></h3>
                 <?php endif; ?>
             </div>
