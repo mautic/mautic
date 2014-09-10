@@ -10,87 +10,98 @@ if ($tmpl == 'index')
 $view->extend('MauticPointBundle:Point:index.html.php');
 ?>
 
-<div class="table-responsive scrollable body-white padding-sm page-list">
     <?php if (count($items)): ?>
-        <table class="table table-hover table-striped table-bordered point-list">
-            <thead>
-            <tr>
-                <th class="col-point-actions"></th>
-                <?php
-                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
-                    'sessionVar' => 'point',
-                    'orderBy'    => 'p.name',
-                    'text'       => 'mautic.point.thead.name',
-                    'class'      => 'col-point-name',
-                    'default'    => true
-                ));
-
-                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
-                    'sessionVar' => 'point',
-                    'orderBy'    => 'p.description',
-                    'text'       => 'mautic.point.thead.description',
-                    'class'      => 'col-point-description'
-                ));
-
-                echo '<th class="col-point-action">' . $view['translator']->trans('mautic.point.thead.action') . '</th>';
-
-                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
-                    'sessionVar' => 'point',
-                    'orderBy'    => 'p.id',
-                    'text'       => 'mautic.point.thead.id',
-                    'class'      => 'col-point-id'
-                ));
-                ?>
-            </tr>
-            </thead>
-            <tbody>
-            <?php foreach ($items as $item): ?>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                <?php echo $view['translator']->trans('mautic.point.header.index');?>
+            </h3>
+        </div>
+        <div class="table-responsive scrollable body-white padding-sm page-list">    
+            <table class="table table-hover table-striped table-bordered point-list">
+                <thead>
                 <tr>
-                    <td>
-                        <?php
-                        echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
-                            'item'      => $item,
-                            'edit'      => $permissions['point:points:edit'],
-                            'clone'     => $permissions['point:points:create'],
-                            'delete'    => $permissions['point:points:delete'],
-                            'routeBase' => 'point',
-                            'menuLink'  => 'mautic_point_index',
-                            'langVar'   => 'point'
-                        ));
-                        ?>
-                    </td>
-                    <td>
-                        <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php',array(
-                            'item'       => $item,
-                            'model'      => 'point'
-                        )); ?>
-                        <a href="<?php echo $view['router']->generate('mautic_point_action',
-                            array("objectAction" => "view", "objectId" => $item->getId())); ?>"
-                           data-toggle="ajax">
-                            <?php echo $item->getName(); ?>
-                        </a>
-                    </td>
-                    <td class="visible-md visible-lg"><?php echo $item->getDescription(); ?></td>
+                    <th class="col-point-actions"></th>
                     <?php
-                    $type   = $item->getType();
-                    $action = (isset($actions[$type])) ? $actions[$type]['label'] : '';
+                    echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                        'sessionVar' => 'point',
+                        'orderBy'    => 'p.name',
+                        'text'       => 'mautic.point.thead.name',
+                        'class'      => 'col-point-name',
+                        'default'    => true
+                    ));
+
+                    echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                        'sessionVar' => 'point',
+                        'orderBy'    => 'p.description',
+                        'text'       => 'mautic.point.thead.description',
+                        'class'      => 'col-point-description'
+                    ));
+
+                    echo '<th class="col-point-action">' . $view['translator']->trans('mautic.point.thead.action') . '</th>';
+
+                    echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                        'sessionVar' => 'point',
+                        'orderBy'    => 'p.id',
+                        'text'       => 'mautic.point.thead.id',
+                        'class'      => 'col-point-id'
+                    ));
                     ?>
-                    <td class="visible-md visible-lg"><?php echo $view['translator']->trans($action); ?></td>
-                    <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 </tr>
-            <?php endforeach; ?>
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                <?php foreach ($items as $item): ?>
+                    <tr>
+                        <td>
+                            <?php
+                            echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
+                                'item'      => $item,
+                                'edit'      => $permissions['point:points:edit'],
+                                'clone'     => $permissions['point:points:create'],
+                                'delete'    => $permissions['point:points:delete'],
+                                'routeBase' => 'point',
+                                'menuLink'  => 'mautic_point_index',
+                                'langVar'   => 'point'
+                            ));
+                            ?>
+                        </td>
+                        <td>
+                            <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php',array(
+                                'item'       => $item,
+                                'model'      => 'point'
+                            )); ?>
+                            <a href="<?php echo $view['router']->generate('mautic_point_action',
+                                array("objectAction" => "view", "objectId" => $item->getId())); ?>"
+                               data-toggle="ajax">
+                                <?php echo $item->getName(); ?>
+                            </a>
+                        </td>
+                        <td class="visible-md visible-lg"><?php echo $item->getDescription(); ?></td>
+                        <?php
+                        $type   = $item->getType();
+                        $action = (isset($actions[$type])) ? $actions[$type]['label'] : '';
+                        ?>
+                        <td class="visible-md visible-lg"><?php echo $view['translator']->trans($action); ?></td>
+                        <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
+                    </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+        <div class="panel-footer">
+            <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
+            "totalItems"      => count($items),
+            "page"            => $page,
+            "limit"           => $limit,
+            "menuLinkId"      => 'mautic_point_index',
+            "baseUrl"         => $view['router']->generate('mautic_point_index'),
+            'sessionVar'      => 'point'
+        )); ?>
+        </div>
+    </div>
     <?php else: ?>
-        <h4><?php echo $view['translator']->trans('mautic.core.noresults'); ?></h4>
+        <div class="alert alert-info">
+            <h4><?php echo $view['translator']->trans('mautic.core.noresults.header'); ?></h4>
+            <p><?php echo $view['translator']->trans('mautic.core.noresults'); ?></p>
+        </div>
     <?php endif; ?>
-    <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
-        "totalItems"      => count($items),
-        "page"            => $page,
-        "limit"           => $limit,
-        "menuLinkId"      => 'mautic_point_index',
-        "baseUrl"         => $view['router']->generate('mautic_point_index'),
-        'sessionVar'      => 'point'
-    )); ?>
-    <div class="footer-margin"></div>
-</div>
