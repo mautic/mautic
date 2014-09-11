@@ -552,8 +552,8 @@ var Mautic = {
             }
 
             //scroll to the top
-            if (response.target == '.main-panel-content') {
-                mQuery('.main-panel-wrapper').animate({
+            if (response.target == '#main-content') {
+                mQuery('body').animate({
                     scrollTop: 0
                 }, 0);
             } else {
