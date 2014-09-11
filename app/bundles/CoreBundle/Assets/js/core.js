@@ -27,6 +27,8 @@ MauticVars.lastGlobalSearchStr  = "";
 
 //register the loading bar for ajax page loads
 MauticVars.showLoadingBar       = true;
+//prevent multiple ajax calls from multiple clicks
+MauticVars.routeInProgress       = '';
 
 mQuery.ajaxSetup({
     beforeSend: function () {
@@ -375,12 +377,20 @@ var Mautic = {
 
                     //restore button class if applicable
                     Mautic.stopIconSpinPostEvent();
+
+                    //clear routeInProgress
+                    MauticVars.routeInProgress = '';
                 }
             },
             error: function (request, textStatus, errorThrown) {
                 if (mauticEnv == 'dev') {
                     alert(errorThrown);
                 }
+                //clear routeInProgress
+                MauticVars.routeInProgress = '';
+
+                //restore button class if applicable
+                Mautic.stopIconSpinPostEvent();
             }
         });
 
@@ -625,9 +635,8 @@ var Mautic = {
                 Mautic.unlockEntity(mQuery('.form-exist-unlock-model').val(), mQuery('.form-exist-unlock-id').val());
             }
         }
-
         var route = mQuery(el).attr('href');
-        if (route.indexOf('javascript')>=0) {
+        if (route.indexOf('javascript')>=0 || MauticVars.routeInProgress === route) {
             return false;
         }
 
@@ -652,6 +661,8 @@ var Mautic = {
         if (loading) {
             MauticVars.showLoadingBar = false;
         }
+
+        MauticVars.routeInProgress = route;
 
         Mautic.loadContent(route, link, method, null, event);
     },
