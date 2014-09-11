@@ -19,7 +19,7 @@ $view->extend('MauticCampaignBundle:Campaign:index.html.php');
                 <?php
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'campaign',
-                    'orderBy'    => 't.name',
+                    'orderBy'    => 'c.name',
                     'text'       => 'mautic.campaign.thead.name',
                     'class'      => 'col-campaign-name',
                     'default'    => true
@@ -27,14 +27,14 @@ $view->extend('MauticCampaignBundle:Campaign:index.html.php');
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'campaign',
-                    'orderBy'    => 't.description',
+                    'orderBy'    => 'c.description',
                     'text'       => 'mautic.campaign.thead.description',
                     'class'      => 'col-campaign-description'
                 ));
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'campaign',
-                    'orderBy'    => 't.id',
+                    'orderBy'    => 'c.id',
                     'text'       => 'mautic.campaign.thead.id',
                     'class'      => 'col-campaign-id'
                 ));

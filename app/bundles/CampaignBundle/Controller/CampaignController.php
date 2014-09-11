@@ -51,7 +51,7 @@ class CampaignController extends FormController
         $this->factory->getSession()->set('mautic.campaign.filter', $search);
 
         $filter = array('string' => $search, 'force' => array());
-        $orderBy    = $this->factory->getSession()->get('mautic.campaign.orderby', 't.name');
+        $orderBy    = $this->factory->getSession()->get('mautic.campaign.orderby', 'c.name');
         $orderByDir = $this->factory->getSession()->get('mautic.campaign.orderbydir', 'ASC');
 
         $campaigns = $this->factory->getModel('campaign')->getEntities(
@@ -299,6 +299,7 @@ class CampaignController extends FormController
      */
     public function editAction ($objectId, $ignorePost = false)
     {
+        /** @var \Mautic\CampaignBundle\Model\CampaignModel $model */
         $model      = $this->factory->getModel('campaign');
         $entity     = $model->getEntity($objectId);
         $session    = $this->factory->getSession();
@@ -352,7 +353,7 @@ class CampaignController extends FormController
 
                 if ($valid = $this->isFormValid($form)) {
                     //make sure that at least one field is selected
-                    if ( empty($addEvents)) {
+                    if (empty($addEvents)) {
                         //set the error
                         $form->addError(new FormError(
                             $this->get('translator')->trans('mautic.campaign.form.events.notempty', array(), 'validators')
@@ -360,13 +361,14 @@ class CampaignController extends FormController
                         $valid = false;
                     } else {
                         $order = $session->get('mautic.campaigns.order');
-                        $model->setEvents($entity, $events, $order);
+                        $model->setEvents($entity, $events, $order, $deletedEvents);
 
                         //form is valid so process the data
                         $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
 
-                        //delete entities
-                        $this->factory->getModel('form.action')->deleteEntities($deletedEvents);
+                        if (!empty($deletedEvents)) {
+                            $this->factory->getModel('campaign.event')->deleteEvents($entity->getEvents(), $addEvents, $deletedEvents);
+                        }
 
                         $this->request->getSession()->getFlashBag()->add(
                             'notice',
@@ -425,7 +427,7 @@ class CampaignController extends FormController
             $this->clearSessionComponents();
 
             //load existing events into session
-            $campaignEvents   = array();
+            $campaignEvents  = array();
             $existingActions = $entity->getEvents()->toArray();
             foreach ($existingActions as $a) {
                 $id     = $a->getId();
@@ -437,14 +439,22 @@ class CampaignController extends FormController
             $deletedEvents = array();
         }
 
+        $templateEvents = array();
+        //weed out child events to prevent them from being displayed multiple times
+        foreach ($campaignEvents as $e) {
+            if (empty($e['parent'])) {
+                $templateEvents[] = $e;
+            }
+        }
+
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'events'        => $model->getEvents(),
-                'campaignEvents' => $campaignEvents,
-                'deletedEvents' => $deletedEvents,
-                'tmpl'          => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
-                'entity'        => $entity,
-                'form'          => $form->createView()
+                'events'         => $model->getEvents(),
+                'campaignEvents' => $templateEvents,
+                'deletedEvents'  => $deletedEvents,
+                'tmpl'           => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
+                'entity'         => $entity,
+                'form'           => $form->createView()
             ),
             'contentTemplate' => 'MauticCampaignBundle:CampaignBuilder:components.html.php',
             'passthroughVars' => array(

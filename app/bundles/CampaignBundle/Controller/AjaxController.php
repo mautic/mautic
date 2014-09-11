@@ -30,7 +30,7 @@ class AjaxController extends CommonAjaxController
     {
         $dataArray  = array('success' => 0);
         $session    = $this->factory->getSession();
-        $order      = InputHelper::clean($request->request->get('campaignEvent'));
+        $order      = InputHelper::clean($request->request->get('CampaignEvent'));
         if (!empty($order)) {
             $session->set('mautic.campaigns.order', $order);
             $dataArray['success'] = 1;

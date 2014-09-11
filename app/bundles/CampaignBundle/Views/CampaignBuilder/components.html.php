@@ -10,17 +10,22 @@
 if ($tmpl == 'index') {
     $view->extend('MauticCampaignBundle:CampaignBuilder:index.html.php');
 }
+
+$campaignType = (is_null($form['type']->vars['data'])) ? 0 : $form['type']->vars['data'];
 ?>
 
-<div id="campaign-events">
+<div id="campaignEventList">
     <?php foreach ($events as $k => $e): ?>
         <?php if ($newGroup = (empty($lastGroup) || $lastGroup != $e['group'])): ?>
             <div class="campaign-event-group-header"><?php echo $e['group']; ?></div>
             <div class="campaign-event-group-body">
         <?php endif; ?>
         <a data-toggle="ajaxmodal" data-target="#campaignEventModal" href="<?php echo $view['router']->generate(
-            'mautic_campaignevent_action',
-            array('objectAction' => 'new', 'type' => $k, 'tmpl' => 'action')); ?>">
+            'mautic_campaignevent_action', array(
+                'objectAction' => 'new',
+                'type'         => $k,
+                'campaignType' => $campaignType
+            )); ?>">
             <div class="page-list-item">
                 <div class="padding-sm">
                     <div class="pull-left padding-sm">

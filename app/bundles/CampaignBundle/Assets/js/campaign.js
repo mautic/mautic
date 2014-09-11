@@ -44,7 +44,7 @@ Mautic.campaignEventOnLoad = function (container, response) {
     //new action created so append it to the form
     if (response.eventHtml) {
         var newHtml = response.eventHtml;
-        var eventId = '#campaignEvents' + response.eventId;
+        var eventId = '#CampaignEvent_' + response.eventId;
         if (mQuery(eventId).length) {
             //replace content
             mQuery(eventId).replaceWith(newHtml);
@@ -78,4 +78,21 @@ Mautic.campaignEventOnLoad = function (container, response) {
             mQuery('#campaign-event-placeholder').remove();
         }
     }
+};
+
+Mautic.updateCampaignEventLinks = function () {
+    //find and update all the event links with the campaign type
+
+    var campaignType = mQuery('#campaign_type .active input').val();
+    if (typeof campaignType == 'undefined') {
+        campaignType = 'interval';
+    }
+
+    mQuery('#campaignEventList a').each(function () {
+        var href    = mQuery(this).attr('href');
+        var newType = (campaignType == 'interval') ? 'date' : 'interval';
+
+        href = href.replace('campaignType=' + campaignType, 'campaignType=' + newType);
+        mQuery(this).attr('href', href);
+    });
 };

@@ -10,10 +10,10 @@
 namespace Mautic\CampaignBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
-use Mautic\CampaignBundle\Entity\CampaignEvent;
+use Mautic\CampaignBundle\Entity\Event;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-class CampaignEventController extends CommonFormController
+class EventController extends CommonFormController
 {
     /**
      * Generates new form and processes post data
@@ -47,10 +47,11 @@ class CampaignEventController extends CommonFormController
         }
 
         //fire the builder event
-        $events = $this->factory->getModel('campaign')->getEvents();
-        $form   = $this->get('form.factory')->create('campaignevent', $triggerEvent, array(
-            'action'   => $this->generateUrl('mautic_campaignevent_action', array('objectAction' => 'new')),
-            'settings' => $events[$eventType]
+        $events                   = $this->factory->getModel('campaign')->getEvents();
+        $form                     = $this->get('form.factory')->create('campaignevent', $triggerEvent, array(
+            'action'       => $this->generateUrl('mautic_campaignevent_action', array('objectAction' => 'new')),
+            'settings'     => $events[$eventType],
+            'campaignType' => $this->request->get('campaignType')
         ));
         $triggerEvent['settings'] = $events[$eventType];
 
@@ -99,7 +100,7 @@ class CampaignEventController extends CommonFormController
 
         if (!empty($keyId)) {
             //prevent undefined errors
-            $entity       = new CampaignEvent();
+            $entity       = new Event();
             $blank        = $entity->convertToArray();
             $triggerEvent = array_merge($blank, $triggerEvent);
 
@@ -137,12 +138,13 @@ class CampaignEventController extends CommonFormController
      */
     public function editAction ($objectId)
     {
-        $session      = $this->factory->getSession();
-        $method       = $this->request->getMethod();
-        $events       = $session->get('mautic.campaigns.add', array());
-        $success      = 0;
-        $valid        = $cancelled = false;
-        $triggerEvent = (array_key_exists($objectId, $events)) ? $events[$objectId] : null;
+        $session       = $this->factory->getSession();
+        $method        = $this->request->getMethod();
+        $addEvents     = $session->get('mautic.campaigns.add', array());
+        $deletedEvents = $session->get('mautic.campaigns.remove', array());
+        $success       = 0;
+        $valid         = $cancelled = false;
+        $triggerEvent  = (array_key_exists($objectId, $addEvents)) ? $addEvents[$objectId] : null;
 
         if ($triggerEvent !== null) {
             $eventType = $triggerEvent['type'];
@@ -161,10 +163,10 @@ class CampaignEventController extends CommonFormController
             //fire the builder event
             $events = $this->factory->getModel('campaign')->getEvents();
             $form   = $this->get('form.factory')->create('campaignevent', $triggerEvent, array(
-                'action'   => $this->generateUrl('mautic_campaignevent_action', array('objectAction' => 'new')),
-                'settings' => $events[$eventType]
+                'action'       => $this->generateUrl('mautic_campaignevent_action', array('objectAction' => 'new')),
+                'settings'     => $events[$eventType],
+                'campaignType' => $this->request->get('campaignType')
             ));
-            $triggerEvent['settings'] = $events[$eventType];
 
             //Check for a submitted form and process it
             if ($method == 'POST') {
@@ -175,16 +177,14 @@ class CampaignEventController extends CommonFormController
                         //form is valid so process the data
 
                         //save the properties to session
-                        $session  = $this->factory->getSession();
-                        $events   = $session->get('mautic.campaigns.add');
                         $formData = $form->getData();
                         //overwrite with updated data
-                        $triggerEvent = array_merge($events[$objectId], $formData);
+                        $triggerEvent = array_merge($addEvents[$objectId], $formData);
                         if (empty($triggerEvent['name'])) {
                             //set it to the event default
                             $triggerEvent['name'] = $this->get('translator')->trans($triggerEvent['settings']['label']);
                         }
-                        $events[$objectId] = $triggerEvent;
+                        $addEvents[$objectId] = $triggerEvent;
                         $session->set('mautic.campaigns.add', $events);
 
                         //generate HTML for the field
@@ -192,6 +192,8 @@ class CampaignEventController extends CommonFormController
                     }
                 }
             }
+
+            $triggerEvent['settings'] = $events[$eventType];
 
             $viewParams = array('type' => $eventType);
             if ($cancelled || $valid) {
@@ -213,17 +215,27 @@ class CampaignEventController extends CommonFormController
                 $passthroughVars['eventId'] = $keyId;
 
                 //prevent undefined errors
-                $entity       = new CampaignEvent();
+                $entity       = new Event();
                 $blank        = $entity->convertToArray();
                 $triggerEvent = array_merge($blank, $triggerEvent);
                 $template     = (empty($triggerEvent['settings']['template'])) ? 'MauticCampaignBundle:Event:generic.html.php'
                     : $triggerEvent['settings']['template'];
 
+                $childrenHtml = (!empty($triggerEvent['children'])) ? $this->renderView('MauticCampaignBundle:CampaignBuilder:events.html.php', array(
+                    'events'        => $triggerEvent['children'],
+                    'level'         => $this->request->get('level', 1) + 1,
+                    'deletedEvents' => $deletedEvents,
+                    'inForm'        => true,
+                    'eventTriggers' => $events
+                )) : '';
+
                 $passthroughVars['eventId']   = $keyId;
                 $passthroughVars['eventHtml'] = $this->renderView($template, array(
-                    'inForm' => true,
-                    'event'  => $triggerEvent,
-                    'id'     => $keyId
+                    'inForm'       => true,
+                    'event'        => $triggerEvent,
+                    'id'           => $keyId,
+                    'childrenHtml' => $childrenHtml,
+                    'level'        => $this->request->get('level', 1),
                 ));
             }
 
@@ -258,9 +270,9 @@ class CampaignEventController extends CommonFormController
      */
     public function deleteAction ($objectId)
     {
-        $session = $this->factory->getSession();
-        $events  = $session->get('mautic.campaigns.add', array());
-        $delete  = $session->get('mautic.campaigns.remove', array());
+        $session    = $this->factory->getSession();
+        $saveEvents = $session->get('mautic.campaigns.add', array());
+        $delete     = $session->get('mautic.campaigns.remove', array());
 
         //ajax only for form fields
         if (!$this->request->isXmlHttpRequest() ||
@@ -272,9 +284,12 @@ class CampaignEventController extends CommonFormController
             return $this->accessDenied();
         }
 
-        $triggerEvent = (array_key_exists($objectId, $events)) ? $events[$objectId] : null;
+        $triggerEvent = (array_key_exists($objectId, $saveEvents)) ? $saveEvents[$objectId] : null;
 
         if ($this->request->getMethod() == 'POST' && $triggerEvent !== null) {
+            $events                   = $this->factory->getModel('campaign')->getEvents();
+            $triggerEvent['settings'] = $events[$triggerEvent['type']];
+
             //add the field to the delete list
             if (!in_array($objectId, $delete)) {
                 $delete[] = $objectId;
@@ -285,22 +300,30 @@ class CampaignEventController extends CommonFormController
                 : $triggerEvent['settings']['template'];
 
             //prevent undefined errors
-            $entity       = new CampaignEvent();
+            $entity       = new Event();
             $blank        = $entity->convertToArray();
             $triggerEvent = array_merge($blank, $triggerEvent);
 
+            $childrenHtml = (!empty($triggerEvent['children'])) ? $this->renderView('MauticCampaignBundle:CampaignBuilder:events.html.php', array(
+                'events'        => $triggerEvent['children'],
+                'level'         => $this->request->get('level', 1) + 1,
+                'deletedEvents' => $delete,
+                'inForm'        => true,
+                'eventTriggers' => $events
+            )) : '';
+
             $dataArray = array(
-                'mauticContent'  => 'campaignEvent',
-                'success'        => 1,
-                'target'         => '#triggerEvent' . $objectId,
-                'route'          => false,
-                'eventId'        => $objectId,
-                'replaceContent' => true,
-                'eventHtml'      => $this->renderView($template, array(
-                    'inForm'  => true,
-                    'event'   => $triggerEvent,
-                    'id'      => $objectId,
-                    'deleted' => true
+                'mauticContent' => 'campaignEvent',
+                'success'       => 1,
+                'route'         => false,
+                'eventId'       => $objectId,
+                'eventHtml'     => $this->renderView($template, array(
+                    'inForm'       => true,
+                    'event'        => $triggerEvent,
+                    'id'           => $objectId,
+                    'deleted'      => true,
+                    'childrenHtml' => $childrenHtml,
+                    'level'        => $this->request->get('level', 1),
                 ))
             );
         } else {
@@ -339,6 +362,8 @@ class CampaignEventController extends CommonFormController
         $triggerEvent = (array_key_exists($objectId, $events)) ? $events[$objectId] : null;
 
         if ($this->request->getMethod() == 'POST' && $triggerEvent !== null) {
+            $events                   = $this->factory->getModel('campaign')->getEvents();
+            $triggerEvent['settings'] = $events[$triggerEvent['type']];
 
             //add the field to the delete list
             if (in_array($objectId, $delete)) {
@@ -350,23 +375,31 @@ class CampaignEventController extends CommonFormController
             $template = (empty($triggerEvent['settings']['template'])) ? 'MauticCampaignBundle:Event:generic.html.php'
                 : $triggerEvent['settings']['template'];
 
+            $childrenHtml = (!empty($triggerEvent['children'])) ? $this->renderView('MauticCampaignBundle:CampaignBuilder:events.html.php', array(
+                'events'        => $triggerEvent['children'],
+                'level'         => $this->request->get('level', 1) + 1,
+                'deletedEvents' => $delete,
+                'inForm'        => true,
+                'eventTriggers' => $events
+            )) : '';
+
             //prevent undefined errors
-            $entity       = new CampaignEvent();
+            $entity       = new Event();
             $blank        = $entity->convertToArray();
             $triggerEvent = array_merge($blank, $triggerEvent);
 
             $dataArray = array(
-                'mauticContent'  => 'campaignEvent',
-                'success'        => 1,
-                'target'         => '#triggerEvent' . $objectId,
-                'route'          => false,
-                'eventId'        => $objectId,
-                'replaceContent' => true,
-                'eventHtml'      => $this->renderView($template, array(
-                    'inForm'  => true,
-                    'event'   => $triggerEvent,
-                    'id'      => $objectId,
-                    'deleted' => false
+                'mauticContent' => 'campaignEvent',
+                'success'       => 1,
+                'route'         => false,
+                'eventId'       => $objectId,
+                'eventHtml'     => $this->renderView($template, array(
+                    'inForm'       => true,
+                    'event'        => $triggerEvent,
+                    'id'           => $objectId,
+                    'deleted'      => false,
+                    'level'        => $this->request->get('level', 1),
+                    'childrenHtml' => $childrenHtml
                 ))
             );
         } else {

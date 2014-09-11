@@ -23,7 +23,7 @@ class LeadEventLog
 
     /**
      * @ORM\Id()
-     * @ORM\ManyToOne(targetEntity="CampaignEvent", inversedBy="log")
+     * @ORM\ManyToOne(targetEntity="Event", inversedBy="log")
      **/
     private $event;
 

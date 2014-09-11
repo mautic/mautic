@@ -24,7 +24,7 @@ $container->setDefinition(
 $container->setDefinition(
     'mautic.campaignrange.type.action',
     new Definition(
-        'Mautic\CampaignBundle\Form\Type\CampaignEventType'
+        'Mautic\CampaignBundle\Form\Type\EventType'
     )
 )
     ->addTag('form.type', array(

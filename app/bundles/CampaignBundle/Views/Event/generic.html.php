@@ -8,7 +8,11 @@
  */
 $containerClass = (!empty($deleted)) ? ' bg-danger' : '';
 
-if ($event instanceof \Mautic\CampaignBundle\Entity\CampaignEvent) {
+if (!isset($childrenHtml)) {
+    $childrenHtml = '';
+}
+
+if ($event instanceof \Mautic\CampaignBundle\Entity\Event) {
     $name = $event->getName();
     $desc = $event->getDescription();
 } else {
@@ -17,14 +21,15 @@ if ($event instanceof \Mautic\CampaignBundle\Entity\CampaignEvent) {
 }
 ?>
 
-<li class="campaign-event-row <?php echo $containerClass; ?>" id="campaignEvent_<?php echo $id; ?>">
+<li class="campaign-event-row <?php echo $containerClass; ?>" id="CampaignEvent_<?php echo $id; ?>">
     <div class="campaign-event-details">
         <?php
         if (!empty($inForm))
             echo $view->render('MauticCampaignBundle:CampaignBuilder:actions.html.php', array(
                 'deleted'  => (!empty($deleted)) ? $deleted : false,
                 'id'       => $id,
-                'route'   => 'mautic_campaignevent_action'
+                'route'    => 'mautic_campaignevent_action',
+                'level'    => $level
             ));
         ?>
         <span class="campaign-event-label"><?php echo $name; ?></span>
@@ -32,4 +37,5 @@ if ($event instanceof \Mautic\CampaignBundle\Entity\CampaignEvent) {
         <span class="campaign-event-descr"><?php echo $desc; ?></span>
         <?php endif; ?>
     </div>
+    <?php echo $childrenHtml; ?>
 </li>

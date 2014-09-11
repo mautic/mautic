@@ -13,7 +13,7 @@ use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\Campaign;
-use Mautic\CampaignBundle\Entity\CampaignEvent;
+use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Event as Events;
 use Mautic\CampaignBundle\CampaignEvents;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -38,7 +38,7 @@ class CampaignModel extends CommonFormModel
 
     public function getEventRepository()
     {
-        return $this->em->getRepository('MauticCampaignBundle:CampaignEvent');
+        return $this->em->getRepository('MauticCampaignBundle:Event');
     }
 
     /**
@@ -208,19 +208,24 @@ class CampaignModel extends CommonFormModel
      * @param       $sessionEvents
      * @param       $sessionOrder
      */
-    public function setEvents(Campaign &$entity, $sessionEvents, $sessionOrder)
+    public function setEvents(Campaign &$entity, $sessionEvents, $sessionOrder, $deletedEvents)
     {
         $existingEvents = $entity->getEvents();
 
-        $events = array();
-        $order  = 1;
+        foreach ($deletedEvents as $deleteMe) {
+            if (isset($existingEvents[$deleteMe])) {
+                $entity->removeEvent($existingEvents[$deleteMe]);
+            }
+        }
 
+        //set the events from session
+        $events = array();
         foreach ($sessionEvents as $id => $properties) {
             $isNew = (!empty($properties['id']) && isset($existingEvents[$properties['id']])) ? false : true;
-            $event = !$isNew ? $existingEvents[$properties['id']] : new CampaignEvent();
+            $event = !$isNew ? $existingEvents[$properties['id']] : new Event();
 
             foreach ($properties as $f => $v) {
-                if (in_array($f, array('id', 'order')))
+                if (in_array($f, array('id', 'order', 'parent')))
                     continue;
 
                 $func = "set" .  ucfirst($f);
@@ -228,54 +233,88 @@ class CampaignModel extends CommonFormModel
                     $event->$func($v);
                 }
                 $event->setCampaign($entity);
-            }
 
-            if (empty($sessionOrder)) {
-                //no order has been set so assume its a straight shot
-                $event->setOrder($order);
-                $order++;
-                $entity->addCampaignEvent($id, $event);
-            } else {
-                //its been rearranged so use the set order
                 $events[$id] = $event;
             }
         }
 
+        //determine and set the order and also parent which must be done after the entity has been created and
+        //monitored by doctrine
+        $orders            = array();
+        $setOrderAndParent = function($eventId, $parentId) use ($orders, $entity, $events, $deletedEvents) {
+            if (!isset($orders[$parentId])) {
+                $orders[$parentId] = 1;
+            }
+
+            if (!isset($orders[$eventId])) {
+                $orders[$eventId] = $orders[$parentId];
+            }
+
+            //check to see if this event has a parent that has been deleted
+            $atTopParent   = false;
+            $parentDeleted = false;
+            $parent        = $events[$eventId]->getParent();
+            while (!$atTopParent && !$parentDeleted) {
+                if ($parent === null) {
+                    $atTopParent = true;
+                } else {
+                    //has this parent been deleted?
+                    if (in_array($parent->getId(), $deletedEvents)) {
+                        $parentDeleted = true;
+                    } else {
+                        //check to see if this parent has a parent of its own
+                        $parent = $events[$parent->getId()]->getParent();
+                    }
+                }
+            }
+
+            if ($parentDeleted) {
+                //parent has been deleted so don't save this event
+                $entity->removeEvent($events[$eventId]);
+                return;
+            }
+
+            //set the parent order
+            if ($parentId == 'null') {
+                $orders[$parentId]++;
+                floor($orders[$parentId]);
+            } else {
+                $orders[$parentId] += 0.01;
+            }
+
+            $events[$eventId]->setOrder($orders[$parentId]);
+
+            if ($parentId != 'null') {
+                if (isset($events[$parentId])) {
+                    $events[$eventId]->setParent($events[$parentId]);
+                }
+            } else {
+                $events[$eventId]->removeParent();
+            }
+            $this->em->persist($events[$eventId]);
+            $entity->addEvent($eventId, $events[$eventId]);
+        };
+
         if (!empty($sessionOrder)) {
-            $orders = array();
+            //the entities have been reordered manually by user
+
             foreach ($sessionOrder as $child => $parent) {
                 if (!isset($events[$child])) {
                     //likely a deleted event
                     continue;
                 }
 
+                $setOrderAndParent($child, $parent);
+            }
+        } else {
+            //the entities were not reordered by user
+
+            foreach ($events as $id => $e) {
                 //set the parent order
-                if ($parent == 'null') {
-                    if (!isset($orders[$parent])) {
-                        $orders[$parent] = 1;
-                    } else {
-                        $orders[$parent]++;
-                    }
+                $parent   = $e->getParent();
+                $parentId = ($parent === null) ? 'null' : $parent->getId();
 
-                    if (!isset($orders[$child])) {
-                        $orders[$child] = 1;
-                    }
-                } else {
-                    $orders[$parent] += 0.01;
-                }
-
-                $events[$child]->setOrder($orders[$parent]);
-
-                if ($parent != 'null') {
-                    if (!isset($events[$parent])) {
-                        //something went wrong and the id isn't available
-                        continue;
-                    }
-                    $events[$child]->setParent($events[$parent]);
-                }
-
-                $entity->addCampaignEvent($child, $events[$child]);
-
+                $setOrderAndParent($id, $parentId);
             }
         }
     }
@@ -297,7 +336,6 @@ class CampaignModel extends CommonFormModel
         }
         return $events;
     }
-
 
     /**
      * Campaigns a specific event
@@ -387,7 +425,7 @@ class CampaignModel extends CommonFormModel
         $campaigns = $lead->getCampaigns();
 
         //find all published campaigns that is applicable to this campaigns
-        /** @var \Mautic\CampaignBundle\Entity\CampaignEventRepository $repo */
+        /** @var \Mautic\CampaignBundle\Entity\EventRepository $repo */
         $repo      = $this->getEventRepository();
         $events    = $repo->getPublishedByCampaignTotal($campaigns);
         /** @var \Mautic\CoreBundle\Entity\IpAddress $ipAddress */
@@ -419,29 +457,5 @@ class CampaignModel extends CommonFormModel
         if (!empty($persist)) {
             $this->getEventRepository()->saveEntities($persist);
         }
-    }
-
-    /**
-     * Returns configured color based on passed in $campaigns
-     *
-     * @param $campaigns
-     *
-     * @return string
-     */
-    public function getColorForLeadCampaigns($campaigns)
-    {
-        static $campaigns = array();
-
-        if (empty($campaigns)) {
-            $campaigns = $this->getRepository()->getCampaignColors();
-        }
-
-        foreach ($campaigns as $campaign) {
-            if ($campaigns >= $campaign['campaigns']) {
-                return $campaign['color'];
-            }
-        }
-
-        return '';
     }
 }
