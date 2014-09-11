@@ -55,5 +55,5 @@ $view['slots']->set("headerTitle", $activeForm->getName());
         echo $view->render('MauticFormBundle:Form:stats.html.php', array('form' => $activeForm));
         echo $view->render('MauticFormBundle:Form:copy.html.php', array('form' => $activeForm));
     ?>
-    <div class="footer-margin"></div>
+    '
 </div>

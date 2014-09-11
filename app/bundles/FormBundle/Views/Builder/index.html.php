@@ -85,7 +85,7 @@ $view['slots']->set("headerTitle", $header);
             echo $view['form']->row($form['forms-panel-wrapper-end']);
             echo $view['form']->end($form);
             ?>
-            <div class="footer-margin"></div>
+            '
         </div>
     </div>
 

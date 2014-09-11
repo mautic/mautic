@@ -9,5 +9,4 @@
 
 //Use an iframe so that Mautic styling does not affect the form
 ?>
-<iframe src="<?php echo $view['router']->generate('mautic_form_action',
-    array('objectAction' => 'preview', 'objectId' => $form->getId())); ?>" style="margin: 0; padding: 0; border: none; width: 100%; height: 100%;"></iframe>
+<iframe src="<?php echo $view['router']->generate('mautic_form_action', array('objectAction' => 'preview', 'objectId' => $form->getId())); ?>" style="margin: 0; padding: 0; border: none; width: 100%; height: 100%;"></iframe>

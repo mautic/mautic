@@ -18,9 +18,7 @@ $header          = (empty($header)) ? "" : $header;
     <div class="modal-dialog<?php echo $size; ?>">
         <div class="modal-content<?php echo $class; ?>">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-                    <i class="fa fa-times-circle fa-lg"></i>
-                </button>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span aria-hidden="true">&times;</span></button>
 
                 <h4 class="modal-title" id="<?php echo $id; ?>-label">
                     <?php echo $header; ?>

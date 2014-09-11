@@ -138,5 +138,5 @@ if ($security->hasEntityAccess($permissions['email:emails:editown'], $permission
         'variants'      => $variants
     )); ?>
     <?php endif; ?>
-    <div class="footer-margin"></div>
+    '
 </div>
