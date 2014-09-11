@@ -56,6 +56,7 @@ $css = <<<CSS
 .mautic-content-placeholder { height: 100%; width: 100%; text-align: center; margin-top: 25px; }
 .mautic-editable.over-droppable { border: dashed 1px #ED9C28; }
 CSS;
+
 $view['assets']->addStyleDeclaration($css);
 
 //Set the slots
