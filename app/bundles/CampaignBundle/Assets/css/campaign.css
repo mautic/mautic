@@ -26,7 +26,6 @@
     margin: 10px 0 !important;
 }
 
-/* Level One */
 #campaignEvents .campaign-event-details {
     padding: 20px;
     margin-bottom: 0 !important;
@@ -38,11 +37,7 @@
     background-color: #ecf0f1;
 }
 
-#campaignEvents .campaign-event-details.bg-danger:hover {
-    background-color: #f2d4d2;
-}
-
-#campaignEvents .campaign-event-details.bg-danger:hover {
+#campaignEvents .campaign-event-row.bg-danger .campaign-event-details:hover {
     background-color: #f2d4d2;
 }
 

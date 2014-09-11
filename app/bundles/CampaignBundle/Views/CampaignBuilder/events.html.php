@@ -16,9 +16,8 @@ if (!isset($level)) {
 <ol>
 <?php
 endif;
-
     foreach ($events as $event):
-        if ($event instanceof \Mautic\CampaignBundle\Entity\CampaignEvent) {
+        if ($event instanceof \Mautic\CampaignBundle\Entity\Event) {
             $parent   = $event->getParent();
             $id       = $event->getId();
             $children = $event->getChildren();
@@ -37,22 +36,22 @@ endif;
         $template  = (isset($settings['template'])) ? $settings['template'] :
             'MauticCampaignBundle:Event:generic.html.php';
 
-        echo $view->render($template, array(
-            'event'   => $event,
-            'inForm'  => (isset($inForm)) ? $inForm : false,
-            'id'      => $id,
-            'deleted' => in_array($id, $deletedEvents)
-        ));
-
-        if (!empty($children)):
-            echo $view->render('MauticCampaignBundle:CampaignBuilder:events.html.php', array(
+        $childrenHtml = (!empty($children)) ? $view->render('MauticCampaignBundle:CampaignBuilder:events.html.php', array(
                 'events'        => $children,
                 'level'         => $level + 1,
                 'deletedEvents' => $deletedEvents,
                 'inForm'        => $inForm,
                 'eventTriggers' => $eventTriggers
-            ));
-        endif;
+            )) : '';
+
+        echo $view->render($template, array(
+            'event'        => $event,
+            'inForm'       => (isset($inForm)) ? $inForm : false,
+            'id'           => $id,
+            'deleted'      => in_array($id, $deletedEvents),
+            'childrenHtml' => $childrenHtml,
+            'level'        => $level
+        ));
      endforeach;
 if (!$levelInitiated && $level > 1): ?>
 </ol>

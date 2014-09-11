@@ -281,7 +281,6 @@ class ActionController extends CommonFormController
         }
 
         $formAction = (array_key_exists($objectId, $actions)) ? $actions[$objectId] : null;
-
         if ($this->request->getMethod() == 'POST' && $formAction !== null) {
             //add the field to the delete list
             if (!in_array($objectId, $delete)) {
