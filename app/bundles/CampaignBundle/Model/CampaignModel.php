@@ -233,7 +233,7 @@ class CampaignModel extends CommonFormModel
                     $event->$func($v);
                 }
                 $event->setCampaign($entity);
-
+                $event->setCampaignType($entity->getType());
                 $events[$id] = $event;
             }
         }
@@ -241,15 +241,7 @@ class CampaignModel extends CommonFormModel
         //determine and set the order and also parent which must be done after the entity has been created and
         //monitored by doctrine
         $orders            = array();
-        $setOrderAndParent = function($eventId, $parentId) use ($orders, $entity, $events, $deletedEvents) {
-            if (!isset($orders[$parentId])) {
-                $orders[$parentId] = 1;
-            }
-
-            if (!isset($orders[$eventId])) {
-                $orders[$eventId] = $orders[$parentId];
-            }
-
+        $setOrderAndParent = function($eventId, $parentId) use (&$orders, $entity, $events, $deletedEvents) {
             //check to see if this event has a parent that has been deleted
             $atTopParent   = false;
             $parentDeleted = false;
@@ -276,9 +268,17 @@ class CampaignModel extends CommonFormModel
 
             //set the parent order
             if ($parentId == 'null') {
-                $orders[$parentId]++;
-                floor($orders[$parentId]);
+                if (!isset($orders[$parentId])) {
+                    $orders[$parentId] = 1;
+                } else {
+                    $orders[$parentId] += 1;
+                    //$orders[$parentId] = floor($orders[$parentId]);
+                }
+                $events[$eventId]->setOrder($orders[$parentId]);
             } else {
+                if (!isset($orders[$parentId])) {
+                    $orders[$parentId] = 1;
+                }
                 $orders[$parentId] += 0.01;
             }
 

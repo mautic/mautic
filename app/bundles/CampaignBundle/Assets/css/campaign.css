@@ -46,6 +46,6 @@
     padding: 20px;
 }
 
-#campaignEvents .form-buttons {
-    float: right;
+#campaignEvents .campaign-event-timeframe {
+    margin-right: 5px;
 }

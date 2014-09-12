@@ -1,5 +1,10 @@
 //CampaignBundle
 
+/**
+ * Setup the campaign view
+ *
+ * @param container
+ */
 Mautic.campaignOnLoad = function (container) {
     if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'campaign');
@@ -40,6 +45,12 @@ Mautic.campaignOnLoad = function (container) {
     }
 };
 
+/**
+ * Setup the campaign event view
+ *
+ * @param container
+ * @param response
+ */
 Mautic.campaignEventOnLoad = function (container, response) {
     //new action created so append it to the form
     if (response.eventHtml) {
@@ -59,6 +70,14 @@ Mautic.campaignEventOnLoad = function (container, response) {
             event.preventDefault();
             return Mautic.ajaxifyLink(this, event);
         });
+
+        //initialize ajax'd modals
+        mQuery(eventId + " a[data-toggle='ajaxmodal']").on('click.ajaxmodal', function (event) {
+            event.preventDefault();
+
+            Mautic.ajaxifyModal(this, event);
+        });
+
         //initialize tooltips
         mQuery(eventId + " *[data-toggle='tooltip']").tooltip({html: true});
 
@@ -80,6 +99,9 @@ Mautic.campaignEventOnLoad = function (container, response) {
     }
 };
 
+/**
+ * Change the links in the available event list when the campaign type is changed
+ */
 Mautic.updateCampaignEventLinks = function () {
     //find and update all the event links with the campaign type
 
@@ -95,4 +117,23 @@ Mautic.updateCampaignEventLinks = function () {
         href = href.replace('campaignType=' + campaignType, 'campaignType=' + newType);
         mQuery(this).attr('href', href);
     });
+};
+
+/**
+ * Enable/Disable timeframe settings if the toggle for immediate trigger is changed
+ */
+Mautic.campaignToggleTimeframes = function() {
+    var disabled = (mQuery('#campaignevent_triggerImmediately_1').prop('checked')) ? true : false;
+
+    if (mQuery('#campaignevent_triggerInterval').length) {
+        mQuery('#campaignevent_triggerInterval').attr('disabled', disabled);
+    }
+
+    if (mQuery('#campaignevent_triggerIntervalUnit').length) {
+        mQuery('#campaignevent_triggerIntervalUnit').attr('disabled', disabled);
+    }
+
+    if (mQuery('#campaignevent_triggerDate').length) {
+        mQuery('#campaignevent_triggerDate').attr('disabled', disabled);
+    }
 };

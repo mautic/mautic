@@ -21,7 +21,7 @@ if (empty($route))
     $route = 'mautic_campaignevent_action';
 ?>
 
-<div class="form-buttons hide">
+<div class="pull-right hide form-buttons">
     <a data-toggle="ajaxmodal" data-target="#campaignEventModal"
        href="<?php echo $view['router']->generate($route,
         array('objectAction' => 'edit', 'objectId' => $id, 'level' => $level)); ?>" class="btn btn-primary btn-xs">

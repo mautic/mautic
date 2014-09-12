@@ -58,7 +58,7 @@ class Event
     private $description;
 
     /**
-     * @ORM\Column(name="event_order", type="decimal", precision=2)
+     * @ORM\Column(name="event_order", type="decimal", scale=2)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})
@@ -74,28 +74,44 @@ class Event
     private $properties = array();
 
     /**
-     * @ORM\Column(name="fire_date", type="datetime")
+     * @ORM\Column(name="trigger_immediately", type="boolean")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})
      */
-    private $fireDate;
+    private $triggerImmediately = false;
 
     /**
-     * @ORM\Column(name="fire_interval", type="integer")
+     * @ORM\Column(name="trigger_date", type="datetime", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})
      */
-    private $fireInterval = 0;
+    private $triggerDate;
 
     /**
-     * @ORM\Column(name="fire_interval_unit", type="string", length=1)
+     * @ORM\Column(name="trigger_interval", type="integer", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})
      */
-    private $fireIntervalUnit;
+    private $triggerInterval = 0;
+
+    /**
+     * @ORM\Column(name="trigger_interval_unit", type="string", length=1, nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full"})
+     */
+    private $triggerIntervalUnit;
+
+    /**
+     * @ORM\Column(name="campaign_type", type="string", length=10)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full"})
+     */
+    private $campaignType;
 
     /**
      * @ORM\ManyToOne(targetEntity="Campaign", inversedBy="events")
@@ -418,51 +434,88 @@ class Event
     /**
      * @return mixed
      */
-    public function getFireDate ()
+    public function getTriggerDate ()
     {
-        return $this->fireDate;
+        return $this->triggerDate;
     }
 
     /**
-     * @param mixed $fireDate
+     * @param mixed $triggerDate
      */
-    public function setFireDate ($fireDate)
+    public function setTriggerDate ($triggerDate)
     {
-        $this->isChanged('fireDate', $fireDate);
-        $this->fireDate = $fireDate;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getFireInterval ()
-    {
-        return $this->fireInterval;
-    }
-
-    /**
-     * @param mixed $fireInterval
-     */
-    public function setFireInterval ($fireInterval)
-    {
-        $this->isChanged('fireInterval', $fireInterval);
-        $this->fireInterval = $fireInterval;
+        $this->isChanged('triggerDate', $triggerDate);
+        $this->triggerDate = $triggerDate;
     }
 
     /**
      * @return mixed
      */
-    public function getFireIntervalUnit ()
+    public function getTriggerInterval ()
     {
-        return $this->fireIntervalUnit;
+        return $this->triggerInterval;
     }
 
     /**
-     * @param mixed $fireIntervalUnit
+     * @param mixed $triggerInterval
      */
-    public function setFireIntervalUnit ($fireIntervalUnit)
+    public function setTriggerInterval ($triggerInterval)
     {
-        $this->isChanged('fireIntervalUnit', $fireIntervalUnit);
-        $this->fireIntervalUnit = $fireIntervalUnit;
+        $this->isChanged('triggerInterval', $triggerInterval);
+        $this->triggerInterval = $triggerInterval;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTriggerIntervalUnit ()
+    {
+        return $this->triggerIntervalUnit;
+    }
+
+    /**
+     * @param mixed $triggerIntervalUnit
+     */
+    public function setTriggerIntervalUnit ($triggerIntervalUnit)
+    {
+        $this->isChanged('triggerIntervalUnit', $triggerIntervalUnit);
+        $this->triggerIntervalUnit = $triggerIntervalUnit;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCampaignType ()
+    {
+        return $this->campaignType;
+    }
+
+    /**
+     * @param mixed $campaignType
+     */
+    public function setCampaignType ($campaignType)
+    {
+        $this->isChanged('campaignType', $campaignType);
+        $this->campaignType = $campaignType;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTriggerImmediately ()
+    {
+        return $this->triggerImmediately;
+    }
+
+    /**
+     * @param mixed $triggerImmediately
+     */
+    public function setTriggerImmediately ($triggerImmediately)
+    {
+        $this->triggerImmediately = $triggerImmediately;
+    }
+
+    public function triggerImmediately () {
+        return $this->triggerImmediately;
     }
 }

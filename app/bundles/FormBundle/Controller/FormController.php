@@ -301,6 +301,7 @@ class FormController extends CommonFormController
         } else {
             //clear out existing fields in case the form was refreshed, browser closed, etc
             $this->clearSessionComponents();
+            $formFields = $formActions = $deletedActions = $deletedFields = array();
         }
 
         //fire the form builder event

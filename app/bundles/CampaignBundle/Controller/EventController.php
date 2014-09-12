@@ -32,7 +32,11 @@ class EventController extends CommonFormController
             $eventType    = $triggerEvent['type'];
         } else {
             $eventType    = $this->request->query->get('type');
-            $triggerEvent = array('type' => $eventType);
+            $campaignType = $this->request->query->get('campaignType', 'interval');
+            $triggerEvent = array(
+                'type'         => $eventType,
+                'campaignType' => $campaignType
+            );
         }
 
         //ajax only for form fields
@@ -65,7 +69,7 @@ class EventController extends CommonFormController
                     $keyId = 'new' . uniqid();
 
                     //save the properties to session
-                    $events             = $session->get('mautic.campaigns.add');
+                    $addEvents          = $session->get('mautic.campaigns.add');
                     $formData           = $form->getData();
                     $triggerEvent       = array_merge($triggerEvent, $formData);
                     $triggerEvent['id'] = $keyId;
@@ -73,8 +77,8 @@ class EventController extends CommonFormController
                         //set it to the event default
                         $triggerEvent['name'] = $this->get('translator')->trans($triggerEvent['settings']['label']);
                     }
-                    $events[$keyId] = $triggerEvent;
-                    $session->set('mautic.campaigns.add', $events);
+                    $addEvents[$keyId] = $triggerEvent;
+                    $session->set('mautic.campaigns.add', $addEvents);
                 } else {
                     $success = 0;
                 }
@@ -111,7 +115,8 @@ class EventController extends CommonFormController
             $passthroughVars['eventHtml'] = $this->renderView($template, array(
                 'inForm' => true,
                 'event'  => $triggerEvent,
-                'id'     => $keyId
+                'id'     => $keyId,
+                'level'  => 1
             ));
         }
 
@@ -163,7 +168,7 @@ class EventController extends CommonFormController
             //fire the builder event
             $events = $this->factory->getModel('campaign')->getEvents();
             $form   = $this->get('form.factory')->create('campaignevent', $triggerEvent, array(
-                'action'       => $this->generateUrl('mautic_campaignevent_action', array('objectAction' => 'new')),
+                'action'       => $this->generateUrl('mautic_campaignevent_action', array('objectAction' => 'edit', 'objectId' => $objectId)),
                 'settings'     => $events[$eventType],
                 'campaignType' => $this->request->get('campaignType')
             ));
@@ -185,7 +190,7 @@ class EventController extends CommonFormController
                             $triggerEvent['name'] = $this->get('translator')->trans($triggerEvent['settings']['label']);
                         }
                         $addEvents[$objectId] = $triggerEvent;
-                        $session->set('mautic.campaigns.add', $events);
+                        $session->set('mautic.campaigns.add', $addEvents);
 
                         //generate HTML for the field
                         $keyId = $objectId;

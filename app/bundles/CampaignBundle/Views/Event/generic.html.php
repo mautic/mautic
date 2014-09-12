@@ -13,29 +13,43 @@ if (!isset($childrenHtml)) {
 }
 
 if ($event instanceof \Mautic\CampaignBundle\Entity\Event) {
-    $name = $event->getName();
-    $desc = $event->getDescription();
-} else {
-    $name = $event['name'];
-    $desc = $event['description'];
+    $event = $event->convertToArray();
 }
 ?>
 
 <li class="campaign-event-row <?php echo $containerClass; ?>" id="CampaignEvent_<?php echo $id; ?>">
     <div class="campaign-event-details">
         <?php
-        if (!empty($inForm))
+        if (!empty($inForm)):
             echo $view->render('MauticCampaignBundle:CampaignBuilder:actions.html.php', array(
                 'deleted'  => (!empty($deleted)) ? $deleted : false,
                 'id'       => $id,
                 'route'    => 'mautic_campaignevent_action',
                 'level'    => $level
             ));
+        endif;
         ?>
-        <span class="campaign-event-label"><?php echo $name; ?></span>
-        <?php if (!empty($desc)): ?>
-        <span class="campaign-event-descr"><?php echo $desc; ?></span>
-        <?php endif; ?>
+        <div class="pull-right campaign-event-timeframe">
+            <?php if (!empty($event['triggerImmediately'])): ?>
+            <i class="fa fa-fw fa-clock-o"></i><?php echo $view['translator']->trans('mautic.campaign.event.inline.triggerimmediately'); ?>
+            <?php elseif ($event['campaignType'] == 'date'): ?>
+            <i class="fa fa-fw fa-clock-o"></i><?php echo $view['date']->toFull($event['triggerDate']); ?>
+            <?php else: ?>
+            <i class="fa fa-fw fa-clock-o"></i>
+                <?php echo $view['translator']->trans('mautic.campaign.event.inline.triggerinterval', array(
+                    '%interval%' => $event['triggerInterval'],
+                    '%unit%'     => $view['translator']->trans('mautic.campaign.event.intervalunit.' . $event['triggerIntervalUnit'])
+                ));
+            endif;
+            ?>
+        </div>
+        <div class="pull-left">
+            <span class="campaign-event-label"><?php echo $event['name']; ?></span>
+            <?php if (!empty($event['description'])): ?>
+            <span class="campaign-event-descr"><?php echo $event['description']; ?></span>
+            <?php endif; ?>
+        </div>
+        <div class="clearfix"></div>
     </div>
     <?php echo $childrenHtml; ?>
 </li>
