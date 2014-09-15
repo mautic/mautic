@@ -27,6 +27,8 @@ MauticVars.lastGlobalSearchStr  = "";
 
 //register the loading bar for ajax page loads
 MauticVars.showLoadingBar       = true;
+//prevent multiple ajax calls from multiple clicks
+MauticVars.routeInProgress       = '';
 
 mQuery.ajaxSetup({
     beforeSend: function () {
@@ -77,6 +79,7 @@ var Mautic = {
         container = typeof container !== 'undefined' ? container : 'body';
 
         //initiate links
+        mQuery(container + " a[data-toggle='ajax']").off('click.ajax');
         mQuery(container + " a[data-toggle='ajax']").on('click.ajax', function (event) {
             event.preventDefault();
 
@@ -89,6 +92,7 @@ var Mautic = {
         });
 
         //initialize ajax'd modals
+        mQuery(container + " *[data-toggle='ajaxmodal']").off('click.ajaxmodal');
         mQuery(container + " *[data-toggle='ajaxmodal']").on('click.ajaxmodal', function (event) {
             event.preventDefault();
 
@@ -134,6 +138,7 @@ var Mautic = {
             });
         });
 
+        mQuery(container + " a[data-toggle='download']").off('click.download');
         mQuery(container + " a[data-toggle='download']").on('click.download', function (event) {
             event.preventDefault();
 
@@ -149,8 +154,14 @@ var Mautic = {
         //little hack to move modal windows outside of positioned divs
         mQuery(container + " *[data-toggle='modal']").each(function (index) {
             var target = mQuery(this).attr('data-target');
+
+            //move the modal to the body tag to get around positioned div issues
+            mQuery(target).off('show.bs.modal');
             mQuery(target).on('show.bs.modal', function () {
-                mQuery(target).appendTo("body");
+                if (!mQuery(target).hasClass('modal-moved')) {
+                    mQuery(target).appendTo("body");
+                    mQuery(target).addClass('modal-moved');
+                }
             });
         });
 
@@ -229,6 +240,7 @@ var Mautic = {
             var handle   = mQuery(this).find('.shelf-handle').first();
             var contents = mQuery(this).find('.shelf-contents').first();
 
+            mQuery(handle).off('click.shelf');
             mQuery(handle).on('click.shelf', function(event) {
                 if (mQuery(contents).css('display') == 'block') {
                     mQuery(handle).find('i').removeClass('fa-chevron-circle-up').addClass('fa-chevron-circle-down')
@@ -300,6 +312,16 @@ var Mautic = {
             mQuery(this).tinymce().remove();
         });
 
+        //unload lingering modals from body so that there will not be multiple modals generated from new ajaxed content
+        mQuery(container + " *[data-toggle='modal']").each(function (index) {
+            var target = mQuery(this).attr('data-target');
+            mQuery(target).remove();
+        });
+        mQuery(container + " *[data-toggle='ajaxmodal']").each(function (index) {
+            var target = mQuery(this).attr('data-target');
+            mQuery(target).remove();
+        });
+
         //run specific unloads
         if (typeof Mautic[mauticContent + "OnUnload"] == 'function') {
             Mautic[mauticContent + "OnUnload"](container, response);
@@ -355,12 +377,20 @@ var Mautic = {
 
                     //restore button class if applicable
                     Mautic.stopIconSpinPostEvent();
+
+                    //clear routeInProgress
+                    MauticVars.routeInProgress = '';
                 }
             },
             error: function (request, textStatus, errorThrown) {
                 if (mauticEnv == 'dev') {
                     alert(errorThrown);
                 }
+                //clear routeInProgress
+                MauticVars.routeInProgress = '';
+
+                //restore button class if applicable
+                Mautic.stopIconSpinPostEvent();
             }
         });
 
@@ -605,9 +635,8 @@ var Mautic = {
                 Mautic.unlockEntity(mQuery('.form-exist-unlock-model').val(), mQuery('.form-exist-unlock-id').val());
             }
         }
-
         var route = mQuery(el).attr('href');
-        if (route.indexOf('javascript')>=0) {
+        if (route.indexOf('javascript')>=0 || MauticVars.routeInProgress === route) {
             return false;
         }
 
@@ -632,6 +661,8 @@ var Mautic = {
         if (loading) {
             MauticVars.showLoadingBar = false;
         }
+
+        MauticVars.routeInProgress = route;
 
         Mautic.loadContent(route, link, method, null, event);
     },
@@ -677,9 +708,11 @@ var Mautic = {
 
         //move the modal to the body tag to get around positioned div issues
         mQuery(target).on('show.bs.modal', function () {
-            mQuery(target).appendTo("body");
+            if (!mQuery(target).hasClass('modal-moved')) {
+                mQuery(target).appendTo("body");
+                mQuery(target).addClass('modal-moved');
+            }
         });
-
         mQuery(target).modal('show');
 
         mQuery.ajax({
@@ -703,7 +736,13 @@ var Mautic = {
 
     processModalContent: function (response, target) {
         //load the content
-        mQuery(target + " .modal-body").html(response.newContent);
+        if (mQuery(target + ' .loading-placeholder').length) {
+            mQuery(target + ' .loading-placeholder').addClass('hide');
+            mQuery(target + " .modal-body-content").html(response.newContent);
+            mQuery(target + " .modal-body-content").removeClass('hide');
+        } else {
+            mQuery(target + " .modal-body").html(response.newContent);
+        }
 
         //inactive tooltips, etc
         Mautic.onPageUnload(target, response);

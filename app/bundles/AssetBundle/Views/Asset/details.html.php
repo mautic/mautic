@@ -124,5 +124,5 @@ if ($security->hasEntityAccess($permissions['asset:assets:editown'], $permission
     <h3>@todo - landing asset stats/analytics will go here</h3>
     <?php echo "<pre>".print_r($stats, true)."</pre>"; ?>
     
-    <div class="footer-margin"></div>
+    '
 </div>

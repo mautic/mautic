@@ -1072,6 +1072,9 @@ a.text-info:hover {
   -webkit-box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
 }
+.modal-dialog {
+  margin: 80px auto;
+}
 .bullet {
   display: inline-block;
   vertical-align: middle;

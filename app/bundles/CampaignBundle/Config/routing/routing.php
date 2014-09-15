@@ -12,25 +12,9 @@ use Symfony\Component\Routing\Route;
 
 $collection = new RouteCollection();
 
-$collection->add('mautic_campaignevent_action', new Route('/campaigns/campaigns/events/{objectAction}/{objectId}',
+$collection->add('mautic_campaignevent_action', new Route('/campaigns/events/{objectAction}/{objectId}',
     array(
-        '_controller' => 'MauticCampaignBundle:RangeAction:execute',
-        "objectId"    => 0
-    )
-));
-
-$collection->add('mautic_campaign_index', new Route('/campaigns/campaigns/{page}',
-    array(
-        '_controller' => 'MauticCampaignBundle:Campaign:index',
-        'page'        => 1,
-    ), array(
-        'page'    => '\d+'
-    )
-));
-
-$collection->add('mautic_campaign_action', new Route('/campaigns/campaigns/{objectAction}/{objectId}',
-    array(
-        '_controller' => 'MauticCampaignBundle:Campaign:execute',
+        '_controller' => 'MauticCampaignBundle:Event:execute',
         "objectId"    => 0
     )
 ));

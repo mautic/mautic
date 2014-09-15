@@ -16,41 +16,35 @@ $view['slots']->set("headerTitle", $activePage->getTitle());?>
 $view['slots']->start('actions');
 if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions['page:pages:editother'],
     $activePage->getCreatedBy())): ?>
-    <li>
-        <a href="<?php echo $this->container->get('router')->generate(
-            'mautic_page_action', array("objectAction" => "edit", "objectId" => $activePage->getId())); ?>"
-           data-toggle="ajax"
-           data-menu-link="#mautic_page_index">
-            <i class="fa fa-fw fa-pencil-square-o"></i><?php echo $view["translator"]->trans("mautic.core.form.edit"); ?>
-        </a>
-    </li>
+    <a class="btn btn-default" href="<?php echo $this->container->get('router')->generate('mautic_page_action', array("objectAction" => "edit", "objectId" => $activePage->getId())); ?>" data-toggle="ajax" data-menu-link="#mautic_page_index">
+        <i class="fa fa-fw fa-pencil-square-o"></i>
+        <?php echo $view["translator"]->trans("mautic.core.form.edit"); ?>
+    </a>
 <?php endif; ?>
 <?php if ($security->hasEntityAccess($permissions['page:pages:deleteown'], $permissions['page:pages:deleteother'],
     $activePage->getCreatedBy())): ?>
-    <li>
-        <a href="javascript:void(0);"
-           onclick="Mautic.showConfirmation(
-               '<?php echo $view->escape($view["translator"]->trans("mautic.page.page.confirmdelete",
-               array("%name%" => $activePage->getTitle() . " (" . $activePage->getId() . ")")), 'js'); ?>',
-               '<?php echo $view->escape($view["translator"]->trans("mautic.core.form.delete"), 'js'); ?>',
-               'executeAction',
-               ['<?php echo $view['router']->generate('mautic_page_action',
-               array("objectAction" => "delete", "objectId" => $activePage->getId())); ?>',
-               '#mautic_page_index'],
-               '<?php echo $view->escape($view["translator"]->trans("mautic.core.form.cancel"), 'js'); ?>','',[]);">
-            <span><i class="fa fa-fw fa-trash-o"></i><?php echo $view['translator']->trans('mautic.core.form.delete'); ?></span>
-        </a>
-    </li>
+    <a class="btn btn-default" href="javascript:void(0);"
+       onclick="Mautic.showConfirmation(
+           '<?php echo $view->escape($view["translator"]->trans("mautic.page.page.confirmdelete",
+           array("%name%" => $activePage->getTitle() . " (" . $activePage->getId() . ")")), 'js'); ?>',
+           '<?php echo $view->escape($view["translator"]->trans("mautic.core.form.delete"), 'js'); ?>',
+           'executeAction',
+           ['<?php echo $view['router']->generate('mautic_page_action',
+           array("objectAction" => "delete", "objectId" => $activePage->getId())); ?>',
+           '#mautic_page_index'],
+           '<?php echo $view->escape($view["translator"]->trans("mautic.core.form.cancel"), 'js'); ?>','',[]);">
+        <i class="fa fa-fw fa-trash-o text-danger"></i>
+        <?php echo $view['translator']->trans('mautic.core.form.delete'); ?>
+    </a>
 <?php endif; ?>
 <?php if (empty($variants['parent']) && $permissions['page:pages:create']): ?>
-    <li>
-        <a href="<?php echo $view['router']->generate('mautic_page_action',
+    <a class="btn btn-default" href="<?php echo $view['router']->generate('mautic_page_action',
            array("objectAction" => "abtest", "objectId" => $activePage->getId())); ?>"
         data-toggle="ajax"
         data-menu-link="mautic_page_index">
-        <span><i class="fa fa-sitemap"></i><?php echo $view['translator']->trans('mautic.page.page.form.abtest'); ?></span>
-        </a>
-    </li>
+        <i class="fa fa-sitemap"></i>
+        <?php echo $view['translator']->trans('mautic.page.page.form.abtest'); ?>
+    </a>
 <?php endif; ?>
 <?php $view['slots']->stop(); ?>
 
@@ -71,7 +65,6 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                data-toggle="ajax">
                 <?php echo $catName; ?>
             </a>
-            <span> | </span>
             <span>
                 <?php
                 $author     = $activePage->getCreatedBy();
@@ -91,7 +84,6 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                     <?php echo $authorName; ?>
                 </a>
             </span>
-            <span> | </span>
             <span>
             <?php $langSearch = $view['translator']->trans('mautic.core.searchcommand.lang').":".$activePage->getLanguage(); ?>
                 <a href="<?php echo $view['router']->generate('mautic_page_index', array('search' => $langSearch)); ?>"
@@ -136,5 +128,5 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
         'variants'      => $variants
     )); ?>
     <?php endif; ?>
-    <div class="footer-margin"></div>
+    '
 </div>

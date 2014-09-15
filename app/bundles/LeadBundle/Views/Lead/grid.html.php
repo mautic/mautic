@@ -14,7 +14,7 @@ if ($tmpl == 'index')
     <?php if (count($items)): ?>
     <?php foreach ($items as $item): ?>
     <?php $fields = $item->getFields(); ?>
-    <div class="shuffle shuffle-item grid margin-md-bottom col-sm-6 col-lg-4">
+    <div class="shuffle shuffle-item grid col-sm-6 col-lg-4">
         <div class="panel widget">
             <div class="table-layout nm">
                 <div class="col-xs-4 text-center">

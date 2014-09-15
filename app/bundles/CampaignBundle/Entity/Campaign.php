@@ -84,7 +84,15 @@ class Campaign extends FormEntity
     private $category;
 
     /**
-     * @ORM\OneToMany(targetEntity="CampaignEvent", mappedBy="campaign", cascade={"all"}, indexBy="id", fetch="EXTRA_LAZY")
+     * @ORM\Column(type="string", length=10)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full"})
+     */
+    private $type;
+
+    /**
+     * @ORM\OneToMany(targetEntity="Event", mappedBy="campaign", cascade={"all"}, indexBy="id", fetch="EXTRA_LAZY")
      * @ORM\OrderBy({"order" = "ASC"})
      */
     private $events;
@@ -187,10 +195,10 @@ class Campaign extends FormEntity
      * Add events
      *
      * @param $key
-     * @param \Mautic\CampaignBundle\Entity\CampaignEvent $event
+     * @param \Mautic\CampaignBundle\Entity\Event $event
      * @return Campaign
      */
-    public function addCampaignEvent($key, CampaignEvent $event)
+    public function addEvent($key, Event $event)
     {
         if ($changes = $event->getChanges()) {
             $this->isChanged('events', array($key, $changes));
@@ -203,9 +211,9 @@ class Campaign extends FormEntity
     /**
      * Remove events
      *
-     * @param \Mautic\CampaignBundle\Entity\CampaignEvent $event
+     * @param \Mautic\CampaignBundle\Entity\Event $event
      */
-    public function removeCampaignEvent(\Mautic\CampaignBundle\Entity\CampaignEvent $event)
+    public function removeEvent(\Mautic\CampaignBundle\Entity\Event $event)
     {
         $this->events->removeElement($event);
     }
@@ -297,6 +305,24 @@ class Campaign extends FormEntity
      */
     public function setCategory ($category)
     {
+        $this->isChanged('category', $category);
         $this->category = $category;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getType ()
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param mixed $type
+     */
+    public function setType ($type)
+    {
+        $this->isChanged('type', $type);
+        $this->type = $type;
     }
 }

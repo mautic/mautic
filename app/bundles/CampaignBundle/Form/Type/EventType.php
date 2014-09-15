@@ -15,11 +15,11 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * Class CampaignEventType
+ * Class EventType
  *
  * @package Mautic\CampaignBundle\Form\Type
  */
-class CampaignEventType extends AbstractType
+class EventType extends AbstractType
 {
 
     /**
@@ -31,18 +31,54 @@ class CampaignEventType extends AbstractType
         $builder->addEventSubscriber(new CleanFormSubscriber());
 
         $builder->add('name', 'text', array(
-            'label'      => 'mautic.campaign.action.name',
+            'label'      => 'mautic.campaign.event.name',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control'),
             'required'   => false
         ));
 
         $builder->add('description', 'text', array(
-            'label'      => 'mautic.campaign.action.description',
+            'label'      => 'mautic.campaign.event.description',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control'),
             'required'   => false
         ));
+
+        if ($options['campaignType'] == 'date') {
+            $builder->add('fireDate', 'text', array(
+                'label'      => 'mautic.campaign.event.firedate',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array(
+                    'class' => 'form-control',
+                    'data-toggle' => 'datetime'
+                )
+            ));
+        } else {
+            $builder->add('fireInterval', 'number', array(
+                'label'      => 'mautic.campaign.event.fireinterval',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array(
+                    'class' => 'form-control',
+                    'preaddon' => 'symbol-hashtag'
+                )
+            ));
+
+            $builder->add('fireIntervalUnit', 'choice', array(
+                'choices' => array(
+                    'i'  => 'mautic.campaign.event.intervalunit.minute',
+                    'h'  => 'mautic.campaign.event.intervalunit.hour',
+                    'd'  => 'mautic.campaign.event.intervalunit.day',
+                    'm'  => 'mautic.campaign.event.intervalunit.month',
+                    'y'  => 'mautic.campaign.event.intervalunit.year',
+                ),
+                'multiple'    => false,
+                'label_attr'  => array('class' => 'control-label'),
+                'label'       => false,
+                'attr'        => array('class' => 'form-control'),
+                'empty_value' => false,
+                'required'    => false
+            ));
+        }
 
         if (!empty($options['settings']['formType'])) {
             $properties = (!empty($options['data']['properties'])) ? $options['data']['properties'] : null;
@@ -81,10 +117,7 @@ class CampaignEventType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults(array(
-            'settings' => false
-        ));
-
+        $resolver->setOptional(array('campaignType'));
         $resolver->setRequired(array('settings'));
     }
 

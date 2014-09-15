@@ -13,11 +13,11 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class FormSubmitActionAddToListType
+ * Class EventListType
  *
  * @package Mautic\LeadBundle\Form\Type
  */
-class FormSubmitActionListType extends AbstractType
+class EventListType extends AbstractType
 {
 
     /**
@@ -27,7 +27,7 @@ class FormSubmitActionListType extends AbstractType
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
         $builder->add('addToLists', 'leadlist_choices', array(
-            'label'      => 'mautic.lead.lead.submitaction.addtolists',
+            'label'      => 'mautic.lead.lead.events.addtolists',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
                 'class'       => 'form-control'
@@ -37,7 +37,7 @@ class FormSubmitActionListType extends AbstractType
         ));
 
         $builder->add('removeFromLists', 'leadlist_choices', array(
-            'label'      => 'mautic.lead.lead.submitaction.removefromlists',
+            'label'      => 'mautic.lead.lead.events.removefromlists',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
                 'class'       => 'form-control'
@@ -51,6 +51,6 @@ class FormSubmitActionListType extends AbstractType
      * @return string
      */
     public function getName() {
-        return "lead_submitaction_leadlist";
+        return "lead_event_leadlist";
     }
 }

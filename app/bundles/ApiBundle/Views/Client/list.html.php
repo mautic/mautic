@@ -70,5 +70,5 @@ endif;
         'sessionVar' => 'client',
         'tmpl'       => $tmpl
     )); ?>
-    <div class="footer-margin"></div>
+    '
 </div>

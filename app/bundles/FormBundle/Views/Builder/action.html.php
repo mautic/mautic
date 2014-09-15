@@ -14,5 +14,5 @@
     </div>
 
     <?php echo $view['form']->form($form); ?>
-    <div class="footer-margin"></div>
+    '
 </div>

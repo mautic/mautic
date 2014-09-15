@@ -15,12 +15,12 @@ use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * Class CampaignEvent
- * @ORM\Table(name="campaign_campaign_events")
- * @ORM\Entity(repositoryClass="Mautic\CampaignBundle\Entity\CampaignEventRepository")
+ * Class Event
+ * @ORM\Table(name="campaign_events")
+ * @ORM\Entity(repositoryClass="Mautic\CampaignBundle\Entity\EventRepository")
  * @Serializer\ExclusionPolicy("all")
  */
-class CampaignEvent
+class Event
 {
 
     /**
@@ -58,7 +58,7 @@ class CampaignEvent
     private $description;
 
     /**
-     * @ORM\Column(name="action_order", type="integer")
+     * @ORM\Column(name="event_order", type="decimal", precision=2)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})
@@ -74,18 +74,42 @@ class CampaignEvent
     private $properties = array();
 
     /**
+     * @ORM\Column(name="fire_date", type="datetime")
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full"})
+     */
+    private $fireDate;
+
+    /**
+     * @ORM\Column(name="fire_interval", type="integer")
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full"})
+     */
+    private $fireInterval = 0;
+
+    /**
+     * @ORM\Column(name="fire_interval_unit", type="string", length=1)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full"})
+     */
+    private $fireIntervalUnit;
+
+    /**
      * @ORM\ManyToOne(targetEntity="Campaign", inversedBy="events")
      * @ORM\JoinColumn(name="campaign_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      */
     private $campaign;
 
     /**
-     * @ORM\OneToMany(targetEntity="CampaignEvent", mappedBy="parent", indexBy="id")
+     * @ORM\OneToMany(targetEntity="Event", mappedBy="parent", indexBy="id")
      **/
     private $children;
 
     /**
-     * @ORM\ManyToOne(targetEntity="CampaignEvent", inversedBy="children")
+     * @ORM\ManyToOne(targetEntity="Event", inversedBy="children")
      * @ORM\JoinColumn(name="parent_id", referencedColumnName="id", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
@@ -94,7 +118,7 @@ class CampaignEvent
     private $parent = null;
 
     /**
-     * @ORM\OneToMany(targetEntity="LeadEventLog", mappedBy="campaign", fetch="EXTRA_LAZY", cascade={"persist", "remove"})
+     * @ORM\OneToMany(targetEntity="LeadEventLog", mappedBy="event", fetch="EXTRA_LAZY", cascade={"persist", "remove"})
      */
     private $log;
 
@@ -143,7 +167,7 @@ class CampaignEvent
      * Set order
      *
      * @param integer $order
-     * @return CampaignEvent
+     * @return Event
      */
     public function setOrder($order)
     {
@@ -168,7 +192,7 @@ class CampaignEvent
      * Set properties
      *
      * @param array $properties
-     * @return CampaignEvent
+     * @return Event
      */
     public function setProperties($properties)
     {
@@ -193,7 +217,7 @@ class CampaignEvent
      * Set campaign
      *
      * @param \Mautic\CampaignBundle\Entity\Campaign $campaign
-     * @return CampaignEvent
+     * @return Event
      */
     public function setCampaign(\Mautic\CampaignBundle\Entity\Campaign $campaign)
     {
@@ -216,7 +240,7 @@ class CampaignEvent
      * Set type
      *
      * @param string $type
-     * @return CampaignEvent
+     * @return Event
      */
     public function setType($type)
     {
@@ -244,12 +268,11 @@ class CampaignEvent
         return get_object_vars($this);
     }
 
-
     /**
      * Set description
      *
      * @param string $description
-     * @return CampaignEvent
+     * @return Event
      */
     public function setDescription($description)
     {
@@ -273,7 +296,7 @@ class CampaignEvent
      * Set name
      *
      * @param string $name
-     * @return CampaignEvent
+     * @return Event
      */
     public function setName($name)
     {
@@ -329,10 +352,10 @@ class CampaignEvent
     /**
      * Add children
      *
-     * @param \Mautic\CampaignBundle\Entity\CampaignEvent $children
-     * @return CampaignEvent
+     * @param \Mautic\CampaignBundle\Entity\Event $children
+     * @return Event
      */
-    public function addChild(\Mautic\CampaignBundle\Entity\CampaignEvent $children)
+    public function addChild(\Mautic\CampaignBundle\Entity\Event $children)
     {
         $this->children[] = $children;
 
@@ -342,9 +365,9 @@ class CampaignEvent
     /**
      * Remove children
      *
-     * @param \Mautic\CampaignBundle\Entity\CampaignEvent $children
+     * @param \Mautic\CampaignBundle\Entity\Event $children
      */
-    public function removeChild(\Mautic\CampaignBundle\Entity\CampaignEvent $children)
+    public function removeChild(\Mautic\CampaignBundle\Entity\Event $children)
     {
         $this->children->removeElement($children);
     }
@@ -362,10 +385,10 @@ class CampaignEvent
     /**
      * Set parent
      *
-     * @param \Mautic\CampaignBundle\Entity\CampaignEvent $parent
-     * @return CampaignEvent
+     * @param \Mautic\CampaignBundle\Entity\Event $parent
+     * @return Event
      */
-    public function setParent(\Mautic\CampaignBundle\Entity\CampaignEvent $parent = null)
+    public function setParent(\Mautic\CampaignBundle\Entity\Event $parent = null)
     {
         $this->isChanged('parent', $parent);
         $this->parent = $parent;
@@ -374,12 +397,72 @@ class CampaignEvent
     }
 
     /**
+     * Remove parent
+     */
+    public function removeParent()
+    {
+        $this->isChanged('parent', '');
+        $this->parent = null;
+    }
+
+    /**
      * Get parent
      *
-     * @return \Mautic\CampaignBundle\Entity\CampaignEvent
+     * @return \Mautic\CampaignBundle\Entity\Event
      */
     public function getParent()
     {
         return $this->parent;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getFireDate ()
+    {
+        return $this->fireDate;
+    }
+
+    /**
+     * @param mixed $fireDate
+     */
+    public function setFireDate ($fireDate)
+    {
+        $this->isChanged('fireDate', $fireDate);
+        $this->fireDate = $fireDate;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getFireInterval ()
+    {
+        return $this->fireInterval;
+    }
+
+    /**
+     * @param mixed $fireInterval
+     */
+    public function setFireInterval ($fireInterval)
+    {
+        $this->isChanged('fireInterval', $fireInterval);
+        $this->fireInterval = $fireInterval;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getFireIntervalUnit ()
+    {
+        return $this->fireIntervalUnit;
+    }
+
+    /**
+     * @param mixed $fireIntervalUnit
+     */
+    public function setFireIntervalUnit ($fireIntervalUnit)
+    {
+        $this->isChanged('fireIntervalUnit', $fireIntervalUnit);
+        $this->fireIntervalUnit = $fireIntervalUnit;
     }
 }

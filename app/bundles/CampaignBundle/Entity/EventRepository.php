@@ -10,12 +10,11 @@
 namespace Mautic\CampaignBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
-use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 /**
- * ActionRepository
+ * EventRepository
  */
-class CampaignEventRepository extends CommonRepository
+class EventRepository extends CommonRepository
 {
 
     /**
@@ -30,7 +29,7 @@ class CampaignEventRepository extends CommonRepository
         $now = new \DateTime();
 
         $q = $this->createQueryBuilder('a')
-            ->select('partial a.{id, type, name, properties, settings}, partial r.{id, name, campaigns, color}')
+            ->select('partial a.{id, type, name, properties}, partial r.{id, name}')
             ->leftJoin('a.range', 'r')
             ->orderBy('a.order');
 
@@ -66,7 +65,7 @@ class CampaignEventRepository extends CommonRepository
     {
         $now = new \DateTime();
         $q = $this->createQueryBuilder('e')
-            ->select('partial e.{id, type, name, properties, settings}, partial t.{id, name, campaigns, color}')
+            ->select('partial e.{id, type, name, properties}, partial t.{id, name}')
             ->join('e.campaign', 't')
             ->orderBy('e.order');
 
@@ -103,8 +102,8 @@ class CampaignEventRepository extends CommonRepository
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select('e')
             ->from(MAUTIC_TABLE_PREFIX . 'campaign_lead_event_log', 'x')
-            ->innerJoin('x', MAUTIC_TABLE_PREFIX . 'campaign_campaign_events', 'e', 'x.campaignevent_id = e.id')
-            ->innerJoin('e', MAUTIC_TABLE_PREFIX . 'campaign_campaigns', 't', 'e.campaign_id = t.id');
+            ->innerJoin('x', MAUTIC_TABLE_PREFIX . 'campaign_events', 'e', 'x.event_id = e.id')
+            ->innerJoin('e', MAUTIC_TABLE_PREFIX . 'campaigns', 't', 'e.campaign_id = t.id');
 
         //make sure the published up and down dates are good
         $q->where($q->expr()->eq('x.lead_id', (int) $leadId));
@@ -131,7 +130,7 @@ class CampaignEventRepository extends CommonRepository
         $results = $this->_em->getConnection()->createQueryBuilder()
             ->select('e.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'e')
-            ->where('e.campaignevent_id = ' . (int) $eventId)
+            ->where('e.event_id = ' . (int) $eventId)
             ->execute()
             ->fetchAll();
 

@@ -7,21 +7,35 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 $containerClass = (!empty($deleted)) ? ' bg-danger' : '';
+
+if (!isset($childrenHtml)) {
+    $childrenHtml = '';
+}
+
+if ($event instanceof \Mautic\CampaignBundle\Entity\Event) {
+    $name = $event->getName();
+    $desc = $event->getDescription();
+} else {
+    $name = $event['name'];
+    $desc = $event['description'];
+}
 ?>
 
-<li class="campaign-event-row <?php echo $containerClass; ?>" id="campaignEvent<?php echo $id; ?>">
-    <div>
+<li class="campaign-event-row <?php echo $containerClass; ?>" id="CampaignEvent_<?php echo $id; ?>">
+    <div class="campaign-event-details">
         <?php
         if (!empty($inForm))
             echo $view->render('MauticCampaignBundle:CampaignBuilder:actions.html.php', array(
                 'deleted'  => (!empty($deleted)) ? $deleted : false,
                 'id'       => $id,
-                'route'   => 'mautic_campaignevent_action'
+                'route'    => 'mautic_campaignevent_action',
+                'level'    => $level
             ));
         ?>
-        <span class="campaign-event-label"><?php echo $action['name']; ?></span>
-        <?php if (!empty($action['description'])): ?>
-        <span class="campaign-event-descr"><?php echo $action['description']; ?></span>
+        <span class="campaign-event-label"><?php echo $name; ?></span>
+        <?php if (!empty($desc)): ?>
+        <span class="campaign-event-descr"><?php echo $desc; ?></span>
         <?php endif; ?>
     </div>
+    <?php echo $childrenHtml; ?>
 </li>

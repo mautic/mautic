@@ -12,4 +12,22 @@ CKEDITOR.editorConfig = function( config ) {
     config.enterMode = CKEDITOR.ENTER_DIV;
     config.filebrowserImageBrowseUrl = mauticBasePath + '/assets/js/ckeditor/filemanager/index.html?type=Images';
     config.filebrowserImageUploadUrl = mauticBasePath + '/assets/js/ckeditor/filemanager/connectors/php/filemanager.php?command=QuickUpload&type;=Images';
+
+    config.toolbar = 'MauticToolbar';
+ 
+	config.toolbar_MauticToolbar =
+	[
+		{ name: 'document', items : [ 'NewPage','Preview' ] },
+		{ name: 'clipboard', items : [ 'Cut','Copy','Paste','PasteText','PasteFromWord','-','Undo','Redo' ] },
+		{ name: 'editing', items : [ 'Find','Replace','-','SelectAll','-','Scayt' ] },
+		{ name: 'insert', items : [ 'Image','Flash','Table','HorizontalRule','Smiley','SpecialChar','PageBreak'
+                 ,'Iframe' ] },
+                '/',
+		{ name: 'styles', items : [ 'Styles','Format' ] },
+		{ name: 'basicstyles', items : [ 'Bold','Italic','Strike','-','RemoveFormat' ] },
+		{ name: 'paragraph', items : [ 'NumberedList','BulletedList','-','Outdent','Indent','-','Blockquote' ] },
+		{ name: 'links', items : [ 'Link','Unlink','Anchor' ] },
+		{ name: 'tools', items : [ 'Maximize','-','About' ] }
+	];
+
 };

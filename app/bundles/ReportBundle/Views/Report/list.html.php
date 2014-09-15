@@ -102,6 +102,6 @@ if ($tmpl == 'index')
             'sessionVar'      => 'page'
         )); ?>
         </div>
-        <div class="footer-margin"></div>
+        '
     </div>
 </div>

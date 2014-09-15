@@ -17,14 +17,13 @@ $view['slots']->set('searchHelp', $view['translator']->trans('mautic.core.help.s
 
 <?php if ($permissions['point:points:create']): ?>
     <?php $view['slots']->start("actions"); ?>
-    <li>
-        <a href="<?php echo $this->container->get('router')->generate(
-            'mautic_point_action', array("objectAction" => "new")); ?>"
-           data-toggle="ajax"
-           data-menu-link="#mautic_point_index">
-            <?php echo $view["translator"]->trans("mautic.point.menu.new"); ?>
-        </a>
-    </li>
+    <a class="btn btn-default" href="<?php echo $this->container->get('router')->generate(
+        'mautic_point_action', array("objectAction" => "new")); ?>"
+        data-toggle="ajax"
+        data-menu-link="#mautic_point_index">
+        <i class="fa fa-plus"></i> 
+        <?php echo $view["translator"]->trans("mautic.point.menu.new"); ?>
+    </a>
     <?php $view['slots']->stop(); ?>
 <?php endif; ?>
 

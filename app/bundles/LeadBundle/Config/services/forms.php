@@ -117,12 +117,12 @@ $container->setDefinition(
 $container->setDefinition(
     'mautic.form.type.lead.submitaction.changelist',
     new Definition(
-        'Mautic\LeadBundle\Form\Type\FormSubmitActionListType',
+        'Mautic\LeadBundle\Form\Type\EventListType',
         array(new Reference('mautic.factory'))
     )
 )
     ->addTag('form.type', array(
-        'alias' => 'lead_submitaction_leadlist',
+        'alias' => 'lead_event_leadlist',
     ));
 
 //Lead note form

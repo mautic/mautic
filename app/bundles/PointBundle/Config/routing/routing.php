@@ -14,7 +14,7 @@ $collection = new RouteCollection();
 
 $collection->add('mautic_pointtriggerevent_action', new Route('/points/triggers/events/{objectAction}/{objectId}',
     array(
-        '_controller' => 'MauticPointBundle:RangeAction:execute',
+        '_controller' => 'MauticPointBundle:TriggerEvent:execute',
         "objectId"    => 0
     )
 ));

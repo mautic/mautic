@@ -268,7 +268,7 @@ body {
   font-family: "Open Sans", Helvetica, Arial, sans-serif;
   font-size: 13px;
   line-height: 1.3856;
-  color: #303566;
+  color: #393939;
   background-color: #f2f2f2;
 }
 input,
@@ -2002,7 +2002,7 @@ select[multiple].input-lg {
   display: block;
   margin-top: 5px;
   margin-bottom: 10px;
-  color: #6169b5;
+  color: #797979;
 }
 @media (min-width: 768px) {
   .form-inline .form-group {
@@ -2120,7 +2120,7 @@ select[multiple].input-lg {
 }
 .btn:hover,
 .btn:focus {
-  color: #404687;
+  color: #515151;
   text-decoration: none;
 }
 .btn:active,
@@ -2141,7 +2141,7 @@ fieldset[disabled] .btn {
   box-shadow: none;
 }
 .btn-default {
-  color: #404687;
+  color: #515151;
   background-color: #ffffff;
   border-color: #d7d7d7;
 }
@@ -2150,7 +2150,7 @@ fieldset[disabled] .btn {
 .btn-default:active,
 .btn-default.active,
 .open > .dropdown-toggle.btn-default {
-  color: #404687;
+  color: #515151;
   background-color: #f2f2f2;
   border-color: #cacaca;
 }
@@ -2179,7 +2179,7 @@ fieldset[disabled] .btn-default.active {
 }
 .btn-default .badge {
   color: #ffffff;
-  background-color: #404687;
+  background-color: #515151;
 }
 .btn-default + .btn.dropdown-toggle {
   border-left-color: #cdcdcd;
@@ -2551,7 +2551,7 @@ tbody.collapse.in {
   clear: both;
   font-weight: normal;
   line-height: 1.3856;
-  color: #303566;
+  color: #393939;
   white-space: nowrap;
 }
 .dropdown-menu > li > a > .fa {
@@ -2561,7 +2561,7 @@ tbody.collapse.in {
 .dropdown-menu > li > a:hover,
 .dropdown-menu > li > a:focus {
   text-decoration: none;
-  color: #282c55;
+  color: #2c2c2c;
   background-color: #f8f8f8;
 }
 .dropdown-menu > .active > a,
@@ -3994,7 +3994,7 @@ a.thumbnail.active {
 }
 .thumbnail .caption {
   padding: 9px;
-  color: #303566;
+  color: #393939;
 }
 .alert {
   padding: 15px;

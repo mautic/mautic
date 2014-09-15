@@ -14,11 +14,11 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 
 /**
- * Class FormSubmitHelper
+ * Class FormEventHelper
  *
  * @package Mautic\LeadBundle\Helper
  */
-class FormSubmitHelper
+class FormEventHelper
 {
 
     /**

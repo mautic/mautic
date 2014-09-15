@@ -33,7 +33,7 @@ $view['slots']->set("headerTitle", $header.$subheader);
                 </h3>
             </div>
             <div class="panel-body">
-                <?php echo $view['form']->row($form['subject']); ?>
+                <?php //echo $view['form']->row($form['subject']); ?>
             </div>
             <div class="panel-footer">
             </div>

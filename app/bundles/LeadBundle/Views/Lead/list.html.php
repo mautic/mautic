@@ -160,5 +160,5 @@ if ($tmpl == 'index')
             'sessionVar'      => 'lead'
         )); ?>
     </div>
-    <div class="footer-margin"></div>
+    '
 </div>
