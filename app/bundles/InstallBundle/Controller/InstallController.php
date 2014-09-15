@@ -96,7 +96,6 @@ class InstallController extends CommonController
     {
         /** @var \Mautic\InstallBundle\Configurator\Configurator $configurator */
         $configurator = $this->container->get('mautic.configurator');
-        $configurator->clean();
 
         try {
             $welcomeUrl = $this->container->get('router')->generate('_welcome');
