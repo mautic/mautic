@@ -82,6 +82,6 @@ class SecretStep implements StepInterface
      */
     public function getTemplate()
     {
-        return 'SensioDistributionBundle:Configurator/Step:secret.html.twig';
+        return 'MauticInstallBundle:Step:secret.html.php';
     }
 }

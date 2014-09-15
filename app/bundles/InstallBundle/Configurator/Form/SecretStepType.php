@@ -1,15 +1,15 @@
 <?php
-
-/*
- * This file is part of the Symfony package.
+/**
+ * @package     Mautic
+ * @copyright   2014 Mautic, NP. All rights reserved.
+ * @author      Mautic
+ * @link        http://mautic.com
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  *
- * (c) Fabien Potencier <fabien@symfony.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ * Based on Sensio\DistributionBundle
  */
 
-namespace Sensio\Bundle\DistributionBundle\Configurator\Form;
+namespace Mautic\InstallBundle\Configurator\Form;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -23,7 +23,12 @@ class SecretStepType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('secret', 'text');
+        $builder->add('secret', 'text', array(
+            'label'      => 'mautic.install.install.form.secret',
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array('class' => 'form-control'),
+            'required'   => true
+        ));
     }
 
     public function getName()

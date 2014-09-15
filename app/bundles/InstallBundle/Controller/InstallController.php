@@ -29,8 +29,9 @@ class InstallController extends CommonController
         /** @var \Mautic\InstallBundle\Configurator\Configurator $configurator */
         $configurator = $this->container->get('mautic.configurator');
 
-        $step = $configurator->getStep($index);
-        $form = $this->container->get('form.factory')->create($step->getFormType(), $step);
+        $action = $this->generateUrl('mautic_installer_step', array('index' => $index));
+        $step   = $configurator->getStep($index);
+        $form   = $this->container->get('form.factory')->create($step->getFormType(), $step, array('action' => $action));
 
         $request = $this->container->get('request');
         if ('POST' === $request->getMethod()) {
@@ -57,12 +58,12 @@ class InstallController extends CommonController
                 'index'   => $index,
                 'count'   => $configurator->getStepCount(),
                 'version' => $this->getVersion(),
-                'tmpl'        => $tmpl,
+                'tmpl'    => $tmpl,
             ),
             'contentTemplate' => $step->getTemplate(),
             'passthroughVars' => array(
                 'activeLink'     => '#mautic_install_index',
-                'mauticContent'  => 'report',
+                'mauticContent'  => 'install',
                 'route'          => $this->generateUrl('mautic_installer_step', array('index' => $index)),
                 'replaceContent' => ($tmpl == 'list') ? 'true' : 'false'
             )
@@ -98,7 +99,7 @@ class InstallController extends CommonController
         $configurator = $this->container->get('mautic.configurator');
 
         try {
-            $welcomeUrl = $this->container->get('router')->generate('_welcome');
+            $welcomeUrl = $this->container->get('router')->generate('mautic_core_index');
         } catch (\Exception $e) {
             $welcomeUrl = null;
         }
