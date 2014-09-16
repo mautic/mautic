@@ -81,15 +81,27 @@ class InstallController extends CommonController
 
         $url = $this->container->get('router')->generate('mautic_installer_step', array('index' => 0));
 
-        if (empty($majors) && empty($minors)) {
+        /*if (empty($majors) && empty($minors)) {
             return new RedirectResponse($url);
-        }
+        }*/
 
-        return $this->container->get('templating')->renderResponse('SensioDistributionBundle::Configurator/check.html.twig', array(
-            'majors'  => $majors,
-            'minors'  => $minors,
-            'url'     => $url,
-            'version' => $this->getVersion(),
+        $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
+
+        return $this->delegateView(array(
+            'viewParameters'  =>  array(
+                'majors'  => $majors,
+                'minors'  => $minors,
+                'url'     => $url,
+                'version' => $this->getVersion(),
+                'tmpl'    => $tmpl,
+            ),
+            'contentTemplate' => 'MauticInstallBundle:Install:check.html.php',
+            'passthroughVars' => array(
+                'activeLink'     => '#mautic_install_index',
+                'mauticContent'  => 'install',
+                'route'          => $this->generateUrl('mautic_installer_step', array('index' => 0)),
+                'replaceContent' => ($tmpl == 'list') ? 'true' : 'false'
+            )
         ));
     }
 
