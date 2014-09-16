@@ -613,6 +613,12 @@ var Mautic = {
         mQuery('form[name="' + formName + '"]').on('submit.ajaxform', (function (e) {
             e.preventDefault();
 
+            if (MauticVars.formSubmitInProgress) {
+                return false;
+            } else {
+                MauticVars.formSubmitInProgress = true;
+            }
+
             Mautic.postForm(mQuery(this), function (response) {
                 var modalParent = mQuery('form[name="' + formName + '"]').closest('.modal');
                 var isInModal   = modalParent.length > 0 ? true : false;
@@ -622,6 +628,7 @@ var Mautic = {
                     var target = '#' + modalParent.attr('id');
                     Mautic.processModalContent(response, target);
                 }
+                MauticVars.formSubmitInProgress = false;
             });
 
             return false;
