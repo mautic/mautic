@@ -26,7 +26,7 @@ $view['slots']->set("headerTitle", $header);
         <p><?php echo $view['translator']->trans('mautic.install.install.sentence.major.problems', array('%majors%' => count($majors))); ?></p>
         <ol>
             <?php foreach ($majors as $message) : ?>
-                <li><?php echo $message; ?></li>
+                <li><?php echo $view['translator']->trans($message); ?></li>
             <?php endforeach; ?>
         </ol>
         <?php endif; ?>
@@ -35,7 +35,7 @@ $view['slots']->set("headerTitle", $header);
         <p><?php echo $view['translator']->trans('mautic.install.install.sentence.minor.problems'); ?></p>
         <ol>
             <?php foreach ($minors as $message) : ?>
-                <li><?php echo $message; ?></li>
+                <li><?php echo $view['translator']->trans($message); ?></li>
             <?php endforeach; ?>
         </ol>
         <?php endif; ?>

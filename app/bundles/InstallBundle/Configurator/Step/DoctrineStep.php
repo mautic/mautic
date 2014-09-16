@@ -77,11 +77,11 @@ class DoctrineStep implements StepInterface
         $messages = array();
 
         if (!class_exists('\PDO')) {
-            $messages[] = 'PDO extension is mandatory.';
+            $messages[] = 'mautic.install.pdo.mandatory';
         } else {
             $drivers = \PDO::getAvailableDrivers();
             if (0 == count($drivers)) {
-                $messages[] = 'Please install PDO drivers.';
+                $messages[] = 'mautic.install.pdo.drivers';
             }
         }
 
