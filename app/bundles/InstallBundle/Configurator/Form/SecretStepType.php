@@ -29,6 +29,27 @@ class SecretStepType extends AbstractType
             'attr'       => array('class' => 'form-control'),
             'required'   => true
         ));
+
+        $builder->add('buttons', 'form_buttons', array(
+            'pre_extra_buttons' => array(
+                array(
+                    'name'  => 'next',
+                    'label' => 'mautic.install.next.step',
+                    'type'  => 'submit',
+                    'attr'  => array(
+                        'class'   => 'btn btn-success',
+                        'icon'    => 'fa fa-arrow-circle-right padding-sm-right'
+                    )
+                )
+            ),
+            'apply_text'  => '',
+            'save_text'   => '',
+            'cancel_text' => ''
+        ));
+
+        if (!empty($options['action'])) {
+            $builder->setAction($options['action']);
+        }
     }
 
     public function getName()
