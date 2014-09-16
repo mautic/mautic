@@ -81,10 +81,6 @@ class InstallController extends CommonController
 
         $url = $this->container->get('router')->generate('mautic_installer_step', array('index' => 0));
 
-        /*if (empty($majors) && empty($minors)) {
-            return new RedirectResponse($url);
-        }*/
-
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
         return $this->delegateView(array(
@@ -116,12 +112,27 @@ class InstallController extends CommonController
             $welcomeUrl = null;
         }
 
+        $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
+
+        return $this->delegateView(array(
+            'viewParameters'  =>  array(
+                'welcome_url' => $welcomeUrl,
+                'parameters'  => $configurator->render(),
+                'config_path' => $this->container->getParameter('kernel.root_dir') . '/config/local.php',
+                'is_writable' => $configurator->isFileWritable(),
+                'version'     => $this->getVersion(),
+                'tmpl'        => $tmpl,
+            ),
+            'contentTemplate' => 'MauticInstallBundle:Install:final.html.php',
+            'passthroughVars' => array(
+                'activeLink'     => '#mautic_install_index',
+                'mauticContent'  => 'install',
+                'route'          => $this->generateUrl('mautic_installer_step', array('index' => 0)),
+                'replaceContent' => ($tmpl == 'list') ? 'true' : 'false'
+            )
+        ));
+
         return $this->container->get('templating')->renderResponse('SensioDistributionBundle::Configurator/final.html.twig', array(
-            'welcome_url' => $welcomeUrl,
-            'parameters'  => $configurator->render(),
-            'yml_path'    => $this->container->getParameter('kernel.root_dir').'/config/parameters.yml',
-            'is_writable' => $configurator->isFileWritable(),
-            'version'     => $this->getVersion(),
         ));
     }
 
