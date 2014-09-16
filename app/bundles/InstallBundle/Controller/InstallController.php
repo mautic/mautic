@@ -131,9 +131,6 @@ class InstallController extends CommonController
                 'replaceContent' => ($tmpl == 'list') ? 'true' : 'false'
             )
         ));
-
-        return $this->container->get('templating')->renderResponse('SensioDistributionBundle::Configurator/final.html.twig', array(
-        ));
     }
 
     protected function getVersion()
