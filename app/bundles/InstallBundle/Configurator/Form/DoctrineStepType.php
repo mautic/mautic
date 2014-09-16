@@ -51,12 +51,12 @@ class DoctrineStepType extends AbstractType
             'required'   => true
         ));
 
-        $builder->add('path', 'text', array(
+        /*$builder->add('path', 'text', array(
             'label'      => 'mautic.install.install.form.path',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control'),
             'required'   => false
-        ));
+        ));*/
 
         $builder->add('port', 'text', array(
             'label'      => 'mautic.install.install.form.port',

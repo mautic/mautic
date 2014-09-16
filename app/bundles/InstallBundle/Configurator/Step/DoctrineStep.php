@@ -53,9 +53,9 @@ class DoctrineStep implements StepInterface
     public function __construct(array $parameters)
     {
         foreach ($parameters as $key => $value) {
-            if (0 === strpos($key, 'database_')) {
-                $parameters[substr($key, 9)] = $value;
-                $key = substr($key, 9);
+            if (0 === strpos($key, 'db_')) {
+                $parameters[substr($key, 3)] = $value;
+                $key = substr($key, 3);
                 $this->$key = $value;
             }
         }
@@ -104,7 +104,7 @@ class DoctrineStep implements StepInterface
         $parameters = array();
 
         foreach ($data as $key => $value) {
-            $parameters['database_'.$key] = $value;
+            $parameters['db_'.$key] = $value;
         }
 
         return $parameters;
