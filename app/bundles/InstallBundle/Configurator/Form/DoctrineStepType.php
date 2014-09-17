@@ -86,7 +86,7 @@ class DoctrineStepType extends AbstractType
                     'label' => 'mautic.install.next.step',
                     'type'  => 'submit',
                     'attr'  => array(
-                        'class'   => 'btn btn-success',
+                        'class'   => 'btn btn-default',
                         'icon'    => 'fa fa-arrow-circle-right padding-sm-right'
                     )
                 )
