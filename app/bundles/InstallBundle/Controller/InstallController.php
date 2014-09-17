@@ -52,6 +52,10 @@ class InstallController extends CommonController
 
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
+        // Always pass the requirements into the templates
+        $majors = $configurator->getRequirements();
+        $minors = $configurator->getOptionalSettings();
+
         return $this->delegateView(array(
             'viewParameters'  =>  array(
                 'form'    => $form->createView(),
@@ -59,43 +63,14 @@ class InstallController extends CommonController
                 'count'   => $configurator->getStepCount(),
                 'version' => $this->getVersion(),
                 'tmpl'    => $tmpl,
+                'majors'  => $majors,
+                'minors'  => $minors,
             ),
             'contentTemplate' => $step->getTemplate(),
             'passthroughVars' => array(
                 'activeLink'     => '#mautic_install_index',
                 'mauticContent'  => 'install',
                 'route'          => $this->generateUrl('mautic_installer_step', array('index' => $index)),
-                'replaceContent' => ($tmpl == 'list') ? 'true' : 'false'
-            )
-        ));
-    }
-
-    public function checkAction()
-    {
-        /** @var \Mautic\InstallBundle\Configurator\Configurator $configurator */
-        $configurator = $this->container->get('mautic.configurator');
-
-        // Trying to get as much requirements as possible
-        $majors = $configurator->getRequirements();
-        $minors = $configurator->getOptionalSettings();
-
-        $url = $this->container->get('router')->generate('mautic_installer_step', array('index' => 0));
-
-        $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
-
-        return $this->delegateView(array(
-            'viewParameters'  =>  array(
-                'majors'  => $majors,
-                'minors'  => $minors,
-                'url'     => $url,
-                'version' => $this->getVersion(),
-                'tmpl'    => $tmpl,
-            ),
-            'contentTemplate' => 'MauticInstallBundle:Install:check.html.php',
-            'passthroughVars' => array(
-                'activeLink'     => '#mautic_install_index',
-                'mauticContent'  => 'install',
-                'route'          => $this->generateUrl('mautic_installer_step', array('index' => 0)),
                 'replaceContent' => ($tmpl == 'list') ? 'true' : 'false'
             )
         ));

@@ -14,7 +14,7 @@ $collection = new RouteCollection();
 
 $collection->add('mautic_installer_home', new Route('/installer',
     array(
-        '_controller' => 'MauticInstallBundle:Install:check'
+        '_controller' => 'MauticInstallBundle:Install:step'
     )
 ));
 

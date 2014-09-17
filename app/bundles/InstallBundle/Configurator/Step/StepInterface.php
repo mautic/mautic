@@ -21,13 +21,6 @@ use Symfony\Component\Form\Type\FormTypeInterface;
 interface StepInterface
 {
     /**
-     * __construct
-     *
-     * @param array $parameters
-     */
-    public function __construct(array $parameters);
-
-    /**
      * Returns the form used for configuration.
      *
      * @return FormTypeInterface

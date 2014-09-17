@@ -9,6 +9,7 @@
 
 namespace Mautic\InstallBundle;
 
+use Mautic\InstallBundle\Configurator\Step\CheckStep;
 use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
 use Mautic\InstallBundle\Configurator\Step\SecretStep;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -24,6 +25,7 @@ class MauticInstallBundle extends Bundle
     {
         /** @var \Mautic\InstallBundle\Configurator\Configurator $configurator */
         $configurator = $this->container->get('mautic.configurator');
+        $configurator->addStep(new CheckStep($configurator->getParameters(), $configurator->isFileWritable()));
         $configurator->addStep(new DoctrineStep($configurator->getParameters()));
         $configurator->addStep(new SecretStep($configurator->getParameters()));
     }

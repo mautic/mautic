@@ -39,9 +39,10 @@ $view['slots']->set("headerTitle", $header);
             <?php endforeach; ?>
         </ol>
         <?php endif; ?>
-        <?php if (!count($majors) && !count($minors)) : ?>
+        <?php if (!count($majors)) : ?>
         <h4><?php echo $view['translator']->trans('mautic.install.install.heading.ready'); ?></h4>
         <p><?php echo $view['translator']->trans('mautic.install.install.sentence.ready'); ?></p>
+        <?php echo $view['form']->form($form); ?>
         <?php endif; ?>
     </div>
 </div>
