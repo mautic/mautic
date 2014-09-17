@@ -17,13 +17,19 @@ use Mautic\InstallBundle\Configurator\Form\CheckStepType;
 class CheckStep implements StepInterface
 {
     private $configIsWritable;
+    private $kernelRoot;
 
     /**
-     * {@inheritdoc}
+     * Constructor
+     *
+     * @param array   $parameters       Existing parameters in local configuration
+     * @param boolean $configIsWritable Flag if the configuration file is writable
+     * @param string  $kernelRoot       Kernel root path
      */
-    public function __construct(array $parameters, $configIsWritable)
+    public function __construct(array $parameters, $configIsWritable, $kernelRoot)
     {
         $this->configIsWritable = $configIsWritable;
+        $this->kernelRoot       = $kernelRoot;
     }
 
     /**
@@ -41,8 +47,28 @@ class CheckStep implements StepInterface
     {
         $messages = array();
 
+        if (version_compare(PHP_VERSION, '5.3.7', '<')) {
+            $messages[] = 'mautic.install.minimum.php.version';
+        }
+
+        if (version_compare(PHP_VERSION, '5.3.16', '==')) {
+            $messages[] = 'mautic.install.buggy.php.version';
+        }
+
+        if (!is_dir(dirname($this->kernelRoot) . '/vendor/composer')) {
+            $messages[] = 'mautic.install.composer.dependencies';
+        }
+
         if (!$this->configIsWritable) {
             $messages[] = 'mautic.install.config.unwritable';
+        }
+
+        if (!is_writable($this->kernelRoot . '/cache')) {
+            $messages[] = 'mautic.install.cache.unwritable';
+        }
+
+        if (!is_writable($this->kernelRoot . '/logs')) {
+            $messages[] = 'mautic.install.logs.unwritable';
         }
 
         return $messages;

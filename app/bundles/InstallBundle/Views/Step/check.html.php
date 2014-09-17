@@ -26,7 +26,20 @@ $view['slots']->set("headerTitle", $header);
         <p><?php echo $view['translator']->trans('mautic.install.install.sentence.major.problems', array('%majors%' => count($majors))); ?></p>
         <ol>
             <?php foreach ($majors as $message) : ?>
-                <li><?php echo $view['translator']->trans($message); ?></li>
+                <?php switch ($message) :
+                    case 'mautic.install.minimum.php.version': ?>
+                        <li><?php echo $view['translator']->trans($message, array('%minimum%' => '5.3.7', '%installed' => PHP_VERSION)); ?></li>
+                        <?php break;
+                    case 'mautic.install.cache.unwritable': ?>
+                        <li><?php echo $view['translator']->trans('mautic.install.directory.unwritable', array('%path%' => $appRoot . '/cache')); ?></li>
+                        <?php break;
+                    case 'mautic.install.logs.unwritable': ?>
+                        <li><?php echo $view['translator']->trans('mautic.install.directory.unwritable', array('%path%' => $appRoot . '/logs')); ?></li>
+                        <?php break;
+                    default: ?>
+                        <li><?php echo $view['translator']->trans($message); ?></li>
+                        <?php break; ?>
+                <?php endswitch; ?>
             <?php endforeach; ?>
         </ol>
         <?php endif; ?>

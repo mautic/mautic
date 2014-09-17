@@ -65,6 +65,7 @@ class InstallController extends CommonController
                 'tmpl'    => $tmpl,
                 'majors'  => $majors,
                 'minors'  => $minors,
+                'appRoot' => $this->container->getParameter('kernel.root_dir'),
             ),
             'contentTemplate' => $step->getTemplate(),
             'passthroughVars' => array(

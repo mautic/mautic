@@ -25,7 +25,7 @@ class MauticInstallBundle extends Bundle
     {
         /** @var \Mautic\InstallBundle\Configurator\Configurator $configurator */
         $configurator = $this->container->get('mautic.configurator');
-        $configurator->addStep(new CheckStep($configurator->getParameters(), $configurator->isFileWritable()));
+        $configurator->addStep(new CheckStep($configurator->getParameters(), $configurator->isFileWritable(), $this->container->getParameter('kernel.root_dir')));
         $configurator->addStep(new DoctrineStep($configurator->getParameters()));
         $configurator->addStep(new SecretStep($configurator->getParameters()));
     }
