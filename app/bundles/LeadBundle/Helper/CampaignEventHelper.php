@@ -17,12 +17,12 @@ namespace Mautic\LeadBundle\Helper;
 class CampaignEventHelper
 {
     /**
-     * @param $action
+     * @param $event
      * @param $factory
      */
-    public static function changeLists ($action, $factory)
+    public static function changeLists ($event, $factory)
     {
-        $properties = $action->getProperties();
+        $properties = $event['properties'];
 
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel  = $factory->getModel('lead');
@@ -30,12 +30,18 @@ class CampaignEventHelper
         $addTo      = $properties['addToLists'];
         $removeFrom = $properties['removeFromLists'];
 
+        $somethingHappened = false;
+
         if (!empty($addTo)) {
             $leadModel->addToLists($lead, $addTo);
+            $somethingHappened = true;
         }
 
         if (!empty($removeFrom)) {
             $leadModel->removeFromLists($lead, $removeFrom);
+            $somethingHappened = true;
         }
+
+        return $somethingHappened;
     }
 }

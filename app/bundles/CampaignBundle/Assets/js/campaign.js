@@ -18,7 +18,6 @@ Mautic.campaignOnLoad = function (container) {
         //make the fields sortable
         mQuery('#campaignEvents').nestedSortable({
             items: 'li',
-            handle: '.reorder-handle',
             toleranceElement: '> div',
             isTree: true,
             placeholder: "campaign-event-placeholder",
@@ -41,6 +40,10 @@ Mautic.campaignOnLoad = function (container) {
             mQuery(this).find('.form-buttons').removeClass('hide');
         }).on('mouseout.campaignevents', function() {
             mQuery(this).find('.form-buttons').addClass('hide');
+        });
+
+        mQuery('#campaignEvents .campaign-event-details').on('dblclick.campaignevents', function() {
+            mQuery(this).find('.btn-edit').first().click();
         });
     }
 };
@@ -81,11 +84,14 @@ Mautic.campaignEventOnLoad = function (container, response) {
         //initialize tooltips
         mQuery(eventId + " *[data-toggle='tooltip']").tooltip({html: true});
 
-        mQuery('#campaignEvents .campaign-event-row').off(".campaignevents");
-        mQuery('#campaignEvents .campaign-event-row').on('mouseover.campaignevents', function() {
+        mQuery(eventId).off('.campaignevents');
+        mQuery(eventId).on('mouseover.campaignevents', function() {
             mQuery(this).find('.form-buttons').removeClass('hide');
         }).on('mouseout.campaignevents', function() {
             mQuery(this).find('.form-buttons').addClass('hide');
+        });
+        mQuery(eventId).on('dblclick.campaignevents', function() {
+            mQuery(this).find('.btn-edit').first().click();
         });
 
         //show events panel
@@ -123,17 +129,23 @@ Mautic.updateCampaignEventLinks = function () {
  * Enable/Disable timeframe settings if the toggle for immediate trigger is changed
  */
 Mautic.campaignToggleTimeframes = function() {
-    var disabled = (mQuery('#campaignevent_triggerImmediately_1').prop('checked')) ? true : false;
+    var immediateChecked = mQuery('#campaignevent_triggerMode_0').prop('checked');
+    var intervalChecked  = mQuery('#campaignevent_triggerMode_1').prop('checked');
+    var dateChecked      = mQuery('#campaignevent_triggerMode_2').prop('checked');
 
     if (mQuery('#campaignevent_triggerInterval').length) {
-        mQuery('#campaignevent_triggerInterval').attr('disabled', disabled);
-    }
-
-    if (mQuery('#campaignevent_triggerIntervalUnit').length) {
-        mQuery('#campaignevent_triggerIntervalUnit').attr('disabled', disabled);
-    }
-
-    if (mQuery('#campaignevent_triggerDate').length) {
-        mQuery('#campaignevent_triggerDate').attr('disabled', disabled);
+        if (immediateChecked) {
+            mQuery('#campaignevent_triggerInterval').attr('disabled', true);
+            mQuery('#campaignevent_triggerIntervalUnit').attr('disabled', true);
+            mQuery('#campaignevent_triggerDate').attr('disabled', true);
+        } else if (intervalChecked) {
+            mQuery('#campaignevent_triggerInterval').attr('disabled', false);
+            mQuery('#campaignevent_triggerIntervalUnit').attr('disabled', false);
+            mQuery('#campaignevent_triggerDate').attr('disabled', true);
+        } else if (dateChecked) {
+            mQuery('#campaignevent_triggerInterval').attr('disabled', true);
+            mQuery('#campaignevent_triggerIntervalUnit').attr('disabled', true);
+            mQuery('#campaignevent_triggerDate').attr('disabled', false);
+        }
     }
 };

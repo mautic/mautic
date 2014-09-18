@@ -154,12 +154,24 @@ class PointModel extends CommonFormModel
      *
      * @param $type
      * @param mixed $passsthrough passthrough from function triggering action to the callback function
+     * @param mixed $typeId Something unique to the triggering event to prevent  unnecessary duplicate calls
      */
-    public function triggerAction($type, $passthrough = null)
+    public function triggerAction($type, $passthrough = null, $typeId = null)
     {
         //only trigger actions for anonymous users
         if (!$this->security->isAnonymous()) {
             return;
+        }
+
+        if ($typeId !== null && $this->factory->getEnvironment() == 'prod') {
+            //let's prevent some unnecessary DB calls
+            $session = $this->factory->getSession();
+            $triggeredEvents = $session->get('mautic.triggered.point.actions', array());
+            if (in_array($typeId, $triggeredEvents)) {
+                return;
+            }
+            $triggeredEvents[] = $typeId;
+            $session->set('mautic.triggered.point.actions', $triggeredEvents);
         }
 
         //find all the actions for published points
@@ -176,7 +188,8 @@ class PointModel extends CommonFormModel
         //get a list of actions that has already been performed on this lead
         $completedActions = $repo->getCompletedLeadActions($type, $lead->getId());
 
-        $persist = array();
+        $persist     = array();
+        $persistLead = false;
         foreach ($availablePoints as $action) {
             //if it's already been done, then skip it
             if (isset($completedActions[$action->getId()])) {
@@ -243,12 +256,15 @@ class PointModel extends CommonFormModel
 
                     $action->addLog($log);
                     $persist[] = $action;
+                    $persistLead = true;
                 }
             }
         }
 
         //save the lead
-        $leadModel->saveEntity($lead);
+        if ($persistLead) {
+            $leadModel->saveEntity($lead);
+        }
 
         //persist the action xref
         if (!empty($persist)) {

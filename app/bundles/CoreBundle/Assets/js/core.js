@@ -479,9 +479,11 @@ var Mautic = {
 
         form.ajaxSubmit({
             success: function(data) {
+                MauticVars.formSubmitInProgress = false;
                 callback(data);
             },
             error: function(info, type, errorThrown) {
+                MauticVars.formSubmitInProgress = false;
                 if ('console' in window) {
                     console.log('form error log', info);
                 }
@@ -593,7 +595,7 @@ var Mautic = {
         mQuery('form[name="' + formName + '"] :submit').each(function () {
             mQuery(this).off('click.ajaxform');
             mQuery(this).on('click.ajaxform', function () {
-                if (mQuery(this).attr('name')) {
+                if (mQuery(this).attr('name') && !mQuery("input[name='" + mQuery(this).attr('name') + "']").length) {
                     mQuery('form[name="' + formName + '"]').append(
                         mQuery("<input type='hidden'>").attr({
                             name: mQuery(this).attr('name'),
@@ -628,7 +630,6 @@ var Mautic = {
                     var target = '#' + modalParent.attr('id');
                     Mautic.processModalContent(response, target);
                 }
-                MauticVars.formSubmitInProgress = false;
             });
 
             return false;

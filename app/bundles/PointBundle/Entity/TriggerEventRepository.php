@@ -35,20 +35,11 @@ class TriggerEventRepository extends CommonRepository
             ->orderBy('a.order');
 
         //make sure the published up and down dates are good
-        $q->where(
-            $q->expr()->andX(
-                $q->expr()->gte('r.points', $points),
-                $q->expr()->eq('r.isPublished', true),
-                $q->expr()->orX(
-                    $q->expr()->isNull('r.publishUp'),
-                    $q->expr()->gte('r.publishUp', ':now')
-                ),
-                $q->expr()->orX(
-                    $q->expr()->isNull('r.publishDown'),
-                    $q->expr()->lte('r.publishDown', ':now')
-                )
-            )
-        )
+        $expr = $this->getPublishedByDateExpression($q);
+        $expr->add(
+            $q->expr()->gte('r.points', $points)
+        );
+        $q->where($expr)
             ->setParameter('now', $now);
 
         $results = $q->getQuery()->getResult();
@@ -66,25 +57,16 @@ class TriggerEventRepository extends CommonRepository
     {
         $now = new \DateTime();
         $q = $this->createQueryBuilder('e')
-            ->select('partial e.{id, type, name, properties, settings}, partial t.{id, name, points, color}')
+            ->select('partial e.{id, type, name, properties}, partial t.{id, name, points, color}')
             ->join('e.trigger', 't')
             ->orderBy('e.order');
 
         //make sure the published up and down dates are good
-        $q->where(
-            $q->expr()->andX(
-                $q->expr()->eq('e.type', ':type'),
-                $q->expr()->eq('t.isPublished', true),
-                $q->expr()->orX(
-                    $q->expr()->isNull('t.publishUp'),
-                    $q->expr()->gte('t.publishUp', ':now')
-                ),
-                $q->expr()->orX(
-                    $q->expr()->isNull('t.publishDown'),
-                    $q->expr()->lte('t.publishDown', ':now')
-                )
-            )
-        )
+        $expr = $this->getPublishedByDateExpression($q);
+        $expr->add(
+            $q->expr()->eq('e.type', ':type')
+        );
+        $q->where($expr)
             ->setParameter('now', $now)
             ->setParameter('type', $type);
 

@@ -68,12 +68,12 @@ final class CampaignEvents
     const CAMPAIGN_ON_BUILD  = 'mautic.campaign_on_build';
 
     /**
-     * The mautic.campaign_on_event_execute event is thrown to execute a campaign event
+     * The mautic.campaign_on_leadchange event is thrown when a lead was added or removed from the campaign
      *
      * The event listener receives a
-     * Mautic\CampaignBundle\Event\CampaignEvent instance.
+     * Mautic\CampaignBundle\Event\CampaignLeadChangeEvent instance.
      *
      * @var string
      */
-    const CAMPAIGN_ON_EVENT_EXECUTE   = 'mautic.campaign_on_event_execute';
+    const CAMPAIGN_ON_LEADCHANGE  = 'mautic.campaign_on_leadchange';
 }

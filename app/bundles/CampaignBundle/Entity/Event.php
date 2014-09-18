@@ -42,6 +42,14 @@ class Event
     private $type;
 
     /**
+     * @ORM\Column(name="event_type", type="string", length=50)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full"})
+     */
+    private $eventType;
+
+    /**
      * @ORM\Column(type="string", length=50, nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
@@ -74,14 +82,6 @@ class Event
     private $properties = array();
 
     /**
-     * @ORM\Column(name="trigger_immediately", type="boolean")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
-     */
-    private $triggerImmediately = false;
-
-    /**
      * @ORM\Column(name="trigger_date", type="datetime", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
@@ -106,12 +106,12 @@ class Event
     private $triggerIntervalUnit;
 
     /**
-     * @ORM\Column(name="campaign_type", type="string", length=10)
+     * @ORM\Column(name="trigger_mode", type="string", length=10, nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})
      */
-    private $campaignType;
+    private $triggerMode;
 
     /**
      * @ORM\ManyToOne(targetEntity="Campaign", inversedBy="events")
@@ -121,6 +121,7 @@ class Event
 
     /**
      * @ORM\OneToMany(targetEntity="Event", mappedBy="parent", indexBy="id")
+     * @ORM\OrderBy({"order" = "ASC"})
      **/
     private $children;
 
@@ -485,37 +486,32 @@ class Event
     /**
      * @return mixed
      */
-    public function getCampaignType ()
+    public function getEventType ()
     {
-        return $this->campaignType;
+        return $this->eventType;
     }
 
     /**
-     * @param mixed $campaignType
+     * @param mixed $eventType
      */
-    public function setCampaignType ($campaignType)
+    public function setEventType ($eventType)
     {
-        $this->isChanged('campaignType', $campaignType);
-        $this->campaignType = $campaignType;
+        $this->eventType = $eventType;
     }
 
     /**
      * @return mixed
      */
-    public function getTriggerImmediately ()
+    public function getTriggerMode ()
     {
-        return $this->triggerImmediately;
+        return $this->triggerMode;
     }
 
     /**
-     * @param mixed $triggerImmediately
+     * @param mixed $triggerMode
      */
-    public function setTriggerImmediately ($triggerImmediately)
+    public function setTriggerMode ($triggerMode)
     {
-        $this->triggerImmediately = $triggerImmediately;
-    }
-
-    public function triggerImmediately () {
-        return $this->triggerImmediately;
+        $this->triggerMode = $triggerMode;
     }
 }

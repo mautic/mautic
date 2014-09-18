@@ -90,7 +90,7 @@ class CommonRepository extends EntityRepository
      */
     public function getEntities($args = array())
     {
-        $alias = (method_exists($this, 'getTableAlias')) ? $this->getTableAlias() : 'e';
+        $alias = $this->getTableAlias();
         $q = $this
             ->createQueryBuilder($alias)
             ->select($alias);
@@ -509,5 +509,40 @@ class CommonRepository extends EntityRepository
             ),
             'mautic.core.searchcommand.category'
         );
+    }
+
+    /**
+     * Returns a andX Expr() that takes into account isPublished, publishUp and publishDown dates
+     * The Expr() sets a :now parameter that must be set in the calling function
+     *
+     * @param $q
+     *
+     * @return mixed
+     */
+    public function getPublishedByDateExpression($q, $alias = null)
+    {
+        if ($alias === null) {
+            $alias = $this->getTableAlias();
+        }
+
+        return $q->expr()->andX(
+            $q->expr()->eq("$alias.isPublished", true),
+            $q->expr()->orX(
+                $q->expr()->isNull("$alias.publishUp"),
+                $q->expr()->gte("$alias.publishUp", ':now')
+            ),
+            $q->expr()->orX(
+                $q->expr()->isNull("$alias.publishDown"),
+                $q->expr()->lte("$alias.publishDown", ':now')
+            )
+        );
+    }
+
+    /**
+     * @return string
+     */
+    public function getTableAlias()
+    {
+        return 'e';
     }
 }

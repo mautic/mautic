@@ -72,43 +72,8 @@ class CampaignType extends AbstractType
             'required'   => false
         ));
 
-
-        $data = $options['data']->getType();
-        if (empty($data)) {
-            $data = 'interval';
-        }
-        $builder->add('type', 'button_group', array(
-            'choices' => array(
-                'interval' => 'mautic.campaign.form.type.interval',
-                'date'     => 'mautic.campaign.form.type.date'
-            ),
-            'expanded'    => true,
-            'multiple'    => false,
-            'label_attr'  => array('class' => 'control-label'),
-            'label'       => 'mautic.campaign.form.type',
-            'empty_value' => false,
-            'required'    => false,
-            'attr'        => array(
-                'onclick' => 'Mautic.updateCampaignEventLinks();'
-            ),
-            'data'        => $data
-        ));
-
         //add category
         FormHelper::buildForm($this->translator, $builder);
-
-        $builder->add('triggerExistingLeads', 'button_group', array(
-            'choice_list' => new ChoiceList(
-                array(false, true),
-                array('mautic.core.form.no', 'mautic.core.form.yes')
-            ),
-            'expanded'    => true,
-            'multiple'    => false,
-            'label'       => 'mautic.campaign.form.existingleads',
-            'label_attr'  => array('class' => 'control-label'),
-            'empty_value' => false,
-            'required'    => false
-        ));
 
         if (!empty($options['data']) && $options['data']->getId()) {
             $readonly = !$this->security->isGranted('campaign:campaigns:publish');

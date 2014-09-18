@@ -20,7 +20,8 @@ endif;
         if ($event instanceof \Mautic\CampaignBundle\Entity\Event) {
             $event = $event->convertToArray();
         }
-        $settings = $eventTriggers[$event['type']];
+
+        $settings  = $eventSettings[$event['eventType']][$event['type']];
 
         $attr      = 'id="event'.$event['id'].'"';
         $attr     .= (!empty($event['parent'])) ? ' data-parent="'.$event['parent']->getId().'"' : '';
@@ -33,7 +34,7 @@ endif;
                 'level'         => $level + 1,
                 'deletedEvents' => $deletedEvents,
                 'inForm'        => $inForm,
-                'eventTriggers' => $eventTriggers,
+                'eventSettings' => $eventSettings,
                 'id'            => $event['id']
             )) : '';
 

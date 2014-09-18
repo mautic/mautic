@@ -14,11 +14,11 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class PointActionPageHitType
+ * Class CampaignTriggerPageHitType
  *
  * @package Mautic\PageBundle\Form\Type
  */
-class PointActionPageHitType extends AbstractType
+class CampaignTriggerPageHitType extends AbstractType
 {
     /**
      * @param FormBuilderInterface $builder
@@ -26,25 +26,12 @@ class PointActionPageHitType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        $default = (empty($options['data']['delta'])) ? 0 : (int) $options['data']['delta'];
-        $builder->add('delta', 'number', array(
-            'label'      => 'mautic.point.action.delta',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       =>
-                array(
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.point.action.delta.help'
-                ),
-            'precision'  => 0,
-            'data'       => $default
-        ));
-
         $builder->add('pages', 'page_list', array(
-            'label'         => 'mautic.page.point.action.form.pages',
+            'label'         => 'mautic.page.campaign.trigger.form.pages',
             'label_attr'    => array('class' => 'control-label'),
             'attr'       => array(
                 'class'   => 'form-control',
-                'tooltip' => 'mautic.page.point.action.form.pages.descr'
+                'tooltip' => 'mautic.page.campaign.trigger.form.pages.descr'
             )
         ));
     }
@@ -53,6 +40,6 @@ class PointActionPageHitType extends AbstractType
      * @return string
      */
     public function getName() {
-        return "pointaction_pagehit";
+        return "campaigntrigger_pagehit";
     }
 }

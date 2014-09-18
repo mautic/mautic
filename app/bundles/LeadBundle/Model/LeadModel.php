@@ -336,40 +336,43 @@ class LeadModel extends FormModel
      */
     public function getCurrentLead($returnTracking = false)
     {
+        static $lead;
+
         $request = $this->factory->getRequest();
         $cookies = $request->cookies;
 
         list($trackingId, $generated) = $this->getTrackingCookie();
 
-        $leadId  = $cookies->get($trackingId);
-        $ip      = $this->factory->getIpAddress();
-        if (empty($leadId)) {
+        if (empty($lead)) {
+            $leadId = $cookies->get($trackingId);
+            $ip     = $this->factory->getIpAddress();
+            if (empty($leadId)) {
+                //this lead is not tracked yet so get leads by IP and track that lead or create a new one
+                $leads = $this->getLeadsByIp($ip->getIpAddress());
 
-            //this lead is not tracked yet so get leads by IP and track that lead or create a new one
-            $leads = $this->getLeadsByIp($ip->getIpAddress());
-
-            if (count($leads)) {
-                //just create a tracking cookie for the newest lead
-                $lead   = $leads[0];
-                $leadId = $lead->getId();
+                if (count($leads)) {
+                    //just create a tracking cookie for the newest lead
+                    $lead   = $leads[0];
+                    $leadId = $lead->getId();
+                } else {
+                    //let's create a lead
+                    $lead = new Lead();
+                    $lead->addIpAddress($ip);
+                    $this->saveEntity($lead);
+                    $leadId = $lead->getId();
+                }
             } else {
-                //let's create a lead
-                $lead = new Lead();
-                $lead->addIpAddress($ip);
-                $this->saveEntity($lead);
-                $leadId = $lead->getId();
+                $lead = $this->getEntity($leadId);
+                if ($lead === null) {
+                    //let's create a lead
+                    $lead = new Lead();
+                    $lead->addIpAddress($ip);
+                    $this->saveEntity($lead);
+                    $leadId = $lead->getId();
+                }
             }
-        } else {
-            $lead = $this->getEntity($leadId);
-            if ($lead === null) {
-                //let's create a lead
-                $lead = new Lead();
-                $lead->addIpAddress($ip);
-                $this->saveEntity($lead);
-                $leadId = $lead->getId();
-            }
+            $this->setLeadCookie($leadId);
         }
-        $this->setLeadCookie($leadId);
         return ($returnTracking) ? array($lead, $trackingId, $generated) : $lead;
     }
 
@@ -415,7 +418,8 @@ class LeadModel extends FormModel
      */
     public function addToLists($lead, $lists)
     {
-        $leadListRepo = $this->factory->getModel('lead.list')->getRepository();
+        $leadListModel = $this->factory->getModel('lead.list');
+        $leadListRepo  = $leadListModel->getRepository();
 
         if (!$lists instanceof LeadList) {
             if (!is_array($lists)) {
@@ -427,7 +431,7 @@ class LeadModel extends FormModel
                 $l = (int) $l;
             }
 
-            $listEntities = $this->getEntities(array(
+            $listEntities = $leadListModel->getEntities(array(
                 'filter' => array(
                     'force' => array(
                         array(

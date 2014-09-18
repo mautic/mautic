@@ -26,10 +26,8 @@ $view['slots']->set("headerTitle", $header);
             echo $view['form']->row($form['details-panel-start']);
             echo $view['form']->row($form['name']);
             echo $view['form']->row($form['description']);
-            echo $view['form']->row($form['type']);
             echo $view['form']->row($form['category_lookup']);
             echo $view['form']->row($form['category']);
-            echo $view['form']->row($form['triggerExistingLeads']);
             echo $view['form']->row($form['isPublished']);
             echo $view['form']->row($form['publishUp']);
             echo $view['form']->row($form['publishDown']);
@@ -45,7 +43,7 @@ $view['slots']->set("headerTitle", $header);
                         'events'        => $campaignEvents,
                         'inForm'        => true,
                         'deletedEvents' => $deletedEvents,
-                        'eventTriggers' => $events
+                        'eventSettings' => $eventSettings
                     ));
                 else: ?>
                 <h3 id='campaign-event-placeholder'><?php echo $view['translator']->trans('mautic.campaign.form.addevent'); ?></h3>

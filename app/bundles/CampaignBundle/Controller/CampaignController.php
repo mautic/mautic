@@ -25,7 +25,6 @@ class CampaignController extends FormController
      */
     public function indexAction ($page = 1)
     {
-
         //set some permissions
         $permissions = $this->factory->getSecurity()->isGranted(array(
             'campaign:campaigns:view',
@@ -61,7 +60,8 @@ class CampaignController extends FormController
                 'filter'     => $filter,
                 'orderBy'    => $orderBy,
                 'orderByDir' => $orderByDir
-            ));
+            )
+        );
 
         $count = count($campaigns);
         if ($count && $count < ($start + 1)) {
@@ -272,9 +272,10 @@ class CampaignController extends FormController
             $addEvents = $deletedEvents = array();
         }
 
+        $events = $model->getEvents();
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'events'         => $model->getEvents(),
+                'eventSettings'  => $events,
                 'campaignEvents' => $addEvents,
                 'deletedEvents'  => $deletedEvents,
                 'tmpl'           => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
@@ -448,9 +449,10 @@ class CampaignController extends FormController
             }
         }
 
+        $events = $model->getEvents();
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'events'         => $model->getEvents(),
+                'eventSettings'  => $events,
                 'campaignEvents' => $templateEvents,
                 'deletedEvents'  => $deletedEvents,
                 'tmpl'           => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',

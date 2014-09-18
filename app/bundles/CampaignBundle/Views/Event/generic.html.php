@@ -17,7 +17,7 @@ if ($event instanceof \Mautic\CampaignBundle\Entity\Event) {
 }
 ?>
 
-<li class="campaign-event-row <?php echo $containerClass; ?>" id="CampaignEvent_<?php echo $id; ?>">
+<li class="campaign-event-row campaign-event-<?php echo $event['eventType']; ?><?php echo $containerClass; ?>" id="CampaignEvent_<?php echo $id; ?>">
     <div class="campaign-event-details">
         <?php
         if (!empty($inForm)):
@@ -28,11 +28,12 @@ if ($event instanceof \Mautic\CampaignBundle\Entity\Event) {
                 'level'    => $level
             ));
         endif;
+        if ($event['eventType'] == 'action'):
         ?>
         <div class="pull-right campaign-event-timeframe">
-            <?php if (!empty($event['triggerImmediately'])): ?>
+            <?php if ($event['triggerMode'] == 'immediate'): ?>
             <i class="fa fa-fw fa-clock-o"></i><?php echo $view['translator']->trans('mautic.campaign.event.inline.triggerimmediately'); ?>
-            <?php elseif ($event['campaignType'] == 'date'): ?>
+            <?php elseif ($event['triggerMode'] == 'date'): ?>
             <i class="fa fa-fw fa-clock-o"></i><?php echo $view['date']->toFull($event['triggerDate']); ?>
             <?php else: ?>
             <i class="fa fa-fw fa-clock-o"></i>
@@ -43,8 +44,10 @@ if ($event instanceof \Mautic\CampaignBundle\Entity\Event) {
             endif;
             ?>
         </div>
+        <?php endif; ?>
         <div class="pull-left">
-            <span class="campaign-event-label"><?php echo $event['name']; ?></span>
+            <?php $icon = ($event['eventType'] == 'trigger') ? 'fa-bullseye text-danger' : 'fa-rocket text-success'; ?>
+            <span class="campaign-event-label" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.campaign.event.'.$event['eventType']); ?>"><i class="fa mr5 <?php echo $icon; ?>"></i><?php echo $event['name']; ?></span>
             <?php if (!empty($event['description'])): ?>
             <span class="campaign-event-descr"><?php echo $event['description']; ?></span>
             <?php endif; ?>

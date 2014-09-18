@@ -39,24 +39,34 @@ class LeadEventLog
     private $ipAddress;
 
     /**
-     * @ORM\Column(name="date_fired", type="datetime")
+     * @ORM\Column(name="date_triggered", type="datetime", nullable=true)
      **/
-    private $dateFired;
+    private $dateTriggered;
+
+    /**
+     * @ORM\Column(name="is_scheduled", type="boolean")
+     */
+    private $isScheduled = false;
+
+    /**
+     * @ORM\Column(name="trigger_date", type="datetime", nullable=true)
+     */
+    private $triggerDate;
 
     /**
      * @return mixed
      */
-    public function getDateFired ()
+    public function getDateTriggered ()
     {
-        return $this->dateFired;
+        return $this->dateTriggered;
     }
 
     /**
-     * @param mixed $dateFired
+     * @param mixed $dateTriggered
      */
-    public function setDateFired ($dateFired)
+    public function setDateTriggered ($dateTriggered)
     {
-        $this->dateFired = $dateFired;
+        $this->dateTriggered = $dateTriggered;
     }
 
     /**
@@ -105,5 +115,37 @@ class LeadEventLog
     public function setEvent ($event)
     {
         $this->event = $event;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getIsScheduled ()
+    {
+        return $this->isScheduled;
+    }
+
+    /**
+     * @param mixed $isScheduled
+     */
+    public function setIsScheduled ($isScheduled)
+    {
+        $this->isScheduled = $isScheduled;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTriggerDate ()
+    {
+        return $this->triggerDate;
+    }
+
+    /**
+     * @param mixed $triggerDate
+     */
+    public function setTriggerDate ($triggerDate)
+    {
+        $this->triggerDate = $triggerDate;
     }
 }

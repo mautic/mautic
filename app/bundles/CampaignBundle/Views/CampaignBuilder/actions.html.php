@@ -22,15 +22,10 @@ if (empty($route))
 ?>
 
 <div class="pull-right hide form-buttons">
-    <a data-toggle="ajaxmodal" data-target="#campaignEventModal"
-       href="<?php echo $view['router']->generate($route,
-        array('objectAction' => 'edit', 'objectId' => $id, 'level' => $level)); ?>" class="btn btn-primary btn-xs">
+    <a data-toggle="ajaxmodal" data-target="#campaignEventModal" href="<?php echo $view['router']->generate($route, array('objectAction' => 'edit', 'objectId' => $id, 'level' => $level)); ?>" class="btn btn-primary btn-xs btn-edit">
         <i class="fa fa-pencil-square-o"></i>
     </a>
-    <a data-menu-link="mautic_campaign_index" data-toggle="ajax" data-ignore-formexit="true" data-method="POST" data-hide-loadingbar="true"
-       href="<?php echo $view['router']->generate($route,
-           array('objectAction' => $action, 'objectId' => $id, 'level' => $level)); ?>"  class="btn <?php echo $btnClass; ?> btn-xs">
+    <a data-menu-link="mautic_campaign_index" data-toggle="ajax" data-ignore-formexit="true" data-method="POST" data-hide-loadingbar="true" href="<?php echo $view['router']->generate($route, array('objectAction' => $action, 'objectId' => $id, 'level' => $level)); ?>"  class="btn <?php echo $btnClass; ?> btn-xs btn-delete">
         <i class="fa <?php echo $iconClass; ?>"></i>
     </a>
-    <i class="fa fa-fw fa-ellipsis-v reorder-handle"></i>
 </div>

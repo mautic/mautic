@@ -11,7 +11,6 @@ namespace Mautic\CampaignBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Event as Events;
@@ -29,13 +28,16 @@ class CampaignModel extends CommonFormModel
     /**
      * {@inheritdoc}
      *
-     * @return string
+     * @return \Mautic\CampaignBundle\Entity\CampaignRepository
      */
     public function getRepository()
     {
         return $this->em->getRepository('MauticCampaignBundle:Campaign');
     }
 
+    /**
+     * @return \Mautic\CampaignBundle\Entity\EventRepository
+     */
     public function getEventRepository()
     {
         return $this->em->getRepository('MauticCampaignBundle:Event');
@@ -68,78 +70,6 @@ class CampaignModel extends CommonFormModel
         }
         $params = (!empty($action)) ? array('action' => $action) : array();
         return $formFactory->create('campaign', $entity, $params);
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @param  \Mautic\CampaignBundle\Entity\Campaign $entity
-     * @param  bool                               $unlock
-     */
-    public function saveEntity($entity, $unlock = true)
-    {
-        $isNew = ($entity->getId()) ? false : true;
-
-        parent::saveEntity($entity, $unlock);
-
-        //should we campaign for existing leads?
-        if ($entity->gettriggerExistingLeads() && $entity->isPublished()) {
-            $events    = $entity->getEvents();
-            $repo      = $this->getRepository();
-            $persist   = array();
-            $ipAddress = $this->factory->getIpAddress();
-
-            foreach ($events as $event) {
-                $dateTime  = $this->factory->getDate($entity->getDateAdded());
-                $filter = array('force' => array(
-                    array(
-                        'column' => 'l.date_added',
-                        'expr'   => 'lte',
-                        'value'  => $dateTime->toUtcString()
-                    ),
-                    array(
-                        'column' => 'l.campaigns',
-                        'expr'   => 'gte',
-                        'value'  => $entity->getCampaigns()
-                    )
-                ));
-
-                if (!$isNew) {
-                    //get a list of leads that has already had this event applied
-                    $leadIds = $repo->getLeadsForEvent($event->getId());
-                    if (!empty($leadIds)) {
-                        $filter['force'][] = array(
-                            'column' => 'l.id',
-                            'expr'   => 'notIn',
-                            'value'  => implode(',', $leadIds)
-                        );
-                    }
-                }
-
-                //get a list of leads that are before the campaign's date_added and campaign if not already done so
-                /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-                $leadModel = $this->factory->getModel('lead');
-                $leads     = $leadModel->getEntities(array(
-                    'filter' => $filter
-                ));
-
-                foreach ($leads as $l) {
-                    if ($this->triggerEvent($event, $l, false)) {
-                        $log = new LeadEventLog();
-                        $log->setIpAddress($ipAddress);
-                        $log->setEvent($event);
-                        $log->setLead($l);
-                        $log->setDateFired(new \DateTime());
-                        $event->addLog($log);
-                        $persist[] = $event;
-                    }
-                }
-            }
-
-            if (!empty($persist)) {
-                $this->getEventRepository()->saveEntities($persist);
-            }
-        }
     }
 
     /**
@@ -233,15 +163,14 @@ class CampaignModel extends CommonFormModel
                     $event->$func($v);
                 }
                 $event->setCampaign($entity);
-                $event->setCampaignType($entity->getType());
                 $events[$id] = $event;
             }
         }
 
         //determine and set the order and also parent which must be done after the entity has been created and
         //monitored by doctrine
-        $orders            = array();
-        $setOrderAndParent = function($eventId, $parentId) use (&$orders, $entity, $events, $deletedEvents) {
+        $byParent = array();
+        $setParent = function($eventId, $parentId) use (&$byParent, $entity, $events, $deletedEvents) {
             //check to see if this event has a parent that has been deleted
             $atTopParent   = false;
             $parentDeleted = false;
@@ -266,56 +195,57 @@ class CampaignModel extends CommonFormModel
                 return;
             }
 
-            //set the parent order
-            if ($parentId == 'null') {
-                if (!isset($orders[$parentId])) {
-                    $orders[$parentId] = 1;
-                } else {
-                    $orders[$parentId] += 1;
-                    //$orders[$parentId] = floor($orders[$parentId]);
-                }
-                $events[$eventId]->setOrder($orders[$parentId]);
-            } else {
-                if (!isset($orders[$parentId])) {
-                    $orders[$parentId] = 1;
-                }
-                $orders[$parentId] += 0.01;
-            }
-
-            $events[$eventId]->setOrder($orders[$parentId]);
-
             if ($parentId != 'null') {
                 if (isset($events[$parentId])) {
                     $events[$eventId]->setParent($events[$parentId]);
                 }
             } else {
                 $events[$eventId]->removeParent();
+
+                //save parentId as itself for setting the order
+                $parentId = $eventId;
             }
-            $this->em->persist($events[$eventId]);
-            $entity->addEvent($eventId, $events[$eventId]);
+
+            $byParent[$parentId][] = $eventId;
         };
 
         if (!empty($sessionOrder)) {
             //the entities have been reordered manually by user
-
             foreach ($sessionOrder as $child => $parent) {
                 if (!isset($events[$child])) {
                     //likely a deleted event
                     continue;
                 }
 
-                $setOrderAndParent($child, $parent);
+                $setParent($child, $parent);
             }
         } else {
             //the entities were not reordered by user
-
             foreach ($events as $id => $e) {
                 //set the parent order
                 $parent   = $e->getParent();
                 $parentId = ($parent === null) ? 'null' : $parent->getId();
 
-                $setOrderAndParent($id, $parentId);
+                $setParent($id, $parentId);
             }
+        }
+
+        //set the order
+        $parentCount = 1;
+        foreach ($byParent as $parentId => $children) {
+            $events[$parentId]->setOrder($parentCount);
+            $entity->addEvent($parentId, $events[$parentId]);
+
+            $childCount = $parentCount + 0.01;
+            foreach ($children as $childId) {
+                if ($childId != $parentId) {
+                    $events[$childId]->setOrder($childCount);
+                    $childCount += 0.01;
+                    $entity->addEvent($childId, $events[$childId]);
+                }
+            }
+
+            $parentCount++;
         }
     }
 
@@ -332,130 +262,155 @@ class CampaignModel extends CommonFormModel
             $events = array();
             $event  = new Events\CampaignBuilderEvent($this->translator);
             $this->dispatcher->dispatch(CampaignEvents::CAMPAIGN_ON_BUILD, $event);
-            $events = $event->getEvents();
+            $events['action']  = $event->getActions();
+            $events['trigger'] = $event->getTriggers();
         }
         return $events;
     }
 
     /**
-     * Campaigns a specific event
+     * Proxy for EventModel::triggerEvent
      *
-     * @param CampaignEvent $event
-     * @param Lead $lead
-     * @param bool $checkApplied
-     * @return bool Was event campaigned
+     * @param      $eventType
+     * @param mixed $passthrough
+     * @param mixed $eventTypeId
      */
-    public function triggerEvent(CampaignEvent $event, Lead $lead = null, $checkApplied = true)
+    public function triggerEvent($eventType, $passthrough = null, $eventTypeId = null)
     {
-        //only campaign events for anonymous users
-        if (!$this->security->isAnonymous()) {
-            return false;
-        }
-
-        if ($lead == null) {
-            $leadModel = $this->factory->getModel('lead');
-            $lead      = $leadModel->getCurrentLead();
-        }
-
-        if ($checkApplied) {
-            //get a list of events that has already been performed on this lead
-            $appliedEvents = $this->getEventRepository()->getLeadCampaignedEvents($lead->getId());
-
-            //if it's already been done, then skip it
-            if (isset($appliedEvents[$event->getId()])) {
-                return false;
-            }
-        }
-
-        //make sure the event still exists
-        $campaign  = $event->getCampaign();
-        if (!isset($availableEvents[$campaign->getType()])) {
-            return false;
-        }
-
-        $settings = $availableEvents[$campaign->getType()];
-        $args     = array(
-            'event'      => array(
-                'id'         => $event->getId(),
-                'type'       => $event->getType(),
-                'name'       => $event->getName(),
-                'properties' => $event->getProperties(),
-                'campaign'      => array(
-                    'id'        => $campaign->getId(),
-                    'name'      => $campaign->getName()
-                )
-            ),
-            'lead'        => $lead,
-            'factory'     => $this->factory
-        );
-
-        if (is_callable($settings['callback'])) {
-            if (is_array($settings['callback'])) {
-                $reflection = new \ReflectionMethod($settings['callback'][0], $settings['callback'][1]);
-            } elseif (strpos($settings['callback'], '::') !== false) {
-                $parts      = explode('::', $settings['callback']);
-                $reflection = new \ReflectionMethod($parts[0], $parts[1]);
-            } else {
-                new \ReflectionMethod(null, $settings['callback']);
-            }
-
-            $pass = array();
-            foreach ($reflection->getParameters() as $param) {
-                if (isset($args[$param->getName()])) {
-                    $pass[] = $args[$param->getName()];
-                } else {
-                    $pass[] = null;
-                }
-            }
-            $reflection->invokeArgs($this, $pass);
-
-            return true;
-        }
-
-        return false;
+        return $this->factory->getModel('campaign.event')->triggerEvent($eventType, $passthrough, $eventTypeId);
     }
 
     /**
-     * Campaign events for the current lead
+     * Gets the
      *
      * @param Lead $lead
      */
-    public function triggerEvents(Lead $lead)
+    public function getLeadCampaigns(Lead $lead = null)
     {
-        $campaigns = $lead->getCampaigns();
+        static $campaigns = array();
 
-        //find all published campaigns that is applicable to this campaigns
-        /** @var \Mautic\CampaignBundle\Entity\EventRepository $repo */
-        $repo      = $this->getEventRepository();
-        $events    = $repo->getPublishedByCampaignTotal($campaigns);
-        /** @var \Mautic\CoreBundle\Entity\IpAddress $ipAddress */
-        $ipAddress = $this->factory->getIpAddress();
-        $persist   = array();
-        if (!empty($events)) {
-            //get a list of actions that has already been applied to this lead
-            $appliedEvents = $repo->getLeadCampaignedEvents($lead->getId());
+        if ($lead === null) {
+            /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+            $leadModel       = $this->factory->getModel('lead');
+            $lead            = $leadModel->getCurrentLead();
+        }
 
-            foreach ($events as $event) {
-                if (isset($appliedEvents[$event->getId()])) {
-                    //don't apply the event to the lead if it's already been done
-                    continue;
-                }
+        if (!isset($campaigns[$lead->getId()])) {
+            $campaigns[$lead->getId()] = $this->getRepository()->getPublishedCampaigns(null, $lead->getId());
+        }
 
-                if ($this->triggerEvent($event, $lead, false)) {
-                    $log = new LeadEventLog();
-                    $log->setIpAddress($ipAddress);
-                    $log->setEvent($event);
-                    $log->setLead($lead);
-                    $log->setDateFired(new \DateTime());
+        return $campaigns[$lead->getId()];
+    }
 
-                    $event->addLog($log);
-                    $persist[] = $event;
-                }
+    /**
+     * Add lead to the campaign
+     *
+     * @param Campaign $campaign
+     * @param Lead     $lead
+     */
+    public function addLead(Campaign $campaign, Lead $lead)
+    {
+        $campaigns = $this->getLeadCampaigns($lead);
+
+        if (isset($campaigns[$campaign->getId()])) {
+            return;
+        }
+
+        $campaignLead = new \Mautic\CampaignBundle\Entity\Lead();
+        $campaignLead->setCampaign($campaign);
+        $campaignLead->setLead($lead);
+        $campaignLead->setDateAdded(new \DateTime());
+
+        $campaign->addLead($lead->getId(), $campaignLead);
+
+        $this->saveEntity($campaign);
+
+        if ($this->dispatcher->hasListeners(CampaignEvents::CAMPAIGN_ON_LEADCHANGE)) {
+            $event = new Events\CampaignLeadChangeEvent($campaign, $lead, 'added');
+            $this->dispatcher->dispatch(CampaignEvents::CAMPAIGN_ON_LEADCHANGE, $event);
+        }
+    }
+
+    /**
+     * Remove lead from the campaign
+     *
+     * @param Campaign $campaign
+     * @param Lead     $lead
+     */
+    public function removeLead(Campaign $campaign, Lead $lead)
+    {
+
+        $campaign->removeLead($lead);
+
+        $this->saveEntity($campaign);
+
+        if ($this->dispatcher->hasListeners(CampaignEvents::CAMPAIGN_ON_LEADCHANGE)) {
+            $event = new Events\CampaignLeadChangeEvent($campaign, $lead, 'removed');
+            $this->dispatcher->dispatch(CampaignEvents::CAMPAIGN_ON_LEADCHANGE, $event);
+        }
+    }
+
+    /**
+     * Add lead(s) to the campaign
+     *
+     * @param Campaign $campaign
+     * @param array    $leads
+     */
+    public function addLeads(Campaign $campaign, array $leads)
+    {
+        foreach ($leads as $lead) {
+            $campaigns = $this->getLeadCampaigns($lead);
+
+            if (isset($campaigns[$campaign->getId()])) {
+                continue;
+            }
+
+            $campaignLead = new \Mautic\CampaignBundle\Entity\Lead();
+            $campaignLead->setCampaign($campaign);
+            $campaignLead->setDateAdded(new \DateTime());
+
+            if ($lead instanceof Lead) {
+                $campaignLead->setLead($lead);
+                $campaign->addLead($lead->getId(), $campaignLead);
+            } else {
+                $leadId = $lead;
+                $lead   = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
+                $campaignLead->setLead($lead);
+                $campaign->addLead($leadId, $campaignLead);
+            }
+
+            if ($this->dispatcher->hasListeners(CampaignEvents::CAMPAIGN_ON_LEADCHANGE)) {
+                $event = new Events\CampaignLeadChangeEvent($campaign, $lead, 'added');
+                $this->dispatcher->dispatch(CampaignEvents::CAMPAIGN_ON_LEADCHANGE, $event);
             }
         }
 
-        if (!empty($persist)) {
-            $this->getEventRepository()->saveEntities($persist);
+        $this->saveEntity($campaign);
+    }
+
+    /**
+     * Remove lead(s) from the campaign
+     *
+     * @param Campaign $campaign
+     * @param array    $leads
+     */
+    public function removeLeads(Campaign $campaign, array $leads)
+    {
+        foreach ($leads as $lead) {
+            if ($lead instanceof Lead) {
+                $campaign->removeLead($lead);
+            } else {
+                $leadId = $lead;
+                $lead   = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
+                $campaign->removeLead($lead);
+            }
+
+            if ($this->dispatcher->hasListeners(CampaignEvents::CAMPAIGN_ON_LEADCHANGE)) {
+                $event = new Events\CampaignLeadChangeEvent($campaign, $lead, 'removed');
+                $this->dispatcher->dispatch(CampaignEvents::CAMPAIGN_ON_LEADCHANGE, $event);
+            }
         }
+
+        $this->saveEntity($campaign);
     }
 }

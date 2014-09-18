@@ -126,4 +126,24 @@ class DateTimeHelper
     {
         return $this->datetime;
     }
+
+    public function getLocalTimestamp()
+    {
+        if ($this->datetime) {
+            $local = $this->datetime->setTimezone($this->local);
+            return $local->getTimestamp();
+        } else {
+            return false;
+        }
+    }
+
+    public function getUtcTimestamp()
+    {
+        if ($this->datetime) {
+            $utc = $this->datetime->setTimezone($this->utc);
+            return $utc->getTimestamp();
+        } else {
+            return false;
+        }
+    }
 }

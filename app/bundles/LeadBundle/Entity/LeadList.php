@@ -261,7 +261,9 @@ class LeadList extends FormEntity
      */
     public function addLead(\Mautic\LeadBundle\Entity\Lead $lead)
     {
-        $this->includedLeads[] = $lead;
+        if (!$this->includedLeads->contains($lead)) {
+            $this->includedLeads[] = $lead;
+        }
 
         if ($this->excludedLeads->contains($lead)) {
             $this->removeExcludedLead($lead);
@@ -301,7 +303,9 @@ class LeadList extends FormEntity
      */
     public function excludeLead(\Mautic\LeadBundle\Entity\Lead $lead)
     {
-        $this->excludedLeads[] = $lead;
+        if (!$this->excludedLeads->contains($lead)) {
+            $this->excludedLeads[] = $lead;
+        }
 
         if ($this->includedLeads->contains($lead)) {
             $this->removeLead($lead);
