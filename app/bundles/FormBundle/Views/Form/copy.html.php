@@ -39,81 +39,81 @@
         ?>
     </div>
     <div class="col-md-3">
-                        <div class="panel panel-minimal">
-                            <div class="panel-heading"><h5 class="panel-title"><i class="ico-health mr5"></i>Latest Activity</h5></div>
-                        
-                            <!-- Media list feed -->
-                            <ul class="media-list media-list-feed nm">
-                                <li class="media">
-                                    <div class="media-object pull-left">
-                                        <i class="ico-pencil bgcolor-success"></i>
-                                    </div>
-                                    <div class="media-body">
-                                        <p class="media-heading">EDIT EXISTING PAGE</p>
-                                        <p class="media-text"><span class="text-primary semibold">Service Page</span> has been edited by Tamara Moon.</p>
-                                        <p class="media-meta">Just Now</p>
-                                    </div>
-                                </li>
-                                <li class="media">
-                                    <div class="media-object pull-left">
-                                        <i class="ico-file-plus bgcolor-success"></i>
-                                    </div>
-                                    <div class="media-body">
-                                        <p class="media-heading">CREATE A NEW PAGE</p>
-                                        <p class="media-text"><span class="text-primary semibold">Service Page</span> has been created by Tamara Moon.</p>
-                                        <p class="media-meta">2 Hour Ago</p>
-                                    </div>
-                                </li>
-                                <li class="media">
-                                    <div class="media-object pull-left">
-                                        <i class="ico-upload22 bgcolor-success"></i>
-                                    </div>
-                                    <div class="media-body">
-                                        <p class="media-heading">UPLOAD CONTENT</p>
-                                        <p class="media-text">Tamara Moon has uploaded 8 new item to the directory</p>
-                                        <p class="media-meta">3 Hour Ago</p>
-                                    </div>
-                                </li>
-                                <li class="media">
-                                    <div class="media-object pull-left">
-                                        <img src="../image/avatar/avatar6.jpg" class="media-object img-circle" alt="">
-                                    </div>
-                                    <div class="media-body">
-                                        <p class="media-heading">NEW MESSAGE</p>
-                                        <p class="media-text">Arthur Abbott send you a message</p>
-                                        <p class="media-meta">3 Hour Ago</p>
-                                    </div>
-                                </li>
-                                <li class="media">
-                                    <div class="media-object pull-left">
-                                        <i class="ico-upload22 bgcolor-success"></i>
-                                    </div>
-                                    <div class="media-body">
-                                        <p class="media-heading">UPLOAD CONTENT</p>
-                                        <p class="media-text">Tamara Moon has uploaded 3 new item to the directory</p>
-                                        <p class="media-meta">7 Hour Ago</p>
-                                    </div>
-                                </li>
-                                <li class="media">
-                                    <div class="media-object pull-left">
-                                        <i class="ico-link5 bgcolor-success"></i>
-                                    </div>
-                                    <div class="media-body">
-                                        <p class="media-heading">NEW UPDATE AVAILABLE</p>
-                                        <p class="media-text">3 new update is available to download</p>
-                                        <p class="media-meta">Yesterday</p>
-                                    </div>
-                                </li>
-                                <li class="media">
-                                    <div class="media-object pull-left">
-                                        <i class="ico-loop4"></i>
-                                    </div>
-                                    <div class="media-body">
-                                        <a href="javascript:void(0);" class="media-heading text-primary">Load more feed</a>
-                                    </div>
-                                </li>
-                            </ul>
-                            <!--/ Media list feed -->
-                        </div>
+        <div class="panel panel-minimal">
+            <div class="panel-heading"><h5 class="panel-title"><i class="ico-health mr5"></i>Latest Activity</h5></div>
+        
+            <!-- Media list feed -->
+            <ul class="media-list media-list-feed nm">
+                <li class="media">
+                    <div class="media-object pull-left">
+                        <i class="ico-pencil bgcolor-success"></i>
                     </div>
+                    <div class="media-body">
+                        <p class="media-heading">EDIT EXISTING PAGE</p>
+                        <p class="media-text"><span class="text-primary semibold">Service Page</span> has been edited by Tamara Moon.</p>
+                        <p class="media-meta">Just Now</p>
+                    </div>
+                </li>
+                <li class="media">
+                    <div class="media-object pull-left">
+                        <i class="ico-file-plus bgcolor-success"></i>
+                    </div>
+                    <div class="media-body">
+                        <p class="media-heading">CREATE A NEW PAGE</p>
+                        <p class="media-text"><span class="text-primary semibold">Service Page</span> has been created by Tamara Moon.</p>
+                        <p class="media-meta">2 Hour Ago</p>
+                    </div>
+                </li>
+                <li class="media">
+                    <div class="media-object pull-left">
+                        <i class="ico-upload22 bgcolor-success"></i>
+                    </div>
+                    <div class="media-body">
+                        <p class="media-heading">UPLOAD CONTENT</p>
+                        <p class="media-text">Tamara Moon has uploaded 8 new item to the directory</p>
+                        <p class="media-meta">3 Hour Ago</p>
+                    </div>
+                </li>
+                <li class="media">
+                    <div class="media-object pull-left">
+                        <img src="../image/avatar/avatar6.jpg" class="media-object img-circle" alt="">
+                    </div>
+                    <div class="media-body">
+                        <p class="media-heading">NEW MESSAGE</p>
+                        <p class="media-text">Arthur Abbott send you a message</p>
+                        <p class="media-meta">3 Hour Ago</p>
+                    </div>
+                </li>
+                <li class="media">
+                    <div class="media-object pull-left">
+                        <i class="ico-upload22 bgcolor-success"></i>
+                    </div>
+                    <div class="media-body">
+                        <p class="media-heading">UPLOAD CONTENT</p>
+                        <p class="media-text">Tamara Moon has uploaded 3 new item to the directory</p>
+                        <p class="media-meta">7 Hour Ago</p>
+                    </div>
+                </li>
+                <li class="media">
+                    <div class="media-object pull-left">
+                        <i class="ico-link5 bgcolor-success"></i>
+                    </div>
+                    <div class="media-body">
+                        <p class="media-heading">NEW UPDATE AVAILABLE</p>
+                        <p class="media-text">3 new update is available to download</p>
+                        <p class="media-meta">Yesterday</p>
+                    </div>
+                </li>
+                <li class="media">
+                    <div class="media-object pull-left">
+                        <i class="ico-loop4"></i>
+                    </div>
+                    <div class="media-body">
+                        <a href="javascript:void(0);" class="media-heading text-primary">Load more feed</a>
+                    </div>
+                </li>
+            </ul>
+            <!--/ Media list feed -->
+        </div>
+    </div>
 </div>

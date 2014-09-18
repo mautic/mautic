@@ -65,6 +65,6 @@ if ($tmpl == 'index') {
                 'sessionVar'      => 'report.' . $report->getId()
             )); ?>
         </div>
-        <div class="footer-margin"></div>
+        '
     </div>
 </div>

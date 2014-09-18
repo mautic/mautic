@@ -30,5 +30,5 @@ $view['slots']->set("headerTitle", $view['translator']->trans('mautic.social.hea
     <?php echo $view['form']->row($form->children['services']->children[$service . '-panel-end']); ?>
     <?php endforeach; ?>
     <?php echo $view['form']->end($form); ?>
-    <div class="footer-margin"></div>
+    '
 </div>

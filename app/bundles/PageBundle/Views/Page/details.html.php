@@ -16,10 +16,7 @@ $view['slots']->set("headerTitle", $activePage->getTitle());?>
 $view['slots']->start('actions');
 if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions['page:pages:editother'],
     $activePage->getCreatedBy())): ?>
-    <a class="btn btn-default" href="<?php echo $this->container->get('router')->generate(
-        'mautic_page_action', array("objectAction" => "edit", "objectId" => $activePage->getId())); ?>"
-       data-toggle="ajax"
-       data-menu-link="#mautic_page_index">
+    <a class="btn btn-default" href="<?php echo $this->container->get('router')->generate('mautic_page_action', array("objectAction" => "edit", "objectId" => $activePage->getId())); ?>" data-toggle="ajax" data-menu-link="#mautic_page_index">
         <i class="fa fa-fw fa-pencil-square-o"></i>
         <?php echo $view["translator"]->trans("mautic.core.form.edit"); ?>
     </a>
@@ -68,7 +65,6 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                data-toggle="ajax">
                 <?php echo $catName; ?>
             </a>
-            <span> | </span>
             <span>
                 <?php
                 $author     = $activePage->getCreatedBy();
@@ -88,7 +84,6 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                     <?php echo $authorName; ?>
                 </a>
             </span>
-            <span> | </span>
             <span>
             <?php $langSearch = $view['translator']->trans('mautic.core.searchcommand.lang').":".$activePage->getLanguage(); ?>
                 <a href="<?php echo $view['router']->generate('mautic_page_index', array('search' => $langSearch)); ?>"
@@ -133,5 +128,5 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
         'variants'      => $variants
     )); ?>
     <?php endif; ?>
-    <div class="footer-margin"></div>
+    '
 </div>

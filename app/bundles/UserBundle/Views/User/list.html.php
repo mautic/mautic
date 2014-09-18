@@ -98,5 +98,5 @@ endif;
         "baseUrl"    =>  $view['router']->generate('mautic_user_index'),
         'sessionVar' => 'user'
     )); ?>
-    <div class="footer-margin"></div>
+    '
 </div>

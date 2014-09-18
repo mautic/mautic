@@ -38,8 +38,10 @@ $view['slots']->set("headerTitle", $header.$subheader);
                 <input type="hidden" id="pageBuilderUrl" value="<?php echo $view['router']->generate('mautic_page_action', array('objectAction' => 'builder', 'objectId' => $activePage->getSessionId())); ?>" />
             </div>
             <div class="page-builder-panel">
-                <button class="btn btn-warning btn-close-builder" onclick="Mautic.closePageEditor();"><?php echo $view['translator']->trans('mautic.page.page.builder.close'); ?></button>
-                <div class="well well-sm margin-md-top"><em><?php echo $view['translator']->trans('mautic.page.page.token.help'); ?></em></div>
+                <p>
+                    <button class="btn btn-danger btn-close-builder" onclick="Mautic.closePageEditor();"><?php echo $view['translator']->trans('mautic.page.page.builder.close'); ?></button>
+                </p>
+                <div><em><?php echo $view['translator']->trans('mautic.page.page.token.help'); ?></em></div>
                 <div class="panel-group margin-sm-top" id="page_tokens">
                     <?php foreach ($tokens as $k => $t): ?>
                     <?php $id = \Mautic\CoreBundle\Helper\InputHelper::alphanum($k); ?>

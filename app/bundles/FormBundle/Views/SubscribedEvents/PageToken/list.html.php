@@ -52,5 +52,5 @@ if ($tmpl == 'index') {
     )); ?>
     <?php endif; ?>
 
-    <div class="footer-margin"></div>
+    '
 </div>

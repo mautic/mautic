@@ -78,5 +78,5 @@ $view['slots']->set("headerTitle", $view['translator']->trans('mautic.user.accou
             <?php endif; ?>
         </div>
     </div>
-    <div class="footer-margin"></div>
+    '
 </div>
