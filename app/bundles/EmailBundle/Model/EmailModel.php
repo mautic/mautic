@@ -124,6 +124,8 @@ class EmailModel extends FormModel
      * Save an array of entities
      *
      * @param  $entities
+     * @param  $unlock
+     *
      * @return array
      */
     public function saveEntities($entities, $unlock = true)

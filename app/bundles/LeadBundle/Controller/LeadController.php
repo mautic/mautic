@@ -591,4 +591,39 @@ class LeadController extends FormController
             'contentTemplate' => 'MauticLeadBundle:LeadLists:index.html.php'
         ));
     }
+
+
+    /**
+     * Add/remove lead from a campaign
+     *
+     * @param $objectId
+     */
+    public function campaignAction($objectId)
+    {
+        $model   = $this->factory->getModel('lead');
+        $lead    = $model->getEntity($objectId);
+
+        if ($lead != null && $this->factory->getSecurity()->hasEntityAccess(
+                'lead:leads:editown', 'lead:leads:editother', $lead->getOwner()
+            )) {
+            /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */
+            $campaignModel = $this->factory->getModel('campaign');
+            $campaigns      = $campaignModel->getPublishedCampaigns(true);
+            $leadsCampaigns = $campaignModel->getLeadCampaigns($lead, true);
+
+            foreach ($campaigns as $c) {
+                $campaigns[$c['id']]['inCampaign'] = (isset($leadsCampaigns[$c['id']])) ? true : false;
+            }
+        } else {
+            $campaigns = array();
+        }
+
+        return $this->delegateView(array(
+            'viewParameters'  => array(
+                'campaigns'  => $campaigns,
+                'lead'       => $lead
+            ),
+            'contentTemplate' => 'MauticLeadBundle:LeadCampaigns:index.html.php'
+        ));
+    }
 }

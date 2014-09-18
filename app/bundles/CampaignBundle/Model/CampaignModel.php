@@ -289,11 +289,12 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
-     * Gets the
+     * Gets the campaigns a specific lead is part of
      *
      * @param Lead $lead
+     * @param bool $forList
      */
-    public function getLeadCampaigns(Lead $lead = null)
+    public function getLeadCampaigns(Lead $lead = null, $forList = false)
     {
         static $campaigns = array();
 
@@ -304,10 +305,27 @@ class CampaignModel extends CommonFormModel
         }
 
         if (!isset($campaigns[$lead->getId()])) {
-            $campaigns[$lead->getId()] = $this->getRepository()->getPublishedCampaigns(null, $lead->getId());
+            $campaigns[$lead->getId()] = $this->getRepository()->getPublishedCampaigns(null, $lead->getId(), $forList);
         }
 
         return $campaigns[$lead->getId()];
+    }
+
+    /**
+     * Gets a list of published campaigns
+     *
+     * @param Lead $lead
+     * @param bool $forList
+     */
+    public function getPublishedCampaigns($forList = false)
+    {
+        static $campaigns = array();
+
+        if (empty($campaigns)) {
+            $campaigns = $this->getRepository()->getPublishedCampaigns(null, null, $forList);
+        }
+
+        return $campaigns;
     }
 
     /**
