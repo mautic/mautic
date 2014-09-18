@@ -301,8 +301,7 @@ class EventController extends CommonFormController
 
         if ($this->request->getMethod() == 'POST' && $event !== null) {
             $events            = $this->factory->getModel('campaign')->getEvents();
-            $eventType         = "{$event['eventType']}s";
-            $event['settings'] = $events[$eventType][$event['type']];
+            $event['settings'] = $events[$event['eventType']][$event['type']];
 
             //add the field to the delete list
             if (!in_array($objectId, $delete)) {
@@ -377,8 +376,7 @@ class EventController extends CommonFormController
 
         if ($this->request->getMethod() == 'POST' && $event !== null) {
             $events            = $this->factory->getModel('campaign')->getEvents();
-            $eventType         = "{$event['eventType']}s";
-            $event['settings'] = $events[$eventType][$event['type']];
+            $event['settings'] = $events[$event['eventType']][$event['type']];
 
             //add the field to the delete list
             if (in_array($objectId, $delete)) {

@@ -44,6 +44,14 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
+     * @return \Mautic\CampaignBundle\Entity\LeadRepository
+     */
+    public function getCampaignLeadRepository()
+    {
+        return $this->em->getRepository('MauticCampaignBundle:Lead');
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @return string
@@ -310,9 +318,13 @@ class CampaignModel extends CommonFormModel
      */
     public function addLead(Campaign $campaign, Lead $lead)
     {
-        $campaigns = $this->getLeadCampaigns($lead);
+        $campaignLead = $this->getCampaignLeadRepository()->findOneBy(array(
+            'lead'     => $lead,
+            'campaign' => $campaign
+        ));
 
-        if (isset($campaigns[$campaign->getId()])) {
+        if ($campaignLead != null) {
+            //already exists
             return;
         }
 
@@ -332,25 +344,6 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
-     * Remove lead from the campaign
-     *
-     * @param Campaign $campaign
-     * @param Lead     $lead
-     */
-    public function removeLead(Campaign $campaign, Lead $lead)
-    {
-
-        $campaign->removeLead($lead);
-
-        $this->saveEntity($campaign);
-
-        if ($this->dispatcher->hasListeners(CampaignEvents::CAMPAIGN_ON_LEADCHANGE)) {
-            $event = new Events\CampaignLeadChangeEvent($campaign, $lead, 'removed');
-            $this->dispatcher->dispatch(CampaignEvents::CAMPAIGN_ON_LEADCHANGE, $event);
-        }
-    }
-
-    /**
      * Add lead(s) to the campaign
      *
      * @param Campaign $campaign
@@ -359,33 +352,64 @@ class CampaignModel extends CommonFormModel
     public function addLeads(Campaign $campaign, array $leads)
     {
         foreach ($leads as $lead) {
-            $campaigns = $this->getLeadCampaigns($lead);
 
-            if (isset($campaigns[$campaign->getId()])) {
+            if (!$lead instanceof Lead) {
+                $leadId = $lead;
+                $lead   = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
+            }
+
+            $campaignLead = $this->getCampaignLeadRepository()->findOneBy(array(
+                'lead'     => $lead,
+                'campaign' => $campaign
+            ));
+
+            if ($campaignLead != null) {
+                //already exists
+                unset($campaignLead);
                 continue;
             }
 
             $campaignLead = new \Mautic\CampaignBundle\Entity\Lead();
             $campaignLead->setCampaign($campaign);
             $campaignLead->setDateAdded(new \DateTime());
-
-            if ($lead instanceof Lead) {
-                $campaignLead->setLead($lead);
-                $campaign->addLead($lead->getId(), $campaignLead);
-            } else {
-                $leadId = $lead;
-                $lead   = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
-                $campaignLead->setLead($lead);
-                $campaign->addLead($leadId, $campaignLead);
-            }
+            $campaignLead->setLead($lead);
+            $campaign->addLead($lead->getId(), $campaignLead);
 
             if ($this->dispatcher->hasListeners(CampaignEvents::CAMPAIGN_ON_LEADCHANGE)) {
                 $event = new Events\CampaignLeadChangeEvent($campaign, $lead, 'added');
                 $this->dispatcher->dispatch(CampaignEvents::CAMPAIGN_ON_LEADCHANGE, $event);
             }
+            unset($campaignLead);
         }
 
         $this->saveEntity($campaign);
+    }
+
+    /**
+     * Remove lead from the campaign
+     *
+     * @param Campaign $campaign
+     * @param Lead     $lead
+     */
+    public function removeLead(Campaign $campaign, Lead $lead)
+    {
+        $campaignLead = $this->getCampaignLeadRepository()->findOneBy(array(
+            'lead'     => $lead,
+            'campaign' => $campaign
+        ));
+
+        if (!$campaignLead) {
+            return;
+        }
+
+        $campaign->removeLead($campaignLead);
+
+        $this->saveEntity($campaign);
+
+        if ($this->dispatcher->hasListeners(CampaignEvents::CAMPAIGN_ON_LEADCHANGE)) {
+            $event = new Events\CampaignLeadChangeEvent($campaign, $lead, 'removed');
+            $this->dispatcher->dispatch(CampaignEvents::CAMPAIGN_ON_LEADCHANGE, $event);
+        }
     }
 
     /**
@@ -397,13 +421,24 @@ class CampaignModel extends CommonFormModel
     public function removeLeads(Campaign $campaign, array $leads)
     {
         foreach ($leads as $lead) {
-            if ($lead instanceof Lead) {
-                $campaign->removeLead($lead);
-            } else {
+
+            if (!$lead instanceof Lead) {
                 $leadId = $lead;
                 $lead   = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
-                $campaign->removeLead($lead);
             }
+
+            $campaignLead = $this->getCampaignLeadRepository()->findOneBy(array(
+                'lead'     => $lead,
+                'campaign' => $campaign
+            ));
+
+            if ($campaignLead == null) {
+                //doesn't exist
+                unset($campaignLead);
+                continue;
+            }
+
+            $campaign->removeLead($campaignLead);
 
             if ($this->dispatcher->hasListeners(CampaignEvents::CAMPAIGN_ON_LEADCHANGE)) {
                 $event = new Events\CampaignLeadChangeEvent($campaign, $lead, 'removed');

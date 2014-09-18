@@ -56,17 +56,22 @@ class CampaignEventHelper
         $addToCampaigns      = $event['properties']['addTo'];
         $removeFromCampaigns = $event['properties']['removeFrom'];
         $em                  = $factory->getEntityManager();
+        $leadsModified       = false;
 
         if (!empty($addToCampaigns)) {
             foreach ($addToCampaigns as $c) {
                 $campaignModel->addLead($em->getReference('MauticCampaignBundle:Campaign', $c), $lead);
             }
+            $leadsModified = true;
         }
 
         if (!empty($removeFromCampaigns)) {
             foreach ($removeFromCampaigns as $c) {
                 $campaignModel->removeLead($em->getReference('MauticCampaignBundle:Campaign', $c), $lead);
             }
+            $leadsModified = true;
         }
+
+        return $leadsModified;
     }
 }

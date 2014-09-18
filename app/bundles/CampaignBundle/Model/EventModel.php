@@ -404,6 +404,7 @@ class EventModel extends CommonFormModel
         $campaignModel   = $this->factory->getModel('campaign');
         $availableEvents = $campaignModel->getEvents();
         $persist         = array();
+
         foreach ($events as $e) {
             /** @var \Mautic\CampaignBundle\Entity\Event $event */
             $event = $e->getEvent();
@@ -416,7 +417,7 @@ class EventModel extends CommonFormModel
             $settings = $availableEvents[$eventType][$type];
 
             $lead = $e->getLead();
-            $campaign = $event->getCampaign();
+
             //trigger the action
             if ($this->invokeEventCallback($event->convertToArray(), $settings, $lead)) {
                 $e->setTriggerDate(null);

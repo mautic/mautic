@@ -302,9 +302,9 @@ class Campaign extends FormEntity
     /**
      * Remove lead
      *
-     * @param \Mautic\LeadBundle\Entity\Lead $lead
+     * @param Lead $lead
      */
-    public function removeLead(\Mautic\LeadBundle\Entity\Lead $lead)
+    public function removeLead(Lead $lead)
     {
         $this->leads->removeElement($lead);
     }
