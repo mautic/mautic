@@ -428,7 +428,7 @@ class EventModel extends CommonFormModel
         }
 
         if (!empty($persist)) {
-            $this->saveEntities($persist, false);
+            $this->getRepository()->saveEntities($persist);
         }
     }
 }
