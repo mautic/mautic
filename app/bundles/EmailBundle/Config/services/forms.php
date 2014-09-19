@@ -30,6 +30,28 @@ $container->setDefinition('mautic.form.type.emailvariant', new Definition(
         'alias' => 'emailvariant',
     ));
 
+$container->setDefinition('mautic.form.type.email_list', new Definition(
+    'Mautic\EmailBundle\Form\Type\EmailListType',
+    array(new Reference('mautic.factory'))
+))
+    ->addTag('form.type', array(
+        'alias' => 'email_list',
+    ));
+
+$container->setDefinition('mautic.form.type.campaigntrigger_email', new Definition(
+    'Mautic\EmailBundle\Form\Type\CampaignTriggerEmailOpenType'
+))
+    ->addTag('form.type', array(
+        'alias' => 'campaigntrigger_email',
+    ));
+
+$container->setDefinition('mautic.form.type.campaignaction_email', new Definition(
+    'Mautic\EmailBundle\Form\Type\CampaignActionEmailSendType'
+))
+    ->addTag('form.type', array(
+        'alias' => 'campaignaction_email',
+    ));
+
 $container
     ->setDefinition('mautic.validator.leadlistaccess', new Definition(
         'Mautic\EmailBundle\Form\Validator\Constraints\LeadListAccessValidator',

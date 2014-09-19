@@ -24,9 +24,10 @@ class AjaxController extends CommonAjaxController
 
     /**
      * @param Request $request
+     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    protected function userListAction(Request $request)
+    protected function userListAction (Request $request)
     {
         $filter    = InputHelper::clean($request->query->get('filter'));
         $results   = $this->factory->getModel('lead.lead')->getLookupResults('user', $filter);
@@ -38,18 +39,20 @@ class AjaxController extends CommonAjaxController
                 "value" => $r['id']
             );
         }
+
         return $this->sendJsonResponse($dataArray);
     }
 
     /**
      * @param Request $request
+     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    protected function fieldListAction(Request $request)
+    protected function fieldListAction (Request $request)
     {
         $dataArray = array('success' => 0);
-        $filter = InputHelper::clean($request->query->get('filter'));
-        $field  = InputHelper::clean($request->query->get('field'));
+        $filter    = InputHelper::clean($request->query->get('filter'));
+        $field     = InputHelper::clean($request->query->get('field'));
         if (!empty($field)) {
             $dataArray = array();
             if ($field == 'company') {
@@ -60,10 +63,10 @@ class AjaxController extends CommonAjaxController
             } elseif ($field == "owner") {
                 $results = $this->factory->getModel('lead.lead')->getLookupResults('user', $filter);
                 foreach ($results as $r) {
-                    $name = $r['firstName'] . ' ' . $r['lastName'];
+                    $name        = $r['firstName'] . ' ' . $r['lastName'];
                     $dataArray[] = array(
                         "value" => $name,
-                        "id" => $r['id']
+                        "id"    => $r['id']
                     );
                 }
             } else {
@@ -73,6 +76,7 @@ class AjaxController extends CommonAjaxController
                 }
             }
         }
+
         return $this->sendJsonResponse($dataArray);
     }
 
@@ -83,22 +87,22 @@ class AjaxController extends CommonAjaxController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    protected function updateSocialProfileAction(Request $request)
+    protected function updateSocialProfileAction (Request $request)
     {
         $dataArray = array('success' => 0);
-        $network = InputHelper::clean($request->request->get('network'));
-        $leadId  = InputHelper::clean($request->request->get('lead'));
+        $network   = InputHelper::clean($request->request->get('network'));
+        $leadId    = InputHelper::clean($request->request->get('lead'));
 
         if (!empty($leadId)) {
             //find the lead
             $model = $this->factory->getModel('lead.lead');
-            $lead = $model->getEntity($leadId);
+            $lead  = $model->getEntity($leadId);
 
             if ($lead !== null) {
                 $fields            = $lead->getFields();
                 $socialProfiles    = NetworkIntegrationHelper::getUserProfiles($this->factory, $lead, $fields, true, $network);
                 $socialProfileUrls = NetworkIntegrationHelper::getSocialProfileUrlRegex(false);
-                $networks = array();
+                $networks          = array();
                 foreach ($socialProfiles as $name => $details) {
                     $networks[$name]['newContent'] = $this->renderView('MauticLeadBundle:Social/' . $name . ':view.html.php', array(
                         'lead'              => $lead,
@@ -118,9 +122,10 @@ class AjaxController extends CommonAjaxController
 
     /**
      * @param Request $request
+     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    protected function toggleLeadListAction(Request $request)
+    protected function toggleLeadListAction (Request $request)
     {
         $dataArray = array('success' => 0);
         $leadId    = InputHelper::int($request->request->get('leadId'));
@@ -144,4 +149,32 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
+    /**
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    protected function toggleLeadCampaignAction (Request $request)
+    {
+        $dataArray  = array('success' => 0);
+        $leadId     = InputHelper::int($request->request->get('leadId'));
+        $campaignId = InputHelper::int($request->request->get('campaignId'));
+        $action     = InputHelper::clean($request->request->get('campaignAction'));
+
+        if (!empty($leadId) && !empty($campaignId) && in_array($action, array('remove', 'add'))) {
+            $leadModel     = $this->factory->getModel('lead');
+            $campaignModel = $this->factory->getModel('campaign');
+
+            $lead     = $leadModel->getEntity($leadId);
+            $campaign = $campaignModel->getEntity($campaignId);
+
+            if ($lead !== null && $campaign !== null) {
+                $class = "{$action}Lead";
+                $campaignModel->$class($campaign, $lead);
+                $dataArray['success'] = 1;
+            }
+        }
+
+        return $this->sendJsonResponse($dataArray);
+    }
 }

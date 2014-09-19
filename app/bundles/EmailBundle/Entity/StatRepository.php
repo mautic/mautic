@@ -47,7 +47,7 @@ class StatRepository extends CommonRepository
      * @param        $emailId
      * @param string $listId
      */
-    public function getSentStats($emailId, $listId = '')
+    public function getSentStats($emailId, $listId = null)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('s.*')

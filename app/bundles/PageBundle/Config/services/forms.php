@@ -31,9 +31,21 @@ $container->setDefinition('mautic.form.type.pagevariant', new Definition(
     ));
 
 $container->setDefinition('mautic.form.type.pointaction_pointhit', new Definition(
-    'Mautic\PageBundle\Form\Type\PointActionPageHitType',
+    'Mautic\PageBundle\Form\Type\PointActionPageHitType'))
+    ->addTag('form.type', array(
+        'alias' => 'pointaction_pagehit',
+    ));
+
+$container->setDefinition('mautic.form.type.pagehit.campaign_trigger', new Definition(
+    'Mautic\PageBundle\Form\Type\CampaignTriggerPageHitType'))
+    ->addTag('form.type', array(
+        'alias' => 'campaigntrigger_pagehit',
+    ));
+
+$container->setDefinition('mautic.form.type.pagelist', new Definition(
+    'Mautic\PageBundle\Form\Type\PageListType',
     array(new Reference('mautic.factory'))
 ))
     ->addTag('form.type', array(
-        'alias' => 'pointaction_pagehit',
+        'alias' => 'page_list',
     ));

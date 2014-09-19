@@ -73,6 +73,13 @@ Mautic.formFieldOnLoad = function (container, response) {
         //initialize tooltips
         mQuery(fieldId + " *[data-toggle='tooltip']").tooltip({html: true});
 
+        //initialize ajax'd modals
+        mQuery(fieldId + " a[data-toggle='ajaxmodal']").on('click.ajaxmodal', function (event) {
+            event.preventDefault();
+
+            Mautic.ajaxifyModal(this, event);
+        });
+
         mQuery('#mauticforms_fields .mauticform-row').off(".mauticform");
         mQuery('#mauticforms_fields .mauticform-row').on('mouseover.mauticformfields', function() {
             mQuery(this).find('.form-buttons').removeClass('hide');
@@ -116,6 +123,13 @@ Mautic.formActionOnLoad = function (container, response) {
         });
         //initialize tooltips
         mQuery(actionId + " *[data-toggle='tooltip']").tooltip({html: true});
+
+        //initialize ajax'd modals
+        mQuery(actionId + " a[data-toggle='ajaxmodal']").on('click.ajaxmodal', function (event) {
+            event.preventDefault();
+
+            Mautic.ajaxifyModal(this, event);
+        });
 
         mQuery('#mauticforms_actions .mauticform-row').off(".mauticform");
         mQuery('#mauticforms_actions .mauticform-row').on('mouseover.mauticformactions', function() {

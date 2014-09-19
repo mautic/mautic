@@ -42,6 +42,14 @@ class Event
     private $type;
 
     /**
+     * @ORM\Column(name="event_type", type="string", length=50)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full"})
+     */
+    private $eventType;
+
+    /**
      * @ORM\Column(type="string", length=50, nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
@@ -58,7 +66,7 @@ class Event
     private $description;
 
     /**
-     * @ORM\Column(name="event_order", type="decimal", precision=2)
+     * @ORM\Column(name="event_order", type="decimal", scale=2)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})
@@ -74,28 +82,36 @@ class Event
     private $properties = array();
 
     /**
-     * @ORM\Column(name="fire_date", type="datetime")
+     * @ORM\Column(name="trigger_date", type="datetime", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})
      */
-    private $fireDate;
+    private $triggerDate;
 
     /**
-     * @ORM\Column(name="fire_interval", type="integer")
+     * @ORM\Column(name="trigger_interval", type="integer", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})
      */
-    private $fireInterval = 0;
+    private $triggerInterval = 0;
 
     /**
-     * @ORM\Column(name="fire_interval_unit", type="string", length=1)
+     * @ORM\Column(name="trigger_interval_unit", type="string", length=1, nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})
      */
-    private $fireIntervalUnit;
+    private $triggerIntervalUnit;
+
+    /**
+     * @ORM\Column(name="trigger_mode", type="string", length=10, nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full"})
+     */
+    private $triggerMode;
 
     /**
      * @ORM\ManyToOne(targetEntity="Campaign", inversedBy="events")
@@ -105,6 +121,7 @@ class Event
 
     /**
      * @ORM\OneToMany(targetEntity="Event", mappedBy="parent", indexBy="id")
+     * @ORM\OrderBy({"order" = "ASC"})
      **/
     private $children;
 
@@ -418,51 +435,83 @@ class Event
     /**
      * @return mixed
      */
-    public function getFireDate ()
+    public function getTriggerDate ()
     {
-        return $this->fireDate;
+        return $this->triggerDate;
     }
 
     /**
-     * @param mixed $fireDate
+     * @param mixed $triggerDate
      */
-    public function setFireDate ($fireDate)
+    public function setTriggerDate ($triggerDate)
     {
-        $this->isChanged('fireDate', $fireDate);
-        $this->fireDate = $fireDate;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getFireInterval ()
-    {
-        return $this->fireInterval;
-    }
-
-    /**
-     * @param mixed $fireInterval
-     */
-    public function setFireInterval ($fireInterval)
-    {
-        $this->isChanged('fireInterval', $fireInterval);
-        $this->fireInterval = $fireInterval;
+        $this->isChanged('triggerDate', $triggerDate);
+        $this->triggerDate = $triggerDate;
     }
 
     /**
      * @return mixed
      */
-    public function getFireIntervalUnit ()
+    public function getTriggerInterval ()
     {
-        return $this->fireIntervalUnit;
+        return $this->triggerInterval;
     }
 
     /**
-     * @param mixed $fireIntervalUnit
+     * @param mixed $triggerInterval
      */
-    public function setFireIntervalUnit ($fireIntervalUnit)
+    public function setTriggerInterval ($triggerInterval)
     {
-        $this->isChanged('fireIntervalUnit', $fireIntervalUnit);
-        $this->fireIntervalUnit = $fireIntervalUnit;
+        $this->isChanged('triggerInterval', $triggerInterval);
+        $this->triggerInterval = $triggerInterval;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTriggerIntervalUnit ()
+    {
+        return $this->triggerIntervalUnit;
+    }
+
+    /**
+     * @param mixed $triggerIntervalUnit
+     */
+    public function setTriggerIntervalUnit ($triggerIntervalUnit)
+    {
+        $this->isChanged('triggerIntervalUnit', $triggerIntervalUnit);
+        $this->triggerIntervalUnit = $triggerIntervalUnit;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getEventType ()
+    {
+        return $this->eventType;
+    }
+
+    /**
+     * @param mixed $eventType
+     */
+    public function setEventType ($eventType)
+    {
+        $this->eventType = $eventType;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTriggerMode ()
+    {
+        return $this->triggerMode;
+    }
+
+    /**
+     * @param mixed $triggerMode
+     */
+    public function setTriggerMode ($triggerMode)
+    {
+        $this->triggerMode = $triggerMode;
     }
 }

@@ -17,7 +17,7 @@ use Mautic\PointBundle\PointEvents;
 /**
  * Class PointSubscriber
  *
- * @package Mautic\PageBundle\EventListener
+ * @package Mautic\AssetBundle\EventListener
  */
 class PointSubscriber extends CommonSubscriber
 {

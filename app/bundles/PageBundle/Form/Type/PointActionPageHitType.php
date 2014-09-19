@@ -20,24 +20,6 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class PointActionPageHitType extends AbstractType
 {
-
-    private $choices = array();
-
-    /**
-     * @param MauticFactory $factory
-     */
-    public function __construct(MauticFactory $factory) {
-        $viewOther = $factory->getSecurity()->isGranted('page:pages:viewother');
-        $choices = $factory->getModel('page')->getRepository()
-            ->getPageList('', 0, 0, $viewOther, 'variant');
-        foreach ($choices as $page) {
-            $this->choices[$page['language']][$page['id']] = $page['id'] . ':' . $page['title'] . ' (' . $page['alias'] . ')';
-        }
-
-        //sort by language
-        ksort($this->choices);
-    }
-
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options
@@ -57,14 +39,9 @@ class PointActionPageHitType extends AbstractType
             'data'       => $default
         ));
 
-        $builder->add('pages', 'choice', array(
-            'choices'       => $this->choices,
-            'expanded'      => false,
-            'multiple'      => true,
+        $builder->add('pages', 'page_list', array(
             'label'         => 'mautic.page.point.action.form.pages',
             'label_attr'    => array('class' => 'control-label'),
-            'empty_value'   => false,
-            'required'      => false,
             'attr'       => array(
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.page.point.action.form.pages.descr'

@@ -411,7 +411,7 @@ Mautic.refreshLeadSocialProfile = function(network, leadId, event) {
             Mautic.stopIconSpinPostEvent(event);
         }
     });
-}
+};
 
 Mautic.loadRemoteContentToModal = function(elementId) {
     mQuery('#'+elementId).on('loaded.bs.modal', function (e) {
@@ -454,14 +454,14 @@ Mautic.loadRemoteContentToModal = function(elementId) {
             }
         });
     });
-}
+};
 
 Mautic.showModalAlert = function(msg, type) {
     mQuery('.alert-modal').hide('fast').remove();
     mQuery('.bottom-form-buttons')
         .before('<div class="alert alert-modal alert-'+type+'" role="alert">'+msg+'</div>')
         .hide().show('fast');
-}
+};
 
 Mautic.toggleLeadList = function(toggleId, leadId, listId) {
     var toggleOn  = 'fa-toggle-on text-success';
@@ -503,4 +503,46 @@ Mautic.toggleLeadList = function(toggleId, leadId, listId) {
             }
         }
     });
-}
+};
+
+Mautic.toggleLeadCampaign = function(toggleId, leadId, campaignId) {
+    var toggleOn  = 'fa-toggle-on text-success';
+    var toggleOff = 'fa-toggle-off text-danger';
+
+    var action = mQuery('#' + toggleId).hasClass('fa-toggle-on') ? 'remove' : 'add';
+    var query = "action=lead:toggleLeadCampaign&leadId=" + leadId + "&campaignId=" + campaignId + "&campaignAction=" + action;
+
+    if (action == 'remove') {
+        //switch it on
+        mQuery('#' + toggleId).removeClass(toggleOn).addClass(toggleOff);
+    } else {
+        mQuery('#' + toggleId).removeClass(toggleOff).addClass(toggleOn);
+    }
+
+    mQuery.ajax({
+        url: mauticAjaxUrl,
+        type: "POST",
+        data: query,
+        dataType: "json",
+        success: function (response) {
+            if (!response.success) {
+                //return the icon back
+                if (action == 'remove') {
+                    //switch it on
+                    mQuery('#' + toggleId).addClass(toggleOff).addClass(toggleOn);
+                } else {
+                    mQuery('#' + toggleId).removeClass(toggleOn).addClass(toggleOff);
+                }
+            }
+        },
+        error: function (request, textStatus, errorThrown) {
+            //return the icon back
+            if (action == 'remove') {
+                //switch it on
+                mQuery('#' + toggleId).addClass(toggleOff).addClass(toggleOn);
+            } else {
+                mQuery('#' + toggleId).removeClass(toggleOn).addClass(toggleOff);
+            }
+        }
+    });
+};

@@ -11,6 +11,7 @@ namespace Mautic\CampaignBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
@@ -44,39 +45,77 @@ class EventType extends AbstractType
             'required'   => false
         ));
 
-        if ($options['campaignType'] == 'date') {
-            $builder->add('fireDate', 'text', array(
-                'label'      => 'mautic.campaign.event.firedate',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array(
-                    'class' => 'form-control',
-                    'data-toggle' => 'datetime'
-                )
-            ));
-        } else {
-            $builder->add('fireInterval', 'number', array(
-                'label'      => 'mautic.campaign.event.fireinterval',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array(
-                    'class' => 'form-control',
-                    'preaddon' => 'symbol-hashtag'
-                )
+        if ($options['data']['eventType'] == 'action') {
+            $triggerMode = (empty($options['data']['triggerMode'])) ? 'immediate' : $options['data']['triggerMode'];
+            $builder->add('triggerMode', 'button_group', array(
+                'choices' => array(
+                    'immediate' => 'mautic.campaign.form.type.immediate',
+                    'interval'  => 'mautic.campaign.form.type.interval',
+                    'date'      => 'mautic.campaign.form.type.date'
+                ),
+                'expanded'    => true,
+                'multiple'    => false,
+                'label_attr'  => array('class' => 'control-label'),
+                'label'       => 'mautic.campaign.form.type',
+                'empty_value' => false,
+                'required'    => false,
+                'attr'        => array(
+                    'onchange' => 'Mautic.campaignToggleTimeframes();'
+                ),
+                'data'        => $triggerMode
             ));
 
-            $builder->add('fireIntervalUnit', 'choice', array(
-                'choices' => array(
-                    'i'  => 'mautic.campaign.event.intervalunit.minute',
-                    'h'  => 'mautic.campaign.event.intervalunit.hour',
-                    'd'  => 'mautic.campaign.event.intervalunit.day',
-                    'm'  => 'mautic.campaign.event.intervalunit.month',
-                    'y'  => 'mautic.campaign.event.intervalunit.year',
+            $attr = array(
+                'class'    => 'form-control',
+                'preaddon' => 'symbol-hashtag',
+                'data-toggle' => 'datetime'
+            );
+            if ($triggerMode != 'date') {
+                $attr['disabled'] = 'disabled';
+            }
+            $builder->add('triggerDate', 'text', array(
+                'label'      => 'mautic.campaign.event.triggerdate',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => $attr
+            ));
+
+            $data = (empty($options['data']['triggerInterval'])) ? 1 : $options['data']['triggerInterval'];
+            $attr = array(
+                'class'    => 'form-control',
+                'preaddon' => 'symbol-hashtag'
+            );
+            if ($triggerMode != 'interval') {
+                $attr['disabled'] = 'disabled';
+            }
+            $builder->add('triggerInterval', 'number', array(
+                'label'      => 'mautic.campaign.event.triggerinterval',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => $attr,
+                'data'       => $data
+            ));
+
+            $data = (!empty($options['data']['triggerIntervalUnit'])) ? $options['data']['triggerIntervalUnit'] : 'd';
+            $attr = array(
+                'class' => 'form-control'
+            );
+            if ($triggerMode != 'interval') {
+                $attr['disabled'] = 'disabled';
+            }
+            $builder->add('triggerIntervalUnit', 'choice', array(
+                'choices'     => array(
+                    'i' => 'mautic.campaign.event.intervalunit.i',
+                    'h' => 'mautic.campaign.event.intervalunit.h',
+                    'd' => 'mautic.campaign.event.intervalunit.d',
+                    'm' => 'mautic.campaign.event.intervalunit.m',
+                    'y' => 'mautic.campaign.event.intervalunit.y',
                 ),
                 'multiple'    => false,
                 'label_attr'  => array('class' => 'control-label'),
                 'label'       => false,
-                'attr'        => array('class' => 'form-control'),
+                'attr'        => $attr,
                 'empty_value' => false,
-                'required'    => false
+                'required'    => false,
+                'data'        => $data
             ));
         }
 
@@ -89,6 +128,7 @@ class EventType extends AbstractType
         }
 
         $builder->add('type', 'hidden');
+        $builder->add('eventType', 'hidden');
 
         $update = !empty($properties);
         if (!empty($update)) {
@@ -117,7 +157,6 @@ class EventType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setOptional(array('campaignType'));
         $resolver->setRequired(array('settings'));
     }
 

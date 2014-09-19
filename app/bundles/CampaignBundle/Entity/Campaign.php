@@ -68,14 +68,6 @@ class Campaign extends FormEntity
     private $publishDown;
 
     /**
-     * @ORM\Column(name="trigger_existing_leads", type="boolean")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
-     */
-    private $triggerExistingLeads = false;
-
-    /**
      * @ORM\ManyToOne(targetEntity="Mautic\CategoryBundle\Entity\Category")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
@@ -84,18 +76,15 @@ class Campaign extends FormEntity
     private $category;
 
     /**
-     * @ORM\Column(type="string", length=10)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
-     */
-    private $type;
-
-    /**
      * @ORM\OneToMany(targetEntity="Event", mappedBy="campaign", cascade={"all"}, indexBy="id", fetch="EXTRA_LAZY")
      * @ORM\OrderBy({"order" = "ASC"})
      */
     private $events;
+
+    /**
+     * @ORM\OneToMany(targetEntity="Lead", mappedBy="campaign", indexBy="id", cascade={"all"}, fetch="EXTRA_LAZY")
+     */
+    private $leads;
 
     /**
      * Constructor
@@ -103,6 +92,7 @@ class Campaign extends FormEntity
     public function __construct()
     {
         $this->events = new ArrayCollection();
+        $this->leads  = new ArrayCollection();
     }
 
     /**
@@ -279,22 +269,6 @@ class Campaign extends FormEntity
     /**
      * @return mixed
      */
-    public function getTriggerExistingLeads ()
-    {
-        return $this->triggerExistingLeads;
-    }
-
-    /**
-     * @param mixed $triggerExistingLeads
-     */
-    public function setTriggerExistingLeads ($triggerExistingLeads)
-    {
-        $this->triggerExistingLeads = $triggerExistingLeads;
-    }
-
-    /**
-     * @return mixed
-     */
     public function getCategory ()
     {
         return $this->category;
@@ -310,19 +284,38 @@ class Campaign extends FormEntity
     }
 
     /**
-     * @return mixed
+     * Add lead
+     *
+     * @param $key
+     * @param \Mautic\CampaignBundle\Entity\Lead $lead
+     * @return Campaign
      */
-    public function getType ()
+    public function addLead($key, Lead $lead)
     {
-        return $this->type;
+        if (!$this->leads->contains($lead)) {
+            $this->leads[$key] = $lead;
+        }
+
+        return $this;
     }
 
     /**
-     * @param mixed $type
+     * Remove lead
+     *
+     * @param Lead $lead
      */
-    public function setType ($type)
+    public function removeLead(Lead $lead)
     {
-        $this->isChanged('type', $type);
-        $this->type = $type;
+        $this->leads->removeElement($lead);
+    }
+
+    /**
+     * Get leads
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getLeads()
+    {
+        return $this->leads;
     }
 }

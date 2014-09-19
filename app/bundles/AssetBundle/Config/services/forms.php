@@ -31,17 +31,30 @@ $container->setDefinition('mautic.form.type.assetcategory', new Definition(
     ));
 
 $container->setDefinition('mautic.form.type.pointaction_assetdownload', new Definition(
-    'Mautic\AssetBundle\Form\Type\PointActionAssetDownloadType',
-    array(new Reference('mautic.factory'))
+    'Mautic\AssetBundle\Form\Type\PointActionAssetDownloadType'
 ))
     ->addTag('form.type', array(
         'alias' => 'pointaction_assetdownload',
     ));
 
+$container->setDefinition('mautic.form.type.campaigntrigger_assetdownload', new Definition(
+    'Mautic\AssetBundle\Form\Type\CampaignTriggerAssetDownloadType'
+))
+    ->addTag('form.type', array(
+        'alias' => 'campaigntrigger_assetdownload',
+    ));
+
 $container->setDefinition('mautic.form.type.formsubmit_assetdownload', new Definition(
-    'Mautic\AssetBundle\Form\Type\FormSubmitActionDownloadFileType',
-    array(new Reference('mautic.factory'))
+    'Mautic\AssetBundle\Form\Type\FormSubmitActionDownloadFileType'
 ))
     ->addTag('form.type', array(
         'alias' => 'asset_submitaction_downloadfile',
+    ));
+
+$container->setDefinition('mautic.form.type.assetlist', new Definition(
+    'Mautic\AssetBundle\Form\Type\AssetListType',
+    array(new Reference('mautic.factory'))
+))
+    ->addTag('form.type', array(
+        'alias' => 'asset_list',
     ));

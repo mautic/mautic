@@ -1,5 +1,10 @@
 //CampaignBundle
 
+/**
+ * Setup the campaign view
+ *
+ * @param container
+ */
 Mautic.campaignOnLoad = function (container) {
     if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'campaign');
@@ -13,7 +18,6 @@ Mautic.campaignOnLoad = function (container) {
         //make the fields sortable
         mQuery('#campaignEvents').nestedSortable({
             items: 'li',
-            handle: '.reorder-handle',
             toleranceElement: '> div',
             isTree: true,
             placeholder: "campaign-event-placeholder",
@@ -37,9 +41,19 @@ Mautic.campaignOnLoad = function (container) {
         }).on('mouseout.campaignevents', function() {
             mQuery(this).find('.form-buttons').addClass('hide');
         });
+
+        mQuery('#campaignEvents .campaign-event-details').on('dblclick.campaignevents', function() {
+            mQuery(this).find('.btn-edit').first().click();
+        });
     }
 };
 
+/**
+ * Setup the campaign event view
+ *
+ * @param container
+ * @param response
+ */
 Mautic.campaignEventOnLoad = function (container, response) {
     //new action created so append it to the form
     if (response.eventHtml) {
@@ -59,14 +73,25 @@ Mautic.campaignEventOnLoad = function (container, response) {
             event.preventDefault();
             return Mautic.ajaxifyLink(this, event);
         });
+
+        //initialize ajax'd modals
+        mQuery(eventId + " a[data-toggle='ajaxmodal']").on('click.ajaxmodal', function (event) {
+            event.preventDefault();
+
+            Mautic.ajaxifyModal(this, event);
+        });
+
         //initialize tooltips
         mQuery(eventId + " *[data-toggle='tooltip']").tooltip({html: true});
 
-        mQuery('#campaignEvents .campaign-event-row').off(".campaignevents");
-        mQuery('#campaignEvents .campaign-event-row').on('mouseover.campaignevents', function() {
+        mQuery(eventId).off('.campaignevents');
+        mQuery(eventId).on('mouseover.campaignevents', function() {
             mQuery(this).find('.form-buttons').removeClass('hide');
         }).on('mouseout.campaignevents', function() {
             mQuery(this).find('.form-buttons').addClass('hide');
+        });
+        mQuery(eventId).on('dblclick.campaignevents', function() {
+            mQuery(this).find('.btn-edit').first().click();
         });
 
         //show events panel
@@ -80,6 +105,9 @@ Mautic.campaignEventOnLoad = function (container, response) {
     }
 };
 
+/**
+ * Change the links in the available event list when the campaign type is changed
+ */
 Mautic.updateCampaignEventLinks = function () {
     //find and update all the event links with the campaign type
 
@@ -95,4 +123,29 @@ Mautic.updateCampaignEventLinks = function () {
         href = href.replace('campaignType=' + campaignType, 'campaignType=' + newType);
         mQuery(this).attr('href', href);
     });
+};
+
+/**
+ * Enable/Disable timeframe settings if the toggle for immediate trigger is changed
+ */
+Mautic.campaignToggleTimeframes = function() {
+    var immediateChecked = mQuery('#campaignevent_triggerMode_0').prop('checked');
+    var intervalChecked  = mQuery('#campaignevent_triggerMode_1').prop('checked');
+    var dateChecked      = mQuery('#campaignevent_triggerMode_2').prop('checked');
+
+    if (mQuery('#campaignevent_triggerInterval').length) {
+        if (immediateChecked) {
+            mQuery('#campaignevent_triggerInterval').attr('disabled', true);
+            mQuery('#campaignevent_triggerIntervalUnit').attr('disabled', true);
+            mQuery('#campaignevent_triggerDate').attr('disabled', true);
+        } else if (intervalChecked) {
+            mQuery('#campaignevent_triggerInterval').attr('disabled', false);
+            mQuery('#campaignevent_triggerIntervalUnit').attr('disabled', false);
+            mQuery('#campaignevent_triggerDate').attr('disabled', true);
+        } else if (dateChecked) {
+            mQuery('#campaignevent_triggerInterval').attr('disabled', true);
+            mQuery('#campaignevent_triggerIntervalUnit').attr('disabled', true);
+            mQuery('#campaignevent_triggerDate').attr('disabled', false);
+        }
+    }
 };

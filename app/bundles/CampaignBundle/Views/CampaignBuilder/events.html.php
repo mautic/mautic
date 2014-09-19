@@ -18,37 +18,31 @@ if (!isset($level)) {
 endif;
     foreach ($events as $event):
         if ($event instanceof \Mautic\CampaignBundle\Entity\Event) {
-            $parent   = $event->getParent();
-            $id       = $event->getId();
-            $children = $event->getChildren();
-            $type     = $event->getType();
-        } else {
-            $parent   = $event['parent'];
-            $id       = $event['id'];
-            $children = $event['children'];
-            $type     = $event['type'];
+            $event = $event->convertToArray();
         }
-        $settings = $eventTriggers[$type];
 
-        $attr      = 'id="event'.$id.'"';
-        $attr     .= (!empty($parent)) ? ' data-parent="'.$parent->getId().'"' : '';
+        $settings  = $eventSettings[$event['eventType']][$event['type']];
+
+        $attr      = 'id="event'.$event['id'].'"';
+        $attr     .= (!empty($event['parent'])) ? ' data-parent="'.$event['parent']->getId().'"' : '';
 
         $template  = (isset($settings['template'])) ? $settings['template'] :
             'MauticCampaignBundle:Event:generic.html.php';
 
-        $childrenHtml = (!empty($children)) ? $view->render('MauticCampaignBundle:CampaignBuilder:events.html.php', array(
-                'events'        => $children,
+        $childrenHtml = (!empty($event['children'])) ? $view->render('MauticCampaignBundle:CampaignBuilder:events.html.php', array(
+                'events'        => $event['children'],
                 'level'         => $level + 1,
                 'deletedEvents' => $deletedEvents,
                 'inForm'        => $inForm,
-                'eventTriggers' => $eventTriggers
+                'eventSettings' => $eventSettings,
+                'id'            => $event['id']
             )) : '';
 
         echo $view->render($template, array(
             'event'        => $event,
             'inForm'       => (isset($inForm)) ? $inForm : false,
-            'id'           => $id,
-            'deleted'      => in_array($id, $deletedEvents),
+            'id'           => $event['id'],
+            'deleted'      => in_array($event['id'], $deletedEvents),
             'childrenHtml' => $childrenHtml,
             'level'        => $level
         ));

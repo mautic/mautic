@@ -74,8 +74,8 @@ $container->loadFromExtension('framework', array(
 
 //Twig Configuration
 $container->loadFromExtension('twig', array(
-    'debug'            => '%kernel.debug%',
-    'strict_variables' => '%kernel.debug%',
+    'debug'                => '%kernel.debug%',
+    'strict_variables'     => '%kernel.debug%'
 ));
 
 //Doctrine Configuration

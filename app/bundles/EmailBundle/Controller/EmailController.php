@@ -796,7 +796,7 @@ class EmailController extends FormController
 
         if ($catPublished && $published && $this->request->getMethod() == 'POST') {
             //process and send
-            $model->sendEmail($entity);
+            $model->sendEmailToLists($entity);
             $flashes[] = array(
                 'type'    => 'notice',
                 'msg'     => 'mautic.email.notice.send.success',

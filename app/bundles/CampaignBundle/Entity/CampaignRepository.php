@@ -20,6 +20,52 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 class CampaignRepository extends CommonRepository
 {
 
+    /**
+     * Returns a list of all published (and active) campaigns (optionally for a specific lead)
+     *
+     * @param null $specificId
+     * @param null $leadId
+     * @param bool $forList If true, returns ID and name only
+     *
+     * @return array
+     */
+    public function getPublishedCampaigns($specificId = null, $leadId = null, $forList = false)
+    {
+        $q   = $this->_em->createQueryBuilder()
+            ->from('MauticCampaignBundle:Campaign', 'c', 'c.id');
+
+        $now = new \DateTime();
+        if ($forList) {
+            $q->select('c.id, c.name');
+        } else {
+            $q->select('c, l');
+        }
+
+        $q->leftJoin('c.leads', 'l')
+            ->leftJoin('c.events', 'e')
+            ->leftJoin('e.log', 'o')
+            ->where($this->getPublishedByDateExpression($q))
+            ->setParameter('now', $now);
+
+        if (!empty($specificId)) {
+            $q->andWhere(
+                $q->expr()->eq('c.id', (int) $specificId)
+            );
+        }
+
+        if (!empty($leadId)) {
+            $q->andWhere(
+                $q->expr()->eq('IDENTITY(l.lead)', (int) $leadId)
+            );
+        }
+
+        $results = $q->getQuery()->getArrayResult();
+        return $results;
+    }
+
+    /**
+     * @return string
+     */
     public function getTableAlias()
     {
         return 'c';

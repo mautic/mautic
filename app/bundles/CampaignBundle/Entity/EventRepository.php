@@ -9,6 +9,7 @@
 
 namespace Mautic\CampaignBundle\Entity;
 
+use Doctrine\ORM\Query\Expr\Join;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -16,99 +17,140 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class EventRepository extends CommonRepository
 {
-
     /**
-     * Get array of published campaigns based on campaign total
-     *
-     * @param $campaigns
-     *
-     * @return array
-     */
-    public function getPublishedByCampaignTotal($campaigns = 0)
-    {
-        $now = new \DateTime();
-
-        $q = $this->createQueryBuilder('a')
-            ->select('partial a.{id, type, name, properties}, partial r.{id, name}')
-            ->leftJoin('a.range', 'r')
-            ->orderBy('a.order');
-
-        //make sure the published up and down dates are good
-        $q->where(
-            $q->expr()->andX(
-                $q->expr()->gte('r.campaigns', $campaigns),
-                $q->expr()->eq('r.isPublished', true),
-                $q->expr()->orX(
-                    $q->expr()->isNull('r.publishUp'),
-                    $q->expr()->gte('r.publishUp', ':now')
-                ),
-                $q->expr()->orX(
-                    $q->expr()->isNull('r.publishDown'),
-                    $q->expr()->lte('r.publishDown', ':now')
-                )
-            )
-        )
-            ->setParameter('now', $now);
-
-        $results = $q->getQuery()->getResult();
-        return $results;
-    }
-
-    /**
-     * Get array of published actions based on type
+     * Get array of published events based on type
      *
      * @param $type
+     * @param $eventType
      *
      * @return array
      */
-    public function getPublishedByType($type)
+    public function getPublishedByType($type, $eventType = null)
     {
         $now = new \DateTime();
         $q = $this->createQueryBuilder('e')
-            ->select('partial e.{id, type, name, properties}, partial t.{id, name}')
-            ->join('e.campaign', 't')
+            ->select('c, e, ec, ecc')
+            ->join('e.campaign', 'c')
+            ->leftJoin('e.children', 'ec')
+            ->leftJoin('ec.campaign', 'ecc')
             ->orderBy('e.order');
 
         //make sure the published up and down dates are good
-        $q->where(
-            $q->expr()->andX(
-                $q->expr()->eq('e.type', ':type'),
-                $q->expr()->eq('t.isPublished', true),
-                $q->expr()->orX(
-                    $q->expr()->isNull('t.publishUp'),
-                    $q->expr()->gte('t.publishUp', ':now')
-                ),
-                $q->expr()->orX(
-                    $q->expr()->isNull('t.publishDown'),
-                    $q->expr()->lte('t.publishDown', ':now')
-                )
-            )
-        )
+        $expr = $this->getPublishedByDateExpression($q, 'c');
+        $expr->add(
+            $q->expr()->eq('e.type', ':type')
+        );
+
+        if (!empty($eventType)) {
+            $expr->add(
+                $q->expr()->eq('e.eventType', ':eventType')
+            );
+            $q->setParameter('eventType', ':eventType');
+        }
+
+        $q->where($expr)
             ->setParameter('now', $now)
             ->setParameter('type', $type);
 
-        $results = $q->getQuery()->getResult();
-        return $results;
+        $results = $q->getQuery()->getArrayResult();
+
+        //group them by campaign
+        $events = array();
+        foreach ($results as $r) {
+            $events[$r['campaign']['id']][$r['id']] = $r;
+        }
+
+        return $events;
     }
 
     /**
+     * Get array of published events based on type for a specific lead
+     *
+     * @param      $type
+     * @param int  $leadId
+     *
+     * @return array
+     */
+    public function getPublishedByTypeForLead($type, $leadId)
+    {
+        //get a list of campaigns
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->select('l.campaign_id')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'l')
+            ->where(
+                $q->expr()->eq('l.lead_id', $leadId)
+            );
+        $results   = $q->execute()->fetchAll();
+        $campaigns = array();
+        foreach ($results as $r) {
+            $campaigns[] = $r['campaign_id'];
+        }
+
+        if (empty($campaigns)) {
+            //lead not part of any campaign
+            return array();
+        }
+
+        $now = new \DateTime();
+        $q = $this->createQueryBuilder('e')
+            ->select('c, e, ec')
+            ->join('e.campaign', 'c')
+            ->leftJoin('e.children', 'ec')
+            ->orderBy('c.id, e.order');
+
+        //make sure the published up and down dates are good
+        $expr = $this->getPublishedByDateExpression($q, 'c');
+        $expr->add(
+            $q->expr()->eq('e.type', ':type')
+        );
+
+        //limit to campaigns the lead is part of
+        $expr->add(
+            $q->expr()->in('c.id', $campaigns)
+        );
+
+        if (!empty($eventType)) {
+            $expr->add(
+                $q->expr()->eq('e.eventType', ':eventType')
+            );
+            $q->setParameter('eventType', ':eventType');
+        }
+
+        $q->where($expr)
+            ->setParameter('now', $now)
+            ->setParameter('type', $type);
+
+        $results = $q->getQuery()->getArrayResult();
+
+        //group them by campaign
+        $events = array();
+        foreach ($results as $r) {
+            $events[$r['campaign']['id']][$r['id']] = $r;
+        }
+
+        return $events;
+    }
+
+    /**
+     * Get an array of events that have been triggered by this lead
+     *
      * @param $type
      * @param $leadId
      *
      * @return array
      */
-    public function getLeadCampaignedEvents($leadId)
+    public function getLeadTriggeredEvents($leadId)
     {
-        $q = $this->_em->getConnection()->createQueryBuilder()
-            ->select('e')
-            ->from(MAUTIC_TABLE_PREFIX . 'campaign_lead_event_log', 'x')
-            ->innerJoin('x', MAUTIC_TABLE_PREFIX . 'campaign_events', 'e', 'x.event_id = e.id')
-            ->innerJoin('e', MAUTIC_TABLE_PREFIX . 'campaigns', 't', 'e.campaign_id = t.id');
+        $q = $this->_em->createQueryBuilder()
+            ->select('e, c, l')
+            ->from('MauticCampaignBundle:Event', 'e')
+            ->join('e.campaign', 'c')
+            ->join('e.log', 'l');
 
         //make sure the published up and down dates are good
-        $q->where($q->expr()->eq('x.lead_id', (int) $leadId));
+        $q->where($q->expr()->eq('IDENTITY(l.lead)', (int) $leadId));
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->getQuery()->getArrayResult();
 
         $return = array();
         foreach ($results as $r) {
@@ -118,8 +160,9 @@ class EventRepository extends CommonRepository
         return $return;
     }
 
-
     /**
+     * Get a list of lead IDs for a specific event
+     *
      * @param $type
      * @param $eventId
      *
@@ -140,5 +183,51 @@ class EventRepository extends CommonRepository
         }
 
         return $return;
+    }
+
+    /**
+     * Get a list of scheduled events
+     *
+     * @param mixed $campaignId
+     * @param \DateTime $date
+     *
+     * @return array
+     */
+    public function getPublishedScheduled($campaignId = null, \DateTime $date = null)
+    {
+
+        if ($date == null) {
+            $date = new \Datetime();
+        }
+
+        $q = $this->_em->createQueryBuilder()
+            ->select('e, c, o, i, l')
+            ->from('MauticCampaignBundle:LeadEventLog', 'o')
+            ->join('o.event', 'e')
+            ->join('e.campaign', 'c')
+            ->join('o.ipAddress', 'i')
+            ->join('o.lead', 'l');
+
+        $expr = $this->getPublishedByDateExpression($q, 'c');
+        $expr->add(
+            $q->expr()->eq('o.isScheduled', 1)
+        );
+
+        $expr->add(
+            $q->expr()->gte('o.triggerDate', ':now')
+        );
+
+        if (!empty($campaignId)) {
+            $expr->add(
+                $q->expr()->eq('c.id', (int) $campaignId)
+            );
+        }
+
+        $q->where($expr)
+            ->setParameter('now', $date);
+
+        $results = $q->getQuery()->getResult();
+
+        return $results;
     }
 }

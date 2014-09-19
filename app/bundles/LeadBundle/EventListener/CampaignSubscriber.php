@@ -32,20 +32,20 @@ class CampaignSubscriber extends CommonSubscriber
     }
 
     /**
-     * Add a lead list change action to available event triggers
+     * Add event triggers and actions
      *
      * @param CampaignBuilderEvent $event
      */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
-        //add lead generation submit action
-        $leadEvent = array(
+        //Add actions
+        $changeListAction = array(
             'group'        => 'mautic.lead.lead.events.group',
             'label'        => 'mautic.lead.lead.events.changelist',
             'description'  => 'mautic.lead.lead.events.changelist',
             'formType'     => 'lead_event_leadlist',
-            'callback'     => '\Mautic\LeadBundle\Helper\CampaignEventHelper::changeList'
+            'callback'     => '\Mautic\LeadBundle\Helper\CampaignEventHelper::changeLists'
         );
-        $event->addEvent('lead.changelist', $leadEvent);
+        $event->addAction('lead.changelist', $changeListAction);
     }
 }

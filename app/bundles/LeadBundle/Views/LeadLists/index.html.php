@@ -18,8 +18,8 @@ $leadName = $lead->getPrimaryIdentifier();
     ?>
     <tr>
         <td class="fa-fw">
-            <i class="fa fa-2x fa-fw <?php echo $switch . ' ' . $bgClass; ?>" id="leadListToggle<?php $l['id']; ?>"
-               onclick="Mautic.toggleLeadList('leadListToggle<?php $l['id']; ?>', <?php echo $leadId; ?>, <?php echo $l['id']; ?>);"></i>
+            <i class="fa fa-2x fa-fw <?php echo $switch . ' ' . $bgClass; ?>" id="leadListToggle<?php echo $l['id']; ?>"
+               onclick="Mautic.toggleLeadList('leadListToggle<?php echo $l['id']; ?>', <?php echo $leadId; ?>, <?php echo $l['id']; ?>);"></i>
         </td>
         <td>
             <?php echo $l['name'] . ' (' . $l['alias'] . ')'; ?>

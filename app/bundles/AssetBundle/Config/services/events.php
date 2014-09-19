@@ -38,3 +38,12 @@ $container->setDefinition(
     )
 )
     ->addTag('kernel.event_subscriber');
+
+$container->setDefinition(
+    'mautic.asset.campaignbundle.subscriber',
+    new Definition(
+        'Mautic\AssetBundle\EventListener\CampaignSubscriber',
+        array(new Reference('mautic.factory'))
+    )
+)
+    ->addTag('kernel.event_subscriber');

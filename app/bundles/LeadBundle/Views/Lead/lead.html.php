@@ -27,7 +27,7 @@ if ($hasEditAccess): ?>
         'mautic_lead_action', array("objectAction" => "edit", "objectId" => $lead->getId())); ?>"
        data-toggle="ajax"
        data-menu-link="#mautic_lead_index">
-       <i class="fa fa-pencil-square-o"></i> 
+       <i class="fa fa-pencil-square-o"></i>
         <?php echo $view["translator"]->trans("mautic.core.form.edit"); ?>
     </a>
 <?php endif; ?>
@@ -56,16 +56,29 @@ if ($hasEditAccess): ?>
        data-header="<?php echo $view['translator']->trans('mautic.lead.lead.header.lists', array(
                '%name%' => $lead->getPrimaryIdentifier())
        ); ?>">
-       <i class="fa fa-list"></i> 
+       <i class="fa fa-list"></i>
         <?php echo $view["translator"]->trans("mautic.lead.lead.lists"); ?>
     </a>
-
+    <?php if ($security->isGranted('campaign:campaigns:edit')): ?>
+    <a class="btn btn-default" href="<?php echo $this->container->get('router')->generate( 'mautic_lead_action', array(
+        "objectId" => $lead->getId(),
+        "objectAction" => "campaign"
+    )); ?>"
+       data-toggle="ajaxmodal"
+       data-target="#leadModal"
+       data-header="<?php echo $view['translator']->trans('mautic.lead.lead.header.campaigns', array(
+               '%name%' => $lead->getPrimaryIdentifier())
+       ); ?>">
+        <i class="fa fa-clock-o"></i>
+        <?php echo $view["translator"]->trans("mautic.lead.lead.campaigns"); ?>
+    </a>
+    <?php endif; ?>
     <a class="btn btn-default" href="<?php echo $this->container->get('router')->generate(
         'mautic_leadnote_action', array("leadId" => $lead->getId(), "objectAction" => "new")); ?>"
        data-toggle="ajaxmodal"
        data-target="#leadModal"
        data-header="<?php $view['translator']->trans('mautic.lead.note.header.new'); ?>">
-       <i class="fa fa-file-o"></i> 
+       <i class="fa fa-file-o"></i>
         <?php echo $view["translator"]->trans("mautic.lead.add.note"); ?>
     </a>
 <?php

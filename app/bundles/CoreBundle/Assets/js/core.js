@@ -317,9 +317,12 @@ var Mautic = {
             var target = mQuery(this).attr('data-target');
             mQuery(target).remove();
         });
+
         mQuery(container + " *[data-toggle='ajaxmodal']").each(function (index) {
-            var target = mQuery(this).attr('data-target');
-            mQuery(target).remove();
+            if (mQuery(this).attr('data-ignore-removemodal') != 'true') {
+                var target = mQuery(this).attr('data-target');
+                mQuery(target).remove();
+            }
         });
 
         //run specific unloads
@@ -479,9 +482,11 @@ var Mautic = {
 
         form.ajaxSubmit({
             success: function(data) {
+                MauticVars.formSubmitInProgress = false;
                 callback(data);
             },
             error: function(info, type, errorThrown) {
+                MauticVars.formSubmitInProgress = false;
                 if ('console' in window) {
                     console.log('form error log', info);
                 }
@@ -552,8 +557,8 @@ var Mautic = {
             }
 
             //scroll to the top
-            if (response.target == '.main-panel-content') {
-                mQuery('.main-panel-wrapper').animate({
+            if (response.target == '#main-content') {
+                mQuery('body').animate({
                     scrollTop: 0
                 }, 0);
             } else {
@@ -593,7 +598,7 @@ var Mautic = {
         mQuery('form[name="' + formName + '"] :submit').each(function () {
             mQuery(this).off('click.ajaxform');
             mQuery(this).on('click.ajaxform', function () {
-                if (mQuery(this).attr('name')) {
+                if (mQuery(this).attr('name') && !mQuery("input[name='" + mQuery(this).attr('name') + "']").length) {
                     mQuery('form[name="' + formName + '"]').append(
                         mQuery("<input type='hidden'>").attr({
                             name: mQuery(this).attr('name'),
@@ -612,6 +617,12 @@ var Mautic = {
         mQuery('form[name="' + formName + '"]').off('submit.ajaxform');
         mQuery('form[name="' + formName + '"]').on('submit.ajaxform', (function (e) {
             e.preventDefault();
+
+            if (MauticVars.formSubmitInProgress) {
+                return false;
+            } else {
+                MauticVars.formSubmitInProgress = true;
+            }
 
             Mautic.postForm(mQuery(this), function (response) {
                 var modalParent = mQuery('form[name="' + formName + '"]').closest('.modal');
@@ -664,7 +675,12 @@ var Mautic = {
 
         MauticVars.routeInProgress = route;
 
-        Mautic.loadContent(route, link, method, null, event);
+        var target = mQuery(el).attr('data-target');
+        if (!target) {
+            target = null;
+        }
+
+        Mautic.loadContent(route, link, method, target, event);
     },
 
     /**

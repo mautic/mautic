@@ -30,3 +30,36 @@ $container->setDefinition(
     ->addTag('form.type', array(
         'alias' => 'campaignevent'
     ));
+
+$container->setDefinition(
+    'mautic.campaign.type.campaignlist',
+    new Definition(
+        'Mautic\CampaignBundle\Form\Type\CampaignListType',
+        array(
+            new Reference('mautic.factory')
+        )
+    )
+)
+    ->addTag('form.type', array(
+        'alias' => 'campaign_list'
+    ));
+
+$container->setDefinition(
+    'mautic.campaign.type.trigger.leadchange',
+    new Definition(
+        'Mautic\CampaignBundle\Form\Type\CampaignTriggerLeadChangeType'
+    )
+)
+    ->addTag('form.type', array(
+        'alias' => 'campaigntrigger_leadchange'
+    ));
+
+$container->setDefinition(
+    'mautic.campaign.type.action.addremovelead',
+    new Definition(
+        'Mautic\CampaignBundle\Form\Type\CampaignActionAddRemoveLeadType'
+    )
+)
+    ->addTag('form.type', array(
+        'alias' => 'campaignaction_addremovelead'
+    ));

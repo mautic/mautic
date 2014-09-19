@@ -29,11 +29,28 @@ $container->setDefinition(
 )
     ->addTag('kernel.event_subscriber');
 
-
 $container->setDefinition(
     'mautic.page.pointbundle.subscriber',
     new Definition(
         'Mautic\PageBundle\EventListener\PointSubscriber',
+        array(new Reference('mautic.factory'))
+    )
+)
+    ->addTag('kernel.event_subscriber');
+
+$container->setDefinition(
+    'mautic.page.reportbundle.subscriber',
+    new Definition(
+        'Mautic\PageBundle\EventListener\ReportSubscriber',
+        array(new Reference('mautic.factory'))
+    )
+)
+    ->addTag('kernel.event_subscriber');
+
+$container->setDefinition(
+    'mautic.page.campaignbundle.subscriber',
+    new Definition(
+        'Mautic\PageBundle\EventListener\CampaignSubscriber',
         array(new Reference('mautic.factory'))
     )
 )

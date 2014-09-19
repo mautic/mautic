@@ -25,7 +25,6 @@ class CampaignController extends FormController
      */
     public function indexAction ($page = 1)
     {
-
         //set some permissions
         $permissions = $this->factory->getSecurity()->isGranted(array(
             'campaign:campaigns:view',
@@ -50,7 +49,7 @@ class CampaignController extends FormController
         $search = $this->request->get('search', $this->factory->getSession()->get('mautic.campaign.filter', ''));
         $this->factory->getSession()->set('mautic.campaign.filter', $search);
 
-        $filter = array('string' => $search, 'force' => array());
+        $filter     = array('string' => $search, 'force' => array());
         $orderBy    = $this->factory->getSession()->get('mautic.campaign.orderby', 'c.name');
         $orderByDir = $this->factory->getSession()->get('mautic.campaign.orderbydir', 'ASC');
 
@@ -61,7 +60,8 @@ class CampaignController extends FormController
                 'filter'     => $filter,
                 'orderBy'    => $orderBy,
                 'orderByDir' => $orderByDir
-            ));
+            )
+        );
 
         $count = count($campaigns);
         if ($count && $count < ($start + 1)) {
@@ -217,7 +217,7 @@ class CampaignController extends FormController
                         $valid = false;
                     } else {
                         $order = $session->get('mautic.campaigns.order');
-                        $model->setEvents($entity, $events, $order);
+                        $model->setEvents($entity, $events, $order, $deletedEvents);
 
                         //form is valid so process the data
                         $model->saveEntity($entity);
@@ -269,16 +269,18 @@ class CampaignController extends FormController
         } else {
             //clear out existing fields in case the form was refreshed, browser closed, etc
             $this->clearSessionComponents();
+            $addEvents = $deletedEvents = array();
         }
 
+        $events = $model->getEvents();
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'events'        => $model->getEvents(),
+                'eventSettings'  => $events,
                 'campaignEvents' => $addEvents,
-                'deletedEvents' => $deletedEvents,
-                'tmpl'          => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
-                'entity'        => $entity,
-                'form'          => $form->createView()
+                'deletedEvents'  => $deletedEvents,
+                'tmpl'           => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
+                'entity'         => $entity,
+                'form'           => $form->createView()
             ),
             'contentTemplate' => 'MauticCampaignBundle:CampaignBuilder:components.html.php',
             'passthroughVars' => array(
@@ -447,9 +449,10 @@ class CampaignController extends FormController
             }
         }
 
+        $events = $model->getEvents();
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'events'         => $model->getEvents(),
+                'eventSettings'  => $events,
                 'campaignEvents' => $templateEvents,
                 'deletedEvents'  => $deletedEvents,
                 'tmpl'           => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
