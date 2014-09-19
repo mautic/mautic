@@ -9,7 +9,6 @@
 
 namespace Mautic\AssetBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
@@ -21,31 +20,13 @@ use Symfony\Component\Form\FormBuilderInterface;
 class FormSubmitActionDownloadFileType extends AbstractType
 {
 
-    private $choices = array();
-
-    /**
-     * @param MauticFactory $factory
-     */
-    public function __construct(MauticFactory $factory) {
-        $viewOther = $factory->getSecurity()->isGranted('asset:assets:viewother');
-        $choices = $factory->getModel('asset')->getRepository()
-            ->getAssetList('', 0, 0, $viewOther);
-        foreach ($choices as $asset) {
-            $this->choices[$asset['language']][$asset['id']] = $asset['id'] . ':' . $asset['title'];
-        }
-
-        //sort by language
-        ksort($this->choices);
-    }
-
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        $builder->add('asset', 'choice', array(
-            'choices'       => $this->choices,
+        $builder->add('asset', 'asset_list', array(
             'expanded'      => false,
             'multiple'      => false,
             'label'         => 'mautic.asset.form.submit.assets',

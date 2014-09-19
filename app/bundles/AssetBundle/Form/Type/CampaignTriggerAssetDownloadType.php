@@ -17,37 +17,21 @@ use Symfony\Component\Form\FormBuilderInterface;
  *
  * @package Mautic\AssetBundle\Form\Type
  */
-class PointActionAssetDownloadType extends AbstractType
+class CampaignTriggerAssetDownloadType extends AbstractType
 {
+
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        $default = (empty($options['data']['delta'])) ? 0 : (int) $options['data']['delta'];
-        $builder->add('delta', 'number', array(
-            'label'      => 'mautic.point.action.delta',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       =>
-                array(
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.point.action.delta.help'
-                ),
-            'precision'  => 0,
-            'data'       => $default
-        ));
-
         $builder->add('assets', 'asset_list', array(
-            'expanded'      => false,
-            'multiple'      => true,
-            'label'         => 'mautic.asset.point.action.assets',
+            'label'         => 'mautic.asset.campaign.trigger.assets',
             'label_attr'    => array('class' => 'control-label'),
-            'empty_value'   => false,
-            'required'      => false,
             'attr'       => array(
                 'class'   => 'form-control',
-                'tooltip' => 'mautic.asset.point.action.assets.descr'
+                'tooltip' => 'mautic.asset.campaign.trigger.assets.descr'
             )
         ));
     }
@@ -56,6 +40,6 @@ class PointActionAssetDownloadType extends AbstractType
      * @return string
      */
     public function getName() {
-        return "pointaction_assetdownload";
+        return "campaigntrigger_assetdownload";
     }
 }
