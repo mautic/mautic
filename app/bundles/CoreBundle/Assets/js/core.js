@@ -317,9 +317,12 @@ var Mautic = {
             var target = mQuery(this).attr('data-target');
             mQuery(target).remove();
         });
+
         mQuery(container + " *[data-toggle='ajaxmodal']").each(function (index) {
-            var target = mQuery(this).attr('data-target');
-            mQuery(target).remove();
+            if (mQuery(this).attr('data-ignore-removemodal') != 'true') {
+                var target = mQuery(this).attr('data-target');
+                mQuery(target).remove();
+            }
         });
 
         //run specific unloads
@@ -672,7 +675,12 @@ var Mautic = {
 
         MauticVars.routeInProgress = route;
 
-        Mautic.loadContent(route, link, method, null, event);
+        var target = mQuery(el).attr('data-target');
+        if (!target) {
+            target = null;
+        }
+
+        Mautic.loadContent(route, link, method, target, event);
     },
 
     /**
