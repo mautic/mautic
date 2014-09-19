@@ -11,6 +11,7 @@
 
 namespace Mautic\InstallBundle\Controller;
 
+use Doctrine\ORM\Tools\SchemaTool;
 use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
@@ -44,6 +45,17 @@ class InstallController extends CommonController
 
                 if ($index < $configurator->getStepCount()) {
                     return new RedirectResponse($this->container->get('router')->generate('mautic_installer_step', array('index' => $index)));
+                }
+
+                // Before moving to the "final" step, let's build the database out - TODO - This needs to run cache:clear first
+                $entityManager = $this->factory->getEntityManager();
+                $metadatas     = $entityManager->getMetadataFactory()->getAllMetadata();
+
+                if (!empty($metadatas)) {
+                    $schemaTool = new SchemaTool($entityManager);
+                    $schemaTool->createSchema($metadatas);
+                } else {
+                    // TODO - Need to enqueue a message
                 }
 
                 return new RedirectResponse($this->container->get('router')->generate('mautic_installer_final'));
@@ -82,11 +94,7 @@ class InstallController extends CommonController
         /** @var \Mautic\InstallBundle\Configurator\Configurator $configurator */
         $configurator = $this->container->get('mautic.configurator');
 
-        try {
-            $welcomeUrl = $this->container->get('router')->generate('mautic_core_index');
-        } catch (\Exception $e) {
-            $welcomeUrl = null;
-        }
+        $welcomeUrl = $this->container->get('router')->generate('mautic_core_index');
 
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
