@@ -446,7 +446,7 @@ class LeadModel extends FormModel
             foreach ($listEntities as $list) {
                 $list->addLead($lead);
             }
-            $leadListRepo->saveEntities($listEntities, false);
+            $leadListRepo->saveEntities($listEntities);
         } else {
             $lists->addLead($lead);
             $leadListRepo->saveEntity($lists);
@@ -459,36 +459,36 @@ class LeadModel extends FormModel
      */
     public function removeFromLists($lead, $lists)
     {
-        $leadListRepo = $this->factory->getModel('lead.list')->getRepository();
+        $leadListModel = $this->factory->getModel('lead.list');
+        $leadListRepo  = $leadListModel->getRepository();
 
         if (!$lists instanceof LeadList) {
-
             if (!is_array($lists)) {
                 $lists = array($lists);
+            }
 
-                //make sure they are ints
-                foreach ($lists as &$l) {
-                    $l = (int)$l;
-                }
+            //make sure they are ints
+            foreach ($lists as &$l) {
+                $l = (int)$l;
+            }
 
-                $listEntities = $this->getEntities(array(
-                    'filter' => array(
-                        'force' => array(
-                            array(
-                                'column' => 'l.id',
-                                'expr'   => 'in',
-                                'value'  => $lists
-                            )
+            $listEntities = $leadListModel->getEntities(array(
+                'filter' => array(
+                    'force' => array(
+                        array(
+                            'column' => 'l.id',
+                            'expr'   => 'in',
+                            'value'  => $lists
                         )
                     )
-                ));
+                )
+            ));
 
-                foreach ($listEntities as $list) {
-                    $list->removeLead($lead);
-                }
-
-                $this->saveEntities($listEntities, false);
+            foreach ($listEntities as $list) {
+                $list->removeLead($lead);
             }
+
+            $leadListRepo->saveEntities($listEntities);
         } else {
             $lists->removeLead($lead);
             $leadListRepo->saveEntity($lists);
