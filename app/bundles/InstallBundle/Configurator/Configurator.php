@@ -185,6 +185,6 @@ class Configurator
         include $this->filename;
 
         // Return the $parameters array defined in the file
-        return $parameters;
+        return isset($parameters) ? $parameters : array();
     }
 }
