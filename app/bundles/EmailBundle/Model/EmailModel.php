@@ -491,11 +491,11 @@ class EmailModel extends FormModel
     }
 
     /**
-     * Send an email
+     * Send an email to lead lists
      *
      * @param Email $email
      */
-    public function sendEmail(Email $email)
+    public function sendEmailToLists(Email $email)
     {
         //get the leads
         $lists     = $email->getLists();
@@ -503,166 +503,15 @@ class EmailModel extends FormModel
         $listRepo  = $this->em->getRepository('MauticLeadBundle:LeadList');
         $listLeads = $listRepo->getLeadsByList($lists);
 
-        $dispatcher   = $this->factory->getDispatcher();
-        $hasListeners = $dispatcher->hasListeners(EmailEvents::EMAIL_ON_SEND);
-        $templating   = $this->factory->getTemplating();
-        $slotsHelper  = $templating->getEngine('MauticEmailBundle::public.html.php')->get('slots');
-        $statRepo     = $this->em->getRepository('MauticEmailBundle:Stat');
-        $emailRepo    = $this->getRepository();
-        $saveEntities = array();
-
-        //get a list of variants for A/B testing
-        $childrenVariant = $email->getVariantChildren();
-
-        //get the list of do not contacts
-        $dnc          = $emailRepo->getDoNotEmailList();
-
-        //used to house slots so they don't have to be fetched over and over for same template
-        $slots            = array();
-        $template         = $email->getTemplate();
-        $slots[$template] = $this->factory->getTheme($template)->getSlots('email');
-
-        //store the settings of all the variants in order to properly disperse the emails
-        //set the parent's setings
-        $emailSettings = array(
-            $email->getId() => array(
-                'template'     => $email->getTemplate(),
-                'slots'        => $this->factory->getTheme($email->getTemplate())->getSlots('email'),
-                'sentCount'    => $email->getSentCount(),
-                'variantCount' => $email->getVariantSentCount(),
-                'entity'       => $email
-            )
-        );
-
-        if (count($childrenVariant)) {
-            $variantWeight = 0;
-            $totalSent     = $email->getVariantSentCount();
-
-            foreach ($childrenVariant as $id => $child) {
-                if ($child->isPublished()) {
-                    $template = $child->getTemplate();
-                    if (isset($slots[$template])) {
-                        $useSlots = $slots[$template];
-                    } else {
-                        $slots[$template] = $this->factory->getTheme($template())->getSlots('email');
-                        $useSlots = $slots[$template];
-                    }
-                    $variantSettings = $child->getVariantSettings();
-
-                    $emailSettings[$child->getId()] = array(
-                        'template'     => $child->getTemplate(),
-                        'slots'        => $useSlots,
-                        'sentCount'    => $child->getSentCount(),
-                        'variantCount' => $child->getVariantSentCount(),
-                        'weight'       => ($variantSettings['weight'] / 100),
-                        'entity'       => $child
-                    );
-
-                    $variantWeight += $variantSettings['weight'];
-                    $totalSent     += $emailSettings[$child->getId()]['sentCount'];
-                }
-            }
-
-            //set parent weight
-            $emailSettings[$email->getId()]['weight'] = ((100 - $variantWeight) / 100);
-
-            //now find what percentage of current leads should receive the variants
-            foreach ($emailSettings as $eid => &$details) {
-                $details['weight'] = ($totalSent) ?
-                    ($details['weight'] - ($details['variantCount'] / $totalSent)) + $details['weight'] :
-                    $details['weight'];
-            }
-        } else {
-            $emailSettings[$email->getId()]['weight'] = 1;
-        }
+        //get email settings such as templates, weights, etc
+        $emailSettings = $this->getEmailSettings($email);
+        $saveEntities  = array();
 
         foreach ($listLeads as $listId => $leads) {
-            $sent   = $statRepo->getSentStats($email->getId(), $listId);
-            $sendTo = array_diff_key($leads, $sent);
-
-            //weed out do not contacts
-            if (!empty($dnc)) {
-                foreach ($sendTo as $k => $lead) {
-                    if (in_array($lead['email'], $dnc)) {
-                        unset($sendTo[$k]);
-                    }
-                }
+            $listSaveEntities = $this->sendEmail($email, $leads, $emailSettings, $listId, true);
+            if (!empty($listSaveEntities)) {
+                $saveEntities = array_merge($saveEntities, $listSaveEntities);
             }
-
-            //get a count of leads
-            $count  = count($sendTo);
-
-            //how many of this batch should go to which email
-            $batchCount  = 0;
-            foreach ($emailSettings as $eid => &$details) {
-                 $details['limit'] = round($count * $details['weight']);
-            }
-
-            //randomize the leads for statistic purposes
-            shuffle($sendTo);
-
-            //start at the beginning for this batch
-            $useEmail = reset($emailSettings);
-
-            foreach ($sendTo as $lead) {
-                $idHash = uniqid();
-
-                if ($hasListeners) {
-                    $event = new EmailSendEvent($useEmail['entity'], $lead, $idHash);
-                    $event->setSlotsHelper($slotsHelper);
-                    $dispatcher->dispatch(EmailEvents::EMAIL_ON_SEND, $event);
-                    $content = $event->getContent();
-                    unset($event);
-                } else {
-                    $content = $email->getContent();
-                }
-
-                $mailer = $this->factory->getMailer();
-                $mailer->setTemplate('MauticEmailBundle::public.html.php', array(
-                    'slots'    => $useEmail['slots'],
-                    'content'  => $content,
-                    'email'    => $useEmail['entity'],
-                    'template' => $useEmail['template'],
-                    'idHash'   => $idHash,
-
-                ));
-                $mailer->message->setTo(array($lead['email'] => $lead['firstname'] . ' ' . $lead['lastname']));
-                $mailer->message->setSubject($useEmail['entity']->getSubject());
-
-                if ($plaintext = $useEmail['entity']->getPlainText()) {
-                    $mailer->message->addPart($plaintext, 'text/plain');
-                }
-
-                //add the trackingID to the $message object in order to update the stats if the email failed to send
-                $mailer->message->leadIdHash = $idHash;
-
-                //queue the message
-                $mailer->send();
-
-                //save some memory
-                unset($mailer);
-
-                //create a stat
-                $stat = new Stat();
-                $stat->setDateSent(new \DateTime());
-                $stat->setEmail($useEmail['entity']);
-                $stat->setLead($this->em->getReference('MauticLeadBundle:Lead', $lead['id']));
-                $stat->setList($this->em->getReference('MauticLeadBundle:LeadList', $listId));
-                $stat->setEmailAddress($lead['email']);
-                $stat->setTrackingHash($idHash);
-                $saveEntities[] = $stat;
-
-                //increase the sent counts
-                $useEmail['entity']->upSentCounts();
-
-                $batchCount++;
-                if ($batchCount > $useEmail['limit']) {
-                    //use the next email
-                    $batchCount = 0;
-                    $useEmail = next($emailSettings);
-                }
-            }
-            unset($sent, $sentTo);
         }
 
         //set the sent count and save
@@ -670,8 +519,225 @@ class EmailModel extends FormModel
             $saveEntities[] = $e['entity'];
         }
 
-        //save the stats and emails
-        $this->saveEntities($saveEntities);
+        if (!empty($saveEntities)) {
+            //save the stats and emails
+            $this->saveEntities($saveEntities);
+        }
+    }
+
+    /**
+     * Gets template, stats, weights, etc for an email in preparation to be sent
+     *
+     * @param Email $email
+     *
+     * @return array
+     */
+    public function getEmailSettings(Email $email)
+    {
+        static $emailSettings = array();
+
+        if (empty($emailSettings[$email->getId])) {
+            //get a list of variants for A/B testing
+            $childrenVariant = $email->getVariantChildren();
+
+            //used to house slots so they don't have to be fetched over and over for same template
+            $slots            = array();
+            $template         = $email->getTemplate();
+            $slots[$template] = $this->factory->getTheme($template)->getSlots('email');
+
+            //store the settings of all the variants in order to properly disperse the emails
+            //set the parent's settings
+            $emailSettings = array(
+                $email->getId() => array(
+                    'template'     => $email->getTemplate(),
+                    'slots'        => $this->factory->getTheme($email->getTemplate())->getSlots('email'),
+                    'sentCount'    => $email->getSentCount(),
+                    'variantCount' => $email->getVariantSentCount(),
+                    'entity'       => $email
+                )
+            );
+
+            if (count($childrenVariant)) {
+                $variantWeight = 0;
+                $totalSent     = $email->getVariantSentCount();
+
+                foreach ($childrenVariant as $id => $child) {
+                    if ($child->isPublished()) {
+                        $template = $child->getTemplate();
+                        if (isset($slots[$template])) {
+                            $useSlots = $slots[$template];
+                        } else {
+                            $slots[$template] = $this->factory->getTheme($template())->getSlots('email');
+                            $useSlots         = $slots[$template];
+                        }
+                        $variantSettings = $child->getVariantSettings();
+
+                        $emailSettings[$child->getId()] = array(
+                            'template'     => $child->getTemplate(),
+                            'slots'        => $useSlots,
+                            'sentCount'    => $child->getSentCount(),
+                            'variantCount' => $child->getVariantSentCount(),
+                            'weight'       => ($variantSettings['weight'] / 100),
+                            'entity'       => $child
+                        );
+
+                        $variantWeight += $variantSettings['weight'];
+                        $totalSent += $emailSettings[$child->getId()]['sentCount'];
+                    }
+                }
+
+                //set parent weight
+                $emailSettings[$email->getId()]['weight'] = ((100 - $variantWeight) / 100);
+
+                //now find what percentage of current leads should receive the variants
+                foreach ($emailSettings as $eid => &$details) {
+                    $details['weight'] = ($totalSent) ?
+                        ($details['weight'] - ($details['variantCount'] / $totalSent)) + $details['weight'] :
+                        $details['weight'];
+                }
+            } else {
+                $emailSettings[$email->getId()]['weight'] = 1;
+            }
+        }
+
+        return $emailSettings[$email->getId()];
+    }
+
+    /**
+     * Send an email to lead(s)
+     *
+     * @param       $email
+     * @param       $leads
+     * @param array $emailSettings
+     * @param null  $listId
+     * @param bool  $returnEntities
+     *
+     * @return mixed
+     * @throws \Doctrine\ORM\ORMException
+     */
+    public function sendEmail($email, $leads, $emailSettings = array(), $listId = null, $returnEntities = false)
+    {
+        if (!is_array($leads)) {
+            $leads = array($leads['id'] => $leads);
+        }
+
+        $dispatcher   = $this->factory->getDispatcher();
+        $hasListeners = $dispatcher->hasListeners(EmailEvents::EMAIL_ON_SEND);
+        $templating   = $this->factory->getTemplating();
+        $slotsHelper  = $templating->getEngine('MauticEmailBundle::public.html.php')->get('slots');
+        /** @var \Mautic\EmailBundle\Entity\StatRepository $statRepo */
+        $statRepo     = $this->em->getRepository('MauticEmailBundle:Stat');
+        /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
+        $emailRepo    = $this->getRepository();
+
+        if (empty($emailSettings)) {
+            //get email settings such as templates, weights, etc
+            $emailSettings = $this->getEmailSettings($email);
+        }
+
+        //get the list of do not contacts
+        static $dnc = array();
+        if (empty($dnc)) {
+            $dnc = $emailRepo->getDoNotEmailList();
+        }
+
+        $sent   = $statRepo->getSentStats($email->getId(), $listId);
+        $sendTo = array_diff_key($leads, $sent);
+
+        //weed out do not contacts
+        if (!empty($dnc)) {
+            foreach ($sendTo as $k => $lead) {
+                if (in_array($lead['email'], $dnc)) {
+                    unset($sendTo[$k]);
+                }
+            }
+        }
+
+        //get a count of leads
+        $count  = count($sendTo);
+
+        //noone to send to so bail
+        if (empty($count)) {
+            return array();
+        }
+
+        //how many of this batch should go to which email
+        $batchCount  = 0;
+        foreach ($emailSettings as $eid => &$details) {
+            $details['limit'] = round($count * $details['weight']);
+        }
+
+        //randomize the leads for statistic purposes
+        shuffle($sendTo);
+
+        //start at the beginning for this batch
+        $useEmail     = reset($emailSettings);
+        $saveEntities = array();
+        foreach ($sendTo as $lead) {
+            $idHash = uniqid();
+
+            if ($hasListeners) {
+                $event = new EmailSendEvent($useEmail['entity'], $lead, $idHash);
+                $event->setSlotsHelper($slotsHelper);
+                $dispatcher->dispatch(EmailEvents::EMAIL_ON_SEND, $event);
+                $content = $event->getContent();
+                unset($event);
+            } else {
+                $content = $email->getContent();
+            }
+
+            $mailer = $this->factory->getMailer();
+            $mailer->setTemplate('MauticEmailBundle::public.html.php', array(
+                'slots'    => $useEmail['slots'],
+                'content'  => $content,
+                'email'    => $useEmail['entity'],
+                'template' => $useEmail['template'],
+                'idHash'   => $idHash,
+
+            ));
+            $mailer->message->setTo(array($lead['email'] => $lead['firstname'] . ' ' . $lead['lastname']));
+            $mailer->message->setSubject($useEmail['entity']->getSubject());
+
+            if ($plaintext = $useEmail['entity']->getPlainText()) {
+                $mailer->message->addPart($plaintext, 'text/plain');
+            }
+
+            //add the trackingID to the $message object in order to update the stats if the email failed to send
+            $mailer->message->leadIdHash = $idHash;
+
+            //queue the message
+            $mailer->send();
+
+            //save some memory
+            unset($mailer);
+
+            //create a stat
+            $stat = new Stat();
+            $stat->setDateSent(new \DateTime());
+            $stat->setEmail($useEmail['entity']);
+            $stat->setLead($this->em->getReference('MauticLeadBundle:Lead', $lead['id']));
+            $stat->setList($this->em->getReference('MauticLeadBundle:LeadList', $listId));
+            $stat->setEmailAddress($lead['email']);
+            $stat->setTrackingHash($idHash);
+            $saveEntities[] = $stat;
+
+            //increase the sent counts
+            $useEmail['entity']->upSentCounts();
+
+            $batchCount++;
+            if ($batchCount > $useEmail['limit']) {
+                //use the next email
+                $batchCount = 0;
+                $useEmail = next($emailSettings);
+            }
+        }
+        unset($sent, $sendTo);
+
+        if ($returnEntities) {
+            return $saveEntities;
+        } else {
+            $this->saveEntities($saveEntities);
+        }
     }
 
     /**

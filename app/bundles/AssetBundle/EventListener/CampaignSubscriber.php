@@ -42,7 +42,7 @@ class CampaignSubscriber extends CommonSubscriber
             'group'       => 'mautic.asset.campaign.trigger.group',
             'label'       => 'mautic.asset.campaign.trigger.download',
             'description' => 'mautic.asset.campaign.trigger.download_descr',
-            'callback'    => array('\\Mautic\\AssetBundle\\Helper\\CampaignTriggerHelper', 'verifyAssetDownloadTrigger'),
+            'callback'    => array('\\Mautic\\AssetBundle\\Helper\\CampaignTriggerHelper', 'validateAssetDownloadTrigger'),
             'formType'    => 'campaigntrigger_assetdownload'
         );
 

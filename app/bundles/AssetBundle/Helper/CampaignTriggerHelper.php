@@ -23,7 +23,7 @@ class CampaignTriggerHelper
      *
      * @return bool
      */
-    public static function verifyAssetDownloadTrigger($passthrough, $event)
+    public static function validateAssetDownloadTrigger($passthrough, $event)
     {
         $assetId       = $passthrough->getId();
         $limitToAssets = $event['properties']['assets'];

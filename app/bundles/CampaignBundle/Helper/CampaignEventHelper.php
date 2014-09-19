@@ -23,7 +23,7 @@ class CampaignEventHelper
      *
      * @return bool
      */
-    public static function verifyLeadChangeTrigger(CampaignLeadChangeEvent $passthrough, $event)
+    public static function validateLeadChangeTrigger(CampaignLeadChangeEvent $passthrough, $event)
     {
         $limitToCampaigns = $event['properties']['campaigns'];
         $action           = $event['properties']['action'];

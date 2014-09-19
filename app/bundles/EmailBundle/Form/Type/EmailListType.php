@@ -7,18 +7,18 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\PageBundle\Form\Type;
+namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * Class PageListType
+ * Class EmailListType
  *
- * @package Mautic\PageBundle\Form\Type
+ * @package Mautic\EmailBundle\Form\Type
  */
-class PageListType extends AbstractType
+class EmailListType extends AbstractType
 {
 
     private $choices = array();
@@ -27,11 +27,11 @@ class PageListType extends AbstractType
      * @param MauticFactory $factory
      */
     public function __construct(MauticFactory $factory) {
-        $viewOther = $factory->getSecurity()->isGranted('page:pages:viewother');
-        $choices = $factory->getModel('page')->getRepository()
-            ->getPageList('', 0, 0, $viewOther, 'variant');
-        foreach ($choices as $page) {
-            $this->choices[$page['language']][$page['id']] = $page['id'] . ':' . $page['title'] . ' (' . $page['alias'] . ')';
+        $viewOther = $factory->getSecurity()->isGranted('email:emails:viewother');
+        $choices = $factory->getModel('email')->getRepository()
+            ->getEmailList('', 0, 0, $viewOther, true);
+        foreach ($choices as $email) {
+            $this->choices[$email['language']][$email['id']] = $email['id'] . ':' . $email['subject'];
         }
 
         //sort by language
@@ -56,7 +56,7 @@ class PageListType extends AbstractType
      * @return string
      */
     public function getName() {
-        return "page_list";
+        return "email_list";
     }
 
     public function getParent()

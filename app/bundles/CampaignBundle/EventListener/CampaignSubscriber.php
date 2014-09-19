@@ -9,6 +9,8 @@
 
 namespace Mautic\CampaignBundle\EventListener;
 
+//todo - subscribe to lead delete event to remove records pertaining to the specific lead
+
 use Mautic\ApiBundle\Event\RouteEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Event as MauticEvents;
@@ -89,7 +91,7 @@ class CampaignSubscriber extends CommonSubscriber
             'label'        => 'mautic.campaign.trigger.leadchange',
             'description'  => 'mautic.campaign.trigger.leadchange_descr',
             'formType'     => 'campaigntrigger_leadchange',
-            'callback'     => '\Mautic\CampaignBundle\Helper\CampaignEventHelper::verifyLeadChangeTrigger'
+            'callback'     => '\Mautic\CampaignBundle\Helper\CampaignEventHelper::validateLeadChangeTrigger'
         );
         $event->addTrigger('campaign.leadchange', $leadChangeTrigger);
 

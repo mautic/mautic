@@ -83,6 +83,43 @@ class EmailRepository extends CommonRepository
     }
 
     /**
+     * @param string $search
+     * @param int    $limit
+     * @param int    $start
+     * @param bool   $viewOther
+     * @param bool   $topLevelOnly
+     */
+    public function getEmailList($search = '', $limit = 10, $start = 0, $viewOther = false, $topLevelOnly = false)
+    {
+        $q = $this->createQueryBuilder('e');
+        $q->select('partial e.{id, subject, language}');
+
+        if (!empty($search)) {
+            $q->andWhere($q->expr()->like('e.subject', ':search'))
+                ->setParameter('search', "{$search}%");
+        }
+
+        if (!$viewOther) {
+            $q->andWhere($q->expr()->eq('IDENTITY(e.createdBy)', ':id'))
+                ->setParameter('id', $this->currentUser->getId());
+        }
+
+        if ($topLevelOnly) {
+            $q->andWhere($q->expr()->isNull('e.variantParent'));
+        }
+
+        $q->orderBy('e.subject');
+
+        if (!empty($limit)) {
+            $q->setFirstResult($start)
+                ->setMaxResults($limit);
+        }
+
+        $results = $q->getQuery()->getArrayResult();
+        return $results;
+    }
+
+    /**
      * @param QueryBuilder $q
      * @param              $filter
      * @return array
