@@ -25,10 +25,10 @@ class ActionController extends CommonFormController
      */
     public function newAction ()
     {
-        $success     = 0;
-        $valid       = $cancelled = false;
-        $method      = $this->request->getMethod();
-        $session     = $this->factory->getSession();
+        $success = 0;
+        $valid   = $cancelled = false;
+        $method  = $this->request->getMethod();
+        $session = $this->factory->getSession();
 
         if ($method == 'POST') {
             $formAction = $this->request->request->get('formaction');
@@ -48,9 +48,9 @@ class ActionController extends CommonFormController
 
         //fire the form builder event
         $customComponents = $this->factory->getModel('form.form')->getCustomComponents();
-        $form = $this->get('form.factory')->create('formaction', $formAction, array(
-            'action'    => $this->generateUrl('mautic_formaction_action', array('objectAction' => 'new')),
-            'settings'  => $customComponents['actions'][$actionType]
+        $form             = $this->get('form.factory')->create('formaction', $formAction, array(
+            'action'   => $this->generateUrl('mautic_formaction_action', array('objectAction' => 'new')),
+            'settings' => $customComponents['actions'][$actionType]
         ));
 
         $formAction['settings'] = $customComponents['actions'][$actionType];
@@ -73,7 +73,7 @@ class ActionController extends CommonFormController
                         //set it to the event default
                         $formAction['name'] = $this->get('translator')->trans($formAction['settings']['label']);
                     }
-                    $actions[$keyId]  = $formAction;
+                    $actions[$keyId] = $formAction;
                     $session->set('mautic.formactions.add', $actions);
                 } else {
                     $success = 0;
@@ -85,13 +85,13 @@ class ActionController extends CommonFormController
         if ($cancelled || $valid) {
             $closeModal = true;
         } else {
-            $closeModal = false;
+            $closeModal         = false;
             $viewParams['tmpl'] = 'action';
-            $formView = $form->createView();
+            $formView           = $form->createView();
             $this->get('templating')->getEngine('MauticFormBundle:Form:index.html.php')->get('form')
                 ->setTheme($formView, 'MauticFormBundle:FormComponent');
-            $viewParams['form'] = $formView;
-            $header = $formAction['settings']['label'];
+            $viewParams['form']         = $formView;
+            $header                     = $formAction['settings']['label'];
             $viewParams['actionHeader'] = $this->get('translator')->trans($header);
         }
 
@@ -101,13 +101,13 @@ class ActionController extends CommonFormController
             'route'         => false
         );
 
-        if (!empty($keyId) ) {
+        if (!empty($keyId)) {
             //prevent undefined errors
-            $entity    = new Action();
-            $blank     = $entity->convertToArray();
+            $entity     = new Action();
+            $blank      = $entity->convertToArray();
             $formAction = array_merge($blank, $formAction);
 
-            $template = (!empty($formAction['settings']['template'])) ? $formAction['settings']['template'] :
+            $template                      = (!empty($formAction['settings']['template'])) ? $formAction['settings']['template'] :
                 'MauticFormBundle:Action:generic.html.php';
             $passthroughVars['actionId']   = $keyId;
             $passthroughVars['actionHtml'] = $this->renderView($template, array(
@@ -120,8 +120,9 @@ class ActionController extends CommonFormController
         if ($closeModal) {
             //just close the modal
             $passthroughVars['closeModal'] = 1;
-            $response  = new JsonResponse($passthroughVars);
+            $response                      = new JsonResponse($passthroughVars);
             $response->headers->set('Content-Length', strlen($response->getContent()));
+
             return $response;
         } else {
             return $this->ajaxAction(array(
@@ -147,8 +148,8 @@ class ActionController extends CommonFormController
         $formAction = (array_key_exists($objectId, $actions)) ? $actions[$objectId] : null;
 
         if ($formAction !== null) {
-            $actionType  = $formAction['type'];
-            $customComponents = $this->factory->getModel('form.form')->getCustomComponents();
+            $actionType             = $formAction['type'];
+            $customComponents       = $this->factory->getModel('form.form')->getCustomComponents();
             $formAction['settings'] = $customComponents['actions'][$actionType];
 
             //ajax only for form fields
@@ -173,11 +174,11 @@ class ActionController extends CommonFormController
                         //form is valid so process the data
 
                         //save the properties to session
-                        $session           = $this->factory->getSession();
-                        $actions           = $session->get('mautic.formactions.add');
-                        $formData          = $form->getData();
+                        $session  = $this->factory->getSession();
+                        $actions  = $session->get('mautic.formactions.add');
+                        $formData = $form->getData();
                         //overwrite with updated data
-                        $formAction        = array_merge($actions[$objectId], $formData);
+                        $formAction = array_merge($actions[$objectId], $formData);
                         if (empty($formAction['name'])) {
                             //set it to the event default
                             $formAction['name'] = $this->get('translator')->trans($formAction['settings']['label']);
@@ -208,17 +209,16 @@ class ActionController extends CommonFormController
 
             $viewParams = array('type' => $actionType);
             if ($cancelled || $valid) {
-               $closeModal = true;
+                $closeModal = true;
             } else {
-                $closeModal = false;
-                $tmpl     = 'action';
-                $formView = $form->createView();
+                $closeModal         = false;
+                $viewParams['tmpl'] = 'action';
+                $formView           = $form->createView();
                 $this->get('templating')->getEngine('MauticFormBundle:Form:index.html.php')->get('form')
                     ->setTheme($formView, 'MauticFormBundle:FormComponent');
-                $viewParams['form']        = $formView;
+                $viewParams['form']         = $formView;
                 $viewParams['actionHeader'] = $this->get('translator')->trans($formAction['settings']['label']);
             }
-            $viewParams['tmpl'] = $tmpl;
 
             $passthroughVars = array(
                 'mauticContent' => 'formAction',
@@ -230,14 +230,14 @@ class ActionController extends CommonFormController
                 $passthroughVars['actionId'] = $keyId;
 
                 //prevent undefined errors
-                $entity     = new Action();
-                $blank      = $entity->convertToArray();
-                $formAction = array_merge($blank, $formAction);
-                $template   = (!empty($formAction['settings']['template'])) ? $formAction['settings']['template'] :
+                $entity                        = new Action();
+                $blank                         = $entity->convertToArray();
+                $formAction                    = array_merge($blank, $formAction);
+                $template                      = (!empty($formAction['settings']['template'])) ? $formAction['settings']['template'] :
                     'MauticFormBundle:Action:generic.html.php';
                 $passthroughVars['actionHtml'] = $this->renderView($template, array(
                     'inForm' => true,
-                    'action'  => $formAction,
+                    'action' => $formAction,
                     'id'     => $keyId
                 ));
             }
@@ -245,19 +245,21 @@ class ActionController extends CommonFormController
             if ($closeModal) {
                 //just close the modal
                 $passthroughVars['closeModal'] = 1;
-                $response  = new JsonResponse($passthroughVars);
+                $response                      = new JsonResponse($passthroughVars);
                 $response->headers->set('Content-Length', strlen($response->getContent()));
+
                 return $response;
             } else {
                 return $this->ajaxAction(array(
-                    'contentTemplate' => 'MauticFormBundle:Builder:' . $tmpl . '.html.php',
+                    'contentTemplate' => 'MauticFormBundle:Builder:' . $viewParams['tmpl'] . '.html.php',
                     'viewParameters'  => $viewParams,
                     'passthroughVars' => $passthroughVars
                 ));
             }
         } else {
-            $response  = new JsonResponse(array('success' => 0));
+            $response = new JsonResponse(array('success' => 0));
             $response->headers->set('Content-Length', strlen($response->getContent()));
+
             return $response;
         }
     }
@@ -266,17 +268,19 @@ class ActionController extends CommonFormController
      * Deletes the entity
      *
      * @param         $objectId
+     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function deleteAction($objectId) {
-        $session   = $this->factory->getSession();
-        $actions   = $session->get('mautic.formactions.add', array());
-        $delete    = $session->get('mautic.formactions.remove', array());
+    public function deleteAction ($objectId)
+    {
+        $session = $this->factory->getSession();
+        $actions = $session->get('mautic.formactions.add', array());
+        $delete  = $session->get('mautic.formactions.remove', array());
 
         //ajax only for form fields
         if (!$this->request->isXmlHttpRequest() ||
             !$this->factory->getSecurity()->isGranted(array('form:forms:editown', 'form:forms:editother', 'form:forms:create'), 'MATCH_ONE')
-        ){
+        ) {
             return $this->accessDenied();
         }
 
@@ -303,18 +307,18 @@ class ActionController extends CommonFormController
                 'MauticFormBundle:Action:generic.html.php';
 
             //prevent undefined errors
-            $entity    = new Action();
-            $blank     = $entity->convertToArray();
+            $entity     = new Action();
+            $blank      = $entity->convertToArray();
             $formAction = array_merge($blank, $formAction);
 
-            $dataArray  = array(
+            $dataArray = array(
                 'mauticContent'  => 'formAction',
                 'success'        => 1,
-                'target'         => '#mauticform_'.$objectId,
+                'target'         => '#mauticform_' . $objectId,
                 'route'          => false,
-                'actionId'        => $objectId,
+                'actionId'       => $objectId,
                 'replaceContent' => true,
-                'actionHtml'      => $this->renderView($template, array(
+                'actionHtml'     => $this->renderView($template, array(
                     'inForm'  => true,
                     'action'  => $formAction,
                     'id'      => $objectId,
@@ -325,8 +329,9 @@ class ActionController extends CommonFormController
             $dataArray = array('success' => 0);
         }
 
-        $response  = new JsonResponse($dataArray);
+        $response = new JsonResponse($dataArray);
         $response->headers->set('Content-Length', strlen($response->getContent()));
+
         return $response;
     }
 
@@ -334,12 +339,14 @@ class ActionController extends CommonFormController
      * Undeletes the entity
      *
      * @param         $objectId
+     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function undeleteAction($objectId) {
-        $session   = $this->factory->getSession();
-        $actions    = $session->get('mautic.formactions.add', array());
-        $delete    = $session->get('mautic.formactions.remove', array());
+    public function undeleteAction ($objectId)
+    {
+        $session = $this->factory->getSession();
+        $actions = $session->get('mautic.formactions.add', array());
+        $delete  = $session->get('mautic.formactions.remove', array());
 
         //ajax only for form fields
         if (!$this->request->isXmlHttpRequest() ||
@@ -377,16 +384,16 @@ class ActionController extends CommonFormController
             $blank      = $entity->convertToArray();
             $formAction = array_merge($blank, $formAction);
 
-            $dataArray  = array(
+            $dataArray = array(
                 'mauticContent'  => 'formAction',
                 'success'        => 1,
-                'target'         => '#mauticform_'.$objectId,
+                'target'         => '#mauticform_' . $objectId,
                 'route'          => false,
-                'actionId'        => $objectId,
+                'actionId'       => $objectId,
                 'replaceContent' => true,
-                'actionHtml'      => $this->renderView($template, array(
+                'actionHtml'     => $this->renderView($template, array(
                     'inForm'  => true,
-                    'action'   => $formAction,
+                    'action'  => $formAction,
                     'id'      => $objectId,
                     'deleted' => false
                 ))
@@ -395,8 +402,9 @@ class ActionController extends CommonFormController
             $dataArray = array('success' => 0);
         }
 
-        $response  = new JsonResponse($dataArray);
+        $response = new JsonResponse($dataArray);
         $response->headers->set('Content-Length', strlen($response->getContent()));
+
         return $response;
     }
 }
