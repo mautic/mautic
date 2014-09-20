@@ -2,58 +2,11 @@
 // Colors
 // --------------------------------------------------
 
-// mixins
-.bg-color(@bg-color; @color) {
-  background-color: @bg-color;
-  color: @color;
-  &.light,
-  .light {
-    background-color: lighten(@bg-color, 5%);
-  }
-  &.lighter,
-  .lighter {
-    background-color: lighten(@bg-color, 10%);
-  }
-  &.dark,
-  .dark {
-    background-color: darken(@bg-color, 5%);
-  }
-  &.darker,
-  .darker {
-    background-color: darken(@bg-color, 10%);
-  }
-}
-
 .bg-white {
   background-color: #fff;
   color: @text-color;
 }
-.bg-auto {
-  background-color: @body-bg;
+.bg-light {
+  background-color: lighten(@brand-light, 9.5%);
   color: @text-color;
-}
-
-// Brand primary
-.bg-primary {
-  .bg-color(@brand-primary, #fff);
-}
-
-// Brand success
-.bg-success {
-  .bg-color(@brand-success, #fff);
-}
-
-// Brand info
-.bg-info {
-  .bg-color(@brand-info, #fff);
-}
-
-// Brand warning
-.bg-warning {
-  .bg-color(@brand-warning, #fff);
-}
-
-// Brand danger
-.bg-danger {
-  .bg-color(@brand-danger, #fff);
 }
