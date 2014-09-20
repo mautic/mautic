@@ -2,11 +2,39 @@
 // Colors
 // --------------------------------------------------
 
+// Background white
 .bg-white {
   background-color: #fff;
   color: @text-color;
 }
-.bg-light {
-  background-color: lighten(@brand-light, 9.5%);
+
+// Background auto - same as body background
+.bg-auto {
+  background-color: @body-bg;
   color: @text-color;
+}
+
+// Background primary
+.bg-primary {
+  .bg-color(@brand-primary, #fff);
+}
+
+// Background success
+.bg-success {
+  .bg-color(@brand-success, #fff);
+}
+
+// Background info
+.bg-info {
+  .bg-color(@brand-info, #fff);
+}
+
+// Background warning
+.bg-warning {
+  .bg-color(@brand-warning, #fff);
+}
+
+// Background danger
+.bg-danger {
+  .bg-color(@brand-danger, #fff);
 }

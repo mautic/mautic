@@ -100,3 +100,26 @@
     }
   }
 }
+
+// Background color variant
+// ------------------------
+.bg-color(@bg-color; @color) {
+  background-color: @bg-color;
+  color: @color;
+  &.light,
+  .light {
+    background-color: lighten(@bg-color, 5%);
+  }
+  &.lighter,
+  .lighter {
+    background-color: lighten(@bg-color, 10%);
+  }
+  &.dark,
+  .dark {
+    background-color: darken(@bg-color, 5%);
+  }
+  &.darker,
+  .darker {
+    background-color: darken(@bg-color, 10%);
+  }
+}

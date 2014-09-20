@@ -1848,9 +1848,109 @@ aside.sidebar .progress {
   background-color: #fff;
   color: #393939;
 }
-.bg-light {
-  background-color: #f8f8f8;
+.bg-auto {
+  background-color: #f2f2f2;
   color: #393939;
+}
+.bg-primary {
+  background-color: #4e5e9e;
+  color: #ffffff;
+}
+.bg-primary.light,
+.bg-primary .light {
+  background-color: #5969ad;
+}
+.bg-primary.lighter,
+.bg-primary .lighter {
+  background-color: #6a79b5;
+}
+.bg-primary.dark,
+.bg-primary .dark {
+  background-color: #46548d;
+}
+.bg-primary.darker,
+.bg-primary .darker {
+  background-color: #3d4a7c;
+}
+.bg-success {
+  background-color: #63c29d;
+  color: #ffffff;
+}
+.bg-success.light,
+.bg-success .light {
+  background-color: #75c9a9;
+}
+.bg-success.lighter,
+.bg-success .lighter {
+  background-color: #88d0b4;
+}
+.bg-success.dark,
+.bg-success .dark {
+  background-color: #51bb91;
+}
+.bg-success.darker,
+.bg-success .darker {
+  background-color: #44ae85;
+}
+.bg-info {
+  background-color: #31b6ba;
+  color: #ffffff;
+}
+.bg-info.light,
+.bg-info .light {
+  background-color: #3ac7cb;
+}
+.bg-info.lighter,
+.bg-info .lighter {
+  background-color: #4eccd0;
+}
+.bg-info.dark,
+.bg-info .dark {
+  background-color: #2ca2a6;
+}
+.bg-info.darker,
+.bg-info .darker {
+  background-color: #268f92;
+}
+.bg-warning {
+  background-color: #fdb834;
+  color: #ffffff;
+}
+.bg-warning.light,
+.bg-warning .light {
+  background-color: #fdc14d;
+}
+.bg-warning.lighter,
+.bg-warning .lighter {
+  background-color: #fdca67;
+}
+.bg-warning.dark,
+.bg-warning .dark {
+  background-color: #fdaf1b;
+}
+.bg-warning.darker,
+.bg-warning .darker {
+  background-color: #fca602;
+}
+.bg-danger {
+  background-color: #e84e40;
+  color: #ffffff;
+}
+.bg-danger.light,
+.bg-danger .light {
+  background-color: #eb6357;
+}
+.bg-danger.lighter,
+.bg-danger .lighter {
+  background-color: #ed786e;
+}
+.bg-danger.dark,
+.bg-danger .dark {
+  background-color: #e53929;
+}
+.bg-danger.darker,
+.bg-danger .darker {
+  background-color: #db2a1a;
 }
 .va-t {
   vertical-align: top !important;
