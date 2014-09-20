@@ -9,7 +9,7 @@
 
 $lastCrumb = count($crumbs) - 1;
 ?>
-<ol class="breadcrumb mb0">
+<ol class="breadcrumb mb-0">
     <?php
     foreach ($crumbs as $crumbCount => $crumb):
         if ($crumb["label"] == "admin"):
