@@ -23,9 +23,7 @@ License: MIT
 /* Fix for * { box-sizing: border-box; } */
 .sp-container,
 .sp-container * {
-    -webkit-box-sizing: content-box;
-       -moz-box-sizing: content-box;
-            box-sizing: content-box;
+    box-sizing: content-box;
 }
 
 /* http://ansciath.tumblr.com/post/7347495869/css-aspect-ratio */
@@ -124,8 +122,8 @@ License: MIT
 .sp-container, .sp-replacer, .sp-preview, .sp-dragger, .sp-slider, .sp-alpha, .sp-clear, .sp-alpha-handle, .sp-container.sp-dragging .sp-input, .sp-container button  {
     -webkit-user-select:none;
     -moz-user-select: -moz-none;
-    -o-user-select:none;
-    user-select: none;
+    -ms-user-select: none;
+        user-select: none;
 }
 
 .sp-container.sp-input-disabled .sp-input-container {
@@ -153,9 +151,7 @@ License: MIT
 .sp-sat {
     background-image: -webkit-gradient(linear,  0 0, 100% 0, from(#FFF), to(rgba(204, 154, 129, 0)));
     background-image: -webkit-linear-gradient(left, #FFF, rgba(204, 154, 129, 0));
-    background-image: -moz-linear-gradient(left, #fff, rgba(204, 154, 129, 0));
-    background-image: -o-linear-gradient(left, #fff, rgba(204, 154, 129, 0));
-    background-image: -ms-linear-gradient(left, #fff, rgba(204, 154, 129, 0));
+    background-image: -webkit-linear-gradient(left, #fff, rgba(204, 154, 129, 0));
     background-image: linear-gradient(to right, #fff, rgba(204, 154, 129, 0));
     -ms-filter: "progid:DXImageTransform.Microsoft.gradient(GradientType = 1, startColorstr=#FFFFFFFF, endColorstr=#00CC9A81)";
     filter : progid:DXImageTransform.Microsoft.gradient(GradientType = 1, startColorstr='#FFFFFFFF', endColorstr='#00CC9A81');
@@ -163,18 +159,13 @@ License: MIT
 .sp-val {
     background-image: -webkit-gradient(linear, 0 100%, 0 0, from(#000000), to(rgba(204, 154, 129, 0)));
     background-image: -webkit-linear-gradient(bottom, #000000, rgba(204, 154, 129, 0));
-    background-image: -moz-linear-gradient(bottom, #000, rgba(204, 154, 129, 0));
-    background-image: -o-linear-gradient(bottom, #000, rgba(204, 154, 129, 0));
-    background-image: -ms-linear-gradient(bottom, #000, rgba(204, 154, 129, 0));
+    background-image: -webkit-linear-gradient(bottom, #000, rgba(204, 154, 129, 0));
     background-image: linear-gradient(to top, #000, rgba(204, 154, 129, 0));
     -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#00CC9A81, endColorstr=#FF000000)";
     filter : progid:DXImageTransform.Microsoft.gradient(startColorstr='#00CC9A81', endColorstr='#FF000000');
 }
 
 .sp-hue {
-    background: -moz-linear-gradient(top, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);
-    background: -ms-linear-gradient(top, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);
-    background: -o-linear-gradient(top, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);
     background: -webkit-gradient(linear, left top, left bottom, from(#ff0000), color-stop(0.17, #ffff00), color-stop(0.33, #00ff00), color-stop(0.5, #00ffff), color-stop(0.67, #0000ff), color-stop(0.83, #ff00ff), to(#ff0000));
     background: -webkit-linear-gradient(top, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);
     background: linear-gradient(to bottom, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);
@@ -261,8 +252,6 @@ See http://bgrins.github.io/spectrum/themes/ for instructions.
 }
 .sp-container, .sp-container button, .sp-container input, .sp-color, .sp-hue, .sp-clear {
     font: normal 12px "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
     -ms-box-sizing: border-box;
     box-sizing: border-box;
 }
@@ -421,9 +410,6 @@ See http://bgrins.github.io/spectrum/themes/ for instructions.
 .sp-container button {
   background-color: #eeeeee;
   background-image: -webkit-linear-gradient(top, #eeeeee, #cccccc);
-  background-image: -moz-linear-gradient(top, #eeeeee, #cccccc);
-  background-image: -ms-linear-gradient(top, #eeeeee, #cccccc);
-  background-image: -o-linear-gradient(top, #eeeeee, #cccccc);
   background-image: linear-gradient(to bottom, #eeeeee, #cccccc);
   border: 1px solid #ccc;
   border-bottom: 1px solid #bbb;
@@ -439,9 +425,6 @@ See http://bgrins.github.io/spectrum/themes/ for instructions.
 .sp-container button:hover {
     background-color: #dddddd;
     background-image: -webkit-linear-gradient(top, #dddddd, #bbbbbb);
-    background-image: -moz-linear-gradient(top, #dddddd, #bbbbbb);
-    background-image: -ms-linear-gradient(top, #dddddd, #bbbbbb);
-    background-image: -o-linear-gradient(top, #dddddd, #bbbbbb);
     background-image: linear-gradient(to bottom, #dddddd, #bbbbbb);
     border: 1px solid #bbb;
     border-bottom: 1px solid #999;
@@ -451,8 +434,6 @@ See http://bgrins.github.io/spectrum/themes/ for instructions.
 .sp-container button:active {
     border: 1px solid #aaa;
     border-bottom: 1px solid #888;
-    -webkit-box-shadow: inset 0 0 5px 2px #aaaaaa, 0 1px 0 0 #eeeeee;
-    -moz-box-shadow: inset 0 0 5px 2px #aaaaaa, 0 1px 0 0 #eeeeee;
     -ms-box-shadow: inset 0 0 5px 2px #aaaaaa, 0 1px 0 0 #eeeeee;
     -o-box-shadow: inset 0 0 5px 2px #aaaaaa, 0 1px 0 0 #eeeeee;
     box-shadow: inset 0 0 5px 2px #aaaaaa, 0 1px 0 0 #eeeeee;
