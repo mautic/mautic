@@ -159,7 +159,7 @@ class Configurator
     /**
      * Writes parameters to file.
      *
-     * @return boolean
+     * @return integer
      * @throws \Symfony\Component\Process\Exception\RuntimeException
      */
     public function write()
@@ -168,7 +168,13 @@ class Configurator
             throw new RuntimeException('Cannot write the config file, the destination is unwritable.');
         }
 
-        return file_put_contents($this->filename, $this->render());
+        $return = file_put_contents($this->filename, $this->render());
+
+        if ($return === false) {
+            throw new RuntimeException('An error occurred while attempting to write the config file to the filesystem.');
+        }
+
+        return $return;
     }
 
     /**

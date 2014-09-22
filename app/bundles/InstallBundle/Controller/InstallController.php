@@ -12,8 +12,10 @@
 namespace Mautic\InstallBundle\Controller;
 
 use Doctrine\ORM\Tools\SchemaTool;
+use Doctrine\ORM\Tools\ToolsException;
 use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\Process\Exception\RuntimeException;
 
 /**
  * InstallController.
@@ -39,7 +41,13 @@ class InstallController extends CommonController
             $form->bind($request);
             if ($form->isValid()) {
                 $configurator->mergeParameters($step->update($form->getData()));
-                $configurator->write();
+
+                try {
+                    $configurator->write();
+                } catch (RuntimeException $exception) {
+                    // TODO - Need to enqueue a message
+                    return new RedirectResponse($this->container->get('router')->generate('mautic_installer_step', array('index' => $index)));
+                }
 
                 $index++;
 
@@ -54,8 +62,16 @@ class InstallController extends CommonController
                 $metadatas     = $entityManager->getMetadataFactory()->getAllMetadata();
 
                 if (!empty($metadatas)) {
-                    $schemaTool = new SchemaTool($entityManager);
-                    $schemaTool->createSchema($metadatas);
+                    try {
+                        $schemaTool = new SchemaTool($entityManager);
+                        $schemaTool->createSchema($metadatas);
+                    } catch (ToolsException $exception) {
+                        // If the exception concerns the tables already having been created, notify the user of such
+                        // TODO - This really should just catch all exceptions to allow the app to handle error display
+                        if (strpos($exception->getMessage(), 'Base table or view already exists') !== false) {
+                            // TODO - Need to enqueue a message
+                        }
+                    }
                 } else {
                     // TODO - Need to enqueue a message
                 }
