@@ -47,7 +47,9 @@ class InstallController extends CommonController
                     return new RedirectResponse($this->container->get('router')->generate('mautic_installer_step', array('index' => $index)));
                 }
 
-                // Before moving to the "final" step, let's build the database out - TODO - This needs to run cache:clear first
+                // Before moving to the "final" step, let's build the database out
+                $this->clearCache();
+
                 $entityManager = $this->factory->getEntityManager();
                 $metadatas     = $entityManager->getMetadataFactory()->getAllMetadata();
 
