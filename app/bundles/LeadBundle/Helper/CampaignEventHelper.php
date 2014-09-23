@@ -8,6 +8,10 @@
  */
 
 namespace Mautic\LeadBundle\Helper;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\PointsChangeLog;
+use Mautic\LeadBundle\Event\ListChangeEvent;
 
 /**
  * Class CampaignEventHelper
@@ -20,13 +24,12 @@ class CampaignEventHelper
      * @param $event
      * @param $factory
      */
-    public static function changeLists ($event, $factory)
+    public static function changeLists ($event, $factory, $lead)
     {
         $properties = $event['properties'];
 
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel  = $factory->getModel('lead');
-        $lead       = $leadModel->getCurrentLead();
         $addTo      = $properties['addToLists'];
         $removeFrom = $properties['removeFromLists'];
 
@@ -43,5 +46,81 @@ class CampaignEventHelper
         }
 
         return $somethingHappened;
+    }
+
+    /**
+     * @param $event
+     * @param $lead
+     *
+     * @return bool
+     */
+    public static function changePoints ($event, $lead, MauticFactory $factory)
+    {
+        $points = $event['properties']['points'];
+
+        $somethingHappened = false;
+
+        if (!empty($points)) {
+            $lead->addToPoints($points);
+
+            //add a lead point change log
+            $log = new PointsChangeLog();
+            $log->setDelta($points);
+            $log->setLead($lead);
+            $log->setType('campaign');
+            $log->setEventName("{$event['campaign']['id']}: {$event['campaign']['name']}");
+            $log->setActionName("{$event['id']}: {$event['name']}");
+            $log->setIpAddress($factory->getIpAddress());
+            $log->setDateAdded(new \DateTime());
+            $lead->addPointsChangeLog($log);
+
+            $somethingHappened = true;
+        }
+
+        return $somethingHappened;
+    }
+
+    /**
+     * @param      $event
+     * @param Lead $lead
+     *
+     * @return bool
+     */
+    public static function validatePointChange ($event, Lead $lead)
+    {
+        $properties  = $event['properties'];
+        $checkPoints = $properties['points'];
+
+        if (!empty($checkPoints)) {
+            $points = $lead->getPoints();
+            if ($points < $checkPoints) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @param ListChangeEvent $passthrough
+     * @param                 $event
+     *
+     * @return bool
+     */
+    public static function validateListChange (ListChangeEvent $passthrough, $event)
+    {
+        $limitAddTo      = $event['properties']['addedTo'];
+        $limitRemoveFrom = $event['properties']['removedFrom'];
+        $list            = $passthrough->getList();
+
+        if ($passthrough->wasAdded() && !empty($limitAddTo) && !in_array($list->getId(), $limitAddTo)) {
+            return false;
+        }
+
+        if ($passthrough->wasRemoved() && !empty($limitRemoveFrom) && !in_array($list->getId(), $limitRemoveFrom)) {
+            return false;
+        }
+
+        return true;
     }
 }

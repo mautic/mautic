@@ -122,7 +122,47 @@ $container->setDefinition(
     )
 )
     ->addTag('form.type', array(
-        'alias' => 'lead_event_leadlist',
+        'alias' => 'leadlist_action_type',
+    ));
+
+$container->setDefinition(
+    'mautic.form.type.leadpoints_trigger',
+    new Definition(
+        'Mautic\LeadBundle\Form\Type\PointTriggerType'
+    )
+)
+    ->addTag('form.type', array(
+        'alias' => 'leadpoints_trigger',
+    ));
+
+$container->setDefinition(
+    'mautic.form.type.leadpoints_action',
+    new Definition(
+        'Mautic\LeadBundle\Form\Type\PointActionType'
+    )
+)
+    ->addTag('form.type', array(
+        'alias' => 'leadpoints_action',
+    ));
+
+$container->setDefinition(
+    'mautic.form.type.leadlist_trigger',
+    new Definition(
+        'Mautic\LeadBundle\Form\Type\ListTriggerType'
+    )
+)
+    ->addTag('form.type', array(
+        'alias' => 'leadlist_trigger',
+    ));
+
+$container->setDefinition(
+    'mautic.form.type.leadlist_action',
+    new Definition(
+        'Mautic\LeadBundle\Form\Type\ListActionType'
+    )
+)
+    ->addTag('form.type', array(
+        'alias' => 'leadlist_action',
     ));
 
 //Lead note form

@@ -10,7 +10,7 @@
 namespace Mautic\PointBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\LeadBundle\Event\LeadEvent;
+use Mautic\LeadBundle\Event\PointsChangeEvent;
 use Mautic\LeadBundle\LeadEvents;
 
 /**
@@ -34,9 +34,9 @@ class LeadSubscriber extends CommonSubscriber
     /**
      * Trigger applicable events for the lead
      *
-     * @param LeadEvent $event
+     * @param PointsChangeEvent $event
      */
-    public function onLeadPointsChange(LeadEvent $event)
+    public function onLeadPointsChange(PointsChangeEvent $event)
     {
         /** @var \Mautic\PointBundle\Model\TriggerModel */
         $model = $this->factory->getModel('point.trigger');

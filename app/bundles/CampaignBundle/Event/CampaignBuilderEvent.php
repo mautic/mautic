@@ -39,7 +39,7 @@ class CampaignBuilderEvent extends Event
      *                        'template'    => (optional) template to use for the action's HTML in the campaign builder
      *                            i.e AcmeMyBundle:CampaignEvent:theaction.html.php
      *                        'formType'    => (optional) name of the form type SERVICE for the action
-     *                        'callback'    => (required) callback function that will be passed when the event is triggered
+     *                        'callback'    => (optional) callback function that will be passed when the event is triggered
      *                            The callback function should return a bool to determine if the trigger's actions
      *                            should be executed.  For example, only trigger actions for specific entities.
      *                            it can can receive the following arguments by name (via ReflectionMethod::invokeArgs())
@@ -56,7 +56,7 @@ class CampaignBuilderEvent extends Event
 
         //check for required keys and that given functions are callable
         $this->verifyComponent(
-            array('group', 'label', 'callback'),
+            array('group', 'label'),
             array('callback'),
             $trigger
         );

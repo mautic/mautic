@@ -12,6 +12,10 @@ namespace Mautic\LeadBundle\EventListener;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\LeadBundle\Event\LeadEvent;
+use Mautic\LeadBundle\Event\ListChangeEvent;
+use Mautic\LeadBundle\Event\PointsChangeEvent;
+use Mautic\LeadBundle\LeadEvents;
 
 /**
  * Class CampaignSubscriber
@@ -28,6 +32,9 @@ class CampaignSubscriber extends CommonSubscriber
     {
         return array(
             CampaignEvents::CAMPAIGN_ON_BUILD => array('onCampaignBuild', 0),
+            LeadEvents::LEAD_POST_SAVE        => array('onLeadPostSave', 0),
+            LeadEvents::LEAD_POINTS_CHANGE    => array('onLeadPointChange', 0),
+            LeadEvents::LEAD_LIST_CHANGE    => array('onLeadListChange', 0)
         );
     }
 
@@ -38,14 +45,93 @@ class CampaignSubscriber extends CommonSubscriber
      */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
+        //Add triggers
+        $trigger = array(
+            'group'        => 'mautic.lead.lead.events.group',
+            'label'        => 'mautic.lead.lead.events.leadcreated',
+            'description'  => 'mautic.lead.lead.events.leadcreated_descr'
+        );
+        $event->addTrigger('lead.created', $trigger);
+
+        $trigger = array(
+            'group'        => 'mautic.lead.lead.events.group',
+            'label'        => 'mautic.lead.lead.events.pointchange',
+            'description'  => 'mautic.lead.lead.events.pointchange_descr',
+            'formType'     => 'leadpoints_trigger',
+            'callback'     => '\Mautic\LeadBundle\Helper\CampaignEventHelper::validatePointChange'
+        );
+        $event->addTrigger('lead.pointchange', $trigger);
+
+        $trigger = array(
+            'group'        => 'mautic.lead.lead.events.group',
+            'label'        => 'mautic.lead.lead.events.listchange',
+            'description'  => 'mautic.lead.lead.events.listchange_descr',
+            'formType'     => 'leadlist_trigger',
+            'callback'     => '\Mautic\LeadBundle\Helper\CampaignEventHelper::validateListChange'
+        );
+        $event->addTrigger('lead.listchange', $trigger);
+
         //Add actions
-        $changeListAction = array(
+        $action = array(
+            'group'       => 'mautic.lead.lead.events.group',
+            'label'       => 'mautic.lead.lead.events.changepoints',
+            'description' => 'mautic.lead.lead.events.changepoints_descr',
+            'formType'    => 'leadpoints_action',
+            'callback'    => '\Mautic\LeadBundle\Helper\CampaignEventHelper::changePoints'
+        );
+        $event->addAction('lead.changepoints', $action);
+
+        $action = array(
             'group'        => 'mautic.lead.lead.events.group',
             'label'        => 'mautic.lead.lead.events.changelist',
-            'description'  => 'mautic.lead.lead.events.changelist',
-            'formType'     => 'lead_event_leadlist',
+            'description'  => 'mautic.lead.lead.events.changelist_descr',
+            'formType'     => 'leadlist_action',
             'callback'     => '\Mautic\LeadBundle\Helper\CampaignEventHelper::changeLists'
         );
-        $event->addAction('lead.changelist', $changeListAction);
+        $event->addAction('lead.changelist', $action);
+    }
+
+    /**
+     * Trigger new lead campaign events
+     *
+     * @param LeadEvent $event
+     */
+    public function onLeadPostSave(LeadEvent $event)
+    {
+        if ($event->isNew()) {
+            /** @var \Mautic\CampaignBundle\Model\CampaignModel $model */
+            $model = $this->factory->getModel('campaign');
+            $model->triggerEvent('lead.created', $event->getLead());
+        }
+    }
+
+    /**
+     * Trigger lead point change campaign events
+     *
+     * @param PointsChangeEvent $event
+     */
+    public function onLeadPointChange(PointsChangeEvent $event)
+    {
+        /** @var \Mautic\CampaignBundle\Model\CampaignModel $model */
+        $model = $this->factory->getModel('campaign');
+        $lead  = $event->getLead();
+        $name  = 'lead.pointchange.'.$lead->getId() . '.' . $event->getOldPoints() . '.' . $event->getNewPoints();
+        $model->triggerEvent('lead.pointchange', $event, $name);
+    }
+
+    /**
+     * Trigger lead list change campaign events
+     *
+     * @param ListChangeEvent $event
+     */
+    public function onLeadListChange(ListChangeEvent $event)
+    {
+        /** @var \Mautic\CampaignBundle\Model\CampaignModel $model */
+        $model  = $this->factory->getModel('campaign');
+        $lead   = $event->getLead();
+        $list   = $event->getList();
+        $action = $event->wasAdded() ? 'added' : 'removed';
+        $name   = 'lead.listchange.' . $lead->getId() . '.' . $list->getId() . '.' . $action;
+        $model->triggerEvent('lead.listchange', $event, $name);
     }
 }

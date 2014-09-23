@@ -45,7 +45,17 @@ final class LeadEvents
      *
      * @var string
      */
-    const LEAD_POINTS_CHANGE   = 'mautic.lead_points_change';
+    const LEAD_POINTS_CHANGE = 'mautic.lead_points_change';
+
+    /**
+     * The mautic.lead_list_change event is thrown if a lead's lists changes.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\LeadListChange instance.
+     *
+     * @var string
+     */
+    const LEAD_LIST_CHANGE   = 'mautic.lead_list_change';
 
     /**
      * The mautic.lead_pre_delete event is thrown before a lead is deleted.

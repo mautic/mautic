@@ -13,11 +13,11 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class EventListType
+ * Class ListActionType
  *
  * @package Mautic\LeadBundle\Form\Type
  */
-class EventListType extends AbstractType
+class ListActionType extends AbstractType
 {
 
     /**
@@ -51,6 +51,6 @@ class EventListType extends AbstractType
      * @return string
      */
     public function getName() {
-        return "lead_event_leadlist";
+        return "leadlist_action";
     }
 }

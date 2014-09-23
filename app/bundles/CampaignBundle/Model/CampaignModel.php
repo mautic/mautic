@@ -259,6 +259,7 @@ class CampaignModel extends CommonFormModel
 
     /**
      * Gets array of custom events from bundles subscribed CampaignEvents::CAMPAIGN_ON_BUILD
+     *
      * @return mixed
      */
     public function getEvents()
@@ -272,7 +273,17 @@ class CampaignModel extends CommonFormModel
             $this->dispatcher->dispatch(CampaignEvents::CAMPAIGN_ON_BUILD, $event);
             $events['action']  = $event->getActions();
             $events['trigger'] = $event->getTriggers();
+
+            $grouped = array();
+            foreach ($events['action'] as $k => $e) {
+                $grouped['action'][$e['group']][$k] = $e;
+            }
+            foreach ($events['trigger'] as $k => $e) {
+                $grouped['trigger'][$e['group']][$k] = $e;
+            }
+            $events['grouped'] = $grouped;
         }
+
         return $events;
     }
 
@@ -285,7 +296,9 @@ class CampaignModel extends CommonFormModel
      */
     public function triggerEvent($eventType, $passthrough = null, $eventTypeId = null)
     {
-        return $this->factory->getModel('campaign.event')->triggerEvent($eventType, $passthrough, $eventTypeId);
+        /** @var \Mautic\CampaignBundle\Model\EventModel $eventModel */
+        $eventModel = $this->factory->getModel('campaign.event');
+        return $eventModel->triggerEvent($eventType, $passthrough, $eventTypeId);
     }
 
     /**

@@ -133,23 +133,32 @@ class LeadSubscriber extends CommonSubscriber
      */
     public function onLeadPostSave(Events\LeadEvent $event)
     {
+        //Because there is an event within an event, there is a risk that something will trigger a loop which
+        //needs to be prevented
+        static $preventLoop = array();
+
         $lead = $event->getLead();
         if ($details = $event->getChanges()) {
-            $log = array(
-                "bundle"    => "lead",
-                "object"    => "lead",
-                "objectId"  => $lead->getId(),
-                "action"    => ($event->isNew()) ? "create" : "update",
-                "details"   => $details,
-                "ipAddress" => $this->request->server->get('REMOTE_ADDR')
-            );
-            $this->factory->getModel('core.auditLog')->writeToLog($log);
+            $check = base64_encode($lead->getId() . serialize($details));
+            if (!in_array($check, $preventLoop)) {
+                $preventLoop[] = $check;
 
-            //trigger the points change event
-            if (isset($this->changes["points"])) {
-                if (!$event->isNew() && $this->dispatcher->hasListeners(LeadEvents::LEAD_POINTS_CHANGE)) {
-                    $pointsEvent = new Events\PointsChangeEvent($lead, $this->changes['points'][0], $this->changes['points'][0]);
-                    $this->dispatcher->dispatch(LeadEvents::LEAD_POINTS_CHANGE, $pointsEvent);
+                $log = array(
+                    "bundle"    => "lead",
+                    "object"    => "lead",
+                    "objectId"  => $lead->getId(),
+                    "action"    => ($event->isNew()) ? "create" : "update",
+                    "details"   => $details,
+                    "ipAddress" => $this->request->server->get('REMOTE_ADDR')
+                );
+                $this->factory->getModel('core.auditLog')->writeToLog($log);
+
+                //trigger the points change event
+                if (isset($details["points"])) {
+                    if (!$event->isNew() && $this->dispatcher->hasListeners(LeadEvents::LEAD_POINTS_CHANGE)) {
+                        $pointsEvent = new Events\PointsChangeEvent($lead, $details['points'][0], $details['points'][1]);
+                        $this->dispatcher->dispatch(LeadEvents::LEAD_POINTS_CHANGE, $pointsEvent);
+                    }
                 }
             }
         }

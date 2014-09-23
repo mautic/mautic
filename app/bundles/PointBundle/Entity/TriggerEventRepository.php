@@ -30,12 +30,12 @@ class TriggerEventRepository extends CommonRepository
         $now = new \DateTime();
 
         $q = $this->createQueryBuilder('a')
-            ->select('partial a.{id, type, name, properties, settings}, partial r.{id, name, points, color}')
+            ->select('partial a.{id, type, name, properties}, partial r.{id, name, points, color}')
             ->leftJoin('a.trigger', 'r')
             ->orderBy('a.order');
 
         //make sure the published up and down dates are good
-        $expr = $this->getPublishedByDateExpression($q);
+        $expr = $this->getPublishedByDateExpression($q, 'r');
         $expr->add(
             $q->expr()->gte('r.points', $points)
         );

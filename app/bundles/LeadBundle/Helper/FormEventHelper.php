@@ -9,7 +9,7 @@
 
 namespace Mautic\LeadBundle\Helper;
 
-use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 
@@ -73,7 +73,6 @@ class FormEventHelper
             }
         }
 
-
         //check for existing IP address
         $ipAddress = $factory->getIpAddress($server['REMOTE_ADDR']);
 
@@ -122,11 +121,11 @@ class FormEventHelper
      * @param array $post
      * @param array $server
      * @param       $fields
-     * @param       $factory
+     * @param MauticFactory $factory
      * @param       $action
      * @param       $form
      */
-    public static function changePoints (array $post, array $server, $fields, $factory, $action, $form)
+    public static function changePoints (array $post, array $server, $fields, MauticFactory $factory, $action, $form)
     {
         $properties = $action->getProperties();
 
@@ -141,14 +140,7 @@ class FormEventHelper
                 );
 
                 //check for existing IP address or add one if not exist
-                $ip        = $server['REMOTE_ADDR'];
-                $ipAddress = $em->getRepository('MauticCoreBundle:IpAddress')
-                    ->findOneByIpAddress($ip);
-
-                if ($ipAddress === null) {
-                    $ipAddress = new IpAddress();
-                    $ipAddress->setIpAddress($ip, $factory->getSystemParameters());
-                }
+                $ipAddress = $factory->getIpAddress();
 
                 //create a new points change event
                 $event = new PointsChangeLog();
@@ -179,8 +171,7 @@ class FormEventHelper
                             $lead = false;
 
                             foreach ($leads as &$l) {
-                                $delta = self::updatePoints($l, $properties['operator'], $properties['points']);
-                                $event->setDelta($delta);
+                                $event->setDelta($properties['points']);
                                 $event->setLead($l);
                                 $l->addPointsChangeLog($event);
 
@@ -197,11 +188,10 @@ class FormEventHelper
                 }
 
                 if ($lead) {
-                    $delta = self::updatePoints($lead, $properties['operator'], $properties['points']);
-                    $event->setDelta($delta);
+                    $event->setDelta($properties['points']);
                     $event->setLead($lead);
                     $lead->addPointsChangeLog($event);
-
+                    $lead->addToPoints($properties['points']);
                     $ipAddresses = $lead->getIpAddresses();
                     //add the IP if the lead is not already associated with it
                     if (!$ipAddresses->contains($ipAddress)) {
@@ -212,35 +202,6 @@ class FormEventHelper
                 }
             }
         }
-    }
-
-    /**
-     * @param $lead
-     * @param $operator
-     * @param $delta
-     */
-    private static function updatePoints (&$lead, $operator, $delta)
-    {
-        $newPoints = $originalPoints = $lead->getPoints();
-
-        switch ($operator) {
-            case 'plus':
-                $newPoints += $delta;
-                break;
-            case 'minus':
-                $newPoints -= $delta;
-                break;
-            case 'times':
-                $newPoints *= $delta;
-                break;
-            case 'divide':
-                $newPoints /= $delta;
-                break;
-        }
-
-        $lead->setPoints($newPoints);
-
-        return $newPoints - $originalPoints;
     }
 
     /**

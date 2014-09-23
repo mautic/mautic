@@ -84,6 +84,12 @@ class LeadListRepository extends CommonRepository
      */
     public function getLists($user = false, $alias = '', $id = '', $withLeads = false)
     {
+        static $lists = array();
+
+        $key = (int) $user . $alias . $id. (int) $withLeads;
+        if (isset($lists[$key])) {
+            return $lists[$key];
+        }
 
         $q = $this->_em->createQueryBuilder()
             ->from('MauticLeadBundle:LeadList', 'l', 'l.id');
@@ -127,6 +133,7 @@ class LeadListRepository extends CommonRepository
             }
         }
 
+        $lists[$key] = $results;
         return $results;
     }
 

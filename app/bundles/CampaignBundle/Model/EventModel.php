@@ -123,7 +123,7 @@ class EventModel extends CommonFormModel
     /**
      * Triggers an event
      *
-     * @param      $eventType
+     * @param       $eventType
      * @param mixed $passthrough
      * @param mixed $eventTypeId
      *
@@ -131,7 +131,7 @@ class EventModel extends CommonFormModel
      */
     public function triggerEvent ($eventType, $passthrough = null, $eventTypeId = null)
     {
-        static $leadCampaigns, $eventList, $availableEvents, $leadsEvents;
+        static $leadCampaigns = array(), $eventList = array(), $availableEvents = array(), $leadsEvents = array(), $examinedEvents = array();
 
         //only trigger events for anonymous users
         if (!$this->security->isAnonymous()) {
@@ -140,7 +140,7 @@ class EventModel extends CommonFormModel
 
         if ($eventTypeId !== null && $this->factory->getEnvironment() == 'prod') {
             //let's prevent some unnecessary DB calls
-            $session = $this->factory->getSession();
+            $session         = $this->factory->getSession();
             $triggeredEvents = $session->get('mautic.triggered.campaign.events', array());
             if (in_array($eventTypeId, $triggeredEvents)) {
                 return false;
@@ -163,9 +163,6 @@ class EventModel extends CommonFormModel
 
         //get the events for the trigger
         $eventRepo = $this->getRepository();
-        if (!is_array($eventList)) {
-            $eventList = array();
-        }
         if (empty($eventList[$eventType])) {
             $eventList[$eventType] = $eventRepo->getPublishedByType($eventType);
         }
@@ -195,7 +192,6 @@ class EventModel extends CommonFormModel
 
         //leads can enter dripflows at any point therefore all matching trigger events are pulled
         //because of this, the events examined must be tracked to prevent double processing of events
-        $examinedEvents = array();
         foreach ($events as $campaignId => $campaignEvents) {
             $lastEvent = false;
 
@@ -305,6 +301,10 @@ class EventModel extends CommonFormModel
             }
         }
 
+        if ($lead->getChanges()) {
+            $leadModel->saveEntity($lead, false);
+        }
+
         if (!empty($persist)) {
             $this->getRepository()->saveEntities($persist);
         }
@@ -388,7 +388,7 @@ class EventModel extends CommonFormModel
                     return array(false, $currentEvent['triggerDate']);
                 }
             default:
-                return array (true, null);
+                return array(true, null);
         }
     }
 
@@ -397,7 +397,7 @@ class EventModel extends CommonFormModel
      *
      * @param mixed $campaignId
      */
-    public function triggerScheduledEvents($campaignId = null)
+    public function triggerScheduledEvents ($campaignId = null)
     {
         $repo            = $this->getRepository();
         $events          = $repo->getPublishedScheduled($campaignId);
@@ -407,9 +407,9 @@ class EventModel extends CommonFormModel
 
         foreach ($events as $e) {
             /** @var \Mautic\CampaignBundle\Entity\Event $event */
-            $event = $e->getEvent();
+            $event     = $e->getEvent();
             $eventType = $event->getEventType();
-            $type = $event->getType();
+            $type      = $event->getType();
             if (!isset($availableEvents[$eventType][$type])) {
                 continue;
             }
