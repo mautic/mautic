@@ -182,6 +182,7 @@ class CampaignController extends FormController
      */
     public function newAction ()
     {
+        /** @var \Mautic\CampaignBundle\Model\CampaignModel $model */
         $model   = $this->factory->getModel('campaign');
         $entity  = $model->getEntity();
         $session = $this->factory->getSession();

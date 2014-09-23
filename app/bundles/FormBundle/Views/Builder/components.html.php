@@ -31,7 +31,7 @@ $actionExpanded  = (empty($fieldExpanded)) ? ' in' : '';
                 <div class="panel-body list-group">
                     <?php foreach ($fields as $fieldType => $field): ?>
                     <a class="list-group-item" data-toggle="ajaxmodal" data-target="#formComponentModal" href="<?php echo $view['router']->generate('mautic_formfield_action', array('objectAction' => 'new', 'type' => $fieldType, 'tmpl' => 'field')); ?>">
-                        <div class="page-list-item">
+                        <div class="padding-sm">
                             <?php echo $field; ?>
                         </div>
                     </a>
@@ -49,24 +49,18 @@ $actionExpanded  = (empty($fieldExpanded)) ? ' in' : '';
                 </h4>
             </div>
             <div id="form-submitactions" class="panel-collapse collapse<?php echo $actionExpanded; ?>">
-                <div class="panel-body list-group">
-                    <?php foreach ($actions as $k => $a): ?>
-                    <?php if ($newGroup = (empty($lastGroup) || $lastGroup != $a['group'])): ?>
-                    <div class="form-submitaction-group-header"><?php echo $a['group']; ?></div>
-                    <div class="form-submitaction-group-body list-group">
-                    <?php endif; ?>
-                        <a class="list-group-item" data-toggle="ajaxmodal" data-target="#formComponentModal" href="<?php echo $view['router']->generate('mautic_formaction_action', array('objectAction' => 'new', 'type' => $k, 'tmpl' => 'action')); ?>">
-                            <div class="page-list-item">
-                                <span class="list-item-primary"><?php echo $view['translator']->trans($a['label']); ?></span>
-                                <?php if (isset($a['description'])): ?>
-                                    <span class="list-item-secondary"><?php echo  $view['translator']->trans($a['description']); ?></span>
-                                <?php endif; ?>
-                            </div>
-                        </a>
-                    <?php if ($newGroup): ?>
-                    </div>
-                    <?php endif; ?>
-                    <?php $lastGroup = $a['group']; ?>
+                <div class="panel-body">
+                    <?php foreach ($actions as $group => $groupActions): ?>
+                        <div class="campaign-event-group-header"><?php echo $group; ?></div>
+                        <div class="campaign-event-group-body list-group">
+                            <?php foreach ($groupActions as $k => $e): ?>
+                                <a data-toggle="ajaxmodal" data-target="#formComponentModal" class="list-group-item" href="<?php echo $view['router']->generate('mautic_formaction_action', array('objectAction' => 'new', 'type' => $k, 'tmpl'=> 'action')); ?>">
+                                    <div class="padding-sm" data-toggle="tooltip" title="<?php echo  $view['translator']->trans($e['description']); ?>">
+                                        <span><?php echo $view['translator']->trans($e['label']); ?></span>
+                                    </div>
+                                </a>
+                            <?php endforeach; ?>
+                        </div>
                     <?php endforeach; ?>
                 </div>
             </div>

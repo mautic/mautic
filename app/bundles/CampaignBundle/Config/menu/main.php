@@ -14,7 +14,7 @@ $items = array(
         'extras'=> array(
             'iconClass' => 'fa-clock-o'
         ),
-        'display' => ($security->isGranted(array('campaign:campaigns:viewown', 'campaign:campaigns:viewother'), 'MATCH_ONE')) ? true : false,
+        'display' => ($security->isGranted('campaign:campaigns:view')) ? true : false,
         'children' => array(
             'mautic.campaign.menu.index' => array(
                 'route'    => 'mautic_campaign_index',

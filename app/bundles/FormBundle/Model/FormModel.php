@@ -380,6 +380,16 @@ class FormModel extends CommonFormModel
             $this->dispatcher->dispatch(FormEvents::FORM_ON_BUILD, $event);
             $customComponents['fields']  = $event->getFormFields();
             $customComponents['actions'] = $event->getSubmitActions();
+
+
+            $grouped = array();
+            foreach ($customComponents['fields'] as $k => $e) {
+                $grouped['fields'][$e['group']][$k] = $e;
+            }
+            foreach ($customComponents['actions'] as $k => $e) {
+                $grouped['actions'][$e['group']][$k] = $e;
+            }
+            $customComponents['grouped'] = $grouped;
         }
 
         return $customComponents;
