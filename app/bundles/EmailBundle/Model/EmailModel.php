@@ -302,21 +302,16 @@ class EmailModel extends FormModel
         $this->em->persist($email);
 
         //check for existing IP
-        $ip = $request->server->get('REMOTE_ADDR');
-        $ipAddress = $this->em->getRepository('MauticCoreBundle:IpAddress')
-            ->findOneByIpAddress($ip);
-
-        if ($ipAddress === null) {
-            $ipAddress = new IpAddress();
-            $ipAddress->setIpAddress($ip, $this->factory->getSystemParameters());
-        }
+        $ipAddress = $this->factory->getIpAddress();
         $stat->setIpAddress($ipAddress);
+
         //save the IP to the lead
         $lead = $stat->getLead();
         if ($lead !== null) {
             if (!$lead->getIpAddresses()->contains($ipAddress)) {
                 $lead->addIpAddress($ipAddress);
-                $this->em->persist($lead);
+                $leadModel = $this->factory->getModel('lead');
+                $leadModel->saveEntity($lead, true);
             }
         }
 

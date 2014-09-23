@@ -342,14 +342,7 @@ class PageModel extends FormModel
         }
 
         //check for existing IP
-        $ip = $request->server->get('REMOTE_ADDR');
-        $ipAddress = $this->em->getRepository('MauticCoreBundle:IpAddress')
-            ->findOneByIpAddress($ip);
-
-        if ($ipAddress === null) {
-            $ipAddress = new IpAddress();
-            $ipAddress->setIpAddress($ip, $this->factory->getSystemParameters());
-        }
+        $ipAddress = $this->factory->getIpAddress();
 
         $hit->setIpAddress($ipAddress);
 
