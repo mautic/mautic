@@ -27,6 +27,11 @@ $container->loadFromExtension('security', array(
         'ROLE_ADMIN' => 'ROLE_USER',
     ),
     'firewalls' => array(
+        'install' => array(
+            'pattern'   => '^/installer',
+            'anonymous' => true,
+            'context'   => 'mautic'
+        ),
         'dev' => array(
             'pattern' => '^/(_(profiler|wdt)|css|images|js)/',
             'security' => true,

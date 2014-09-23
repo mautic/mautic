@@ -11,7 +11,9 @@ namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\UserBundle\Entity\User;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -252,5 +254,18 @@ class CommonController extends Controller implements MauticController
                 ))
             ));
         }
+    }
+
+    /**
+     * Clear the application cache and run the warmup routine for the current environment
+     *
+     * @return void
+     */
+    public function clearCache()
+    {
+        $input       = new ArgvInput(array('console', 'cache:clear', '--env=' . $this->factory->getEnvironment()));
+        $application = new Application($this->get('kernel'));
+        $application->setAutoExit(false);
+        $application->run($input);
     }
 }
