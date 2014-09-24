@@ -49,31 +49,35 @@ class InstallController extends CommonController
                     return new RedirectResponse($this->container->get('router')->generate('mautic_installer_step', array('index' => $index)));
                 }
 
+                // Post-step processing
+                switch ($index) {
+                    case 1:
+                        $this->clearCache();
+
+                        $entityManager = $this->factory->getEntityManager();
+                        $metadatas     = $entityManager->getMetadataFactory()->getAllMetadata();
+
+                        if (!empty($metadatas)) {
+                            try {
+                                $schemaTool = new SchemaTool($entityManager);
+                                $schemaTool->createSchema($metadatas);
+                            } catch (ToolsException $exception) {
+                                // If the exception concerns the tables already having been created, notify the user of such
+                                // TODO - This really should just catch all exceptions to allow the app to handle error display
+                                if (strpos($exception->getMessage(), 'Base table or view already exists') !== false) {
+                                    // TODO - Need to enqueue a message
+                                }
+                            }
+                        } else {
+                            // TODO - Need to enqueue a message
+                        }
+                        break;
+                }
+
                 $index++;
 
                 if ($index < $configurator->getStepCount()) {
                     return new RedirectResponse($this->container->get('router')->generate('mautic_installer_step', array('index' => $index)));
-                }
-
-                // Before moving to the "final" step, let's build the database out
-                $this->clearCache();
-
-                $entityManager = $this->factory->getEntityManager();
-                $metadatas     = $entityManager->getMetadataFactory()->getAllMetadata();
-
-                if (!empty($metadatas)) {
-                    try {
-                        $schemaTool = new SchemaTool($entityManager);
-                        $schemaTool->createSchema($metadatas);
-                    } catch (ToolsException $exception) {
-                        // If the exception concerns the tables already having been created, notify the user of such
-                        // TODO - This really should just catch all exceptions to allow the app to handle error display
-                        if (strpos($exception->getMessage(), 'Base table or view already exists') !== false) {
-                            // TODO - Need to enqueue a message
-                        }
-                    }
-                } else {
-                    // TODO - Need to enqueue a message
                 }
 
                 return new RedirectResponse($this->container->get('router')->generate('mautic_installer_final'));
