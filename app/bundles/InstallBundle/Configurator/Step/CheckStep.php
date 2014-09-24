@@ -260,7 +260,7 @@ class CheckStep implements StepInterface
      */
     public function getTemplate()
     {
-        return 'MauticInstallBundle:Step:check.html.php';
+        return 'MauticInstallBundle:Install:check.html.php';
     }
 
     /**

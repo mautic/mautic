@@ -31,6 +31,8 @@ class DoctrineStep implements StepInterface
      */
     public $host;
 
+    public $table_prefix;
+
     /**
      * @Assert\Range(min = "0")
      */
@@ -115,7 +117,7 @@ class DoctrineStep implements StepInterface
      */
     public function getTemplate()
     {
-        return 'MauticInstallBundle:Step:doctrine.html.php';
+        return 'MauticInstallBundle:Install:doctrine.html.php';
     }
 
     /**
