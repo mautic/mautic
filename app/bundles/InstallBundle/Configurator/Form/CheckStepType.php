@@ -43,6 +43,6 @@ class CheckStepType extends AbstractType
 
     public function getName()
     {
-        return 'distributionbundle_check_step';
+        return 'install_check_step';
     }
 }

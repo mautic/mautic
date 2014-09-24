@@ -14,6 +14,8 @@ namespace Mautic\InstallBundle\Controller;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\ORM\Tools\ToolsException;
 use Mautic\CoreBundle\Controller\CommonController;
+use Mautic\UserBundle\Entity\Role;
+use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Process\Exception\RuntimeException;
 
@@ -71,6 +73,36 @@ class InstallController extends CommonController
                         } else {
                             // TODO - Need to enqueue a message
                         }
+
+                        break;
+
+                    case 2:
+                        // First we need to create the admin role
+                        $translator    = $this->factory->getTranslator();
+                        $entityManager = $this->factory->getEntityManager();
+                        $role = new Role();
+                        $role->setName($translator->trans('mautic.user.role.admin.name', array(), 'fixtures'));
+                        $role->setDescription($translator->trans('mautic.user.role.admin.description', array(), 'fixtures'));
+                        $role->setIsAdmin(1);
+                        $entityManager->persist($role);
+                        $entityManager->flush();
+
+                        // Now we create the user
+                        $data = $form->getData();
+                        $user = new User();
+
+                        /** @var \Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface $encoder */
+                        $encoder = $this->container->get('security.encoder_factory')->getEncoder($user);
+
+                        $user->setFirstName($data->firstname);
+                        $user->setLastName($data->lastname);
+                        $user->setUsername($data->username);
+                        $user->setEmail($data->email);
+                        $user->setPassword($encoder->encodePassword($data->password, $user->getSalt()));
+                        $user->setRole($role);
+                        $entityManager->persist($user);
+                        $entityManager->flush();
+
                         break;
                 }
 
@@ -79,6 +111,21 @@ class InstallController extends CommonController
                 if ($index < $configurator->getStepCount()) {
                     return new RedirectResponse($this->container->get('router')->generate('mautic_installer_step', array('index' => $index)));
                 }
+
+                // Post-processing once installation is complete
+                // Need to generate a secret value and merge it into the config
+                $secret = hash('sha1', uniqid(mt_rand()));
+                $configurator->mergeParameters(array('secret' => $secret));
+
+                // Write the updated config file
+                try {
+                    $configurator->write();
+                } catch (RuntimeException $exception) {
+                    // TODO - Need to enqueue a message
+                }
+
+                // Clear the cache one final time with the updated config
+                $this->clearCache();
 
                 return new RedirectResponse($this->container->get('router')->generate('mautic_installer_final'));
             }
