@@ -64,7 +64,7 @@ class DoctrineStep implements StepInterface
     }
 
     /**
-     * @see StepInterface
+     * {@inheritdoc}
      */
     public function getFormType()
     {
@@ -72,7 +72,7 @@ class DoctrineStep implements StepInterface
     }
 
     /**
-     * @see StepInterface
+     * {@inheritdoc}
      */
     public function checkRequirements()
     {
@@ -91,7 +91,7 @@ class DoctrineStep implements StepInterface
     }
 
     /**
-     * @see StepInterface
+     * {@inheritdoc}
      */
     public function checkOptionalSettings()
     {
@@ -99,7 +99,7 @@ class DoctrineStep implements StepInterface
     }
 
     /**
-     * @see StepInterface
+     * {@inheritdoc}
      */
     public function update(StepInterface $data)
     {
@@ -113,7 +113,7 @@ class DoctrineStep implements StepInterface
     }
 
     /**
-     * @see StepInterface
+     * {@inheritdoc}
      */
     public function getTemplate()
     {

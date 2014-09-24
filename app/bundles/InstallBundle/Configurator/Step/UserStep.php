@@ -29,6 +29,7 @@ class UserStep implements StepInterface
 
     /**
      * @Assert\NotBlank
+     * @Assert\Email
      */
     public $email;
 
