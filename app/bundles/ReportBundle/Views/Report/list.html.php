@@ -102,6 +102,5 @@ if ($tmpl == 'index')
             'sessionVar'      => 'page'
         )); ?>
         </div>
-        '
     </div>
 </div>
