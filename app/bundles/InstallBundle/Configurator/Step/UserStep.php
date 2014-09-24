@@ -18,27 +18,37 @@ use Symfony\Component\Validator\Constraints as Assert;
 class UserStep implements StepInterface
 {
     /**
+     * User's first name
+     *
      * @Assert\NotBlank
      */
     public $firstname;
 
     /**
+     * User's last name
+     *
      * @Assert\NotBlank
      */
     public $lastname;
 
     /**
+     * User's e-mail address
+     *
      * @Assert\NotBlank
      * @Assert\Email
      */
     public $email;
 
     /**
+     * User's username
+     *
      * @Assert\NotBlank
      */
     public $username;
 
     /**
+     * User's password
+     *
      * @Assert\NotBlank
      */
     public $password;

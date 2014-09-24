@@ -12,11 +12,9 @@
 namespace Mautic\InstallBundle\Controller;
 
 use Doctrine\ORM\Tools\SchemaTool;
-use Doctrine\ORM\Tools\ToolsException;
 use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Process\Exception\RuntimeException;
 
 /**
@@ -27,7 +25,9 @@ use Symfony\Component\Process\Exception\RuntimeException;
 class InstallController extends CommonController
 {
     /**
-     * @return Response A Response instance
+     * Controller action for install steps
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function stepAction($index = 0)
     {
@@ -304,6 +304,11 @@ class InstallController extends CommonController
         ));
     }
 
+    /**
+     * Controller action for the final step
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     */
     public function finalAction()
     {
         /** @var \Mautic\InstallBundle\Configurator\Configurator $configurator */
@@ -332,8 +337,14 @@ class InstallController extends CommonController
         ));
     }
 
+    /**
+     * Retrieve the kernel version
+     *
+     * @return string
+     */
     protected function getVersion()
     {
+        /** @var \AppKernel $kernel */
         $kernel = $this->container->get('kernel');
 
         return $kernel::VERSION;

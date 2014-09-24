@@ -17,6 +17,9 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class UserStepType extends AbstractType
 {
+    /**
+     * {@inheritdoc}
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('firstname', 'text', array(
@@ -78,6 +81,9 @@ class UserStepType extends AbstractType
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'install_user_step';

@@ -35,14 +35,14 @@ interface StepInterface
     public function checkRequirements();
 
     /**
-     * Checks for optional setting it could be nice to have.
+     * Checks for optional settings.
      *
      * @return array
      */
     public function checkOptionalSettings();
 
     /**
-     * Returns the template to be renderer for this step.
+     * Returns the template to be rendered for this step.
      *
      * @return string
      */
@@ -51,7 +51,8 @@ interface StepInterface
     /**
      * Updates form data parameters.
      *
-     * @param  StepInterface $data
+     * @param StepInterface $data
+     *
      * @return array
      */
     public function update(StepInterface $data);

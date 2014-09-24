@@ -22,36 +22,65 @@ use Symfony\Component\Validator\Constraints as Assert;
 class DoctrineStep implements StepInterface
 {
     /**
+     * Database driver
+     *
      * @Assert\Choice(callback="getDriverKeys")
      */
     public $driver;
 
     /**
+     * Database host
+     *
      * @Assert\NotBlank
      */
     public $host;
 
+    /**
+     * Database table prefix
+     *
+     * @var string
+     */
     public $table_prefix;
 
     /**
+     * Database connection port
+     *
      * @Assert\Range(min = "0")
      */
     public $port;
 
     /**
+     * Database name
+     *
      * @Assert\NotBlank
      */
     public $name;
 
     /**
+     * Database user
      * @Assert\NotBlank
      */
     public $user;
 
+    /**
+     * Database user's password
+     *
+     * @var string
+     */
     public $password;
 
+    /**
+     * Path to database
+     *
+     * @var string
+     */
     public $path;
 
+    /**
+     * Constructor
+     *
+     * @param array $parameters
+     */
     public function __construct(array $parameters)
     {
         foreach ($parameters as $key => $value) {
@@ -121,6 +150,8 @@ class DoctrineStep implements StepInterface
     }
 
     /**
+     * Return the key values of the available driver array
+     *
      * @return array
      */
     public static function getDriverKeys()
@@ -129,6 +160,8 @@ class DoctrineStep implements StepInterface
     }
 
     /**
+     * Fetches the available database drivers for the environment
+     *
      * @return array
      */
     public static function getDrivers()

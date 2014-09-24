@@ -21,6 +21,9 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class MauticInstallBundle extends Bundle
 {
+    /**
+     * {@inheritdoc}
+     */
     public function boot()
     {
         /** @var \Mautic\InstallBundle\Configurator\Configurator $configurator */
