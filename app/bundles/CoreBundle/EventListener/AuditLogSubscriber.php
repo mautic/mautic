@@ -70,7 +70,7 @@ class AuditLogSubscriber extends CommonSubscriber
                 'event'     => 'lead.' . $row->getAction(),
                 'timestamp' => $row->getDateAdded(),
                 'extra'     => array(
-                    'page_id' => $row->getDetails(),
+                    'details' => $row->getDetails(),
                     'editor'  => $row->getUserName()
                 )
             ));
