@@ -31,9 +31,10 @@ class FormEventHelper
      *
      * @return array
      */
-    public static function createLead ($action, $form, array $post, array $server, $factory, array $fields)
+    public static function createLead ($action, $form, array $post, array $server, MauticFactory $factory, array $fields)
     {
-        $model      = $factory->getModel('lead.lead');
+        /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+        $model      = $factory->getModel('lead');
         $em         = $factory->getEntityManager();
         $properties = $action->getProperties();
 
@@ -41,7 +42,9 @@ class FormEventHelper
         $leadFields = $factory->getModel('lead.field')->getEntities(
             array('filter' => array('isPublished' => true))
         );
-        $data       = array();
+        $data = array();
+        $lead = $model->getCurrentLead();
+
         foreach ($leadFields as $f) {
             $id    = $f->getId();
             $alias = $f->getAlias();
@@ -65,7 +68,10 @@ class FormEventHelper
                             );
                             if (count($leads)) {
                                 //there is a match so use the latest lead
-                                $lead = $leads[0];
+                                if ($leads[0]->getId() != $lead->getId()) {
+                                    //merge with current lead
+                                    $lead = $model->mergeLeads($lead, $leads[0]);
+                                }
                             }
                         }
                     }
@@ -74,13 +80,11 @@ class FormEventHelper
         }
 
         //check for existing IP address
-        $ipAddress = $factory->getIpAddress($server['REMOTE_ADDR']);
+        $ipAddress = $factory->getIpAddress();
 
         //no lead was found by a mapped email field so create a new one
-        if (empty($lead)) {
-            $lead = new Lead();
+        if ($lead->isNewlyCreated()) {
             $lead->setPoints($properties['points']);
-            $ipAddresses = false;
 
             //create a new points change event
             $lead->addPointsChangeLogEntry(
@@ -90,17 +94,10 @@ class FormEventHelper
                 $properties['points'],
                 $ipAddress
             );
-        } else {
-            $ipAddresses = $lead->getIpAddresses();
         }
 
         //set the mapped fields
         $model->setFieldValues($lead, $data, false);
-
-        //add the IP if the lead is not already associated with it
-        if (!$ipAddresses || !$ipAddresses->contains($ipAddress)) {
-            $lead->addIpAddress($ipAddress);
-        }
 
         if (!empty($event)) {
             $event->setIpAddress($ipAddress);

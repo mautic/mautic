@@ -8,54 +8,32 @@
  */
 ?>
 <div class="page-list" id="form-email-tokens">
-    <ul class="draggable scrollable">
-        <li class="page-list-item has-click-event">
-            <div class="padding-sm">
-                <span class="list-item-primary">
-                    <?php echo $view['translator']->trans('mautic.email.token.unsubscribe_text'); ?>
-                </span>
-                <span class="list-item-secondary" data-toggle="tooltip" data-placement="bottom"
-                      title="<?php echo $view['translator']->trans('mautic.email.token.unsubscribe_text.descr'); ?>">
-                    <?php echo substr($view['translator']->trans('mautic.email.token.unsubscribe_text.descr'), 0, 30); ?>...
-                </span>
-                <input type="hidden" class="email-token" value="{unsubscribe_text}" />
-            </div>
-        </li>
-        <li class="page-list-item has-click-event">
-            <div class="padding-sm">
-                <span class="list-item-primary">
-                    <?php echo $view['translator']->trans('mautic.email.token.unsubscribe_url'); ?>
-                </span>
-                <span class="list-item-secondary" data-toggle="tooltip" data-placement="bottom"
-                      title="<?php echo $view['translator']->trans('mautic.email.token.unsubscribe_url.descr'); ?>">
-                    <?php echo substr($view['translator']->trans('mautic.email.token.unsubscribe_url.descr'), 0, 30); ?>...
-                </span>
-                <input type="hidden" class="email-token" value="{unsubscribe_url}" />
-            </div>
-        </li>
-        <li class="page-list-item has-click-event">
-            <div class="padding-sm">
-                <span class="list-item-primary">
-                    <?php echo $view['translator']->trans('mautic.email.token.webview_text'); ?>
-                </span>
-                <span class="list-item-secondary" data-toggle="tooltip" data-placement="bottom"
-                      title="<?php echo $view['translator']->trans('mautic.email.token.webview_text.descr'); ?>">
-                    <?php echo substr($view['translator']->trans('mautic.email.token.webview_text.descr'), 0, 30); ?>...
-                </span>
-                <input type="hidden" class="email-token" value="{webview_text}" />
-            </div>
-        </li>
-        <li class="page-list-item has-click-event">
-            <div class="padding-sm">
-                <span class="list-item-primary">
-                    <?php echo $view['translator']->trans('mautic.email.token.webview_url'); ?>
-                </span>
-                <span class="list-item-secondary" data-toggle="tooltip" data-placement="bottom"
-                      title="<?php echo $view['translator']->trans('mautic.email.token.webview_url.descr'); ?>">
-                    <?php echo substr($view['translator']->trans('mautic.email.token.webview_url.descr'), 0, 30); ?>...
-                </span>
-                <input type="hidden" class="email-token" value="{webview_url}" />
-            </div>
-        </li>
-    </ul>
+    <p class="row">
+        <div class="col-sm-6">
+            <a href="#" data-toggle="tooltip" class="btn btn-default btn-block" title="<?php echo $view['translator']->trans('mautic.email.token.unsubscribe_text.descr'); ?>">
+                <i class="fa fa-file-text-o"></i><br />
+                <?php echo $view['translator']->trans('mautic.email.token.unsubscribe_text'); ?>
+            </a> 
+        </div>
+        <div class="col-sm-6">
+            <a href="#" data-toggle="tooltip" class="btn btn-default btn-block" title="<?php echo $view['translator']->trans('mautic.email.token.unsubscribe_url.descr'); ?>">
+                <i class="fa fa-link"></i><br />
+                <?php echo $view['translator']->trans('mautic.email.token.unsubscribe_url'); ?>
+            </a> 
+        </div>
+    </div>
+    <p class="row">
+        <div class="col-sm-6">
+            <a href="#" data-toggle="tooltip" class="btn btn-default btn-block" title="<?php echo $view['translator']->trans('mautic.email.token.webview_text.descr'); ?>">
+                <i class="fa fa-file-text-o"></i><br />
+                <?php echo $view['translator']->trans('mautic.email.token.webview_text'); ?>
+            </a> 
+        </div>
+        <div class="col-sm-6">
+            <a href="#" data-toggle="tooltip" class="btn btn-default btn-block" title="<?php echo $view['translator']->trans('mautic.email.token.webview_url.descr'); ?>">
+                <i class="fa fa-link"></i><br />
+                <?php echo $view['translator']->trans('mautic.email.token.webview_url'); ?>
+            </a>
+        </div>
+    </p>
 </div>
