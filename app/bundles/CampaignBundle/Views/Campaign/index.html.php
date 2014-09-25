@@ -17,14 +17,14 @@ $view['slots']->set('searchHelp', $view['translator']->trans('mautic.core.help.s
 
 <?php if ($permissions['campaign:campaigns:create']): ?>
     <?php $view['slots']->start("actions"); ?>
-    <li>
         <a href="<?php echo $this->container->get('router')->generate(
             'mautic_campaign_action', array("objectAction" => "new")); ?>"
            data-toggle="ajax"
+           class="btn btn-default"
            data-menu-link="#mautic_campaign_index">
+            <i class="fa fa-plus"></i> 
             <?php echo $view["translator"]->trans("mautic.campaign.menu.new"); ?>
         </a>
-    </li>
     <?php $view['slots']->stop(); ?>
 <?php endif; ?>
 
