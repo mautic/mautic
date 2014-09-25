@@ -12,15 +12,15 @@
 <head>
     <?php $view['assets']->outputHeadDeclarations(); ?>
 </head>
-<body>
-    <table style="width: 600px; height: 760px; color: #555; display: block; font-family: Helvetica Neue, Helvetica, Arial, sans-serif; padding: 135px 90px 50px 90px;">
+<body style="background: #f2f2f2;">
+    <table style="background: #FFFFFF; width: 600px; height: 760px; color: #555; display: block; font-family: Helvetica Neue, Helvetica, Arial, sans-serif; padding: 50px; border: 1px solid #d5d4d4; box-shadow: 1px 1px 1px #d5d4d4; margin: 50px auto;">
         <tr>
-            <td>
+            <td style="vertical-align: top;">
                 <?php $view['slots']->output('body'); ?>
             </td>
         </tr>
         <tr>
-            <td>
+            <td style="vertical-align: top;">
                 <?php $view['slots']->output('footer'); ?>
             </td>
         </tr>

@@ -55,27 +55,17 @@ $timezones = $tz->getTimezones();
                 ?>
             </div>
             <div class="row">
-                <div class="form-group col-xs-12 col-sm-8<?php echo $feedbackClass; ?>">
+                <div class="form-group <?php echo $feedbackClass; ?>">
                     <?php echo $view['form']->label($filterForm); ?>
                     <?php echo $view['form']->errors($filterForm); ?>
                     <div class="row">
                         <div class="col-xs-4 available-filters">
                             <h4><?php echo $view['translator']->trans('mautic.core.form.filters.available'); ?></h4>
-                            <div class="rounded-corners body-white padding-md">
+                            <div class="list-group">
                                 <?php foreach ($choices as $value => $params): ?>
                                 <div id="available_<?php echo $value; ?>">
-                                    <a href="javascript:void(0);" onclick="Mautic.addLeadListFilter('<?php echo $value; ?>');">
-                                        <div class="leadlist-filter">
-                                            <div class="padding-sm">
-                                                <div class="pull-left padding-sm">
-                                                    <span class="leadlist-filter-name"><?php echo $view['translator']->trans($params['label']); ?></span>
-                                                </div>
-                                                <div class="pull-right padding-sm">
-                                                    <i class="fa fa-fw fa-plus fa-lg"></i>
-                                                </div>
-                                                <div class="clearfix"></div>
-                                            </div>
-                                        </div>
+                                    <a class="list-group-item" href="javascript:void(0);" onclick="Mautic.addLeadListFilter('<?php echo $value; ?>');">
+                                        <span class="leadlist-filter-name"><?php echo $view['translator']->trans($params['label']); ?></span>
                                     </a>
                                     <input type="hidden" class="field_alias" value="<?php echo $value; ?>" />
                                     <input type="hidden" class="field_type" value="<?php echo $params['properties']['type']; ?>" />
@@ -89,13 +79,12 @@ $timezones = $tz->getTimezones();
                         </div>
                         <div class="col-xs-8 selected-filters">
                             <h4><?php echo $view['translator']->trans('mautic.core.form.filters.selected'); ?></h4>
-                            <div class="rounded-corners body-white padding-md">
-                                <ul class="padding-none no-bullet" id="<?php echo $filterForm->vars['id']; ?>_right">
+                            <div class="list-group" id="<?php echo $filterForm->vars['id']; ?>_right">
                                     <?php foreach ($filterValues as $filter): ?>
                                     <?php if (!isset($choices[$filter['field']])) continue; ?>
                                     <?php $randomId = "id_" . uniqid(); ?>
-                                    <li class="padding-sm">
-                                        <i class="fa fa-fw fa-ellipsis-v sortable-handle"></i><i class="fa fa-fw fa-trash-o remove-selected"></i>
+                                    <div class="list-group-item">
+                                        <i class="fa fa-fw fa-ellipsis-v sortable-handle pull-right"></i><i class="fa fa-fw fa-trash-o remove-selected pull-right"></i>
                                         <?php echo $choices[$filter['field']]['label']; ?>
                                         <div class="filter-container">
                                             <div class="col-xs-6 col-sm-3 padding-none">
@@ -208,9 +197,8 @@ $timezones = $tz->getTimezones();
                                             <input type="hidden" name="leadlist[filters][type][]" value="<?php echo $filter['type']; ?>" />
                                             <div class="clearfix"></div>
                                         </div>
-                                    </li>
+                                    </div>
                                     <?php endforeach; ?>
-                                </ul>
                             </div>
                         </div>
                     </div>
