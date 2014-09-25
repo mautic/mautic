@@ -60,9 +60,22 @@ $container->loadFromExtension('security', array(
             ),
             'anonymous'  => true
         ),
+        'oauth_login' => array(
+            'pattern' =>  '^/oauth/v1/auth$',
+            'security' => false
+        ),
+        'oauth_area' => array(
+            'pattern' => '^/oauth/v1/auth',
+            'form_login' => array(
+                'check_path' => '/oauth/v1/auth_login_check',
+                'login_path' => '/oauth/v1/auth_login'
+            ),
+            'anonymous'  => true
+        ),
         'api' => array(
             'pattern'   => '^/api',
             'fos_oauth' => true,
+            'bazinga_oauth' => true,
             'stateless' => true
         ),
         'main' => array(
@@ -85,19 +98,4 @@ $container->loadFromExtension('security', array(
     )
 ));
 
-$container->loadFromExtension('fos_oauth_server', array(
-    'db_driver'           => 'orm',
-    'client_class'        => 'Mautic\ApiBundle\Entity\Client',
-    'access_token_class'  => 'Mautic\ApiBundle\Entity\AccessToken',
-    'refresh_token_class' => 'Mautic\ApiBundle\Entity\RefreshToken',
-    'auth_code_class'     => 'Mautic\ApiBundle\Entity\AuthCode',
-    'service'             => array(
-        'user_provider' => 'mautic.user.provider',
-        'options'       => array(
-            'supported_scopes' => 'user'
-        )
-    ),
-    'template'            => array(
-        'engine' => 'php'
-    )
-));
+$this->import('security_api.php');

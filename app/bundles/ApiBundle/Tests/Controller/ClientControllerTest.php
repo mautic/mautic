@@ -9,7 +9,7 @@
 
 namespace Mautic\ApiBundle\Tests\Controller;
 
-use Mautic\ApiBundle\Entity\Client;
+use Mautic\ApiBundle\Entity\oAuth2\Client;
 use Mautic\CoreBundle\Test\MauticWebTestCase;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
@@ -146,7 +146,7 @@ class ClientControllerTest extends MauticWebTestCase
 
         //make sure the client id and secret remained the same
         $updatedClient = $this->em
-            ->getRepository('MauticApiBundle:Client')
+            ->getRepository('MauticApiBundle:oAuth2\Client')
             ->findOneById($apiClient->getId());
 
         $this->assertEquals($updatedClient->getRandomId(), $apiClient->getRandomId());

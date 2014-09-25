@@ -7,7 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\ApiBundle\Entity;
+namespace Mautic\ApiBundle\Entity\oAuth2;
 
 use FOS\OAuthServerBundle\Entity\Client as BaseClient;
 use Doctrine\ORM\Mapping as ORM;
@@ -16,8 +16,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
- * @ORM\Table(name="oauth_clients")
- * @ORM\Entity(repositoryClass="Mautic\ApiBundle\Entity\ClientRepository")
+ * @ORM\Table(name="oauth2_clients")
+ * @ORM\Entity(repositoryClass="Mautic\ApiBundle\Entity\oAuth2\ClientRepository")
  */
 class Client extends BaseClient
 {
@@ -122,10 +122,10 @@ class Client extends BaseClient
     /**
      * Add authCodes
      *
-     * @param \Mautic\ApiBundle\Entity\AuthCode $authCodes
+     * @param \Mautic\ApiBundle\Entity\oAuth2\AuthCode $authCodes
      * @return Client
      */
-    public function addAuthCode(\Mautic\ApiBundle\Entity\AuthCode $authCodes)
+    public function addAuthCode(\Mautic\ApiBundle\Entity\oAuth2\AuthCode $authCodes)
     {
         $this->authCodes[] = $authCodes;
 
@@ -135,9 +135,9 @@ class Client extends BaseClient
     /**
      * Remove authCodes
      *
-     * @param \Mautic\ApiBundle\Entity\AuthCode $authCodes
+     * @param \Mautic\ApiBundle\Entity\oAuth2\AuthCode $authCodes
      */
-    public function removeAuthCode(\Mautic\ApiBundle\Entity\AuthCode $authCodes)
+    public function removeAuthCode(\Mautic\ApiBundle\Entity\oAuth2\AuthCode $authCodes)
     {
         $this->authCodes->removeElement($authCodes);
     }

@@ -12,25 +12,21 @@ use Symfony\Component\Routing\Route;
 
 $collection = new RouteCollection();
 
-//fos_oauth_server_token
+
+//oAuth 2
 $collection->addCollection(
     $loader->import("@FOSOAuthServerBundle/Resources/config/routing/token.xml")
 );
 
-//fos_oauth_server_authorize
-$collection->addCollection(
-    $loader->import("@FOSOAuthServerBundle/Resources/config/routing/authorize.xml")
-);
-
-$collection->add('mautic_oauth_server_auth_login', new Route('/oauth/v2/auth_login',
+$collection->add('mautic_oauth2_server_auth_login', new Route('/oauth/v2/auth_login',
     array(
-        '_controller' => 'MauticApiBundle:Security:login',
+        '_controller' => 'MauticApiBundle:Security:oAuth2Login',
     )
 ));
 
-$collection->add('mautic_oauth_server_auth_login_check', new Route('/oauth/v2/auth_login_check',
+$collection->add('mautic_oauth2_server_auth_login_check', new Route('/oauth/v2/auth_login_check',
     array(
-        '_controller' => 'MauticApiBundle:Security:loginCheck',
+        '_controller' => 'MauticApiBundle:Security:oAuth2LoginCheck',
     )
 ));
 
@@ -52,12 +48,31 @@ $collection->add('mautic_client_action', new Route('/clients/{objectAction}/{obj
     )
 ));
 
+//oAuth 1.0a
+$collection->addCollection(
+    $loader->import("@BazingaOAuthServerBundle/Resources/config/routing/routing.yml")
+);
+
+$collection->add('mautic_oauth1_server_auth_login', new Route('/oauth/v1/auth_login',
+    array(
+        '_controller' => 'MauticApiBundle:Security:oAuth1Login',
+    )
+));
+
+$collection->add('mautic_oauth1_server_auth_login_check', new Route('/oauth/v1/auth_login_check',
+    array(
+        '_controller' => 'MauticApiBundle:Security:oAuth1LoginCheck',
+    )
+));
+//override bazinga's login allow route
+$collection->add('bazinga_oauth_login_allow', new Route('/oauth/v1/auth_login/allow',
+        array('_controller' => 'bazinga.oauth.controller.login:allowAction'),
+        array('_method' => 'GET')
+));
+
 //Load bundle API urls
 $apiRoute = $loader->import('mautic.api', 'mautic.api');
 $apiRoute->addPrefix('/api');
 $collection->addCollection($apiRoute);
-
-$apiDocs = $loader->import('mautic.api_docs', 'mautic.api_docs');
-$collection->addCollection($apiDocs);
 
 return $collection;

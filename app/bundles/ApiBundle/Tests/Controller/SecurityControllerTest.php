@@ -11,8 +11,6 @@ namespace Mautic\ApiBundle\Tests\Controller;
 
 use FOS\RestBundle\Util\Codes;
 use Mautic\CoreBundle\Test\MauticWebTestCase;
-use Mautic\ApiBundle\Entity\Client;
-use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 /**
  * Class SecurityControllerTest
@@ -45,7 +43,7 @@ class SecurityControllerTest extends MauticWebTestCase
 
         $anonClient->followRedirects(false);
 
-        $client = $this->em->getRepository('MauticApiBundle:Client')->findOneByName('Mautic');
+        $client = $this->em->getRepository('MauticApiBundle:oAuth2\Client')->findOneByName('Mautic');
         $redirectUris = $client->getRedirectUris();
         $redirectUri  = urlencode($redirectUris[0]);
         $anonClient->request('GET', 'oauth/v2/auth?client_id=' . $client->getPublicId() . '&response_type=code&redirect_uri=' . $redirectUri);

@@ -15,8 +15,6 @@ use Mautic\ApiBundle\ApiEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\ApiBundle\Event as Events;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Class ApiSubscriber
@@ -35,8 +33,17 @@ class ApiSubscriber extends CommonSubscriber
             CoreEvents::GLOBAL_SEARCH       => array('onGlobalSearch', 0),
             CoreEvents::BUILD_COMMAND_LIST  => array('onBuildCommandList', 0),
             ApiEvents::CLIENT_POST_SAVE     => array('onClientPostSave', 0),
-            ApiEvents::CLIENT_POST_DELETE   => array('onClientDelete', 0)
+            ApiEvents::CLIENT_POST_DELETE   => array('onClientDelete', 0),
+            CoreEvents::BUILD_ROUTE         => array('onBuildRoute', 5),
         );
+    }
+
+    /**
+     * @param RouteEvent $event
+     */
+    public function onBuildRoute (MauticEvents\RouteEvent $event)
+    {
+        $this->buildRoute($event, 'apidocs');
     }
 
     /**

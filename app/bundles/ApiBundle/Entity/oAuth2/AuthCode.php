@@ -7,7 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\ApiBundle\Entity;
+namespace Mautic\ApiBundle\Entity\oAuth2;
 
 use FOS\OAuthServerBundle\Entity\AuthCode as BaseAuthCode;
 use Doctrine\ORM\Mapping as ORM;
@@ -15,7 +15,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use FOS\OAuthServerBundle\Model\ClientInterface;
 
 /**
- * @ORM\Table(name="oauth_authcodes")
+ * @ORM\Table(name="oauth2_authcodes")
  * @ORM\Entity
  */
 class AuthCode extends BaseAuthCode

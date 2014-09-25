@@ -78,7 +78,7 @@ class MauticWebTestCase extends WebTestCase
 
         $anonClient->followRedirects(false);
 
-        $client = $this->em->getRepository('MauticApiBundle:Client')->findOneByName('Mautic');
+        $client = $this->em->getRepository('MauticApiBundle:oAuth2\Client')->findOneByName('Mautic');
         $redirectUris = $client->getRedirectUris();
         $redirectUri  = urlencode($redirectUris[0]);
         $anonClient->request('GET', 'oauth/v2/auth?client_id=' . $client->getPublicId() . '&response_type=code&redirect_uri=' . $redirectUri);
