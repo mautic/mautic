@@ -71,4 +71,21 @@ class CommonModel
         return false;
     }
 
+    /**
+     * Return list of entities
+     *
+     * @param array $args [start, limit, filter, orderBy, orderByDir]
+     * @return mixed
+     */
+    public function getEntities(array $args = array())
+    {
+        //set the translator
+        $repo = $this->getRepository();
+        $repo->setTranslator($this->translator);
+        $repo->setCurrentUser(
+            $this->factory->getUser()
+        );
+
+        return $repo->getEntities($args);
+    }
 }

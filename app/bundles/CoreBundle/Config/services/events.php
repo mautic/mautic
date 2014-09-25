@@ -21,6 +21,15 @@ $container->setDefinition(
 )
     ->addTag('kernel.event_subscriber');
 
+$container->setDefinition(
+    'mautic.core.auditlog.subscriber',
+    new Definition(
+        'Mautic\CoreBundle\EventListener\AuditLogSubscriber',
+        array(new Reference('mautic.factory'))
+    )
+)
+    ->addTag('kernel.event_subscriber');
+
 //Database table prefix
 $container->setDefinition ('mautic.tblprefix_subscriber',
     new Definition(
