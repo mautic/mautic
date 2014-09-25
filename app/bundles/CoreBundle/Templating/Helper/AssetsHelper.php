@@ -29,7 +29,7 @@ class AssetsHelper extends BaseAssetsHelper
     public function addScript($script, $location = 'head')
     {
         $assets =& $this->assets;
-        $addScripts = function ($s) use ($location, $assets) {
+        $addScripts = function ($s) use ($location, &$assets) {
             if ($location == 'head') {
                 //special place for these so that declarations and scripts can be mingled
                 $assets['headDeclarations'][] = array(
@@ -89,7 +89,7 @@ class AssetsHelper extends BaseAssetsHelper
     public function addStylesheet($stylesheet)
     {
         $assets =& $this->assets;
-        $addSheet = function ($s) use ($assets) {
+        $addSheet = function ($s) use (&$assets) {
             if (!isset($assets['stylesheets'])) {
                 $assets['stylesheets'] = array();
             }
