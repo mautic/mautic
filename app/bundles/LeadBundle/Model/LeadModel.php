@@ -175,7 +175,7 @@ class LeadModel extends FormModel
         $lead->setSocialCache($socialCache);
 
         //save the field values
-        if (!$isNew) {
+        if (!$isNew && !$lead->isNewlyCreated()) {
             $fieldValues = $lead->getFields();
         } else {
             static $fields;
@@ -360,6 +360,7 @@ class LeadModel extends FormModel
                     $lead = new Lead();
                     $lead->addIpAddress($ip);
                     $this->saveEntity($lead);
+                    $lead->setNewlyCreated(true);
                     $leadId = $lead->getId();
                 }
             } else {
@@ -369,6 +370,7 @@ class LeadModel extends FormModel
                     $lead = new Lead();
                     $lead->addIpAddress($ip);
                     $this->saveEntity($lead);
+                    $lead->setNewlyCreated(true);
                     $leadId = $lead->getId();
                 }
             }
@@ -544,5 +546,60 @@ class LeadModel extends FormModel
                 $this->dispatcher->dispatch(LeadEvents::LEAD_LIST_CHANGE, $event);
             }
         }
+    }
+
+    /**
+     * Merge two leads; if a conflict of data occurs, the newest lead will get precedence
+     *
+     * @param Lead $lead
+     * @param Lead $lead2
+     */
+    public function mergeLeads(Lead $lead, Lead $lead2)
+    {
+        $leadId  = $lead->getId();
+        $lead2Id = $lead2->getId();
+
+        //if they are the same lead, then just return one
+        if ($leadId === $lead2Id) {
+            return $lead;
+        }
+
+        //which lead is the oldest?
+        $oldLead  = ($lead->getDateAdded() < $lead2->getDateAdded()) ? $lead : $lead2;
+        $newLead  = ($oldLead->getId() === $leadId) ? $lead2 : $lead;
+
+        //merge IP addresses
+        $ipAddresses = $newLead->getIpAddresses();
+        foreach ($ipAddresses as $ip) {
+            $oldLead->addIpAddress($ip);
+        }
+
+        //merge fields
+        $newLeadFields = $newLead->getFields();
+        foreach ($newLeadFields as $group => $groupFields) {
+            foreach ($groupFields as $alias => $value) {
+                //overwrite old lead's data with new lead's if new lead's is not empty
+                if (!empty($value)) {
+                    $oldLead->addUpdatedField($alias, $value);
+                }
+            }
+        }
+
+        //merge owner
+        $oldOwner = $oldLead->getOwner();
+        $newOwner = $newLead->getOwner();
+
+        if ($oldOwner === null) {
+            $oldLead->setOwner($newOwner);
+        }
+
+        //save the updated lead
+        $this->saveEntity($oldLead, false);
+
+        //delete the old
+        $this->deleteEntity($newLead);
+
+        //return the merged lead
+        return $oldLead;
     }
 }

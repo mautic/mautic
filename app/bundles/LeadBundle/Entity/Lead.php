@@ -58,7 +58,7 @@ class Lead extends FormEntity
     private $pointsChangeLog;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Mautic\CoreBundle\Entity\IpAddress", cascade={"merge", "persist", "refresh", "detach"}, fetch="EXTRA_LAZY")
+     * @ORM\ManyToMany(targetEntity="Mautic\CoreBundle\Entity\IpAddress", cascade={"merge", "persist", "refresh", "detach"}, fetch="EXTRA_LAZY", indexBy="ipAddress")
      * @ORM\JoinTable(name="lead_ips_xref",
      *   joinColumns={@ORM\JoinColumn(name="lead_id", referencedColumnName="id")},
      *   inverseJoinColumns={@ORM\JoinColumn(name="ip_id", referencedColumnName="id")}
@@ -92,6 +92,13 @@ class Lead extends FormEntity
      * @var
      */
     private $color;
+
+    /**
+     * Sets if the IP was just created by LeadModel::getCurrentLead()
+     *
+     * @var bool
+     */
+    private $newlyCreated = false;
 
     /**
      * Used by Mautic to populate the fields pulled from the DB
@@ -172,8 +179,11 @@ class Lead extends FormEntity
      */
     public function addIpAddress(\Mautic\CoreBundle\Entity\IpAddress $ipAddresses)
     {
-        $this->isChanged('ipAddresses', $ipAddresses);
-        $this->ipAddresses[] = $ipAddresses;
+        $ip = $ipAddresses->getIpAddress();
+        if (!isset($this->ipAddresses[$ip])) {
+            $this->isChanged('ipAddresses', $ipAddresses);
+            $this->ipAddresses[$ip] = $ipAddresses;
+        }
 
         return $this;
     }
@@ -439,5 +449,30 @@ class Lead extends FormEntity
     public function setColor ($color)
     {
         $this->color = $color;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAnonymous ()
+    {
+        $primary = $this->getPrimaryIdentifier();
+        return ($primary == 'mautic.lead.lead.anonymous') ? true : false;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isNewlyCreated ()
+    {
+        return $this->newlyCreated;
+    }
+
+    /**
+     * @param boolean $newlyCreated
+     */
+    public function setNewlyCreated ($newlyCreated)
+    {
+        $this->newlyCreated = $newlyCreated;
     }
 }
