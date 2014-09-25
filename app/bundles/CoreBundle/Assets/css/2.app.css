@@ -1690,6 +1690,9 @@ aside.sidebar .progress {
   margin-left: -15px;
   margin-right: -15px;
 }
+.panel-footer {
+  overflow: hidden;
+}
 .switch {
   vertical-align: middle;
   margin-bottom: 0;

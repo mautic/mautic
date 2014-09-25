@@ -179,5 +179,4 @@ if ($tmpl == 'index')
             'sessionVar'      => 'lead'
         )); ?>
     </div>
-    '
 </div>
