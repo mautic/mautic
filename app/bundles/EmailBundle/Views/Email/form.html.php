@@ -33,14 +33,13 @@ $view['slots']->set("headerTitle", $header.$subheader);
                 </h3>
             </div>
             <div class="panel-body">
-                <?php //echo $view['form']->row($form['subject']); ?>
-            </div>
-            <div class="panel-footer">
+                <?php echo $view['form']->row($form['subject']); ?>
+                <?php echo $view['form']->row($form['plainText']); ?>
             </div>
         </div>
     </div>
     <div class="col-md-4">
-            <?php echo $view['form']->form($form); ?>
+        <?php echo $view['form']->form($form); ?>
 
             <div class="hide email-builder">
                 <div class="email-builder-content">

@@ -35,5 +35,5 @@
                 <?php echo $view['translator']->trans('mautic.email.token.webview_url'); ?>
             </a>
         </div>
-    </p>
+    </div>
 </div>

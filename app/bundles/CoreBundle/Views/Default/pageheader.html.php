@@ -14,7 +14,7 @@
             <?php echo $view->render('MauticCoreBundle:Default:breadcrumbs.html.php'); ?>
         </div>
         <div class="col-sm-6 va-m">
-            <div class="toolbar" id="toolbar">
+            <div class="toolbar text-right" id="toolbar">
                 <?php $view['slots']->output('actions'); ?>
 
                 <div class="toolbar-bundle-buttons pull-left"><?php $view['slots']->output('toolbar'); ?></div>
