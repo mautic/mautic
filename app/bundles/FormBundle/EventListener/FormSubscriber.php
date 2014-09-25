@@ -15,6 +15,8 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\FormBundle\Event as Events;
 use Mautic\FormBundle\FormEvents;
+use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Event\LeadTimelineEvent;
 
 /**
  * Class FormSubscriber
@@ -30,10 +32,11 @@ class FormSubscriber extends CommonSubscriber
     static public function getSubscribedEvents()
     {
         return array(
-            CoreEvents::GLOBAL_SEARCH      => array('onGlobalSearch', 0),
-            CoreEvents::BUILD_COMMAND_LIST => array('onBuildCommandList', 0),
-            FormEvents::FORM_POST_SAVE     => array('onFormPostSave', 0),
-            FormEvents::FORM_POST_DELETE   => array('onFormDelete', 0)
+            CoreEvents::GLOBAL_SEARCH        => array('onGlobalSearch', 0),
+            CoreEvents::BUILD_COMMAND_LIST   => array('onBuildCommandList', 0),
+            FormEvents::FORM_POST_SAVE       => array('onFormPostSave', 0),
+            FormEvents::FORM_POST_DELETE     => array('onFormDelete', 0),
+            LeadEvents::TIMELINE_ON_GENERATE => array('onTimelineGenerate', 0)
         );
     }
 
@@ -144,5 +147,38 @@ class FormSubscriber extends CommonSubscriber
             "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
         );
         $this->factory->getModel('core.auditLog')->writeToLog($log);
+    }
+
+    /**
+     * Compile events for the lead timeline
+     *
+     * @param LeadTimelineEvent $event
+     */
+    public function onTimelineGenerate(LeadTimelineEvent $event)
+    {
+        $lead    = $event->getLead();
+        $leadIps = array();
+
+        /** @var \Mautic\CoreBundle\Entity\IpAddress $ip */
+        foreach ($lead->getIpAddresses() as $ip) {
+            $leadIps[] = $ip->getId();
+        }
+
+        /** @var \Mautic\FormBundle\Entity\SubmissionRepository $submissionRepository */
+        $submissionRepository = $this->factory->getEntityManager()->getRepository('MauticFormBundle:Submission');
+
+        $rows = $submissionRepository->getSubmissions($leadIps);
+
+        // Add the submissions to the event array
+        foreach ($rows as $row) {
+            $event->addEvent(array(
+                'event'     => 'form.submitted',
+                'timestamp' => new \DateTime($row['date_submitted']),
+                'extra'     => array(
+                    'form_id' => $row['form_id'],
+                    'page_id' => $row['page_id']
+                )
+            ));
+        }
     }
 }
