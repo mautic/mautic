@@ -33,11 +33,6 @@ class LeadPermissions extends AbstractPermissions
             ),
             'fields' => array(
                 'full'        => 1024
-            ),
-            'timeline' => array(
-                'viewown'     => 2,
-                'viewother'   => 4,
-                'full'        => 1024
             )
         );
         $this->addExtendedPermissions('leads', false);
@@ -94,21 +89,6 @@ class LeadPermissions extends AbstractPermissions
             'data'     => (!empty($data['fields']) ? $data['fields'] : array())
         ));
 
-        $builder->add('lead:timeline', 'button_group', array(
-            'choices'  => array(
-                'viewown'      => 'mautic.core.permissions.viewown',
-                'viewother'    => 'mautic.core.permissions.viewother',
-                'full'         => 'mautic.core.permissions.full'
-            ),
-            'label'    => 'mautic.lead.permissions.timeline',
-            'expanded' => true,
-            'multiple' => true,
-            'attr'     => array(
-                'onclick' => 'Mautic.onPermissionChange(this, event, \'timeline\')'
-            ),
-            'data'     => (!empty($data['timeline']) ? $data['timeline'] : array())
-        ));
-
         $this->addExtendedFormFields('lead', 'notes', $builder, $data, false);
     }
 
@@ -126,7 +106,6 @@ class LeadPermissions extends AbstractPermissions
         //make sure the user has access to own leads as well if they have access to lists, notes or fields
         if ((array_key_exists("lead:lists", $permissions) ||
             array_key_exists("lead:fields", $permissions) ||
-            array_key_exists("lead:timeline", $permissions) ||
             array_key_exists("lead:notes", $permissions)) &&
             (!in_array("full", $leadPermissions) && !in_array("viewown", $leadPermissions) &&
                 !in_array("viewother", $leadPermissions))) {

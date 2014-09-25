@@ -48,13 +48,6 @@ $collection->add('mautic_lead_index', new Route('/leads/{page}',
     )
 ));
 
-$collection->add('mautic_leadtimeline_view', new Route('/leads/timeline/{leadId}',
-    array(
-        '_controller'  => 'MauticLeadBundle:Timeline:view',
-        "leadId"       => 0,
-    )
-));
-
 $collection->add('mautic_lead_action', new Route('/leads/{objectAction}/{objectId}',
     array(
         '_controller' => 'MauticLeadBundle:Lead:execute',
