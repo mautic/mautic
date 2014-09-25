@@ -37,13 +37,14 @@ class LeadSubscriber extends CommonSubscriber
     static public function getSubscribedEvents()
     {
         return array(
-            CoreEvents::GLOBAL_SEARCH      => array('onGlobalSearch', 0),
-            CoreEvents::BUILD_COMMAND_LIST => array('onBuildCommandList', 0),
-            LeadEvents::LEAD_POST_SAVE     => array('onLeadPostSave', 0),
-            LeadEvents::LEAD_POST_DELETE   => array('onLeadDelete', 0),
-            LeadEvents::FIELD_POST_SAVE    => array('onFieldPostSave', 0),
-            LeadEvents::FIELD_POST_DELETE  => array('onFieldDelete', 0),
-            UserEvents::USER_PRE_DELETE    => array('onUserDelete', 0)
+            CoreEvents::GLOBAL_SEARCH        => array('onGlobalSearch', 0),
+            CoreEvents::BUILD_COMMAND_LIST   => array('onBuildCommandList', 0),
+            LeadEvents::LEAD_POST_SAVE       => array('onLeadPostSave', 0),
+            LeadEvents::LEAD_POST_DELETE     => array('onLeadDelete', 0),
+            LeadEvents::FIELD_POST_SAVE      => array('onFieldPostSave', 0),
+            LeadEvents::FIELD_POST_DELETE    => array('onFieldDelete', 0),
+            LeadEvents::TIMELINE_ON_GENERATE => array('onTimelineGenerate', 0),
+            UserEvents::USER_PRE_DELETE      => array('onUserDelete', 0)
         );
     }
 
@@ -221,6 +222,22 @@ class LeadSubscriber extends CommonSubscriber
             "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
         );
         $this->factory->getModel('core.auditLog')->writeToLog($log);
+    }
+
+    /**
+     * Compile events for the lead timeline
+     *
+     * @param Events\LeadTimelineEvent $event
+     */
+    public function onTimelineGenerate(Events\LeadTimelineEvent $event)
+    {
+        $lead = $event->getLead();
+
+        // Add the lead's creation time to the timeline
+        $event->addEvent(array(
+            'event'     => 'lead.created',
+            'timestamp' => $lead->getDateAdded()
+        ));
     }
 
     /**

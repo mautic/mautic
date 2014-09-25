@@ -45,6 +45,30 @@ class HitRepository extends CommonRepository
     }
 
     /**
+     * Get a lead's page hits
+     *
+     * @param integer $leadId
+     * @param array   $ipIds
+     *
+     * @return array
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function getLeadHits($leadId, array $ipIds = array())
+    {
+        $query = $this->createQueryBuilder('h')
+            ->select('IDENTITY(h.page) AS page_id, h.dateHit')
+            ->where('h.lead = ' . $leadId);
+
+        if (!empty($ipIds)) {
+            $query->orWhere('h.ipAddress IN (' . implode(',', $ipIds) . ')');
+        }
+
+        return $query->getQuery()
+            ->getArrayResult();
+    }
+
+    /**
      * Get the number of bounces
      *
      * @param $pageIds

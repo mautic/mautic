@@ -18,5 +18,11 @@ $view['slots']->set('headerTitle',
 
 ?>
 <div class="scrollable">
-    <h1>Coming Soon</h1>
+    <?php foreach ($events as $event) : ?>
+    <div class="row">
+        <p>At <?php echo $view['date']->toFullConcat($event['timestamp']); ?>, <?php echo $event['event']; ?>.
+        <?php if (isset($event['extra'])) print_r($event['extra']); ?>
+        </p>
+    </div>
+    <?php endforeach; ?>
 </div>
