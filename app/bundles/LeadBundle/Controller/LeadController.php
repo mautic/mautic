@@ -33,7 +33,9 @@ class LeadController extends FormController
             'lead:leads:editown',
             'lead:leads:editother',
             'lead:leads:deleteown',
-            'lead:leads:deleteother'
+            'lead:leads:deleteother',
+            'lead:timeline:viewown',
+            'lead:timeline:viewother'
         ), "RETURN_ARRAY");
 
         if (!$permissions['lead:leads:viewown'] || !$permissions['lead:leads:viewother']) {

@@ -102,6 +102,25 @@ if ($tmpl == 'index')
                             );
                         }
 
+                        $hasTimelineAccess = $security->hasEntityAccess(
+                            $permissions['lead:timeline:viewown'],
+                            $permissions['lead:timeline:viewother'],
+                            $item->getOwner()
+                        );
+
+                        if ($hasTimelineAccess) {
+                            $custom[] = array(
+                                'attr'  => array(
+                                    'data-toggle' => 'ajax',
+                                    'href'        => $view['router']->generate('mautic_leadtimeline_view', array(
+                                        'leadId' => $item->getId()
+                                    )),
+                                ),
+                                'icon'  => 'fa-ellipsis-h',
+                                'label' => 'mautic.lead.lead.timeline'
+                            );
+                        }
+
                         echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
                             'item'      => $item,
                             'edit'      => $hasEditAccess,
