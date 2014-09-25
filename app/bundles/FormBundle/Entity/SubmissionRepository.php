@@ -196,4 +196,24 @@ class SubmissionRepository extends CommonRepository
             array('s.date_submitted', 'ASC')
         );
     }
+
+    /**
+     * Fetch the base submission data from the database
+     *
+     * @param array $ips
+     *
+     * @return array
+     */
+    public function getSubmissions(array $ips = array())
+    {
+        $fq = $this->_em->getConnection()->createQueryBuilder();
+        $fq->select('f.form_id, f.page_id, f.date_submitted')
+            ->from(MAUTIC_TABLE_PREFIX . 'form_submissions', 'f');
+
+        if (!empty($ips)) {
+            $fq->where('f.ip_id IN (' . implode(',', $ips) . ')');
+        }
+
+        return $fq->execute()->fetchAll();
+    }
 }
