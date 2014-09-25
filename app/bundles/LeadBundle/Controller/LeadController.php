@@ -70,7 +70,6 @@ class LeadController extends FormController
         if (!$permissions['lead:leads:viewother']) {
             $filter['force'] .= " $isCommand:$mine";
         }
-        var_dump($filter);die;
 
         $results = $model->getEntities(
             array(
