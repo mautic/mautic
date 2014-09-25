@@ -10,7 +10,7 @@ if ($tmpl == 'index') {
     $view->extend('MauticInstallBundle:Install:content.html.php');
 }
 
-$header = $view['translator']->trans('mautic.install.install.heading.secret.configuration');
+$header = $view['translator']->trans('mautic.install.install.heading.user.configuration');
 $view['slots']->set("headerTitle", $header);
 ?>
 
@@ -21,7 +21,7 @@ $view['slots']->set("headerTitle", $header);
 		</h3>
 	</div>
 	<div class="panel-body">
-        <p><?php echo $view['translator']->trans('mautic.install.install.secret.introtext'); ?></p>
+        <p><?php echo $view['translator']->trans('mautic.install.install.user.introtext'); ?></p>
     	<?php echo $view['form']->form($form); ?>
     </div>
 </div>

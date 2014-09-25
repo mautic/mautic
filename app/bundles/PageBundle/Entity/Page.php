@@ -128,7 +128,7 @@ class Page extends FormEntity
     private $revision = 1;
 
     /**
-     * @ORM\Column(name="meta_description", type="string", nullable=true, length=160)
+     * @ORM\Column(name="meta_description", type="string", nullable=true, length=320)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})

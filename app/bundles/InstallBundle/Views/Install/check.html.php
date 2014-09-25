@@ -36,6 +36,10 @@ $view['slots']->set("headerTitle", $header);
                     case 'mautic.install.logs.unwritable': ?>
                         <li><?php echo $view['translator']->trans('mautic.install.directory.unwritable', array('%path%' => $appRoot . '/logs')); ?></li>
                         <?php break;
+                    case 'mautic.install.apc.version': ?>
+                        <?php $minAPCverison = version_compare(PHP_VERSION, '5.4.0', '>=') ? '3.1.13' : '3.0.17'; ?>
+                        <li><?php echo $view['translator']->trans($message, array('%minapc%' => $minAPCverison, '%currentapc%' => phpversion('apc'))); ?></li>
+                        <?php break;
                     default: ?>
                         <li><?php echo $view['translator']->trans($message); ?></li>
                         <?php break; ?>
@@ -48,7 +52,14 @@ $view['slots']->set("headerTitle", $header);
         <p><?php echo $view['translator']->trans('mautic.install.install.sentence.minor.problems'); ?></p>
         <ol>
             <?php foreach ($minors as $message) : ?>
-                <li><?php echo $view['translator']->trans($message); ?></li>
+                <?php switch ($message) :
+                    case 'mautic.install.pcre.version': ?>
+                        <li><?php echo $view['translator']->trans($message, array('%pcreversion%' => (float) PCRE_VERSION)); ?></li>
+                        <?php break;
+                    default: ?>
+                        <li><?php echo $view['translator']->trans($message); ?></li>
+                        <?php break; ?>
+                <?php endswitch; ?>
             <?php endforeach; ?>
         </ol>
         <?php endif; ?>

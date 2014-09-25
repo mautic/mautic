@@ -85,5 +85,4 @@ $view->extend('MauticCampaignBundle:Campaign:index.html.php');
         "baseUrl"         => $view['router']->generate('mautic_campaign_index'),
         'sessionVar'      => 'campaign'
     )); ?>
-    '
 </div>

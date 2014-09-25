@@ -22,19 +22,47 @@ use Symfony\Component\Yaml\Yaml;
  */
 class Configurator
 {
+
+    /**
+     * Configuration filename
+     *
+     * @var string
+     */
     protected $filename;
+
+    /**
+     * Array containing the steps
+     *
+     * @var StepInterface[]
+     */
     protected $steps;
+
+    /**
+     * Configuration parameters
+     *
+     * @var array
+     */
     protected $parameters;
 
+    /**
+     * Constructor.
+     *
+     * @param string $kernelDir
+     */
     public function __construct($kernelDir)
     {
         $this->kernelDir = $kernelDir;
-        $this->filename = $kernelDir.'/config/local.php';
+        $this->filename  = $kernelDir . '/config/local.php';
 
-        $this->steps = array();
+        $this->steps      = array();
         $this->parameters = $this->read();
     }
 
+    /**
+     * Check if the configuration path is writable.
+     *
+     * @return bool
+     */
     public function isFileWritable()
     {
         // If there's already a file, check it
@@ -47,6 +75,8 @@ class Configurator
     }
 
     /**
+     * Add a step to the configurator.
+     *
      * @param StepInterface $step
      */
     public function addStep(StepInterface $step)
@@ -55,18 +85,25 @@ class Configurator
     }
 
     /**
+     * Retrieves the specified step.
+     *
      * @param integer $index
      *
      * @return StepInterface
+     * @throws \InvalidArgumentException
      */
     public function getStep($index)
     {
         if (isset($this->steps[$index])) {
             return $this->steps[$index];
         }
+
+        throw new \InvalidArgumentException(sprintf('There is not a step %s', $index));
     }
 
     /**
+     * Retrieves the loaded steps.
+     *
      * @return array
      */
     public function getSteps()
@@ -75,6 +112,8 @@ class Configurator
     }
 
     /**
+     * Retrieves the configuration parameters.
+     *
      * @return array
      */
     public function getParameters()
@@ -83,6 +122,8 @@ class Configurator
     }
 
     /**
+     * Return the number of steps in the configurator.
+     *
      * @return integer
      */
     public function getStepCount()
@@ -91,6 +132,8 @@ class Configurator
     }
 
     /**
+     * Merges parameters to the main configuration.
+     *
      * @param array $parameters
      */
     public function mergeParameters($parameters)
@@ -99,6 +142,8 @@ class Configurator
     }
 
     /**
+     * Fetches the requirements from the defined steps.
+     *
      * @return array
      */
     public function getRequirements()
@@ -114,6 +159,8 @@ class Configurator
     }
 
     /**
+     * Fetches the optional settings from the defined steps.
+     *
      * @return array
      */
     public function getOptionalSettings()
@@ -143,8 +190,7 @@ class Configurator
                 $value = "'$value'";
             } elseif (is_bool($value)) {
                 $value = ($value) ? 'true' : 'false';
-            }
-            elseif (is_null($value)) {
+            } elseif (is_null($value)) {
                 $value = 'null';
             }
 
@@ -164,7 +210,7 @@ class Configurator
      */
     public function write()
     {
-        if (! $this->isFileWritable()) {
+        if (!$this->isFileWritable()) {
             throw new RuntimeException('Cannot write the config file, the destination is unwritable.');
         }
 
