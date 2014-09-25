@@ -10,6 +10,8 @@
 namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\LeadBundle\Event\LeadTimelineEvent;
+use Mautic\LeadBundle\LeadEvents;
 
 /**
  * Class TimelineController
@@ -63,15 +65,19 @@ class TimelineController extends FormController
             return $this->accessDenied();
         }
 
-        $template      = 'MauticLeadBundle:Timeline:timeline.html.php';
-        $vars['route'] = $this->generateUrl('mautic_leadtimeline_view', array('leadId' => $lead->getId()));
+        // Trigger the TIMELINE_ON_GENERATE event to fetch the timeline events from subscribed bundles
+        $dispatcher = $this->factory->getDispatcher();
+        $event = new LeadTimelineEvent($lead);
+        $dispatcher->dispatch(LeadEvents::TIMELINE_ON_GENERATE, $event);
+        $events = $event->getEvents();
 
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'lead' => $lead,
-                'tmpl' => $tmpl
+                'lead'   => $lead,
+                'tmpl'   => $tmpl,
+                'events' => $events
             ),
             'contentTemplate' => 'MauticLeadBundle:Timeline:timeline.html.php',
             'passthroughVars' => array(

@@ -19,7 +19,6 @@
 /vendor/*
 /bin/*
 /composer.phar
-/composer.lock
 /assetic
 /bundles
 /assets/css/mautic*

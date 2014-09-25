@@ -20,14 +20,18 @@ class PublicController extends CommonFormController
     {
         $post    = $this->request->request->get('mauticform');
         $server  = $this->request->server->all();
-        $return  = $post['return'];
+        $return  = (isset($post['return'])) ? $post['return'] : false;
         if (empty($return)) {
             //try to get it from the HTTP_REFERER
-            $return = $server['HTTP_REFERER'];
+            $return = (isset($server['HTTP_REFERER'])) ? $server['HTTP_REFERER'] : false;
         }
-        //remove mauticError and mauticMessage from the referer so it doesn't get sent back
-        $return = InputHelper::url($return, null, null, array('mauticError', 'mauticMessage'));
-        $query  = (strpos($return, '?') === false) ? '?' : '&';
+
+        if (!empty($return)) {
+            //remove mauticError and mauticMessage from the referer so it doesn't get sent back
+            $return = InputHelper::url($return, null, null, array('mauticError', 'mauticMessage'));
+            $query  = (strpos($return, '?') === false) ? '?' : '&';
+        }
+
 
         $translator = $this->get('translator');
 

@@ -463,6 +463,16 @@ system('rm vendor/willdurand/negotiation/CONTRIBUTING.md');
 system('rm vendor/willdurand/negotiation/phpunit.xml.dist');
 system('rm vendor/willdurand/negotiation/README.md');
 
+// willdurand/oauth-server-bundle
+system('rm -rf vendor/willdurand/oauth-server-bundle/Resources/doc');
+system('rm -rf vendor/willdurand/oauth-server-bundle/Tests');
+system('rm vendor/willdurand/oauth-server-bundle/.gitignore');
+system('rm vendor/willdurand/oauth-server-bundle/.travis.yml');
+system('rm vendor/willdurand/oauth-server-bundle/composer.json');
+system('rm vendor/willdurand/oauth-server-bundle/composer.lock');
+system('rm vendor/willdurand/oauth-server-bundle/phpunit.xml.dist');
+system('rm vendor/willdurand/oauth-server-bundle/README.markdown');
+
 // Find any .git directories and nuke them
 system('find . -type d -name .git -exec rm -rf {} \\;');
 
