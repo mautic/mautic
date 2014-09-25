@@ -64,6 +64,10 @@ $items = array(
                 ),
                 'display' => false //only used for breadcrumb generation
             ),
+            'mautic.lead.lead.menu.timeline' => array(
+                'route'           => 'mautic_leadtimeline_view',
+                'display' => false //only used for breadcrumb generation
+            ),
             'mautic.lead.list.menu.index' => array(
                 'route'    => 'mautic_leadlist_index',
                 'extras'  => array(
