@@ -1693,6 +1693,12 @@ aside.sidebar .progress {
 .panel-footer {
   overflow: hidden;
 }
+.panel-toolbar-wrapper {
+  display: block;
+  background-color: #fbfbfb;
+  border-bottom: 1px solid #cfd9db;
+  padding: 0px 15px;
+}
 .switch {
   vertical-align: middle;
   margin-bottom: 0;
