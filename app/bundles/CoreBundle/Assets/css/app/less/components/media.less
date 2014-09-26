@@ -1,0 +1,65 @@
+//
+// Media objects
+// --------------------------------------------------
+
+// Common styles
+
+.media {
+  > a {
+    display: block;
+  }
+  &.read {
+    opacity: .8;
+    a {
+      color: lighten(@text-color, 5%);
+    }
+  }
+  &.new {
+    background-color: lighten(@gray-lighter, 4%);
+  }
+}
+.media-body {
+  display: block;
+}
+
+.media-heading {
+  display: block;
+  > .bullet {
+    margin-top: -1px;
+  }
+}
+
+// Media list variation
+// -------------------------
+
+// Media list feed
+.media-list {
+  &.media-list-feed {
+    position: relative;
+    .media {
+      overflow: visible;
+      > .media-object {
+        position: relative;
+        &:before {
+          content: '';
+          position: absolute;
+          top: -100%;
+          bottom: -100%;
+          width: 1px;
+          background-color: @hr-border;
+          left: 50%;
+        }
+      }
+      &:first-child {
+        > .media-object {
+          &:before { top: 0; }
+        }
+      }
+      &:last-child {
+        > .media-object {
+          &:before { bottom: 5px; }
+        }
+      }
+    }
+  }
+}

@@ -3,17 +3,16 @@
 // --------------------------------------------------
 
 .label {
-  display: inline-block; //#MODIFIED default value - inline
-  padding: 4px 5px;  //#MODIFIED default value - .2em .6em .3em
-  font-size: 10px; //#MODIFIED default value - 75%
-  font-weight: 700; //#MODIFIED default value - bold
+  display: inline;
+  padding: .2em .6em .3em;
+  font-size: 75%;
+  font-weight: bold;
   line-height: 1;
   color: @label-color;
   text-align: center;
   white-space: nowrap;
-  //vertical-align: baseline;
-  border-radius: @border-radius-small;
-  text-shadow: 0 -1px 0 rgba(0,0,0,0.15);
+  vertical-align: baseline;
+  border-radius: .25em;
 
   // Add hover effects, but only for links
   a& {

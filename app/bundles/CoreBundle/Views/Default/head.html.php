@@ -10,6 +10,7 @@
 <head>
     <meta charset="UTF-8" />
     <title><?php echo $view['slots']->get('pageTitle', 'Mautic'); ?></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link rel="icon" type="image/x-icon" href="<?php echo $view['assets']->getUrl('assets/images/favicon.ico') ?>" />
     <link rel="apple-touch-icon" href="<?php echo $view['assets']->getUrl('assets/images/apple-touch-icon.png') ?>" />
 

@@ -1,0 +1,34 @@
+//
+// Logo
+// --------------------------------------------------
+
+// mautic-brand
+.mautic-brand {
+  display: block;
+  float: left;
+  width: 100%;
+
+  // mautic logo figure
+  > svg.mautic-logo-figure {
+    float: left;
+    width: @mautic-logo-figure-width;
+    height: @header-height;
+    .circle {
+      fill: @mautic-logo-figure-circle-fill;
+    }
+    .m,
+    .m-arrow {
+      fill: @mautic-logo-figure-m-fill;
+    }
+  }
+
+  // mautic logo text
+  > svg.mautic-logo-text {
+    float: left;
+    height: @header-height;
+    width: @mautic-logo-text-width;
+    .m,.a,.u,.t,.i,.c {
+      fill: @mautic-logo-text-fill
+    }
+  }
+}

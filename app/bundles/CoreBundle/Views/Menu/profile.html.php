@@ -9,11 +9,11 @@
 ?>
 <li class="dropdown">
     <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-        <span class="img-wrapper img-rounded"><img src="https://www.gravatar.com/avatar/b478da8c5e12d157346139359dc8a2fd?s=250&amp;d=mm"></span>
-        <span class="text fw-sb ml5 hidden-xs"><?php echo $app->getUser()->getName();?></span>
-        <span class="caret ml5"></span>
+        <span class="img-wrapper img-rounded" style="width:32px;"><img src="https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg"></span>
+        <span class="text fw-sb ml-xs hidden-xs"><?php echo $app->getUser()->getName();?></span>
+        <span class="caret ml-xs"></span>
     </a>
-    <ul class="pull-right dropdown-menu">
+    <ul class="dropdown-menu dropdown-menu-right">
         <li>
             <a href="<?php echo $view['router']->generate("mautic_user_account"); ?>" data-toggle="ajax">
                 <i class="fa fa-cog fs-14"></i><span><?php echo $view["translator"]->trans("mautic.user.account.settings"); ?></span>
@@ -26,6 +26,7 @@
         </li>
     </ul>
 </li>
+
 <!--<li class="panel-toggle right-panel-toggle">
     <a href="javascript: void(0);" data-toggle="sidebar" data-direction="rtl"><i class="fa fa-bars fa-2x"></i></a>
 </li>-->

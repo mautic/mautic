@@ -1,17 +1,35 @@
+//
 // Scrollbar
 // --------------------------------------------------
 
-// Custom scrollbar - webkit
+// Scrollbar on devices with touch support
+.touch {
+  .scroll-content {
+    height: 100%;
+    overflow-y: scroll;
+    -ms-overflow-style: -ms-autohiding-scrollbar;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+// Scrollbar on devices with no touch support
 .no-touch {
-  // rail
-  // -------------------------
-  .scrollrail {
-    border-radius: 0 !important;
+  .scroll-wrapper,
+  .scroll-wrapper > .scroll-content {
+    height: 100%;
   }
 
-  // bar
-  // -------------------------
-  .scrollbar {
-    
+  .scroll-wrapper {
+    // scroll-rail
+    > .scroll-rail {
+      display: none !important;
+    }
+
+    // scrollbar
+    > .scroll-bar {
+      //opacity: 0.8 !important;
+      background-color: gray !important;
+      right: 3px !important;
+    }
   }
 }

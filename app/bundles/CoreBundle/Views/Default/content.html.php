@@ -16,7 +16,7 @@ endif;
 <div class="content-body" id="main-content">
     <?php echo $view->render('MauticCoreBundle:Default:pageheader.html.php'); ?>
 
-    <div class="container-fluid">
+    <div class="container-fluid pt-md pb-md">
         <?php $view['slots']->output('_content'); ?>
     </div>
 </div>

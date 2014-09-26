@@ -22,7 +22,6 @@
   &,
   &:active,
   &.active {
-    outline: 0; //#MODIFIED default is none;
     &:focus {
       .tab-focus();
     }
@@ -85,7 +84,7 @@
 // Make a button look and behave like a link
 .btn-link {
   color: @link-color;
-  font-weight: @btn-font-weight; //#MODIFIED default is - normal
+  font-weight: normal;
   cursor: pointer;
   border-radius: 0;
 
@@ -105,7 +104,7 @@
   &:hover,
   &:focus {
     color: @link-hover-color;
-    text-decoration: none; //#MODIFIED default is - underline
+    text-decoration: underline;
     background-color: transparent;
   }
   &[disabled],

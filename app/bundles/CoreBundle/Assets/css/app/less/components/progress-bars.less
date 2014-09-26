@@ -5,21 +5,22 @@
 // Progress Itself
 // -------------------------
 .progress {
-  background-color: darken(@body-bg, 10%);
+  background-color: @hr-border;
   .box-shadow(none);
 
   // Sizing
   &.progress-md {
-    height: (@line-height-computed - 4);
+    height: (@line-height-computed - 6); // 12px
     border-radius: @border-radius-small;
   }
   &.progress-sm {
-    height: (@line-height-computed - 8);
+    height: (@line-height-computed - 10); // 8px
     border-radius: @border-radius-small;
+    margin-top: 2px;
   }
   &.progress-xs {
-    height: (@line-height-computed - 12);
-    border-radius: (@border-radius-small);
+    height: (@line-height-computed - 14); // 4px
+    border-radius: @border-radius-small;
   }
 }
 .progress-bar {
@@ -43,8 +44,8 @@
 
 // Progress inside sidebar
 // -------------------------
-aside.sidebar {
+.app-sidebar {
   .progress {
-    background-color: fade(contrast(@sidebar-bg-color), 5%);
+    background-color: lighten(@sidebar-left-bg, 3%);
   }
 }

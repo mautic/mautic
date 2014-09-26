@@ -1,69 +1,71 @@
+//
 // Layout Content
 // --------------------------------------------------
 
-// fixed header option
-.header-fixed {
-  section#app-content {
-    padding-top: @header-height;
-
-    // breakpoint screen-sm and up
-    // -------------------------
-    @media (min-width: @screen-sm-min) {
-      padding-top: @header-height-sm;
-    }
+// animate `app-content` on sidebar-left opened
+.csstransforms3d.sidebar-open-ltr {
+  #app-content {
+    .translate3d(@sidebar-left-width, 0, 0);
+    .transition(transform .3s ease);
   }
 }
-
-section#app-content {
+.no-csstransforms3d.sidebar-open-ltr {
+  #app-content {
+    left: @sidebar-left-width;
+  }
+}
+.csstransforms3d.sidebar-open-rtl {
+  #app-content {
+    .translate3d(-@sidebar-right-width, 0, 0);
+    .transition(transform .3s ease);
+  }
+}
+.no-csstransforms3d.sidebar-open-rtl {
+  #app-content {
+    left: -@sidebar-right-width;
+  }
+}
+#app-content {
   position: relative;
-  z-index: @content-zindex;
-  height: 100%;
-  padding-bottom: @footer-height;
-  .box-sizing(border-box);
+  //z-index: @content-zindex;
+  //min-height: 100%;
   .clearfix();
+  .transition(transform .3s ease);
 
   // content body
   // -------------------------
   > .content-body {
+    //position: relative;
     width: 100%;
     float: left;
 
     // container
     // -------------------------
-    .container-fluid,
-    .container {
-      width: 100%;
-      padding: 15px;
-
+    .container-fluid {
       &.container-xs {
-        padding: 5px;
+        padding-left: 5px;
+        padding-right: 5px;
       }
       &.container-sm {
-        padding: 10px;
+        padding-left: 10px;
+        padding-right: 10px;
       }
       &.container-md {
-        padding: 15px;
+        padding-left: 15px;
+        padding-right: 15px;
       }
       &.container-lg {
-        padding: 20px;
+        padding-left: 20px;
+        padding-right: 20px;
       }
     }
   }
+}
 
-  // breakpoint screen-sm and up
-  // -------------------------
-  @media (min-width: @screen-sm-min) {
-
-    // breakpoint screen-sm only
-    // -------------------------
-    @media (max-width: @screen-sm-max) {
-      margin-left: @sidebar-width-sm;
-    }
-  }
-
-  // breakpoint screen-md and up
-  // -------------------------
-  @media (min-width: @screen-md-min) {
-    margin-left: @sidebar-width;
+// breakpoint screen-sm and up
+// -------------------------
+@media (min-width: @screen-sm-min) {
+  #app-content {
+    position: static;
   }
 }

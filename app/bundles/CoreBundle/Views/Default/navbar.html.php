@@ -7,44 +7,43 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
-
-<!-- start: Brand and toggle -->
-<div class="navbar-header">
-    <!-- sidebar toggle button -->
-    <button type="button" class="navbar-toggle" sidebar-toggle data-position="left">
-        <span class="icon-bar thin"></span>
-        <span class="icon-bar thin"></span>
-        <span class="icon-bar thin"></span>
-    </button>
-    <!--/ sidebar toggle button -->
-
-    <!-- brand -->
-    <a class="navbar-brand" href="#">
-        <span class="navbar-brand-logo"></span>
-    </a>
-    <!--/ brand -->
+<!-- start: loading bar -->
+<div class="loading-bar">
+    <?php echo $view['translator']->trans('mautic.core.loading'); ?>
 </div>
-<!--/ end: Brand and toggle -->
+<!--/ end: loading bar -->
 
-<!-- start: right nav -->
-<ul class="nav navbar-nav navbar-right">
-    <!--<li class="dropdown">
-        <a href="" class="dropdown-toggle" data-toggle="dropdown">
-            <span class="img-wrapper img-rounded"><img src="images/avatar/avatar2.jpg" alt=""></span>
-            <span class="text fw-sb ml5 hidden-xs">Andrew</span>
-            <span class="caret ml5"></span>
-        </a>
-        <ul class="dropdown-menu" role="menu">
-            <li><a href="#">Action</a></li>
-            <li><a href="#">Another action</a></li>
-            <li><a href="#">Something else here</a></li>
-            <li class="divider"></li>
-            <li><a href="#">Separated link</a></li>
+<!-- start: container fluid -->
+<div class="container-fluid">
+    <!-- start: navbar nocollapse -->
+    <div class="navbar-nocollapse">
+        <!-- start: Sidebar left toggle -->
+        <div class="navbar-header navbar-left visible-xs-inline-block">
+            <button type="button" class="navbar-toggle" data-toggle="sidebar" data-direction="ltr">
+                <span class="icon-bar thin"></span>
+                <span class="icon-bar thin"></span>
+                <span class="icon-bar thin"></span>
+            </button>
+        </div>
+        <!--/ end: Sidebar left toggle -->
+
+        <!-- start: Sidebar right toggle -->
+        <div class="navbar-header navbar-right">
+            <button type="button" class="navbar-toggle" data-toggle="sidebar" data-direction="rtl">
+                <span class="icon-bar thin"></span>
+                <span class="icon-bar thin"></span>
+                <span class="icon-bar thin"></span>
+            </button>
+        </div>
+        <!--/ end: Sidebar right toggle -->
+
+        <!-- start: right nav -->
+        <ul class="nav navbar-nav navbar-right">
+            <?php echo $view['knp_menu']->render('admin', array("menu" => "admin")); ?>
+            <?php echo $view->render("MauticCoreBundle:Menu:profile.html.php"); ?>
         </ul>
-    </li>-->
-
-    <?php echo $view['knp_menu']->render('admin', array("menu" => "admin")); ?>
-    <?php echo $view->render("MauticCoreBundle:Menu:profile.html.php"); ?>
-</ul>
-<!--/ end: right nav -->
+        <!--/ end: right nav -->
+    </div>
+    <!--/ end: navbar nocollapse -->
 </div>
+<!--/ end: container fluid -->

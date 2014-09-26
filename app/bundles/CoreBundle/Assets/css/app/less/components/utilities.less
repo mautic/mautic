@@ -1,53 +1,135 @@
+//
 // Utilities
 // --------------------------------------------------
 
 // vertical alignment
-// -------------------------
+// ---------------------------------------------
 .va-t { vertical-align: top !important; }
 .va-m { vertical-align: middle !important; }
 .va-b { vertical-align: bottom !important; }
 
 // float and text alignment
-// -------------------------
+// ---------------------------------------------
+.pull-right-xs { float:right; }
+.pull-left-xs { float:left; }
+
 // breakpoint screen-sm and up
-// -------------------------
 @media (min-width: @screen-sm-min) {
   .pull-right-sm { float: right; }
   .pull-left-sm { float: left; }
   .text-right-sm { text-align: right; }
   .text-left-sm { text-align: left; }
+  .pull-right-xs { float:none; }
+  .pull-left-xs { float:none; }
 }
+
 // breakpoint screen-md and up
-// -------------------------
 @media (min-width: @screen-md-min) {
   .pull-right-md { float: right; }
   .pull-left-md { float: left; }
   .text-right-md { text-align: right; }
   .text-left-md { text-align: left; }
+  .pull-right-xs { float:none; }
+  .pull-left-xs { float:none; }
 }
+
 // breakpoint screen-lg and up
-// -------------------------
 @media (min-width: @screen-lg-min) {
   .pull-right-lg { float: right; }
   .pull-left-lg { float: left; }
   .text-right-lg { text-align: right; }
   .text-left-lg { text-align: left; }
+  .pull-right-xs { float:none; }
+  .pull-left-xs { float:none; }
 }
 
 // Border
-// -------------------------
-.bdr-l { border-left: 1px solid @hr-border; }
-.bdr-r { border-right: 1px solid @hr-border; }
-.bdr-w-0 { border-width: 0; }
-.bdr-l-wdh-0 { border-left-width: 0; }
-.bdr-r-wdh-0 { border-right-width: 0; }
-.bdr-t-wdh-0 { border-top-width: 0; }
-.bdr-b-wdh-0 { border-bottom-width: 0; }
-.bdr-rd-0 { border-radius: 0 !important; }
-.bdr-rd { border-radius: @border-radius-base; }
+// ---------------------------------------------
+.bdr-a { border: 1px solid @hr-border !important; }
+.bdr-l { border-left: 1px solid @hr-border !important; }
+.bdr-r { border-right: 1px solid @hr-border !important; }
+.bdr-t { border-top: 1px solid @hr-border !important; }
+.bdr-b { border-bottom: 1px solid @hr-border !important; }
+.bdr-c-t { border-color: transparent !important; }
+.bdr-w-0 { border-width: 0 !important; }
+.bdr-l-wdh-0 { border-left-width: 0 !important; }
+.bdr-r-wdh-0 { border-right-width: 0 !important; }
+.bdr-t-wdh-0 { border-top-width: 0 !important; }
+.bdr-b-wdh-0 { border-bottom-width: 0 !important; }
+.bdr-rds-0 { border-radius: 0 !important; }
+.bdr-rds { border-radius: @border-radius-base !important; }
+.bdr-rds-lg { border-radius: @border-radius-large !important; }
+.bdr-rds-sm { border-radius: @border-radius-small !important; }
 
-// margin
-// -------------------------
+// breakpoint screen-xs and up
+@media (max-width: @screen-xs-max) {
+  .bdr-l-xs { border-left: 1px solid @hr-border; }
+  .bdr-r-xs { border-right: 1px solid @hr-border; }
+  .bdr-t-xs { border-top: 1px solid @hr-border; }
+  .bdr-b-xs { border-bottom: 1px solid @hr-border; }
+}
+// breakpoint screen-sm and up
+@media (min-width: @screen-sm-min) {
+  .bdr-l-sm { border-left: 1px solid @hr-border; }
+  .bdr-r-sm { border-right: 1px solid @hr-border; }
+  .bdr-t-sm { border-top: 1px solid @hr-border; }
+  .bdr-b-sm { border-bottom: 1px solid @hr-border; }
+}
+// breakpoint screen-md and up
+@media (min-width: @screen-md-min) {
+  .bdr-l-md { border-left: 1px solid @hr-border; }
+  .bdr-r-md { border-right: 1px solid @hr-border; }
+  .bdr-t-md { border-top: 1px solid @hr-border; }
+  .bdr-b-md { border-bottom: 1px solid @hr-border; }
+}
+// breakpoint screen-lg and up
+@media (min-width: @screen-lg-min) {
+  .bdr-l-lg { border-left: 1px solid @hr-border; }
+  .bdr-r-lg { border-right: 1px solid @hr-border; }
+  .bdr-t-lg { border-top: 1px solid @hr-border; }
+  .bdr-b-lg { border-bottom: 1px solid @hr-border; }
+}
+
+// background picture
+// ---------------------------------------------
+.bg-picture {
+  position: relative;
+  min-height: 300px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+
+  > .bg-picture-overlay {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(0,0,0,0.3);
+  }
+
+  > .meta {
+    position: absolute;
+    left: 0;
+    right: 0;
+    &.top {
+      top: 0;
+    }
+    &.bottom {
+      bottom: 0;
+    }
+  }
+}
+
+// Shadow
+// ---------------------------------------------
+.shd-0,
+.shd-none {
+  .box-shadow(none);
+}
+
+// Margin
+// ---------------------------------------------
 .ma-20, .ma-lg { margin: 20px !important; }
 .ma-15, .ma-md { margin: 15px !important; }
 .ma-10, .ma-sm { margin: 10px !important; }
@@ -138,8 +220,8 @@
 .mnl-2 { margin-left: -2px !important; }
 .mnl-1 { margin-left: -1px !important; }
 
-// padding
-// -------------------------
+// Padding
+// ---------------------------------------------
 .pa-20, .pa-lg { padding: 20px !important; }
 .pa-15, .pa-md { padding: 15px !important; }
 .pa-10, .pa-sm { padding: 10px !important; }
@@ -158,6 +240,7 @@
 .pt-3 { padding-top: 3px !important; }
 .pt-2 { padding-top: 2px !important; }
 .pt-1 { padding-top: 1px !important; }
+.pt-0 { padding-top: 0px !important; }
 
 .pr-20, .pr-lg { padding-right: 20px !important; }
 .pr-15, .pr-md { padding-right: 15px !important; }
@@ -167,6 +250,7 @@
 .pr-3 { padding-right: 3px !important; }
 .pr-2 { padding-right: 2px !important; }
 .pr-1 { padding-right: 1px !important; }
+.pr-0 { padding-right: 0px !important; }
 
 .pb-20, .pb-lg { padding-bottom: 20px !important; }
 .pb-15, .pb-md { padding-bottom: 15px !important; }
@@ -176,6 +260,7 @@
 .pb-3 { padding-bottom: 3px !important; }
 .pb-2 { padding-bottom: 2px !important; }
 .pb-1 { padding-bottom: 1px !important; }
+.pb-0 { padding-bottom: 0px !important; }
 
 .pl-20, .pl-lg { padding-left: 20px !important; }
 .pl-15, .pl-md { padding-left: 15px !important; }
@@ -185,3 +270,22 @@
 .pl-3 { padding-left: 3px !important; }
 .pl-2 { padding-left: 2px !important; }
 .pl-1 { padding-left: 1px !important; }
+.pl-0 { padding-left: 0px !important; }
+
+// disable focus ring
+// ---------------------------------------------
+.no-focus {
+  &.form-control,
+  .form-control & {
+    border-color: transparent;
+    &:focus {
+      outline: 0;
+    }
+  }
+}
+
+// Overflow
+// ---------------------------------------------
+.ovf-h {
+  overflow: hidden;
+}

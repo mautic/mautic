@@ -22,7 +22,7 @@
         top: -15px;
         height: 15px;
         width: 1px;
-        background-color: @brand-light-darker-sm;
+        background-color: @gray-light;
       }
     }
   }
@@ -32,7 +32,7 @@
   .steps {
     position: relative;
     display: inline-block;
-    color: @brand-light-darker-md;
+    color: @gray-light;
 
     // steps figure
     // -------------------------
@@ -43,7 +43,7 @@
       font-size: 14px;
       line-height: @input-height-base - 4;
       border-radius: 50%;
-      border: 2px solid @brand-light-darker-md;
+      border: 2px solid @gray-light;
       + .steps-text {
         margin-left: 5px;
       }
@@ -60,7 +60,7 @@
     // steps active state
     // -------------------------
     &.active {
-      color: @subtext-color;
+      color: @text-color;
       > .steps-figure {
         border-color: @text-color;
       }
@@ -73,9 +73,9 @@
     // -------------------------
     &:hover,
     &:focus {
-      color: darken(@brand-light-darker-md, 6%);
+      color: darken(@gray-light, 6%);
       > .steps-figure {
-        border-color: darken(@brand-light-darker-md, 6%);
+        border-color: darken(@gray-light, 6%);
       }
     }
   }

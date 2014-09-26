@@ -14,54 +14,57 @@ h1, h2, h3, h4, h5, h6,
 // Ellipsis
 // -------------------------
 .ellipsis {
+  display: block;
   .text-overflow();
 }
 
 // font size
 // -------------------------
 .fs-base { font-size: @font-size-base; }
-.fs-2 { font-size: 2px }
-.fs-4 { font-size: 4px }
-.fs-6 { font-size: 6px }
-.fs-8 { font-size: 8px }
-.fs-10 { font-size: 10px }
-.fs-12 { font-size: 12px }
+.fs-2 { font-size: 2px !important; }
+.fs-4 { font-size: 4px !important; }
+.fs-6 { font-size: 6px !important; }
+.fs-8 { font-size: 8px !important; }
+.fs-10 { font-size: 10px !important; }
+.fs-11 { font-size: 11px !important; }
+.fs-12 { font-size: 12px !important; }
 .fs-14 { font-size: 14px !important; }
-.fs-16 { font-size: 16px }
-.fs-18 { font-size: 18px }
-.fs-20 { font-size: 20px }
-.fs-22 { font-size: 22px }
-.fs-24 { font-size: 24px }
-.fs-26 { font-size: 26px }
-.fs-28 { font-size: 28px }
-.fs-30 { font-size: 30px }
-.fs-32 { font-size: 32px }
-.fs-34 { font-size: 34px }
-.fs-36 { font-size: 36px }
-.fs-38 { font-size: 38px }
-.fs-40 { font-size: 40px }
-.fs-42 { font-size: 42px }
-.fs-44 { font-size: 44px }
-.fs-46 { font-size: 46px }
+.fs-16 { font-size: 16px !important; }
+.fs-18 { font-size: 18px !important; }
+.fs-20 { font-size: 20px !important; }
+.fs-22 { font-size: 22px !important; }
+.fs-24 { font-size: 24px !important; }
+.fs-26 { font-size: 26px !important; }
+.fs-28 { font-size: 28px !important; }
+.fs-30 { font-size: 30px !important; }
+.fs-32 { font-size: 32px !important; }
+.fs-34 { font-size: 34px !important; }
+.fs-36 { font-size: 36px !important; }
+.fs-38 { font-size: 38px !important; }
+.fs-40 { font-size: 40px !important; }
+.fs-42 { font-size: 42px !important; }
+.fs-44 { font-size: 44px !important; }
+.fs-46 { font-size: 46px !important; }
+.fs-48 { font-size: 48px !important; }
+.fs-50 { font-size: 50px !important; }
+.fs-52 { font-size: 52px !important; }
+.fs-54 { font-size: 54px !important; }
+.fs-56 { font-size: 56px !important; }
 
 // Page Header
 // -------------------------
 .page-header {
-  background-color: lighten(@body-bg, 2.5%);
-  padding: 15px;
+  background-color: lighten(@body-bg, 1%);
+  padding: 20px 15px;
   margin: 0;
   border-bottom: 0;
-  border-bottom: 1px solid darken(@body-bg, 3%);
+  border-bottom: 1px solid @hr-border;
 
   // breadcrumb
   .breadcrumb {
     padding: 0;
     background-color: inherit;
     border-radius: 0;
-  }
-
-  .table-layout {
-    margin-bottom: 0px;
   }
 }
 // page header inside container reset
@@ -92,13 +95,48 @@ h1, h2, h3, h4, h5, h6,
 
 // Contextual colors
 // -------------------------
-.text-muted { .text-emphasis-variant(@subtext-color); }
+.text-muted { .text-emphasis-variant(rgba(0,0,0,0.5)); }
+.text-white { .text-emphasis-variant(#fff); }
 .text-primary { .text-emphasis-variant(@brand-primary); }
 .text-success { .text-emphasis-variant(@brand-success); }
 .text-warning { .text-emphasis-variant(@brand-warning); }
 .text-danger { .text-emphasis-variant(@brand-danger); }
 .text-info { .text-emphasis-variant(@brand-info); }
 
-.pagination-limit {
-  width: 55px;
+// Blockquote
+// -------------------------
+blockquote {
+  padding-left: 40px;
+  border-width: 0px;
+
+  > p {
+    position: relative;
+    font-style: italic;
+    font-size: 18px !important;
+  }
+
+  > p:before {
+    position: absolute;
+    top: -1px;
+    margin-left: -25px;
+    font-family: "FontAwesome";
+    font-size: 18px;
+    content: "\f10d";
+    color: @gray-lighter;
+  }
+
+  > p:after {
+    position: absolute;
+    bottom: -1px;
+    margin-left: 5px;
+    font-family: "FontAwesome";
+    font-size: 18px;
+    content: "\f10e";
+    color: @gray-lighter;
+  }
+}
+.blockquote-reverse {
+  padding-left: 20px;
+  padding-right: 40px;
+  border-width: 0px;
 }

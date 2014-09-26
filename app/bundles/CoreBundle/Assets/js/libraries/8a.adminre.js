@@ -296,14 +296,14 @@ var Mustache;(function(a){if(typeof module!=="undefined"&&module.exports){module
             Scrollbar: function (elem) {
                 $(".no-touch "+elem).each(function (index, value) {
                     $(value).slimScroll({
-                        size: "8px",
+                        size: "6px",
                         distance: "0px",
-                        wrapperClass: $(value).data("wrapper") || "viewport",
-                        railClass: "scrollrail",
-                        barClass: "scrollbar",
+                        wrapperClass: $(value).data("wrapper") || "scroll-wrapper",
+                        railClass: "scroll-rail",
+                        barClass: "scroll-bar",
                         wheelStep: 10,
                         railVisible: true,
-                        alwaysVisible: true
+                        alwaysVisible: false
                     });
                 });
             },
@@ -870,7 +870,7 @@ var Mustache;(function(a){if(typeof module!=="undefined"&&module.exports){module
                 }
 
                 $(document)
-                    .on("click", close)
+                    //.on("click", close)
                     .on("click", ".sidebar,"+ toggler, function (e) { e.stopPropagation(); })
                     .on("click", toggler, toggle);
 
