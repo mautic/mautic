@@ -99,6 +99,14 @@ class LeadField extends FormEntity
     private $isVisible = true;
 
     /**
+     * @ORM\Column(name="is_short_visible", type="boolean")
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full", "limited"})
+     */
+    private $isShortVisible = true;
+
+    /**
      * @ORM\Column(name="is_listable", type="boolean")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
@@ -393,6 +401,40 @@ class LeadField extends FormEntity
     public function isVisible()
     {
         return $this->getIsVisible();
+    }
+
+    /**
+     * Set isShortVisible
+     *
+     * @param boolean $isShortVisible
+     * @return LeadField
+     */
+    public function setIsShortVisible($isShortVisible)
+    {
+        $this->isChanged('isShortVisible', $isShortVisible);
+        $this->isShortVisible = $isShortVisible;
+
+        return $this;
+    }
+
+    /**
+     * Get isShortVisible
+     *
+     * @return boolean
+     */
+    public function getIsShortVisible()
+    {
+        return $this->isShortVisible;
+    }
+
+    /**
+     * Proxy to getIsShortVisible()
+     *
+     * @return boolean
+     */
+    public function isShortVisible()
+    {
+        return $this->getIsShortVisible();
     }
 
     /**

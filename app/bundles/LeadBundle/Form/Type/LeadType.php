@@ -46,16 +46,18 @@ class LeadType extends AbstractType
         $builder->addEventSubscriber(new CleanFormSubscriber());
         $builder->addEventSubscriber(new FormExitSubscriber('lead.lead', $options));
 
-        $builder->add('owner_lookup', 'text', array(
-            'label'      => 'mautic.lead.lead.field.owner',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array(
-                'class'   => 'form-control',
-                'tooltip' => 'mautic.core.help.autocomplete',
-            ),
-            'mapped'     => false,
-            'required'   => false
-        ));
+        if (!$options['isShortForm']) {
+            $builder->add('owner_lookup', 'text', array(
+                'label'      => 'mautic.lead.lead.field.owner',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array(
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.core.help.autocomplete',
+                ),
+                'mapped'     => false,
+                'required'   => false
+            ));
+        }
 
         $builder->add('owner', 'hidden_entity', array(
             'required'   => false,
@@ -174,7 +176,9 @@ class LeadType extends AbstractType
             }
         }
 
-        $builder->add('buttons', 'form_buttons');
+        if (!$options['isShortForm']) {
+            $builder->add('buttons', 'form_buttons');
+        }
 
         if (!empty($options["action"])) {
             $builder->setAction($options["action"]);
@@ -187,10 +191,11 @@ class LeadType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'Mautic\LeadBundle\Entity\Lead'
+            'data_class'  => 'Mautic\LeadBundle\Entity\Lead',
+            'isShortForm' => false
         ));
 
-        $resolver->setRequired(array('fields'));
+        $resolver->setRequired(array('fields', 'isShortForm'));
     }
 
     /**

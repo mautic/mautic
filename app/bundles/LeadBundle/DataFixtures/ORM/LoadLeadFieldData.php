@@ -110,6 +110,9 @@ class LoadLeadFieldData extends AbstractFixture implements OrderedFixtureInterfa
             )) ? false : true;
             $entity->setIsListable($listable);
 
+            $shortVisible = in_array($name, array('firstname', 'lastname', 'email')) ? true : false;
+            $entity->setIsShortVisible($shortVisible);
+
             $group = (in_array($name, array('twitter', 'facebook', 'googleplus', 'skype'))) ? 'social' : 'core';
             $entity->setGroup($group);
 

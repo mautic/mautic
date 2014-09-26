@@ -20,6 +20,9 @@ $view['slots']->set("headerTitle", $view['translator']->trans('mautic.lead.lead.
            data-menu-link="#mautic_lead_index">
             <i class="fa fa-plus"></i> <?php echo $view["translator"]->trans("mautic.lead.lead.menu.new"); ?>
         </a>
+        <button class="btn btn-default" data-toggle="modal" data-target="#lead-quick-add">
+            <i class="fa fa-plus"></i> <?php echo $view["translator"]->trans("mautic.lead.lead.menu.quickadd"); ?>
+        </button>
         <div class="btn-group">
           <a href="<?php echo $view['router']->generate('mautic_lead_index', array('page' => $page, 'view' => 'list')); ?>"
            data-toggle="ajax"
@@ -28,6 +31,16 @@ $view['slots']->set("headerTitle", $view['translator']->trans('mautic.lead.lead.
            data-toggle="ajax"
            class="btn btn-default"><i class="fa fa-fw fa-th-large"></i></a>
         </div>
+    <?php
+    echo $view->render('MauticCoreBundle:Helper:modal.html.php', array(
+        'id'     => 'lead-quick-add',
+        'header' => $view['translator']->trans('mautic.lead.lead.header.quick.add'),
+        'body'   => $view->render('MauticLeadBundle:Lead:quickadd.html.php', array('form' => $quickForm->createView())),
+        'size'   => 'sm',
+        'footer' => '<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times padding-sm-right text-danger "></i> ' . $view["translator"]->trans("mautic.core.form.cancel") . '</button>'
+                    . '<button type="button" class="btn btn-default" onclick="mQuery(\'form[name=lead]\').submit()"><i class="fa fa-save padding-sm-right "></i> ' . $view["translator"]->trans("mautic.core.form.save") . '</button>'
+    ));
+    ?>
     <?php $view['slots']->stop(); ?>
 
 <?php endif; ?>

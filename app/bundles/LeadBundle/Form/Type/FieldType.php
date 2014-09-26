@@ -168,6 +168,18 @@ class FieldType extends AbstractType
             'required'      => false
         ));
 
+        $builder->add('isShortVisible', 'button_group', array(
+            'choice_list' => new ChoiceList(
+                array(false, true),
+                array('mautic.core.form.no', 'mautic.core.form.yes')
+            ),
+            'expanded'      => true,
+            'multiple'      => false,
+            'label'         => 'mautic.lead.field.form.isshortvisible',
+            'empty_value'   => false,
+            'required'      => false
+        ));
+
         $builder->add('isListable', 'button_group', array(
             'choice_list' => new ChoiceList(
                 array(false, true),
