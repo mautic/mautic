@@ -2,439 +2,225 @@
 // Layout Sidebar
 // --------------------------------------------------
 
-// 3d transform support
-// -------------------------
-.csstransforms3d {
-  .sidebar-left-open,
-  &.sidebar-left-open {
-    aside.app-sidebar {
-      &.sidebar-left {
-        .translate3d(@sidebar-width, 0, 0);
-      }
-    }
+// animate `app-sidebar` on sidebar-left opened
+.csstransforms3d.sidebar-open-ltr {
+  .app-sidebar.sidebar-left {
+    .translate3d(@sidebar-left-width, 0, 0);
+    .transition(transform .3s ease);
+  }
+}
+.no-csstransforms3d.sidebar-open-ltr {
+  .app-sidebar.sidebar-left {
+    left: 0;
+  }
+}
+.csstransforms3d.sidebar-open-rtl {
+  .app-sidebar.sidebar-right {
+    .translate3d(-@sidebar-right-width, 0, 0);
+    .transition(transform .3s ease);
+  }
+  .app-sidebar.sidebar-left {
+    .translate3d(-@sidebar-right-width, 0, 0);
+    .transition(transform .3s ease);
+  }
+}
+.no-csstransforms3d.sidebar-open-rtl {
+  .app-sidebar.sidebar-right {
+    right: 0;
+  }
+  .app-sidebar.sidebar-left {
+    left: -@sidebar-right-width;
   }
 }
 
-// no 3d transform support
-// -------------------------
-.no-csstransforms3d {
-  .sidebar-left-open,
-  &.sidebar-left-open {
-    aside.app-sidebar {
-      &.sidebar-left {
-        left: 0;
-      }
-    }
-  }
-}
-
-// Sidebar open state
-// -------------------------
-.sidebar-left-open {
-  aside.app-sidebar {
-    -webkit-box-shadow: 5px 0 8px -5px rgba(0,0,0,0.5);
-    box-shadow: 5px 0 8px -5px rgba(0,0,0,0.5);
-  }
-}
-
-// Sidebar on header fixed
-// -------------------------
-.header-fixed {
-  // breakpoint screen-sm and up
-  // -------------------------
-  @media (min-width: @screen-sm-min) {
-    aside.app-sidebar {
-      padding-top: @header-height-sm;
-    }
-  }
-}
-
-// sidebar
-// -------------------------
-aside.app-sidebar {
+// The sidebar itself
+.app-sidebar {
   position: fixed;
   z-index: @sidebar-zindex;
   top: 0;
   bottom: 0;
-  width: @sidebar-width;
-  color: fade(contrast(@sidebar-bg-color), 55%);
-  .transition(transform 0.2s ease);
-
-  &:before {
-    content: "";
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: inherit;
-    background-color: @sidebar-bg-color;
-    border: inherit;
-  }
+  .transition(transform .3s ease);
 
   // sidebar left
   // -------------------------
   &.sidebar-left {
-    left: -@sidebar-width;
-    //border-right: 1px solid darken(@body-bg, 3%);
+    width: @sidebar-left-width;
+    left: -@sidebar-left-width;
+    background-color: @sidebar-left-bg;
+    box-shadow:inset -1px 0 0 0 rgba(0,0,0,0.05);
+    color: fade(contrast(@sidebar-left-bg), 55%);
+
+    // sidebar header
+    > .sidebar-header {
+      width: @sidebar-left-width;
+      background-color: @sidebar-left-header-bg;
+    }
+
+    // sidebar content
+    > .sidebar-content {
+      padding-right: 1px;
+    }
+
+    // nav-sidebar color variants
+    .nav-sidebar {
+      > .nav {
+        .nav-sidebar-variants(@sidebar-left-bg);
+      }
+    }
   }
 
   // sidebar right
   // -------------------------
   &.sidebar-right {
-    display: none;
-    left: auto;
-    right: -@sidebar-width;
+    width: @sidebar-right-width;
+    right: -@sidebar-right-width;
+    background-color: @sidebar-right-bg;
+    box-shadow:inset 1px 0 0 0 rgba(0,0,0,0.05);
+    color: fade(contrast(@sidebar-right-bg), 55%);
+
+    // sidebar header
+    > .sidebar-header {
+      width: @sidebar-right-width;
+      background-color: @sidebar-right-header-bg;
+    }
+
+    // sidebar content
+    > .sidebar-content {
+      padding-left: 1px;
+    }
+
+    // nav-sidebar color variants
+    .nav-sidebar {
+      > .nav {
+        .nav-sidebar-variants(@sidebar-right-bg);
+      }
+    }
   }
 
-  // sidebar wrapper
-  // -------------------------
-  > .wrapper,
-  > .content {
-    width: 100% !important;
-    height: 100% !important;
-  }
-  > .wrapper {
-    > .content {
-      height: 100% !important;
+  // sidebar header
+  > .sidebar-header {
+    z-index: 10;
+    height: @header-height;
+    padding-left: 15px;
+    padding-right: 15px;
+
+    // sidebar header fixed
+    .header-fixed & {
+      position: absolute;
+      top: 0;
+      box-shadow: 0 5px 5px -5px rgba(0,0,0,0.15), 0 1px 0 rgba(0,0,0,0.03);
     }
   }
 
   // sidebar content
-  // -------------------------
-  > .content {
-    overflow-y: scroll;
-    overflow-x: auto;
-    -ms-overflow-style: -ms-autohiding-scrollbar;
-    -webkit-overflow-scrolling: touch;
+  > .sidebar-content {
+    position: absolute;
+    top: @header-height;
+    bottom: 0;
+    width: 100%;
   }
-  .content {
-    // sidebar heading
-    // -------------------------
-    .content-heading {
-      font-weight: 600;
-      font-size: 12px;
-      color: fade(contrast(@sidebar-bg-color), 25%);
-      margin: 0px;
-      padding: 15px 25px 10px 25px;
-    }
 
-    // container
-    // -------------------------
-    .container,
-    .container-fluid {
-      padding: 15px 25px;
-      width: auto;
-    }
-
-    // horizontal line
-    // -------------------------
-    hr {
-      border-color: fade(contrast(@sidebar-bg-color), 3.5%);
-      margin: 10px 0;
-    }
-
-    // sidebar menu
-    // -------------------------
-    .nav {
-      margin: 0;
-      padding: 0;
-
-      li {
-        // Nav heading
-        // -------------------------
-        &.nav-heading {
-          font-weight: 600;
-          font-size: 12px;
-          color: fade(contrast(@sidebar-bg-color), 25%);
-          margin: 0px;
-          padding: 15px 25px 5px 25px;
-        }
-
-        // Nav divider
-        // -------------------------
-        &.nav-divider {
-          background-color: fade(contrast(@sidebar-bg-color), 3.5%);
-          margin: 10px 0;
-        }
-
-        // Nav anchor
-        // -------------------------
-        a {
-          border: 0;
-          display: table;
-          table-layout: fixed;
-          width: 100%;
-          color: fade(contrast(@sidebar-bg-color), 55%);
-          outline: 0;
-          padding: 5px 25px;
-          .transition(color .2s ease);
-
-          // Menu link - figure
-          // -------------------------
-          > .figure {
-            display: table-cell;
-            table-layout: fixed;
-            vertical-align: middle;
-            width: 34px;
-            font-size: 16px;
-            color: fade(contrast(@sidebar-bg-color), 45%);
-          }
-
-          // Menu link - text
-          // -------------------------
-          > .text {
-            display: table-cell;
-            table-layout: fixed;
-            vertical-align: middle;
-            width: 100%;
-            line-height: 30px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-          }
-
-          // Menu link - number
-          // -----------------------------------
-          > .number {
-            display: table-cell;
-            table-layout: fixed;
-            vertical-align: middle;
-            width: 40px;
-            font-weight: normal;
-
-            > .label {
-              float: right;
-              max-width: 35px;
-              white-space: nowrap;
-              overflow: hidden;
-              text-overflow: ellipsis;
-            }
-          }
-
-          // Menu link - arrow
-          // -------------------------
-          > .arrow {
-            display: table-cell;
-            table-layout: fixed;
-            vertical-align: middle;
-            font-weight: normal;
-            width: 20px;
-            text-align: right;
-
-            &:before {
-              font-family: "FontAwesome";
-              content: "\f105";
-              font-size: 14px;
-            }
-          }
-
-          // Focus state reset
-          // -------------------------
-          &:focus,
-          &:hover {
-            background-color: @sidebar-bg-color;
-            color: fade(contrast(@sidebar-bg-color), 85%);
-          }
-        }
-
-        // 2nd level menu
-        // -------------------------
-        .nav-submenu {
-          position: relative;
-          overflow: hidden;
-          background-color: darken(@sidebar-bg-color, 5%);
-          padding-left: 45px;
-
-          li {
-            list-style: none;
-            // anchor
-            a { 
-              padding: 1px 15px; 
-            
-              // Focus state reset
-              // -------------------------
-              &:focus,
-              &:hover {
-                background-color: darken(@sidebar-bg-color, 5%);
-              }
-
-            }
-
-            // last item
-            &:last-child { padding-bottom: 5px; }
-          }
-        }
-
-        // State active
-        // -------------------------
-        &.active,
-        &.open {
-          > a {
-            background-color: lighten(@sidebar-bg-color, 3%);
-            color: fade(contrast(@sidebar-bg-color), 85%);
-
-            // Menu link - arrow
-            // -------------------------
-            > .arrow {
-              &:before {
-                content: "\f107";
-              }
-            }
-
-            > .figure {
-              color: @brand-secondary;
-            }
-
-          }
-
-          // 2nd level menu
-          // -------------------------
-          .nav-submenu {
-            
-          }
-        }
-      }
-
-      // Top level menu only
-      // -------------------------
+  // sidebar nav
+  // -------------------------
+  .nav-sidebar {
+    > .nav {
       > li {
-        // Nav anchor
-        // -------------------------
         > a {
-          // Menu link - text
-          // -------------------------
-          > .text {
-            font-weight: 600;
-            text-shadow: 0px -1px 0px darken(@sidebar-bg-color, 2.5%);
+          padding: 10px 20px;
+          .transition(all .15s ease);
+          .text {
+            position: relative;
+            top: -1px;
+            //font-weight: 600;
           }
+          .icon {
+            font-weight: normal;
+            font-size: 14px;
+            min-width: 26px;
+          }
+          .arrow {
+            font-family: 'FontAwesome';
+            position: relative;
+            top: 1px;
+            &:after {
+              content: "\f0da";
+            }
+          }
+        }
+        // Open and active state
+        &.open,
+        &.active {
+          > a {
+            .arrow {
+              &:after {
+                content: "\f0d7";
+              }
+            }
+            .icon {
+              color: @brand-warning;
+            }
+          }
+        }
+
+        // nav-submenu style
+        > .nav-submenu {
+          padding-left: 50px;
+          > li {
+            list-style: none;
+            > a {
+              display: block;
+              padding: 5px 20px 5px 0px;
+              .transition(all .15s ease);
+            }
+            &:last-child {
+              padding-bottom: 10px;
+            }
+          }
+        }
+      }
+
+      // nav-heading
+      .nav-heading {
+        padding: 10px 18px;
+        &:first-child {
+          padding-top: 20px;
         }
       }
     }
   }
-  
-  // breakpoint screen-sm and up
+}
+
+// breakpoint screen-sm and up
+// -------------------------
+@media (min-width: @screen-sm-min) {
+  // sidebar
   // -------------------------
-  @media (min-width: @screen-sm-min) {
-    position: relative;
-
-    &:before {
-      position: fixed;
-    }
-
+  .app-sidebar {
     // sidebar left
     // -------------------------
     &.sidebar-left {
-      left: auto;
-      float: left;
-    }
+      left: 0;
 
-    // sidebar wrapper
-    // -------------------------
-    > .wrapper,
-    > .wrapper > .content,
-    > .content {
-      height: auto !important;
-      min-height: 100%;
-      overflow: visible !important;
-    }
-    > .wrapper > .scrollrail {
-      display: none !important;
-    }
+      // reset app-header
+      ~ #app-header.navbar {
+        left: @sidebar-left-width;
+      }
+      // reset app-content
+      ~ #app-content {
+        margin-left: @sidebar-left-width;
 
-    // breakpoint screen-sm only
-    // -------------------------
-    @media (max-width: @screen-sm-max) {
-      width: @sidebar-width-sm;
-
-      // sidebar content
-      // -------------------------
-      .content {
-        // sidebar heading
-        // -------------------------
-        .content-heading {
-          display: none;
+        // sidebar is on collapse state
+        .sidebar-left-collapse & {
+          margin-left: @sidebar-left-collapse-width;
         }
+      }
+      // reset app-footer
+      ~ #app-footer {
+        margin-left: @sidebar-left-width;
 
-        // sidebar menu
-        // -------------------------
-        .nav {
-          > li {
-            // Nav anchor
-            // -------------------------
-            > a {
-              padding: 16px 15px;
-
-              // Menu link - figure
-              // -------------------------
-              > .figure {
-                display: block;
-                text-align: center;
-                width: auto;
-              }
-
-              // Menu link - text
-              // -------------------------
-              > .text {
-                display: none;
-              }
-
-              // Menu link - number
-              // -----------------------------------
-              > .number {
-                display: block;
-                position: absolute;
-                top: 10px;
-              }
-
-              // Menu link - arrow
-              // -------------------------
-              > .arrow {
-                display: none;
-              }
-            }
-
-            // 2nd level menu
-            // -------------------------
-            .nav-submenu {
-              position: absolute;
-              left: -160px;
-              top: 0px;
-              width: 150px;
-              height: auto !important;
-              padding-left: 0px;
-              padding-top: 5px;
-              -webkit-box-shadow: 4px 4px 0 -1px rgba(0,0,0,0.1);
-              box-shadow: 4px 4px 0 -1px rgba(0,0,0,0.1);
-            }
-
-            // LI open state
-            // -------------------------
-            &.open {
-              // Nav anchor
-              // -------------------------
-              a { background-color: @sidebar-bg-color; }
-
-              // 2nd level menu
-              // -------------------------
-              .nav-submenu {
-                display: none;
-              }
-            }
-
-            // LI hover state
-            // -------------------------
-            &.hover {
-              // Nav anchor
-              // -------------------------
-              a { background-color: darken(@sidebar-bg-color, 1%); }
-
-              // 2nd level menu
-              // -------------------------
-              .nav-submenu {
-                display: block;
-                left: (@sidebar-width-sm - 1);
-              }
-            }
-          }
+        // reset app-footer on sidebar collapse
+        .sidebar-left-collapse & {
+          margin-left: @sidebar-left-collapse-width;
         }
       }
     }

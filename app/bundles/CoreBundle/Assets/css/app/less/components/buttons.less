@@ -2,9 +2,19 @@
 // Buttons
 // --------------------------------------------------
 
+
 // Base styles
 // ---------------------
 .btn {
+  &,
+  &:active,
+  &.active {
+    outline: 0;
+  }
+
+  // reset font awesome width
+  .fa { min-width: 13px; }
+  
   // caret
   // ---------------------
   > .caret {
@@ -36,12 +46,26 @@
   // ---------------------
   &.btn-outline {
     background-color: transparent;
-    border-width: 2px;
+    border-width: 1px;
 
     &.btn-primary { color: @brand-primary; }
     &.btn-success { color: @brand-success; }
     &.btn-warning { color: @brand-warning; }
     &.btn-danger { color: @brand-danger; }
     &.btn-info { color: @brand-info; }
+  }
+}
+
+
+// Link buttons
+// -------------------------
+
+// Make a button look and behave like a link
+.btn-link {
+  font-weight: @btn-font-weight;
+
+  &:hover,
+  &:focus {
+    text-decoration: none;
   }
 }

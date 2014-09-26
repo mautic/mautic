@@ -2,13 +2,105 @@
 // Forms
 // --------------------------------------------------
 
+// Normalize non-controls
+//
+// Restyle and baseline non-control form elements.
+
+label {
+  font-weight: 600;
+}
+
+// control label
+// -------------------------
+.control-label {
+  &.text-left {
+    text-align: left;
+  }
+}
+
 // form control
 // -------------------------
 .form-control {
+  .box-shadow(none);
+  .transition(~"border-color ease-in-out .15s");
   // Rounded
   // -------------------------
   &.form-control-rounded {
     border-radius: @input-height-base;
+  }
+}
+
+// stacked form
+.form-stack {
+  .form-control {
+    position: relative;
+    border-radius: 0;
+    // focus state
+    &:focus {
+      z-index: 1;
+    }
+    + .form-control {
+      margin-top: -1px;
+    }
+
+    // reset radius
+    &:first-child {
+      border-radius: @border-radius-base @border-radius-base 0 0;
+    }
+    &:last-child {
+      border-radius: 0 0 @border-radius-base @border-radius-base;
+    }
+
+    // input-lg reset radius
+    &.input-lg {
+      &:first-child {
+        border-radius: @border-radius-large @border-radius-large 0 0;
+      }
+      &:last-child {
+        border-radius: 0 0 @border-radius-large @border-radius-large;
+      }
+    }
+
+    // input-sm reset radius
+    &.input-sm {
+      &:first-child {
+        border-radius: @border-radius-small @border-radius-small 0 0;
+      }
+      &:last-child {
+        border-radius: 0 0 @border-radius-small @border-radius-small;
+      }
+    }
+  }
+  .form-control-icon {
+    &:first-child {
+      > .form-control {
+        border-radius: @border-radius-base @border-radius-base 0 0;
+        // input-lg reset radius
+        &.input-lg {
+          border-radius: @border-radius-large @border-radius-large 0 0;
+        }
+        // input-sm reset radius
+        &.input-sm {
+          border-radius: @border-radius-small @border-radius-small 0 0;
+        }
+      }
+    }
+    &:last-child {
+      > .form-control {
+        border-radius: 0 0 @border-radius-base @border-radius-base;
+        // input-lg reset radius
+        &.input-lg {
+          border-radius: 0 0 @border-radius-large @border-radius-large;
+        }
+        // input-lg reset radius
+        &.input-sm {
+          border-radius: 0 0 @border-radius-small @border-radius-small;
+        }
+      }
+    }
+    + .form-control-icon {
+      margin-top: -1px;
+    }
   }
 }
 
@@ -37,7 +129,9 @@
   }
   .the-icon {
     position: absolute;
+    z-index: 2;
     top: 0;
+    left: 0;
     line-height: @input-height-base;
     width: @input-height-base;
     text-align: center;
@@ -45,6 +139,7 @@
   &.form-control-icon-right {
     .the-icon {
       right: 0;
+      left: auto;
     }
     .form-control {
       padding-left: @padding-base-horizontal;
@@ -118,10 +213,10 @@
             position: absolute;
             top: 2px;
             left: 2px;
-            background-color: @brand-dark;
+            background-color: @gray-dark;
             height: 10px;
             width: 10px;
-            border-radius: (@border-radius-base - 1);
+            border-radius: @border-radius-base - 1;
             .scale(0);
             .transition(all .1s ease);
           }
@@ -138,7 +233,7 @@
         // checked state
         &:checked {
           + span {
-            border: 1px solid @brand-dark;
+            border: 1px solid @gray-dark;
             &:after { 
               .scale(1);
               .transition(all .1s ease);
@@ -154,7 +249,7 @@
           }
           &:checked {
             + span {
-              border: 1px solid @brand-dark;
+              border: 1px solid @gray-dark;
             }
           }
         }

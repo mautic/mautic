@@ -5,7 +5,6 @@
 .switch {
   vertical-align: middle;
   margin-bottom: 0;
-  font-size: 28px;
   line-height: 0;
   cursor: pointer;
   .user-select(none);
@@ -16,14 +15,23 @@
     position: absolute;
     opacity: 0;
 
-    + span {
+    ~ .text {
+      display: inline-block;
+      font-weight: 400;
+      line-height: 24px;
+      vertical-align: middle;
+    }
+
+    ~ .switch {
+      font-size: 24px;
       position: relative;
       display: inline-block;
+      vertical-align: middle;
       background-color: darken(#fff, 2%);
       box-shadow: inset 0 0 0 1px #e5e5e5;
       cursor: pointer;
-      height: 28px;
-      width: (28px * 1.6);
+      height: 24px;
+      width: (24px * 1.6);
       border-radius: 28px;
       transition: border .25s .15s, box-shadow .25s .3s, padding .25s;
       
@@ -31,12 +39,12 @@
         position: absolute;
         background-color: #fff;
         border: 1px solid #e5e5e5;
-        border-radius: 28px;
+        border-radius: 24px;
         box-shadow: 0 1px 4px hsla(0,0%,0%,.01), 0 2px 4px hsla(0,0%,0%,.05);
         content: '';
         display: block;
-        height: 28px;
-        width: 28px;
+        height: 24px;
+        width: 24px;
         left: 0;
         top: 0;
         transition: border .25s .15s, left .25s .1s, right .15s .175s;
@@ -44,7 +52,7 @@
     }
 
     &:checked {
-      + span {
+      + .switch {
         border-color: @brand-success;
         box-shadow: inset 0 0 0 0.6em @brand-success;
         transition: border .25s, box-shadow .25s, padding .25s .15s;
@@ -78,12 +86,12 @@
 
   // sizing
   &.switch-lg {
-    .switch-size(32px);
+    .switch-size(28px);
   }
   &.switch-sm {
-    .switch-size(24px);
+    .switch-size(20px);
   }
   &.switch-xs {
-    .switch-size(20px);
+    .switch-size(16px);
   }
 }

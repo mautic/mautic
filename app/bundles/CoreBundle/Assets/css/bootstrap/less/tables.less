@@ -24,19 +24,18 @@ th {
     > tr {
       > th,
       > td {
-        padding: @table-cell-padding 15px;
+        padding: @table-cell-padding;
         line-height: @line-height-base;
-        vertical-align: middle; //#MODIFIED default value is - top
+        vertical-align: top;
         border-top: 1px solid @table-border-color;
       }
     }
   }
   // Bottom align for column headings
   > thead > tr > th {
-    padding: (@table-cell-padding + 2) 15px;
-    background-color: @table-header-bg; //#MODIFIED newly added
+    font-weight: 600;
     vertical-align: bottom;
-    border-bottom: 1px solid @table-border-color;
+    border-bottom: 2px solid @table-border-color;
   }
   // Remove top border from thead by default
   > caption + thead,
@@ -96,7 +95,7 @@ th {
   > thead > tr {
     > th,
     > td {
-      border-bottom-width: 1px;
+      border-bottom-width: 2px;
     }
   }
 }

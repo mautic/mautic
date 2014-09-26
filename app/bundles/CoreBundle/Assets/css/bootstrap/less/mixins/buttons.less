@@ -14,8 +14,8 @@
   &.active,
   .open > .dropdown-toggle& {
     color: @color;
-    background-color: darken(@background, 5%); //#MODIFIED default bootstrap is - darken(@background, 10%)
-        border-color: darken(@border, 5%); //#MODIFIED default bootstrap is - darken(@background, 15%)
+    background-color: darken(@background, 4%); // MODIFIED
+        border-color: darken(@border, 4%); // MODIFIED
   }
   &:active,
   &.active,
@@ -40,11 +40,9 @@
     background-color: @color;
   }
 
-  // dropdown toggle border
-  //#MODIFIED default bootstrap is none
-  // ---------------------
-  + .btn.dropdown-toggle {
-    border-left-color: darken(@border, 4%);
+  // MODIFIED - newly added
+  + .dropdown-toggle {
+    border-left-color: darken(@border, 3%);
   }
 }
 

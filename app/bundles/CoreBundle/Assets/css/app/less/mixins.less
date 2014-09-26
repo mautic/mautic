@@ -2,12 +2,67 @@
 // Mixins
 // --------------------------------------------------
 
+// Background color
+// ------------------------
+.bg-color(@bg-color; @color) {
+  background-color: @bg-color;
+  color: @color;
+
+  // lighten the base bg-color
+  &.bg-light-xs,
+  .bg-light-xs {
+    background-color: lighten(@bg-color, 1%);
+    border-color: darken(@bg-color, 3%) !important;
+  }
+  &.bg-light-sm,
+  .bg-light-sm {
+    background-color: lighten(@bg-color, 3%);
+    border-color: darken(@bg-color, 3%) !important;
+  }
+  &.bg-light-md,
+  .bg-light-md {
+    background-color: lighten(@bg-color, 5%);
+    border-color: darken(@bg-color, 3%) !important;
+  }
+  &.bg-light-lg,
+  .bg-light-lg {
+    background-color: lighten(@bg-color, 7%);
+    border-color: darken(@bg-color, 3%) !important;
+  }
+
+  // darken the base bg-color
+  &.bg-dark-xs,
+  .bg-dark-xs {
+    background-color: darken(@bg-color, 1%);
+    border-color: darken(@bg-color, 3%) !important;
+  }
+  &.bg-dark-sm,
+  .bg-dark-sm {
+    background-color: darken(@bg-color, 3%);
+    border-color: darken(@bg-color, 6%) !important;
+  }
+  &.bg-dark-md,
+  .bg-dark-md {
+    background-color: darken(@bg-color, 5%);
+    border-color: darken(@bg-color, 9%) !important;
+  }
+  &.bg-dark-lg,
+  .bg-dark-lg {
+    background-color: darken(@bg-color, 7%);
+    border-color: darken(@bg-color, 12%) !important;
+  }
+}
+
 // Switch size
 // ------------------------
 .switch-size(@height) {
-  font-size: @height;
   input {
-    + span {
+    ~ .text {
+      line-height: @height;
+    }
+
+    ~ .switch {
+      font-size: @height;
       height: @height;
       width: (@height * 1.6);
       border-radius: @height;
@@ -26,7 +81,7 @@
 .switch-color(@color) {
   input {
     &:checked {
-      + span {
+      + .switch {
         border-color: @color;
         box-shadow: inset 0 0 0 0.6em @color;
         &:after { border-color: @color; }
@@ -68,58 +123,73 @@
   }
 }
 
-// Panel color variant
+// sidebar nav variant
 // ------------------------
-.panel-variants(@border; @heading-text-color; @heading-bg-color; @heading-border) {
-  border-color: @border;
-
-  & > .panel-heading {
-    color: @heading-text-color;
-    background-color: @heading-bg-color;
-    border-color: @heading-border;
-
-    + .panel-collapse > .panel-body {
-      border-top-color: @border;
-    }
-    .badge {
-      color: @heading-bg-color;
-      background-color: @heading-text-color;
-    }
-    a.btn {
-      color: fadeout(@heading-text-color, 10%);
-
+.nav-sidebar-variants(@bgcolor) {
+  > li {
+    > a {
+      color: fade(contrast(@bgcolor), 50%);
       &:hover,
       &:focus {
-        color: @heading-text-color;
+        background-color: darken(@bgcolor, 2%);
+        color: fade(contrast(@bgcolor), 75%);
+      }
+    }
+
+    // Active and open state
+    &.active,
+    &.open {
+      > a {
+        background-color: darken(@bgcolor, 1.5%);
+        color: fade(contrast(@bgcolor), 75%);
+      }
+
+      // `nav-submenu`
+      > .nav-submenu {
+        background-color: darken(@bgcolor, 1.5%);
+      }
+    }
+
+    // nav-submenu style
+    > .nav-submenu {
+      background-color: darken(@bgcolor, 1.5%);
+      > li {
+        > a {
+          color: fade(contrast(@bgcolor), 50%);
+          &:hover,
+          &:focus {
+            color: fade(contrast(@bgcolor), 80%);
+          }
+        }
+
+        // Active and open state
+        &.active,
+        &.open {
+          > a {
+            color: fade(contrast(@bgcolor), 80%);
+          }
+        }
       }
     }
   }
-  & > .panel-footer {
-    + .panel-collapse > .panel-body {
-      border-bottom-color: @border;
-    }
+
+  // nav-heading
+  .nav-heading {
+    color: fade(contrast(@bgcolor), 25%);
+  }
+
+  // nav-divider
+  .nav-divider {
+    background-color: fade(contrast(@bgcolor), 6%);
   }
 }
 
-// Background color variant
+// loading bar variant
 // ------------------------
-.bg-color(@bg-color; @color) {
-  background-color: @bg-color;
-  color: @color;
-  &.light,
-  .light {
-    background-color: lighten(@bg-color, 5%);
-  }
-  &.lighter,
-  .lighter {
-    background-color: lighten(@bg-color, 10%);
-  }
-  &.dark,
-  .dark {
-    background-color: darken(@bg-color, 5%);
-  }
-  &.darker,
-  .darker {
-    background-color: darken(@bg-color, 10%);
+.loading-bar-variant(@bgcolor) {
+  background-color: lighten(@bgcolor, 45%);
+  &:after,
+  &:before {
+    background-color: @bgcolor;
   }
 }

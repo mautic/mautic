@@ -5,7 +5,7 @@
 .box-layout {
   display: table !important;
   width: 100%;
-  height: 100%;
+  //height: 100%;
   table-layout: fixed;
   border-spacing: 0;
 
@@ -14,13 +14,6 @@
     position: static;
     padding: 0;
 
-    +[class*=" col-"],
-    + [class^="col-"] {
-      &.bg-auto {
-        background-color: @body-bg;
-      }
-    }
-
     &.height-auto {
       &:before {
         content: "";
@@ -28,7 +21,6 @@
         width: inherit;
         top: 0;
         bottom: 0;
-        height: 100%;
         z-index: -1;
         background-color: inherit;
         border: inherit;
