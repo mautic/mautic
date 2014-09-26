@@ -36,3 +36,4 @@
 /build/packaging
 /build/packages/*
 !/build/packages/.placeholder
+/mockup
