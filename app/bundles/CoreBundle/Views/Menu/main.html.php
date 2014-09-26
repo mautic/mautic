@@ -11,7 +11,7 @@
 
 <?php if ($item->hasChildren() && $options["depth"] !== 0 && $item->getDisplayChildren()): ?>
     <?php if ($item->isRoot()): ?>
-        <ul class="nav mt-sm" data-toggle="menu">
+        <ul class="nav" data-toggle="menu">
         <li class="nav-heading hidden-sm">MAIN MENU</li>
     <?php else: ?>
         <ul<?php echo $view["menu_helper"]->parseAttributes($item->getChildrenAttributes()); ?>>
@@ -54,7 +54,8 @@
             ?>
 
             <?php if ($showChildren): ?>
-                <a href="javascript:void(0);" data-target="#<?php echo $linkAttributes['id']; ?>_child" data-toggle="submenu" <?php echo $view["menu_helper"]->parseAttributes($linkAttributes); ?>>
+                <a href="javascript:void(0);" data-target="#<?php echo $linkAttributes['id']; ?>_child" data-toggle="submenu" data-parent=".nav" <?php echo $view["menu_helper"]->parseAttributes($linkAttributes); ?>>
+                <span class="arrow pull-right text-right"></span>
             <?php else: ?>
                 <?php
                 $url = $child->getUri();
@@ -64,9 +65,7 @@
             <?php endif; ?>
 
             <?php if ($icon = ($child->getExtra("iconClass"))): ?>
-                <span class="figure">
-                    <i class="fa fa-fw <?php echo $icon; ?>"></i>
-                </span>
+                <span class="icon fa <?php echo $icon; ?>"></span>
             <?php endif; ?>
 
                 <?php

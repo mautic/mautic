@@ -13,8 +13,8 @@
 <?php if ($isRoot = ($item->isRoot())): ?>
 <li class="dropdown">
     <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-        <span class="text fw-sb ml5"><?php echo $view['translator']->trans('mautic.core.menu.admin'); ?></span>
-        <span class="caret ml5"></span>
+        <span class="text fw-sb ml-xs"><?php echo $view['translator']->trans('mautic.core.menu.admin'); ?></span>
+        <span class="caret ml-xs"></span>
     </a>
 
     <ul class="dropdown-menu pull-right">
@@ -31,7 +31,7 @@
                 <?php endif; ?>
 
                 <?php if ($icon = ($child->getExtra("iconClass"))): ?>
-                    <i class="fa <?php echo $icon; ?> fs-14"></i>
+                    <i class="fa <?php echo $icon; ?> fs-14 mr-2"></i>
                 <?php endif; ?>
 
                 <span<?php echo $view["menu_helper"]->parseAttributes($child->getLabelAttributes()); ?>><?php
