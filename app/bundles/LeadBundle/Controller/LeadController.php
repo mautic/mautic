@@ -13,6 +13,8 @@
 namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\SocialBundle\Helper\NetworkIntegrationHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -217,11 +219,11 @@ class LeadController extends FormController
             return $this->accessDenied();
         }
 
-        $template      = 'MauticLeadBundle:Lead:lead.html.php';
-        $vars['route'] = $this->generateUrl('mautic_lead_action', array(
-            'objectAction' => 'view',
-            'objectId'     => $lead->getId())
-        );
+        // Trigger the TIMELINE_ON_GENERATE event to fetch the timeline events from subscribed bundles
+        $dispatcher = $this->factory->getDispatcher();
+        $event = new LeadTimelineEvent($lead);
+        $dispatcher->dispatch(LeadEvents::TIMELINE_ON_GENERATE, $event);
+        $events = $event->getEvents();
 
         $fields            = $lead->getFields();
         $socialProfiles    = NetworkIntegrationHelper::getUserProfiles($this->factory, $lead, $fields);
@@ -234,9 +236,10 @@ class LeadController extends FormController
                 'socialProfiles'    => $socialProfiles,
                 'socialProfileUrls' => $socialProfileUrls,
                 'security'          => $this->factory->getSecurity(),
-                'permissions'       => $permissions
+                'permissions'       => $permissions,
+                'events'            => $events
             ),
-            'contentTemplate' => $template,
+            'contentTemplate' => 'MauticLeadBundle:Lead:lead.html.php',
             'passthroughVars' => array(
                 'activeLink'    => '#mautic_lead_index',
                 'mauticContent' => 'lead',

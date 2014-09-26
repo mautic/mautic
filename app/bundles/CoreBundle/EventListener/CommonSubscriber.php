@@ -49,4 +49,80 @@ class CommonSubscriber implements EventSubscriberInterface
     {
         return array();
     }
+
+    /**
+     * Find and add menu items
+     *
+     * @param MenuEvent $event
+     * @param           $name
+     */
+    protected function buildMenu(MauticEvents\MenuEvent $event, $name)
+    {
+        $security = $event->getSecurity();
+        $request  = $this->factory->getRequest();
+
+        $bundles = $this->factory->getParameter('bundles');
+        $menuItems = array();
+        foreach ($bundles as $bundle) {
+            //check common place
+            $path = $bundle['directory'] . "/Config/menu/$name.php";
+            if (!file_exists($path)) {
+                if ($name == 'main') {
+                    //else check for just a menu.php file
+                    $path = $bundle['directory'] . "/Config/menu.php";
+                }
+                $recheck = true;
+            } else {
+                $recheck = false;
+            }
+
+            if (!$recheck || file_exists($path)) {
+                $config      = include $path;
+                $menuItems[] = array(
+                    'priority' => !isset($config['priority']) ? 9999 : $config['priority'],
+                    'items'    => !isset($config['items'])    ? $config : $config['items']
+                );
+            }
+        }
+
+        usort($menuItems, function($a, $b) {
+            $ap = $a['priority'];
+            $bp = $b['priority'];
+
+            if ($ap == $bp) {
+                return 0;
+            }
+
+            return ($ap < $bp) ? -1 : 1;
+        });
+
+        foreach ($menuItems as $items) {
+            $event->addMenuItems($items['items']);
+        }
+    }
+
+
+    /**
+     * Get routing from bundles and add to Routing event
+     *
+     * @param $event
+     * @param $name
+     */
+    protected function buildRoute(MauticEvents\RouteEvent $event, $name)
+    {
+        $bundles = $this->factory->getParameter('bundles');
+
+        $routes = array();
+        foreach ($bundles as $bundle) {
+            $routing = $bundle['directory'] . "/Config/$name.php";
+            if (file_exists($routing)) {
+                $event->addRoutes($routing);
+            } else {
+                $routing = $bundle['directory'] . "/Config/routing/$name.php";
+                if (file_exists($routing)) {
+                    $event->addRoutes($routing);
+                }
+            }
+        }
+    }
 }

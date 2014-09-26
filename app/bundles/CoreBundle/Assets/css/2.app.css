@@ -1790,6 +1790,9 @@ label {
     float: none;
   }
 }
+.panel-footer {
+  overflow: hidden;
+}
 .switch {
   vertical-align: middle;
   margin-bottom: 0;

@@ -24,7 +24,7 @@ use Symfony\Component\Routing\RouteCollection;
 class RouteLoader extends Loader
 {
     private $loaded    = false;
-    private $dispatcher;
+    private $bundles;
     private $apiEnabled;
 
     /**
@@ -32,7 +32,7 @@ class RouteLoader extends Loader
      */
     public function __construct(MauticFactory $factory)
     {
-        $this->dispatcher = $factory->getDispatcher();
+        $this->bundles    = $factory->getParameter('bundles');
         $this->apiEnabled = $factory->getParameter('api_enabled');
     }
 
@@ -51,9 +51,18 @@ class RouteLoader extends Loader
         }
 
         if (!empty($this->apiEnabled)) {
-            $event = new RouteEvent($this);
-            $this->dispatcher->dispatch(ApiEvents::BUILD_ROUTE, $event);
-            $collection = $event->getCollection();
+            $collection = new RouteCollection();
+            foreach ($this->bundles as $bundle) {
+                $routing = $bundle['directory'] . "/Config/api.php";
+                if (file_exists($routing)) {
+                    $collection->addCollection($this->import($routing));
+                } else {
+                    $routing = $bundle['directory'] . "/Config/routing/api.php";
+                    if (file_exists($routing)) {
+                        $collection->addCollection($this->import($routing));
+                    }
+                }
+            }
         } else {
             $collection = new RouteCollection();
         }

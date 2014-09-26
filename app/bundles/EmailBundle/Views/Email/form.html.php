@@ -33,43 +33,34 @@ $view['slots']->set("headerTitle", $header.$subheader);
                 </h3>
             </div>
             <div class="panel-body">
-                <?php //echo $view['form']->row($form['subject']); ?>
-            </div>
-            <div class="panel-footer">
+                <?php echo $view['form']->row($form['subject']); ?>
+                <?php echo $view['form']->row($form['plainText']); ?>
             </div>
         </div>
     </div>
     <div class="col-md-4">
-            <?php echo $view['form']->form($form); ?>
+        <?php echo $view['form']->form($form); ?>
 
             <div class="hide email-builder">
                 <div class="email-builder-content">
                     <input type="hidden" id="EmailBuilderUrl" value="<?php echo $view['router']->generate('mautic_email_action', array('objectAction' => 'builder', 'objectId' => $email->getSessionId())); ?>" />
                 </div>
                 <div class="email-builder-panel">
-                    <button class="btn btn-warning btn-close-builder" onclick="Mautic.closeEmailEditor();"><?php echo $view['translator']->trans('mautic.email.builder.close'); ?></button>
+                    <p>
+                        <button class="btn btn-primary btn-close-builder" onclick="Mautic.closeEmailEditor();"><?php echo $view['translator']->trans('mautic.email.builder.close'); ?></button>
+                    </p>
                     <div class="well well-sm margin-md-top"><em><?php echo $view['translator']->trans('mautic.email.token.help'); ?></em></div>
-                    <div class="panel-group margin-sm-top" id="email_tokens">
+                    <div class="panel-group" id="email_tokens">
                         <?php foreach ($tokens as $k => $t): ?>
                         <?php $id = \Mautic\CoreBundle\Helper\InputHelper::alphanum($k); ?>
                         <div class="panel panel-default">
                             <div class="panel-heading">
                                 <h4 class="panel-title">
-                                    <a style="display: block;" data-toggle="collapse" data-parent="#email_tokens" href="#<?php echo $id; ?>">
-                                        <span class="pull-left">
-                                            <?php echo $t['header']; ?>
-                                        </span>
-                                        <span class="pull-right">
-                                            <i class="fa fa-lg fa-fw fa-angle-down"></i>
-                                        </span>
-                                        <div class="clearfix"></div>
-                                    </a>
+                                    <?php echo $t['header']; ?>
                                 </h4>
                             </div>
-                            <div id="<?php echo $id; ?>" class="panel-collapse collapse">
-                                <div class="panel-body">
-                                    <?php echo $t['content']; ?>
-                                </div>
+                            <div class="panel-body">
+                                <?php echo $t['content']; ?>
                             </div>
                         </div>
                         <?php endforeach; ?>

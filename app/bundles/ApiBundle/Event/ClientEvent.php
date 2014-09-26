@@ -10,7 +10,7 @@
 namespace Mautic\ApiBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
-use Mautic\ApiBundle\Entity\Client;
+use Mautic\ApiBundle\Entity\oAuth2\Client;
 
 /**
  * Class ClientEvent

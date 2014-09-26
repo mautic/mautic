@@ -21,6 +21,16 @@ class AuditLogModel extends CommonModel
 {
 
     /**
+     * {@inheritdoc}
+     *
+     * @return \Mautic\CoreBundle\Entity\AuditLogRepository
+     */
+    public function getRepository()
+    {
+        return $this->em->getRepository('MauticCoreBundle:AuditLog');
+    }
+
+    /**
      * Writes an entry to the audit log
      *
      * @param array $args [bundle, object, objectId, action, details, ipAddress]

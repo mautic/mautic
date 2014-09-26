@@ -22,6 +22,9 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class DoctrineStepType extends AbstractType
 {
+    /**
+     * {@inheritdoc}
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('driver', 'choice', array(
@@ -101,6 +104,9 @@ class DoctrineStepType extends AbstractType
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'install_doctrine_step';

@@ -85,19 +85,4 @@ $container->loadFromExtension('security', array(
     )
 ));
 
-$container->loadFromExtension('fos_oauth_server', array(
-    'db_driver'           => 'orm',
-    'client_class'        => 'Mautic\ApiBundle\Entity\Client',
-    'access_token_class'  => 'Mautic\ApiBundle\Entity\AccessToken',
-    'refresh_token_class' => 'Mautic\ApiBundle\Entity\RefreshToken',
-    'auth_code_class'     => 'Mautic\ApiBundle\Entity\AuthCode',
-    'service'             => array(
-        'user_provider' => 'mautic.user.provider',
-        'options'       => array(
-            'supported_scopes' => 'user'
-        )
-    ),
-    'template'            => array(
-        'engine' => 'php'
-    )
-));
+$this->import('security_api.php');

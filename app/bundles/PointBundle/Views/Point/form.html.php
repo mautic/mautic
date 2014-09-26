@@ -15,24 +15,35 @@ $header = ($entity->getId()) ?
         array('%name%' => $view['translator']->trans($entity->getName()))) :
     $view['translator']->trans('mautic.point.header.new');
 $view['slots']->set("headerTitle", $header);
-
 echo $view['form']->start($form);
-echo $view['form']->row($form['name']);
-echo $view['form']->row($form['description']);
-echo $view['form']->row($form['category_lookup']);
-echo $view['form']->row($form['category']);
-echo $view['form']->row($form['isPublished']);
-echo $view['form']->row($form['publishUp']);
-echo $view['form']->row($form['publishDown']);
-echo $view['form']->row($form['type']);
 ?>
-<div id="pointActionProperties">
-    <?php
-    if (isset($form['properties'])):
-    echo $view['form']->row($form['properties']);
-    endif;
-    ?>
+<div class="col-md-8" id="pointActionProperties">
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h4 class="panel-title">
+				<?php echo $header; ?>
+			</h4>
+		</div>
+		<div class="panel-body">
+		    <?php		    
+			echo $view['form']->row($form['name']);
+			echo $view['form']->row($form['description']);
+			echo $view['form']->row($form['type']);
+
+		    if (isset($form['properties'])):
+		    	echo $view['form']->row($form['properties']);
+		    endif;
+		    ?>
+		</div>
+	</div>
 </div>
-<?php
-echo $view['form']->end($form);
-?>
+<div class="col-md-4">
+	<?php
+	echo $view['form']->row($form['category_lookup']);
+	echo $view['form']->row($form['category']);
+	echo $view['form']->row($form['isPublished']);
+	echo $view['form']->row($form['publishUp']);
+	echo $view['form']->row($form['publishDown']);
+	?>
+</div>
+<?php echo $view['form']->end($form); ?>

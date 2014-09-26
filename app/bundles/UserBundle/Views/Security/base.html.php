@@ -18,10 +18,10 @@
 
     <?php $view['assets']->outputSystemStylesheets(); ?>
 </head>
-<body style="background-color: #513B49;">
+<body style="background-color: #4E5E9E;">
 <div class="login-container">
     <div class="container-fluid">
-        <img src="<?php echo $view['assets']->getUrl('assets/images/mautic_logo.png') ?>" />
+        <img src="<?php echo $view['assets']->getUrl('assets/images/mautic_logo_db200.png') ?>" />
         <h2 class="user-login-heading"><?php $view['slots']->output('header', ''); ?></h2>
         <div id="main-panel-flash-msgs">
             <?php echo $view->render('MauticCoreBundle:Default:flashes.html.php'); ?>

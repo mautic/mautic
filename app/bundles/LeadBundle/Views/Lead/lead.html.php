@@ -97,32 +97,13 @@ $view['slots']->stop();
       ?>
     </div>
     <div class="col-md-9">
-      <?php
-      echo $view->render('MauticLeadBundle:Lead:details.html.php', array(
-          "lead"              => $lead,
-          'fields'            => $fields,
-          'socialProfileUrls' => $socialProfileUrls
-      ));
-
-      echo $view->render('MauticLeadBundle:Lead:visits.html.php', array(
-          "lead"        => $lead,
-          'fields'      => $fields
-      ));
-
-      echo $view->render('MauticLeadBundle:Lead:social.html.php', array(
-          "lead"              => $lead,
-          'socialProfiles'    => $socialProfiles,
-          'socialProfileUrls' => $socialProfileUrls
-      ));
-
-      echo $view->render('MauticLeadBundle:Lead:points_log.html.php', array(
-          "lead" => $lead
-      ));
-
-      $ipAddresses = count($lead->getIpAddresses());
-      if (!empty($ipAddresses))
-          echo $view->render('MauticLeadBundle:Lead:ip_addresses.html.php', array("lead" => $lead));
-      ?>
+        <?php foreach ($events as $event) : ?>
+        <div class="row">
+            <p>At <?php echo $view['date']->toFullConcat($event['timestamp']); ?>, <?php echo $event['event']; ?>.
+            <?php if (isset($event['extra'])) print_r($event['extra']); ?>
+            </p>
+        </div>
+        <?php endforeach; ?>
     </div>
   </div>
 </div>

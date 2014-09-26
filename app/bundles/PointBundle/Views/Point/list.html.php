@@ -100,7 +100,7 @@ $view->extend('MauticPointBundle:Point:index.html.php');
         </div>
     </div>
     <?php else: ?>
-        <div class="alert alert-info">
+        <div class="well well-small">
             <h4><?php echo $view['translator']->trans('mautic.core.noresults.header'); ?></h4>
             <p><?php echo $view['translator']->trans('mautic.core.noresults'); ?></p>
         </div>

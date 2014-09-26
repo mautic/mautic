@@ -21,7 +21,7 @@ class ClientRepositoryTest extends MauticWebTestCase
 
     public function testAdvancedSearch()
     {
-        $repo = $this->em->getRepository('MauticApiBundle:Client');
+        $repo = $this->em->getRepository('MauticApiBundle:oAuth2\Client');
 
         //set the translator
         $repo->setTranslator($this->container->get('translator'));

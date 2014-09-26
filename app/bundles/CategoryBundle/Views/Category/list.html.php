@@ -9,6 +9,8 @@
 if ($tmpl == 'index')
     $view->extend('MauticCategoryBundle:Category:index.html.php');
 ?>
+
+<?php if (count($items)): ?>
 <div class="panel panel-default">
     <div class="panel-heading">
         <h3 class="panel-title">
@@ -28,7 +30,6 @@ if ($tmpl == 'index')
         </div>
     </div>
     <div class="table-responsive scrollable body-white padding-sm page-list">
-        <?php if (count($items)): ?>
             <table class="table table-hover table-striped table-bordered category-list">
                 <thead>
                 <tr>
@@ -93,9 +94,7 @@ if ($tmpl == 'index')
                 <?php endforeach; ?>
                 </tbody>
             </table>
-        <?php else: ?>
-            <h4><?php echo $view['translator']->trans('mautic.core.noresults'); ?></h4>
-        <?php endif; ?>
+        
         <div class="panel-footer">
         <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
             "totalItems"      => count($items),
@@ -110,3 +109,9 @@ if ($tmpl == 'index')
         </div>
     </div>
 </div>
+<?php else: ?>
+    <div class="well well-small">
+        <h4><?php echo $view['translator']->trans('mautic.core.noresults.header'); ?></h4>
+        <p><?php echo $view['translator']->trans('mautic.core.noresults'); ?></p>
+    </div>
+<?php endif; ?>

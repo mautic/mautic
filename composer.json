@@ -28,6 +28,7 @@
         "knplabs/knp-menu": "2.0.*@dev",
         "knplabs/knp-menu-bundle":"dev-master",
         "friendsofsymfony/oauth-server-bundle": "dev-master",
+        "willdurand/oauth-server-bundle": "dev-master",
         "jms/serializer-bundle": "@dev",
         "friendsofsymfony/rest-bundle": "1.3.*",
 
@@ -38,7 +39,7 @@
     },
     "require-dev": {
         "liip/functional-test-bundle": "dev-master",
-        "nelmio/api-doc-bundle": "2.5.*@dev",
+        "nelmio/api-doc-bundle": "@stable",
         "sensio/distribution-bundle": "~2.3",
         "sensio/generator-bundle": "~2.3"
     },

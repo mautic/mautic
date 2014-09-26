@@ -28,15 +28,11 @@
     top: 0;
     bottom: 0;
     right: 0;
-    width: 250px;
+    width: 300px;
     height: 100%;
     padding: 15px;
-    background-color: #604656;
+    background-color: #d5d4d4;
     overflow-y: auto;
-}
-
-.email-builder-panel .panel-body {
-    padding: 0;
 }
 
 .email-builder-panel .btn-close-builder {
@@ -50,4 +46,8 @@
     right: 250px;
     height: 100%;
     position: fixed;
+}
+
+.email-builder-panel .panel a.btn {
+    white-space: normal;
 }

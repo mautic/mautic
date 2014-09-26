@@ -22,34 +22,65 @@ use Symfony\Component\Validator\Constraints as Assert;
 class DoctrineStep implements StepInterface
 {
     /**
+     * Database driver
+     *
      * @Assert\Choice(callback="getDriverKeys")
      */
     public $driver;
 
     /**
+     * Database host
+     *
      * @Assert\NotBlank
      */
     public $host;
 
     /**
+     * Database table prefix
+     *
+     * @var string
+     */
+    public $table_prefix;
+
+    /**
+     * Database connection port
+     *
      * @Assert\Range(min = "0")
      */
     public $port;
 
     /**
+     * Database name
+     *
      * @Assert\NotBlank
      */
     public $name;
 
     /**
+     * Database user
      * @Assert\NotBlank
      */
     public $user;
 
+    /**
+     * Database user's password
+     *
+     * @var string
+     */
     public $password;
 
+    /**
+     * Path to database
+     *
+     * @var string
+     */
     public $path;
 
+    /**
+     * Constructor
+     *
+     * @param array $parameters
+     */
     public function __construct(array $parameters)
     {
         foreach ($parameters as $key => $value) {
@@ -62,7 +93,7 @@ class DoctrineStep implements StepInterface
     }
 
     /**
-     * @see StepInterface
+     * {@inheritdoc}
      */
     public function getFormType()
     {
@@ -70,7 +101,7 @@ class DoctrineStep implements StepInterface
     }
 
     /**
-     * @see StepInterface
+     * {@inheritdoc}
      */
     public function checkRequirements()
     {
@@ -89,7 +120,7 @@ class DoctrineStep implements StepInterface
     }
 
     /**
-     * @see StepInterface
+     * {@inheritdoc}
      */
     public function checkOptionalSettings()
     {
@@ -97,7 +128,7 @@ class DoctrineStep implements StepInterface
     }
 
     /**
-     * @see StepInterface
+     * {@inheritdoc}
      */
     public function update(StepInterface $data)
     {
@@ -111,14 +142,16 @@ class DoctrineStep implements StepInterface
     }
 
     /**
-     * @see StepInterface
+     * {@inheritdoc}
      */
     public function getTemplate()
     {
-        return 'MauticInstallBundle:Step:doctrine.html.php';
+        return 'MauticInstallBundle:Install:doctrine.html.php';
     }
 
     /**
+     * Return the key values of the available driver array
+     *
      * @return array
      */
     public static function getDriverKeys()
@@ -127,19 +160,38 @@ class DoctrineStep implements StepInterface
     }
 
     /**
+     * Fetches the available database drivers for the environment
+     *
      * @return array
      */
     public static function getDrivers()
     {
-        return array(
+        $supported = array(
             'pdo_mysql'  => 'MySQL (PDO)',
             'pdo_sqlite' => 'SQLite (PDO)',
             'pdo_pgsql'  => 'PosgreSQL (PDO)',
-            'oci8'       => 'Oracle (native)',
-            'ibm_db2'    => 'IBM DB2 (native)',
             'pdo_oci'    => 'Oracle (PDO)',
             'pdo_ibm'    => 'IBM DB2 (PDO)',
             'pdo_sqlsrv' => 'SQLServer (PDO)',
+            'oci8'       => 'Oracle (native)',
+            'ibm_db2'    => 'IBM DB2 (native)',
+            'mysqli'     => 'MySQLi',
         );
+
+        $available = array();
+
+        // Add PDO drivers if they're supported
+        foreach (\PDO::getAvailableDrivers() as $driver) {
+            if (array_key_exists('pdo_' . $driver, $supported)) {
+                $available['pdo_' . $driver] = $supported['pdo_' . $driver];
+            }
+        }
+
+        // Add MySQLi if available
+        if (function_exists('mysqli_connect')) {
+            $available['mysqli'] = 'MySQLi';
+        }
+
+        return $available;
     }
 }

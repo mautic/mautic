@@ -17,6 +17,9 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class CheckStepType extends AbstractType
 {
+    /**
+     * {@inheritdoc}
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('buttons', 'form_buttons', array(
@@ -41,6 +44,9 @@ class CheckStepType extends AbstractType
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'install_check_step';

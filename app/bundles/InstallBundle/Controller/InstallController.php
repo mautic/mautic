@@ -12,11 +12,9 @@
 namespace Mautic\InstallBundle\Controller;
 
 use Doctrine\ORM\Tools\SchemaTool;
-use Doctrine\ORM\Tools\ToolsException;
 use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Process\Exception\RuntimeException;
 
 /**
@@ -27,7 +25,9 @@ use Symfony\Component\Process\Exception\RuntimeException;
 class InstallController extends CommonController
 {
     /**
-     * @return Response A Response instance
+     * Controller action for install steps
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function stepAction($index = 0)
     {
@@ -37,6 +37,11 @@ class InstallController extends CommonController
         $action = $this->generateUrl('mautic_installer_step', array('index' => $index));
         $step   = $configurator->getStep($index);
         $form   = $this->container->get('form.factory')->create($step->getFormType(), $step, array('action' => $action));
+        $tmpl   = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
+
+        // Always pass the requirements into the templates
+        $majors = $configurator->getRequirements();
+        $minors = $configurator->getOptionalSettings();
 
         $request = $this->container->get('request');
         if ('POST' === $request->getMethod()) {
@@ -47,8 +52,30 @@ class InstallController extends CommonController
                 try {
                     $configurator->write();
                 } catch (RuntimeException $exception) {
-                    // TODO - Need to enqueue a message
-                    return new RedirectResponse($this->container->get('router')->generate('mautic_installer_step', array('index' => $index)));
+                    return $this->postActionRedirect(array(
+                        'viewParameters'    => array(
+                            'form'    => $form->createView(),
+                            'index'   => $index,
+                            'count'   => $configurator->getStepCount(),
+                            'version' => $this->getVersion(),
+                            'tmpl'    => $tmpl,
+                            'majors'  => $majors,
+                            'minors'  => $minors,
+                            'appRoot' => $this->container->getParameter('kernel.root_dir'),
+                        ),
+                        'returnUrl'       => $this->generateUrl('mautic_installer_step', array('index' => $index)),
+                        'contentTemplate' => $step->getTemplate(),
+                        'passthroughVars' => array(
+                            'activeLink'    => '#mautic_installer_index',
+                            'mauticContent' => 'installer'
+                        ),
+                        'flashes'         => array(
+                            array(
+                                'type'    => 'error',
+                                'msg'     => 'mautic.installer.error.writing.configuration'
+                            )
+                        )
+                    ));
                 }
 
                 // Post-step processing
@@ -63,45 +90,125 @@ class InstallController extends CommonController
                             try {
                                 $schemaTool = new SchemaTool($entityManager);
                                 $schemaTool->createSchema($metadatas);
-                            } catch (ToolsException $exception) {
-                                // If the exception concerns the tables already having been created, notify the user of such
-                                // TODO - This really should just catch all exceptions to allow the app to handle error display
+                            } catch (\Exception $exception) {
                                 if (strpos($exception->getMessage(), 'Base table or view already exists') !== false) {
-                                    // TODO - Need to enqueue a message
+                                    $msg = 'mautic.installer.error.database.exists';
+                                } else {
+                                    $msg = 'mautic.installer.error.creating.database';
                                 }
+
+                                return $this->postActionRedirect(array(
+                                    'viewParameters'    => array(
+                                        'form'    => $form->createView(),
+                                        'index'   => $index,
+                                        'count'   => $configurator->getStepCount(),
+                                        'version' => $this->getVersion(),
+                                        'tmpl'    => $tmpl,
+                                        'majors'  => $majors,
+                                        'minors'  => $minors,
+                                        'appRoot' => $this->container->getParameter('kernel.root_dir'),
+                                    ),
+                                    'returnUrl'         => $this->generateUrl('mautic_installer_step', array('index' => $index)),
+                                    'contentTemplate'   => $step->getTemplate(),
+                                    'passthroughVars'   => array(
+                                        'activeLink'    => '#mautic_installer_index',
+                                        'mauticContent' => 'installer'
+                                    ),
+                                    'flashes'           => array(
+                                        array(
+                                            'type'    => 'error',
+                                            'msg'     => $msg,
+                                            'msgVars' => array('%exception%' => $exception->getMessage())
+                                        )
+                                    ),
+                                    'forwardController' => false
+                                ));
                             }
                         } else {
-                            // TODO - Need to enqueue a message
+                            return $this->postActionRedirect(array(
+                                'viewParameters'    => array(
+                                    'form'    => $form->createView(),
+                                    'index'   => $index,
+                                    'count'   => $configurator->getStepCount(),
+                                    'version' => $this->getVersion(),
+                                    'tmpl'    => $tmpl,
+                                    'majors'  => $majors,
+                                    'minors'  => $minors,
+                                    'appRoot' => $this->container->getParameter('kernel.root_dir'),
+                                ),
+                                'returnUrl'         => $this->generateUrl('mautic_installer_step', array('index' => $index)),
+                                'contentTemplate'   => $step->getTemplate(),
+                                'passthroughVars'   => array(
+                                    'activeLink'    => '#mautic_installer_index',
+                                    'mauticContent' => 'installer'
+                                ),
+                                'flashes'           => array(
+                                    array(
+                                        'type' => 'error',
+                                        'msg'  => 'mautic.installer.error.no.metadata'
+                                    )
+                                ),
+                                'forwardController' => false
+                            ));
                         }
 
                         break;
 
                     case 2:
-                        // First we need to create the admin role
-                        $translator    = $this->factory->getTranslator();
-                        $entityManager = $this->factory->getEntityManager();
-                        $role = new Role();
-                        $role->setName($translator->trans('mautic.user.role.admin.name', array(), 'fixtures'));
-                        $role->setDescription($translator->trans('mautic.user.role.admin.description', array(), 'fixtures'));
-                        $role->setIsAdmin(1);
-                        $entityManager->persist($role);
-                        $entityManager->flush();
+                        try {
+                            // First we need to create the admin role
+                            $translator    = $this->factory->getTranslator();
+                            $entityManager = $this->factory->getEntityManager();
+                            $role = new Role();
+                            $role->setName($translator->trans('mautic.user.role.admin.name', array(), 'fixtures'));
+                            $role->setDescription($translator->trans('mautic.user.role.admin.description', array(), 'fixtures'));
+                            $role->setIsAdmin(1);
+                            $entityManager->persist($role);
+                            $entityManager->flush();
 
-                        // Now we create the user
-                        $data = $form->getData();
-                        $user = new User();
+                            // Now we create the user
+                            $data = $form->getData();
+                            $user = new User();
 
-                        /** @var \Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface $encoder */
-                        $encoder = $this->container->get('security.encoder_factory')->getEncoder($user);
+                            /** @var \Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface $encoder */
+                            $encoder = $this->container->get('security.encoder_factory')->getEncoder($user);
 
-                        $user->setFirstName($data->firstname);
-                        $user->setLastName($data->lastname);
-                        $user->setUsername($data->username);
-                        $user->setEmail($data->email);
-                        $user->setPassword($encoder->encodePassword($data->password, $user->getSalt()));
-                        $user->setRole($role);
-                        $entityManager->persist($user);
-                        $entityManager->flush();
+                            $user->setFirstName($data->firstname);
+                            $user->setLastName($data->lastname);
+                            $user->setUsername($data->username);
+                            $user->setEmail($data->email);
+                            $user->setPassword($encoder->encodePassword($data->password, $user->getSalt()));
+                            $user->setRole($role);
+                            $entityManager->persist($user);
+                            $entityManager->flush();
+                        } catch (\Exception $exception) {
+                            return $this->postActionRedirect(array(
+                                'viewParameters'    => array(
+                                    'form'    => $form->createView(),
+                                    'index'   => $index,
+                                    'count'   => $configurator->getStepCount(),
+                                    'version' => $this->getVersion(),
+                                    'tmpl'    => $tmpl,
+                                    'majors'  => $majors,
+                                    'minors'  => $minors,
+                                    'appRoot' => $this->container->getParameter('kernel.root_dir'),
+                                ),
+                                'returnUrl'         => $this->generateUrl('mautic_installer_step', array('index' => $index)),
+                                'contentTemplate'   => $step->getTemplate(),
+                                'passthroughVars'   => array(
+                                    'activeLink'    => '#mautic_installer_index',
+                                    'mauticContent' => 'installer'
+                                ),
+                                'flashes'           => array(
+                                    array(
+                                        'type'    => 'error',
+                                        'msg'     => 'mautic.installer.error.creating.user',
+                                        'msgVars' => array('%exception%' => $exception->getMessage())
+                                    )
+                                ),
+                                'forwardController' => false
+                            ));
+                        }
 
                         break;
                 }
@@ -109,7 +216,30 @@ class InstallController extends CommonController
                 $index++;
 
                 if ($index < $configurator->getStepCount()) {
-                    return new RedirectResponse($this->container->get('router')->generate('mautic_installer_step', array('index' => $index)));
+                    $nextStep = $configurator->getStep($index);
+                    $action   = $this->generateUrl('mautic_installer_step', array('index' => $index));
+
+                    $form = $this->container->get('form.factory')->create($nextStep->getFormType(), $nextStep, array('action' => $action));
+
+                    return $this->postActionRedirect(array(
+                        'viewParameters'    => array(
+                            'form'    => $form->createView(),
+                            'index'   => $index,
+                            'count'   => $configurator->getStepCount(),
+                            'version' => $this->getVersion(),
+                            'tmpl'    => $tmpl,
+                            'majors'  => $majors,
+                            'minors'  => $minors,
+                            'appRoot' => $this->container->getParameter('kernel.root_dir'),
+                        ),
+                        'returnUrl'         => $action,
+                        'contentTemplate'   => $nextStep->getTemplate(),
+                        'passthroughVars'   => array(
+                            'activeLink'    => '#mautic_installer_index',
+                            'mauticContent' => 'installer'
+                        ),
+                        'forwardController' => false
+                    ));
                 }
 
                 // Post-processing once installation is complete
@@ -117,25 +247,41 @@ class InstallController extends CommonController
                 $secret = hash('sha1', uniqid(mt_rand()));
                 $configurator->mergeParameters(array('secret' => $secret));
 
+                $flashes = array();
+
                 // Write the updated config file
                 try {
                     $configurator->write();
                 } catch (RuntimeException $exception) {
-                    // TODO - Need to enqueue a message
+                    $flashes[] = array(
+                        'type'    => 'error',
+                        'msg'     => 'mautic.installer.error.writing.configuration'
+                    );
                 }
 
                 // Clear the cache one final time with the updated config
                 $this->clearCache();
 
-                return new RedirectResponse($this->container->get('router')->generate('mautic_installer_final'));
+                return $this->postActionRedirect(array(
+                    'viewParameters'  =>  array(
+                        'welcome_url' => $this->generateUrl('mautic_core_index'),
+                        'parameters'  => $configurator->render(),
+                        'config_path' => $this->container->getParameter('kernel.root_dir') . '/config/local.php',
+                        'is_writable' => $configurator->isFileWritable(),
+                        'version'     => $this->getVersion(),
+                        'tmpl'        => $tmpl,
+                    ),
+                    'returnUrl'         => $this->generateUrl('mautic_installer_final'),
+                    'contentTemplate'   => 'MauticInstallBundle:Install:final.html.php',
+                    'passthroughVars'   => array(
+                        'activeLink'    => '#mautic_installer_index',
+                        'mauticContent' => 'installer'
+                    ),
+                    'flashes'           => $flashes,
+                    'forwardController' => false
+                ));
             }
         }
-
-        $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
-
-        // Always pass the requirements into the templates
-        $majors = $configurator->getRequirements();
-        $minors = $configurator->getOptionalSettings();
 
         return $this->delegateView(array(
             'viewParameters'  =>  array(
@@ -150,20 +296,25 @@ class InstallController extends CommonController
             ),
             'contentTemplate' => $step->getTemplate(),
             'passthroughVars' => array(
-                'activeLink'     => '#mautic_install_index',
-                'mauticContent'  => 'install',
+                'activeLink'     => '#mautic_installer_index',
+                'mauticContent'  => 'installer',
                 'route'          => $this->generateUrl('mautic_installer_step', array('index' => $index)),
                 'replaceContent' => ($tmpl == 'list') ? 'true' : 'false'
             )
         ));
     }
 
+    /**
+     * Controller action for the final step
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     */
     public function finalAction()
     {
         /** @var \Mautic\InstallBundle\Configurator\Configurator $configurator */
         $configurator = $this->container->get('mautic.configurator');
 
-        $welcomeUrl = $this->container->get('router')->generate('mautic_core_index');
+        $welcomeUrl = $this->generateUrl('mautic_core_index');
 
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
@@ -178,16 +329,22 @@ class InstallController extends CommonController
             ),
             'contentTemplate' => 'MauticInstallBundle:Install:final.html.php',
             'passthroughVars' => array(
-                'activeLink'     => '#mautic_install_index',
-                'mauticContent'  => 'install',
-                'route'          => $this->generateUrl('mautic_installer_step', array('index' => 0)),
+                'activeLink'     => '#mautic_installer_index',
+                'mauticContent'  => 'installer',
+                'route'          => $this->generateUrl('mautic_installer_final'),
                 'replaceContent' => ($tmpl == 'list') ? 'true' : 'false'
             )
         ));
     }
 
+    /**
+     * Retrieve the kernel version
+     *
+     * @return string
+     */
     protected function getVersion()
     {
+        /** @var \AppKernel $kernel */
         $kernel = $this->container->get('kernel');
 
         return $kernel::VERSION;

@@ -9,6 +9,7 @@
 if ($tmpl == 'index')
 $view->extend('MauticAssetBundle:Asset:index.html.php');
 ?>
+<?php if (count($items)): ?>
 <div class="panel panel-default">
     <div class="panel-heading">
         <div class="panel-title">
@@ -28,7 +29,6 @@ $view->extend('MauticAssetBundle:Asset:index.html.php');
         </div>
     </div>
     <div class="table-responsive scrollable body-white padding-sm page-list">
-        <?php if (count($items)): ?>
             <table class="table table-hover table-striped table-bordered asset-list">
                 <thead>
                 <tr>
@@ -127,10 +127,11 @@ $view->extend('MauticAssetBundle:Asset:index.html.php');
                 <?php endforeach; ?>
                 </tbody>
             </table>
-        <?php else: ?>
-            <div class="alert alert-warning text-center">
-                <?php echo $view['translator']->trans('mautic.core.noresults'); ?>
-            </div>
-        <?php endif; ?>
     </div>
 </div>
+<?php else: ?>
+    <div class="well well-small">
+        <h4><?php echo $view['translator']->trans('mautic.core.noresults.header'); ?></h4>
+        <p><?php echo $view['translator']->trans('mautic.core.noresults'); ?></p>
+    </div>
+<?php endif; ?>

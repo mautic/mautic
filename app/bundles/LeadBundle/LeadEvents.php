@@ -157,4 +157,14 @@ final class LeadEvents
      * @var string
      */
     const FIELD_POST_DELETE   = 'mautic.lead_field_post_delete';
+
+    /**
+     * The mautic.lead_timeline_on_generate event is thrown when generating a lead's timeline view
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\LeadTimelineEvent instance.
+     *
+     * @var string
+     */
+    const TIMELINE_ON_GENERATE = 'mautic.lead_timeline_on_generate';
 }

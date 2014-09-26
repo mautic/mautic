@@ -29,20 +29,20 @@ class AssetsHelper extends BaseAssetsHelper
     public function addScript($script, $location = 'head')
     {
         $assets =& $this->assets;
-        $addScripts = function ($s) use ($location, $assets) {
+        $addScripts = function ($s) use ($location, &$assets) {
             if ($location == 'head') {
                 //special place for these so that declarations and scripts can be mingled
-                $this->assets['headDeclarations'][] = array(
+                $assets['headDeclarations'][] = array(
                     'type' => 'script',
                     'src'  => $s
                 );
             } else {
-                if (!isset($this->assets['scripts'][$location])) {
-                    $this->assets['scripts'][$location] = array();
+                if (!isset($assets['scripts'][$location])) {
+                    $assets['scripts'][$location] = array();
                 }
 
-                if (!in_array($s, $this->assets['scripts'][$location])) {
-                    $this->assets['scripts'][$location][] = $s;
+                if (!in_array($s, $assets['scripts'][$location])) {
+                    $assets['scripts'][$location][] = $s;
                 }
             }
         };
@@ -89,13 +89,13 @@ class AssetsHelper extends BaseAssetsHelper
     public function addStylesheet($stylesheet)
     {
         $assets =& $this->assets;
-        $addSheet = function ($s) use ($assets) {
-            if (!isset($this->assets['stylesheets'])) {
-                $this->assets['stylesheets'] = array();
+        $addSheet = function ($s) use (&$assets) {
+            if (!isset($assets['stylesheets'])) {
+                $assets['stylesheets'] = array();
             }
 
-            if (!in_array($s, $this->assets['stylesheets'])) {
-                $this->assets['stylesheets'][] = $s;
+            if (!in_array($s, $assets['stylesheets'])) {
+                $assets['stylesheets'][] = $s;
             }
         };
 

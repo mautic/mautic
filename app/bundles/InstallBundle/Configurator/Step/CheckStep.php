@@ -16,7 +16,19 @@ use Mautic\InstallBundle\Configurator\Form\CheckStepType;
  */
 class CheckStep implements StepInterface
 {
+
+    /**
+     * Flag if the configuration file is writable
+     *
+     * @var bool
+     */
     private $configIsWritable;
+
+    /**
+     * Path to the kernel root
+     *
+     * @var string
+     */
     private $kernelRoot;
 
     /**
@@ -260,7 +272,7 @@ class CheckStep implements StepInterface
      */
     public function getTemplate()
     {
-        return 'MauticInstallBundle:Step:check.html.php';
+        return 'MauticInstallBundle:Install:check.html.php';
     }
 
     /**
