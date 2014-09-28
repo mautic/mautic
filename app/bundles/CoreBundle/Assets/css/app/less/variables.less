@@ -10,17 +10,17 @@
 //== Logo
 //
 //## common logo color
-@mautic-logo-figure-width:                  32px;
+@mautic-logo-figure-width:                  38px;
 @mautic-logo-figure-circle-fill:            fade(contrast(@sidebar-left-header-bg), 80%);
 @mautic-logo-figure-m-fill:                 @brand-warning;
-@mautic-logo-text-width:                    76px;
+@mautic-logo-text-width:                    96px;
 @mautic-logo-text-fill:                     fade(contrast(@sidebar-left-header-bg), 80%);
 
 
 //== Header layout
 //
 //## common main header variable.
-@header-bg:                                 @brand-primary;
+@header-bg:                                 #fff;
 @header-height:                             56px;
 @header-zindex:                             @zindex-navbar + 5; // 1005
 
@@ -31,13 +31,13 @@
 @sidebar-zindex:                            (@zindex-navbar - 20 + 5);  // 985
 //** left sidebar option
 @sidebar-left-bg:                           #27303a;
-@sidebar-left-header-bg:                    darken(@brand-primary, 3%);
-@sidebar-left-width:                        205px;
+@sidebar-left-header-bg:                    @brand-primary;
+@sidebar-left-width:                        240px;
 @sidebar-left-collapse-width:               60px;
 //** right sidebar option - coming soon
-@sidebar-right-bg:                          #eee;
-@sidebar-right-header-bg:                   darken(@brand-primary, 3%);
-@sidebar-right-width:                       260px;
+@sidebar-right-bg:                          #27303a;
+@sidebar-right-header-bg:                   lighten(@sidebar-right-bg, 3%);
+@sidebar-right-width:                       240px;
 
 
 //== Content layout
