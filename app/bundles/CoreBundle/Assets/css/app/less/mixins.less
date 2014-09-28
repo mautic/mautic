@@ -53,6 +53,39 @@
   }
 }
 
+// Text emphasis
+// ------------------------
+.text-emphasis-variants(@color) {
+  color: @color;
+  a&:hover {
+    color: darken(@color, 10%);
+  }
+  &.dark-xs {
+    color: darken(@color, 15%);
+    a&:hover {
+      color: darken(@color, 20%);
+    }
+  }
+  &.dark-sm {
+    color: darken(@color, 30%);
+    a&:hover {
+      color: darken(@color, 35%);
+    }
+  }
+  &.dark-md {
+    color: darken(@color, 45%);
+    a&:hover {
+      color: darken(@color, 50%);
+    }
+  }
+  &.dark-lg {
+    color: darken(@color, 60%);
+    a&:hover {
+      color: darken(@color, 65%);
+    }
+  }
+}
+
 // Switch size
 // ------------------------
 .switch-size(@height) {
