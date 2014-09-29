@@ -22,11 +22,20 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
 
+/**
+ * Mautic's Factory
+ */
 class MauticFactory
 {
 
+    /**
+     * @var ContainerInterface
+     */
     private $container;
 
+    /**
+     * @param ContainerInterface $container
+     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -421,5 +430,15 @@ class MauticFactory
         }
 
         return $ipAddress;
+    }
+
+    /**
+     * Retrieves the application's version number
+     *
+     * @return string
+     */
+    public function getVersion()
+    {
+        return $this->container->get('kernel')->getVersion();
     }
 }

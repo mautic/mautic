@@ -1,10 +1,52 @@
 <?php
+/**
+ * @package     Mautic
+ * @copyright   2014 Mautic, NP. All rights reserved.
+ * @author      Mautic
+ * @link        http://mautic.com
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
 
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Config\Loader\LoaderInterface;
 
+/**
+ * Mautic Application Kernel
+ */
 class AppKernel extends Kernel
 {
+
+    /**
+     * Major version number
+     *
+     * @const integer
+     */
+    const MAJOR_VERSION = 1;
+
+    /**
+     * Minor version number
+     *
+     * @const integer
+     */
+    const MINOR_VERSION = 0;
+
+    /**
+     * Patch version number
+     *
+     * @const integer
+     */
+    const PATCH_VERSION = 0;
+
+    /**
+     * Major version number
+     *
+     * @const integer
+     */
+    const EXTRA_VERSION = '-dev';
+
+    /**
+     * {@inheritdoc}
+     */
     public function registerBundles()
     {
         $bundles = array(
@@ -63,8 +105,27 @@ class AppKernel extends Kernel
         return $bundles;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function registerContainerConfiguration(LoaderInterface $loader)
     {
         $loader->load(__DIR__.'/config/config_'.$this->getEnvironment().'.php');
+    }
+
+    /**
+     * Retrieves the application's version number
+     *
+     * @return string
+     */
+    public function getVersion()
+    {
+        $version = self::MAJOR_VERSION . '.' . self::MINOR_VERSION . '.' . self::PATCH_VERSION;
+
+        if (self::EXTRA_VERSION != '') {
+            $version .= self::EXTRA_VERSION;
+        }
+
+        return $version;
     }
 }
