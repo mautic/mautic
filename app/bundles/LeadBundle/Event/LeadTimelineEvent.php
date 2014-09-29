@@ -46,11 +46,13 @@ class LeadTimelineEvent extends Event
      * Add an event to the container.
      *
      * The data should be an associative array with the following data:
+     * 'event' =>     string    The event name
+     * 'timestamp' => \DateTime The timestamp of the event
+     * 'extra'     => array     An optional array of extra data for the event
      *
      * @param array $data Data array for the table
      *
      * @return void
-     * @todo Document container
      */
     public function addEvent(array $data)
     {
@@ -60,11 +62,21 @@ class LeadTimelineEvent extends Event
     /**
      * Fetch the events
      *
-     * @return array
+     * @return array Events sorted by timestamp with most recent event first
      */
     public function getEvents()
     {
-        return $this->events;
+        $events = $this->events;
+
+        usort($events, function($a, $b) {
+            if ($a['timestamp'] == $b['timestamp']) {
+                return 0;
+            }
+
+            return ($a['timestamp'] > $b['timestamp']) ? -1 : 1;
+        });
+
+        return $events;
     }
 
     /**
