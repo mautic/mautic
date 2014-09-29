@@ -22,5 +22,4 @@ $view['slots']->set("headerTitle", $header.$subheader);
 
 <div class="scrollable">
     <?php echo $view['form']->form($form); ?>
-    '
 </div>
