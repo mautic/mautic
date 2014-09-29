@@ -11,6 +11,7 @@
     "require": {
         "php": ">=5.3.7",
         "symfony/symfony": "2.5.*",
+        "symfony/icu": "1.0.*",
         "symfony/swiftmailer-bundle": "~2.3",
         "symfony/monolog-bundle": "~2.4",
         "sensio/distribution-bundle": "~2.3",
