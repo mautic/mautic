@@ -42,6 +42,7 @@ class LeadController extends FormController
             return $this->accessDenied();
         }
 
+        /** @var \Mautic\LeadBundle\Model\LeadModel $model */
         $model   = $this->factory->getModel('lead.lead');
         $session = $this->factory->getSession();
         //set limits
@@ -87,6 +88,29 @@ class LeadController extends FormController
 
         $leads = $results['results'];
         unset($results);
+
+        // Get the quick add form
+        $action = $this->generateUrl('mautic_lead_action', array('objectAction' => 'new'));
+
+        $fields = $this->factory->getModel('lead.field')->getEntities(array(
+            'filter' => array(
+                'force' => array(
+                    array(
+                        'column' => 'f.isPublished',
+                        'expr'   => 'eq',
+                        'value'  => true
+                    ),
+                    array(
+                        'column' => 'f.isShortVisible',
+                        'expr'   => 'eq',
+                        'value'  => true
+                    )
+                )
+            ),
+            'hydration_mode' => 'HYDRATE_ARRAY'
+        ));
+
+        $quickForm = $model->createForm($model->getEntity(), $this->get('form.factory'), $action, array('fields' => $fields, 'isShortForm' => true));
 
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page
@@ -152,7 +176,8 @@ class LeadController extends FormController
             'lists'        => $lists,
             'currentList'  => $list,
             'security'     => $this->factory->getSecurity(),
-            'inSingleList' => $inSingleList
+            'inSingleList' => $inSingleList,
+            'quickForm'    => $quickForm
         );
 
         return $this->delegateView(array(
@@ -270,7 +295,13 @@ class LeadController extends FormController
 
         $action = $this->generateUrl('mautic_lead_action', array('objectAction' => 'new'));
         $fields = $this->factory->getModel('lead.field')->getEntities(array(
-            'filter' => array('isPublished' => true),
+            'force' => array(
+                array(
+                    'column' => 'f.isPublished',
+                    'expr'   => 'eq',
+                    'value'  => true
+                )
+            ),
             'hydration_mode' => 'HYDRATE_ARRAY'
         ));
 
@@ -413,7 +444,13 @@ class LeadController extends FormController
 
         $action = $this->generateUrl('mautic_lead_action', array('objectAction' => 'edit', 'objectId' => $objectId));
         $fields = $this->factory->getModel('lead.field')->getEntities(array(
-            'filter' => array('isPublished' => true),
+            'force' => array(
+                array(
+                    'column' => 'f.isPublished',
+                    'expr'   => 'eq',
+                    'value'  => true
+                )
+            ),
             'hydration_mode' => 'HYDRATE_ARRAY'
         ));
         $form   = $model->createForm($lead, $this->get('form.factory'), $action, array('fields' => $fields));

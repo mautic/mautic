@@ -97,13 +97,35 @@ $view['slots']->stop();
       ?>
     </div>
     <div class="col-md-9">
-        <?php foreach ($events as $event) : ?>
-        <div class="row">
-            <p>At <?php echo $view['date']->toFullConcat($event['timestamp']); ?>, <?php echo $event['event']; ?>.
-            <?php if (isset($event['extra'])) print_r($event['extra']); ?>
-            </p>
-        </div>
-        <?php endforeach; ?>
+      <ul class="timeline">
+        <li class="header year ellipsis">Recent Events</li>
+        <li class="wrapper">
+          <ul class="events">
+            <?php foreach ($events as $event) : ?>
+              <li class="wrapper<?php if ($event['event'] == 'lead.created') echo ' featured'; ?>">
+                <div class="figure bgcolor-success"><i class="ico-file-plus"></i></div>
+                <div class="panel">
+                  <div class="panel-body">
+                    <ul class="list-table">
+                      <!-- <li class="text-left" style="width:60px;">
+                        <img class="img-circle" src="../image/avatar/avatar9.jpg" alt="" width="50px" height="50px">
+                      </li> -->
+                      <li class="text-left">
+                        <p class="mb5">At <?php echo $view['date']->toFullConcat($event['timestamp']); ?>, <?php echo $event['event']; ?>.</p>
+                      </li>
+                    </ul>
+                  </div>
+                  <?php if (isset($event['extra'])) : ?>
+                    <div class="panel-footer">
+                      <?php print_r($event['extra']); ?>
+                    </div>
+                  <?php endif; ?>
+                </div>
+              </li>
+            <?php endforeach; ?>
+          </ul>
+        </li>
+      </ul>
     </div>
   </div>
 </div>

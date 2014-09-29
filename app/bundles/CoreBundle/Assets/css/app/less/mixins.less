@@ -5,51 +5,85 @@
 // Background color
 // ------------------------
 .bg-color(@bg-color; @color) {
-  background-color: @bg-color;
-  color: @color;
+  background-color: @bg-color !important;
+  border-color: darken(@bg-color, 3%) !important;
+  color: @color !important;
 
   // lighten the base bg-color
   &.bg-light-xs,
   .bg-light-xs {
-    background-color: lighten(@bg-color, 1%);
+    background-color: lighten(@bg-color, 1%) !important;
     border-color: darken(@bg-color, 3%) !important;
   }
   &.bg-light-sm,
   .bg-light-sm {
-    background-color: lighten(@bg-color, 3%);
+    background-color: lighten(@bg-color, 3%) !important;
     border-color: darken(@bg-color, 3%) !important;
   }
   &.bg-light-md,
   .bg-light-md {
-    background-color: lighten(@bg-color, 5%);
+    background-color: lighten(@bg-color, 5%) !important;
     border-color: darken(@bg-color, 3%) !important;
   }
   &.bg-light-lg,
   .bg-light-lg {
-    background-color: lighten(@bg-color, 7%);
+    background-color: lighten(@bg-color, 7%) !important;
     border-color: darken(@bg-color, 3%) !important;
   }
 
   // darken the base bg-color
   &.bg-dark-xs,
   .bg-dark-xs {
-    background-color: darken(@bg-color, 1%);
+    background-color: darken(@bg-color, 1%) !important;
     border-color: darken(@bg-color, 3%) !important;
   }
   &.bg-dark-sm,
   .bg-dark-sm {
-    background-color: darken(@bg-color, 3%);
+    background-color: darken(@bg-color, 3%) !important;
     border-color: darken(@bg-color, 6%) !important;
   }
   &.bg-dark-md,
   .bg-dark-md {
-    background-color: darken(@bg-color, 5%);
+    background-color: darken(@bg-color, 5%) !important;
     border-color: darken(@bg-color, 9%) !important;
   }
   &.bg-dark-lg,
   .bg-dark-lg {
-    background-color: darken(@bg-color, 7%);
+    background-color: darken(@bg-color, 7%) !important;
     border-color: darken(@bg-color, 12%) !important;
+  }
+}
+
+// Text emphasis
+// ------------------------
+.text-emphasis-variants(@color) {
+  color: @color;
+  a&:hover {
+    color: darken(@color, 10%);
+  }
+  &.dark-xs {
+    color: darken(@color, 15%);
+    a&:hover {
+      color: darken(@color, 20%);
+    }
+  }
+  &.dark-sm {
+    color: darken(@color, 30%);
+    a&:hover {
+      color: darken(@color, 35%);
+    }
+  }
+  &.dark-md {
+    color: darken(@color, 45%);
+    a&:hover {
+      color: darken(@color, 50%);
+    }
+  }
+  &.dark-lg {
+    color: darken(@color, 60%);
+    a&:hover {
+      color: darken(@color, 65%);
+    }
   }
 }
 

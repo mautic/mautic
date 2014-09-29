@@ -10,6 +10,7 @@
 $size            = (empty($size)) ? '' : ' modal-'.$size;
 $class           = (!empty($class)) ? " $class" : "";
 $body            = (empty($body)) ? "" : $body;
+$footer          = (empty($footer)) ? "" : $footer;
 $hidePlaceholder = (empty($body)) ? false : true;
 $header          = (empty($header)) ? "" : $header;
 ?>
@@ -32,6 +33,11 @@ $header          = (empty($header)) ? "" : $header;
                     <?php echo $body; ?>
                 </div>
             </div>
+            <?php if (!empty($footer)) : ?>
+            <div class="modal-footer">
+                <?php echo $footer; ?>
+            </div>
+            <?php endif; ?>
         </div>
     </div>
 </div>

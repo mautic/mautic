@@ -3,7 +3,9 @@
 // --------------------------------------------------
 
 // Common styles
-
+a.media {
+  display: block;
+}
 .media {
   > a {
     display: block;
@@ -58,6 +60,93 @@
       &:last-child {
         > .media-object {
           &:before { bottom: 5px; }
+        }
+      }
+    }
+  }
+}
+
+// Media list contact
+.media-list {
+  &.media-list-contact {
+    > .media-heading {
+      padding: 15px 15px 5px;
+      font-weight: 600;
+      font-size: 12px;
+      margin-bottom: 0;
+    }
+    > .media {
+      margin: 0;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      a {
+        padding: 10px 15px;
+        &:hover,
+        &:foucs {
+          background-color: transparent;
+        }
+      }
+    }
+  }
+}
+
+// Media list chat bubbles
+.media-list {
+  &.media-list-bubble {
+    > .media {
+      padding: 15px;
+
+      &:after {
+        display: none;
+      }
+
+      .media-object {
+        position: relative;
+        float: left;
+        margin-right: 15px;
+
+        &:after {
+          content: "";
+          position: absolute;
+          top: 7px;
+          right: -18px;
+
+          width: 0px;
+          height: 0px;
+          border-style: solid;
+          border-width: 10px 10px 10px 0;
+          border-color: transparent lighten(#eee, 2%) transparent transparent;
+        }
+      }
+
+      .media-body {
+        .media-text {
+          display: inline-block;
+          padding: 8px;
+          color: lighten(@text-color, 5%);
+          background-color: lighten(#eee, 2%);
+          border-radius: @border-radius-base;
+        }
+      }
+
+      &.media-right {
+        .media-object {
+          float: right;
+          margin-left: 15px;
+          margin-right: 0px;
+
+          &:after {
+            left: -18px;
+            right: auto;
+            border-width: 10px 0 10px 10px;
+            border-color: transparent transparent transparent @brand-primary;
+          }
+        }
+        .media-body {
+          text-align: right;
+          .media-text {
+            color: darken(#fff, 5%);
+            background-color: @brand-primary;
+          }
         }
       }
     }

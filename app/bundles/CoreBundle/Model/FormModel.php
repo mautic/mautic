@@ -260,11 +260,12 @@ class FormModel extends CommonModel
     /**
      * Creates the appropriate form per the model
      *
-     * @param      $entity
-     * @param      $formFactory
-     * @param null $action
-     * @param array $options
-     * @return mixed
+     * @param                                     $entity
+     * @param \Symfony\Component\Form\FormFactory $formFactory
+     * @param string|null                         $action
+     * @param array                               $options
+     *
+     * @return \Symfony\Component\Form\Form
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function createForm($entity, $formFactory, $action = null, $options = array())

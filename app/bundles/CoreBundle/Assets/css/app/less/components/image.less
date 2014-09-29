@@ -7,7 +7,7 @@
 .img-wrapper {
   display: inline-block;
   position: relative;
-  overflow: hidden;
+  //overflow: hidden;
 
   +.img-wrapper {
     margin-left: 3px;
@@ -34,7 +34,17 @@
   }
 
   img {
+    border-radius: inherit;
     .img-responsive();
+  }
+
+  // label & badge
+  > .label,
+  > .badge {
+    position: absolute;
+    z-index: 5;
+    top: -10px;
+    right: -10px;
   }
 }
 

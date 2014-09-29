@@ -55,14 +55,14 @@ h1, h2, h3, h4, h5, h6,
 // -------------------------
 .page-header {
   background-color: lighten(@body-bg, 1%);
-  padding: 20px 15px;
+  padding: 15px;
   margin: 0;
   border-bottom: 0;
-  border-bottom: 1px solid @hr-border;
+  border-bottom: 1px solid darken(@hr-border, 2%);
 
   // breadcrumb
   .breadcrumb {
-    padding: 0;
+    padding: 5px 0;
     background-color: inherit;
     border-radius: 0;
   }
@@ -93,15 +93,20 @@ h1, h2, h3, h4, h5, h6,
 .fw-n { font-weight: 400; }
 .fw-t { font-weight: 300; }
 
+.tt-u { text-transform: uppercase; }
+
 // Contextual colors
 // -------------------------
 .text-muted { .text-emphasis-variant(rgba(0,0,0,0.5)); }
-.text-white { .text-emphasis-variant(#fff); }
+.text-white { .text-emphasis-variants(#fff); }
 .text-primary { .text-emphasis-variant(@brand-primary); }
 .text-success { .text-emphasis-variant(@brand-success); }
 .text-warning { .text-emphasis-variant(@brand-warning); }
 .text-danger { .text-emphasis-variant(@brand-danger); }
 .text-info { .text-emphasis-variant(@brand-info); }
+.text-twitter { .text-emphasis-variant(@brand-twitter); }
+.text-facebook { .text-emphasis-variant(@brand-facebook); }
+.text-google { .text-emphasis-variant(@brand-google); }
 
 // Blockquote
 // -------------------------

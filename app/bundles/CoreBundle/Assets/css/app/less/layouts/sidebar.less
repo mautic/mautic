@@ -50,14 +50,15 @@
     box-shadow:inset -1px 0 0 0 rgba(0,0,0,0.05);
     color: fade(contrast(@sidebar-left-bg), 55%);
 
-    // sidebar header
-    > .sidebar-header {
+    // sidebar header & footer
+    .sidebar-header,
+    .sidebar-footer {
       width: @sidebar-left-width;
       background-color: @sidebar-left-header-bg;
     }
 
     // sidebar content
-    > .sidebar-content {
+    .sidebar-content {
       padding-right: 1px;
     }
 
@@ -78,14 +79,15 @@
     box-shadow:inset 1px 0 0 0 rgba(0,0,0,0.05);
     color: fade(contrast(@sidebar-right-bg), 55%);
 
-    // sidebar header
-    > .sidebar-header {
+    // sidebar header & footer
+    .sidebar-header,
+    .sidebar-footer {
       width: @sidebar-right-width;
       background-color: @sidebar-right-header-bg;
     }
 
     // sidebar content
-    > .sidebar-content {
+    .sidebar-content {
       padding-left: 1px;
     }
 
@@ -98,7 +100,7 @@
   }
 
   // sidebar header
-  > .sidebar-header {
+  .sidebar-header {
     z-index: 10;
     height: @header-height;
     padding-left: 15px;
@@ -108,14 +110,40 @@
     .header-fixed & {
       position: absolute;
       top: 0;
-      box-shadow: 0 5px 5px -5px rgba(0,0,0,0.15), 0 1px 0 rgba(0,0,0,0.03);
+      box-shadow: 0 1px 0 0 rgba(0,0,0,0.06);
+      //box-shadow: 0 5px 5px -5px rgba(0,0,0,0.15), 0 1px 0 rgba(0,0,0,0.03);
+    }
+
+    // add top space to `sidebar-content` if header is present
+    ~ .sidebar-content {
+      top: @header-height;
+    }
+  }
+
+  // sidebar footer
+  .sidebar-footer {
+    position: absolute;
+    bottom: 0;
+    z-index: 9;
+    height: @footer-height;
+    padding-left: 15px;
+    padding-right: 15px;
+    box-shadow: 0 -1px 0 0 rgba(0,0,0,0.07);
+    
+    .form-control {
+      color: darken(#fff, 40%);
+    }
+
+    // add bottom space to `sidebar-content` if footer is present
+    ~ .sidebar-content {
+      bottom: @footer-height;
     }
   }
 
   // sidebar content
-  > .sidebar-content {
+  .sidebar-content {
     position: absolute;
-    top: @header-height;
+    top: 0;
     bottom: 0;
     width: 100%;
   }
@@ -181,6 +209,7 @@
 
       // nav-heading
       .nav-heading {
+        text-transform: uppercase;
         padding: 10px 18px;
         &:first-child {
           padding-top: 20px;
