@@ -33,7 +33,7 @@ class OAuthListener extends \Bazinga\OAuthServerBundle\Security\Firewall\OAuthLi
     {
         $request = $event->getRequest();
 
-        if (false === $request->attributes->get('oauth_request_parameters')) {
+        if (false === $request->attributes->get('oauth_request_parameters', false)) {
             return;
         }
 
