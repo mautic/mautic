@@ -19,19 +19,24 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
             <?php echo $view['translator']->trans('mautic.lead.list.header.index'); ?>
         </h3>
     </div>
-    <div class="panel-toolbar-wrapper">
-        <div class="panel-toolbar">
-            <div class="checkbox custom-checkbox pull-left">
-                <input type="checkbox" id="customcheckbox-one0" value="1" data-toggle="checkall" data-target="#reportTable">
-                <label for="customcheckbox-one0"><?php echo $view['translator']->trans('mautic.core.table.selectall'); ?></label>
+    <div class="panel-body">
+        <div class="box-layout">
+            <div class="col-xs-6 va-m">
+                <div class="checkbox-inline custom-primary">
+                    <label class="mb-0">
+                        <input type="checkbox" id="customcheckbox-one0" value="1">
+                        <span></span>
+                        <?php echo $view['translator']->trans('mautic.core.table.selectall'); ?>
+                    </label>
+                </div>
+            </div>
+            <div class="col-xs-6 va-m text-right">
+                <button type="button" class="btn btn-sm btn-warning"><i class="fa fa-files-o"></i></button>
+                <button type="button" class="btn btn-sm btn-danger"><i class="fa fa-trash-o"></i></button>
             </div>
         </div>
-        <div class="panel-toolbar text-right">
-            <button type="button" class="btn btn-sm btn-warning"><i class="fa fa-files-o"></i></button>
-            <button type="button" class="btn btn-sm btn-danger"><i class="fa fa-trash-o"></i></button>
-        </div>
     </div>
-    <div class="table-responsive scrollable body-white padding-sm page-list">
+    <div class="table-responsive">
         <?php if (count($items)): ?>
         <table class="table table-hover table-striped table-bordered leadlist-list">
             <thead>

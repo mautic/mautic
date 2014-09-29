@@ -17,23 +17,27 @@ if ($tmpl == 'index')
             <?php echo $view->render('MauticCoreBundle:Default:search.html.php'); ?>
         </div>
     </div>
-    <div class="panel-toolbar-wrapper">
-        <div class="panel-toolbar">
-            <div class="checkbox custom-checkbox pull-left">
-                <input type="checkbox" id="customcheckbox-one0" value="1" data-toggle="checkall" data-target="#leadTable">
-                <label for="customcheckbox-one0"><?php echo $view['translator']->trans('mautic.core.table.selectall'); ?></label>
+    <div class="panel-body">
+        <div class="box-layout">
+            <div class="col-xs-6 va-m">
+                <div class="checkbox-inline custom-primary">
+                    <label class="mb-0">
+                        <input type="checkbox" id="customcheckbox-one0" value="1" data-toggle="checkall" data-target="#leadTable">
+                        <span></span>
+                        <?php echo $view['translator']->trans('mautic.core.table.selectall'); ?>
+                    </label>
+                </div>
             </div>
-        </div>
-        <div class="panel-toolbar text-right">
-            <div class="btn-group">
-                <button type="button" class="btn btn-sm btn-default"><i class="fa fa-upload"></i></button>
-                <button type="button" class="btn btn-sm btn-default"><i class="fa fa-archive"></i></button>
+            <div class="col-xs-6 va-m text-right">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-sm btn-default"><i class="fa fa-upload"></i></button>
+                    <button type="button" class="btn btn-sm btn-default"><i class="fa fa-archive"></i></button>
+                </div>
+                <button type="button" class="btn btn-sm btn-danger"><i class="fa fa-trash-o"></i></button>
             </div>
-
-            <button type="button" class="btn btn-sm btn-danger"><i class="fa fa-trash-o"></i></button>
         </div>
     </div>
-    <div class="table-responsive panel-collapse pull out">
+    <div class="table-responsive">
         <?php if (count($items)): ?>
         <table class="table table-hover table-striped table-bordered" id="leadTable">
             <thead>
