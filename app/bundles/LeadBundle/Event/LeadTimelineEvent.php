@@ -46,7 +46,7 @@ class LeadTimelineEvent extends Event
      * Add an event to the container.
      *
      * The data should be an associative array with the following data:
-     * 'event' =>     string    The event name
+     * 'event'     => string    The event name
      * 'timestamp' => \DateTime The timestamp of the event
      * 'extra'     => array     An optional array of extra data for the event
      *
