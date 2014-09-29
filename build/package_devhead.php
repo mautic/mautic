@@ -39,7 +39,6 @@ system('cp ../robots.txt packaging/');
 // Step 4 - Remove stuff that shouldn't be distro'ed
 echo "Removing extra files\n";
 chdir($baseDir . '/packaging');
-system('rm app/bootstrap*');
 system('rm app/phpunit.*');
 system('rm app/tests.bootstrap*');
 system('rm app/config/config_local.php*');
