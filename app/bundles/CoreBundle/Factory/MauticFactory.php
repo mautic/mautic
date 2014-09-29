@@ -52,6 +52,10 @@ class MauticFactory
                 $modelClass = '\\Mautic\\' . ucfirst($parts[0]) . 'Bundle\\Model\\' . ucfirst($parts[1]) . 'Model';
                 if (class_exists($modelClass)) {
                     $models[$name] = new $modelClass($this);
+
+                    if (method_exists($models[$name], 'initialize')) {
+                        $models[$name]->initialize();
+                    }
                 } else {
                     throw new NotAcceptableHttpException($name . " is not an acceptable model name.");
                 }

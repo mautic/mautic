@@ -9,6 +9,7 @@
 
 namespace Mautic\UserBundle\Entity;
 
+use Bazinga\OAuthServerBundle\Model\UserInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -27,7 +28,7 @@ use JMS\Serializer\Annotation as Serializer;
  * @ORM\Entity(repositoryClass="Mautic\UserBundle\Entity\UserRepository")
  * @Serializer\ExclusionPolicy("all")
  */
-class User extends FormEntity implements AdvancedUserInterface, \Serializable
+class User extends FormEntity implements UserInterface, AdvancedUserInterface, \Serializable
 {
     /**
      * @ORM\Column(type="integer")
@@ -101,7 +102,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      * @ORM\JoinColumn(name="role_id", referencedColumnName="id")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"full"})
      */
     private $role;
 
@@ -109,7 +110,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      * @ORM\Column(type="text", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"full"})
      */
     private $timezone = 'UTC';
 
@@ -117,7 +118,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      * @ORM\Column(type="text", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"full"})
      */
     private $locale   = 'en_US';
 
@@ -125,7 +126,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      * @ORM\Column(type="datetime", name="last_login", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"full"})
      */
     private $lastLogin;
 
@@ -133,7 +134,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      * @ORM\Column(type="datetime", name="last_active", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"full"})
      */
     private $lastActive;
 
@@ -141,7 +142,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable
      * @ORM\Column(type="string", name="online_status", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"full"})
      */
     private $onlineStatus;
 

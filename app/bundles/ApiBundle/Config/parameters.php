@@ -9,7 +9,7 @@
 
 $parameters = array(
     "api_enabled" => false,
-    "api_mode"    => "oauth1a" //oauth1a or oauth2
+    "api_mode"    => "oauth1" //oauth1 or oauth2
 );
 
 return $parameters;

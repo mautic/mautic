@@ -31,13 +31,15 @@ class ClientType extends AbstractType
 
     private $translator;
     private $validator;
+    private $apiMode;
 
     /**
      * @param MauticFactory $factory
      */
     public function __construct(MauticFactory $factory) {
         $this->translator = $factory->getTranslator();
-        $this->validator  = $factory->getValidator();;
+        $this->validator  = $factory->getValidator();
+        $this->apiMode    = $factory->getParameter('api_mode');
     }
 
     /**
@@ -55,48 +57,107 @@ class ClientType extends AbstractType
             'attr'       => array('class' => 'form-control')
         ));
 
-        $arrayStringTransformer = new Transformers\ArrayStringTransformer();
-        $builder->add(
-            $builder->create('redirectUris', 'text', array(
-                'label'      => 'mautic.api.client.form.redirecturis',
+
+        if ($this->apiMode == 'oauth2') {
+            $arrayStringTransformer = new Transformers\ArrayStringTransformer();
+            $builder->add(
+                $builder->create('redirectUris', 'text', array(
+                    'label'      => 'mautic.api.client.form.redirecturis',
+                    'label_attr' => array('class' => 'control-label'),
+                    'attr'       => array(
+                        'class'   => 'form-control',
+                        'tooltip' => 'mautic.api.client.form.help.requesturis',
+                    )
+                ))
+                    ->addViewTransformer($arrayStringTransformer)
+            );
+
+            $builder->add('publicId', 'text', array(
+                'label'      => 'mautic.api.client.form.clientid',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array('class' => 'form-control'),
+                'disabled'   => true,
+                'required'   => false,
+                'mapped'     => false,
+                'data'       => $options['data']->getPublicId()
+            ));
+
+            $builder->add('secret', 'text', array(
+                'label'      => 'mautic.api.client.form.clientsecret',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array('class' => 'form-control'),
+                'disabled'   => true,
+                'required'   => false
+            ));
+
+            $translator = $this->translator;
+            $validator  = $this->validator;
+
+            $builder->addEventListener(FormEvents::POST_SUBMIT, function(FormEvent $event) use ($translator, $validator) {
+                $form = $event->getForm();
+                $data = $event->getData();
+
+                if ($form->has('redirectUris')) {
+                    foreach ($data->getRedirectUris() as $uri) {
+                        $urlConstraint = new Assert\Url(array(
+                            'protocols' => array('http','https')
+                        ));
+                        $urlConstraint->message = $translator->trans(
+                            'mautic.api.client.redirecturl.invalid',
+                            array('%url%' => $uri),
+                            'validators'
+                        );
+
+                        $errors = $validator->validateValue(
+                            $uri,
+                            $urlConstraint
+                        );
+
+                        if (!empty($errors)) {
+                            foreach ($errors as $error) {
+                                $form['redirectUris']->addError(new FormError($error->getMessage()));
+                            }
+                        }
+                    }
+                }
+            });
+        } else {
+            $builder->add('callback', 'text', array(
+                'label'      => 'mautic.api.client.form.callback',
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array(
                     'class'   => 'form-control',
-                    'tooltip' => 'mautic.api.client.form.help.requesturis',
+                    'tooltip' => 'mautic.api.client.form.help.callback',
                 )
-            ))
-            ->addViewTransformer($arrayStringTransformer)
-        );
+            ));
 
-        $builder->add('publicId', 'text', array(
-            'label'      => 'mautic.api.client.form.clientid',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control'),
-            'disabled'   => true,
-            'required'   => false,
-            'mapped'     => false,
-            'data'       => $options['data']->getPublicId()
-        ));
+            $builder->add('consumerKey', 'text', array(
+                'label'      => 'mautic.api.client.form.consumerkey',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array('class' => 'form-control'),
+                'disabled'   => true,
+                'required'   => false,
+                'mapped'     => false,
+                'data'       => $options['data']->getConsumerKey()
+            ));
 
-        $builder->add('secret', 'text', array(
-            'label'      => 'mautic.api.client.form.clientsecret',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control'),
-            'disabled'   => true,
-            'required'   => false
-        ));
+            $builder->add('consumerSecret', 'text', array(
+                'label'      => 'mautic.api.client.form.consumersecret',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array('class' => 'form-control'),
+                'disabled'   => true,
+                'required'   => false
+            ));
 
-        $builder->add('buttons', 'form_buttons');
+            $translator = $this->translator;
+            $validator  = $this->validator;
 
-        $translator = $this->translator;
-        $validator  = $this->validator;
+            $builder->addEventListener(FormEvents::POST_SUBMIT, function(FormEvent $event) use ($translator, $validator) {
+                $form = $event->getForm();
+                $data = $event->getData();
 
-        $builder->addEventListener(FormEvents::POST_SUBMIT, function(FormEvent $event) use ($translator, $validator) {
-            $form = $event->getForm();
-            $data = $event->getData();
-
-            if ($form->has('redirectUris')) {
-                foreach ($data->getRedirectUris() as $uri) {
+                if ($form->has('callback')) {
+                    $uri           = $data->getCallback();
                     $urlConstraint = new Assert\Url(array(
                         'protocols' => array('http','https')
                     ));
@@ -113,12 +174,14 @@ class ClientType extends AbstractType
 
                     if (!empty($errors)) {
                         foreach ($errors as $error) {
-                            $form['redirectUris']->addError(new FormError($error->getMessage()));
+                            $form['callback']->addError(new FormError($error->getMessage()));
                         }
                     }
                 }
-            }
-        });
+            });
+        }
+
+        $builder->add('buttons', 'form_buttons');
 
         if (!empty($options["action"])) {
             $builder->setAction($options["action"]);
@@ -131,8 +194,9 @@ class ClientType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
+        $dataClass = ($this->apiMode == 'oauth2') ? 'Mautic\ApiBundle\Entity\oAuth2\Client' : 'Mautic\ApiBundle\Entity\oAuth1\Consumer';
         $resolver->setDefaults(array(
-            'data_class' => 'Mautic\ApiBundle\Entity\oAuth2\Client'
+            'data_class' => $dataClass
         ));
     }
 

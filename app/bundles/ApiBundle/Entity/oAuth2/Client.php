@@ -35,7 +35,7 @@ class Client extends BaseClient
 
     /**
      * @ORM\ManyToMany(targetEntity="Mautic\UserBundle\Entity\User")
-     * @ORM\JoinTable(name="oauth_user_client_xref")
+     * @ORM\JoinTable(name="oauth2_user_client_xref")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      */
     protected $users;

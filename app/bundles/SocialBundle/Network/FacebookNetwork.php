@@ -51,7 +51,6 @@ class FacebookNetwork extends AbstractNetwork
         return array(
             'public_profile',
             'share_button'
-
         );
     }
 

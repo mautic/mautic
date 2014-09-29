@@ -10,11 +10,15 @@
 namespace Mautic\ApiBundle\Entity\oAuth1;
 
 use Bazinga\OAuthServerBundle\Model\Consumer as BaseConsumer;
+use Bazinga\OAuthServerBundle\Util\Random;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Mautic\ApiBundle\Entity\oAuth1\ConsumerRepository")
  * @ORM\Table(name="oauth1_consumers")
+ * @ORM\HasLifecycleCallbacks
  */
 class Consumer extends BaseConsumer
 {
@@ -44,4 +48,109 @@ class Consumer extends BaseConsumer
      * @ORM\Column(type="string")
      */
     protected $callback;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="Mautic\UserBundle\Entity\User")
+     * @ORM\JoinTable(name="oauth1_user_consumer_xref")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
+     */
+    protected $users;
+
+    /**
+     * @param ClassMetadata $metadata
+     */
+    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    {
+        $metadata->addPropertyConstraint('name', new Assert\NotBlank(
+            array('message' => 'mautic.api.client.name.notblank')
+        ));
+
+        $metadata->addPropertyConstraint('callback', new Assert\NotBlank(
+            array('message' => 'mautic.api.client.callback.notblank')
+        ));
+    }
+
+    /**
+     * Add users
+     *
+     * @param \Mautic\UserBundle\Entity\User $users
+     * @return Client
+     */
+    public function addUser(\Mautic\UserBundle\Entity\User $users)
+    {
+        $this->users[] = $users;
+
+        return $this;
+    }
+
+    /**
+     * Remove users
+     *
+     * @param \Mautic\UserBundle\Entity\User $users
+     */
+    public function removeUser(\Mautic\UserBundle\Entity\User $users)
+    {
+        $this->users->removeElement($users);
+    }
+
+    /**
+     * Get users
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getUsers()
+    {
+        return $this->users;
+    }
+
+    /**
+     * Proxy to get consumer key
+     *
+     * @return mixed
+     */
+    public function getRandomId()
+    {
+        return $this->consumerKey;
+    }
+
+    /**
+     * Proxy to consumer key
+     *
+     * @return mixed
+     */
+    public function getPublicId()
+    {
+        return $this->consumerKey;
+    }
+
+    /**
+     * Proxy to consumer secret
+     *
+     * @return mixed
+     */
+    public function getSecret()
+    {
+        return $this->consumerSecret;
+    }
+
+    /**
+     * @ORM\PrePersist
+     */
+    public function createConsumerKeys()
+    {
+        if (empty($this->consumerKey)) {
+            $this->consumerKey    = Random::generateToken();
+            $this->consumerSecret = Random::generateToken();
+        }
+    }
+
+    /**
+     * Proxy to callback
+     *
+     * @return array
+     */
+    public function getRedirectUris()
+    {
+        return array($this->callback);
+    }
 }

@@ -10,6 +10,7 @@
 namespace Mautic\ApiBundle\Model;
 
 use Mautic\ApiBundle\ApiEvents;
+use Mautic\ApiBundle\Entity\oAuth1\Consumer;
 use Mautic\ApiBundle\Event\ClientEvent;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\ApiBundle\Entity\oAuth2\Client;
@@ -24,6 +25,15 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 class ClientModel extends FormModel
 {
 
+    private $apiMode;
+    /**
+     *
+     */
+    public function initialize()
+    {
+        $this->apiMode = $this->factory->getParameter('api_mode');
+    }
+
     /**
      * {@inheritdoc}
      *
@@ -31,7 +41,11 @@ class ClientModel extends FormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticApiBundle:oAuth2\Client');
+        if ($this->apiMode == 'oauth2') {
+            return $this->em->getRepository('MauticApiBundle:oAuth2\Client');
+        } else {
+            return $this->em->getRepository('MauticApiBundle:oAuth1\Consumer');
+        }
     }
 
     /**
@@ -56,8 +70,8 @@ class ClientModel extends FormModel
      */
     public function createForm($entity, $formFactory, $action = null, $options = array())
     {
-        if (!$entity instanceof Client) {
-            throw new MethodNotAllowedHttpException(array('Client'), 'Entity must be of class Client()');
+        if (!$entity instanceof Client && !$entity instanceof Consumer) {
+            throw new MethodNotAllowedHttpException(array('Client', 'Consumer'));
         }
 
         $params = (!empty($action)) ? array('action' => $action) : array();
@@ -73,7 +87,7 @@ class ClientModel extends FormModel
     public function getEntity($id = null)
     {
         if ($id === null) {
-            return new Client();
+            return $this->apiMode == 'oauth2' ? new Client() : new Consumer();
         }
 
         return parent::getEntity($id);
@@ -91,8 +105,8 @@ class ClientModel extends FormModel
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, $event = false)
     {
-        if (!$entity instanceof Client) {
-            throw new MethodNotAllowedHttpException(array('Client'), 'Entity must be of class Client()');
+        if (!$entity instanceof Client && !$entity instanceof Consumer) {
+            throw new MethodNotAllowedHttpException(array('Client', 'Consumer'));
         }
 
         switch ($action) {

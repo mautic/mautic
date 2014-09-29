@@ -26,13 +26,13 @@ class RequestToken extends BaseRequestToken
     protected $id;
 
     /**
-     * @ORM\OneToOne(targetEntity="Consumer")
-     * @ORM\JoinColumn(name="customer_id", referencedColumnName="id")
+     * @ORM\ManyToOne(targetEntity="Consumer")
+     * @ORM\JoinColumn(name="consumer_id", referencedColumnName="id")
      */
     protected $consumer;
 
     /**
-     * @ORM\OneToOne(targetEntity="Mautic\UserBundle\Entity\User")
+     * @ORM\ManyToOne(targetEntity="Mautic\UserBundle\Entity\User")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
      */
     protected $user;

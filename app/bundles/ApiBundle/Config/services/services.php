@@ -10,14 +10,6 @@
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-//oAuth1 service providers
-$container->setDefinition ('mautic.api.oauth1.nonce_provider',
-    new Definition(
-        'Mautic\ApiBundle\Provider\NonceProvider',
-        array(new Reference('doctrine.orm.entity_manager'))
-    )
-);
-
 //API Route Loader
 $container->setDefinition ('mautic.api_route_loader',
     new Definition(
@@ -35,3 +27,13 @@ $container->setDefinition ('mautic.api_docs_route_loader',
     )
 )
     ->addTag('routing.loader');
+
+//oAuth1 service providers
+$container->setDefinition ('mautic.api.oauth1.nonce_provider',
+    new Definition(
+        'Mautic\ApiBundle\Provider\NonceProvider',
+        array(new Reference('doctrine.orm.entity_manager'))
+    )
+);
+$container->setParameter('bazinga.oauth.security.authentication.provider.class', 'Mautic\ApiBundle\Security\Authentification\Provider\OAuthProvider');
+$container->setParameter('bazinga.oauth.security.authentication.listener.class', 'Mautic\ApiBundle\Security\Firewall\OAuthListener');

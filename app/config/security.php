@@ -47,30 +47,41 @@ $container->loadFromExtension('security', array(
             'anonymous' => true,
             'context'   => 'mautic'
         ),
-        'oauth_token' => array(
+        'oauth2_token' => array(
             'pattern'  => '^/oauth/v2/token',
             'security' => false
         ),
-        'oauth_authorize' => array(
-            'pattern'    => '^/oauth/v2/auth',
+        'oauth2_login' => array(
+            'pattern'  => '^/oauth/v2/login',
+            'anonymous'  => true
+        ),
+        'oauth2_area' => array(
+            'pattern'    => '^/oauth/v2/authorize',
             'form_login' => array(
                 'provider'   => 'user_provider',
-                'check_path' => '/oauth/v2/auth_login_check',
-                'login_path' => '/oauth/v2/auth_login'
-            ),
-            'anonymous'  => true
+                'check_path' => '/oauth/v2/authorize_login_check',
+                'login_path' => '/oauth/v2/authorize_login'
+            )
         ),
-        'oauth_login' => array(
-            'pattern' =>  '^/oauth/v1/auth$',
+        'oauth1_request_token' => array(
+            'pattern'  => '^/oauth/v1/request_token',
             'security' => false
         ),
-        'oauth_area' => array(
-            'pattern' => '^/oauth/v1/auth',
-            'form_login' => array(
-                'check_path' => '/oauth/v1/auth_login_check',
-                'login_path' => '/oauth/v1/auth_login'
-            ),
+        'oauth1_access_token' => array(
+            'pattern'  => '^/oauth/v1/access_token',
+            'security' => false
+        ),
+        'oauth1_login' => array(
+            'pattern'  => '^/oauth/v1/login',
             'anonymous'  => true
+        ),
+        'oauth1_area' => array(
+            'pattern' => '^/oauth/v1/authorize',
+            'form_login' => array(
+                'provider'   => 'user_provider',
+                'check_path' => '/oauth/v1/authorize_login_check',
+                'login_path' => '/oauth/v1/authorize_login'
+            )
         ),
         'api' => array(
             'pattern'   => '^/api',

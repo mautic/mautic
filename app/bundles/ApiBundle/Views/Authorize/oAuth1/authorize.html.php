@@ -1,0 +1,23 @@
+<?php
+/**
+ * @package     Mautic
+ * @copyright   2014 Mautic, NP. All rights reserved.
+ * @author      Mautic
+ * @link        http://mautic.com
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
+$view->extend('MauticUserBundle:Security:base.html.php');
+$view['slots']->set('header', $view['translator']->trans('mautic.api.oauth.header'));
+$name = $consumer->getName();
+$msg  = (!empty($name)) ? $view['translator']->trans('mautic.api.oauth.clientwithname', array('%name%' => $name)) :
+    $view['translator']->trans('mautic.api.oauth.clientnoname');
+?>
+<h4><?php echo $msg; ?></h4>
+<form class="form-login" role="form" name="bazinga_oauth_server_authorize" action="<?php echo $view['router']->generate('bazinga_oauth_server_authorize') ?>" method="post">
+    <input type="hidden" name="oauth_token" value="<?php echo  $oauth_token; ?>" />
+    <input type="hidden" name="oauth_callback" value="<?php echo $oauth_callback; ?>" />
+
+    <input type="submit" class="btn btn-primary btn-accept" name="submit_true" value="<?php echo $view['translator']->trans('mautic.api.oauth.accept'); ?>" />
+    <input type="submit" class="btn btn-danger btn-deny" name="submit_false" value="<?php echo $view['translator']->trans('mautic.api.oauth.deny'); ?>" />
+</form>
