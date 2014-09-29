@@ -1197,6 +1197,9 @@ a.list-group-item:focus {
   border-top: 1px solid transparent;
   border-bottom: 1px solid transparent;
 }
+.dropdown-menu > li > a .fa {
+  min-width: 15px;
+}
 .dropdown-menu > li > a:hover,
 .dropdown-menu > li > a:focus {
   z-index: 2;
