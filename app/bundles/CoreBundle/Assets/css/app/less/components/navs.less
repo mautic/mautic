@@ -8,7 +8,8 @@
 .nav {
   > li {
     > a {
-      color: @text-color;
+      font-weight: 600;
+      //color: @text-color;
       // nav anchor `text` and `icon` behavior
       .text,
       .icon,
@@ -38,8 +39,29 @@
 .nav-tabs {
   border-top-right-radius: @nav-pills-border-radius;
   border-top-left-radius: @nav-pills-border-radius;
-  background-color: @body-bg;
-  .box-shadow(inset 0 -3px 4px -3px rgba(0,0,0,0.06));
+  //background-color: @body-bg;
+  .box-shadow(inset 0 -3px 5px -3px rgba(0,0,0,0.06));
+
+  > li {
+    > a {
+      line-height: 20px;
+    }
+
+    // Active state
+    &.active > a {
+      overflow: hidden;
+      border-top-color: transparent;
+      &:after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background-color: @nav-pills-active-link-hover-bg;
+      }
+    }
+  }
 }
 
 // Tabs content
