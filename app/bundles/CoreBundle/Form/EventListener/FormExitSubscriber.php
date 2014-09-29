@@ -46,15 +46,24 @@ class FormExitSubscriber implements EventSubscriberInterface
                 'data'     => $this->model,
                 'required' => false,
                 'mapped'   => false,
-                'attr'     => array('class' => 'form-exist-unlock-model')
+                'attr'     => array('class' => 'form-exit-unlock-model')
             ));
 
             $form->add('unlockId', 'hidden', array(
                 'data'     => $id,
                 'required' => false,
                 'mapped'   => false,
-                'attr'     => array('class' => 'form-exist-unlock-id')
+                'attr'     => array('class' => 'form-exit-unlock-id')
             ));
+
+            if (isset($this->options['unlockParameter'])) {
+                $form->add('unlockParameter', 'hidden', array(
+                    'data'     => $this->options['unlockParameter'],
+                    'required' => false,
+                    'mapped'   => false,
+                    'attr'     => array('class' => 'form-exit-unlock-parameter')
+                ));
+            }
         }
     }
 }

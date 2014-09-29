@@ -641,9 +641,10 @@ var Mautic = {
 
     ajaxifyLink: function (el, event) {
         //prevent leaving if currently in a form
-        if (mQuery(".form-exist-unlock-id").length) {
+        if (mQuery(".form-exit-unlock-id").length) {
             if (mQuery(el).attr('data-ignore-formexit') != 'true') {
-                Mautic.unlockEntity(mQuery('.form-exist-unlock-model').val(), mQuery('.form-exist-unlock-id').val());
+                var unlockParameter = (mQuery('.form-exit-unlock-parameter').length) ? mQuery('.form-exit-unlock-parameter').val() : '';
+                Mautic.unlockEntity(mQuery('.form-exit-unlock-model').val(), mQuery('.form-exit-unlock-id').val(), unlockParameter);
             }
         }
         var route = mQuery(el).attr('href');
@@ -1323,11 +1324,11 @@ var Mautic = {
      * @param model
      * @param id
      */
-    unlockEntity: function(model, id) {
+    unlockEntity: function(model, id, parameter) {
         mQuery.ajax({
             url: mauticAjaxUrl,
             type: "POST",
-            data: "action=unlockEntity&model=" + model + "&id=" + id,
+            data: "action=unlockEntity&model=" + model + "&id=" + id + "&parameter=" + parameter,
             dataType: "json"
         });
     }

@@ -264,6 +264,7 @@ class AjaxController extends CommonController
         $dataArray   = array('success' => 0);
         $name        = InputHelper::clean($request->request->get('model'));
         $id          = InputHelper::int($request->request->get('id'));
+        $extra       = InputHelper::clean($request->request->get('parameter'));
         $model       = $this->factory->getModel($name);
         $entity      = $model->getEntity($id);
         $currentUser = $this->factory->getUser();
@@ -271,7 +272,7 @@ class AjaxController extends CommonController
 
         if ($entity !== null && !empty($checkedOut) && $checkedOut->getId() === $currentUser->getId()) {
             //entity exists, is checked out, and is checked out by the current user so go ahead and unlock
-            $model->unlockEntity($entity);
+            $model->unlockEntity($entity, $extra);
             $dataArray['success'] = 1;
         }
 

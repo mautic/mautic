@@ -26,7 +26,7 @@ endif;
                 'class'      => 'col-client-name'
             ));
             ?>
-            <th class="visible-md visible-lg col-client-redirecturis"><?php echo $view['translator']->trans('mautic.api.client.thead.redirecturis'); ?></th>
+            <th class="visible-md visible-lg col-client-publicid"><?php echo $view['translator']->trans('mautic.api.client.thead.publicid'); ?></th>
             <?php
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                 'sessionVar' => 'client',
@@ -54,9 +54,11 @@ endif;
                     ?>
                 </td>
                 <td>
-                    <?php echo $item->getName(true); ?>
+                    <?php echo $item->getName(); ?>
                 </td>
-                <td class="visible-md visible-lg"><?php echo implode("<br />", $item->getRedirectUris()); ?></td>
+                <td class="visible-md visible-lg">
+                    <?php echo $item->getPublicId(); ?>
+                </td>
                 <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
             </tr>
         <?php endforeach; ?>
@@ -70,5 +72,4 @@ endif;
         'sessionVar' => 'client',
         'tmpl'       => $tmpl
     )); ?>
-    '
 </div>

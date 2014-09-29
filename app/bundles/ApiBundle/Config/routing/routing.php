@@ -22,7 +22,7 @@ $collection->add('bazinga_oauth_server_requesttoken', new Route('/oauth/v1/reque
 
 //step two - authenticate user and get authorization
 $collection->add('bazinga_oauth_login_allow', new Route('/oauth/v1/authorize',
-    array('_controller' => 'MauticApiBundle:oAuth1/Authorize:allow'),
+    array('_controller' => 'MauticApiBundle:OAuth1/Authorize:allow'),
     array('_method'     => 'GET')
 ));
 
@@ -32,12 +32,12 @@ $collection->add('bazinga_oauth_server_authorize', new Route('/oauth/v1/authoriz
 ));
 
 $collection->add('mautic_oauth1_server_auth_login', new Route('/oauth/v1/authorize_login',
-    array('_controller' => 'MauticApiBundle:oAuth1/Security:login'),
+    array('_controller' => 'MauticApiBundle:OAuth1/Security:login'),
     array('_method'     => 'GET|POST')
 ));
 
 $collection->add('mautic_oauth1_server_auth_login_check', new Route('/oauth/v1/authorize_login_check',
-    array('_controller' => 'MauticApiBundle:oAuth1/Security:loginCheck'),
+    array('_controller' => 'MauticApiBundle:OAuth1/Security:loginCheck'),
     array('_method'     => 'GET|POST')
 ));
 
@@ -57,17 +57,17 @@ $collection->add('fos_oauth_server_token', new Route('/oauth/v2/token',
 
 //step two - authenticate user and get authorization
 $collection->add('fos_oauth_server_authorize', new Route('/oauth/v2/authorize',
-    array('_controller' => 'MauticApiBundle:oAuth2/Authorize:authorize'),
-    array('_method'     => 'GET')
+    array('_controller' => 'MauticApiBundle:OAuth2/Authorize:authorize'),
+    array('_method'     => 'GET|POST')
 ));
 
 $collection->add('mautic_oauth2_server_auth_login', new Route('/oauth/v2/authorize_login',
-    array('_controller' => 'MauticApiBundle:oAuth2/Security:login'),
+    array('_controller' => 'MauticApiBundle:OAuth2/Security:login'),
     array('_method'     => 'GET|POST')
 ));
 
 $collection->add('mautic_oauth2_server_auth_login_check', new Route('/oauth/v2/authorize_login_check',
-    array('_controller' => 'MauticApiBundle:oAuth2/Security:loginCheck'),
+    array('_controller' => 'MauticApiBundle:OAuth2/Security:loginCheck'),
     array('_method'     => 'GET|POST')
 ));
 

@@ -7,7 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\ApiBundle\Controller\oAuth1;
+namespace Mautic\ApiBundle\Controller\OAuth1;
 
 
 use Bazinga\OAuthServerBundle\Model\RequestTokenInterface;

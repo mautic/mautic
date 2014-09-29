@@ -85,8 +85,9 @@ class FormModel extends CommonModel
      * Unlock an entity that prevents multiple people from editing
      *
      * @param $entity
+     * @param $extra Can be used by model to determine what to unlock
      */
-    public function unlockEntity($entity)
+    public function unlockEntity($entity, $extra = null)
     {
         //unlock the row if applicable
         if (method_exists($entity, 'setCheckedOut')) {

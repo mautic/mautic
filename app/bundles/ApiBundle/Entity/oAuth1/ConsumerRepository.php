@@ -69,42 +69,6 @@ class ConsumerRepository extends CommonRepository
         );
     }
 
-    protected function addSearchCommandWhereClause(&$q, $filter)
-    {
-        $command         = $field = $filter->command;
-        $unique          = $this->generateRandomParameterName();
-        $returnParameter = true; //returning a parameter that is not used will lead to a Doctrine error
-        $expr            = false;
-
-        switch ($command) {
-            case $this->translator->trans('mautic.core.searchcommand.name'):
-                $expr = $q->expr()->like("c.name", ':'.$unique);
-                break;
-            case $this->translator->trans('mautic.api.client.searchcommand.callback'):
-                $expr = $q->expr()->like('c.redirectUris', ":$unique");
-                break;
-        }
-
-
-        $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
-        if ($expr && $filter->not) {
-            $expr = $q->expr()->not($expr);
-        }
-        return array(
-            $expr,
-            ($returnParameter) ? array("$unique" => $string) : array()
-        );
-
-    }
-
-    public function getSearchCommands()
-    {
-        return array(
-            'mautic.core.searchcommand.name',
-            'mautic.api.client.searchcommand.callback',
-        );
-    }
-
     protected function getDefaultOrder()
     {
         return array(

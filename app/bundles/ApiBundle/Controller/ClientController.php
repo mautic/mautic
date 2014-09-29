@@ -260,13 +260,13 @@ class ClientController extends FormController
         if ($client === null) {
             return $this->postActionRedirect(
                 array_merge($postActionVars, array(
-                    'flashes'         =>array(
-                        array(
-                            'type' => 'error',
-                            'msg'  => 'mautic.api.client.error.notfound',
-                            'msgVars' => array('%id%' => $objectId)
-                        )
-                    ))
+                        'flashes'         =>array(
+                            array(
+                                'type' => 'error',
+                                'msg'  => 'mautic.api.client.error.notfound',
+                                'msgVars' => array('%id%' => $objectId)
+                            )
+                        ))
                 )
             );
         } elseif ($model->isLocked($client)) {

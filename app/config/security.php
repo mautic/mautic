@@ -51,17 +51,14 @@ $container->loadFromExtension('security', array(
             'pattern'  => '^/oauth/v2/token',
             'security' => false
         ),
-        'oauth2_login' => array(
-            'pattern'  => '^/oauth/v2/login',
-            'anonymous'  => true
-        ),
         'oauth2_area' => array(
             'pattern'    => '^/oauth/v2/authorize',
             'form_login' => array(
                 'provider'   => 'user_provider',
                 'check_path' => '/oauth/v2/authorize_login_check',
                 'login_path' => '/oauth/v2/authorize_login'
-            )
+            ),
+            'anonymous'  => true
         ),
         'oauth1_request_token' => array(
             'pattern'  => '^/oauth/v1/request_token',
@@ -71,17 +68,14 @@ $container->loadFromExtension('security', array(
             'pattern'  => '^/oauth/v1/access_token',
             'security' => false
         ),
-        'oauth1_login' => array(
-            'pattern'  => '^/oauth/v1/login',
-            'anonymous'  => true
-        ),
         'oauth1_area' => array(
             'pattern' => '^/oauth/v1/authorize',
             'form_login' => array(
                 'provider'   => 'user_provider',
                 'check_path' => '/oauth/v1/authorize_login_check',
                 'login_path' => '/oauth/v1/authorize_login'
-            )
+            ),
+            'anonymous'  => true
         ),
         'api' => array(
             'pattern'   => '^/api',
