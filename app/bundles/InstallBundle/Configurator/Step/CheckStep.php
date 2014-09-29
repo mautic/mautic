@@ -224,7 +224,11 @@ class CheckStep implements StepInterface
         }
 
         if (class_exists('\\Collator')) {
-            if (is_null(new \Collator('fr_FR'))) {
+            try {
+                if (is_null(new \Collator('fr_FR'))) {
+                    $messages[] = 'mautic.install.intl.config';
+                }
+            } catch (\Exception $exception) {
                 $messages[] = 'mautic.install.intl.config';
             }
         }

@@ -33,6 +33,9 @@ $view['slots']->set("headerTitle", $header);
                     case 'mautic.install.cache.unwritable': ?>
                         <li><?php echo $view['translator']->trans('mautic.install.directory.unwritable', array('%path%' => $appRoot . '/cache')); ?></li>
                         <?php break;
+                    case 'mautic.install.config.unwritable': ?>
+                        <li><?php echo $view['translator']->trans($message, array('%path%' => $appRoot . '/config/local.php')); ?></li>
+                        <?php break;
                     case 'mautic.install.logs.unwritable': ?>
                         <li><?php echo $view['translator']->trans('mautic.install.directory.unwritable', array('%path%' => $appRoot . '/logs')); ?></li>
                         <?php break;
