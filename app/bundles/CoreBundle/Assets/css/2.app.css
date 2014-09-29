@@ -345,12 +345,12 @@ body > #app-wrapper {
 }
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li > a:hover,
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li > a:focus {
-  background-color: #232b34;
+  background-color: #27303a;
   color: rgba(255, 255, 255, 0.75);
 }
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li.active > a,
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li.open > a {
-  background-color: #242c35;
+  background-color: #27303a;
   color: rgba(255, 255, 255, 0.75);
 }
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li.active > .nav-submenu,
@@ -359,6 +359,13 @@ body > #app-wrapper {
 }
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li > .nav-submenu {
   background-color: #242c35;
+}
+.app-sidebar.sidebar-left .nav-sidebar > .nav > li > .nav-submenu:after {
+  background-color: #2b3540;
+}
+.app-sidebar.sidebar-left .nav-sidebar > .nav > li > .nav-submenu > li:after {
+  background-color: #2c3642;
+  box-shadow: 0 0 0 2px #242c35;
 }
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li > .nav-submenu > li > a {
   color: rgba(255, 255, 255, 0.5);
@@ -397,12 +404,12 @@ body > #app-wrapper {
 }
 .app-sidebar.sidebar-right .nav-sidebar > .nav > li > a:hover,
 .app-sidebar.sidebar-right .nav-sidebar > .nav > li > a:focus {
-  background-color: #232b34;
+  background-color: #27303a;
   color: rgba(255, 255, 255, 0.75);
 }
 .app-sidebar.sidebar-right .nav-sidebar > .nav > li.active > a,
 .app-sidebar.sidebar-right .nav-sidebar > .nav > li.open > a {
-  background-color: #242c35;
+  background-color: #27303a;
   color: rgba(255, 255, 255, 0.75);
 }
 .app-sidebar.sidebar-right .nav-sidebar > .nav > li.active > .nav-submenu,
@@ -411,6 +418,13 @@ body > #app-wrapper {
 }
 .app-sidebar.sidebar-right .nav-sidebar > .nav > li > .nav-submenu {
   background-color: #242c35;
+}
+.app-sidebar.sidebar-right .nav-sidebar > .nav > li > .nav-submenu:after {
+  background-color: #2b3540;
+}
+.app-sidebar.sidebar-right .nav-sidebar > .nav > li > .nav-submenu > li:after {
+  background-color: #2c3642;
+  box-shadow: 0 0 0 2px #242c35;
 }
 .app-sidebar.sidebar-right .nav-sidebar > .nav > li > .nav-submenu > li > a {
   color: rgba(255, 255, 255, 0.5);
@@ -496,10 +510,34 @@ body > #app-wrapper {
   color: #fdb933;
 }
 .app-sidebar .nav-sidebar > .nav > li > .nav-submenu {
+  position: relative;
   padding-left: 50px;
 }
+.app-sidebar .nav-sidebar > .nav > li > .nav-submenu:after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 26px;
+  z-index: 1;
+  width: 1px;
+}
 .app-sidebar .nav-sidebar > .nav > li > .nav-submenu > li {
+  position: relative;
   list-style: none;
+}
+.app-sidebar .nav-sidebar > .nav > li > .nav-submenu > li:after {
+  content: '';
+  position: absolute;
+  z-index: 2;
+  top: 11px;
+  left: -27px;
+  width: 7px;
+  height: 7px;
+  border-radius: 7px;
+}
+.app-sidebar .nav-sidebar > .nav > li > .nav-submenu > li.active:after {
+  background-color: #fdb933 !important;
 }
 .app-sidebar .nav-sidebar > .nav > li > .nav-submenu > li > a {
   display: block;
@@ -507,9 +545,6 @@ body > #app-wrapper {
   -webkit-transition: all 0.15s ease;
   -o-transition: all 0.15s ease;
   transition: all 0.15s ease;
-}
-.app-sidebar .nav-sidebar > .nav > li > .nav-submenu > li:last-child {
-  padding-bottom: 10px;
 }
 .app-sidebar .nav-sidebar > .nav .nav-heading {
   text-transform: uppercase;

@@ -165,7 +165,7 @@
       color: fade(contrast(@bgcolor), 50%);
       &:hover,
       &:focus {
-        background-color: darken(@bgcolor, 2%);
+        background-color: @bgcolor;
         color: fade(contrast(@bgcolor), 75%);
       }
     }
@@ -174,7 +174,7 @@
     &.active,
     &.open {
       > a {
-        background-color: darken(@bgcolor, 1.5%);
+        background-color: @bgcolor;
         color: fade(contrast(@bgcolor), 75%);
       }
 
@@ -187,7 +187,15 @@
     // nav-submenu style
     > .nav-submenu {
       background-color: darken(@bgcolor, 1.5%);
+      &:after {
+        background-color: lighten(@bgcolor, 2%);
+      }
       > li {
+        // the dot
+        &:after {
+          background-color: lighten(@bgcolor, 2.5%);
+          box-shadow: 0 0 0 2px darken(@bgcolor, 1.5%);
+        }
         > a {
           color: fade(contrast(@bgcolor), 50%);
           &:hover,

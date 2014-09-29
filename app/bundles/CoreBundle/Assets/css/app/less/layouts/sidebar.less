@@ -192,16 +192,46 @@
 
         // nav-submenu style
         > .nav-submenu {
+          position: relative;
           padding-left: 50px;
+
+          // the line
+          &:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 26px;
+            z-index: 1;
+            width: 1px;
+          }
+
           > li {
+            position: relative;
             list-style: none;
+
+            // the dot
+            &:after {
+              content: '';
+              position: absolute;
+              z-index: 2;
+              top: 11px;
+              left: -27px;
+              width: 7px;
+              height: 7px;
+              border-radius: 7px;
+            }
+            &.active {
+              // the dot
+              &:after {
+                background-color: @brand-warning !important;
+              }
+            }
+
             > a {
               display: block;
               padding: 5px 20px 5px 0px;
               .transition(all .15s ease);
-            }
-            &:last-child {
-              padding-bottom: 10px;
             }
           }
         }
