@@ -10,8 +10,30 @@ if ($tmpl == 'index')
 $view->extend('MauticCampaignBundle:Campaign:index.html.php');
 ?>
 <?php if (count($items)): ?>
-<div class="table-responsive scrollable body-white padding-sm page-list">
-    
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">
+            Campaign
+        </h3>
+    </div>
+    <div class="panel-body">
+        <div class="box-layout">
+            <div class="col-xs-6 va-m">
+                <div class="checkbox-inline custom-primary">
+                    <label class="mb-0">
+                        <input type="checkbox" id="customcheckbox-one0" value="1">
+                        <span></span>
+                        <?php echo $view['translator']->trans('mautic.core.table.selectall'); ?>
+                    </label>
+                </div>
+            </div>
+            <div class="col-xs-6 va-m text-right">
+                <button type="button" class="btn btn-sm btn-warning"><i class="fa fa-files-o"></i></button>
+                <button type="button" class="btn btn-sm btn-danger"><i class="fa fa-trash-o"></i></button>
+            </div>
+        </div>
+    </div>
+    <div class="table-responsive">
         <table class="table table-hover table-striped table-bordered campaign-list">
             <thead>
             <tr>
@@ -74,15 +96,17 @@ $view->extend('MauticCampaignBundle:Campaign:index.html.php');
             <?php endforeach; ?>
             </tbody>
         </table>
-   
-    <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
-        "totalItems"      => count($items),
-        "page"            => $page,
-        "limit"           => $limit,
-        "menuLinkId"      => 'mautic_campaign_index',
-        "baseUrl"         => $view['router']->generate('mautic_campaign_index'),
-        'sessionVar'      => 'campaign'
-    )); ?>
+    </div>
+    <div class="panel-footer">
+        <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
+            "totalItems"      => count($items),
+            "page"            => $page,
+            "limit"           => $limit,
+            "menuLinkId"      => 'mautic_campaign_index',
+            "baseUrl"         => $view['router']->generate('mautic_campaign_index'),
+            'sessionVar'      => 'campaign'
+        )); ?>
+    </div>
 </div>
  <?php else: ?>
     <div class="well well-small">
