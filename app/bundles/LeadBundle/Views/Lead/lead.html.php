@@ -167,6 +167,16 @@ $view['slots']->stop();
 
                     <!-- #notes-container -->
                     <div class="tab-pane fade bdr-w-0" id="notes-container">
+                        
+                        <!-- form -->
+                        <form action="" class="panel">
+                            <div class="form-control-icon pa-xs">
+                                <input type="text" class="form-control bdr-w-0" placeholder="Search...">
+                                <span class="the-icon fa fa-search text-muted mt-xs"></span><!-- must below `form-control` -->
+                            </div>
+                        </form>
+                        <!--/ form -->
+
                         Excepteur sint occaecat cupidatat non
                         proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
                         Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
