@@ -26,7 +26,7 @@
         </svg>
         <!--/ logo figure -->
         <!-- logo text -->
-        <svg version="1.1" class="mautic-logo-text ml-xs" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 260 65" enable-background="new 0 0 260 65" xml:space="preserve">
+        <svg version="1.1" class="mautic-logo-text" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 260 65" enable-background="new 0 0 260 65" xml:space="preserve">
             <g>
                 <path class="m" d="M39.336,57.983V37.951c0-4.932-2.58-9.409-7.664-9.409
                 c-5.008,0-7.967,4.477-7.967,9.409v20.032h-9.258V20.498h8.575l0.683,4.553c1.972-3.794,6.298-5.16,9.864-5.16

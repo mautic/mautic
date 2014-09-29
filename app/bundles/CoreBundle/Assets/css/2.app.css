@@ -1254,11 +1254,11 @@ a.list-group-item:focus {
 }
 .mautic-brand {
   display: block;
-  float: left;
+  height: 56px;
+  text-align: center;
   width: 100%;
 }
 .mautic-brand > svg.mautic-logo-figure {
-  float: left;
   width: 38px;
   height: 56px;
 }
@@ -1270,7 +1270,6 @@ a.list-group-item:focus {
   fill: #fdb933;
 }
 .mautic-brand > svg.mautic-logo-text {
-  float: left;
   height: 56px;
   width: 96px;
 }
@@ -2483,12 +2482,12 @@ lesshat-selector {
 .loading-bar {
   opacity: 0;
   position: absolute;
-  bottom: 0;
+  bottom: -1px;
   z-index: 1;
   left: 0;
   right: 0;
   height: 2px;
-  background-color: #e1e4f0;
+  background-color: #adb5d7;
   overflow: hidden;
   -webkit-transition: opacity 0.3s ease;
   -moz-transition: opacity 0.3s ease;

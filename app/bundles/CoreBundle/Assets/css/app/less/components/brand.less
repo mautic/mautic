@@ -5,12 +5,12 @@
 // mautic-brand
 .mautic-brand {
   display: block;
-  float: left;
+  height: @header-height;
+  text-align: center;
   width: 100%;
 
   // mautic logo figure
   > svg.mautic-logo-figure {
-    float: left;
     width: @mautic-logo-figure-width;
     height: @header-height;
     .circle {
@@ -24,7 +24,6 @@
 
   // mautic logo text
   > svg.mautic-logo-text {
-    float: left;
     height: @header-height;
     width: @mautic-logo-text-width;
     .m,.a,.u,.t,.i,.c {
