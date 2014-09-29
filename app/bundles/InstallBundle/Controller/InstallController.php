@@ -57,7 +57,7 @@ class InstallController extends CommonController
                             'form'    => $form->createView(),
                             'index'   => $index,
                             'count'   => $configurator->getStepCount(),
-                            'version' => $this->getVersion(),
+                            'version' => $this->factory->getVersion(),
                             'tmpl'    => $tmpl,
                             'majors'  => $majors,
                             'minors'  => $minors,
@@ -102,7 +102,7 @@ class InstallController extends CommonController
                                         'form'    => $form->createView(),
                                         'index'   => $index,
                                         'count'   => $configurator->getStepCount(),
-                                        'version' => $this->getVersion(),
+                                        'version' => $this->factory->getVersion(),
                                         'tmpl'    => $tmpl,
                                         'majors'  => $majors,
                                         'minors'  => $minors,
@@ -130,7 +130,7 @@ class InstallController extends CommonController
                                     'form'    => $form->createView(),
                                     'index'   => $index,
                                     'count'   => $configurator->getStepCount(),
-                                    'version' => $this->getVersion(),
+                                    'version' => $this->factory->getVersion(),
                                     'tmpl'    => $tmpl,
                                     'majors'  => $majors,
                                     'minors'  => $minors,
@@ -187,7 +187,7 @@ class InstallController extends CommonController
                                     'form'    => $form->createView(),
                                     'index'   => $index,
                                     'count'   => $configurator->getStepCount(),
-                                    'version' => $this->getVersion(),
+                                    'version' => $this->factory->getVersion(),
                                     'tmpl'    => $tmpl,
                                     'majors'  => $majors,
                                     'minors'  => $minors,
@@ -226,7 +226,7 @@ class InstallController extends CommonController
                             'form'    => $form->createView(),
                             'index'   => $index,
                             'count'   => $configurator->getStepCount(),
-                            'version' => $this->getVersion(),
+                            'version' => $this->factory->getVersion(),
                             'tmpl'    => $tmpl,
                             'majors'  => $majors,
                             'minors'  => $minors,
@@ -268,7 +268,7 @@ class InstallController extends CommonController
                         'parameters'  => $configurator->render(),
                         'config_path' => $this->container->getParameter('kernel.root_dir') . '/config/local.php',
                         'is_writable' => $configurator->isFileWritable(),
-                        'version'     => $this->getVersion(),
+                        'version'     => $this->factory->getVersion(),
                         'tmpl'        => $tmpl,
                     ),
                     'returnUrl'         => $this->generateUrl('mautic_installer_final'),
@@ -288,7 +288,7 @@ class InstallController extends CommonController
                 'form'    => $form->createView(),
                 'index'   => $index,
                 'count'   => $configurator->getStepCount(),
-                'version' => $this->getVersion(),
+                'version' => $this->factory->getVersion(),
                 'tmpl'    => $tmpl,
                 'majors'  => $majors,
                 'minors'  => $minors,
@@ -324,7 +324,7 @@ class InstallController extends CommonController
                 'parameters'  => $configurator->render(),
                 'config_path' => $this->container->getParameter('kernel.root_dir') . '/config/local.php',
                 'is_writable' => $configurator->isFileWritable(),
-                'version'     => $this->getVersion(),
+                'version'     => $this->factory->getVersion(),
                 'tmpl'        => $tmpl,
             ),
             'contentTemplate' => 'MauticInstallBundle:Install:final.html.php',
@@ -335,18 +335,5 @@ class InstallController extends CommonController
                 'replaceContent' => ($tmpl == 'list') ? 'true' : 'false'
             )
         ));
-    }
-
-    /**
-     * Retrieve the kernel version
-     *
-     * @return string
-     */
-    protected function getVersion()
-    {
-        /** @var \AppKernel $kernel */
-        $kernel = $this->container->get('kernel');
-
-        return $kernel::VERSION;
     }
 }
