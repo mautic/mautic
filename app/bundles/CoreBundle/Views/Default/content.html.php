@@ -13,7 +13,7 @@ if (!$app->getRequest()->isXmlHttpRequest() && $view['slots']->get('contentOnly'
 endif;
 ?>
 
-<div class="content-body" id="main-content">
+<div class="content-body">
     <?php echo $view->render('MauticCoreBundle:Default:pageheader.html.php'); ?>
 
     <div class="container-fluid pt-md pb-md">
