@@ -94,7 +94,7 @@ $view['slots']->stop();
         <div class="col-md-9 bg-white height-auto">
             <div class="bg-auto">
                 <!-- header -->
-                <div class="bg-picture mb-lg" style="background-image:url('http://www.graphicsfuel.com/wp-content/uploads/2014/09/polygon-background3-preview.jpg')">
+                <div class="bg-picture mb-lg mnt-1" style="background-image:url('http://www.graphicsfuel.com/wp-content/uploads/2014/09/polygon-background3-preview.jpg')">
                     <!-- overlay -->
                     <span class="bg-picture-overlay"></span>
                     
@@ -124,81 +124,80 @@ $view['slots']->stop();
                 <!--/ tabs controls -->
             </div>
 
-            <div class="pa-md">
-                <!-- start: tab-content -->
-                <div class="tab-content">
-                    <!-- #history-container -->
-                    <div class="tab-pane fade in active bdr-w-0" id="history-container">
-                        <!-- form -->
-                        <form action="" class="panel">
-                            <div class="form-control-icon pa-xs">
-                                <input type="text" class="form-control bdr-w-0" placeholder="Search...">
-                                <span class="the-icon fa fa-search text-muted mt-xs"></span><!-- must below `form-control` -->
-                            </div>
-                        </form>
-                        <!--/ form -->
+            <!-- start: tab-content -->
+            <div class="tab-content pa-md">
+                <!-- #history-container -->
+                <div class="tab-pane fade in active bdr-w-0" id="history-container">
+                    <!-- form -->
+                    <form action="" class="panel">
+                        <div class="form-control-icon pa-xs">
+                            <input type="text" class="form-control bdr-w-0" placeholder="Search...">
+                            <span class="the-icon fa fa-search text-muted mt-xs"></span><!-- must below `form-control` -->
+                        </div>
+                    </form>
+                    <!--/ form -->
 
-                        <!-- timeline -->
-                        <ul class="timeline">
-                            <li class="header ellipsis bg-white">Recent Events</li>
-                            <li class="wrapper">
-                                <ul class="events">
-                                    <?php foreach ($events as $event) : ?>
-                                    <li class="<?php if ($event['event'] == 'lead.created') echo 'featured'; else echo 'wrapper'; ?>">
-                                        <div class="figure"><!--<span class="fa fa-check"></span>--></div>
-                                        <div class="panel <?php if ($event['event'] == 'lead.created') echo 'bg-primary'; ?>">
-                                            <div class="panel-body">
-                                                <p class="mb-0">At <?php echo $view['date']->toFullConcat($event['timestamp']); ?>, <?php echo $event['event']; ?>.</p>
-                                            </div>
-                                            <?php if (isset($event['extra'])) : ?>
-                                            <div class="panel-footer">
-                                                <?php print_r($event['extra']); ?>
-                                            </div>
-                                            <?php endif; ?>
+                    <!-- timeline -->
+                    <ul class="timeline">
+                        <li class="header ellipsis bg-white">Recent Events</li>
+                        <li class="wrapper">
+                            <ul class="events">
+                                <?php foreach ($events as $event) : ?>
+                                <li class="<?php if ($event['event'] == 'lead.created') echo 'featured'; else echo 'wrapper'; ?>">
+                                    <div class="figure"><!--<span class="fa fa-check"></span>--></div>
+                                    <div class="panel <?php if ($event['event'] == 'lead.created') echo 'bg-primary'; ?>">
+                                        <div class="panel-body">
+                                            <p class="mb-0">At <?php echo $view['date']->toFullConcat($event['timestamp']); ?>, <?php echo $event['event']; ?>.</p>
                                         </div>
-                                    </li>
-                                    <?php endforeach; ?>
-                                </ul>
-                            </li>
-                        </ul>
-                        <!--/ timeline -->
-                    </div>
-                    <!--/ #history-container -->
-
-                    <!-- #notes-container -->
-                    <div class="tab-pane fade bdr-w-0" id="notes-container">
-                        
-                        <!-- form -->
-                        <form action="" class="panel">
-                            <div class="form-control-icon pa-xs">
-                                <input type="text" class="form-control bdr-w-0" placeholder="Search...">
-                                <span class="the-icon fa fa-search text-muted mt-xs"></span><!-- must below `form-control` -->
-                            </div>
-                        </form>
-                        <!--/ form -->
-
-                        Excepteur sint occaecat cupidatat non
-                        proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-                        tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-                        quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-                        consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-                        cillum dolore eu fugiat nulla pariatur.
-                    </div>
-                    <!--/ #notes-container -->
-
-                    <!-- #social-container -->
-                    <div class="tab-pane fade bdr-w-0" id="social-container">
-                        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-                        tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-                        quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-                        consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-                        cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-                        proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                    </div>
-                    <!--/ #social-container -->
+                                        <?php if (isset($event['extra'])) : ?>
+                                        <div class="panel-footer">
+                                            <?php print_r($event['extra']); ?>
+                                        </div>
+                                        <?php endif; ?>
+                                    </div>
+                                </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </li>
+                    </ul>
+                    <!--/ timeline -->
                 </div>
+                <!--/ #history-container -->
+
+                <!-- #notes-container -->
+                <div class="tab-pane fade bdr-w-0" id="notes-container">
+                    
+                    <!-- form -->
+                    <form action="" class="panel">
+                        <div class="form-control-icon pa-xs">
+                            <input type="text" class="form-control bdr-w-0" placeholder="Search...">
+                            <span class="the-icon fa fa-search text-muted mt-xs"></span><!-- must below `form-control` -->
+                        </div>
+                    </form>
+                    <!--/ form -->
+
+                    Excepteur sint occaecat cupidatat non
+                    proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+                    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+                    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+                    consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+                    cillum dolore eu fugiat nulla pariatur.
+                </div>
+                <!--/ #notes-container -->
+
+                <!-- #social-container -->
+                <div class="tab-pane fade bdr-w-0" id="social-container">
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+                    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+                    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+                    consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+                    cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+                    proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                </div>
+                <!--/ #social-container -->
             </div>
+            <!--/ end: tab-content -->
         </div>
         <!--/ left section -->
 
