@@ -14,21 +14,17 @@ $header = $view['translator']->trans('mautic.install.install.heading.check.envir
 $view['slots']->set("headerTitle", $header);
 ?>
 
-<div class="panel panel-default">
-	<div class="panel-heading">
-		<h3 class="panel-title">
+		<h2 class="page-header">
 			<?php echo $header; ?>
-		</h3>
-	</div>
-	<div class="panel-body">
+		</h2>
         <?php if (count($majors)) : ?>
         <h4><?php echo $view['translator']->trans('mautic.install.install.heading.major.problems'); ?></h4>
         <p><?php echo $view['translator']->trans('mautic.install.install.sentence.major.problems', array('%majors%' => count($majors))); ?></p>
-        <ol>
+        <ul class="list-unstyled">
             <?php foreach ($majors as $message) : ?>
                 <?php switch ($message) :
                     case 'mautic.install.minimum.php.version': ?>
-                        <li><?php echo $view['translator']->trans($message, array('%minimum%' => '5.3.7', '%installed' => PHP_VERSION)); ?></li>
+                        <li> <?php echo $view['translator']->trans($message, array('%minimum%' => '5.3.7', '%installed' => PHP_VERSION)); ?></li>
                         <?php break;
                     case 'mautic.install.cache.unwritable': ?>
                         <li><?php echo $view['translator']->trans('mautic.install.directory.unwritable', array('%path%' => $appRoot . '/cache')); ?></li>
@@ -48,28 +44,35 @@ $view['slots']->set("headerTitle", $header);
                         <?php break; ?>
                 <?php endswitch; ?>
             <?php endforeach; ?>
-        </ol>
+        </ul>
         <?php endif; ?>
         <?php if (count($minors)) : ?>
-        <h4><?php echo $view['translator']->trans('mautic.install.install.heading.minor.problems'); ?></h4>
-        <p><?php echo $view['translator']->trans('mautic.install.install.sentence.minor.problems'); ?></p>
-        <ol>
-            <?php foreach ($minors as $message) : ?>
-                <?php switch ($message) :
-                    case 'mautic.install.pcre.version': ?>
-                        <li><?php echo $view['translator']->trans($message, array('%pcreversion%' => (float) PCRE_VERSION)); ?></li>
-                        <?php break;
-                    default: ?>
-                        <li><?php echo $view['translator']->trans($message); ?></li>
-                        <?php break; ?>
-                <?php endswitch; ?>
-            <?php endforeach; ?>
-        </ol>
+        <div class="panel panel-warning">
+            <div class="panel-heading">
+                <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.install.install.heading.minor.problems'); ?></h3>
+            </div>
+            <div class="panel-body alert-warning">
+                <p><?php echo $view['translator']->trans('mautic.install.install.sentence.minor.problems'); ?></p>
+            </div>
+             <ul class="list-group">
+                <?php foreach ($minors as $message) : ?>
+                    <?php switch ($message) :
+                        case 'mautic.install.pcre.version': ?>
+                            <li class="list-group-item"><?php echo $view['translator']->trans($message, array('%pcreversion%' => (float) PCRE_VERSION)); ?></li>
+                            <?php break;
+                        default: ?>
+                            <li class="list-group-item"><?php echo $view['translator']->trans($message); ?></li>
+                            <?php break; ?>
+                    <?php endswitch; ?>
+                <?php endforeach; ?>
+            </ul>
+        </div>
         <?php endif; ?>
         <?php if (!count($majors)) : ?>
-        <h4><?php echo $view['translator']->trans('mautic.install.install.heading.ready'); ?></h4>
-        <p><?php echo $view['translator']->trans('mautic.install.install.sentence.ready'); ?></p>
+        <div class="alert alert-success">
+            <h4><i class="fa fa-check"></i> <?php echo $view['translator']->trans('mautic.install.install.heading.ready'); ?></h4>
+            <p><?php echo $view['translator']->trans('mautic.install.install.sentence.ready'); ?></p>
+        </div>
         <?php echo $view['form']->form($form); ?>
         <?php endif; ?>
     </div>
-</div>

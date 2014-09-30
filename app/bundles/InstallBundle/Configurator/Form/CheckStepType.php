@@ -29,7 +29,7 @@ class CheckStepType extends AbstractType
                     'label' => 'mautic.install.next.step',
                     'type'  => 'submit',
                     'attr'  => array(
-                        'class'   => 'btn btn-default',
+                        'class'   => 'btn btn-success pull-right mt-20',
                         'icon'    => 'fa fa-arrow-circle-right padding-sm-right'
                     )
                 )

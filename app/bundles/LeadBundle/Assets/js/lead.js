@@ -251,15 +251,15 @@ Mautic.addLeadListFilter = function (elId) {
     var label  = mQuery(filterId + ' span.leadlist-filter-name').text();
 
     //create a new filter
-    var li = mQuery("<li />").addClass("padding-sm").text(label).appendTo(mQuery('#leadlist_filters_right'));
+    var li = mQuery("<div />").addClass("padding-sm").text(label).appendTo(mQuery('#leadlist_filters_right'));
 
     //add a delete button
-    mQuery("<i />").addClass("fa fa-fw fa-trash-o remove-selected").prependTo(li).on('click', function() {
+    mQuery("<i />").addClass("fa fa-fw fa-trash-o remove-selected pull-right").prependTo(li).on('click', function() {
         mQuery(this).parent().remove();
     });
 
     //add a sortable handle
-    mQuery("<i />").addClass("fa fa-fw fa-ellipsis-v sortable-handle").prependTo(li);
+    mQuery("<i />").addClass("fa fa-fw fa-ellipsis-v sortable-handle pull-right").prependTo(li);
 
     var fieldType = mQuery(filterId).find("input.field_type").val();
     var alias     = mQuery(filterId).find("input.field_alias").val();

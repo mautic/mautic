@@ -59,7 +59,7 @@ $timezones = $tz->getTimezones();
                     <?php echo $view['form']->label($filterForm); ?>
                     <?php echo $view['form']->errors($filterForm); ?>
                     <div class="row">
-                        <div class="col-xs-4 available-filters">
+                        <div class="col-xs-12 available-filters">
                             <h4><?php echo $view['translator']->trans('mautic.core.form.filters.available'); ?></h4>
                             <div class="list-group">
                                 <?php foreach ($choices as $value => $params): ?>
@@ -77,7 +77,9 @@ $timezones = $tz->getTimezones();
                                 <?php endforeach; ?>
                             </div>
                         </div>
-                        <div class="col-xs-8 selected-filters">
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12 selected-filters">
                             <h4><?php echo $view['translator']->trans('mautic.core.form.filters.selected'); ?></h4>
                             <div class="list-group" id="<?php echo $filterForm->vars['id']; ?>_right">
                                     <?php foreach ($filterValues as $filter): ?>
@@ -85,7 +87,6 @@ $timezones = $tz->getTimezones();
                                     <?php $randomId = "id_" . uniqid(); ?>
                                     <div class="list-group-item">
                                         <i class="fa fa-fw fa-ellipsis-v sortable-handle pull-right"></i><i class="fa fa-fw fa-trash-o remove-selected pull-right"></i>
-                                        <?php echo $choices[$filter['field']]['label']; ?>
                                         <div class="filter-container">
                                             <div class="col-xs-6 col-sm-3 padding-none">
                                                 <select name="leadlist[filters][glue][]" class="form-control ">
@@ -97,6 +98,7 @@ $timezones = $tz->getTimezones();
                                                     <?php endforeach; ?>
                                                 </select>
                                             </div>
+                                            <?php echo $choices[$filter['field']]['label']; ?>
                                             <div class="col-xs-6 col-sm-3 padding-none">
                                                 <select name="leadlist[filters][operator][]" class="form-control ">
                                                     <?php
