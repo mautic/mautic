@@ -296,6 +296,9 @@ var Mautic = {
 
             Mautic.activateLiveSearch("#global_search", "lastGlobalSearchStr", "globalLivecache");
         }
+
+        //initiate sparkline plugin
+        mQuery('.plugin-sparkline').sparkline('html', { enableTagOptions: true });
     },
 
     /**
@@ -504,7 +507,7 @@ var Mautic = {
     processPageContent: function (response) {
         if (response) {
             if (!response.target) {
-                response.target = '#main-content';
+                response.target = '#app-content';
             }
 
             //update type of content displayed
@@ -557,7 +560,7 @@ var Mautic = {
             }
 
             //scroll to the top
-            if (response.target == '#main-content') {
+            if (response.target == '#app-content') {
                 mQuery('body').animate({
                     scrollTop: 0
                 }, 0);
