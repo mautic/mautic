@@ -13,6 +13,8 @@ endif;
 
 $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list');
 ?>
+
+<?php if (count($items)): ?>
 <div class="panel panel-default">
     <div class="panel-heading">
         <h3 class="panel-title">
@@ -37,7 +39,6 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
         </div>
     </div>
     <div class="table-responsive">
-        <?php if (count($items)): ?>
         <table class="table table-hover table-striped table-bordered leadlist-list">
             <thead>
             <tr>
@@ -98,8 +99,11 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                 'sessionVar' => 'leadlist'
             )); ?>
         </div>
-        <?php else: ?>
-        <h4><?php echo $view['translator']->trans('mautic.core.noresults'); ?></h4>
-    <?php endif; ?>
     </div>
 </div>
+<?php else: ?>
+    <div class="well well-small">
+        <h4><?php echo $view['translator']->trans('mautic.core.noresults.header'); ?></h4>
+        <p><?php echo $view['translator']->trans('mautic.core.noresults'); ?></p>
+    </div>
+<?php endif; ?>
