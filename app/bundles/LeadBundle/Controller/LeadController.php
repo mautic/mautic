@@ -67,8 +67,9 @@ class LeadController extends FormController
         $mine        = $translator->trans('mautic.core.searchcommand.ismine');
 
         if (strpos($search, "$isCommand:$anonymous") === false && strpos($search, "$listCommand:") === false) {
+            //todo - maybe add this back?
             //remove anonymous leads unless requested to prevent clutter
-            $filter['force'] .= " !$isCommand:$anonymous";
+            //$filter['force'] .= " !$isCommand:$anonymous";
         }
         if (!$permissions['lead:leads:viewother']) {
             $filter['force'] .= " $isCommand:$mine";
