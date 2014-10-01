@@ -42,24 +42,39 @@ a.media {
       overflow: visible;
       > .media-object {
         position: relative;
+        width: 28px;
+        text-align: center;
         &:before {
           content: '';
           position: absolute;
-          top: -100%;
-          bottom: -100%;
+          top: -200%;
+          bottom: -200%;
           width: 1px;
-          background-color: @hr-border;
           left: 50%;
+          .lh-background-image(linear-gradient(top,  rgba(255,255,255,0) 0%, rgba(229,229,229,1) 10%, rgba(229,229,229,1) 90%, rgba(229,229,229,0) 100%));
+        }
+
+        > .figure {
+          position: relative;
+          z-index: 5;
+          display: inline-block;
+          width: 14px;
+          height: 14px;
+          text-align: center;
+          font-size: 12px;
+          border-radius: 50%;
+          background-color: darken(@hr-border, 5%);
+
+          &.featured {
+            width: 20px;
+            height: 20px;
+            line-height: 19px;
+          }
         }
       }
       &:first-child {
         > .media-object {
           &:before { top: 0; }
-        }
-      }
-      &:last-child {
-        > .media-object {
-          &:before { bottom: 5px; }
         }
       }
     }

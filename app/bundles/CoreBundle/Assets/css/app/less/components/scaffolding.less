@@ -3,11 +3,49 @@
 
 // Horizontal rules
 
-hr {
-  margin-top:    @line-height-computed;
-  margin-bottom: @line-height-computed;
+hr,
+.hr-expand {
+  margin-top:    15px;
+  margin-bottom: 15px;
   border: 0;
   border-top: 1px solid @hr-border;
+
+  &.hr-w-2 {
+    border-width: 2px;
+  }
+  &.hr-w-3 {
+    border-width: 3px;
+  }
+}
+.hr-expand {
+  a.arrow {
+    display: inline-block;
+    position: relative;
+    top: -1px;
+    z-index: 1;
+    background-color: @body-bg;
+    padding: 0 15px;
+    margin: 0 15px;
+    border: 1px solid @hr-border;
+    border-top-width: 0;
+    border-bottom-left-radius: @border-radius-base;
+    border-bottom-right-radius: @border-radius-base;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.03);
+
+    > .caret {
+      margin-left: 0;
+    }
+  }
+  &.hr-w-2 {
+    a.arrow {
+      top: -2px;
+    }
+  }
+  &.hr-w-3 {
+    a.arrow {
+      top: -3px;
+    }
+  }
 }
 
 

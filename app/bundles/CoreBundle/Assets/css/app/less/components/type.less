@@ -58,7 +58,8 @@ h1, h2, h3, h4, h5, h6,
   padding: 15px;
   margin: 0;
   border-bottom: 0;
-  border-bottom: 1px solid darken(@hr-border, 2%);
+  border-bottom: 1px solid #fff;
+  box-shadow:inset 0 -1px 0 0 darken(@hr-border, 2%);
 
   // breadcrumb
   .breadcrumb {
@@ -100,7 +101,7 @@ h1, h2, h3, h4, h5, h6,
 .text-muted { .text-emphasis-variant(rgba(0,0,0,0.5)); }
 .text-white { .text-emphasis-variants(#fff); }
 .text-primary { .text-emphasis-variant(@brand-primary); }
-.text-success { .text-emphasis-variant(@brand-success); }
+.text-success { .text-emphasis-variants(@brand-success); }
 .text-warning { .text-emphasis-variant(@brand-warning); }
 .text-danger { .text-emphasis-variant(@brand-danger); }
 .text-info { .text-emphasis-variant(@brand-info); }

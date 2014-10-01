@@ -402,7 +402,7 @@
 
 //=== Shared nav styles
 @nav-link-padding:                          10px 18px;
-@nav-link-hover-bg:                         @gray-lighter;
+@nav-link-hover-bg:                         darken(@body-bg, 3%);
 
 @nav-disabled-link-color:                   @gray-light;
 @nav-disabled-link-hover-color:             @gray-light;
@@ -410,13 +410,13 @@
 @nav-open-link-hover-color:                 #fff;
 
 //== Tabs
-@nav-tabs-border-color:                     lighten(@input-border, 5%);
+@nav-tabs-border-color:                     @hr-border;
 
-@nav-tabs-link-hover-border-color:          @gray-lighter;
+@nav-tabs-link-hover-border-color:          darken(@body-bg, 4%);
 
 @nav-tabs-active-link-hover-bg:             #fff;
 @nav-tabs-active-link-hover-color:          @gray;
-@nav-tabs-active-link-hover-border-color:   lighten(@input-border, 5%);
+@nav-tabs-active-link-hover-border-color:   @hr-border;
 
 @nav-tabs-justified-link-border-color:            @input-border;
 @nav-tabs-justified-active-link-border-color:     transparent;
