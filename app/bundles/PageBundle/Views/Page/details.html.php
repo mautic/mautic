@@ -142,8 +142,8 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                 <div class="pr-md pl-md pt-lg pb-lg">
                     <div class="box-layout">
                         <div class="col-xs-6 va-m">
-                            <h4 class="fw-sb">Super Awesome Page</h4>
-                            <p class="text-white dark-sm mb-0">Created on 7 Jan 2014</p>
+                            <h4 class="fw-sb text-primary">Super Awesome Page</h4>
+                            <p class="text-white dark-lg mb-0">Created on 7 Jan 2014</p>
                         </div>
                         <div class="col-xs-6 va-m text-right">
                             <h4 class="fw-sb"><span class="label label-success">PUBLISH UP</span></h4>
