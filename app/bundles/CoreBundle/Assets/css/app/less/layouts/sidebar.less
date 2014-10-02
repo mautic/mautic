@@ -288,53 +288,56 @@
         width: @sidebar-left-collapse-width;
 
         // reset `nav-sidebar` style
-        .nav-sidebar > .nav > li {
-          > a {
-            padding-top: 12px;
-            padding-bottom: 12px;
-          }
-          &.nav-heading,
-          > a .text,
-          > a .arrow,
-          > a .badge,
-          > a .label {
-            display: none;
-          }
-          > a .icon {
-            min-width: 0;
-            width: 100%;
-            text-align: center;
-          }
-          > .nav-submenu {
-            display: none;
-            height: auto !important;
-            position: absolute;
-            z-index: -1;
-            top: 0;
-            padding-top: 10px;
-            padding-bottom: 10px;
-            padding-left: 30px;
-            min-width: 180px;
-            border-top-right-radius: @border-radius-base;
-            border-bottom-right-radius: @border-radius-base;
-
-            // the line
-            &:after {
-              left: 16px;
+        .nav-sidebar {
+          margin-top: 10px;
+          > .nav > li {
+            > a {
+              padding-top: 12px;
+              padding-bottom: 12px;
             }
-
-            // the dot
-            > li:after {
-              left: -17px;
+            &.nav-heading,
+            > a .text,
+            > a .arrow,
+            > a .badge,
+            > a .label {
+              display: none;
             }
-          }
-
-          // Open and hover state
-          &.open {
-            // Open `nav-submenu` if in `active` state
+            > a .icon {
+              min-width: 0;
+              width: 100%;
+              text-align: center;
+            }
             > .nav-submenu {
-              display: block;
-              left: @sidebar-left-collapse-width;
+              display: none;
+              height: auto !important;
+              position: absolute;
+              z-index: -1;
+              top: 0;
+              padding-top: 10px;
+              padding-bottom: 10px;
+              padding-left: 30px;
+              min-width: 180px;
+              border-top-right-radius: @border-radius-base;
+              border-bottom-right-radius: @border-radius-base;
+
+              // the line
+              &:after {
+                left: 16px;
+              }
+
+              // the dot
+              > li:after {
+                left: -17px;
+              }
+            }
+
+            // Open and hover state
+            &.open {
+              // Open `nav-submenu` if in `active` state
+              > .nav-submenu {
+                display: block;
+                left: @sidebar-left-collapse-width;
+              }
             }
           }
         }
@@ -354,7 +357,7 @@
         .sidebar-header {
           padding: 0;
           width: @sidebar-left-collapse-width;
-          
+
           > .mautic-brand > .mautic-logo-text {
             display: none;
           }

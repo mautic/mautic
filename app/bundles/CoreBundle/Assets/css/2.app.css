@@ -579,6 +579,9 @@ body > #app-wrapper {
   .sidebar-minimized .app-sidebar.sidebar-left {
     width: 60px;
   }
+  .sidebar-minimized .app-sidebar.sidebar-left .nav-sidebar {
+    margin-top: 10px;
+  }
   .sidebar-minimized .app-sidebar.sidebar-left .nav-sidebar > .nav > li > a {
     padding-top: 12px;
     padding-bottom: 12px;
