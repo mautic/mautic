@@ -145,6 +145,12 @@ if ($container->getParameter('mautic.api_enabled')) {
 
     //JMS Serializer
     $container->loadFromExtension('jms_serializer', array(
+        'handlers' => array(
+            'datetime' => array(
+                'default_format' => 'c',
+                'default_timezone' => 'UTC'
+            )
+        ),
         'property_naming' => array(
             'separator'  => '',
             'lower_case' => false

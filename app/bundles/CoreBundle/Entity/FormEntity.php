@@ -26,14 +26,17 @@ class FormEntity
      * @ORM\Column(name="is_published", type="boolean")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"publishDetails"})
      */
     private $isPublished = true;
 
     /**
      * @ORM\Column(name="date_added", type="datetime", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"publishDetails"})
      */
-    private $dateAdded;
+    private $dateAdded = null;
 
     /**
      * @ORM\ManyToOne(targetEntity="Mautic\UserBundle\Entity\User")
@@ -43,6 +46,9 @@ class FormEntity
 
     /**
      * @ORM\Column(name="date_modified", type="datetime", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"publishDetails"})
      */
     private $dateModified;
 

@@ -40,7 +40,7 @@
     },
     "require-dev": {
         "liip/functional-test-bundle": "dev-master",
-        "nelmio/api-doc-bundle": "@stable",
+        "nelmio/api-doc-bundle": "2.7.*@dev",
         "sensio/distribution-bundle": "~2.3",
         "sensio/generator-bundle": "~2.3"
     },

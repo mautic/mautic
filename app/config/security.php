@@ -8,50 +8,50 @@
  */
 
 $container->loadFromExtension('security', array(
-    'providers' => array(
+    'providers'      => array(
         'user_provider' => array(
             'id' => 'mautic.user.provider'
         )
     ),
-    'encoders' => array(
+    'encoders'       => array(
         'Symfony\Component\Security\Core\User\User' => array(
-            'algorithm'         => 'bcrypt',
-            'iterations'        => 12,
+            'algorithm'  => 'bcrypt',
+            'iterations' => 12,
         ),
-        'Mautic\UserBundle\Entity\User' => array(
-            'algorithm'         => 'bcrypt',
-            'iterations'        => 12,
+        'Mautic\UserBundle\Entity\User'             => array(
+            'algorithm'  => 'bcrypt',
+            'iterations' => 12,
         )
     ),
     'role_hierarchy' => array(
         'ROLE_ADMIN' => 'ROLE_USER',
     ),
-    'firewalls' => array(
-        'install' => array(
+    'firewalls'      => array(
+        'install'              => array(
             'pattern'   => '^/installer',
             'anonymous' => true,
             'context'   => 'mautic'
         ),
-        'dev' => array(
-            'pattern' => '^/(_(profiler|wdt)|css|images|js)/',
-            'security' => true,
+        'dev'                  => array(
+            'pattern'   => '^/(_(profiler|wdt)|css|images|js)/',
+            'security'  => true,
             'anonymous' => true
         ),
-        'public' => array(
+        'public'               => array(
             'pattern'   => '^/p/',
             'anonymous' => true,
             'context'   => 'mautic'
         ),
-        'login' => array(
+        'login'                => array(
             'pattern'   => '^/login$',
             'anonymous' => true,
             'context'   => 'mautic'
         ),
-        'oauth2_token' => array(
+        'oauth2_token'         => array(
             'pattern'  => '^/oauth/v2/token',
             'security' => false
         ),
-        'oauth2_area' => array(
+        'oauth2_area'          => array(
             'pattern'    => '^/oauth/v2/authorize',
             'form_login' => array(
                 'provider'   => 'user_provider',
@@ -64,12 +64,12 @@ $container->loadFromExtension('security', array(
             'pattern'  => '^/oauth/v1/request_token',
             'security' => false
         ),
-        'oauth1_access_token' => array(
+        'oauth1_access_token'  => array(
             'pattern'  => '^/oauth/v1/access_token',
             'security' => false
         ),
-        'oauth1_area' => array(
-            'pattern' => '^/oauth/v1/authorize',
+        'oauth1_area'          => array(
+            'pattern'    => '^/oauth/v1/authorize',
             'form_login' => array(
                 'provider'   => 'user_provider',
                 'check_path' => '/oauth/v1/authorize_login_check',
@@ -77,25 +77,25 @@ $container->loadFromExtension('security', array(
             ),
             'anonymous'  => true
         ),
-        'api' => array(
-            'pattern'   => '^/api',
-            'fos_oauth' => true,
+        'api'                  => array(
+            'pattern'       => '^/api',
+            'fos_oauth'     => true,
             'bazinga_oauth' => true,
-            'stateless' => true
+            'stateless'     => true
         ),
-        'main' => array(
-            'pattern' => "^/",
-            'form_login' => array(
+        'main'                 => array(
+            'pattern'     => "^/",
+            'form_login'  => array(
                 'csrf_provider' => 'form.csrf_provider'
             ),
-            'logout' => array(),
+            'logout'      => array(),
             'remember_me' => array(
                 'key'      => '%mautic.rememberme_key%',
                 'lifetime' => '%mautic.rememberme_lifetime%',
                 'path'     => '%mautic.rememberme_path%',
                 'domain'   => '%mautic.rememberme_domain%'
             ),
-            'context'   => 'mautic'
+            'context'     => 'mautic'
         ),
     ),
     'access_control' => array(
