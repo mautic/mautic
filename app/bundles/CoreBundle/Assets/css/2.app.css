@@ -195,7 +195,7 @@ body > #app-wrapper {
 #app-header.navbar .navbar-nocollapse .navbar-nav .open .dropdown-menu {
   position: absolute;
   top: 100%;
-  left: 0;
+  left: 15px;
   float: left;
   background-color: #ffffff;
   border: 1px solid #eeeeee;
@@ -268,7 +268,7 @@ body > #app-wrapper {
   float: left !important;
 }
 #app-header.navbar .navbar-nocollapse .navbar-left .open .dropdown-menu {
-  left: 0;
+  left: 15px;
   right: auto;
 }
 #app-header.navbar .navbar-nocollapse .navbar-right {
@@ -276,7 +276,7 @@ body > #app-wrapper {
 }
 #app-header.navbar .navbar-nocollapse .navbar-right .open .dropdown-menu {
   left: auto;
-  right: 0;
+  right: 15px;
 }
 @media (min-width: 768px) {
   .header-fixed #app-header.navbar ~ .app-sidebar {
@@ -322,7 +322,7 @@ body > #app-wrapper {
 }
 .app-sidebar {
   position: fixed;
-  z-index: 985;
+  z-index: 990;
   top: 0;
   bottom: 0;
   -webkit-transition: transform 0.3s ease;
@@ -724,7 +724,7 @@ body > #app-wrapper {
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 1020;
+  z-index: 1000;
   height: 46px;
   line-height: 46px;
   background-color: #fbfbfb;

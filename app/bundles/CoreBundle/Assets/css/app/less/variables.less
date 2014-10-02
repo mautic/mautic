@@ -28,7 +28,7 @@
 //== Sidebar layout
 //
 //## common main sidebar variable.
-@sidebar-zindex:                            (@zindex-navbar - 20 + 5);  // 985
+@sidebar-zindex:                            (@header-zindex - 20 + 5);  // 990
 //** left sidebar option
 @sidebar-left-bg:                           #27303a;
 @sidebar-left-header-bg:                    @brand-primary;
@@ -43,7 +43,7 @@
 //== Content layout
 //
 //## common main content variable.
-@content-zindex:                            (@zindex-navbar - 10 + 5);  // 995
+@content-zindex:                            (@header-zindex - 10 + 5);  // 1000
 @content-bg:                                #f8f8f8;
 
 
@@ -52,4 +52,4 @@
 //## common footer variable.
 @footer-height:                             46px;
 @footer-bg:                                 lighten(@body-bg, 1%);
-@footer-zindex:                             (@content-zindex + 20 + 5);  // 955
+@footer-zindex:                             @content-zindex;  // 1000
