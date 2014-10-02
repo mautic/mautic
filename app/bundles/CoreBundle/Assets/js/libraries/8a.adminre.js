@@ -701,14 +701,14 @@ var Mustache;(function(a){if(typeof module!=="undefined"&&module.exports){module
                     if($(element).hasClass("sidebar-minimized")) {
                         isMinimize = false;
                         $(element).removeClass("sidebar-minimized");
-                        $(this).removeClass("minimized");
+                        $(this).removeClass("active");
 
                         // publish event
                         $(element).trigger(settings.eventPrefix+".sidebar.maximize", { "element": $(element) });
                     } else {
                         isMinimize = true;
                         $(element).addClass("sidebar-minimized");
-                        $(this).addClass("minimized");
+                        $(this).addClass("active");
 
                         // publish event
                         $(element).trigger(settings.eventPrefix+".sidebar.minimize", { "element": $(element) });

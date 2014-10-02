@@ -65,14 +65,6 @@
     .navbar-header {
       height: @header-height;
 
-      // alignment
-      &.navbar-left {
-        margin-left: -15px;
-      }
-      &.navbar-right {
-        margin-right: -15px;
-      }
-
       // navbar-toggle
       .navbar-toggle {
         display: inline-block;
@@ -166,6 +158,24 @@
             &.pull-right {
               left: auto;
               right: 4px;
+            }
+          }
+
+          // Sidebar minimizer
+          // -------------------------
+          &.sidebar-minimizer {
+            > .arrow {
+              &:after {
+                font-family: 'FontAwesome';
+                content: '\f060';
+              }
+            }
+            &.active {
+              > .arrow {
+                &:after {
+                  content: '\f061';
+                }
+              }
             }
           }
 
@@ -320,13 +330,12 @@
       }
     }
 
-    .navbar-nocollapse {
-      // navbar-header
-      // -------------------------
-      .navbar-header {
-        
-      }
+    // minimized state
+    .sidebar-minimized & {
+      left: @sidebar-left-collapse-width !important;
+    }
 
+    .navbar-nocollapse {
       // navbar-form
       // -------------------------
       .navbar-form {
