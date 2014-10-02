@@ -1293,6 +1293,12 @@ a.list-group-item:focus {
   z-index: 2;
   border-color: #f3f3f3;
 }
+.dropdown-menu > .active > a,
+.dropdown-menu > .active > a:hover,
+.dropdown-menu > .active > a:focus {
+  color: #596776;
+  background-color: #f0f0f0;
+}
 .nav > li > a {
   font-weight: 600;
 }
@@ -3095,6 +3101,9 @@ lesshat-selector {
 .shd-none {
   -webkit-box-shadow: none;
   box-shadow: none;
+}
+.csr-move {
+  cursor: move !important;
 }
 .ma-20,
 .ma-lg {

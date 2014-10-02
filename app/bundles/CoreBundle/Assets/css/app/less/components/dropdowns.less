@@ -53,3 +53,13 @@
     border-color: darken(@dropdown-link-hover-bg, 0.7%);
   }
 }
+
+// Active state
+.dropdown-menu > .active > a {
+  &,
+  &:hover,
+  &:focus {
+    color: @nav-tabs-active-link-hover-color;
+    background-color: @nav-link-hover-bg;
+  }
+}
