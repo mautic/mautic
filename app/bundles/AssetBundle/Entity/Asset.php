@@ -31,7 +31,7 @@ class Asset extends FormEntity
      * @ORM\GeneratedValue(strategy="AUTO")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"full", "limited"})
      */
     private $id;
 
@@ -39,7 +39,7 @@ class Asset extends FormEntity
      * @ORM\Column(name="title", type="string")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"full", "limited"})
      */
     private $title;
 
@@ -76,7 +76,7 @@ class Asset extends FormEntity
 
     /**
      * Temporary location when asset file is beeing updated.
-     * We need to keep the old file till we are sure the new 
+     * We need to keep the old file till we are sure the new
      * one is stored correctly.
      */
     private $temp;
@@ -85,7 +85,7 @@ class Asset extends FormEntity
      * @ORM\Column(name="alias", type="string")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"full", "limited"})
      */
     private $alias;
 
@@ -101,7 +101,7 @@ class Asset extends FormEntity
      * @ORM\Column(name="lang", type="string")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"full", "limited"})
      */
     private $language = 'en';
 
@@ -125,7 +125,7 @@ class Asset extends FormEntity
      * @ORM\Column(name="download_count", type="integer")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"full", "limited"})
      */
     private $downloadCount = 0;
 
@@ -133,7 +133,7 @@ class Asset extends FormEntity
      * @ORM\Column(name="unique_download_count", type="integer")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"full", "limited"})
      */
     private $uniqueDownloadCount = 0;
 
@@ -141,7 +141,7 @@ class Asset extends FormEntity
      * @ORM\Column(name="revision", type="integer")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"full", "limited"})
      */
     private $revision = 1;
 
@@ -149,7 +149,7 @@ class Asset extends FormEntity
      * @ORM\ManyToOne(targetEntity="Mautic\CategoryBundle\Entity\Category")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"full", "limited"})
      **/
     private $category;
 
@@ -491,7 +491,7 @@ class Asset extends FormEntity
     /**
      * Get uniqueDownloadCount
      *
-     * @return integer 
+     * @return integer
      */
     public function getUniqueDownloadCount()
     {
@@ -546,7 +546,7 @@ class Asset extends FormEntity
 
     /**
      * Returns absolut path to the file.
-     * 
+     *
      * @return string
      */
     public function getAbsolutePath()
@@ -558,7 +558,7 @@ class Asset extends FormEntity
 
     /**
      * Returns relative path to the file.
-     * 
+     *
      * @return string
      */
     public function getWebPath()
@@ -570,7 +570,7 @@ class Asset extends FormEntity
 
     /**
      * Returns absolut path to upload dir.
-     * 
+     *
      * @return string
      */
     protected function getUploadRootDir()
@@ -580,8 +580,8 @@ class Asset extends FormEntity
 
     /**
      * Returns relative path to upload dir.
-     * 
-     * @return string 
+     *
+     * @return string
      */
     protected function getUploadDir()
     {
@@ -607,8 +607,8 @@ class Asset extends FormEntity
 
     /**
      * Returns file extension
-     * 
-     * @return string 
+     *
+     * @return string
      */
     public function getFileType()
     {
@@ -621,8 +621,8 @@ class Asset extends FormEntity
 
     /**
      * Returns file mime type
-     * 
-     * @return string 
+     *
+     * @return string
      */
     public function getFileMimeType()
     {
@@ -635,8 +635,8 @@ class Asset extends FormEntity
 
     /**
      * Returns file size in kB
-     * 
-     * @return int 
+     *
+     * @return int
      */
     public function getFileSize()
     {
@@ -649,8 +649,8 @@ class Asset extends FormEntity
 
     /**
      * Returns Font Awesome icon class based on file type.
-     * 
-     * @return string 
+     *
+     * @return string
      */
     public function getIconClass()
     {
@@ -671,13 +671,13 @@ class Asset extends FormEntity
         }
 
         // File extension is unknown, display general file icon.
-        return 'fa fa-file-o'; 
+        return 'fa fa-file-o';
     }
 
     /**
      * Returns array of common extensions
-     * 
-     * @return string 
+     *
+     * @return string
      */
     public function getFileExtensions()
     {
@@ -757,7 +757,7 @@ class Asset extends FormEntity
 
     /**
      * Load the file object from it's path.
-     * 
+     *
      * @return Symfony\Component\HttpFoundation\File\File or null
      */
     public function loadFile()
@@ -778,7 +778,7 @@ class Asset extends FormEntity
 
     /**
      * Load content of the file from it's path.
-     * 
+     *
      * @return string
      */
     public function getFileContents()
