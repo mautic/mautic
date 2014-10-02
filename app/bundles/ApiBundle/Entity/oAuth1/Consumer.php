@@ -50,13 +50,6 @@ class Consumer extends BaseConsumer
     protected $callback;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Mautic\UserBundle\Entity\User")
-     * @ORM\JoinTable(name="oauth1_user_consumer_xref")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
-     */
-    protected $users;
-
-    /**
      * @param ClassMetadata $metadata
      */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
@@ -68,39 +61,6 @@ class Consumer extends BaseConsumer
         $metadata->addPropertyConstraint('callback', new Assert\NotBlank(
             array('message' => 'mautic.api.client.callback.notblank')
         ));
-    }
-
-    /**
-     * Add users
-     *
-     * @param \Mautic\UserBundle\Entity\User $users
-     * @return Client
-     */
-    public function addUser(\Mautic\UserBundle\Entity\User $users)
-    {
-        $this->users[] = $users;
-
-        return $this;
-    }
-
-    /**
-     * Remove users
-     *
-     * @param \Mautic\UserBundle\Entity\User $users
-     */
-    public function removeUser(\Mautic\UserBundle\Entity\User $users)
-    {
-        $this->users->removeElement($users);
-    }
-
-    /**
-     * Get users
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getUsers()
-    {
-        return $this->users;
     }
 
     /**

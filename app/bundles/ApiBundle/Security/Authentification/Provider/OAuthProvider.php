@@ -18,6 +18,38 @@ class OAuthProvider extends \Bazinga\OAuthServerBundle\Security\Authentification
     /**
      * {@inheritdoc}
      */
+    public function authenticate(TokenInterface $token)
+    {
+        if (!$this->supports($token)) {
+            return null;
+        }
+
+        $requestParameters = $token->getRequestParameters();
+        $requestMethod     = $token->getRequestMethod();
+        $requestUrl        = $token->getRequestUrl();
+
+        if ($this->serverService->validateRequest($requestParameters, $requestMethod, $requestUrl)) {
+            $accessToken = $this->tokenProvider->loadAccessTokenByToken($requestParameters['oauth_token']);
+            $user        = $accessToken->getUser();
+
+            if (null !== $user) {
+                //Recreate token to include user roles in order to be able to avoid CSRF checks with forms
+                $token = new OAuthToken($user->getRoles());
+                $token->setRequestParameters($requestParameters);
+                $token->setRequestMethod($requestMethod);
+                $token->setRequestUrl($requestUrl);
+                $token->setAuthenticated(true);
+                $token->setUser($user);
+            }
+
+            return $token;
+        }
+
+        throw new AuthenticationException('OAuth authentification failed');
+    }
+    /**
+     * {@inheritdoc}
+     */
     public function supports(TokenInterface $token)
     {
         return ($token instanceof OAuthToken);

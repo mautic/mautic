@@ -15,6 +15,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 
 class AuthorizeController extends Controller
@@ -34,19 +36,24 @@ class AuthorizeController extends Controller
         $securityContext = $this->container->get('security.context');
         $tokenProvider   = $this->container->get('bazinga.oauth.provider.token_provider');
 
-        if ($securityContext->isGranted('IS_AUTHENTICATED_FULLY')) {
-            $token = $tokenProvider->loadRequestTokenByToken($oauth_token);
+        $user = $securityContext->getToken()->getUser();
 
-            if ($token instanceof RequestTokenInterface) {
-                $tokenProvider->setUserForRequestToken($token, $securityContext->getToken()->getUser());
-
-                return new Response($this->container->get('templating')->render('MauticApiBundle:Authorize:oAuth1/authorize.html.php', array(
-                    'consumer'       => $token->getConsumer(),
-                    'oauth_token'    => $oauth_token,
-                    'oauth_callback' => $oauth_callback
-                )));
-            }
+        if (!$user instanceof UserInterface) {
+            throw new AccessDeniedException('This user does not have access to this section.');
         }
+
+        $token = $tokenProvider->loadRequestTokenByToken($oauth_token);
+
+        if ($token instanceof RequestTokenInterface) {
+            $tokenProvider->setUserForRequestToken($token, $securityContext->getToken()->getUser());
+
+            return new Response($this->container->get('templating')->render('MauticApiBundle:Authorize:oAuth1/authorize.html.php', array(
+                'consumer'       => $token->getConsumer(),
+                'oauth_token'    => $oauth_token,
+                'oauth_callback' => $oauth_callback
+            )));
+        }
+
 
         throw new HttpException(404);
     }
