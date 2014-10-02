@@ -12,3 +12,64 @@
   border-radius: @border-radius-base;
   border-width: 0 !important;
 }
+
+// Flotchart
+// -------------------------
+.flotchart {
+  display: block;
+  width: 100%;
+
+  // hide the flot data
+  > .flotdata {
+    display: none;
+  }
+
+  // flot legend
+  .legend {
+    > table {
+      tr {
+        td {
+          padding: 3px;
+          &:first-child {
+            padding-left: 5px;
+          }
+          &:last-child {
+            padding-right: 5px;
+          }
+        }
+
+        + tr {
+          td {
+            padding-top: 0px;
+          }
+        }
+      }
+    }
+
+    > div {
+      &:first-child {
+        background-color: transparent !important;
+      }
+    }
+
+    .legendColorBox {
+      > div {
+        border-color: rgba(0, 0, 0, 0.1) !important;
+      }
+    }
+  }
+}
+
+// Flot tooltip
+// -------------------------
+#flotTip {
+  font-size: 12px !important;
+  font-weight: 600;
+  position: relative;
+  z-index: 5;
+  padding: 4px 5px;
+  border-radius: @border-radius-base !important;
+  border-color: transparent !important;
+  background-color: #444 !important;
+  color: #eee;
+}

@@ -2974,6 +2974,42 @@ lesshat-selector {
   border-radius: 3px;
   border-width: 0 !important;
 }
+.flotchart {
+  display: block;
+  width: 100%;
+}
+.flotchart > .flotdata {
+  display: none;
+}
+.flotchart .legend > table tr td {
+  padding: 3px;
+}
+.flotchart .legend > table tr td:first-child {
+  padding-left: 5px;
+}
+.flotchart .legend > table tr td:last-child {
+  padding-right: 5px;
+}
+.flotchart .legend > table tr + tr td {
+  padding-top: 0px;
+}
+.flotchart .legend > div:first-child {
+  background-color: transparent !important;
+}
+.flotchart .legend .legendColorBox > div {
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+#flotTip {
+  font-size: 12px !important;
+  font-weight: 600;
+  position: relative;
+  z-index: 5;
+  padding: 4px 5px;
+  border-radius: 3px !important;
+  border-color: transparent !important;
+  background-color: #444 !important;
+  color: #eee;
+}
 .va-t {
   vertical-align: top !important;
 }
