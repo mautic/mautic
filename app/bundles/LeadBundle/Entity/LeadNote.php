@@ -31,7 +31,7 @@ class LeadNote extends FormEntity
      * @ORM\Id()
      * @ORM\GeneratedValue(strategy="AUTO")
      * @Serializer\Expose
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"leadNoteDetails"})
      */
     private $id;
 
@@ -40,15 +40,21 @@ class LeadNote extends FormEntity
      * @ORM\JoinColumn(name="author_id", referencedColumnName="id", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"leadNoteDetails"})
      */
     private $author;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Mautic\LeadBundle\Entity\Lead")
+     * @ORM\JoinColumn(name="lead_id", referencedColumnName="id")
+     */
+    private $lead;
 
     /**
      * @ORM\Column(type="string")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"leadNoteDetails"})
      */
     private $text;
 
@@ -56,7 +62,7 @@ class LeadNote extends FormEntity
      * @ORM\Column(type="string", length=50, nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"leadNoteDetails"})
      */
     private $type;
 
@@ -64,7 +70,7 @@ class LeadNote extends FormEntity
      * @ORM\Column(name="date", type="datetime", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"leadNoteDetails"})
      */
     private $date;
 
@@ -187,5 +193,21 @@ class LeadNote extends FormEntity
         $metadata->addPropertyConstraint('text', new NotBlank(
             array('message' => 'mautic.lead.note.text.notblank')
         ));
+    }
+
+    /**
+     * @return Lead
+     */
+    public function getLead ()
+    {
+        return $this->lead;
+    }
+
+    /**
+     * @param Lead $lead
+     */
+    public function setLead (Lead $lead)
+    {
+        $this->lead = $lead;
     }
 }

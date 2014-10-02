@@ -82,6 +82,18 @@ $collection->add('mautic_api_deletelead', new Route('/leads/{id}/delete.{_format
     )
 ));
 
+$collection->add('mautic_api_getleadnotes', new Route('/leads/{id}/notes.{_format}',
+    array(
+        '_controller' => 'MauticLeadBundle:Api\LeadApi:getNotes',
+        '_format' => 'json'
+    ),
+    array(
+        '_method' => 'GET',
+        '_format' => 'json|xml',
+        'id'      => '\d+'
+    )
+));
+
 $collection->add('mautic_api_getleadowners', new Route('/leads/list/owners.{_format}',
     array(
         '_controller' => 'MauticLeadBundle:Api\LeadApi:getOwners',

@@ -30,7 +30,7 @@ class Lead extends FormEntity
      * @ORM\GeneratedValue(strategy="AUTO")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"leadDetails", "leadList"})
      */
     private $id;
 
@@ -39,7 +39,7 @@ class Lead extends FormEntity
      * @ORM\JoinColumn(name="owner_id", referencedColumnName="id", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"leadDetails"})
      */
     private $owner;
 
@@ -47,7 +47,7 @@ class Lead extends FormEntity
      * @ORM\Column(type="integer")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"leadDetails", "leadList"})
      */
     private $points = 0;
 
@@ -98,11 +98,17 @@ class Lead extends FormEntity
     private $newlyCreated = false;
 
     /**
+     * @ORM\OneToMany(targetEntity="LeadNote", mappedBy="lead", cascade={"remove"}, orphanRemoval=true, fetch="EXTRA_LAZY")
+     * @ORM\OrderBy({"dateAdded" = "DESC"})
+     */
+    private $notes;
+
+    /**
      * Used by Mautic to populate the fields pulled from the DB
      * @var array
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"leadDetails", "leadList"})
      */
     protected $fields = array();
 
@@ -471,5 +477,13 @@ class Lead extends FormEntity
     public function setNewlyCreated ($newlyCreated)
     {
         $this->newlyCreated = $newlyCreated;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getNotes ()
+    {
+        return $this->notes;
     }
 }

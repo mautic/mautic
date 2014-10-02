@@ -125,7 +125,7 @@ class FormFieldHelper
      * @param $properties
      * @return bool
      */
-    static public function validateProperties($type, $properties)
+    static public function validateProperties($type, &$properties)
     {
         if (!array_key_exists($type, self::$types)) {
             //ensure the field type is supported
@@ -135,8 +135,7 @@ class FormFieldHelper
         $fieldType = self::$types[$type];
         foreach ($properties as $key => $value) {
             if (!array_key_exists($key, $fieldType['properties'])) {
-                //ensure the properties are recognized
-                return array(false, 'mautic.lead.field.keynotrecognized');
+                unset($properties[$key]);
             }
 
             if (!empty($fieldType['properties'][$key]['required']) && empty($value)) {

@@ -31,7 +31,7 @@ class LeadList extends FormEntity
      * @ORM\GeneratedValue(strategy="AUTO")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"leadListDetails", "leadListList"})
      */
     private $id;
 
@@ -39,7 +39,7 @@ class LeadList extends FormEntity
      * @ORM\Column(type="string")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"leadListDetails", "leadListList"})
      */
     private $name;
 
@@ -47,7 +47,7 @@ class LeadList extends FormEntity
      * @ORM\Column(type="string")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"leadListDetails", "leadListList"})
      */
     private $alias;
 
@@ -55,7 +55,7 @@ class LeadList extends FormEntity
      * @ORM\Column(type="text", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"leadListDetails", "leadListList"})
      */
     private $description;
 
@@ -63,7 +63,7 @@ class LeadList extends FormEntity
      * @ORM\Column(type="array")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"leadListDetails"})
      */
     private $filters;
 
@@ -71,7 +71,7 @@ class LeadList extends FormEntity
      * @ORM\Column(name="is_global", type="boolean")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"leadListDetails"})
      */
     private $isGlobal = false;
 

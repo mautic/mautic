@@ -305,7 +305,6 @@ class LeadController extends FormController
             ),
             'hydration_mode' => 'HYDRATE_ARRAY'
         ));
-
         $form   = $model->createForm($lead, $this->get('form.factory'), $action, array('fields' => $fields));
 
         ///Check for a submitted form and process it
@@ -318,10 +317,7 @@ class LeadController extends FormController
 
                     //pull the data from the form in order to apply the form's formatting
                     foreach ($form as $f) {
-                        $name = $f->getName();
-                        if (strpos($name, 'field_') === 0) {
-                            $data[$name] = $f->getData();
-                        }
+                        $data[$f->getName()] = $f->getData();
                     }
 
                     $model->setFieldValues($lead, $data);

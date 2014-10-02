@@ -250,14 +250,15 @@ class LeadModel extends FormModel
      * @param $type
      * @param $filter
      * @param $limit
+     * @param $start
      * @return array
      */
-    public function getLookupResults($type, $filter = '', $limit = 10)
+    public function getLookupResults($type, $filter = '', $limit = 10, $start = 0)
     {
         $results = array();
         switch ($type) {
             case 'user':
-                $results = $this->em->getRepository('MauticUserBundle:User')->getUserList($filter, $limit, 0, array('lead' => 'leads'));
+                $results = $this->em->getRepository('MauticUserBundle:User')->getUserList($filter, $limit, $start, array('lead' => 'leads'));
                 break;
         }
 

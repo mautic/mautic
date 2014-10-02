@@ -30,7 +30,7 @@ class LeadField extends FormEntity
      * @ORM\Id()
      * @ORM\GeneratedValue(strategy="AUTO")
      * @Serializer\Expose
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"leadFieldDetails", "leadFieldList"})
      */
     private $id;
 
@@ -38,7 +38,7 @@ class LeadField extends FormEntity
      * @ORM\Column(type="string")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"leadFieldDetails", "leadFieldList"})
      */
     private $label;
 
@@ -46,7 +46,7 @@ class LeadField extends FormEntity
      * @ORM\Column(type="string")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"leadFieldDetails", "leadFieldList"})
      */
     private $alias;
 
@@ -54,7 +54,7 @@ class LeadField extends FormEntity
      * @ORM\Column(type="string", length=50)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"leadFieldDetails", "leadFieldList"}))
      */
     private $type;
 
@@ -62,7 +62,7 @@ class LeadField extends FormEntity
      * @ORM\Column(type="string", name="field_group", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"leadFieldDetails", "leadFieldList"})
      */
     private $group;
 
@@ -70,7 +70,7 @@ class LeadField extends FormEntity
      * @ORM\Column(name="default_value", type="string", length=255, nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"leadFieldDetails"})
      */
     private $defaultValue;
 
@@ -78,39 +78,27 @@ class LeadField extends FormEntity
      * @ORM\Column(name="is_required", type="boolean")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"leadFieldDetails"})
      */
     private $isRequired = false;
 
     /**
      * @ORM\Column(name="is_fixed", type="boolean")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
      */
     private $isFixed = false;
 
     /**
      * @ORM\Column(name="is_visible", type="boolean")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
      */
     private $isVisible = true;
 
     /**
      * @ORM\Column(name="is_short_visible", type="boolean")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
      */
     private $isShortVisible = true;
 
     /**
      * @ORM\Column(name="is_listable", type="boolean")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
      */
     private $isListable = true;
 
@@ -118,7 +106,7 @@ class LeadField extends FormEntity
      * @ORM\Column(name="field_order", type="integer", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"leadFieldDetails", "leadFieldList"})
      */
     private $order = 0;
 
@@ -126,7 +114,7 @@ class LeadField extends FormEntity
      * @ORM\Column(type="array", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"leadFieldDetails"})
      */
     private $properties;
 

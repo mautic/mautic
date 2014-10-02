@@ -26,10 +26,13 @@ class LeadApiController extends CommonApiController
 
     public function initialize(FilterControllerEvent $event)
     {
-        $this->model           = $this->factory->getModel('lead.lead');
-        $this->entityClass     = 'Mautic\LeadBundle\Entity\Lead';
-        $this->entityNameOne   = 'lead';
-        $this->entityNameMulti = 'leads';
+        parent::initialize($event);
+        $this->model            = $this->factory->getModel('lead.lead');
+        $this->entityClass      = 'Mautic\LeadBundle\Entity\Lead';
+        $this->entityNameOne    = 'lead';
+        $this->entityNameMulti  = 'leads';
+        $this->permissionBase   = 'lead:leads';
+        $this->serializerGroups = array("leadDetails", "userList", "publishDetails");
     }
 
     /**
@@ -54,29 +57,7 @@ class LeadApiController extends CommonApiController
      */
     public function getEntitiesAction()
     {
-        if (!$this->factory->getSecurity()->isGranted(
-            array('lead:leads:viewown', 'lead:leads:viewother'),
-            'MATCH_ONE'
-        )) {
-            return $this->accessDenied();
-        }
-
-        $args = array(
-            'start'      => $this->request->query->get('start', 0),
-            'limit'      => $this->request->query->get('limit', $this->factory->getParameter('default_pagelimit')),
-            'filter'     => $this->request->query->get('search', ''),
-            'orderBy'    => $this->request->query->get('orderBy', ''),
-            'orderByDir' => $this->request->query->get('orderByDir', 'ASC')
-        );
-
-        $results = $this->model->getEntities($args);
-        //we have to convert them from paginated proxy functions to entities in order for them to be
-        //returned by the serializer/rest bundle
-
-        $view = $this->view(array($this->entityNameMulti => $results), Codes::HTTP_OK);
-        $context = SerializationContext::create()->setGroups(array('limited'));
-        $view->setSerializationContext($context);
-        return $this->handleView($view);
+        return parent::getEntitiesAction();
     }
 
     /**
@@ -97,25 +78,7 @@ class LeadApiController extends CommonApiController
      */
     public function getEntityAction($id)
     {
-        $entity = $this->model->getEntity($id);
-        if (!$this->factory->getSecurity()->hasEntityAccess(
-            'lead:leads:viewown',
-            'lead:leads:viewother',
-            $entity
-        )) {
-            return $this->accessDenied();
-        }
-
-        if (!$entity instanceof $this->entityClass) {
-            throw new NotFoundHttpException($this->get('translator')->trans('mautic.api.call.notfound'));
-        }
-
-        $view = $this->view(array($this->entityNameOne => $entity), Codes::HTTP_OK);
-
-        $context = SerializationContext::create()->setGroups(array("limited"));
-        $view->setSerializationContext($context);
-
-        return $this->handleView($view);
+        return parent::getEntityAction($id);
     }
 
     /**
@@ -134,37 +97,13 @@ class LeadApiController extends CommonApiController
      */
     public function deleteEntityAction($id)
     {
-        $entity = $this->model->getEntity($id);
-
-        if (!$this->factory->getSecurity()->hasEntityAccess(
-            'lead:leads:deleteown',
-            'lead:leads:deleteother',
-            $entity
-        )) {
-            return $this->accessDenied();
-        }
-
-        if ($entity !== null) {
-            /**
-            //set custom fields before deleting
-            $fields = $entity->getFields();
-            foreach ($fields as $f) {
-                $entity->addCustomField($f->getField()->getAlias(), $f->getValue());
-            }
-            */
-            $this->model->deleteEntity($entity);
-
-            $view = $this->view(array($this->entityNameOne => $entity), Codes::HTTP_OK);
-            $context = SerializationContext::create()->setGroups(array("limited"));
-            $view->setSerializationContext($context);
-            return $this->handleView($view);
-        } else {
-            throw new NotFoundHttpException($this->get('translator')->trans('mautic.api.call.notfound'));
-        }
+        return parent::deleteEntityAction($id);
     }
 
     /**
-     * Creates a new lead
+     * Creates a new lead.  You should make a call to /api/leads/list/fields.json in order to get a list of
+     * custom fields that will be accepted.  You can also pass in a ipAddress parameter if the IP of the lead
+     * is different than that of the originating request.
      *
      * @ApiDoc(
      *   section = "Leads",
@@ -173,28 +112,19 @@ class LeadApiController extends CommonApiController
      *     200 = "Returned if successful",
      *     400 = "Returned if validation failed"
      *   },
-     *   input = "lead",
-     *   output = "Mautic\LeadBundle\Entity\Lead"
+     *   output={
+     *      "class"="Mautic\LeadBundle\Entity\Lead",
+     *      "groups"={"leadDetails", "userList", "publishDetails"}
+     *   }
      * )
      */
     public function newEntityAction()
     {
-        $entity = $this->model->getEntity();
-
-        if (!$this->factory->getSecurity()->isGranted('lead:leads:create')) {
-            return $this->accessDenied();
-        }
-
-        $parameters = $this->request->request->all();
-        $this->model->setFieldValues($entity, $parameters);
-
-        $this->serializerGroups = array("limited");
-        return $this->processForm($entity, $parameters, 'POST');
+        return parent::newEntityAction();
     }
 
-
     /**
-     * Edits an existing lead or creates a new one on PUT if not found
+     * Edits an existing lead or creates a new one on PUT if not found.
      *
      * @ApiDoc(
      *   section = "Leads",
@@ -204,11 +134,10 @@ class LeadApiController extends CommonApiController
      *     201 = "Returned if a new lead was created",
      *     400 = "Returned if validation failed"
      *   },
-     *   parameters = {
-     *
-     *   },
-     *   input = "lead",
-     *   output = "Mautic\LeadBundle\Entity\Lead"
+     *   output={
+     *      "class"="Mautic\LeadBundle\Entity\Lead",
+     *      "groups"={"leadDetails", "userList", "publishDetails"}
+     *   }
      * )
      *
      * @param int $id Lead ID
@@ -217,47 +146,30 @@ class LeadApiController extends CommonApiController
      */
     public function editEntityAction($id)
     {
-        $entity     = $this->model->getEntity($id);
-        $parameters = $this->request->request->all();
-        $method     = $this->request->getMethod();
-
-        if (!$this->factory->getSecurity()->hasEntityAccess(
-            'lead:leads:editown',
-            'lead:leads:editother',
-            $entity
-        )) {
-            return $this->accessDenied();
-        }
-
-        if ($entity === null) {
-            if ($method === "PATCH" ||
-                ($method === "PUT" && !$this->factory->getSecurity()->isGranted('lead:leads:create'))
-            ) {
-                //PATCH requires that an entity exists or must have create access for PUT
-                throw new NotFoundHttpException($this->get('translator')->trans('mautic.api.call.notfound'));
-            } else {
-                $entity = $this->model->getEntity();
-            }
-        }
-
-        $this->model->setFieldValues($entity, $parameters);
-
-        $this->serializerGroups = array("limited");
-        return $this->processForm($entity, $parameters, $method);
+       return parent::editEntityAction($id);
     }
 
     /**
-     * Add the customFields after edit/new
+     * {@inheritdoc}
      *
      * @param $entity
+     *
+     * @return mixed|void
      */
-    protected function postProcessForm(&$entity)
+    protected function createEntityForm($entity)
     {
-        //set custom fields before deleting
-        $fields = $entity->getFields();
-        foreach ($fields as $f) {
-            $entity->addCustomField($f->getField()->getAlias(), $f->getValue());
-        }
+        $fields = $this->factory->getModel('lead.field')->getEntities(array(
+            'force' => array(
+                array(
+                    'column' => 'f.isPublished',
+                    'expr'   => 'eq',
+                    'value'  => true
+                )
+            ),
+            'hydration_mode' => 'HYDRATE_ARRAY'
+        ));
+
+        return $this->model->createForm($entity, $this->get('form.factory'), null, array('fields' => $fields));
     }
 
     /**
@@ -269,9 +181,14 @@ class LeadApiController extends CommonApiController
      *   filters={
      *      {"name"="filter", "dataType"="string", "required"=false, "description"="A string in which to filter the results by."},
      *      {"name"="limit", "dataType"="integer", "required"=false, "description"="Limit the number of records to retrieve."},
+     *      {"name"="start", "dataType"="integer", "required"=false, "description"="Set start record; defaults to 0."},
      *   },
      *   statusCodes = {
      *     200 = "Returned when successful"
+     *   },
+     *   output={
+     *      "class"="Mautic\UserBundle\Entity\User",
+     *      "groups"={"userList"}
      *   }
      * )
      *
@@ -286,13 +203,14 @@ class LeadApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $filter = $this->request->query->get('filter', null);
-        $limit  = $this->request->query->get('limit', null);
-        $users  = $this->model->getLookupResults('user', $filter, $limit);
-
-        $view = $this->view($users, Codes::HTTP_OK);
-        $context = SerializationContext::create()->setGroups(array('limited'));
+        $filter  = $this->request->query->get('filter', null);
+        $limit   = $this->request->query->get('limit', null);
+        $start   = $this->request->query->get('start', null);
+        $users   = $this->model->getLookupResults('user', $filter, $limit, $start);
+        $view    = $this->view($users, Codes::HTTP_OK);
+        $context = SerializationContext::create()->setGroups(array('userList'));
         $view->setSerializationContext($context);
+
         return $this->handleView($view);
     }
 
@@ -301,9 +219,13 @@ class LeadApiController extends CommonApiController
      *
      * @ApiDoc(
      *   section = "Leads",
-     *   description = "Obtains a list of of smart lists for the user",
+     *   description = "Obtains a list of of lead lists available to the user",
      *   statusCodes = {
      *     200 = "Returned when successful"
+     *   },
+     *   output={
+     *      "class"="Mautic\LeadBundle\Entity\LeadList",
+     *      "groups"={"leadListList"}
      *   }
      * )
      *
@@ -313,8 +235,9 @@ class LeadApiController extends CommonApiController
     {
         $lists = $this->factory->getModel('lead.list')->getUserLists();
         $view = $this->view($lists, Codes::HTTP_OK);
-        $context = SerializationContext::create()->setGroups(array('limited'));
+        $context = SerializationContext::create()->setGroups(array('leadListList'));
         $view->setSerializationContext($context);
+
         return $this->handleView($view);
     }
 
@@ -326,6 +249,10 @@ class LeadApiController extends CommonApiController
      *   description = "Obtains a list of of custom fields for editing leads",
      *   statusCodes = {
      *     200 = "Returned when successful"
+     *   },
+     *   output={
+     *      "class"="Mautic\LeadBundle\Entity\Lead",
+     *      "groups"={"leadFieldList"}
      *   }
      * )
      *
@@ -342,8 +269,103 @@ class LeadApiController extends CommonApiController
 
         $fields = $this->factory->getModel('lead.field')->getEntities();
         $view = $this->view($fields, Codes::HTTP_OK);
-        $context = SerializationContext::create()->setGroups(array('limited'));
+        $context = SerializationContext::create()->setGroups(array('leadFieldList'));
         $view->setSerializationContext($context);
+
         return $this->handleView($view);
+    }
+
+
+    /**
+     * Obtains a list of custom fields
+     *
+     * @ApiDoc(
+     *   section = "Leads",
+     *   description = "Obtains a list of of custom fields for editing leads",
+     *   statusCodes = {
+     *     200 = "Returned when successful"
+     *   },
+     *   output={
+     *      "class"="Mautic\LeadBundle\Entity\LeadNote",
+     *      "groups"={"leadNoteList"}
+     *   }
+     * )
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function getNotesAction($id)
+    {
+        $entity = $this->model->getEntity($id);
+        if ($entity !== null) {
+            if (!$this->factory->getSecurity()->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $entity->getOwner())) {
+                return $this->accessDenied();
+            }
+
+            $notes = $this->factory->getModel('lead.note')->getEntities(array(
+                'filter' => array(
+                    'force' => array(
+                        array(
+                            'column' => 'e.lead',
+                            'expr'   => 'eq',
+                            'value'  => $entity
+                        )
+                    )
+                ),
+                'orderBy' => 'e.dateAdded',
+                'orderByDir' => 'DESC'
+            ));
+            $view = $this->view($notes, Codes::HTTP_OK);
+            $context = SerializationContext::create()->setGroups(array('leadNoteList'));
+            $view->setSerializationContext($context);
+            return $this->handleView($view);
+        }
+
+        return $this->notFound();
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param \Mautic\LeadBundle\Entity\Lead  &$entity
+     * @param                                 $parameters
+     * @param                                 $form
+     * @param string                          $action
+     */
+    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
+    {
+        //Since the request can be from 3rd party, check for an IP address if included
+        if (isset($parameters['ipAddress'])) {
+            $ip = $parameters['ipAddress'];
+            unset($parameters['ipAddress']);
+
+            $ipAddress = $this->factory->getIpAddress($ip);
+
+            $entity->addIpAddress($ipAddress);
+        }
+
+        //set the custom field values
+
+        //pull the data from the form in order to apply the form's formatting
+        foreach ($form as $f) {
+            $parameters[$f->getName()] = $f->getData();
+        }
+
+        $this->model->setFieldValues($entity, $parameters);
+    }
+
+    /**
+     * Remove IpAddress as it'll be handled outsie the form
+     *
+     * @param $parameters
+     * @param $entity
+     * @param $action
+     *
+     * @return mixed|void
+     */
+    protected function prepareParametersForBinding($parameters, $entity, $action)
+    {
+        unset($parameters['ipAddress']);
+
+        return $parameters;
     }
 }
