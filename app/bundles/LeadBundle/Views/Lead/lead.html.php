@@ -93,27 +93,144 @@ $view['slots']->stop();
         <!-- left section -->
         <div class="col-md-9 bg-white height-auto">
             <div class="bg-auto">
-                <!-- header -->
-                <div class="bg-picture mb-lg mnt-1" style="background-image:url('http://www.graphicsfuel.com/wp-content/uploads/2014/09/polygon-background3-preview.jpg')">
-                    <!-- overlay -->
-                    <span class="bg-picture-overlay"></span>
-                    
-                    <!-- meta bottom -->
-                    <div class="box-layout meta bottom pa-md">
-                        <div class="col-sm-8 va-m">
-                            <div class="media-body">
-                                <h3 class="text-white mb-2 fw-sb ellipsis">Leads Name Or Title</h3>
-                                <h5 class="text-white dark-xs">Company Name PTE</h5>
+                <!-- lead detail header -->
+                <div class="pr-md pl-md pt-lg pb-lg">
+                    <div class="box-layout">
+                        <div class="col-xs-6 va-m">
+                            <div class="media">
+                                <span class="pull-left img-wrapper img-rounded" style="width:38px">
+                                    <img src="https://s3.amazonaws.com/uifaces/faces/twitter/nisaanjani/128.jpg" alt="">
+                                </span>
+                                <div class="media-body">
+                                    <h4 class="fw-sb text-primary">Nisa Anjani</h4>
+                                    <p class="text-white dark-lg mb-0">Melbourne, Australia</p>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-sm-4 va-m text-right">
-                            <h2 class="fw-sb text-white"><span class="fa fa-star-o text-warning"></span> 105</h2>
-                            <h5 class="text-white dark-xs">Lead Points</h5>
+                        <div class="col-xs-4 va-m text-right">
+                            <h4 class="fw-sb text-white dark-md"><span class="fa fa-star-o text-warning"></span> 105</h4>
                         </div>
                     </div>
-                    <!--/ meta bottom -->
                 </div>
-                <!--/ header -->
+                <!--/ lead detail header -->
+
+                <!-- lead detail collapseable -->
+                <div class="collapse" id="lead-details">
+                    <div class="pr-md pl-md pb-md">
+                        <div class="panel shd-none mb-0">
+                            <table class="table table-bordered table-striped mb-0">
+                                <tbody>
+                                    <tr>
+                                        <td width="20%"><span class="fw-b">Company</span></td>
+                                        <td>Lorem Ipsum PTE.</td>
+                                    </tr>
+                                    <tr>
+                                        <td width="20%"><span class="fw-b">Position</span></td>
+                                        <td>Manager</td>
+                                    </tr>
+                                    <tr>
+                                        <td width="20%"><span class="fw-b">Email</span></td>
+                                        <td>nisa.anjani@mail.com</td>
+                                    </tr>
+                                    <tr>
+                                        <td width="20%"><span class="fw-b">phone</span></td>
+                                        <td>(222) 222-2222</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!--/ lead detail collapseable -->
+            </div>
+
+            <div class="bg-auto bg-dark-xs">
+                <!-- lead detail collapseable toggler -->
+                <div class="hr-expand nm">
+                    <span data-toggle="tooltip" title="Detail">
+                        <a href="javascript:void(0)" class="arrow" data-toggle="collapse" data-target="#lead-details"><span class="caret"></span></a>
+                    </span>
+                </div>
+                <!--/ lead detail collapseable toggler -->
+
+                <!-- 
+                some stats: need more input on what type of form data to show.
+                delete if it is not require
+                -->
+                <div class="pa-md">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="panel ovf-h bg-auto bg-light-xs">
+                                <div class="panel-body box-layout">
+                                    <div class="col-xs-8 va-m">
+                                        <h5 class="text-white dark-md fw-sb mb-xs">Lead Views</h5>
+                                        <h2 class="fw-b">112</h2>
+                                    </div>
+                                    <div class="col-xs-4 va-t text-right">
+                                        <h3 class="text-white dark-sm"><span class="fa fa-eye"></span></h3>
+                                    </div>
+                                </div>
+                                <div class="plugin-sparkline text-right pr-md pl-md"
+                                sparkHeight="34"
+                                sparkWidth="180"
+                                sparkType="bar"
+                                sparkBarWidth="8"
+                                sparkBarSpacing="3"
+                                sparkZeroAxis="false"
+                                sparkBarColor="#00B49C">
+                                    129,137,186,167,200,115,118,162,112,106,104,106
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="panel ovf-h bg-auto bg-light-xs">
+                                <div class="panel-body box-layout">
+                                    <div class="col-xs-8 va-m">
+                                        <h5 class="text-white dark-md fw-sb mb-xs">Lead Conversions</h5>
+                                        <h2 class="fw-b">162</h2>
+                                    </div>
+                                    <div class="col-xs-4 va-t text-right">
+                                        <h3 class="text-white dark-sm"><span class="fa fa-arrows-h"></span></h3>
+                                    </div>
+                                </div>
+                                <div class="plugin-sparkline text-right pr-md pl-md"
+                                sparkHeight="34"
+                                sparkWidth="180"
+                                sparkType="bar"
+                                sparkBarWidth="8"
+                                sparkBarSpacing="3"
+                                sparkZeroAxis="false"
+                                sparkBarColor="#F86B4F">
+                                    156,162,185,102,144,156,150,114,198,117,120,138
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="panel ovf-h bg-auto bg-light-xs">
+                                <div class="panel-body box-layout">
+                                    <div class="col-xs-8 va-m">
+                                        <h5 class="text-white dark-md fw-sb mb-xs">Total Leads</h5>
+                                        <h2 class="fw-b">192</h2>
+                                    </div>
+                                    <div class="col-xs-4 va-t text-right">
+                                        <h3 class="text-white dark-sm"><span class="fa fa-user"></span></h3>
+                                    </div>
+                                </div>
+                                <div class="plugin-sparkline text-right pr-md pl-md"
+                                sparkHeight="34"
+                                sparkWidth="180"
+                                sparkType="bar"
+                                sparkBarWidth="8"
+                                sparkBarSpacing="3"
+                                sparkZeroAxis="false"
+                                sparkBarColor="#FDB933">
+                                    115,195,185,110,182,192,168,185,138,176,119,109
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--/ some stats -->
 
                 <!-- tabs controls -->
                 <ul class="nav nav-tabs pr-md pl-md">
@@ -202,66 +319,91 @@ $view['slots']->stop();
         <!--/ left section -->
 
         <!-- right section -->
-        <div class="col-md-3 bg-auto bdr-l height-auto">
-            <!-- profile -->
-            <div class="panel bdr-rds-0 bdr-w-0 shd-none bg-transparent mb-0">
-                <div class="panel-body text-center">
-                    <span class="img-wrapper img-rounded mb-md mt-lg" style="width:76px;">
-                        <img src="https://s3.amazonaws.com/uifaces/faces/twitter/nisaanjani/128.jpg" alt="">
-                    </span>
-                    <h4 class="fw-sb mb-xs">Nisa Anjani</h4>
-                    <p class="mb-0 text-muted"><span class="fa fa-map-marker"></span> Melbourne, Australia</p>
+        <div class="col-md-3 bg-white bdr-l height-auto">
+            <!-- form HTML -->
+            <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
+                <div class="panel-heading">
+                    <div class="panel-title">Contact</div>
+                </div>
+                <div class="panel-body pt-sm">
+                    <h6 class="fw-sb">Address</h6>
+                    <address class="text-muted">
+                        795 Folsom Ave, Suite 600<br>
+                        San Francisco, CA 94107<br>
+                        <abbr title="Phone">P:</abbr> (123) 456-7890
+                    </address>
 
-                    <div class="mt-lg mb-lg">
-                        <a href="javascript:void(0);" class="text-twitter"><span class="fa fa-twitter fs-18 mr-md"></span></a>
-                        <a href="javascript:void(0);" class="text-facebook"><span class="fa fa-facebook fs-18 mr-md"></span></a>
-                        <a href="javascript:void(0);" class="text-google"><span class="fa fa-google-plus fs-18"></span></a>
-                    </div>
-                    <a href="" class="btn btn-default"><span class="fa fa-envelope mr-xs"></span> Message</a>
+                    <h6 class="fw-sb">Email</h6>
+                    <p class="text-muted">nisa.anjani@mail.com</p>
+
+                    <h6 class="fw-sb">Phone - home</h6>
+                    <p class="text-muted">(222) 222-2222</p>
+
+                    <h6 class="fw-sb">Phone - mobile</h6>
+                    <p class="text-muted mb-0">(333) 333-3333</p>
                 </div>
             </div>
-            <!--/ profile -->
+            <!--/ form HTML -->
 
-            <div class="pa-md">
-                <!-- about -->
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <div class="panel-title">General</div>
-                    </div>
-                    <div class="panel-body">
-                        <h6 class="fw-sb">Position</h6>
-                        <p class="text-muted">Senior CEO</p>
+            <hr class="hr-w-2" style="width:50%">
 
-                        <h6 class="fw-sb">Company</h6>
-                        <p class="text-muted mb-0">Lorem Ipsum LTD</p>
-                    </div>
+            <!--
+            we can leverage data from audit_log table
+            and build activity feed from it
+            -->
+            <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mb-0">
+                <div class="panel-heading">
+                    <div class="panel-title">Recent Activity</div>
                 </div>
-                <!--/ about -->
-
-                <!-- about -->
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <div class="panel-title">Contact</div>
-                    </div>
-                    <div class="panel-body">
-                        <h6 class="fw-sb">Address</h6>
-                        <address class="text-muted">
-                            795 Folsom Ave, Suite 600<br>
-                            San Francisco, CA 94107<br>
-                            <abbr title="Phone">P:</abbr> (123) 456-7890
-                        </address>
-
-                        <h6 class="fw-sb">Email</h6>
-                        <p class="text-muted">nisa.anjani@mail.com</p>
-
-                        <h6 class="fw-sb">Phone - home</h6>
-                        <p class="text-muted">(222) 222-2222</p>
-
-                        <h6 class="fw-sb">Phone - mobile</h6>
-                        <p class="text-muted mb-0">(333) 333-3333</p>
-                    </div>
+                <div class="panel-body pt-sm">
+                    <ul class="media-list media-list-feed">
+                        <li class="media">
+                            <div class="media-object pull-left mt-xs">
+                                <span class="figure"></span>
+                            </div>
+                            <div class="media-body">
+                                Dan Counsell Create <strong class="text-primary">Super Awesome Campaign</strong>
+                                <p class="fs-12 text-white dark-sm">Jan 16, 2014</p>
+                            </div>
+                        </li>
+                        <li class="media">
+                            <div class="media-object pull-left mt-xs">
+                                <span class="figure"></span>
+                            </div>
+                            <div class="media-body">
+                                Ima Steward Update <strong class="text-primary">Super Awesome Campaign</strong> action
+                                <p class="fs-12 text-white dark-sm">May 1, 2015</p>
+                            </div>
+                        </li>
+                        <li class="media">
+                            <div class="media-object pull-left mt-xs">
+                                <span class="figure"></span>
+                            </div>
+                            <div class="media-body">
+                                Ima Steward Update <strong class="text-primary">Super Awesome Campaign</strong> leads
+                                <p class="fs-12 text-white dark-sm">Aug 2, 2014</p>
+                            </div>
+                        </li>
+                        <li class="media">
+                            <div class="media-object pull-left">
+                                <span class="figure featured bg-success"><span class="fa fa-check"></span></span>
+                            </div>
+                            <div class="media-body">
+                                Dan Counsell Publish <strong class="text-primary">Super Awesome Campaign</strong>
+                                <p class="fs-12 text-white dark-sm">Sep 23, 2014</p>
+                            </div>
+                        </li>
+                        <li class="media">
+                            <div class="media-object pull-left">
+                                <span class="figure"></span>
+                            </div>
+                            <div class="media-body">
+                                Dan Counsell Unpublish <strong class="text-primary">Super Awesome Campaign</strong>
+                                <p class="fs-12 text-white dark-sm">Sep 29, 2014</p>
+                            </div>
+                        </li>
+                    </ul>
                 </div>
-                <!--/ about -->
             </div>
         </div>
         <!--/ right section -->
