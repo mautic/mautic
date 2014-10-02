@@ -30,7 +30,7 @@
       },
       tooltip: true,
       tooltipOpts: {
-        content: '%x : %y'
+        content: '%y'
       },
       xaxis: {
         tickColor: 'transparent',
@@ -64,7 +64,7 @@
       },
       tooltip: true,
       tooltipOpts: {
-        content: '%x : %y'
+        content: '%y'
       },
       xaxis: {
         tickColor: '#fcfcfc',
@@ -72,6 +72,59 @@
       },
       yaxis: {
         tickColor: '#eee'
+      },
+      shadowSize: 0
+    },
+
+    // Donut chart option
+    donutChartOpt: {
+      series: {
+        pie: {
+          innerRadius: 0.5,
+          show: true,
+          label: {
+            show: true,
+            radius: 0
+          }
+        }
+      },
+      legend: {
+        show: false
+      }
+    },
+
+    // Line chart option
+    lineChartOpt: {
+      series: {
+        lines: { show: false },
+        splines: {
+          show: true,
+          tension: 0.4,
+          lineWidth: 2,
+          fill: 0
+        },
+        points: {
+          show: true,
+          radius: 4
+        }
+      },
+      grid: {
+        borderColor: '#eee',
+        borderWidth: 1,
+        hoverable: true,
+        backgroundColor: '#fcfcfc'
+      },
+      tooltip: true,
+      tooltipOpts: {
+        content: '%y'
+      },
+      xaxis: {
+        show: false,
+        tickColor: 'transparent',
+        mode: 'categories'
+      },
+      yaxis: {
+        tickColor: '#ebedf0'
       },
       shadowSize: 0
     }
@@ -88,10 +141,23 @@
   $.extend(Plugin.prototype, {
     init: function() {
       var jsonData = $(this.element).children('.flotdata').text();
+      var chartType = $(this.element).data('type');
+      var flotOption = '';
+
+      // flot chart option
+      if(chartType === 'area') {
+        flotOption = this.settings.areaChartOpt;
+      } else if(chartType === 'bar') {
+        flotOption = this.settings.barChartOpt;
+      } else if(chartType === 'donut') {
+        flotOption = this.settings.donutChartOpt;
+      } else if(chartType === 'line') {
+        flotOption = this.settings.lineChartOpt;
+      }
       
       // init flot
-      if(jsonData === "") { return; }
-      $.plot($(this.element), $.parseJSON(jsonData), this.settings.areaChartOpt);
+      if(jsonData === '') { return; }
+      $.plot($(this.element), $.parseJSON(jsonData), flotOption);
     }
   });
 
@@ -103,8 +169,4 @@
     });
     return this;
   };
-
-  // instatiate the plugin
-  $('.flotchart').flotChart();
-
 })(jQuery, window, document);

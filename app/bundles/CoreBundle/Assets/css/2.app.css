@@ -162,10 +162,10 @@ body > #app-wrapper {
 }
 #app-header.navbar .navbar-nocollapse .navbar-nav > li > a.sidebar-minimizer > .arrow:after {
   font-family: 'FontAwesome';
-  content: '\f060';
+  content: '\f053';
 }
 #app-header.navbar .navbar-nocollapse .navbar-nav > li > a.sidebar-minimizer.active > .arrow:after {
-  content: '\f061';
+  content: '\f054';
 }
 #app-header.navbar .navbar-nocollapse .navbar-nav > li > a:hover {
   color: rgba(0, 0, 0, 0.7);
@@ -2977,6 +2977,7 @@ lesshat-selector {
 .flotchart {
   display: block;
   width: 100%;
+  margin: 0;
 }
 .flotchart > .flotdata {
   display: none;

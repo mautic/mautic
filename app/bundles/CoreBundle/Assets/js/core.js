@@ -297,8 +297,11 @@ var Mautic = {
             Mautic.activateLiveSearch("#global_search", "lastGlobalSearchStr", "globalLivecache");
         }
 
-        //initiate sparkline plugin
+        //instantiate sparkline plugin
         mQuery('.plugin-sparkline').sparkline('html', { enableTagOptions: true });
+
+        // instantiate the plugin
+        mQuery('.flotchart').flotChart();
     },
 
     /**
