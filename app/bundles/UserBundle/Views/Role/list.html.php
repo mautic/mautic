@@ -17,6 +17,23 @@ endif;
             <?php echo $view['translator']->trans('mautic.user.role.header.index'); ?>
         </h3>
     </div>
+     <div class="panel-body">
+        <div class="box-layout">
+            <div class="col-xs-6 va-m">
+                <div class="checkbox-inline custom-primary">
+                    <label class="mb-0">
+                        <input type="checkbox" id="customcheckbox-one0" value="1">
+                        <span></span>
+                        <?php echo $view['translator']->trans('mautic.core.table.selectall'); ?>
+                    </label>
+                </div>
+            </div>
+            <div class="col-xs-6 va-m text-right">
+                <button type="button" class="btn btn-sm btn-warning"><i class="fa fa-files-o"></i></button>
+                <button type="button" class="btn btn-sm btn-danger"><i class="fa fa-trash-o"></i></button>
+            </div>
+        </div>
+    </div>
     <div class="table-responsive scrollable body-white padding-sm page-list">
         <table class="table table-hover table-striped table-bordered role-list">
             <thead>
