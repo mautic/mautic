@@ -408,18 +408,22 @@ class MauticFactory
     }
 
     /**
-     * Get an IpAddress entity for current session
+     * Get an IpAddress entity for current session or for passed in IP address
+     *
+     * @param $ip
      *
      * @return IpAddress
      */
-    public function getIpAddress()
+    public function getIpAddress($ip = null)
     {
-        static $ipAddress;
+        static $ipAddresses = array();
 
-        if (empty($ipAddress)) {
+        if ($ip === null) {
             $request = $this->getRequest();
             $ip      = $request->server->get('REMOTE_ADDR');
+        }
 
+        if (empty($ipAddress[$ip])) {
             $ipAddress = $this->getEntityManager()->getRepository('MauticCoreBundle:IpAddress')
                 ->findOneByIpAddress($ip);
 
@@ -427,9 +431,11 @@ class MauticFactory
                 $ipAddress = new IpAddress();
                 $ipAddress->setIpAddress($ip, $this->getSystemParameters());
             }
+
+            $ipAddresses[$ip] = $ipAddress;
         }
 
-        return $ipAddress;
+        return $ipAddresses[$ip];
     }
 
     /**
