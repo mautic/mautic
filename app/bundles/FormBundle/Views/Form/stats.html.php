@@ -70,7 +70,7 @@
         <!--/ form detail collapseable toggler -->
 
         <!-- 
-        some stats: need more input on what type of campaign data to show.
+        some stats: need more input on what type of form data to show.
         delete if it is not require
         -->
         <div class="pa-md">
@@ -147,78 +147,6 @@
             </div>
         </div>
         <!--/ some stats -->
-
-        <!--<div class="pa-md bg-auto">
-            <table class="table table-bordered">
-                <tbody>
-                    <tr>
-                        <td>
-                            <div class="box-layout">
-                                <div class="col-xs-8 va-m">
-                                    <h5 class="text-white dark-md fw-sb mb-xs">Form Views</h5>
-                                    <h2 class="fw-b">112</h2>
-                                </div>
-                                <div class="col-xs-4 va-t text-right">
-                                    <h3 class="text-white dark-sm"><span class="fa fa-eye"></span></h3>
-                                </div>
-                            </div>
-                            <div class="plugin-sparkline text-right pr-md pl-md"
-                            sparkHeight="34"
-                            sparkWidth="180"
-                            sparkType="bar"
-                            sparkBarWidth="8"
-                            sparkBarSpacing="3"
-                            sparkZeroAxis="false"
-                            sparkBarColor="#00B49C">
-                                129,137,186,167,200,115,118,162,112,106,104,106
-                            </div>
-                        </td>
-                        <td>
-                            <div class="box-layout">
-                                <div class="col-xs-8 va-m">
-                                    <h5 class="text-white dark-md fw-sb mb-xs">Form Conversions</h5>
-                                    <h2 class="fw-b">162</h2>
-                                </div>
-                                <div class="col-xs-4 va-t text-right">
-                                    <h3 class="text-white dark-sm"><span class="fa fa-arrows-h"></span></h3>
-                                </div>
-                            </div>
-                            <div class="plugin-sparkline text-right pr-md pl-md"
-                            sparkHeight="34"
-                            sparkWidth="180"
-                            sparkType="bar"
-                            sparkBarWidth="8"
-                            sparkBarSpacing="3"
-                            sparkZeroAxis="false"
-                            sparkBarColor="#F86B4F">
-                                156,162,185,102,144,156,150,114,198,117,120,138
-                            </div>
-                        </td>
-                        <td>
-                            <div class="box-layout">
-                                <div class="col-xs-8 va-m">
-                                    <h5 class="text-white dark-md fw-sb mb-xs">Total Leads</h5>
-                                    <h2 class="fw-b">192</h2>
-                                </div>
-                                <div class="col-xs-4 va-t text-right">
-                                    <h3 class="text-white dark-sm"><span class="fa fa-user"></span></h3>
-                                </div>
-                            </div>
-                            <div class="plugin-sparkline text-right pr-md pl-md"
-                            sparkHeight="34"
-                            sparkWidth="180"
-                            sparkType="bar"
-                            sparkBarWidth="8"
-                            sparkBarSpacing="3"
-                            sparkZeroAxis="false"
-                            sparkBarColor="#FDB933">
-                                115,195,185,110,182,192,168,185,138,176,119,109
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>-->
 
         <!-- tabs controls -->
         <ul class="nav nav-tabs pr-md pl-md">

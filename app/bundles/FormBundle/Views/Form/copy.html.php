@@ -11,7 +11,7 @@
 <div class="col-md-3 bg-white bdr-l height-auto">
     <!-- form HTML -->
     <div class="pa-md">
-        <div class="panel bg-info bg-light-lg bdr-w-0">
+        <div class="panel bg-info bg-light-lg bdr-w-0 mb-0">
             <div class="panel-body">
                 <h5 class="fw-sb mb-sm"><?php echo $view['translator']->trans('mautic.form.form.header.copy'); ?></h5>
                 <p class="mb-sm"><?php echo $view['translator']->trans('mautic.form.form.help.landingpages'); ?></p>
@@ -22,6 +22,8 @@
         </div>
     </div>
     <!--/ form HTML -->
+
+    <hr class="hr-w-2" style="width:50%">
 
     <!--
     we can leverage data from audit_log table
