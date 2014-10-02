@@ -36,7 +36,7 @@ class User extends FormEntity implements UserInterface, AdvancedUserInterface, \
      * @ORM\GeneratedValue(strategy="AUTO")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"userDetails", "userList"})
      */
     protected $id;
 
@@ -44,7 +44,7 @@ class User extends FormEntity implements UserInterface, AdvancedUserInterface, \
      * @ORM\Column(type="string", length=25, unique=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"userDetails", "userList"})
      */
     protected $username;
 
@@ -55,7 +55,6 @@ class User extends FormEntity implements UserInterface, AdvancedUserInterface, \
 
     /**
      * Used for when updating the password
-     * @var
      */
     private $plainPassword;
 
@@ -69,7 +68,7 @@ class User extends FormEntity implements UserInterface, AdvancedUserInterface, \
      * @ORM\Column(name="first_name",type="string", length=50)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"userDetails", "userList"})
      */
     private $firstName;
 
@@ -77,7 +76,7 @@ class User extends FormEntity implements UserInterface, AdvancedUserInterface, \
      * @ORM\Column(name="last_name", type="string", length=50)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"userDetails", "userList"})
      */
     private $lastName;
 
@@ -85,7 +84,7 @@ class User extends FormEntity implements UserInterface, AdvancedUserInterface, \
      * @ORM\Column(type="string", length=60, unique=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"userDetails"})
      */
     private $email;
 
@@ -93,7 +92,7 @@ class User extends FormEntity implements UserInterface, AdvancedUserInterface, \
      * @ORM\Column(type="string", length=60, nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"userDetails"})
      */
     private $position;
 
@@ -102,7 +101,7 @@ class User extends FormEntity implements UserInterface, AdvancedUserInterface, \
      * @ORM\JoinColumn(name="role_id", referencedColumnName="id")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"userDetails"})
      */
     private $role;
 
@@ -110,7 +109,7 @@ class User extends FormEntity implements UserInterface, AdvancedUserInterface, \
      * @ORM\Column(type="text", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"userDetails"})
      */
     private $timezone = 'UTC';
 
@@ -118,7 +117,7 @@ class User extends FormEntity implements UserInterface, AdvancedUserInterface, \
      * @ORM\Column(type="text", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"userDetails"})
      */
     private $locale   = 'en_US';
 
@@ -126,7 +125,7 @@ class User extends FormEntity implements UserInterface, AdvancedUserInterface, \
      * @ORM\Column(type="datetime", name="last_login", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"userDetails"})
      */
     private $lastLogin;
 
@@ -134,7 +133,7 @@ class User extends FormEntity implements UserInterface, AdvancedUserInterface, \
      * @ORM\Column(type="datetime", name="last_active", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"userDetails"})
      */
     private $lastActive;
 
@@ -142,16 +141,13 @@ class User extends FormEntity implements UserInterface, AdvancedUserInterface, \
      * @ORM\Column(type="string", name="online_status", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"userDetails"})
      */
     private $onlineStatus;
 
     /**
      * Stores active role permissions
      * @var
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $activePermissions;
 

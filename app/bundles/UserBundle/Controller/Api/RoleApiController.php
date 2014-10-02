@@ -23,10 +23,12 @@ class RoleApiController extends CommonApiController
 
     public function initialize(FilterControllerEvent $event)
     {
+        parent::initialize($event);
         $this->model           = $this->factory->getModel('user.role');
         $this->entityClass     = 'Mautic\UserBundle\Entity\Role';
         $this->entityNameOne   = 'role';
         $this->entityNameMulti = 'roles';
+        $this->permissionBase  = 'user:roles';
     }
 
     /**
@@ -51,10 +53,6 @@ class RoleApiController extends CommonApiController
      */
     public function getEntitiesAction()
     {
-        if (!$this->factory->getSecurity()->isGranted('user:roles:view')) {
-            return $this->accessDenied();
-        }
-        $this->serializerGroups = array('full');
         return parent::getEntitiesAction();
     }
 
@@ -76,42 +74,6 @@ class RoleApiController extends CommonApiController
      */
     public function getEntityAction($id)
     {
-        if (!$this->factory->getSecurity()->isGranted('user:roles:view')) {
-            return $this->accessDenied();
-        }
-        $this->serializerGroups = array('full');
         return parent::getEntityAction($id);
-    }
-
-    /**
-     * Delete is not allowed via API
-     *
-     * @param int $id
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function deleteEntityAction($id)
-    {
-        return $this->accessDenied();
-    }
-
-    /**
-     * Editing roles is not allowed via API
-     *
-     * @param int $id
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function editEntityAction($id)
-    {
-        return $this->accessDenied();
-    }
-
-    /**
-     * Adding roles is not allowed via API
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function newEntityAction()
-    {
-        return $this->accessDenied();
     }
 }

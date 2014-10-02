@@ -31,7 +31,7 @@ class Role extends FormEntity
      * @ORM\GeneratedValue(strategy="AUTO")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"roleDetails", "roleList"})
      */
     private $id;
 
@@ -39,7 +39,7 @@ class Role extends FormEntity
      * @ORM\Column(type="string", length=255)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"roleDetails", "roleList"})
      */
     private $name;
 
@@ -47,7 +47,7 @@ class Role extends FormEntity
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"roleDetails", "roleList"})
      */
     private $description;
 
@@ -55,7 +55,7 @@ class Role extends FormEntity
      * @ORM\Column(name="is_admin", type="boolean")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"roleDetails"})
      */
     private $isAdmin = false;
 

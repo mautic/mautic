@@ -27,10 +27,12 @@ class UserApiController extends CommonApiController
 
     public function initialize(FilterControllerEvent $event)
     {
+        parent::initialize($event);
         $this->model           = $this->factory->getModel('user.user');
         $this->entityClass     = 'Mautic\UserBundle\Entity\User';
         $this->entityNameOne   = 'user';
         $this->entityNameMulti = 'users';
+        $this->permissionBase  = 'user:users';
     }
 
     /**
@@ -55,10 +57,6 @@ class UserApiController extends CommonApiController
      */
     public function getEntitiesAction()
     {
-        if (!$this->factory->getSecurity()->isGranted('user:users:view')) {
-            return $this->accessDenied();
-        }
-        $this->serializerGroups = array('full');
         return parent::getEntitiesAction();
     }
 
@@ -80,10 +78,6 @@ class UserApiController extends CommonApiController
      */
     public function getEntityAction($id)
     {
-        if (!$this->factory->getSecurity()->isGranted('user:users:view')) {
-            return $this->accessDenied();
-        }
-        $this->serializerGroups = array('full');
         return parent::getEntityAction($id);
     }
 
@@ -204,7 +198,7 @@ class UserApiController extends CommonApiController
                 ($method === "PUT" && !$this->factory->getSecurity()->isGranted('user:users:create'))
             ) {
                 //PATCH requires that an entity exists or must have create access for PUT
-                throw new NotFoundHttpException($this->get('translator')->trans('mautic.api.call.notfound'));
+                return $this->notFound();
             } else {
                 $entity = $this->model->getEntity();
                 if (isset($parameters['plainPassword']['password'])) {
@@ -264,13 +258,13 @@ class UserApiController extends CommonApiController
     {
         $entity = $this->model->getEntity($id);
         if (!$entity instanceof $this->entityClass) {
-            throw new NotFoundHttpException($this->get('translator')->trans('mautic.api.call.notfound'));
+            return $this->notFound();
         }
 
         $permissions = $this->request->request->get('permissions');
 
         if (empty($permissions)) {
-            throw new BadRequestHttpException($this->get('translator')->trans('mautic.api.call.permissionempty'));
+            return $this->badRequest('mautic.api.call.permissionempty');
         } elseif (!is_array($permissions)) {
             $permissions = array($permissions);
         }

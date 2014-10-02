@@ -23,17 +23,6 @@ $collection->add('mautic_api_getusers', new Route('/users.{_format}',
     )
 ));
 
-$collection->add('mautic_api_newuser', new Route('/users/new.{_format}',
-    array(
-        '_controller' => 'MauticUserBundle:Api\UserApi:newEntity',
-        '_format' => 'json'
-    ),
-    array(
-        '_method' => 'POST',
-        '_format' => 'json|xml'
-    )
-));
-
 $collection->add('mautic_api_getuser', new Route('/users/{id}.{_format}',
     array(
         '_controller' => 'MauticUserBundle:Api\UserApi:getEntity',
@@ -53,6 +42,18 @@ $collection->add('mautic_api_getself', new Route('/users/self.{_format}',
     ),
     array(
         '_method' => 'GET',
+        '_format' => 'json|xml'
+    )
+));
+
+/*
+$collection->add('mautic_api_newuser', new Route('/users/new.{_format}',
+    array(
+        '_controller' => 'MauticUserBundle:Api\UserApi:newEntity',
+        '_format' => 'json'
+    ),
+    array(
+        '_method' => 'POST',
         '_format' => 'json|xml'
     )
 ));
@@ -92,6 +93,7 @@ $collection->add('mautic_api_deleteuser', new Route('/users/{id}/delete.{_format
         'id'      => '\d+'
     )
 ));
+*/
 
 $collection->add('mautic_api_checkpermission', new Route('/users/{id}/permissioncheck.{_format}',
     array(
