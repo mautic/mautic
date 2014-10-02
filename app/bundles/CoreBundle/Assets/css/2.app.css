@@ -625,7 +625,7 @@ body > #app-wrapper {
   .sidebar-minimized .app-sidebar.sidebar-left .nav-sidebar > .nav > li > .nav-submenu > li:after {
     left: -17px;
   }
-  .sidebar-minimized .app-sidebar.sidebar-left .nav-sidebar > .nav > li.open > .nav-submenu {
+  .sidebar-minimized .app-sidebar.sidebar-left .nav-sidebar > .nav > li.hover > .nav-submenu {
     display: block;
     left: 60px;
   }
