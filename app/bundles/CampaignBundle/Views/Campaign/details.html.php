@@ -49,7 +49,7 @@ $view['slots']->set("headerTitle", $entity->getName());
         <div class="col-md-9 bg-white height-auto">
             <div class="bg-auto">
                 <!-- campaign detail header -->
-                <div class="pr-md pl-md pt-lg pb-lg bg-auto">
+                <div class="pr-md pl-md pt-lg pb-lg">
                     <div class="box-layout">
                         <div class="col-xs-6 va-m">
                             <h4 class="fw-sb">Super Awesome Campaign</h4>
@@ -63,53 +63,56 @@ $view['slots']->set("headerTitle", $entity->getName());
                 <!--/ campaign detail header -->
 
                 <!-- campaign detail collapseable -->
-                <div class="mb-md">
-                    <div class="collapse" id="campaign-details">
-                        <div class="pr-md pl-md pb-md">
-                            <div class="panel shd-none mb-0">
-                                <table class="table table-bordered table-striped mb-0">
-                                    <tbody>
-                                        <tr>
-                                            <td width="20%"><span class="fw-b">Description</span></td>
-                                            <td>Campaign description Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
-                                        </tr>
-                                        <tr>
-                                            <td width="20%"><span class="fw-b">Created By</span></td>
-                                            <td>Dan Counsell</td>
-                                        </tr>
-                                        <tr>
-                                            <td width="20%"><span class="fw-b">Category</span></td>
-                                            <td>Some category</td>
-                                        </tr>
-                                        <tr>
-                                            <td width="20%"><span class="fw-b">Publish Up</span></td>
-                                            <td>Mar 30, 2014</td>
-                                        </tr>
-                                        <tr>
-                                            <td width="20%"><span class="fw-b">Publish Down</span></td>
-                                            <td>Apr 10, 2014</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                <div class="collapse" id="campaign-details">
+                    <div class="pr-md pl-md pb-md">
+                        <div class="panel shd-none mb-0">
+                            <table class="table table-bordered table-striped mb-0">
+                                <tbody>
+                                    <tr>
+                                        <td width="20%"><span class="fw-b">Description</span></td>
+                                        <td>Campaign description Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+                                    </tr>
+                                    <tr>
+                                        <td width="20%"><span class="fw-b">Created By</span></td>
+                                        <td>Dan Counsell</td>
+                                    </tr>
+                                    <tr>
+                                        <td width="20%"><span class="fw-b">Category</span></td>
+                                        <td>Some category</td>
+                                    </tr>
+                                    <tr>
+                                        <td width="20%"><span class="fw-b">Publish Up</span></td>
+                                        <td>Mar 30, 2014</td>
+                                    </tr>
+                                    <tr>
+                                        <td width="20%"><span class="fw-b">Publish Down</span></td>
+                                        <td>Apr 10, 2014</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
-                    </div>
-                    <div class="hr-expand nm">
-                        <span data-toggle="tooltip" title="Detail">
-                            <a href="javascript:void(0)" class="arrow" data-toggle="collapse" data-target="#campaign-details"><span class="caret"></span></a>
-                        </span>
                     </div>
                 </div>
                 <!--/ campaign detail collapseable -->
+            </div>
+
+            <div class="bg-auto bg-dark-xs">
+                <!-- campaign detail collapseable toggler -->
+                <div class="hr-expand nm">
+                    <span data-toggle="tooltip" title="Detail">
+                        <a href="javascript:void(0)" class="arrow" data-toggle="collapse" data-target="#campaign-details"><span class="caret"></span></a>
+                    </span>
+                </div>
+                <!--/ campaign detail collapseable toggler -->
 
                 <!-- 
                 some stats: need more input on what type of campaign data to show.
                 delete if it is not require
                 -->
-                <div class="pa-md bg-auto">
+                <div class="pa-md">
                     <div class="row">
                         <div class="col-md-4">
-                            <div class="panel ovf-h bg-auto bg-dark-sm">
+                            <div class="panel ovf-h bg-auto bg-light-xs">
                                 <div class="panel-body box-layout">
                                     <div class="col-xs-8 va-m">
                                         <h5 class="text-white dark-md fw-sb mb-xs">Asset Download</h5>
@@ -132,7 +135,7 @@ $view['slots']->set("headerTitle", $entity->getName());
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <div class="panel ovf-h bg-auto bg-dark-sm">
+                            <div class="panel ovf-h bg-auto bg-light-xs">
                                 <div class="panel-body box-layout">
                                     <div class="col-xs-8 va-m">
                                         <h5 class="text-white dark-md fw-sb mb-xs">Campaign View</h5>
@@ -155,7 +158,7 @@ $view['slots']->set("headerTitle", $entity->getName());
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <div class="panel ovf-h bg-auto bg-dark-sm">
+                            <div class="panel ovf-h bg-auto bg-light-xs">
                                 <div class="panel-body box-layout">
                                     <div class="col-xs-8 va-m">
                                         <h5 class="text-white dark-md fw-sb mb-xs">Page Hit</h5>
