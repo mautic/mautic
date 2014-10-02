@@ -31,7 +31,7 @@ class Form extends FormEntity
      * @ORM\GeneratedValue(strategy="AUTO")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"full", "limited"})
      */
     private $id;
 
@@ -39,7 +39,7 @@ class Form extends FormEntity
      * @ORM\Column(type="string")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"full", "limited"})
      */
     private $name;
 
@@ -47,7 +47,7 @@ class Form extends FormEntity
      * @ORM\Column(type="string")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"full", "limited"})
      */
     private $alias;
 
@@ -55,7 +55,7 @@ class Form extends FormEntity
      * @ORM\Column(type="string", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"full", "limited"})
      */
     private $description;
 
@@ -63,19 +63,17 @@ class Form extends FormEntity
      * @ORM\ManyToOne(targetEntity="Mautic\CategoryBundle\Entity\Category")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"full", "limited"})
      **/
     private $category;
 
     /**
      * @ORM\Column(name="cached_html", type="text", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full", "limited"})
      */
     private $cachedHtml;
-
-    /**
-     * @ORM\Column(name="cached_js", type="text", nullable=true)
-     */
-    private $cachedJs;
 
     /**
      * @ORM\Column(name="post_action", type="string")
@@ -126,6 +124,20 @@ class Form extends FormEntity
      * @ORM\OrderBy({"dateSubmitted" = "DESC"})
      */
     private $submissions;
+
+    /**
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full", "limited"})
+     */
+    public $submissionCount;
+
+    /**
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full", "limited"})
+     */
+    public $automaticJs;
 
     public function __clone() {
         $this->id = null;
@@ -272,29 +284,6 @@ class Form extends FormEntity
     public function getCachedHtml()
     {
         return $this->cachedHtml;
-    }
-
-    /**
-     * Set cachedJs
-     *
-     * @param string $cachedJs
-     * @return Form
-     */
-    public function setCachedJs($cachedJs)
-    {
-        $this->cachedJs = $cachedJs;
-
-        return $this;
-    }
-
-    /**
-     * Get cachedJs
-     *
-     * @return string
-     */
-    public function getCachedJs()
-    {
-        return $this->cachedJs;
     }
 
     /**
