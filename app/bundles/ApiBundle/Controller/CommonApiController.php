@@ -14,6 +14,7 @@ namespace Mautic\ApiBundle\Controller;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Util\Codes;
 use JMS\Serializer\SerializationContext;
+use Mautic\ApiBundle\Serializer\Exclusion\PublishDetailsExclusionStrategy;
 use Mautic\CoreBundle\Controller\MauticController;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\HttpFoundation\Request;
@@ -31,35 +32,57 @@ class CommonApiController extends FOSRestController implements MauticController
     protected $request;
 
     /**
-     * @var
+     * @var \Mautic\CoreBundle\Factory\MauticFactory $factory
      */
 
     protected $factory;
 
     /**
-     * @var
+     * @var \Mautic\CoreBundle\Security\Permissions\CorePermissions $security
      */
     protected $security;
 
     /**
+     * Model object for processing the entity
+     *
      * @var
      */
     protected $model;
 
     /**
+     * Key to return for a single entity
+     *
      * @var
      */
     protected $entityNameOne;
 
     /**
+     * Key to return for entity lists
+     *
      * @var
      */
     protected $entityNameMulti;
 
     /**
+     * Class for the entity
+     *
      * @var
      */
     protected $entityClass;
+
+    /**
+     * Permission base for the entity such as page:pages
+     *
+     * @var
+     */
+    protected $permissionBase;
+
+    /**
+     * Used to set default filters for entity lists such as restricting to owning user
+     *
+     * @var array
+     */
+    protected $listFilters = array();
 
     /**
      * @var array
@@ -116,23 +139,46 @@ class CommonApiController extends FOSRestController implements MauticController
         $args = array(
             'start'      => $this->request->query->get('start', 0),
             'limit'      => $this->request->query->get('limit', $this->factory->getParameter('default_pagelimit')),
-            'filter'     => $this->request->query->get('search', ''),
+            'filter'     => array(
+                'string' => $this->request->query->get('search', ''),
+                'force'  => $this->listFilters
+            ),
             'orderBy'    => $this->request->query->get('orderBy', ''),
             'orderByDir' => $this->request->query->get('orderByDir', 'ASC')
         );
-
         $results = $this->model->getEntities($args);
+
         //we have to convert them from paginated proxy functions to entities in order for them to be
         //returned by the serializer/rest bundle
         $entities = array();
         foreach ($results as $r) {
-            $entities[] = $r;
+            if (is_array($r) && isset($r[0])) {
+                //entity has some extra something something tacked onto the entities
+                if (is_object($r[0])) {
+                    foreach ($r as $k => $v) {
+                        if ($k === 0) {
+                            continue;
+                        }
+
+                        $r[0]->$k = $v;
+                    }
+                    $this->preSerializeEntity($r[0]);
+                    $entities[] = $r[0];
+                } elseif (is_array($r[0])) {
+                    foreach ($r[0] as $k => $v) {
+                        $r[$k] = $v;
+                    }
+                    unset($r[0]);
+                    $this->preSerializeEntity($r);
+                    $entities[] = $r;
+                }
+            } else {
+                $this->preSerializeEntity($r);
+                $entities[] = $r;
+            }
         }
         $view = $this->view(array($this->entityNameMulti => $entities), Codes::HTTP_OK);
-        if (!empty($this->serializerGroups)) {
-            $context = SerializationContext::create()->setGroups($this->serializerGroups);
-            $view->setSerializationContext($context);
-        }
+        $this->setSerializationContext($view);
         return $this->handleView($view);
     }
 
@@ -149,20 +195,21 @@ class CommonApiController extends FOSRestController implements MauticController
      *
      * @param int $id Entity ID
      * @return \Symfony\Component\HttpFoundation\Response
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function getEntityAction($id)
     {
         $entity = $this->model->getEntity($id);
         if (!$entity instanceof $this->entityClass) {
-            throw new NotFoundHttpException($this->get('translator')->trans('mautic.api.call.notfound'));
+            return $this->notFound();
         }
 
-        $view = $this->view(array($this->entityNameOne => $entity), Codes::HTTP_OK);
-        if (!empty($this->serializerGroups)) {
-            $context = SerializationContext::create()->setGroups($this->serializerGroups);
-            $view->setSerializationContext($context);
+        if (!$this->checkEntityAccess($entity, 'view')) {
+            return $this->accessDenied();
         }
+
+        $this->preSerializeEntity($entity);
+        $view = $this->view(array($this->entityNameOne => $entity), Codes::HTTP_OK);
+        $this->setSerializationContext($view);
         return $this->handleView($view);
     }
 
@@ -181,7 +228,12 @@ class CommonApiController extends FOSRestController implements MauticController
      */
     public function newEntityAction()
     {
-        $entity     = $this->model->getEntity();
+        $entity = $this->model->getEntity();
+
+        if (!$this->checkEntityAccess($entity, 'create')) {
+            return $this->accessDenied();
+        }
+
         $parameters = $this->request->request->all();
         return $this->processForm($entity, $parameters, 'POST');
     }
@@ -201,22 +253,28 @@ class CommonApiController extends FOSRestController implements MauticController
      *
      * @param int $id Entity ID
      * @return Response
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function editEntityAction($id)
     {
         $entity     = $this->model->getEntity($id);
         $parameters = $this->request->request->all();
-        $method     = $this->request-getMethod();
+        $method     = $this->request->getMethod();
 
-        if (!$entity) {
+        if ($entity === null) {
             if ($method === "PATCH") {
                 //PATCH requires that an entity exists
-                throw new NotFoundHttpException($this->get('translator')->trans('mautic.api.call.notfound'));
+                return $this->notFound();
             } else {
                 //PUT can create a new entity if it doesn't exist
                 $entity = $this->model->getEntity();
+                if (!$this->checkEntityAccess($entity, 'create')) {
+                    return $this->accessDenied();
+                }
             }
+        }
+
+        if (!$this->checkEntityAccess($entity, 'edit')) {
+            return $this->accessDenied();
         }
 
         return $this->processForm($entity, $parameters, $method);
@@ -240,17 +298,18 @@ class CommonApiController extends FOSRestController implements MauticController
     {
         $entity = $this->model->getEntity($id);
         if (null !== $entity) {
+            if (!$this->checkEntityAccess($entity, 'delete')) {
+                return $this->accessDenied();
+            }
+
             $this->model->deleteEntity($entity);
 
             $view = $this->view(array($this->entityNameOne => $entity), Codes::HTTP_OK);
-            if (!empty($this->serializerGroups)) {
-                $context = SerializationContext::create()->setGroups($this->serializerGroups);
-                $view->setSerializationContext($context);
-            }
+            $this->setSerializationContext($view);
 
             return $this->handleView($view);
         } else {
-            throw new NotFoundHttpException($this->get('translator')->trans('mautic.api.call.notfound'));
+            return $this->notFound();
         }
     }
 
@@ -275,15 +334,21 @@ class CommonApiController extends FOSRestController implements MauticController
         }
 
         //is an entity being updated or created?
-        $statusCode = $entity->getId() ? Codes::HTTP_OK : Codes::HTTP_CREATED;
+        if ($entity->getId()) {
+            $statusCode = Codes::HTTP_OK;
+            $action     = 'edit';
+        } else {
+            $statusCode = Codes::HTTP_CREATED;
+            $action     = 'new';
+        }
 
-        $form = $this->model->createForm($entity, $this->get('form.factory'));
-
-        $form->submit($parameters, 'PATCH' !== $method);
+        $form         = $this->createEntityForm($entity);
+        $submitParams = $this->prepareParametersForBinding($parameters, $entity, $action);
+        $form->submit($submitParams, 'PATCH' !== $method);
 
         if ($form->isValid()) {
+            $this->preSaveEntity($entity, $form, $parameters, $action);
             $this->model->saveEntity($entity);
-            $this->postProcessForm($entity);
             $headers = array();
             //return the newly created entities location if applicable
             if (Codes::HTTP_CREATED === $statusCode) {
@@ -292,12 +357,10 @@ class CommonApiController extends FOSRestController implements MauticController
                     true
                 );
             }
+            $this->preSerializeEntity($entity, $action);
 
             $view = $this->view(array($this->entityNameOne => $entity), $statusCode, $headers);
-            if (!empty($this->serializerGroups)) {
-                $context = SerializationContext::create()->setGroups($this->serializerGroups);
-                $view->setSerializationContext($context);
-            }
+            $this->setSerializationContext($view);
         } else {
             $view = $this->view($form, Codes::HTTP_BAD_REQUEST);
         }
@@ -305,25 +368,145 @@ class CommonApiController extends FOSRestController implements MauticController
         return $this->handleView($view);
     }
 
-    /*
-     * Give the controller an opportunity to process the entity before sending it as a response
+    /**
+     * Checks if user has permission to access retrieved entity
+     *
+     * @param mixed $entity
+     * @param string $action view|create|edit|publish|delete
+     *
+     * @return bool
      */
-    protected function postProcessForm(&$entity)
+    protected function checkEntityAccess($entity, $action = 'view')
     {
-        //...
+        if ($action != 'create') {
+            $ownPerm   = "{$this->permissionBase}:{$action}own";
+            $otherPerm = "{$this->permissionBase}:{$action}other";
+            return $this->security->hasEntityAccess($ownPerm, $otherPerm, $entity->getCreatedBy());
+        } else {
+            return $this->security->isGranted("{$this->permissionBase}:create");
+        }
     }
+
+    /**
+     * Creates the form instance
+     *
+     * @param $entity
+     *
+     * @return mixed
+     */
+    protected function createEntityForm($entity)
+    {
+        return $this->model->createForm($entity, $this->get('form.factory'));
+    }
+
+    /**
+     * Set serialization groups and exclusion strategies
+     *
+     * @param $view
+     */
+    protected function setSerializationContext(&$view)
+    {
+        $context = SerializationContext::create();
+        if (!empty($this->serializerGroups)) {
+            $context->setGroups($this->serializerGroups);
+        }
+
+        //Only include FormEntity properties for the top level entity and not the associated entities
+        $context->addExclusionStrategy(
+            new PublishDetailsExclusionStrategy()
+        );
+
+        $view->setSerializationContext($context);
+    }
+
+    /**
+     * Convert posted parameters into what the form needs in order to successfully bind
+     *
+     * @param $parameters
+     * @param $entity
+     * @param $action
+     *
+     * @return mixed
+     */
+    protected function prepareParametersForBinding($parameters, $entity, $action)
+    {
+        return $parameters;
+    }
+
+    /**
+     * Give the controller an opportunity to process the entity before persisting
+     *
+     * @param $entity
+     * @param $form
+     * @param $parameters
+     * @param $action
+     */
+    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit') {}
+
+    /**
+     * Gives child controllers opportunity to analyze and do whatever to an entity before going through serializer
+     *
+     * @param        $entity
+     * @param string $action
+     */
+    protected function preSerializeEntity(&$entity, $action = 'view') {}
+
+    /**
+     * Gives child controllers opportunity to analyze and do whatever to an entity before populating the form
+     *
+     * @param        $entity
+     * @param        $parameters
+     * @param string $action
+     */
+    protected function prePopulateForm(&$entity, $parameters, $action = 'edit') {}
 
     /**
      * Returns a 403 Access Denied
      *
+     * @param $msg
+     *
      * @return Response
      */
-    public function accessDenied()
+    protected function accessDenied($msg = 'mautic.core.error.accessdenied')
     {
         $view = $this->view(
             array(
-                "error" => $this->get('translator')->trans('mautic.core.error.accessdenied')
+                "error" => $this->get('translator')->trans($msg)
             ), Codes::HTTP_FORBIDDEN
+        );
+        return $this->handleView($view);
+    }
+
+    /**
+     * Returns a 404 Not Found
+     *
+     * @param $msg
+     *
+     * @return Response
+     */
+    protected function notFound($msg = 'mautic.core.error.notfound')
+    {
+        $view = $this->view(
+            array(
+                "error" => $this->get('translator')->trans($msg)
+            ), Codes::HTTP_NOT_FOUND
+        );
+        return $this->handleView($view);
+    }
+
+    /**
+     * Returns a 400 Bad Request
+     *
+     * @param string $msg
+     *
+     * @return Response
+     */
+    protected function badRequest($msg = 'mautic.core.error.badrequest')
+    {
+        $view = $this->view(
+            array(
+                "error" => $this->get('translator')->trans($msg)
+            ), Codes::HTTP_BAD_REQUEST
         );
         return $this->handleView($view);
     }
