@@ -268,6 +268,10 @@ body > #app-wrapper {
   float: left !important;
 }
 #app-header.navbar .navbar-nocollapse .navbar-left .open .dropdown-menu {
+  left: 0;
+  right: auto;
+}
+#app-header.navbar .navbar-nocollapse .navbar-left .open.dropdown-custom .dropdown-menu {
   left: 15px;
   right: auto;
 }
@@ -275,6 +279,10 @@ body > #app-wrapper {
   float: right !important;
 }
 #app-header.navbar .navbar-nocollapse .navbar-right .open .dropdown-menu {
+  left: auto;
+  right: 0;
+}
+#app-header.navbar .navbar-nocollapse .navbar-right .open.dropdown-custom .dropdown-menu {
   left: auto;
   right: 15px;
 }
