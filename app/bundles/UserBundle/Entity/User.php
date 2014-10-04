@@ -198,7 +198,7 @@ class User extends FormEntity implements UserInterface, AdvancedUserInterface, \
             array('message' => 'mautic.user.user.email.valid')
         ));
 
-        $metadata->addPropertyConstraint('email',     new Assert\Email(
+        $metadata->addPropertyConstraint('email', new Assert\Email(
             array(
                 'message' => 'mautic.user.user.email.valid',
                 'groups'  => array('SecondPass')

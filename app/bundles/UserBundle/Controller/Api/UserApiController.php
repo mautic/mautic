@@ -33,6 +33,7 @@ class UserApiController extends CommonApiController
         $this->entityNameOne   = 'user';
         $this->entityNameMulti = 'users';
         $this->permissionBase  = 'user:users';
+        $this->serializerGroups = array('userDetails', 'roleList', 'publishDetails');
     }
 
     /**
@@ -100,7 +101,6 @@ class UserApiController extends CommonApiController
     {
         $currentUser = $this->get('security.context')->getToken()->getUser();
         $view = $this->view($currentUser, Codes::HTTP_OK);
-        $this->serializerGroups = array('full');
         return $this->handleView($view);
     }
 
@@ -123,7 +123,6 @@ class UserApiController extends CommonApiController
         if (!$this->factory->getSecurity()->isGranted('user:users:delete')) {
             return $this->accessDenied();
         }
-        $this->serializerGroups = array('full');
         return parent::deleteEntityAction($id);
     }
 
@@ -156,7 +155,6 @@ class UserApiController extends CommonApiController
             $encoder           = $this->get('security.encoder_factory')->getEncoder($entity);
             $entity->setPassword($this->model->checkNewPassword($entity, $encoder, $submittedPassword));
         }
-        $this->serializerGroups = array('full');
         return $this->processForm($entity, $parameters, 'POST');
     }
 
@@ -232,7 +230,6 @@ class UserApiController extends CommonApiController
                 $parameters['role']     = $entity->getRole()->getId();
             }
         }
-        $this->serializerGroups = array('full');
         return $this->processForm($entity, $parameters, $method);
     }
 
@@ -302,10 +299,10 @@ class UserApiController extends CommonApiController
 
         $filter = $this->request->query->get('filter', null);
         $limit  = $this->request->query->get('limit', null);
-        $roles = $this->factory->getModel('user.user')->getLookupResults('role', $filter, $limit);
+        $roles = $this->factory->getModel('user')->getLookupResults('role', $filter, $limit);
 
         $view = $this->view($roles, Codes::HTTP_OK);
-        $context = SerializationContext::create()->setGroups(array('limited'));
+        $context = SerializationContext::create()->setGroups(array('roleList'));
         $view->setSerializationContext($context);
         return $this->handleView($view);
     }

@@ -29,6 +29,7 @@ class RoleApiController extends CommonApiController
         $this->entityNameOne   = 'role';
         $this->entityNameMulti = 'roles';
         $this->permissionBase  = 'user:roles';
+        $this->serializerGroups = array('roleDetails', 'publishDetails');
     }
 
     /**

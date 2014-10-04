@@ -12,130 +12,119 @@ use Symfony\Component\Routing\Route;
 
 $collection = new RouteCollection();
 
-$collection->add('mautic_api_getusers', new Route('/users.{_format}',
+$collection->add('mautic_api_getusers', new Route('/users',
     array(
         '_controller' => 'MauticUserBundle:Api\UserApi:getEntities',
-        '_format' => 'json'
+        '_format'     => 'json'
     ),
     array(
-        '_method' => 'GET',
-        '_format' => 'json|xml'
+        '_method' => 'GET'
     )
 ));
 
-$collection->add('mautic_api_getuser', new Route('/users/{id}.{_format}',
+$collection->add('mautic_api_getuser', new Route('/users/{id}',
     array(
         '_controller' => 'MauticUserBundle:Api\UserApi:getEntity',
-        '_format' => 'json'
+        '_format'     => 'json'
     ),
     array(
         '_method' => 'GET',
-        '_format' => 'json|xml',
         'id'      => '\d+'
     )
 ));
 
-$collection->add('mautic_api_getself', new Route('/users/self.{_format}',
+$collection->add('mautic_api_getself', new Route('/users/self',
     array(
         '_controller' => 'MauticUserBundle:Api\UserApi:getSelf',
-        '_format' => 'json'
+        '_format'     => 'json'
     ),
     array(
-        '_method' => 'GET',
-        '_format' => 'json|xml'
+        '_method' => 'GET'
     )
 ));
 
 /*
-$collection->add('mautic_api_newuser', new Route('/users/new.{_format}',
+$collection->add('mautic_api_newuser', new Route('/users/new',
     array(
         '_controller' => 'MauticUserBundle:Api\UserApi:newEntity',
-        '_format' => 'json'
+        '_format'     => 'json'
     ),
     array(
         '_method' => 'POST',
-        '_format' => 'json|xml'
     )
 ));
 
-$collection->add('mautic_api_editputuser', new Route('/users/{id}/edit.{_format}',
+$collection->add('mautic_api_editputuser', new Route('/users/{id}/edit',
     array(
         '_controller' => 'MauticUserBundle:Api\UserApi:editEntity',
-        '_format' => 'json'
+        '_format'     => 'json'
     ),
     array(
         '_method' => 'PUT',
-        '_format' => 'json|xml',
         'id'      => '\d+'
     )
 ));
 
-$collection->add('mautic_api_editpatchuser', new Route('/users/{id}/edit.{_format}',
+$collection->add('mautic_api_editpatchuser', new Route('/users/{id}/edit',
     array(
         '_controller' => 'MauticUserBundle:Api\UserApi:editEntity',
-        '_format' => 'json'
+        '_format'     => 'json'
     ),
     array(
         '_method' => 'PATCH',
-        '_format' => 'json|xml',
         'id'      => '\d+'
     )
 ));
 
-$collection->add('mautic_api_deleteuser', new Route('/users/{id}/delete.{_format}',
+$collection->add('mautic_api_deleteuser', new Route('/users/{id}/delete',
     array(
         '_controller' => 'MauticUserBundle:Api\UserApi:deleteEntity',
-        '_format' => 'json'
+        '_format'     => 'json'
     ),
     array(
         '_method' => 'DELETE',
-        '_format' => 'json|xml',
         'id'      => '\d+'
     )
 ));
 */
 
-$collection->add('mautic_api_checkpermission', new Route('/users/{id}/permissioncheck.{_format}',
+$collection->add('mautic_api_checkpermission', new Route('/users/{id}/permissioncheck',
     array(
         '_controller' => 'MauticUserBundle:Api\UserApi:isGranted',
-        '_format' => 'json'
+        '_format'     => 'json'
     ),
     array(
         '_method' => 'POST',
-        '_format' => 'json|xml',
         'id'      => '\d+'
     )
 ));
 
-$collection->add('mautic_api_getuserroles', new Route('/users/list/roles.{_format}',
+$collection->add('mautic_api_getuserroles', new Route('/users/list/roles',
     array(
         '_controller' => 'MauticUserBundle:Api\UserApi:getRoles',
-        '_format' => 'json'
+        '_format'     => 'json'
     ),
     array(
-        '_method' => 'GET',
-        '_format' => 'json|xml'
+        '_method' => 'GET'
     )
 ));
 
-$collection->add('mautic_api_getroles', new Route('/roles.{_format}',
+$collection->add('mautic_api_getroles', new Route('/roles',
     array(
         '_controller' => 'MauticUserBundle:Api\RoleApi:getEntities',
-        '_format' => 'json'
+        '_format'     => 'json'
     ),
     array(
-        '_method' => 'GET',
-        '_format' => 'json|xml'
+        '_method' => 'GET'
     )
 ));
 
-$collection->add('mautic_api_getrole', new Route('/roles/{id}.{_format}', array(
+$collection->add('mautic_api_getrole', new Route('/roles/{id}', array(
         '_controller' => 'MauticUserBundle:Api\RoleApi:getEntity',
-        '_format' => 'json'
+        '_format'     => 'json'
     ),
     array(
         '_method' => 'GET',
-        '_format' => 'json|xml',
         'id'      => '\d+'
     )
 ));
