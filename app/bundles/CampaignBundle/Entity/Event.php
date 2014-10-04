@@ -29,7 +29,7 @@ class Event
      * @ORM\GeneratedValue(strategy="AUTO")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"campaignDetails"})
      */
     private $id;
 
@@ -37,7 +37,7 @@ class Event
      * @ORM\Column(type="string", length=50)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"campaignDetails"})
      */
     private $type;
 
@@ -45,7 +45,7 @@ class Event
      * @ORM\Column(name="event_type", type="string", length=50)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"campaignDetails"})
      */
     private $eventType;
 
@@ -53,7 +53,7 @@ class Event
      * @ORM\Column(type="string", length=50, nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"campaignDetails"})
      */
     private $name;
 
@@ -61,7 +61,7 @@ class Event
      * @ORM\Column(type="string", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"campaignDetails"})
      */
     private $description;
 
@@ -69,7 +69,7 @@ class Event
      * @ORM\Column(name="event_order", type="decimal", scale=2)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"campaignDetails"})
      */
     private $order = 0;
 
@@ -77,7 +77,7 @@ class Event
      * @ORM\Column(type="array")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"campaignDetails"})
      */
     private $properties = array();
 
@@ -85,7 +85,7 @@ class Event
      * @ORM\Column(name="trigger_date", type="datetime", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"campaignDetails"})
      */
     private $triggerDate;
 
@@ -93,7 +93,7 @@ class Event
      * @ORM\Column(name="trigger_interval", type="integer", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"campaignDetails"})
      */
     private $triggerInterval = 0;
 
@@ -101,7 +101,7 @@ class Event
      * @ORM\Column(name="trigger_interval_unit", type="string", length=1, nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"campaignDetails"})
      */
     private $triggerIntervalUnit;
 
@@ -109,7 +109,7 @@ class Event
      * @ORM\Column(name="trigger_mode", type="string", length=10, nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"campaignDetails"})
      */
     private $triggerMode;
 
@@ -122,6 +122,9 @@ class Event
     /**
      * @ORM\OneToMany(targetEntity="Event", mappedBy="parent", indexBy="id")
      * @ORM\OrderBy({"order" = "ASC"})
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"campaignDetails"})
      **/
     private $children;
 
@@ -130,7 +133,8 @@ class Event
      * @ORM\JoinColumn(name="parent_id", referencedColumnName="id", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"campaignDetails"})
+     * @Serializer\MaxDepth(1)
      **/
     private $parent = null;
 

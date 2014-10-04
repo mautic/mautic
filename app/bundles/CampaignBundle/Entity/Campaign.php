@@ -31,7 +31,7 @@ class Campaign extends FormEntity
      * @ORM\GeneratedValue(strategy="AUTO")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"campaignDetails", "campaignList"})
      */
     private $id;
 
@@ -39,7 +39,7 @@ class Campaign extends FormEntity
      * @ORM\Column(type="string", length=50, nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"campaignDetails", "campaignList"})
      */
     private $name;
 
@@ -47,7 +47,7 @@ class Campaign extends FormEntity
      * @ORM\Column(type="string", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"campaignDetails"})
      */
     private $description;
 
@@ -55,7 +55,7 @@ class Campaign extends FormEntity
      * @ORM\Column(name="publish_up", type="datetime", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"campaignDetails"})
      */
     private $publishUp;
 
@@ -63,7 +63,7 @@ class Campaign extends FormEntity
      * @ORM\Column(name="publish_down", type="datetime", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"campaignDetails"})
      */
     private $publishDown;
 
@@ -71,13 +71,16 @@ class Campaign extends FormEntity
      * @ORM\ManyToOne(targetEntity="Mautic\CategoryBundle\Entity\Category")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"campaignDetails", "campaignList"})
      **/
     private $category;
 
     /**
      * @ORM\OneToMany(targetEntity="Event", mappedBy="campaign", cascade={"all"}, indexBy="id", fetch="EXTRA_LAZY")
      * @ORM\OrderBy({"order" = "ASC"})
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"campaignDetails"})
      */
     private $events;
 
