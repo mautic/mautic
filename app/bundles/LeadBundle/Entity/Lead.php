@@ -19,6 +19,7 @@ use Mautic\CoreBundle\Entity\IpAddress;
  * Class Lead
  * @ORM\Table(name="leads")
  * @ORM\Entity(repositoryClass="Mautic\LeadBundle\Entity\LeadRepository")
+ * @Serializer\XmlRoot("lead")
  * @Serializer\ExclusionPolicy("all")
  */
 class Lead extends FormEntity
@@ -63,6 +64,9 @@ class Lead extends FormEntity
      *   joinColumns={@ORM\JoinColumn(name="lead_id", referencedColumnName="id")},
      *   inverseJoinColumns={@ORM\JoinColumn(name="ip_id", referencedColumnName="id")}
      * )
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"leadDetails"})
      */
     private $ipAddresses;
 
@@ -87,6 +91,9 @@ class Lead extends FormEntity
      * Used to populate trigger color
      *
      * @var
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"leadDetails", "leadList"})
      */
     private $color;
 

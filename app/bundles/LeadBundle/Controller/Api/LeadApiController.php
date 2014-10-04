@@ -32,7 +32,7 @@ class LeadApiController extends CommonApiController
         $this->entityNameOne    = 'lead';
         $this->entityNameMulti  = 'leads';
         $this->permissionBase   = 'lead:leads';
-        $this->serializerGroups = array("leadDetails", "userList", "publishDetails");
+        $this->serializerGroups = array("leadDetails", "userList", "publishDetails", "ipAddress");
     }
 
     /**
@@ -43,6 +43,10 @@ class LeadApiController extends CommonApiController
      *   description = "Obtains a list of leads",
      *   statusCodes = {
      *     200 = "Returned when successful"
+     *   },
+     *   output={
+     *      "class"="Mautic\LeadBundle\Entity\Lead",
+     *      "groups"={"leadDetails", "userList", "publishDetails"}
      *   },
      *   filters={
      *      {"name"="start", "dataType"="integer", "required"=false, "description"="Set the record to start with."},
@@ -69,6 +73,10 @@ class LeadApiController extends CommonApiController
      *   statusCodes = {
      *     200 = "Returned when successful",
      *     404 = "Returned if the lead was not found"
+     *   },
+     *   output={
+     *      "class"="Mautic\LeadBundle\Entity\Lead",
+     *      "groups"={"leadDetails", "userList", "publishDetails"}
      *   }
      * )
      *
@@ -101,9 +109,7 @@ class LeadApiController extends CommonApiController
     }
 
     /**
-     * Creates a new lead.  You should make a call to /api/leads/list/fields.json in order to get a list of
-     * custom fields that will be accepted.  You can also pass in a ipAddress parameter if the IP of the lead
-     * is different than that of the originating request.
+     * Creates a new lead.  You should make a call to /api/leads/list/fields in order to get a list of custom fields that will be accepted. The key should be the alias of the custom field. You can also pass in a ipAddress parameter if the IP of the lead is different than that of the originating request.
      *
      * @ApiDoc(
      *   section = "Leads",
@@ -114,7 +120,7 @@ class LeadApiController extends CommonApiController
      *   },
      *   output={
      *      "class"="Mautic\LeadBundle\Entity\Lead",
-     *      "groups"={"leadDetails", "userList", "publishDetails"}
+     *      "groups"={"leadDetails", "userList", "publishDetails", "ipAddress"}
      *   }
      * )
      */
@@ -124,7 +130,7 @@ class LeadApiController extends CommonApiController
     }
 
     /**
-     * Edits an existing lead or creates a new one on PUT if not found.
+     * Edits an existing lead or creates a new one on PUT if not found.  You should make a call to /api/leads/list/fields in order to get a list of custom fields that will be accepted. The key should be the alias of the custom field. You can also pass in a ipAddress parameter if the IP of the lead is different than that of the originating request.
      *
      * @ApiDoc(
      *   section = "Leads",
@@ -134,9 +140,13 @@ class LeadApiController extends CommonApiController
      *     201 = "Returned if a new lead was created",
      *     400 = "Returned if validation failed"
      *   },
+     *   parameters={
+     *       {"name"="owner", "dataType"="integer", "required"=false, "description"="ID of the user who is to be the owner of this lead."},
+     *       {"name"="ipAddress", "dataType"="string", "required"=false, "description"="Passthrough IP of where the lead originated."}
+     *   },
      *   output={
      *      "class"="Mautic\LeadBundle\Entity\Lead",
-     *      "groups"={"leadDetails", "userList", "publishDetails"}
+     *      "groups"={"leadDetails", "userList", "publishDetails", "ipAddress"}
      *   }
      * )
      *
