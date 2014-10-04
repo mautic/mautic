@@ -31,7 +31,7 @@ class Trigger extends FormEntity
      * @ORM\GeneratedValue(strategy="AUTO")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"triggerDetails", "triggerList"})
      */
     private $id;
 
@@ -39,7 +39,7 @@ class Trigger extends FormEntity
      * @ORM\Column(type="string", length=50, nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"triggerDetails", "triggerList"})
      */
     private $name;
 
@@ -47,7 +47,7 @@ class Trigger extends FormEntity
      * @ORM\Column(type="string", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"triggerDetails", "triggerList"})
      */
     private $description;
 
@@ -55,7 +55,7 @@ class Trigger extends FormEntity
      * @ORM\Column(name="publish_up", type="datetime", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"triggerDetails"})
      */
     private $publishUp;
 
@@ -63,7 +63,7 @@ class Trigger extends FormEntity
      * @ORM\Column(name="publish_down", type="datetime", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"triggerDetails"})
      */
     private $publishDown;
 
@@ -71,7 +71,7 @@ class Trigger extends FormEntity
      * @ORM\Column(name="points", type="integer")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"triggerDetails"})
      */
     private $points = 0;
 
@@ -79,15 +79,12 @@ class Trigger extends FormEntity
      * @ORM\Column(name="color", type="string", length=7)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"triggerDetails"})
      */
     private $color;
 
     /**
      * @ORM\Column(name="trigger_existing_leads", type="boolean")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $triggerExistingLeads = false;
 
@@ -95,13 +92,16 @@ class Trigger extends FormEntity
      * @ORM\ManyToOne(targetEntity="Mautic\CategoryBundle\Entity\Category")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"triggerDetails", "triggerList"})
      **/
     private $category;
 
     /**
      * @ORM\OneToMany(targetEntity="TriggerEvent", mappedBy="trigger", cascade={"all"}, indexBy="id", fetch="EXTRA_LAZY")
      * @ORM\OrderBy({"order" = "ASC"})
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"triggerDetails"})
      */
     private $events;
 

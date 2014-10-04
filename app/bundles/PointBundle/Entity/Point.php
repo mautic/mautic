@@ -31,7 +31,7 @@ class Point extends FormEntity
      * @ORM\GeneratedValue(strategy="AUTO")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"pointDetails", "pointList"})
      */
     private $id;
 
@@ -39,7 +39,7 @@ class Point extends FormEntity
      * @ORM\Column(type="string", length=50)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"pointDetails", "pointList"})
      */
     private $type;
 
@@ -47,7 +47,7 @@ class Point extends FormEntity
      * @ORM\Column(type="string", length=50, nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"pointDetails", "pointList"})
      */
     private $name;
 
@@ -55,7 +55,7 @@ class Point extends FormEntity
      * @ORM\Column(type="string", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"pointDetails", "pointList"})
      */
     private $description;
 
@@ -63,7 +63,7 @@ class Point extends FormEntity
      * @ORM\Column(name="publish_up", type="datetime", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"pointDetails"})
      */
     private $publishUp;
 
@@ -71,7 +71,7 @@ class Point extends FormEntity
      * @ORM\Column(name="publish_down", type="datetime", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"pointDetails"})
      */
     private $publishDown;
 
@@ -79,7 +79,7 @@ class Point extends FormEntity
      * @ORM\Column(name="action_order", type="integer")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"pointDetails"})
      */
     private $order = 0;
 
@@ -87,7 +87,7 @@ class Point extends FormEntity
      * @ORM\Column(type="array")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"pointDetails"})
      */
     private $properties = array();
 
@@ -100,7 +100,7 @@ class Point extends FormEntity
      * @ORM\ManyToOne(targetEntity="Mautic\CategoryBundle\Entity\Category")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"pointDetails", "pointList"})
      **/
     private $category;
 

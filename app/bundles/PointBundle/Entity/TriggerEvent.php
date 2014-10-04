@@ -28,7 +28,7 @@ class TriggerEvent
      * @ORM\GeneratedValue(strategy="AUTO")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"triggerDetails"})
      */
     private $id;
 
@@ -36,7 +36,7 @@ class TriggerEvent
      * @ORM\Column(type="string", length=50)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"triggerDetails"})
      */
     private $type;
 
@@ -44,7 +44,7 @@ class TriggerEvent
      * @ORM\Column(type="string", length=50, nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"triggerDetails"})
      */
     private $name;
 
@@ -52,7 +52,7 @@ class TriggerEvent
      * @ORM\Column(type="string", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"triggerDetails"})
      */
     private $description;
 
@@ -60,7 +60,7 @@ class TriggerEvent
      * @ORM\Column(name="action_order", type="integer")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"triggerDetails"})
      */
     private $order = 0;
 
@@ -68,7 +68,7 @@ class TriggerEvent
      * @ORM\Column(type="array")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"triggerDetails"})
      */
     private $properties = array();
 
