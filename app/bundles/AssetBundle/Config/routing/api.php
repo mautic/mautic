@@ -12,25 +12,23 @@ use Symfony\Component\Routing\Route;
 
 $collection = new RouteCollection();
 
-$collection->add('mautic_api_getassets', new Route('/assets.{_format}',
+$collection->add('mautic_api_getassets', new Route('/assets',
     array(
         '_controller' => 'MauticAssetBundle:Api\AssetApi:getEntities',
-        '_format' => 'json'
+        '_format'     => 'json'
     ),
     array(
-        '_method' => 'GET',
-        '_format' => 'json|xml'
+        '_method' => 'GET'
     )
 ));
 
-$collection->add('mautic_api_getasset', new Route('/assets/{id}.{_format}',
+$collection->add('mautic_api_getasset', new Route('/assets/{id}',
     array(
         '_controller' => 'MauticAssetBundle:Api\AssetApi:getEntity',
-        '_format' => 'json'
+        '_format'     => 'json'
     ),
     array(
         '_method' => 'GET',
-        '_format' => 'json|xml',
         'id'      => '\d+'
     )
 ));

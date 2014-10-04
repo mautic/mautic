@@ -29,6 +29,7 @@ class AssetApiController extends CommonApiController
         $this->entityNameOne   = 'asset';
         $this->entityNameMulti = 'assets';
         $this->permissionBase  = 'asset:assets';
+        $this->serializerGroups = array("assetDetails", "categoryList", "publishDetails");
     }
 
     /**
@@ -39,6 +40,10 @@ class AssetApiController extends CommonApiController
      *   description = "Obtains a list of assets",
      *   statusCodes = {
      *     200 = "Returned when successful"
+     *   },
+     *   output={
+     *      "class"="Mautic\AssetBundle\Entity\Asset",
+     *      "groups"={"assetDetails", "categoryList", "publishDetails"}
      *   },
      *   filters={
      *      {"name"="start", "dataType"="integer", "required"=false, "description"="Set the record to start with."},
@@ -74,6 +79,10 @@ class AssetApiController extends CommonApiController
      *   statusCodes = {
      *     200 = "Returned when successful",
      *     404 = "Returned if the asset was not found"
+     *   },
+     *   output={
+     *      "class"="Mautic\AssetBundle\Entity\Asset",
+     *      "groups"={"assetDetails", "categoryList", "publishDetails"}
      *   }
      * )
      *

@@ -31,7 +31,7 @@ class Asset extends FormEntity
      * @ORM\GeneratedValue(strategy="AUTO")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"assetDetails", "assetList"})
      */
     private $id;
 
@@ -39,23 +39,17 @@ class Asset extends FormEntity
      * @ORM\Column(name="title", type="string")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"assetDetails", "assetList"})
      */
     private $title;
 
     /**
      * @ORM\Column(name="path", type="string", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $path;
 
     /**
      * @ORM\Column(name="original_file_name", type="string", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $originalFileName;
 
@@ -85,7 +79,7 @@ class Asset extends FormEntity
      * @ORM\Column(name="alias", type="string")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"assetDetails", "assetList"})
      */
     private $alias;
 
@@ -93,7 +87,7 @@ class Asset extends FormEntity
      * @ORM\Column(name="author", type="string", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"assetDetails"})
      */
     private $author;
 
@@ -101,7 +95,7 @@ class Asset extends FormEntity
      * @ORM\Column(name="lang", type="string")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"assetDetails"})
      */
     private $language = 'en';
 
@@ -109,7 +103,7 @@ class Asset extends FormEntity
      * @ORM\Column(name="publish_up", type="datetime", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"assetDetails"})
      */
     private $publishUp;
 
@@ -117,7 +111,7 @@ class Asset extends FormEntity
      * @ORM\Column(name="publish_down", type="datetime", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"assetDetails"})
      */
     private $publishDown;
 
@@ -125,7 +119,7 @@ class Asset extends FormEntity
      * @ORM\Column(name="download_count", type="integer")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"assetDetails"})
      */
     private $downloadCount = 0;
 
@@ -133,7 +127,7 @@ class Asset extends FormEntity
      * @ORM\Column(name="unique_download_count", type="integer")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"assetDetails"})
      */
     private $uniqueDownloadCount = 0;
 
@@ -141,7 +135,7 @@ class Asset extends FormEntity
      * @ORM\Column(name="revision", type="integer")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"assetDetails"})
      */
     private $revision = 1;
 
@@ -149,7 +143,7 @@ class Asset extends FormEntity
      * @ORM\ManyToOne(targetEntity="Mautic\CategoryBundle\Entity\Category")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"assetDetails", "assetList"})
      **/
     private $category;
 
