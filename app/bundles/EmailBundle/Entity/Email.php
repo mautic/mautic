@@ -32,7 +32,7 @@ class Email extends FormEntity
      * @ORM\GeneratedValue(strategy="AUTO")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"emailDetails", "emailList"})
      */
     private $id;
 
@@ -40,7 +40,7 @@ class Email extends FormEntity
      * @ORM\Column(type="string")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"emailDetails", "emailList"})
      */
     private $subject;
 
@@ -53,7 +53,7 @@ class Email extends FormEntity
      * @ORM\Column(name="author", type="string", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"emailDetails"})
      */
     private $author;
 
@@ -61,23 +61,17 @@ class Email extends FormEntity
      * @ORM\Column(name="lang", type="string")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"emailDetails", "emailList"})
      */
     private $language = 'en';
 
     /**
      * @ORM\Column(name="content", type="array")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $content = array();
 
     /**
      * @ORM\Column(name="plain_text", type="text", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $plainText;
 
@@ -85,7 +79,7 @@ class Email extends FormEntity
      * @ORM\Column(name="publish_up", type="datetime", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"emailDetails"})
      */
     private $publishUp;
 
@@ -93,7 +87,7 @@ class Email extends FormEntity
      * @ORM\Column(name="publish_down", type="datetime", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"emailDetails"})
      */
     private $publishDown;
 
@@ -101,7 +95,7 @@ class Email extends FormEntity
      * @ORM\Column(name="read_count", type="integer")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"emailDetails"})
      */
     private $readCount = 0;
 
@@ -109,7 +103,7 @@ class Email extends FormEntity
      * @ORM\Column(name="read_in_browser", type="boolean")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"emailDetails"})
      */
     private $readInBrowser = false;
 
@@ -117,7 +111,7 @@ class Email extends FormEntity
      * @ORM\Column(name="sent_count", type="integer")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"emailDetails"})
      */
     private $sentCount = 0;
 
@@ -125,7 +119,7 @@ class Email extends FormEntity
      * @ORM\Column(name="revision", type="integer")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"emailDetails"})
      */
     private $revision = 1;
 
@@ -133,7 +127,7 @@ class Email extends FormEntity
      * @ORM\ManyToOne(targetEntity="Mautic\CategoryBundle\Entity\Category")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"emailDetails", "emailList"})
      **/
     private $category;
 
@@ -141,9 +135,6 @@ class Email extends FormEntity
      * @ORM\ManyToMany(targetEntity="Mautic\LeadBundle\Entity\LeadList", fetch="EXTRA_LAZY", indexBy="id")
      * @ORM\JoinTable(name="email_list_xref")
      * @ORM\JoinColumn(name="list_id", referencedColumnName="id", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      **/
     private $lists;
 
@@ -152,20 +143,22 @@ class Email extends FormEntity
      * @ORM\JoinColumn(name="variant_parent_id", referencedColumnName="id", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"emailDetails"})
+     * @Serializer\MaxDepth(1)
      **/
     private $variantParent = null;
 
     /**
      * @ORM\OneToMany(targetEntity="Email", mappedBy="variantParent", indexBy="id")
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"emailDetails"})
+     * @Serializer\MaxDepth(1)
      **/
     private $variantChildren;
 
     /**
      * @ORM\Column(name="variant_settings", type="array", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $variantSettings = array();
 
@@ -173,7 +166,7 @@ class Email extends FormEntity
      * @ORM\Column(name="variant_start_date", type="datetime", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"emailDetails"})
      */
     private $variantStartDate;
 
@@ -181,7 +174,7 @@ class Email extends FormEntity
      * @ORM\Column(name="variant_sent_count", type="integer")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"emailDetails"})
      */
     private $variantSentCount = 0;
 
@@ -189,7 +182,7 @@ class Email extends FormEntity
      * @ORM\Column(name="variant_read_count", type="integer")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"emailDetails"})
      */
     private $variantReadCount = 0;
 
