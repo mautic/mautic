@@ -30,7 +30,7 @@ class Page extends FormEntity
      * @ORM\GeneratedValue(strategy="AUTO")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"pageDetails", "pageList"})
      */
     private $id;
 
@@ -38,7 +38,7 @@ class Page extends FormEntity
      * @ORM\Column(name="title", type="string")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"pageDetails", "pageList"})
      */
     private $title;
 
@@ -46,7 +46,7 @@ class Page extends FormEntity
      * @ORM\Column(name="alias", type="string")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"pageDetails", "pageList"})
      */
     private $alias;
 
@@ -59,7 +59,7 @@ class Page extends FormEntity
      * @ORM\Column(name="author", type="string", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"pageDetails"})
      */
     private $author;
 
@@ -67,15 +67,12 @@ class Page extends FormEntity
      * @ORM\Column(name="lang", type="string")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"pageDetails"})
      */
     private $language = 'en';
 
     /**
      * @ORM\Column(name="content", type="array")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $content = array();
 
@@ -83,7 +80,7 @@ class Page extends FormEntity
      * @ORM\Column(name="publish_up", type="datetime", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"pageDetails"})
      */
     private $publishUp;
 
@@ -91,7 +88,7 @@ class Page extends FormEntity
      * @ORM\Column(name="publish_down", type="datetime", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"pageDetails"})
      */
     private $publishDown;
 
@@ -99,7 +96,7 @@ class Page extends FormEntity
      * @ORM\Column(name="hits", type="integer")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"pageDetails"})
      */
     private $hits = 0;
 
@@ -107,7 +104,7 @@ class Page extends FormEntity
      * @ORM\Column(name="unique_hits", type="integer")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"pageDetails"})
      */
     private $uniqueHits = 0;
 
@@ -115,7 +112,7 @@ class Page extends FormEntity
      * @ORM\Column(name="variant_hits", type="integer")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"pageDetails"})
      */
     private $variantHits = 0;
 
@@ -123,7 +120,7 @@ class Page extends FormEntity
      * @ORM\Column(name="revision", type="integer")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"pageDetails"})
      */
     private $revision = 1;
 
@@ -131,7 +128,7 @@ class Page extends FormEntity
      * @ORM\Column(name="meta_description", type="string", nullable=true, length=320)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"pageDetails"})
      */
     private $metaDescription;
 
@@ -139,12 +136,16 @@ class Page extends FormEntity
      * @ORM\ManyToOne(targetEntity="Mautic\CategoryBundle\Entity\Category")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"pageDetails", "pageList"})
      **/
     private $category;
 
     /**
      * @ORM\OneToMany(targetEntity="Page", mappedBy="translationParent", indexBy="id")
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"pageDetails"})
+     * @Serializer\MaxDepth(1)
      **/
     private $translationChildren;
 
@@ -153,12 +154,17 @@ class Page extends FormEntity
      * @ORM\JoinColumn(name="translation_parent_id", referencedColumnName="id", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"pageDetails"})
+     * @Serializer\MaxDepth(1)
      **/
     private $translationParent = null;
 
     /**
      * @ORM\OneToMany(targetEntity="Page", mappedBy="variantParent", indexBy="id")
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"pageDetails"})
+     * @Serializer\MaxDepth(1)
      **/
     private $variantChildren;
 
@@ -167,7 +173,8 @@ class Page extends FormEntity
      * @ORM\JoinColumn(name="variant_parent_id", referencedColumnName="id", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"pageDetails"})
+     * @Serializer\MaxDepth(1)
      **/
     private $variantParent = null;
 
@@ -175,7 +182,7 @@ class Page extends FormEntity
      * @ORM\Column(name="variant_settings", type="array", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"pageDetails"})
      */
     private $variantSettings = array();
 
@@ -183,7 +190,7 @@ class Page extends FormEntity
      * @ORM\Column(name="variant_start_date", type="datetime", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"pageDetails"})
      */
     private $variantStartDate;
 
