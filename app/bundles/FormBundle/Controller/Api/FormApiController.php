@@ -29,6 +29,7 @@ class FormApiController extends CommonApiController
         $this->entityNameOne   = 'form';
         $this->entityNameMulti = 'forms';
         $this->permissionBase  = 'form:forms';
+        $this->serializerGroups = array('formDetails', 'categoryList', 'publishDetails');
     }
 
     /**
@@ -90,8 +91,9 @@ class FormApiController extends CommonApiController
      * {@inheritdoc}
      *
      * @param $entity
+     * @param $view
      */
-    protected function preSerializeEntity (&$entity)
+    protected function preSerializeEntity(&$entity, $action = 'view')
     {
         $entity->automaticJs = '<script type="text/javascript" src="'.$this->generateUrl('mautic_form_generateform', array('id' => $entity->getId()), true).'"></script>';
     }

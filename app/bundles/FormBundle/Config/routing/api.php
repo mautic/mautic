@@ -12,25 +12,23 @@ use Symfony\Component\Routing\Route;
 
 $collection = new RouteCollection();
 
-$collection->add('mautic_api_getforms', new Route('/forms.{_format}',
+$collection->add('mautic_api_getforms', new Route('/forms',
     array(
         '_controller' => 'MauticFormBundle:Api\FormApi:getEntities',
-        '_format' => 'json'
+        '_format'     => 'json'
     ),
     array(
-        '_method' => 'GET',
-        '_format' => 'json|xml'
+        '_method' => 'GET'
     )
 ));
 
-$collection->add('mautic_api_getform', new Route('/forms/{id}.{_format}',
+$collection->add('mautic_api_getform', new Route('/forms/{id}',
     array(
         '_controller' => 'MauticFormBundle:Api\FormApi:getEntity',
-        '_format' => 'json'
+        '_format'     => 'json'
     ),
     array(
         '_method' => 'GET',
-        '_format' => 'json|xml',
         'id'      => '\d+'
     )
 ));

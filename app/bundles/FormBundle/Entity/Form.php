@@ -31,7 +31,7 @@ class Form extends FormEntity
      * @ORM\GeneratedValue(strategy="AUTO")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"formDetails", "formList"})
      */
     private $id;
 
@@ -39,7 +39,7 @@ class Form extends FormEntity
      * @ORM\Column(type="string")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"formDetails", "formList"})
      */
     private $name;
 
@@ -47,7 +47,7 @@ class Form extends FormEntity
      * @ORM\Column(type="string")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"formDetails", "formList"})
      */
     private $alias;
 
@@ -55,7 +55,7 @@ class Form extends FormEntity
      * @ORM\Column(type="string", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"formDetails"})
      */
     private $description;
 
@@ -63,7 +63,7 @@ class Form extends FormEntity
      * @ORM\ManyToOne(targetEntity="Mautic\CategoryBundle\Entity\Category")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"formDetails", "formList"})
      **/
     private $category;
 
@@ -71,23 +71,17 @@ class Form extends FormEntity
      * @ORM\Column(name="cached_html", type="text", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"formDetails"})
      */
     private $cachedHtml;
 
     /**
      * @ORM\Column(name="post_action", type="string")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $postAction;
 
     /**
      * @ORM\Column(name="post_action_property", type="string", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $postActionProperty;
 
@@ -95,7 +89,7 @@ class Form extends FormEntity
      * @ORM\Column(name="publish_up", type="datetime", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"formDetails"})
      */
     private $publishUp;
 
@@ -103,19 +97,25 @@ class Form extends FormEntity
      * @ORM\Column(name="publish_down", type="datetime", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"formDetails"})
      */
     private $publishDown;
 
     /**
      * @ORM\OneToMany(targetEntity="Field", mappedBy="form", cascade={"all"}, indexBy="id")
      * @ORM\OrderBy({"order" = "ASC"})
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"formDetails"})
      */
     private $fields;
 
     /**
      * @ORM\OneToMany(targetEntity="Action", mappedBy="form", cascade={"all"}, indexBy="id", fetch="EXTRA_LAZY")
      * @ORM\OrderBy({"order" = "ASC"})
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"formDetails"})
      */
     private $actions;
 
@@ -128,14 +128,14 @@ class Form extends FormEntity
     /**
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"formDetails"})
      */
     public $submissionCount;
 
     /**
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full", "limited"})
+     * @Serializer\Groups({"formDetails"})
      */
     public $automaticJs;
 

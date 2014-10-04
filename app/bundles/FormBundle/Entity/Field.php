@@ -27,7 +27,7 @@ class Field
      * @ORM\GeneratedValue(strategy="AUTO")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"formDetails"})
      */
     private $id;
 
@@ -35,7 +35,7 @@ class Field
      * @ORM\Column(type="string")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"formDetails"})
      */
     private $label;
 
@@ -43,7 +43,7 @@ class Field
      * @ORM\Column(name="show_label", type="boolean", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"formDetails"})
      */
     private $showLabel = true;
 
@@ -51,7 +51,7 @@ class Field
      * @ORM\Column(type="string")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"formDetails"})
      */
     private $alias;
 
@@ -59,23 +59,17 @@ class Field
      * @ORM\Column(type="string")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"formDetails"})
      */
     private $type;
 
     /**
      * @ORM\Column(name="is_custom", type="boolean")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $isCustom = false;
 
     /**
      * @ORM\Column(name="custom_parameters", type="array", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $customParameters = array();
 
@@ -83,7 +77,7 @@ class Field
      * @ORM\Column(name="default_value", type="string", length=255, nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"formDetails"})
      */
     private $defaultValue;
 
@@ -91,7 +85,7 @@ class Field
      * @ORM\Column(name="is_required", type="boolean")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"formDetails"})
      */
     private $isRequired = false;
 
@@ -99,7 +93,7 @@ class Field
      * @ORM\Column(name="validation_message", type="string", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"formDetails"})
      */
     private $validationMessage;
 
@@ -107,7 +101,7 @@ class Field
      * @ORM\Column(name="help_message", type="string", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"formDetails"})
      */
     private $helpMessage;
 
@@ -115,7 +109,7 @@ class Field
      * @ORM\Column(name="field_order", type="integer", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"formDetails"})
      */
     private $order = 0;
 
@@ -123,7 +117,7 @@ class Field
      * @ORM\Column(type="array", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"formDetails"})
      */
     private $properties = array();
 
@@ -135,11 +129,17 @@ class Field
 
     /**
      * @ORM\Column(name="label_attr", type="string", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"formDetails"})
      */
     private $labelAttributes;
 
     /**
      * @ORM\Column(name="input_attr", type="string", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"formDetails"})
      */
     private $inputAttributes;
 
