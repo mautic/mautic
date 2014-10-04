@@ -33,6 +33,7 @@ class IpAddress {
      * @ORM\Column(name="ip_address", type="text", length=15)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
+     * @Serializer\Groups({"ipAddress"})
      */
     private $ipAddress;
 
@@ -40,6 +41,7 @@ class IpAddress {
      * @ORM\Column(name="ip_details", type="array", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
+     * @Serializer\Groups({"ipAddress"})
      */
     private $ipDetails;
 

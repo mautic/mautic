@@ -29,7 +29,7 @@ class Category extends FormEntity
      * @ORM\GeneratedValue(strategy="AUTO")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"categoryDetails", "categoryList"})
      */
     private $id;
 
@@ -37,7 +37,7 @@ class Category extends FormEntity
      * @ORM\Column(name="title", type="string")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"categoryDetails", "categoryList"})
      */
     private $title;
 
@@ -45,7 +45,7 @@ class Category extends FormEntity
      * @ORM\Column(name="alias", type="string")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"categoryDetails", "categoryList"})
      */
     private $alias;
 
@@ -53,15 +53,12 @@ class Category extends FormEntity
      * @ORM\Column(name="description", type="string", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @Serializer\Groups({"categoryDetails"})
      */
     private $description;
 
     /**
      * @ORM\Column(type="string", length=50)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $bundle;
 

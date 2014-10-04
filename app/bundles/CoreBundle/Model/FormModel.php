@@ -72,8 +72,7 @@ class FormModel extends CommonModel
             if (!empty($checkedOut)) {
                 //is it checked out by the current user?
                 $checkedOutBy = $entity->getCheckedOutBy();
-                if (!empty($checkedOutBy) && $checkedOutBy->getId() !==
-                    $this->factory->getUser()->getId()) {
+                if (!empty($checkedOutBy) && $checkedOutBy->getId() !== $this->factory->getUser()->getId()) {
                     return true;
                 }
             }

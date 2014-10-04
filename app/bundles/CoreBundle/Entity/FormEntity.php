@@ -41,6 +41,9 @@ class FormEntity
     /**
      * @ORM\ManyToOne(targetEntity="Mautic\UserBundle\Entity\User")
      * @ORM\JoinColumn(name="created_by", referencedColumnName="id", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"publishDetails"})
      */
     private $createdBy;
 
@@ -55,6 +58,9 @@ class FormEntity
     /**
      * @ORM\ManyToOne(targetEntity="Mautic\UserBundle\Entity\User")
      * @ORM\JoinColumn(name="modified_by", referencedColumnName="id", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"publishDetails"})
      */
     private $modifiedBy;
 
