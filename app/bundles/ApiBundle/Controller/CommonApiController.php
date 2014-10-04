@@ -416,6 +416,9 @@ class CommonApiController extends FOSRestController implements MauticController
             new PublishDetailsExclusionStrategy()
         );
 
+        //include null values
+        $context->setSerializeNull(true);
+
         $view->setSerializationContext($context);
     }
 

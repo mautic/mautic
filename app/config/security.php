@@ -78,10 +78,11 @@ $container->loadFromExtension('security', array(
             'anonymous'  => true
         ),
         'api'                  => array(
-            'pattern'       => '^/api',
-            'fos_oauth'     => true,
-            'bazinga_oauth' => true,
-            'stateless'     => true
+            'pattern'         => '^/api',
+            'mautic_api_auth' => true,
+            'fos_oauth'       => true,
+            'bazinga_oauth'   => true,
+            'stateless'       => true
         ),
         'main'                 => array(
             'pattern'     => "^/",
@@ -100,7 +101,7 @@ $container->loadFromExtension('security', array(
     ),
     'access_control' => array(
         array('path' => '^/api', 'roles' => 'IS_AUTHENTICATED_FULLY')
-    )
+     )
 ));
 
 $this->import('security_api.php');

@@ -50,21 +50,17 @@ class RouteLoader extends Loader
             throw new \RuntimeException('Do not add the "mautic.api" loader twice');
         }
 
-        if (!empty($this->apiEnabled)) {
-            $collection = new RouteCollection();
-            foreach ($this->bundles as $bundle) {
-                $routing = $bundle['directory'] . "/Config/api.php";
+        $collection = new RouteCollection();
+        foreach ($this->bundles as $bundle) {
+            $routing = $bundle['directory'] . "/Config/api.php";
+            if (file_exists($routing)) {
+                $collection->addCollection($this->import($routing));
+            } else {
+                $routing = $bundle['directory'] . "/Config/routing/api.php";
                 if (file_exists($routing)) {
                     $collection->addCollection($this->import($routing));
-                } else {
-                    $routing = $bundle['directory'] . "/Config/routing/api.php";
-                    if (file_exists($routing)) {
-                        $collection->addCollection($this->import($routing));
-                    }
                 }
             }
-        } else {
-            $collection = new RouteCollection();
         }
 
         $this->loaded = true;

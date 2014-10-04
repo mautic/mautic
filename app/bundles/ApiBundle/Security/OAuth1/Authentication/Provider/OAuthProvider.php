@@ -7,13 +7,25 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\ApiBundle\Security\Authentification\Provider;
+namespace Mautic\ApiBundle\Security\OAuth1\Authentication\Provider;
 
 use Bazinga\OAuthServerBundle\Security\Authentification\Token\OAuthToken;
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 class OAuthProvider extends \Bazinga\OAuthServerBundle\Security\Authentification\Provider\OAuthProvider
 {
+
+    /**
+     * @var MauticFactory $factory
+     */
+    private $factory;
+
+    public function setFactory(MauticFactory $factory)
+    {
+        $this->factory = $factory;
+    }
 
     /**
      * {@inheritdoc}
@@ -23,6 +35,8 @@ class OAuthProvider extends \Bazinga\OAuthServerBundle\Security\Authentification
         if (!$this->supports($token)) {
             return null;
         }
+
+        $translator = $this->factory->getTranslator();
 
         $requestParameters = $token->getRequestParameters();
         $requestMethod     = $token->getRequestMethod();
@@ -45,7 +59,7 @@ class OAuthProvider extends \Bazinga\OAuthServerBundle\Security\Authentification
             return $token;
         }
 
-        throw new AuthenticationException('OAuth authentification failed');
+        throw new AuthenticationException($translator->trans('mautic.api.oauth.auth.failed'));
     }
     /**
      * {@inheritdoc}

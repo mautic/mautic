@@ -1,6 +1,6 @@
 <?php
 
-namespace Mautic\ApiBundle\Security\Authentification\Token;
+namespace Mautic\ApiBundle\Security\OAuth1\Authentication\Token;
 
 /**
  * Class OAuthToken

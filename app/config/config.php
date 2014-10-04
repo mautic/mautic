@@ -133,7 +133,7 @@ if ($container->getParameter('mautic.api_enabled')) {
         'view'           => array(
             'formats' => array(
                 'json' => true,
-                'xml'  => true,
+                'xml'  => false,
                 'html' => false
             ),
             'templating_formats' => array(

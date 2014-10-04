@@ -7,10 +7,10 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\ApiBundle\Security\Firewall;
+namespace Mautic\ApiBundle\Security\OAuth1\Firewall;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Mautic\ApiBundle\Security\Authentification\Token\OAuthToken;
+use Mautic\ApiBundle\Security\OAuth1\Authentication\Token\OAuthToken;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Exception\HttpException;
