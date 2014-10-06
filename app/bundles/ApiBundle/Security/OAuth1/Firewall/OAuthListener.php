@@ -9,6 +9,7 @@
 
 namespace Mautic\ApiBundle\Security\OAuth1\Firewall;
 
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Mautic\ApiBundle\Security\OAuth1\Authentication\Token\OAuthToken;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,6 +24,15 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
  */
 class OAuthListener extends \Bazinga\OAuthServerBundle\Security\Firewall\OAuthListener
 {
+    /**
+     * @var MauticFactory $factory
+     */
+    private $factory;
+
+    public function setFactory(MauticFactory $factory)
+    {
+        $this->factory = $factory;
+    }
 
     /**
      * @author William DURAND <william.durand1@gmail.com>
@@ -31,6 +41,11 @@ class OAuthListener extends \Bazinga\OAuthServerBundle\Security\Firewall\OAuthLi
      */
     public function handle(GetResponseEvent $event)
     {
+        $apiMode = $this->factory->getParameter('api_mode');
+        if ($apiMode != 'oauth1') {
+            return;
+        }
+
         $request = $event->getRequest();
 
         if (false === $request->attributes->get('oauth_request_parameters', false)) {

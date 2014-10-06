@@ -277,7 +277,18 @@ class LeadApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $fields = $this->factory->getModel('lead.field')->getEntities();
+        $fields = $this->factory->getModel('lead.field')->getEntities(array(
+            'filter' => array(
+                'force' => array(
+                    array(
+                        'column' => 'f.isPublished',
+                        'expr'   => 'eq',
+                        'value'  => true
+                    )
+                )
+            )
+        ));
+
         $view = $this->view($fields, Codes::HTTP_OK);
         $context = SerializationContext::create()->setGroups(array('leadFieldList'));
         $view->setSerializationContext($context);
@@ -287,13 +298,14 @@ class LeadApiController extends CommonApiController
 
 
     /**
-     * Obtains a list of custom fields
+     * Obtains a list of notes on a specific lead
      *
      * @ApiDoc(
      *   section = "Leads",
-     *   description = "Obtains a list of of custom fields for editing leads",
+     *   description = "Obtains a list of of notes on a specific lead"
      *   statusCodes = {
-     *     200 = "Returned when successful"
+     *     200 = "Returned when successful",
+     *     404 = "Lead not found"
      *   },
      *   output={
      *      "class"="Mautic\LeadBundle\Entity\LeadNote",

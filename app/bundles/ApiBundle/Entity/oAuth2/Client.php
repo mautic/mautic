@@ -12,6 +12,7 @@ namespace Mautic\ApiBundle\Entity\oAuth2;
 use FOS\OAuthServerBundle\Entity\Client as BaseClient;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\UserBundle\Entity\User;
+use OAuth2\OAuth2;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -43,6 +44,11 @@ class Client extends BaseClient
     public function __construct()
     {
         parent::__construct();
+
+        $this->allowedGrantTypes = array(
+            OAuth2::GRANT_TYPE_AUTH_CODE,
+            OAuth2::GRANT_TYPE_REFRESH_TOKEN,
+        );
     }
 
     /**

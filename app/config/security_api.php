@@ -17,7 +17,7 @@ $container->loadFromExtension('fos_oauth_server', array(
     'service'             => array(
         'user_provider' => 'mautic.user.provider',
         'options'       => array(
-            'supported_scopes' => 'user'
+            //'supported_scopes' => 'user'
         )
     ),
     'template'            => array(

@@ -36,23 +36,7 @@ $container->setDefinition('mautic.api.oauth1.nonce_provider',
     )
 );
 
-//Hijack some OAuth1 classes to extend and fix bugs
+//Hijack some OAuth classes to extend and fix bugs
 $container->setParameter('bazinga.oauth.security.authentication.provider.class', 'Mautic\ApiBundle\Security\OAuth1\Authentication\Provider\OAuthProvider');
 $container->setParameter('bazinga.oauth.security.authentication.listener.class', 'Mautic\ApiBundle\Security\OAuth1\Firewall\OAuthListener');
-
-//Register custom authentication provider and listener that will be a door way to the API
-$container->setDefinition('mautic_api.security.authentication.provider',
-    new Definition(
-        'Mautic\ApiBundle\Security\Authentication\Provider\ApiProvider', array('')
-    )
-);
-
-$container->setDefinition('mautic_api.security.authentication.listener',
-    new Definition(
-        'Mautic\ApiBundle\Security\Firewall\ApiListener', array(
-            new Reference('security.context'),
-            new Reference('security.authentication.manager'),
-            new Reference('mautic.factory'),
-        )
-    )
-);
+$container->setParameter('fos_oauth_server.security.authentication.listener.class', 'Mautic\ApiBundle\Security\OAuth2\Firewall\OAuthListener');

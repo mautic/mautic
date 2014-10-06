@@ -153,7 +153,8 @@ class UserRepository extends CommonRepository
             $q->andWhere($expr);
         }
 
-        $q->orderBy('u.firstName, u.lastName');
+        $q->andWhere('u.isPublished', true)
+            ->orderBy('u.firstName, u.lastName');
 
         if (!empty($limit)) {
             $q->setFirstResult($start)

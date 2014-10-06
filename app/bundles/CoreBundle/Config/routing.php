@@ -26,8 +26,8 @@ $collection->add('mautic_remove_trailing_slash', new Route( '/{url}',
         '_controller' => 'MauticCoreBundle:Common:removeTrailingSlash',
     ),
     array(
-        'url' => '.*/$',
-        '_method' => 'GET',
+        'url'     => '.*/$',
+        '_method' => 'GET'
     )
 ));
 

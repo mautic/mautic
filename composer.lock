@@ -854,12 +854,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/FriendsOfSymfony/FOSOAuthServerBundle.git",
-                "reference": "18eac304b53a2fa16bca5e2f2bdcc6cf6a88aa03"
+                "reference": "ab26212ee333456ae0d3a12e23832e1f87b25b87"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/FriendsOfSymfony/FOSOAuthServerBundle/zipball/18eac304b53a2fa16bca5e2f2bdcc6cf6a88aa03",
-                "reference": "18eac304b53a2fa16bca5e2f2bdcc6cf6a88aa03",
+                "url": "https://api.github.com/repos/FriendsOfSymfony/FOSOAuthServerBundle/zipball/ab26212ee333456ae0d3a12e23832e1f87b25b87",
+                "reference": "ab26212ee333456ae0d3a12e23832e1f87b25b87",
                 "shasum": ""
             },
             "require": {
@@ -914,7 +914,7 @@
                 "oauth2",
                 "server"
             ],
-            "time": "2014-09-16 00:41:15"
+            "time": "2014-10-04 17:05:53"
         },
         {
             "name": "friendsofsymfony/oauth2-php",
@@ -1889,20 +1889,20 @@
         },
         {
             "name": "swiftmailer/swiftmailer",
-            "version": "v5.2.2",
+            "version": "v5.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/swiftmailer/swiftmailer.git",
-                "reference": "e02f71a35436af4bd58a1bd90116089e632e29e1"
+                "reference": "b86b927dfefdb56ab0b22d1350033d9a38e9f205"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/swiftmailer/swiftmailer/zipball/e02f71a35436af4bd58a1bd90116089e632e29e1",
-                "reference": "e02f71a35436af4bd58a1bd90116089e632e29e1",
+                "url": "https://api.github.com/repos/swiftmailer/swiftmailer/zipball/b86b927dfefdb56ab0b22d1350033d9a38e9f205",
+                "reference": "b86b927dfefdb56ab0b22d1350033d9a38e9f205",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.2.4"
+                "php": ">=5.3.3"
             },
             "require-dev": {
                 "mockery/mockery": "~0.9.1"
@@ -1910,7 +1910,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "5.2-dev"
+                    "dev-master": "5.3-dev"
                 }
             },
             "autoload": {
@@ -1937,7 +1937,7 @@
                 "mail",
                 "mailer"
             ],
-            "time": "2014-09-20 07:17:36"
+            "time": "2014-10-04 05:53:18"
         },
         {
             "name": "symfony/finder",
@@ -2362,16 +2362,16 @@
         },
         {
             "name": "willdurand/negotiation",
-            "version": "1.3.3",
+            "version": "1.3.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/willdurand/Negotiation.git",
-                "reference": "a98fb6b9808610c1aa326c736893d3d77d9383b6"
+                "reference": "d7fa4ce4a0436915b9ba9f7cb5ff37719f0a834c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/willdurand/Negotiation/zipball/a98fb6b9808610c1aa326c736893d3d77d9383b6",
-                "reference": "a98fb6b9808610c1aa326c736893d3d77d9383b6",
+                "url": "https://api.github.com/repos/willdurand/Negotiation/zipball/d7fa4ce4a0436915b9ba9f7cb5ff37719f0a834c",
+                "reference": "d7fa4ce4a0436915b9ba9f7cb5ff37719f0a834c",
                 "shasum": ""
             },
             "require": {
@@ -2395,8 +2395,7 @@
             "authors": [
                 {
                     "name": "William Durand",
-                    "email": "william.durand1@gmail.com",
-                    "homepage": "http://www.willdurand.fr"
+                    "email": "william.durand1@gmail.com"
                 }
             ],
             "description": "Content Negotiation tools for PHP provided as a standalone library.",
@@ -2408,7 +2407,7 @@
                 "header",
                 "negotiation"
             ],
-            "time": "2014-05-16 12:34:51"
+            "time": "2014-10-02 07:26:00"
         },
         {
             "name": "willdurand/oauth-server-bundle",

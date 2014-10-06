@@ -65,7 +65,7 @@ class FieldModel extends FormModel
     /**
      * Returns lead custom fields
      *
-     * @param $args Takes only key filter and must be array supported by EntityRepository::findBy
+     * @param $args
      *
      * @return array
      */

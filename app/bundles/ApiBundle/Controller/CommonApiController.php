@@ -11,6 +11,7 @@
 
 namespace Mautic\ApiBundle\Controller;
 
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Util\Codes;
 use JMS\Serializer\SerializationContext;
@@ -137,16 +138,26 @@ class CommonApiController extends FOSRestController implements MauticController
     public function getEntitiesAction()
     {
         $args = array(
-            'start'      => $this->request->query->get('start', 0),
-            'limit'      => $this->request->query->get('limit', $this->factory->getParameter('default_pagelimit')),
-            'filter'     => array(
+            'start'          => $this->request->query->get('start', 0),
+            'limit'          => $this->request->query->get('limit', $this->factory->getParameter('default_pagelimit')),
+            'filter'         => array(
                 'string' => $this->request->query->get('search', ''),
                 'force'  => $this->listFilters
             ),
-            'orderBy'    => $this->request->query->get('orderBy', ''),
-            'orderByDir' => $this->request->query->get('orderByDir', 'ASC')
+            'orderBy'        => $this->request->query->get('orderBy', ''),
+            'orderByDir'     => $this->request->query->get('orderByDir', 'ASC'),
+            'withTotalCount' => true //for repositories that break free of Paginator
         );
         $results = $this->model->getEntities($args);
+
+        if ($results instanceof Paginator) {
+            $totalCount = count($results);
+        } elseif (isset($results['count'])) {
+            $totalCount = $results['count'];
+            $results    = $results['results'];
+        } else {
+            $totalCount = count($results);
+        }
 
         //we have to convert them from paginated proxy functions to entities in order for them to be
         //returned by the serializer/rest bundle
@@ -177,7 +188,10 @@ class CommonApiController extends FOSRestController implements MauticController
                 $entities[] = $r;
             }
         }
-        $view = $this->view(array($this->entityNameMulti => $entities), Codes::HTTP_OK);
+        $view = $this->view(array(
+            'total'                => $totalCount,
+            $this->entityNameMulti => $entities
+        ), Codes::HTTP_OK);
         $this->setSerializationContext($view);
         return $this->handleView($view);
     }
@@ -474,7 +488,10 @@ class CommonApiController extends FOSRestController implements MauticController
     {
         $view = $this->view(
             array(
-                "error" => $this->get('translator')->trans($msg)
+                'error' => array(
+                    'code'    => Codes::HTTP_FORBIDDEN,
+                    'message' => $this->get('translator')->trans($msg, array(), 'flashes')
+                )
             ), Codes::HTTP_FORBIDDEN
         );
         return $this->handleView($view);
@@ -491,7 +508,10 @@ class CommonApiController extends FOSRestController implements MauticController
     {
         $view = $this->view(
             array(
-                "error" => $this->get('translator')->trans($msg)
+                'error' => array(
+                    'code'    => Codes::HTTP_NOT_FOUND,
+                    'message' => $this->get('translator')->trans($msg, array(), 'flashes')
+                )
             ), Codes::HTTP_NOT_FOUND
         );
         return $this->handleView($view);
@@ -508,7 +528,10 @@ class CommonApiController extends FOSRestController implements MauticController
     {
         $view = $this->view(
             array(
-                "error" => $this->get('translator')->trans($msg)
+                'error' => array(
+                    'code'    => Codes::HTTP_BAD_REQUEST,
+                    'message' => $this->get('translator')->trans($msg, array(), 'flashes')
+                )
             ), Codes::HTTP_BAD_REQUEST
         );
         return $this->handleView($view);

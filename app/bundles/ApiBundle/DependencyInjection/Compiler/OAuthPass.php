@@ -25,5 +25,19 @@ class OAuthPass implements CompilerPassInterface
                 'setFactory', array(new Reference('mautic.factory'))
             );
         }
+
+        if ($container->hasDefinition('bazinga.oauth.security.authentication.listener')) {
+            //Add a addMethodCall to set factory
+            $container->getDefinition('bazinga.oauth.security.authentication.listener')->addMethodCall(
+                'setFactory', array(new Reference('mautic.factory'))
+            );
+        }
+
+        if ($container->hasDefinition('fos_oauth_server.security.authentication.listener')) {
+            //Add a addMethodCall to set factory
+            $container->getDefinition('fos_oauth_server.security.authentication.listener')->addMethodCall(
+                'setFactory', array(new Reference('mautic.factory'))
+            );
+        }
     }
 }

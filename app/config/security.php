@@ -79,7 +79,6 @@ $container->loadFromExtension('security', array(
         ),
         'api'                  => array(
             'pattern'         => '^/api',
-            'mautic_api_auth' => true,
             'fos_oauth'       => true,
             'bazinga_oauth'   => true,
             'stateless'       => true
