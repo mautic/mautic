@@ -78,6 +78,7 @@ if ($tmpl == 'index')
             </thead>
             <tbody>
             <?php foreach ($items as $item): ?>
+                <?php /** @var \Mautic\LeadBundle\Entity\Lead $item */ ?>
                 <?php $fields = $item->getFields(); ?>
                 <tr>
                     <td>
