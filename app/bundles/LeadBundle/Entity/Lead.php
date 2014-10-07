@@ -257,7 +257,7 @@ class Lead extends FormEntity
         } elseif (!empty($this->fields['core']['email']['value'])) {
             return $this->fields['core']['email']['value'];
         } elseif (count($ips = $this->getIpAddresses())) {
-            return $ips[0]->getIpAddress();
+            return $ips->first()->getIpAddress();
         } else {
             return 'mautic.lead.lead.anonymous';
         }
