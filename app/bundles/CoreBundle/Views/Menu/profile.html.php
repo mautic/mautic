@@ -6,10 +6,12 @@
  * @link        http://mautic.com
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
+/** @var \Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables $app */
 ?>
 <li class="dropdown">
     <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-        <span class="img-wrapper img-rounded" style="width:32px;"><img src="https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg"></span>
+        <span class="img-wrapper img-rounded" style="width:32px;"><img src="<?php echo $view['gravatar']->getImage($app->getUser()->getEmail()); ?>"></span>
         <span class="text fw-sb ml-xs hidden-xs"><?php echo $app->getUser()->getName();?></span>
         <span class="caret ml-xs"></span>
     </a>
