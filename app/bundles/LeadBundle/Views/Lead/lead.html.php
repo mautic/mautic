@@ -7,12 +7,15 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+/** @var \Mautic\LeadBundle\Entity\Lead $lead */
+/** @var array $fields */
+
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'lead');
 $view['slots']->set("headerTitle",
-    '<span class="span-block">' . $view['translator']->trans($lead->getPrimaryIdentifier())) . '</span><span class="span-block small">' .
-    $lead->getSecondaryIdentifier() . '</span>';
+    '<span class="span-block">' . $view['translator']->trans($lead->getPrimaryIdentifier()) . '</span><span class="span-block small">' .
+    $lead->getSecondaryIdentifier() . '</span>');
 $hasEditAccess = $security->hasEntityAccess($permissions['lead:leads:editown'], $permissions['lead:leads:editother'], $lead->getOwner());
 
 $view['slots']->start('modal');
@@ -99,11 +102,11 @@ $view['slots']->stop();
                         <div class="col-xs-6 va-m">
                             <div class="media">
                                 <span class="pull-left img-wrapper img-rounded" style="width:38px">
-                                    <img src="https://s3.amazonaws.com/uifaces/faces/twitter/nisaanjani/128.jpg" alt="">
+                                    <img src="<?php echo $view['gravatar']->getImage($fields['core']['email']['value']); ?>" alt="">
                                 </span>
                                 <div class="media-body">
-                                    <h4 class="fw-sb text-primary">Nisa Anjani</h4>
-                                    <p class="text-white dark-lg mb-0">Melbourne, Australia</p>
+                                    <h4 class="fw-sb text-primary"><?php echo $lead->getPrimaryIdentifier(); ?></h4>
+                                    <p class="text-white dark-lg mb-0"><?php echo $lead->getLocation(); ?></p>
                                 </div>
                             </div>
                         </div>
@@ -122,19 +125,19 @@ $view['slots']->stop();
                                 <tbody>
                                     <tr>
                                         <td width="20%"><span class="fw-b">Company</span></td>
-                                        <td>Lorem Ipsum PTE.</td>
+                                        <td><?php echo $lead->getSecondaryIdentifier(); ?></td>
                                     </tr>
                                     <tr>
                                         <td width="20%"><span class="fw-b">Position</span></td>
-                                        <td>Manager</td>
+                                        <td><?php echo $fields['core']['position']['value']; ?></td>
                                     </tr>
                                     <tr>
                                         <td width="20%"><span class="fw-b">Email</span></td>
-                                        <td>nisa.anjani@mail.com</td>
+                                        <td><?php echo $fields['core']['email']['value']; ?></td>
                                     </tr>
                                     <tr>
-                                        <td width="20%"><span class="fw-b">phone</span></td>
-                                        <td>(222) 222-2222</td>
+                                        <td width="20%"><span class="fw-b">Phone</span></td>
+                                        <td><?php echo $fields['core']['phone']['value']; ?></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -153,7 +156,7 @@ $view['slots']->stop();
                 </div>
                 <!--/ lead detail collapseable toggler -->
 
-                <!-- 
+                <!--
                 some stats: need more input on what type of form data to show.
                 delete if it is not require
                 -->
@@ -234,7 +237,7 @@ $view['slots']->stop();
 
                 <!-- tabs controls -->
                 <ul class="nav nav-tabs pr-md pl-md">
-                    <li class="active"><a href="#history-container" role="tab" data-toggle="tab"><span class="label label-primary mr-sm">12</span> History</a></li>
+                    <li class="active"><a href="#history-container" role="tab" data-toggle="tab"><span class="label label-primary mr-sm"><?php echo count($events); ?></span> History</a></li>
                     <li class=""><a href="#notes-container" role="tab" data-toggle="tab">Notes</a></li>
                     <li class=""><a href="#social-container" role="tab" data-toggle="tab">Social</a></li>
                 </ul>
@@ -283,7 +286,7 @@ $view['slots']->stop();
 
                 <!-- #notes-container -->
                 <div class="tab-pane fade bdr-w-0" id="notes-container">
-                    
+
                     <!-- form -->
                     <form action="" class="panel">
                         <div class="form-control-icon pa-xs">
@@ -328,19 +331,20 @@ $view['slots']->stop();
                 <div class="panel-body pt-sm">
                     <h6 class="fw-sb">Address</h6>
                     <address class="text-muted">
-                        795 Folsom Ave, Suite 600<br>
-                        San Francisco, CA 94107<br>
-                        <abbr title="Phone">P:</abbr> (123) 456-7890
+                        <?php echo $fields['core']['address1']['value']; ?><br>
+                        <?php if (!empty($fields['core']['address2']['value'])) : echo $fields['core']['address2']['value'] . '<br>'; endif ?>
+                        <?php echo $lead->getLocation(); ?> <?php echo $fields['core']['zipcode']['value']; ?><br>
+                        <abbr title="Phone">P:</abbr> <?php echo $fields['core']['phone']['value']; ?>
                     </address>
 
                     <h6 class="fw-sb">Email</h6>
-                    <p class="text-muted">nisa.anjani@mail.com</p>
+                    <p class="text-muted"><?php echo $fields['core']['email']['value']; ?></p>
 
                     <h6 class="fw-sb">Phone - home</h6>
-                    <p class="text-muted">(222) 222-2222</p>
+                    <p class="text-muted"><?php echo $fields['core']['phone']['value']; ?></p>
 
                     <h6 class="fw-sb">Phone - mobile</h6>
-                    <p class="text-muted mb-0">(333) 333-3333</p>
+                    <p class="text-muted mb-0"><?php echo $fields['core']['mobile']['value']; ?></p>
                 </div>
             </div>
             <!--/ form HTML -->

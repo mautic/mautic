@@ -263,7 +263,6 @@ class Lead extends FormEntity
         }
     }
 
-
     /**
      * Get the secondary identifier for the lead; mainly company
      *
@@ -274,6 +273,32 @@ class Lead extends FormEntity
         if (!empty($this->fields['core']['company']['value'])) {
             return $this->fields['core']['company']['value'];
         }
+
+        return '';
+    }
+
+    /**
+     * Get the location for the lead
+     *
+     * @return string
+     */
+    public function getLocation()
+    {
+        $location = '';
+
+        if (!empty($this->fields['core']['city']['value'])) {
+            $location .= $this->fields['core']['city']['value'] . ', ';
+        }
+
+        if (!empty($this->fields['core']['state']['value'])) {
+            $location .= $this->fields['core']['state']['value'] . ', ';
+        }
+
+        if (!empty($this->fields['core']['country']['value'])) {
+            $location .= $this->fields['core']['country']['value'] . ', ';
+        }
+
+        return rtrim($location, ', ');
     }
 
     /**
