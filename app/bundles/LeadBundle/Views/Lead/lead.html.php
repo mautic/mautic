@@ -111,7 +111,8 @@ $view['slots']->stop();
                             </div>
                         </div>
                         <div class="col-xs-4 va-m text-right">
-                            <h4 class="fw-sb text-white dark-md"><span class="fa fa-star-o text-warning"></span> 105</h4>
+                            <?php // TODO - Change color of circle icon based on points ?>
+                            <h4 class="fw-sb text-white dark-md"><span class="fa fa-circle-o text-warning"></span> <?php echo $lead->getPoints(); ?></h4>
                         </div>
                     </div>
                 </div>
