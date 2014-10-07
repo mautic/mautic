@@ -568,7 +568,7 @@ class CommonRepository extends EntityRepository
                 $parentProps = $parentClass->getProperties();
                 $props       = array_merge($parentProps, $props);
             }
-
+            $baseCols[$entityClass] = array();
             foreach ($props as $p) {
                 if (!in_array($p->name, $baseCols[$entityClass])) {
                     $n = $p->name;
@@ -597,7 +597,7 @@ class CommonRepository extends EntityRepository
         $properties = $this->getBaseColumns($entityClass);
 
         //check force filters
-        if (isset($args['filter']['force'])) {
+        if (isset($args['filter']['force']) && is_array($args['filter']['force'])) {
             foreach ($args['filter']['force'] as $k => &$f) {
                 $col   = $f['column'];
                 $alias = '';
