@@ -6,6 +6,9 @@
  * @link        http://mautic.com
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
+/** @var \Mautic\UserBundle\Entity\User $me */
+
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'user');
 $view['slots']->set("headerTitle", $view['translator']->trans('mautic.user.account.header.index'));
@@ -21,10 +24,10 @@ $view['slots']->set("headerTitle", $view['translator']->trans('mautic.user.accou
                 <!-- profile -->
                 <div class="panel-body text-center pt-lg pb-lg">
                     <span class="img-wrapper img-rounded mb-md" style="width:72px;">
-                        <img src="https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg" alt="">
+                        <img src="<?php echo $view['gravatar']->getImage($me->getEmail()); ?>" alt="">
                     </span>
-                    <h4 class="fw-sb">John Doe</h4>
-                    <p class="mb-md"><em>Senior Developer</em></p>
+                    <h4 class="fw-sb"><?php echo $me->getName(); ?></h4>
+                    <p class="mb-md"><em><?php echo $me->getPosition(); ?></em></p>
                     <a href="" class="btn btn-danger">Button</a>
                 </div>
                 <!--/ profile -->
@@ -73,7 +76,7 @@ $view['slots']->set("headerTitle", $view['translator']->trans('mautic.user.accou
                         <label class="col-sm-2 control-label">Photo</label>
                         <div class="col-sm-6">
                             <span class="img-wrapper img-rounded" style="width:32px">
-                                <img src="https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg" alt="">
+                                <img src="<?php echo $view['gravatar']->getImage($me->getEmail()); ?>" alt="" />
                             </span>
                             <div class="btn-group va-t">
                                 <button type="button" class="btn btn-default">Change Photo</button>
@@ -96,14 +99,14 @@ $view['slots']->set("headerTitle", $view['translator']->trans('mautic.user.accou
                     <div class="form-group">
                         <label class="col-sm-2 control-label">Name</label>
                         <div class="col-sm-6">
-                            <input type="text" name="name" class="form-control">
+                            <input type="text" name="name" class="form-control" value="<?php echo $me->getName(); ?>">
                             <span class="help-block mb-0">Enter your real name, so people you know can recognize you.</span>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-sm-2 control-label">Location</label>
                         <div class="col-sm-6">
-                            <input type="text" name="location" class="form-control">
+                            <input type="text" name="location" class="form-control" value="">
                             <span class="help-block mb-0">Where in the world are you?</span>
                         </div>
                     </div>
