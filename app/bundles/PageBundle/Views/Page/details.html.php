@@ -7,6 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+/** @var \Mautic\PageBundle\Entity\Page $activePage */
 //@todo - add landing page stats/analytics
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'page');
@@ -142,11 +143,24 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                 <div class="pr-md pl-md pt-lg pb-lg">
                     <div class="box-layout">
                         <div class="col-xs-6 va-m">
-                            <h4 class="fw-sb text-primary">Super Awesome Page</h4>
-                            <p class="text-white dark-lg mb-0">Created on 7 Jan 2014</p>
+                            <h4 class="fw-sb text-primary"><?php echo $activePage->getTitle(); ?></h4>
+                            <p class="text-white dark-lg mb-0">Created on <?php echo $view['date']->toDate($activePage->getDateAdded()); ?></p>
                         </div>
                         <div class="col-xs-6 va-m text-right">
-                            <h4 class="fw-sb"><span class="label label-success">PUBLISH UP</span></h4>
+                            <?php switch ($activePage->getPublishStatus()) {
+                                case 'published':
+                                    $labelColor = "success";
+                                    break;
+                                case 'unpublished':
+                                case 'expired'    :
+                                    $labelColor = "danger";
+                                    break;
+                                case 'pending':
+                                    $labelColor = "warning";
+                                    break;
+                            } ?>
+                            <?php $labelText = strtoupper($view['translator']->trans('mautic.core.form.' . $activePage->getPublishStatus())); ?>
+                            <h4 class="fw-sb"><span class="label label-<?php echo $labelColor; ?>"><?php echo $labelText; ?></span></h4>
                         </div>
                     </div>
                 </div>
@@ -160,23 +174,23 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                                 <tbody>
                                     <tr>
                                         <td width="20%"><span class="fw-b">Description</span></td>
-                                        <td>Page description Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+                                        <td><?php echo $activePage->getMetaDescription(); ?></td>
                                     </tr>
                                     <tr>
                                         <td width="20%"><span class="fw-b">Created By</span></td>
-                                        <td>Dan Counsell</td>
+                                        <td><?php echo $activePage->getAuthor(); ?></td>
                                     </tr>
                                     <tr>
                                         <td width="20%"><span class="fw-b">Category</span></td>
-                                        <td>Some category</td>
+                                        <td><?php echo $activePage->getCategory()->getTitle(); ?></td>
                                     </tr>
                                     <tr>
                                         <td width="20%"><span class="fw-b">Publish Up</span></td>
-                                        <td>Mar 30, 2014</td>
+                                        <td><?php echo (!is_null($activePage->getPublishUp())) ? $view['date']->toFull($activePage->getPublishUp()) : ''; ?></td>
                                     </tr>
                                     <tr>
                                         <td width="20%"><span class="fw-b">Publish Down</span></td>
-                                        <td>Apr 10, 2014</td>
+                                        <td><?php echo (!is_null($activePage->getPublishDown())) ? $view['date']->toFull($activePage->getPublishDown()) : ''; ?></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -195,7 +209,7 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                 </div>
                 <!--/ page detail collapseable toggler -->
 
-                <!-- 
+                <!--
                 some stats: need more input on what type of form data to show.
                 delete if it is not require
                 -->
@@ -206,7 +220,7 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                                 <div class="panel-body box-layout">
                                     <div class="col-xs-8 va-m">
                                         <h5 class="text-white dark-md fw-sb mb-xs">Page Views</h5>
-                                        <h2 class="fw-b">112</h2>
+                                        <h2 class="fw-b"><?php echo $activePage->getHits(); ?></h2>
                                     </div>
                                     <div class="col-xs-4 va-t text-right">
                                         <h3 class="text-white dark-sm"><span class="fa fa-eye"></span></h3>
@@ -300,36 +314,70 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                     <!--/ header -->
 
                     <!-- start: related translations list -->
+                    <?php if (count($translations['children']) || $translations['parent']) : ?>
                     <ul class="list-group">
+                        <?php if ($translations['parent']) : ?>
                         <li class="list-group-item bg-auto bg-light-xs">
                             <div class="box-layout">
                                 <div class="col-md-1 va-m">
-                                    <h3><span class="fa fa-check-circle-o fw-sb text-success" data-toggle="tooltip" data-placement="right" title="Published"></span></h3>
+                                    <h3>
+                                        <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php', array(
+                                            'item'  => $translations['parent'],
+                                            'model' => 'page.page',
+                                            'size'  => ''
+                                        )); ?>
+                                    </h3>
                                 </div>
                                 <div class="col-md-7 va-m">
-                                    <h5 class="fw-sb text-primary"><a href="">Kaleidoscope Conference 2014 <span>[current]</span> <span>[parent]</span></a></h5>
-                                    <span class="text-white dark-sm">kaleidoscope-conference-2014</span>
+                                    <h5 class="fw-sb text-primary">
+                                        <a href="<?php echo $view['router']->generate('mautic_page_action', array('objectAction' => 'view', 'objectId' => $translations['parent']->getId())); ?>" data-toggle="ajax"><?php echo $translations['parent']->getTitle(); ?>
+                                            <?php if ($translations['parent']->getId() == $activePage->getId()) : ?>
+                                            <span>[<?php echo $view['translator']->trans('mautic.page.page.current'); ?>]</span>
+                                            <?php endif; ?>
+                                            <span>[<?php echo $view['translator']->trans('mautic.page.page.parent'); ?>]</span>
+                                        </a>
+                                    </h5>
+                                    <span class="text-white dark-sm"><?php echo $translations['parent']->getAlias(); ?></span>
                                 </div>
                                 <div class="col-md-4 va-m text-right">
-                                    <em class="text-white dark-sm">en</em>
+                                    <em class="text-white dark-sm"><?php echo $translations['parent']->getLanguage(); ?></em>
                                 </div>
                             </div>
                         </li>
+                        <?php endif; ?>
+                        <?php if (count($translations['children'])) : ?>
+                        <?php /** @var \Mautic\PageBundle\Entity\Page $translation */ ?>
+                        <?php foreach ($translations['children'] as $translation) : ?>
                         <li class="list-group-item bg-auto bg-light-xs">
                             <div class="box-layout">
                                 <div class="col-md-1 va-m">
-                                    <h3><span class="fa fa-check-circle-o fw-sb text-success" data-toggle="tooltip" data-placement="right" title="Published"></span></h3>
+                                    <h3>
+                                        <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php', array(
+                                            'item'  => $translation,
+                                            'model' => 'page.page',
+                                            'size'  => ''
+                                        )); ?>
+                                    </h3>
                                 </div>
                                 <div class="col-md-7 va-m">
-                                    <h5 class="fw-sb text-primary"><a href="">Kaleidoscope Conference 2014</a></h5>
-                                    <span class="text-white dark-sm">kaleidoscope-conference-2014</span>
+                                    <h5 class="fw-sb text-primary">
+                                        <a href="<?php echo $view['router']->generate('mautic_page_action', array('objectAction' => 'view', 'objectId' => $translation->getId())); ?>" data-toggle="ajax"><?php echo $translation->getTitle(); ?>
+                                            <?php if ($translation->getId() == $activePage->getId()) : ?>
+                                            <span>[<?php echo $view['translator']->trans('mautic.page.page.current'); ?>]</span>
+                                            <?php endif; ?>
+                                        </a>
+                                    </h5>
+                                    <span class="text-white dark-sm"><?php echo $translation->getAlias(); ?></span>
                                 </div>
                                 <div class="col-md-4 va-m text-right">
-                                    <em class="text-white dark-sm">en_MX</em>
+                                    <em class="text-white dark-sm"><?php echo $translation->getLanguage(); ?></em>
                                 </div>
                             </div>
                         </li>
+                        <?php endforeach; ?>
+                        <?php endif; ?>
                     </ul>
+                    <?php endif; ?>
                     <!--/ end: related translations list -->
                 </div>
                 <!--/ #translation-container -->
@@ -355,36 +403,72 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                     <!--/ header -->
 
                     <!-- start: variants list -->
+                    <?php if (count($variants['children']) || $variants['parent']) : ?>
                     <ul class="list-group">
+                        <?php if ($variants['parent']) : ?>
                         <li class="list-group-item bg-auto bg-light-xs">
                             <div class="box-layout">
                                 <div class="col-md-1 va-m">
-                                    <h3><span class="fa fa-check-circle-o fw-sb text-success" data-toggle="tooltip" data-placement="right" title="Published"></span></h3>
+                                    <h3>
+                                        <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php', array(
+                                            'item'  => $variants['parent'],
+                                            'model' => 'page.page',
+                                            'size'  => ''
+                                        )); ?>
+                                    </h3>
                                 </div>
                                 <div class="col-md-7 va-m">
-                                    <h5 class="fw-sb text-primary"><a href="">Kaleidoscope Conference 2014 <span>[current]</span> <span>[parent]</span></a></h5>
-                                    <span class="text-white dark-sm">kaleidoscope-conference-2014</span>
+                                    <h5 class="fw-sb text-primary">
+                                        <a href="<?php echo $view['router']->generate('mautic_page_action', array('objectAction' => 'view', 'objectId' => $variants['parent']->getId())); ?>" data-toggle="ajax"><?php echo $variants['parent']->getTitle(); ?>
+                                            <?php if ($variants['parent']->getId() == $activePage->getId()) : ?>
+                                            <span>[<?php echo $view['translator']->trans('mautic.page.page.current'); ?>]</span>
+                                            <?php endif; ?>
+                                            <span>[<?php echo $view['translator']->trans('mautic.page.page.parent'); ?>]</span>
+                                        </a>
+                                    </h5>
+                                    <span class="text-white dark-sm"><?php echo $variants['parent']->getAlias(); ?></span>
                                 </div>
-                                <div class="col-md-4 va-m text-right">
-                                    <!--<a href="#" class="btn btn-default"><span class="fa fa-trophy mr-xs"></span> Make Winner</a>-->
-                                </div>
+                                <div class="col-md-4 va-m text-right"></div>
                             </div>
                         </li>
+                        <?php endif; ?>
+                        <?php if (count($variants['children'])) : ?>
+                        <?php /** @var \Mautic\PageBundle\Entity\Page $variant */ ?>
+                        <?php foreach ($variants['children'] as $variant) : ?>
                         <li class="list-group-item bg-auto bg-light-xs">
                             <div class="box-layout">
                                 <div class="col-md-1 va-m">
-                                    <h3><span class="fa fa-check-circle-o fw-sb text-success" data-toggle="tooltip" data-placement="right" title="Published"></span></h3>
+                                    <h3>
+                                        <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php', array(
+                                            'item'  => $variant,
+                                            'model' => 'page.page',
+                                            'size'  => ''
+                                        )); ?>
+                                    </h3>
                                 </div>
                                 <div class="col-md-7 va-m">
-                                    <h5 class="fw-sb text-primary"><a href="">Kaleidoscope Conference 2014</a></h5>
-                                    <span class="text-white dark-sm">kaleidoscope-conference-2014</span>
+                                    <h5 class="fw-sb text-primary">
+                                        <a href="<?php echo $view['router']->generate('mautic_page_action', array('objectAction' => 'view', 'objectId' => $variant->getId())); ?>" data-toggle="ajax"><?php echo $variant->getTitle(); ?>
+                                            <?php if ($variant->getId() == $activePage->getId()) : ?>
+                                            <span>[<?php echo $view['translator']->trans('mautic.page.page.current'); ?>]</span>
+                                            <?php endif; ?>
+                                        </a>
+                                    </h5>
+                                    <span class="text-white dark-sm"><?php echo $variant->getAlias(); ?></span>
                                 </div>
                                 <div class="col-md-4 va-m text-right">
-                                    <a href="#" class="btn btn-default"><span class="fa fa-trophy mr-xs"></span> Make Winner</a>
+                                    <?php if (isset($abTestResults['winners']) && $variants['parent']->getVariantStartDate() && $variant->isPublished()): ?>
+                                        <a href="<?php echo $view['router']->generate('mautic_page_action', array('objectAction' => 'winner', 'objectId' => $variant->getId())); ?>" data-toggle="ajax" data-method="post" class="btn btn-default">
+                                            <span class="fa fa-trophy mr-xs"></span> <?php echo $view['translator']->trans('mautic.page.page.abtest.makewinner'); ?>
+                                        </a>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </li>
+                        <?php endforeach; ?>
+                        <?php endif; ?>
                     </ul>
+                    <?php endif; ?>
                     <!--/ end: variants list -->
                 </div>
                 <!--/ #variants-container -->
@@ -398,7 +482,8 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
             <!-- preview URL -->
             <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
                 <div class="panel-heading">
-                    <div class="panel-title">Preview URL</div>
+                    <?php $trans = (!empty($variants['parent'])) ? 'mautic.page.page.urlvariant' : 'mautic.page.page.url'; ?>
+                    <div class="panel-title"><?php echo $view['translator']->trans($trans); ?></div>
                 </div>
                 <div class="panel-body pt-xs">
                     <div class="input-group">

@@ -9,6 +9,7 @@
 
 $extra  = (!isset($extra)) ? '' : $extra;
 $status = $item->getPublishStatus();
+$size   = (!isset($size)) ? 'fa-lg' : $size;
 switch ($status) {
     case 'published':
         $icon = " fa-check-circle-o text-success";
@@ -36,7 +37,7 @@ $clickAction = (isset($disableToggle) && $disableToggle === false) ? '' : ' has-
 $idClass     = str_replace('.', '-', $model) . '-publish-icon' . $item->getId();
 ?>
 
-<i class="fa fa-fw fa-lg <?php echo $icon . $clickAction . " " . $idClass; ?>"
+<i class="fa fa-fw <?php echo $size . " " . $icon . $clickAction . " " . $idClass; ?>"
    data-toggle="tooltip"
    data-container="body"
    data-placement="right"

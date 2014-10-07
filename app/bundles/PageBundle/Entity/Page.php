@@ -357,7 +357,7 @@ class Page extends FormEntity
     /**
      * Set hits
      *
-     * @param \DateTime $hits
+     * @param integer $hits
      * @return Page
      */
     public function setHits($hits)
@@ -370,7 +370,7 @@ class Page extends FormEntity
     /**
      * Get hits
      *
-     * @return \DateTime
+     * @return integer
      */
     public function getHits()
     {
