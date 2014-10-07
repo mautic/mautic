@@ -18,5 +18,13 @@ use Doctrine\ORM\Query;
  */
 class LeadNoteRepository extends CommonRepository
 {
-
+    /**
+     * {@inheritdoc}
+     *
+     * @return string
+     */
+    public function getTableAlias()
+    {
+        return 'n';
+    }
 }

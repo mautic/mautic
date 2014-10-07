@@ -12,6 +12,7 @@ namespace Mautic\LeadBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\LeadBundle\Entity\LeadNote;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\Response;
 
 class NoteController extends FormController
 {
@@ -19,41 +20,60 @@ class NoteController extends FormController
     /**
      * Generate's default list view
      *
+     * @param $leadId
+     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction()
+    public function indexAction($leadId = 0)
     {
-        if (!$this->factory->getSecurity()->isGranted('lead:notes:full')) {
+        if (empty($leadId)) {
             return $this->accessDenied();
         }
-        $items = $this->factory->getModel('lead.note')->getEntities();
+
+        $lead = $this->checkLeadAccess($leadId, 'view');
+        if ($lead instanceof Response) {
+            return $lead;
+        }
+
+        $items = $this->factory->getModel('lead.note')->getEntities(array(
+            'filter' => array(
+                'force' => array(
+                    array(
+                        'column' => 'n.lead',
+                        'expr'   => 'eq',
+                        'value'  => $lead
+                    )
+                )
+            )
+        ));
 
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'items'      => $items
+                'items'      => $items,
+                'lead'       => $lead
             ),
-            'contentTemplate' => 'MauticLeadBundle:Note:index.html.php',
-            'passthroughVars' => array(
-                'activeLink'    => '#mautic_leadnote_index',
-                'route'         => $this->generateUrl('mautic_leadnote_index'),
-                'mauticContent' => 'leadnote'
-            )
+            'contentTemplate' => 'MauticLeadBundle:Note:index.html.php'
         ));
     }
 
     /**
      * Generate's new note and processes post data
      *
+     * @param $leadId
+     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function newAction ()
+    public function newAction ($leadId)
     {
-        if (!$this->factory->getSecurity()->isGranted('lead:notes:full')) {
-            return $this->accessDenied();
+        $lead = $this->checkLeadAccess($leadId, 'view');
+        if ($lead instanceof Response) {
+            return $lead;
         }
 
         //retrieve the entity
         $note       = new LeadNote();
+        $note->setLead($lead);
+
         $model      = $this->factory->getModel('lead.note');
         //set the return URL for post actions
         $returnUrl  = $this->generateUrl('mautic_leadnote_index');
@@ -66,47 +86,9 @@ class NoteController extends FormController
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    $request = $this->request->request->all();
-                    if (isset($request['leadnote']['properties'])) {
-                        $result = $model->setNoteProperties($note, $request['leadnote']['properties']);
-                        if ($result !== true) {
-                            //set the error
-                            $form->get('properties')->addError(new FormError(
-                                $this->get('translator')->trans($result, array(), 'validators')
-                            ));
-                            $valid = false;
-                        }
-                    }
-
-                    if ($valid) {
-                        //form is valid so process the data
-                        $model->saveEntity($note);
-
-                        // $this->request->getSession()->getFlashBag()->add(
-                        //     'notice',
-                        //     $this->get('translator')->trans('mautic.lead.note.notice.created',  array(
-                        //         '%name%' => $note->getName(),
-                        //         '%url%'          => $this->generateUrl('mautic_leadnote_action', array(
-                        //             'objectAction' => 'edit',
-                        //             'objectId'     => $note->getId()
-                        //         ))
-                        //     ), 'flashes')
-                        // );
-                    }
+                    //form is valid so process the data
+                    $model->saveEntity($note);
                 }
-            }
-
-            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
-                return $this->postActionRedirect(array(
-                    'returnUrl'       => $returnUrl,
-                    'contentTemplate' => 'MauticLeadBundle:Note:index',
-                    'passthroughVars' => array(
-                        'activeLink'    => '#mautic_leadnote_index',
-                        'mauticContent' => 'leadnote'
-                    )
-                ));
-            } elseif ($valid && !$cancelled) {
-                return $this->editAction($note->getId(), true);
             }
         }
 
@@ -114,108 +96,54 @@ class NoteController extends FormController
 
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'form'            => $form->createView()
+                'form' => $formView,
+                'lead' => $lead
             ),
-            'contentTemplate' => 'MauticLeadBundle:Note:form.html.php',
-            'passthroughVars' => array(
-                'activeLink'    => '#mautic_leadnote_index',
-                'route'         => $this->generateUrl('mautic_leadnote_action', array('objectAction' => 'new')),
-                'mauticContent' => 'leadnote'
-            )
+            'contentTemplate' => 'MauticLeadBundle:Note:form.html.php'
         ));
     }
 
     /**
      * Generate's edit form and processes post data
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @param $leadId
+     * @param $objectId
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function editAction ($objectId, $ignorePost = false)
+    public function editAction ($leadId, $objectId)
     {
-        if (!$this->factory->getSecurity()->isGranted('lead:notes:full')) {
-            return $this->accessDenied();
+        $lead = $this->checkLeadAccess($leadId, 'view');
+        if ($lead instanceof Response) {
+            return $lead;
         }
 
-        $model   = $this->factory->getModel('lead.note');
+        $model  = $this->factory->getModel('lead.note');
         $note   = $model->getEntity($objectId);
 
-        //set the return URL
-        $returnUrl  = $this->generateUrl('mautic_leadnote_index');
-
-        $postActionVars = array(
-            'returnUrl'       => $returnUrl,
-            'contentTemplate' => 'MauticLeadBundle:Note:index',
-            'passthroughVars' => array(
-                'activeLink'    => '#mautic_leadnote_index',
-                'mauticContent' => 'leadnote'
-            )
-        );
-        //list not found
-        if ($note === null) {
-            return $this->postActionRedirect(
-                array_merge($postActionVars, array(
-                    'flashes' => array(
-                        array(
-                            'type' => 'error',
-                            'msg'  => 'mautic.lead.note.error.notfound',
-                            'msgVars' => array('%id%' => $objectId)
-                        )
-                    )
-                ))
-            );
-        } elseif ($model->isLocked($note)) {
+        if ($model->isLocked($note)) {
             //deny access if the entity is locked
-            return $this->isLocked($postActionVars, $note, 'lead.note');
+            return $this->isLocked(array(), $note, 'lead.note');
         }
 
         $action = $this->generateUrl('mautic_leadnote_action', array('objectAction' => 'edit', 'objectId' => $objectId));
         $form   = $model->createForm($note, $this->get('form.factory'), $action);
 
         ///Check for a submitted form and process it
-        if (!$ignorePost && $this->request->getMethod() == 'POST') {
+        if ($this->request->getMethod() == 'POST') {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    $request = $this->request->request->all();
-                    if (isset($request['leadnote']['properties'])) {
-                        $result = $model->setNoteProperties($note, $request['leadfnote']['properties']);
-                        if ($result !== true) {
-                            //set the error
-                            $form->get('properties')->addError(new FormError(
-                                $this->get('translator')->trans($result, array(), 'validators')
-                            ));
-                            $valid = false;
-                        }
-                    }
-
-                    if ($valid) {
-                        //form is valid so process the data
-                        $model->saveEntity($note, $form->get('buttons')->get('save')->isClicked());
-
-                        // $this->request->getSession()->getFlashBag()->add(
-                        //     'notice',
-                        //     $this->get('translator')->trans('mautic.lead.note.notice.created',  array(
-                        //         '%url%'          => $this->generateUrl('mautic_leadnote_action', array(
-                        //             'objectAction' => 'edit',
-                        //             'objectId'     => $note->getId()
-                        //         ))
-                        //     ), 'flashes')
-                        // );
-                    }
+                    //form is valid so process the data
+                    $model->saveEntity($note);
                 }
             } else {
                 //unlock the entity
                 $model->unlockEntity($note);
             }
 
-            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
-                return $this->postActionRedirect(
-                    array_merge($postActionVars, array(
-                            'viewParameters'  => array('objectId' => $note->getId()),
-                            'contentTemplate' => 'MauticLeadBundle:Note:index'
-                        )
-                    )
-                );
+            if ($cancelled || $valid) {
+
             }
         } else {
             //lock the entity
@@ -226,98 +154,51 @@ class NoteController extends FormController
             'viewParameters'  => array(
                 'form'    => $form->createView()
             ),
-            'contentTemplate' => 'MauticLeadBundle:Note:form.html.php',
-            'passthroughVars' => array(
-                'activeLink'    => '#mautic_leadnote_index',
-                'route'         => $action,
-                'mauticContent' => 'leadnote'
-            )
+            'contentTemplate' => 'MauticLeadBundle:Note:form.html.php'
         ));
     }
 
-    // /**
-    //  * Clone an entity
-    //  *
-    //  * @param $objectId
-    //  * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
-    //  */
-    // public function cloneAction ($objectId)
-    // {
-    //     $model   = $this->factory->getModel('lead.field');
-    //     $entity  = $model->getEntity($objectId);
+    /**
+     * Determines if the user has access to the lead the note is for
+     *
+     * @param $leadId
+     * @param $action
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    protected function checkLeadAccess($leadId, $action)
+    {
+        //make sure the user has view access to this lead
+        $leadModel = $this->factory->getModel('lead');
+        $lead      = $leadModel->getEntity($leadId);
 
-    //     if ($entity != null) {
-    //         if (!$this->factory->getSecurity()->isGranted('lead:fields:full')) {
-    //             return $this->accessDenied();
-    //         }
+        if ($lead === null) {
+            //set the return URL
+            $page       = $this->factory->getSession()->get('mautic.lead.page', 1);
+            $returnUrl  = $this->generateUrl('mautic_lead_index', array('page' => $page));
 
-    //         $clone = clone $entity;
-    //         $clone->setIsPublished(false);
-    //         $clone->setIsFixed(false);
-    //         $model->saveEntity($clone);
-    //         $objectId = $clone->getId();
-    //     }
-
-    //     return $this->editAction($objectId);
-    // }
-
-    // /**
-    //  * Delete a field
-    //  *
-    //  * @param         $objectId
-    //  * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
-    //  */
-    // public function deleteAction($objectId)
-    // {
-    //     if (!$this->factory->getSecurity()->isGranted('lead:fields:full')) {
-    //         return $this->accessDenied();
-    //     }
-
-    //     $returnUrl = $this->generateUrl('mautic_leadfield_index');
-    //     $flashes   = array();
-
-    //     $postActionVars = array(
-    //         'returnUrl'       => $returnUrl,
-    //         'contentTemplate' => 'MauticLeadBundle:Field:index',
-    //         'passthroughVars' => array(
-    //             'activeLink'    => '#mautic_leadfield_index',
-    //             'mauticContent' => 'lead'
-    //         )
-    //     );
-
-    //     if ($this->request->getMethod() == 'POST') {
-    //         $model  = $this->factory->getModel('lead.field');
-    //         $field = $model->getEntity($objectId);
-
-    //         if ($field === null) {
-    //             $flashes[] = array(
-    //                 'type'    => 'error',
-    //                 'msg'     => 'mautic.lead.field.error.notfound',
-    //                 'msgVars' => array('%id%' => $objectId)
-    //             );
-    //         } elseif ($model->isLocked($field)) {
-    //             return $this->isLocked($postActionVars, $field, 'lead.field');
-    //         } elseif ($field->isFixed()) {
-    //             //cannot delete fixed fields
-    //             return $this->accessDenied();
-    //         }
-
-    //         $model->deleteEntity($field);
-
-    //         $flashes[]  = array(
-    //             'type'    => 'notice',
-    //             'msg'     => 'mautic.lead.field.notice.deleted',
-    //             'msgVars' => array(
-    //                 '%name%' => $field->getLabel(),
-    //                 '%id%'   => $objectId
-    //             )
-    //         );
-    //     } //else don't do anything
-
-    //     return $this->postActionRedirect(
-    //         array_merge($postActionVars, array(
-    //             'flashes' => $flashes
-    //         ))
-    //     );
-    // }
+            return $this->postActionRedirect(array(
+                'returnUrl'       => $returnUrl,
+                'viewParameters'  => array('page' => $page),
+                'contentTemplate' => 'MauticLeadBundle:Lead:index',
+                'passthroughVars' => array(
+                    'activeLink'    => '#mautic_lead_index',
+                    'mauticContent' => 'leadNote'
+                ),
+                'flashes'         =>array(
+                    array(
+                        'type' => 'error',
+                        'msg'  => 'mautic.lead.lead.error.notfound',
+                        'msgVars' => array('%id%' => $leadId)
+                    )
+                )
+            ));
+        } elseif (!$this->factory->getSecurity()->hasEntityAccess(
+            'lead:leads:'.$action.'own', 'lead:leads:'.$action.'other', $lead->getOwner()
+        )) {
+            return $this->accessDenied();
+        } else {
+            return $lead;
+        }
+    }
 }

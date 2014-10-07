@@ -24,7 +24,7 @@ $collection->add('mautic_leadlist_index', new Route('/leads/lists/{page}',
 $collection->add('mautic_leadlist_action', new Route('/leads/lists/{objectAction}/{objectId}',
     array(
         '_controller' => 'MauticLeadBundle:List:execute',
-        "objectId"    => 0
+        'objectId'    => 0
     )
 ));
 
@@ -35,7 +35,7 @@ $collection->add('mautic_leadfield_index', new Route('/leads/fields',
 $collection->add('mautic_leadfield_action', new Route('/leads/fields/{objectAction}/{objectId}',
     array(
         '_controller' => 'MauticLeadBundle:Field:execute',
-        "objectId"    => 0
+        'objectId'    => 0
     )
 ));
 
@@ -51,24 +51,23 @@ $collection->add('mautic_lead_index', new Route('/leads/{page}',
 $collection->add('mautic_lead_action', new Route('/leads/{objectAction}/{objectId}',
     array(
         '_controller' => 'MauticLeadBundle:Lead:execute',
-        "objectId"    => 0
+        'objectId'    => 0
     )
 ));
 
-$collection->add('mautic_leadnote_index', new Route('/leads/notes/{page}',
+$collection->add('mautic_leadnote_index', new Route('/leads/notes/{leadId}',
     array(
         '_controller' => 'MauticLeadBundle:Note:index',
-        'page'        => 1,
+        'leadId'    => 0
     ), array(
-        'page'    => '\d+'
+        'leadId'    => '\d+'
     )
 ));
 
 $collection->add('mautic_leadnote_action', new Route('/leads/notes/{leadId}/{objectAction}/{objectId}',
     array(
         '_controller' => 'MauticLeadBundle:Note:execute',
-        "leadId"    => 0,
-        "objectId"    => 0
+        'objectId'    => 0
     )
 ));
 

@@ -36,7 +36,6 @@ class LeadPermissions extends AbstractPermissions
             )
         );
         $this->addExtendedPermissions('leads', false);
-        $this->addExtendedPermissions('notes', false);
     }
 
     /**
@@ -88,8 +87,6 @@ class LeadPermissions extends AbstractPermissions
             ),
             'data'     => (!empty($data['fields']) ? $data['fields'] : array())
         ));
-
-        $this->addExtendedFormFields('lead', 'notes', $builder, $data, false);
     }
 
     /**
