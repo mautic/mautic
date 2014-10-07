@@ -262,6 +262,9 @@ class LeadRepository extends CommonRepository
             $fields[$r['alias']] = $r;
         }
 
+        //Fix arguments if necessary
+        $args = $this->convertOrmProperties('Mautic\\LeadBundle\\Entity\\Lead', $args);
+
         //DBAL
         $dq = $this->_em->getConnection()->createQueryBuilder();
         $dq->select('count(*) as count')
@@ -350,7 +353,7 @@ class LeadRepository extends CommonRepository
      */
     protected function removeNonFieldColumns(&$r)
     {
-        $baseCols = $this->getBaseColumns(true);
+        $baseCols = $this->getBaseColumns('Mautic\\LeadBundle\\Entity\\Lead', true);
         foreach ($baseCols as $c) {
             unset($r[$c]);
         }
@@ -695,36 +698,6 @@ class LeadRepository extends CommonRepository
             'mautic.lead.lead.searchcommand.email',
             'mautic.lead.lead.searchcommand.owner'
         );
-    }
-
-    public function getBaseColumns($convertCamelCase = false)
-    {
-        static $baseCols = array();
-
-        if (empty($baseCols)) {
-            //get a list of properties from the Lead entity so that anything not listed is a custom field
-            $leadEntity = new Lead();
-            $reflect    = new \ReflectionClass($leadEntity);
-            $props      = $reflect->getProperties();
-
-            if ($parentClass = $reflect->getParentClass()) {
-                $parentProps = $parentClass->getProperties();
-                $props       = array_merge($parentProps, $props);
-            }
-
-            foreach ($props as $p) {
-                if (!in_array($p->name, $baseCols)) {
-                    $n = $p->name;
-                    if ($convertCamelCase) {
-                        $n = preg_replace('/(?<=\\w)(?=[A-Z])/',"_$1", $n);
-                        $n = strtolower($n);
-                    }
-                    $baseCols[] = $n;
-                }
-            }
-        }
-
-        return $baseCols;
     }
 
     /**

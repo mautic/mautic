@@ -1,7 +1,7 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic, Na. All rights reserved.
  * @author      Mautic
  * @link        http://mautic.com
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -29,9 +29,9 @@ class AssetRepository extends CommonRepository
     public function getEntities($args = array())
     {
         $q = $this
-            ->createQueryBuilder('p')
-            ->select('p')
-            ->leftJoin('p.category', 'c');
+            ->createQueryBuilder('a')
+            ->select('a')
+            ->leftJoin('a.category', 'c');
 
         $this->buildClauses($q, $args);
 
@@ -54,14 +54,14 @@ class AssetRepository extends CommonRepository
      */
     public function checkUniqueAlias($alias, $entity = null)
     {
-        $q = $this->createQueryBuilder('e')
-            ->select('count(e.id) as aliasCount')
-            ->where('e.alias = :alias');
+        $q = $this->createQueryBuilder('a')
+            ->select('count(a.id) as aliasCount')
+            ->where('a.alias = :alias');
         $q->setParameter('alias', $alias);
 
         if (!empty($entity)) {
             if ($entity->getId()) {
-                $q->andWhere('e.id != :id');
+                $q->andWhere('a.id != :id');
                 $q->setParameter('id', $entity->getId());
             }
         }
@@ -114,8 +114,8 @@ class AssetRepository extends CommonRepository
         $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
 
         $expr = $q->expr()->orX(
-            $q->expr()->like('p.title',  ":$unique"),
-            $q->expr()->like('p.alias',  ":$unique")
+            $q->expr()->like('a.title',  ":$unique"),
+            $q->expr()->like('a.alias',  ":$unique")
         );
         if ($filter->not) {
             $expr = $q->expr()->not($expr);
@@ -139,28 +139,28 @@ class AssetRepository extends CommonRepository
         $returnParameter = true; //returning a parameter that is not used will lead to a Doctrine error
         $expr            = false;
         switch ($command) {
-            case $this->translator->trans('mautic.core.searchcommand.is'):
+            case $this->translator->trans('mautic.cora.searchcommand.is'):
                 switch($string) {
-                    case $this->translator->trans('mautic.core.searchcommand.ispublished'):
-                        $expr = $q->expr()->eq("p.isPublished", 1);
+                    case $this->translator->trans('mautic.cora.searchcommand.ispublished'):
+                        $expr = $q->expr()->eq("a.isPublished", 1);
                         break;
-                    case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
-                        $expr = $q->expr()->eq("p.isPublished", 0);
+                    case $this->translator->trans('mautic.cora.searchcommand.isunpublished'):
+                        $expr = $q->expr()->eq("a.isPublished", 0);
                         break;
-                    case $this->translator->trans('mautic.core.searchcommand.isuncategorized'):
+                    case $this->translator->trans('mautic.cora.searchcommand.isuncategorized'):
                         $expr = $q->expr()->orX(
-                            $q->expr()->isNull('p.category'),
-                            $q->expr()->eq('p.category', $q->expr()->literal(''))
+                            $q->expr()->isNull('a.category'),
+                            $q->expr()->eq('a.category', $q->expr()->literal(''))
                         );
                         break;
-                    case $this->translator->trans('mautic.core.searchcommand.ismine'):
-                        $expr = $q->expr()->eq("IDENTITY(p.createdBy)", $this->currentUser->getId());
+                    case $this->translator->trans('mautic.cora.searchcommand.ismine'):
+                        $expr = $q->expr()->eq("IDENTITY(a.createdBy)", $this->currentUser->getId());
                         break;
 
                 }
                 $returnParameter = false;
                 break;
-            case $this->translator->trans('mautic.core.searchcommand.category'):
+            case $this->translator->trans('mautic.cora.searchcommand.category'):
                 $expr = $q->expr()->like('c.alias', ":$unique");
                 $filter->strict = true;
                 break;
@@ -172,8 +172,8 @@ class AssetRepository extends CommonRepository
                     $unique     => $filter->string
                 );
                 $expr = $q->expr()->orX(
-                    $q->expr()->eq('p.language', ":$unique"),
-                    $q->expr()->like('p.language', ":$langUnique")
+                    $q->expr()->eq('a.language', ":$unique"),
+                    $q->expr()->like('a.language', ":$langUnique")
                 );
                 break;
         }
@@ -200,13 +200,13 @@ class AssetRepository extends CommonRepository
     public function getSearchCommands()
     {
         return array(
-            'mautic.core.searchcommand.is' => array(
-                'mautic.core.searchcommand.ispublished',
-                'mautic.core.searchcommand.isunpublished',
-                'mautic.core.searchcommand.isuncategorized',
-                'mautic.core.searchcommand.ismine',
+            'mautic.cora.searchcommand.is' => array(
+                'mautic.cora.searchcommand.ispublished',
+                'mautic.cora.searchcommand.isunpublished',
+                'mautic.cora.searchcommand.isuncategorized',
+                'mautic.cora.searchcommand.ismine',
             ),
-            'mautic.core.searchcommand.category',
+            'mautic.cora.searchcommand.category',
             'mautic.asset.asset.searchcommand.lang'
         );
     }
@@ -217,12 +217,17 @@ class AssetRepository extends CommonRepository
     protected function getDefaultOrder()
     {
         return array(
-            array('p.title', 'ASC')
+            array('a.title', 'ASC')
         );
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return string
+     */
     public function getTableAlias()
     {
-        return 'p';
+        return 'a';
     }
 }

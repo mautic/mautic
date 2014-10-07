@@ -49,6 +49,7 @@ class EmailApiController extends CommonApiController
      *      {"name"="start", "dataType"="integer", "required"=false, "description"="Set the record to start with."},
      *      {"name"="limit", "dataType"="integer", "required"=false, "description"="Limit the number of records to retrieve."},
      *      {"name"="filter", "dataType"="string", "required"=false, "description"="A string in which to filter the results by."},
+     *      {"name"="published", "dataType"="integer", "required"=false, "description"="If set to one, will return only published items."},
      *      {"name"="orderBy", "dataType"="string", "required"=false, "pattern"="(id|subject|lang|readCount|sentCount|isPublished)", "description"="Table column in which to sort the results by."},
      *      {"name"="orderByDir", "dataType"="string", "required"=false, "pattern"="(ASC|DESC)", "description"="Direction in which to sort results by."}
      *   }
@@ -59,14 +60,20 @@ class EmailApiController extends CommonApiController
     public function getEntitiesAction()
     {
         if (!$this->security->isGranted('email:emails:viewother')) {
-            $this->listFilters = array(
-                array(
-                    'column' => 'e.createdBy',
-                    'expr'   => 'eq',
-                    'value'  => $this->factory->getUser()
-                )
+            $this->listFilters[] =
+            array(
+                'column' => 'e.createdBy',
+                'expr'   => 'eq',
+                'value'  => $this->factory->getUser()
             );
         }
+
+        //get parent level only
+        $this->listFilters[] = array(
+            'column' => 'e.variantParent',
+            'expr' => 'isNull'
+        );
+
         return parent::getEntitiesAction();
     }
 

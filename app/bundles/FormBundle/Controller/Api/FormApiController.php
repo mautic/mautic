@@ -45,6 +45,7 @@ class FormApiController extends CommonApiController
      *      {"name"="start", "dataType"="integer", "required"=false, "description"="Set the record to start with."},
      *      {"name"="limit", "dataType"="integer", "required"=false, "description"="Limit the number of records to retrieve."},
      *      {"name"="filter", "dataType"="string", "required"=false, "description"="A string in which to filter the results by."},
+     *      {"name"="published", "dataType"="integer", "required"=false, "description"="If set to one, will return only published items."},
      *      {"name"="orderBy", "dataType"="string", "required"=false, "pattern"="(id|name|alias)", "description"="Table column in which to sort the results by."},
      *      {"name"="orderByDir", "dataType"="string", "required"=false, "pattern"="(ASC|DESC)", "description"="Direction in which to sort results by."}
      *   }
@@ -56,11 +57,9 @@ class FormApiController extends CommonApiController
     {
         if (!$this->security->isGranted('form:forms:viewother')) {
             $this->listFilters = array(
-                array(
-                    'column' => 'f.createdBy',
-                    'expr'   => 'eq',
-                    'value'  => $this->factory->getUser()
-                )
+                'column' => 'f.createdBy',
+                'expr'   => 'eq',
+                'value'  => $this->factory->getUser()
             );
         }
         return parent::getEntitiesAction();

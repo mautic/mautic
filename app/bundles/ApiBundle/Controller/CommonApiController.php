@@ -128,6 +128,7 @@ class CommonApiController extends FOSRestController implements MauticController
      *      {"name"="start", "dataType"="integer", "required"=false, "description"="Set the record to start with."},
      *      {"name"="limit", "dataType"="integer", "required"=false, "description"="Limit the number of records to retrieve."},
      *      {"name"="filter", "dataType"="string", "required"=false, "description"="A string in which to filter the results by."},
+     *      {"name"="published", "dataType"="integer", "required"=false, "description"="If set to one, will return only published items."},
      *      {"name"="orderBy", "dataType"="string", "required"=false, "description"="Table column in which to sort the results by."},
      *      {"name"="orderByDir", "dataType"="string", "required"=false, "description"="Direction in which to sort results by. (ASC|DESC)"}
      *   }
@@ -137,6 +138,18 @@ class CommonApiController extends FOSRestController implements MauticController
      */
     public function getEntitiesAction()
     {
+        $repo       = $this->model->getRepository();
+        $tableAlias = $repo->getTableAlias();
+
+        $publishedOnly = $this->request->get('published', 0);
+        if ($publishedOnly) {
+            $this->listFilters[] = array(
+                'column' => $tableAlias . '.isPublished',
+                'expr'   => 'eq',
+                'value'  => true
+            );
+        }
+
         $args = array(
             'start'          => $this->request->query->get('start', 0),
             'limit'          => $this->request->query->get('limit', $this->factory->getParameter('default_pagelimit')),

@@ -44,6 +44,7 @@ class PageApiController extends CommonApiController
      *   filters={
      *      {"name"="start", "dataType"="integer", "required"=false, "description"="Set the record to start with."},
      *      {"name"="limit", "dataType"="integer", "required"=false, "description"="Limit the number of records to retrieve."},
+     *      {"name"="published", "dataType"="integer", "required"=false, "description"="If set to one, will return only published items."},
      *      {"name"="filter", "dataType"="string", "required"=false, "description"="A string in which to filter the results by."},
      *      {"name"="orderBy", "dataType"="string", "required"=false, "pattern"="(id|name|alias)", "description"="Table column in which to sort the results by."},
      *      {"name"="orderByDir", "dataType"="string", "required"=false, "pattern"="(ASC|DESC)", "description"="Direction in which to sort results by."}
@@ -56,13 +57,23 @@ class PageApiController extends CommonApiController
     {
         if (!$this->security->isGranted('page:pages:viewother')) {
             $this->listFilters = array(
-                array(
-                    'column' => 'p.createdBy',
-                    'expr'   => 'eq',
-                    'value'  => $this->factory->getUser()
-                )
+                'column' => 'p.createdBy',
+                'expr'   => 'eq',
+                'value'  => $this->factory->getUser()
             );
         }
+
+        //get parent level only
+        $this->listFilters[] = array(
+            'column' => 'p.variantParent',
+            'expr' => 'isNull'
+        );
+
+        $this->listFilters[] = array(
+            'column' => 'p.translationParent',
+            'expr' => 'isNull'
+        );
+
         return parent::getEntitiesAction();
     }
 

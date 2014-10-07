@@ -51,6 +51,7 @@ class LeadApiController extends CommonApiController
      *   filters={
      *      {"name"="start", "dataType"="integer", "required"=false, "description"="Set the record to start with."},
      *      {"name"="limit", "dataType"="integer", "required"=false, "description"="Limit the number of records to retrieve."},
+     *      {"name"="published", "dataType"="integer", "required"=false, "description"="If set to one, will return only published items."},
      *      {"name"="filter", "dataType"="string", "required"=false, "description"="A string in which to filter the results by."},
      *      {"name"="orderBy", "dataType"="string", "required"=false, "pattern"="(id|firstName|lastName|email|company|points|phone)", "description"="Table column in which to sort the results by."},
      *      {"name"="orderByDir", "dataType"="string", "required"=false, "pattern"="(ASC|DESC)", "description"="Direction in which to sort results by."}
@@ -190,6 +191,7 @@ class LeadApiController extends CommonApiController
      *   description = "Obtains a list of available users(owners) for leads",
      *   filters={
      *      {"name"="filter", "dataType"="string", "required"=false, "description"="A string in which to filter the results by."},
+     *      {"name"="published", "dataType"="integer", "required"=false, "description"="If set to one, will return only published items."},
      *      {"name"="limit", "dataType"="integer", "required"=false, "description"="Limit the number of records to retrieve."},
      *      {"name"="start", "dataType"="integer", "required"=false, "description"="Set start record; defaults to 0."},
      *   },

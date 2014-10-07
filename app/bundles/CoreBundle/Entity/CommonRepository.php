@@ -545,4 +545,94 @@ class CommonRepository extends EntityRepository
     {
         return 'e';
     }
+
+    /**
+     * Gets the properties of an ORM entity
+     *
+     * @param      $entityClass
+     * @param bool $convertCamelCase
+     *
+     * @return array
+     */
+    public function getBaseColumns($entityClass, $convertCamelCase = false)
+    {
+        static $baseCols = array();
+
+        if (empty($baseCols[$entityClass])) {
+            //get a list of properties from the Lead entity so that anything not listed is a custom field
+            $entity = new $entityClass();
+            $reflect    = new \ReflectionClass($entity);
+            $props      = $reflect->getProperties();
+
+            if ($parentClass = $reflect->getParentClass()) {
+                $parentProps = $parentClass->getProperties();
+                $props       = array_merge($parentProps, $props);
+            }
+
+            foreach ($props as $p) {
+                if (!in_array($p->name, $baseCols[$entityClass])) {
+                    $n = $p->name;
+                    if ($convertCamelCase) {
+                        $n = preg_replace('/(?<=\\w)(?=[A-Z])/',"_$1", $n);
+                        $n = strtolower($n);
+                    }
+                    $baseCols[$entityClass][] = $n;
+                }
+            }
+        }
+
+        return $baseCols[$entityClass];
+    }
+
+    /**
+     * Examines the arguments passed to getEntities and converts ORM properties to dBAL column names
+     *
+     * @param $entityClass
+     * @param $args
+     *
+     * return array
+     */
+    public function convertOrmProperties($entityClass, array $args)
+    {
+        $properties = $this->getBaseColumns($entityClass);
+
+        //check force filters
+        if (isset($args['filter']['force'])) {
+            foreach ($args['filter']['force'] as $k => &$f) {
+                $col   = $f['column'];
+                $alias = '';
+                if (strpos($col, '.') !== false) {
+                    list($alias, $col) = explode('.', $col);
+                }
+
+                if (in_array($col, $properties)) {
+                    $col = preg_replace('/(?<=\\w)(?=[A-Z])/',"_$1", $col);
+                    $col = strtolower($col);
+                }
+
+                $f['column'] = (!empty($alias)) ? $alias . '.' . $col : $col;
+            }
+        }
+
+        //check order by
+        if (isset($args['order'])) {
+            if (is_array($args['order'])) {
+                foreach ($args['order'] as &$o) {
+                    $alias = '';
+                    if (strpos($o, '.') !== false) {
+                        list($alias, $o) = explode('.', $o);
+                    }
+
+                    if (in_array($o, $properties)) {
+                        $o = preg_replace('/(?<=\\w)(?=[A-Z])/',"_$1", $o);
+                        $o = strtolower($o);
+                    }
+
+                    $o = (!empty($alias)) ? $alias . '.' . $o : $o;
+                }
+            }
+        }
+
+        return $args;
+    }
 }
