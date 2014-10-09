@@ -14,7 +14,7 @@ module.exports = function(grunt) {
     // mautic assets dir path
     mautic: {
       // configurable paths
-      coreBundleAssets: 'app/bundles/coreBundle/Assets',
+      coreBundleAssets: 'app/bundles/CoreBundle/Assets',
       rootAssets: 'assets'
     },
 
