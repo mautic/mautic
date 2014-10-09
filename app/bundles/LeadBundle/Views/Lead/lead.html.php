@@ -241,9 +241,9 @@ $view['slots']->stop();
 
                 <!-- tabs controls -->
                 <ul class="nav nav-tabs pr-md pl-md">
-                    <li class="active"><a href="#history-container" role="tab" data-toggle="tab"><span class="label label-primary mr-sm"><?php echo count($events); ?></span> History</a></li>
-                    <li class=""><a href="#notes-container" role="tab" data-toggle="tab">Notes</a></li>
-                    <li class=""><a href="#social-container" role="tab" data-toggle="tab">Social</a></li>
+                    <li class="active"><a href="#history-container" role="tab" data-toggle="tab"><span class="label label-primary mr-sm"><?php echo count($events); ?></span> <?php echo $view['translator']->trans('mautic.lead.lead.tab.history'); ?></a></li>
+                    <li class=""><a href="#notes-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.lead.lead.tab.notes'); ?></a></li>
+                    <li class=""><a href="#social-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.lead.lead.tab.social'); ?></a></li>
                 </ul>
                 <!--/ tabs controls -->
             </div>
@@ -290,23 +290,10 @@ $view['slots']->stop();
 
                 <!-- #notes-container -->
                 <div class="tab-pane fade bdr-w-0" id="notes-container">
-
-                    <!-- form -->
-                    <form action="" class="panel">
-                        <div class="form-control-icon pa-xs">
-                            <input type="text" class="form-control bdr-w-0" placeholder="Search...">
-                            <span class="the-icon fa fa-search text-muted mt-xs"></span><!-- must below `form-control` -->
-                        </div>
-                    </form>
-                    <!--/ form -->
-
-                    Excepteur sint occaecat cupidatat non
-                    proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-                    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-                    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-                    consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-                    cillum dolore eu fugiat nulla pariatur.
+                    <?php
+                    //forward to Note::index controller action so that it handles pagination, etc
+                    echo $view->render(new \Symfony\Component\HttpKernel\Controller\ControllerReference('MauticLeadBundle:Note:index', array('leadId' => $lead->getId())));
+                    ?>
                 </div>
                 <!--/ #notes-container -->
 

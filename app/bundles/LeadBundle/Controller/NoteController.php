@@ -12,6 +12,7 @@ namespace Mautic\LeadBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\LeadBundle\Entity\LeadNote;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 class NoteController extends FormController
@@ -24,7 +25,7 @@ class NoteController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction($leadId = 0)
+    public function indexAction($leadId = 0, $page = 1)
     {
         if (empty($leadId)) {
             return $this->accessDenied();
@@ -35,6 +36,21 @@ class NoteController extends FormController
             return $lead;
         }
 
+        $session = $this->factory->getSession();
+        //set limits
+        $limit = $session->get('mautic.leadnote.limit',$this->factory->getParameter('default_pagelimit'));
+        $start = ($page === 1) ? 0 : (($page-1) * $limit);
+        if ($start < 0) {
+            $start = 0;
+        }
+
+        $search     = $this->request->get('search', $session->get('mautic.leadnote.filter', ''));
+        $session->set('mautic.leadnote.filter', $search);
+
+        //do some default filtering
+        $orderBy     = $this->factory->getSession()->get('mautic.leadnote.orderby', 'n.dateAdded');
+        $orderByDir  = $this->factory->getSession()->get('mautic.leadnote.orderbydir', 'ASC');
+
         $items = $this->factory->getModel('lead.note')->getEntities(array(
             'filter' => array(
                 'force' => array(
@@ -44,7 +60,11 @@ class NoteController extends FormController
                         'value'  => $lead
                     )
                 )
-            )
+            ),
+            'start'          => $start,
+            'limit'          => $limit,
+            'orderBy'        => $orderBy,
+            'orderByDir'     => $orderByDir
         ));
 
         return $this->delegateView(array(
@@ -75,32 +95,43 @@ class NoteController extends FormController
         $note->setLead($lead);
 
         $model      = $this->factory->getModel('lead.note');
-        //set the return URL for post actions
-        $returnUrl  = $this->generateUrl('mautic_leadnote_index');
-        $action     = $this->generateUrl('mautic_leadnote_action', array('objectAction' => 'new'));
+        $action     = $this->generateUrl('mautic_leadnote_action', array('objectAction' => 'new', 'leadId' => $leadId));
         //get the user form factory
         $form       = $model->createForm($note, $this->get('form.factory'), $action);
 
         ///Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
-            $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
+                    $closeModal = true;
+
                     //form is valid so process the data
                     $model->saveEntity($note);
                 }
+            } else {
+                $closeModal = true;
             }
         }
 
-        $formView = $this->setFormTheme($form, 'MauticLeadBundle:Note:form.html.php', 'MauticLeadBundle:FormNote');
+        if ($closeModal) {
+            //just close the modal
+            $passthroughVars['closeModal'] = 1;
+            $response                      = new JsonResponse($passthroughVars);
+            $response->headers->set('Content-Length', strlen($response->getContent()));
 
-        return $this->delegateView(array(
-            'viewParameters'  => array(
-                'form' => $formView,
-                'lead' => $lead
-            ),
-            'contentTemplate' => 'MauticLeadBundle:Note:form.html.php'
-        ));
+            return $response;
+        } else {
+
+            $formView = $this->setFormTheme($form, 'MauticLeadBundle:Note:form.html.php', 'MauticLeadBundle:FormNote');
+
+            return $this->delegateView(array(
+                'viewParameters'  => array(
+                    'form' => $formView,
+                    'lead' => $lead
+                ),
+                'contentTemplate' => 'MauticLeadBundle:Note:form.html.php'
+            ));
+        }
     }
 
     /**
@@ -118,44 +149,56 @@ class NoteController extends FormController
             return $lead;
         }
 
-        $model  = $this->factory->getModel('lead.note');
-        $note   = $model->getEntity($objectId);
+        $model      = $this->factory->getModel('lead.note');
+        $note       = $model->getEntity($objectId);
+        $closeModal = false;
+        $user       = $this->factory->getUser();
 
-        if ($model->isLocked($note)) {
-            //deny access if the entity is locked
-            return $this->isLocked(array(), $note, 'lead.note');
+        if ($note === null || $note->getAuthor()->getId() !== $user->getId()) {
+            return $this->accessDenied();
         }
 
-        $action = $this->generateUrl('mautic_leadnote_action', array('objectAction' => 'edit', 'objectId' => $objectId));
+        $action = $this->generateUrl('mautic_leadnote_action', array(
+            'objectAction' => 'edit',
+            'objectId' => $objectId,
+            'leadId' => $leadId
+        ));
         $form   = $model->createForm($note, $this->get('form.factory'), $action);
 
         ///Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
-            $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
                     $model->saveEntity($note);
+                    $closeModal = true;
                 }
-            } else {
-                //unlock the entity
-                $model->unlockEntity($note);
             }
-
-            if ($cancelled || $valid) {
-
-            }
-        } else {
-            //lock the entity
-            $model->lockEntity($note);
         }
 
-        return $this->delegateView(array(
-            'viewParameters'  => array(
-                'form'    => $form->createView()
-            ),
-            'contentTemplate' => 'MauticLeadBundle:Note:form.html.php'
-        ));
+        $passthroughVars = array(
+            'mauticContent' => 'leadNote',
+            'route'         => false
+        );
+
+        if ($closeModal) {
+            //just close the modal
+            $passthroughVars['closeModal'] = 1;
+            $response                      = new JsonResponse($passthroughVars);
+            $response->headers->set('Content-Length', strlen($response->getContent()));
+
+            return $response;
+        } else {
+            $formView = $this->setFormTheme($form, 'MauticLeadBundle:Note:form.html.php', 'MauticLeadBundle:FormNote');
+
+            return $this->delegateView(array(
+                'viewParameters'  => array(
+                    'form' => $formView,
+                    'lead' => $lead
+                ),
+                'contentTemplate' => 'MauticLeadBundle:Note:form.html.php'
+            ));
+        }
     }
 
     /**

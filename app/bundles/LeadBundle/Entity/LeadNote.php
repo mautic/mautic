@@ -67,12 +67,20 @@ class LeadNote extends FormEntity
     private $type;
 
     /**
-     * @ORM\Column(name="date", type="datetime", nullable=true)
+     * @ORM\Column(name="date_added", type="datetime", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"leadNoteDetails"})
      */
-    private $date;
+    private $dateAdded;
+
+    /**
+     * @ORM\Column(name="date_modified", type="datetime", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"leadNoteDetails"})
+     */
+    private $dateModified;
 
     public function __clone() {
         $this->id = null;
@@ -166,10 +174,10 @@ class LeadNote extends FormEntity
      * @param \DateTime $date
      * @return LeadNote
      */
-    public function setDate($date)
+    public function setDate($dateAdded)
     {
-        $this->isChanged('date', $date);
-        $this->date = $date;
+        $this->isChanged('dateAdded', $dateAdded);
+        $this->dateAdded = $dateAdded;
 
         return $this;
     }
@@ -179,9 +187,9 @@ class LeadNote extends FormEntity
      *
      * @return \DateTime
      */
-    public function getDate()
+    public function getDateAdded()
     {
-        return $this->date;
+        return $this->dateAdded;
     }
 
     /**
@@ -209,5 +217,21 @@ class LeadNote extends FormEntity
     public function setLead (Lead $lead)
     {
         $this->lead = $lead;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDateModified ()
+    {
+        return $this->dateModified;
+    }
+
+    /**
+     * @param mixed $dateModified
+     */
+    public function setDateModified ($dateModified)
+    {
+        $this->dateModified = $dateModified;
     }
 }
