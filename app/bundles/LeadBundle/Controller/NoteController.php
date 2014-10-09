@@ -69,7 +69,7 @@ class NoteController extends FormController
 
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'items'      => $items,
+                'notes'      => $items,
                 'lead'       => $lead
             ),
             'contentTemplate' => 'MauticLeadBundle:Note:index.html.php'

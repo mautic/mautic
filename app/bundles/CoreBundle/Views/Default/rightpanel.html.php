@@ -7,8 +7,6 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-use Symfony\Component\HttpKernel\Controller\ControllerReference;
-
 $value = $app->getSession()->get('mautic.global_search');
 ?>
 
@@ -71,7 +69,7 @@ $value = $app->getSession()->get('mautic.global_search');
         </form>
         <!--/ Offcanvas Left -->
 
-        <!-- 
+        <!--
         Offcanvas Main:
         This will be default/initial view if sidebar right is in open
         state. Put the chat list here.
