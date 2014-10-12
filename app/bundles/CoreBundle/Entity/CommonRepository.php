@@ -91,9 +91,14 @@ class CommonRepository extends EntityRepository
     public function getEntities($args = array())
     {
         $alias = $this->getTableAlias();
-        $q = $this
-            ->createQueryBuilder($alias)
-            ->select($alias);
+
+        if (isset($args['qb'])) {
+            $q = $args['qb'];
+        } else {
+            $q = $this
+                ->createQueryBuilder($alias)
+                ->select($alias);
+        }
 
         $this->buildClauses($q, $args);
         $query = $q->getQuery();

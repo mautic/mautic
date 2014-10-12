@@ -49,7 +49,7 @@ class NoteController extends FormController
 
         //do some default filtering
         $orderBy     = $this->factory->getSession()->get('mautic.leadnote.orderby', 'n.dateAdded');
-        $orderByDir  = $this->factory->getSession()->get('mautic.leadnote.orderbydir', 'ASC');
+        $orderByDir  = $this->factory->getSession()->get('mautic.leadnote.orderbydir', 'DESC');
 
         $items = $this->factory->getModel('lead.note')->getEntities(array(
             'filter' => array(
@@ -64,7 +64,8 @@ class NoteController extends FormController
             'start'          => $start,
             'limit'          => $limit,
             'orderBy'        => $orderBy,
-            'orderByDir'     => $orderByDir
+            'orderByDir'     => $orderByDir,
+            'hydration_mode' => 'HYDRATE_ARRAY'
         ));
 
         return $this->delegateView(array(
@@ -98,7 +99,7 @@ class NoteController extends FormController
         $action     = $this->generateUrl('mautic_leadnote_action', array('objectAction' => 'new', 'leadId' => $leadId));
         //get the user form factory
         $form       = $model->createForm($note, $this->get('form.factory'), $action);
-
+        $closeModal = false;
         ///Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
             if (!$cancelled = $this->isFormCancelled($form)) {
@@ -116,7 +117,15 @@ class NoteController extends FormController
         if ($closeModal) {
             //just close the modal
             $passthroughVars['closeModal'] = 1;
-            $response                      = new JsonResponse($passthroughVars);
+
+            if ($valid && !$cancelled) {
+                $passthroughVars['noteHtml'] = $this->renderView('MauticLeadBundle:Note:note.html.php', array('note' => $note, 'lead' => $lead));
+                $passthroughVars['noteId']   = $note->getId();
+            }
+
+            $passthroughVars['mauticContent'] = 'leadNote';
+
+            $response = new JsonResponse($passthroughVars);
             $response->headers->set('Content-Length', strlen($response->getContent()));
 
             return $response;
@@ -244,4 +253,20 @@ class NoteController extends FormController
             return $lead;
         }
     }
+
+    /**
+     * Executes an action defined in route
+     *
+     * @param     $objectAction
+     * @param int $objectId
+     * @return Response
+     */
+    public function executeNoteAction($objectAction, $objectId = 0, $leadId = 0) {
+        if (method_exists($this, "{$objectAction}Action")) {
+            return $this->{"{$objectAction}Action"}($leadId, $objectId);
+        } else {
+            return $this->accessDenied();
+        }
+    }
+
 }

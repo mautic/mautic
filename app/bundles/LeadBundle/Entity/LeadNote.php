@@ -36,15 +36,6 @@ class LeadNote extends FormEntity
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Mautic\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="author_id", referencedColumnName="id", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"leadNoteDetails"})
-     */
-    private $author;
-
-    /**
      * @ORM\ManyToOne(targetEntity="Mautic\LeadBundle\Entity\Lead", inversedBy="notes")
      * @ORM\JoinColumn(name="lead_id", referencedColumnName="id")
      */
@@ -66,10 +57,6 @@ class LeadNote extends FormEntity
      */
     private $type;
 
-    public function __clone() {
-        $this->id = null;
-    }
-
     /**
      * Get id
      *
@@ -78,30 +65,6 @@ class LeadNote extends FormEntity
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * Set author
-     *
-     * @param string $author
-     * @return Asset
-     */
-    public function setAuthor($author)
-    {
-        $this->isChanged('author', $author);
-        $this->author = $author;
-
-        return $this;
-    }
-
-    /**
-     * Get author
-     *
-     * @return string
-     */
-    public function getAuthor()
-    {
-        return $this->author;
     }
 
     /**
@@ -178,5 +141,13 @@ class LeadNote extends FormEntity
     public function setLead (Lead $lead)
     {
         $this->lead = $lead;
+    }
+
+    /**
+     * @return array
+     */
+    public function convertToArray()
+    {
+        return get_object_vars($this);
     }
 }

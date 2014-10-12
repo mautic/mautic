@@ -546,3 +546,14 @@ Mautic.toggleLeadCampaign = function(toggleId, leadId, campaignId) {
         }
     });
 };
+
+Mautic.leadNoteOnLoad = function (container, response) {
+    if (response.noteHtml) {
+        if (mQuery('#LeadNote' + response.noteId).length) {
+            mQuery('#LeadNote' + response.noteId).replaceWith(response.noteHtml);
+        } else {
+            mQuery('#notes-container ul.events').prepend(response.noteHtml);
+        }
+    }
+};
+

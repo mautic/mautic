@@ -18,6 +18,24 @@ use Doctrine\ORM\Query;
  */
 class LeadNoteRepository extends CommonRepository
 {
+
+    /**
+     * {@inhertidoc}
+     *
+     * @param array      $args
+     * @return Paginator
+     */
+    public function getEntities($args = array())
+    {
+        $q = $this
+            ->createQueryBuilder('n')
+            ->select('n, a')
+            ->join('n.createdBy', 'a');
+        $args['qb'] = $q;
+
+        return parent::getEntities($args);
+    }
+
     /**
      * {@inheritdoc}
      *

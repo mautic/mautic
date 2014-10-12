@@ -76,11 +76,7 @@ if ($hasEditAccess): ?>
         <?php echo $view["translator"]->trans("mautic.lead.lead.campaigns"); ?>
     </a>
     <?php endif; ?>
-    <a class="btn btn-default" href="<?php echo $this->container->get('router')->generate(
-        'mautic_leadnote_action', array("leadId" => $lead->getId(), "objectAction" => "new")); ?>"
-       data-toggle="ajaxmodal"
-       data-target="#leadModal"
-       data-header="<?php $view['translator']->trans('mautic.lead.note.header.new'); ?>">
+    <a class="btn btn-default" href="<?php echo $this->container->get('router')->generate('mautic_leadnote_action', array('leadId' => $lead->getId(), 'objectAction' => 'new', 'leadId' => $lead->getId())); ?>" data-toggle="ajaxmodal" data-target="#leadModal" data-header="<?php echo $view['translator']->trans('mautic.lead.note.header.new'); ?>">
        <i class="fa fa-file-o"></i>
         <?php echo $view["translator"]->trans("mautic.lead.add.note"); ?>
     </a>
@@ -242,7 +238,7 @@ $view['slots']->stop();
                 <!-- tabs controls -->
                 <ul class="nav nav-tabs pr-md pl-md">
                     <li class="active"><a href="#history-container" role="tab" data-toggle="tab"><span class="label label-primary mr-sm"><?php echo count($events); ?></span> <?php echo $view['translator']->trans('mautic.lead.lead.tab.history'); ?></a></li>
-                    <li class=""><a href="#notes-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.lead.lead.tab.notes'); ?></a></li>
+                    <li class=""><a href="#notes-container" role="tab" data-toggle="tab"><span class="label label-primary mr-sm"><?php echo count($lead->getNotes()); ?></span> <?php echo $view['translator']->trans('mautic.lead.lead.tab.notes'); ?></a></li>
                     <li class=""><a href="#social-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.lead.lead.tab.social'); ?></a></li>
                 </ul>
                 <!--/ tabs controls -->
@@ -292,7 +288,7 @@ $view['slots']->stop();
                 <div class="tab-pane fade bdr-w-0" id="notes-container">
                     <?php
                     //forward to Note::index controller action so that it handles pagination, etc
-                    echo $view['actions']->render(new \Symfony\Component\HttpKernel\Controller\ControllerReference('MauticLeadBundle:Note:index', array('leadId' => $lead->getId())));
+                    echo $view['actions']->render(new \Symfony\Component\HttpKernel\Controller\ControllerReference('MauticLeadBundle:Note:index', array('leadId' => $lead->getId(), 'ignoreAjax' => 1)));
                     ?>
                 </div>
                 <!--/ #notes-container -->

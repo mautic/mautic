@@ -55,19 +55,21 @@ $collection->add('mautic_lead_action', new Route('/leads/{objectAction}/{objectI
     )
 ));
 
-$collection->add('mautic_leadnote_index', new Route('/leads/notes/{leadId}',
+$collection->add('mautic_leadnote_action', new Route('/leads/notes/{leadId}/{objectAction}/{objectId}',
     array(
-        '_controller' => 'MauticLeadBundle:Note:index',
-        'leadId'    => 0
+        '_controller' => 'MauticLeadBundle:Note:executeNote',
+        'objectId'    => 0
     ), array(
         'leadId'    => '\d+'
     )
 ));
 
-$collection->add('mautic_leadnote_action', new Route('/leads/notes/{leadId}/{objectAction}/{objectId}',
+$collection->add('mautic_leadnote_index', new Route('/leads/notes/{leadId}',
     array(
-        '_controller' => 'MauticLeadBundle:Note:execute',
-        'objectId'    => 0
+        '_controller' => 'MauticLeadBundle:Note:executeNote',
+        'leadId'    => 0
+    ), array(
+        'leadId'    => '\d+'
     )
 ));
 

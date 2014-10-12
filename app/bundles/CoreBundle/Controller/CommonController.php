@@ -222,8 +222,9 @@ class CommonController extends Controller implements MauticController
      * @param int $objectId
      * @return Response
      */
-    public function executeAction($objectAction, $objectId = 0, $objectModel = '') {
+    public function executeAction($objectAction, $objectId = 0, $objectSubId = 0, $objectModel = '') {
         if (method_exists($this, "{$objectAction}Action")) {
+
             return $this->{"{$objectAction}Action"}($objectId, $objectModel);
         } else {
             return $this->accessDenied();

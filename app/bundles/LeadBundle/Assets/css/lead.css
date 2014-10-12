@@ -87,3 +87,9 @@
     background: #517fa4;
     color: #FFFFFF;
 }
+
+.btn-leadnote-add {
+    margin-left: 0 !important;
+    border-bottom-left-radius: 2px !important;
+    border-top-left-radius: 2px !important;
+}
