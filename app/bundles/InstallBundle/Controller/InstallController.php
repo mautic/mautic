@@ -91,14 +91,22 @@ class InstallController extends CommonController
                                 $schemaTool = new SchemaTool($entityManager);
                                 $schemaTool->createSchema($metadatas);
                             } catch (\Exception $exception) {
-                                $data  = $form->getData();
                                 $error = false;
-                                if (strpos($exception->getMessage(), $this->checkDatabaseNotExistsMessage($data->driver, $data->name)) !== false) {
-                                    // Try to manually create the database
+                                if (strpos($exception->getMessage(), $this->checkDatabaseNotExistsMessage($originalData->driver, $originalData->name)) !== false) {
+                                    // Try to manually create the database, first we null out the database name
+                                    $originalData   = $form->getData();
+                                    $editData       = clone $originalData;
+                                    $editData->name = null;
+                                    $configurator->mergeParameters($step->update($editData));
+                                    $configurator->write();
+                                    $this->clearCache();
                                     try {
                                         $this->factory->getEntityManager()->getConnection()->executeQuery('CREATE DATABASE ' . $data->name);
 
                                         // Assuming we got here, we should be able to install correctly now
+                                        $configurator->mergeParameters($step->update($originalData));
+                                        $configurator->write();
+                                        $this->clearCache();
                                         $schemaTool = new SchemaTool($entityManager);
                                         $schemaTool->createSchema($metadatas);
                                     } catch (\Exception $exception) {
