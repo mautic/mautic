@@ -14,7 +14,7 @@ endif;
 ?>
 
 <div class="pt-120 pb-20 content-body" id="main-content">
-    <?php echo $view->render('MauticInstallBundle:Install:pageheader.html.php'); ?>
+    <?php echo $view->render('MauticCoreBundle:Default:flashes.html.php'); ?>
 
     <div class="container-fluid">
         <?php $view['slots']->output('_content'); ?>
