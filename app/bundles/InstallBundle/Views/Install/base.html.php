@@ -21,9 +21,9 @@ $activePanelClasses  = ($app->getSession()->get('left-panel', 'default') == 'unp
                         <img src="<?php echo $view['assets']->getUrl('assets/images/mautic_logo_lb200.png') ?>" height="50px" />
                         <h5 class="semibold text-muted mt-5"><?php $view['slots']->output('header', ''); ?></h5>
                     </div>
-                    
+
                     <div class="mt-20 col-lg-6 col-lg-offset-3">
-                        <div class="panel">
+                        <div id="app-content" class="panel">
                             <?php $view['slots']->output('_content'); ?>
                         </div>
                     </div>
