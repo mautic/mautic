@@ -91,38 +91,58 @@ class InstallController extends CommonController
                                 $schemaTool = new SchemaTool($entityManager);
                                 $schemaTool->createSchema($metadatas);
                             } catch (\Exception $exception) {
-                                if (strpos($exception->getMessage(), 'Base table or view already exists') !== false) {
-                                    $msg = 'mautic.installer.error.database.exists';
+                                $data  = $form->getData();
+                                $error = false;
+                                if (strpos($exception->getMessage(), $this->checkDatabaseNotExistsMessage($data->driver, $data->name)) !== false) {
+                                    // Try to manually create the database
+                                    try {
+                                        $this->factory->getEntityManager()->getConnection()->executeQuery('CREATE DATABASE ' . $data->name);
+
+                                        // Assuming we got here, we should be able to install correctly now
+                                        $schemaTool = new SchemaTool($entityManager);
+                                        $schemaTool->createSchema($metadatas);
+                                    } catch (\Exception $exception) {
+                                        // We did our best, we really did
+                                        $error = true;
+                                        $msg   = 'mautic.installer.error.creating.database';
+                                    }
                                 } else {
-                                    $msg = 'mautic.installer.error.creating.database';
+                                    $error = true;
+                                    if (strpos($exception->getMessage(), 'Base table or view already exists') !== false) {
+                                        $msg = 'mautic.installer.error.database.exists';
+                                    } else {
+                                        $msg = 'mautic.installer.error.creating.database';
+                                    }
                                 }
 
-                                return $this->postActionRedirect(array(
-                                    'viewParameters'    => array(
-                                        'form'    => $form->createView(),
-                                        'index'   => $index,
-                                        'count'   => $configurator->getStepCount(),
-                                        'version' => $this->factory->getVersion(),
-                                        'tmpl'    => $tmpl,
-                                        'majors'  => $majors,
-                                        'minors'  => $minors,
-                                        'appRoot' => $this->container->getParameter('kernel.root_dir'),
-                                    ),
-                                    'returnUrl'         => $this->generateUrl('mautic_installer_step', array('index' => $index)),
-                                    'contentTemplate'   => $step->getTemplate(),
-                                    'passthroughVars'   => array(
-                                        'activeLink'    => '#mautic_installer_index',
-                                        'mauticContent' => 'installer'
-                                    ),
-                                    'flashes'           => array(
-                                        array(
-                                            'type'    => 'error',
-                                            'msg'     => $msg,
-                                            'msgVars' => array('%exception%' => $exception->getMessage())
-                                        )
-                                    ),
-                                    'forwardController' => false
-                                ));
+                                if ($error) {
+                                    return $this->postActionRedirect(array(
+                                        'viewParameters'    => array(
+                                            'form'    => $form->createView(),
+                                            'index'   => $index,
+                                            'count'   => $configurator->getStepCount(),
+                                            'version' => $this->factory->getVersion(),
+                                            'tmpl'    => $tmpl,
+                                            'majors'  => $majors,
+                                            'minors'  => $minors,
+                                            'appRoot' => $this->container->getParameter('kernel.root_dir'),
+                                        ),
+                                        'returnUrl'         => $this->generateUrl('mautic_installer_step', array('index' => $index)),
+                                        'contentTemplate'   => $step->getTemplate(),
+                                        'passthroughVars'   => array(
+                                            'activeLink'    => '#mautic_installer_index',
+                                            'mauticContent' => 'installer'
+                                        ),
+                                        'flashes'           => array(
+                                            array(
+                                                'type'    => 'error',
+                                                'msg'     => $msg,
+                                                'msgVars' => array('%exception%' => $exception->getMessage())
+                                            )
+                                        ),
+                                        'forwardController' => false
+                                    ));
+                                }
                             }
                         } else {
                             return $this->postActionRedirect(array(
@@ -335,5 +355,26 @@ class InstallController extends CommonController
                 'replaceContent' => ($tmpl == 'list') ? 'true' : 'false'
             )
         ));
+    }
+
+    /**
+     * Fetches the message to check if the database does not exist
+     *
+     * @param string $driver   Database driver
+     * @param string $database Database name
+     *
+     * @return string
+     */
+    private function checkDatabaseNotExistsMessage($driver, $database)
+    {
+        switch ($driver) {
+            case 'pdo_mysql':
+                return "Unknown database '$database'";
+
+            case 'pdo_pgsql':
+                return 'database "' . $database . '" does not exist';
+        }
+
+        return '';
     }
 }
