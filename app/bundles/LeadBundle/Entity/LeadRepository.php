@@ -204,6 +204,17 @@ class LeadRepository extends CommonRepository
                 }
             }
         }
+
+        if ($byGroup) {
+            //make sure each group key is present
+            $groups = array('core', 'social', 'personal', 'professional');
+            foreach ($groups as $g) {
+                if (!isset($fieldValues[$g])) {
+                    $fieldValues[$g] = array();
+                }
+            }
+        }
+
         return $fieldValues;
     }
 

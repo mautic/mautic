@@ -318,6 +318,15 @@ class LeadModel extends FormModel
                 }
             }
         }
+
+        //make sure each group key is present
+        $groups = array('core', 'social', 'personal', 'professional');
+        foreach ($groups as $g) {
+            if (!isset($array[$g])) {
+                $array[$g] = array();
+            }
+        }
+
         return $array;
     }
 
