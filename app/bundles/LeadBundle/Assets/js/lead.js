@@ -549,11 +549,30 @@ Mautic.toggleLeadCampaign = function(toggleId, leadId, campaignId) {
 
 Mautic.leadNoteOnLoad = function (container, response) {
     if (response.noteHtml) {
-        if (mQuery('#LeadNote' + response.noteId).length) {
-            mQuery('#LeadNote' + response.noteId).replaceWith(response.noteHtml);
+        var el = '#LeadNote' + response.noteId;
+        if (mQuery(el).length) {
+            mQuery(el).replaceWith(response.noteHtml);
         } else {
             mQuery('#notes-container ul.events').prepend(response.noteHtml);
         }
+
+        //initialize ajax'd modals
+        mQuery(el + " *[data-toggle='ajaxmodal']").off('click.ajaxmodal');
+        mQuery(el + " *[data-toggle='ajaxmodal']").on('click.ajaxmodal', function (event) {
+            event.preventDefault();
+
+            Mautic.ajaxifyModal(this, event);
+        });
+
+        //initiate links
+        mQuery(el + " a[data-toggle='ajax']").off('click.ajax');
+        mQuery(el + " a[data-toggle='ajax']").on('click.ajax', function (event) {
+            event.preventDefault();
+
+            return Mautic.ajaxifyLink(this, event);
+        });
+    } else if (response.deleteId && mQuery('#LeadNote' + response.deleteId).length) {
+        mQuery('#LeadNote' + response.deleteId).remove();
     }
 };
 

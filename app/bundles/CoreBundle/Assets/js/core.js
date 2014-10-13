@@ -199,16 +199,6 @@ var Mautic = {
             preferredFormat: 'hex'
         });
 
-        //Set the height of containers
-        var windowWidth  = mQuery(window).width();
-        if (windowWidth > 765) {
-            var windowHeight = mQuery(window).height() - 175;
-            mQuery(container + ' .auto-height').each(function (index) {
-                //set height of divs
-                mQuery(this).css('height', windowHeight + 'px');
-            });
-        }
-
         //Copy form buttons to the toolbar
         if (mQuery(container + " .bottom-form-buttons").length) {
             //hide the toolbar actions if applicable
@@ -1015,6 +1005,10 @@ var Mautic = {
             type: "POST",
             dataType: "json",
             success: function (response) {
+                if (!response.target) {
+                    //make a bogus target so that it doesn't jump to the top of the page
+                    response.target = 'ignoreme';
+                }
                 Mautic.processPageContent(response);
             },
             error: function (request, textStatus, errorThrown) {

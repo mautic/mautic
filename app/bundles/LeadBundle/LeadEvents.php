@@ -117,7 +117,6 @@ final class LeadEvents
      */
     const LIST_POST_DELETE   = 'mautic.lead_list_post_delete';
 
-
     /**
      * The mautic.lead_field_pre_save event is thrown right before a lead_field is persisted.
      *
@@ -167,4 +166,44 @@ final class LeadEvents
      * @var string
      */
     const TIMELINE_ON_GENERATE = 'mautic.lead_timeline_on_generate';
+
+    /**
+     * The mautic.lead_note_pre_save event is thrown right before a lead note is persisted.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\LeadEvent instance.
+     *
+     * @var string
+     */
+    const NOTE_PRE_SAVE   = 'mautic.lead_note_pre_save';
+
+    /**
+     * The mautic.lead_note_post_save event is thrown right after a lead note is persisted.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\LeadFieldEvent instance.
+     *
+     * @var string
+     */
+    const NOTE_POST_SAVE   = 'mautic.lead_note_post_save';
+
+    /**
+     * The mautic.lead_note_pre_delete event is thrown before a lead note is deleted.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\LeadFieldEvent instance.
+     *
+     * @var string
+     */
+    const NOTE_PRE_DELETE   = 'mautic.lead_note_pre_delete';
+
+    /**
+     * The mautic.lead_note_post_delete event is thrown after a lead note is deleted.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\LeadFieldEvent instance.
+     *
+     * @var string
+     */
+    const NOTE_POST_DELETE   = 'mautic.lead_note_post_delete';
 }

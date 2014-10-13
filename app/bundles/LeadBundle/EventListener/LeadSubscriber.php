@@ -43,6 +43,8 @@ class LeadSubscriber extends CommonSubscriber
             LeadEvents::LEAD_POST_DELETE     => array('onLeadDelete', 0),
             LeadEvents::FIELD_POST_SAVE      => array('onFieldPostSave', 0),
             LeadEvents::FIELD_POST_DELETE    => array('onFieldDelete', 0),
+            LeadEvents::NOTE_POST_SAVE      => array('onNotePostSave', 0),
+            LeadEvents::NOTE_POST_DELETE    => array('onNoteDelete', 0),
             LeadEvents::TIMELINE_ON_GENERATE => array('onTimelineGenerate', 0),
             UserEvents::USER_PRE_DELETE      => array('onUserDelete', 0)
         );
@@ -248,5 +250,46 @@ class LeadSubscriber extends CommonSubscriber
     public function onUserDelete(UserEvent $event)
     {
         $this->factory->getModel('lead.lead')->disassociateOwner($event->getUser()->getId());
+    }
+
+
+    /**
+     * Add a note entry to the audit log
+     *
+     * @param Events\LeadNoteEvent $event
+     */
+    public function onNotePostSave(Events\LeadNoteEvent $event)
+    {
+        $note = $event->getNote();
+        if ($details = $event->getChanges()) {
+            $log = array(
+                "bundle"    => "lead",
+                "object"    => "note",
+                "objectId"  => $note->getId(),
+                "action"    => ($event->isNew()) ? "create" : "update",
+                "details"   => $details,
+                "ipAddress" => $this->request->server->get('REMOTE_ADDR')
+            );
+            $this->factory->getModel('core.auditLog')->writeToLog($log);
+        }
+    }
+
+    /**
+     * Add a note delete entry to the audit log
+     *
+     * @param Events\LeadNoteEvent $event
+     */
+    public function onNoteDelete(Events\LeadNoteEvent $event)
+    {
+        $note = $event->getNote();
+        $log = array(
+            "bundle"     => "lead",
+            "object"     => "note",
+            "objectId"   => $note->deletedId,
+            "action"     => "delete",
+            "details"    => array('text', $note->getText()),
+            "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
+        );
+        $this->factory->getModel('core.auditLog')->writeToLog($log);
     }
 }
