@@ -31,7 +31,7 @@ if ($tmpl == 'index') {
                     <?php
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                         'sessionVar' => 'report.' . $report->getId(),
-                        'orderBy'    => 'r.' . $key,
+                        'orderBy'    => $key,
                         'text'       => ucfirst($key),
                         'class'      => 'col-page-' . $key
                     )); ?>

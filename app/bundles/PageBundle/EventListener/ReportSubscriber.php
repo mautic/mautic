@@ -48,7 +48,7 @@ class ReportSubscriber extends CommonSubscriber
 
         foreach ($fields as $field) {
             $fieldData = $metadata->getFieldMapping($field);
-            $columns[$fieldData['columnName']] = array('label' => $field, 'type' => $fieldData['type']);
+            $columns['p.' . $fieldData['columnName']] = array('label' => $field, 'type' => $fieldData['type']);
         }
 
         $data = array(
@@ -76,8 +76,7 @@ class ReportSubscriber extends CommonSubscriber
 
         $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
 
-        // TODO - Still need to update some code to enable unique aliases, for now we require 'r'
-        $queryBuilder->from(MAUTIC_TABLE_PREFIX . 'pages', 'r');
+        $queryBuilder->from(MAUTIC_TABLE_PREFIX . 'pages', 'p');
 
         $event->setQueryBuilder($queryBuilder);
     }
