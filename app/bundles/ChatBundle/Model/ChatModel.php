@@ -84,18 +84,25 @@ class ChatModel extends FormModel
      * @param string $search
      * @param int    $limit
      * @param int    $start
+     * @param bool   $unreadPriority
      *
      * @return mixed
      */
-    public function getUserList($search = '', $limit = 10, $start = 0)
+    public function getUserList($search = '', $limit = 10, $start = 0, $unreadPriority = true)
     {
         $repo  = $this->getRepository();
-        $users = $repo->getUsers($this->factory->getUser()->getId(), $search, $limit, $start);
 
-        //get users unread messages
-        $unread = $repo->getUnreadMessageCount($this->factory->getUser()->getId(), array_keys($users));
-        foreach ($unread as $u) {
-            $users[$u['userId']]['unread'] = $u['unread'];
+        if ($unreadPriority) {
+            $unread = $repo->getUnreadMessageCount($this->factory->getUser()->getId());
+            $users  = $repo->getUsers($this->factory->getUser()->getId(), $search, $limit, $start, array_keys($unread));
+        } else {
+            $users  = $repo->getUsers($this->factory->getUser()->getId(), $search, $limit, $start);
+            $unread = $repo->getUnreadMessageCount($this->factory->getUser()->getId(), array_keys($users));
+        }
+
+        //set the unread count
+        foreach ($users as &$u) {
+            $users[$u['id']]['unread'] = (isset($unread[$u['id']])) ? $unread[$u['id']] : 0;
         }
 
         return $users;

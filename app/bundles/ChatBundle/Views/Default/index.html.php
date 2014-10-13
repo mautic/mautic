@@ -15,21 +15,28 @@ if (empty($contentOnly)) {
     $view['assets']->addScriptDeclaration('Mautic.activateChatListUpdate();', 'bodyClose');
 }
 ?>
-<div id="ChatList">
-    <h5 class="heading">
-        <?php echo $view['translator']->trans('mautic.chat.chat.channels'); ?>
-        <span class="small">
-            <a href="<?php echo $view['router']->generate('mautic_chatchannel_action', array('objectAction' => 'new')); ?>"
-               data-toggle="ajax"
-               data-method="post"
-               data-ignore-formexit="true">
-                <?php echo $view['translator']->trans('mautic.chat.channel.new'); ?>
-            </a>
-        </span>
-    </h5>
 
-    <?php echo $view->render('MauticChatBundle:Default:channels.html.php', array('channels' => $channels)); ?>
-
-    <h5 class="heading"><?php echo $view['translator']->trans('mautic.chat.chat.users'); ?></h5>
-    <?php echo $view->render('MauticChatBundle:Default:users.html.php', array('users' => $users)); ?>
+<!-- start: sidebar header -->
+<div class="sidebar-header box-layout">
+    <div class="col-xs-6 va-m">
+        <h5 class="fw-sb"><?php echo $view['translator']->trans('mautic.chat.chat.channels'); ?></h5>
+    </div>
+    <div class="col-xs-6 va-m text-right">
+        <!-- this will toggle offcanvas-left container-->
+        <a href="javascript:void(0);" class="btn btn-primary offcanvas-opener offcanvas-open-ltr">Add</a>
+    </div>
 </div>
+<!--/ end: sidebar header -->
+
+<!-- start: sidebar content -->
+<div class="sidebar-content">
+    <!-- scroll-content -->
+    <div class="scroll-content slimscroll">
+        <?php echo $view->render('MauticChatBundle:Default:channels.html.php', array('channels' => $channels)); ?>
+
+        <!-- put the chat list here -->
+        <?php echo $view->render('MauticChatBundle:Default:users.html.php', array('users' => $users)); ?>
+    </div>
+    <!--/ scroll-content -->
+</div>
+<!--/ end: sidebar content -->

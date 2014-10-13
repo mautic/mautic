@@ -76,8 +76,9 @@ class ChatRepository extends CommonRepository
      * @param string $search
      * @param int    $limit
      * @param int    $start
+     * @param array  $usersWithUnreadMsgs
      */
-    public function getUsers($currentUserId = 0, $search = '', $limit = 10, $start = 0)
+    public function getUsers($currentUserId = 0, $search = '', $limit = 10, $start = 0, $usersWithUnreadMsgs = array())
     {
         $q = $this->_em->createQueryBuilder();
 
@@ -110,7 +111,13 @@ class ChatRepository extends CommonRepository
                 ->setParameter('search', "{$search}%");
         }
 
-        if (!empty($limit)) {
+        if (!empty($usersWithUnreadMsgs)) {
+            $q->andWhere(
+                $q->expr()->in('u.id', 'users')
+            )->setParameter('users', $usersWithUnreadMsgs);
+        }
+
+        if (!empty($limit) && $limit > count($usersWithUnreadMsgs)) {
             $q->setFirstResult($start)
                 ->setMaxResults($limit);
         }
@@ -122,6 +129,10 @@ class ChatRepository extends CommonRepository
         return $results;
     }
 
+    /**
+     * @param      $results
+     * @param null $key
+     */
     private function generateOnlineStatuses(&$results, $key = null)
     {
         //fix online statuses
@@ -241,21 +252,33 @@ class ChatRepository extends CommonRepository
         return $results;
     }
 
-    public function getUnreadMessageCount($toUser, array $fromUsers)
+    /**
+     * @param       $toUser
+     * @param array $fromUsers
+     *
+     * @return array
+     */
+    public function getUnreadMessageCount($toUser, array $fromUsers = array())
     {
         $q = $this->_em->createQueryBuilder();
+
+        $expr = $q->expr()->andX(
+            $q->expr()->eq('IDENTITY(c.toUser)', ':toUser'),
+            $q->expr()->eq('c.isRead', 0)
+        );
+
+        if (!empty($fromUsers)) {
+            $expr->add(
+                $q->expr()->in('IDENTITY(c.fromUser)', ':fromUsers')
+            );
+            $q->setParameter('fromUsers', $fromUsers);
+        }
+
         $q->select('c.id, count(c.id) as unread, u.id as userId')
             ->from('MauticChatBundle:Chat', 'c')
             ->leftJoin('c.fromUser', 'u')
-            ->where(
-                $q->expr()->andX(
-                    $q->expr()->eq('IDENTITY(c.toUser)', ':toUser'),
-                    $q->expr()->in('IDENTITY(c.fromUser)', ':fromUsers'),
-                    $q->expr()->eq('c.isRead', 0)
-                )
-            )
+            ->where($expr)
             ->setParameter('toUser', $toUser)
-            ->setParameter('fromUsers', $fromUsers)
             ->groupBy('c.fromUser');
         $results = $q->getQuery()->getArrayResult();
         return $results;

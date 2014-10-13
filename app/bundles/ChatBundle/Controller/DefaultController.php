@@ -26,9 +26,19 @@ class DefaultController extends FormController
         $channelModel = $this->factory->getModel('chat.channel');
         $channels     = $channelModel->getMyChannels();
 
-        $chatModel = $this->factory->getModel('chat.chat');
+        //let's sort by unread count then alphabetical
+        usort($channels, function($a, $b) {
+            return $a['stats']['unread'] > $b['stats']['unread'];
+        });
+
         //get a list of  users
+        $chatModel = $this->factory->getModel('chat');
         $users     = $chatModel->getUserList();
+
+        //sort by unread count
+        usort($users, function($a, $b) {
+            return $a['unread'] > $b['unread'];
+        });
 
         return $this->delegateView(array(
             'viewParameters'  => array(
@@ -37,9 +47,7 @@ class DefaultController extends FormController
             ),
             'contentTemplate' => 'MauticChatBundle:Default:index.html.php',
             'passthroughVars' => array(
-                'mauticContent'  => 'chat',
-                'target'         => '#ChatList',
-                'replaceContent' => 'true'
+                'mauticContent'  => 'chat'
             )
         ));
     }
