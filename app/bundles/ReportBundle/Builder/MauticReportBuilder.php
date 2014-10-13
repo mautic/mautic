@@ -86,7 +86,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
         $selectColumns = array();
 
         foreach ($fields as $field) {
-            $selectColumns[] = 'r.' . $field;
+            $selectColumns[] = $field;
         }
 
         // Trigger the REPORT_ON_GENERATE event to initialize the QueryBuilder
@@ -110,21 +110,21 @@ final class MauticReportBuilder implements ReportBuilderInterface
             foreach ($filters as $filter) {
                 if ($filter['condition'] == 'notEmpty') {
                     $and->add(
-                        $expr->isNotNull('r.' . $filter['column'])
+                        $expr->isNotNull($filter['column'])
                     );
                     $and->add(
-                        $expr->neq('r.' . $filter['column'], $expr->literal(''))
+                        $expr->neq($filter['column'], $expr->literal(''))
                     );
                 } elseif ($filter['condition'] == 'empty') {
                     $and->add(
-                        $expr->isNull('r.' . $filter['column'])
+                        $expr->isNull($filter['column'])
                     );
                     $and->add(
-                        $expr->eq('r.' . $filter['column'], $expr->literal(''))
+                        $expr->eq($filter['column'], $expr->literal(''))
                     );
                 } else {
                     $and->add(
-                        $expr->{$filter['condition']}('r.' . $filter['column'], $expr->literal($filter['value']))
+                        $expr->{$filter['condition']}($filter['column'], $expr->literal($filter['value']))
                     );
                 }
             }
