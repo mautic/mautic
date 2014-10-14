@@ -8,7 +8,6 @@
  */
 
 //@todo generate points log view
-
 ?>
 
     <?php $count = 0; ?>
