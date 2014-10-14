@@ -12,11 +12,6 @@ use Symfony\Component\Routing\Route;
 
 $collection = new RouteCollection();
 
-$collection->add('mautic_core_index', new Route('/', array(
-    //@TODO Change to a different landing page
-    '_controller' => 'MauticCoreBundle:Default:index'
-)));
-
 $collection->add('mautic_core_ajax', new Route('/ajax', array(
     '_controller' => 'MauticCoreBundle:Ajax:delegateAjax'
 )));

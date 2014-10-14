@@ -57,7 +57,7 @@ class FormController extends CommonController
         $date      = $entity->getCheckedOut();
         $returnUrl = !empty($postActionVars['returnUrl']) ?
             urlencode($postActionVars['returnUrl']) :
-            urlencode($this->generateUrl('mautic_core_index'));
+            urlencode($this->generateUrl('mautic_dashboard_index'));
         $override  = '';
 
         $model        = $this->factory->getModel($model);
@@ -145,7 +145,7 @@ class FormController extends CommonController
             }
             $returnUrl = urldecode($this->request->get('returnUrl'));
             if (empty($returnUrl)) {
-                $returnUrl = $this->generateUrl('mautic_core_index');
+                $returnUrl = $this->generateUrl('mautic_dashboard_index');
             }
             $this->factory->getSession()->getFlashBag()->add(
                 'notice',

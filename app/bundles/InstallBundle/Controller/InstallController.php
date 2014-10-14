@@ -292,7 +292,7 @@ class InstallController extends CommonController
 
                 return $this->postActionRedirect(array(
                     'viewParameters'  =>  array(
-                        'welcome_url' => $this->generateUrl('mautic_core_index'),
+                        'welcome_url' => $this->generateUrl('mautic_dashboard_index'),
                         'parameters'  => $configurator->render(),
                         'config_path' => $this->container->getParameter('kernel.root_dir') . '/config/local.php',
                         'is_writable' => $configurator->isFileWritable(),
@@ -342,7 +342,7 @@ class InstallController extends CommonController
         /** @var \Mautic\InstallBundle\Configurator\Configurator $configurator */
         $configurator = $this->container->get('mautic.configurator');
 
-        $welcomeUrl = $this->generateUrl('mautic_core_index');
+        $welcomeUrl = $this->generateUrl('mautic_dashboard_index');
 
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 

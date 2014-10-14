@@ -405,7 +405,7 @@ class UserController extends FormController
         //user not found
         if ($user === null) {
             return $this->postActionRedirect(array(
-                'returnUrl'       => $this->generateUrl('mautic_core_index'),
+                'returnUrl'       => $this->generateUrl('mautic_dashboard_index'),
                 'contentTemplate' => 'MauticUserBundle:User:contact',
                 'flashes'         => array(
                     array(
@@ -424,7 +424,7 @@ class UserController extends FormController
 
         if ($this->request->getMethod() == 'POST') {
             $formUrl   = $this->request->request->get('contact[returnUrl]', '', true);
-            $returnUrl = ($formUrl) ? urldecode($formUrl) : $this->generateUrl('mautic_core_index');
+            $returnUrl = ($formUrl) ? urldecode($formUrl) : $this->generateUrl('mautic_dashboard_index');
             $valid     = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -482,7 +482,7 @@ class UserController extends FormController
         } else {
             $reEntityId   = InputHelper::int($this->request->get('id'));
             $reSubject    = InputHelper::clean($this->request->get('subject'));
-            $returnUrl    = InputHelper::clean($this->request->get('returnUrl', $this->generateUrl('mautic_core_index')));
+            $returnUrl    = InputHelper::clean($this->request->get('returnUrl', $this->generateUrl('mautic_dashboard_index')));
             $reEntity     = InputHelper::clean($this->request->get('entity'));
 
             $form->get('entity')->setData($reEntity);

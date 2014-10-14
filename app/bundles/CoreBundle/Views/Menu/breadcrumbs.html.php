@@ -15,9 +15,9 @@ $lastCrumb = count($crumbs) - 1;
         if ($crumb["label"] == "admin"):
         ?>
         <li>
-            <a id="bc_mautic_core_index"
-               href="<?php echo $view['router']->generate("mautic_core_index"); ?>"
-               data-toggle="ajax" data-menu-link="#bc_mautic_core_index">
+            <a id="bc_mautic_dashboard_index"
+               href="<?php echo $view['router']->generate("mautic_dashboard_index"); ?>"
+               data-toggle="ajax" data-menu-link="#bc_mautic_dashboard_index">
                 <span><?php echo $view['translator']->trans('mautic.core.menu.index'); ?></span>
             </a>
         </li>
@@ -26,9 +26,9 @@ $lastCrumb = count($crumbs) - 1;
         </li>
         <?php
         else:
-        $id    = ($crumb["label"] == "root") ? "mautic_core_index" : $crumb["item"]->getLinkAttribute("id");
+        $id    = ($crumb["label"] == "root") ? "mautic_dashboard_index" : $crumb["item"]->getLinkAttribute("id");
         $label = ($crumb["label"] == "root") ? "mautic.core.menu.index" : $crumb["label"];
-        $route = ($crumb["label"] == "root") ? $view['router']->generate("mautic_core_index") : $crumb["uri"];
+        $route = ($crumb["label"] == "root") ? $view['router']->generate("mautic_dashboard_index") : $crumb["uri"];
         ?>
         <li>
             <?php if (empty($route) || $lastCrumb === $crumbCount): ?>

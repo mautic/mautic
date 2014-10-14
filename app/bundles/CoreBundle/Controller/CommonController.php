@@ -106,7 +106,7 @@ class CommonController extends Controller implements MauticController
      * @param array $args [returnUrl, viewParameters, contentTemplate, passthroughVars, flashes, forwardController]
      */
     public function postActionRedirect($args = array()) {
-        $returnUrl = array_key_exists('returnUrl', $args) ? $args['returnUrl'] : $this->generateUrl('mautic_core_index');
+        $returnUrl = array_key_exists('returnUrl', $args) ? $args['returnUrl'] : $this->generateUrl('mautic_dashboard_index');
         $flashes   = array_key_exists('flashes', $args) ? $args['flashes'] : array();
 
         //forward the controller by default
@@ -243,11 +243,11 @@ class CommonController extends Controller implements MauticController
             throw new AccessDeniedHttpException($this->get('translator')->trans('mautic.core.url.error.401'));
         } else {
             return $this->postActionRedirect(array(
-                'returnUrl'       => $this->generateUrl('mautic_core_index'),
+                'returnUrl'       => $this->generateUrl('mautic_dashboard_index'),
                 'contentTemplate' => 'MauticCoreBundle:Default:index',
                 'passthroughVars' => array(
-                    'activeLink' => '#mautic_core_index',
-                    'route'      => $this->generateUrl('mautic_core_index')
+                    'activeLink' => '#mautic_dashboard_index',
+                    'route'      => $this->generateUrl('mautic_dashboard_index')
                 ),
                 'flashes'         => array(array(
                     'type' => 'error',

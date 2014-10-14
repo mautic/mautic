@@ -9,7 +9,7 @@
 ?>
 
 <script>
-    var mauticBaseUrl = '<?php echo $view['router']->generate("mautic_core_index"); ?>';
+    var mauticBaseUrl = '<?php echo $view['router']->generate("mautic_dashboard_index"); ?>';
     var mauticAjaxUrl = '<?php echo $view['router']->generate("mautic_core_ajax"); ?>';
     var mauticContent = '<?php $view['slots']->output('mauticContent',''); ?>';
     var mauticEnv     = '<?php echo $app->getEnvironment(); ?>';
