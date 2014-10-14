@@ -229,7 +229,7 @@ class InstagramNetwork extends AbstractNetwork
         return array(
             "full_name" => array("type" => "string"),
             "bio"       => array("type" => "string"),
-            "webiste"   => array("type" => "string")
+            "website"   => array("type" => "string")
         );
     }
 }
