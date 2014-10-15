@@ -41,7 +41,7 @@ $view->extend('MauticAssetBundle:Asset:index.html.php');
                     <?php
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                         'sessionVar' => 'asset',
-                        'orderBy'    => 'p.title',
+                        'orderBy'    => 'a.title',
                         'text'       => 'mautic.asset.asset.thead.title',
                         'class'      => 'col-page-title',
                         'default'    => true
@@ -56,28 +56,28 @@ $view->extend('MauticAssetBundle:Asset:index.html.php');
 
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                         'sessionVar' => 'asset',
-                        'orderBy'    => 'p.author',
+                        'orderBy'    => 'a.author',
                         'text'       => 'mautic.asset.asset.thead.author',
                         'class'      => 'visible-md visible-lg col-page-author'
                     ));
 
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                         'sessionVar' => 'asset',
-                        'orderBy'    => 'p.language',
+                        'orderBy'    => 'a.language',
                         'text'       => 'mautic.asset.asset.thead.language',
                         'class'      => 'visible-md visible-lg col-page-lang'
                     ));
 
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                         'sessionVar' => 'asset',
-                        'orderBy'    => 'p.download_count',
+                        'orderBy'    => 'a.download_count',
                         'text'       => 'mautic.asset.asset.thead.download.count',
                         'class'      => 'col-page-download-count'
                     ));
 
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                         'sessionVar' => 'asset',
-                        'orderBy'    => 'p.id',
+                        'orderBy'    => 'a.id',
                         'text'       => 'mautic.asset.asset.thead.id',
                         'class'      => 'col-page-id'
                     ));
