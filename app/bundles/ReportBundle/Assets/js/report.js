@@ -80,7 +80,7 @@ Mautic.updateColumnList = function () {
 				mQuery('#report_columns_available')
 					.append(mQuery('<option>')
 						.attr('value', key)
-						.text(value));
+						.text(value.label));
 			});
 
 			// Remove any filters, they're no longer valid with different column lists
