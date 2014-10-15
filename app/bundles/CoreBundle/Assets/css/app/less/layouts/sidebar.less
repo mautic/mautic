@@ -146,6 +146,43 @@
     top: 0;
     bottom: 0;
     width: 100%;
+
+    // nav tab
+    .nav.nav-tabs {
+      border-bottom: 1px solid darken(@sidebar-right-bg, 1%);
+      box-shadow: none;
+      > li {
+        margin-bottom: 0;
+        > a {
+          border-width: 0;
+          border-radius: 0;
+          margin-right: 0;
+          padding-top: 12px;
+          padding-bottom: 12px;
+          color: fade(contrast(@sidebar-right-bg), 45%);
+          background-color: transparent;
+          &:hover,
+          &:focus {
+            color: fade(contrast(@sidebar-right-bg), 85%);
+            background-color: transparent;
+          }
+        }
+        &.active > a {
+          overflow: visible;
+          &,
+          &:hover,
+          &:focus {
+            color: fade(contrast(@sidebar-right-bg), 85%);
+            background-color: rgba(0,0,0,0.06);
+          }
+          &:after {
+            top: auto;
+            bottom: -1px;
+            height: 1px;
+          }
+        }
+      }
+    }
   }
 
   // sidebar nav
@@ -154,7 +191,7 @@
     > .nav {
       > li {
         > a {
-          padding: 10px 20px;
+          padding: 12px 20px;
           .transition(all .15s ease);
           .text {
             position: relative;
