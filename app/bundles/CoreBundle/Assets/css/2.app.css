@@ -1010,10 +1010,10 @@ h6,
   text-transform: uppercase;
 }
 .text-muted {
-  color: rgba(0, 0, 0, 0.5);
+  color: #8393a2;
 }
 a.text-muted:hover {
-  color: rgba(0, 0, 0, 0.5);
+  color: #68798a;
 }
 .text-white {
   color: #ffffff;
