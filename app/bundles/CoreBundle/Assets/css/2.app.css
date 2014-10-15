@@ -352,6 +352,14 @@ body > #app-wrapper {
 .app-sidebar.sidebar-left .sidebar-content {
   padding-right: 1px;
 }
+.app-sidebar.sidebar-left .nav-sidebar > .nav > li.nav-group:after {
+  content: '';
+  position: absolute;
+  right: 0;
+  left: 50px;
+  bottom: 0;
+  border-bottom: 1px solid #2b353f;
+}
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li > a {
   color: rgba(255, 255, 255, 0.5);
 }
@@ -410,6 +418,14 @@ body > #app-wrapper {
 }
 .app-sidebar.sidebar-right .sidebar-content {
   padding-left: 1px;
+}
+.app-sidebar.sidebar-right .nav-sidebar > .nav > li.nav-group:after {
+  content: '';
+  position: absolute;
+  right: 0;
+  left: 50px;
+  bottom: 0;
+  border-bottom: 1px solid #2b353f;
 }
 .app-sidebar.sidebar-right .nav-sidebar > .nav > li > a {
   color: rgba(255, 255, 255, 0.5);
@@ -490,8 +506,43 @@ body > #app-wrapper {
   bottom: 0;
   width: 100%;
 }
+.app-sidebar .sidebar-content .nav.nav-tabs {
+  border-bottom: 1px solid #252d37;
+  box-shadow: none;
+}
+.app-sidebar .sidebar-content .nav.nav-tabs > li {
+  margin-bottom: 0;
+}
+.app-sidebar .sidebar-content .nav.nav-tabs > li > a {
+  border-width: 0;
+  border-radius: 0;
+  margin-right: 0;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  color: rgba(255, 255, 255, 0.45);
+  background-color: transparent;
+}
+.app-sidebar .sidebar-content .nav.nav-tabs > li > a:hover,
+.app-sidebar .sidebar-content .nav.nav-tabs > li > a:focus {
+  color: rgba(255, 255, 255, 0.85);
+  background-color: transparent;
+}
+.app-sidebar .sidebar-content .nav.nav-tabs > li.active > a {
+  overflow: visible;
+}
+.app-sidebar .sidebar-content .nav.nav-tabs > li.active > a,
+.app-sidebar .sidebar-content .nav.nav-tabs > li.active > a:hover,
+.app-sidebar .sidebar-content .nav.nav-tabs > li.active > a:focus {
+  color: rgba(255, 255, 255, 0.85);
+  background-color: rgba(0, 0, 0, 0.06);
+}
+.app-sidebar .sidebar-content .nav.nav-tabs > li.active > a:after {
+  top: auto;
+  bottom: -1px;
+  height: 1px;
+}
 .app-sidebar .nav-sidebar > .nav > li > a {
-  padding: 10px 20px;
+  padding: 12px 20px;
   -webkit-transition: all 0.15s ease;
   -o-transition: all 0.15s ease;
   transition: all 0.15s ease;
