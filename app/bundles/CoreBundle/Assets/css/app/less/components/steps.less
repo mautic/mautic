@@ -7,14 +7,12 @@
   margin: 0;
 
   // step list
-  // -------------------------
   > li {
     list-style: none;
     + li {
       margin-top: 15px;
 
       // steps line
-      // -------------------------
       .steps:after {
         content: "";
         position: absolute;
@@ -23,6 +21,36 @@
         height: 15px;
         width: 1px;
         background-color: @gray-light;
+      }
+    }
+
+    // steps active state
+    &.active {
+      .steps {
+        color: @text-color;
+        > .steps-figure {
+          border-color: @text-color;
+        }
+      }
+      a.steps {
+        &:hover,
+        &:focus {
+          color: @text-color;
+          > .steps-figure {
+            border-color: @text-color;
+          }
+        }
+      }
+    }
+
+    // anchored steps
+    a.steps {
+      &:hover,
+      &:focus {
+        color: darken(@gray-light, 10%);
+        > .steps-figure {
+          border-color: darken(@gray-light, 10%);
+        }
       }
     }
   }
@@ -35,7 +63,6 @@
     color: @gray-light;
 
     // steps figure
-    // -------------------------
     > .steps-figure {
       display: inline-block;
       .square(@input-height-base);
@@ -50,32 +77,9 @@
     }
 
     // steps text
-    // -------------------------
     > .steps-text {
       + .steps-figure {
         margin-left: 5px;
-      }
-    }
-
-    // steps active state
-    // -------------------------
-    &.active {
-      color: @text-color;
-      > .steps-figure {
-        border-color: @text-color;
-      }
-    }
-  }
-
-  // anchored steps
-  a.steps {
-    // steps hover & focus state
-    // -------------------------
-    &:hover,
-    &:focus {
-      color: darken(@gray-light, 6%);
-      > .steps-figure {
-        border-color: darken(@gray-light, 6%);
       }
     }
   }

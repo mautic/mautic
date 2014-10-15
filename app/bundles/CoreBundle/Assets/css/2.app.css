@@ -2369,6 +2369,28 @@ label {
   width: 1px;
   background-color: #a0acb8;
 }
+.step > li.active .steps {
+  color: #47535f;
+}
+.step > li.active .steps > .steps-figure {
+  border-color: #47535f;
+}
+.step > li.active a.steps:hover,
+.step > li.active a.steps:focus {
+  color: #47535f;
+}
+.step > li.active a.steps:hover > .steps-figure,
+.step > li.active a.steps:focus > .steps-figure {
+  border-color: #47535f;
+}
+.step > li a.steps:hover,
+.step > li a.steps:focus {
+  color: #8392a2;
+}
+.step > li a.steps:hover > .steps-figure,
+.step > li a.steps:focus > .steps-figure {
+  border-color: #8392a2;
+}
 .step .steps {
   position: relative;
   display: inline-block;
@@ -2389,20 +2411,6 @@ label {
 }
 .step .steps > .steps-text + .steps-figure {
   margin-left: 5px;
-}
-.step .steps.active {
-  color: #47535f;
-}
-.step .steps.active > .steps-figure {
-  border-color: #47535f;
-}
-.step a.steps:hover,
-.step a.steps:focus {
-  color: #8e9caa;
-}
-.step a.steps:hover > .steps-figure,
-.step a.steps:focus > .steps-figure {
-  border-color: #8e9caa;
 }
 .bg-white {
   background-color: #ffffff !important;
