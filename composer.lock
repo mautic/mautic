@@ -776,16 +776,16 @@
         },
         {
             "name": "doctrine/orm",
-            "version": "v2.4.5",
+            "version": "v2.4.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/doctrine2.git",
-                "reference": "c0d3cdbdfbf873871167050ab077e49b1ad02ab0"
+                "reference": "bebacf79d8d4dae9168f0f9bc6811e6c2cb6a4d9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/doctrine2/zipball/c0d3cdbdfbf873871167050ab077e49b1ad02ab0",
-                "reference": "c0d3cdbdfbf873871167050ab077e49b1ad02ab0",
+                "url": "https://api.github.com/repos/doctrine/doctrine2/zipball/bebacf79d8d4dae9168f0f9bc6811e6c2cb6a4d9",
+                "reference": "bebacf79d8d4dae9168f0f9bc6811e6c2cb6a4d9",
                 "shasum": ""
             },
             "require": {
@@ -845,7 +845,7 @@
                 "database",
                 "orm"
             ],
-            "time": "2014-09-22 21:58:51"
+            "time": "2014-10-06 13:22:50"
         },
         {
             "name": "friendsofsymfony/oauth-server-bundle",
@@ -1407,7 +1407,7 @@
                     "email": "stof@notk.org"
                 },
                 {
-                    "name": "KnpLabs",
+                    "name": "Knplabs",
                     "homepage": "http://knplabs.com"
                 },
                 {
@@ -2265,16 +2265,16 @@
         },
         {
             "name": "twig/twig",
-            "version": "v1.16.0",
+            "version": "v1.16.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fabpot/Twig.git",
-                "reference": "8ce37115802e257a984a82d38254884085060024"
+                "reference": "7c4c01dcf578523cfcddf383641a4f12790270ec"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fabpot/Twig/zipball/8ce37115802e257a984a82d38254884085060024",
-                "reference": "8ce37115802e257a984a82d38254884085060024",
+                "url": "https://api.github.com/repos/fabpot/Twig/zipball/7c4c01dcf578523cfcddf383641a4f12790270ec",
+                "reference": "7c4c01dcf578523cfcddf383641a4f12790270ec",
                 "shasum": ""
             },
             "require": {
@@ -2318,7 +2318,7 @@
             "keywords": [
                 "templating"
             ],
-            "time": "2014-07-05 12:19:05"
+            "time": "2014-10-10 14:09:53"
         },
         {
             "name": "willdurand/jsonp-callback-validator",
@@ -2578,12 +2578,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/nelmio/NelmioApiDocBundle.git",
-                "reference": "3889e7ff245dde6ad802e3c61d73fdf1bf4d3329"
+                "reference": "888705cd232476909ceaa97c26db37571646381e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nelmio/NelmioApiDocBundle/zipball/3889e7ff245dde6ad802e3c61d73fdf1bf4d3329",
-                "reference": "3889e7ff245dde6ad802e3c61d73fdf1bf4d3329",
+                "url": "https://api.github.com/repos/nelmio/NelmioApiDocBundle/zipball/888705cd232476909ceaa97c26db37571646381e",
+                "reference": "888705cd232476909ceaa97c26db37571646381e",
                 "shasum": ""
             },
             "require": {
@@ -2644,7 +2644,7 @@
                 "documentation",
                 "rest"
             ],
-            "time": "2014-09-29 15:12:56"
+            "time": "2014-10-12 13:38:01"
         },
         {
             "name": "sensio/generator-bundle",
@@ -2695,7 +2695,9 @@
             "time": "2014-09-22 14:56:14"
         }
     ],
-    "aliases": [],
+    "aliases": [
+
+    ],
     "minimum-stability": "stable",
     "stability-flags": {
         "symfony/event-dispatcher": 20,
@@ -2715,5 +2717,7 @@
     "platform": {
         "php": ">=5.3.7"
     },
-    "platform-dev": []
+    "platform-dev": [
+
+    ]
 }

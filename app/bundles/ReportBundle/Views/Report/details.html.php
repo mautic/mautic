@@ -79,8 +79,8 @@ if ($tmpl == 'index') {
                 <div class="pr-md pl-md pt-lg pb-lg">
                     <div class="box-layout">
                         <div class="col-xs-6 va-m">
-                            <h4 class="fw-sb text-primary">Awesome Campaign Name</h4>
-                            <p class="text-white dark-lg mb-0">Created on 7 Jan 2014</p>
+                            <h4 class="fw-sb text-primary"><?php echo $view['translator']->trans($report->getTitle()); ?></h4>
+                            <p class="text-white dark-lg mb-0">Created on <?php echo $view['date']->toDate($report->getDateAdded()); ?></p>
                         </div>
                         <div class="col-xs-6 va-m text-right">
                             <div class="btn-group">
@@ -104,24 +104,20 @@ if ($tmpl == 'index') {
                             <table class="table table-bordered table-striped mb-0">
                                 <tbody>
                                     <tr>
-                                        <td width="20%"><span class="fw-b">Description</span></td>
-                                        <td>Report description Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+                                        <td width="20%"><span class="fw-b">Source</span></td>
+                                        <td><?php echo $report->getSource(); ?></td>
                                     </tr>
                                     <tr>
                                         <td width="20%"><span class="fw-b">Created By</span></td>
-                                        <td>Dan Counsell</td>
+                                        <td><?php echo $report->getCreatedBy()->getName(); ?></td>
                                     </tr>
                                     <tr>
-                                        <td width="20%"><span class="fw-b">Category</span></td>
-                                        <td>Some category</td>
+                                        <td width="20%"><span class="fw-b">Created on</span></td>
+                                        <td><?php echo $view['date']->toDate($report->getDateAdded()); ?></td>
                                     </tr>
                                     <tr>
-                                        <td width="20%"><span class="fw-b">Publish Up</span></td>
-                                        <td>Mar 30, 2014</td>
-                                    </tr>
-                                    <tr>
-                                        <td width="20%"><span class="fw-b">Publish Down</span></td>
-                                        <td>Apr 10, 2014</td>
+                                        <td width="20%"><span class="fw-b">Modified on</span></td>
+                                        <td><?php echo $view['date']->toDate($report->getDateModified()); ?></td>
                                     </tr>
                                 </tbody>
                             </table>
