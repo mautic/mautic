@@ -109,7 +109,7 @@ $view['slots']->stop();
                             $color = $lead->getColor();
                             $style = !empty($color) ? ' style="background-color: ' . $color . ' !important;"' : '';
                             ?>
-                            <h4 class="fw-sb text-white dark-md"><span class="fa fa-circle-o"<?php echo $style; ?>></span> <?php echo $lead->getPoints(); ?></h4>
+                            <h1 class="fw-sb text-white dark-md<?php echo $style; ?>"><?php echo $lead->getPoints(); ?></h1>
                         </div>
                     </div>
                 </div>
@@ -154,18 +154,13 @@ $view['slots']->stop();
                 </div>
                 <!--/ lead detail collapseable toggler -->
 
-                <!--
-                some stats: need more input on what type of form data to show.
-                delete if it is not require
-                -->
                 <div class="pa-md">
                     <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-sm-12">
                             <div class="panel ovf-h bg-auto bg-light-xs">
                                 <div class="panel-body box-layout">
                                     <div class="col-xs-8 va-m">
-                                        <h5 class="text-white dark-md fw-sb mb-xs">Lead Views</h5>
-                                        <h2 class="fw-b">112</h2>
+                                        <h5 class="text-white dark-md fw-sb mb-xs">Engagements</h5>
                                     </div>
                                     <div class="col-xs-4 va-t text-right">
                                         <h3 class="text-white dark-sm"><span class="fa fa-eye"></span></h3>
@@ -173,65 +168,16 @@ $view['slots']->stop();
                                 </div>
                                 <div class="plugin-sparkline text-right pr-md pl-md"
                                 sparkHeight="34"
-                                sparkWidth="180"
-                                sparkType="bar"
-                                sparkBarWidth="8"
-                                sparkBarSpacing="3"
+                                sparkWidth="100%"
+                                sparkType="line"
                                 sparkZeroAxis="false"
                                 sparkBarColor="#00B49C">
-                                    129,137,186,167,200,115,118,162,112,106,104,106
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="panel ovf-h bg-auto bg-light-xs">
-                                <div class="panel-body box-layout">
-                                    <div class="col-xs-8 va-m">
-                                        <h5 class="text-white dark-md fw-sb mb-xs">Lead Conversions</h5>
-                                        <h2 class="fw-b">162</h2>
-                                    </div>
-                                    <div class="col-xs-4 va-t text-right">
-                                        <h3 class="text-white dark-sm"><span class="fa fa-arrows-h"></span></h3>
-                                    </div>
-                                </div>
-                                <div class="plugin-sparkline text-right pr-md pl-md"
-                                sparkHeight="34"
-                                sparkWidth="180"
-                                sparkType="bar"
-                                sparkBarWidth="8"
-                                sparkBarSpacing="3"
-                                sparkZeroAxis="false"
-                                sparkBarColor="#F86B4F">
-                                    156,162,185,102,144,156,150,114,198,117,120,138
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="panel ovf-h bg-auto bg-light-xs">
-                                <div class="panel-body box-layout">
-                                    <div class="col-xs-8 va-m">
-                                        <h5 class="text-white dark-md fw-sb mb-xs">Total Leads</h5>
-                                        <h2 class="fw-b">192</h2>
-                                    </div>
-                                    <div class="col-xs-4 va-t text-right">
-                                        <h3 class="text-white dark-sm"><span class="fa fa-user"></span></h3>
-                                    </div>
-                                </div>
-                                <div class="plugin-sparkline text-right pr-md pl-md"
-                                sparkHeight="34"
-                                sparkWidth="180"
-                                sparkType="bar"
-                                sparkBarWidth="8"
-                                sparkBarSpacing="3"
-                                sparkZeroAxis="false"
-                                sparkBarColor="#FDB933">
-                                    115,195,185,110,182,192,168,185,138,176,119,109
+                                    129,137,186,167,200,350,240,220,280,264,284,400
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <!--/ some stats -->
 
                 <!-- tabs controls -->
                 <ul class="nav nav-tabs pr-md pl-md">
