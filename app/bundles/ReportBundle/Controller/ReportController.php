@@ -437,6 +437,7 @@ class ReportController extends FormController
         /* @type \Mautic\ReportBundle\Model\ReportModel $model */
         $model      = $this->factory->getModel('report');
         $entity     = $model->getEntity($reportId);
+        $security   = $this->factory->getSecurity();
 
         //set the page we came from
         $page       = $this->factory->getSession()->get('mautic.report.page', 1);
@@ -462,7 +463,7 @@ class ReportController extends FormController
                     )
                 )
             ));
-        } elseif (!$this->factory->getSecurity()->hasEntityAccess(
+        } elseif (!$security->hasEntityAccess(
             'report:reports:viewown', 'report:reports:viewother', $entity->getCreatedBy()
         )
         ) {
@@ -509,6 +510,16 @@ class ReportController extends FormController
                 'reportPage' => $page,
                 'tmpl'       => $tmpl,
                 'limit'      => $limit,
+                'security'   => $security,
+                'permissions'   => $security->isGranted(array(
+                    'report:reports:viewown',
+                    'report:reports:viewother',
+                    'report:reports:create',
+                    'report:reports:editown',
+                    'report:reports:editother',
+                    'report:reports:deleteown',
+                    'report:reports:deleteother'
+                ), "RETURN_ARRAY"),
             ),
             'contentTemplate' => $contentTemplate,
             'passthroughVars' => array(
