@@ -13,89 +13,70 @@ $header = ($lead->getId()) ?
     $view['translator']->trans('mautic.lead.lead.header.new');
 
 $view['slots']->set('mauticContent', 'lead');
-$view['slots']->set("headerTitle", $header);
 
 $groups = array_keys($fields);
 ?>
 
-<?php echo $view['form']->start($form); ?>
-<div class="scrollable">
-	<div class="row">
-		<div class="col-md-6">
-			<div class="panel panel-default">
-				<div class="panel-heading">
-					<h3 class="panel-title">
-						<?php echo $view['translator']->trans('mautic.lead.field.group.core'); ?>
-					</h3>
-				</div>
-				<div class="panel-body">
-					<?php foreach ($fields['core'] as $field): ?>
-						<?php echo $view['form']->row($form[$field['alias']]); ?>
-					<?php endforeach; ?>
-				</div>
-			</div>
-		</div>
-		<div class="col-md-6">
-			<div class="panel panel-teal">
-				<div class="panel-heading">
-					<h3 class="panel-title">
-						<?php echo $view['translator']->trans('mautic.lead.field.group.extra'); ?>
-					</h3>
-				</div>
-				<div class="panel-body">
-					<?php echo $view['form']->row($form['owner_lookup']); ?>
-				</div>
-			</div>
+<!-- reset container-fluid padding -->
+<div class="mna-md">
+    <!-- start: box layout -->
+    <div class="box-layout">
+        <!-- step container -->
+        <div class="col-md-3 bg-white height-auto">
+            <div class="pr-lg pl-lg pt-md pb-md">
+                <h4 class="mb-sm fw-sb"><?php echo $header; ?></h4>
 
-			<?php if (isset($fields['social'])): ?>
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						<h3 class="panel-title">
-							<?php echo $view['translator']->trans('mautic.lead.field.group.social'); ?>
-						</h3>
-					</div>
-					<div class="panel-body">
-						<?php foreach ($fields['social'] as $field): ?>
-							<?php echo $view['form']->row($form[$field['alias']]); ?>
-						<?php endforeach; ?>
-					</div>
-				</div>
-			<?php endif; ?>
+                <ul class="step">
+                    <?php $step = 1; ?>
+                    <?php foreach ($groups as $g): ?>
+                        <?php if (!empty($fields[$g])): ?>
+                            <li class="<?php if ($step === 1) echo "active"; ?>">
+                                <a href="#<?php echo $g; ?>" class="steps" data-toggle="tab">
+                                    <span class="steps-figure"><?php echo $step; ?></span>
+                                    <span class="steps-text fw-sb"><?php echo $view['translator']->trans('mautic.lead.field.group.' . $g); ?></span>
+                                </a>
+                            </li>
+                            <?php $step++; ?>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        </div>
+        <!--/ step container -->
 
-			<?php if (isset($fields['professional'])): ?>
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						<h3 class="panel-title">
-							<?php echo $view['translator']->trans('mautic.lead.field.group.professional'); ?>
-						</h3>
-					</div>
-					<div class="panel-body">
-						<?php foreach ($fields['professional'] as $field): ?>
-							<?php echo $view['form']->row($form[$field['alias']]); ?>
-						<?php endforeach; ?>
-					</div>
-				</div>
-			<?php endif; ?>
-		</div>
-	</div>
-
-	<div class="row">
-		<?php foreach ($groups as $k => $group): ?>
-			<div class="col-md-6">
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						<h3 class="panel-title">
-							<?php echo $view['translator']->trans('mautic.lead.field.group.'.$group); ?>
-						</h3>
-					</div>
-					<div class="panel-body">
-						<?php foreach ($fields[$group] as $field): ?>
-							<?php echo $view['form']->row($form[$field['alias']]); ?>
-						<?php endforeach; ?>
-					</div>
-				</div>
-			</div>
-		<?php endforeach; ?>
-	</div>
+        <!-- container -->
+        <div class="col-md-9 bg-auto height-auto bdr-l">
+            <!-- Tab panes act as a form -->
+            <?php echo $view['form']->start($form, array('attr' => array('class' => 'tab-content'))); ?>
+                <!-- pane -->
+                <?php $first = ' in active'; ?>
+                <?php foreach ($fields as $group => $groupFields): ?>
+                <?php if (!empty($groupFields)): ?>
+                    <div class="tab-pane fade<?php echo $first; ?> bdr-rds-0 bdr-w-0" id="<?php echo $group; ?>">
+                        <div class="pa-md bg-auto bg-light-xs bdr-b">
+                            <h4 class="fw-sb"><?php echo $view['translator']->trans('mautic.lead.field.group.' . $group); ?></h4>
+                        </div>
+                        <div class="pa-md">
+                            <?php if ($group == 'core'): ?>
+                            <?php echo $view['form']->row($form['owner_lookup']); ?>
+                            <?php echo $view['form']->row($form['owner']); ?>
+                            <hr class="mnr-md mnl-md">
+                            <?php endif; ?>
+                            <?php foreach ($groupFields as $alias => $field): ?>
+                            <?php echo $view['form']->row($form[$alias]); ?>
+                            <hr class="mnr-md mnl-md">
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                <?php $first = ''; ?>
+                <?php endif; ?>
+                <?php endforeach; ?>
+                <!--/ #pane -->
+            <?php echo $view['form']->end($form); ?>
+            <!--/ Tab panes act as a form -->
+        </div>
+        <!--/ end: container -->
+    </div>
+    <!--/ end: box layout -->
 </div>
-<?php echo $view['form']->end($form); ?>
+<!--/ reset container-fluid padding -->

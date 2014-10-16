@@ -45,20 +45,22 @@
 
     <!-- start: right nav -->
     <ul class="nav navbar-nav navbar-right">
-        <?php echo $view['knp_menu']->render('admin', array("menu" => "admin")); ?>
         <li class="dropdown dropdown-custom">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                <span class="label label-danger">3</span>
+                <?php if (!empty($newNotifications)): ?>
+                <span class="label label-danger"></span>
+                <?php endif; ?>
                 <span class="fa fa-bell fs-16"></span>
             </a>
             <div class="dropdown-menu">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <div class="panel-title"><h6 class="fw-sb">3 new notification</h6></div>
+                        <div class="panel-title"><h6 class="fw-sb"><?php echo $view['translator']->trans('mautic.core.notifications'); ?></h6></div>
                     </div>
                     <div class="pt-xs pb-xs pl-0 pr-0">
                         <div class="scroll-content slimscroll" style="height:250px;">
                             <div class="media pt-sm pb-sm pr-md pl-md nm bdr-b">
+                                <!--
                                 <span class="pull-left img-wrapper img-rounded mt-xs" style="width:36px">
                                     <img class="media-object" src="https://s3.amazonaws.com/uifaces/faces/twitter/mlane/73.jpg">
                                 </span>
@@ -70,43 +72,7 @@
                                         <span class="fs-10 text-white dark-sm pull-left">1H</span>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="media pt-sm pb-sm pr-md pl-md nm bdr-b">
-                                <span class="pull-left mt-xs" style="width:36px">
-                                    <span class="fa fa-newspaper-o text-warning fs-20"></span>
-                                </span>
-                                <div class="media-body">
-                                    <a href="" class="media-heading fw-sb mb-0 text-primary">Your campaign is completed!</a>
-                                    <div class="ellipsis text-white dark-sm">Nam porttitor scelerisque neque. Nullam nisl. Maecenas malesuada</div>
-                                    <div class="clearfix mt-xs">
-                                        <span class="fs-10 text-white dark-sm pull-left">2H</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="media pt-sm pb-sm pr-md pl-md nm bdr-b">
-                                <span class="pull-left img-wrapper img-rounded mt-xs" style="width:36px">
-                                    <img class="media-object" src="https://s3.amazonaws.com/uifaces/faces/twitter/BillSKenney/73.jpg">
-                                </span>
-                                <div class="media-body">
-                                    <a href="" class="media-heading fw-sb mb-0 text-primary">Bill Kenny join the conference.</a>
-                                    <div class="ellipsis text-white dark-sm">Nam porttitor scelerisque neque. Nullam nisl. Maecenas malesuada</div>
-                                    <div class="clearfix mt-xs">
-                                        <span class="fa fa-thumbs-up text-success pull-left mr-xs"></span>
-                                        <span class="fs-10 text-white dark-sm pull-left">1D</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="media pt-sm pb-sm pr-md pl-md nm">
-                                <span class="pull-left mt-xs" style="width:36px">
-                                    <span class="fa fa-trophy text-warning fs-20"></span>
-                                </span>
-                                <div class="media-body">
-                                    <a href="" class="media-heading fw-sb mb-0 text-primary">You have a page winner!</a>
-                                    <div class="ellipsis text-white dark-sm">Nam porttitor scelerisque neque. Nullam nisl. Maecenas malesuada</div>
-                                    <div class="clearfix mt-xs">
-                                        <span class="fs-10 text-white dark-sm pull-left">2H</span>
-                                    </div>
-                                </div>
+                                -->
                             </div>
                         </div>
                     </div>

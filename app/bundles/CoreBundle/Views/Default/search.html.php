@@ -53,14 +53,12 @@ $searchClass   = (!empty($searchString) ? 'show-search' : 'hide-search');
 			</div>
 
 			<?php
-				$view['slots']->start('modal');
-		        echo $view->render('MauticCoreBundle:Helper:modal.html.php', array(
-		            'id'     => 'search-help',
-		            'header' => $view['translator']->trans('mautic.core.search.header'),
-		            'body'   => $view['translator']->trans('mautic.core.search.help') .
-		                $view['slots']->get('searchHelp', '')
-		        ));
-		        $view['slots']->stop();
+            $view['slots']->append('modal', $view->render('MauticCoreBundle:Helper:modal.html.php', array(
+                'id'     => 'search-help',
+                'header' => $view['translator']->trans('mautic.core.search.header'),
+                'body'   => $view['translator']->trans('mautic.core.search.help') .
+                    $view['slots']->get('searchHelp', '')
+            )));
 		    ?>
 		</div>
 	</div>

@@ -11,7 +11,6 @@
 <div class="page-header">
     <div class="box-layout">
         <div class="col-sm-6 va-m">
-            <?php echo $view->render('MauticCoreBundle:Default:breadcrumbs.html.php'); ?>
         </div>
         <div class="col-sm-6 va-m">
             <div class="toolbar text-right" id="toolbar">

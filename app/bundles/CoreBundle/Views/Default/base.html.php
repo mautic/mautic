@@ -17,23 +17,15 @@ $activePanelClasses  = ($app->getSession()->get('left-panel', 'default') == 'unp
         <section id="app-wrapper">
             <?php $view['assets']->outputScripts("bodyOpen"); ?>
 
-            <!-- start: loading-message
-            <div class="loading-message hidden">
-                <div class="loading-message-inner-wrapper bg-success">
-                    <?php //echo $view['translator']->trans('mautic.core.loading'); ?>
-                </div>
-            </div>
-            end: loading-message -->
-
             <!-- start: app-sidebar(left) -->
             <aside class="app-sidebar sidebar-left">
-                <?php echo $view->render('MauticCoreBundle:Default:leftpanel.html.php'); ?>
+                <?php echo $view->render('MauticCoreBundle:LeftPanel:index.html.php'); ?>
             </aside>
             <!--/ end: app-sidebar(left) -->
 
             <!-- start: app-sidebar(right) -->
             <aside class="app-sidebar sidebar-right">
-                <?php echo $view->render('MauticCoreBundle:Default:rightpanel.html.php'); ?>
+                <?php echo $view->render('MauticCoreBundle:RightPanel:index.html.php'); ?>
             </aside>
             <!--/ end: app-sidebar(right) -->
 
@@ -59,30 +51,6 @@ $activePanelClasses  = ($app->getSession()->get('left-panel', 'default') == 'unp
             </section>
             <!--/ end: app-content -->
 
-            <?php /*
-            <div class="page-wrapper<?php echo $activePanelClasses; ?>">
-                <div class="loading-bar progress">
-                    <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>
-                </div>
-                <div class="main-panel-wrapper">
-                    </div>
-                    <div class="main-panel">
-                        <a href="#" id="main-panel-top"></a>
-                        <div class="main-panel-flash-msgs">
-                            <?php echo $view->render('MauticCoreBundle:Default:flashes.html.php'); ?>
-                        </div>
-                        <div id="page-content" class="main-panel-content container-fluid">
-                            <?php $view['slots']->output('_content'); ?>
-                        </div>
-                    </div>
-                </div>
-            </div> */ ?>
-
-           <?php /*
-            <div class="right-panel scrollable">
-                <?php echo $view->render('MauticCoreBundle:Default:rightpanel.html.php'); ?>
-            </div>
-            */ ?>
         </section>
         <!--/ end: app-wrapper -->
 

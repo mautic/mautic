@@ -27,10 +27,10 @@ $view['slots']->set("headerTitle", $header);
                     <li class=""><a href="#actions-container" role="tab" data-toggle="tab">Actions</a></li>
                 </ul>
             <!--/ tabs controls -->
-            
+
 
             <?php echo $view['form']->start($form); ?>
-            
+
                 <div class="tab-content pa-md bg-white">
                     <!-- #history-container -->
                     <div class="tab-pane fade in active bdr-w-0" id="details-container">
@@ -105,11 +105,9 @@ $view['slots']->set("headerTitle", $header);
         </div>
 
     <?php
-    $view['slots']->start('modal');
-    echo $this->render('MauticCoreBundle:Helper:modal.html.php', array(
+    $view['slots']->append('modal', $this->render('MauticCoreBundle:Helper:modal.html.php', array(
         'id'     => 'formComponentModal',
         'header' => $view['translator']->trans('mautic.form.form.modalheader'),
-    ));
-    $view['slots']->stop();
+    )));
     ?>
 </div>

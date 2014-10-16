@@ -107,7 +107,7 @@ class AjaxController extends CommonAjaxController
             }
             $dataArray['divider'] = $this->renderView('MauticChatBundle:User:newdivider.html.php', array('tag' => 'div'));;
             $dataArray['success'] = 1;
-            $dataArray['mauticContent'] = 'chatchannel';
+            $dataArray['mauticContent'] = 'chatChannel';
         }
 
         return $this->sendJsonResponse($dataArray);
@@ -238,22 +238,11 @@ class AjaxController extends CommonAjaxController
      */
     public function updateListAction(Request $request)
     {
-        //get a list of channels
-        $channelModel = $this->factory->getModel('chat.channel');
-        $channels     = $channelModel->getMyChannels();
-
-        $chatModel = $this->factory->getModel('chat.chat');
-        //get a list of  users
-        $users     = $chatModel->getUserList();
+        $response = $this->forward('MauticChatBundle:Default:index.html.php', array('ignoreAjax' => true));
 
         $dataArray = array(
-            'newContent' => $this->renderView('MauticChatBundle:Default:index.html.php', array(
-                'channels'    => $channels,
-                'users'       => $users,
-                'contentOnly' => true
-            )),
-            'ignore_wdt' => 1,
-            'mauticContent' => 'chat'
+            'newContent'    => $response->getContent(),
+            'ignore_wdt'    => 1
         );
 
         return $this->sendJsonResponse($dataArray);

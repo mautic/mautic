@@ -11,7 +11,7 @@ $size            = (empty($size)) ? '' : ' modal-'.$size;
 $class           = (!empty($class)) ? " $class" : "";
 $body            = (empty($body)) ? "" : $body;
 $footer          = (empty($footer)) ? "" : $footer;
-$hidePlaceholder = (empty($body)) ? false : true;
+$hidePlaceholder = (empty($body)) ? '' : ' hide';
 $header          = (empty($header)) ? "" : $header;
 ?>
 
