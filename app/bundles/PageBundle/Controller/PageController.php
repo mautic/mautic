@@ -238,6 +238,12 @@ class PageController extends FormController
             $abTestResults['error'] = $variantError;
         }
 
+        // Audit Log
+        $logs = $this->factory->getModel('core.auditLog')->getLogForObject('page', $activePage->getId());
+
+        // Hit count per day for last 30 days
+        $last30 = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit')->getHitsForLast30Days($activePage->getId());
+
         //get related translations
         list($translationParent, $translationChildren) = $model->getTranslations($activePage);
 
@@ -277,7 +283,9 @@ class PageController extends FormController
                 ),
                 'abTestResults' => $abTestResults,
                 'security'      => $security,
-                'pageUrl'       => $model->generateUrl($activePage, true)
+                'pageUrl'       => $model->generateUrl($activePage, true),
+                'logs'          => $logs,
+                'last30'        => $last30
             ),
             'contentTemplate' => 'MauticPageBundle:Page:details.html.php',
             'passthroughVars' => array(

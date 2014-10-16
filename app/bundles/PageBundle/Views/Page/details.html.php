@@ -11,7 +11,7 @@
 //@todo - add landing page stats/analytics
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'page');
-$view['slots']->set("headerTitle", $activePage->getTitle());?>
+$view['slots']->set("headerTitle", $activePage->getTitle()); ?>
 
 <?php
 $view['slots']->start('actions');
@@ -173,23 +173,23 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                             <table class="table table-bordered table-striped mb-0">
                                 <tbody>
                                     <tr>
-                                        <td width="20%"><span class="fw-b">Description</span></td>
+                                        <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.core.description'); ?></span></td>
                                         <td><?php echo $activePage->getMetaDescription(); ?></td>
                                     </tr>
                                     <tr>
-                                        <td width="20%"><span class="fw-b">Created By</span></td>
+                                        <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.core.author'); ?></span></td>
                                         <td><?php echo $activePage->getAuthor(); ?></td>
                                     </tr>
                                     <tr>
-                                        <td width="20%"><span class="fw-b">Category</span></td>
+                                        <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.core.category'); ?></span></td>
                                         <td><?php echo $activePage->getCategory()->getTitle(); ?></td>
                                     </tr>
                                     <tr>
-                                        <td width="20%"><span class="fw-b">Publish Up</span></td>
+                                        <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.page.page.publish.up'); ?></span></td>
                                         <td><?php echo (!is_null($activePage->getPublishUp())) ? $view['date']->toFull($activePage->getPublishUp()) : ''; ?></td>
                                     </tr>
                                     <tr>
-                                        <td width="20%"><span class="fw-b">Publish Down</span></td>
+                                        <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.page.page.publish.down'); ?></span></td>
                                         <td><?php echo (!is_null($activePage->getPublishDown())) ? $view['date']->toFull($activePage->getPublishDown()) : ''; ?></td>
                                     </tr>
                                 </tbody>
@@ -219,7 +219,7 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                             <div class="panel ovf-h bg-auto bg-light-xs">
                                 <div class="panel-body box-layout">
                                     <div class="col-xs-8 va-m">
-                                        <h5 class="text-white dark-md fw-sb mb-xs">Page Views</h5>
+                                        <h5 class="dark-md fw-sb mb-xs"><?php echo $view['translator']->trans('mautic.page.page.pageviews'); ?></h5>
                                         <h2 class="fw-b"><?php echo $activePage->getHits(); ?></h2>
                                     </div>
                                     <div class="col-xs-4 va-t text-right">
@@ -230,11 +230,11 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                                 sparkHeight="34"
                                 sparkWidth="180"
                                 sparkType="bar"
-                                sparkBarWidth="8"
+                                sparkBarWidth="7"
                                 sparkBarSpacing="3"
                                 sparkZeroAxis="false"
                                 sparkBarColor="#00B49C">
-                                    129,137,186,167,200,115,118,162,112,106,104,106
+                                    <?php echo implode(',', array_reverse($last30)); ?>
                                 </div>
                             </div>
                         </div>
@@ -242,7 +242,7 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                             <div class="panel ovf-h bg-auto bg-light-xs">
                                 <div class="panel-body box-layout">
                                     <div class="col-xs-8 va-m">
-                                        <h5 class="text-white dark-md fw-sb mb-xs">Page Conversions</h5>
+                                        <h5 class="dark-md fw-sb mb-xs"><?php echo $view['translator']->trans('mautic.page.page.conversions'); ?></h5>
                                         <h2 class="fw-b">162</h2>
                                     </div>
                                     <div class="col-xs-4 va-t text-right">
@@ -265,7 +265,7 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                             <div class="panel ovf-h bg-auto bg-light-xs">
                                 <div class="panel-body box-layout">
                                     <div class="col-xs-8 va-m">
-                                        <h5 class="text-white dark-md fw-sb mb-xs">Ads Click</h5>
+                                        <h5 class="dark-md fw-sb mb-xs"><?php echo $view['translator']->trans('mautic.page.page.ads.click'); ?></h5>
                                         <h2 class="fw-b">192</h2>
                                     </div>
                                     <div class="col-xs-4 va-t text-right">
@@ -290,8 +290,8 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
 
                 <!-- tabs controls -->
                 <ul class="nav nav-tabs pr-md pl-md">
-                    <li class="active"><a href="#translation-container" role="tab" data-toggle="tab">Translations</a></li>
-                    <li class=""><a href="#variants-container" role="tab" data-toggle="tab">Variants</a></li>
+                    <li class="active"><a href="#translation-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.page.page.translations'); ?></a></li>
+                    <li class=""><a href="#variants-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.page.page.variants'); ?></a></li>
                 </ul>
                 <!--/ tabs controls -->
             </div>
@@ -397,7 +397,7 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
 
                         <!-- button -->
                         <div class="col-xs-4 va-m text-right">
-                            <a href="#" class="btn btn-primary">A/B Test Stats</a>
+                            <a href="#" class="btn btn-primary"><?php echo $view['translator']->trans('mautic.page.page.ab.test.stats'); ?></a>
                         </div>
                     </div>
                     <!--/ header -->
@@ -507,56 +507,38 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
             -->
             <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mb-0">
                 <div class="panel-heading">
-                    <div class="panel-title">Recent Activity</div>
+                    <div class="panel-title"><?php echo $view['translator']->trans('mautic.page.page.recent.activity'); ?></div>
                 </div>
                 <div class="panel-body pt-xs">
+                    <?php if (isset($logs) && $logs) : ?>
                     <ul class="media-list media-list-feed">
+                        <?php foreach ($logs as $log) : ?>
                         <li class="media">
                             <div class="media-object pull-left mt-xs">
-                                <span class="figure"></span>
-                            </div>
-                            <div class="media-body">
-                                Dan Counsell Create <strong class="text-primary">Super Awesome Page</strong>
-                                <p class="fs-12 text-white dark-sm">Jan 16, 2014</p>
-                            </div>
-                        </li>
-                        <li class="media">
-                            <div class="media-object pull-left mt-xs">
-                                <span class="figure"></span>
-                            </div>
-                            <div class="media-body">
-                                Ima Steward Update <strong class="text-primary">Super Awesome Page</strong> action
-                                <p class="fs-12 text-white dark-sm">May 1, 2015</p>
-                            </div>
-                        </li>
-                        <li class="media">
-                            <div class="media-object pull-left mt-xs">
-                                <span class="figure"></span>
-                            </div>
-                            <div class="media-body">
-                                Ima Steward Update <strong class="text-primary">Super Awesome Page</strong> leads
-                                <p class="fs-12 text-white dark-sm">Aug 2, 2014</p>
-                            </div>
-                        </li>
-                        <li class="media">
-                            <div class="media-object pull-left">
+                            <?php if ($log['action'] == 'create') : ?>
                                 <span class="figure featured bg-success"><span class="fa fa-check"></span></span>
-                            </div>
-                            <div class="media-body">
-                                Dan Counsell Publish <strong class="text-primary">Super Awesome Page</strong>
-                                <p class="fs-12 text-white dark-sm">Sep 23, 2014</p>
-                            </div>
-                        </li>
-                        <li class="media">
-                            <div class="media-object pull-left">
+                            <?php else: ?>
                                 <span class="figure"></span>
+                            <?php endif; ?>
                             </div>
                             <div class="media-body">
-                                Dan Counsell Unpublish <strong class="text-primary">Super Awesome Page</strong>
-                                <p class="fs-12 text-white dark-sm">Sep 29, 2014</p>
+                                <?php echo $log['userName']; ?>
+                                <?php echo $log['action']; ?>
+                                <ul>
+                                <?php foreach ($log['details'] as $key => $detail) : ?>
+                                    <li>
+                                        <strong class="text-primary">
+                                            <?php echo ucfirst($key); ?>
+                                        </strong>: <?php echo $view['translator']->trans($detail[1]); ?>
+                                    </li>
+                                <?php endforeach; ?>
+                                </ul>
+                                <p class="fs-12 dark-sm"><small> <?php echo $log['dateAdded']->format('D, d M Y H:i:s'); ?></small></p>
                             </div>
                         </li>
+                        <?php endforeach; ?>
                     </ul>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
