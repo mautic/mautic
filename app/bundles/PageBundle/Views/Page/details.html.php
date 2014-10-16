@@ -397,7 +397,7 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
 
                         <!-- button -->
                         <div class="col-xs-4 va-m text-right">
-                            <a href="#" class="btn btn-primary"><?php echo $view['translator']->trans('autic.page.page.ab.test.stats'); ?></a>
+                            <a href="#" class="btn btn-primary"><?php echo $view['translator']->trans('mautic.page.page.ab.test.stats'); ?></a>
                         </div>
                     </div>
                     <!--/ header -->
