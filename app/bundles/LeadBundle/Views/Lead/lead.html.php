@@ -22,6 +22,8 @@ $view['slots']->append('modal', $view->render('MauticCoreBundle:Helper:modal.htm
     'id' => 'leadModal'
 )));
 
+$groups = array_keys($fields);
+
 $view['slots']->start("actions");
 if ($hasEditAccess): ?>
     <a class="btn btn-default" href="<?php echo $this->container->get('router')->generate(
@@ -117,29 +119,51 @@ $view['slots']->stop();
 
                 <!-- lead detail collapseable -->
                 <div class="collapse" id="lead-details">
-                    <div class="pr-md pl-md pb-md">
-                        <div class="panel shd-none mb-0">
-                            <table class="table table-bordered table-striped mb-0">
-                                <tbody>
-                                    <tr>
-                                        <td width="20%"><span class="fw-b">Company</span></td>
-                                        <td><?php echo $lead->getSecondaryIdentifier(); ?></td>
-                                    </tr>
-                                    <tr>
-                                        <td width="20%"><span class="fw-b">Position</span></td>
-                                        <td><?php echo $fields['core']['position']['value']; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <td width="20%"><span class="fw-b">Email</span></td>
-                                        <td><?php echo $fields['core']['email']['value']; ?></td>
-                                    </tr>
-                                    <tr>
-                                        <td width="20%"><span class="fw-b">Phone</span></td>
-                                        <td><?php echo $fields['core']['phone']['value']; ?></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                    
+                    <ul class="nav nav-tabs pr-md pl-md" role="tablist">
+                    <?php $step = 0; ?>
+                    <?php foreach ($groups as $g): ?>
+                        <?php if (!empty($fields[$g])): ?>
+                            <li class="<?php if ($step === 1) echo "active"; ?>">
+                                <a href="#<?php echo $g; ?>" class="group" data-toggle="tab">
+                                    <?php echo $view['translator']->trans('mautic.lead.field.group.' . $g); ?>
+                                </a>
+                            </li>
+                            <?php $step++; ?>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                    </ul>
+
+                    <!-- start: tab-content -->
+                    <div class="tab-content pa-md">
+                        <?php foreach ($groups as $g): ?>
+                            <div class="tab-pane fade in active bdr-w-0" id="<?php echo $g; ?>">
+                                <div class="pr-md pl-md pb-md">
+                                    <div class="panel shd-none mb-0">
+                                        <table class="table table-bordered table-striped mb-0">
+                                            <tbody>
+                                                <tr>
+                                                    <td width="20%"><span class="fw-b">Company</span></td>
+                                                    <td><?php echo $lead->getSecondaryIdentifier(); ?></td>
+                                                </tr>
+                                                <tr>
+                                                    <td width="20%"><span class="fw-b">Position</span></td>
+                                                    <td><?php echo $fields['core']['position']['value']; ?></td>
+                                                </tr>
+                                                <tr>
+                                                    <td width="20%"><span class="fw-b">Email</span></td>
+                                                    <td><?php echo $fields['core']['email']['value']; ?></td>
+                                                </tr>
+                                                <tr>
+                                                    <td width="20%"><span class="fw-b">Phone</span></td>
+                                                    <td><?php echo $fields['core']['phone']['value']; ?></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
                     </div>
                 </div>
                 <!--/ lead detail collapseable -->
@@ -149,7 +173,7 @@ $view['slots']->stop();
                 <!-- lead detail collapseable toggler -->
                 <div class="hr-expand nm">
                     <span data-toggle="tooltip" title="Detail">
-                        <a href="javascript:void(0)" class="arrow" data-toggle="collapse" data-target="#lead-details"><span class="caret"></span></a>
+                        <a href="javascript:void(0)" class="arrow text-muted" data-toggle="collapse" data-target="#lead-details"><span class="caret"></span> <?php echo $view['translator']->trans('mautic.lead.lead.details'); ?></a>
                     </span>
                 </div>
                 <!--/ lead detail collapseable toggler -->
