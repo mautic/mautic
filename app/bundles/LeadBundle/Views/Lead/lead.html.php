@@ -157,7 +157,7 @@ $view['slots']->stop();
                 <div class="pa-md">
                     <div class="row">
                         <div class="col-sm-12">
-                            <div class="panel ovf-h bg-auto bg-light-xs">
+                            <div class="panel">
                                 <div class="panel-body box-layout">
                                     <div class="col-xs-8 va-m">
                                         <h5 class="text-white dark-md fw-sb mb-xs">Engagements</h5>
