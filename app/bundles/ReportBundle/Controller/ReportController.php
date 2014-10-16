@@ -495,6 +495,8 @@ class ReportController extends FormController
 
         $result = $query->getConnection()->executeQuery((string) $query)->fetchAll();
 
+        $contentTemplate = $reportGenerator->getContentTemplate();
+
         //set what page currently on so that we can return here after form submission/cancellation
         $this->factory->getSession()->set('mautic.report.' . $entity->getId() . '.page', $reportPage);
 
@@ -508,7 +510,7 @@ class ReportController extends FormController
                 'tmpl'       => $tmpl,
                 'limit'      => $limit,
             ),
-            'contentTemplate' => 'MauticReportBundle:Report:details.html.php',
+            'contentTemplate' => $contentTemplate,
             'passthroughVars' => array(
                 'activeLink'     => '#mautic_report_index',
                 'mauticContent'  => 'report',

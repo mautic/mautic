@@ -34,6 +34,13 @@ class ReportGeneratorEvent extends Event
     private $queryBuilder;
 
     /**
+     * contentTemplate
+     *
+     * @var string
+     */
+    private $contentTemplate;
+
+    /**
      * Constructor
      *
      * @param string $context Event context
@@ -79,5 +86,34 @@ class ReportGeneratorEvent extends Event
     public function setQueryBuilder(QueryBuilder $queryBuilder)
     {
         $this->queryBuilder = $queryBuilder;
+    }
+
+    /**
+     * Fetch the ContentTemplate path
+     *
+     * @return QueryBuilder
+     *
+     * @throws \RuntimeException
+     */
+    public function getContentTemplate()
+    {
+        if ($this->contentTemplate) {
+            return $this->contentTemplate;
+        }
+
+        // Defautl content template
+        return 'MauticReportBundle:Report:details.html.php';
+    }
+
+    /**
+     * Set the ContentTemplate path
+     *
+     * @param string $contentTemplate
+     *
+     * @return void
+     */
+    public function setContentTemplate($contentTemplate)
+    {
+        $this->contentTemplate = $contentTemplate;
     }
 }

@@ -34,6 +34,11 @@ final class MauticReportBuilder implements ReportBuilderInterface
     private $entity;
 
     /**
+     * @var string
+     */
+    private $contentTemplate;
+
+    /**
      * Constructor
      *
      * @param \Symfony\Component\Security\Core\SecurityContextInterface $securityContext Symfony Core Security Context
@@ -69,6 +74,16 @@ final class MauticReportBuilder implements ReportBuilderInterface
     }
 
     /**
+     * Gets the getContentTemplate path
+     *
+     * @return string
+     */
+    public function getContentTemplate()
+    {
+        return $this->contentTemplate;
+    }
+
+    /**
      * Configures builder
      *
      * This method configures the ReportBuilder. It has to return
@@ -96,6 +111,9 @@ final class MauticReportBuilder implements ReportBuilderInterface
         $event = new ReportGeneratorEvent($source);
         $dispatcher->dispatch(ReportEvents::REPORT_ON_GENERATE, $event);
         $queryBuilder = $event->getQueryBuilder();
+
+        // Set Content Template
+        $this->contentTemplate = $event->getContentTemplate();
 
         $queryBuilder
             ->select(implode(', ', $selectColumns));
