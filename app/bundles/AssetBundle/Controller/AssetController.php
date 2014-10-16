@@ -59,7 +59,7 @@ class AssetController extends FormController
                 array('column' => 'p.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser());
         }
 
-        $orderBy     = $this->factory->getSession()->get('mautic.asset.orderby', 'p.title');
+        $orderBy     = $this->factory->getSession()->get('mautic.asset.orderby', 'a.title');
         $orderByDir  = $this->factory->getSession()->get('mautic.asset.orderbydir', 'DESC');
 
         $assets = $model->getEntities(
