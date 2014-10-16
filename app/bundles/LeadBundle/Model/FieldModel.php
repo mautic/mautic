@@ -93,8 +93,9 @@ class FieldModel extends FormModel
         //set some defaults
         $this->setTimestamps($entity, $isNew, $unlock);
 
+        $alias = $entity->getAlias();
+
         if ($isNew) {
-            $alias = $entity->getAlias();
             if (empty($alias)) {
                 $alias = strtolower(InputHelper::alphanum($entity->getName()));
             } else {

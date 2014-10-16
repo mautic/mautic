@@ -55,12 +55,7 @@ class AjaxController extends CommonAjaxController
         $field     = InputHelper::clean($request->query->get('field'));
         if (!empty($field)) {
             $dataArray = array();
-            if ($field == 'company') {
-                $results = $this->factory->getModel('lead.lead')->getLookupResults('company', $filter);
-                foreach ($results as $r) {
-                    $dataArray[] = array('value' => $r['company']);
-                }
-            } elseif ($field == "owner") {
+            if ($field == "owner") {
                 $results = $this->factory->getModel('lead.lead')->getLookupResults('user', $filter);
                 foreach ($results as $r) {
                     $name        = $r['firstName'] . ' ' . $r['lastName'];
