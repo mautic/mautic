@@ -17,52 +17,54 @@ $header = ($entity->getId()) ?
 $view['slots']->set("headerTitle", $header);
 ?>
 
-<div class="row bundle-content-container">
-    <div class="col-xs-12 col-sm-8 bundle-main bundle-main-left auto-height">
-        <div class="rounded-corners body-white bundle-main-inner-wrapper scrollable padding-md">
-            <?php echo $view['form']->start($form); ?>
-            <?php
-            echo $view['form']->row($form['campaigns-panel-wrapper-start']);
-            echo $view['form']->row($form['details-panel-start']);
-            echo $view['form']->row($form['name']);
-            echo $view['form']->row($form['description']);
-            echo $view['form']->row($form['category_lookup']);
-            echo $view['form']->row($form['category']);
-            echo $view['form']->row($form['isPublished']);
-            echo $view['form']->row($form['publishUp']);
-            echo $view['form']->row($form['publishDown']);
-            echo $view['form']->row($form['details-panel-end']);
-            echo $view['form']->row($form['events-panel-start']);
-            ?>
-            <div>
+<ul class="nav nav-tabs" role="tablist">
+    <li class="active"><a href="#details" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.campaign.form.panel.details'); ?></a></li>
+    <li><a href="#events" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.campaign.form.panel.events'); ?></a></li>
+</ul>
+
+<?php echo $view['form']->start($form); ?>
+<div class="tab-content">
+    <div class="tab-pane active pa-md" id="details">
+
+        <?php
+        echo $view['form']->row($form['name']);
+        echo $view['form']->row($form['description']);
+        echo $view['form']->row($form['category_lookup']);
+        echo $view['form']->row($form['category']);
+        echo $view['form']->row($form['isPublished']);
+        echo $view['form']->row($form['publishUp']);
+        echo $view['form']->row($form['publishDown']);
+        ?>
+    </div>
+    <div class="tab-pane pa-md" id="events">
+        <div class="row">
+            <div class="col-md-8">
+                <?php if (!$hasEvents = count($campaignEvents)): ?>
+                <h3 id='campaign-event-placeholder'><?php echo $view['translator']->trans('mautic.campaign.form.addevent'); ?></h3>
+                <?php endif; ?>
                 <ol id="campaignEvents">
                 <?php
-                $level = 1;
-                if (count($campaignEvents)):
+                if ($hasEvents):
                     echo $view->render('MauticCampaignBundle:CampaignBuilder:events.html.php', array(
                         'events'        => $campaignEvents,
                         'inForm'        => true,
                         'deletedEvents' => $deletedEvents,
                         'eventSettings' => $eventSettings
                     ));
-                else: ?>
-                <h3 id='campaign-event-placeholder'><?php echo $view['translator']->trans('mautic.campaign.form.addevent'); ?></h3>
-                <?php endif; ?>
+                endif;
+                ?>
+                </ol>
             </div>
-            <?php
-            echo $view['form']->row($form['events-panel-end']);
-            echo $view['form']->row($form['campaigns-panel-wrapper-end']);
-            echo $view['form']->end($form);
-            ?>
+            <div class="col-md-4">
+                <?php echo $view->render('MauticCampaignBundle:CampaignBuilder:components.html.php', array(
+                    'eventSettings' => $eventSettings,
+                    'tmpl'          => $tmpl
+                )); ?>
+            </div>
         </div>
     </div>
 
-    <div class="col-xs-12 col-sm-4 bundle-side bundle-side-right auto-height">
-        <div class="rounded-corners body-white bundle-side-inner-wrapper scrollable padding-md">
-            <?php $view['slots']->output('_content'); ?>
-        </div>
-    </div>
-
+    <?php echo $view['form']->end($form); ?>
     <?php
     $view['slots']->append('modal', $this->render('MauticCoreBundle:Helper:modal.html.php', array(
         'id'     => 'campaignEventModal',

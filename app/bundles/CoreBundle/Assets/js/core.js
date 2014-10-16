@@ -698,7 +698,7 @@ var Mautic = {
         //move the modal to the body tag to get around positioned div issues
         mQuery(target).on('show.bs.modal', function () {
             if (!mQuery(target).hasClass('modal-moved')) {
-                mQuery(target).appendTo("body");
+                mQuery(target).appendTo('body');
                 mQuery(target).addClass('modal-moved');
             }
         });
@@ -727,10 +727,10 @@ var Mautic = {
         //load the content
         if (mQuery(target + ' .loading-placeholder').length) {
             mQuery(target + ' .loading-placeholder').addClass('hide');
-            mQuery(target + " .modal-body-content").html(response.newContent);
-            mQuery(target + " .modal-body-content").removeClass('hide');
+            mQuery(target + ' .modal-body-content').html(response.newContent);
+            mQuery(target + ' .modal-body-content').removeClass('hide');
         } else {
-            mQuery(target + " .modal-body").html(response.newContent);
+            mQuery(target + ' .modal-body').html(response.newContent);
         }
 
         //inactive tooltips, etc

@@ -283,7 +283,7 @@ class CampaignController extends FormController
                 'entity'         => $entity,
                 'form'           => $form->createView()
             ),
-            'contentTemplate' => 'MauticCampaignBundle:CampaignBuilder:components.html.php',
+            'contentTemplate' => 'MauticCampaignBundle:CampaignBuilder:index.html.php',
             'passthroughVars' => array(
                 'activeLink'    => '#mautic_campaign_index',
                 'mauticContent' => 'campaign',
@@ -460,7 +460,7 @@ class CampaignController extends FormController
                 'entity'         => $entity,
                 'form'           => $form->createView()
             ),
-            'contentTemplate' => 'MauticCampaignBundle:CampaignBuilder:components.html.php',
+            'contentTemplate' => 'MauticCampaignBundle:CampaignBuilder:index.html.php',
             'passthroughVars' => array(
                 'activeLink'    => '#mautic_campaign_index',
                 'mauticContent' => 'campaign',

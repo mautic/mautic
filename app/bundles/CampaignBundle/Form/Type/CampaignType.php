@@ -45,20 +45,6 @@ class CampaignType extends AbstractType
         $builder->addEventSubscriber(new CleanFormSubscriber());
         $builder->addEventSubscriber(new FormExitSubscriber('campaign', $options));
 
-        $builder->add("campaigns-panel-wrapper-start", 'panel_wrapper_start', array(
-            'attr' => array(
-                'id' => "campaigns-panel"
-            )
-        ));
-
-        //details
-        $builder->add("details-panel-start", 'panel_start', array(
-            'label'      => 'mautic.campaign.form.panel.details',
-            'dataParent' => '#campaigns-panel',
-            'bodyId'     => 'details-panel',
-            'bodyAttr'   => array('class' => 'in')
-        ));
-
         $builder->add('name', 'text', array(
             'label'      => 'mautic.campaign.form.name',
             'label_attr' => array('class' => 'control-label'),
@@ -124,19 +110,6 @@ class CampaignType extends AbstractType
             'format'     => 'yyyy-MM-dd HH:mm',
             'required'   => false
         ));
-
-        $builder->add("details-panel-end", 'panel_end');
-
-        //actions
-        $builder->add("events-panel-start", 'panel_start', array(
-            'label'      => 'mautic.campaign.form.panel.events',
-            'dataParent' => '#campaigns-panel',
-            'bodyId'     => 'events-panel'
-        ));
-
-        $builder->add("events-panel-end", 'panel_end');
-
-        $builder->add("campaigns-panel-wrapper-end", 'panel_wrapper_end');
 
         $builder->add('tempId', 'hidden', array(
             'mapped' => false

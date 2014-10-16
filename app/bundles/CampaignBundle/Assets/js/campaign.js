@@ -94,11 +94,6 @@ Mautic.campaignEventOnLoad = function (container, response) {
             mQuery(this).find('.btn-edit').first().click();
         });
 
-        //show events panel
-        if (!mQuery('#events-panel').hasClass('in')) {
-            mQuery('a[href="#events-panel"]').trigger('click');
-        }
-
         if (mQuery('#campaign-event-placeholder').length) {
             mQuery('#campaign-event-placeholder').remove();
         }

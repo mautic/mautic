@@ -204,7 +204,7 @@ class EventModel extends CommonFormModel
                 }
                 $examinedEvents[] = $event['id'];
 
-                //check the callback function for the event to make sure it even applies based on the its settings
+                //check the callback function for the event to make sure it even applies based on its settings
                 if (!$this->invokeEventCallback($event, $settings, $lead, $passthrough)) {
                     continue;
                 }
