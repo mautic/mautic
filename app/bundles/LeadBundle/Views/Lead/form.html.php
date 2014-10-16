@@ -21,19 +21,36 @@ $groups = array_keys($fields);
 <div class="mna-md">
     <!-- start: box layout -->
     <div class="box-layout">
-        <!-- step container -->
+               <!-- step container -->
         <div class="col-md-3 bg-white height-auto">
             <div class="pr-lg pl-lg pt-md pb-md">
-                <h4 class="mb-sm fw-sb"><?php echo $header; ?></h4>
+                <div class="media">
+                    <div class="pull-left">
+                        <img class="img-circle img-bordered media-object" src="<?php echo $view['gravatar']->getImage($fields['core']['email']['value']); ?>" alt="" width="65px">
+                    </div>
+                    <div class="media-body">
+                        <h4><?php echo $header; ?></h4>
+                        <div style="max-width:200px;">
+                            <div class="progress progress-xs mb5">
+                                <div class="progress-bar progress-bar-warning" style="width:70%"></div>
+                            </div>
+                            <p class="text-muted clearfix nm">
+                                <span class="pull-left"><?php echo $view['translator']->trans('mautic.lead.lead.thead.points'); ?></span>
+                                <span class="pull-right"><?php echo $lead->getPoints(); ?></span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
 
-                <ul class="step">
+                <hr />
+
+                <ul class="list-group list-group-tabs">
                     <?php $step = 1; ?>
                     <?php foreach ($groups as $g): ?>
                         <?php if (!empty($fields[$g])): ?>
-                            <li class="<?php if ($step === 1) echo "active"; ?>">
+                            <li class="list-group-item <?php if ($step === 1) echo "active"; ?>">
                                 <a href="#<?php echo $g; ?>" class="steps" data-toggle="tab">
-                                    <span class="steps-figure"><?php echo $step; ?></span>
-                                    <span class="steps-text fw-sb"><?php echo $view['translator']->trans('mautic.lead.field.group.' . $g); ?></span>
+                                    <?php echo $view['translator']->trans('mautic.lead.field.group.' . $g); ?>
                                 </a>
                             </li>
                             <?php $step++; ?>
