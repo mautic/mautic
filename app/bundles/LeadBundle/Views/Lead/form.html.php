@@ -57,15 +57,93 @@ $groups = array_keys($fields);
                             <h4 class="fw-sb"><?php echo $view['translator']->trans('mautic.lead.field.group.' . $group); ?></h4>
                         </div>
                         <div class="pa-md">
-                            <?php if ($group == 'core'): ?>
-                            <?php echo $view['form']->row($form['owner_lookup']); ?>
-                            <?php echo $view['form']->row($form['owner']); ?>
+                        <?php if ($group == 'core'): ?>
+                            <div class="form-group mb-0">
+                                <?php echo $view['form']->label($form['owner_lookup']); ?>
+                                <div class="row">
+                                    <div class="col-sm-8">
+                                        <?php echo $view['form']->widget($form['owner_lookup']); ?>
+                                    </div>
+                                </div>
+                            </div>
                             <hr class="mnr-md mnl-md">
-                            <?php endif; ?>
-                            <?php foreach ($groupFields as $alias => $field): ?>
-                            <?php echo $view['form']->row($form[$alias]); ?>
+
+                            <div class="form-group mb-0">
+                                <label class="control-label mb-xs"><?php echo $view['translator']->trans('mautic.lead.field.name'); ?></label>
+                                <div class="row">
+                                    <div class="col-sm-2">
+                                        <?php echo $view['form']->widget($form['title'], array('attr' => array('placeholder' => $form['title']->vars['label']))); ?>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <?php echo $view['form']->widget($form['firstname'], array('attr' => array('placeholder' => $form['firstname']->vars['label']))); ?>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <?php echo $view['form']->widget($form['lastname'], array('attr' => array('placeholder' => $form['lastname']->vars['label']))); ?>
+                                    </div>
+                                </div>
+                            </div>
                             <hr class="mnr-md mnl-md">
-                            <?php endforeach; ?>
+
+                            <div class="form-group mb-0">
+                                <label class="control-label mb-xs"><?php echo $form['email']->vars['label']; ?></label>
+                                <div class="row">
+                                    <div class="col-sm-8">
+                                        <?php echo $view['form']->widget($form['email'], array('attr' => array('placeholder' => $form['email']->vars['label']))); ?>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr class="mnr-md mnl-md">
+
+                            <div class="form-group mb-0">
+                                <label class="control-label mb-xs"><?php echo $view['translator']->trans('mautic.lead.field.company'); ?></label>
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <?php echo $view['form']->widget($form['company'], array('attr' => array('placeholder' => $view['translator']->trans('mautic.lead.field.companyname')))); ?>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <?php echo $view['form']->widget($form['position'], array('attr' => array('placeholder' => $form['position']->vars['label']))); ?>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr class="mnr-md mnl-md">
+
+                            <div class="form-group mb-0">
+                                <label class="control-label mb-xs"><?php echo $view['translator']->trans('mautic.lead.field.address'); ?></label>
+                                <div class="row mb-xs">
+                                    <div class="col-sm-8">
+                                        <?php echo $view['form']->widget($form['address1'], array('attr' => array('placeholder' => $form['address1']->vars['label']))); ?>
+                                    </div>
+                                </div>
+                                <div class="row mb-xs">
+                                    <div class="col-sm-8">
+                                        <?php echo $view['form']->widget($form['address2'], array('attr' => array('placeholder' => $form['address2']->vars['label']))); ?>
+                                    </div>
+                                </div>
+                                <div class="row mb-xs">
+                                    <div class="col-sm-4">
+                                        <?php echo $view['form']->widget($form['city'], array('attr' => array('placeholder' => $form['city']->vars['label']))); ?>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <?php echo $view['form']->widget($form['state'], array('attr' => array('placeholder' => $form['state']->vars['label']))); ?>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <?php echo $view['form']->widget($form['zipcode'], array('attr' => array('placeholder' => $form['zipcode']->vars['label']))); ?>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <?php echo $view['form']->widget($form['country'], array('attr' => array('placeholder' => $form['country']->vars['label']))); ?>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr class="mnr-md mnl-md">
+                            <?php
+                            endif;
+
+                            foreach ($groupFields as $alias => $field):
+                                echo $view['form']->row($form[$alias]);
+                            endforeach;
+                            ?>
                         </div>
                     </div>
                 <?php $first = ''; ?>
