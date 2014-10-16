@@ -115,9 +115,12 @@ final class MauticReportBuilder implements ReportBuilderInterface
         // Set Content Template
         $this->contentTemplate = $event->getContentTemplate();
 
-        $queryBuilder
-            ->select(implode(', ', $selectColumns));
-
+        if ($selectColumns) {
+            $queryBuilder->select(implode(', ', $selectColumns));
+        } else {
+            $queryBuilder->select('*');
+        }
+        
         // Add filters as AND values to the WHERE clause if present
         $filters = $this->entity->getFilters();
 
@@ -153,7 +156,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
         // TODO - We might not always want to apply these options, expand the array to make the options optional
         if ($options['orderBy'] != '' && $options['orderByDir'] != '') {
             $queryBuilder->orderBy($options['orderBy'], $options['orderByDir']);
-        } else {
+        } elseif (isset($selectColumns[0])) {
             $queryBuilder->orderBy($selectColumns[0], 'ASC');
         }
 
