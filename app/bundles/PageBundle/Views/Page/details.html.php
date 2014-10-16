@@ -230,11 +230,11 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                                 sparkHeight="34"
                                 sparkWidth="180"
                                 sparkType="bar"
-                                sparkBarWidth="8"
+                                sparkBarWidth="7"
                                 sparkBarSpacing="3"
                                 sparkZeroAxis="false"
                                 sparkBarColor="#00B49C">
-                                    129,137,186,167,200,115,118,162,112,106,104,106
+                                    <?php echo implode(',', array_reverse($last30)); ?>
                                 </div>
                             </div>
                         </div>

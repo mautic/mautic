@@ -69,6 +69,43 @@ class HitRepository extends CommonRepository
     }
 
     /**
+     * Get hit count per day for last 30 days
+     *
+     * @param integer $pageId
+     *
+     * @return array
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function getHitsForLast30Days($pageId)
+    {
+        $query = $this->createQueryBuilder('h');
+        $query->select('IDENTITY(h.page), h.dateHit')
+            ->where($query->expr()->eq('IDENTITY(h.page)', (int) $pageId))
+            ->andwhere($query->expr()->lte('h.dateHit', ':now'))
+            ->setParameter('now', new \DateTime());
+
+        $hits = $query->getQuery()->getArrayResult();
+        $days = array();
+        $today = new \DateTime();
+        $oneDay = new \DateInterval('P1D');
+
+        // Prefill $days array keys
+        for ($i = 0; $i < 30; $i++) {
+            $days[$today->format('Y-m-d')] = 0;
+            $today->sub($oneDay);
+        }
+
+        // Group hits by date
+        foreach ($hits as $hit) {
+            $day = $hit['dateHit']->format('Y-m-d');
+            $days[$day]++;
+        }
+
+        return $days;
+    }
+
+    /**
      * Get the number of bounces
      *
      * @param $pageIds
