@@ -17,7 +17,34 @@ if ($tmpl == 'index') {
 }
 ?>
 
-<!--<div class="panel panel-default page-list">
+<?php
+$view['slots']->start('actions');
+if ($security->hasEntityAccess($permissions['report:reports:editown'], $permissions['report:reports:editother'],
+    $report->getCreatedBy())): ?>
+    <a class="btn btn-default" href="<?php echo $this->container->get('router')->generate('mautic_report_action', array("objectAction" => "edit", "objectId" => $report->getId())); ?>" data-toggle="ajax" data-menu-link="#mautic_report_index">
+        <i class="fa fa-fw fa-pencil-square-o"></i>
+        <?php echo $view["translator"]->trans("mautic.core.form.edit"); ?>
+    </a>
+<?php endif; ?>
+<?php if ($security->hasEntityAccess($permissions['report:reports:deleteown'], $permissions['report:reports:deleteother'],
+    $report->getCreatedBy())): ?>
+    <a class="btn btn-default" href="javascript:void(0);"
+       onclick="Mautic.showConfirmation(
+           '<?php echo $view->escape($view["translator"]->trans("mautic.report.report.confirmdelete",
+           array("%name%" => $report->getTitle() . " (" . $report->getId() . ")")), 'js'); ?>',
+           '<?php echo $view->escape($view["translator"]->trans("mautic.core.form.delete"), 'js'); ?>',
+           'executeAction',
+           ['<?php echo $view['router']->generate('mautic_report_action',
+           array("objectAction" => "delete", "objectId" => $report->getId())); ?>',
+           '#mautic_report_index'],
+           '<?php echo $view->escape($view["translator"]->trans("mautic.core.form.cancel"), 'js'); ?>','',[]);">
+        <i class="fa fa-fw fa-trash-o text-danger"></i>
+        <?php echo $view['translator']->trans('mautic.core.form.delete'); ?>
+    </a>
+<?php endif; ?>
+<?php $view['slots']->stop(); ?>
+
+<div class="panel panel-default page-list">
     <div class="panel-heading">
         <h3 class="panel-title"><?php echo $header; ?></h3>
     </div>
@@ -66,7 +93,7 @@ if ($tmpl == 'index') {
             )); ?>
         </div>
     </div>
-</div>-->
+</div>
 
 <!-- reset container-fluid padding -->
 <div class="mna-md">
@@ -109,7 +136,7 @@ if ($tmpl == 'index') {
                                     </tr>
                                     <tr>
                                         <td width="20%"><span class="fw-b">Created By</span></td>
-                                        <td><?php //echo $report->getAuthor()->getName(); ?></td>
+                                        <td><?php echo $report->getCreatedBy()->getName(); ?></td>
                                     </tr>
                                     <tr>
                                         <td width="20%"><span class="fw-b">Created on</span></td>

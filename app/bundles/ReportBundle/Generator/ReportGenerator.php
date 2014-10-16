@@ -45,6 +45,11 @@ class ReportGenerator
     private $validInterface = "Mautic\\ReportBundle\\Builder\\ReportBuilderInterface";
 
     /**
+     * @var string
+     */
+    private $contentTemplate;
+
+    /**
      * Constructor
      *
      * @param \Symfony\Component\Security\Core\SecurityContextInterface $securityContext Security context
@@ -73,7 +78,11 @@ class ReportGenerator
     {
         $builder = $this->getBuilder();
 
-        return $builder->getQuery($options);
+        $query = $builder->getQuery($options);
+
+        $this->contentTemplate = $builder->getContentTemplate();
+
+        return $query;
     }
 
     /**
@@ -89,6 +98,16 @@ class ReportGenerator
     public function getForm(Report $entity, $options)
     {
         return $this->formFactory->createBuilder('report', $entity, $options)->getForm();
+    }
+
+    /**
+     * Gets the getContentTemplate path
+     *
+     * @return string
+     */
+    public function getContentTemplate()
+    {
+        return $this->contentTemplate;
     }
 
     /**

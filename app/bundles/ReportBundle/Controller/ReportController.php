@@ -437,6 +437,7 @@ class ReportController extends FormController
         /* @type \Mautic\ReportBundle\Model\ReportModel $model */
         $model      = $this->factory->getModel('report');
         $entity     = $model->getEntity($reportId);
+        $security   = $this->factory->getSecurity();
 
         //set the page we came from
         $page       = $this->factory->getSession()->get('mautic.report.page', 1);
@@ -462,7 +463,7 @@ class ReportController extends FormController
                     )
                 )
             ));
-        } elseif (!$this->factory->getSecurity()->hasEntityAccess(
+        } elseif (!$security->hasEntityAccess(
             'report:reports:viewown', 'report:reports:viewother', $entity->getCreatedBy()
         )
         ) {
@@ -495,6 +496,8 @@ class ReportController extends FormController
 
         $result = $query->getConnection()->executeQuery((string) $query)->fetchAll();
 
+        $contentTemplate = $reportGenerator->getContentTemplate();
+
         //set what page currently on so that we can return here after form submission/cancellation
         $this->factory->getSession()->set('mautic.report.' . $entity->getId() . '.page', $reportPage);
 
@@ -507,8 +510,18 @@ class ReportController extends FormController
                 'reportPage' => $page,
                 'tmpl'       => $tmpl,
                 'limit'      => $limit,
+                'security'   => $security,
+                'permissions'   => $security->isGranted(array(
+                    'report:reports:viewown',
+                    'report:reports:viewother',
+                    'report:reports:create',
+                    'report:reports:editown',
+                    'report:reports:editother',
+                    'report:reports:deleteown',
+                    'report:reports:deleteother'
+                ), "RETURN_ARRAY"),
             ),
-            'contentTemplate' => 'MauticReportBundle:Report:details.html.php',
+            'contentTemplate' => $contentTemplate,
             'passthroughVars' => array(
                 'activeLink'     => '#mautic_report_index',
                 'mauticContent'  => 'report',

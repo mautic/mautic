@@ -34,6 +34,11 @@ final class MauticReportBuilder implements ReportBuilderInterface
     private $entity;
 
     /**
+     * @var string
+     */
+    private $contentTemplate;
+
+    /**
      * Constructor
      *
      * @param \Symfony\Component\Security\Core\SecurityContextInterface $securityContext Symfony Core Security Context
@@ -69,6 +74,16 @@ final class MauticReportBuilder implements ReportBuilderInterface
     }
 
     /**
+     * Gets the getContentTemplate path
+     *
+     * @return string
+     */
+    public function getContentTemplate()
+    {
+        return $this->contentTemplate;
+    }
+
+    /**
      * Configures builder
      *
      * This method configures the ReportBuilder. It has to return
@@ -97,9 +112,15 @@ final class MauticReportBuilder implements ReportBuilderInterface
         $dispatcher->dispatch(ReportEvents::REPORT_ON_GENERATE, $event);
         $queryBuilder = $event->getQueryBuilder();
 
-        $queryBuilder
-            ->select(implode(', ', $selectColumns));
+        // Set Content Template
+        $this->contentTemplate = $event->getContentTemplate();
 
+        if ($selectColumns) {
+            $queryBuilder->select(implode(', ', $selectColumns));
+        } else {
+            $queryBuilder->select('*');
+        }
+        
         // Add filters as AND values to the WHERE clause if present
         $filters = $this->entity->getFilters();
 
@@ -135,7 +156,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
         // TODO - We might not always want to apply these options, expand the array to make the options optional
         if ($options['orderBy'] != '' && $options['orderByDir'] != '') {
             $queryBuilder->orderBy($options['orderBy'], $options['orderByDir']);
-        } else {
+        } elseif (isset($selectColumns[0])) {
             $queryBuilder->orderBy($selectColumns[0], 'ASC');
         }
 
