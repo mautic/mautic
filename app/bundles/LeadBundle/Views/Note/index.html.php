@@ -1,4 +1,4 @@
-<span class="input-group-btn"><a class="btn btn-sm btn-default btn-leadnote-add pull-right" href="<?php echo $this->container->get('router')->generate('mautic_leadnote_action', array('leadId' => $lead->getId(), 'objectAction' => 'new')); ?>" data-toggle="ajaxmodal" data-target="#leadModal" data-header="<?php echo $view['translator']->trans('mautic.lead.note.header.new'); ?>"><i class="fa fa-plus fa-lg"></i> Add Note</a></span>
+<div class="input-group-btn pb-10"><a class="btn btn-sm btn-default btn-leadnote-add pull-right" href="<?php echo $this->container->get('router')->generate('mautic_leadnote_action', array('leadId' => $lead->getId(), 'objectAction' => 'new')); ?>" data-toggle="ajaxmodal" data-target="#leadModal" data-header="<?php echo $view['translator']->trans('mautic.lead.note.header.new'); ?>"><i class="fa fa-plus fa-lg"></i> Add Note</a></div>
 
 <!-- form -->
 <form action="" class="panel">
