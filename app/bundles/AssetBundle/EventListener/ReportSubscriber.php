@@ -42,13 +42,24 @@ class ReportSubscriber extends CommonSubscriber
      */
     public function onReportBuilder(ReportBuilderEvent $event)
     {
-        $metadata = $this->factory->getEntityManager()->getClassMetadata('Mautic\\AssetBundle\\Entity\\Asset');
-        $fields   = $metadata->getFieldNames();
+        $metadataAsset = $this->factory->getEntityManager()->getClassMetadata('Mautic\\AssetBundle\\Entity\\Asset');
+        $metadataDownload = $this->factory->getEntityManager()->getClassMetadata('Mautic\\AssetBundle\\Entity\\Download');
+        $assetFields = $metadataAsset->getFieldNames();
+        $downloadFields = $metadataDownload->getFieldNames();
+
+        // Unset download id
+        unset($downloadFields[0]);
+
         $columns  = array();
 
-        foreach ($fields as $field) {
-            $fieldData = $metadata->getFieldMapping($field);
+        foreach ($assetFields as $field) {
+            $fieldData = $metadataAsset->getFieldMapping($field);
             $columns['a.' . $fieldData['columnName']] = array('label' => $field, 'type' => $fieldData['type']);
+        }
+
+        foreach ($downloadFields as $field) {
+            $fieldData = $metadataDownload->getFieldMapping($field);
+            $columns['ad.' . $fieldData['columnName']] = array('label' => $field, 'type' => $fieldData['type']);
         }
 
         $data = array(
@@ -77,6 +88,7 @@ class ReportSubscriber extends CommonSubscriber
         $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
 
         $queryBuilder->from(MAUTIC_TABLE_PREFIX . 'assets', 'a');
+        $queryBuilder->leftJoin('a', MAUTIC_TABLE_PREFIX . 'asset_downloads', 'ad', 'a.id = ad.asset_id');
 
         $event->setQueryBuilder($queryBuilder);
         $event->setContentTemplate('MauticAssetBundle:Report:details.html.php');
