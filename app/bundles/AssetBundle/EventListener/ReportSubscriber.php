@@ -79,5 +79,6 @@ class ReportSubscriber extends CommonSubscriber
         $queryBuilder->from(MAUTIC_TABLE_PREFIX . 'assets', 'a');
 
         $event->setQueryBuilder($queryBuilder);
+        $event->setContentTemplate('MauticAssetBundle:Report:details.html.php');
     }
 }
