@@ -11,7 +11,7 @@
 //@todo - add landing page stats/analytics
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'page');
-$view['slots']->set("headerTitle", $activePage->getTitle());?>
+$view['slots']->set("headerTitle", $activePage->getTitle()); ?>
 
 <?php
 $view['slots']->start('actions');
@@ -510,53 +510,35 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                     <div class="panel-title">Recent Activity</div>
                 </div>
                 <div class="panel-body pt-xs">
+                    <?php if (isset($logs) && $logs) : ?>
                     <ul class="media-list media-list-feed">
+                        <?php foreach ($logs as $log) : ?>
                         <li class="media">
                             <div class="media-object pull-left mt-xs">
-                                <span class="figure"></span>
-                            </div>
-                            <div class="media-body">
-                                Dan Counsell Create <strong class="text-primary">Super Awesome Page</strong>
-                                <p class="fs-12 text-white dark-sm">Jan 16, 2014</p>
-                            </div>
-                        </li>
-                        <li class="media">
-                            <div class="media-object pull-left mt-xs">
-                                <span class="figure"></span>
-                            </div>
-                            <div class="media-body">
-                                Ima Steward Update <strong class="text-primary">Super Awesome Page</strong> action
-                                <p class="fs-12 text-white dark-sm">May 1, 2015</p>
-                            </div>
-                        </li>
-                        <li class="media">
-                            <div class="media-object pull-left mt-xs">
-                                <span class="figure"></span>
-                            </div>
-                            <div class="media-body">
-                                Ima Steward Update <strong class="text-primary">Super Awesome Page</strong> leads
-                                <p class="fs-12 text-white dark-sm">Aug 2, 2014</p>
-                            </div>
-                        </li>
-                        <li class="media">
-                            <div class="media-object pull-left">
+                            <?php if ($log['action'] == 'create') : ?>
                                 <span class="figure featured bg-success"><span class="fa fa-check"></span></span>
-                            </div>
-                            <div class="media-body">
-                                Dan Counsell Publish <strong class="text-primary">Super Awesome Page</strong>
-                                <p class="fs-12 text-white dark-sm">Sep 23, 2014</p>
-                            </div>
-                        </li>
-                        <li class="media">
-                            <div class="media-object pull-left">
+                            <?php else: ?>
                                 <span class="figure"></span>
+                            <?php endif; ?>
                             </div>
                             <div class="media-body">
-                                Dan Counsell Unpublish <strong class="text-primary">Super Awesome Page</strong>
-                                <p class="fs-12 text-white dark-sm">Sep 29, 2014</p>
+                                <?php echo $log['userName']; ?>
+                                <?php echo $log['action']; ?>
+                                <ul>
+                                <?php foreach ($log['details'] as $key => $detail) : ?>
+                                    <li>
+                                        <strong class="text-primary">
+                                            <?php echo ucfirst($key); ?>
+                                        </strong>: <?php echo $view['translator']->trans($detail[1]); ?>
+                                    </li>
+                                <?php endforeach; ?>
+                                </ul>
+                                <p class="fs-12 dark-sm"><small> <?php echo $log['dateAdded']->format('D, d M Y H:i:s'); ?></small></p>
                             </div>
                         </li>
+                        <?php endforeach; ?>
                     </ul>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>

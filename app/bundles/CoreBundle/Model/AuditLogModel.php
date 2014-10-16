@@ -68,4 +68,17 @@ class AuditLogModel extends CommonModel
 
         $this->em->getRepository("MauticCoreBundle:AuditLog")->saveEntity($log);
     }
+
+    /**
+     * Get the audit log for specific object
+     *
+     * @param string $object type
+     * @param integer $id of the object
+     * 
+     * @return array of logs
+     */
+    public function getLogForObject($object, $id)
+    {
+        return $this->em->getRepository("MauticCoreBundle:AuditLog")->getLogForObject($object, $id);
+    }
 }
