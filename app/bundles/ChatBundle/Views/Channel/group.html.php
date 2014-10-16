@@ -31,7 +31,7 @@ if (!empty($insertUnreadDivider) && !$firstMsg['isRead']) {
         endforeach;
         ?>
         <?php if ($showDate): ?>
-        <p class="media-meta"><?php echo $view['date']->toShort($message['dateSent']); ?></p>
+        <p class="media-meta text-white dark-lg"><?php echo $view['date']->toShort($message['dateSent']); ?></p>
         <?php endif; ?>
     </div>
     <input type="hidden" class="chat-group-firstid" value="<?php echo $firstMsg['id']; ?>" />

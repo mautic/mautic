@@ -16,27 +16,13 @@ if (empty($contentOnly)) {
 }
 ?>
 
-<!-- start: sidebar header -->
-<div class="sidebar-header box-layout">
-    <div class="col-xs-6 va-m">
-        <h5 class="fw-sb"><?php echo $view['translator']->trans('mautic.chat.chat.channels'); ?></h5>
-    </div>
-    <div class="col-xs-6 va-m text-right">
-        <!-- this will toggle offcanvas-left container-->
-        <a href="javascript:void(0);" class="btn btn-primary offcanvas-opener offcanvas-open-ltr">Add</a>
-    </div>
-</div>
-<!--/ end: sidebar header -->
-
-<!-- start: sidebar content -->
-<div class="sidebar-content">
-    <!-- scroll-content -->
-    <div class="scroll-content slimscroll">
-        <?php echo $view->render('MauticChatBundle:Default:channels.html.php', array('channels' => $channels)); ?>
-
-        <!-- put the chat list here -->
-        <?php echo $view->render('MauticChatBundle:Default:users.html.php', array('users' => $users)); ?>
-    </div>
-    <!--/ scroll-content -->
-</div>
-<!--/ end: sidebar content -->
+<?php echo $view->render('MauticChatBundle:Default:channels.html.php', array(
+    'channels'    => $channels,
+    'permissions' => $permissions
+)); ?>
+<?php echo $view->render('MauticChatBundle:Default:users.html.php', array('users' => $users)); ?>
+<?php
+if (empty($ignoreModal)):
+    echo $this->render('MauticCoreBundle:Helper:modal.html.php', array('id' => 'channelModal'));
+endif;
+?>

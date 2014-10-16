@@ -24,26 +24,66 @@ class DefaultController extends FormController
     {
         //get a list of channels
         $channelModel = $this->factory->getModel('chat.channel');
-        $channels     = $channelModel->getMyChannels();
+        $unsorted     = $channelModel->getMyChannels();
+
+        $withUnread    = array();
+        $withoutUnread = array();
 
         //let's sort by unread count then alphabetical
-        usort($channels, function($a, $b) {
-            return $a['stats']['unread'] > $b['stats']['unread'];
+        foreach ($unsorted as $c) {
+            if (!empty($c['stats']['unread'])) {
+                $withUnread[] = $c;
+            } else {
+                $withoutUnread[] = $c;
+            }
+        }
+
+        usort($withUnread, function($a, $b) {
+            return strnatcasecmp($a['name'], $b['name']);
         });
+        usort($withoutUnread, function($a, $b) {
+            return strnatcasecmp($a['name'], $b['name']);
+        });
+
+        $channels = array_merge($withUnread, $withoutUnread);
 
         //get a list of  users
         $chatModel = $this->factory->getModel('chat');
-        $users     = $chatModel->getUserList();
+        $unsorted  = $chatModel->getUserList();
 
-        //sort by unread count
-        usort($users, function($a, $b) {
-            return $a['unread'] > $b['unread'];
+        $withUnread    = array();
+        $withoutUnread = array();
+
+        //let's sort by unread count then alphabetical
+        foreach ($unsorted as $u) {
+            if (!empty($u['stats']['unread'])) {
+                $withUnread[] = $u;
+            } else {
+                $withoutUnread[] = $u;
+            }
+        }
+
+        usort($withUnread, function($a, $b) {
+            return strnatcasecmp($a['username'], $b['username']);
         });
+        usort($withoutUnread, function($a, $b) {
+            return strnatcasecmp($a['username'], $b['username']);
+        });
+
+        $users = array_merge($withUnread, $withoutUnread);
+
+        $security = $this->factory->getSecurity();
 
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'channels' => $channels,
-                'users'    => $users
+                'channels'    => $channels,
+                'users'       => $users,
+                'permissions' => $security->isGranted(array(
+                    'chat:channels:create',
+                    'chat:channels:editother',
+                    'chat:channels:archiveother'
+                ), 'RETURN_ARRAY'),
+                'ignoreModal' => $this->request->get('ignoreModal', false)
             ),
             'contentTemplate' => 'MauticChatBundle:Default:index.html.php',
             'passthroughVars' => array(

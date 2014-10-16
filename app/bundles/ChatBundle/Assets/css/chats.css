@@ -3,7 +3,21 @@
     color: #00b6ad;
 }
 
+.chat-channel {
+    font-size: 14px;
+}
+
+li.chat-list:after {
+    border-bottom: 0 !important;
+}
+
+.chat-list .bullet {
+    height: 8px;
+    width: 8px;
+}
+
 /** Need to update this CSS */
 #ChatConversation .chat-group {
     padding-top: 0 !important;
 }
+

@@ -111,7 +111,8 @@ class LeadController extends FormController
             'hydration_mode' => 'HYDRATE_ARRAY'
         ));
 
-        $quickForm = $model->createForm($model->getEntity(), $this->get('form.factory'), $action, array('fields' => $fields, 'isShortForm' => true));
+        $quickForm     = $model->createForm($model->getEntity(), $this->get('form.factory'), $action, array('fields' => $fields, 'isShortForm' => true));
+        $quickFormView = $this->setFormTheme($quickForm, 'MauticLeadBundle:Lead:form.html.php', 'MauticLeadBundle:FormRow12');
 
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page
@@ -178,7 +179,7 @@ class LeadController extends FormController
             'currentList'  => $list,
             'security'     => $this->factory->getSecurity(),
             'inSingleList' => $inSingleList,
-            'quickForm'    => $quickForm
+            'quickForm'    => $quickFormView
         );
 
         return $this->delegateView(array(

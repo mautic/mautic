@@ -63,13 +63,10 @@ $view['slots']->set("headerTitle", $header);
         </div>
     </div>
 
-
     <?php
-    $view['slots']->start('modal');
-    echo $this->render('MauticCoreBundle:Helper:modal.html.php', array(
+    $view['slots']->append('modal', $this->render('MauticCoreBundle:Helper:modal.html.php', array(
         'id'     => 'campaignEventModal',
         'header' => $view['translator']->trans('mautic.campaign.form.modalheader'),
-    ));
-    $view['slots']->stop();
+    )));
     ?>
 </div>

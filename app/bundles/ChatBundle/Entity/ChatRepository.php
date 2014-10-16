@@ -31,7 +31,7 @@ class ChatRepository extends CommonRepository
     public function getUserConversation($currentUser, $withUser, $lastId = null, \DateTime $fromDateTime = null)
     {
         $q = $this->_em->createQueryBuilder();
-        $q->select('c, partial fu.{id, firstName, lastName, email}, partial tu.{id, firstName, lastName, email}')
+        $q->select('c, partial fu.{id, firstName, lastName, email}, partial tu.{id, username, firstName, lastName, email}')
             ->from('MauticChatBundle:Chat', 'c', 'c.id')
             ->join('c.fromUser', 'fu')
             ->join('c.toUser', 'tu')
@@ -82,7 +82,7 @@ class ChatRepository extends CommonRepository
     {
         $q = $this->_em->createQueryBuilder();
 
-        $q->select('u.id, u.firstName, u.lastName, u.email, u.lastActive, u.onlineStatus')
+        $q->select('u.id, u.username, u.firstName, u.lastName, u.email, u.lastActive, u.onlineStatus')
             ->from('MauticUserBundle:User', 'u', 'u.id');
         if (!empty($currentUserId)) {
             $q->where('u.id != :currentUser')
@@ -215,7 +215,7 @@ class ChatRepository extends CommonRepository
         $dt = new DateTimeHelper(strtotime('3 minutes ago'), 'U', 'local');
         $delay = $dt->getUtcDateTime();
 
-        $q->select('partial u.{id, firstName, lastName, email, lastActive, onlineStatus}')
+        $q->select('partial u.{id, username, firstName, lastName, email, lastActive, onlineStatus}')
             ->from('MauticUserBundle:User', 'u')
             ->where('u.lastActive >= :delay')
             ->setParameter('delay', $delay)

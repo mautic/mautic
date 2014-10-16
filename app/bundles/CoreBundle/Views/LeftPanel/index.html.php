@@ -21,7 +21,7 @@
             c26.751,0,48.513-21.764,48.513-48.516c0-5.735-0.988-11.345-2.939-16.677c-0.723-1.968,0.289-4.149,2.258-4.869
             c1.971-0.721,4.15,0.291,4.871,2.259c2.258,6.171,3.404,12.661,3.404,19.287C120.107,94.673,94.938,119.843,64,119.843"/>
             <polygon class="m" points="88.545,57.987 79.807,67.055 84.664,87.332 95.621,87.332 "/>
-            <polygon class="m-arrow" points="84.982,31.157 88.004,34.176 63.933,59.605 43.446,38.475 31.664,87.332 42.621,87.332 
+            <polygon class="m-arrow" points="84.982,31.157 88.004,34.176 63.933,59.605 43.446,38.475 31.664,87.332 42.621,87.332
             49.122,60.198 63.933,76.399 95.699,41.815 98.738,44.875 101.75,27.784 "/>
         </svg>
         <!--/ logo figure -->
@@ -68,19 +68,3 @@
     <!--/ scroll-content -->
 </div>
 <!--/ end: sidebar-content -->
-
-<?php /*
-<div class="left-panel-inner-wrapper">
-	<div class="left-panel-header">
-	    <img class="pull-left" src="<?php echo $view['assets']->getUrl('assets/images/mautic_circle.png'); ?>" />
-	    <span>Mautic</span>
-	    <div class="side-bar-pin left-side-bar-pin">
-        	<i class="fa fa-thumb-tack<?php echo $pinned; ?>" onclick="Mautic.stickSidePanel('left');"></i>
-    	</div>
-	</div>
-    <div class="side-panel-nav-wrapper">
-        <nav>
-        </nav>
-    </div>
-</div>
-*/ ?>

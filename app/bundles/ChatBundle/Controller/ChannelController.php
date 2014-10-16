@@ -10,6 +10,7 @@
 namespace Mautic\ChatBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
  * Class ChannelController
@@ -76,34 +77,49 @@ class ChannelController extends FormController
         $action = $this->generateUrl('mautic_chatchannel_action', array('objectAction' => 'new'));
         $form   = $model->createForm($entity, $this->get('form.factory'), $action);
 
+        $closeModal = false;
+        $valid      = false;
         if ($this->request->getMethod() == 'POST') {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 $valid = $this->isFormValid($form);
                 if ($valid) {
                     $model->saveEntity($entity);
-
-                    return $this->forward('MauticChatBundle:Channel:index', array(
-                        'channelId' => $entity->getId()
-                    ));
+                    $closeModal = true;
                 }
             } else {
-                return $this->forward('MauticChatBundle:Default:index');
+                $closeModal = true;
             }
         }
 
-        $formView = $this->setFormTheme($form, 'MauticChatBundle:Channel:form.html.php', 'MauticChatBundle:FormChannel');
+        if ($closeModal) {
+            $vars = array(
+                'closeModal' => 1
+            );
 
-        return $this->delegateView(array(
-            'viewParameters'  => array(
-                'form'        => $formView,
-                'contentOnly' => false
-            ),
-            'contentTemplate' => 'MauticChatBundle:Channel:form.html.php',
-            'passthroughVars' => array(
-                'mauticContent' => 'chatchannel',
-                'target'        => '#ChatList'
-            )
-        ));
+            if ($valid && !$cancelled) {
+                $newChannelResponse = $this->forward('MauticChatBundle:Default:index', array(
+                    'ignoreAjax'  => true,
+                    'ignoreModal' => true
+                ));
+
+                $vars['chatHtml']      = $newChannelResponse->getContent();
+                $vars['mauticContent'] = "chatChannel";
+            }
+
+            $response = new JsonResponse($vars);
+            $response->headers->set('Content-Length', strlen($response->getContent()));
+
+            return $response;
+        } else {
+            $formView = $this->setFormTheme($form, 'MauticChatBundle:Channel:form.html.php', 'MauticChatBundle:FormChannel');
+
+            return $this->delegateView(array(
+                'viewParameters'  => array(
+                    'form' => $formView
+                ),
+                'contentTemplate' => 'MauticChatBundle:Channel:form.html.php'
+            ));
+        }
     }
 
     public function editAction($objectId = 0)

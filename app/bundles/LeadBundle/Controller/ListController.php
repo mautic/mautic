@@ -174,7 +174,7 @@ class ListController extends FormController
 
         $formView = $form->createView();
         $this->factory->getTemplating()->getEngine('MauticLeadBundle:List:form.html.php')->get('form')
-            ->setTheme($formView, 'MauticLeadBundle:FormList');
+            ->setTheme($formView, 'MauticLeadBundle:FormRow12');
 
         return $this->delegateView(array(
             'viewParameters'  => array(
@@ -279,7 +279,7 @@ class ListController extends FormController
         }
         $formView = $form->createView();
         $this->factory->getTemplating()->getEngine('MauticLeadBundle:List:form.html.php')->get('form')
-            ->setTheme($formView, 'MauticLeadBundle:FormList');
+            ->setTheme($formView, 'MauticLeadBundle:FormRow12');
 
         return $this->delegateView(array(
             'viewParameters'  => array(

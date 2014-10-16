@@ -35,7 +35,7 @@ $view['slots']->set("headerTitle", $view['translator']->trans('mautic.lead.lead.
     echo $view->render('MauticCoreBundle:Helper:modal.html.php', array(
         'id'     => 'lead-quick-add',
         'header' => $view['translator']->trans('mautic.lead.lead.header.quick.add'),
-        'body'   => $view->render('MauticLeadBundle:Lead:quickadd.html.php', array('form' => $quickForm->createView())),
+        'body'   => $view->render('MauticLeadBundle:Lead:quickadd.html.php', array('form' => $quickForm)),
         'size'   => 'sm',
         'footer' => '<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times padding-sm-right text-danger "></i> ' . $view["translator"]->trans("mautic.core.form.cancel") . '</button>'
                     . '<button type="button" class="btn btn-default" onclick="mQuery(\'form[name=lead]\').submit()"><i class="fa fa-save padding-sm-right "></i> ' . $view["translator"]->trans("mautic.core.form.save") . '</button>'

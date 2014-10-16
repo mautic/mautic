@@ -18,11 +18,9 @@ $view['slots']->set("headerTitle",
     $lead->getSecondaryIdentifier() . '</span>');
 $hasEditAccess = $security->hasEntityAccess($permissions['lead:leads:editown'], $permissions['lead:leads:editother'], $lead->getOwner());
 
-$view['slots']->start('modal');
-echo $view->render('MauticCoreBundle:Helper:modal.html.php', array(
+$view['slots']->append('modal', $view->render('MauticCoreBundle:Helper:modal.html.php', array(
     'id' => 'leadModal'
-));
-$view['slots']->stop();
+)));
 
 $view['slots']->start("actions");
 if ($hasEditAccess): ?>

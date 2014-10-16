@@ -11,13 +11,8 @@
 <?php if ($item->hasChildren() && $options["depth"] !== 0 && $item->getDisplayChildren()): ?>
 
 <?php if ($isRoot = ($item->isRoot())): ?>
-<li class="dropdown">
-    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-        <span class="text fw-sb ml-xs"><?php echo $view['translator']->trans('mautic.core.menu.admin'); ?></span>
-        <span class="caret ml-xs"></span>
-    </a>
-
-    <ul class="dropdown-menu pull-right">
+    <ul class="nav">
+        <li class="nav-heading"><?php echo $view['translator']->trans('mautic.core.menu.admin'); ?></li>
 <?php else: ?>
     <ul<?php echo $view["menu_helper"]->parseAttributes($item->getChildrenAttributes()); //convert array to name="value" ?>>
 <?php endif; ?>
@@ -56,7 +51,4 @@
         </li>
     <?php endforeach; ?>
     </ul>
-<?php if ($isRoot): ?>
-</li>
-<?php endif; ?>
 <?php endif; ?>

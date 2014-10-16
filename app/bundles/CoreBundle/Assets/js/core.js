@@ -37,37 +37,13 @@ mQuery.ajaxSetup({
         }
     },
     cache: false,
-    xhr: function () {
-        var xhr = new window.XMLHttpRequest();
-        if (MauticVars.showLoadingBar) {
-            xhr.upload.addEventListener("progress", function (evt) {
-                if (evt.lengthComputable) {
-                    var percentComplete = Math.round((evt.loaded / evt.total) * 100);
-                    mQuery(".loading-bar .progress-bar").attr('aria-valuenow', percentComplete);
-                    mQuery(".loading-bar .progress-bar").css('width', percentComplete + "%");
-                }
-            }, false);
-            xhr.addEventListener("progress", function (evt) {
-                if (evt.lengthComputable) {
-                    var percentComplete = Math.round((evt.loaded / evt.total) * 100);
-                    mQuery(".loading-bar .progress-bar").attr('aria-valuenow', percentComplete);
-                    mQuery(".loading-bar .progress-bar").css('width', percentComplete + "%");
-                }
-            }, false);
-        }
-        return xhr;
-    },
     complete: function () {
-        if (MauticVars.showLoadingBar) {
-            setTimeout(function () {
-                mQuery("body").removeClass("loading-content");
-                mQuery(".loading-bar .progress-bar").attr('aria-valuenow', 0);
-                mQuery(".loading-bar .progress-bar").css('width', "0%");
-            }, 500);
-        } else {
-            //change default back to show
-            MauticVars.showLoadingBar = true;
-        }
+        setTimeout(function () {
+            mQuery("body").removeClass("loading-content");
+        }, 500);
+
+        //change default back to show
+        MauticVars.showLoadingBar = true;
     }
 });
 
