@@ -1430,7 +1430,7 @@ a.list-group-item:focus {
   background-color: #f0f0f0;
 }
 .nav > li > a {
-  font-weight: 600;
+  font-weight: normal;
 }
 .nav > li > a .text,
 .nav > li > a .icon,

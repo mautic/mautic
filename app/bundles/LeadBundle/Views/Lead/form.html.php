@@ -36,7 +36,7 @@ $groups = array_keys($fields);
                             </div>
                             <p class="text-muted clearfix nm">
                                 <span class="pull-left"><?php echo $view['translator']->trans('mautic.lead.lead.thead.points'); ?></span>
-                                <span class="pull-right"><?php echo $lead->getPoints(); ?></span>
+                                
                             </p>
                         </div>
                     </div>
