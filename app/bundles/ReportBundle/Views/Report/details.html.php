@@ -109,7 +109,7 @@ if ($tmpl == 'index') {
                                     </tr>
                                     <tr>
                                         <td width="20%"><span class="fw-b">Created By</span></td>
-                                        <td><?php echo $report->getCreatedBy()->getName(); ?></td>
+                                        <td><?php //echo $report->getAuthor()->getName(); ?></td>
                                     </tr>
                                     <tr>
                                         <td width="20%"><span class="fw-b">Created on</span></td>
