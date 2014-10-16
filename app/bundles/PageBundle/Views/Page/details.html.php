@@ -173,23 +173,23 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                             <table class="table table-bordered table-striped mb-0">
                                 <tbody>
                                     <tr>
-                                        <td width="20%"><span class="fw-b">Description</span></td>
+                                        <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.core.description'); ?></span></td>
                                         <td><?php echo $activePage->getMetaDescription(); ?></td>
                                     </tr>
                                     <tr>
-                                        <td width="20%"><span class="fw-b">Created By</span></td>
+                                        <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.core.author'); ?></span></td>
                                         <td><?php echo $activePage->getAuthor(); ?></td>
                                     </tr>
                                     <tr>
-                                        <td width="20%"><span class="fw-b">Category</span></td>
+                                        <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.core.category'); ?></span></td>
                                         <td><?php echo $activePage->getCategory()->getTitle(); ?></td>
                                     </tr>
                                     <tr>
-                                        <td width="20%"><span class="fw-b">Publish Up</span></td>
+                                        <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.page.page.publish.up'); ?></span></td>
                                         <td><?php echo (!is_null($activePage->getPublishUp())) ? $view['date']->toFull($activePage->getPublishUp()) : ''; ?></td>
                                     </tr>
                                     <tr>
-                                        <td width="20%"><span class="fw-b">Publish Down</span></td>
+                                        <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.page.page.publish.down'); ?></span></td>
                                         <td><?php echo (!is_null($activePage->getPublishDown())) ? $view['date']->toFull($activePage->getPublishDown()) : ''; ?></td>
                                     </tr>
                                 </tbody>
@@ -219,7 +219,7 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                             <div class="panel ovf-h bg-auto bg-light-xs">
                                 <div class="panel-body box-layout">
                                     <div class="col-xs-8 va-m">
-                                        <h5 class="text-white dark-md fw-sb mb-xs">Page Views</h5>
+                                        <h5 class="dark-md fw-sb mb-xs"><?php echo $view['translator']->trans('mautic.page.page.pageviews'); ?></h5>
                                         <h2 class="fw-b"><?php echo $activePage->getHits(); ?></h2>
                                     </div>
                                     <div class="col-xs-4 va-t text-right">
@@ -242,7 +242,7 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                             <div class="panel ovf-h bg-auto bg-light-xs">
                                 <div class="panel-body box-layout">
                                     <div class="col-xs-8 va-m">
-                                        <h5 class="text-white dark-md fw-sb mb-xs">Page Conversions</h5>
+                                        <h5 class="dark-md fw-sb mb-xs"><?php echo $view['translator']->trans('mautic.page.page.conversions'); ?></h5>
                                         <h2 class="fw-b">162</h2>
                                     </div>
                                     <div class="col-xs-4 va-t text-right">
@@ -265,7 +265,7 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                             <div class="panel ovf-h bg-auto bg-light-xs">
                                 <div class="panel-body box-layout">
                                     <div class="col-xs-8 va-m">
-                                        <h5 class="text-white dark-md fw-sb mb-xs">Ads Click</h5>
+                                        <h5 class="dark-md fw-sb mb-xs"><?php echo $view['translator']->trans('mautic.page.page.ads.click'); ?></h5>
                                         <h2 class="fw-b">192</h2>
                                     </div>
                                     <div class="col-xs-4 va-t text-right">
@@ -290,8 +290,8 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
 
                 <!-- tabs controls -->
                 <ul class="nav nav-tabs pr-md pl-md">
-                    <li class="active"><a href="#translation-container" role="tab" data-toggle="tab">Translations</a></li>
-                    <li class=""><a href="#variants-container" role="tab" data-toggle="tab">Variants</a></li>
+                    <li class="active"><a href="#translation-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.page.page.translations'); ?></a></li>
+                    <li class=""><a href="#variants-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.page.page.variants'); ?></a></li>
                 </ul>
                 <!--/ tabs controls -->
             </div>
@@ -397,7 +397,7 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
 
                         <!-- button -->
                         <div class="col-xs-4 va-m text-right">
-                            <a href="#" class="btn btn-primary">A/B Test Stats</a>
+                            <a href="#" class="btn btn-primary"><?php echo $view['translator']->trans('autic.page.page.ab.test.stats'); ?></a>
                         </div>
                     </div>
                     <!--/ header -->
@@ -507,7 +507,7 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
             -->
             <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mb-0">
                 <div class="panel-heading">
-                    <div class="panel-title">Recent Activity</div>
+                    <div class="panel-title"><?php echo $view['translator']->trans('mautic.page.page.recent.activity'); ?></div>
                 </div>
                 <div class="panel-body pt-xs">
                     <?php if (isset($logs) && $logs) : ?>
