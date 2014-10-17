@@ -173,7 +173,7 @@ $view['slots']->stop();
                 <!-- lead detail collapseable toggler -->
                 <div class="hr-expand nm">
                     <span data-toggle="tooltip" title="Detail">
-                        <a href="javascript:void(0)" class="arrow text-muted" data-toggle="collapse" data-target="#lead-details"><span class="caret"></span> <?php echo $view['translator']->trans('mautic.lead.lead.header.leadinfo'); ?></a>
+                        <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse" data-target="#lead-details"><span class="caret"></span> <?php echo $view['translator']->trans('mautic.lead.lead.header.leadinfo'); ?></a>
                     </span>
                 </div>
                 <!--/ lead detail collapseable toggler -->

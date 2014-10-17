@@ -37,8 +37,18 @@ hr,
 
     > .caret {
       margin-left: 0;
+      border-top: 0px;
+      border-bottom: 4px solid;
     }
   }
+
+  a.collapsed {
+    > .caret {
+        border-top: 4px solid;
+        border-bottom: 0px;
+      }
+  }
+
   &.hr-w-2 {
     a.arrow {
       top: -2px;
