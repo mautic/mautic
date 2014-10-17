@@ -24,13 +24,21 @@ $item = $event['extra']['log'];
 			</h3>
 	        <p class="mb-0">At <?php echo $view['date']->toFullConcat($event['timestamp']); ?>, <?php echo $event['event']; ?>.</p>
 	    </div>
-	    <?php if (isset($event['extra'])) : ?>
-	        <div class="panel-footer">
-	            <p>
-	            	Triggered
-					<strong><?php echo $item['eventName']; ?></strong> event
-				</p>
-	        </div>
-	    <?php endif; ?>
+        <div class="panel-footer">
+            <p>
+            	Triggered
+				<strong><?php echo $item['eventName']; ?></strong> event
+			</p>
+			<?php if ($item['campaignDescription']): ?>
+			<p>
+				<strong>Campaign description: </strong> <?php echo $item['campaignDescription']; ?>
+			</p>
+			<?php endif; ?>
+			<?php if ($item['eventDescription']): ?>
+			<p>
+				<strong>Event description: </strong> <?php echo $item['eventDescription']; ?>
+			</p>
+			<?php endif; ?>
+        </div>
 	</div>
 </li>

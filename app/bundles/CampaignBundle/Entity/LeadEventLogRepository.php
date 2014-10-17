@@ -29,7 +29,13 @@ class LeadEventLogRepository extends EntityRepository
     public function getLeadLogs($leadId, array $ipIds = array())
     {
         $query = $this->createQueryBuilder('ll')
-            ->select('IDENTITY(ll.event) AS event_id, IDENTITY(e.campaign) AS campaign_id, ll.dateTriggered, e.name AS eventName, c.name AS campaignName')
+            ->select('IDENTITY(ll.event) AS event_id,
+                    IDENTITY(e.campaign) AS campaign_id,
+                    ll.dateTriggered,
+                    e.name AS eventName,
+                    e.description AS eventDescription,
+                    c.name AS campaignName,
+                    c.description AS campaignDescription')
             ->leftJoin('MauticCampaignBundle:Event', 'e', 'WITH', 'e.id = ll.event')
             ->leftJoin('MauticCampaignBundle:Campaign', 'c', 'WITH', 'c.id = e.campaign')
             ->where('ll.lead = ' . $leadId)
