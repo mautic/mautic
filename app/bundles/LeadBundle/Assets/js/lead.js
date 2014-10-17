@@ -1,5 +1,22 @@
 //LeadBundle
 Mautic.leadOnLoad = function (container) {
+
+    Mousetrap.bind('a', function(e) {
+        if(mQuery('#lead-quick-add').length) {
+            mQuery('#lead-quick-add').modal();
+        } else if (mQuery('#addNoteButton').length) {
+            mQuery('#addNoteButton').click();
+        }
+    });
+
+    Mousetrap.bind('mod+enter', function(e) {
+        if(mQuery('#leadnote_button_save').length) {
+            mQuery('#leadnote_buttons_save').click();
+        } else if (mQuery('#save-quick-add').length) {
+            mQuery('#save-quick-add').click();
+        }
+    });
+
     if (mQuery(container + ' form[name="lead"]').length) {
         Mautic.activateLeadOwnerTypeahead('lead_owner_lookup');
 

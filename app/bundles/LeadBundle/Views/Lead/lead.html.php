@@ -76,7 +76,7 @@ if ($hasEditAccess): ?>
         <?php echo $view["translator"]->trans("mautic.lead.lead.campaigns"); ?>
     </a>
     <?php endif; ?>
-    <a class="btn btn-default" href="<?php echo $this->container->get('router')->generate('mautic_leadnote_action', array('leadId' => $lead->getId(), 'objectAction' => 'new', 'leadId' => $lead->getId())); ?>" data-toggle="ajaxmodal" data-target="#leadModal" data-header="<?php echo $view['translator']->trans('mautic.lead.note.header.new'); ?>">
+    <a id="addNoteButton" class="btn btn-default" href="<?php echo $this->container->get('router')->generate('mautic_leadnote_action', array('leadId' => $lead->getId(), 'objectAction' => 'new', 'leadId' => $lead->getId())); ?>" data-toggle="ajaxmodal" data-target="#leadModal" data-header="<?php echo $view['translator']->trans('mautic.lead.note.header.new'); ?>">
        <i class="fa fa-file-o"></i>
         <?php echo $view["translator"]->trans("mautic.lead.add.note"); ?>
     </a>

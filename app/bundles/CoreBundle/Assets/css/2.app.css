@@ -2140,6 +2140,11 @@ label {
   background-color: inherit;
   border: inherit;
 }
+.box-layout > [class*=" col-"] > .panel-body,
+.box-layout > [class^="col-"] > .panel-body {
+  white-space: nowrap;
+  overflow: hidden;
+}
 .box-layout > [class*=" col-"].bdr-l.height-auto:before,
 .box-layout > [class^="col-"].bdr-l.height-auto:before {
   margin-left: -1px;

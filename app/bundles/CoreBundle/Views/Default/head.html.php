@@ -17,6 +17,7 @@
     <?php echo $view['assets']->outputSystemStylesheets(); ?>
     <link rel="stylesheet" href="<?php echo $view['assets']->getUrl('assets/css/font-awesome.min.css'); ?>" />
     <script src="<?php echo $view['assets']->getUrl('assets/js/modernizr.min.js'); ?>"></script>
+	<script src="<?php echo $view['assets']->getUrl('assets/js/mousetrap.min.js'); ?>"></script>
 
     <?php $view['assets']->outputHeadDeclarations(); ?>
 </head>
