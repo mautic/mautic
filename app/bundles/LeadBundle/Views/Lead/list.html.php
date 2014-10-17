@@ -138,7 +138,7 @@ if ($tmpl == 'index')
                         $color = $item->getColor();
                         $style = !empty($color) ? ' style="background-color: ' . $color . ' !important;"' : '';
                         ?>
-                        <span class="badge"<?php echo $style; ?>><?php echo $item->getPoints(); ?></span>
+                        <span class="label label-default"<?php echo $style; ?>><?php echo $item->getPoints(); ?></span>
                     </td>
                 </tr>
             <?php endforeach; ?>

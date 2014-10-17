@@ -200,7 +200,7 @@ $view['slots']->stop();
                                 </div>
                             </div>
                             <div class="plugin-sparkline text-right pr-md pl-md"
-                            sparkHeight="34"
+                            sparkHeight="120"
                             sparkWidth="100%"
                             sparkType="line"
                             sparkZeroAxis="false"
