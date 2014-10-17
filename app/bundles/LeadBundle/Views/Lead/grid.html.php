@@ -16,8 +16,11 @@ if ($tmpl == 'index')
                 <h3><?php echo $view['translator']->trans('mautic.lead.lead.header.index'); ?></h3>
             </div>
             <div class="col-xs-6 va-m text-right">
+                <button type="button" class="btn btn-danger pull-right ml-sm"><i class="fa fa-trash-o"></i></button>
                 <div class="btn-group">
+                    <button type="button" class="btn btn-default pull-right"><i class="fa fa-archive"></i></button>
                     <button type="button" class="btn btn-default pull-right ml-md"><i class="fa fa-upload"></i></button>
+
                     <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
                         "totalItems"      => $totalItems,
                         "page"            => $page,

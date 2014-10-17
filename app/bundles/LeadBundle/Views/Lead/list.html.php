@@ -19,10 +19,10 @@ if ($tmpl == 'index')
             </div>
             <div class="col-xs-6 va-m text-right">
                 <div class="btn-group">
-                    <button type="button" class="btn btn-sm btn-default"><i class="fa fa-upload"></i></button>
-                    <button type="button" class="btn btn-sm btn-default"><i class="fa fa-archive"></i></button>
+                    <button type="button" class="btn btn-default"><i class="fa fa-upload"></i></button>
+                    <button type="button" class="btn btn-default"><i class="fa fa-archive"></i></button>
                 </div>
-                <button type="button" class="btn btn-sm btn-danger"><i class="fa fa-trash-o"></i></button>
+                <button type="button" class="btn btn-danger"><i class="fa fa-trash-o"></i></button>
             </div>
         </div>
     </div>
