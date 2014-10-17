@@ -11,11 +11,26 @@ $item = $event['extra']['log'];
 
 ?>
 
-<span class="icon fa fa-clock-o"></span>
-Triggered
-<strong><?php echo $item['eventName']; ?></strong> event from 
-<a href="<?php echo $view['router']->generate('mautic_campaign_action',
-    array("objectAction" => "view", "objectId" => $item['campaign_id'])); ?>"
-   data-toggle="ajax">
-    <?php echo $item['campaignName']; ?>
-</a>
+<li class="wrapper campain-event">
+	<div class="figure"><span class="icon fa fa-clock-o"></span></div>
+	<div class="panel">
+	    <div class="panel-body">
+	    	<h3>
+	    		<a href="<?php echo $view['router']->generate('mautic_campaign_action',
+				    array("objectAction" => "view", "objectId" => $item['campaign_id'])); ?>"
+				   data-toggle="ajax">
+				    <?php echo $item['campaignName']; ?>
+				</a>
+			</h3>
+	        <p class="mb-0">At <?php echo $view['date']->toFullConcat($event['timestamp']); ?>, <?php echo $event['event']; ?>.</p>
+	    </div>
+	    <?php if (isset($event['extra'])) : ?>
+	        <div class="panel-footer">
+	            <p>
+	            	Triggered
+					<strong><?php echo $item['eventName']; ?></strong> event
+				</p>
+	        </div>
+	    <?php endif; ?>
+	</div>
+</li>

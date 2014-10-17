@@ -11,10 +11,23 @@ $item = $event['extra']['stats'];
 
 ?>
 
-<span class="icon fa fa-send"></span>
-<a href="<?php echo $view['router']->generate('mautic_email_action',
-    array("objectAction" => "view", "objectId" => $item['email_id'])); ?>"
-   data-toggle="ajax">
-    <?php echo $item['subject']; ?>
-</a>
-<p><?php echo $item['plainText']; ?></p>
+<li class="wrapper email-read">
+	<div class="figure"><span class="icon fa fa-send"></span></div>
+	<div class="panel">
+	    <div class="panel-body">
+	    	<h3>
+	    		<a href="<?php echo $view['router']->generate('mautic_email_action',
+				    array("objectAction" => "view", "objectId" => $item['email_id'])); ?>"
+				   data-toggle="ajax">
+				    <?php echo $item['subject']; ?>
+				</a>
+			</h3>
+	        <p class="mb-0">At <?php echo $view['date']->toFullConcat($event['timestamp']); ?>, <?php echo $event['event']; ?>.</p>
+	    </div>
+	    <?php if (isset($event['extra'])) : ?>
+	        <div class="panel-footer">
+	            <p><strong>Email Body:</strong> <?php echo $item['plainText']; ?></p>
+	        </div>
+	    <?php endif; ?>
+	</div>
+</li>

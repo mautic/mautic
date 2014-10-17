@@ -23,25 +23,9 @@
     <li class="wrapper">
         <ul class="events">
             <?php foreach ($events as $event) : ?>
-                <li class="<?php if ($event['event'] == 'lead.created') echo 'featured'; else echo 'wrapper'; ?>">
-                    <div class="figure"><!--<span class="fa fa-check"></span>--></div>
-                    <div class="panel <?php if ($event['event'] == 'lead.created') echo 'bg-primary'; ?>">
-                        <div class="panel-body">
-                            <p class="mb-0">At <?php echo $view['date']->toFullConcat($event['timestamp']); ?>, <?php echo $event['event']; ?>.</p>
-                        </div>
-                        <?php if (isset($event['extra'])) : ?>
-                            <?php if (isset($event['contentTemplate'])) : ?>
-                            <div class="panel-footer">
-                                <?php echo $view->render($event['contentTemplate'], array('event' => $event)); ?>
-                            </div>
-                            <?php else : ?>
-                            <div class="panel-footer">
-                                <?php print_r($event['extra']); ?>
-                            </div>
-                            <?php endif; ?>
-                        <?php endif; ?>
-                    </div>
-                </li>
+                <?php if (isset($event['contentTemplate'])) : ?>
+                    <?php echo $view->render($event['contentTemplate'], array('event' => $event)); ?>
+                <?php endif; ?>
             <?php endforeach; ?>
         </ul>
     </li>

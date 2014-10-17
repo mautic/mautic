@@ -10,9 +10,24 @@
 $item = $event['extra']['asset'];
 
 ?>
-<span class="icon fa fa-folder-open-o"></span>
-<a href="<?php echo $view['router']->generate('mautic_asset_action',
-    array("objectAction" => "view", "objectId" => $item->getId())); ?>"
-   data-toggle="ajax">
-    <?php echo $item->getTitle(); ?> (<?php echo $item->getAlias(); ?>)
-</a>
+
+<li class="wrapper asset-download">
+	<div class="figure"><span class="icon fa fa-folder-open-o"></span></div>
+	<div class="panel">
+	    <div class="panel-body">
+	    	<h3>
+	    		<a href="<?php echo $view['router']->generate('mautic_asset_action',
+				    array("objectAction" => "view", "objectId" => $item->getId())); ?>"
+				   data-toggle="ajax">
+				    <?php echo $item->getTitle(); ?>
+				</a>
+			</h3>
+	        <p class="mb-0">At <?php echo $view['date']->toFullConcat($event['timestamp']); ?>, <?php echo $event['event']; ?>.</p>
+	    </div>
+	    <?php if (isset($event['extra'])) : ?>
+	        <!-- <div class="panel-footer">
+	            <p></p>
+	        </div> -->
+	    <?php endif; ?>
+	</div>
+</li>
