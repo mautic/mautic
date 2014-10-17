@@ -9,6 +9,29 @@
 if ($tmpl == 'index')
     $view->extend('MauticLeadBundle:Lead:index.html.php');
 ?>
+<div class="panel panel-default page-list bdr-t-wdh-0">
+    <div class="panel-body">
+        <div class="box-layout">
+            <div class="col-xs-6 va-m">
+                <h3><?php echo $view['translator']->trans('mautic.lead.lead.header.index'); ?></h3>
+            </div>
+            <div class="col-xs-6 va-m text-right">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-default pull-right ml-md"><i class="fa fa-upload"></i></button>
+                    <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
+                        "totalItems"      => $totalItems,
+                        "page"            => $page,
+                        "limit"           => $limit,
+                        "menuLinkId"      => 'mautic_lead_index',
+                        "baseUrl"         => $view['router']->generate('mautic_lead_index'),
+                        "tmpl"            => $indexMode,
+                        'sessionVar'      => 'lead'
+                    )); ?>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="pa-md">
     <div class="shuffle grid row scrollable page-list" id="shuffle-grid">
         <?php if (count($items)): ?>
@@ -66,18 +89,5 @@ if ($tmpl == 'index')
                 <h4><?php echo $view['translator']->trans('mautic.core.noresults'); ?></h4>
             </div>
         <?php endif; ?>
-    </div>
-    <div class="row">
-        <div class="col-sm-12">
-            <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
-                "totalItems"      => $totalItems,
-                "page"            => $page,
-                "limit"           => $limit,
-                "menuLinkId"      => 'mautic_lead_index',
-                "baseUrl"         => $view['router']->generate('mautic_lead_index'),
-                "tmpl"            => $indexMode,
-                'sessionVar'      => 'lead'
-            )); ?>
-        </div>
     </div>
 </div>

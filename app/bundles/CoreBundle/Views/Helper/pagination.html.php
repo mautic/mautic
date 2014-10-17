@@ -68,7 +68,7 @@ $formExit = (!empty($ignoreFormExit)) ? ' data-ignore-formexit="true"' : '';
     </div>
 <?php endif; ?>
 
-<div class="pagination-wrapper pull-left">
+<div class="pagination-wrapper pull-left ml-md mr-md">
     <ul class="pagination nm <?php echo $pageClass; ?>">
         <?php
         $urlPage = $page - $range;
