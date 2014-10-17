@@ -15,7 +15,7 @@ use JMS\Serializer\Annotation as Serializer;
 /**
  * Class LeadEventLog
  * @ORM\Table(name="campaign_lead_event_log")
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="Mautic\CampaignBundle\Entity\LeadEventLogRepository")
  * @Serializer\ExclusionPolicy("all")
  */
 class LeadEventLog

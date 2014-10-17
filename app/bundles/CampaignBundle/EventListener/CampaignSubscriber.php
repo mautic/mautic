@@ -16,6 +16,8 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\CampaignBundle\Event as Events;
 use Mautic\CampaignBundle\CampaignEvents;
+use Mautic\LeadBundle\Event\LeadTimelineEvent;
+use Mautic\LeadBundle\LeadEvents;
 
 /**
  * Class CampaignSubscriber
@@ -35,6 +37,7 @@ class CampaignSubscriber extends CommonSubscriber
             CampaignEvents::CAMPAIGN_POST_DELETE   => array('onCampaignDelete', 0),
             CampaignEvents::CAMPAIGN_ON_BUILD      => array('onCampaignBuild', 0),
             CampaignEvents::CAMPAIGN_ON_LEADCHANGE => array('onCampaignLeadChange', 0),
+            LeadEvents::TIMELINE_ON_GENERATE => array('onTimelineGenerate', 0)
         );
     }
 
@@ -116,5 +119,38 @@ class CampaignSubscriber extends CommonSubscriber
         $lead     = $event->getLead();
         $campaign = $event->getCampaign();
         $model->triggerEvent('campaign.leadchange', $event, 'campaign.leadchange.'.$lead->getId() . '.' . $campaign->getId());
+    }
+
+    /**
+     * Compile events for the lead timeline
+     *
+     * @param LeadTimelineEvent $event
+     */
+    public function onTimelineGenerate(LeadTimelineEvent $event)
+    {
+        $lead    = $event->getLead();
+        $leadIps = array();
+
+        /** @var \Mautic\CoreBundle\Entity\IpAddress $ip */
+        foreach ($lead->getIpAddresses() as $ip) {
+            $leadIps[] = $ip->getId();
+        }
+
+        /** @var \Mautic\CampaignBundle\Entity\LeadEventLogRepository $logRepository */
+        $logRepository = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:LeadEventLog');
+
+        $logs = $logRepository->getLeadLogs($lead->getId(), $leadIps);
+
+        // Add the hits to the event array
+        foreach ($logs as $log) {
+            $event->addEvent(array(
+                'event'     => 'campaign.event',
+                'timestamp' => $log['dateTriggered'],
+                'extra'     => array(
+                    'log' => $log
+                ),
+                'contentTemplate' => 'MauticCampaignBundle:Timeline:index.html.php'
+            ));
+        }
     }
 }
