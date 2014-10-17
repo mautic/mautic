@@ -195,7 +195,7 @@ class StatRepository extends CommonRepository
     public function getLeadStats($leadId, array $ipIds = array())
     {
         $query = $this->createQueryBuilder('s')
-            ->select('IDENTITY(s.email) AS email_id, s.dateRead, e.subject, e.plainText')
+            ->select('IDENTITY(s.email) AS email_id, s.dateRead, s.dateSent, e.subject, e.plainText')
             ->leftJoin('MauticEmailBundle:Email', 'e', 'WITH', 'e.id = s.email')
             ->where('s.lead = ' . $leadId);
 
