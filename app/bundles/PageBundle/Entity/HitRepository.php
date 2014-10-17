@@ -79,22 +79,24 @@ class HitRepository extends CommonRepository
      */
     public function getHitsForLast30Days($pageId)
     {
-        $query = $this->createQueryBuilder('h');
-        $query->select('IDENTITY(h.page), h.dateHit')
-            ->where($query->expr()->eq('IDENTITY(h.page)', (int) $pageId))
-            ->andwhere($query->expr()->lte('h.dateHit', ':now'))
-            ->setParameter('now', new \DateTime());
-
-        $hits = $query->getQuery()->getArrayResult();
-        $days = array();
-        $today = new \DateTime();
+        $date = new \DateTime();
         $oneDay = new \DateInterval('P1D');
+        $days = array();
 
         // Prefill $days array keys
         for ($i = 0; $i < 30; $i++) {
-            $days[$today->format('Y-m-d')] = 0;
-            $today->sub($oneDay);
+            $days[$date->format('Y-m-d')] = 0;
+            $date->sub($oneDay);
         }
+        
+        $query = $this->createQueryBuilder('h');
+        
+        $query->select('IDENTITY(h.page), h.dateHit')
+            ->where($query->expr()->eq('IDENTITY(h.page)', (int) $pageId))
+            ->andwhere($query->expr()->gte('h.dateHit', ':date'))
+            ->setParameter('date', $date);
+
+        $hits = $query->getQuery()->getArrayResult();
 
         // Group hits by date
         foreach ($hits as $hit) {
