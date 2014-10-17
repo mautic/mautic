@@ -65,12 +65,16 @@ class LeadController extends FormController
         $anonymous   = $translator->trans('mautic.lead.lead.searchcommand.isanonymous');
         $listCommand = $translator->trans('mautic.lead.lead.searchcommand.list');
         $mine        = $translator->trans('mautic.core.searchcommand.ismine');
+        $indexMode   = $this->request->get('view', $session->get('mautic.lead.indexmode', 'list'));
+        
+        $session->set('mautic.lead.indexmode', $indexMode);
 
-        if (strpos($search, "$isCommand:$anonymous") === false && strpos($search, "$listCommand:") === false) {
-            //todo - maybe add this back?
+        // (strpos($search, "$isCommand:$anonymous") === false && strpos($search, "$listCommand:") === false)) ||  
+        if ($indexMode != 'list') {
             //remove anonymous leads unless requested to prevent clutter
-            //$filter['force'] .= " !$isCommand:$anonymous";
+            $filter['force'] .= " !$isCommand:$anonymous";
         }
+        
         if (!$permissions['lead:leads:viewother']) {
             $filter['force'] .= " $isCommand:$mine";
         }
@@ -146,8 +150,6 @@ class LeadController extends FormController
         }
 
         $lists     = $this->factory->getModel('lead.list')->getUserLists();
-        $indexMode = $this->request->get('view', $session->get('mautic.lead.indexmode', 'list'));
-        $session->set('mautic.lead.indexmode', $indexMode);
 
         //check to see if in a single list
         $inSingleList = (substr_count($search, "$listCommand:") === 1) ? true : false;
