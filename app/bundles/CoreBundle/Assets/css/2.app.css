@@ -1254,6 +1254,15 @@ blockquote > p:after {
 .alert-dismissible .close {
   top: -1px;
 }
+.alert-primary {
+  background: #aeb6d7;
+}
+.alert-secondary {
+  background: #feedcb;
+}
+.alert-tertiary {
+  background: #a3e2e4;
+}
 a.media {
   display: block;
 }
