@@ -17,7 +17,7 @@ use Doctrine\ORM\EntityRepository;
 class LeadEventLogRepository extends EntityRepository
 {
 	/**
-     * Get a lead's page hits
+     * Get a lead's page event log
      *
      * @param integer $leadId
      * @param array   $ipIds
@@ -35,7 +35,6 @@ class LeadEventLogRepository extends EntityRepository
             ->where('ll.lead = ' . $leadId)
             ->andWhere('e.eventType = :eventType')
             ->setParameter('eventType', 'trigger');
-
 
         if (!empty($ipIds)) {
             $query->orWhere('ll.ipAddress IN (' . implode(',', $ipIds) . ')');
