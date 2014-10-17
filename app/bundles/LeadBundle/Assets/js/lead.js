@@ -1,12 +1,28 @@
 //LeadBundle
 Mautic.leadOnLoad = function (container) {
 
+Mousetrap.bind('shift+l', function(e) {
+    mQuery('#menu_lead_parent_child > li:first > a').click();
+});
+
     Mousetrap.bind('a', function(e) {
         if(mQuery('#lead-quick-add').length) {
             mQuery('#lead-quick-add').modal();
         } else if (mQuery('#addNoteButton').length) {
             mQuery('#addNoteButton').click();
         }
+    });
+
+    Mousetrap.bind('t', function(e) {
+        mQuery('#table-view').click();
+    });
+
+    Mousetrap.bind('c', function(e) {
+        mQuery('#card-view').click();
+    });
+
+    Mousetrap.bind('n', function(e) {
+        mQuery('#new-lead').click();
     });
 
     Mousetrap.bind('mod+enter', function(e) {

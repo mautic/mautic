@@ -9,6 +9,11 @@ if (typeof mauticContent !== 'undefined') {
     })(mQuery);
 }
 
+Mousetrap.bind('shift+d', function(e) {
+    mQuery('#mautic_dashboard_index').click();
+});
+
+
 //Fix for back/forward buttons not loading ajax content with History.pushState()
 MauticVars.manualStateChange = true;
 History.Adapter.bind(window, 'statechange', function () {
