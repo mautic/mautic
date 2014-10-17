@@ -15,20 +15,14 @@ if ($tmpl == 'index')
     <div class="panel-body">
         <div class="box-layout">
             <div class="col-xs-6 va-m">
-                <div class="checkbox-inline custom-primary">
-                    <label class="mb-0">
-                        <input type="checkbox" id="customcheckbox-one0" value="1" data-toggle="checkall" data-target="#leadTable">
-                        <span></span>
-                        <?php echo $view['translator']->trans('mautic.core.table.selectall'); ?>
-                    </label>
-                </div>
+                <h3><?php echo $view['translator']->trans('mautic.lead.lead.header.index'); ?></h3>
             </div>
             <div class="col-xs-6 va-m text-right">
                 <div class="btn-group">
-                    <button type="button" class="btn btn-sm btn-default"><i class="fa fa-upload"></i></button>
-                    <button type="button" class="btn btn-sm btn-default"><i class="fa fa-archive"></i></button>
+                    <button type="button" class="btn btn-default"><i class="fa fa-upload"></i></button>
+                    <button type="button" class="btn btn-default"><i class="fa fa-archive"></i></button>
                 </div>
-                <button type="button" class="btn btn-sm btn-danger"><i class="fa fa-trash-o"></i></button>
+                <button type="button" class="btn btn-danger"><i class="fa fa-trash-o"></i></button>
             </div>
         </div>
     </div>
@@ -36,7 +30,15 @@ if ($tmpl == 'index')
         <table class="table table-hover table-striped table-bordered" id="leadTable">
             <thead>
                 <tr>
-                    <th class="col-lead-actions"></th>
+                    <th class="col-lead-actions pl-20">
+                        <div class="checkbox-inline custom-primary">
+                            <label class="mb-0 pl-10">
+                                <input type="checkbox" id="customcheckbox-one0" value="1" data-toggle="checkall" data-target="#leadTable">
+                                <span></span>
+                                <?php // echo $view['translator']->trans('mautic.core.table.selectall'); ?>
+                            </label>
+                        </div>
+                    </th>
                     <?php
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                         'sessionVar' => 'lead',
