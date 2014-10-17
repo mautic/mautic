@@ -175,7 +175,8 @@ class PageSubscriber extends CommonSubscriber
                 'timestamp' => $hit['dateHit'],
                 'extra'     => array(
                     'page_id' => $hit['page_id']
-                )
+                ),
+                'contentTemplate' => 'MauticPageBundle:Timeline:index.html.php'
             ));
         }
     }

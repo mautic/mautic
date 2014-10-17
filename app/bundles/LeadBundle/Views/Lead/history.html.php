@@ -30,9 +30,15 @@
                             <p class="mb-0">At <?php echo $view['date']->toFullConcat($event['timestamp']); ?>, <?php echo $event['event']; ?>.</p>
                         </div>
                         <?php if (isset($event['extra'])) : ?>
+                            <?php if (isset($event['contentTemplate'])) : ?>
+                            <div class="panel-footer">
+                                <?php echo $view->render($event['contentTemplate'], array('event' => $event)); ?>
+                            </div>
+                            <?php else : ?>
                             <div class="panel-footer">
                                 <?php print_r($event['extra']); ?>
                             </div>
+                            <?php endif; ?>
                         <?php endif; ?>
                     </div>
                 </li>
