@@ -43,4 +43,28 @@ class DownloadRepository extends CommonRepository
 
         return (int) $count['num'];
     }
+
+    /**
+     * Get a lead's page hits
+     *
+     * @param integer $leadId
+     * @param array   $ipIds
+     *
+     * @return array
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function getLeadDownloads($leadId, array $ipIds = array())
+    {
+        $query = $this->createQueryBuilder('d')
+            ->select('IDENTITY(d.asset) AS asset_id, d.dateDownload')
+            ->where('d.lead = ' . $leadId);
+
+        if (!empty($ipIds)) {
+            $query->orWhere('d.ipAddress IN (' . implode(',', $ipIds) . ')');
+        }
+
+        return $query->getQuery()
+            ->getArrayResult();
+    }
 }

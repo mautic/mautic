@@ -176,7 +176,6 @@ class PageSubscriber extends CommonSubscriber
                 'event'     => 'page.hit',
                 'timestamp' => $hit['dateHit'],
                 'extra'     => array(
-                    'page_id' => $hit['page_id'],
                     'page' => $model->getEntity($hit['page_id'])
                 ),
                 'contentTemplate' => 'MauticPageBundle:Timeline:index.html.php'
