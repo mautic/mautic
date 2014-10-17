@@ -124,7 +124,7 @@ $view['slots']->stop();
                     <?php $step = 0; ?>
                     <?php foreach ($groups as $g): ?>
                         <?php if (!empty($fields[$g])): ?>
-                            <li class="<?php if ($step === 1) echo "active"; ?>">
+                            <li class="<?php if ($step === 0) echo "active"; ?>">
                                 <a href="#<?php echo $g; ?>" class="group" data-toggle="tab">
                                     <?php echo $view['translator']->trans('mautic.lead.field.group.' . $g); ?>
                                 </a>
@@ -136,33 +136,44 @@ $view['slots']->stop();
 
                     <!-- start: tab-content -->
                     <div class="tab-content pa-md">
-                        <?php foreach ($groups as $g): ?>
-                            <div class="tab-pane fade in active bdr-w-0" id="<?php echo $g; ?>">
+                        <?php $i = 0; ?>
+                        <?php foreach ($groups as $group): ?>
+                            <div class="tab-pane fade <?php echo $i == 0 ? 'in active' : ''; ?> bdr-w-0" id="<?php echo $group; ?>">
                                 <div class="pr-md pl-md pb-md">
                                     <div class="panel shd-none mb-0">
                                         <table class="table table-bordered table-striped mb-0">
                                             <tbody>
-                                                <tr>
-                                                    <td width="20%"><span class="fw-b">Company</span></td>
-                                                    <td><?php echo $lead->getSecondaryIdentifier(); ?></td>
-                                                </tr>
-                                                <tr>
-                                                    <td width="20%"><span class="fw-b">Position</span></td>
-                                                    <td><?php echo $fields['core']['position']['value']; ?></td>
-                                                </tr>
-                                                <tr>
-                                                    <td width="20%"><span class="fw-b">Email</span></td>
-                                                    <td><?php echo $fields['core']['email']['value']; ?></td>
-                                                </tr>
-                                                <tr>
-                                                    <td width="20%"><span class="fw-b">Phone</span></td>
-                                                    <td><?php echo $fields['core']['phone']['value']; ?></td>
-                                                </tr>
+                                                 <?php if ($group == 'core') : ?>
+                                                    <tr>
+                                                        <td width="20%"><span class="fw-b">Company</span></td>
+                                                        <td><?php echo $lead->getSecondaryIdentifier(); ?></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td width="20%"><span class="fw-b">Position</span></td>
+                                                        <td><?php echo $fields['core']['position']['value']; ?></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td width="20%"><span class="fw-b">Email</span></td>
+                                                        <td><?php echo $fields['core']['email']['value']; ?></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td width="20%"><span class="fw-b">Phone</span></td>
+                                                        <td><?php echo $fields['core']['phone']['value']; ?></td>
+                                                    </tr>
+                                                <?php else: ?>
+                                                    <?php foreach ($fields[$group] as $field): ?>
+                                                        <tr>
+                                                            <td width="20%"><span class="fw-b"><?php echo $field['label']; ?></span></td>
+                                                            <td><?php echo $field['value']; ?></td>
+                                                        </tr>
+                                                    <?php endforeach; ?>
+                                                <?php endif; ?>
                                             </tbody>
                                         </table>
                                     </div>
                                 </div>
                             </div>
+                            <?php $i++; ?>
                         <?php endforeach; ?>
                     </div>
                 </div>

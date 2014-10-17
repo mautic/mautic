@@ -837,9 +837,18 @@ hr.hr-w-3,
   border-bottom-left-radius: 3px;
   border-bottom-right-radius: 3px;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+  font-size: 9px;
+  line-height: 22px;
+  text-transform: uppercase;
 }
 .hr-expand a.arrow > .caret {
   margin-left: 0;
+  border-top: 0px;
+  border-bottom: 4px solid;
+}
+.hr-expand a.collapsed > .caret {
+  border-top: 4px solid;
+  border-bottom: 0px;
 }
 .hr-expand.hr-w-2 a.arrow {
   top: -2px;
