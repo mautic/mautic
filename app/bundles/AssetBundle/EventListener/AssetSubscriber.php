@@ -97,7 +97,7 @@ class AssetSubscriber extends CommonSubscriber
 
         $model = $this->factory->getModel('asset.asset');
 
-        // Add the hits to the event array
+        // Add the downloads to the event array
         foreach ($downloads as $download) {
             $event->addEvent(array(
                 'event'     => 'asset.download',

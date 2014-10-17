@@ -232,14 +232,29 @@ class EmailSubscriber extends CommonSubscriber
 
         // Add the events to the event array
         foreach ($stats as $stat) {
-            $event->addEvent(array(
-                'event'     => 'email.read',
-                'timestamp' => $stat['dateRead'],
-                'extra'     => array(
-                    'stats' => $stat
-                ),
-                'contentTemplate' => 'MauticEmailBundle:Timeline:index.html.php'
-            ));
+            // Email Sent
+            if ($stat['dateSent']) {
+                $event->addEvent(array(
+                    'event'     => 'email.sent',
+                    'timestamp' => $stat['dateSent'],
+                    'extra'     => array(
+                        'stats' => $stat
+                    ),
+                    'contentTemplate' => 'MauticEmailBundle:Timeline:index.html.php'
+                ));
+            }
+
+            // Email read
+            if ($stat['dateRead']) {
+                $event->addEvent(array(
+                    'event'     => 'email.read',
+                    'timestamp' => $stat['dateRead'],
+                    'extra'     => array(
+                        'stats' => $stat
+                    ),
+                    'contentTemplate' => 'MauticEmailBundle:Timeline:index.html.php'
+                ));
+            }
         }
     }
 }

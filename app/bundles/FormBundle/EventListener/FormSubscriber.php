@@ -169,15 +169,19 @@ class FormSubscriber extends CommonSubscriber
 
         $rows = $submissionRepository->getSubmissions($leadIps);
 
+        $pageModel = $this->factory->getModel('page.page');
+        $formModel = $this->factory->getModel('form.form');
+
         // Add the submissions to the event array
         foreach ($rows as $row) {
             $event->addEvent(array(
                 'event'     => 'form.submitted',
                 'timestamp' => new \DateTime($row['date_submitted']),
                 'extra'     => array(
-                    'form_id' => $row['form_id'],
-                    'page_id' => $row['page_id']
-                )
+                    'form'  => $formModel->getEntity($row['form_id']),
+                    'page'  => $pageModel->getEntity($row['page_id'])
+                ),
+                'contentTemplate' => 'MauticFormBundle:Timeline:index.html.php'
             ));
         }
     }

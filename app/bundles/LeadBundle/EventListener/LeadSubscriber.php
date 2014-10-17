@@ -238,7 +238,8 @@ class LeadSubscriber extends CommonSubscriber
         // Add the lead's creation time to the timeline
         $event->addEvent(array(
             'event'     => 'lead.created',
-            'timestamp' => $lead->getDateAdded()
+            'timestamp' => $lead->getDateAdded(),
+            'contentTemplate' => 'MauticLeadBundle:Timeline:index.html.php'
         ));
     }
 
