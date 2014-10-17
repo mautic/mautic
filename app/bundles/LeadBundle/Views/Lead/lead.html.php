@@ -100,7 +100,7 @@ $view['slots']->stop();
                             </span>
                             <div class="media-body">
                                 <h4 class="fw-sb text-primary"><?php echo $lead->getPrimaryIdentifier(); ?></h4>
-                                <p class="text-white dark-lg mb-0"><?php echo $fields['core']['position']['value']; ?> <?php echo $fields['core']['company']['value']; ?></p>
+                                <p class="dark-lg mb-0"><?php echo $fields['core']['position']['value']; ?> <?php echo $fields['core']['company']['value']; ?></p>
                             </div>
                         </div>
                     </div>
@@ -109,7 +109,7 @@ $view['slots']->stop();
                         $color = $lead->getColor();
                         $style = !empty($color) ? ' style="background-color: ' . $color . ' !important;"' : '';
                         ?>
-                        <h1 class="fw-sb text-white dark-md<?php echo $style; ?>"><?php echo $lead->getPoints(); ?></h1>
+                        <h1 class="fw-sb dark-md<?php echo $style; ?>"><?php echo $lead->getPoints(); ?></h1>
                     </div>
                 </div>
             </div>
@@ -117,7 +117,7 @@ $view['slots']->stop();
 
             <!-- lead detail collapseable -->
             <div class="collapse" id="lead-details">
-                
+
                 <ul class="nav nav-tabs pr-md pl-md" role="tablist">
                 <?php $step = 0; ?>
                 <?php foreach ($groups as $g): ?>
@@ -193,10 +193,10 @@ $view['slots']->stop();
                         <div class="panel">
                             <div class="panel-body box-layout">
                                 <div class="col-xs-8 va-m">
-                                    <h5 class="text-white dark-md fw-sb mb-xs">Engagements</h5>
+                                    <h5 class="dark-md fw-sb mb-xs">Engagements</h5>
                                 </div>
                                 <div class="col-xs-4 va-t text-right">
-                                    <h3 class="text-white dark-sm"><span class="fa fa-eye"></span></h3>
+                                    <h3 class="dark-sm"><span class="fa fa-eye"></span></h3>
                                 </div>
                             </div>
                             <div class="plugin-sparkline text-right pr-md pl-md"

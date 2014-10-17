@@ -29,9 +29,7 @@ Mautic.updateChatList = function (killTimer) {
             }
         },
         error: function (request, textStatus, errorThrown) {
-            if (mauticEnv == 'dev') {
-                alert(errorThrown);
-            }
+            Mautic.processAjaxError(request, textStatus, errorThrown);
         }
     });
 };
@@ -64,9 +62,7 @@ Mautic.startUserChat = function (userId, fromDate) {
             }
         },
         error: function (request, textStatus, errorThrown) {
-            if (mauticEnv == 'dev') {
-                alert(errorThrown);
-            }
+            Mautic.processAjaxError(request, textStatus, errorThrown);
         }
     });
 };
@@ -98,9 +94,7 @@ Mautic.startChannelChat = function (channelId, fromDate) {
             }
         },
         error: function (request, textStatus, errorThrown) {
-            if (mauticEnv == 'dev') {
-                alert(errorThrown);
-            }
+            Mautic.processAjaxError(request, textStatus, errorThrown);
         }
     });
 };
@@ -164,9 +158,7 @@ Mautic.activateChatUpdater = function(itemId, chatType) {
                     Mautic.updateChatConversation(response, chatType);
                 },
                 error: function (request, textStatus, errorThrown) {
-                    if (mauticEnv == 'dev') {
-                        alert(errorThrown);
-                    }
+                    Mautic.processAjaxError(request, textStatus, errorThrown);
                 }
             });
         } else {
@@ -201,9 +193,7 @@ Mautic.sendChatMessage = function(toId, chatType) {
                 Mautic.updateChatConversation(response, chatType);
             },
             error: function (request, textStatus, errorThrown) {
-                if (mauticEnv == 'dev') {
-                    alert(errorThrown);
-                }
+                Mautic.processAjaxError(request, textStatus, errorThrown);
             }
         });
     }
@@ -278,9 +268,7 @@ Mautic.addChatChannel = function() {
 
         },
         error: function (request, textStatus, errorThrown) {
-            if (mauticEnv == 'dev') {
-                alert(errorThrown);
-            }
+            Mautic.processAjaxError(request, textStatus, errorThrown);
         }
     });
 };

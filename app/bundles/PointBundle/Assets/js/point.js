@@ -98,9 +98,7 @@ Mautic.getPointActionPropertiesForm = function(actionType) {
             spinner.remove();
         },
         error: function (request, textStatus, errorThrown) {
-            if (mauticEnv == 'dev') {
-                alert(errorThrown);
-            }
+            Mautic.processAjaxError(request, textStatus, errorThrown);
             spinner.remove();
         }
     });

@@ -238,7 +238,7 @@ class AjaxController extends CommonAjaxController
      */
     public function updateListAction(Request $request)
     {
-        $response = $this->forward('MauticChatBundle:Default:index.html.php', array('ignoreAjax' => true));
+        $response = $this->forward('MauticChatBundle:Default:index', array('ignoreAjax' => true));
 
         $dataArray = array(
             'newContent'    => $response->getContent(),

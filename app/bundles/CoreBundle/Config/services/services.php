@@ -50,3 +50,6 @@ $container->setDefinition('mautic.translation.loader',
             new Reference('mautic.factory'))
     ))
     ->addTag('translation.loader', array('alias' => 'mautic'));
+
+//Override exception class for AJAX
+$container->setParameter('twig.controller.exception.class', 'Mautic\CoreBundle\Controller\ExceptionController');

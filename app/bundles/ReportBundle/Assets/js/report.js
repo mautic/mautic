@@ -89,9 +89,7 @@ Mautic.updateColumnList = function () {
 			// TODO - Need to parse the prototype and replace the options in the column list for filters too
 		},
 		error: function (request, textStatus, errorThrown) {
-			if (mauticEnv == 'dev') {
-				alert(errorThrown);
-			}
+            Mautic.processAjaxError(request, textStatus, errorThrown);
 		}
 	});
 };

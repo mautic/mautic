@@ -366,9 +366,8 @@ var Mautic = {
                 }
             },
             error: function (request, textStatus, errorThrown) {
-                if (mauticEnv == 'dev') {
-                    alert(errorThrown);
-                }
+                Mautic.processAjaxError(request, textStatus, errorThrown);
+
                 //clear routeInProgress
                 MauticVars.routeInProgress = '';
 
@@ -465,14 +464,10 @@ var Mautic = {
                 MauticVars.formSubmitInProgress = false;
                 callback(data);
             },
-            error: function(info, type, errorThrown) {
+            error: function(request, textStatus, errorThrown) {
                 MauticVars.formSubmitInProgress = false;
-                if ('console' in window) {
-                    console.log('form error log', info);
-                }
-                if (mauticEnv == 'dev') {
-                    alert(errorThrown);
-                }
+
+                Mautic.processAjaxError(request, textStatus, errorThrown);
             }
         });
     },
@@ -723,9 +718,7 @@ var Mautic = {
                 Mautic.stopIconSpinPostEvent();
             },
             error: function (request, textStatus, errorThrown) {
-                if (mauticEnv == 'dev') {
-                    alert(errorThrown);
-                }
+                Mautic.processAjaxError(request, textStatus, errorThrown);
                 Mautic.stopIconSpinPostEvent();
             }
         });
@@ -921,9 +914,7 @@ var Mautic = {
                 }
             },
             error: function (request, textStatus, errorThrown) {
-                if (mauticEnv == 'dev') {
-                    alert(errorThrown);
-                }
+                Mautic.processAjaxError(request, textStatus, errorThrown);
             }
         });
     },
@@ -950,9 +941,7 @@ var Mautic = {
                 }
             },
             error: function (request, textStatus, errorThrown) {
-                if (mauticEnv == 'dev') {
-                    alert(errorThrown);
-                }
+                Mautic.processAjaxError(request, textStatus, errorThrown);
             }
         });
     },
@@ -971,9 +960,7 @@ var Mautic = {
                 }
             },
             error: function (request, textStatus, errorThrown) {
-                if (mauticEnv == 'dev') {
-                    alert(errorThrown);
-                }
+                Mautic.processAjaxError(request, textStatus, errorThrown);
             }
         });
     },
@@ -996,9 +983,7 @@ var Mautic = {
                 Mautic.processPageContent(response);
             },
             error: function (request, textStatus, errorThrown) {
-                if (mauticEnv == 'dev') {
-                    alert(errorThrown);
-                }
+                Mautic.processAjaxError(request, textStatus, errorThrown);
             }
         });
     },
@@ -1195,9 +1180,7 @@ var Mautic = {
                         MauticVars.searchIsActive = false;
                     },
                     error: function (request, textStatus, errorThrown) {
-                        if (mauticEnv == 'dev') {
-                            alert(errorThrown);
-                        }
+                        Mautic.processAjaxError(request, textStatus, errorThrown);
                     }
                 });
             }
@@ -1253,9 +1236,7 @@ var Mautic = {
                 }
             },
             error: function (request, textStatus, errorThrown) {
-                if (mauticEnv == 'dev') {
-                    alert(errorThrown);
-                }
+                Mautic.processAjaxError(request, textStatus, errorThrown);
             }
         });
     },
@@ -1315,5 +1296,22 @@ var Mautic = {
             data: "action=unlockEntity&model=" + model + "&id=" + id + "&parameter=" + parameter,
             dataType: "json"
         });
+    },
+
+    /**
+     * Processes ajax errors
+     *
+     *
+     * @param request
+     * @param textStatus
+     * @param errorThrown
+     */
+    processAjaxError: function(request, textStatus, errorThrown) {
+       if (typeof mauticEnv !== 'undefined' && mauticEnv == 'dev') {
+           console.log(request);
+
+           var error = request.responseJSON.error.code + ': ' + errorThrown + '; ' + request.responseJSON.error.exception;
+           alert(error);
+       }
     }
 };
