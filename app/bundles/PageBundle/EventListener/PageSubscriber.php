@@ -168,13 +168,16 @@ class PageSubscriber extends CommonSubscriber
 
         $hits = $hitRepository->getLeadHits($lead->getId(), $leadIps);
 
+        $model = $this->factory->getModel('page.page');
+
         // Add the hits to the event array
         foreach ($hits as $hit) {
             $event->addEvent(array(
                 'event'     => 'page.hit',
                 'timestamp' => $hit['dateHit'],
                 'extra'     => array(
-                    'page_id' => $hit['page_id']
+                    'page_id' => $hit['page_id'],
+                    'page' => $model->getEntity($hit['page_id'])
                 ),
                 'contentTemplate' => 'MauticPageBundle:Timeline:index.html.php'
             ));
