@@ -13,6 +13,9 @@ Mousetrap.bind('shift+d', function(e) {
     mQuery('#mautic_dashboard_index').click();
 });
 
+Mousetrap.bind('shift+right', function(e) {
+    mQuery('.navbar-right > button.navbar-toggle').click();
+});
 
 //Fix for back/forward buttons not loading ajax content with History.pushState()
 MauticVars.manualStateChange = true;

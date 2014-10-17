@@ -11,13 +11,7 @@ if ($tmpl == 'index')
 ?>
 
 <?php if (count($items)): ?>
-<div class="panel panel-default page-list">
-    <div class="panel-heading">
-        <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.lead.lead.header.index'); ?></h3>
-        <div class="panel-toolbar text-right">
-            <?php echo $view->render('MauticCoreBundle:Default:search.html.php'); ?>
-        </div>
-    </div>
+<div class="panel panel-default page-list bdr-t-wdh-0">
     <div class="panel-body">
         <div class="box-layout">
             <div class="col-xs-6 va-m">

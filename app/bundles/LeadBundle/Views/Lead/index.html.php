@@ -11,6 +11,10 @@ $view['slots']->set('mauticContent', 'lead');
 $view['slots']->set("headerTitle", $view['translator']->trans('mautic.lead.lead.header.index'));
 ?>
 
+<?php $view['slots']->start("search"); ?>
+  <?php echo $view->render('MauticCoreBundle:Default:search.html.php'); ?>
+<?php $view['slots']->stop(); ?>
+
 <?php if ($permissions['lead:leads:create']): ?>
     <?php $view['slots']->start("actions"); ?>
         <a id="new-lead" href="<?php echo $this->container->get('router')->generate(

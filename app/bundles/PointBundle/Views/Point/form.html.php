@@ -17,33 +17,40 @@ $header = ($entity->getId()) ?
 $view['slots']->set("headerTitle", $header);
 echo $view['form']->start($form);
 ?>
-<div class="col-md-8" id="pointActionProperties">
-	<div class="panel panel-default">
-		<div class="panel-heading">
-			<h4 class="panel-title">
-				<?php echo $header; ?>
-			</h4>
-		</div>
-		<div class="panel-body">
-		    <?php		    
-			echo $view['form']->row($form['name']);
-			echo $view['form']->row($form['description']);
-			echo $view['form']->row($form['type']);
+<!-- reset container-fluid padding -->
+<div class="mna-md">
+    <!-- start: box layout -->
+    <div class="box-layout">
+        <!-- container -->
+        <div class="col-md-9 bg-auto height-auto bdr-r">
+            <div class="bdr-rds-0 bdr-w-0">
+                <div class="pa-md bg-auto bg-light-xs bdr-b">
+                    <h4 class="fw-sb"><?php echo $header; ?></h4>
+                </div>
+                <div class="pa-md">
+				    <?php		    
+					echo $view['form']->row($form['name']);
+					echo $view['form']->row($form['description']);
+					echo $view['form']->row($form['type']);
 
-		    if (isset($form['properties'])):
-		    	echo $view['form']->row($form['properties']);
-		    endif;
-		    ?>
+				    if (isset($form['properties'])):
+				    	echo $view['form']->row($form['properties']);
+				    endif;
+				    ?>
+				</div>
+			</div>
+		</div>
+	 	<div class="col-md-3 bg-white height-auto">
+			<div class="pr-lg pl-lg pt-md pb-md">
+				<?php
+					echo $view['form']->row($form['category_lookup']);
+					echo $view['form']->row($form['category']);
+					echo $view['form']->row($form['isPublished']);
+					echo $view['form']->row($form['publishUp']);
+					echo $view['form']->row($form['publishDown']);
+				?>
+			</div>
 		</div>
 	</div>
-</div>
-<div class="col-md-4">
-	<?php
-	echo $view['form']->row($form['category_lookup']);
-	echo $view['form']->row($form['category']);
-	echo $view['form']->row($form['isPublished']);
-	echo $view['form']->row($form['publishUp']);
-	echo $view['form']->row($form['publishDown']);
-	?>
 </div>
 <?php echo $view['form']->end($form); ?>

@@ -24,25 +24,27 @@ $groups = array_keys($fields);
                <!-- step container -->
         <div class="col-md-3 bg-white height-auto">
             <div class="pr-lg pl-lg pt-md pb-md">
-                <div class="media">
-                    <div class="pull-left">
-                        <img class="img-circle img-bordered media-object" src="<?php echo $view['gravatar']->getImage($fields['core']['email']['value']); ?>" alt="" width="65px">
-                    </div>
-                    <div class="media-body">
-                        <h4><?php echo $header; ?></h4>
-                        <div style="max-width:200px;">
-                            <div class="progress progress-xs mb5">
-                                <div class="progress-bar progress-bar-warning" style="width:70%"></div>
+                <?php if ($lead->getId()): ?>
+                    <div class="media">
+                        <div class="pull-left">
+                            <img class="img-circle img-bordered media-object" src="<?php echo $view['gravatar']->getImage($fields['core']['email']['value']); ?>" alt="" width="65px">
+                        </div>
+                        <div class="media-body">
+                            <h4><?php echo $header; ?></h4>
+                            <div style="max-width:200px;">
+                                <div class="progress progress-xs mb5">
+                                    <div class="progress-bar progress-bar-warning" style="width:70%"></div>
+                                </div>
+                                <p class="text-muted clearfix nm">
+                                    <span class="pull-left"><?php echo $view['translator']->trans('mautic.lead.lead.thead.points'); ?></span>
+                                    
+                                </p>
                             </div>
-                            <p class="text-muted clearfix nm">
-                                <span class="pull-left"><?php echo $view['translator']->trans('mautic.lead.lead.thead.points'); ?></span>
-                                
-                            </p>
                         </div>
                     </div>
-                </div>
 
-                <hr />
+                    <hr />
+                <?php endif; ?>
 
                 <ul class="list-group list-group-tabs">
                     <?php $step = 1; ?>
