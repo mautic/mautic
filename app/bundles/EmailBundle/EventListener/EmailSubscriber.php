@@ -17,6 +17,8 @@ use Mautic\EmailBundle\Entity\DoNotEmail;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event as Events;
 use Mautic\EmailBundle\EmailEvents;
+use Mautic\LeadBundle\Event\LeadTimelineEvent;
+use Mautic\LeadBundle\LeadEvents;
 /**
  * Class EmailSubscriber
  *
@@ -36,7 +38,8 @@ class EmailSubscriber extends CommonSubscriber
             EmailEvents::EMAIL_POST_SAVE    => array('onEmailPostSave', 0),
             EmailEvents::EMAIL_POST_DELETE  => array('onEmailDelete', 0),
             CoreEvents::EMAIL_FAILED        => array('onEmailFailed', 0),
-            CoreEvents::EMAIL_RESEND        => array('onEmailResend', 0)
+            CoreEvents::EMAIL_RESEND        => array('onEmailResend', 0),
+            LeadEvents::TIMELINE_ON_GENERATE => array('onTimelineGenerate', 0)
         );
     }
 
@@ -204,6 +207,39 @@ class EmailSubscriber extends CommonSubscriber
                 $em->persist($stat);
                 $em->flush();
             }
+        }
+    }
+
+    /**
+     * Compile events for the lead timeline
+     *
+     * @param LeadTimelineEvent $event
+     */
+    public function onTimelineGenerate(LeadTimelineEvent $event)
+    {
+        $lead    = $event->getLead();
+        $leadIps = array();
+
+        /** @var \Mautic\CoreBundle\Entity\IpAddress $ip */
+        foreach ($lead->getIpAddresses() as $ip) {
+            $leadIps[] = $ip->getId();
+        }
+
+        /** @var \Mautic\EmailBundle\Entity\StatRepository $statRepository */
+        $statRepository = $this->factory->getEntityManager()->getRepository('MauticEmailBundle:Stat');
+
+        $stats = $statRepository->getLeadStats($lead->getId(), $leadIps);
+
+        // Add the events to the event array
+        foreach ($stats as $stat) {
+            $event->addEvent(array(
+                'event'     => 'email.read',
+                'timestamp' => $stat['dateRead'],
+                'extra'     => array(
+                    'stats' => $stat
+                ),
+                'contentTemplate' => 'MauticEmailBundle:Timeline:index.html.php'
+            ));
         }
     }
 }

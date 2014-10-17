@@ -181,4 +181,29 @@ class StatRepository extends CommonRepository
 
         return (isset($results[0])) ? $results[0]['failedCount'] : 0;
     }
+
+    /**
+     * Get a lead's email stat
+     *
+     * @param integer $leadId
+     * @param array   $ipIds
+     *
+     * @return array
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function getLeadStats($leadId, array $ipIds = array())
+    {
+        $query = $this->createQueryBuilder('s')
+            ->select('IDENTITY(s.email) AS email_id, s.dateRead, e.subject, e.plainText')
+            ->leftJoin('MauticEmailBundle:Email', 'e', 'WITH', 'e.id = s.email')
+            ->where('s.lead = ' . $leadId);
+
+        if (!empty($ipIds)) {
+            $query->orWhere('s.ipAddress IN (' . implode(',', $ipIds) . ')');
+        }
+
+        return $query->getQuery()
+            ->getArrayResult();
+    }
 }
