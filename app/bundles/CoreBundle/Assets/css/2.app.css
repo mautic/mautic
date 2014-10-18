@@ -160,13 +160,6 @@ body > #app-wrapper {
   left: auto;
   right: 4px;
 }
-#app-header.navbar .navbar-nocollapse .navbar-nav > li > a.sidebar-minimizer > .arrow:after {
-  font-family: 'FontAwesome';
-  content: '\f053';
-}
-#app-header.navbar .navbar-nocollapse .navbar-nav > li > a.sidebar-minimizer.active > .arrow:after {
-  content: '\f054';
-}
 #app-header.navbar .navbar-nocollapse .navbar-nav > li > a:hover {
   color: rgba(0, 0, 0, 0.7);
   background-color: transparent;
@@ -615,6 +608,13 @@ body > #app-wrapper {
 }
 .app-sidebar .nav-sidebar > .nav .nav-heading:first-child {
   padding-top: 20px;
+}
+.app-sidebar .nav-sidebar .sidebar-minimizer > .direction:after {
+  font-family: 'FontAwesome';
+  content: '\f053';
+}
+.app-sidebar .nav-sidebar .sidebar-minimizer.active .direction:after {
+  content: '\f054';
 }
 @media (min-width: 768px) {
   .app-sidebar.sidebar-left {

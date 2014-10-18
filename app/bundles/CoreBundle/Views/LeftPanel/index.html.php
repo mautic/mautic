@@ -62,6 +62,15 @@
         <!-- start: navigation -->
         <nav class="nav-sidebar">
             <?php echo $view['knp_menu']->render('main', array("menu" => "main")); ?>
+
+            <!-- start: left nav -->
+            <ul class="nav">
+                <li class="hidden-xs" data-toggle="tooltip" data-placement="right" title="Minimize Sidebar">
+                    <a href="javascript:void(0)" data-toggle="minimize" class="sidebar-minimizer"><span class="direction icon fa"></span><span class="nav-item-name text"><?php echo $view['translator']->trans('mautic.core.menu.left.collapse'); ?></span></a>
+                </li>
+            </ul>
+            <!--/ end: left nav -->
+
         </nav>
         <!--/ end: navigation -->
     </div>

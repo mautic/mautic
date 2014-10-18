@@ -6,14 +6,11 @@
  * @link        http://mautic.com
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'lead');
 $view['slots']->set("headerTitle", $view['translator']->trans('mautic.lead.lead.header.index'));
 ?>
-
-<?php $view['slots']->start("title"); ?>
-  <h3><?php echo $view['translator']->trans('mautic.lead.lead.header.index'); ?></h3>
-<?php $view['slots']->stop(); ?>
 
 <?php if ($permissions['lead:leads:create']): ?>
     <?php $view['slots']->start("actions"); ?>

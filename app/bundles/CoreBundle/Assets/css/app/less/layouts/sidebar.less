@@ -283,6 +283,24 @@
         }
       }
     }
+
+    // Sidebar minimizer
+    // -------------------------
+    .sidebar-minimizer {
+      > .direction {
+        &:after {
+          font-family: 'FontAwesome';
+          content: '\f053';
+        }
+      }
+      &.active {
+        .direction {
+          &:after {
+            content: '\f054';
+          }
+        }
+      }
+    }
   }
 }
 
