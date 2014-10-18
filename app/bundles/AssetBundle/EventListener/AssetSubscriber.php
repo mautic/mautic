@@ -82,6 +82,20 @@ class AssetSubscriber extends CommonSubscriber
      */
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
+        // Set available event types
+        $eventTypeKey = 'asset.download';
+        $eventTypeName = $this->translator->trans('mautic.asset.event.download');
+        $event->addEventType($eventTypeKey, $eventTypeName);
+
+        // Decide if those events are filtered
+        $filter = $event->getEventFilter();
+        $loadAllEvents = empty($filter);
+        $eventFilterExists = in_array($eventTypeKey, $filter);
+
+        if (!$loadAllEvents && !$eventFilterExists) {
+            return;
+        }
+
         $lead    = $event->getLead();
         $leadIps = array();
 
@@ -100,7 +114,8 @@ class AssetSubscriber extends CommonSubscriber
         // Add the downloads to the event array
         foreach ($downloads as $download) {
             $event->addEvent(array(
-                'event'     => 'asset.download',
+                'event'     => $eventTypeKey,
+                'eventLabel' => $eventTypeName,
                 'timestamp' => $download['dateDownload'],
                 'extra'     => array(
                     'asset' => $model->getEntity($download['asset_id'])
