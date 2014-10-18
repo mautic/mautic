@@ -13,7 +13,7 @@
 	<div class="figure"></div>
 	<div class="panel bg-primary">
 	    <div class="panel-body">
-	        <p class="mb-0">At <?php echo $view['date']->toFullConcat($event['timestamp']); ?>, <?php echo $event['event']; ?>.</p>
+	        <p class="mb-0">At <?php echo $view['date']->toFullConcat($event['timestamp']); ?>, <?php echo $event['eventLabel']; ?>.</p>
 	    </div>
 	</div>
 </li>

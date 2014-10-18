@@ -233,11 +233,26 @@ class LeadSubscriber extends CommonSubscriber
      */
     public function onTimelineGenerate(Events\LeadTimelineEvent $event)
     {
+        // Set available event types
+        $eventTypeKey = 'lead.created';
+        $eventTypeName = $this->translator->trans('mautic.lead.event.created');
+        $event->addEventType($eventTypeKey, $eventTypeName);
+
+        // Decide if those events are filtered
+        $filter = $event->getEventFilter();
+        $loadAllEvents = empty($filter);
+        $eventFilterExists = in_array($eventTypeKey, $filter);
+
+        if (!$loadAllEvents && !$eventFilterExists) {
+            return;
+        }
+
         $lead = $event->getLead();
 
         // Add the lead's creation time to the timeline
         $event->addEvent(array(
-            'event'     => 'lead.created',
+            'event'     => $eventTypeKey,
+            'eventLabel' => $eventTypeName,
             'timestamp' => $lead->getDateAdded(),
             'contentTemplate' => 'MauticLeadBundle:Timeline:index.html.php'
         ));
