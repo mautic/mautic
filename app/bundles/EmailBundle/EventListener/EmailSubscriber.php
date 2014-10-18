@@ -217,6 +217,25 @@ class EmailSubscriber extends CommonSubscriber
      */
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
+        // Set available event types
+        $eventTypeKeySent = 'email.sent';
+        $eventTypeNameSent = 'Email sent';
+        $event->addEventType($eventTypeKeySent, $eventTypeNameSent);
+
+        $eventTypeKeyRead = 'email.read';
+        $eventTypeNameRead = 'Email read';
+        $event->addEventType($eventTypeKeyRead, $eventTypeNameRead);
+
+        // Decide if those events are filtered
+        $filter = $event->getEventFilter();
+        $loadAllEvents = empty($filter);
+        $sentEventFilterExists = in_array($eventTypeKeySent, $filter);
+        $readEventFilterExists = in_array($eventTypeKeyRead, $filter);
+
+        if (!$loadAllEvents && !($sentEventFilterExists || $readEventFilterExists)) {
+            return;
+        }
+
         $lead    = $event->getLead();
         $leadIps = array();
 
@@ -233,7 +252,7 @@ class EmailSubscriber extends CommonSubscriber
         // Add the events to the event array
         foreach ($stats as $stat) {
             // Email Sent
-            if ($stat['dateSent']) {
+            if (($loadAllEvents || $sentEventFilterExists) && $stat['dateSent']) {
                 $event->addEvent(array(
                     'event'     => 'email.sent',
                     'timestamp' => $stat['dateSent'],
@@ -245,7 +264,7 @@ class EmailSubscriber extends CommonSubscriber
             }
 
             // Email read
-            if ($stat['dateRead']) {
+            if (($loadAllEvents || $readEventFilterExists) && $stat['dateRead']) {
                 $event->addEvent(array(
                     'event'     => 'email.read',
                     'timestamp' => $stat['dateRead'],
