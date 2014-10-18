@@ -27,7 +27,7 @@ class DefaultController extends CommonController
      */
     public function indexAction()
     {
-        return $this->delegateView('MauticCoreBundle:Default:index.html.php');
+        return $this->delegateView('MauticDashboardBundle:Default:index.html.php');
     }
 
     public function globalSearchAction()
