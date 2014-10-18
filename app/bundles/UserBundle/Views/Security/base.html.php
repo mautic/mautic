@@ -25,7 +25,7 @@
             <div class="col-lg-4 col-lg-offset-4">
                 <div class="text-center">
                     <img src="<?php echo $view['assets']->getUrl('assets/images/mautic_logo_lb200.png') ?>" height="50px" />
-                    <h5 class="semibold text-muted mt-5"><?php $view['slots']->output('header', ''); ?></h5>
+                    <h5 class="semibold text-muted mt-sm"><?php $view['slots']->output('header', ''); ?></h5>
                 </div>
                 <hr />
 
@@ -35,18 +35,6 @@
                             <?php echo $view->render('MauticCoreBundle:Default:flashes.html.php'); ?>
                         </div>
 
-                        <div class="form-group">
-                            <select class="form-control" name="lang">
-                                <option value="0">Select language</option>
-                                <option value="en">English</option>
-                                <option value="da">Danish - Dansk</option>
-                                <option value="nl">Dutch - Nederlands</option>
-                                <option value="en-gb">English - UK</option>
-                                <option value="fr">French - français</option>
-                                <option value="de">German - Deutsch</option>
-                            </select>
-                        </div>
-                        
                         <?php $view['slots']->output('_content'); ?>
                     </div>
                 </div>
@@ -58,6 +46,6 @@
     //clear typeahead caches
     window.localStorage.clear();
 </script>
-<?php $view['assets']->outputSystemScripts(); ?>
+
 </body>
 </html>
