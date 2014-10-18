@@ -12,10 +12,9 @@ if ($tmpl == 'index') {
 }
 ?>
 
-<ul class="timeline" id="NoteTimeline">
-    <li class="header ellipsis bg-white"><?php echo $view['translator']->trans('mautic.lead.note.notes'); ?></li>
+<ul class="notes" id="NoteTimeline">
     <li class="wrapper">
-        <ul class="events">
+        <ul class="notes">
             <?php foreach ($notes as $note): ?>
                 <?php
                 //Use a separate layout for AJAX generated content
@@ -28,7 +27,7 @@ if ($tmpl == 'index') {
         </ul>
     </li>
 </ul>
-<div class="timeline-pagination">
+<div class="notes-pagination">
     <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
         'totalItems'      => count($notes),
         'target'          => '#notes-container',
