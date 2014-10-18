@@ -19,7 +19,13 @@
         <strong>Filter Events by Type:</strong>
         <?php foreach ($eventTypes as $typeKey => $typeName) : ?>
             <label class="checkbox-inline">
-                <input name="eventFilter" type="checkbox" value="<?php echo $typeKey; ?>"> <?php echo $typeName; ?>
+                <input 
+                    name="eventFilter"
+                    type="checkbox"
+                    value="<?php echo $typeKey; ?>"
+                    <?php echo in_array($typeKey, $eventFilter) ? 'checked' : ''; ?>
+                    onchange="Mautic.refreshLeadTimeline(<?php echo $lead->getId(); ?>, this);">
+                <?php echo $typeName; ?>
             </label>
         <?php endforeach; ?>
     </div>

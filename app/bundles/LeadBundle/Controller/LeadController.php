@@ -249,7 +249,7 @@ class LeadController extends FormController
         }
 
         // Set which events to load. Empty array == all.
-        $eventFilter = array();
+        $eventFilter = $this->factory->getSession()->get('mautic.lead.'.$lead->getId().'.timeline.filter', array());
 
         // Trigger the TIMELINE_ON_GENERATE event to fetch the timeline events from subscribed bundles
         $dispatcher = $this->factory->getDispatcher();
@@ -273,6 +273,7 @@ class LeadController extends FormController
                 'permissions'       => $permissions,
                 'events'            => $events,
                 'eventTypes'        => $eventTypes,
+                'eventFilter'       => $eventFilter,
                 'noteCount'         => $this->factory->getModel('lead.note')->getNoteCount($lead)
             ),
             'contentTemplate' => 'MauticLeadBundle:Lead:lead.html.php',

@@ -464,6 +464,30 @@ Mautic.refreshLeadSocialProfile = function(network, leadId, event) {
     });
 };
 
+Mautic.refreshLeadTimeline = function(leadId, event) {
+    Mautic.startIconSpinOnEvent(event);
+    var filter = mQuery(event);
+    var filterName = filter.attr('name');
+    var filterValue = filter.val();
+    var query = "action=lead:updateTimeline&filter_name=" + filterName + "&filter_value=" + filterValue + "&lead=" + leadId;
+    mQuery.ajax({
+        url: mauticAjaxUrl,
+        type: "POST",
+        data: query,
+        dataType: "json",
+        success: function (response) {
+            if (response.success) {
+                mQuery('#history-container').html(response.timeline);
+            }
+            Mautic.stopIconSpinPostEvent(event);
+        },
+        error: function (request, textStatus, errorThrown) {
+            Mautic.processAjaxError(request, textStatus, errorThrown);
+            Mautic.stopIconSpinPostEvent(event);
+        }
+    });
+};
+
 Mautic.loadRemoteContentToModal = function(elementId) {
     mQuery('#'+elementId).on('loaded.bs.modal', function (e) {
         // take HTML content from JSON and place it back

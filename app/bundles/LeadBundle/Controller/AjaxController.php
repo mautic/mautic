@@ -13,6 +13,8 @@ use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\SocialBundle\Helper\NetworkIntegrationHelper;
 use Symfony\Component\HttpFoundation\Request;
+use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Event\LeadTimelineEvent;
 
 /**
  * Class AjaxController
@@ -109,6 +111,66 @@ class AjaxController extends CommonAjaxController
 
                 $dataArray['success']  = 1;
                 $dataArray['profiles'] = $networks;
+            }
+        }
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * Updates the timeline events and gets returns updated HTML
+     *
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    protected function updateTimelineAction (Request $request)
+    {
+        $dataArray = array('success' => 0);
+        $filterName = InputHelper::clean($request->request->get('filter_name'));
+        $filterValue = InputHelper::clean($request->request->get('filter_value'));
+        $leadId    = InputHelper::clean($request->request->get('lead'));
+
+        if (!empty($leadId)) {
+            //find the lead
+            $model = $this->factory->getModel('lead.lead');
+            $lead  = $model->getEntity($leadId);
+
+            if ($lead !== null) {
+
+                if ($filterName == 'eventFilter') {
+                    $session = $this->factory->getSession();
+
+                    // Set which events to load. Empty array == all.
+                    $eventFilter = $session->get('mautic.lead.'.$leadId.'.timeline.filter', array());
+
+                    $filterKey = array_search($filterValue, $eventFilter);
+
+                    if ($filterKey === false) {
+                        $eventFilter[] = $filterValue;
+                    } else {
+                        unset($eventFilter[$filterKey]);
+                    }
+
+                    $session->set('mautic.lead.'.$leadId.'.timeline.filter', $eventFilter);
+                }
+
+                // Trigger the TIMELINE_ON_GENERATE event to fetch the timeline events from subscribed bundles
+                $dispatcher = $this->factory->getDispatcher();
+                $event = new LeadTimelineEvent($lead, $eventFilter);
+                $dispatcher->dispatch(LeadEvents::TIMELINE_ON_GENERATE, $event);
+                
+                $events = $event->getEvents();
+                $eventTypes = $event->getEventTypes();
+
+                $timeline = $this->renderView('MauticLeadBundle:Lead:history.html.php', array(
+                    'events' => $events,
+                    'eventTypes' => $eventTypes,
+                    'eventFilter' => $eventFilter,
+                    'lead' => $lead));
+
+                $dataArray['success']  = 1;
+                $dataArray['timeline'] = $timeline;
             }
         }
 
