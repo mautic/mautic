@@ -45,26 +45,17 @@ switch ($type) {
             <div class="height-auto icon bdr-r bg-dark-xs col-xs-1 text-center">
                 <h3><i class="fa fa-lg fa-fw <?php echo $icon; ?>"></i></h3>
             </div>
-            <div class="media-body col-xs-11">
-                <p class="mb-sm">
-                    <?php echo $text; ?>
-                </p>
-                <div class="clearfix"></div>
-                <div class="pull-left">
-                    <div><i class="fa fa-clock-o fa-fw"></i><span class="small"><?php echo $view['date']->toFullConcat($date); ?></span></div>
-                    <div><i class="fa fa-user fa-fw"></i><span class="small"><?php echo $author; ?></span></div>
+            <div class="media-body col-xs-11 pa-10">
+                <div class="pull-right btn-group">
+                    <?php if ($permissions['edit']): ?>
+                        <a class="btn btn-default btn-xs" href="<?php echo $this->container->get('router')->generate('mautic_leadnote_action', array('leadId' => $lead->getId(), 'objectAction' => 'edit', 'objectId' => $id)); ?>" data-toggle="ajaxmodal" data-target="#leadModal" data-header="<?php echo $view['translator']->trans('mautic.lead.note.header.edit'); ?>"><i class="fa fa-pencil"></i></a>
+                    <?php endif; ?>
+                     <?php if ($permissions['delete']): ?>
+                         <a class="btn btn-default btn-xs" href="javascript:void(0);" onclick="Mautic.showConfirmation('<?php echo $view->escape($view["translator"]->trans('mautic.lead.note.confirmdelete'), 'js'); ?>', '<?php echo $view->escape($view["translator"]->trans("mautic.core.form.delete"), 'js'); ?>', 'executeAction', ['<?php echo $view['router']->generate('mautic_leadnote_action', array('objectAction' => 'delete', 'objectId' => $id, 'leadId' => $lead->getId())); ?>', ''], '<?php echo $view->escape($view["translator"]->trans("mautic.core.form.cancel"), 'js'); ?>','',[]);"><i class="fa fa-trash text-danger"></i></a>
+                     <?php endif; ?>
                 </div>
-                <div class="pull-right">
-                     <span>
-                        <?php if ($permissions['edit']): ?>
-                            <a class="btn btn-xs" href="<?php echo $this->container->get('router')->generate('mautic_leadnote_action', array('leadId' => $lead->getId(), 'objectAction' => 'edit', 'objectId' => $id)); ?>" data-toggle="ajaxmodal" data-target="#leadModal" data-header="<?php echo $view['translator']->trans('mautic.lead.note.header.edit'); ?>"><i class="fa fa-pencil"></i></a>
-                        <?php endif; ?>
-                         <?php if ($permissions['delete']): ?>
-                             <a class="btn btn-xs ml-10" href="javascript:void(0);" onclick="Mautic.showConfirmation('<?php echo $view->escape($view["translator"]->trans('mautic.lead.note.confirmdelete'), 'js'); ?>', '<?php echo $view->escape($view["translator"]->trans("mautic.core.form.delete"), 'js'); ?>', 'executeAction', ['<?php echo $view['router']->generate('mautic_leadnote_action', array('objectAction' => 'delete', 'objectId' => $id, 'leadId' => $lead->getId())); ?>', ''], '<?php echo $view->escape($view["translator"]->trans("mautic.core.form.cancel"), 'js'); ?>','',[]);"><i class="fa fa-trash text-danger"></i></a>
-                         <?php endif; ?>
-                    </span>
-                </div>
-                <div class="clearfix"></div>
+                <?php echo $text; ?>
+                <div class="mt-15 text-muted"><i class="fa fa-clock-o fa-fw"></i><span class="small"><?php echo $view['date']->toFullConcat($date); ?></span> <i class="fa fa-user fa-fw"></i><span class="small"><?php echo $author; ?></span></div>
             </div>
         </div>
     </div>
