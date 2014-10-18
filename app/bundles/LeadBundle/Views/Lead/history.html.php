@@ -16,7 +16,7 @@
     </div>
     <?php if (isset($eventTypes) && is_array($eventTypes)) : ?>
     <div class="form-control-icon pa-xs">
-        <strong>Filter Events by Type:</strong>
+        <strong>Filter Events:</strong>
         <?php foreach ($eventTypes as $typeKey => $typeName) : ?>
             <label class="checkbox-inline">
                 <input 
