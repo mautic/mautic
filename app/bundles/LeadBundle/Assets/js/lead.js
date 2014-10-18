@@ -1,5 +1,6 @@
 //LeadBundle
 Mautic.leadOnLoad = function (container) {
+    Mousetrap.reset();
 
     Mousetrap.bind('shift+l', function(e) {
         mQuery('#menu_lead_parent_child > li:first > a').click();
@@ -26,12 +27,27 @@ Mautic.leadOnLoad = function (container) {
     });
 
     Mousetrap.bind('mod+enter', function(e) {
-        if(mQuery('#leadnote_button_save').length) {
+        if(mQuery('#leadnote_buttons_save').length) {
             mQuery('#leadnote_buttons_save').click();
         } else if (mQuery('#save-quick-add').length) {
             mQuery('#save-quick-add').click();
         }
     });
+
+    //Prevent single combo keys from initiating within lead note
+    Mousetrap.stopCallback = function(e, element, combo) {
+        if (element.id == 'leadnote_text' && combo != 'mod+enter') {
+            return true;
+        }
+
+        // if the element has the class "mousetrap" then no need to stop
+        if ((' ' + element.className + ' ').indexOf(' mousetrap ') > -1) {
+            return false;
+        }
+
+        // stop for input, select, and textarea
+        return element.tagName == 'INPUT' || element.tagName == 'SELECT' || element.tagName == 'TEXTAREA' || (element.contentEditable && element.contentEditable == 'true');
+    };
 
     if (mQuery(container + ' form[name="lead"]').length) {
         Mautic.activateLeadOwnerTypeahead('lead_owner_lookup');
@@ -608,6 +624,21 @@ Mautic.leadNoteOnLoad = function (container, response) {
         });
     } else if (response.deleteId && mQuery('#LeadNote' + response.deleteId).length) {
         mQuery('#LeadNote' + response.deleteId).remove();
+    }
+
+    if (response.upNoteCount || response.noteCount || response.downNoteCount) {
+        if (response.upNoteCount || response.downNoteCount) {
+            var count = parseInt(mQuery('#NoteCount').html());
+            if (response.upNoteCount) {
+                count = count + 1;
+            } else {
+                count = count - 1;
+            }
+        } else {
+            var count = parseInt(response.noteCount);
+        }
+
+        mQuery('#NoteCount').html(count);
     }
 };
 
