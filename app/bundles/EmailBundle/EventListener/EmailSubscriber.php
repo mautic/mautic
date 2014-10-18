@@ -219,11 +219,11 @@ class EmailSubscriber extends CommonSubscriber
     {
         // Set available event types
         $eventTypeKeySent = 'email.sent';
-        $eventTypeNameSent = 'Email sent';
+        $eventTypeNameSent = $this->translator->trans('mautic.email.event.sent');
         $event->addEventType($eventTypeKeySent, $eventTypeNameSent);
 
         $eventTypeKeyRead = 'email.read';
-        $eventTypeNameRead = 'Email read';
+        $eventTypeNameRead = $this->translator->trans('mautic.email.event.read');
         $event->addEventType($eventTypeKeyRead, $eventTypeNameRead);
 
         // Decide if those events are filtered
@@ -254,7 +254,8 @@ class EmailSubscriber extends CommonSubscriber
             // Email Sent
             if (($loadAllEvents || $sentEventFilterExists) && $stat['dateSent']) {
                 $event->addEvent(array(
-                    'event'     => 'email.sent',
+                    'event'     => $eventTypeKeySent,
+                    'eventLabel' => $eventTypeNameSent,
                     'timestamp' => $stat['dateSent'],
                     'extra'     => array(
                         'stats' => $stat
@@ -266,7 +267,8 @@ class EmailSubscriber extends CommonSubscriber
             // Email read
             if (($loadAllEvents || $readEventFilterExists) && $stat['dateRead']) {
                 $event->addEvent(array(
-                    'event'     => 'email.read',
+                    'event'     => $eventTypeKeyRead,
+                    'eventLabel' => $eventTypeNameRead,
                     'timestamp' => $stat['dateRead'],
                     'extra'     => array(
                         'stats' => $stat

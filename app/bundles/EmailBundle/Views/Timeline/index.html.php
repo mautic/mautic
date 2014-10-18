@@ -22,7 +22,7 @@ $item = $event['extra']['stats'];
 				    <?php echo $item['subject']; ?>
 				</a>
 			</h3>
-	        <p class="mb-0">At <?php echo $view['date']->toFullConcat($event['timestamp']); ?>, <?php echo $event['event']; ?>.</p>
+	        <p class="mb-0">At <?php echo $view['date']->toFullConcat($event['timestamp']); ?>, <?php echo $event['eventLabel']; ?>.</p>
 	    </div>
 	    <?php if (isset($event['extra'])) : ?>
 	        <div class="panel-footer">
