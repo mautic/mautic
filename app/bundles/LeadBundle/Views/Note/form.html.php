@@ -15,6 +15,4 @@ if (!empty($userId)) {
     $header = $view['translator']->trans('mautic.lead.note.header.new');
 }
 ?>
-<?php echo $view['form']->start($form); ?>
-<?php echo $view['form']->row($form['text']); ?>
-<?php echo $view['form']->end($form); ?>
+<?php echo $view['form']->form($form); ?>

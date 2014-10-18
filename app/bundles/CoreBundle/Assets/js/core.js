@@ -360,10 +360,8 @@ var Mautic = {
 
                     //restore button class if applicable
                     Mautic.stopIconSpinPostEvent();
-
-                    //clear routeInProgress
-                    MauticVars.routeInProgress = '';
                 }
+                MauticVars.routeInProgress = '';
             },
             error: function (request, textStatus, errorThrown) {
                 Mautic.processAjaxError(request, textStatus, errorThrown);
@@ -1073,6 +1071,8 @@ var Mautic = {
                 var overlayTarget = mQuery(el).attr('data-overlay-target');
                 if (!overlayTarget) overlayTarget = target;
             }
+            console.log(MauticVars.searchIsActive);
+            console.log(event.which);
             if (
                 !MauticVars.searchIsActive &&
                 (
@@ -1160,13 +1160,15 @@ var Mautic = {
                 Mautic.processPageContent(response);
                 MauticVars.searchIsActive = false;
             } else {
-                //disable page loading bar
-                MauticVars.showLoadingBar = false;
+                var searchName = el.attr('name');
+                if (searchName == 'undefined') {
+                    searchName = 'search';
+                }
 
                 mQuery.ajax({
                     url: route,
                     type: "GET",
-                    data: el.attr('name') + "=" + encodeURIComponent(value) + '&tmpl=list',
+                    data: searchName + "=" + encodeURIComponent(value) + '&tmpl=list',
                     dataType: "json",
                     success: function (response) {
                         //cache the response

@@ -29,4 +29,18 @@ class ButtonGroupType extends AbstractType
     {
         return 'button_group';
     }
+
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->setDefaults(array(
+            'expanded'      => true,
+            'multiple'      => false,
+            'empty_value'   => false,
+            'required'      => false
+        ));
+    }
 }

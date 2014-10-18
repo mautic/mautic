@@ -45,4 +45,87 @@ class LeadNoteRepository extends CommonRepository
     {
         return 'n';
     }
+
+
+    /**
+     * @param QueryBuilder $q
+     * @param              $filter
+     * @return array
+     */
+    protected function addCatchAllWhereClause(&$q, $filter)
+    {
+        $unique  = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
+        $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
+
+        $expr = $q->expr()->like('n.text', ":$unique");
+
+        if ($filter->not) {
+            $q->expr()->not($expr);
+        }
+
+        return array(
+            $expr,
+            array("$unique" => $string)
+        );
+    }
+
+    /**
+     * @param QueryBuilder $q
+     * @param              $filter
+     * @return array
+     */
+    protected function addSearchCommandWhereClause(&$q, $filter)
+    {
+        $command         = $field = $filter->command;
+        $string          = $filter->string;
+        $unique          = $this->generateRandomParameterName();
+        $returnParameter = true; //returning a parameter that is not used will lead to a Doctrine error
+        $expr            = false;
+
+        switch ($command) {
+            case $this->translator->trans('mautic.lead.note.searchcommand.type'):
+                switch($string) {
+                    case $this->translator->trans('mautic.lead.note.searchcommand.general'):
+                        $filter->string = 'general';
+                        break;
+                    case $this->translator->trans('mautic.lead.note.searchcommand.call'):
+                        $filter->string = 'call';
+                        break;
+                    case $this->translator->trans('mautic.lead.note.searchcommand.email'):
+                        $filter->string = 'email';
+                        break;
+                    case $this->translator->trans('mautic.lead.note.searchcommand.meeting'):
+                        $filter->string = 'meeting';
+                        break;
+                }
+                $expr = $q->expr()->eq('n.type', ":$unique");
+                $filter->strict = true;
+                break;
+        }
+
+        $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
+        if ($expr && $filter->not) {
+            $expr = $q->expr()->not($expr);
+        }
+        return array(
+            $expr,
+            ($returnParameter) ? array("$unique" => $string) : array()
+        );
+    }
+
+    /**
+     * @return array
+     */
+    public function getSearchCommands()
+    {
+        return array(
+            'mautic.lead.note.searchcommand.type' => array(
+                'mautic.lead.note.searchcommand.general',
+                'mautic.lead.note.searchcommand.call',
+                'mautic.lead.note.searchcommand.email',
+                'mautic.lead.note.searchcommand.meeting'
+            )
+        );
+    }
+
 }

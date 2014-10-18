@@ -53,6 +53,18 @@ class NoteType extends AbstractType
             'attr'       => array('class' => 'mousetrap form-control', 'rows' => 10)
         ));
 
+        $builder->add('type', 'choice', array(
+            'label'      => 'mautic.lead.note.form.type',
+            'choices' => array(
+                'general' => 'mautic.lead.note.type.general',
+                'email'   => 'mautic.lead.note.type.email',
+                'call'    => 'mautic.lead.note.type.call',
+                'meeting' => 'mautic.lead.note.type.meeting',
+            ),
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array('class' => 'form-control')
+        ));
+
         $builder->add('buttons', 'form_buttons', array(
             'container_class' => 'lead-note-buttons',
             'apply_text'      => false,

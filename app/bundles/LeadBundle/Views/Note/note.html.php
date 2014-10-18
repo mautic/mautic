@@ -13,18 +13,38 @@ if ($note instanceof \Mautic\LeadBundle\Entity\LeadNote) {
     $date      = $note->getDateAdded();
     $createdBy = $note->getCreatedBy();
     $author    = $createdBy->getFirstName() . ' ' . $createdBy->getLastName();
+    $type      = $note->getType();
 } else {
     $id     = $note['id'];
     $text   = $note['text'];
     $date   = $note['dateAdded'];
     $author = $note['createdBy']['firstName'] . ' ' . $note['createdBy']['lastName'];
+    $type   = $note['type'];
 }
+
+switch ($type) {
+    default:
+    case 'general':
+        $icon = 'fa-file-text';
+        break;
+    case 'email':
+        $icon = 'fa-send';
+        break;
+    case 'call':
+        $icon = 'fa-phone';
+        break;
+    case 'meeting':
+        $icon = 'fa-group';
+        break;
+}
+
 ?>
 <li class="featured" id="LeadNote<?php echo $id; ?>">
     <div class="figure"><!--<span class="fa fa-check"></span>--></div>
     <div class="panel ">
         <div class="panel-body">
             <p class="mb-sm">
+                <i class="fa fa-lg fa-fw <?php echo $icon; ?>"></i>
                 <?php echo $text; ?>
             </p>
             <div class="clearfix"></div>

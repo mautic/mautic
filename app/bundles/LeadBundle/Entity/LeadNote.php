@@ -55,7 +55,7 @@ class LeadNote extends FormEntity
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"leadNoteDetails"})
      */
-    private $type;
+    private $type = 'general';
 
     /**
      * Get id

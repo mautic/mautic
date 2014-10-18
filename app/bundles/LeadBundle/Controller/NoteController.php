@@ -37,6 +37,7 @@ class NoteController extends FormController
         }
 
         $session = $this->factory->getSession();
+
         //set limits
         $limit = $session->get('mautic.leadnote.limit', $this->factory->getParameter('default_pagelimit'));
         $start = ($page === 1) ? 0 : (($page - 1) * $limit);
@@ -59,7 +60,8 @@ class NoteController extends FormController
                         'expr'   => 'eq',
                         'value'  => $lead
                     )
-                )
+                ),
+                'string' => $search
             ),
             'start'          => $start,
             'limit'          => $limit,
@@ -74,12 +76,20 @@ class NoteController extends FormController
             'viewParameters'  => array(
                 'notes'       => $items,
                 'lead'        => $lead,
+                'page'        => $page,
+                'limit'       => $limit,
+                'search'      => $search,
+                'tmpl'        => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                 'permissions' => array(
                     'edit'   => $security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getOwner()),
                     'delete' => $security->hasEntityAccess('lead:leads:deleteown', 'lead:leads:deleteown', $lead->getOwner()),
                 )
             ),
-            'contentTemplate' => 'MauticLeadBundle:Note:index.html.php'
+            'passthroughVars' => array(
+                'route' => false,
+                'mauticContent' => 'leadNote'
+            ),
+            'contentTemplate' => 'MauticLeadBundle:Note:list.html.php'
         ));
     }
 
@@ -109,6 +119,7 @@ class NoteController extends FormController
         //get the user form factory
         $form       = $model->createForm($note, $this->get('form.factory'), $action);
         $closeModal = false;
+        $valid      = false;
         ///Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
             if (!$cancelled = $this->isFormCancelled($form)) {
@@ -181,6 +192,7 @@ class NoteController extends FormController
         $model      = $this->factory->getModel('lead.note');
         $note       = $model->getEntity($objectId);
         $closeModal = false;
+        $valid      = false;
 
         if ($note === null || !$this->factory->getSecurity()->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getOwner())) {
             return $this->accessDenied();
@@ -195,7 +207,6 @@ class NoteController extends FormController
 
         ///Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
-            $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data

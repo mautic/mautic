@@ -1,9 +1,9 @@
 //LeadBundle
 Mautic.leadOnLoad = function (container) {
 
-Mousetrap.bind('shift+l', function(e) {
-    mQuery('#menu_lead_parent_child > li:first > a').click();
-});
+    Mousetrap.bind('shift+l', function(e) {
+        mQuery('#menu_lead_parent_child > li:first > a').click();
+    });
 
     Mousetrap.bind('a', function(e) {
         if(mQuery('#lead-quick-add').length) {
@@ -50,6 +50,10 @@ Mousetrap.bind('shift+l', function(e) {
 
     if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'lead.lead');
+    }
+
+    if (mQuery(container + ' #notes-container').length) {
+        Mautic.activateSearchAutocomplete('NoteFilter', 'lead.note');
     }
 
     // Shuffle

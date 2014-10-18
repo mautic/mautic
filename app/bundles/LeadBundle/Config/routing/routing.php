@@ -48,10 +48,14 @@ $collection->add('mautic_lead_index', new Route('/leads/{page}',
     )
 ));
 
-$collection->add('mautic_lead_action', new Route('/leads/{objectAction}/{objectId}',
+$collection->add('mautic_leadnote_index', new Route('/leads/notes/{leadId}/{page}',
     array(
-        '_controller' => 'MauticLeadBundle:Lead:execute',
-        'objectId'    => 0
+        '_controller' => 'MauticLeadBundle:Note:index',
+        'leadId'    => 0,
+        'page'      => 1
+    ), array(
+        'leadId'   => '\d+',
+        'page'     => '\d+'
     )
 ));
 
@@ -64,13 +68,12 @@ $collection->add('mautic_leadnote_action', new Route('/leads/notes/{leadId}/{obj
     )
 ));
 
-$collection->add('mautic_leadnote_index', new Route('/leads/notes/{leadId}',
+$collection->add('mautic_lead_action', new Route('/leads/{objectAction}/{objectId}',
     array(
-        '_controller' => 'MauticLeadBundle:Note:executeNote',
-        'leadId'    => 0
-    ), array(
-        'leadId'    => '\d+'
+        '_controller' => 'MauticLeadBundle:Lead:execute',
+        'objectId'    => 0
     )
 ));
+
 
 return $collection;
