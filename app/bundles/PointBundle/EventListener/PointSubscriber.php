@@ -126,6 +126,20 @@ class PointSubscriber extends CommonSubscriber
      */
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
+        // Set available event types
+        $eventTypeKey = 'point.gained';
+        $eventTypeName = $this->translator->trans('mautic.point.event.gained');
+        $event->addEventType($eventTypeKey, $eventTypeName);
+
+        // Decide if those events are filtered
+        $filter = $event->getEventFilter();
+        $loadAllEvents = empty($filter);
+        $eventFilterExists = in_array($eventTypeKey, $filter);
+
+        if (!$loadAllEvents && !$eventFilterExists) {
+            return;
+        }
+
         $lead    = $event->getLead();
         $leadIps = array();
 
@@ -144,7 +158,8 @@ class PointSubscriber extends CommonSubscriber
         // Add the logs to the event array
         foreach ($logs as $log) {
             $event->addEvent(array(
-                'event'     => 'point.gained',
+                'event'     => $eventTypeKey,
+                'eventLabel' => $eventTypeName,
                 'timestamp' => $log['dateFired'],
                 'extra'     => array(
                     'log' => $model->getEntity($log['point_id'])

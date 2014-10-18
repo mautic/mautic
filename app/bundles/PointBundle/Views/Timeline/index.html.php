@@ -22,7 +22,7 @@ $item = $event['extra']['log'];
 				    <?php echo $item->getName(); ?>
 				</a>
 			</h3>
-	        <p class="mb-0">At <?php echo $view['date']->toFullConcat($event['timestamp']); ?>, <?php echo $event['event']; ?>.</p>
+	        <p class="mb-0">At <?php echo $view['date']->toFullConcat($event['timestamp']); ?>, <?php echo $event['eventLabel']; ?>.</p>
 	    </div>
         <div class="panel-footer">
 	        <p><strong>Point description:</strong> <?php echo $item->getDescription() ?></p>
