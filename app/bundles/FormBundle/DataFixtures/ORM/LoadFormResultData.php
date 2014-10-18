@@ -52,7 +52,8 @@ class LoadFormResultData extends AbstractFixture implements OrderedFixtureInterf
         $pageModel = $factory->getModel('page.page');
         $repo      = $factory->getModel('form.submission')->getRepository();
 
-        $importResults = function($results) use ($factory, $pageModel, $repo) {
+        $fixture =& $this;
+        $importResults = function($results) use ($factory, $pageModel, $repo, &$fixture) {
             foreach ($results as $count => $rows) {
                 $submission = new Submission();
                 $submission->setDateSubmitted(new \DateTime());
@@ -61,7 +62,7 @@ class LoadFormResultData extends AbstractFixture implements OrderedFixtureInterf
                     if ($val != "NULL") {
                         $setter = "set" . ucfirst($col);
                         if (in_array($col, array('form', 'page', 'ipAddress'))) {
-                            $entity = $this->getReference($col . '-' . $val);
+                            $entity = $fixture->getReference($col . '-' . $val);
                             if ($col == 'page') {
                                 $submission->setReferer($pageModel->generateUrl($entity));
                             }
