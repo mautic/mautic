@@ -33,7 +33,28 @@ class LeadNoteRepository extends CommonRepository
             ->join('n.createdBy', 'a');
         $args['qb'] = $q;
 
+
+
         return parent::getEntities($args);
+    }
+
+    /**
+     * @param $leadId
+     *
+     * @return mixed
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function getNoteCount($leadId)
+    {
+        $q = $this
+            ->createQueryBuilder('n');
+        $q->select('count(n.id) as noteCount')
+            ->where($q->expr()->eq('IDENTITY(n.lead)', ':lead'))
+            ->setParameter('lead', $leadId);
+
+        $results = $q->getQuery()->getArrayResult();
+        return $results[0]['noteCount'];
     }
 
     /**

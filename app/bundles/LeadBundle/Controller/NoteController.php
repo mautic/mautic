@@ -52,7 +52,9 @@ class NoteController extends FormController
         $orderBy    = $this->factory->getSession()->get('mautic.leadnote.orderby', 'n.dateAdded');
         $orderByDir = $this->factory->getSession()->get('mautic.leadnote.orderbydir', 'DESC');
 
-        $items = $this->factory->getModel('lead.note')->getEntities(array(
+        $model = $this->factory->getModel('lead.note');
+
+        $items = $model->getEntities(array(
             'filter'         => array(
                 'force' => array(
                     array(
@@ -86,8 +88,9 @@ class NoteController extends FormController
                 )
             ),
             'passthroughVars' => array(
-                'route' => false,
-                'mauticContent' => 'leadNote'
+                'route'         => false,
+                'mauticContent' => 'leadNote',
+                'noteCount'     => $model->getNoteCount($lead)
             ),
             'contentTemplate' => 'MauticLeadBundle:Note:list.html.php'
         ));
@@ -142,18 +145,21 @@ class NoteController extends FormController
 
         if ($closeModal) {
             //just close the modal
-            $passthroughVars['closeModal'] = 1;
+            $passthroughVars = array(
+                'closeModal'    => 1,
+                'mauticContent' => 'leadNote'
+            );
 
             if ($valid && !$cancelled) {
+                $passthroughVars['upNoteCount'] = 1;
                 $passthroughVars['noteHtml'] = $this->renderView('MauticLeadBundle:Note:note.html.php', array(
                     'note'        => $note,
                     'lead'        => $lead,
-                    'permissions' => $permissions
+                    'permissions' => $permissions,
                 ));
                 $passthroughVars['noteId']   = $note->getId();
             }
 
-            $passthroughVars['mauticContent'] = 'leadNote';
 
             $response = new JsonResponse($passthroughVars);
             $response->headers->set('Content-Length', strlen($response->getContent()));
@@ -335,7 +341,8 @@ class NoteController extends FormController
 
         $response = new JsonResponse(array(
             'deleteId'      => $objectId,
-            'mauticContent' => 'leadNote'
+            'mauticContent' => 'leadNote',
+            'downNoteCount' => 1
         ));
         $response->headers->set('Content-Length', strlen($response->getContent()));
 

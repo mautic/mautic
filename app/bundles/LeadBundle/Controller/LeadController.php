@@ -66,15 +66,15 @@ class LeadController extends FormController
         $listCommand = $translator->trans('mautic.lead.lead.searchcommand.list');
         $mine        = $translator->trans('mautic.core.searchcommand.ismine');
         $indexMode   = $this->request->get('view', $session->get('mautic.lead.indexmode', 'list'));
-        
+
         $session->set('mautic.lead.indexmode', $indexMode);
 
-        // (strpos($search, "$isCommand:$anonymous") === false && strpos($search, "$listCommand:") === false)) ||  
+        // (strpos($search, "$isCommand:$anonymous") === false && strpos($search, "$listCommand:") === false)) ||
         if ($indexMode != 'list') {
             //remove anonymous leads unless requested to prevent clutter
             $filter['force'] .= " !$isCommand:$anonymous";
         }
-        
+
         if (!$permissions['lead:leads:viewother']) {
             $filter['force'] .= " $isCommand:$mine";
         }
@@ -266,7 +266,8 @@ class LeadController extends FormController
                 'socialProfileUrls' => $socialProfileUrls,
                 'security'          => $this->factory->getSecurity(),
                 'permissions'       => $permissions,
-                'events'            => $events
+                'events'            => $events,
+                'noteCount'         => $this->factory->getModel('lead.note')->getNoteCount($lead)
             ),
             'contentTemplate' => 'MauticLeadBundle:Lead:lead.html.php',
             'passthroughVars' => array(

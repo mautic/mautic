@@ -10,6 +10,7 @@
 namespace Mautic\LeadBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadNote;
 use Mautic\LeadBundle\Event\LeadNoteEvent;
 use Mautic\LeadBundle\LeadEvents;
@@ -124,4 +125,14 @@ class NoteModel extends FormModel
              return false;
          }
      }
+
+    /**
+     * @param Lead $lead
+     *
+     * @return mixed
+     */
+    public function getNoteCount(Lead $lead)
+    {
+        return $this->getRepository()->getNoteCount($lead->getId());
+    }
 }
