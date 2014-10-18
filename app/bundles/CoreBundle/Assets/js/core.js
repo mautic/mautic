@@ -1071,8 +1071,7 @@ var Mautic = {
                 var overlayTarget = mQuery(el).attr('data-overlay-target');
                 if (!overlayTarget) overlayTarget = target;
             }
-            console.log(MauticVars.searchIsActive);
-            console.log(event.which);
+
             if (
                 !MauticVars.searchIsActive &&
                 (
