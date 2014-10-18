@@ -248,11 +248,16 @@ class LeadController extends FormController
             return $this->accessDenied();
         }
 
+        // Set which events to load. Empty array == all.
+        $eventFilter = array();
+
         // Trigger the TIMELINE_ON_GENERATE event to fetch the timeline events from subscribed bundles
         $dispatcher = $this->factory->getDispatcher();
-        $event = new LeadTimelineEvent($lead);
+        $event = new LeadTimelineEvent($lead, $eventFilter);
         $dispatcher->dispatch(LeadEvents::TIMELINE_ON_GENERATE, $event);
+        
         $events = $event->getEvents();
+        $eventTypes = $event->getEventTypes();
 
         $fields            = $lead->getFields();
         $socialProfiles    = NetworkIntegrationHelper::getUserProfiles($this->factory, $lead, $fields);
@@ -267,6 +272,7 @@ class LeadController extends FormController
                 'security'          => $this->factory->getSecurity(),
                 'permissions'       => $permissions,
                 'events'            => $events,
+                'eventTypes'        => $eventTypes,
                 'noteCount'         => $this->factory->getModel('lead.note')->getNoteCount($lead)
             ),
             'contentTemplate' => 'MauticLeadBundle:Lead:lead.html.php',
