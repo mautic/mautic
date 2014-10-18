@@ -11,8 +11,8 @@ $view['slots']->set('mauticContent', 'lead');
 $view['slots']->set("headerTitle", $view['translator']->trans('mautic.lead.lead.header.index'));
 ?>
 
-<?php $view['slots']->start("search"); ?>
-  <?php echo $view->render('MauticCoreBundle:Default:search.html.php'); ?>
+<?php $view['slots']->start("title"); ?>
+  <h3><?php echo $view['translator']->trans('mautic.lead.lead.header.index'); ?></h3>
 <?php $view['slots']->stop(); ?>
 
 <?php if ($permissions['lead:leads:create']): ?>

@@ -15,26 +15,15 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
 ?>
 
 <?php if (count($items)): ?>
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <h3 class="panel-title">
-            <?php echo $view['translator']->trans('mautic.lead.list.header.index'); ?>
-        </h3>
-    </div>
+<div class="panel panel-default page-list bdr-t-wdh-0">
     <div class="panel-body">
         <div class="box-layout">
             <div class="col-xs-6 va-m">
-                <div class="checkbox-inline custom-primary">
-                    <label class="mb-0">
-                        <input type="checkbox" id="customcheckbox-one0" value="1">
-                        <span></span>
-                        <?php echo $view['translator']->trans('mautic.core.table.selectall'); ?>
-                    </label>
-                </div>
+                <?php echo $view->render('MauticCoreBundle:Default:search.html.php'); ?>
             </div>
             <div class="col-xs-6 va-m text-right">
-                <button type="button" class="btn btn-sm btn-warning"><i class="fa fa-files-o"></i></button>
-                <button type="button" class="btn btn-sm btn-danger"><i class="fa fa-trash-o"></i></button>
+                <button type="button" class="btn btn-warning"><i class="fa fa-files-o"></i></button>
+                <button type="button" class="btn btn-danger"><i class="fa fa-trash-o"></i></button>
             </div>
         </div>
     </div>
@@ -42,7 +31,14 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
         <table class="table table-hover table-striped table-bordered leadlist-list">
             <thead>
             <tr>
-                <th class="col-leadlist-actions"></th>
+                <th class="col-leadlist-actions pl-20">
+                    <div class="checkbox-inline custom-primary">
+                    <label class="mb-0 pl-10">
+                        <input type="checkbox" id="customcheckbox-one0" value="1">
+                        <span></span>
+                    </label>
+                </div>
+                </th>
                 <th class="col-leadlist-name"><?php echo $view['translator']->trans('mautic.lead.list.thead.name'); ?></th>
                 <th class="visible-md visible-lg col-leadlist-descr"><?php echo $view['translator']->trans('mautic.lead.list.thead.descr'); ?></th>
                 <th class="visible-md visible-lg col-leadlist-id"><?php echo $view['translator']->trans('mautic.lead.list.thead.id'); ?></th>
