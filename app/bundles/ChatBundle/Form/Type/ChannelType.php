@@ -58,6 +58,8 @@ class ChannelType extends AbstractType
             ),
             'expanded'      => true,
             'multiple'      => false,
+                    'empty_value'   => false,
+            'required'      => false
             'label_attr'    => array('class' => 'control-label'),
             'label'         => 'mautic.chat.channel.form.isprivate',
             'empty_value'   => false,
