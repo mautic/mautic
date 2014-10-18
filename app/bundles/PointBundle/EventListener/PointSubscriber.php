@@ -14,6 +14,8 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\PointBundle\Event as Events;
 use Mautic\PointBundle\PointEvents;
+use Mautic\LeadBundle\Event\LeadTimelineEvent;
+use Mautic\LeadBundle\LeadEvents;
 
 /**
  * Class PointSubscriber
@@ -32,7 +34,8 @@ class PointSubscriber extends CommonSubscriber
             PointEvents::POINT_POST_SAVE     => array('onPointPostSave', 0),
             PointEvents::POINT_POST_DELETE   => array('onPointDelete', 0),
             PointEvents::TRIGGER_POST_SAVE     => array('onTriggerPostSave', 0),
-            PointEvents::TRIGGER_POST_DELETE   => array('onTriggerDelete', 0)
+            PointEvents::TRIGGER_POST_DELETE   => array('onTriggerDelete', 0),
+            LeadEvents::TIMELINE_ON_GENERATE => array('onTimelineGenerate', 0)
         );
     }
 
@@ -114,5 +117,40 @@ class PointSubscriber extends CommonSubscriber
             "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
         );
         $this->factory->getModel('core.auditLog')->writeToLog($log);
+    }
+
+    /**
+     * Compile events for the lead timeline
+     *
+     * @param LeadTimelineEvent $event
+     */
+    public function onTimelineGenerate(LeadTimelineEvent $event)
+    {
+        $lead    = $event->getLead();
+        $leadIps = array();
+
+        /** @var \Mautic\CoreBundle\Entity\IpAddress $ip */
+        foreach ($lead->getIpAddresses() as $ip) {
+            $leadIps[] = $ip->getId();
+        }
+
+        /** @var \Mautic\PageBundle\Entity\HitRepository $hitRepository */
+        $logRepository = $this->factory->getEntityManager()->getRepository('MauticPointBundle:LeadPointLog');
+
+        $logs = $logRepository->getLeadLogs($lead->getId(), $leadIps);
+
+        $model = $this->factory->getModel('point.point');
+
+        // Add the logs to the event array
+        foreach ($logs as $log) {
+            $event->addEvent(array(
+                'event'     => 'point.gained',
+                'timestamp' => $log['dateFired'],
+                'extra'     => array(
+                    'log' => $model->getEntity($log['point_id'])
+                ),
+                'contentTemplate' => 'MauticPointBundle:Timeline:index.html.php'
+            ));
+        }
     }
 }

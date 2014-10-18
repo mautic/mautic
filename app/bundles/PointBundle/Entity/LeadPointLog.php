@@ -15,7 +15,7 @@ use JMS\Serializer\Annotation as Serializer;
 /**
  * Class LeadPointLog
  * @ORM\Table(name="point_lead_action_log")
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="Mautic\PointBundle\Entity\LeadPointLogRepository")
  * @Serializer\ExclusionPolicy("all")
  */
 class LeadPointLog
