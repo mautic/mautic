@@ -156,6 +156,20 @@ class FormSubscriber extends CommonSubscriber
      */
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
+        // Set available event types
+        $eventTypeKey = 'form.submitted';
+        $eventTypeName = $this->translator->trans('mautic.form.event.submitted');
+        $event->addEventType($eventTypeKey, $eventTypeName);
+
+        // Decide if those events are filtered
+        $filter = $event->getEventFilter();
+        $loadAllEvents = empty($filter);
+        $eventFilterExists = in_array($eventTypeKey, $filter);
+
+        if (!$loadAllEvents && !$eventFilterExists) {
+            return;
+        }
+
         $lead    = $event->getLead();
         $leadIps = array();
 
@@ -175,7 +189,8 @@ class FormSubscriber extends CommonSubscriber
         // Add the submissions to the event array
         foreach ($rows as $row) {
             $event->addEvent(array(
-                'event'     => 'form.submitted',
+                'event'     => $eventTypeKey,
+                'eventLabel' => $eventTypeName,
                 'timestamp' => new \DateTime($row['date_submitted']),
                 'extra'     => array(
                     'form'  => $formModel->getEntity($row['form_id']),

@@ -23,7 +23,7 @@ $page = $event['extra']['page'];
 				    <?php echo $form->getName(); ?>
 				</a>
 			</h3>
-	        <p class="mb-0">At <?php echo $view['date']->toFullConcat($event['timestamp']); ?>, <?php echo $event['event']; ?>.</p>
+	        <p class="mb-0">At <?php echo $view['date']->toFullConcat($event['timestamp']); ?>, <?php echo $event['eventLabel']; ?>.</p>
 	    </div>
 	    <?php if (isset($event['extra'])) : ?>
 	        <div class="panel-footer">
