@@ -155,6 +155,20 @@ class PageSubscriber extends CommonSubscriber
      */
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
+        // Set available event types
+        $eventTypeKey = 'page.hit';
+        $eventTypeName = $this->translator->trans('mautic.page.event.hit');
+        $event->addEventType($eventTypeKey, $eventTypeName);
+
+        // Decide if those events are filtered
+        $filter = $event->getEventFilter();
+        $loadAllEvents = empty($filter);
+        $eventFilterExists = in_array($eventTypeKey, $filter);
+
+        if (!$loadAllEvents && !$eventFilterExists) {
+            return;
+        }
+
         $lead    = $event->getLead();
         $leadIps = array();
 
@@ -173,7 +187,8 @@ class PageSubscriber extends CommonSubscriber
         // Add the hits to the event array
         foreach ($hits as $hit) {
             $event->addEvent(array(
-                'event'     => 'page.hit',
+                'event'     => $eventTypeKey,
+                'eventLabel' => $eventTypeName,
                 'timestamp' => $hit['dateHit'],
                 'extra'     => array(
                     'page' => $model->getEntity($hit['page_id'])
