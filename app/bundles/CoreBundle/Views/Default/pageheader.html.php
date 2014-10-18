@@ -11,7 +11,7 @@
 <div class="page-header">
     <div class="box-layout">
         <div class="col-sm-6 va-m">
-            <?php $view['slots']->output('search'); ?>
+            <?php $view['slots']->output('title'); ?>
         </div>
         <div class="col-sm-6 va-m">
             <div class="toolbar text-right" id="toolbar">
