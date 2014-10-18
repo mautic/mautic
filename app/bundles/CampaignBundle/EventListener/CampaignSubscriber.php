@@ -128,6 +128,20 @@ class CampaignSubscriber extends CommonSubscriber
      */
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
+        // Set available event types
+        $eventTypeKey = 'campaign.triggered';
+        $eventTypeName = $this->translator->trans('mautic.campaign.event.triggered');
+        $event->addEventType($eventTypeKey, $eventTypeName);
+
+        // Decide if those events are filtered
+        $filter = $event->getEventFilter();
+        $loadAllEvents = empty($filter);
+        $eventFilterExists = in_array($eventTypeKey, $filter);
+
+        if (!$loadAllEvents && !$eventFilterExists) {
+            return;
+        }
+
         $lead    = $event->getLead();
         $leadIps = array();
 
@@ -144,7 +158,8 @@ class CampaignSubscriber extends CommonSubscriber
         // Add the hits to the event array
         foreach ($logs as $log) {
             $event->addEvent(array(
-                'event'     => 'campaign.event',
+                'event'     => $eventTypeKey,
+                'eventLabel' => $eventTypeName,
                 'timestamp' => $log['dateTriggered'],
                 'extra'     => array(
                     'log' => $log
