@@ -40,10 +40,11 @@ class SocialController extends FormController
             $leadFields['mautic.lead.field.group.'. $f->getGroup()][$f->getId()] = $f->getLabel();
         }
         //sort the groups
-        ksort($leadFields, SORT_NATURAL);
+        uksort($leadFields, "strnatcmp");
+
         //sort each group by translation
         foreach ($leadFields as $group => &$fieldGroup) {
-            asort($fieldGroup, SORT_NATURAL);
+            uasort($fieldGroup, "strnatcmp");
         }
 
         //bind to the form
