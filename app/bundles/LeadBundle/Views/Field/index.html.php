@@ -33,8 +33,8 @@ $view['slots']->set("headerTitle", $view['translator']->trans('mautic.lead.field
                 </div>
             </div>
             <div class="col-xs-6 va-m text-right">
-                <button type="button" class="btn btn-sm btn-warning"><i class="fa fa-files-o"></i></button>
-                <button type="button" class="btn btn-sm btn-danger"><i class="fa fa-trash-o"></i></button>
+                <button type="button" class="btn btn-warning"><i class="fa fa-files-o"></i></button>
+                <button type="button" class="btn btn-danger"><i class="fa fa-trash-o"></i></button>
             </div>
         </div>
     </div>
