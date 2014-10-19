@@ -255,7 +255,7 @@ class LeadController extends FormController
         $dispatcher = $this->factory->getDispatcher();
         $event = new LeadTimelineEvent($lead, $eventFilter);
         $dispatcher->dispatch(LeadEvents::TIMELINE_ON_GENERATE, $event);
-        
+
         $events = $event->getEvents();
         $eventTypes = $event->getEventTypes();
 
@@ -404,9 +404,8 @@ class LeadController extends FormController
                 'activeLink'    => '#mautic_lead_index',
                 'mauticContent' => 'lead',
                 'route'         => $this->generateUrl('mautic_lead_action', array(
-                    'objectAction' => 'edit',
-                    'objectId'     => $lead->getId())
-                )
+                    'objectAction' => 'new'
+                ))
             )
         ));
     }
