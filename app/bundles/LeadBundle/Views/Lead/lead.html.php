@@ -199,14 +199,6 @@ $view['slots']->stop();
                                     <h3 class="dark-sm"><span class="fa fa-eye"></span></h3>
                                 </div>
                             </div>
-                            <div class="plugin-sparkline text-right pr-md pl-md"
-                            sparkHeight="120"
-                            sparkWidth="100%"
-                            sparkType="line"
-                            sparkZeroAxis="false"
-                            sparkBarColor="#00B49C">
-                                129,137,186,167,200,350,240,220,280,264,284,400
-                            </div>
                             <canvas class="chart" id="chart-engagement" height="50"></canvas>
                         </div>
                     </div>
