@@ -207,6 +207,7 @@ $view['slots']->stop();
                             sparkBarColor="#00B49C">
                                 129,137,186,167,200,350,240,220,280,264,284,400
                             </div>
+                            <canvas class="chart" id="chart-engagement" height="50"></canvas>
                         </div>
                     </div>
                 </div>
