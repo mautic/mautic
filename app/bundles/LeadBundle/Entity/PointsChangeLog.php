@@ -14,7 +14,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Class PointsChangeLog
  * @ORM\Table(name="lead_points_change_log")
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Mautic\LeadBundle\Entity\PointsChangeLogRepository")
  */
 class PointsChangeLog
 {
