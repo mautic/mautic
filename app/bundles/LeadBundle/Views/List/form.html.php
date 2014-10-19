@@ -31,11 +31,6 @@ $timezones = $tz->getTimezones();
 <div class="row">
     <div class="col-md-9">
         <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">
-                    <?php echo $view['translator']->trans('mautic.lead.list.header.index');?>
-                </h3>
-            </div>
         <div class="panel-body">
             <?php echo $view['form']->start($form); ?>
             <div class="row">

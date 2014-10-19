@@ -21,11 +21,6 @@ $view['slots']->set("headerTitle", $view['translator']->trans('mautic.lead.field
 <?php $view['slots']->stop(); ?>
 
 <div class="panel panel-default">
-    <div class="panel-heading">
-        <h3 class="panel-title">
-            <?php echo $view['translator']->trans('mautic.lead.field.header.index'); ?>
-        </h3>
-    </div>
     <div class="panel-body">
         <div class="box-layout">
             <div class="col-xs-6 va-m">

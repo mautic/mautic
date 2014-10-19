@@ -18,19 +18,17 @@ if (!empty($userId)) {
 }
 $view['slots']->set("headerTitle", $header);
 ?>
-<div class="row">
-    <div class="col-md-9">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">
-                    <?php echo $header; ?>
-                </h3>
-            </div>
-            <div class="panel-body">
+<div class="box-layout">
+    <!-- container -->
+    <div class="col-md-9 bg-auto height-auto bdr-r">
+        <div class="pa-md">
             <?php echo $view['form']->start($form); ?>
             <?php echo $view['form']->row($form['label']); ?>
             <?php echo $view['form']->row($form['alias']); ?>
             <?php echo $view['form']->row($form['group']); ?>
+            <?php echo $view['form']->row($form['type']); ?>
+            <?php echo $view['form']->row($form['defaultValue']); ?>
+
             <?php
             $type          = $form['type']->vars['data'];
             $properties    = $form['properties']->vars['data'];
@@ -38,52 +36,52 @@ $view['slots']->set("headerTitle", $header);
             $feedbackClass = ($app->getRequest()->getMethod() == 'POST' && !empty($errors)) ? " has-error" : "";
             ?>
 
-                <div class="row">
-                    <div class="form-group  col-xs-12 col-sm-8 col-md-6<?php echo $feedbackClass; ?>">
-                        <div id="leadfield_properties">
-                            <?php
-                            switch ($type):
-                            case 'boolean':
-                                echo $view->render('MauticLeadBundle:Field:properties_boolean.html.php', array(
-                                    'yes' => isset($properties['yes']) ? $properties['yes'] : '',
-                                    'no'  => isset($properties['no'])  ? $properties['no'] : ''
-                                ));
-                                break;
-                            case 'lookup':
-                                echo $view->render('MauticLeadBundle:Field:properties_lookup.html.php', array(
-                                    'value' => isset($properties['list']) ? $properties['list'] : ''
-                                ));
-                                break;
-                            case 'number':
-                                echo $view->render('MauticLeadBundle:Field:properties_number.html.php', array(
-                                    'roundMode' => isset($properties['roundmode']) ? $properties['roundmode'] : '',
-                                    'precision' => isset($properties['precision']) ? $properties['precision'] : ''
-                                ));
-                                break;
-                            case 'select':
-                                echo $view->render('MauticLeadBundle:Field:properties_select.html.php', array(
-                                    'value' => isset($properties['list']) ? $properties['list'] : ''
-                                ));
-                                break;
-                            endswitch;
-                            ?>
-                        </div>
-                        <?php echo $view['form']->errors($form['properties']); ?>
+            <div class="row">
+                <div class="form-group  col-xs-12 col-sm-8 col-md-6<?php echo $feedbackClass; ?>">
+                    <div id="leadfield_properties">
+                        <?php
+                        switch ($type):
+                        case 'boolean':
+                            echo $view->render('MauticLeadBundle:Field:properties_boolean.html.php', array(
+                                'yes' => isset($properties['yes']) ? $properties['yes'] : '',
+                                'no'  => isset($properties['no'])  ? $properties['no'] : ''
+                            ));
+                            break;
+                        case 'lookup':
+                            echo $view->render('MauticLeadBundle:Field:properties_lookup.html.php', array(
+                                'value' => isset($properties['list']) ? $properties['list'] : ''
+                            ));
+                            break;
+                        case 'number':
+                            echo $view->render('MauticLeadBundle:Field:properties_number.html.php', array(
+                                'roundMode' => isset($properties['roundmode']) ? $properties['roundmode'] : '',
+                                'precision' => isset($properties['precision']) ? $properties['precision'] : ''
+                            ));
+                            break;
+                        case 'select':
+                            echo $view->render('MauticLeadBundle:Field:properties_select.html.php', array(
+                                'value' => isset($properties['list']) ? $properties['list'] : ''
+                            ));
+                            break;
+                        endswitch;
+                        ?>
                     </div>
-                </div>
-                <?php $form['properties']->setRendered(); ?>
-
-                <div id="field-templates" class="hide">
-                    <?php echo $view->render('MauticLeadBundle:Field:properties_boolean.html.php'); ?>
-                    <?php echo $view->render('MauticLeadBundle:Field:properties_lookup.html.php'); ?>
-                    <?php echo $view->render('MauticLeadBundle:Field:properties_number.html.php'); ?>
-                    <?php echo $view->render('MauticLeadBundle:Field:properties_select.html.php'); ?>
+                    <?php echo $view['form']->errors($form['properties']); ?>
                 </div>
             </div>
+            <?php $form['properties']->setRendered(); ?>
+
+            <div id="field-templates" class="hide">
+                <?php echo $view->render('MauticLeadBundle:Field:properties_boolean.html.php'); ?>
+                <?php echo $view->render('MauticLeadBundle:Field:properties_lookup.html.php'); ?>
+                <?php echo $view->render('MauticLeadBundle:Field:properties_number.html.php'); ?>
+                <?php echo $view->render('MauticLeadBundle:Field:properties_select.html.php'); ?>
+            </div>
         </div>
-        
     </div>
-    <div class="col-md-3">
-        <?php echo $view['form']->end($form); ?>
+    <div class="col-md-3 bg-white height-auto">
+        <div class="pr-lg pl-lg pt-md pb-md">
+            <?php echo $view['form']->end($form); ?>
+        </div>
     </div>
 </div>
