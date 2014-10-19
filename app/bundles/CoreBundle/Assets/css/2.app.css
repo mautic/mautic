@@ -397,6 +397,10 @@ body > #app-wrapper {
 .app-sidebar.sidebar-left .nav-sidebar > .nav .nav-divider {
   background-color: rgba(255, 255, 255, 0.06);
 }
+.app-sidebar.sidebar-left .nav.sidebar-left-dark,
+.app-sidebar.sidebar-left .nav.sidebar-left-dark > li > a:hover {
+  background: #212831;
+}
 .app-sidebar.sidebar-right {
   width: 230px;
   right: -230px;
