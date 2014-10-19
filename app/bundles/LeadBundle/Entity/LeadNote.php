@@ -58,6 +58,14 @@ class LeadNote extends FormEntity
     private $type = 'general';
 
     /**
+     * @ORM\Column(type="datetime", name="date_time", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"leadNoteDetails"})
+     */
+    private $dateTime;
+
+    /**
      * Get id
      *
      * @return integer
@@ -149,5 +157,21 @@ class LeadNote extends FormEntity
     public function convertToArray()
     {
         return get_object_vars($this);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDateTime ()
+    {
+        return $this->dateTime;
+    }
+
+    /**
+     * @param mixed $dateTime
+     */
+    public function setDateTime ($dateTime)
+    {
+        $this->dateTime = $dateTime;
     }
 }

@@ -49,7 +49,7 @@ class NoteController extends FormController
         $session->set('mautic.leadnote.filter', $search);
 
         //do some default filtering
-        $orderBy    = $this->factory->getSession()->get('mautic.leadnote.orderby', 'n.dateAdded');
+        $orderBy    = $this->factory->getSession()->get('mautic.leadnote.orderby', 'n.dateTime');
         $orderByDir = $this->factory->getSession()->get('mautic.leadnote.orderbydir', 'DESC');
 
         $model = $this->factory->getModel('lead.note');

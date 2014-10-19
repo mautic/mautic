@@ -15,4 +15,21 @@ if (!empty($userId)) {
     $header = $view['translator']->trans('mautic.lead.note.header.new');
 }
 ?>
-<?php echo $view['form']->form($form); ?>
+<?php echo $view['form']->start($form); ?>
+<?php echo $view['form']->row($form['text']); ?>
+
+<div class="row">
+    <div class="col-xs-6">
+        <?php echo $view['form']->widget($form['type']); ?>
+    </div>
+    <div class="col-xs-6">
+        <?php echo $view['form']->widget($form['dateTime']); ?>
+    </div>
+</div>
+
+<div class="row mt-sm">
+    <div class="col-xs-12 form-group">
+        <?php echo $view['form']->widget($form['buttons']); ?>
+    </div>
+</div>
+<?php echo $view['form']->end($form); ?>

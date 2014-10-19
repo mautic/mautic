@@ -29,13 +29,16 @@ class NoteType extends AbstractType
 
     private $translator;
     private $em;
+    private $dateHelper;
 
     /**
      * @param MauticFactory $factory
      */
-    public function __construct(MauticFactory $factory) {
+    public function __construct (MauticFactory $factory)
+    {
         $this->translator = $factory->getTranslator();
         $this->em         = $factory->getEntityManager();
+        $this->dateHelper = $factory->getDate();
     }
 
     /**
@@ -55,7 +58,7 @@ class NoteType extends AbstractType
 
         $builder->add('type', 'choice', array(
             'label'      => 'mautic.lead.note.form.type',
-            'choices' => array(
+            'choices'    => array(
                 'general' => 'mautic.lead.note.type.general',
                 'email'   => 'mautic.lead.note.type.email',
                 'call'    => 'mautic.lead.note.type.call',
@@ -63,6 +66,22 @@ class NoteType extends AbstractType
             ),
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control')
+        ));
+
+        $dt   = $options['data']->getDatetime();
+        $data = ($dt == null) ? $this->dateHelper->getDateTime() : $dt;
+
+        $builder->add('dateTime', 'datetime', array(
+            'label'      => 'mautic.lead.note.form.dateadded',
+            'label_attr' => array('class' => 'control-label'),
+            'widget'     => 'single_text',
+            'attr'       => array(
+                'class'       => 'form-control',
+                'data-toggle' => 'datetime',
+                'preaddon'    => 'fa fa-calendar'
+            ),
+            'format'     => 'yyyy-MM-dd HH:mm',
+            'data'       => $data
         ));
 
         $builder->add('buttons', 'form_buttons', array(
@@ -79,7 +98,7 @@ class NoteType extends AbstractType
     /**
      * @param OptionsResolverInterface $resolver
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function setDefaultOptions (OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
             'data_class' => 'Mautic\LeadBundle\Entity\LeadNote'
@@ -89,7 +108,8 @@ class NoteType extends AbstractType
     /**
      * @return string
      */
-    public function getName() {
+    public function getName ()
+    {
         return "leadnote";
     }
 }
