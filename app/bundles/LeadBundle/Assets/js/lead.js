@@ -672,23 +672,45 @@ Mautic.leadNoteOnLoad = function (container, response) {
     }
 };
 
-Mautic.loadEngagementChart = function () {
-    if (mQuery(("#chart-engagement")).length) {
-        var data = {
-            labels: ["January", "February", "March", "April", "May", "June", "July"],
-            datasets: [
-                {
-                    label: "My Second dataset",
-                    fillColor: "rgba(151,187,205,0.2)",
-                    strokeColor: "rgba(151,187,205,1)",
-                    pointColor: "rgba(151,187,205,1)",
-                    pointStrokeColor: "#fff",
-                    pointHighlightFill: "#fff",
-                    pointHighlightStroke: "rgba(151,187,205,1)",
-                    data: [28, 48, 49, 50, 86, 86, 90]
+Mautic.loadEngagementChart = function() {
+    if (mQuery("#chart-engagement").length) {
+        var canvas = document.getElementById("chart-engagement");
+
+        if (canvas === null) {
+            return;
+        }
+
+        var leadId = canvas.getAttribute('data-item-id');
+        var query = "action=lead:engagementGraph&leadId=" + leadId + "&quantity=" + 6 + "&unit=" + "M";
+
+        mQuery.ajax({
+            url: mauticAjaxUrl,
+            type: "POST",
+            data: query,
+            dataType: "json",
+            success: function (response) {
+                if (response.success) {
+                    var chartData = {
+                        labels: response.labels,
+                        datasets: [
+                            {
+                                label: "Engagement",
+                                fillColor: "rgba(151,187,205,0.2)",
+                                strokeColor: "rgba(151,187,205,1)",
+                                pointColor: "rgba(151,187,205,1)",
+                                pointStrokeColor: "#fff",
+                                pointHighlightFill: "#fff",
+                                pointHighlightStroke: "rgba(151,187,205,1)",
+                                data: response.data
+                            }
+                        ]
+                    };
+                    var chart = new Chart(canvas.getContext("2d")).Line(chartData);
                 }
-            ]
-        };
-        var chart = new Chart(document.getElementById("chart-engagement").getContext("2d")).Line(data);
+            },
+            error: function (request, textStatus, errorThrown) {
+                Mautic.processAjaxError(request, textStatus, errorThrown);
+            }
+        });
     }
 };
