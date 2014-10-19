@@ -107,8 +107,5 @@ if ($tmpl == 'index')
     </div>
 </div>
 <?php else: ?>
-    <div class="well well-small">
-        <h4><?php echo $view['translator']->trans('mautic.core.noresults.header'); ?></h4>
-        <p><?php echo $view['translator']->trans('mautic.core.noresults'); ?></p>
-    </div>
+    <?php echo $view->render('MauticCoreBundle:Default:noresults.html.php'); ?>
 <?php endif; ?>
