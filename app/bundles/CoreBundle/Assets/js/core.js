@@ -55,6 +55,10 @@ mQuery.ajaxSetup({
     }
 });
 
+// configure global Chart options
+Chart.defaults.global.responsive = true;
+Chart.defaults.global.animation = false;
+
 var Mautic = {
     /**
      * Initiate various functions on page load, manual or ajax

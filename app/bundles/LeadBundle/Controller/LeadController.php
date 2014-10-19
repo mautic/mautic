@@ -259,6 +259,12 @@ class LeadController extends FormController
         $events = $event->getEvents();
         $eventTypes = $event->getEventTypes();
 
+        // Upcoming events from Campaign Bundle
+        /** @var \Mautic\CampaignBundle\Entity\LeadEventLogRepository $leadEventLogRepository */
+        $leadEventLogRepository = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:LeadEventLog');
+
+        $upcomingEvents = $leadEventLogRepository->getUpcomingEvents($lead);
+
         $fields            = $lead->getFields();
         $socialProfiles    = NetworkIntegrationHelper::getUserProfiles($this->factory, $lead, $fields);
         $socialProfileUrls = NetworkIntegrationHelper::getSocialProfileUrlRegex(false);
@@ -274,6 +280,7 @@ class LeadController extends FormController
                 'events'            => $events,
                 'eventTypes'        => $eventTypes,
                 'eventFilter'       => $eventFilter,
+                'upcomingEvents'    => $upcomingEvents,
                 'noteCount'         => $this->factory->getModel('lead.note')->getNoteCount($lead)
             ),
             'contentTemplate' => 'MauticLeadBundle:Lead:lead.html.php',

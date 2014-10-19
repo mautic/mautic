@@ -199,14 +199,7 @@ $view['slots']->stop();
                                     <h3 class="dark-sm"><span class="fa fa-eye"></span></h3>
                                 </div>
                             </div>
-                            <div class="plugin-sparkline text-right pr-md pl-md"
-                            sparkHeight="120"
-                            sparkWidth="100%"
-                            sparkType="line"
-                            sparkZeroAxis="false"
-                            sparkBarColor="#00B49C">
-                                129,137,186,167,200,350,240,220,280,264,284,400
-                            </div>
+                            <canvas class="chart" id="chart-engagement" height="50"></canvas>
                         </div>
                     </div>
                 </div>
@@ -275,6 +268,36 @@ $view['slots']->stop();
             </div>
         </div>
         <!--/ form HTML -->
+
+        <?php if ($upcomingEvents) : ?>
+        <hr class="hr-w-2" style="width:50%">
+
+        <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mb-0">
+            <div class="panel-heading">
+                <div class="panel-title">Upcoming Events</div>
+            </div>
+            <div class="panel-body pt-sm">
+                <ul class="media-list media-list-feed">
+                    <?php foreach ($upcomingEvents as $event) : ?>
+                    <li class="media">
+                        <div class="media-object pull-left mt-xs">
+                            <span class="figure"></span>
+                        </div>
+                        <div class="media-body">
+                            <strong class="text-primary"><?php echo $event['eventName']; ?></strong> event will be triggered at
+                            <a href="<?php echo $view['router']->generate('mautic_campaign_action',
+                                array("objectAction" => "view", "objectId" => $event['campaign_id'])); ?>"
+                               data-toggle="ajax">
+                                <?php echo $event['campaignName']; ?>
+                            </a>
+                            <p class="fs-12 dark-sm"><?php echo $view['date']->toFull($event['triggerDate']); ?></p>
+                        </div>
+                    </li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        </div>
+        <?php endif; ?>
 
         <hr class="hr-w-2" style="width:50%">
 
