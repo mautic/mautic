@@ -13,7 +13,7 @@ if ($tmpl == 'index')
     <div class="panel-body">
         <div class="box-layout">
             <div class="col-xs-6 va-m">
-                <?php echo $view->render('MauticCoreBundle:Default:search.html.php'); ?>
+                <?php echo $view->render('MauticCoreBundle:Helper:search.html.php'); ?>
             </div>
             <div class="col-xs-6 va-m text-right">
                 <button type="button" class="btn btn-danger pull-right ml-sm"><i class="fa fa-trash-o"></i></button>

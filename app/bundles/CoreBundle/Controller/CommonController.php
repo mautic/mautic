@@ -209,8 +209,15 @@ class CommonController extends Controller implements MauticController
                 $passthrough
             );
         }
-        $code      = (isset($args['responseCode'])) ? $args['responseCode'] : 200;
-        $response  = new JsonResponse($dataArray, $code);
+
+        $code = (isset($args['responseCode'])) ? $args['responseCode'] : 200;
+
+        if ($newContent instanceof Response) {
+            $response = $newContent;
+        } else {
+            $response = new JsonResponse($dataArray, $code);
+        }
+
         $response->headers->set('Content-Length', strlen($response->getContent()));
         return $response;
     }

@@ -15,7 +15,7 @@ if ($tmpl == 'index')
     <div class="panel-body">
         <div class="box-layout">
             <div class="col-xs-6 va-m">
-                <?php echo $view->render('MauticCoreBundle:Default:search.html.php'); ?>
+                <?php echo $view->render('MauticCoreBundle:Helper:search.html.php'); ?>
             </div>
             <div class="col-xs-6 va-m text-right">
                 <button type="button" class="btn btn-sm btn-warning"><i class="fa fa-files-o"></i></button>
@@ -95,7 +95,7 @@ if ($tmpl == 'index')
                 <?php endforeach; ?>
                 </tbody>
             </table>
-        
+
         <div class="panel-footer">
         <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
             "totalItems"      => count($items),

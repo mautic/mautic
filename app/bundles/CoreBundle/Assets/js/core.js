@@ -991,24 +991,6 @@ var Mautic = {
     },
 
     /**
-     * Shows the search search input in an search list
-     */
-    showSearchInput: function () {
-        if (mQuery('.toolbar').length) {
-            mQuery('.toolbar').addClass('show-search').removeClass('hide-search');
-        }
-    },
-
-    /**
-     * Hides the search search input in an search list
-     */
-    hideSearchInput: function (elId) {
-        if (mQuery('.toolbar').length && mQuery('#' + elId).length && !mQuery('#' + elId).val() && !mQuery('#' + elId).is(":focus")) {
-            mQuery('.toolbar').addClass('hide-search').removeClass('show-search');
-        }
-    },
-
-    /**
      * Activates Typeahead.js command lists for search boxes
      * @param elId
      * @param modelName
