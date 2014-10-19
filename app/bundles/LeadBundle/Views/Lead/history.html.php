@@ -17,15 +17,18 @@
     <?php if (isset($eventTypes) && is_array($eventTypes)) : ?>
         <div class="panel-footer text-muted">
             <?php foreach ($eventTypes as $typeKey => $typeName) : ?>
-                <label class="checkbox-inline">
+            <div class="checkbox-inline custom-primary">
+                <label class="mb-0">
                     <input 
                         name="eventFilter"
                         type="checkbox"
                         value="<?php echo $typeKey; ?>"
                         <?php echo in_array($typeKey, $eventFilter) ? 'checked' : ''; ?>
                         onchange="Mautic.refreshLeadTimeline(<?php echo $lead->getId(); ?>, this);">
-                    <?php echo $typeName; ?>
+                    <span class="mr-0"></span> 
+                     <?php echo $typeName; ?>
                 </label>
+            </div>
             <?php endforeach; ?>
         </div>
     <?php endif; ?>
