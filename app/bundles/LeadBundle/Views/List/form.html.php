@@ -34,27 +34,36 @@ echo $view['form']->start($form);
 <!-- start: box layout -->
 <div class="box-layout">
     <!-- container -->
-    <div class="col-md-9 bg-auto height-auto bdr-r">
-        <div class="pa-md">
-            <?php echo $view['form']->row($form['name']); ?>
-            <?php echo $view['form']->row($form['alias']); ?>
-            <?php echo $view['form']->row($form['description']); ?>
-
-            <?php
-            $filterForm   = $form['filters'];
-            $filterValues = $filterForm->vars['data'] ?: array();
-            $form['filters']->setRendered();
-            $feedbackClass = ($app->getRequest()->getMethod() == 'POST' && !empty($filterForm->vars['errors'])) ? " has-error" : "";
-            ?>
-            <div class="row">
-                <div class="col-xs-12 form-group <?php echo $feedbackClass; ?>">
-                    <?php echo $view['form']->label($filterForm); ?>
-                    <?php echo $view['form']->errors($filterForm); ?>
-                    <div class="row">
-                        <div class="col-xs-12 available-filters">
+    <div class="col-md-9 bg-white height-auto">
+        <div class="bg-auto bg-dark-xs">
+            <div class="pa-md">
+                <?php echo $view['form']->row($form['name']); ?>
+                <?php echo $view['form']->row($form['alias']); ?>
+                <?php echo $view['form']->row($form['description']); ?>
+            </div>
+            <ul class="nav nav-tabs pr-md pl-md" role="tablist">
+                <li class="active">
+                    <a href="#filters" class="group" data-toggle="tab">
+                        <?php echo $view['form']->label($form['filters']); ?>
+                    </a>
+                </li>
+            </ul>
+        </div>
+                <!-- start: tab-content -->
+        <div class="tab-content pa-md">
+            <div class="tab-pane fade in active bdr-w-0" id="filters">
+                <?php
+                $filterForm   = $form['filters'];
+                $filterValues = $filterForm->vars['data'] ?: array();
+                $form['filters']->setRendered();
+                $feedbackClass = ($app->getRequest()->getMethod() == 'POST' && !empty($filterForm->vars['errors'])) ? " has-error" : "";
+                ?>
+                    <div class="form-group <?php echo $feedbackClass; ?>">
+                        <?php echo $view['form']->errors($filterForm); ?>
+                        <div class="available-filters mb-md">
                             <div class="dropdown">
                                 <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
-                                    <?php echo $view['translator']->trans('mautic.core.form.filters.available'); ?>
+                                    <?php echo $view['translator']->trans('mautic.lead.list.form.filters.add'); ?>
                                     <span class="caret"></span>
                                 </button>
                                 <ul class="dropdown-menu" role="menu">
@@ -70,10 +79,7 @@ echo $view['form']->start($form);
                                 </ul>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-xs-12 selected-filters">
-                            <label><?php echo $view['translator']->trans('mautic.core.form.filters.selected'); ?></label>
+                        <div class="selected-filters">
                             <div class="list-group" id="<?php echo $filterForm->vars['id']; ?>_right">
                                     <?php foreach ($filterValues as $filter): ?>
                                     <?php if (!isset($choices[$filter['field']])) continue; ?>
@@ -197,11 +203,10 @@ echo $view['form']->start($form);
                             </div>
                         </div>
                     </div>
-                </div>
             </div>
         </div>
     </div>
-    <div class="col-md-3 bg-white height-auto">
+    <div class="col-md-3 bg-white bdr-l height-auto">
         <div class="pr-lg pl-lg pt-md pb-md">
             <?php echo $view['form']->row($form['isGlobal']); ?>
             <?php echo $view['form']->row($form['isPublished']); ?>

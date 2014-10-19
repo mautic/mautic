@@ -1,5 +1,6 @@
 var MauticVars = {};
 var mQuery = jQuery.noConflict(true);
+window.jQuery = mQuery;
 
 if (typeof mauticContent !== 'undefined') {
     (function ($) {
@@ -126,6 +127,7 @@ var Mautic = {
             });
         });
 
+        //downloads
         mQuery(container + " a[data-toggle='download']").off('click.download');
         mQuery(container + " a[data-toggle='download']").on('click.download', function (event) {
             event.preventDefault();
@@ -212,23 +214,10 @@ var Mautic = {
             }
         }
 
-        //Activate hidden shelves
-        mQuery(container + ' .hidden-shelf').each(function(index) {
-            var shelf    = mQuery(this);
-            var handle   = mQuery(this).find('.shelf-handle').first();
-            var contents = mQuery(this).find('.shelf-contents').first();
-
-            mQuery(handle).off('click.shelf');
-            mQuery(handle).on('click.shelf', function(event) {
-                if (mQuery(contents).css('display') == 'block') {
-                    mQuery(handle).find('i').removeClass('fa-chevron-circle-up').addClass('fa-chevron-circle-down')
-                    mQuery(contents).slideUp();
-                } else {
-                    mQuery(handle).find('i').removeClass('fa-chevron-circle-down').addClass('fa-chevron-circle-up')
-                    mQuery(contents).slideDown();
-                }
-            });
-        });
+        //activate editors
+        if (mQuery(container + " textarea.editor").length) {
+            mQuery(container + " textarea.editor").ckeditor();
+        }
 
         //run specific on loads
         var contentSpecific = (response && response.mauticContent) ? response.mauticContent : mauticContent;

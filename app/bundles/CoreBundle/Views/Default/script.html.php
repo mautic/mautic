@@ -9,10 +9,11 @@
 ?>
 
 <script>
-    var mauticBaseUrl = '<?php echo $view['router']->generate("mautic_dashboard_index"); ?>';
-    var mauticAjaxUrl = '<?php echo $view['router']->generate("mautic_core_ajax"); ?>';
-    var mauticContent = '<?php $view['slots']->output('mauticContent',''); ?>';
-    var mauticEnv     = '<?php echo $app->getEnvironment(); ?>';
+    var mauticBasePath = '<?php echo $app->getRequest()->getBasePath(); ?>';
+    var mauticBaseUrl  = '<?php echo $view['router']->generate("mautic_dashboard_index"); ?>';
+    var mauticAjaxUrl  = '<?php echo $view['router']->generate("mautic_core_ajax"); ?>';
+    var mauticContent  = '<?php $view['slots']->output('mauticContent',''); ?>';
+    var mauticEnv      = '<?php echo $app->getEnvironment(); ?>';
 </script>
 <?php $view['assets']->outputSystemScripts(); ?>
 <?php //load file ?>
