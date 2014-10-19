@@ -11,11 +11,6 @@ $view->extend('MauticCampaignBundle:Campaign:index.html.php');
 ?>
 <?php if (count($items)): ?>
 <div class="panel panel-default">
-    <div class="panel-heading">
-        <h3 class="panel-title">
-            Campaign
-        </h3>
-    </div>
     <div class="panel-body">
         <div class="box-layout">
             <div class="col-xs-6 va-m">

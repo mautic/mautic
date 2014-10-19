@@ -1533,7 +1533,9 @@ a.list-group-item:focus {
 .notes li > .panel > .panel-body [class^="icon"].bdr-r.height-auto:before {
   margin-right: -1px;
 }
-.notes li > .panel > .panel-body > .col-xs-1,
+.notes li > .panel > .panel-body > .col-xs-1 {
+  vertical-align: middle;
+}
 .notes li > .panel > .panel-body > .col-xs-2,
 .notes li > .panel > .panel-body > .col-xs-3,
 .notes li > .panel > .panel-body > .col-xs-4,
@@ -1546,7 +1548,7 @@ a.list-group-item:focus {
 .notes li > .panel > .panel-body > .col-xs-11,
 .notes li > .panel > .panel-body > .cell {
   display: table-cell;
-  vertical-align: middle;
+  vertical-align: top;
   height: 100%;
   float: none;
 }

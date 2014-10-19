@@ -15,27 +15,23 @@ $header = ($entity->getId()) ?
         array('%name%' => $view['translator']->trans($entity->getName()))) :
     $view['translator']->trans('mautic.point.header.new');
 $view['slots']->set("headerTitle", $header);
+
 echo $view['form']->start($form);
 ?>
 <!-- start: box layout -->
 <div class="box-layout">
     <!-- container -->
     <div class="col-md-9 bg-auto height-auto bdr-r">
-        <div class="bdr-rds-0 bdr-w-0">
-            <div class="pa-md bg-auto bg-light-xs bdr-b">
-                <h4 class="fw-sb"><?php echo $header; ?></h4>
-            </div>
-            <div class="pa-md">
-			    <?php		    
-				echo $view['form']->row($form['name']);
-				echo $view['form']->row($form['description']);
-				echo $view['form']->row($form['type']);
+        <div class="pa-md">
+		    <?php		    
+			echo $view['form']->row($form['name']);
+			echo $view['form']->row($form['description']);
+			echo $view['form']->row($form['type']);
 
-			    if (isset($form['properties'])):
-			    	echo $view['form']->row($form['properties']);
-			    endif;
-			    ?>
-			</div>
+		    if (isset($form['properties'])):
+		    	echo $view['form']->row($form['properties']);
+		    endif;
+		    ?>
 		</div>
 	</div>
  	<div class="col-md-3 bg-white height-auto">

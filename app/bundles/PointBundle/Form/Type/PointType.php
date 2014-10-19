@@ -51,7 +51,7 @@ class PointType extends AbstractType
             'attr'       => array('class' => 'form-control')
         ));
 
-        $builder->add('description', 'text', array(
+        $builder->add('description', 'textarea', array(
             'label'      => 'mautic.point.form.description',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control'),

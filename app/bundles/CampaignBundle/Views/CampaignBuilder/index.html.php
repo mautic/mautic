@@ -17,10 +17,9 @@ $header = ($entity->getId()) ?
 $view['slots']->set("headerTitle", $header);
 ?>
 
-<ul class="nav nav-tabs" role="tablist">
-    <li class="active"><a href="#details" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.campaign.form.panel.details'); ?></a></li>
-    <li><a href="#events" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.campaign.form.panel.events'); ?></a></li>
-</ul>
+<?php echo $view['slots']->start('actions'); ?>
+
+<?php echo $view['slots']->stop('actions'); ?>
 
 <?php echo $view['form']->start($form); ?>
 <div class="tab-content">

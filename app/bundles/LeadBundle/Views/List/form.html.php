@@ -55,32 +55,33 @@ $timezones = $tz->getTimezones();
                 ?>
             </div>
             <div class="row">
-                <div class="form-group <?php echo $feedbackClass; ?>">
+                <div class="col-xs-12 form-group <?php echo $feedbackClass; ?>">
                     <?php echo $view['form']->label($filterForm); ?>
                     <?php echo $view['form']->errors($filterForm); ?>
                     <div class="row">
                         <div class="col-xs-12 available-filters">
-                            <h4><?php echo $view['translator']->trans('mautic.core.form.filters.available'); ?></h4>
-                            <div class="list-group">
-                                <?php foreach ($choices as $value => $params): ?>
-                                <div id="available_<?php echo $value; ?>">
-                                    <a class="list-group-item" href="javascript:void(0);" onclick="Mautic.addLeadListFilter('<?php echo $value; ?>');">
-                                        <span class="leadlist-filter-name"><?php echo $view['translator']->trans($params['label']); ?></span>
-                                    </a>
-                                    <input type="hidden" class="field_alias" value="<?php echo $value; ?>" />
-                                    <input type="hidden" class="field_type" value="<?php echo $params['properties']['type']; ?>" />
-                                    <?php $list = (!empty($params['properties']['list'])) ? $params['properties']['list'] : ''; ?>
-                                    <input type="hidden" class="field_list" value="<?php echo $list; ?>" />
-                                    <?php $callback = (!empty($params['properties']['callback'])) ? $params['properties']['callback'] : ''; ?>
-                                    <input type="hidden" class="field_callback" value="<?php echo $callback; ?>" />
-                                </div>
-                                <?php endforeach; ?>
+                            <div class="dropdown">
+                                <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+                                    <?php echo $view['translator']->trans('mautic.core.form.filters.available'); ?>
+                                    <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu" role="menu">
+                                    <?php foreach ($choices as $value => $params): ?>
+                                        <?php $list = (!empty($params['properties']['list'])) ? $params['properties']['list'] : ''; ?>
+                                        <?php $callback = (!empty($params['properties']['callback'])) ? $params['properties']['callback'] : ''; ?>
+                                        <li id="available_<?php echo $value; ?>">
+                                            <a class="list-group-item" href="javascript:void(0);" onclick="Mautic.addLeadListFilter('<?php echo $value; ?>');" data-field-type="<?php echo $params['properties']['type']; ?>" data-field-list="<?php echo $list; ?>" data-field-callback="<?php echo $callback; ?>">
+                                                <span class="leadlist-filter-name"><?php echo $view['translator']->trans($params['label']); ?></span>
+                                            </a>
+                                        </li>
+                                    <?php endforeach; ?>
+                                </ul>
                             </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-xs-12 selected-filters">
-                            <h4><?php echo $view['translator']->trans('mautic.core.form.filters.selected'); ?></h4>
+                            <label><?php echo $view['translator']->trans('mautic.core.form.filters.selected'); ?></label>
                             <div class="list-group" id="<?php echo $filterForm->vars['id']; ?>_right">
                                     <?php foreach ($filterValues as $filter): ?>
                                     <?php if (!isset($choices[$filter['field']])) continue; ?>
@@ -209,28 +210,37 @@ $timezones = $tz->getTimezones();
             <?php echo $view['form']->end($form); ?>
 
             <div id="filter-template" class="hide">
-                <div class="col-xs-6 col-sm-2 padding-none">
-                    <select name="leadlist[filters][glue][]" class="form-control ">
-                        <?php foreach ($glueOptions as $v => $l): ?>
-                            <option value="<?php echo $v; ?>"><?php echo $view['translator']->trans($l); ?></option>
-                        <?php endforeach; ?>
-                    </select>
+                <div class="panel-footer">
+                    <div class="col-sm-2">
+                        <select name="leadlist[filters][glue][]" class="form-control">
+                            <?php foreach ($glueOptions as $v => $l): ?>
+                                <option value="<?php echo $v; ?>"><?php echo $view['translator']->trans($l); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
                 </div>
-                <div class="col-xs-6 col-sm-3 padding-none">
-                    <select name="leadlist[filters][operator][]" class="form-control ">
-                        <?php foreach ($operatorOptions as $v => $l): ?>
-                            <option value="<?php echo $v; ?>"><?php echo $view['translator']->trans($l['label']); ?></option>
-                        <?php endforeach; ?>
-                    </select>
+                <div class="panel-body">
+                    <div class="col-xs-6 col-sm-3 field-name">
+
+                    </div>
+                    <div class="col-xs-6 col-sm-3 padding-none">
+                        <select name="leadlist[filters][operator][]" class="form-control ">
+                            <?php foreach ($operatorOptions as $v => $l): ?>
+                                <option value="<?php echo $v; ?>"><?php echo $view['translator']->trans($l['label']); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="col-xs-10 col-sm-5 padding-none">
+                        <input type="text" class="form-control" name="leadlist[filters][filter][]"
+                               placeholder="<?php echo $view['translator']->trans('mautic.lead.list.form.filtervalue'); ?>" />
+                        <input type="hidden" name="leadlist[filters][display][]" />
+                    </div>
+                    <div class="col-xs-2 col-sm-1">
+                        <a href="#" class="remove-selected btn btn-default text-danger pull-right"><i class="fa fa-trash-o"></i></a>
+                    </div>
+                    <input type="hidden" name="leadlist[filters][field][]" />
+                    <input type="hidden" name="leadlist[filters][type][]" />
                 </div>
-                <div class="col-xs-12 col-sm-7 padding-none">
-                    <input type="text" class="form-control" name="leadlist[filters][filter][]"
-                           placeholder="<?php echo $view['translator']->trans('mautic.lead.list.form.filtervalue'); ?>" />
-                    <input type="hidden" name="leadlist[filters][display][]" />
-                </div>
-                <input type="hidden" name="leadlist[filters][field][]" />
-                <input type="hidden" name="leadlist[filters][type][]" />
-                <div class="clearfix"></div>
             </div>
 
             <div id="filter-country-template" class="hide">

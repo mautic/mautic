@@ -115,11 +115,23 @@ class CampaignType extends AbstractType
             'mapped' => false
         ));
 
-        $builder->add('buttons', 'form_buttons');
-
         if (!empty($options["action"])) {
             $builder->setAction($options["action"]);
         }
+
+        $builder->add('buttons', 'form_buttons', array(
+            'pre_extra_buttons' => array(
+                array(
+                    'name'  => 'builder',
+                    'label' => 'mautic.campaign.campaign.launch.builder',
+                    'attr'  => array(
+                        'class'   => 'btn btn-default',
+                        'icon'    => 'fa fa-cube padding-sm-right text-info',
+                        'onclick' => "Mautic.launchCampaignEditor();"
+                    )
+                )
+            )
+        ));
     }
 
     /**

@@ -11,14 +11,11 @@ $header = ($lead->getId()) ?
     $view['translator']->trans('mautic.lead.lead.header.edit',
         array('%name%' => $view['translator']->trans($lead->getPrimaryIdentifier()))) :
     $view['translator']->trans('mautic.lead.lead.header.new');
-
+$view['slots']->set('headerTitle', $header);
 $view['slots']->set('mauticContent', 'lead');
 
 $groups = array_keys($fields);
 ?>
-
-<!-- reset container-fluid padding -->
-<div class="mna-md">
     <!-- start: box layout -->
     <div class="box-layout">
                <!-- step container -->
@@ -175,5 +172,3 @@ $groups = array_keys($fields);
         <!--/ end: container -->
     </div>
     <!--/ end: box layout -->
-</div>
-<!--/ reset container-fluid padding -->

@@ -15,23 +15,22 @@
         <span class="the-icon fa fa-search text-muted mt-xs"></span><!-- must below `form-control` -->
     </div>
     <?php if (isset($eventTypes) && is_array($eventTypes)) : ?>
-    <div class="form-control-icon pa-xs">
-        <strong>Filter Events:</strong>
-        <?php foreach ($eventTypes as $typeKey => $typeName) : ?>
-            <label class="checkbox-inline">
-                <input 
-                    name="eventFilter"
-                    type="checkbox"
-                    value="<?php echo $typeKey; ?>"
-                    <?php echo in_array($typeKey, $eventFilter) ? 'checked' : ''; ?>
-                    onchange="Mautic.refreshLeadTimeline(<?php echo $lead->getId(); ?>, this);">
-                <?php echo $typeName; ?>
-            </label>
-        <?php endforeach; ?>
-    </div>
+        <div class="panel-footer text-muted">
+            <?php foreach ($eventTypes as $typeKey => $typeName) : ?>
+                <label class="checkbox-inline">
+                    <input 
+                        name="eventFilter"
+                        type="checkbox"
+                        value="<?php echo $typeKey; ?>"
+                        <?php echo in_array($typeKey, $eventFilter) ? 'checked' : ''; ?>
+                        onchange="Mautic.refreshLeadTimeline(<?php echo $lead->getId(); ?>, this);">
+                    <?php echo $typeName; ?>
+                </label>
+            <?php endforeach; ?>
+        </div>
     <?php endif; ?>
+    <!--/ form -->
 </form>
-<!--/ form -->
 
 <!-- timeline -->
 <ul class="timeline">

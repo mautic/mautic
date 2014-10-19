@@ -201,7 +201,7 @@ class EmailType extends AbstractType
                     'label' => 'mautic.email.launch.builder',
                     'attr'  => array(
                         'class'   => 'btn btn-default',
-                        'icon'    => 'fa fa-file-text-o padding-sm-right text-info',
+                        'icon'    => 'fa fa-cube padding-sm-right text-mautic',
                         'onclick' => "Mautic.launchEmailEditor();"
                     )
                 )

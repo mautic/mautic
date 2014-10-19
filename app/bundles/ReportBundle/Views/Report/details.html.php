@@ -154,7 +154,7 @@ if ($tmpl == 'index') {
                     <!-- put generated data inside .flotdata -->
                     <span class="flotdata">
                         [{
-                            "label": "Redemtions",
+                            "label": "Redemptions",
                             "color": "#00B49C",
                             "data": [
                                 ["jan", 7574],

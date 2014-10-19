@@ -17,13 +17,12 @@ $view['slots']->set('searchHelp', $view['translator']->trans('mautic.api.client.
 
 <?php if ($permissions['create']): ?>
 <?php $view['slots']->start("actions"); ?>
-<li>
-    <a href="<?php echo $this->container->get('router')->generate(
+    <a class="btn btn-default" href="<?php echo $this->container->get('router')->generate(
         'mautic_client_action', array('objectAction' => 'new')); ?>"
        data-toggle="ajax">
+       <i class="fa fa-plus"></i> 
        <?php echo $view["translator"]->trans("mautic.api.client.menu.new"); ?>
     </a>
-</li>
 <?php $view['slots']->stop(); ?>
 <?php endif; ?>
 

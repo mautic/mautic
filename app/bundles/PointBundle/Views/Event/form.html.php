@@ -12,7 +12,5 @@
     <div class="bundle-form-header">
         <h3><?php echo $actionHeader; ?></h3>
     </div>
-
     <?php echo $view['form']->form($form); ?>
-    '
 </div>

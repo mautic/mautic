@@ -24,12 +24,7 @@ $header = ($activePage->getId()) ?
 $view['slots']->set("headerTitle", $header.$subheader);
 ?>
 
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <h3 class="panel-title">
-            <?php echo $header; ?>
-        </h3>
-    </div>
+<div class="panel panel-default bdr-t-wdh-0">
     <div class="panel-body">
         <?php echo $view['form']->form($form); ?>
 
