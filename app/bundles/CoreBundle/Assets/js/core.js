@@ -1311,8 +1311,21 @@ var Mautic = {
        if (typeof mauticEnv !== 'undefined' && mauticEnv == 'dev') {
            console.log(request);
 
-           var error = request.responseJSON.error.code + ': ' + errorThrown + '; ' + request.responseJSON.error.exception;
-           alert(error);
+           if (typeof request.responseJSON !== 'undefined' && typeof request.responseJSON.error !== 'undefined') {
+               var error = request.responseJSON.error.code + ': ' + errorThrown + '; ' + request.responseJSON.error.exception;
+               alert(error);
+           } else if (typeof request.responseText !== 'undefined') {
+               var regex = /{(.+?)}}/g //g flag so the regex is global
+
+               //check to see if the error is embedded in html
+               var match = request.responseText.match(regex);
+
+               if (match) {
+                   var errorObj = mQuery.parseJSON(match);
+                   var error = errorObj.error.code + ': ' + errorThrown + '; ' + errorObj.error.exception;
+                   alert(error);
+               }
+           }
        }
     }
 };
