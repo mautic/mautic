@@ -332,7 +332,7 @@ Mautic.addLeadListFilter = function (elId) {
     mQuery(container).find("a.remove-selected").on('click', function() {
         li.remove();
     });
-    
+
     mQuery(container).find("div.field-name").html(label);
     mQuery(container).find("input[name='leadlist[filters][field][]']").val(alias);
     mQuery(container).find("input[name='leadlist[filters][type][]']").val(fieldType);
@@ -634,7 +634,7 @@ Mautic.leadNoteOnLoad = function (container, response) {
         if (mQuery(el).length) {
             mQuery(el).replaceWith(response.noteHtml);
         } else {
-            mQuery('#notes-container ul.events').prepend(response.noteHtml);
+            mQuery('#LeadNotes').prepend(response.noteHtml);
         }
 
         //initialize ajax'd modals
@@ -673,21 +673,22 @@ Mautic.leadNoteOnLoad = function (container, response) {
 };
 
 Mautic.loadEngagementChart = function () {
-
-    var data = {
-        labels: ["January", "February", "March", "April", "May", "June", "July"],
-        datasets: [
-            {
-                label: "My Second dataset",
-                fillColor: "rgba(151,187,205,0.2)",
-                strokeColor: "rgba(151,187,205,1)",
-                pointColor: "rgba(151,187,205,1)",
-                pointStrokeColor: "#fff",
-                pointHighlightFill: "#fff",
-                pointHighlightStroke: "rgba(151,187,205,1)",
-                data: [28, 48, 49, 50, 86, 86, 90]
-            }
-        ]
-    };
-    var chart = new Chart(document.getElementById("chart-engagement").getContext("2d")).Line(data);
+    if (mQuery(("#chart-engagement")).length) {
+        var data = {
+            labels: ["January", "February", "March", "April", "May", "June", "July"],
+            datasets: [
+                {
+                    label: "My Second dataset",
+                    fillColor: "rgba(151,187,205,0.2)",
+                    strokeColor: "rgba(151,187,205,1)",
+                    pointColor: "rgba(151,187,205,1)",
+                    pointStrokeColor: "#fff",
+                    pointHighlightFill: "#fff",
+                    pointHighlightStroke: "rgba(151,187,205,1)",
+                    data: [28, 48, 49, 50, 86, 86, 90]
+                }
+            ]
+        };
+        var chart = new Chart(document.getElementById("chart-engagement").getContext("2d")).Line(data);
+    }
 };
