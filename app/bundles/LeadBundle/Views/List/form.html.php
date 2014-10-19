@@ -27,28 +27,25 @@ $glueOptions = array(
 $countries = \Symfony\Component\Intl\Intl::getRegionBundle()->getCountryNames();
 $tz        = new \Symfony\Component\Form\Extension\Core\Type\TimezoneType();
 $timezones = $tz->getTimezones();
-?>
-<div class="row">
-    <div class="col-md-9">
-        <div class="panel panel-default">
-        <div class="panel-body">
-            <?php echo $view['form']->start($form); ?>
-            <div class="row">
-                <div class="col-xs-12 col-sm-6">
-                    <?php echo $view['form']->row($form['name']); ?>
-                    <?php echo $view['form']->row($form['alias']); ?>
-                    <?php echo $view['form']->row($form['description']); ?>
-                    <?php echo $view['form']->row($form['isGlobal']); ?>
-                    <?php echo $view['form']->row($form['isPublished']); ?>
-                </div>
 
-                <?php
-                $filterForm   = $form['filters'];
-                $filterValues = $filterForm->vars['data'] ?: array();
-                $form['filters']->setRendered();
-                $feedbackClass = ($app->getRequest()->getMethod() == 'POST' && !empty($filterForm->vars['errors'])) ? " has-error" : "";
-                ?>
-            </div>
+echo $view['form']->start($form);
+?>
+
+<!-- start: box layout -->
+<div class="box-layout">
+    <!-- container -->
+    <div class="col-md-9 bg-auto height-auto bdr-r">
+        <div class="pa-md">
+            <?php echo $view['form']->row($form['name']); ?>
+            <?php echo $view['form']->row($form['alias']); ?>
+            <?php echo $view['form']->row($form['description']); ?>
+
+            <?php
+            $filterForm   = $form['filters'];
+            $filterValues = $filterForm->vars['data'] ?: array();
+            $form['filters']->setRendered();
+            $feedbackClass = ($app->getRequest()->getMethod() == 'POST' && !empty($filterForm->vars['errors'])) ? " has-error" : "";
+            ?>
             <div class="row">
                 <div class="col-xs-12 form-group <?php echo $feedbackClass; ?>">
                     <?php echo $view['form']->label($filterForm); ?>
@@ -202,7 +199,16 @@ $timezones = $tz->getTimezones();
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+    <div class="col-md-3 bg-white height-auto">
+        <div class="pr-lg pl-lg pt-md pb-md">
+            <?php echo $view['form']->row($form['isGlobal']); ?>
+            <?php echo $view['form']->row($form['isPublished']); ?>
+            
             <?php echo $view['form']->end($form); ?>
+        </div>
+    </div>
 
             <div id="filter-template" class="hide">
                 <div class="panel-footer">

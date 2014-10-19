@@ -88,9 +88,7 @@ if ($tmpl == 'index')
                 </div>
             <?php endforeach; ?>
         <?php else: ?>
-            <div class="col-xs-12">
-                <h4><?php echo $view['translator']->trans('mautic.core.noresults'); ?></h4>
-            </div>
+            <?php echo $view->render('MauticCoreBundle:Default:noresults.html.php'); ?>
         <?php endif; ?>
     </div>
 </div>
