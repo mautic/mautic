@@ -24,6 +24,9 @@ $view['slots']->append('modal', $view->render('MauticCoreBundle:Helper:modal.htm
 
 $groups = array_keys($fields);
 
+//load the editor
+$view['assets']->loadEditor();
+
 $view['slots']->start("actions");
 if ($hasEditAccess): ?>
     <a class="btn btn-default" href="<?php echo $this->container->get('router')->generate(

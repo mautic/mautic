@@ -109,6 +109,22 @@ class AssetsHelper extends BaseAssetsHelper
     }
 
     /**
+     * Load ckeditor source files
+     */
+    public function loadEditor()
+    {
+        static $editorLoaded;
+
+        if (empty($editorLoaded)) {
+            $editorLoaded = true;
+            $this->addScript(array(
+                'assets/js/ckeditor/ckeditor.js',
+                'assets/js/ckeditor/adapters/jquery.js'
+            ), 'bodyClose');
+        }
+    }
+
+    /**
      * Add style tag to the header
      *
      * @param $styles
@@ -145,8 +161,6 @@ class AssetsHelper extends BaseAssetsHelper
                 $this->assets['customDeclarations'][$location][] = $declaration;
             }
         }
-
-
     }
 
     /**

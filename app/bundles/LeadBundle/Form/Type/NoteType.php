@@ -47,13 +47,13 @@ class NoteType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber());
+        $builder->addEventSubscriber(new CleanFormSubscriber(array('text' => 'html')));
         $builder->addEventSubscriber(new FormExitSubscriber('lead.note', $options));
 
         $builder->add('text', 'textarea', array(
             'label'      => 'mautic.lead.note.form.text',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'mousetrap form-control', 'rows' => 10, 'autofocus' => 'autofocus')
+            'attr'       => array('class' => 'mousetrap form-control editor', 'rows' => 10, 'autofocus' => 'autofocus')
         ));
 
         $builder->add('type', 'choice', array(
