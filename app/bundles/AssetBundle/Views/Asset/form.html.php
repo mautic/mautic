@@ -13,13 +13,36 @@ $view['slots']->set('mauticContent', 'asset');
 $subheader = '';
 
 $header = ($activeAsset->getId()) ?
-    $view['translator']->trans('mautic.asset.asset.header.edit',
+    $view['translator']->trans('mautic.asset.asset.menu.edit',
         array('%name%' => $activeAsset->getTitle())) :
-    $view['translator']->trans('mautic.asset.asset.header.new');
+    $view['translator']->trans('mautic.asset.asset.menu.new');
 
 $view['slots']->set("headerTitle", $header.$subheader);
 ?>
 
-<div class="scrollable">
-    <?php echo $view['form']->form($form); ?>
+<!-- start: box layout -->
+<div class="box-layout">
+    <!-- container -->
+    <div class="col-md-9 bg-auto height-auto bdr-r">
+        <div class="pa-md">
+		    <?php		    
+			echo $view['form']->row($form['file']);
+			echo $view['form']->row($form['title']);
+			echo $view['form']->row($form['alias']);
+		    ?>
+		</div>
+	</div>
+ 	<div class="col-md-3 bg-white height-auto">
+		<div class="pr-lg pl-lg pt-md pb-md">
+			<?php
+				echo $view['form']->row($form['category_lookup']);
+				echo $view['form']->row($form['category']);
+				echo $view['form']->row($form['language']);
+				echo $view['form']->row($form['isPublished']);
+				echo $view['form']->row($form['publishUp']);
+				echo $view['form']->row($form['publishDown']);
+			?>
+		</div>
+	</div>
 </div>
+<?php echo $view['form']->end($form); ?>
