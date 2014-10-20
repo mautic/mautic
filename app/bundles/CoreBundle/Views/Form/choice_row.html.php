@@ -1,10 +1,16 @@
 <?php
 $hasErrors = count($form->vars['errors']);
 //select boxes vs radio/checkboxes
-$responsiveClasses = ((!$form->vars['expanded'] && !$form->vars['multiple']) ||
-    (!$form->vars['expanded'] && $form->vars['multiple'])) ?
+if (isset($view['form']->vars['attr']['row-width'])) {
+    $responsiveClasses = $view['form']->vars['attr']['row-width'];
+    unset($view['form']->vars['attr']['row-width']);
+} else {
+    $responsiveClasses = ((!$form->vars['expanded'] && !$form->vars['multiple']) ||
+        (!$form->vars['expanded'] && $form->vars['multiple'])) ?
         ' col-xs-12 col-sm-8 col-md-6' :
         ' col-xs-12';
+}
+
 $feedbackClass = ($app->getRequest()->getMethod() == 'POST' && !empty($hasErrors)) ? ' has-error' : '';
 ?>
 <div class="row">
