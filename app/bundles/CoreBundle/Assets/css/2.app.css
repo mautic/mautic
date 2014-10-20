@@ -22,6 +22,14 @@ body > #app-wrapper {
     overflow-x: hidden;
   }
 }
+@media (min-width: 970px) {
+  .modal {
+    overflow-y: auto;
+  }
+  .modal-open {
+    overflow: auto;
+  }
+}
 .csstransforms3d.sidebar-open-ltr #app-header.navbar {
   -webkit-transform: translate3d(230px, 0, 0);
   transform: translate3d(230px, 0, 0);

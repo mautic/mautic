@@ -60,7 +60,7 @@ if ($tmpl == 'index')
                                 <div class="panel-body">
                                     <div class="pull-right">
                                         <div class="checkbox-inline custom-primary">
-                                            <label class="mb-0 pl-10">
+                                            <label class="mb-0">
                                                 <input type="checkbox" value="1">
                                                 <span></span>
                                             </label>
