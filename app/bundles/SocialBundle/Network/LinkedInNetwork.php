@@ -35,7 +35,7 @@ class LinkedInNetwork extends AbstractNetwork
         );
     }
 
-    public function getIdentifierField()
+    public function getIdentifierFields()
     {
         return false;
     }

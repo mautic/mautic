@@ -49,7 +49,7 @@ abstract class AbstractNetwork
      *
      * @return mixed
      */
-    abstract public function getIdentifierField();
+    abstract public function getIdentifierFields();
 
     /**
      * Set the social network entity

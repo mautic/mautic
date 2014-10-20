@@ -37,7 +37,7 @@ class FoursquareNetwork extends AbstractNetwork
      *
      * @return string
      */
-    public function getIdentifierField()
+    public function getIdentifierFields()
     {
         return array(
             'email',
@@ -252,12 +252,6 @@ class FoursquareNetwork extends AbstractNetwork
 
             if (!empty($activity)) {
                 $socialCache['activity'] = $activity;
-            } else {
-                $socialCache['activity'] = array(
-                //    'mayorships' => array(),
-                    'tips'       => array()
-                //    'lists'      => array()
-                );
             }
         }
     }
