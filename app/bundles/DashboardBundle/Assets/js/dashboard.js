@@ -31,7 +31,12 @@ Mautic.loadDashboardMap = function () {
                 showTooltip: true,
                 values: mapData,
                 scaleColors: ['#C8EEFF', '#006491'],
-                normalizeFunction: 'polynomial'
+                normalizeFunction: 'polynomial',
+                onLabelShow: function (event, label, code) {
+                    if(mapData[code] > 0) {
+                        label.append(': '+mapData[code]+' Leads'); 
+                    }
+                }
             });
         }
     });
