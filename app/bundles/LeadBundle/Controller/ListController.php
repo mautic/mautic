@@ -70,16 +70,16 @@ class ListController extends FormController
             if ($count === 1) {
                 $lastPage = 1;
             } else {
-                $lastPage = (floor($limit / $count)) ? : 1;
+                $lastPage = (floor($limit / $count)) ?: 1;
             }
             $this->factory->getSession()->set('mautic.leadlist.page', $lastPage);
-            $returnUrl   = $this->generateUrl('mautic_leadlist_index', array('page' => $lastPage));
+            $returnUrl = $this->generateUrl('mautic_leadlist_index', array('page' => $lastPage));
 
             return $this->postActionRedirect(array(
                 'returnUrl'       => $returnUrl,
                 'viewParameters'  => array(
-                    'page' => $lastPage,
-                    'tmpl' => $tmpl
+                    'page'        => $lastPage,
+                    'tmpl'        => $tmpl
                 ),
                 'contentTemplate' => 'MauticLeadBundle:List:index',
                 'passthroughVars' => array(
@@ -99,7 +99,8 @@ class ListController extends FormController
             'permissions' => $permissions,
             'security'    => $this->factory->getSecurity(),
             'tmpl'        => $tmpl,
-            'currentUser' => $this->factory->getUser()
+            'currentUser' => $this->factory->getUser(),
+            'searchValue' => $filter['string']
         );
 
         return $this->delegateView(array(
@@ -108,8 +109,7 @@ class ListController extends FormController
             'passthroughVars' => array(
                 'activeLink'     => '#mautic_leadlist_index',
                 'route'          => $this->generateUrl('mautic_leadlist_index', array('page' => $page)),
-                'mauticContent'  => 'leadlist',
-                'replaceContent' => ($tmpl == 'list') ? 'true' : 'false'
+                'mauticContent'  => 'leadlist'
             )
         ));
     }
