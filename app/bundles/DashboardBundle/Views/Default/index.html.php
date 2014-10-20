@@ -8,6 +8,11 @@
  */
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set("headerTitle", "Dashboard");
+$view['assets']->addScriptDeclaration('
+    mQuery(function() {
+        Mautic.dashboardOnLoad();
+    });
+', 'bodyClose');
 ?>
 <div class="box-layout">
     <div class="np col-md-9 height-auto bg-white">
@@ -48,7 +53,7 @@ $view['slots']->set("headerTitle", "Dashboard");
     		<div class="pa-md mb-lg">
     			<div class="row">
     				<div class="col-sm-12">
-    					http://jqvmap.com/
+    					<div id="dashboard-map" style="height: 400px;"></div>
     				</div>
     			</div>
     		</div>
