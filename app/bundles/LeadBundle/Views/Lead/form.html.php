@@ -24,11 +24,11 @@ $groups = array_keys($fields);
                 <?php if ($lead->getId()): ?>
                     <div class="media">
                         <div class="pull-left">
-                            <img class="img-circle img-bordered media-object" src="<?php echo $view['gravatar']->getImage($fields['core']['email']['value']); ?>" alt="" width="65px">
+                            <img class="img-rounded img-bordered media-object" src="<?php echo $view['gravatar']->getImage($fields['core']['email']['value']); ?>" alt="" width="65px">
                         </div>
                         <div class="media-body">
                             <h4><?php echo $header; ?></h4>
-                            <div style="max-width:200px;">
+                            <div style="max-width:200px;" class="mt-md">
                                 <div class="progress progress-xs mb5">
                                     <div class="progress-bar progress-bar-warning" style="width:70%"></div>
                                 </div>

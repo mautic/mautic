@@ -27,6 +27,11 @@
                     <?php echo $view['translator']->trans('mautic.lead.lead.social.google.photos'); ?>
                 </a>
             </li>
+            <li>
+                <a href="#GoogleTags" role="tab" data-toggle="tab">
+                    <?php echo $view['translator']->trans('mautic.lead.lead.social.google.tags'); ?>
+                </a>
+            </li>
         </ul>
     </div>
 </div>
@@ -34,19 +39,25 @@
     <div class="tab-pane active" id="GoogleProfile">
         <?php echo $view->render('MauticLeadBundle:Social/GooglePlus:profile.html.php', array(
             'lead'      => $lead,
-            // 'profile'   => $details['profile']
+            'profile'   => $details['profile']
         )); ?>
     </div>
     <div class="tab-pane" id="GooglePosts">
         <?php echo $view->render('MauticLeadBundle:Social/GooglePlus:posts.html.php', array(
             'lead'      => $lead,
-            // 'activity'   => $details['activity']['posts']
+            'activity'   => $details['activity']['posts']
         )); ?>
     </div>
     <div class="tab-pane" id="GooglePhotos">
         <?php echo $view->render('MauticLeadBundle:Social/GooglePlus:photos.html.php', array(
             'lead'      => $lead,
-            // 'activity'   => $details['activity']['photos']
+            'activity'  => $details['activity']['photos']
+        )); ?>
+    </div>
+    <div class="tab-pane" id="GoogleTags">
+        <?php echo $view->render('MauticLeadBundle:Social/GooglePlus:tags.html.php', array(
+            'lead'      => $lead,
+            'activity' => $details['activity']['tags']
         )); ?>
     </div>
 </div>

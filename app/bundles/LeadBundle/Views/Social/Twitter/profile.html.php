@@ -18,6 +18,9 @@
         <h4 class="media-title"><?php echo $profile['name']; ?></h4>
         <p><a href="https://twitter.com/<?php echo $profile['profileHandle']; ?>" target="_blank"><?php echo $profile['profileHandle']; ?></a></p>
         <p class="text-muted">
+            <?php echo $profile['location']; ?>
+        </p>
+        <p class="text-muted">
             <?php echo $profile['description']; ?>
         </p>
     </div>

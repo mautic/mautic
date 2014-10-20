@@ -60,7 +60,7 @@ class PermissionsType extends AbstractType
         }
 
         //order panels
-        asort($panels, SORT_NATURAL);
+        uasort($panels, "strnatcmp");
 
         //build forms
         foreach ($panels as $bundle => $label) {

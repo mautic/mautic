@@ -160,7 +160,7 @@ class NetworkIntegrationHelper
                             break;
                     }
                 }
-                asort($fields[$s], SORT_NATURAL);
+                uasort($fields[$s], "strnatcmp");
             }
         }
 
@@ -193,20 +193,22 @@ class NetworkIntegrationHelper
                     "/youtu.be\/user\/(.*?)($|\/)/"
                 ),
                 "flickr"    => "/flickr.com\/photos\/(.*?)($|\/)/",
-                "skype"     => "/skype:(.*?)($|\?)/"
+                "skype"     => "/skype:(.*?)($|\?)/",
+                "google"    => "/plus.google.com\/(.*?)($|\/)/",
             );
         } else {
             //populate placeholder
             return array(
-                "twitter"   => "https://twitter.com/%handle%",
-                "facebook"  => "https://facebook.com/%handle%",
-                "linkedin"  => "https://linkedin.com/in/%handle%",
-                "instagram" => "https://instagram.com/%handle%",
-                "pinterest" => "https://pinterest.com/%handle%",
-                "klout"     => "https://klout.com/%handle%",
-                "youtube"   => "https://youtube.com/user/%handle%",
-                "flickr"    => "https://flickr.com/photos/%handle%",
-                "skype"     => "skype:%handle%?call"
+                "twitter"    => "https://twitter.com/%handle%",
+                "facebook"   => "https://facebook.com/%handle%",
+                "linkedin"   => "https://linkedin.com/in/%handle%",
+                "instagram"  => "https://instagram.com/%handle%",
+                "pinterest"  => "https://pinterest.com/%handle%",
+                "klout"      => "https://klout.com/%handle%",
+                "youtube"    => "https://youtube.com/user/%handle%",
+                "flickr"     => "https://flickr.com/photos/%handle%",
+                "skype"      => "skype:%handle%?call",
+                "googleplus" => "https://plus.google.com/%handle%"
             );
         }
     }
@@ -235,7 +237,7 @@ class NetworkIntegrationHelper
      *
      * @return array
      */
-    public static function getUserProfiles($factory, $lead, $fields, $refresh = false, $specificNetwork = null,
+    public static function getUserProfiles($factory, $lead, $fields = array(), $refresh = false, $specificNetwork = null,
                                            $persistLead = true, $returnSettings = false)
     {
         $socialCache      = $lead->getSocialCache();
@@ -256,25 +258,30 @@ class NetworkIntegrationHelper
                 }
 
                 if ($identifierField && $settings->isPublished()) {
-                    if (!isset($socialCache[$network])) {
-                        $socialCache[$network] = array();
-                    }
+                    $profile = (!isset($socialCache[$network])) ? array() : $socialCache[$network];
 
-                    if (!isset($socialCache[$network]['profile'])) {
-                        $socialCache[$network]['profile'] = array();
-                    }
                     if (in_array('public_profile', $features)) {
-                        $sn->getUserData($identifierField, $socialCache[$network]);
+                        $sn->getUserData($identifierField, $profile);
                     }
 
-                    if (!isset($socialCache[$network]['activity'])) {
-                        $socialCache[$network]['activity'] = array();
-                    }
                     if (in_array('public_activity', $features)) {
-                        $sn->getPublicActivity($identifierField, $socialCache[$network]);
+                        $sn->getPublicActivity($identifierField, $profile);
                     }
 
-                    $socialCache[$network]['lastRefresh'] = $now->toUtcString();
+                    if (!empty($profile['profile']) || !empty($profile['activity'])) {
+                        if (!isset($socialCache[$network])) {
+                            $socialCache[$network] = array();
+                        }
+
+                        $socialCache[$network]['profile']     = (!empty($profile['profile'])) ? $profile['profile'] : array();
+                        $socialCache[$network]['activity']    = (!empty($profile['activity'])) ? $profile['activity'] : array();
+                        $socialCache[$network]['lastRefresh'] = $now->toUtcString();
+                    } else {
+                        unset($socialCache[$network]);
+                    }
+                } elseif (isset($socialCache[$network])) {
+                    //network is now not applicable
+                    unset($socialCache[$network]);
                 }
             }
 
@@ -296,6 +303,24 @@ class NetworkIntegrationHelper
         } else {
             return ($returnSettings) ? array($socialCache, $featureSettings) : $socialCache;
         }
+    }
+
+    /**
+     * @param      $factory
+     * @param      $lead
+     * @param bool $network
+     */
+    public static function clearNetworkCache($factory, $lead, $network = false)
+    {
+        $socialCache = $lead->getSocialCache();
+        if (!empty($network)) {
+            unset($socialCache[$network]);
+        } else {
+            $socialCache = array();
+        }
+        $lead->setSocialCache($socialCache);
+        $factory->getEntityManager()->getRepository('MauticLeadBundle:Lead')->saveEntity($lead);
+        return $socialCache;
     }
 
     /**

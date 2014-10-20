@@ -122,14 +122,6 @@ class InstagramNetwork extends AbstractNetwork
                 $socialCache['profile'] = $info;
             }
         }
-
-        if (empty($socialCache['profile'])) {
-            //populate empty data
-            $empty = new \stdClass();
-            $socialCache['profile'] = $this->matchUpData($empty);
-            $socialCache['profile']['profileHandle'] = "";
-            $socialCache['profile']['profileImage']  = $this->factory->getAssetsHelper()->getUrl('assets/images/avatar.png');
-        }
     }
 
     /**
@@ -140,6 +132,7 @@ class InstagramNetwork extends AbstractNetwork
      */
     public function getPublicActivity($identifier, &$socialCache)
     {
+        $socialCache['has']['activity'] = false;
         if ($id = $this->getUserId($identifier, $socialCache)) {
             //get more than 10 so we can weed out videos
             $url  = $this->getApiUrl("users/$id/media/recent"). "&count=20";
@@ -151,6 +144,7 @@ class InstagramNetwork extends AbstractNetwork
             );
 
             if (!empty($data->data)) {
+                $socialCache['has']['activity'] = true;
                 $count = 1;
                 foreach ($data->data as $m) {
                     if ($count > 10) break;

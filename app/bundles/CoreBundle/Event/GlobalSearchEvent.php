@@ -73,7 +73,7 @@ class GlobalSearchEvent extends Event
      */
     public function getResults()
     {
-        ksort($this->results, SORT_NATURAL);
+        uksort($this->results, "strnatcmp");
         return $this->results;
     }
 }
