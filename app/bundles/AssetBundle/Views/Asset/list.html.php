@@ -11,39 +11,35 @@ $view->extend('MauticAssetBundle:Asset:index.html.php');
 ?>
 <?php if (count($items)): ?>
 <div class="panel panel-default">
-    <div class="panel-heading">
-        <div class="panel-title">
-            <?php echo $view['translator']->trans('mautic.asset.asset.header.index'); ?>
-        </div>
-    </div>
     <div class="panel-body">
         <div class="box-layout">
             <div class="col-xs-6 va-m">
-                <div class="checkbox-inline custom-primary">
-                    <label class="mb-0">
-                        <input type="checkbox" id="customcheckbox-one0" value="1">
-                        <span></span>
-                        <?php echo $view['translator']->trans('mautic.core.table.selectall'); ?>
-                    </label>
-                </div>
+                <?php echo $view->render('MauticCoreBundle:Helper:search.html.php'); ?>
             </div>
             <div class="col-xs-6 va-m text-right">
-                <button type="button" class="btn btn-sm btn-warning"><i class="fa fa-files-o"></i></button>
-                <button type="button" class="btn btn-sm btn-danger"><i class="fa fa-trash-o"></i></button>
+                <button type="button" class="btn btn-warning"><i class="fa fa-files-o"></i></button>
+                <button type="button" class="btn btn-danger"><i class="fa fa-trash-o"></i></button>
             </div>
         </div>
     </div>
-    <div class="table-responsive scrollable body-white padding-sm page-list">
+    <div class="table-responsive scrollable body-white padding-sm asset-list">
             <table class="table table-hover table-striped table-bordered asset-list">
                 <thead>
                 <tr>
-                    <th class="col-asset-actions"></th>
+                    <th class="col-asset-actions pl-20">
+                        <div class="checkbox-inline custom-primary">
+                            <label class="mb-0 pl-10">
+                                <input type="checkbox" id="customcheckbox-one0" value="1">
+                                <span></span>
+                            </label>
+                        </div>
+                    </th>
                     <?php
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                         'sessionVar' => 'asset',
                         'orderBy'    => 'a.title',
                         'text'       => 'mautic.asset.asset.thead.title',
-                        'class'      => 'col-page-title',
+                        'class'      => 'col-asset-title',
                         'default'    => true
                     ));
 
@@ -51,35 +47,35 @@ $view->extend('MauticAssetBundle:Asset:index.html.php');
                         'sessionVar' => 'asset',
                         'orderBy'    => 'c.title',
                         'text'       => 'mautic.asset.asset.thead.category',
-                        'class'      => 'visible-md visible-lg col-page-category'
+                        'class'      => 'visible-md visible-lg col-asset-category'
                     ));
 
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                         'sessionVar' => 'asset',
                         'orderBy'    => 'a.author',
                         'text'       => 'mautic.asset.asset.thead.author',
-                        'class'      => 'visible-md visible-lg col-page-author'
+                        'class'      => 'visible-md visible-lg col-asset-author'
                     ));
 
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                         'sessionVar' => 'asset',
                         'orderBy'    => 'a.language',
                         'text'       => 'mautic.asset.asset.thead.language',
-                        'class'      => 'visible-md visible-lg col-page-lang'
+                        'class'      => 'visible-md visible-lg col-asset-lang'
                     ));
 
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                         'sessionVar' => 'asset',
                         'orderBy'    => 'a.download_count',
                         'text'       => 'mautic.asset.asset.thead.download.count',
-                        'class'      => 'col-page-download-count'
+                        'class'      => 'col-asset-download-count'
                     ));
 
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                         'sessionVar' => 'asset',
                         'orderBy'    => 'a.id',
                         'text'       => 'mautic.asset.asset.thead.id',
-                        'class'      => 'col-page-id'
+                        'class'      => 'col-asset-id'
                     ));
                     ?>
                 </tr>
