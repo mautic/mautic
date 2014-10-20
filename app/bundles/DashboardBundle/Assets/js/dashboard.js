@@ -34,7 +34,8 @@ Mautic.loadDashboardMap = function () {
                 normalizeFunction: 'polynomial',
                 onLabelShow: function (event, label, code) {
                     if(mapData[code] > 0) {
-                        label.append(': '+mapData[code]+' Leads'); 
+                        label.find('span').remove();
+                        label.append('<span>: '+mapData[code]+' Leads<span>'); 
                     }
                 }
             });
