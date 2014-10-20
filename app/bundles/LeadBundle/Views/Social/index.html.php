@@ -44,6 +44,8 @@
 </div>
 <?php
 $view['slots']->append('modal', $view->render('MauticCoreBundle:Helper:modal.html.php', array(
-    'id'   => 'socialImageModal',
-    'body' => '<div class="row"><div class="col-xs-12 text-center"><img class="img-responsive img-thumbnail" /></div></div>'
+    'id'      => 'socialImageModal',
+    'body'    => '<img class="img-responsive img-thumbnail" />',
+    'header'  => false,
+    'paddingg' => 'pa-0'
 )));

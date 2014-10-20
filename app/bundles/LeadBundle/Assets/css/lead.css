@@ -100,3 +100,9 @@ ul.tag-cloud li {
     margin: 0 10px;
     height: 35px;
 }
+
+#social-container div.tab-pane {
+    height: 250px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
