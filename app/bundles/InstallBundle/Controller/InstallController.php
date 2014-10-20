@@ -11,10 +11,13 @@
 
 namespace Mautic\InstallBundle\Controller;
 
+use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
+use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Doctrine\ORM\Tools\SchemaTool;
 use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
 use Symfony\Component\Process\Exception\RuntimeException;
 
 /**
@@ -85,7 +88,7 @@ class InstallController extends CommonController
                 // Post-step processing
                 switch ($index) {
                     case 1:
-                        $result = $this->performDatabaseInstallation($form);
+                        $result = $this->performDatabaseInstallation($form, $configurator, $step);
 
                         break;
 
@@ -93,6 +96,9 @@ class InstallController extends CommonController
                         $result = $this->performUserAddition($form);
 
                         break;
+
+                    default:
+                        $result = true;
                 }
 
                 // On a failure, the result will be an array; for success it will be a boolean
@@ -149,11 +155,16 @@ class InstallController extends CommonController
                 }
 
                 // Post-processing once installation is complete
+                $flashes = array();
+                $result = $this->performFieldFixtureInstall();
+
+                if (is_array($result)) {
+                    $flashes[] = $result;
+                }
+
                 // Need to generate a secret value and merge it into the config
                 $secret = hash('sha1', uniqid(mt_rand()));
                 $configurator->mergeParameters(array('secret' => $secret));
-
-                $flashes = array();
 
                 // Write the updated config file
                 try {
@@ -279,6 +290,7 @@ class InstallController extends CommonController
 
         $entityManager = $this->factory->getEntityManager();
         $metadatas     = $entityManager->getMetadataFactory()->getAllMetadata();
+        $originalData  = $form->getData();
 
         if (!empty($metadatas)) {
             try {
@@ -288,7 +300,6 @@ class InstallController extends CommonController
                 $error = false;
                 if (strpos($exception->getMessage(), $this->checkDatabaseNotExistsMessage($originalData->driver, $originalData->name)) !== false) {
                     // Try to manually create the database, first we null out the database name
-                    $originalData   = $form->getData();
                     $editData       = clone $originalData;
                     $editData->name = null;
                     $configurator->mergeParameters($step->update($editData));
@@ -379,6 +390,45 @@ class InstallController extends CommonController
                 array(
                     'type'    => 'error',
                     'msg'     => 'mautic.installer.error.creating.user',
+                    'msgVars' => array('%exception%' => $exception->getMessage())
+                )
+            );
+        }
+
+        return true;
+    }
+
+    private function performFieldFixtureInstall()
+    {
+        try {
+            // First we need to setup the environment
+            $entityManager = $this->factory->getEntityManager();
+            $paths         = array(dirname(__DIR__) . '/DataFixtures/ORM');
+            $loader        = new ContainerAwareLoader($this->container);
+
+            foreach ($paths as $path) {
+                if (is_dir($path)) {
+                    $loader->loadFromDirectory($path);
+                }
+            }
+
+            $fixtures = $loader->getFixtures();
+
+            if (!$fixtures) {
+                throw new \InvalidArgumentException(
+                    sprintf('Could not find any fixtures to load in: %s', "\n\n- ".implode("\n- ", $paths))
+                );
+            }
+
+            $purger = new ORMPurger($entityManager);
+            $purger->setPurgeMode(ORMPurger::PURGE_MODE_DELETE);
+            $executor = new ORMExecutor($entityManager, $purger);
+            $executor->execute($fixtures, true);
+        } catch (\Exception $exception) {
+            return array(
+                array(
+                    'type'    => 'error',
+                    'msg'     => 'mautic.installer.error.adding.fields',
                     'msgVars' => array('%exception%' => $exception->getMessage())
                 )
             );
