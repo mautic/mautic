@@ -67,7 +67,8 @@ class LoadLeadFieldData extends AbstractFixture implements OrderedFixtureInterfa
             'facebook',
             'googleplus',
             'skype',
-            'instagram'
+            'instagram',
+            'foursquare'
         );
 
         $leadsSchema = $this->container->get('mautic.factory')->getSchemaHelper('column', 'leads');
@@ -119,6 +120,8 @@ class LoadLeadFieldData extends AbstractFixture implements OrderedFixtureInterfa
                 'facebook',
                 'googleplus',
                 'skype',
+                'foursquare',
+                'instagram',
                 'mobile',
                 'website'
             )) ? false : true;
@@ -127,7 +130,7 @@ class LoadLeadFieldData extends AbstractFixture implements OrderedFixtureInterfa
             $shortVisible = in_array($name, array('firstname', 'lastname', 'email')) ? true : false;
             $entity->setIsShortVisible($shortVisible);
 
-            $group = (in_array($name, array('twitter', 'facebook', 'googleplus', 'skype'))) ? 'social' : 'core';
+            $group = (in_array($name, array('twitter', 'facebook', 'googleplus', 'skype', 'instagram', 'foursquare'))) ? 'social' : 'core';
             $entity->setGroup($group);
 
             $manager->persist($entity);

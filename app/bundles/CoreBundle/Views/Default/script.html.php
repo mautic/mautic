@@ -35,4 +35,6 @@
     });
     <?php endif; ?>
 </script>
+
+<?php $view['assets']->loadEditor(); ?>
 <?php $view['assets']->outputScripts("bodyClose"); ?>
