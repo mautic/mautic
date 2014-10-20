@@ -11,7 +11,7 @@
 /** @var array $fields */
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
-$view->extend('MauticCoreBundle:Default:content.html.php');
+
 $view['slots']->set('mauticContent', 'lead');
 $view['slots']->set("headerTitle",
     '<span class="span-block">' . $view['translator']->trans($lead->getPrimaryIdentifier()) . '</span> <span class="span-block small">' .
@@ -23,9 +23,6 @@ $view['slots']->append('modal', $view->render('MauticCoreBundle:Helper:modal.htm
 )));
 
 $groups = array_keys($fields);
-
-//load the editor
-$view['assets']->loadEditor();
 
 $view['slots']->start("actions");
 if ($hasEditAccess): ?>
