@@ -60,7 +60,7 @@ class LoadFormData extends AbstractFixture implements OrderedFixtureInterface, C
 
                     if (in_array($col, array('dateAdded'))) {
                         $form->$setter(new \DateTime($val));
-                    } elseif (in_array($col, array('cachedHtml', 'cachedJs'))) {
+                    } elseif (in_array($col, array('cachedHtml'))) {
                         $val = stripslashes($val);
                         $form->$setter($val);
                     } else {

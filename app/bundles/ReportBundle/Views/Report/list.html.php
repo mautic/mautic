@@ -10,24 +10,15 @@ if ($tmpl == 'index')
     $view->extend('MauticReportBundle:Report:index.html.php');
 ?>
 <?php if (count($items)): ?>
-<div class="panel panel-default page-list">
-    <div class="panel-heading">
-        <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.report.report.header.index'); ?></h3>
-    </div>
+<div class="panel panel-default page-list bdr-t-wdh-0">
     <div class="panel-body">
         <div class="box-layout">
             <div class="col-xs-6 va-m">
-                <div class="checkbox-inline custom-primary">
-                    <label class="mb-0">
-                        <input type="checkbox" id="customcheckbox-one0" value="1">
-                        <span></span>
-                        <?php echo $view['translator']->trans('mautic.core.table.selectall'); ?>
-                    </label>
-                </div>
+                <?php echo $view->render('MauticCoreBundle:Helper:search.html.php'); ?>
             </div>
             <div class="col-xs-6 va-m text-right">
-                <button type="button" class="btn btn-sm btn-warning"><i class="fa fa-files-o"></i></button>
-                <button type="button" class="btn btn-sm btn-danger"><i class="fa fa-trash-o"></i></button>
+                <button type="button" class="btn btn-warning"><i class="fa fa-files-o"></i></button>
+                <button type="button" class="btn btn-danger"><i class="fa fa-trash-o"></i></button>
             </div>
         </div>
     </div>
@@ -35,7 +26,14 @@ if ($tmpl == 'index')
         <table class="table table-hover table-striped table-bordered report-list" id="reportTable">
             <thead>
                 <tr>
-                    <th class="col-page-actions"></th>
+                    <th class="col-page-actions pl-20">
+                        <div class="checkbox-inline custom-primary">
+                            <label class="mb-0 pl-10">
+                                <input type="checkbox" id="customcheckbox-one0" value="1">
+                                <span></span>
+                            </label>
+                        </div>
+                    </th>
                     <?php
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                         'sessionVar' => 'report',
