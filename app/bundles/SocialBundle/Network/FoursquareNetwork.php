@@ -41,7 +41,7 @@ class FoursquareNetwork extends AbstractNetwork
     {
         return array(
             'email',
-            'twitter' //foursquare allows searching directly by twitter handle
+            'twitter', //foursquare allows searching directly by twitter handle
         );
     }
 
@@ -93,11 +93,11 @@ class FoursquareNetwork extends AbstractNetwork
      *
      * @return string
      */
-    public function getApiUrl($endpoint)
+    public function getApiUrl($endpoint, $m = 'foursquare')
     {
         $keys = $this->settings->getApiKeys();
         $token = (isset($keys['access_token'])) ? $keys['access_token'] : '';
-        return "https://api.foursquare.com/v2/$endpoint?v=20140719&oauth_token={$token}";
+        return "https://api.foursquare.com/v2/$endpoint?v=20140806&m={$m}&oauth_token={$token}";
     }
 
     /**
@@ -119,7 +119,7 @@ class FoursquareNetwork extends AbstractNetwork
                 if (isset($result->photo)) {
                     $socialCache['profile']['profileImage'] = $result->photo->prefix . '300x300' . $result->photo->suffix;
                 }
-                $socialCache['profile']['profileHandle'] = 'https://foursquare.com/user/' . $id;
+                $socialCache['profile']['profileHandle'] = $id;
             }
         }
     }
@@ -135,16 +135,17 @@ class FoursquareNetwork extends AbstractNetwork
     public function getPublicActivity($identifier, &$socialCache)
     {
         if ($id = $this->getUserId($identifier, $socialCache)) {
-            $activity = array();
-            $socialCache['activity'] = array(
-                'mayorships' => array(),
+            $activity = array(
+                //'mayorships' => array(),
                 'tips'       => array(),
-                'lists'      => array()
+                //'lists'      => array()
             );
 
+            /*
             //mayorships
             $url  = $this->getApiUrl("users/{$id}/mayorships");
             $data = $this->makeCall($url);
+
             if (isset($data->response->mayorships) && count($data->response->mayorships->items)) {
                 $limit = 5;
                 foreach ($data->response->mayorships->items as $m) {
@@ -169,6 +170,7 @@ class FoursquareNetwork extends AbstractNetwork
                     $limit--;
                 }
             }
+            */
 
             //tips
             $url  = $this->getApiUrl("users/{$id}/tips") . "&limit=5&sort=recent";
@@ -197,6 +199,7 @@ class FoursquareNetwork extends AbstractNetwork
                 }
             }
 
+            /*
             //lists
             $url  = $this->getApiUrl("users/{$id}/lists") . "&limit=5&group=created";
             $data = $this->makeCall($url);
@@ -245,10 +248,16 @@ class FoursquareNetwork extends AbstractNetwork
                     $activity['lists'][] = $item;
                 }
             }
+            */
 
             if (!empty($activity)) {
                 $socialCache['activity'] = $activity;
-                $socialCache['has']['activity'] = true;
+            } else {
+                $socialCache['activity'] = array(
+                //    'mayorships' => array(),
+                    'tips'       => array()
+                //    'lists'      => array()
+                );
             }
         }
     }
@@ -337,22 +346,21 @@ class FoursquareNetwork extends AbstractNetwork
         }
 
         $cleaned = $this->cleanIdentifier($identifier);
-        if (!empty($cleaned['email'])) {
-            $query = $cleaned['email'];
-            $searchBy = 'email';
-        } elseif (!empty($cleaned['twitter'])) {
-            $query = $cleaned['twitter'];
-            $searchBy = 'twitter';
+
+        if (!is_array($cleaned)) {
+            $cleaned = array($cleaned);
         }
+
         $keys  = $this->settings->getApiKeys();
 
-        if (!empty($query) && !empty($keys['access_token'])) {
-            $url  = $this->getApiUrl("users/search") . "&{$searchBy}={$query}";
-            $data = $this->makeCall($url);
-            if (!empty($data) && isset($data->response->results) && count($data->response->results)) {
-                $socialCache['id'] = $data->response->results[0]->id;
-
-                return $socialCache['id'];
+        if (!empty($keys['access_token'])) {
+            foreach ($cleaned as $type => $c) {
+                $url  = $this->getApiUrl("users/search") . "&{$type}={$c}";
+                $data = $this->makeCall($url);
+                if (!empty($data) && isset($data->response->results) && count($data->response->results)) {
+                    $socialCache['id'] = $data->response->results[0]->id;
+                    return $socialCache['id'];
+                }
             }
         }
 

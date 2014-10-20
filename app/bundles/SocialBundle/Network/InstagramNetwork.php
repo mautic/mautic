@@ -111,9 +111,8 @@ class InstagramNetwork extends AbstractNetwork
     public function getUserData($identifier, &$socialCache)
     {
         if ($id = $this->getUserId($identifier, $socialCache)) {
-            $url  = $this->getApiUrl('users/'.$id) . "&q=$identifier";
+            $url  = $this->getApiUrl('users/'.$id);
             $data = $this->makeCall($url);
-
             if (isset($data->data)) {
                 $info = $this->matchUpData($data->data);
 

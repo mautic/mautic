@@ -390,20 +390,20 @@ class GooglePlusNetwork extends AbstractNetwork
         }
 
         $cleaned = $this->cleanIdentifier($identifier);
-        if (!empty($cleaned['googleplus'])) {
-            $query = $cleaned['googleplus'];
 
-            if (is_numeric($query)) {
-                //this is a google user ID
-                $socialCache['id'] = $query;
-                return $query;
-            }
-        } elseif (!empty($cleaned['email'])) {
-            $query = $cleaned['email'];
+        if (!is_array($cleaned)) {
+            $cleaned = array($cleaned);
         }
 
-        if (!empty($query)) {
-            $url  = $this->getApiUrl('people') . "&query={$query}";
+        foreach ($cleaned as $type => $id) {
+            if ($type == 'googleplus' && is_numeric($id)) {
+                //this is a google user ID
+                $socialCache['id'] = $id;
+
+                return $id;
+            }
+
+            $url  = $this->getApiUrl('people') . "&query={$id}";
             $data = $this->makeCall($url);
 
             if (!empty($data) && isset($data->items) && count($data->items)) {
