@@ -95,7 +95,7 @@ class AjaxController extends CommonAjaxController
             $model = $this->factory->getModel('lead.lead');
             $lead  = $model->getEntity($leadId);
 
-            if ($lead !== null) {
+            if ($lead !== null && $this->factory->getSecurity()->hasEntityAccess('lead:leads:editown', 'lead:leads:editown', $lead->getOwner())) {
                 $fields            = $lead->getFields();
                 $socialProfiles    = NetworkIntegrationHelper::getUserProfiles($this->factory, $lead, $fields, true, $network);
                 $socialProfileUrls = NetworkIntegrationHelper::getSocialProfileUrlRegex(false);
@@ -111,6 +111,35 @@ class AjaxController extends CommonAjaxController
 
                 $dataArray['success']  = 1;
                 $dataArray['profiles'] = $networks;
+            }
+        }
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * Clears the cache for a network
+     *
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    protected function clearSocialProfileAction (Request $request)
+    {
+        $dataArray = array('success' => 0);
+        $network   = InputHelper::clean($request->request->get('network'));
+        $leadId    = InputHelper::clean($request->request->get('lead'));
+
+        if (!empty($leadId)) {
+            //find the lead
+            $model = $this->factory->getModel('lead.lead');
+            $lead  = $model->getEntity($leadId);
+
+            if ($lead !== null && $this->factory->getSecurity()->hasEntityAccess('lead:leads:editown', 'lead:leads:editown', $lead->getOwner())) {
+                $socialCache = NetworkIntegrationHelper::clearNetworkCache($this->factory, $lead, $network);
+
+                $dataArray['success']  = 1;
+                $dataArray['socialCount'] = count($socialCache);
             }
         }
 
@@ -159,7 +188,7 @@ class AjaxController extends CommonAjaxController
                 $dispatcher = $this->factory->getDispatcher();
                 $event = new LeadTimelineEvent($lead, $eventFilter);
                 $dispatcher->dispatch(LeadEvents::TIMELINE_ON_GENERATE, $event);
-                
+
                 $events = $event->getEvents();
                 $eventTypes = $event->getEventTypes();
 

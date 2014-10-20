@@ -212,7 +212,7 @@ $view['slots']->stop();
             <ul class="nav nav-tabs pr-md pl-md">
                 <li class="active"><a href="#history-container" role="tab" data-toggle="tab"><span class="label label-primary mr-sm" id="HistoryCount"><?php echo count($events); ?></span> <?php echo $view['translator']->trans('mautic.lead.lead.tab.history'); ?></a></li>
                 <li class=""><a href="#notes-container" role="tab" data-toggle="tab"><span class="label label-primary mr-sm" id="NoteCount"><?php echo $noteCount; ?></span> <?php echo $view['translator']->trans('mautic.lead.lead.tab.notes'); ?></a></li>
-                <li class=""><a href="#social-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.lead.lead.tab.social'); ?></a></li>
+                <li class=""><a href="#social-container" role="tab" data-toggle="tab"><span class="label label-primary mr-sm" id="SocialCount"><?php echo count($socialProfiles); ?></span> <?php echo $view['translator']->trans('mautic.lead.lead.tab.social'); ?></a></li>
             </ul>
             <!--/ tabs controls -->
         </div>

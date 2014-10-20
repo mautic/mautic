@@ -75,7 +75,12 @@ class GooglePlusNetwork extends AbstractNetwork
             $url                = $this->getApiUrl("people/{$userid}");
             $data               = $this->makeCall($url);
             $info               = $this->matchUpData($data);
-            $info['profileHandle'] = $data->url;
+
+            if (isset($data->url)) {
+                preg_match("/plus.google.com\/(.*?)($|\/)/", $data->url, $matches);
+                $info['profileHandle'] = $matches[1];
+            }
+
             if (isset($data->image->url)) {
                 //remove the size from the end
                 $image = $data->image->url;
@@ -83,12 +88,6 @@ class GooglePlusNetwork extends AbstractNetwork
                 $info["profileImage"] = $image;
             }
             $socialCache['profile'] = $info;
-        } elseif (empty($socialCache['profile'])) {
-            //populate empty data
-            $empty = new \stdClass();
-            $socialCache['profile'] = $this->matchUpData($empty);
-            $socialCache['profile']['profileHandle'] = "";
-            $socialCache['profile']['profileImage']  = $this->factory->getAssetsHelper()->getUrl('assets/images/avatar.png');
         }
     }
 
@@ -104,7 +103,9 @@ class GooglePlusNetwork extends AbstractNetwork
         if ($id = $this->getUserId($identifier, $socialCache)) {
             $url  = $this->getApiUrl("people/$id/activities/public") . "&maxResults=10";
             $data = $this->makeCall($url);
+
             if (!empty($data) && isset($data->items) && count($data->items)) {
+                $socialCache['has']['activity'] = true;
                 $socialCache['activity'] = array(
                     'posts'  => array(),
                     'photos' => array(),
@@ -141,10 +142,13 @@ class GooglePlusNetwork extends AbstractNetwork
                         foreach ($page->object->attachments as $a) {
                             //use proxy image so that its SSL
                             if (isset($a->image)) {
+                                $url = $a->image->url;
+
                                 //remove size limits
-                                $url = (isset($a->image->width)) ?
-                                    str_replace('=w' . $a->image->width . '-h' . $a->image->height, '', $a->image->url) :
-                                    $a->image->url;
+                                if (isset($a->image->width)) {
+                                    $pos = strpos($url, '=w');
+                                    $url = substr($url, 0, $pos);
+                                }
 
                                 $photo = array(
                                     'url'  => $url
@@ -160,8 +164,9 @@ class GooglePlusNetwork extends AbstractNetwork
         if (empty($socialCache['activity'])) {
             //ensure keys are present
             $socialCache['activity'] = array(
-                'posts' => array(),
-                'photos' => array()
+                'posts'  => array(),
+                'photos' => array(),
+                'tags'   => array()
             );
         }
     }
@@ -190,8 +195,8 @@ class GooglePlusNetwork extends AbstractNetwork
                         break;
                     case 'object':
                         foreach ($fieldDetails['fields'] as $f) {
+                            $name = (stripos($f, $field) === false) ? $f . ucfirst($field) : $f;
                             if (isset($values->$f)) {
-                                $name        = $f . ucfirst($field);
                                 $info[$name] = $values->$f;
                             }
                         }
@@ -298,10 +303,10 @@ class GooglePlusNetwork extends AbstractNetwork
                     "other"
                 )
             ),
+            "displayName"        => array("type" => "string"),
             "name"               => array(
                 "type"   => "object",
                 "fields" => array(
-                    "formatted",
                     "familyName",
                     "givenName",
                     "middleName",
@@ -387,9 +392,16 @@ class GooglePlusNetwork extends AbstractNetwork
         $cleaned = $this->cleanIdentifier($identifier);
         if (!empty($cleaned['googleplus'])) {
             $query = $cleaned['googleplus'];
+
+            if (is_numeric($query)) {
+                //this is a google user ID
+                $socialCache['id'] = $query;
+                return $query;
+            }
         } elseif (!empty($cleaned['email'])) {
             $query = $cleaned['email'];
         }
+
         if (!empty($query)) {
             $url  = $this->getApiUrl('people') . "&query={$query}";
             $data = $this->makeCall($url);

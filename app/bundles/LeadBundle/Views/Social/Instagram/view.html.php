@@ -10,6 +10,6 @@
 
 <div class="panel-body">
     <?php echo $view->render('MauticLeadBundle:Social/Instagram:photos.html.php', array(
-        'photos'   => $details['activity']['photos']
+        'activity'   => $details['activity']['photos']
     )); ?>
 </div>

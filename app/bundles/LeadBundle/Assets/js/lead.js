@@ -62,8 +62,6 @@ Mautic.leadOnLoad = function (container) {
         Mautic.updateLeadFieldProperties(mQuery('#leadfield_type').val());
     }
 
-    Mautic.loadRemoteContentToModal('note-modal');
-
     if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'lead.lead');
     }
@@ -461,11 +459,35 @@ Mautic.refreshLeadSocialProfile = function(network, leadId, event) {
                     }
                 });
             }
-            Mautic.stopIconSpinPostEvent(event);
+            Mautic.stopIconSpinPostEvent();
         },
         error: function (request, textStatus, errorThrown) {
             Mautic.processAjaxError(request, textStatus, errorThrown);
-            Mautic.stopIconSpinPostEvent(event);
+            Mautic.stopIconSpinPostEvent();
+        }
+    });
+};
+
+Mautic.clearLeadSocialProfile = function(network, leadId, event) {
+    Mautic.startIconSpinOnEvent(event);
+    var query = "action=lead:clearSocialProfile&network=" + network + "&lead=" + leadId;
+    mQuery.ajax({
+        url: mauticAjaxUrl,
+        type: "POST",
+        data: query,
+        dataType: "json",
+        success: function (response) {
+            if (response.success) {
+                //activate the click to remove the panel
+                mQuery('.' + network + '-panelremove').click();
+                mQuery('#SocialCount').html(response.socialCount);
+            }
+
+            Mautic.stopIconSpinPostEvent();
+        },
+        error: function (request, textStatus, errorThrown) {
+            Mautic.processAjaxError(request, textStatus, errorThrown);
+            Mautic.stopIconSpinPostEvent();
         }
     });
 };
@@ -492,56 +514,6 @@ Mautic.refreshLeadTimeline = function(leadId, event) {
             Mautic.stopIconSpinPostEvent(event);
         }
     });
-};
-
-Mautic.loadRemoteContentToModal = function(elementId) {
-    mQuery('#'+elementId).on('loaded.bs.modal', function (e) {
-        // take HTML content from JSON and place it back
-        var remoteContent = mQuery.parseJSON(e.target.textContent).newContent;
-        mQuery(this).find('.modal-content').html(remoteContent);
-
-        var modalForm = mQuery(this).find('form');
-
-        // form submit
-        modalForm.ajaxForm({
-            beforeSubmit: function(formData) {
-                // disable buttons while sending data
-                modalForm.find('button').prop('disabled', true);
-
-                // show work in progress
-                Mautic.showModalAlert('<i class="fa fa-spinner fa-spin"></i> Saving...', 'info');
-
-                // cancel form if cancel button was hit
-                var submitForm = true;
-                mQuery.each(formData, function( index, value ) {
-                    if (value.type === 'submit' && value.name.indexOf('[buttons][cancel]') >= 0) {
-                        submitForm = false;
-                    }
-                });
-
-                if (submitForm) {
-                    return true;
-                } else {
-                    mQuery('#'+elementId).modal('hide');
-                }
-            },
-            success: function(response) {
-                modalForm.find('button').prop('disabled', false);
-                Mautic.showModalAlert('Saved successfully.', 'success');
-            },
-            error: function(response) {
-                modalForm.find('button').prop('disabled', false);
-                Mautic.showModalAlert(response.statusText, 'danger');
-            }
-        });
-    });
-};
-
-Mautic.showModalAlert = function(msg, type) {
-    mQuery('.alert-modal').hide('fast').remove();
-    mQuery('.bottom-form-buttons')
-        .before('<div class="alert alert-modal alert-'+type+'" role="alert">'+msg+'</div>')
-        .hide().show('fast');
 };
 
 Mautic.toggleLeadList = function(toggleId, leadId, listId) {
@@ -659,11 +631,7 @@ Mautic.leadNoteOnLoad = function (container, response) {
     if (response.upNoteCount || response.noteCount || response.downNoteCount) {
         if (response.upNoteCount || response.downNoteCount) {
             var count = parseInt(mQuery('#NoteCount').html());
-            if (response.upNoteCount) {
-                count = count + 1;
-            } else {
-                count = count - 1;
-            }
+            count = (response.upNoteCount) ? count + 1 : count - 1;
         } else {
             var count = parseInt(response.noteCount);
         }
@@ -713,4 +681,10 @@ Mautic.loadEngagementChart = function() {
             }
         });
     }
+};
+
+Mautic.showSocialMediaImageModal = function(imgSrc)
+{
+    mQuery('#socialImageModal img').attr('src', imgSrc);
+    mQuery('#socialImageModal').modal('show');
 };

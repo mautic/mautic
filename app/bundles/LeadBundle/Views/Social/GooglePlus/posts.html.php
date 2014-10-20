@@ -6,20 +6,12 @@
  * @link        http://mautic.com
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
-/*
 ?>
-<ul>
+<ul class="list-group">
     <?php foreach ($activity as $item): ?>
-        <li>
-
-            <a href="<?php echo $item['url']; ?>" target="_blank">
-                <?php echo $view['translator']->trans('mautic.lead.lead.socialactivity.title',array(
-                    '%title%' => $item['title'],
-                    '%date%'  => $view['date']->toFull($item['published'])
-                )); ?>
-            </a>
+        <li class="list-group-item">
+            <p><a href="<?php echo $item['url']; ?>" target="_new"><?php echo $item['title']; ?></a></p>
+            <span class="text-muted"><?php echo $view['date']->toFull($item['published']); ?></span>
         </li>
     <?php endforeach; ?>
 </ul>
-*/

@@ -418,4 +418,22 @@ abstract class AbstractNetwork
         }
         return $info;
     }
+
+    /**
+     * Checks to ensure an image still exists before caching
+     *
+     * @param $url
+     *
+     * @return bool
+     */
+    public function checkImageExists($url)
+    {
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_NOBODY, true);
+        curl_setopt($ch,CURLOPT_USERAGENT,'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13');
+        curl_exec($ch);
+        $retcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        return ($retcode == 200);
+    }
 }

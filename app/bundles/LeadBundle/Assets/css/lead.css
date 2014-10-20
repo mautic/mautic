@@ -93,3 +93,10 @@
     border-bottom-left-radius: 2px !important;
     border-top-left-radius: 2px !important;
 }
+
+ul.tag-cloud li {
+    list-style-type: none;
+    float:left;
+    margin: 0 10px;
+    height: 35px;
+}

@@ -158,14 +158,6 @@ class FacebookNetwork extends AbstractNetwork
             }
             $this->preventDoubleCall = false;
         }
-
-        if (empty($socialCache['profile'])) {
-            //populate empty data
-            $empty = new \stdClass();
-            $socialCache['profile'] = $this->matchUpData($empty);
-            $socialCache['profile']['profileHandle'] = "";
-            $socialCache['profile']['profileImage']  = $this->factory->getAssetsHelper()->getUrl('assets/images/avatar.png');
-        }
     }
 
     /**

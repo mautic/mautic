@@ -258,13 +258,6 @@ class TwitterNetwork extends AbstractNetwork
             }
             $this->preventDoubleCall = false;
         }
-
-        if (empty($socialCache['profile'])) {
-            //populate empty data
-            $socialCache['profile'] = $this->matchUpData(array());
-            $socialCache['profile']['profileHandle'] = "";
-            $socialCache['profile']['profileImage']  = $this->factory->getAssetsHelper()->getUrl('assets/images/avatar.png');
-        }
     }
 
     /**
@@ -282,6 +275,7 @@ class TwitterNetwork extends AbstractNetwork
             $data = $this->makeCall($url);
 
             if (!empty($data) && count($data)) {
+                $socialCache['has']['activity'] = true;
                 $socialCache['activity'] = array(
                     'tweets' => array(),
                     'photos' => array(),

@@ -122,14 +122,6 @@ class FoursquareNetwork extends AbstractNetwork
                 $socialCache['profile']['profileHandle'] = 'https://foursquare.com/user/' . $id;
             }
         }
-
-        if (empty($socialCache['profile'])) {
-            //populate empty data
-            $empty = new \stdClass();
-            $socialCache['profile'] = $this->matchUpData($empty);
-            $socialCache['profile']['profileHandle'] = "";
-            $socialCache['profile']['profileImage']  = $this->factory->getAssetsHelper()->getUrl('assets/images/avatar.png');
-        }
     }
 
     /**
@@ -256,15 +248,7 @@ class FoursquareNetwork extends AbstractNetwork
 
             if (!empty($activity)) {
                 $socialCache['activity'] = $activity;
-            }
-
-            if (empty($socialCache['activity'])) {
-                //ensure the keys are present
-                $socialCache['activity'] = array(
-                    'mayorships' => array(),
-                    'tips'       => array(),
-                    'lists'      => array()
-                );
+                $socialCache['has']['activity'] = true;
             }
         }
     }
@@ -370,13 +354,6 @@ class FoursquareNetwork extends AbstractNetwork
 
                 return $socialCache['id'];
             }
-        }
-
-        if (empty($socialCache['profile'])) {
-            //populate empty data
-            $socialCache['profile'] = $this->matchUpData(array());
-            $socialCache['profile']['profileHandle'] = "";
-            $socialCache['profile']['profileImage']  = $this->factory->getAssetsHelper()->getUrl('assets/images/avatar.png');
         }
 
         return false;
