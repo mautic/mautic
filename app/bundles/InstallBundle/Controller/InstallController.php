@@ -27,6 +27,8 @@ class InstallController extends CommonController
     /**
      * Controller action for install steps
      *
+     * @param integer $index The step number to process
+     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function stepAction($index = 0)
@@ -36,6 +38,8 @@ class InstallController extends CommonController
 
         $action = $this->generateUrl('mautic_installer_step', array('index' => $index));
         $step   = $configurator->getStep($index);
+
+        /** @var \Symfony\Component\Form\Form $form */
         $form   = $this->container->get('form.factory')->create($step->getFormType(), $step, array('action' => $action));
         $tmpl   = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
@@ -43,9 +47,8 @@ class InstallController extends CommonController
         $majors = $configurator->getRequirements();
         $minors = $configurator->getOptionalSettings();
 
-        $request = $this->container->get('request');
-        if ('POST' === $request->getMethod()) {
-            $form->bind($request);
+        if ('POST' === $this->request->getMethod()) {
+            $form->submit($this->request);
             if ($form->isValid()) {
                 $configurator->mergeParameters($step->update($form->getData()));
 
@@ -63,182 +66,57 @@ class InstallController extends CommonController
                             'minors'  => $minors,
                             'appRoot' => $this->container->getParameter('kernel.root_dir'),
                         ),
-                        'returnUrl'       => $this->generateUrl('mautic_installer_step', array('index' => $index)),
-                        'contentTemplate' => $step->getTemplate(),
-                        'passthroughVars' => array(
+                        'returnUrl'         => $this->generateUrl('mautic_installer_step', array('index' => $index)),
+                        'contentTemplate'   => $step->getTemplate(),
+                        'passthroughVars'   => array(
                             'activeLink'    => '#mautic_installer_index',
                             'mauticContent' => 'installer'
                         ),
-                        'flashes'         => array(
+                        'flashes'           => array(
                             array(
                                 'type'    => 'error',
                                 'msg'     => 'mautic.installer.error.writing.configuration'
                             )
-                        )
+                        ),
+                        'forwardController' => false
                     ));
                 }
 
                 // Post-step processing
                 switch ($index) {
                     case 1:
-                        $this->clearCache();
-
-                        $entityManager = $this->factory->getEntityManager();
-                        $metadatas     = $entityManager->getMetadataFactory()->getAllMetadata();
-
-                        if (!empty($metadatas)) {
-                            try {
-                                $schemaTool = new SchemaTool($entityManager);
-                                $schemaTool->createSchema($metadatas);
-                            } catch (\Exception $exception) {
-                                $error = false;
-                                if (strpos($exception->getMessage(), $this->checkDatabaseNotExistsMessage($originalData->driver, $originalData->name)) !== false) {
-                                    // Try to manually create the database, first we null out the database name
-                                    $originalData   = $form->getData();
-                                    $editData       = clone $originalData;
-                                    $editData->name = null;
-                                    $configurator->mergeParameters($step->update($editData));
-                                    $configurator->write();
-                                    $this->clearCache();
-                                    try {
-                                        $this->factory->getEntityManager()->getConnection()->executeQuery('CREATE DATABASE ' . $data->name);
-
-                                        // Assuming we got here, we should be able to install correctly now
-                                        $configurator->mergeParameters($step->update($originalData));
-                                        $configurator->write();
-                                        $this->clearCache();
-                                        $schemaTool = new SchemaTool($entityManager);
-                                        $schemaTool->createSchema($metadatas);
-                                    } catch (\Exception $exception) {
-                                        // We did our best, we really did
-                                        $error = true;
-                                        $msg   = 'mautic.installer.error.creating.database';
-                                    }
-                                } else {
-                                    $error = true;
-                                    if (strpos($exception->getMessage(), 'Base table or view already exists') !== false) {
-                                        $msg = 'mautic.installer.error.database.exists';
-                                    } else {
-                                        $msg = 'mautic.installer.error.creating.database';
-                                    }
-                                }
-
-                                if ($error) {
-                                    return $this->postActionRedirect(array(
-                                        'viewParameters'    => array(
-                                            'form'    => $form->createView(),
-                                            'index'   => $index,
-                                            'count'   => $configurator->getStepCount(),
-                                            'version' => $this->factory->getVersion(),
-                                            'tmpl'    => $tmpl,
-                                            'majors'  => $majors,
-                                            'minors'  => $minors,
-                                            'appRoot' => $this->container->getParameter('kernel.root_dir'),
-                                        ),
-                                        'returnUrl'         => $this->generateUrl('mautic_installer_step', array('index' => $index)),
-                                        'contentTemplate'   => $step->getTemplate(),
-                                        'passthroughVars'   => array(
-                                            'activeLink'    => '#mautic_installer_index',
-                                            'mauticContent' => 'installer'
-                                        ),
-                                        'flashes'           => array(
-                                            array(
-                                                'type'    => 'error',
-                                                'msg'     => $msg,
-                                                'msgVars' => array('%exception%' => $exception->getMessage())
-                                            )
-                                        ),
-                                        'forwardController' => false
-                                    ));
-                                }
-                            }
-                        } else {
-                            return $this->postActionRedirect(array(
-                                'viewParameters'    => array(
-                                    'form'    => $form->createView(),
-                                    'index'   => $index,
-                                    'count'   => $configurator->getStepCount(),
-                                    'version' => $this->factory->getVersion(),
-                                    'tmpl'    => $tmpl,
-                                    'majors'  => $majors,
-                                    'minors'  => $minors,
-                                    'appRoot' => $this->container->getParameter('kernel.root_dir'),
-                                ),
-                                'returnUrl'         => $this->generateUrl('mautic_installer_step', array('index' => $index)),
-                                'contentTemplate'   => $step->getTemplate(),
-                                'passthroughVars'   => array(
-                                    'activeLink'    => '#mautic_installer_index',
-                                    'mauticContent' => 'installer'
-                                ),
-                                'flashes'           => array(
-                                    array(
-                                        'type' => 'error',
-                                        'msg'  => 'mautic.installer.error.no.metadata'
-                                    )
-                                ),
-                                'forwardController' => false
-                            ));
-                        }
+                        $result = $this->performDatabaseInstallation($form);
 
                         break;
 
                     case 2:
-                        try {
-                            // First we need to create the admin role
-                            $translator    = $this->factory->getTranslator();
-                            $entityManager = $this->factory->getEntityManager();
-                            $role = new Role();
-                            $role->setName($translator->trans('mautic.user.role.admin.name', array(), 'fixtures'));
-                            $role->setDescription($translator->trans('mautic.user.role.admin.description', array(), 'fixtures'));
-                            $role->setIsAdmin(1);
-                            $entityManager->persist($role);
-                            $entityManager->flush();
-
-                            // Now we create the user
-                            $data = $form->getData();
-                            $user = new User();
-
-                            /** @var \Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface $encoder */
-                            $encoder = $this->container->get('security.encoder_factory')->getEncoder($user);
-
-                            $user->setFirstName($data->firstname);
-                            $user->setLastName($data->lastname);
-                            $user->setUsername($data->username);
-                            $user->setEmail($data->email);
-                            $user->setPassword($encoder->encodePassword($data->password, $user->getSalt()));
-                            $user->setRole($role);
-                            $entityManager->persist($user);
-                            $entityManager->flush();
-                        } catch (\Exception $exception) {
-                            return $this->postActionRedirect(array(
-                                'viewParameters'    => array(
-                                    'form'    => $form->createView(),
-                                    'index'   => $index,
-                                    'count'   => $configurator->getStepCount(),
-                                    'version' => $this->factory->getVersion(),
-                                    'tmpl'    => $tmpl,
-                                    'majors'  => $majors,
-                                    'minors'  => $minors,
-                                    'appRoot' => $this->container->getParameter('kernel.root_dir'),
-                                ),
-                                'returnUrl'         => $this->generateUrl('mautic_installer_step', array('index' => $index)),
-                                'contentTemplate'   => $step->getTemplate(),
-                                'passthroughVars'   => array(
-                                    'activeLink'    => '#mautic_installer_index',
-                                    'mauticContent' => 'installer'
-                                ),
-                                'flashes'           => array(
-                                    array(
-                                        'type'    => 'error',
-                                        'msg'     => 'mautic.installer.error.creating.user',
-                                        'msgVars' => array('%exception%' => $exception->getMessage())
-                                    )
-                                ),
-                                'forwardController' => false
-                            ));
-                        }
+                        $result = $this->performUserAddition($form);
 
                         break;
+                }
+
+                // On a failure, the result will be an array; for success it will be a boolean
+                if (is_array($result)) {
+                    return $this->postActionRedirect(array(
+                        'viewParameters'    => array(
+                            'form'    => $form->createView(),
+                            'index'   => $index,
+                            'count'   => $configurator->getStepCount(),
+                            'version' => $this->factory->getVersion(),
+                            'tmpl'    => $tmpl,
+                            'majors'  => $majors,
+                            'minors'  => $minors,
+                            'appRoot' => $this->container->getParameter('kernel.root_dir'),
+                        ),
+                        'returnUrl'         => $this->generateUrl('mautic_installer_step', array('index' => $index)),
+                        'contentTemplate'   => $step->getTemplate(),
+                        'passthroughVars'   => array(
+                            'activeLink'    => '#mautic_installer_index',
+                            'mauticContent' => 'installer'
+                        ),
+                        'flashes'           => $result,
+                        'forwardController' => false
+                    ));
                 }
 
                 $index++;
@@ -384,5 +262,128 @@ class InstallController extends CommonController
         }
 
         return '';
+    }
+
+    /**
+     * Performs the database installation
+     *
+     * @param \Symfony\Component\Form\Form                         $form
+     * @param \Mautic\InstallBundle\Configurator\Configurator      $configurator
+     * @param \Mautic\InstallBundle\Configurator\Step\DoctrineStep $step
+     *
+     * @return array|boolean Array containing the flash message data on a failure, boolean true on success
+     */
+    private function performDatabaseInstallation($form, $configurator, $step)
+    {
+        $this->clearCache();
+
+        $entityManager = $this->factory->getEntityManager();
+        $metadatas     = $entityManager->getMetadataFactory()->getAllMetadata();
+
+        if (!empty($metadatas)) {
+            try {
+                $schemaTool = new SchemaTool($entityManager);
+                $schemaTool->createSchema($metadatas);
+            } catch (\Exception $exception) {
+                $error = false;
+                if (strpos($exception->getMessage(), $this->checkDatabaseNotExistsMessage($originalData->driver, $originalData->name)) !== false) {
+                    // Try to manually create the database, first we null out the database name
+                    $originalData   = $form->getData();
+                    $editData       = clone $originalData;
+                    $editData->name = null;
+                    $configurator->mergeParameters($step->update($editData));
+                    $configurator->write();
+                    $this->clearCache();
+                    try {
+                        $this->factory->getEntityManager()->getConnection()->executeQuery('CREATE DATABASE ' . $data->name);
+
+                        // Assuming we got here, we should be able to install correctly now
+                        $configurator->mergeParameters($step->update($originalData));
+                        $configurator->write();
+                        $this->clearCache();
+                        $schemaTool = new SchemaTool($entityManager);
+                        $schemaTool->createSchema($metadatas);
+                    } catch (\Exception $exception) {
+                        // We did our best, we really did
+                        $error = true;
+                        $msg   = 'mautic.installer.error.creating.database';
+                    }
+                } else {
+                    $error = true;
+                    if (strpos($exception->getMessage(), 'Base table or view already exists') !== false) {
+                        $msg = 'mautic.installer.error.database.exists';
+                    } else {
+                        $msg = 'mautic.installer.error.creating.database';
+                    }
+                }
+
+                if ($error) {
+                    return array(
+                        array(
+                            'type'    => 'error',
+                            'msg'     => $msg,
+                            'msgVars' => array('%exception%' => $exception->getMessage())
+                        )
+                    );
+                }
+            }
+        } else {
+            return array(
+                array(
+                    'type' => 'error',
+                    'msg'  => 'mautic.installer.error.no.metadata'
+                )
+            );
+        }
+
+        return true;
+    }
+
+    /**
+     * Creates the admin user
+     *
+     * @param \Symfony\Component\Form\Form $form
+     *
+     * @return array|boolean Array containing the flash message data on a failure, boolean true on success
+     */
+    private function performUserAddition($form)
+    {
+        try {
+            // First we need to create the admin role
+            $translator    = $this->factory->getTranslator();
+            $entityManager = $this->factory->getEntityManager();
+            $role = new Role();
+            $role->setName($translator->trans('mautic.user.role.admin.name', array(), 'fixtures'));
+            $role->setDescription($translator->trans('mautic.user.role.admin.description', array(), 'fixtures'));
+            $role->setIsAdmin(1);
+            $entityManager->persist($role);
+            $entityManager->flush();
+
+            // Now we create the user
+            $data = $form->getData();
+            $user = new User();
+
+            /** @var \Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface $encoder */
+            $encoder = $this->container->get('security.encoder_factory')->getEncoder($user);
+
+            $user->setFirstName($data->firstname);
+            $user->setLastName($data->lastname);
+            $user->setUsername($data->username);
+            $user->setEmail($data->email);
+            $user->setPassword($encoder->encodePassword($data->password, $user->getSalt()));
+            $user->setRole($role);
+            $entityManager->persist($user);
+            $entityManager->flush();
+        } catch (\Exception $exception) {
+            return array(
+                array(
+                    'type'    => 'error',
+                    'msg'     => 'mautic.installer.error.creating.user',
+                    'msgVars' => array('%exception%' => $exception->getMessage())
+                )
+            );
+        }
+
+        return true;
     }
 }
