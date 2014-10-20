@@ -103,7 +103,7 @@ $view['slots']->stop();
                             </span>
                             <div class="media-body">
                                 <h4 class="fw-sb text-primary"><?php echo $lead->getPrimaryIdentifier(); ?></h4>
-                                    <p class="text-white dark-lg mb-0"><?php echo $lead->getLocation(); ?></p>
+                                    <p class="text-white dark-lg mb-0"><?php echo $fields['core']['position']['value'] == '' ?:  $fields['core']['position']['value'] . ', '; ?> <?php echo $lead->getSecondaryIdentifier(); ?></p>
                             </div>
                         </div>
                     </div>
@@ -136,7 +136,7 @@ $view['slots']->stop();
                 </ul>
 
                 <!-- start: tab-content -->
-                <div class="tab-content pa-md">
+                <div class="tab-content pa-md bg-white">
                     <?php $i = 0; ?>
                     <?php foreach ($groups as $group): ?>
                         <div class="tab-pane fade <?php echo $i == 0 ? 'in active' : ''; ?> bdr-w-0" id="<?php echo $group; ?>">
