@@ -9,7 +9,7 @@
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'campaign');
-$view['slots']->set("headerTitle", $view['translator']->trans('mautic.campaign.header.index'));
+$view['slots']->set("headerTitle", $view['translator']->trans('mautic.campaigns.header.index'));
 $view['slots']->set('searchUri', $view['router']->generate('mautic_campaign_index', array('page' => $page)));
 $view['slots']->set('searchString', $app->getSession()->get('mautic.campaign.filter'));
 $view['slots']->set('searchHelp', $view['translator']->trans('mautic.core.help.searchcommands'));
