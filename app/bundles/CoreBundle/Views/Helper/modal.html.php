@@ -12,7 +12,7 @@ $class           = (!empty($class)) ? " $class" : "";
 $body            = (empty($body)) ? "" : $body;
 $footer          = (empty($footer)) ? "" : $footer;
 $hidePlaceholder = (empty($body)) ? '' : ' hide';
-$header          = (empty($header)) ? "" : $header;
+$header          = (!isset($header)) ? "" : $header;
 $padding         = (empty($padding)) ? "" : $padding;
 ?>
 
