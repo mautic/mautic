@@ -8,25 +8,18 @@ CKEDITOR.editorConfig = function( config ) {
 	// config.language = 'fr';
 	// config.uiColor = '#AADC6E';
 
+	config.skin = 'bootstrapck';
     config.removePlugins = 'floating-tools, symbol, language';
     config.enterMode = CKEDITOR.ENTER_DIV;
     config.filebrowserImageBrowseUrl = mauticBasePath + '/assets/js/ckeditor/filemanager/index.html?type=Images';
     config.filebrowserImageUploadUrl = mauticBasePath + '/assets/js/ckeditor/filemanager/connectors/php/filemanager.php?command=QuickUpload&type;=Images';
 
-    config.toolbar = 'MauticToolbar';
- 
-	config.toolbar_MauticToolbar =
+	config.toolbar =
 	[
-		{ name: 'document', items : [ 'NewPage','Preview' ] },
-		{ name: 'clipboard', items : [ 'Cut','Copy','Paste','PasteText','PasteFromWord','-','Undo','Redo' ] },
-		{ name: 'editing', items : [ 'Find','Replace','-','SelectAll','-','Scayt' ] },
-		{ name: 'insert', items : [ 'Image','Flash','Table','HorizontalRule','Smiley','SpecialChar','PageBreak'
-                 ,'Iframe' ] },
-                '/',
-		{ name: 'styles', items : [ 'Styles','Format' ] },
-		{ name: 'basicstyles', items : [ 'Bold','Italic','Strike','-','RemoveFormat' ] },
-		{ name: 'paragraph', items : [ 'NumberedList','BulletedList','-','Outdent','Indent','-','Blockquote' ] }
-		
+		{ name: 'basicstyles', items : [ 'Bold','Italic' ] },
+		{ name: 'paragraph', items : [ 'NumberedList','BulletedList' ] },
+		{ name: 'clipboard', items : [ 'Cut', 'Copy', 'Paste','PasteText','PasteFromWord','-','Undo','Redo' ] },
+		{ name: 'insert', items : [ 'Image','Table' ] }
 	];
 
 };

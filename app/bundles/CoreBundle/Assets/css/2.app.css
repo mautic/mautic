@@ -1302,6 +1302,14 @@ blockquote > p:after {
 .alert-tertiary {
   background: #a3e2e4;
 }
+.content-body .cke_chrome {
+  background: #ebedf0;
+  border: 1px solid #d5d5d5;
+}
+.content-body .cke_bottom,
+.content-body .cke_top {
+  background: #ebedf0;
+}
 a.media {
   display: block;
 }
