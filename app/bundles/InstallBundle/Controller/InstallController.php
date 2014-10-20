@@ -403,7 +403,7 @@ class InstallController extends CommonController
         try {
             // First we need to setup the environment
             $entityManager = $this->factory->getEntityManager();
-            $paths         = array(dirname(__DIR__) . '/DataFixtures/ORM');
+            $paths         = array(dirname(__DIR__) . '/InstallFixtures/ORM');
             $loader        = new ContainerAwareLoader($this->container);
 
             foreach ($paths as $path) {
