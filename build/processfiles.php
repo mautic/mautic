@@ -35,6 +35,11 @@ system('rm app/config/local.php*');
 system('rm -rf app/cache');
 system('rm -rf app/logs');
 
+// babdev/transifex
+system('rm vendor/babdev/transifex/.scrutinizer.yml');
+system('rm vendor/babdev/transifex/composer.json');
+system('rm vendor/babdev/transifex/README.markdown');
+
 // doctrine/annotations
 system('rm -rf vendor/doctrine/annotations/tests');
 system('rm vendor/doctrine/annotations/.gitignore');
@@ -223,6 +228,20 @@ system('rm vendor/jms/serializer-bundle/JMS/SerializerBundle/composer.json');
 system('rm vendor/jms/serializer-bundle/JMS/SerializerBundle/phpunit.xml.dist');
 system('rm vendor/jms/serializer-bundle/JMS/SerializerBundle/README.md');
 system('rm vendor/jms/serializer-bundle/JMS/SerializerBundle/UPGRADING.md');
+
+// joomla/http
+system('rm -rf vendor/joomla/http/Tests');
+system('rm vendor/joomla/http/composer.json');
+system('rm vendor/joomla/http/phpunit.travis.xml');
+system('rm vendor/joomla/http/phpunit.xml.dist');
+system('rm vendor/joomla/http/README.md');
+
+// joomla/uri
+system('rm -rf vendor/joomla/uri/Tests');
+system('rm vendor/joomla/uri/composer.json');
+system('rm vendor/joomla/uri/phpunit.travis.xml');
+system('rm vendor/joomla/uri/phpunit.xml.dist');
+system('rm vendor/joomla/uri/README.md');
 
 // knplabs/knp-menu
 system('rm -rf vendor/knplabs/knp-menu/doc');

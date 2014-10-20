@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "4bfe57cba01328c8eef78f9cf6d7daad",
+    "hash": "fb7fbc43b496e48997931783e6584279",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -2462,16 +2462,16 @@
     "packages-dev": [
         {
             "name": "babdev/transifex",
-            "version": "dev-master",
+            "version": "1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/BabDev/Transifex-API.git",
-                "reference": "a35d54bb3070561fccb9353670f678a607b47fe3"
+                "reference": "1154c370e9fb512274c26bf3c02257fb75dbdc27"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/BabDev/Transifex-API/zipball/a35d54bb3070561fccb9353670f678a607b47fe3",
-                "reference": "a35d54bb3070561fccb9353670f678a607b47fe3",
+                "url": "https://api.github.com/repos/BabDev/Transifex-API/zipball/1154c370e9fb512274c26bf3c02257fb75dbdc27",
+                "reference": "1154c370e9fb512274c26bf3c02257fb75dbdc27",
                 "shasum": ""
             },
             "require": {
@@ -2486,7 +2486,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.0-dev"
+                    "dev-master": "1.x-dev"
                 }
             },
             "autoload": {
@@ -2510,7 +2510,7 @@
                 "php",
                 "transifex"
             ],
-            "time": "2014-10-20 21:24:32"
+            "time": "2014-10-20 22:45:28"
         },
         {
             "name": "joomla/http",
@@ -2839,8 +2839,7 @@
         "willdurand/oauth-server-bundle": 20,
         "jms/serializer-bundle": 20,
         "liip/functional-test-bundle": 20,
-        "nelmio/api-doc-bundle": 20,
-        "babdev/transifex": 20
+        "nelmio/api-doc-bundle": 20
     },
     "prefer-stable": false,
     "platform": {
