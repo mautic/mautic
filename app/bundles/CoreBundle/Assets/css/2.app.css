@@ -188,6 +188,7 @@ body > #app-wrapper {
 #app-header.navbar .navbar-nocollapse .navbar-nav .open .dropdown-menu {
   position: absolute;
   top: 100%;
+  margin-top: 5px;
   left: 15px;
   float: left;
   background-color: #ffffff;
@@ -270,6 +271,32 @@ body > #app-wrapper {
 }
 #app-header.navbar .navbar-nocollapse .navbar-right {
   float: right !important;
+}
+#app-header.navbar .navbar-nocollapse .navbar-right .open > a:after {
+  z-index: 1003;
+  bottom: -7px;
+  margin-left: -8px;
+  border-width: 0 8px 8px;
+  border-color: transparent transparent #fff;
+  position: absolute;
+  content: "";
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-style: solid;
+}
+#app-header.navbar .navbar-nocollapse .navbar-right .open > a:before {
+  z-index: 1002;
+  bottom: -6px;
+  margin-left: -9px;
+  border-width: 0 9px 9px;
+  border-color: transparent transparent rgba(0, 0, 0, 0.06);
+  position: absolute;
+  content: "";
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-style: solid;
 }
 #app-header.navbar .navbar-nocollapse .navbar-right .open .dropdown-menu {
   left: auto;

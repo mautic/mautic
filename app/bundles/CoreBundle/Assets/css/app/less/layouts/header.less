@@ -204,6 +204,7 @@
         .dropdown-menu {
           position: absolute;
           top: 100%;
+          margin-top: 5px;
           left: 15px;
           float: left;
           background-color: @dropdown-bg;
@@ -295,6 +296,34 @@
     }
     .navbar-right {
       float: right !important;
+
+      .open > a:after {
+        z-index: 1003;
+        bottom: -7px;
+        margin-left: -8px;
+        border-width: 0 8px 8px;
+        border-color: transparent transparent #fff;
+        position: absolute;
+        content: "";
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-style: solid;
+      }
+
+      .open > a:before {
+        z-index: 1002;
+        bottom: -6px;
+        margin-left: -9px;
+        border-width: 0 9px 9px;
+        border-color: transparent transparent @dropdown-border;
+        position: absolute;
+        content: "";
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-style: solid;
+      }
 
       // dropdown alignment
       .open .dropdown-menu {
