@@ -107,9 +107,9 @@ $view['slots']->stop();
                     <div class="col-xs-4 va-m text-right">
                         <?php
                         $color = $lead->getColor();
-                        $style = !empty($color) ? ' style="background-color: ' . $color . ' !important;"' : '';
+                        $style = !empty($color) ? ' style="font-color: ' . $color . ' !important;"' : '';
                         ?>
-                            <h1 class="fw-sb text-white dark-md<?php echo $style; ?>"><?php echo $lead->getPoints(); ?></h1>
+                            <h1 class="fw-sb text-white dark-md"<?php echo $style; ?>><?php echo $lead->getPoints(); ?></h1>
                     </div>
                 </div>
             </div>
