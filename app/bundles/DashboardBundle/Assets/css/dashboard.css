@@ -1,1 +1,6 @@
-#dashboard { font-size: 10px; }
+.jumbo-font {
+	font-size: 80px;
+}
+.panel .h150 {
+	height: 150px;
+}
