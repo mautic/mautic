@@ -14,7 +14,7 @@ $view->extend('MauticCoreBundle:Default:content.html.php');
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'lead');
 $view['slots']->set("headerTitle",
-    '<span class="span-block">' . $view['translator']->trans($lead->getPrimaryIdentifier()) . '</span><span class="span-block small">' .
+    '<span class="span-block">' . $view['translator']->trans($lead->getPrimaryIdentifier()) . '</span> <span class="span-block small">' .
     $lead->getSecondaryIdentifier() . '</span>');
 $hasEditAccess = $security->hasEntityAccess($permissions['lead:leads:editown'], $permissions['lead:leads:editother'], $lead->getOwner());
 

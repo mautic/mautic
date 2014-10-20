@@ -17,23 +17,28 @@ endif;
 ?>
 
 <form class="form-group" name="login" data-toggle="ajax" role="form" action="<?php echo $view['router']->generate('mautic_user_logincheck') ?>" method="post">
-    <div class="form-stack has-icon pull-left">
+    <div class="input-group mb-md">
+
+        <span class="input-group-addon"><i class="fa fa-user"></i></span>
         <label for="username" class="sr-only"><?php echo $view['translator']->trans('mautic.user.auth.form.loginusername'); ?></label>
         <input type="text" id="username" name="_username"
                class="form-control input-lg" value="<?php echo $last_username ?>" required autofocus
                placeholder='<?php echo $view['translator']->trans('mautic.user.auth.form.loginusername'); ?>' />
-        <i class="fa fa-user form-control-icon"></i>
     </div>
-    <div class="form-stack has-icon pull-left">
+    <div class="input-group mb-md">
+        <span class="input-group-addon"><i class="fa fa-key"></i></span>
         <label for="password" class="sr-only"><?php echo $view['translator']->trans('mautic.user.auth.form.loginpw'); ?>:</label>
         <input type="password" id="password" name="_password"
                class="form-control input-lg" required
                placeholder='<?php echo $view['translator']->trans('mautic.user.auth.form.loginpw'); ?>' />
-        <i class="fa fa-lock form-control-icon"></i>
     </div>
-    <div class="form-stack has-icon pull-left">
-        <input type="checkbox" id="remember_me" name="_remember_me" />
-        <label for="remember_me"><?php echo $view['translator']->trans('mautic.user.auth.form.rememberme'); ?></label>
+    
+    <div class="checkbox-inline custom-primary pull-left mb-md">
+        <label for="remember_me">
+            <input type="checkbox" id="remember_me" name="_remember_me" />
+            <span></span>
+            <?php echo $view['translator']->trans('mautic.user.auth.form.rememberme'); ?>
+        </label>
     </div>
 
     <input type="hidden" name="_csrf_token" value="<?php echo $view['form']->csrfToken('authenticate') ?>" />

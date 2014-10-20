@@ -37,14 +37,6 @@
 
     <!-- start: left nav -->
     <ul class="nav navbar-nav navbar-left">
-        <li class="hidden-xs" data-toggle="tooltip" data-placement="right" title="Minimize Sidebar">
-            <a href="javascript:void(0)" data-toggle="minimize" class="sidebar-minimizer"><span class="arrow fs-14"></span></a>
-        </li>
-    </ul>
-    <!--/ end: left nav -->
-
-    <!-- start: right nav -->
-    <ul class="nav navbar-nav navbar-right">
         <li class="dropdown dropdown-custom">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                 <?php if (!empty($newNotifications)): ?>
@@ -79,6 +71,15 @@
                 </div>
             </div>
         </li>
+
+        <li class="hidden-xs" data-toggle="tooltip" data-placement="right" title="Minimize Sidebar">
+            <a href="javascript:void(0)" data-toggle="minimize" class="sidebar-minimizer"><span class="arrow fs-14"></span></a>
+        </li>
+    </ul>
+    <!--/ end: left nav -->
+
+    <!-- start: right nav -->
+    <ul class="nav navbar-nav navbar-right">
         <?php echo $view->render("MauticCoreBundle:Menu:profile.html.php"); ?>
     </ul>
     <!--/ end: right nav -->

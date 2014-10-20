@@ -39,7 +39,7 @@ $activePanelClasses  = ($app->getSession()->get('left-panel', 'default') == 'unp
             <footer id="app-footer">
                 <div class="container-fluid">
                     <div class="row">
-                        <div class="col-xs-6">Copyright Mautic 2014</div>
+                        <div class="col-xs-6">Copyright 2014 Mautic. All Rights Reserved.</div>
                     </div>
                 </div>
             </footer>
