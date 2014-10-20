@@ -38,14 +38,18 @@ $view['assets']->addScriptDeclaration('
     			                
     			            <canvas class="flot-base" width="574" height="300" style="direction: ltr; position: absolute; left: 0px; top: 0px; width: 287px; height: 150px;"></canvas><canvas class="flot-overlay" width="574" height="300" style="direction: ltr; position: absolute; left: 0px; top: 0px; width: 287px; height: 150px;"></canvas><span class="pieLabel" id="pieLabel0" style="position: absolute; top: 60px; left: 126px;"><div style="font-size:x-small;text-align:center;padding:2px;color:#eee;">Overall<br>10%</div></span><span class="pieLabel" id="pieLabel1" style="position: absolute; top: 60px; left: 119px;"><div style="font-size:x-small;text-align:center;padding:2px;color:#35B4B9;">Click Rate<br>90%</div></span></div>
     			            <ul class="list-group">
-    			                <li class="list-group-item">Email Delivered <span class="badge pull-right">100</span></li>
-    			                <li class="list-group-item">Total Click <span class="badge pull-right">90</span></li>
+                                <li class="list-group-item">Email Delivered <span class="badge pull-right">100</span></li>
+                                <li class="list-group-item">Total Click <span class="badge pull-right">90</span></li>
     			            </ul>
     			        </div>
     			    </div>
     			    <div class="col-md-4">
     			        <div class="panel mb-0">
-    			           <div class="text-center pa-20 jumbo-font">44</div>
+    			           <div class="text-center pa-20 jumbo-font h150">44</div>
+                            <ul class="list-group">
+                                <li class="list-group-item">Most Visits this Week<span class="badge pull-right">100</span></li>
+                                <li class="list-group-item">Most Visits all Time <span class="badge pull-right">190</span></li>
+                            </ul>
     			        </div>
     			    </div>
     			</div>
