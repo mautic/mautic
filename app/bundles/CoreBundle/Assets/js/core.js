@@ -1218,16 +1218,6 @@ var Mautic = {
     },
 
     /**
-     * Adds active class to selected list item in left/right panel view
-     * @param prefix
-     * @param id
-     */
-    activateListItem: function(prefix,id) {
-        mQuery('.page-list-item').removeClass('active');
-        mQuery('#'+prefix+'-' + id).addClass('active');
-    },
-
-    /**
      * Apply filter
      * @param list
      */

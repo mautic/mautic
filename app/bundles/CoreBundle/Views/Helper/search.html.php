@@ -7,10 +7,8 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-$bundle        = strtolower($app->getRequest()->get('bundle'));
-$searchString  = $view['slots']->get('searchString', '');
-$searchClass   = (!empty($searchString) ? 'show-search' : 'hide-search');
-$target        = (empty($target)) ? '.page-list' : $target;
+$searchValue = (empty($searchValue)) ? '' : $searchValue;
+$target      = (empty($target)) ? '.page-list' : $target;
 ?>
 
 <div class="row">
@@ -28,18 +26,14 @@ $target        = (empty($target)) ? '.page-list' : $target;
                    id="list-search"
                    name="search"
                    placeholder="<?php echo $view['translator']->trans('mautic.core.form.search'); ?>"
-                   value="<?php echo $searchString; ?>"
+                   value="<?php echo $searchValue; ?>"
                    autocomplete="off"
                    data-toggle="livesearch"
                    data-target="<?php echo $target; ?>"
-                   data-action="<?php echo $app->getRequest()->getUri(); ?>"
-                   data-overlay-text="<?php echo $view['translator']->trans('mautic.core.search.livesearch'); ?>"
-                   data-overlay-target="#main-content"
+                   data-action="<?php echo $action; ?>"
                 />
 			<div class="input-group-btn">
-		        <button class="btn btn-default btn-search"
-		                id="btn-filter"
-		                data-livesearch-parent="list-search">
+		        <button class="btn btn-default btn-search" id="btn-filter" data-livesearch-parent="list-search">
 		            <i class="fa fa-search fa-fw"></i>
 		        </button>
 			</div>
