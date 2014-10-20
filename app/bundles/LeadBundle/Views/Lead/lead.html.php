@@ -202,7 +202,7 @@ $view['slots']->stop();
                                         <h3 class="text-white dark-sm"><span class="fa fa-eye"></span></h3>
                                 </div>
                             </div>
-                            <div class="chart-wrapper" style="padding: 0 15px 10px 15px">
+                            <div class="pt-0 pl-15 pb-10 pr-15">
                                 <div>
                                     <canvas class="chart" id="chart-engagement" height="50" data-item-id="<?php echo $lead->getId(); ?>"></canvas>
                                 </div>
