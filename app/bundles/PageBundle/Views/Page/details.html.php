@@ -182,7 +182,7 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                                     </tr>
                                     <tr>
                                         <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.core.category'); ?></span></td>
-                                        <td><?php echo $activePage->getCategory()->getTitle(); ?></td>
+                                        <td><?php echo is_object($activePage->getCategory()) ? $activePage->getCategory()->getTitle() : ''; ?></td>
                                     </tr>
                                     <tr>
                                         <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.page.page.publish.up'); ?></span></td>
