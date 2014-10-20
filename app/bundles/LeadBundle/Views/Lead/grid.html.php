@@ -51,7 +51,7 @@ if ($tmpl == 'index')
                             </span>
                                 </div>
                             </div>
-                            <div class="col-xs-8 va-m">
+                            <div class="col-xs-8 va-t">
                                 <div class="panel-body">
                                     <?php
                                     $color = $item->getColor();

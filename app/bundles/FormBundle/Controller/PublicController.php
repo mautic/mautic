@@ -142,7 +142,7 @@ class PublicController extends CommonFormController
         if ($form !== null) {
             $status = $form->getPublishStatus();
             if ($status == 'published') {
-                $js = $form->getCachedJs();
+                $js = $model->getAutomaticJavascript($form);
             }
         }
 

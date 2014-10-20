@@ -29,6 +29,7 @@
         </ul>
     </div>
 </div>
+
 <div class="panel-body tab-content">
     <div class="tab-pane active" id="FoursquareMayor">
         <?php echo $view->render('MauticLeadBundle:Social/Foursquare:mayor.html.php', array(
