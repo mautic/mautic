@@ -29,12 +29,16 @@ $groups = array_keys($fields);
                         <div class="media-body">
                             <h4><?php echo $header; ?></h4>
                             <div style="max-width:200px;" class="mt-md">
-                                <div class="progress progress-xs mb5">
-                                    <div class="progress-bar progress-bar-warning" style="width:70%"></div>
-                                </div>
                                 <p class="text-muted clearfix nm">
-                                    <span class="pull-left"><?php echo $view['translator']->trans('mautic.lead.lead.thead.points'); ?></span>
-                                    
+                                    <span class="pull-left">
+                                        <?php
+                                        $color = $lead->getColor();
+
+                                        $style = !empty($color) ? ' style="background-color: ' . $color . ';"' : '';
+                                        ?>
+                                        <span class="label label-default"<?php echo $style; ?>><?php echo $lead->getPoints(); ?></span>
+                                        <?php echo $view['translator']->trans('mautic.lead.lead.thead.points'); ?>
+                                    </span>
                                 </p>
                             </div>
                         </div>

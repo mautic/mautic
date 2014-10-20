@@ -106,6 +106,10 @@ class LeadModel extends FormModel
             return new Lead();
         }
 
+        //set the point trigger model in order to get the color code for the lead
+        $repo = $this->getRepository();
+        $repo->setTriggerModel($this->factory->getModel('point.trigger'));
+
         $entity = parent::getEntity($id);
 
         return $entity;
