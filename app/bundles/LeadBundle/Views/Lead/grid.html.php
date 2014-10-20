@@ -39,13 +39,18 @@ if ($tmpl == 'index')
     <div class="shuffle grid row scrollable page-list" id="shuffle-grid">
         <?php if (count($items)): ?>
             <?php foreach ($items as $item): ?>
-                <?php $fields = $item->getFields(); ?>
+                <?php 
+                    $fields = $item->getFields();
+                    $color = $item->getColor();
+                    $style = !empty($color) ? ' style="background-color: ' . $color . ' !important;"' : '';
+                ?>
                 <div class="shuffle shuffle-item grid col-sm-6 col-lg-4">
                     <div class="panel ovf-h">
                         <div class="box-layout">
                             <div class="col-xs-4 va-m">
                                 <div class="panel-body">
                             <span class="img-wrapper img-rounded" style="width:100%">
+                                <span class="label label-default ma-20"<?php echo $style; ?>><?php echo $item->getPoints(); ?></span>
                                 <img class="img img-responsive"
                                      src="<?php echo $view['gravatar']->getImage($fields['core']['email']['value'], '250'); ?>" />
                             </span>
@@ -53,16 +58,19 @@ if ($tmpl == 'index')
                             </div>
                             <div class="col-xs-8 va-t">
                                 <div class="panel-body">
-                                    <?php
-                                    $color = $item->getColor();
-                                    $style = !empty($color) ? ' style="background-color: ' . $color . ' !important;"' : '';
-                                    ?>
-                                    <span class="pull-right label label-default mnt-1"<?php echo $style; ?>><?php echo $item->getPoints(); ?></span>
+                                    <div class="pull-right">
+                                        <div class="checkbox-inline custom-primary">
+                                            <label class="mb-0 pl-10">
+                                                <input type="checkbox" value="1">
+                                                <span></span>
+                                            </label>
+                                        </div>
+                                    </div>
                                     <h4 class="fw-sb mb-xs">
                                         <a href="<?php echo $view['router']->generate('mautic_lead_action',
                                             array("objectAction" => "view", "objectId" => $item->getId())); ?>"
                                            data-toggle="ajax">
-                                            <span><?php echo $item->getPrimaryIdentifier(); ?></span>
+                                            <span><?php echo $item->getPrimaryIdentifier(); ?></span> 
                                         </a>
                                     </h4>
                                     <div class="text-muted mb-1">

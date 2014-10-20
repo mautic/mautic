@@ -14,8 +14,6 @@ $view['slots']->set('mauticContent', 'user');
 $view['slots']->set("headerTitle", $view['translator']->trans('mautic.user.account.header.index'));
 ?>
 
-<!-- reset container-fluid padding -->
-<div class="mna-md">
     <!-- start: box layout -->
     <div class="box-layout">
         <!-- left section -->
@@ -153,8 +151,6 @@ $view['slots']->set("headerTitle", $view['translator']->trans('mautic.user.accou
         <!--/ right section -->
     </div>
     <!--/ end: box layout -->
-</div>
-<!--/ reset container fluid padding -->
 
 <!--<div class="account-wrapper scrollable">
     <div class="row padding-md">

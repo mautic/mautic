@@ -35,7 +35,6 @@ if ($tmpl == 'index')
                             <label class="mb-0 pl-10">
                                 <input type="checkbox" id="customcheckbox-one0" value="1" data-toggle="checkall" data-target="#leadTable">
                                 <span></span>
-                                <?php // echo $view['translator']->trans('mautic.core.table.selectall'); ?>
                             </label>
                         </div>
                     </th>
