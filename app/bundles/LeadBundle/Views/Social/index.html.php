@@ -47,5 +47,5 @@ $view['slots']->append('modal', $view->render('MauticCoreBundle:Helper:modal.htm
     'id'      => 'socialImageModal',
     'body'    => '<img class="img-responsive img-thumbnail" />',
     'header'  => false,
-    'padding' => false
+    'paddingg' => 'pa-0'
 )));
