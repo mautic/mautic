@@ -71,9 +71,32 @@ $view['assets']->addScriptDeclaration('
                                 <div class="panel-heading">
                                 	<h3 class="panel-title">Most Popular Pages</h3>
                                 </div>
+                                <?php if ($popularPages) : ?>
                                 <div class="panel-body">
-
+                                    <table class="table table-striped">
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Lang</th>
+                                        <th>Hits</th>
+                                    </tr>
+                                    <?php foreach ($popularPages as $page) : ?>
+                                        <tr>
+                                            <td>
+                                                <a href="<?php echo $view['router']->generate('mautic_page_action', array('objectAction' => 'view', 'objectId' => $page['page_id'])); ?>" data-toggle="ajax">
+                                                    <?php echo $page['title']; ?>
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <?php echo $page['lang']; ?>
+                                            </td>
+                                            <td>
+                                                <?php echo $page['hits']; ?>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                    </table>
                                 </div>
+                                <?php endif; ?>
                             </div>
                         </div>
                         <div class="col-md-4">

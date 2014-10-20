@@ -48,6 +48,28 @@ class PageRepository extends CommonRepository
     }
 
     /**
+     * Get a list of popular (by hits) pages
+     *
+     * @param integer $limit
+     * @return array
+     */
+    public function getPopularPages($limit = 10)
+    {
+        $q  = $this->_em->getConnection()->createQueryBuilder();
+
+        $q->select('count(h.id) as hits, p.id AS page_id, p.title, p.lang')
+            ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h')
+            ->leftJoin('h', MAUTIC_TABLE_PREFIX.'pages', 'p', 'h.page_id = p.id')
+            ->orderBy('hits', 'DESC')
+            ->groupBy('p.id')
+            ->setMaxResults($limit);
+
+        $results = $q->execute()->fetchAll();
+
+        return $results;
+    }
+
+    /**
      * @param      $alias
      * @param null $entity
      * @return mixed

@@ -29,6 +29,38 @@ class DefaultController extends CommonController
      */
     public function indexAction()
     {
-        return $this->delegateView('MauticDashboardBundle:Default:index.html.php');
+    	$model = $this->factory->getModel('dashboard.dashboard');
+        
+
+        //set some permissions
+        $permissions = $this->factory->getSecurity()->isGranted(array(
+            'dashboard:dashboards:viewown',
+            'dashboard:dashboards:viewother',
+            'dashboard:dashboards:create',
+            'dashboard:dashboards:editown',
+            'dashboard:dashboards:editother',
+            'dashboard:dashboards:deleteown',
+            'dashboard:dashboards:deleteother',
+            'dashboard:dashboards:publishown',
+            'dashboard:dashboards:publishother'
+        ), "RETURN_ARRAY");
+
+        if (!$permissions['dashboard:dashboards:viewown'] && !$permissions['dashboard:dashboards:viewother']) {
+            return $this->accessDenied();
+        }
+
+        $popularPages = $this->factory->getModel('page.page')->getRepository()->getPopularPages();
+
+        return $this->delegateView(array(
+            'viewParameters'  =>  array(
+                'popularPages' => $popularPages,
+                'security'    => $this->factory->getSecurity()
+            ),
+            'contentTemplate' => 'MauticDashboardBundle:Default:index.html.php',
+            'passthroughVars' => array(
+                'activeLink'     => '#mautic_dashboard_index',
+                'mauticContent'  => 'dashboard'
+            )
+        ));
     }
 }
