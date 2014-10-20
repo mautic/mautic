@@ -18,7 +18,6 @@
 <?php $view['assets']->outputSystemScripts(); ?>
 <?php //load file ?>
 <script>
-    Mautic.onPageLoad();
     <?php if ($app->getEnvironment() === "dev"): ?>
     mQuery( document ).ajaxComplete(function(event, XMLHttpRequest, ajaxOption){
         if(XMLHttpRequest.responseJSON && typeof XMLHttpRequest.responseJSON.ignore_wdt == 'undefined' && XMLHttpRequest.getResponseHeader('x-debug-token')) {
@@ -38,3 +37,6 @@
 
 <?php $view['assets']->loadEditor(); ?>
 <?php $view['assets']->outputScripts("bodyClose"); ?>
+<script>
+    Mautic.onPageLoad();
+</script>
