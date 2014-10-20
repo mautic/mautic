@@ -52,7 +52,7 @@ class NoteType extends AbstractType
 
         $builder->add('text', 'textarea', array(
             'label'      => 'mautic.lead.note.form.text',
-            'label_attr' => array('class' => 'control-label'),
+            'label_attr' => array('class' => 'control-label sr-only'),
             'attr'       => array('class' => 'mousetrap form-control editor', 'rows' => 10, 'autofocus' => 'autofocus')
         ));
 

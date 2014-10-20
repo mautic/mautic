@@ -30,22 +30,6 @@
             'profile'   => $details['profile']
         )); ?>
     </div>
-    <?php /*
-    <div class="tab-pane" id="FoursquareMayor">
-        <?php echo $view->render('MauticLeadBundle:Social/Foursquare:mayor.html.php', array(
-            'lead'      => $lead,
-            'activity'   => $details['activity']['mayorships']
-        )); ?>
-    </div>
-
-    <div class="tab-pane" id="FoursquareLists">
-    <div class="tab-pane" id="FoursquareLists">
-        <?php echo $view->render('MauticLeadBundle:Social/Foursquare:lists.html.php', array(
-            'lead'      => $lead,
-            'activity'   => $details['activity']['lists']
-        )); ?>
-    </div>
-    */ ?>
     <div class="tab-pane" id="FoursquareTips">
         <?php echo $view->render('MauticLeadBundle:Social/Foursquare:tips.html.php', array(
             'lead'      => $lead,

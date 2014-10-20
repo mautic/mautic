@@ -100,7 +100,7 @@ $view['slots']->stop();
                             </span>
                             <div class="media-body">
                                 <h4 class="fw-sb text-primary"><?php echo $lead->getPrimaryIdentifier(); ?></h4>
-                                    <p class="text-white dark-lg mb-0"><?php echo $fields['core']['position']['value'] == '' ?:  $fields['core']['position']['value'] . ', '; ?> <?php echo $lead->getSecondaryIdentifier(); ?></p>
+                                    <p class="text-white dark-lg mb-0"><?php echo $fields['core']['position']['value'] == '' ? '' :  $fields['core']['position']['value'] . ', '; ?> <?php echo $lead->getSecondaryIdentifier(); ?></p>
                             </div>
                         </div>
                     </div>

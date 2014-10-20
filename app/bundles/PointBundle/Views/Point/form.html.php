@@ -25,7 +25,7 @@ echo $view['form']->start($form);
         <div class="pa-md">
 		    <?php		    
 			echo $view['form']->row($form['name']);
-			echo $view['form']->row($form['description']);
+			echo $view['form']->row($form['description'], array('attr' => array('class' => 'form-control editor')));
 			echo $view['form']->row($form['type']);
 
 		    if (isset($form['properties'])):
