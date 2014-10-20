@@ -11,9 +11,9 @@ $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'campaign');
 
 $header = ($entity->getId()) ?
-    $view['translator']->trans('mautic.campaign.header.edit',
+    $view['translator']->trans('mautic.campaign.menu.edit',
         array('%name%' => $view['translator']->trans($entity->getName()))) :
-    $view['translator']->trans('mautic.campaign.header.new');
+    $view['translator']->trans('mautic.campaign.menu.new');
 $view['slots']->set("headerTitle", $header);
 ?>
 
@@ -22,46 +22,29 @@ $view['slots']->set("headerTitle", $header);
 <?php echo $view['slots']->stop('actions'); ?>
 
 <?php echo $view['form']->start($form); ?>
-<div class="tab-content">
-    <div class="tab-pane active pa-md" id="details">
-
-        <?php
-        echo $view['form']->row($form['name']);
-        echo $view['form']->row($form['description']);
-        echo $view['form']->row($form['category_lookup']);
-        echo $view['form']->row($form['category']);
-        echo $view['form']->row($form['isPublished']);
-        echo $view['form']->row($form['publishUp']);
-        echo $view['form']->row($form['publishDown']);
-        ?>
-    </div>
-    <div class="tab-pane pa-md" id="events">
-        <div class="row">
-            <div class="col-md-8">
-                <?php if (!$hasEvents = count($campaignEvents)): ?>
-                <h3 id='campaign-event-placeholder'><?php echo $view['translator']->trans('mautic.campaign.form.addevent'); ?></h3>
-                <?php endif; ?>
-                <ol id="campaignEvents">
-                <?php
-                if ($hasEvents):
-                    echo $view->render('MauticCampaignBundle:CampaignBuilder:events.html.php', array(
-                        'events'        => $campaignEvents,
-                        'inForm'        => true,
-                        'deletedEvents' => $deletedEvents,
-                        'eventSettings' => $eventSettings
-                    ));
-                endif;
-                ?>
-                </ol>
-            </div>
-            <div class="col-md-4">
-                <?php echo $view->render('MauticCampaignBundle:CampaignBuilder:components.html.php', array(
-                    'eventSettings' => $eventSettings,
-                    'tmpl'          => $tmpl
-                )); ?>
-            </div>
+<!-- start: box layout -->
+<div class="box-layout">
+    <!-- container -->
+    <div class="col-md-9 bg-auto height-auto bdr-r">
+        <div class="pa-md">
+            <?php
+            echo $view['form']->row($form['name']);
+            echo $view['form']->row($form['description']);
+            ?>
         </div>
     </div>
+    <div class="col-md-3 bg-white height-auto">
+        <div class="pr-lg pl-lg pt-md pb-md">
+            <?php
+            echo $view['form']->row($form['category_lookup']);
+            echo $view['form']->row($form['category']);
+            echo $view['form']->row($form['isPublished']);
+            echo $view['form']->row($form['publishUp']);
+            echo $view['form']->row($form['publishDown']);
+            ?>
+        </div>
+    </div>
+</div>
 
     <?php echo $view['form']->end($form); ?>
     <?php

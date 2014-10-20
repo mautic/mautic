@@ -333,7 +333,7 @@ body > #app-wrapper {
 .app-sidebar.sidebar-left {
   width: 230px;
   left: -230px;
-  background-color: #27303a;
+  background-color: #1d232b;
   box-shadow: inset -1px 0 0 0 rgba(0, 0, 0, 0.05);
   color: rgba(255, 255, 255, 0.55);
 }
@@ -351,34 +351,34 @@ body > #app-wrapper {
   right: 0;
   left: 50px;
   bottom: 0;
-  border-bottom: 1px solid #2b353f;
+  border-bottom: 1px solid #202830;
 }
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li > a {
   color: rgba(255, 255, 255, 0.5);
 }
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li > a:hover,
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li > a:focus {
-  background-color: #27303a;
+  background-color: #1d232b;
   color: rgba(255, 255, 255, 0.75);
 }
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li.active > a,
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li.open > a {
-  background-color: #27303a;
+  background-color: #1d232b;
   color: rgba(255, 255, 255, 0.75);
 }
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li.active > .nav-submenu,
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li.open > .nav-submenu {
-  background-color: #242c35;
+  background-color: #171c22;
 }
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li > .nav-submenu {
-  background-color: #242c35;
+  background-color: #1a2026;
 }
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li > .nav-submenu:after {
-  background-color: #2b3540;
+  background-color: #212831;
 }
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li > .nav-submenu > li:after {
-  background-color: #2c3642;
-  box-shadow: 0 0 0 2px #242c35;
+  background-color: #222a32;
+  box-shadow: 0 0 0 2px #1a2026;
 }
 .app-sidebar.sidebar-left .nav-sidebar > .nav > li > .nav-submenu > li > a {
   color: rgba(255, 255, 255, 0.5);
@@ -399,19 +399,19 @@ body > #app-wrapper {
 }
 .app-sidebar.sidebar-left .nav.sidebar-left-dark,
 .app-sidebar.sidebar-left .nav.sidebar-left-dark > li > a:hover {
-  background: #212831;
+  background: #0c0f12;
 }
 .app-sidebar.sidebar-right {
   width: 230px;
   right: -230px;
-  background-color: #27303a;
+  background-color: #1d232b;
   box-shadow: inset 1px 0 0 0 rgba(0, 0, 0, 0.05);
   color: rgba(255, 255, 255, 0.55);
 }
 .app-sidebar.sidebar-right .sidebar-header,
 .app-sidebar.sidebar-right .sidebar-footer {
   width: 230px;
-  background-color: #2d3843;
+  background-color: #232b34;
 }
 .app-sidebar.sidebar-right .sidebar-content {
   padding-left: 1px;
@@ -422,34 +422,34 @@ body > #app-wrapper {
   right: 0;
   left: 50px;
   bottom: 0;
-  border-bottom: 1px solid #2b353f;
+  border-bottom: 1px solid #202830;
 }
 .app-sidebar.sidebar-right .nav-sidebar > .nav > li > a {
   color: rgba(255, 255, 255, 0.5);
 }
 .app-sidebar.sidebar-right .nav-sidebar > .nav > li > a:hover,
 .app-sidebar.sidebar-right .nav-sidebar > .nav > li > a:focus {
-  background-color: #27303a;
+  background-color: #1d232b;
   color: rgba(255, 255, 255, 0.75);
 }
 .app-sidebar.sidebar-right .nav-sidebar > .nav > li.active > a,
 .app-sidebar.sidebar-right .nav-sidebar > .nav > li.open > a {
-  background-color: #27303a;
+  background-color: #1d232b;
   color: rgba(255, 255, 255, 0.75);
 }
 .app-sidebar.sidebar-right .nav-sidebar > .nav > li.active > .nav-submenu,
 .app-sidebar.sidebar-right .nav-sidebar > .nav > li.open > .nav-submenu {
-  background-color: #242c35;
+  background-color: #171c22;
 }
 .app-sidebar.sidebar-right .nav-sidebar > .nav > li > .nav-submenu {
-  background-color: #242c35;
+  background-color: #1a2026;
 }
 .app-sidebar.sidebar-right .nav-sidebar > .nav > li > .nav-submenu:after {
-  background-color: #2b3540;
+  background-color: #212831;
 }
 .app-sidebar.sidebar-right .nav-sidebar > .nav > li > .nav-submenu > li:after {
-  background-color: #2c3642;
-  box-shadow: 0 0 0 2px #242c35;
+  background-color: #222a32;
+  box-shadow: 0 0 0 2px #1a2026;
 }
 .app-sidebar.sidebar-right .nav-sidebar > .nav > li > .nav-submenu > li > a {
   color: rgba(255, 255, 255, 0.5);
@@ -504,7 +504,7 @@ body > #app-wrapper {
   width: 100%;
 }
 .app-sidebar .sidebar-content .nav.nav-tabs {
-  border-bottom: 1px solid #252d37;
+  border-bottom: 1px solid #1b2128;
   box-shadow: none;
 }
 .app-sidebar .sidebar-content .nav.nav-tabs > li {
@@ -1660,7 +1660,7 @@ a.list-group-item:focus {
   height: 60px;
 }
 .mautic-brand > svg.mautic-logo-figure .circle {
-  fill: rgba(255, 255, 255, 0.8);
+  fill: #ffffff;
 }
 .mautic-brand > svg.mautic-logo-figure .m,
 .mautic-brand > svg.mautic-logo-figure .m-arrow {
@@ -1676,7 +1676,7 @@ a.list-group-item:focus {
 .mautic-brand > svg.mautic-logo-text .t,
 .mautic-brand > svg.mautic-logo-text .i,
 .mautic-brand > svg.mautic-logo-text .c {
-  fill: rgba(255, 255, 255, 0.8);
+  fill: #ffffff;
 }
 label {
   font-weight: 600;
@@ -2201,7 +2201,7 @@ label {
   background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
 }
 .app-sidebar .progress {
-  background-color: #2d3843;
+  background-color: #232b34;
 }
 .panel {
   border: 1px solid #ebedf0;
