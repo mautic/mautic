@@ -53,7 +53,7 @@ $view['assets']->addScriptDeclaration('
     		<div class="pa-md mb-lg">
     			<div class="row">
     				<div class="col-sm-12">
-    					<div id="dashboard-map" style="height: 400px;"></div>
+    					<div id="dashboard-map" style="height: 550px;"></div>
     				</div>
     			</div>
     		</div>
