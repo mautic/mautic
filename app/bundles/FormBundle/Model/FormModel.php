@@ -256,20 +256,6 @@ class FormModel extends CommonFormModel
         $html = $style . $html . $script;
         $entity->setCachedHtml($html);
 
-        //replace line breaks with literal symbol and escape quotations
-        $search = array(
-            "\n",
-            '"'
-        );
-        $replace = array(
-            '\n',
-            '\"'
-        );
-        $html = str_replace($search, $replace, $html);
-        $js = "document.write(\"".$html."\");";
-        $entity->setCachedJs($js);
-        $this->getRepository()->saveEntity($entity);
-
         //now build the form table
         if ($entity->getId()) {
             $this->createTableSchema($entity, $isNew);
@@ -393,5 +379,29 @@ class FormModel extends CommonFormModel
         }
 
         return $customComponents;
+    }
+
+    /**
+     * Get the document write javascript for the form
+     *
+     * @param Form $form
+     */
+    public function getAutomaticJavascript(Form $form)
+    {
+        $html = $form->getCachedHtml();
+
+        //replace line breaks with literal symbol and escape quotations
+        $search = array(
+            "\n",
+            '"'
+        );
+        $replace = array(
+            '\n',
+            '\"'
+        );
+        $html = str_replace($search, $replace, $html);
+        $js = "document.write(\"".$html."\");";
+
+        return $js;
     }
 }

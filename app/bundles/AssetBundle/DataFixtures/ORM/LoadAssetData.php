@@ -48,8 +48,8 @@ class LoadAssetData extends AbstractFixture implements OrderedFixtureInterface, 
 
         $asset = new Asset();
         $asset
-            ->setId(1)
             ->setTitle('@TOCHANGE: Asset1 Title')
+            ->setAlias('asset1')
             ->setOriginalFileName('@TOCHANGE: Asset1 Original File Name')
             ->setPath('fdb8e28357b02d12d068de3e5661832e21bc08ec.doc')
             ->setDownloadCount(1)

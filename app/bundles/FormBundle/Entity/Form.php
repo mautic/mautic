@@ -132,13 +132,6 @@ class Form extends FormEntity
      */
     public $submissionCount;
 
-    /**
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"formDetails"})
-     */
-    public $automaticJs;
-
     public function __clone() {
         $this->id = null;
     }

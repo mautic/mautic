@@ -9,6 +9,7 @@
 
 namespace Mautic\DashboardBundle\Security\Permissions;
 
+use Mautic\CategoryBundle\Helper\PermissionHelper;
 use Symfony\Component\Form\FormBuilderInterface;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 
@@ -35,7 +36,7 @@ class DashboardPermissions extends AbstractPermissions
      * @return string|void
      */
     public function getName() {
-        return 'dastboard';
+        return 'dashboard';
     }
 
     /**
@@ -47,17 +48,5 @@ class DashboardPermissions extends AbstractPermissions
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {
         $this->addExtendedFormFields('dashboard', 'dashboards', $builder, $data);
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @param array $permissions
-     */
-    public function analyzePermissions (array &$permissions)
-    {
-        parent::analyzePermissions($permissions);
-
-        PermissionHelper::analyzePermissions('dashboard', 'dashboards', $permissions);
     }
 }
