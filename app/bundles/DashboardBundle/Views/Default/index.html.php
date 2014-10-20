@@ -45,7 +45,7 @@ $view['assets']->addScriptDeclaration('
     			    </div>
     			    <div class="col-md-4">
     			        <div class="panel mb-0">
-    			           <div class="text-center pa-20 jumbo-font h150">44</div>
+                            <div class="text-center pa-20 jumbo-font h150">44</div>
                             <ul class="list-group">
                                 <li class="list-group-item">Most Visits this Week<span class="badge pull-right">100</span></li>
                                 <li class="list-group-item">Most Visits all Time <span class="badge pull-right">190</span></li>
@@ -108,9 +108,28 @@ $view['assets']->addScriptDeclaration('
                                 <div class="panel-heading">
                                 	<h3 class="panel-title">Most Popular Assets</h3>
                                 </div>
+                                <?php if ($popularAssets) : ?>
                                 <div class="panel-body">
-
+                                    <table class="table table-striped">
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Hits</th>
+                                    </tr>
+                                    <?php foreach ($popularAssets as $asset) : ?>
+                                        <tr>
+                                            <td>
+                                                <a href="<?php echo $view['router']->generate('mautic_asset_action', array('objectAction' => 'view', 'objectId' => $asset['id'])); ?>" data-toggle="ajax">
+                                                    <?php echo $asset['title']; ?>
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <?php echo $asset['downloadCount']; ?>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                    </table>
                                 </div>
+                                <?php endif; ?>
                             </div>
                         </div>
                         <div class="col-md-4">

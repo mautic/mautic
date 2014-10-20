@@ -212,6 +212,26 @@ class AssetRepository extends CommonRepository
     }
 
     /**
+     * Get a list of popular (by downloads) assets
+     *
+     * @param integer $limit
+     * @return array
+     */
+    public function getPopularAssets($limit = 10)
+    {
+        $q = $this->createQueryBuilder('a');
+
+        $q->select('a.id, a.title, a.downloadCount')
+            ->orderBy('a.downloadCount', 'DESC')
+            ->groupBy('a.id')
+            ->setMaxResults($limit);
+
+        $results = $q->getQuery()->getArrayResult();
+
+        return $results;
+    }
+
+    /**
      * @return string
      */
     protected function getDefaultOrder()
