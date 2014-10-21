@@ -101,4 +101,27 @@ class CampaignRepository extends CommonRepository
     {
         return $this->getStandardSearchCommands();
     }
+
+    /**
+     * Get a list of popular (by logs) campaigns
+     *
+     * @param integer $limit
+     * @return array
+     */
+    public function getPopularCampaigns($limit = 10)
+    {
+        $q  = $this->_em->getConnection()->createQueryBuilder();
+
+        $q->select('count(cl.ipAddress_id) as hits, c.id AS campaign_id, c.name')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'cl')
+            ->leftJoin('cl', MAUTIC_TABLE_PREFIX.'campaign_events', 'ce', 'cl.event_id = ce.id')
+            ->leftJoin('ce', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'ce.campaign_id = c.id')
+            ->orderBy('hits', 'DESC')
+            ->groupBy('c.id')
+            ->setMaxResults($limit);
+
+        $results = $q->execute()->fetchAll();
+
+        return $results;
+    }
 }

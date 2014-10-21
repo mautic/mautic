@@ -45,30 +45,16 @@ class TriggerType extends AbstractType
         $builder->addEventSubscriber(new CleanFormSubscriber());
         $builder->addEventSubscriber(new FormExitSubscriber('point', $options));
 
-        $builder->add("triggers-panel-wrapper-start", 'panel_wrapper_start', array(
-            'attr' => array(
-                'id' => "triggers-panel"
-            )
-        ));
-
-        //details
-        $builder->add("details-panel-start", 'panel_start', array(
-            'label'      => 'mautic.point.trigger.form.panel.details',
-            'dataParent' => '#triggers-panel',
-            'bodyId'     => 'details-panel',
-            'bodyAttr'   => array('class' => 'in')
-        ));
-
         $builder->add('name', 'text', array(
             'label'      => 'mautic.point.trigger.form.name',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control')
         ));
 
-        $builder->add('description', 'text', array(
+        $builder->add('description', 'textarea', array(
             'label'      => 'mautic.point.trigger.form.description',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control'),
+            'attr'       => array('class' => 'form-control editor'),
             'required'   => false
         ));
 
@@ -152,19 +138,6 @@ class TriggerType extends AbstractType
             'format'     => 'yyyy-MM-dd HH:mm',
             'required'   => false
         ));
-
-        $builder->add("details-panel-end", 'panel_end');
-
-        //actions
-        $builder->add("events-panel-start", 'panel_start', array(
-            'label'      => 'mautic.point.trigger.form.panel.events',
-            'dataParent' => '#triggers-panel',
-            'bodyId'     => 'events-panel'
-        ));
-
-        $builder->add("events-panel-end", 'panel_end');
-
-        $builder->add("triggers-panel-wrapper-end", 'panel_wrapper_end');
 
         $builder->add('tempId', 'hidden', array(
             'mapped' => false

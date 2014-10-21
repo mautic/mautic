@@ -20,27 +20,5 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
  */
 class LeadPointLogRepository extends CommonRepository
 {
-    /**
-     * Get a lead's point log
-     *
-     * @param integer $leadId
-     * @param array   $ipIds
-     *
-     * @return array
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
-     */
-    public function getLeadLogs($leadId, array $ipIds = array())
-    {
-        $query = $this->createQueryBuilder('el')
-            ->select('IDENTITY(el.point) AS point_id, el.dateFired')
-            ->where('el.lead = ' . $leadId);
-
-        if (!empty($ipIds)) {
-            $query->orWhere('el.ipAddress IN (' . implode(',', $ipIds) . ')');
-        }
-
-        return $query->getQuery()
-            ->getArrayResult();
-    }
+    
 }

@@ -62,18 +62,24 @@ class InstallApplicationCommand extends ContainerAwareCommand
         $env = $this->getContainer()->getParameter('kernel.environment');
 
         // Create the database
-        $command = $this->getApplication()->find('doctrine:schema:create');
-        $input = new ArrayInput(array(
-            'command' => 'doctrine:schema:create',
-            '--env'   => $env,
-            '--quiet'  => true
-        ));
-        $returnCode = $command->run($input, $output);
+        try {
+            $command = $this->getApplication()->find('doctrine:schema:create');
+            $input = new ArrayInput(array(
+                'command' => 'doctrine:schema:create',
+                '--env'   => $env,
+                '--quiet'  => true
+            ));
+            $returnCode = $command->run($input, $output);
 
-        if ($returnCode !== 0) {
-            $output->writeln($translator->trans('mautic.core.command.install_application_could_not_create_database'));
+            if ($returnCode !== 0) {
+                $output->writeln($translator->trans('mautic.core.command.install_application_could_not_create_database'));
 
-            return $returnCode;
+                return $returnCode;
+            }
+        } catch (\Exception $exception) {
+            $output->writeln($translator->trans('mautic.core.command.install_application_could_not_create_database_exception', array('%message%' => $exception->getMessage())));
+
+            return 0;
         }
 
         // Now populate the tables with fixtures
@@ -88,10 +94,16 @@ class InstallApplicationCommand extends ContainerAwareCommand
 
         $input = new ArrayInput($args);
         $returnCode = $command->run($input, $output);
-        if ($returnCode !== 0) {
-            $output->writeln($translator->trans('mautic.core.command.install_application_could_not_load_fixtures'));
+        try {
+            if ($returnCode !== 0) {
+                $output->writeln($translator->trans('mautic.core.command.install_application_could_not_load_fixtures'));
 
-            return $returnCode;
+                return $returnCode;
+            }
+        } catch (\Exception $exception) {
+            $output->writeln($translator->trans('mautic.core.command.install_application_could_not_load_fixtures_exception', array('%message%' => $exception->getMessage())));
+
+            return 0;
         }
 
         try {

@@ -115,7 +115,7 @@ class InstallController extends CommonController
                 }
 
                 // On a failure, the result will be an array; for success it will be a boolean
-                if (is_array($flashes)) {
+                if (!empty($flashes)) {
                     return $this->postActionRedirect(array(
                         'viewParameters'    => array(
                             'form'    => $form->createView(),

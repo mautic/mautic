@@ -75,15 +75,23 @@ class StatRepository extends CommonRepository
      * @param $emailId
      * @param $listId
      */
-    public function getSentCount($emailId, $listId)
+    public function getSentCount($emailId = 0, $listId = 0)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
         $q->select('count(*) as sentCount')
-            ->from(MAUTIC_TABLE_PREFIX.'email_stats', 's')
-            ->where('email_id = ' . $emailId)
-            ->andWhere('list_id = ' . $listId)
-            ->andWhere('is_failed = 0');
+            ->from(MAUTIC_TABLE_PREFIX.'email_stats', 's');
+
+        if ($emailId) {
+            $q->where('email_id = ' . $emailId);
+        }
+
+        if ($listId) {
+            $q->andWhere('list_id = ' . $listId);
+        }
+
+        $q->andWhere('is_failed = 0');
+        
         $results = $q->execute()->fetchAll();
 
         return (isset($results[0])) ? $results[0]['sentCount'] : 0;
