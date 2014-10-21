@@ -13,30 +13,26 @@ $view['slots']->set("headerTitle", $entity->getName());
 ?>
 <?php $view['slots']->start("actions"); ?>
 <?php if ($permissions['point:triggers:edit']): ?>
-    <li>
-        <a href="<?php echo $this->container->get('router')->generate(
-            'mautic_pointtrigger_action', array("objectAction" => "edit", "objectId" => $entity->getId())); ?>"
-           data-toggle="ajax"
-           data-menu-link="#mautic_pointtrigger_index">
-            <i class="fa fa-fw fa-pencil-square-o"></i><?php echo $view["translator"]->trans("mautic.core.form.edit"); ?>
-        </a>
-    </li>
+  <a class="btn btn-default" href="<?php echo $this->container->get('router')->generate(
+      'mautic_pointtrigger_action', array("objectAction" => "edit", "objectId" => $entity->getId())); ?>"
+     data-toggle="ajax"
+     data-menu-link="#mautic_pointtrigger_index">
+      <i class="fa fa-fw fa-pencil-square-o"></i> <?php echo $view["translator"]->trans("mautic.core.form.edit"); ?>
+  </a>
 <?php endif; ?>
 <?php if ($permissions['point:triggers:delete']): ?>
-<li>
-    <a href="javascript:void(0);"
-       onclick="Mautic.showConfirmation(
-           '<?php echo $view->escape($view["translator"]->trans("mautic.point.trigger.confirmdelete",
-           array("%name%" => $entity->getName() . " (" . $entity->getId() . ")")), 'js'); ?>',
-           '<?php echo $view->escape($view["translator"]->trans("mautic.core.form.delete"), 'js'); ?>',
-           'executeAction',
-           ['<?php echo $view['router']->generate('mautic_pointtrigger_action',
-           array("objectAction" => "delete", "objectId" => $entity->getId())); ?>',
-           '#mautic_pointtrigger_index'],
-           '<?php echo $view->escape($view["translator"]->trans("mautic.core.form.cancel"), 'js'); ?>','',[]);">
-        <span><i class="fa fa-fw fa-trash-o"></i><?php echo $view['translator']->trans('mautic.core.form.delete'); ?></span>
-    </a>
-</li>
+  <a href="javascript:void(0);"
+     class="btn btn-default" onclick="Mautic.showConfirmation(
+         '<?php echo $view->escape($view["translator"]->trans("mautic.point.trigger.confirmdelete",
+         array("%name%" => $entity->getName() . " (" . $entity->getId() . ")")), 'js'); ?>',
+         '<?php echo $view->escape($view["translator"]->trans("mautic.core.form.delete"), 'js'); ?>',
+         'executeAction',
+         ['<?php echo $view['router']->generate('mautic_pointtrigger_action',
+         array("objectAction" => "delete", "objectId" => $entity->getId())); ?>',
+         '#mautic_pointtrigger_index'],
+         '<?php echo $view->escape($view["translator"]->trans("mautic.core.form.cancel"), 'js'); ?>','',[]);">
+        <i class="fa fa-fw fa-trash-o"></i> <?php echo $view['translator']->trans('mautic.core.form.delete'); ?>
+  </a>
 <?php endif; ?>
 <?php $view['slots']->stop(); ?>
 
