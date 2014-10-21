@@ -33,11 +33,13 @@ class DefaultController extends CommonController
 
         $popularPages = $this->factory->getModel('page.page')->getRepository()->getPopularPages();
         $popularAssets = $this->factory->getModel('asset.asset')->getRepository()->getPopularAssets();
+        $popularCampaigns = $this->factory->getModel('campaign.campaign')->getRepository()->getPopularCampaigns();
 
         return $this->delegateView(array(
             'viewParameters'  =>  array(
                 'popularPages' => $popularPages,
                 'popularAssets' => $popularAssets,
+                'popularCampaigns' => $popularCampaigns,
                 'security'    => $this->factory->getSecurity()
             ),
             'contentTemplate' => 'MauticDashboardBundle:Default:index.html.php',

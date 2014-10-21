@@ -109,7 +109,7 @@ $view['slots']->set('mauticContent', 'dashboard');
                                     <table class="table table-striped">
                                     <tr>
                                         <th>Title</th>
-                                        <th>Hits</th>
+                                        <th>Downloads</th>
                                     </tr>
                                     <?php foreach ($popularAssets as $asset) : ?>
                                         <tr>
@@ -133,9 +133,28 @@ $view['slots']->set('mauticContent', 'dashboard');
                                 <div class="panel-heading">
                                 	<h3 class="panel-title">Most Popular Campaigns</h3>
                                 </div>
+                                <?php if ($popularCampaigns) : ?>
                                 <div class="panel-body">
-
+                                    <table class="table table-striped">
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Hits</th>
+                                    </tr>
+                                    <?php foreach ($popularCampaigns as $campaign) : ?>
+                                        <tr>
+                                            <td>
+                                                <a href="<?php echo $view['router']->generate('mautic_campaign_action', array('objectAction' => 'view', 'objectId' => $campaign['campaign_id'])); ?>" data-toggle="ajax">
+                                                    <?php echo $campaign['name']; ?>
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <?php echo $campaign['hits']; ?>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                    </table>
                                 </div>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
