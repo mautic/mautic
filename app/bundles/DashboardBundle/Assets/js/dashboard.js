@@ -50,7 +50,7 @@ Mautic.renderOpenRateDoughnut = function () {
     var element = mQuery('#open-rate');
     var sentCount = +element.attr('data-sent-count');
     var readCount = +element.attr('data-read-count');
-    var options = {percentageInnerCutout: 90, responsive: false}
+    var options = {percentageInnerCutout: 65, responsive: false}
     var data = [
         {
             value: readCount,
@@ -60,7 +60,7 @@ Mautic.renderOpenRateDoughnut = function () {
         },
         {
             value: sentCount - readCount,
-            color: "#ffffff",
+            color: "#efeeec",
             highlight: "#EBEBEB",
             label: "Not opened"
         }
@@ -73,7 +73,7 @@ Mautic.renderClickRateDoughnut = function () {
     var element = mQuery('#click-rate');
     var sentCount = +element.attr('data-read-count');
     var readCount = +element.attr('data-click-count');
-    var options = {percentageInnerCutout: 90, responsive: false}
+    var options = {percentageInnerCutout: 65, responsive: false}
     var data = [
         {
             value: readCount,
@@ -83,7 +83,7 @@ Mautic.renderClickRateDoughnut = function () {
         },
         {
             value: sentCount - readCount,
-            color: "#ffffff",
+            color: "#efeeec",
             highlight: "#EBEBEB",
             label: "Not clicked"
         }

@@ -17,8 +17,8 @@ $view['slots']->set('mauticContent', 'dashboard');
     			<div class="row">
     			    <div class="col-md-4">
     			        <div class="panel mb-0">
-                            <div style="position:relative; height: 150px; padding: 10px">
-                                <canvas id="open-rate" widht="130" height="130" data-sent-count="<?php echo $sentReadCount['sentCount'] ?>" data-read-count="<?php echo $sentReadCount['readCount'] ?>"></canvas>
+                            <div style="position:relative; height: 150px; padding: 20px">
+                                <canvas id="open-rate" width="287" height="110" data-sent-count="<?php echo $sentReadCount['sentCount'] ?>" data-read-count="<?php echo $sentReadCount['readCount'] ?>"></canvas>
         			            <div style="font-size:x-small;text-align:center;padding:2px;color:#4E5D9D;position:absolute;top:50%;left:50%;margin-left:-26px;margin-top:-15px">Open Rate<br><?php echo $openRate ?>%</div>
     			            </div>
                             <ul class="list-group">
@@ -29,9 +29,9 @@ $view['slots']->set('mauticContent', 'dashboard');
     			    </div>
     			    <div class="col-md-4">
     			        <div class="panel mb-0">
-    			            <div style="position:relative; height: 150px; padding: 10px">
-                                <canvas id="click-rate" widht="130" height="130" data-read-count="<?php echo $sentReadCount['readCount'] ?>" data-click-count="<?php echo $sentReadCount['clickCount'] ?>"></canvas>
-                                <div style="font-size:x-small;text-align:center;padding:2px;color:#35B4B9;position:absolute;top:50%;left:50%;margin-left:-26px;margin-top:-15px">Click Rate<br><?php echo $openRate ?>%</div>
+    			            <div style="position:relative; height: 150px; padding: 20px">
+                                <canvas id="click-rate" width="287" height="110" data-read-count="<?php echo $sentReadCount['readCount'] ?>" data-click-count="<?php echo $sentReadCount['clickCount'] ?>"></canvas>
+                                <div style="font-size:x-small;text-align:center;padding:2px;color:#35B4B9;position:absolute;top:50%;left:50%;margin-left:-26px;margin-top:-15px">Click Rate<br><?php echo $clickRate ?>%</div>
                             </div>
     			            <ul class="list-group">
                                 <li class="list-group-item">Email Delivered <span class="badge pull-right"><?php echo $allSentEmails; ?></span></li>

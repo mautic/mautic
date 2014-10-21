@@ -49,13 +49,14 @@ class DefaultController extends CommonController
         $clickRate = 0;
 
         if ($sentReadCount['readCount']) {
-            $openRate = round($sentReadCount['clickCount'] / $sentReadCount['readCount'] * 100);
+            $clickRate = round($sentReadCount['clickCount'] / $sentReadCount['readCount'] * 100);
         }
 
         return $this->delegateView(array(
             'viewParameters'  =>  array(
                 'sentReadCount'     => $sentReadCount,
                 'openRate'          => $openRate,
+                'clickRate'         => $clickRate,
                 'newReturningVisitors' => $newReturningVisitors,
                 'weekVisitors'      => $weekVisitors,
                 'allTimeVisitors'   => $allTimeVisitors,
