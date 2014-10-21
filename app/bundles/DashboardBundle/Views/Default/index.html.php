@@ -18,7 +18,7 @@ $view['slots']->set('mauticContent', 'dashboard');
     			    <div class="col-md-4">
     			        <div class="panel mb-0">
                             <div style="position:relative; height: 150px; padding: 10px">
-                                <canvas id="open-reate" widht="130" height="130" data-sent-count="<?php echo $sentReadCount['sentCount'] ?>" data-read-count="<?php echo $sentReadCount['readCount'] ?>"></canvas>
+                                <canvas id="open-rate" widht="130" height="130" data-sent-count="<?php echo $sentReadCount['sentCount'] ?>" data-read-count="<?php echo $sentReadCount['readCount'] ?>"></canvas>
         			            <div style="font-size:x-small;text-align:center;padding:2px;color:#4E5D9D;position:absolute;top:50%;left:50%;margin-left:-26px;margin-top:-15px">Open Rate<br><?php echo $openRate ?>%</div>
     			            </div>
                             <ul class="list-group">
@@ -29,10 +29,10 @@ $view['slots']->set('mauticContent', 'dashboard');
     			    </div>
     			    <div class="col-md-4">
     			        <div class="panel mb-0">
-    			            <div class="flotchart" data-type="donut" style="height: 150px; padding: 0px; position: relative;">
-    			                <!-- put generated data inside .flotdata -->
-    			                
-    			            <canvas class="flot-base" width="574" height="300" style="direction: ltr; position: absolute; left: 0px; top: 0px; width: 287px; height: 150px;"></canvas><canvas class="flot-overlay" width="574" height="300" style="direction: ltr; position: absolute; left: 0px; top: 0px; width: 287px; height: 150px;"></canvas><span class="pieLabel" id="pieLabel0" style="position: absolute; top: 60px; left: 126px;"><div style="font-size:x-small;text-align:center;padding:2px;color:#eee;">Overall<br>10%</div></span><span class="pieLabel" id="pieLabel1" style="position: absolute; top: 60px; left: 119px;"><div style="font-size:x-small;text-align:center;padding:2px;color:#35B4B9;">Click Rate<br>90%</div></span></div>
+    			            <div style="position:relative; height: 150px; padding: 10px">
+                                <canvas id="click-rate" widht="130" height="130" data-read-count="<?php echo $sentReadCount['readCount'] ?>" data-click-count="<?php echo $sentReadCount['clickCount'] ?>"></canvas>
+                                <div style="font-size:x-small;text-align:center;padding:2px;color:#35B4B9;position:absolute;top:50%;left:50%;margin-left:-26px;margin-top:-15px">Click Rate<br><?php echo $openRate ?>%</div>
+                            </div>
     			            <ul class="list-group">
                                 <li class="list-group-item">Email Delivered <span class="badge pull-right">100</span></li>
                                 <li class="list-group-item">Total Click <span class="badge pull-right">90</span></li>

@@ -2,6 +2,7 @@
 Mautic.dashboardOnLoad = function (container) {
     Mautic.loadDashboardMap();
     Mautic.renderOpenRateDoughnut();
+    Mautic.renderClickRateDoughnut();
     Mautic.updateActiveVisitorCount();
 };
 
@@ -46,7 +47,7 @@ Mautic.loadDashboardMap = function () {
 }
 
 Mautic.renderOpenRateDoughnut = function () {
-    var element = mQuery('#open-reate');
+    var element = mQuery('#open-rate');
     var sentCount = +element.attr('data-sent-count');
     var readCount = +element.attr('data-read-count');
     var options = {percentageInnerCutout: 90, responsive: false}
@@ -64,7 +65,30 @@ Mautic.renderOpenRateDoughnut = function () {
             label: "Not opened"
         }
     ];
-    var ctx = document.getElementById("open-reate").getContext("2d");
+    var ctx = document.getElementById("open-rate").getContext("2d");
+    var myNewChart = new Chart(ctx).Doughnut(data, options);
+}
+
+Mautic.renderClickRateDoughnut = function () {
+    var element = mQuery('#click-rate');
+    var sentCount = +element.attr('data-read-count');
+    var readCount = +element.attr('data-click-count');
+    var options = {percentageInnerCutout: 90, responsive: false}
+    var data = [
+        {
+            value: readCount,
+            color:"#35B4B9",
+            highlight: "#227276",
+            label: "Clicked"
+        },
+        {
+            value: sentCount - readCount,
+            color: "#ffffff",
+            highlight: "#EBEBEB",
+            label: "Not clicked"
+        }
+    ];
+    var ctx = document.getElementById("click-rate").getContext("2d");
     var myNewChart = new Chart(ctx).Doughnut(data, options);
 }
 
