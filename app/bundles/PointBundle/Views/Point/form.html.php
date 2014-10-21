@@ -27,7 +27,7 @@ echo $view['form']->start($form);
 		        <div class="pa-md">
 				    <?php		    
 					echo $view['form']->row($form['name']);
-					echo $view['form']->row($form['description'], array('attr' => array('class' => 'form-control editor')));
+					echo $view['form']->row($form['description']);
 
 				    if (isset($form['properties'])):
 				    	echo $view['form']->row($form['properties']);
@@ -48,7 +48,7 @@ echo $view['form']->start($form);
 		<div class="pr-lg pl-lg pt-md pb-md">
 			<?php
 				echo $view['form']->row($form['category_lookup']);
-				echo $view['form']->row($form['category'], array('attr' => array('row-width' => 'form-group col-xs-12')));
+				echo $view['form']->row($form['category']);
 				echo $view['form']->row($form['isPublished']);
 				echo $view['form']->row($form['publishUp']);
 				echo $view['form']->row($form['publishDown']);
