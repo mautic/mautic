@@ -3,6 +3,10 @@ Mautic.dashboardOnLoad = function (container) {
     Mautic.loadDashboardMap();
     Mautic.renderOpenRateDoughnut();
     Mautic.updateActiveVisitorCount();
+    setInterval(function() {
+        Mautic.updateActiveVisitorCount();
+    }, 5000);
+    
 };
 
 Mautic.loadDashboardMap = function () {
@@ -78,12 +82,21 @@ Mautic.updateActiveVisitorCount = function () {
             if (response.success) {
                 var element = mQuery('#active-visitors');
                 element.text(response.viewingVisitors);
+                if (response.viewingVisitors != Mautic.ActiveVisitorsCount) {
+                    var color = '#34D43B';
+                    if (Mautic.ActiveVisitorsCount > response.viewingVisitors) {
+                        color = '#BC2525';
+                    }
+                    element.css('text-shadow', color+' 0px 0px 50px');
+                    setTimeout(function() {
+                        element.css('text-shadow', '#fff 0px 0px 50px');
+                    }, 3000);
+                }
+                Mautic.ActiveVisitorsCount = response.viewingVisitors;
             }
-            Mautic.stopIconSpinPostEvent(event);
         },
         error: function (request, textStatus, errorThrown) {
             Mautic.processAjaxError(request, textStatus, errorThrown);
-            Mautic.stopIconSpinPostEvent(event);
         }
     });
 }

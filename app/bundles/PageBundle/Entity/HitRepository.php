@@ -165,7 +165,7 @@ class HitRepository extends CommonRepository
      * @param integer      $seconds
      * @return integer
      */
-    public function countViewingVisitors($seconds = 20)
+    public function countViewingVisitors($seconds = 60)
     {
         $now = new \DateTime();
         $viewingTime = new \DateInterval('PT'.$seconds.'S');
