@@ -160,6 +160,33 @@ class HitRepository extends CommonRepository
     }
 
     /**
+     * Count how many visitors hit some page in last X $seconds
+     *
+     * @param integer      $seconds
+     * @return integer
+     */
+    public function countViewingVisitors($seconds = 20)
+    {
+        $now = new \DateTime();
+        $viewingTime = new \DateInterval('PT'.$seconds.'S');
+        $now->sub($viewingTime);
+        $query = $this->createQueryBuilder('h');
+
+        $query->select('count(h.code) as visitors')
+            ->where($query->expr()->gte('h.dateHit', ':date'))
+            ->setParameter('date', $now)
+            ->andWhere($query->expr()->isNull('h.dateLeft'));
+
+        $result = $query->getQuery()->getSingleResult();
+
+        if (!isset($result['visitors'])) {
+            return 0;
+        }
+
+        return (int) $result['visitors'];
+    }
+
+    /**
      * Get the number of bounces
      *
      * @param $pageIds

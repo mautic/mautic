@@ -41,7 +41,7 @@ $view['slots']->set('mauticContent', 'dashboard');
     			    </div>
     			    <div class="col-md-4">
     			        <div class="panel mb-0">
-                            <div class="text-center pa-20 jumbo-font h150">44</div>
+                            <div class="text-center pa-20 jumbo-font h150" id="active-visitors">0</div>
                             <ul class="list-group">
                                 <li class="list-group-item">Most Visits this Week<span class="badge pull-right">100</span></li>
                                 <li class="list-group-item">Most Visits all Time <span class="badge pull-right">190</span></li>

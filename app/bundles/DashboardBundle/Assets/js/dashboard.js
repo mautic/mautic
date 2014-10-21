@@ -2,6 +2,7 @@
 Mautic.dashboardOnLoad = function (container) {
     Mautic.loadDashboardMap();
     Mautic.renderOpenRateDoughnut();
+    Mautic.updateActiveVisitorCount();
 };
 
 Mautic.loadDashboardMap = function () {
@@ -65,4 +66,24 @@ Mautic.renderOpenRateDoughnut = function () {
     ];
     var ctx = document.getElementById("open-reate").getContext("2d");
     var myNewChart = new Chart(ctx).Doughnut(data, options);
+}
+
+Mautic.updateActiveVisitorCount = function () {
+    mQuery.ajax({
+        url: mauticAjaxUrl,
+        type: "POST",
+        data: "action=dashboard:viewingVisitors",
+        dataType: "json",
+        success: function (response) {
+            if (response.success) {
+                var element = mQuery('#active-visitors');
+                element.text(response.viewingVisitors);
+            }
+            Mautic.stopIconSpinPostEvent(event);
+        },
+        error: function (request, textStatus, errorThrown) {
+            Mautic.processAjaxError(request, textStatus, errorThrown);
+            Mautic.stopIconSpinPostEvent(event);
+        }
+    });
 }

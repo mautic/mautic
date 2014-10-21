@@ -23,11 +23,13 @@ class AjaxController extends CommonAjaxController
 {
 
     /**
+     * Fetch date for the map.
+     * 
      * @param Request $request
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    protected function mapDataAction (Request $request)
+    protected function mapDataAction(Request $request)
     {
         $dataArray  = array('success' => 0, 'stats' => array());
 
@@ -43,6 +45,26 @@ class AjaxController extends CommonAjaxController
                 $dataArray['stats'][strtolower($countries[$leadCountry['country']])] = $leadCountry['quantity'];
             }
         }
+
+        $dataArray['success'] = 1;
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * Count how many visitors is currently viewing some page.
+     * 
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    protected function viewingVisitorsAction(Request $request)
+    {
+        $dataArray  = array('success' => 0);
+
+        /** @var \Mautic\PageBundle\Entity\PageRepository $pageRepository */
+        $pageRepository = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit');
+        $dataArray['viewingVisitors'] = $pageRepository->countViewingVisitors();
 
         $dataArray['success'] = 1;
 
