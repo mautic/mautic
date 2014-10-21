@@ -190,8 +190,7 @@ class LeadController extends FormController
             'passthroughVars' => array(
                 'activeLink'     => '#mautic_lead_index',
                 'mauticContent'  => 'lead',
-                'route'          => $this->generateUrl('mautic_lead_index', array('page' => $page)),
-                'replaceContent' => ($tmpl == 'list') ? 'true' : 'false'
+                'route'          => $this->generateUrl('mautic_lead_index', array('page' => $page))
             )
         ));
     }

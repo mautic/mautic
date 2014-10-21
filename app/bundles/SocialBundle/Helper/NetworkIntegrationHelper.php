@@ -260,6 +260,9 @@ class NetworkIntegrationHelper
                 if ($identifierField && $settings->isPublished()) {
                     $profile = (!isset($socialCache[$network])) ? array() : $socialCache[$network];
 
+                    //clear the cache
+                    unset($profile['profile'], $profile['activity']);
+
                     if (in_array('public_profile', $features)) {
                         $sn->getUserData($identifierField, $profile);
                     }
@@ -360,7 +363,7 @@ class NetworkIntegrationHelper
      */
     public static function getUserIdentifierField($networkObject, $fields)
     {
-        $identifierField = $networkObject->getIdentifierField();
+        $identifierField = $networkObject->getIdentifierFields();
         $identifier      = (is_array($identifierField)) ? array() : false;
         $matchFound      = false;
 

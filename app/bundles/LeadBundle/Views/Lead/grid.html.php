@@ -10,85 +10,83 @@ if ($tmpl == 'index')
     $view->extend('MauticLeadBundle:Lead:index.html.php');
 ?>
 
-<div class="page-list">
-    <div class="pa-md">
-        <div class="shuffle grid row scrollable" id="shuffle-grid">
-            <?php if (count($items)): ?>
-                <?php foreach ($items as $item): ?>
-                    <?php
-                        $fields = $item->getFields();
-                        $color = $item->getColor();
-                        $style = !empty($color) ? ' style="background-color: ' . $color . ' !important;"' : '';
-                    ?>
-                    <div class="shuffle shuffle-item grid col-sm-6 col-lg-4">
-                        <div class="panel ovf-h">
-                            <div class="box-layout">
-                                <div class="col-xs-4 va-m">
-                                    <div class="panel-body">
-                                <span class="img-wrapper img-rounded" style="width:100%">
-                                    <span class="label label-default ma-20"<?php echo $style; ?>><?php echo $item->getPoints(); ?></span>
-                                    <img class="img img-responsive"
-                                         src="<?php echo $view['gravatar']->getImage($fields['core']['email']['value'], '250'); ?>" />
-                                </span>
-                                    </div>
+<div class="pa-md">
+    <div class="shuffle grid row scrollable" id="shuffle-grid">
+        <?php if (count($items)): ?>
+            <?php foreach ($items as $item): ?>
+                <?php
+                    $fields = $item->getFields();
+                    $color = $item->getColor();
+                    $style = !empty($color) ? ' style="background-color: ' . $color . ' !important;"' : '';
+                ?>
+                <div class="shuffle shuffle-item grid col-sm-6 col-lg-4">
+                    <div class="panel ovf-h">
+                        <div class="box-layout">
+                            <div class="col-xs-4 va-m">
+                                <div class="panel-body">
+                            <span class="img-wrapper img-rounded" style="width:100%">
+                                <span class="label label-default ma-20"<?php echo $style; ?>><?php echo $item->getPoints(); ?></span>
+                                <img class="img img-responsive"
+                                     src="<?php echo $view['gravatar']->getImage($fields['core']['email']['value'], '250'); ?>" />
+                            </span>
                                 </div>
-                                <div class="col-xs-8 va-t">
-                                    <div class="panel-body">
-                                        <div class="pull-right">
-                                            <div class="checkbox-inline custom-primary">
-                                                <label class="mb-0">
-                                                    <input type="checkbox" value="1">
-                                                    <span></span>
-                                                </label>
-                                            </div>
+                            </div>
+                            <div class="col-xs-8 va-t">
+                                <div class="panel-body">
+                                    <div class="pull-right">
+                                        <div class="checkbox-inline custom-primary">
+                                            <label class="mb-0">
+                                                <input type="checkbox" value="1">
+                                                <span></span>
+                                            </label>
                                         </div>
-                                        <h4 class="fw-sb mb-xs">
-                                            <a href="<?php echo $view['router']->generate('mautic_lead_action',
-                                                array("objectAction" => "view", "objectId" => $item->getId())); ?>"
-                                               data-toggle="ajax">
-                                                <span><?php echo $item->getPrimaryIdentifier(); ?></span>
-                                            </a>
-                                        </h4>
-                                        <div class="text-muted mb-1">
-                                            <i class="fa fa-fw fa-building mr-xs"></i><?php echo $fields['core']['company']['value']; ?>
-                                        </div>
-                                        <div class="text-muted mb-1">
-                                            <i class="fa fa-fw fa-map-marker mr-xs"></i><?php
-                                            if (!empty($fields['core']['city']['value']) && !empty($fields['core']['state']['value']))
-                                                echo $fields['core']['city']['value'] . ', ' . $fields['core']['state']['value'];
-                                            elseif (!empty($fields['core']['city']['value']))
-                                                echo $fields['core']['city']['value'];
-                                            elseif (!empty($fields['core']['state']['value']))
-                                                echo $fields['core']['state']['value'];
-                                            ?>
-                                        </div>
-                                        <div class="text-muted mb-1">
-                                            <i class="fa fa-fw fa-globe mr-xs"></i><?php echo $fields['core']['country']['value']; ?>
-                                        </div>
+                                    </div>
+                                    <h4 class="fw-sb mb-xs">
+                                        <a href="<?php echo $view['router']->generate('mautic_lead_action',
+                                            array("objectAction" => "view", "objectId" => $item->getId())); ?>"
+                                           data-toggle="ajax">
+                                            <span><?php echo $item->getPrimaryIdentifier(); ?></span>
+                                        </a>
+                                    </h4>
+                                    <div class="text-muted mb-1">
+                                        <i class="fa fa-fw fa-building mr-xs"></i><?php echo $fields['core']['company']['value']; ?>
+                                    </div>
+                                    <div class="text-muted mb-1">
+                                        <i class="fa fa-fw fa-map-marker mr-xs"></i><?php
+                                        if (!empty($fields['core']['city']['value']) && !empty($fields['core']['state']['value']))
+                                            echo $fields['core']['city']['value'] . ', ' . $fields['core']['state']['value'];
+                                        elseif (!empty($fields['core']['city']['value']))
+                                            echo $fields['core']['city']['value'];
+                                        elseif (!empty($fields['core']['state']['value']))
+                                            echo $fields['core']['state']['value'];
+                                        ?>
+                                    </div>
+                                    <div class="text-muted mb-1">
+                                        <i class="fa fa-fw fa-globe mr-xs"></i><?php echo $fields['core']['country']['value']; ?>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <?php echo $view->render('MauticCoreBundle:Default:noresults.html.php'); ?>
-            <?php endif; ?>
-        </div>
+                </div>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <?php echo $view->render('MauticCoreBundle:Default:noresults.html.php'); ?>
+        <?php endif; ?>
     </div>
-
-    <?php if (count($items)): ?>
-        <div class="clearfix"></div>
-        <div class="panel-footer">
-            <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
-                "totalItems"      => $totalItems,
-                "page"            => $page,
-                "limit"           => $limit,
-                "menuLinkId"      => 'mautic_lead_index',
-                "baseUrl"         => $view['router']->generate('mautic_lead_index'),
-                "tmpl"            => $indexMode,
-                'sessionVar'      => 'lead'
-            )); ?>
-        </div>
-    <?php endif; ?>
 </div>
+
+<?php if (count($items)): ?>
+    <div class="clearfix"></div>
+    <div class="panel-footer">
+        <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
+            "totalItems"      => $totalItems,
+            "page"            => $page,
+            "limit"           => $limit,
+            "menuLinkId"      => 'mautic_lead_index',
+            "baseUrl"         => $view['router']->generate('mautic_lead_index'),
+            "tmpl"            => $indexMode,
+            'sessionVar'      => 'lead'
+        )); ?>
+    </div>
+<?php endif; ?>

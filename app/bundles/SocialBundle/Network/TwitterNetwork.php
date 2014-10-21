@@ -45,7 +45,7 @@ class TwitterNetwork extends AbstractNetwork
      *
      * @return string
      */
-    public function getIdentifierField()
+    public function getIdentifierFields()
     {
         return 'twitter';
     }
@@ -323,14 +323,6 @@ class TwitterNetwork extends AbstractNetwork
                     }
                 }
             }
-        }
-
-        if (empty($socialCache['activity'])) {
-            //ensure keys are present
-            $socialCache['activity'] = array(
-                'tweets' => array(),
-                'photos' => array()
-            );
         }
     }
 

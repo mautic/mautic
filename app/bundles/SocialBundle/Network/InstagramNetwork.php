@@ -50,7 +50,7 @@ class InstagramNetwork extends AbstractNetwork
      *
      * @return string
      */
-    public function getIdentifierField()
+    public function getIdentifierFields()
     {
         return 'instagram';
     }
@@ -173,13 +173,6 @@ class InstagramNetwork extends AbstractNetwork
                 }
             }
         }
-
-        if (empty($socialCache['activity'])) {
-            $socialCache['activity'] = array(
-                "photos" => array(),
-                "tags"   => array()
-            );
-        }
     }
 
     /**
@@ -215,6 +208,8 @@ class InstagramNetwork extends AbstractNetwork
 
             return (!empty($socialCache['id'])) ? $socialCache['id'] : false;
         }
+
+        return false;
     }
 
     public function getAvailableFields()
