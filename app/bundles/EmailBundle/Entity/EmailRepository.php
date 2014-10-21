@@ -93,7 +93,7 @@ class EmailRepository extends CommonRepository
         $q = $this->_em->createQueryBuilder();
         $q->select('SUM(e.sentCount) as sentCount, SUM(e.readCount) as readCount')
             ->from('MauticEmailBundle:Email', 'e');
-        $results = $q->getQuery()->getSingleResult();
+        $results = $q->getQuery()->getScalarResult();
 
         if (!isset($results['sentCount'])) {
             $results['sentCount'] = 0;

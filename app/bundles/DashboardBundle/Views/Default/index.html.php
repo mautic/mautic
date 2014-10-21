@@ -22,8 +22,8 @@ $view['slots']->set('mauticContent', 'dashboard');
         			            <div style="font-size:x-small;text-align:center;padding:2px;color:#4E5D9D;position:absolute;top:50%;left:50%;margin-left:-26px;margin-top:-15px">Open Rate<br><?php echo $openRate ?>%</div>
     			            </div>
                             <ul class="list-group">
-    			                <li class="list-group-item">New Visitors <span class="badge pull-right">100</span></li>
-    			                <li class="list-group-item">Returning Visitors <span class="badge pull-right">40</span></li>
+    			                <li class="list-group-item">New Visitors <span class="badge pull-right"><?php echo $newReturningVisitors['new']; ?></span></li>
+    			                <li class="list-group-item">Returning Visitors <span class="badge pull-right"><?php echo $newReturningVisitors['returning']; ?></span></li>
     			            </ul>
     			        </div>
     			    </div>
