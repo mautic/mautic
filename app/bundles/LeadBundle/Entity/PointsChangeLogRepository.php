@@ -83,4 +83,28 @@ class PointsChangeLogRepository extends CommonRepository
 
         return array('labels' => array_reverse($labels), 'data' => array_reverse($values));
     }
+
+    /**
+     * Get a lead's point log
+     *
+     * @param integer $leadId
+     * @param array   $ipIds
+     *
+     * @return array
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function getLeadTimelineEvents($leadId, array $ipIds = array())
+    {
+        $query = $this->createQueryBuilder('lp')
+            ->select('lp.eventName, lp.actionName, lp.dateAdded, lp.type, lp.delta')
+            ->where('lp.lead = ' . $leadId);
+
+        if (!empty($ipIds)) {
+            $query->orWhere('lp.ipAddress IN (' . implode(',', $ipIds) . ')');
+        }
+
+        return $query->getQuery()
+            ->getArrayResult();
+    }
 }
