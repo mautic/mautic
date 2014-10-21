@@ -20,17 +20,11 @@ $view['slots']->set("headerTitle", $view['translator']->trans('mautic.lead.field
     </a>
 <?php $view['slots']->stop(); ?>
 
-<div class="panel panel-default">
+<div class="panel panel-default bdr-t-wdh-0">
     <div class="panel-body">
         <div class="box-layout">
             <div class="col-xs-6 va-m">
-                <div class="checkbox-inline custom-primary">
-                    <label class="mb-0">
-                        <input type="checkbox" id="customcheckbox-one0" value="1">
-                        <span></span>
-                        <?php echo $view['translator']->trans('mautic.core.table.selectall'); ?>
-                    </label>
-                </div>
+                <?php echo $view->render('MauticCoreBundle:Helper:search.html.php', array('searchValue' => $searchValue, 'action' => $currentRoute)); ?>
             </div>
             <div class="col-xs-6 va-m text-right">
                 <button type="button" class="btn btn-warning"><i class="fa fa-files-o"></i></button>
@@ -42,7 +36,14 @@ $view['slots']->set("headerTitle", $view['translator']->trans('mautic.lead.field
         <table class="table table-hover table-striped table-bordered leadfield-list">
             <thead>
                 <th class="col-leadfield-orderhandle"></th>
-                <th class="col-leadfield-actions"></th>
+                <th class="col-leadfield-actions pl-20">
+                    <div class="checkbox-inline custom-primary">
+                        <label class="mb-0 pl-10">
+                            <input type="checkbox" id="customcheckbox-one0" value="1">
+                            <span></span>
+                        </label>
+                    </div>
+                </th>
                 <th class="col-leadfield-label"><?php echo $view['translator']->trans('mautic.lead.field.thead.label'); ?></th>
                 <th class="visible-md visible-lg col-leadfield-alias"><?php echo $view['translator']->trans('mautic.lead.field.thead.alias'); ?></th>
                 <th class="visible-md visible-lg col-leadfield-group"><?php echo $view['translator']->trans('mautic.lead.field.thead.group'); ?></th>

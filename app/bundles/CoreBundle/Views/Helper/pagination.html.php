@@ -31,7 +31,7 @@ $totalPages = ($limit) ? (int) ceil($totalItems / $limit) : 1;
 $pageClass = (!isset($paginationClass)) ? "" : " pagination-$paginationClass";
 $menuLink  = (!empty($menuLinkId)) ? " data-menu-link=\"$menuLinkId\"" : "";
 
-$queryString = '?tmpl=' . $tmpl . (isset($queryString) ? $querystring : '');
+$queryString = '?tmpl=' . $tmpl . (isset($queryString) ? $queryString : '');
 
 $limitOptions = array(
     5   => '5',

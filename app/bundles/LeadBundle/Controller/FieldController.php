@@ -23,14 +23,19 @@ class FieldController extends FormController
      */
     public function indexAction()
     {
+        $session = $this->factory->getSession();
+        $search  = $this->request->get('search', $session->get('mautic.leadfield.filter', ''));
+        $session->set('mautic.leadfield.filter', $search);
+
         if (!$this->factory->getSecurity()->isGranted('lead:fields:full')) {
             return $this->accessDenied();
         }
-        $items = $this->factory->getModel('lead.field')->getEntities();
+        $items = $this->factory->getModel('lead.field')->getEntities(array('filter' => $search));
 
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'items'      => $items
+                'items'       => $items,
+                'searchValue' => $search
             ),
             'contentTemplate' => 'MauticLeadBundle:Field:index.html.php',
             'passthroughVars' => array(

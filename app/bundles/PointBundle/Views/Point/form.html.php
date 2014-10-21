@@ -22,16 +22,26 @@ echo $view['form']->start($form);
 <div class="box-layout">
     <!-- container -->
     <div class="col-md-9 bg-auto height-auto bdr-r">
-        <div class="pa-md">
-		    <?php		    
-			echo $view['form']->row($form['name']);
-			echo $view['form']->row($form['description'], array('attr' => array('class' => 'form-control editor')));
-			echo $view['form']->row($form['type']);
+    	<div class="row">
+    		<div class="col-md-6">
+		        <div class="pa-md">
+				    <?php		    
+					echo $view['form']->row($form['name']);
+					echo $view['form']->row($form['description'], array('attr' => array('class' => 'form-control editor')));
 
-		    if (isset($form['properties'])):
-		    	echo $view['form']->row($form['properties']);
-		    endif;
-		    ?>
+				    if (isset($form['properties'])):
+				    	echo $view['form']->row($form['properties']);
+				    endif;
+				    ?>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="pa-md">
+					<?php echo $view['form']->row($form['type']); ?>
+					<div id="pointActionProperties">
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
  	<div class="col-md-3 bg-white height-auto">

@@ -10,9 +10,6 @@
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'asset');
 $view['slots']->set("headerTitle", $view['translator']->trans('mautic.asset.asset.menu.root'));
-$view['slots']->set('searchUri', $view['router']->generate('mautic_asset_index', array('asset' => $asset)));
-$view['slots']->set('searchString', $app->getSession()->get('mautic.asset.filter'));
-$view['slots']->set('searchHelp', $view['translator']->trans('mautic.asset.asset.help.searchcommands'));
 ?>
 
 <?php if ($permissions['asset:assets:create']): ?>
@@ -27,4 +24,17 @@ $view['slots']->set('searchHelp', $view['translator']->trans('mautic.asset.asset
     <?php $view['slots']->stop(); ?>
 <?php endif; ?>
 
-<?php $view['slots']->output('_content'); ?>
+<div class="panel panel-default">
+    <div class="panel-body">
+        <div class="box-layout">
+            <div class="col-xs-6 va-m">
+                <?php echo $view->render('MauticCoreBundle:Helper:search.html.php', array('searchValue' => $searchValue, 'action' => $currentRoute)); ?>
+            </div>
+            <div class="col-xs-6 va-m text-right">
+                <button type="button" class="btn btn-warning"><i class="fa fa-files-o"></i></button>
+                <button type="button" class="btn btn-danger"><i class="fa fa-trash-o"></i></button>
+            </div>
+        </div>
+    </div>
+	<?php $view['slots']->output('_content'); ?>
+</div>

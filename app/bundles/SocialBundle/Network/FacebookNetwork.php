@@ -34,7 +34,7 @@ class FacebookNetwork extends AbstractNetwork
      *
      * @return array
      */
-    public function getIdentifierField()
+    public function getIdentifierFields()
     {
         return array(
             'facebook'
