@@ -83,6 +83,29 @@ class EmailRepository extends CommonRepository
     }
 
     /**
+     * Get amounts of sent and read emails
+     *
+     * @param array      $args
+     * @return array
+     */
+    public function getSentReadCount($args = array())
+    {
+        $q = $this->_em->createQueryBuilder();
+        $q->select('SUM(e.sentCount) as sentCount, SUM(e.readCount) as readCount')
+            ->from('MauticEmailBundle:Email', 'e');
+        $results = $q->getQuery()->getSingleResult();
+
+        if (!isset($results['sentCount'])) {
+            $results['sentCount'] = 0;
+        }
+        if (!isset($results['readCount'])) {
+            $results['readCount'] = 0;
+        }
+
+        return $results;
+    }
+
+    /**
      * @param string $search
      * @param int    $limit
      * @param int    $start

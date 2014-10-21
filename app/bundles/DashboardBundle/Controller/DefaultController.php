@@ -31,16 +31,25 @@ class DefaultController extends CommonController
     {
     	$model = $this->factory->getModel('dashboard.dashboard');
 
+        $sentReadCount = $this->factory->getModel('email.email')->getRepository()->getSentReadCount();
         $popularPages = $this->factory->getModel('page.page')->getRepository()->getPopularPages();
         $popularAssets = $this->factory->getModel('asset.asset')->getRepository()->getPopularAssets();
         $popularCampaigns = $this->factory->getModel('campaign.campaign')->getRepository()->getPopularCampaigns();
 
+        $openRate = 0;
+
+        if ($sentReadCount['sentCount']) {
+            $openRate = round($sentReadCount['readCount'] / $sentReadCount['sentCount'] * 100);
+        }
+
         return $this->delegateView(array(
             'viewParameters'  =>  array(
-                'popularPages' => $popularPages,
-                'popularAssets' => $popularAssets,
-                'popularCampaigns' => $popularCampaigns,
-                'security'    => $this->factory->getSecurity()
+                'sentReadCount'     => $sentReadCount,
+                'openRate'          => $openRate,
+                'popularPages'      => $popularPages,
+                'popularAssets'     => $popularAssets,
+                'popularCampaigns'  => $popularCampaigns,
+                'security'          => $this->factory->getSecurity()
             ),
             'contentTemplate' => 'MauticDashboardBundle:Default:index.html.php',
             'passthroughVars' => array(

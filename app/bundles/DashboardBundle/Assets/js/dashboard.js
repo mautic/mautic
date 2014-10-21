@@ -1,6 +1,7 @@
 //DashboardBundle
 Mautic.dashboardOnLoad = function (container) {
     Mautic.loadDashboardMap();
+    Mautic.renderOpenRateDoughnut();
 };
 
 Mautic.loadDashboardMap = function () {
@@ -41,4 +42,27 @@ Mautic.loadDashboardMap = function () {
             });
         }
     });
+}
+
+Mautic.renderOpenRateDoughnut = function () {
+    var element = mQuery('#open-reate');
+    var sentCount = +element.attr('data-sent-count');
+    var readCount = +element.attr('data-read-count');
+    var options = {percentageInnerCutout: 90, responsive: false}
+    var data = [
+        {
+            value: readCount,
+            color:"#4E5D9D",
+            highlight: "#353F6A",
+            label: "Opened"
+        },
+        {
+            value: sentCount - readCount,
+            color: "#ffffff",
+            highlight: "#EBEBEB",
+            label: "Not opened"
+        }
+    ];
+    var ctx = document.getElementById("open-reate").getContext("2d");
+    var myNewChart = new Chart(ctx).Doughnut(data, options);
 }
