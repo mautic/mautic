@@ -30,24 +30,6 @@ class DefaultController extends CommonController
     public function indexAction()
     {
     	$model = $this->factory->getModel('dashboard.dashboard');
-        
-
-        //set some permissions
-        $permissions = $this->factory->getSecurity()->isGranted(array(
-            'dashboard:dashboards:viewown',
-            'dashboard:dashboards:viewother',
-            'dashboard:dashboards:create',
-            'dashboard:dashboards:editown',
-            'dashboard:dashboards:editother',
-            'dashboard:dashboards:deleteown',
-            'dashboard:dashboards:deleteother',
-            'dashboard:dashboards:publishown',
-            'dashboard:dashboards:publishother'
-        ), "RETURN_ARRAY");
-
-        if (!$permissions['dashboard:dashboards:viewown'] && !$permissions['dashboard:dashboards:viewother']) {
-            return $this->accessDenied();
-        }
 
         $popularPages = $this->factory->getModel('page.page')->getRepository()->getPopularPages();
         $popularAssets = $this->factory->getModel('asset.asset')->getRepository()->getPopularAssets();
