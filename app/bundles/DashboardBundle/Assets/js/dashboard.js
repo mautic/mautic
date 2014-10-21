@@ -3,10 +3,6 @@ Mautic.dashboardOnLoad = function (container) {
     Mautic.loadDashboardMap();
     Mautic.renderOpenRateDoughnut();
     Mautic.updateActiveVisitorCount();
-    // setInterval(function() {
-    //     Mautic.updateActiveVisitorCount();
-    // }, 5000);
-    
 };
 
 Mautic.loadDashboardMap = function () {

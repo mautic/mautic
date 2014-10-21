@@ -64,7 +64,7 @@ class AjaxController extends CommonAjaxController
 
         /** @var \Mautic\PageBundle\Entity\PageRepository $pageRepository */
         $pageRepository = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit');
-        $dataArray['viewingVisitors'] = $pageRepository->countViewingVisitors();
+        $dataArray['viewingVisitors'] = $pageRepository->countVisitors(60, true);
 
         $dataArray['success'] = 1;
 

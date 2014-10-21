@@ -33,6 +33,8 @@ class DefaultController extends CommonController
 
         $sentReadCount = $this->factory->getModel('email.email')->getRepository()->getSentReadCount();
         $newReturningVisitors = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit')->getNewReturningVisitorsCount();
+        $weekVisitors = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit')->countVisitors(604800);
+        $allTimeVisitors = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit')->countVisitors(0);
         $popularPages = $this->factory->getModel('page.page')->getRepository()->getPopularPages();
         $popularAssets = $this->factory->getModel('asset.asset')->getRepository()->getPopularAssets();
         $popularCampaigns = $this->factory->getModel('campaign.campaign')->getRepository()->getPopularCampaigns();
@@ -48,6 +50,8 @@ class DefaultController extends CommonController
                 'sentReadCount'     => $sentReadCount,
                 'openRate'          => $openRate,
                 'newReturningVisitors' => $newReturningVisitors,
+                'weekVisitors'      => $weekVisitors,
+                'allTimeVisitors'   => $allTimeVisitors,
                 'popularPages'      => $popularPages,
                 'popularAssets'     => $popularAssets,
                 'popularCampaigns'  => $popularCampaigns,

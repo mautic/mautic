@@ -165,17 +165,23 @@ class HitRepository extends CommonRepository
      * @param integer      $seconds
      * @return integer
      */
-    public function countViewingVisitors($seconds = 60)
+    public function countVisitors($seconds = 60, $notLeft = false)
     {
         $now = new \DateTime();
         $viewingTime = new \DateInterval('PT'.$seconds.'S');
         $now->sub($viewingTime);
         $query = $this->createQueryBuilder('h');
 
-        $query->select('count(h.code) as visitors')
-            ->where($query->expr()->gte('h.dateHit', ':date'))
-            ->setParameter('date', $now)
-            ->andWhere($query->expr()->isNull('h.dateLeft'));
+        $query->select('count(h.code) as visitors');
+
+        if ($seconds) {
+            $query->where($query->expr()->gte('h.dateHit', ':date'))
+                ->setParameter('date', $now);
+        }
+        
+        if ($notLeft) {
+            $query->andWhere($query->expr()->isNull('h.dateLeft'));
+        }
 
         $result = $query->getQuery()->getSingleResult();
 
