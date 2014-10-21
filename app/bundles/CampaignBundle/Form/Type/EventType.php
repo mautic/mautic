@@ -38,13 +38,6 @@ class EventType extends AbstractType
             'required'   => false
         ));
 
-        $builder->add('description', 'text', array(
-            'label'      => 'mautic.campaign.event.description',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control'),
-            'required'   => false
-        ));
-
         if ($options['data']['eventType'] == 'action') {
             $triggerMode = (empty($options['data']['triggerMode'])) ? 'immediate' : $options['data']['triggerMode'];
             $builder->add('triggerMode', 'button_group', array(
