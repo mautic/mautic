@@ -34,8 +34,8 @@ $view['slots']->set('mauticContent', 'dashboard');
                                 <div style="font-size:x-small;text-align:center;padding:2px;color:#35B4B9;position:absolute;top:50%;left:50%;margin-left:-26px;margin-top:-15px">Click Rate<br><?php echo $openRate ?>%</div>
                             </div>
     			            <ul class="list-group">
-                                <li class="list-group-item">Email Delivered <span class="badge pull-right">100</span></li>
-                                <li class="list-group-item">Total Click <span class="badge pull-right">90</span></li>
+                                <li class="list-group-item">Email Delivered <span class="badge pull-right"><?php echo $allSentEmails; ?></span></li>
+                                <li class="list-group-item">Total Click <span class="badge pull-right"><?php echo $sentReadCount['clickCount'] ?></span></li>
     			            </ul>
     			        </div>
     			    </div>
@@ -43,8 +43,8 @@ $view['slots']->set('mauticContent', 'dashboard');
     			        <div class="panel mb-0">
                             <div class="text-center pa-20 jumbo-font h150" id="active-visitors" style="text-shadow: #fff 0px 0px 50px;transition: text-shadow 1.2s ease;" >0</div>
                             <ul class="list-group">
-                                <li class="list-group-item">Most Visits this Week<span class="badge pull-right"><?php echo $weekVisitors ?></span></li>
-                                <li class="list-group-item">Most Visits all Time <span class="badge pull-right"><?php echo $allTimeVisitors ?></span></li>
+                                <li class="list-group-item">Most Visits this Week<span class="badge pull-right"><?php echo $weekVisitors; ?></span></li>
+                                <li class="list-group-item">Most Visits all Time <span class="badge pull-right"><?php echo $allTimeVisitors; ?></span></li>
                             </ul>
     			        </div>
     			    </div>

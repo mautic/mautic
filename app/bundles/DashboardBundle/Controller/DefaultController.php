@@ -35,6 +35,7 @@ class DefaultController extends CommonController
         $newReturningVisitors = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit')->getNewReturningVisitorsCount();
         $weekVisitors = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit')->countVisitors(604800);
         $allTimeVisitors = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit')->countVisitors(0);
+        $allSentEmails = $this->factory->getEntityManager()->getRepository('MauticEmailBundle:Stat')->getSentCount();
         $popularPages = $this->factory->getModel('page.page')->getRepository()->getPopularPages();
         $popularAssets = $this->factory->getModel('asset.asset')->getRepository()->getPopularAssets();
         $popularCampaigns = $this->factory->getModel('campaign.campaign')->getRepository()->getPopularCampaigns();
@@ -61,6 +62,7 @@ class DefaultController extends CommonController
                 'popularPages'      => $popularPages,
                 'popularAssets'     => $popularAssets,
                 'popularCampaigns'  => $popularCampaigns,
+                'allSentEmails'     => $allSentEmails,
                 'security'          => $this->factory->getSecurity()
             ),
             'contentTemplate' => 'MauticDashboardBundle:Default:index.html.php',

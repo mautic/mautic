@@ -103,7 +103,7 @@ class EmailRepository extends CommonRepository
         }
 
         // @TODO: This is fake data. Replace it when click count ready
-        $results['clickCount'] = $results['readCount'] - ($results['readCount'] * 0.37);
+        $results['clickCount'] = round($results['readCount'] - ($results['readCount'] * 0.37));
 
         return $results;
     }
