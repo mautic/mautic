@@ -17,10 +17,6 @@ $header = ($entity->getId()) ?
 $view['slots']->set("headerTitle", $header);
 ?>
 
-<?php echo $view['slots']->start('actions'); ?>
-
-<?php echo $view['slots']->stop('actions'); ?>
-
 <?php echo $view['form']->start($form); ?>
 <!-- start: box layout -->
 <div class="box-layout">
@@ -46,11 +42,6 @@ $view['slots']->set("headerTitle", $header);
     </div>
 </div>
 
-    <?php echo $view['form']->end($form); ?>
-    <?php
-    $view['slots']->append('modal', $this->render('MauticCoreBundle:Helper:modal.html.php', array(
-        'id'     => 'campaignEventModal',
-        'header' => $view['translator']->trans('mautic.campaign.form.modalheader'),
-    )));
-    ?>
-</div>
+<?php echo $view['form']->end($form); ?>
+
+<?php echo $view->render('MauticCampaignBundle:Campaign:builder.html.php', array('components' => $components)); ?>

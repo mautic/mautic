@@ -121,6 +121,18 @@ Mautic.updateCampaignEventLinks = function () {
 };
 
 /**
+ * Launch campaign builder modal
+ */
+Mautic.launchCampaignEditor = function() {
+//    mQuery('#campaignBuilder').modal('show');
+    mQuery('.page-builder').addClass('page-builder-active');
+    //show it
+
+    Mautic.drawCampaign();
+    mQuery('.page-builder').removeClass('hide');
+};
+
+/**
  * Enable/Disable timeframe settings if the toggle for immediate trigger is changed
  */
 Mautic.campaignToggleTimeframes = function() {
@@ -144,3 +156,4 @@ Mautic.campaignToggleTimeframes = function() {
         }
     }
 };
+

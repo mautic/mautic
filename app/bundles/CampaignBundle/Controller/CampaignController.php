@@ -276,14 +276,14 @@ class CampaignController extends FormController
         $events = $model->getEvents();
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'eventSettings'  => $events,
+                'components'  => $events,
                 'campaignEvents' => $addEvents,
                 'deletedEvents'  => $deletedEvents,
                 'tmpl'           => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                 'entity'         => $entity,
                 'form'           => $form->createView()
             ),
-            'contentTemplate' => 'MauticCampaignBundle:CampaignBuilder:index.html.php',
+            'contentTemplate' => 'MauticCampaignBundle:Campaign:form.html.php',
             'passthroughVars' => array(
                 'activeLink'    => '#mautic_campaign_index',
                 'mauticContent' => 'campaign',
@@ -460,7 +460,7 @@ class CampaignController extends FormController
                 'entity'         => $entity,
                 'form'           => $form->createView()
             ),
-            'contentTemplate' => 'MauticCampaignBundle:CampaignBuilder:index.html.php',
+            'contentTemplate' => 'MauticCampaignBundle:Campaign:form.html.php',
             'passthroughVars' => array(
                 'activeLink'    => '#mautic_campaign_index',
                 'mauticContent' => 'campaign',
