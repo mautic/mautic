@@ -195,7 +195,7 @@ if ($security->hasEntityAccess($permissions['asset:assets:editown'], $permission
                                     <span class="text-white dark-md fw-sb mb-xs">Unique: <?php echo $stats['downloads']['unique']; ?></span>
                                 </div>
                                 <div class="col-xs-4 va-m text-right">
-                                    <div class="btn-group" data-asset-id="<?php echo $activeAsset->getId(); ?>">
+                                    <div class="btn-group">
                                         <a href="#" class="btn btn-sm btn-default" onclick="Mautic.updateDownloadChart(this, 24, 'H');return false;">Hourly</a>
                                         <a href="#" class="btn btn-sm btn-default active" onclick="Mautic.updateDownloadChart(this, 30, 'D');return false;">Dayly</a>
                                         <a href="#" class="btn btn-sm btn-default" onclick="Mautic.updateDownloadChart(this, 20, 'W');return false;">Weekly</a>
@@ -290,5 +290,6 @@ if ($security->hasEntityAccess($permissions['asset:assets:editown'], $permission
         </div>
     </div>
     <!--/ right section -->
+    <input id="itemId" value="<?php echo $activeAsset->getId(); ?>" />
 </div>
 <!--/ end: box layout -->
