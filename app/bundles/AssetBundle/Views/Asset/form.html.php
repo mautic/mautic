@@ -6,20 +6,15 @@
  * @link        http://mautic.com
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 $view->extend('MauticCoreBundle:Default:content.html.php');
-$view['slots']->set('mauticContent', 'asset');
-
-$subheader = '';
-
 $header = ($activeAsset->getId()) ?
     $view['translator']->trans('mautic.asset.asset.menu.edit',
         array('%name%' => $activeAsset->getTitle())) :
     $view['translator']->trans('mautic.asset.asset.menu.new');
-
-$view['slots']->set("headerTitle", $header.$subheader);
+$view['slots']->set("headerTitle", $header);
+$view['slots']->set('mauticContent', 'asset');
 ?>
-
+<?php echo $view['form']->start($form); ?>
 <!-- start: box layout -->
 <div class="box-layout">
     <!-- container -->
