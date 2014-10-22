@@ -184,23 +184,32 @@ if ($security->hasEntityAccess($permissions['asset:assets:editown'], $permission
                         <div class="panel">
                             <div class="panel-body box-layout">
                                 <div class="col-xs-4 va-m">
-                                    <h5 class="text-white dark-md fw-sb mb-xs">Downloads</h5>
+                                    <h5 class="text-white dark-md fw-sb mb-xs">
+                                        <span class="fa fa-download"></span>
+                                        Downloads
+                                    </h5>
                                 </div>
                                 <div class="col-xs-4 va-m text-center">
                                     <span class="text-white dark-md fw-sb mb-xs">Total: <?php echo $stats['downloads']['total']; ?></span>
                                     <span class="text-white dark-md fw-sb mb-xs">|</span>
                                     <span class="text-white dark-md fw-sb mb-xs">Unique: <?php echo $stats['downloads']['unique']; ?></span>
                                 </div>
-                                <div class="col-xs-4 va-t text-right">
-                                    <h3 class="text-white dark-sm"><span class="fa fa-download"></span></h3>
+                                <div class="col-xs-4 va-m text-right">
+                                    <div class="btn-group" data-asset-id="<?php echo $activeAsset->getId(); ?>">
+                                        <a href="#" class="btn btn-sm btn-default" onclick="Mautic.updateDownloadChart(this, 24, 'H');return false;">Hourly</a>
+                                        <a href="#" class="btn btn-sm btn-default active" onclick="Mautic.updateDownloadChart(this, 30, 'D');return false;">Dayly</a>
+                                        <a href="#" class="btn btn-sm btn-default" onclick="Mautic.updateDownloadChart(this, 20, 'W');return false;">Weekly</a>
+                                        <a href="#" class="btn btn-sm btn-default" onclick="Mautic.updateDownloadChart(this, 24, 'M');return false;">Monthly</a>
+                                        <a href="#" class="btn btn-sm btn-default" onclick="Mautic.updateDownloadChart(this, 10, 'Y');return false;">Yearly</a>
+                                    </div>
                                 </div>
                             </div>
                             <div class="pt-0 pl-15 pb-10 pr-15">
                                 <div>
                                     <canvas id="download-chart" height="80"></canvas>
                                 </div>
-                                <div id="download-chart-data" class="hide"><?php echo json_encode($stats['downloads']['timeStats']); ?></div>
                             </div>
+                            <div id="download-chart-data" class="hide"><?php echo json_encode($stats['downloads']['timeStats']); ?></div>
                         </div>
                     </div>
                 </div>

@@ -73,7 +73,7 @@ class DownloadRepository extends CommonRepository
      *
      * @param integer $assetId
      * @param integer $amount
-     * @param integer $unit: php.net/manual/en/class.dateinterval.php#dateinterval.props
+     * @param char $unit: php.net/manual/en/dateinterval.construct.php#refsect1-dateinterval.construct-parameters
      *
      * @return array
      * @throws \Doctrine\ORM\NoResultException
@@ -81,13 +81,28 @@ class DownloadRepository extends CommonRepository
      */
     public function getDownloads($assetId, $amount = 30, $unit = 'D')
     {
+        $isTime = '';
+
+        if ($unit == 'H') {
+            $isTime = 'T';
+            $format = 'H:00';
+        } elseif ($unit == 'D') {
+            $format = 'jS F';
+        } elseif ($unit == 'W') {
+            $format = 'W';
+        } elseif ($unit == 'M') {
+            $format = 'F y';
+        } elseif ($unit == 'Y') {
+            $format = 'Y';
+        }
+
         $date = new \DateTime();
-        $oneUnit = new \DateInterval('P1'.$unit);
+        $oneUnit = new \DateInterval('P'.$isTime.'1'.$unit);
         $data = array('labels' => array(), 'values' => array());
 
         // Prefill $data arrays
-        for ($i = 0; $i < 30; $i++) {
-            $data['labels'][$i] = $date->format('Y-m-d');
+        for ($i = 0; $i < $amount; $i++) {
+            $data['labels'][$i] = $date->format($format);
             $data['values'][$i] = 0;
             $date->sub($oneUnit);
         }
@@ -103,7 +118,7 @@ class DownloadRepository extends CommonRepository
 
         // Group hits by date
         foreach ($downloads as $download) {
-            $oneItem = $download['dateDownload']->format('Y-m-d');
+            $oneItem = $download['dateDownload']->format($format);
             if (($itemKey = array_search($oneItem, $data['labels'])) !== false) {
                 $data['values'][$itemKey]++;
             }
