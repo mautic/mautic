@@ -186,15 +186,17 @@ class Configurator
         $string .= "\$parameters = array(\n";
 
         foreach ($this->parameters as $key => $value) {
-            if (is_string($value)) {
-                $value = "'$value'";
-            } elseif (is_bool($value)) {
-                $value = ($value) ? 'true' : 'false';
-            } elseif (is_null($value)) {
-                $value = 'null';
-            }
+            if ($value !== '') {
+                if (is_string($value)) {
+                    $value = "'$value'";
+                } elseif (is_bool($value)) {
+                    $value = ($value) ? 'true' : 'false';
+                } elseif (is_null($value)) {
+                    $value = 'null';
+                }
 
-            $string .= "\t'$key' => $value,\n";
+                $string .= "\t'$key' => $value,\n";
+            }
         }
 
         $string .= ");\n";

@@ -8,57 +8,28 @@
  */
 ?>
 
-<div class="panel-toolbar-wrapper">
-    <div class="panel-toolbar">
-        <ul class="nav nav-tabs nav-justified">
-            <li class="active">
-                <a href="#FoursquareProfile" role="tab" data-toggle="tab">
-                    <?php echo $view['translator']->trans('mautic.lead.lead.social.foursquare.profile'); ?>
-                </a>
-            </li>
-            <?php /*
-            <li>
-                <a href="#FoursquareMayor" role="tab" data-toggle="tab">
-                    <?php echo $view['translator']->trans('mautic.lead.lead.social.foursquare.mayorship'); ?>
-                </a>
-            </li>
-            <li>
-                <a href="#FoursquareLists" role="tab" data-toggle="tab">
-                    <?php echo $view['translator']->trans('mautic.lead.lead.social.foursquare.lists'); ?>
-                </a>
-            </li>
-            */ ?>
-            <li>
-                <a href="#FoursquareTips" role="tab" data-toggle="tab">
-                    <?php echo $view['translator']->trans('mautic.lead.lead.social.foursquare.tips'); ?>
-                </a>
-            </li>
-        </ul>
-    </div>
+<div class="panel-toolbar np">
+    <ul class="nav nav-tabs pr-md pl-md">
+        <li class="active">
+            <a href="#FoursquareProfile" role="tab" data-toggle="tab">
+                <?php echo $view['translator']->trans('mautic.lead.lead.social.foursquare.profile'); ?>
+            </a>
+        </li>
+        <li>
+            <a href="#FoursquareTips" role="tab" data-toggle="tab">
+                <?php echo $view['translator']->trans('mautic.lead.lead.social.foursquare.tips'); ?>
+            </a>
+        </li>
+    </ul>
 </div>
 
-<div class="panel-body tab-content">
-    <div class="tab-pane active" id="FoursquareProfile">
+<div class="np panel-body tab-content">
+    <div class="pa-20 tab-pane active" id="FoursquareProfile">
         <?php echo $view->render('MauticLeadBundle:Social/Foursquare:profile.html.php', array(
             'lead'      => $lead,
             'profile'   => $details['profile']
         )); ?>
     </div>
-    <?php /*
-    <div class="tab-pane" id="FoursquareMayor">
-        <?php echo $view->render('MauticLeadBundle:Social/Foursquare:mayor.html.php', array(
-            'lead'      => $lead,
-            'activity'   => $details['activity']['mayorships']
-        )); ?>
-    </div>
-
-    <div class="tab-pane" id="FoursquareLists">
-        <?php echo $view->render('MauticLeadBundle:Social/Foursquare:lists.html.php', array(
-            'lead'      => $lead,
-            'activity'   => $details['activity']['lists']
-        )); ?>
-    </div>
-    */ ?>
     <div class="tab-pane" id="FoursquareTips">
         <?php echo $view->render('MauticLeadBundle:Social/Foursquare:tips.html.php', array(
             'lead'      => $lead,

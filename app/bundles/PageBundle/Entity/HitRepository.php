@@ -81,11 +81,12 @@ class HitRepository extends CommonRepository
     {
         $date = new \DateTime();
         $oneDay = new \DateInterval('P1D');
-        $days = array();
+        $data = array('labels' => array(), 'values' => array());
 
-        // Prefill $days array keys
+        // Prefill $data arrays
         for ($i = 0; $i < 30; $i++) {
-            $days[$date->format('Y-m-d')] = 0;
+            $data['labels'][$i] = $date->format('Y-m-d');
+            $data['values'][$i] = 0;
             $date->sub($oneDay);
         }
         
@@ -101,10 +102,100 @@ class HitRepository extends CommonRepository
         // Group hits by date
         foreach ($hits as $hit) {
             $day = $hit['dateHit']->format('Y-m-d');
-            $days[$day]++;
+            if (($dayKey = array_search($day, $data['labels'])) !== false) {
+                $data['values'][$dayKey]++;
+            }
         }
 
-        return $days;
+        $data['values'] = array_reverse($data['values']);
+        $data['labels'] = array_reverse($data['labels']);
+
+        return $data;
+    }
+
+    /**
+     * Get new, unique and returning visitors
+     *
+     * @param array      $args
+     * @return array
+     */
+    public function getNewReturningVisitorsCount($args = array())
+    {
+        $results = array();
+        $results['returning'] = $this->getReturningCount($args);
+        $results['unique'] = $this->getUniqueCount($args);
+        $results['new'] = $results['unique'] - $results['returning'];
+
+        return $results;
+    }
+
+    /**
+     * Count returning visitors
+     *
+     * @param array      $args
+     * @return integer
+     */
+    public function getReturningCount($args = array())
+    {
+        $q = $this->createQueryBuilder('h');
+        $q->select('COUNT(h.ipAddress) as returning')
+            ->groupBy('h.ipAddress')
+            ->having($q->expr()->gt('COUNT(h.ipAddress)', 1));
+        $results = $q->getQuery()->getResult();
+
+        return count($results);
+    }
+
+    /**
+     * Count how many unique visitors hit pages
+     *
+     * @param array      $args
+     * @return integer
+     */
+    public function getUniqueCount($args = array())
+    {
+        $q = $this->createQueryBuilder('h');
+        $q->select('COUNT(DISTINCT h.ipAddress) as unique');
+        $results = $q->getQuery()->getSingleResult();
+
+        if (!isset($results['unique'])) {
+            return 0;
+        }
+
+        return (int) $results['unique'];
+    }
+
+    /**
+     * Count how many visitors hit some page in last X $seconds
+     *
+     * @param integer      $seconds
+     * @return integer
+     */
+    public function countVisitors($seconds = 60, $notLeft = false)
+    {
+        $now = new \DateTime();
+        $viewingTime = new \DateInterval('PT'.$seconds.'S');
+        $now->sub($viewingTime);
+        $query = $this->createQueryBuilder('h');
+
+        $query->select('count(h.code) as visitors');
+
+        if ($seconds) {
+            $query->where($query->expr()->gte('h.dateHit', ':date'))
+                ->setParameter('date', $now);
+        }
+        
+        if ($notLeft) {
+            $query->andWhere($query->expr()->isNull('h.dateLeft'));
+        }
+
+        $result = $query->getQuery()->getSingleResult();
+
+        if (!isset($result['visitors'])) {
+            return 0;
+        }
+
+        return (int) $result['visitors'];
     }
 
     /**

@@ -67,4 +67,66 @@ class DownloadRepository extends CommonRepository
         return $query->getQuery()
             ->getArrayResult();
     }
+
+    /**
+     * Get hit count per day for last 30 days
+     *
+     * @param integer $assetId
+     * @param integer $amount
+     * @param char $unit: php.net/manual/en/dateinterval.construct.php#refsect1-dateinterval.construct-parameters
+     *
+     * @return array
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function getDownloads($assetId, $amount = 30, $unit = 'D')
+    {
+        $isTime = '';
+
+        if ($unit == 'H') {
+            $isTime = 'T';
+            $format = 'H:00';
+        } elseif ($unit == 'D') {
+            $format = 'jS F';
+        } elseif ($unit == 'W') {
+            $format = 'W';
+        } elseif ($unit == 'M') {
+            $format = 'F y';
+        } elseif ($unit == 'Y') {
+            $format = 'Y';
+        }
+
+        $date = new \DateTime();
+        $oneUnit = new \DateInterval('P'.$isTime.'1'.$unit);
+        $data = array('labels' => array(), 'values' => array());
+
+        // Prefill $data arrays
+        for ($i = 0; $i < $amount; $i++) {
+            $data['labels'][$i] = $date->format($format);
+            $data['values'][$i] = 0;
+            $date->sub($oneUnit);
+        }
+        
+        $query = $this->createQueryBuilder('d');
+        
+        $query->select('IDENTITY(d.asset), d.dateDownload')
+            ->where($query->expr()->eq('IDENTITY(d.asset)', (int) $assetId))
+            ->andwhere($query->expr()->gte('d.dateDownload', ':date'))
+            ->setParameter('date', $date);
+
+        $downloads = $query->getQuery()->getArrayResult();
+
+        // Group hits by date
+        foreach ($downloads as $download) {
+            $oneItem = $download['dateDownload']->format($format);
+            if (($itemKey = array_search($oneItem, $data['labels'])) !== false) {
+                $data['values'][$itemKey]++;
+            }
+        }
+
+        $data['values'] = array_reverse($data['values']);
+        $data['labels'] = array_reverse($data['labels']);
+
+        return $data;
+    }
 }

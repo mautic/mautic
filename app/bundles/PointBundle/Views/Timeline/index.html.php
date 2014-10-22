@@ -16,17 +16,12 @@ $item = $event['extra']['log'];
 	<div class="panel">
 	    <div class="panel-body">
 	    	<h3>
-	    		<a href="<?php echo $view['router']->generate('mautic_point_action',
-				    array("objectAction" => "view", "objectId" => $item->getId())); ?>"
-				   data-toggle="ajax">
-				    <?php echo $item->getName(); ?>
-				</a>
+				<span class="text-primary"><?php echo $item['eventName']; ?>:</span> <?php echo $item['actionName']; ?>
 			</h3>
 	        <p class="mb-0">At <?php echo $view['date']->toFullConcat($event['timestamp']); ?>, <?php echo $event['eventLabel']; ?>.</p>
 	    </div>
         <div class="panel-footer">
-	        <p><strong>Point description:</strong> <?php echo $item->getDescription() ?></p>
-	        <p><strong>Point type:</strong> <?php echo $item->getType() ?></p>
+	        <p><strong>Point increment:</strong> <strong class="text-primary"><?php echo $item['delta'] ?></strong></p>
         </div>
 	</div>
 </li>

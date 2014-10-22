@@ -53,6 +53,11 @@ class TableSchemaHelper
     protected $dropTables;
 
     /**
+     * @var
+     */
+    protected $addTables;
+
+    /**
      * @param Connection $db
      * @param            $prefix
      */
@@ -94,6 +99,7 @@ class TableSchemaHelper
 
         //now add the tables
         foreach ($tables as $table) {
+            $this->addTables[] = $table;
             $this->addTable($table, false);
         }
     }
@@ -132,6 +138,8 @@ class TableSchemaHelper
                 $this->deleteTable($table['name']);
             }
         }
+
+        $this->addTables[] = $table;
 
         $options = (isset($table['options'])) ? $table['options'] : array();
         $columns = (isset($table['columns'])) ? $table['columns'] : array();
@@ -189,11 +197,15 @@ class TableSchemaHelper
         }
 
         $sql = $this->schema->toSql($platform);
+
         if (!empty($sql)) {
             foreach ($sql as $s) {
                 $this->db->executeUpdate($s);
             }
         }
+
+        //reset schema
+        $this->schema = new \Doctrine\DBAL\Schema\Schema(array(), array(), $this->sm->createSchemaConfig());
     }
 
     /**

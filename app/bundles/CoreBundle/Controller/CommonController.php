@@ -75,6 +75,10 @@ class CommonController extends Controller implements MauticController
             );
         }
 
+        if (isset($args['passthroughVars']['route'])) {
+            $args['viewParameters']['currentRoute'] = $args['passthroughVars']['route'];
+        }
+
         if ($this->request->isXmlHttpRequest() && !$this->request->get('ignoreAjax', false)) {
             return $this->ajaxAction($args);
         } else {

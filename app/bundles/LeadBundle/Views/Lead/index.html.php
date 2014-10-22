@@ -14,23 +14,15 @@ $view['slots']->set("headerTitle", $view['translator']->trans('mautic.lead.lead.
 
 <?php if ($permissions['lead:leads:create']): ?>
     <?php $view['slots']->start("actions"); ?>
-        <a id="new-lead" href="<?php echo $this->container->get('router')->generate(
-            'mautic_lead_action', array("objectAction" => "new")); ?>"
-           data-toggle="ajax"
-           class="btn btn-default"
-           data-menu-link="#mautic_lead_index">
+        <a id="new-lead" href="<?php echo $this->container->get('router')->generate('mautic_lead_action', array("objectAction" => "new")); ?>" data-toggle="ajax" class="btn btn-default" data-menu-link="#mautic_lead_index">
             <i class="fa fa-plus"></i> <?php echo $view["translator"]->trans("mautic.lead.lead.menu.new"); ?>
         </a>
         <button class="btn btn-default" data-toggle="modal" data-target="#lead-quick-add">
             <i class="fa fa-plus"></i> <?php echo $view["translator"]->trans("mautic.lead.lead.menu.quickadd"); ?>
         </button>
         <div class="btn-group">
-          <a id="table-view" href="<?php echo $view['router']->generate('mautic_lead_index', array('page' => $page, 'view' => 'list')); ?>"
-           data-toggle="ajax"
-           class="btn btn-default"><i class="fa fa-fw fa-table"></i></a>
-          <a id="card-view" href="<?php echo $view['router']->generate('mautic_lead_index', array('page' => $page, 'view' => 'grid')); ?>"
-           data-toggle="ajax"
-           class="btn btn-default"><i class="fa fa-fw fa-th-large"></i></a>
+          <a id="table-view" href="<?php echo $view['router']->generate('mautic_lead_index', array('page' => $page, 'view' => 'list')); ?>" data-toggle="ajax" class="btn btn-default"><i class="fa fa-fw fa-table"></i></a>
+          <a id="card-view" href="<?php echo $view['router']->generate('mautic_lead_index', array('page' => $page, 'view' => 'grid')); ?>" data-toggle="ajax" class="btn btn-default"><i class="fa fa-fw fa-th-large"></i></a>
         </div>
     <?php
     echo $view->render('MauticCoreBundle:Helper:modal.html.php', array(
@@ -46,4 +38,23 @@ $view['slots']->set("headerTitle", $view['translator']->trans('mautic.lead.lead.
 
 <?php endif; ?>
 
-<?php $view['slots']->output('_content'); ?>
+<div class="panel panel-default bdr-t-wdh-0">
+    <div class="panel-body">
+        <div class="box-layout">
+            <div class="col-xs-6 va-m">
+                <?php echo $view->render('MauticCoreBundle:Helper:search.html.php', array('searchValue' => $searchValue, 'action' => $currentRoute)); ?>
+            </div>
+            <div class="col-xs-6 va-m text-right">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-default"><i class="fa fa-upload"></i></button>
+                    <button type="button" class="btn btn-default"><i class="fa fa-archive"></i></button>
+                </div>
+                <button type="button" class="btn btn-danger"><i class="fa fa-trash-o"></i></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="page-list">
+    <?php $view['slots']->output('_content'); ?>
+</div>

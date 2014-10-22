@@ -40,7 +40,7 @@ class GooglePlusNetwork extends AbstractNetwork
      *
      * @return string
      */
-    public function getIdentifierField()
+    public function getIdentifierFields()
     {
         return array(
             'googleplus',
@@ -159,15 +159,6 @@ class GooglePlusNetwork extends AbstractNetwork
                     }
                 }
             }
-        }
-
-        if (empty($socialCache['activity'])) {
-            //ensure keys are present
-            $socialCache['activity'] = array(
-                'posts'  => array(),
-                'photos' => array(),
-                'tags'   => array()
-            );
         }
     }
 
@@ -396,6 +387,9 @@ class GooglePlusNetwork extends AbstractNetwork
         }
 
         foreach ($cleaned as $type => $id) {
+            if (empty($id)) {
+                continue;
+            }
             if ($type == 'googleplus' && is_numeric($id)) {
                 //this is a google user ID
                 $socialCache['id'] = $id;

@@ -12,12 +12,14 @@ $class           = (!empty($class)) ? " $class" : "";
 $body            = (empty($body)) ? "" : $body;
 $footer          = (empty($footer)) ? "" : $footer;
 $hidePlaceholder = (empty($body)) ? '' : ' hide';
-$header          = (empty($header)) ? "" : $header;
+$header          = (!isset($header)) ? "" : $header;
+$padding         = (empty($padding)) ? "" : $padding;
 ?>
 
 <div class="modal fade" id="<?php echo $id; ?>" tabindex="-1" role="dialog" aria-labelledby="<?php echo $id; ?>-label" aria-hidden="true">
     <div class="modal-dialog<?php echo $size; ?>">
         <div class="modal-content<?php echo $class; ?>">
+            <?php if ($header !== false): ?>
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span aria-hidden="true">&times;</span></button>
 
@@ -25,7 +27,8 @@ $header          = (empty($header)) ? "" : $header;
                     <?php echo $header; ?>
                 </h4>
             </div>
-            <div class="modal-body">
+            <?php endif; ?>
+            <div class="modal-body <?php echo $padding; ?>">
                 <div class="loading-placeholder<?php echo $hidePlaceholder; ?>">
                     <?php echo $view['translator']->trans('mautic.core.loading'); ?>
                 </div>

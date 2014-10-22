@@ -111,7 +111,7 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
     }
 
     /**
-     * @return int
+     * {@inheritdoc}
      */
     public function getOrder()
     {

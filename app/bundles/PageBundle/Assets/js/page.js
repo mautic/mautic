@@ -7,11 +7,19 @@ Mautic.pageOnLoad = function (container) {
     if (mQuery(container + ' form[name="page"]').length) {
        Mautic.activateCategoryLookup('page', 'page');
     }
+
+    Mautic.renderPageViewsBarChart(container);
 };
 
 Mautic.pageUnLoad = function() {
     //remove page builder from body
     mQuery('.page-builder').remove();
+};
+
+Mautic.pageOnUnload = function(id) {
+    if (id === '#app-content') {
+        delete Mautic.pageViewsBarChartObject;
+    }
 };
 
 Mautic.launchPageEditor = function () {
@@ -98,4 +106,36 @@ Mautic.pageEditorOnLoad = function (container) {
         scrollSpeed: 100,
         cursorAt: {top: 15, left: 15}
     });
+};
+
+Mautic.renderPageViewsBarChart = function (container) {
+    if (!mQuery('#page-views-chart').length) {
+        return;
+    }
+    chartData = mQuery.parseJSON(mQuery('#page-views-chart-data').text());
+    if (typeof chartData.labels === "undefined" || typeof chartData.values === "undefined") {
+        return;
+    }
+    var ctx = document.getElementById("page-views-chart").getContext("2d");
+    var options = {
+         scaleShowGridLines : false,
+         barShowStroke : false,
+         barValueSpacing : 1,
+         showScale: false,
+         tooltipFontSize: 10,
+         tooltipCaretSize: 0
+    }
+    var data = {
+        labels: chartData.labels,
+        datasets: [
+            {
+                fillColor: "#00b49c",
+                highlightFill: "#028473",
+                data: chartData.values
+            }
+        ]
+    };
+    if (typeof Mautic.pageViewsBarChartObject === 'undefined') {
+        Mautic.pageViewsBarChartObject = new Chart(ctx).Bar(data, options);
+    }
 };

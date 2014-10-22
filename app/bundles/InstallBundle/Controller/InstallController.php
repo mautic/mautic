@@ -86,14 +86,27 @@ class InstallController extends CommonController
                 }
 
                 // Post-step processing
+                $flashes = array();
+
                 switch ($index) {
                     case 1:
                         $result = $this->performDatabaseInstallation($form, $configurator, $step);
+                        if (is_array($result)) {
+                            $flashes[] = $result;
+                        }
+
+                        $result = $this->performFixtureInstall();
+                        if (is_array($result)) {
+                            $flashes[] = $result;
+                        }
 
                         break;
 
                     case 2:
                         $result = $this->performUserAddition($form);
+                        if (is_array($result)) {
+                            $flashes[] = $result;
+                        }
 
                         break;
 
@@ -102,7 +115,7 @@ class InstallController extends CommonController
                 }
 
                 // On a failure, the result will be an array; for success it will be a boolean
-                if (is_array($result)) {
+                if (!empty($flashes)) {
                     return $this->postActionRedirect(array(
                         'viewParameters'    => array(
                             'form'    => $form->createView(),
@@ -154,13 +167,9 @@ class InstallController extends CommonController
                     ));
                 }
 
-                // Post-processing once installation is complete
-                $flashes = array();
-                $result = $this->performFieldFixtureInstall();
-
-                if (is_array($result)) {
-                    $flashes[] = $result;
-                }
+                /*
+                 * Post-processing once installation is complete
+                 */
 
                 // Need to generate a secret value and merge it into the config
                 $secret = hash('sha1', uniqid(mt_rand()));
@@ -330,20 +339,16 @@ class InstallController extends CommonController
 
                 if ($error) {
                     return array(
-                        array(
-                            'type'    => 'error',
-                            'msg'     => $msg,
-                            'msgVars' => array('%exception%' => $exception->getMessage())
-                        )
+                        'type'    => 'error',
+                        'msg'     => $msg,
+                        'msgVars' => array('%exception%' => $exception->getMessage())
                     );
                 }
             }
         } else {
             return array(
-                array(
-                    'type' => 'error',
-                    'msg'  => 'mautic.installer.error.no.metadata'
-                )
+                'type' => 'error',
+                'msg'  => 'mautic.installer.error.no.metadata'
             );
         }
 
@@ -360,15 +365,7 @@ class InstallController extends CommonController
     private function performUserAddition($form)
     {
         try {
-            // First we need to create the admin role
-            $translator    = $this->factory->getTranslator();
             $entityManager = $this->factory->getEntityManager();
-            $role = new Role();
-            $role->setName($translator->trans('mautic.user.role.admin.name', array(), 'fixtures'));
-            $role->setDescription($translator->trans('mautic.user.role.admin.description', array(), 'fixtures'));
-            $role->setIsAdmin(1);
-            $entityManager->persist($role);
-            $entityManager->flush();
 
             // Now we create the user
             $data = $form->getData();
@@ -377,12 +374,15 @@ class InstallController extends CommonController
             /** @var \Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface $encoder */
             $encoder = $this->container->get('security.encoder_factory')->getEncoder($user);
 
+            /** @var \Mautic\UserBundle\Model\RoleModel $model */
+            $model = $this->factory->getModel('user.role');
+
             $user->setFirstName($data->firstname);
             $user->setLastName($data->lastname);
             $user->setUsername($data->username);
             $user->setEmail($data->email);
             $user->setPassword($encoder->encodePassword($data->password, $user->getSalt()));
-            $user->setRole($role);
+            $user->setRole($model->getEntity(1));
             $entityManager->persist($user);
             $entityManager->flush();
         } catch (\Exception $exception) {
@@ -398,7 +398,7 @@ class InstallController extends CommonController
         return true;
     }
 
-    private function performFieldFixtureInstall()
+    private function performFixtureInstall()
     {
         try {
             // First we need to setup the environment
@@ -428,7 +428,7 @@ class InstallController extends CommonController
             return array(
                 array(
                     'type'    => 'error',
-                    'msg'     => 'mautic.installer.error.adding.fields',
+                    'msg'     => 'mautic.installer.error.adding.fixtures',
                     'msgVars' => array('%exception%' => $exception->getMessage())
                 )
             );

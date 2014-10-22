@@ -149,20 +149,18 @@ class PointSubscriber extends CommonSubscriber
         }
 
         /** @var \Mautic\PageBundle\Entity\HitRepository $hitRepository */
-        $logRepository = $this->factory->getEntityManager()->getRepository('MauticPointBundle:LeadPointLog');
+        $logRepository = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:PointsChangeLog');
 
-        $logs = $logRepository->getLeadLogs($lead->getId(), $leadIps);
-
-        $model = $this->factory->getModel('point.point');
+        $logs = $logRepository->getLeadTimelineEvents($lead->getId(), $leadIps);
 
         // Add the logs to the event array
         foreach ($logs as $log) {
             $event->addEvent(array(
                 'event'     => $eventTypeKey,
                 'eventLabel' => $eventTypeName,
-                'timestamp' => $log['dateFired'],
+                'timestamp' => $log['dateAdded'],
                 'extra'     => array(
-                    'log' => $model->getEntity($log['point_id'])
+                    'log' => $log
                 ),
                 'contentTemplate' => 'MauticPointBundle:Timeline:index.html.php'
             ));

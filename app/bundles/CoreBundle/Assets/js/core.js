@@ -10,13 +10,15 @@ if (typeof mauticContent !== 'undefined') {
     })(mQuery);
 }
 
-Mousetrap.bind('shift+d', function(e) {
-    mQuery('#mautic_dashboard_index').click();
-});
+if (typeof Mousetrap != 'undefined') {
+    Mousetrap.bind('shift+d', function(e) {
+        mQuery('#mautic_dashboard_index').click();
+    });
 
-Mousetrap.bind('shift+right', function(e) {
-    mQuery('.navbar-right > button.navbar-toggle').click();
-});
+    Mousetrap.bind('shift+right', function(e) {
+        mQuery('.navbar-right > button.navbar-toggle').click();
+    });
+}
 
 //Fix for back/forward buttons not loading ajax content with History.pushState()
 MauticVars.manualStateChange = true;
@@ -56,9 +58,11 @@ mQuery.ajaxSetup({
     }
 });
 
-// configure global Chart options
-Chart.defaults.global.responsive = true;
-Chart.defaults.global.animation = false;
+if (typeof Chart != 'undefined') {
+    // configure global Chart options
+    Chart.defaults.global.responsive = true;
+    Chart.defaults.global.animation = false;
+}
 
 var Mautic = {
     /**
@@ -1215,16 +1219,6 @@ var Mautic = {
                 Mautic.processAjaxError(request, textStatus, errorThrown);
             }
         });
-    },
-
-    /**
-     * Adds active class to selected list item in left/right panel view
-     * @param prefix
-     * @param id
-     */
-    activateListItem: function(prefix,id) {
-        mQuery('.page-list-item').removeClass('active');
-        mQuery('#'+prefix+'-' + id).addClass('active');
     },
 
     /**

@@ -17,34 +17,34 @@ $view['slots']->set('mauticContent', 'dashboard');
     			<div class="row">
     			    <div class="col-md-4">
     			        <div class="panel mb-0">
-    			            <div class="flotchart" data-type="donut" style="height: 150px; padding: 0px; position: relative;">
-    			                <!-- put generated data inside .flotdata -->
-    			                
-    			            <canvas class="flot-base" width="574" height="300" style="direction: ltr; position: absolute; left: 0px; top: 0px; width: 287px; height: 150px;"></canvas><canvas class="flot-overlay" width="574" height="300" style="direction: ltr; position: absolute; left: 0px; top: 0px; width: 287px; height: 150px;"></canvas><span class="pieLabel" id="pieLabel0" style="position: absolute; top: 60px; left: 126px;"><div style="font-size:x-small;text-align:center;padding:2px;color:#eee;">Overall<br>60%</div></span><span class="pieLabel" id="pieLabel1" style="position: absolute; top: 60px; left: 117.5px;"><div style="font-size:x-small;text-align:center;padding:2px;color:#4E5D9D;">Open Rate<br>40%</div></span></div>
-    			            <ul class="list-group">
-    			                <li class="list-group-item">New Visitors <span class="badge pull-right">100</span></li>
-    			                <li class="list-group-item">Returning Visitors <span class="badge pull-right">40</span></li>
-    			            </ul>
-    			        </div>
-    			    </div>
-    			    <div class="col-md-4">
-    			        <div class="panel mb-0">
-    			            <div class="flotchart" data-type="donut" style="height: 150px; padding: 0px; position: relative;">
-    			                <!-- put generated data inside .flotdata -->
-    			                
-    			            <canvas class="flot-base" width="574" height="300" style="direction: ltr; position: absolute; left: 0px; top: 0px; width: 287px; height: 150px;"></canvas><canvas class="flot-overlay" width="574" height="300" style="direction: ltr; position: absolute; left: 0px; top: 0px; width: 287px; height: 150px;"></canvas><span class="pieLabel" id="pieLabel0" style="position: absolute; top: 60px; left: 126px;"><div style="font-size:x-small;text-align:center;padding:2px;color:#eee;">Overall<br>10%</div></span><span class="pieLabel" id="pieLabel1" style="position: absolute; top: 60px; left: 119px;"><div style="font-size:x-small;text-align:center;padding:2px;color:#35B4B9;">Click Rate<br>90%</div></span></div>
-    			            <ul class="list-group">
-                                <li class="list-group-item">Email Delivered <span class="badge pull-right">100</span></li>
-                                <li class="list-group-item">Total Click <span class="badge pull-right">90</span></li>
-    			            </ul>
-    			        </div>
-    			    </div>
-    			    <div class="col-md-4">
-    			        <div class="panel mb-0">
-                            <div class="text-center pa-20 jumbo-font h150">44</div>
+                            <div class="text-center doughnut-wrapper">
+                                <canvas id="open-rate" width="110" height="110" data-sent-count="<?php echo $sentReadCount['sentCount'] ?>" data-read-count="<?php echo $sentReadCount['readCount'] ?>"></canvas>
+        			            <div class="doughnut-inner-text doughnut-open-rate">Open Rate<br><?php echo $openRate ?>%</div>
+    			            </div>
                             <ul class="list-group">
-                                <li class="list-group-item">Most Visits this Week<span class="badge pull-right">100</span></li>
-                                <li class="list-group-item">Most Visits all Time <span class="badge pull-right">190</span></li>
+    			                <li class="list-group-item">New Visitors <span class="badge pull-right"><?php echo $newReturningVisitors['new']; ?></span></li>
+    			                <li class="list-group-item">Returning Visitors <span class="badge pull-right"><?php echo $newReturningVisitors['returning']; ?></span></li>
+    			            </ul>
+    			        </div>
+    			    </div>
+    			    <div class="col-md-4">
+    			        <div class="panel mb-0">
+    			            <div class="text-center doughnut-wrapper">
+                                <canvas id="click-rate" width="110" height="110" data-read-count="<?php echo $sentReadCount['readCount'] ?>" data-click-count="<?php echo $sentReadCount['clickCount'] ?>"></canvas>
+                                <div class="doughnut-inner-text doughnut-click-rate">Click Rate<br><?php echo $clickRate ?>%</div>
+                            </div>
+    			            <ul class="list-group">
+                                <li class="list-group-item">Email Delivered <span class="badge pull-right"><?php echo $allSentEmails; ?></span></li>
+                                <li class="list-group-item">Total Click <span class="badge pull-right"><?php echo $sentReadCount['clickCount'] ?></span></li>
+    			            </ul>
+    			        </div>
+    			    </div>
+    			    <div class="col-md-4">
+    			        <div class="panel mb-0">
+                            <div class="text-center pa-20 jumbo-font h150" id="active-visitors">0</div>
+                            <ul class="list-group">
+                                <li class="list-group-item">Most Visits this Week<span class="badge pull-right"><?php echo $weekVisitors; ?></span></li>
+                                <li class="list-group-item">Most Visits all Time <span class="badge pull-right"><?php echo $allTimeVisitors; ?></span></li>
                             </ul>
     			        </div>
     			    </div>
@@ -53,7 +53,7 @@ $view['slots']->set('mauticContent', 'dashboard');
     		<div class="pa-md mb-lg">
     			<div class="row">
     				<div class="col-sm-12">
-    					<div id="dashboard-map" style="height: 350px;"></div>
+    					<div id="dashboard-map"></div>
     				</div>
     			</div>
     		</div>
@@ -109,7 +109,7 @@ $view['slots']->set('mauticContent', 'dashboard');
                                     <table class="table table-striped">
                                     <tr>
                                         <th>Title</th>
-                                        <th>Hits</th>
+                                        <th>Downloads</th>
                                     </tr>
                                     <?php foreach ($popularAssets as $asset) : ?>
                                         <tr>
@@ -133,9 +133,28 @@ $view['slots']->set('mauticContent', 'dashboard');
                                 <div class="panel-heading">
                                 	<h3 class="panel-title">Most Popular Campaigns</h3>
                                 </div>
+                                <?php if ($popularCampaigns) : ?>
                                 <div class="panel-body">
-
+                                    <table class="table table-striped">
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Hits</th>
+                                    </tr>
+                                    <?php foreach ($popularCampaigns as $campaign) : ?>
+                                        <tr>
+                                            <td>
+                                                <a href="<?php echo $view['router']->generate('mautic_campaign_action', array('objectAction' => 'view', 'objectId' => $campaign['campaign_id'])); ?>" data-toggle="ajax">
+                                                    <?php echo $campaign['name']; ?>
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <?php echo $campaign['hits']; ?>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                    </table>
                                 </div>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>

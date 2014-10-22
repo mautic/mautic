@@ -30,33 +30,41 @@ class DefaultController extends CommonController
     public function indexAction()
     {
     	$model = $this->factory->getModel('dashboard.dashboard');
-        
 
-        //set some permissions
-        $permissions = $this->factory->getSecurity()->isGranted(array(
-            'dashboard:dashboards:viewown',
-            'dashboard:dashboards:viewother',
-            'dashboard:dashboards:create',
-            'dashboard:dashboards:editown',
-            'dashboard:dashboards:editother',
-            'dashboard:dashboards:deleteown',
-            'dashboard:dashboards:deleteother',
-            'dashboard:dashboards:publishown',
-            'dashboard:dashboards:publishother'
-        ), "RETURN_ARRAY");
-
-        if (!$permissions['dashboard:dashboards:viewown'] && !$permissions['dashboard:dashboards:viewother']) {
-            return $this->accessDenied();
-        }
-
+        $sentReadCount = $this->factory->getModel('email.email')->getRepository()->getSentReadCount();
+        $newReturningVisitors = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit')->getNewReturningVisitorsCount();
+        $weekVisitors = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit')->countVisitors(604800);
+        $allTimeVisitors = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit')->countVisitors(0);
+        $allSentEmails = $this->factory->getEntityManager()->getRepository('MauticEmailBundle:Stat')->getSentCount();
         $popularPages = $this->factory->getModel('page.page')->getRepository()->getPopularPages();
         $popularAssets = $this->factory->getModel('asset.asset')->getRepository()->getPopularAssets();
+        $popularCampaigns = $this->factory->getModel('campaign.campaign')->getRepository()->getPopularCampaigns();
+
+        $openRate = 0;
+
+        if ($sentReadCount['sentCount']) {
+            $openRate = round($sentReadCount['readCount'] / $sentReadCount['sentCount'] * 100);
+        }
+
+        $clickRate = 0;
+
+        if ($sentReadCount['readCount']) {
+            $clickRate = round($sentReadCount['clickCount'] / $sentReadCount['readCount'] * 100);
+        }
 
         return $this->delegateView(array(
             'viewParameters'  =>  array(
-                'popularPages' => $popularPages,
-                'popularAssets' => $popularAssets,
-                'security'    => $this->factory->getSecurity()
+                'sentReadCount'     => $sentReadCount,
+                'openRate'          => $openRate,
+                'clickRate'         => $clickRate,
+                'newReturningVisitors' => $newReturningVisitors,
+                'weekVisitors'      => $weekVisitors,
+                'allTimeVisitors'   => $allTimeVisitors,
+                'popularPages'      => $popularPages,
+                'popularAssets'     => $popularAssets,
+                'popularCampaigns'  => $popularCampaigns,
+                'allSentEmails'     => $allSentEmails,
+                'security'          => $this->factory->getSecurity()
             ),
             'contentTemplate' => 'MauticDashboardBundle:Default:index.html.php',
             'passthroughVars' => array(

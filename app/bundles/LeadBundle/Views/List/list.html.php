@@ -10,7 +10,6 @@
 if ($tmpl == 'index'):
     $view->extend('MauticLeadBundle:List:index.html.php');
 endif;
-
 $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list');
 ?>
 

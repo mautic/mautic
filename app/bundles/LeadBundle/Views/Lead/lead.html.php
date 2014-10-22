@@ -100,16 +100,16 @@ $view['slots']->stop();
                             </span>
                             <div class="media-body">
                                 <h4 class="fw-sb text-primary"><?php echo $lead->getPrimaryIdentifier(); ?></h4>
-                                    <p class="text-white dark-lg mb-0"><?php echo $fields['core']['position']['value'] == '' ?:  $fields['core']['position']['value'] . ', '; ?> <?php echo $lead->getSecondaryIdentifier(); ?></p>
+                                    <p class="text-white dark-lg mb-0"><?php echo $fields['core']['position']['value'] == '' ? '' :  $fields['core']['position']['value'] . ', '; ?> <?php echo $lead->getSecondaryIdentifier(); ?></p>
                             </div>
                         </div>
                     </div>
                     <div class="col-xs-4 va-m text-right">
                         <?php
                         $color = $lead->getColor();
-                        $style = !empty($color) ? ' style="background-color: ' . $color . ' !important;"' : '';
+                        $style = !empty($color) ? ' style="font-color: ' . $color . ' !important;"' : '';
                         ?>
-                            <h1 class="fw-sb text-white dark-md<?php echo $style; ?>"><?php echo $lead->getPoints(); ?></h1>
+                            <h1 class="fw-sb text-white dark-md"<?php echo $style; ?>><?php echo $lead->getPoints(); ?></h1>
                     </div>
                 </div>
             </div>
