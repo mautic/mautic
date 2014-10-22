@@ -10,6 +10,7 @@
 namespace Mautic\ConfigBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Symfony\Component\Form\Form;
 
 /**
  * Class ConfigController
@@ -47,9 +48,17 @@ class ConfigController extends FormController
                 /** @var \Mautic\InstallBundle\Configurator\Configurator $configurator */
                 $configurator = $this->get('mautic.configurator');
 
-                $data = $form->getData();
+                // Bind request to the form
+                $post     = $this->request->request;
+                $formData = $form->getData();
 
-                foreach ($data as $object) {
+                foreach ($formData as $bundle => $bundleConfig) {
+                    foreach ($bundleConfig as $key => $value) {
+                        $formData[$bundle][$key] = $post->get('config[' . $key . ']', null, true);
+                    }
+                }
+
+                foreach ($formData as $object) {
                     $configurator->mergeParameters($object);
                 }
 
@@ -86,7 +95,7 @@ class ConfigController extends FormController
                 );
             }
 
-            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+            if ($cancelled || $form->get('buttons')->get('save')->isClicked()) {
                 return $this->postActionRedirect(array(
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => $viewParams,
