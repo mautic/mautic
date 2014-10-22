@@ -51,7 +51,7 @@ class PushTransifexCommand extends ContainerAwareCommand
         }
 
         $options = $input->getOptions();
-        $create  = (empty($options['create'])) ? true : false;
+        $create  = (isset($options['create']));
         $files   = $this->getLanguageFiles();
 
         /** @var \BabDev\Transifex\Transifex $transifex */
