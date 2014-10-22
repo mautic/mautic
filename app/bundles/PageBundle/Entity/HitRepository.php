@@ -105,8 +105,6 @@ class HitRepository extends CommonRepository
             if (($dayKey = array_search($day, $data['labels'])) !== false) {
                 $data['values'][$dayKey]++;
             }
-            var_dump($day);
-            var_dump($dayKey);
         }
 
         return $data;
