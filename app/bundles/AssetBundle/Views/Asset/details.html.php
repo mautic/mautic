@@ -183,17 +183,23 @@ if ($security->hasEntityAccess($permissions['asset:assets:editown'], $permission
                     <div class="col-sm-12">
                         <div class="panel">
                             <div class="panel-body box-layout">
-                                <div class="col-xs-8 va-m">
-                                        <h5 class="text-white dark-md fw-sb mb-xs">Downloads</h5>
+                                <div class="col-xs-4 va-m">
+                                    <h5 class="text-white dark-md fw-sb mb-xs">Downloads</h5>
+                                </div>
+                                <div class="col-xs-4 va-m text-center">
+                                    <span class="text-white dark-md fw-sb mb-xs">Total: <?php echo $stats['downloads']['total']; ?></span>
+                                    <span class="text-white dark-md fw-sb mb-xs">|</span>
+                                    <span class="text-white dark-md fw-sb mb-xs">Unique: <?php echo $stats['downloads']['unique']; ?></span>
                                 </div>
                                 <div class="col-xs-4 va-t text-right">
-                                        <h3 class="text-white dark-sm"><span class="fa fa-download"></span></h3>
+                                    <h3 class="text-white dark-sm"><span class="fa fa-download"></span></h3>
                                 </div>
                             </div>
                             <div class="pt-0 pl-15 pb-10 pr-15">
                                 <div>
-                                    <?php echo "<pre>".print_r($stats, true)."</pre>"; ?>
+                                    <canvas id="download-chart" height="80"></canvas>
                                 </div>
+                                <div id="download-chart-data" class="hide"><?php echo json_encode($stats['downloads']['timeStats']); ?></div>
                             </div>
                         </div>
                     </div>

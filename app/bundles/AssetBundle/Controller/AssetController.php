@@ -166,13 +166,16 @@ class AssetController extends FormController
 
         $properties = array();
 
+        // Download stats per time period
+        $timeStats = $this->factory->getEntityManager()->getRepository('MauticAssetBundle:Download')->getDownloads($activeAsset->getId());
+
         return $this->delegateView(array(
             'returnUrl'       => $this->generateUrl('mautic_asset_action', array(
                     'objectAction' => 'view',
                     'objectId'     => $activeAsset->getId())
             ),
             'viewParameters'  => array(
-                'activeAsset'    => $activeAsset,
+                'activeAsset'   => $activeAsset,
                 'permissions'   => $security->isGranted(array(
                     'asset:assets:viewown',
                     'asset:assets:viewother',
@@ -185,13 +188,14 @@ class AssetController extends FormController
                     'asset:assets:publishother'
                 ), "RETURN_ARRAY"),
                 'stats'         => array(
-                    'downloads'      => array(
+                    'downloads'  => array(
                         'total'  => $activeAsset->getDownloadCount(),
-                        'unique' => $activeAsset->getUniqueDownloadCount()
+                        'unique' => $activeAsset->getUniqueDownloadCount(),
+                        'timeStats' => $timeStats
                     )
                 ),
-                'security'      => $security,
-                'assetUrl'       => $model->generateUrl($activeAsset, true)
+                'security'    => $security,
+                'assetUrl'    => $model->generateUrl($activeAsset, true)
             ),
             'contentTemplate' => 'MauticAssetBundle:Asset:details.html.php',
             'passthroughVars' => array(
