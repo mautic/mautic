@@ -11,6 +11,7 @@ if ($tmpl == 'index') {
 }
 ?>
 <?php if (!empty($params)) : ?>
+<?php echo $view['form']->start($form); ?>
 <div class="panel panel-default page-list bdr-t-wdh-0">
     <div class="panel-body">
         <div class="row">
@@ -21,7 +22,9 @@ if ($tmpl == 'index') {
                     	<h3 class="panel-title"><?php echo $key; ?></h3>
                     </div>
                     <div class="panel-body">
-                        <pre><?php print_r($paramArray); ?></pre>
+                        <?php foreach ($paramArray as $paramKey => $paramValue) : ?>
+                        <?php echo $view['form']->row($form[$paramKey]); ?>
+                        <?php endforeach; ?>
                     </div>
                 </div>
             </div>
@@ -29,6 +32,7 @@ if ($tmpl == 'index') {
         </div>
     </div>
 </div>
+<?php echo $view['form']->end($form); ?>
 <?php else: ?>
     <?php echo $view->render('MauticCoreBundle:Default:noresults.html.php'); ?>
 <?php endif; ?>

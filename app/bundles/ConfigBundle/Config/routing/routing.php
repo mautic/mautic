@@ -12,12 +12,6 @@ use Symfony\Component\Routing\Route;
 
 $collection = new RouteCollection();
 
-$collection->add('mautic_config_index', new Route('/config',
-    array(
-        '_controller' => 'MauticConfigBundle:Config:index'
-    )
-));
-
 $collection->add('mautic_config_action', new Route('/config/{objectAction}',
     array(
         '_controller' => 'MauticConfigBundle:Config:execute'

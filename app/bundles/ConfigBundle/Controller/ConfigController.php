@@ -18,13 +18,13 @@ class ConfigController extends FormController
 {
 
     /**
-     * Controller action for viewing the application configuration
+     * Controller action for editing the application configuration
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction()
+    public function editAction()
     {
-        //set some permissions
+        // Set some permissions
         $permissions = $this->factory->getSecurity()->isGranted(array('config:config:full'), "RETURN_ARRAY");
 
         if (!$permissions['config:config:full']) {
@@ -33,6 +33,13 @@ class ConfigController extends FormController
 
         $params = $this->getBundleParams();
 
+        /* @type \Mautic\ConfigBundle\Model\ConfigModel $model */
+        $model = $this->factory->getModel('config');
+
+        // Create the form
+        $action = $this->generateUrl('mautic_config_action', array('objectAction' => 'edit'));
+        $form   = $model->createForm($params, $this->get('form.factory'), array('action' => $action));
+
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
         return $this->delegateView(array(
@@ -40,13 +47,14 @@ class ConfigController extends FormController
                 'params'      => $params,
                 'permissions' => $permissions,
                 'tmpl'        => $tmpl,
-                'security'    => $this->factory->getSecurity()
+                'security'    => $this->factory->getSecurity(),
+                'form'        => $this->setFormTheme($form, 'MauticConfigBundle:Config:form.html.php', 'MauticLeadBundle:Config')
             ),
-            'contentTemplate' => 'MauticConfigBundle:Config:list.html.php',
+            'contentTemplate' => 'MauticConfigBundle:Config:form.html.php',
             'passthroughVars' => array(
                 'activeLink'     => '#mautic_config_index',
                 'mauticContent'  => 'config',
-                'route'          => $this->generateUrl('mautic_config_index'),
+                'route'          => $this->generateUrl('mautic_config_action', array('objectAction' => 'edit')),
                 'replaceContent' => ($tmpl == 'list') ? 'true' : 'false'
             )
         ));
