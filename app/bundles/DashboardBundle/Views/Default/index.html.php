@@ -17,9 +17,9 @@ $view['slots']->set('mauticContent', 'dashboard');
     			<div class="row">
     			    <div class="col-md-4">
     			        <div class="panel mb-0">
-                            <div class="text-center" style="position:relative; height: 150px; padding: 20px">
+                            <div class="text-center doughnut-wrapper">
                                 <canvas id="open-rate" width="110" height="110" data-sent-count="<?php echo $sentReadCount['sentCount'] ?>" data-read-count="<?php echo $sentReadCount['readCount'] ?>"></canvas>
-        			            <div style="font-size:x-small;text-align:center;padding:2px;color:#4E5D9D;position:absolute;top:50%;left:50%;margin-left:-26px;margin-top:-15px">Open Rate<br><?php echo $openRate ?>%</div>
+        			            <div class="doughnut-inner-text doughnut-open-rate">Open Rate<br><?php echo $openRate ?>%</div>
     			            </div>
                             <ul class="list-group">
     			                <li class="list-group-item">New Visitors <span class="badge pull-right"><?php echo $newReturningVisitors['new']; ?></span></li>
@@ -29,9 +29,9 @@ $view['slots']->set('mauticContent', 'dashboard');
     			    </div>
     			    <div class="col-md-4">
     			        <div class="panel mb-0">
-    			            <div class="text-center" style="position:relative; height: 150px; padding: 20px">
+    			            <div class="text-center doughnut-wrapper">
                                 <canvas id="click-rate" width="110" height="110" data-read-count="<?php echo $sentReadCount['readCount'] ?>" data-click-count="<?php echo $sentReadCount['clickCount'] ?>"></canvas>
-                                <div style="font-size:x-small;color:#35B4B9;position:absolute;top:50%;left:50%;margin-left:-20px;margin-top:-13px">Click Rate<br><?php echo $clickRate ?>%</div>
+                                <div class="doughnut-inner-text doughnut-click-rate">Click Rate<br><?php echo $clickRate ?>%</div>
                             </div>
     			            <ul class="list-group">
                                 <li class="list-group-item">Email Delivered <span class="badge pull-right"><?php echo $allSentEmails; ?></span></li>
@@ -41,7 +41,7 @@ $view['slots']->set('mauticContent', 'dashboard');
     			    </div>
     			    <div class="col-md-4">
     			        <div class="panel mb-0">
-                            <div class="text-center pa-20 jumbo-font h150" id="active-visitors" style="text-shadow: #fff 0px 0px 50px;transition: text-shadow 1.2s ease;" >0</div>
+                            <div class="text-center pa-20 jumbo-font h150" id="active-visitors">0</div>
                             <ul class="list-group">
                                 <li class="list-group-item">Most Visits this Week<span class="badge pull-right"><?php echo $weekVisitors; ?></span></li>
                                 <li class="list-group-item">Most Visits all Time <span class="badge pull-right"><?php echo $allTimeVisitors; ?></span></li>
@@ -53,7 +53,7 @@ $view['slots']->set('mauticContent', 'dashboard');
     		<div class="pa-md mb-lg">
     			<div class="row">
     				<div class="col-sm-12">
-    					<div id="dashboard-map" style="height: 350px;"></div>
+    					<div id="dashboard-map"></div>
     				</div>
     			</div>
     		</div>

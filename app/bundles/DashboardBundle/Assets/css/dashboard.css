@@ -4,3 +4,30 @@
 .panel .h150 {
 	height: 150px;
 }
+.doughnut-wrapper {
+	position: relative;
+	height: 150px;
+	padding: 20px;
+}
+.doughnut-inner-text {
+	font-size: x-small;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	margin-left: -25px;
+	margin-top: -13px;
+	width: 50px;
+}
+.doughnut-click-rate {
+	color: #35B4B9;
+}
+.doughnut-open-rate {
+	color:#4E5D9D;
+}
+#active-visitors {
+	text-shadow: #fff 0px 0px 50px;
+	transition: text-shadow 1.2s ease;
+}
+#dashboard-map {
+	height: 350px;
+}
