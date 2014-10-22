@@ -10,7 +10,7 @@
 
 <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mb-0">
     <div class="panel-heading">
-        <div class="panel-title"><?php echo $view['translator']->trans('mautic.page.page.recent.activity'); ?></div>
+        <div class="panel-title"><?php echo $view['translator']->trans('mautic.core.recent.activity'); ?></div>
     </div>
     <div class="panel-body pt-xs">
         <?php if (isset($logs) && $logs) : ?>

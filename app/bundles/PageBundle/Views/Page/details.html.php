@@ -496,45 +496,9 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
         <hr class="hr-w-2" style="width:50%">
 
         <!--
-        we can leverage data from audit_log table
-        and build activity feed from it
+        recent activity
         -->
-        <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mb-0">
-            <div class="panel-heading">
-                <div class="panel-title"><?php echo $view['translator']->trans('mautic.page.page.recent.activity'); ?></div>
-            </div>
-            <div class="panel-body pt-xs">
-                <?php if (isset($logs) && $logs) : ?>
-                <ul class="media-list media-list-feed">
-                    <?php foreach ($logs as $log) : ?>
-                    <li class="media">
-                        <div class="media-object pull-left mt-xs">
-                        <?php if ($log['action'] == 'create') : ?>
-                            <span class="figure featured bg-success"><span class="fa fa-check"></span></span>
-                        <?php else: ?>
-                            <span class="figure"></span>
-                        <?php endif; ?>
-                        </div>
-                        <div class="media-body">
-                            <?php echo $log['userName']; ?>
-                            <?php echo $log['action']; ?>
-                            <ul>
-                            <?php foreach ($log['details'] as $key => $detail) : ?>
-                                <li>
-                                    <strong class="text-primary">
-                                        <?php echo ucfirst($key); ?>
-                                    </strong>: <?php echo $view['translator']->trans($detail[1]); ?>
-                                </li>
-                            <?php endforeach; ?>
-                            </ul>
-                            <p class="fs-12 dark-sm"><small> <?php echo $log['dateAdded']->format('D, d M Y H:i:s'); ?></small></p>
-                        </div>
-                    </li>
-                    <?php endforeach; ?>
-                </ul>
-                <?php endif; ?>
-            </div>
-        </div>
+        <?php echo $view->render('MauticCoreBundle:Default:recentactivity.html.php', array('logs' => $logs)); ?>
     </div>
     <!--/ right section -->
 </div>
