@@ -17,11 +17,9 @@ Mautic.loadDashboardMap = function () {
             if (response.success) {
                 mapData = response.stats;
             }
-            Mautic.stopIconSpinPostEvent(event);
         },
         error: function (request, textStatus, errorThrown) {
             Mautic.processAjaxError(request, textStatus, errorThrown);
-            Mautic.stopIconSpinPostEvent(event);
         },
         complete: function () {
             jQuery('#dashboard-map').vectorMap({
@@ -38,7 +36,7 @@ Mautic.loadDashboardMap = function () {
                 onLabelShow: function (event, label, code) {
                     if(mapData[code] > 0) {
                         label.find('span').remove();
-                        label.append('<span>: '+mapData[code]+' Leads<span>'); 
+                        label.append('<span>: '+mapData[code]+' Leads<span>');
                     }
                 }
             });
