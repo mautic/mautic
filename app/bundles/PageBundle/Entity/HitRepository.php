@@ -81,11 +81,12 @@ class HitRepository extends CommonRepository
     {
         $date = new \DateTime();
         $oneDay = new \DateInterval('P1D');
-        $days = array();
+        $data = array('labels' => array(), 'values' => array());
 
-        // Prefill $days array keys
+        // Prefill $data arrays
         for ($i = 0; $i < 30; $i++) {
-            $days[$date->format('Y-m-d')] = 0;
+            $data['labels'][$i] = $date->format('Y-m-d');
+            $data['values'][$i] = 0;
             $date->sub($oneDay);
         }
         
@@ -101,10 +102,14 @@ class HitRepository extends CommonRepository
         // Group hits by date
         foreach ($hits as $hit) {
             $day = $hit['dateHit']->format('Y-m-d');
-            $days[$day]++;
+            if (($dayKey = array_search($day, $data['labels'])) !== false) {
+                $data['values'][$dayKey]++;
+            }
+            var_dump($day);
+            var_dump($dayKey);
         }
 
-        return $days;
+        return $data;
     }
 
     /**

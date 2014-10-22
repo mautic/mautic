@@ -7,6 +7,8 @@ Mautic.pageOnLoad = function (container) {
     if (mQuery(container + ' form[name="page"]').length) {
        Mautic.activateCategoryLookup('page', 'page');
     }
+
+    Mautic.renderPageViewsBarChart(container);
 };
 
 Mautic.pageUnLoad = function() {
@@ -98,4 +100,35 @@ Mautic.pageEditorOnLoad = function (container) {
         scrollSpeed: 100,
         cursorAt: {top: 15, left: 15}
     });
+};
+
+Mautic.renderPageViewsBarChart = function (container) {
+    if (!mQuery('#page-views-chart').length) {
+        return;
+    }
+    var labels = Mautic.renderPageViewsBarChartLabels;
+    var values = Mautic.renderPageViewsBarChartValues;
+    if (mQuery.type(labels) === "undefined" || mQuery.type(values) === "undefined") {
+        return;
+    }
+    var ctx = document.getElementById("page-views-chart").getContext("2d");
+    var options = {
+         scaleShowGridLines : false,
+         barShowStroke : false,
+         barValueSpacing : 1,
+         showScale: false,
+         tooltipFontSize: 10,
+         tooltipCaretSize: 0
+    }
+    var data = {
+        labels: labels,
+        datasets: [
+            {
+                fillColor: "#00b49c",
+                highlightFill: "#028473",
+                data: values
+            }
+        ]
+    };
+    var myBarChart = new Chart(ctx).Bar(data, options);
 };

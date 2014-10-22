@@ -224,15 +224,12 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                                     <h3 class="text-white dark-sm"><span class="fa fa-eye"></span></h3>
                                 </div>
                             </div>
-                            <div class="plugin-sparkline text-right pr-md pl-md"
-                            sparkHeight="34"
-                            sparkWidth="180"
-                            sparkType="bar"
-                            sparkBarWidth="7"
-                            sparkBarSpacing="3"
-                            sparkZeroAxis="false"
-                            sparkBarColor="#00B49C">
-                                <?php echo implode(',', array_reverse($last30)); ?>
+                            <div class="pt-0 pl-10 pb-0 pr-10">
+                                <div>
+                                    <canvas id="page-views-chart" height="35"></canvas>
+                                    <?php $view['assets']->addScriptDeclaration('Mautic.renderPageViewsBarChartLabels = '.json_encode(array_reverse($last30['labels'])), 'head'); ?>
+                                    <?php $view['assets']->addScriptDeclaration('Mautic.renderPageViewsBarChartValues = '.json_encode(array_reverse($last30['values'])), 'head'); ?>
+                                </div>
                             </div>
                         </div>
                     </div>
