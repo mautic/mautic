@@ -47,8 +47,10 @@ class ConfigType extends AbstractType
         foreach ($options['data'] as $config) {
             foreach ($config as $key => $value) {
                 $builder->add($key, 'text', array(
-                    'required' => false,
-                    'data'     => $value
+                    'label_attr' => array('class' => 'control-label'),
+                    'attr'       => array('class' => 'form-control'),
+                    'required'   => false,
+                    'data'       => $value
                 ));
             }
         }
