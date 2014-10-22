@@ -16,6 +16,12 @@ Mautic.pageUnLoad = function() {
     mQuery('.page-builder').remove();
 };
 
+Mautic.pageOnUnload = function(id) {
+    if (id === '#app-content') {
+        delete Mautic.pageViewsBarChartObject;
+    }
+};
+
 Mautic.launchPageEditor = function () {
     var src = mQuery('#pageBuilderUrl').val();
     src += '?template=' + mQuery('#page_template').val();
@@ -106,9 +112,8 @@ Mautic.renderPageViewsBarChart = function (container) {
     if (!mQuery('#page-views-chart').length) {
         return;
     }
-    var labels = Mautic.renderPageViewsBarChartLabels;
-    var values = Mautic.renderPageViewsBarChartValues;
-    if (mQuery.type(labels) === "undefined" || mQuery.type(values) === "undefined") {
+    chartData = mQuery.parseJSON(mQuery('#page-views-chart-data').text());
+    if (typeof chartData.labels === "undefined" || typeof chartData.values === "undefined") {
         return;
     }
     var ctx = document.getElementById("page-views-chart").getContext("2d");
@@ -121,14 +126,16 @@ Mautic.renderPageViewsBarChart = function (container) {
          tooltipCaretSize: 0
     }
     var data = {
-        labels: labels,
+        labels: chartData.labels,
         datasets: [
             {
                 fillColor: "#00b49c",
                 highlightFill: "#028473",
-                data: values
+                data: chartData.values
             }
         ]
     };
-    var myBarChart = new Chart(ctx).Bar(data, options);
+    if (typeof Mautic.pageViewsBarChartObject === 'undefined') {
+        Mautic.pageViewsBarChartObject = new Chart(ctx).Bar(data, options);
+    }
 };

@@ -227,10 +227,9 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                             <div class="pt-0 pl-10 pb-0 pr-10">
                                 <div>
                                     <canvas id="page-views-chart" height="35"></canvas>
-                                    <?php $view['assets']->addScriptDeclaration('Mautic.renderPageViewsBarChartLabels = '.json_encode(array_reverse($last30['labels'])), 'head'); ?>
-                                    <?php $view['assets']->addScriptDeclaration('Mautic.renderPageViewsBarChartValues = '.json_encode(array_reverse($last30['values'])), 'head'); ?>
                                 </div>
                             </div>
+                            <div id="page-views-chart-data" class="hide"><?php echo json_encode($last30); ?></div>
                         </div>
                     </div>
                     <div class="col-md-4">
