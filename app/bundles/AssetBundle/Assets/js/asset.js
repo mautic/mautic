@@ -8,6 +8,16 @@ Mautic.assetOnLoad = function (container) {
 	}
 };
 
+Mautic.assetOnUnload = function(id) {
+	if (id === '#app-content') {
+		delete Mautic.renderDownloadChartObject;
+	}
+};
+
+Mautic.getAssetId = function() {
+	return mQuery('input#itemId').val();
+} 
+
 Mautic.renderDownloadChart = function (chartData) {
 	if (!mQuery('#download-chart').length) {
 		return;
@@ -32,6 +42,7 @@ Mautic.renderDownloadChart = function (chartData) {
 	        }
 	    ]
 	};
+
 	if (typeof Mautic.renderDownloadChartObject === 'undefined') {
 	    Mautic.renderDownloadChartObject = new Chart(ctx).Line(data, options);
     } else {
@@ -43,7 +54,7 @@ Mautic.renderDownloadChart = function (chartData) {
 Mautic.updateDownloadChart = function(element, amount, unit) {
 	var element = mQuery(element);
 	var wrapper = element.parent();
-	var assetId = wrapper.attr('data-asset-id');
+	var assetId = Mautic.getAssetId();
 	wrapper.find('a').removeClass('active');
 	element.addClass('active');
 	var query = "action=asset:updateDownloadChart&amount=" + amount + "&unit=" + unit + "&assetId=" + assetId;

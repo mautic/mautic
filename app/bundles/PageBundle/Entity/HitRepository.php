@@ -107,6 +107,9 @@ class HitRepository extends CommonRepository
             }
         }
 
+        $data['values'] = array_reverse($data['values']);
+        $data['labels'] = array_reverse($data['labels']);
+
         return $data;
     }
 
