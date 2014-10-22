@@ -54,6 +54,12 @@ class ConfigType extends AbstractType
                 ));
             }
         }
+
+        $builder->add('buttons', 'form_buttons');
+
+        if (!empty($options['action'])) {
+            $builder->setAction($options['action']);
+        }
     }
 
     /**

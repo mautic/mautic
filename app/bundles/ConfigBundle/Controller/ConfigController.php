@@ -40,6 +40,62 @@ class ConfigController extends FormController
         $action = $this->generateUrl('mautic_config_action', array('objectAction' => 'edit'));
         $form   = $model->createForm($params, $this->get('form.factory'), array('action' => $action));
 
+        /// Check for a submitted form and process it
+        if ($this->request->getMethod() == 'POST') {
+            $valid = false;
+            if (!$cancelled = $this->isFormCancelled($form)) {
+                /** @var \Mautic\InstallBundle\Configurator\Configurator $configurator */
+                $configurator = $this->get('mautic.configurator');
+
+                $data = $form->getData();
+
+                foreach ($data as $object) {
+                    $configurator->mergeParameters($object);
+                }
+
+                try {
+                    $configurator->write();
+
+                    $this->request->getSession()->getFlashBag()->add(
+                        'notice',
+                        $this->get('translator')->trans('mautic.config.config.notice.updated', array(), 'flashes')
+                    );
+
+                    $this->clearCache();
+                } catch (RuntimeException $exception) {
+                    $this->request->getSession()->getFlashBag()->add(
+                        'error',
+                        $this->get('translator')->trans('mautic.config.config.error.not.updated', array(), 'flashes')
+                    );
+                }
+
+                $returnUrl = $this->generateUrl('mautic_config_action', array('objectAction' => 'edit'));
+                $viewParams = array();
+                $template = 'MauticConfigBundle:Config:form';
+                $passthroughVars = array(
+                    'activeLink'    => 'mautic_config_index',
+                    'mauticContent' => 'config'
+                );
+            } else {
+                $returnUrl = $this->generateUrl('mautic_dashboard_index');
+                $viewParams = array();
+                $template  = 'MauticDashboardBundle:Default:index';
+                $passthroughVars = array(
+                    'activeLink'    => 'mautic_dashboard_index',
+                    'mauticContent' => 'dashboard'
+                );
+            }
+
+            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+                return $this->postActionRedirect(array(
+                    'returnUrl'       => $returnUrl,
+                    'viewParameters'  => $viewParams,
+                    'contentTemplate' => $template,
+                    'passthroughVars' => $passthroughVars
+                ));
+            }
+        }
+
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
         return $this->delegateView(array(
@@ -48,7 +104,7 @@ class ConfigController extends FormController
                 'permissions' => $permissions,
                 'tmpl'        => $tmpl,
                 'security'    => $this->factory->getSecurity(),
-                'form'        => $this->setFormTheme($form, 'MauticConfigBundle:Config:form.html.php', 'MauticLeadBundle:Config')
+                'form'        => $this->setFormTheme($form, 'MauticConfigBundle:Config:form.html.php', 'MauticConfigBundle:Config')
             ),
             'contentTemplate' => 'MauticConfigBundle:Config:form.html.php',
             'passthroughVars' => array(
