@@ -31,7 +31,7 @@ class ChatRepository extends CommonRepository
     public function getUserConversation($currentUser, $withUser, $lastId = null, \DateTime $fromDateTime = null)
     {
         $q = $this->_em->createQueryBuilder();
-        $q->select('c, partial fu.{id, firstName, lastName, email}, partial tu.{id, username, firstName, lastName, email}')
+        $q->select('c, partial fu.{id, firstName, lastName, email, lastActive}, partial tu.{id, username, firstName, lastName, email, lastActive}')
             ->from('MauticChatBundle:Chat', 'c', 'c.id')
             ->join('c.fromUser', 'fu')
             ->join('c.toUser', 'tu')
@@ -112,18 +112,31 @@ class ChatRepository extends CommonRepository
         }
 
         if (!empty($usersWithUnreadMsgs)) {
-            $q->andWhere(
-                $q->expr()->in('u.id', 'users')
+            $q2 = clone $q;
+
+            $q2->andWhere(
+                $q2->expr()->in('u.id', ':users')
             )->setParameter('users', $usersWithUnreadMsgs);
+
+            if (!empty($limit) && $limit > count($usersWithUnreadMsgs)) {
+                $q2->setFirstResult($start)
+                    ->setMaxResults($limit);
+            }
+
+            $results = $q2->getQuery()->getArrayResult();
+
+            if (count($results) > $limit) {
+                $this->generateOnlineStatuses($results);
+                return $results;
+            }
         }
 
-        if (!empty($limit) && $limit > count($usersWithUnreadMsgs)) {
+        if (!empty($limit)) {
             $q->setFirstResult($start)
                 ->setMaxResults($limit);
         }
 
         $results = $q->getQuery()->getArrayResult();
-
         $this->generateOnlineStatuses($results);
 
         return $results;
@@ -138,6 +151,7 @@ class ChatRepository extends CommonRepository
         //fix online statuses
         $dt    = new DateTimeHelper(strtotime('15 minutes ago'), 'U', 'local');
         $delay = $dt->getUtcDateTime();
+
         foreach ($results as &$r) {
             if (is_array($key)) {
                 foreach ($key as $k) {
@@ -275,7 +289,7 @@ class ChatRepository extends CommonRepository
         }
 
         $q->select('c.id, count(c.id) as unread, u.id as userId')
-            ->from('MauticChatBundle:Chat', 'c')
+            ->from('MauticChatBundle:Chat', 'c', 'c.id')
             ->leftJoin('c.fromUser', 'u')
             ->where($expr)
             ->setParameter('toUser', $toUser)

@@ -669,7 +669,6 @@ var Mautic = {
             Mautic.startIconSpinOnEvent(event);
         }
 
-
         MauticVars.showLoadingBar = false;
 
         var route = mQuery(el).attr('href');
@@ -700,6 +699,7 @@ var Mautic = {
                 mQuery(target).addClass('modal-moved');
             }
         });
+
         mQuery(target).modal('show');
 
         mQuery.ajax({

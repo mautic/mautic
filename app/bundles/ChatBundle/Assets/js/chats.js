@@ -247,7 +247,7 @@ Mautic.updateChatConversation = function(response, chatType)
 
     if (contentUpdated) {
         //Scroll to bottom of chat (latest messages)
-        mQuery('#ChatConversation').scrollTop(mQuery('#ChatConversation')[0].scrollHeight);
+        mQuery('#ChatConversation').scrollTop(mQuery('#ChatConversation').scrollHeight);
     }
 
     if (response.latestId) {
