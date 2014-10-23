@@ -62,6 +62,19 @@ Mautic.leadOnLoad = function (container) {
         Mautic.updateLeadFieldProperties(mQuery('#leadfield_type').val());
     }
 
+    // Timeline filters
+    var timelineForm = mQuery(container + ' #timeline-filters');
+    if (timelineForm.length) {
+        timelineForm.on('change', function() {
+            timelineForm.submit();
+        }).on('keyup', function() {
+            timelineForm.delay(200).submit();
+        }).on('submit', function(e) {
+            e.preventDefault();
+            Mautic.refreshLeadTimeline(timelineForm);
+        });
+    }
+
     if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'lead.lead');
     }
@@ -106,6 +119,10 @@ Mautic.leadOnLoad = function (container) {
 
     Mautic.loadEngagementChart();
 };
+
+Mautic.getLeadId = function() {
+    return mQuery('input#leadId').val();
+}
 
 Mautic.activateLeadFieldTypeahead = function(field, target, options) {
     if (options) {
@@ -262,6 +279,59 @@ Mautic.activateLeadOwnerTypeahead = function(el) {
         mQuery(this).typeahead( 'open');
     });
 };
+
+// Mautic.activateTimelineTypeahead = function(timelineForm) {
+//     var events = new Bloodhound({
+//         datumTokenizer: Bloodhound.tokenizers.obj.whitespace('label'),
+//         queryTokenizer: Bloodhound.tokenizers.whitespace,
+//         prefetch: {
+//             url: mauticAjaxUrl + "?action=lead:timelineEventsList",
+//             ajax: {
+//                 beforeSend: function () {
+//                     MauticVars.showLoadingBar = false;
+//                 }
+//             }
+//         },
+//         remote: {
+//             url: mauticAjaxUrl + "?action=lead:timelineEventsList&filter=%QUERY",
+//             ajax: {
+//                 beforeSend: function () {
+//                     MauticVars.showLoadingBar = false;
+//                 }
+//             }
+//         },
+//         dupDetector: function (remoteMatch, localMatch) {
+//             return (remoteMatch.label == localMatch.label);
+//         },
+//         ttl: 1800000,
+//         limit: 5
+//     });
+//     events.initialize();
+//     timelineForm.find("#search").typeahead(
+//         {
+//             hint: true,
+//             highlight: true,
+//             minLength: 2
+//         }
+//         // ,
+//         // {
+//         //     name: 'lead_owners',
+//         //     displayKey: 'label',
+//         //     source: events.ttAdapter()
+//         // }
+//         // ).on('typeahead:selected', function (event, datum) {
+//         //     if (mQuery("#lead_owner").length) {
+//         //         mQuery("#lead_owner").val(datum["value"]);
+//         //     }
+//         // }).on('typeahead:autocompleted', function (event, datum) {
+//         //     if (mQuery("#lead_owner").length) {
+//         //         mQuery("#lead_owner").val(datum["value"]);
+//         //     }
+//         // }
+//     ).on( 'focus', function() {
+//         mQuery(this).typeahead( 'open');
+//     });
+// };
 
 Mautic.leadlistOnLoad = function(container) {
     if (mQuery(container + ' #list-search').length) {
@@ -492,26 +562,20 @@ Mautic.clearLeadSocialProfile = function(network, leadId, event) {
     });
 };
 
-Mautic.refreshLeadTimeline = function(leadId, event) {
-    Mautic.startIconSpinOnEvent(event);
-    var filter = mQuery(event);
-    var filterName = filter.attr('name');
-    var filterValue = filter.val();
-    var query = "action=lead:updateTimeline&filter_name=" + filterName + "&filter_value=" + filterValue + "&lead=" + leadId;
+Mautic.refreshLeadTimeline = function(form) {
+    var formData = form.serialize()
     mQuery.ajax({
         url: mauticAjaxUrl,
         type: "POST",
-        data: query,
+        data: "action=lead:updateTimeline&" + formData,
         dataType: "json",
         success: function (response) {
             if (response.success) {
-                mQuery('#history-container').html(response.timeline);
+                mQuery('#timeline-container').html(response.timeline);
             }
-            Mautic.stopIconSpinPostEvent(event);
         },
         error: function (request, textStatus, errorThrown) {
             Mautic.processAjaxError(request, textStatus, errorThrown);
-            Mautic.stopIconSpinPostEvent(event);
         }
     });
 };

@@ -8,33 +8,6 @@
  */
 ?>
 
-<!-- form -->
-<form action="" class="panel">
-    <div class="form-control-icon pa-xs">
-        <input type="text" class="form-control bdr-w-0" placeholder="Search...">
-        <span class="the-icon fa fa-search text-muted mt-xs"></span><!-- must below `form-control` -->
-    </div>
-    <?php if (isset($eventTypes) && is_array($eventTypes)) : ?>
-        <div class="panel-footer text-muted">
-            <?php foreach ($eventTypes as $typeKey => $typeName) : ?>
-            <div class="checkbox-inline custom-primary">
-                <label class="mb-0">
-                    <input 
-                        name="eventFilter"
-                        type="checkbox"
-                        value="<?php echo $typeKey; ?>"
-                        <?php echo in_array($typeKey, $eventFilter) ? 'checked' : ''; ?>
-                        onchange="Mautic.refreshLeadTimeline(<?php echo $lead->getId(); ?>, this);">
-                    <span class="mr-0"></span> 
-                     <?php echo $typeName; ?>
-                </label>
-            </div>
-            <?php endforeach; ?>
-        </div>
-    <?php endif; ?>
-    <!--/ form -->
-</form>
-
 <!-- timeline -->
 <ul class="timeline">
     <li class="header ellipsis bg-white">Recent Events</li>

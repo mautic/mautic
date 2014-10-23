@@ -155,10 +155,10 @@ class AjaxController extends CommonAjaxController
      */
     protected function updateTimelineAction (Request $request)
     {
-        $dataArray = array('success' => 0);
-        $filterName = InputHelper::clean($request->request->get('filter_name'));
-        $filterValue = InputHelper::clean($request->request->get('filter_value'));
-        $leadId    = InputHelper::clean($request->request->get('lead'));
+        $dataArray      = array('success' => 0);
+        $filters        = InputHelper::clean($request->request->get('eventFilters'));
+        $search         = InputHelper::clean($request->request->get('search'));
+        $leadId         = InputHelper::int($request->request->get('leadId'));
 
         if (!empty($leadId)) {
             //find the lead
@@ -167,22 +167,18 @@ class AjaxController extends CommonAjaxController
 
             if ($lead !== null) {
 
-                if ($filterName == 'eventFilter') {
-                    $session = $this->factory->getSession();
+                $session = $this->factory->getSession();
 
-                    // Set which events to load. Empty array == all.
-                    $eventFilter = $session->get('mautic.lead.'.$leadId.'.timeline.filter', array());
+                // Set which events to load. Empty array == all.
+                $eventFilter = $session->get('mautic.lead.' . $leadId . '.timeline.filter', array());
 
-                    $filterKey = array_search($filterValue, $eventFilter);
-
-                    if ($filterKey === false) {
-                        $eventFilter[] = $filterValue;
-                    } else {
-                        unset($eventFilter[$filterKey]);
-                    }
-
-                    $session->set('mautic.lead.'.$leadId.'.timeline.filter', $eventFilter);
+                if ($filters) {
+                    $eventFilter = $filters;
                 }
+
+                $session->set('mautic.lead.' . $leadId . '.timeline.filter', $eventFilter);
+
+                $eventFilter['search'] = $search;
 
                 // Trigger the TIMELINE_ON_GENERATE event to fetch the timeline events from subscribed bundles
                 $dispatcher = $this->factory->getDispatcher();
