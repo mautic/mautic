@@ -1,14 +1,24 @@
 //DashboardBundle
 Mautic.dashboardOnLoad = function (container) {
-    Mautic.loadDashboardMap();
+    Mautic.renderDashboardMap();
     Mautic.renderOpenRateDoughnut();
     Mautic.renderClickRateDoughnut();
     Mautic.updateActiveVisitorCount();
 };
 
-Mautic.loadDashboardMap = function () {
-    var mapData = {};
-    mapData = mQuery.parseJSON(mQuery('#dashboard-map-data').text());
+Mautic.dashboardOnUnload = function(id) {
+    // Trash map data object on app content change.
+    if (id === '#app-content') {
+        delete Mautic.dashboardMapData;
+    }
+};
+
+Mautic.renderDashboardMap = function () {
+    // Initilize map only for first time
+    if (typeof Mautic.dashboardMapData === 'object') {
+        return;
+    }
+    Mautic.dashboardMapData = mQuery.parseJSON(mQuery('#dashboard-map-data').text());
     jQuery('#dashboard-map').vectorMap({
         map: 'world_en',
         backgroundColor: null,
@@ -17,13 +27,12 @@ Mautic.loadDashboardMap = function () {
         selectedColor: '#666666',
         enableZoom: true,
         showTooltip: true,
-        values: mapData,
+        values: Mautic.dashboardMapData,
         scaleColors: ['#C8EEFF', '#006491'],
         normalizeFunction: 'polynomial',
         onLabelShow: function (event, label, code) {
-            if(mapData[code] > 0) {
-                label.find('span').remove();
-                label.append('<span>: '+mapData[code]+' Leads<span>');
+            if(Mautic.dashboardMapData[code] > 0) {
+                label.append(': '+Mautic.dashboardMapData[code]+' Leads');
             }
         }
     });
