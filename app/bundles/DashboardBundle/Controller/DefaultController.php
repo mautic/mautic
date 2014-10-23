@@ -12,7 +12,7 @@ namespace Mautic\DashboardBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Mautic\CoreBundle\Controller\CommonController;
-
+use Symfony\Component\Intl\Intl;
 
 /**
  * Class DefaultController
@@ -52,6 +52,20 @@ class DefaultController extends CommonController
             $clickRate = round($sentReadCount['clickCount'] / $sentReadCount['readCount'] * 100);
         }
 
+        $countries = array_flip(Intl::getRegionBundle()->getCountryNames());
+        $mapData = array();
+
+        /** @var \Mautic\LeadBundle\Entity\LeadRepository $leadRepository */
+        $leadRepository = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:Lead');
+        $leadCountries = $leadRepository->getLeadsCountPerCountries();
+
+        // Convert country names to 2-char code
+        foreach ($leadCountries as $leadCountry) {
+            if (isset($countries[$leadCountry['country']])) {
+                $mapData[strtolower($countries[$leadCountry['country']])] = $leadCountry['quantity'];
+            }
+        }
+
         return $this->delegateView(array(
             'viewParameters'  =>  array(
                 'sentReadCount'     => $sentReadCount,
@@ -64,6 +78,7 @@ class DefaultController extends CommonController
                 'popularAssets'     => $popularAssets,
                 'popularCampaigns'  => $popularCampaigns,
                 'allSentEmails'     => $allSentEmails,
+                'mapData'           => $mapData,
                 'security'          => $this->factory->getSecurity()
             ),
             'contentTemplate' => 'MauticDashboardBundle:Default:index.html.php',

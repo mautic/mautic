@@ -56,6 +56,7 @@ $view['slots']->set('mauticContent', 'dashboard');
     					<div id="dashboard-map"></div>
     				</div>
     			</div>
+                <div id="dashboard-map-data" class="hide"><?php echo json_encode($mapData); ?></div>
     		</div>
     		<ul class="nav nav-tabs pr-md pl-md">
     	        <li class="active"><a href="#email-stats-container" role="tab" data-toggle="tab">Stats</a></li>
