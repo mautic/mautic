@@ -12,7 +12,7 @@ $root  = $container->getParameter('kernel.root_dir');
 $paths = array(
     //customizable
     'themes'  => 'themes',
-    'assets'  => 'assets',
+    'assets'  => 'media',
     'addons'  => 'addons',
     //fixed
     'root'    => substr($root, 0, -4),

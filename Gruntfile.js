@@ -15,7 +15,7 @@ module.exports = function(grunt) {
     mautic: {
       // configurable paths
       coreBundleAssets: 'app/bundles/CoreBundle/Assets',
-      rootAssets: 'assets'
+      rootAssets: 'media'
     },
 
     // Watches files for changes and runs tasks based on the changed files
