@@ -106,7 +106,7 @@ if ($tmpl == 'index')
                     <a href="<?php echo $view['router']->generate('mautic_lead_action',
                         array("objectAction" => "view", "objectId" => $item->getId())); ?>"
                        data-toggle="ajax">
-                        <div><?php echo $item->getPrimaryIdentifier(); ?></div>
+                        <div><?php echo ($item->isAnonymous()) ? $view['translator']->trans($item->getPrimaryIdentifier()) : $item->getPrimaryIdentifier(); ?></div>
                         <div class="small"><?php echo $item->getSecondaryIdentifier(); ?></div>
                     </a>
                 </td>

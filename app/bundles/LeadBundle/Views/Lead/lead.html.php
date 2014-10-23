@@ -11,10 +11,11 @@
 /** @var array $fields */
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
+$leadName = ($lead->isAnonymous()) ? $view['translator']->trans($lead->getPrimaryIdentifier()) : $lead->getPrimaryIdentifier();
 
 $view['slots']->set('mauticContent', 'lead');
 $view['slots']->set("headerTitle",
-    '<span class="span-block">' . $view['translator']->trans($lead->getPrimaryIdentifier()) . '</span> <span class="span-block small">' .
+    '<span class="span-block">' . $leadName . '</span> <span class="span-block small">' .
     $lead->getSecondaryIdentifier() . '</span>');
 $hasEditAccess = $security->hasEntityAccess($permissions['lead:leads:editown'], $permissions['lead:leads:editother'], $lead->getOwner());
 
