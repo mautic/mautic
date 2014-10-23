@@ -48,24 +48,28 @@ class HitRepository extends CommonRepository
      * Get a lead's page hits
      *
      * @param integer $leadId
-     * @param array   $ipIds
+     * @param array   $options
      *
      * @return array
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getLeadHits($leadId, array $ipIds = array())
+    public function getLeadHits($leadId, array $options = array())
     {
-        $query = $this->createQueryBuilder('h')
-            ->select('IDENTITY(h.page) AS page_id, h.dateHit')
-            ->where('h.lead = ' . $leadId);
+        $query = $this->createQueryBuilder('h');
+        $query->select('IDENTITY(h.page) AS page_id, h.dateHit')
+            ->where('h.lead = ' . (int) $leadId);
 
-        if (!empty($ipIds)) {
-            $query->orWhere('h.ipAddress IN (' . implode(',', $ipIds) . ')');
+        if (!empty($options['ipIds'])) {
+            $query->orWhere('h.ipAddress IN (' . implode(',', $options['ipIds']) . ')');
         }
 
-        return $query->getQuery()
-            ->getArrayResult();
+        if (isset($options['filters']['search']) && $options['filters']['search']) {
+            $query->leftJoin('h.page', 'p')
+                ->andWhere($query->expr()->like('p.title', $query->expr()->literal('%' . $options['filters']['search'] . '%')));
+        }
+
+        return $query->getQuery()->getArrayResult();
     }
 
     /**

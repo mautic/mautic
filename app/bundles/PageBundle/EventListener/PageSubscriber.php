@@ -170,17 +170,17 @@ class PageSubscriber extends CommonSubscriber
         }
 
         $lead    = $event->getLead();
-        $leadIps = array();
+        $options = array('ipIds' => array(), 'filters' => $filter);
 
         /** @var \Mautic\CoreBundle\Entity\IpAddress $ip */
         foreach ($lead->getIpAddresses() as $ip) {
-            $leadIps[] = $ip->getId();
+            $options['ipIds'][] = $ip->getId();
         }
 
         /** @var \Mautic\PageBundle\Entity\HitRepository $hitRepository */
         $hitRepository = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit');
 
-        $hits = $hitRepository->getLeadHits($lead->getId(), $leadIps);
+        $hits = $hitRepository->getLeadHits($lead->getId(), $options);
 
         $model = $this->factory->getModel('page.page');
 
