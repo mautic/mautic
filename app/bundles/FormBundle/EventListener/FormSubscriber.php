@@ -171,17 +171,17 @@ class FormSubscriber extends CommonSubscriber
         }
 
         $lead    = $event->getLead();
-        $leadIps = array();
+        $options = array('ipIds' => array(), 'filters' => $filter);
 
         /** @var \Mautic\CoreBundle\Entity\IpAddress $ip */
         foreach ($lead->getIpAddresses() as $ip) {
-            $leadIps[] = $ip->getId();
+            $options['ipIds'][] = $ip->getId();
         }
 
         /** @var \Mautic\FormBundle\Entity\SubmissionRepository $submissionRepository */
         $submissionRepository = $this->factory->getEntityManager()->getRepository('MauticFormBundle:Submission');
 
-        $rows = $submissionRepository->getSubmissions($leadIps);
+        $rows = $submissionRepository->getSubmissions($options);
 
         $pageModel = $this->factory->getModel('page.page');
         $formModel = $this->factory->getModel('form.form');
