@@ -21,19 +21,27 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Class UserType
- *
- * @package Mautic\UserBundle\Form\Type
  */
 class UserType extends AbstractType
 {
 
+    /**
+     * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
+     */
     private $translator;
+
+    /**
+     * @var bool|mixed
+     */
     private $supportedLanguages;
+
+    /**
+     * @var \Doctrine\ORM\EntityManager
+     */
     private $em;
 
     /**
-     * @param TranslatorInterface    $translator
-     * @param array         $supportedLanguages
+     * @param MauticFactory $factory
      */
     public function __construct(MauticFactory $factory)
     {
@@ -43,10 +51,9 @@ class UserType extends AbstractType
     }
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
+     * {@inheritdoc}
      */
-    public function buildForm (FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber());
         $builder->addEventSubscriber(new FormExitSubscriber('user.user', $options));
@@ -180,9 +187,8 @@ class UserType extends AbstractType
         }
     }
 
-
     /**
-     * @param OptionsResolverInterface $resolver
+     * {@inheritdoc}
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
@@ -197,9 +203,10 @@ class UserType extends AbstractType
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
-    public function getName() {
+    public function getName()
+    {
         return "user";
     }
 }

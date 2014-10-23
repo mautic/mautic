@@ -9,7 +9,6 @@
 
 namespace Mautic\UserBundle\Entity;
 
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -47,24 +46,10 @@ class UserRepository extends CommonRepository
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @param $entity
-     * @param $flush true by default; use false if persisting in batches
-     * @return int
-     */
-    public function saveEntity($entity, $flush = true)
-    {
-        $this->_em->persist($entity);
-        if ($flush)
-            $this->_em->flush();
-    }
-
-
-    /**
      * Checks to ensure that a username and/or email is unique
      *
      * @param $params
+     *
      * @return array
      */
     public function checkUniqueUsernameEmail($params) {
@@ -81,7 +66,8 @@ class UserRepository extends CommonRepository
     /**
      * Get a list of users
      *
-     * @param array      $args
+     * @param array $args
+     *
      * @return Paginator
      */
     public function getEntities($args = array())
@@ -94,8 +80,7 @@ class UserRepository extends CommonRepository
         $this->buildClauses($q, $args);
 
         $query = $q->getQuery();
-        $result = new Paginator($query);
-        return $result;
+        return new Paginator($query);
     }
 
     /**
@@ -105,6 +90,7 @@ class UserRepository extends CommonRepository
      * @param int    $limit
      * @param int    $start
      * @param array  $permissionLimiter
+     *
      * @return array
      */
     public function getUserList($search = '', $limit = 10, $start = 0, $permissionLimiter = array())
@@ -161,14 +147,15 @@ class UserRepository extends CommonRepository
                 ->setMaxResults($limit);
         }
 
-        $results = $q->getQuery()->getArrayResult();
-        return $results;
+        return $q->getQuery()->getArrayResult();
     }
 
     /**
      * @param string $search
      * @param int    $limit
      * @param int    $start
+     *
+     * @return array
      */
     public function getPositionList($search = '', $limit = 10, $start = 0)
     {
@@ -190,14 +177,11 @@ class UserRepository extends CommonRepository
                 ->setMaxResults($limit);
         }
 
-        $results = $q->getQuery()->getArrayResult();
-        return $results;
+        return $q->getQuery()->getArrayResult();
     }
 
     /**
-     * @param QueryBuilder $q
-     * @param              $filter
-     * @return array
+     * {@inheritdoc}
      */
     protected function addCatchAllWhereClause(&$q, $filter)
     {
@@ -223,9 +207,7 @@ class UserRepository extends CommonRepository
     }
 
     /**
-     * @param QueryBuilder $q
-     * @param              $filter
-     * @return array
+     * {@inheritdoc}
      */
     protected function addSearchCommandWhereClause(&$q, $filter)
     {
@@ -281,7 +263,7 @@ class UserRepository extends CommonRepository
     }
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
     public function getSearchCommands()
     {
@@ -301,7 +283,7 @@ class UserRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     protected function getDefaultOrder()
     {

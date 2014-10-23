@@ -14,8 +14,6 @@ use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 
 /**
  * Class UserPermissions
- *
- * @package Mautic\UserBundle\Security\Permissions
  */
 class UserPermissions extends AbstractPermissions
 {
@@ -42,18 +40,14 @@ class UserPermissions extends AbstractPermissions
 
     /**
      * {@inheritdoc}
-     *
-     * @return string|void
      */
-    public function getName() {
+    public function getName()
+    {
         return 'user';
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @param FormBuilderInterface $builder
-     * @param array                $options
      */
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {

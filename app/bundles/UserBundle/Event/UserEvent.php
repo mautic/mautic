@@ -14,8 +14,6 @@ use Mautic\UserBundle\Entity\User;
 
 /**
  * Class UserEvent
- *
- * @package Mautic\UserBundle\Event
  */
 class UserEvent extends CommonEvent
 {
@@ -26,8 +24,8 @@ class UserEvent extends CommonEvent
      */
     public function __construct(User &$user, $isNew = false)
     {
-        $this->entity  =& $user;
-        $this->isNew = $isNew;
+        $this->entity =& $user;
+        $this->isNew  = $isNew;
     }
 
     /**

@@ -14,8 +14,6 @@ use Mautic\UserBundle\Entity\Role;
 
 /**
  * Class RoleEvent
- *
- * @package Mautic\RoleBundle\Event
  */
 class RoleEvent extends CommonEvent
 {
@@ -26,8 +24,8 @@ class RoleEvent extends CommonEvent
      */
     public function __construct(Role &$role, $isNew = false)
     {
-        $this->entity  =& $role;
-        $this->isNew = $isNew;
+        $this->entity =& $role;
+        $this->isNew  = $isNew;
     }
 
     /**

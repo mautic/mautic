@@ -9,27 +9,49 @@
 
 namespace Mautic\UserBundle\Security\Provider;
 
+use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\Query;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
-use Doctrine\Common\Persistence\ObjectRepository;
-use Doctrine\ORM\NoResultException;
 
+/**
+ * Class UserProvider
+ */
 class UserProvider implements UserProviderInterface
 {
+
+    /**
+     * @var ObjectRepository
+     */
     protected $userRepository;
+
+    /**
+     * @var ObjectRepository
+     */
     protected $permissionRepository;
+
+    /**
+     * @var Session
+     */
     protected $session;
 
+    /**
+     * @param ObjectRepository $userRepository
+     * @param ObjectRepository $permissionRepository
+     * @param Session          $session
+     */
     public function __construct(ObjectRepository $userRepository, ObjectRepository $permissionRepository, Session $session){
         $this->userRepository       = $userRepository;
         $this->permissionRepository = $permissionRepository;
         $this->session              = $session;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function loadUserByUsername($username)
     {
         $q = $this->userRepository
@@ -64,11 +86,7 @@ class UserProvider implements UserProviderInterface
 
 
     /**
-     * Refresh user; Symfony requires for authentication
-     *
-     * @param UserInterface $user
-     * @return null|object
-     * @throws \Symfony\Component\Security\Core\Exception\UnsupportedUserException
+     * {@inheritdoc}
      */
     public function refreshUser(UserInterface $user)
     {
@@ -86,10 +104,7 @@ class UserProvider implements UserProviderInterface
     }
 
     /**
-     * Check to see if this provider supports a class
-     *
-     * @param $class
-     * @return bool
+     * {@inheritdoc}
      */
     public function supportsClass($class)
     {

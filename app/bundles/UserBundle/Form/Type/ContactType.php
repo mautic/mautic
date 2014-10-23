@@ -11,13 +11,19 @@ namespace Mautic\UserBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Collection;
 
+/**
+ * Class ContactType
+ */
 class ContactType extends AbstractType
 {
+
+    /**
+     * {@inheritdoc}
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
@@ -56,19 +62,21 @@ class ContactType extends AbstractType
                 'attr' => array(
                     'autocomplete' => 'off'
                 )
+            ))
+            ->add('buttons', 'form_buttons', array(
+                'save_text'  => 'mautic.user.user.contact.send',
+                'save_icon'  => 'fa fa-send',
+                'apply_text' => false
             ));
-
-        $builder->add('buttons', 'form_buttons', array(
-            'save_text'  => 'mautic.user.user.contact.send',
-            'save_icon'  => 'fa fa-send',
-            'apply_text' => false
-        ));
 
         if (!empty($options["action"])) {
             $builder->setAction($options["action"]);
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'contact';

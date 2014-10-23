@@ -23,13 +23,13 @@ use JMS\Serializer\Annotation as Serializer;
 /**
  * Class User
  *
- * @package Mautic\UserBundle\Entity
  * @ORM\Table(name="users")
  * @ORM\Entity(repositoryClass="Mautic\UserBundle\Entity\UserRepository")
  * @Serializer\ExclusionPolicy("all")
  */
 class User extends FormEntity implements UserInterface, AdvancedUserInterface, \Serializable
 {
+
     /**
      * @ORM\Column(type="integer")
      * @ORM\Id
@@ -55,12 +55,15 @@ class User extends FormEntity implements UserInterface, AdvancedUserInterface, \
 
     /**
      * Used for when updating the password
+     *
+     * @var string
      */
     private $plainPassword;
 
     /**
      * Used for updating account
-     * @var
+     *
+     * @var string
      */
     private $currentPassword;
 
@@ -147,22 +150,28 @@ class User extends FormEntity implements UserInterface, AdvancedUserInterface, \
 
     /**
      * Stores active role permissions
+     *
      * @var
      */
     private $activePermissions;
 
+    /**
+     * {@inheritdoc}
+     */
     protected function isChanged($prop, $val)
     {
         $getter  = "get" . ucfirst($prop);
         $current = $this->$getter();
         if ($prop == 'role') {
             if ($current && !$val) {
-                $this->changes['role'] = array($current->getName() . ' ('. $current->getId().')', $val);
+                $this->changes['role'] = array($current->getName() . ' (' . $current->getId() . ')', $val);
             } elseif (!$this->role && $val) {
-                $this->changes['role'] = array($current, $val->getName() . ' ('. $val->getId().')');
+                $this->changes['role'] = array($current, $val->getName() . ' (' . $val->getId() . ')');
             } elseif ($current && $val && $current->getId() != $val->getId()) {
-                $this->changes['role'] = array($current->getName() . '('. $current->getId().')',
-                    $val->getName() . '('. $val->getId().')');
+                $this->changes['role'] = array(
+                    $current->getName() . '(' . $current->getId() . ')',
+                    $val->getName() . '(' . $val->getId() . ')'
+                );
             }
         } elseif ($current != $val) {
             $this->changes[$prop] = array($current, $val);
@@ -244,9 +253,10 @@ class User extends FormEntity implements UserInterface, AdvancedUserInterface, \
 
     /**
      * @param Form $form
+     *
      * @return array
      */
-    static public function determineValidationGroups(Form $form) {
+    public static function determineValidationGroups(Form $form) {
         $data = $form->getData();
         $groups = array('User', 'SecondPass');
 
@@ -264,7 +274,7 @@ class User extends FormEntity implements UserInterface, AdvancedUserInterface, \
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getUsername()
     {
@@ -272,7 +282,7 @@ class User extends FormEntity implements UserInterface, AdvancedUserInterface, \
     }
 
     /**
-     * @return null|string
+     * {@inheritdoc}
      */
     public function getSalt()
     {
@@ -281,7 +291,7 @@ class User extends FormEntity implements UserInterface, AdvancedUserInterface, \
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getPassword()
     {
@@ -309,9 +319,7 @@ class User extends FormEntity implements UserInterface, AdvancedUserInterface, \
     }
 
     /**
-     * Determines user role for symfony authentication
-     *
-     * @return array
+     * {@inheritdoc}
      */
     public function getRoles()
     {
@@ -322,13 +330,16 @@ class User extends FormEntity implements UserInterface, AdvancedUserInterface, \
         return $roles;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function eraseCredentials()
     {
 
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function serialize()
     {
@@ -341,7 +352,7 @@ class User extends FormEntity implements UserInterface, AdvancedUserInterface, \
     }
 
     /**
-     * @param string $serialized
+     * {@inheritdoc}
      */
     public function unserialize($serialized)
     {
@@ -368,6 +379,7 @@ class User extends FormEntity implements UserInterface, AdvancedUserInterface, \
      * Set username
      *
      * @param string $username
+     *
      * @return User
      */
     public function setUsername($username)
@@ -382,6 +394,7 @@ class User extends FormEntity implements UserInterface, AdvancedUserInterface, \
      * Set password
      *
      * @param string $password
+     *
      * @return User
      */
     public function setPassword($password)
@@ -395,7 +408,8 @@ class User extends FormEntity implements UserInterface, AdvancedUserInterface, \
      * Set plain password
      *
      * @param $plainPassword
-     * @return $this
+     *
+     * @return User
      */
     public function setPlainPassword($plainPassword)
     {
@@ -408,7 +422,8 @@ class User extends FormEntity implements UserInterface, AdvancedUserInterface, \
      * Set current password
      *
      * @param $currentPassword
-     * @return $this
+     *
+     * @return User
      */
     public function setCurrentPassword($currentPassword)
     {
@@ -422,6 +437,7 @@ class User extends FormEntity implements UserInterface, AdvancedUserInterface, \
      * Set firstName
      *
      * @param string $firstName
+     *
      * @return User
      */
     public function setFirstName($firstName)
@@ -446,6 +462,7 @@ class User extends FormEntity implements UserInterface, AdvancedUserInterface, \
      * Set lastName
      *
      * @param string $lastName
+     *
      * @return User
      */
     public function setLastName($lastName)
@@ -470,19 +487,19 @@ class User extends FormEntity implements UserInterface, AdvancedUserInterface, \
      * Get full name
      *
      * @param bool $lastFirst
+     *
      * @return string
      */
     public function getName($lastFirst = false)
     {
-        $fullName = ($lastFirst) ? $this->lastName . ", " . $this->firstName : $this->firstName . " " . $this->lastName;
-        return $fullName;
-
+        return ($lastFirst) ? $this->lastName . ", " . $this->firstName : $this->firstName . " " . $this->lastName;
     }
 
     /**
      * Set email
      *
      * @param string $email
+     *
      * @return User
      */
     public function setEmail($email)
@@ -504,7 +521,7 @@ class User extends FormEntity implements UserInterface, AdvancedUserInterface, \
     }
 
     /**
-     * @return bool
+     * {@inheritdoc}
      */
     public function isAccountNonExpired()
     {
@@ -512,7 +529,7 @@ class User extends FormEntity implements UserInterface, AdvancedUserInterface, \
     }
 
     /**
-     * @return bool
+     * {@inheritdoc}
      */
     public function isAccountNonLocked()
     {
@@ -520,7 +537,7 @@ class User extends FormEntity implements UserInterface, AdvancedUserInterface, \
     }
 
     /**
-     * @return bool
+     * {@inheritdoc}
      */
     public function isCredentialsNonExpired()
     {
@@ -528,7 +545,7 @@ class User extends FormEntity implements UserInterface, AdvancedUserInterface, \
     }
 
     /**
-     * @return bool
+     * {@inheritdoc}
      */
     public function isEnabled()
     {
@@ -538,10 +555,11 @@ class User extends FormEntity implements UserInterface, AdvancedUserInterface, \
     /**
      * Set role
      *
-     * @param \Mautic\UserBundle\Entity\Role $role
+     * @param Role $role
+     *
      * @return User
      */
-    public function setRole(\Mautic\UserBundle\Entity\Role $role = null)
+    public function setRole(Role $role = null)
     {
         $this->isChanged('role', $role);
         $this->role = $role;
@@ -552,7 +570,7 @@ class User extends FormEntity implements UserInterface, AdvancedUserInterface, \
     /**
      * Get role
      *
-     * @return \Mautic\UserBundle\Entity\Role
+     * @return Role
      */
     public function getRole()
     {
@@ -563,8 +581,11 @@ class User extends FormEntity implements UserInterface, AdvancedUserInterface, \
      * Set active permissions
      *
      * @param array $permissions
+     *
+     * @return User
      */
-    public function setActivePermissions(array $permissions) {
+    public function setActivePermissions(array $permissions)
+    {
         $this->activePermissions = $permissions;
         return $this;
     }
@@ -574,7 +595,8 @@ class User extends FormEntity implements UserInterface, AdvancedUserInterface, \
      *
      * @return mixed
      */
-    public function getActivePermissions() {
+    public function getActivePermissions()
+    {
         return $this->activePermissions;
     }
 
@@ -582,6 +604,7 @@ class User extends FormEntity implements UserInterface, AdvancedUserInterface, \
      * Set position
      *
      * @param string $position
+     *
      * @return User
      */
     public function setPosition($position)
@@ -606,6 +629,7 @@ class User extends FormEntity implements UserInterface, AdvancedUserInterface, \
      * Set timezone
      *
      * @param string $timezone
+     *
      * @return User
      */
     public function setTimezone($timezone)
@@ -630,6 +654,7 @@ class User extends FormEntity implements UserInterface, AdvancedUserInterface, \
      * Set locale
      *
      * @param string $locale
+     *
      * @return User
      */
     public function setLocale($locale)
@@ -667,7 +692,7 @@ class User extends FormEntity implements UserInterface, AdvancedUserInterface, \
     /**
      * @return mixed
      */
-    public function getLastLogin ()
+    public function getLastLogin()
     {
         return $this->lastLogin;
     }
@@ -675,7 +700,7 @@ class User extends FormEntity implements UserInterface, AdvancedUserInterface, \
     /**
      * @param mixed $lastLogin
      */
-    public function setLastLogin ($lastLogin = null)
+    public function setLastLogin($lastLogin = null)
     {
         if (empty($lastLogin)) {
             $lastLogin = new \DateTime();
@@ -686,7 +711,7 @@ class User extends FormEntity implements UserInterface, AdvancedUserInterface, \
     /**
      * @return mixed
      */
-    public function getLastActive ()
+    public function getLastActive()
     {
         return $this->lastActive;
     }
@@ -694,7 +719,7 @@ class User extends FormEntity implements UserInterface, AdvancedUserInterface, \
     /**
      * @param mixed $lastActive
      */
-    public function setLastActive ($lastActive = null)
+    public function setLastActive($lastActive = null)
     {
         if (empty($lastActive)) {
             $lastActive = new \DateTime();
@@ -705,7 +730,7 @@ class User extends FormEntity implements UserInterface, AdvancedUserInterface, \
     /**
      * @return mixed
      */
-    public function getOnlineStatus ()
+    public function getOnlineStatus()
     {
         return $this->onlineStatus;
     }
@@ -713,7 +738,7 @@ class User extends FormEntity implements UserInterface, AdvancedUserInterface, \
     /**
      * @param mixed $status
      */
-    public function setOnlineStatus ($status)
+    public function setOnlineStatus($status)
     {
         $this->onlineStatus = $status;
     }

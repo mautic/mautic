@@ -17,13 +17,18 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Class PermissionsType
- *
- * @package Mautic\UserBundle\Form\Type
  */
 class PermissionsType extends AbstractType
 {
 
+    /**
+     * @var \Mautic\CoreBundle\Security\Permissions\CorePermissions
+     */
     private $security;
+
+    /**
+     * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
+     */
     private $translator;
 
     /**
@@ -35,10 +40,9 @@ class PermissionsType extends AbstractType
     }
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
+     * {@inheritdoc}
      */
-    public function buildForm (FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $permissionClasses = $this->security->getPermissionClasses();
 
@@ -94,12 +98,16 @@ class PermissionsType extends AbstractType
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
-    public function getName() {
+    public function getName()
+    {
         return "permissions";
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(

@@ -15,19 +15,19 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class AjaxController
- *
- * @package Mautic\FormBundle\Controller
  */
 class AjaxController extends CommonAjaxController
 {
 
     /**
+     * @param Request $request
+     *
      * @return \Mautic\CoreBundle\Controller\JsonResponse
      */
     protected function roleListAction(Request $request)
     {
         $filter    = InputHelper::clean($request->query->get('filter'));
-        $results   = $this->factory->getModel('user.user')->getLookupResults('role', $filter);
+        $results   = $this->factory->getModel('user')->getLookupResults('role', $filter);
         $dataArray = array();
         foreach ($results as $r) {
             $dataArray[] = array(
@@ -39,12 +39,14 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
+     * @param Request $request
+     *
      * @return \Mautic\CoreBundle\Controller\JsonResponse
      */
     protected function positionListAction(Request $request)
     {
         $filter  = InputHelper::clean($request->query->get('filter'));
-        $results = $this->factory->getModel('user.user')->getLookupResults('position', $filter);
+        $results = $this->factory->getModel('user')->getLookupResults('position', $filter);
         $dataArray = array();
         foreach ($results as $r) {
             $dataArray[] = array('value' => $r['position']);

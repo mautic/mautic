@@ -27,7 +27,7 @@ $items = array(
 $security = $event->getSecurity();
 
 $items    = array();
-if ($security->isGranted("user:users:view")) {
+if ($security->isGranted('user:users:view')) {
     $items['mautic.user.user.menu.index'] = array(
         'route'           => 'mautic_user_index',
         'linkAttributes'  => array(
@@ -42,7 +42,7 @@ if ($security->isGranted("user:users:view")) {
         'children'        => array(
             'mautic.user.user.menu.new'  => array(
                 'route'           => 'mautic_user_action',
-                'routeParameters' => array("objectAction" => "new"),
+                'routeParameters' => array('objectAction' => 'new'),
                 'extras'          => array(
                     'routeName' => 'mautic_user_action|new'
                 ),
@@ -50,7 +50,7 @@ if ($security->isGranted("user:users:view")) {
             ),
             'mautic.user.user.menu.edit' => array(
                 'route'           => 'mautic_user_action',
-                'routeParameters' => array("objectAction" => "edit"),
+                'routeParameters' => array('objectAction' => 'edit'),
                 'extras'          => array(
                     'routeName' => 'mautic_user_action|edit'
                 ),
@@ -60,7 +60,7 @@ if ($security->isGranted("user:users:view")) {
     );
 }
 
-if ($security->isGranted("user:roles:view")) {
+if ($security->isGranted('user:roles:view')) {
     $items['mautic.user.role.menu.index'] = array(
         'route'           => 'mautic_role_index',
         'extras'          => array(
@@ -75,7 +75,7 @@ if ($security->isGranted("user:roles:view")) {
         'children'        => array(
             'mautic.user.role.menu.new'  => array(
                 'route'           => 'mautic_role_action',
-                'routeParameters' => array("objectAction" => "new"),
+                'routeParameters' => array('objectAction' => 'new'),
                 'extras'          => array(
                     'routeName' => 'mautic_role_action|new'
                 ),
@@ -83,7 +83,7 @@ if ($security->isGranted("user:roles:view")) {
             ),
             'mautic.user.role.menu.edit' => array(
                 'route'           => 'mautic_role_action',
-                'routeParameters' => array("objectAction" => "edit"),
+                'routeParameters' => array('objectAction' => 'edit'),
                 'extras'          => array(
                     'routeName' => 'mautic_role_action|edit'
                 ),

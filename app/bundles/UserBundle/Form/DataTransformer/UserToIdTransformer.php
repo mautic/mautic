@@ -16,11 +16,10 @@ use Mautic\UserBundle\Entity\User;
 
 /**
  * Class UserToIdTransformer
- *
- * @package Mautic\UserBundle\Form\DataTransformer
  */
 class UserToIdTransformer implements DataTransformerInterface
 {
+
     /**
      * @var EntityManager
      */
@@ -38,12 +37,13 @@ class UserToIdTransformer implements DataTransformerInterface
      * Transforms an object (user) to a string (id).
      *
      * @param  User|null $user
+     *
      * @return string
      */
     public function transform($user)
     {
         if ($user === null) {
-            return "";
+            return '';
         }
 
         return $user->getId();
@@ -66,8 +66,7 @@ class UserToIdTransformer implements DataTransformerInterface
 
         $user = $this->em
             ->getRepository('MauticUserBundle:User')
-            ->findOneBy(array('id' => $id))
-        ;
+            ->findOneBy(array('id' => $id));
 
         if ($user === null) {
             throw new TransformationFailedException(sprintf(

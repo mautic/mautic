@@ -16,11 +16,10 @@ use Mautic\UserBundle\Entity\Role;
 
 /**
  * Class RoleToIdTransformer
- *
- * @package Mautic\UserBundle\Form\DataTransformer
  */
 class RoleToIdTransformer implements DataTransformerInterface
 {
+
     /**
      * @var EntityManager
      */
@@ -38,12 +37,13 @@ class RoleToIdTransformer implements DataTransformerInterface
      * Transforms an object (role) to a string (id).
      *
      * @param  Role|null $role
+     *
      * @return string
      */
     public function transform($role)
     {
         if ($role === null) {
-            return "";
+            return '';
         }
 
         return $role->getId();
@@ -66,8 +66,7 @@ class RoleToIdTransformer implements DataTransformerInterface
 
         $user = $this->em
             ->getRepository('MauticUserBundle:Role')
-            ->findOneBy(array('id' => $id))
-        ;
+            ->findOneBy(array('id' => $id));
 
         if ($user === null) {
             throw new TransformationFailedException(sprintf(

@@ -19,8 +19,6 @@ use Mautic\UserBundle\UserEvents;
 
 /**
  * Class UserSubscriber
- *
- * @package Mautic\UserBundle\EventListener
  */
 class UserSubscriber extends CommonSubscriber
 {
@@ -200,7 +198,7 @@ class UserSubscriber extends CommonSubscriber
     /**
      * Add a role delete entry to the audit log
      *
-     * @param Events\UserEvent $event
+     * @param Events\RoleEvent $event
      */
     public function onRoleDelete(Events\RoleEvent $event)
     {

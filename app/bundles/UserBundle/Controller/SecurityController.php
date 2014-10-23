@@ -14,22 +14,18 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Component\Security\Core\Exception as Exception;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
-use Symfony\Component\Security\Core\SecurityContextInterface;
 
 /**
  * Class DefaultController
- *
- * @package Mautic\UserBundle\Controller
  */
 class SecurityController extends CommonController
 {
 
     /**
-     * @param FilterControllerEvent    $event
+     * {@inheritdoc}
      */
     public function initialize(FilterControllerEvent $event)
     {
-
         $securityContext = $this->get('security.context');
 
         //redirect user if they are already authenticated
@@ -46,7 +42,7 @@ class SecurityController extends CommonController
     /**
      * Generates login form and processes login
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function loginAction() {
 
@@ -61,16 +57,16 @@ class SecurityController extends CommonController
         }
         if (!empty($error)) {
             if (($error instanceof Exception\BadCredentialsException)) {
-                $msg = "mautic.user.auth.error.invalidlogin";
+                $msg = 'mautic.user.auth.error.invalidlogin';
             } elseif ($error instanceof Exception\DisabledException) {
-                $msg = "mautic.user.auth.error.disabledaccount";
+                $msg = 'mautic.user.auth.error.disabledaccount';
             } else {
                 $msg = $error->getMessage();
             }
 
             $this->factory->getSession()->getFlashBag()->add(
                 'error',
-                $this->get("translator")->trans($msg, array(), 'flashes')
+                $this->get('translator')->trans($msg, array(), 'flashes')
             );
         }
         $this->request->query->set('tmpl', 'login');
