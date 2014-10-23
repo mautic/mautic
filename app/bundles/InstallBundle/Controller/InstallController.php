@@ -5,8 +5,6 @@
  * @author      Mautic
  * @link        http://mautic.com
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- *
- * Based on Sensio\DistributionBundle
  */
 
 namespace Mautic\InstallBundle\Controller;
@@ -15,15 +13,12 @@ use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Doctrine\ORM\Tools\SchemaTool;
 use Mautic\CoreBundle\Controller\CommonController;
-use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
 use Symfony\Component\Process\Exception\RuntimeException;
 
 /**
  * InstallController.
- *
- * @author Fabien Potencier <fabien@symfony.com>
  */
 class InstallController extends CommonController
 {
