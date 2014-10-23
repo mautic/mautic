@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "8c1d9b0b165c877409a1ac1b44d102ed",
+    "hash": "fb7fbc43b496e48997931783e6584279",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -1404,7 +1404,7 @@
                     "email": "stof@notk.org"
                 },
                 {
-                    "name": "Knplabs",
+                    "name": "KnpLabs",
                     "homepage": "http://knplabs.com"
                 },
                 {
@@ -2461,6 +2461,139 @@
     ],
     "packages-dev": [
         {
+            "name": "babdev/transifex",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/BabDev/Transifex-API.git",
+                "reference": "1154c370e9fb512274c26bf3c02257fb75dbdc27"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/BabDev/Transifex-API/zipball/1154c370e9fb512274c26bf3c02257fb75dbdc27",
+                "reference": "1154c370e9fb512274c26bf3c02257fb75dbdc27",
+                "shasum": ""
+            },
+            "require": {
+                "joomla/http": "~1.1",
+                "php": ">=5.3.10"
+            },
+            "require-dev": {
+                "joomla/test": "~1.0",
+                "phpunit/phpunit": "4.*",
+                "squizlabs/php_codesniffer": "1.*"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "BabDev\\Transifex\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0+"
+            ],
+            "authors": [
+                {
+                    "name": "Michael Babker",
+                    "homepage": "http://www.babdev.com"
+                }
+            ],
+            "description": "The Transifex API Package is a wrapper of the Transifex API available for PHP developers",
+            "homepage": "https://github.com/BabDev/Transifex-API",
+            "keywords": [
+                "php",
+                "transifex"
+            ],
+            "time": "2014-10-20 22:45:28"
+        },
+        {
+            "name": "joomla/http",
+            "version": "1.1.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/joomla-framework/http.git",
+                "reference": "e3b88785aa42de2ee8290a14ee4ee6652508a0d0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/joomla-framework/http/zipball/e3b88785aa42de2ee8290a14ee4ee6652508a0d0",
+                "reference": "e3b88785aa42de2ee8290a14ee4ee6652508a0d0",
+                "shasum": ""
+            },
+            "require": {
+                "joomla/uri": "~1.0",
+                "php": ">=5.3.10"
+            },
+            "require-dev": {
+                "joomla/test": "~1.0"
+            },
+            "suggest": {
+                "joomla/registry": "Registry can be used as an alternative to using an array for the package options."
+            },
+            "type": "joomla-package",
+            "autoload": {
+                "psr-4": {
+                    "Joomla\\Http\\": "src/",
+                    "Joomla\\Http\\Tests\\": "Tests/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0+"
+            ],
+            "description": "Joomla HTTP Package",
+            "homepage": "https://github.com/joomla-framework/http",
+            "keywords": [
+                "framework",
+                "http",
+                "joomla"
+            ],
+            "time": "2014-08-23 19:15:18"
+        },
+        {
+            "name": "joomla/uri",
+            "version": "1.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/joomla-framework/uri.git",
+                "reference": "980e532e4235bb8f1ada15b28822abbeb171da3f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/joomla-framework/uri/zipball/980e532e4235bb8f1ada15b28822abbeb171da3f",
+                "reference": "980e532e4235bb8f1ada15b28822abbeb171da3f",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.10"
+            },
+            "type": "joomla-package",
+            "autoload": {
+                "psr-4": {
+                    "Joomla\\Uri\\": "src/",
+                    "Joomla\\Uri\\Tests\\": "Tests/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0+"
+            ],
+            "description": "Joomla Uri Package",
+            "homepage": "https://github.com/joomla-framework/uri",
+            "keywords": [
+                "framework",
+                "joomla",
+                "uri"
+            ],
+            "time": "2014-02-09 02:57:17"
+        },
+        {
             "name": "liip/functional-test-bundle",
             "version": "dev-master",
             "target-dir": "Liip/FunctionalTestBundle",
@@ -2692,9 +2825,7 @@
             "time": "2014-09-22 14:56:14"
         }
     ],
-    "aliases": [
-
-    ],
+    "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
         "symfony/event-dispatcher": 20,
@@ -2714,7 +2845,5 @@
     "platform": {
         "php": ">=5.3.7"
     },
-    "platform-dev": [
-
-    ]
+    "platform-dev": []
 }

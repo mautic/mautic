@@ -53,3 +53,12 @@ $container->setDefinition('mautic.translation.loader',
 
 //Override exception class for AJAX
 $container->setParameter('twig.controller.exception.class', 'Mautic\CoreBundle\Controller\ExceptionController');
+
+//Transifex class
+$transifex = new Definition(
+    'BabDev\Transifex\Transifex',
+    array(
+        array('api.username' => $container->getParameter('mautic.transifex_username'), 'api.password' => $container->getParameter('mautic.transifex_password'))
+    )
+);
+$container->setDefinition('transifex', $transifex);

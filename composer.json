@@ -42,7 +42,8 @@
         "liip/functional-test-bundle": "dev-master",
         "nelmio/api-doc-bundle": "2.7.*@dev",
         "sensio/distribution-bundle": "~2.3",
-        "sensio/generator-bundle": "~2.3"
+        "sensio/generator-bundle": "~2.3",
+	    "babdev/transifex": "~1.0"
     },
     "scripts": {
         "post-install-cmd": [
