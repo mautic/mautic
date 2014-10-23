@@ -97,17 +97,17 @@ class AssetSubscriber extends CommonSubscriber
         }
 
         $lead    = $event->getLead();
-        $leadIps = array();
+        $options = array('ipIds' => array(), 'filters' => $filter);
 
         /** @var \Mautic\CoreBundle\Entity\IpAddress $ip */
         foreach ($lead->getIpAddresses() as $ip) {
-            $leadIps[] = $ip->getId();
+            $options['ipIds'][] = $ip->getId();
         }
 
         /** @var \Mautic\AssetBundle\Entity\DownloadRepository $downloadRepository */
         $downloadRepository = $this->factory->getEntityManager()->getRepository('MauticAssetBundle:Download');
 
-        $downloads = $downloadRepository->getLeadDownloads($lead->getId(), $leadIps);
+        $downloads = $downloadRepository->getLeadDownloads($lead->getId(), $options);
 
         $model = $this->factory->getModel('asset.asset');
 
