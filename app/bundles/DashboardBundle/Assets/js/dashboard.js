@@ -7,9 +7,12 @@ Mautic.dashboardOnLoad = function (container) {
 };
 
 Mautic.dashboardOnUnload = function(id) {
-    // Trash map data object on app content change.
+    // Trash initialized dashboard vars on app content change.
     if (id === '#app-content') {
         delete Mautic.dashboardMapData;
+        delete Mautic.dashboardClickRateDoughnutObject;
+        delete Mautic.dashboardOpenRateDoughnutObject;
+        delete Mautic.ActiveVisitorsCount;
     }
 };
 
@@ -39,6 +42,10 @@ Mautic.renderDashboardMap = function () {
 }
 
 Mautic.renderOpenRateDoughnut = function () {
+    // Initilize chart only for first time
+    if (typeof Mautic.dashboardOpenRateDoughnutObject === 'object') {
+        return;
+    }
     var element = mQuery('#open-rate');
     var sentCount = +element.attr('data-sent-count');
     var readCount = +element.attr('data-read-count');
@@ -58,30 +65,34 @@ Mautic.renderOpenRateDoughnut = function () {
         }
     ];
     var ctx = document.getElementById("open-rate").getContext("2d");
-    var myNewChart = new Chart(ctx).Doughnut(data, options);
+    Mautic.dashboardOpenRateDoughnutObject = new Chart(ctx).Doughnut(data, options);
 }
 
 Mautic.renderClickRateDoughnut = function () {
+    // Initilize chart only for first time
+    if (typeof Mautic.dashboardClickRateDoughnutObject === 'object') {
+        return;
+    }
     var element = mQuery('#click-rate');
-    var sentCount = +element.attr('data-read-count');
-    var readCount = +element.attr('data-click-count');
+    var readCount = +element.attr('data-read-count');
+    var clickCount = +element.attr('data-click-count');
     var options = {percentageInnerCutout: 65, responsive: false}
     var data = [
         {
-            value: readCount,
+            value: clickCount,
             color:"#35B4B9",
             highlight: "#227276",
             label: "Clicked"
         },
         {
-            value: sentCount - readCount,
+            value: readCount - clickCount,
             color: "#efeeec",
             highlight: "#EBEBEB",
             label: "Not clicked"
         }
     ];
     var ctx = document.getElementById("click-rate").getContext("2d");
-    var myNewChart = new Chart(ctx).Doughnut(data, options);
+    Mautic.dashboardClickRateDoughnutObject = new Chart(ctx).Doughnut(data, options);
 }
 
 Mautic.updateActiveVisitorCount = function () {
