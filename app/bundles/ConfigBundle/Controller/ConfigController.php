@@ -10,7 +10,6 @@
 namespace Mautic\ConfigBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
-use Symfony\Component\Form\Form;
 
 /**
  * Class ConfigController
@@ -41,7 +40,7 @@ class ConfigController extends FormController
         $action = $this->generateUrl('mautic_config_action', array('objectAction' => 'edit'));
         $form   = $model->createForm($params, $this->get('form.factory'), array('action' => $action));
 
-        /// Check for a submitted form and process it
+        // Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
@@ -52,12 +51,14 @@ class ConfigController extends FormController
                 $post     = $this->request->request;
                 $formData = $form->getData();
 
+                // Merge the values POSTed with the current data
                 foreach ($formData as $bundle => $bundleConfig) {
                     foreach ($bundleConfig as $key => $value) {
                         $formData[$bundle][$key] = $post->get('config[' . $key . ']', null, true);
                     }
                 }
 
+                // Merge each bundle's updated configuration into the local configuration
                 foreach ($formData as $object) {
                     $configurator->mergeParameters($object);
                 }
@@ -70,6 +71,7 @@ class ConfigController extends FormController
                         $this->get('translator')->trans('mautic.config.config.notice.updated', array(), 'flashes')
                     );
 
+                    // We must clear the application cache for the updated values to take effect
                     $this->clearCache();
                 } catch (RuntimeException $exception) {
                     $this->request->getSession()->getFlashBag()->add(
@@ -132,6 +134,10 @@ class ConfigController extends FormController
      */
     private function getBundleParams()
     {
+        // List config keys we do not want the user to change via the UI
+        $doNotChange = array('db_driver', 'db_host', 'db_table_prefix', 'db_name', 'db_user', 'db_password', 'db_path', 'db_port', 'secret');
+
+        // Import the current local configuration, $parameters is defined in this file
         require $this->container->getParameter('kernel.root_dir') . '/config/local.php';
         $localParams = $parameters;
 
@@ -143,12 +149,19 @@ class ConfigController extends FormController
             $paramsFile = $bundle['directory'] . '/Config/parameters.php';
 
             if (file_exists($paramsFile)) {
+                // Import the bundle configuration, $parameters is defined in this file
                 require_once $paramsFile;
+
+                // Merge the bundle params with the local params
                 foreach ($parameters as $key => $value) {
-                    if (array_key_exists($key, $localParams)) {
+                    if (in_array($key, $doNotChange)) {
+                        unset($parameters[$key]);
+                    }
+                    elseif (array_key_exists($key, $localParams)) {
                         $parameters[$key] = $localParams[$key];
                     }
                 }
+
                 $params[$bundle['bundle']] = $parameters;
             }
         }
