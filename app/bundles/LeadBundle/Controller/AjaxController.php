@@ -170,10 +170,12 @@ class AjaxController extends CommonAjaxController
                 $session = $this->factory->getSession();
 
                 // Set which events to load. Empty array == all.
-                $eventFilter = $session->get('mautic.lead.' . $leadId . '.timeline.filter', array());
+                $eventFilter = $session->get('mautic.lead.' . $leadId . '.timeline.filter');
 
                 if ($filters) {
                     $eventFilter = $filters;
+                } else {
+                    $eventFilter = array();
                 }
 
                 $session->set('mautic.lead.' . $leadId . '.timeline.filter', $eventFilter);

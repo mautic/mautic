@@ -163,7 +163,7 @@ class FormSubscriber extends CommonSubscriber
 
         // Decide if those events are filtered
         $filter = $event->getEventFilter();
-        $loadAllEvents = empty($filter);
+        $loadAllEvents = !isset($filter[0]);
         $eventFilterExists = in_array($eventTypeKey, $filter);
 
         if (!$loadAllEvents && !$eventFilterExists) {

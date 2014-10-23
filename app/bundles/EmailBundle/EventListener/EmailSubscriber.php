@@ -228,7 +228,7 @@ class EmailSubscriber extends CommonSubscriber
 
         // Decide if those events are filtered
         $filter = $event->getEventFilter();
-        $loadAllEvents = empty($filter);
+        $loadAllEvents = !isset($filter[0]);
         $sentEventFilterExists = in_array($eventTypeKeySent, $filter);
         $readEventFilterExists = in_array($eventTypeKeyRead, $filter);
 
