@@ -88,23 +88,29 @@ class PointsChangeLogRepository extends CommonRepository
      * Get a lead's point log
      *
      * @param integer $leadId
-     * @param array   $ipIds
+     * @param array   $options
      *
      * @return array
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getLeadTimelineEvents($leadId, array $ipIds = array())
+    public function getLeadTimelineEvents($leadId, array $options = array())
     {
         $query = $this->createQueryBuilder('lp')
             ->select('lp.eventName, lp.actionName, lp.dateAdded, lp.type, lp.delta')
             ->where('lp.lead = ' . $leadId);
 
-        if (!empty($ipIds)) {
-            $query->orWhere('lp.ipAddress IN (' . implode(',', $ipIds) . ')');
+        if (!empty($options['ipIds'])) {
+            $query->orWhere('lp.ipAddress IN (' . implode(',', $options['ipIds']) . ')');
         }
 
-        return $query->getQuery()
-            ->getArrayResult();
+        if (isset($options['filters']['search']) && $options['filters']['search']) {
+            $query->andWhere($query->expr()->orX(
+                $query->expr()->like('lp.eventName', $query->expr()->literal('%' . $options['filters']['search'] . '%')),
+                $query->expr()->like('lp.actionName', $query->expr()->literal('%' . $options['filters']['search'] . '%'))
+            ));
+        }
+
+        return $query->getQuery()->getArrayResult();
     }
 }

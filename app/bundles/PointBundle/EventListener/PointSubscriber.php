@@ -141,17 +141,17 @@ class PointSubscriber extends CommonSubscriber
         }
 
         $lead    = $event->getLead();
-        $leadIps = array();
+        $options = array('ipIds' => array(), 'filters' => $filter);
 
         /** @var \Mautic\CoreBundle\Entity\IpAddress $ip */
         foreach ($lead->getIpAddresses() as $ip) {
-            $leadIps[] = $ip->getId();
+            $options['ipIds'][] = $ip->getId();
         }
 
         /** @var \Mautic\PageBundle\Entity\HitRepository $hitRepository */
         $logRepository = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:PointsChangeLog');
 
-        $logs = $logRepository->getLeadTimelineEvents($lead->getId(), $leadIps);
+        $logs = $logRepository->getLeadTimelineEvents($lead->getId(), $options);
 
         // Add the logs to the event array
         foreach ($logs as $log) {
