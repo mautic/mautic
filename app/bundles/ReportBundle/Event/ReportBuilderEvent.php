@@ -14,11 +14,10 @@ use Symfony\Component\EventDispatcher\Event;
 
 /**
  * Class ReportBuilderEvent
- *
- * @package Mautic\ReportBundle\Event
  */
 class ReportBuilderEvent extends Event
 {
+
     /**
      * Container with all registered tables and columns
      *

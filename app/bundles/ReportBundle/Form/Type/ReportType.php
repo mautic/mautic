@@ -20,8 +20,6 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * Class ReportType
- *
- * @package Mautic\ReportBundle\Form\Type
  */
 class ReportType extends AbstractType
 {
@@ -42,7 +40,8 @@ class ReportType extends AbstractType
     /**
      * @param MauticFactory $factory
      */
-    public function __construct(MauticFactory $factory) {
+    public function __construct(MauticFactory $factory)
+    {
         $this->translator = $factory->getTranslator();
         $this->factory    = $factory;
     }

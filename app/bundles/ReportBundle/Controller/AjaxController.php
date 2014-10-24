@@ -14,8 +14,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class AjaxController
- *
- * @package Mautic\ReportBundle\Controller
  */
 class AjaxController extends CommonAjaxController
 {

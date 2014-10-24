@@ -11,16 +11,28 @@ namespace Mautic\ReportBundle\Form\DataTransformer;
 
 use Symfony\Component\Form\DataTransformerInterface;
 
+/**
+ * Class ColumnSelectTransformer
+ */
 class ColumnSelectTransformer implements DataTransformerInterface
 {
 
+    /**
+     * @var array
+     */
     private $columnList;
 
+    /**
+     * @param array $columnList
+     */
     public function __construct($columnList)
     {
         $this->columnList = $columnList;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function transform($rawFilters)
     {
         if (!is_array($rawFilters)) {
@@ -33,6 +45,9 @@ class ColumnSelectTransformer implements DataTransformerInterface
         return $filters;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function reverseTransform($rawFilters)
     {
         if (!is_array($rawFilters)) {

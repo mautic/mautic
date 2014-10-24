@@ -5,9 +5,6 @@
  * @author      Mautic
  * @link        http://mautic.com
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- *
- * This file was originally distributed as part of VelvelReportBundle (C) 2012 Velvel IT Solutions
- * and distributed under the GNU Lesser General Public License version 3.
  */
 
 namespace Mautic\ReportBundle\Builder;
@@ -43,8 +40,6 @@ final class MauticReportBuilder implements ReportBuilderInterface
      *
      * @param \Symfony\Component\Security\Core\SecurityContextInterface $securityContext Symfony Core Security Context
      * @param \Mautic\ReportBundle\Entity\Report                        $entity          Report entity
-     *
-     * @author r1pp3rj4ck <attila.bukor@gmail.com>
      */
     public function __construct(SecurityContextInterface $securityContext, Report $entity)
     {
@@ -53,14 +48,9 @@ final class MauticReportBuilder implements ReportBuilderInterface
     }
 
     /**
-     * Gets the QueryBuilder instance with the report query prepared
+     * {@inheritdoc}
      *
-     * @param array $options Options array
-     *
-     * @return \Doctrine\DBAL\Query\QueryBuilder
      * @throws InvalidReportQueryException
-     *
-     * @author r1pp3rj4ck <attila.bukor@gmail.com>
      */
     public function getQuery(array $options)
     {
@@ -86,8 +76,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
     /**
      * Configures builder
      *
-     * This method configures the ReportBuilder. It has to return
-     * a configured Doctrine DBAL QueryBuilder.
+     * This method configures the ReportBuilder. It has to return a configured Doctrine DBAL QueryBuilder.
      *
      * @param array $options Options array
      *
@@ -120,7 +109,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
         } else {
             $queryBuilder->select('*');
         }
-        
+
         // Add filters as AND values to the WHERE clause if present
         $filters = $this->entity->getFilters();
 

@@ -14,8 +14,6 @@ use Mautic\ReportBundle\Entity\Report;
 
 /**
  * Class ReportEvent
- *
- * @package Mautic\ReportBundle\Event
  */
 class ReportEvent extends CommonEvent
 {

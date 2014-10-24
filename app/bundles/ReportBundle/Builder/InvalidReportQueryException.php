@@ -5,14 +5,13 @@
  * @author      Mautic
  * @link        http://mautic.com
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- *
- * This file was originally distributed as part of VelvelReportBundle (C) 2012 Velvel IT Solutions
- * and distributed under the GNU Lesser General Public License version 3.
  */
 
 namespace Mautic\ReportBundle\Builder;
 
+/**
+ * Class InvalidReportQueryException
+ */
 class InvalidReportQueryException extends \Exception
 {
-
 }

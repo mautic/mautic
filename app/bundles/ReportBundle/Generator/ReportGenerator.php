@@ -5,9 +5,6 @@
  * @author      Mautic
  * @link        http://mautic.com
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- *
- * This file was originally distributed as part of VelvelReportBundle (C) 2012 Velvel IT Solutions
- * and distributed under the GNU Lesser General Public License version 3.
  */
 
 namespace Mautic\ReportBundle\Generator;
@@ -19,8 +16,6 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
 
 /**
  * Report generator
- *
- * @author r1pp3rj4ck <attila.bukor@gmail.com>
  */
 class ReportGenerator
 {
@@ -55,8 +50,6 @@ class ReportGenerator
      * @param \Symfony\Component\Security\Core\SecurityContextInterface $securityContext Security context
      * @param \Symfony\Component\Form\FormFactoryInterface              $formFactory     Form factory
      * @param \Mautic\ReportBundle\Entity\Report                        $entity          Report entity
-     *
-     * @author r1pp3rj4ck <attila.bukor@gmail.com>
      */
     public function __construct(SecurityContextInterface $securityContext, FormFactoryInterface $formFactory, Report $entity)
     {
@@ -71,8 +64,6 @@ class ReportGenerator
      * @param array $options Optional options array for the query
      *
      * @return \Doctrine\DBAL\Query\QueryBuilder
-     *
-     * @author r1pp3rj4ck <attila.bukor@gmail.com>
      */
     public function getQuery(array $options = array())
     {
@@ -92,8 +83,6 @@ class ReportGenerator
      * @param array                              $options Parameters set by the caller
      *
      * @return \Symfony\Component\Form\Form
-     *
-     * @author r1pp3rj4ck <attila.bukor@gmail.com>
      */
     public function getForm(Report $entity, $options)
     {
@@ -115,8 +104,6 @@ class ReportGenerator
      *
      * @return \Mautic\ReportBundle\Builder\ReportBuilderInterface
      * @throws \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     *
-     * @author r1pp3rj4ck <attila.bukor@gmail.com>
      */
     protected function getBuilder()
     {
@@ -127,13 +114,11 @@ class ReportGenerator
         }
 
         $reflection = new \ReflectionClass($className);
-        if ($reflection->implementsInterface($this->validInterface)) {
-            $builder = $reflection->newInstanceArgs(array($this->securityContext, $this->entity));
-        }
-        else {
+
+        if (!$reflection->implementsInterface($this->validInterface)) {
             throw new RuntimeException(sprintf("ReportBuilders have to implement %s, and %s doesn't implement it", $this->validInterface, $className));
         }
 
-        return $builder;
+        return $reflection->newInstanceArgs(array($this->securityContext, $this->entity));
     }
 }
