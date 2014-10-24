@@ -894,24 +894,13 @@ var Mautic = {
      * Reorder table data
      * @param name
      * @param orderby
+     * @param tmpl
+     * @param target
      */
     reorderTableData: function (name, orderby, tmpl, target) {
-        var query = "action=setTableOrder&name=" + name + "&orderby=" + orderby;
-        mQuery.ajax({
-            url: mauticAjaxUrl,
-            type: "POST",
-            data: query,
-            dataType: "json",
-            success: function (response) {
-                if (response.success) {
-                    var route = window.location.pathname + "?tmpl=" + tmpl;
-                    Mautic.loadContent(route, '', 'GET', target);
-                }
-            },
-            error: function (request, textStatus, errorThrown) {
-                Mautic.processAjaxError(request, textStatus, errorThrown);
-            }
-        });
+        var route = window.location.pathname + "?tmpl=" + tmpl + "&name=" + name + "&orderby=" + orderby;
+
+	    Mautic.loadContent(route, '', 'POST', target);
     },
 
     /**

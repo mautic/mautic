@@ -53,6 +53,10 @@ class CategoryController extends FormController
             return $this->accessDenied();
         }
 
+        if ($this->request->getMethod() == 'POST') {
+            $this->setTableOrder();
+        }
+
         $viewParams = array(
             'page'   => $page,
             'bundle' => $bundle

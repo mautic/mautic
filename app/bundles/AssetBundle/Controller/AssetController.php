@@ -42,6 +42,10 @@ class AssetController extends FormController
             return $this->accessDenied();
         }
 
+        if ($this->request->getMethod() == 'POST') {
+            $this->setTableOrder();
+        }
+
         //set limits
         $limit = $this->factory->getSession()->get('mautic.asset.limit', $this->factory->getParameter('default_assetlimit'));
         $start = ($asset === 1) ? 0 : (($asset-1) * $limit);
