@@ -96,7 +96,14 @@ $view['slots']->stop();
                     <div class="col-xs-6 va-m">
                         <div class="media">
                             <span class="pull-left img-wrapper img-rounded" style="width:38px">
-                                <img src="<?php echo $view['gravatar']->getImage($fields['core']['email']['value']); ?>" alt="">
+                                <?php $preferred = $lead->getPreferredProfileImage(); ?>
+                                <?php if ($preferred == 'gravatar' || empty($preferred)) : ?>
+                                    <?php $img = $view['gravatar']->getImage($fields['core']['email']['value']); ?>
+                                <?php else : ?>
+                                    <?php $socialData = $lead->getSocialCache(); ?>
+                                    <?php $img = $socialData[$preferred]['profile']['profileImage']; ?>
+                                <?php endif; ?>
+                                <img src="<?php echo $img; ?>" alt="">
                             </span>
                             <div class="media-body">
                                 <h4 class="fw-sb text-primary"><?php echo $lead->getPrimaryIdentifier(); ?></h4>

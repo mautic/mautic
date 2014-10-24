@@ -119,6 +119,14 @@ class Lead extends FormEntity
      */
     protected $fields = array();
 
+    /**
+     * @ORM\Column(name="preferred_profile_image",type="string")
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"full"})
+     */
+    private $preferredProfileImage;
+
     protected function isChanged($prop, $val)
     {
         $getter  = "get" . ucfirst($prop);
@@ -517,5 +525,23 @@ class Lead extends FormEntity
     public function getNotes ()
     {
         return $this->notes;
+    }
+
+    /**
+     * @param string $source
+     *
+     * @return void
+     */
+    public function setPreferredProfileImage($source)
+    {
+        $this->preferredProfileImage = $source;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPreferredProfileImage()
+    {
+        return $this->preferredProfileImage;
     }
 }

@@ -57,6 +57,24 @@ class LeadType extends AbstractType
                 'mapped'     => false,
                 'required'   => false
             ));
+
+            $imageChoices = array('gravatar' => 'Gravatar');
+
+            foreach ($options['data']->getSocialCache() as $key => $data) {
+                $imageChoices[$key] = $key;
+            }
+
+            $builder->add('preferred_profile_image', 'column_selector', array(
+                'choices'    => $imageChoices,
+                'label'      => 'mautic.lead.lead.field.preferred_profile',
+                'label_attr' => array('class' => 'control-label'),
+                'required'   => true,
+                'multiple'   => false,
+                'attr'       => array(
+                    'class' => 'form-control'
+                    )
+                )
+            );
         }
 
         $builder->add('owner', 'hidden_entity', array(

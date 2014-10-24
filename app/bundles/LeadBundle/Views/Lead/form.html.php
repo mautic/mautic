@@ -79,10 +79,14 @@ $groups = array_keys($fields);
                         <div class="pa-md">
                         <?php if ($group == 'core'): ?>
                             <div class="form-group mb-0">
-                                <?php echo $view['form']->label($form['owner_lookup']); ?>
                                 <div class="row">
-                                    <div class="col-sm-8">
+                                    <div class="col-sm-4">
+                                        <?php echo $view['form']->label($form['owner_lookup']); ?>
                                         <?php echo $view['form']->widget($form['owner_lookup']); ?>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <?php echo $view['form']->label($form['preferred_profile_image']); ?>
+                                        <?php echo $view['form']->widget($form['preferred_profile_image']); ?>
                                     </div>
                                 </div>
                             </div>

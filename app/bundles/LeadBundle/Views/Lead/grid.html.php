@@ -26,8 +26,15 @@ if ($tmpl == 'index')
                                 <div class="panel-body">
                             <span class="img-wrapper img-rounded" style="width:100%">
                                 <span class="label label-default ma-20"<?php echo $style; ?>><?php echo $item->getPoints(); ?></span>
+                                <?php $preferred = $item->getPreferredProfileImage(); ?>
+                                <?php if ($preferred == 'gravatar' || empty($preferred)) : ?>
+                                    <?php $img = $view['gravatar']->getImage($fields['core']['email']['value'], '250'); ?>
+                                <?php else : ?>
+                                    <?php $socialData = $item->getSocialCache(); ?>
+                                    <?php $img = $socialData[$preferred]['profile']['profileImage']; ?>
+                                <?php endif; ?>
                                 <img class="img img-responsive"
-                                     src="<?php echo $view['gravatar']->getImage($fields['core']['email']['value'], '250'); ?>" />
+                                     src="<?php echo $img; ?>" />
                             </span>
                                 </div>
                             </div>
