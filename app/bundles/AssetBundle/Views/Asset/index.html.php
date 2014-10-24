@@ -24,7 +24,7 @@ $view['slots']->set("headerTitle", $view['translator']->trans('mautic.asset.asse
     <?php $view['slots']->stop(); ?>
 <?php endif; ?>
 
-<div class="panel panel-default">
+<div class="panel panel-default bdr-t-wdh-0">
     <div class="panel-body">
         <div class="box-layout">
             <div class="col-xs-6 va-m">

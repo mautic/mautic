@@ -11,12 +11,7 @@ $view->extend('MauticPointBundle:Point:index.html.php');
 ?>
 
     <?php if (count($items)): ?>
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h3 class="panel-title">
-                <?php echo $view['translator']->trans('mautic.point.header.index');?>
-            </h3>
-        </div>
+    <div class="panel panel-default bdr-t-wdh-0">
         <div class="table-responsive scrollable body-white padding-sm page-list">    
             <table class="table table-hover table-striped table-bordered point-list">
                 <thead>
