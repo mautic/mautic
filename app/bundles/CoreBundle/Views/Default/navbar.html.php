@@ -51,8 +51,8 @@
                     </div>
                     <div class="pt-xs pb-xs pl-0 pr-0">
                         <div class="scroll-content slimscroll" style="height:250px;">
+                            <!--
                             <div class="media pt-sm pb-sm pr-md pl-md nm bdr-b">
-                                <!--
                                 <span class="pull-left img-wrapper img-rounded mt-xs" style="width:36px">
                                     <img class="media-object" src="https://s3.amazonaws.com/uifaces/faces/twitter/mlane/73.jpg">
                                 </span>
@@ -64,8 +64,8 @@
                                         <span class="fs-10 text-white dark-sm pull-left">1H</span>
                                     </div>
                                 </div>
-                                -->
                             </div>
+                            -->
                         </div>
                     </div>
                 </div>
