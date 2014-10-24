@@ -11,12 +11,6 @@ if ($tmpl == 'index')
 ?>
 <?php if (count($items)): ?>
     <div class="panel panel-default">
-        <div class="panel-heading">
-            <h3 class="panel-title">
-                <i class="fa fa-fw fa-pencil-square-o"></i>
-                <?php echo $view['translator']->trans('mautic.form.form.header.index'); ?>
-            </h3>
-        </div>
         <div class="panel-body">
             <div class="box-layout">
                 <div class="col-xs-6 va-m">

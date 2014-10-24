@@ -97,6 +97,7 @@ class UserController extends FormController
 
         $parameters = array(
             'items'       => $users,
+            'searchValue' => $search,
             'page'        => $page,
             'limit'       => $limit,
             'permissions' => $permissions,
