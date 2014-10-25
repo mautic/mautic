@@ -68,7 +68,11 @@ var Mautic = {
     /**
      * Initiate various functions on page load, manual or ajax
      */
-    onPageLoad: function (container, response) {
+    onPageLoad: function (container, response, ignoreContentSpecificOnLoad) {
+        if (typeof ignoreContentSpecificOnLoad == 'undefined') {
+            var ignoreContentSpecificOnLoad = false;
+        }
+
         container = typeof container !== 'undefined' ? container : 'body';
 
         //initiate links
@@ -224,9 +228,11 @@ var Mautic = {
         }
 
         //run specific on loads
-        var contentSpecific = (response && response.mauticContent) ? response.mauticContent : mauticContent;
-        if (typeof Mautic[contentSpecific + "OnLoad"] == 'function') {
-            Mautic[contentSpecific + "OnLoad"](container, response);
+        if (!ignoreContentSpecificOnLoad) {
+            var contentSpecific = (response && response.mauticContent) ? response.mauticContent : mauticContent;
+            if (typeof Mautic[contentSpecific + "OnLoad"] == 'function') {
+                Mautic[contentSpecific + "OnLoad"](container, response);
+            }
         }
 
         if (container == 'body') {
@@ -471,7 +477,7 @@ var Mautic = {
      * Updates new content
      * @param response
      */
-    processPageContent: function (response) {
+    processPageContent: function (response, ignoreContentSpecificOnLoad) {
         if (response) {
             if (!response.target) {
                 response.target = '#app-content';
@@ -542,7 +548,7 @@ var Mautic = {
             }
 
             //activate content specific stuff
-            Mautic.onPageLoad(response.target, response);
+            Mautic.onPageLoad(response.target, response, ignoreContentSpecificOnLoad);
         }
     },
 

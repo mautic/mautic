@@ -22,7 +22,7 @@ Mautic.updateChatList = function (killTimer) {
 
             mQuery('#ChatList').replaceWith(response.newContent);
             response.target = '#ChatList';
-            Mautic.processPageContent(response);
+            Mautic.processPageContent(response, true);
 
             if (killTimer) {
                  clearInterval(Mautic['chatUpdaterInterval']);
@@ -58,7 +58,7 @@ Mautic.startUserChat = function (userId, fromDate) {
 
                 //activate links, etc
                 response.target = ".offcanvas-right";
-                Mautic.processPageContent(response);
+                Mautic.processPageContent(response, true);
             }
         },
         error: function (request, textStatus, errorThrown) {
@@ -90,7 +90,7 @@ Mautic.startChannelChat = function (channelId, fromDate) {
 
                 //activate links, etc
                 response.target = "#OffCanvasRightContent";
-                Mautic.processPageContent(response);
+                Mautic.processPageContent(response, true);
             }
         },
         error: function (request, textStatus, errorThrown) {
