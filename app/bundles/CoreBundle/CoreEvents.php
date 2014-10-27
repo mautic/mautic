@@ -83,4 +83,14 @@ final class CoreEvents
      * @var string
      */
     const EMAIL_RESEND = 'mautic.on_email_resend';
+
+    /**
+     * The mautic.on_fetch_icons event is thrown to fetch icons of menu items.
+     *
+     * The event listener receives a
+     * Mautic\CoreBundle\Event\IconEvent instance.
+     *
+     * @var string
+     */
+    const FETCH_ICONS = 'mautic.on_fetch_icons';
 }

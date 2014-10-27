@@ -13,6 +13,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\Intl\Intl;
+use Mautic\CoreBundle\Event\IconEvent;
+use Mautic\CoreBundle\CoreEvents;
 
 /**
  * Class DefaultController
@@ -69,6 +71,7 @@ class DefaultController extends CommonController
         // Audit Log
         $logs = $this->factory->getModel('core.auditLog')->getLogForObject(null, null, 10);
 
+        // Get names of log's items
         foreach ($logs as &$log) {
             if (!empty($log['bundle']) && !empty($log['object']) && !empty($log['objectId'])) {
                 $model = $this->factory->getModel($log['bundle'] . '.' . $log['object']);
@@ -80,6 +83,10 @@ class DefaultController extends CommonController
                 }
             }
         }
+
+        $event = new IconEvent($this->factory->getSecurity());
+        $this->factory->getDispatcher()->dispatch(CoreEvents::FETCH_ICONS, $event);
+        $icons = $event->getIcons();
 
         return $this->delegateView(array(
             'viewParameters'  =>  array(
@@ -95,6 +102,7 @@ class DefaultController extends CommonController
                 'allSentEmails'     => $allSentEmails,
                 'mapData'           => $mapData,
                 'logs'              => $logs,
+                'icons'             => $icons,
                 'security'          => $this->factory->getSecurity()
             ),
             'contentTemplate' => 'MauticDashboardBundle:Default:index.html.php',

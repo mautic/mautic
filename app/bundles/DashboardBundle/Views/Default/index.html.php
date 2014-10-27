@@ -238,7 +238,7 @@ $view['slots']->set('mauticContent', 'dashboard');
     <div class="col-md-3 bg-white bdr-l height-auto">
 
         <!-- activity feed -->
-        <?php echo $view->render('MauticDashboardBundle:Default:recentactivity.html.php', array('logs' => $logs)); ?>
+        <?php echo $view->render('MauticDashboardBundle:Default:recentactivity.html.php', array('logs' => $logs, 'icons' => $icons)); ?>
 
     </div>
 </div>

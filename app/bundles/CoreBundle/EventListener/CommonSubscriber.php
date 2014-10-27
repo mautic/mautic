@@ -101,6 +101,48 @@ class CommonSubscriber implements EventSubscriberInterface
         }
     }
 
+    /**
+     * Find and add menu items
+     *
+     * @param IconEvent $event
+     * @param           $name
+     */
+    protected function buildIcons(MauticEvents\IconEvent $event)
+    {
+        $security = $event->getSecurity();
+        $request  = $this->factory->getRequest();
+        $bundles = $this->factory->getParameter('bundles');
+        $icons = array();
+
+        foreach ($bundles as $bundle) {
+            //check common place
+            $path = $bundle['directory'] . "/Config/menu/main.php";
+            if (!file_exists($path)) {
+                //else check for just a menu.php file
+                $path = $bundle['directory'] . "/Config/menu.php";
+                $recheck = true;
+            } else {
+                $recheck = false;
+            }
+
+            if (!$recheck || file_exists($path)) {
+                $config = include $path;
+                $items = (!isset($config['items']) ? $config : $config['items']);
+                if ($items) {
+                    foreach ($items as $item) {
+                        $icons[] = $item;
+                        if (isset($item['extras']['iconClass']) && isset($item['linkAttributes']['id'])) {
+                            $id = explode('_', $item['linkAttributes']['id']);
+                            if (isset($id[1])) {
+                                $event->addIcon($id[1], $item['extras']['iconClass']);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 
     /**
      * Get routing from bundles and add to Routing event

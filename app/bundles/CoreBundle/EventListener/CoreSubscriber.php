@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Controller\MauticController;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MenuEvent;
 use Mautic\CoreBundle\Event\RouteEvent;
+use Mautic\CoreBundle\Event\IconEvent;
 use Mautic\ApiBundle\Event as ApiEvents;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
@@ -40,6 +41,7 @@ class CoreSubscriber extends CommonSubscriber
             CoreEvents::BUILD_MENU            => array('onBuildMenu', 9999),
             CoreEvents::BUILD_ADMIN_MENU      => array('onBuildAdminMenu', 9999),
             CoreEvents::BUILD_ROUTE           => array('onBuildRoute', 0),
+            CoreEvents::FETCH_ICONS           => array('onFetchIcons', 9999),
             SecurityEvents::INTERACTIVE_LOGIN => array('onSecurityInteractiveLogin', 0)
         );
     }
@@ -173,5 +175,13 @@ class CoreSubscriber extends CommonSubscriber
     public function onBuildRoute (RouteEvent $event)
     {
         $this->buildRoute($event, 'routing');
+    }
+
+    /**
+     * @param MenuEvent $event
+     */
+    public function onFetchIcons (IconEvent $event)
+    {
+        $this->buildIcons($event);
     }
 }
