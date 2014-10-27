@@ -10,7 +10,7 @@ if ($tmpl == 'index')
     $view->extend('MauticLeadBundle:Lead:index.html.php');
 ?>
 
-<div class="pa-md">
+<div class="pa-md bg-auto">
     <div class="shuffle grid row scrollable" id="shuffle-grid">
         <?php if (count($items)): ?>
             <?php foreach ($items as $item): ?>
@@ -81,9 +81,7 @@ if ($tmpl == 'index')
         <?php endif; ?>
     </div>
 </div>
-
 <?php if (count($items)): ?>
-    <div class="clearfix"></div>
     <div class="panel-footer">
         <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
             "totalItems"      => $totalItems,
