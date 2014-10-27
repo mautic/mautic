@@ -100,19 +100,28 @@ class ConfigType extends AbstractType
                     ));
                 } elseif ($key == 'default_timezone') {
                     $builder->add($key, 'timezone', array(
-                        'label'    => 'mautic.config.' . $bundle . '.' . $key,
+                        'label'       => 'mautic.config.' . $bundle . '.' . $key,
                         'label_attr'  => array('class' => 'control-label'),
                         'attr'        => array(
-                            'class'   => 'form-control'
+                            'class' => 'form-control'
                         ),
                         'multiple'    => false,
                         'empty_value' => 'mautic.user.user.form.defaulttimezone',
                         'data'        => $value
                     ));
+                } elseif (in_array($key, array('mailer_password', 'transifex_password'))) {
+                    $builder->add($key, 'password', array(
+                        'label'      => 'mautic.config.' . $bundle . '.' . $key,
+                        'label_attr' => array('class' => 'control-label'),
+                        'attr'       => array(
+                            'class'       => 'form-control',
+                            'placeholder' => 'mautic.user.user.form.passwordplaceholder',
+                            'preaddon'    => 'fa fa-lock'
+                        ),
+                        'data'       => $value
+                    ));
                 } else {
-                    if (in_array($key, array('mailer_password', 'transifex_password'))) {
-                        $type = 'password';
-                    } elseif (in_array($key, array('mailer_from_email'))) {
+                    if (in_array($key, array('mailer_from_email'))) {
                         $type = 'email';
                     } else {
                         $type = 'text';
@@ -122,7 +131,6 @@ class ConfigType extends AbstractType
                         'label'      => 'mautic.config.' . $bundle . '.' . $key,
                         'label_attr' => array('class' => 'control-label'),
                         'attr'       => array('class' => 'form-control'),
-                        'required'   => false,
                         'data'       => $value
                     ));
                 }
