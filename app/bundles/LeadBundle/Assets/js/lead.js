@@ -117,7 +117,15 @@ Mautic.leadOnLoad = function (container) {
         .on("fa.sidebar.minimize", function () { grid.shuffle("update"); })
         .on("fa.sidebar.maximize", function () { grid.shuffle("update"); });
 
-    Mautic.loadEngagementChart();
+    if (typeof Mautic.leadEngagementChart === 'undefined') {
+        Mautic.loadEngagementChart();
+    }
+};
+
+Mautic.leadOnUnload = function(id) {
+    if (id === '#app-content') {
+        delete Mautic.leadEngagementChart;
+    }
 };
 
 Mautic.getLeadId = function() {
@@ -684,7 +692,7 @@ Mautic.loadEngagementChart = function() {
                             }
                         ]
                     };
-                    var chart = new Chart(canvas.getContext("2d")).Line(chartData);
+                    Mautic.leadEngagementChart = new Chart(canvas.getContext("2d")).Line(chartData);
                 }
             },
             error: function (request, textStatus, errorThrown) {
