@@ -55,7 +55,11 @@ class UserStepType extends AbstractType
         $builder->add('password', 'password', array(
             'label'      => 'mautic.install.install.form.user.password',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control'),
+            'attr'       => array(
+                'class'    => 'form-control',
+                'tooltip'  => 'mautic.user.user.form.help.passwordrequirements',
+                'preaddon' => 'fa fa-lock'
+            ),
             'required'   => true
         ));
 
@@ -66,7 +70,7 @@ class UserStepType extends AbstractType
                     'label' => 'mautic.install.next.step',
                     'type'  => 'submit',
                     'attr'  => array(
-                        'class'   => 'btn btn-default',
+                        'class'   => 'btn btn-success pull-right mt-20',
                         'icon'    => 'fa fa-arrow-circle-right padding-sm-right'
                     )
                 )

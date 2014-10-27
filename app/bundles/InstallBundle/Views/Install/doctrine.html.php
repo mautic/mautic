@@ -14,14 +14,8 @@ $header = $view['translator']->trans('mautic.install.install.heading.database.co
 $view['slots']->set("headerTitle", $header);
 ?>
 
-<div class="panel panel-default">
-	<div class="panel-heading">
-		<h3 class="panel-title">
-			<?php echo $header; ?>
-		</h3>
-	</div>
-	<div class="panel-body">
-        <p><?php echo $view['translator']->trans('mautic.install.install.database.introtext'); ?></p>
-    	<?php echo $view['form']->form($form); ?>
-    </div>
-</div>
+<h2 class="page-header">
+	<?php echo $header; ?>
+</h2>
+<p><?php echo $view['translator']->trans('mautic.install.install.database.introtext'); ?></p>
+<?php echo $view['form']->form($form); ?>

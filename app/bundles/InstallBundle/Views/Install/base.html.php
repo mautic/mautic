@@ -15,7 +15,7 @@
         <!-- start: app-wrapper -->
         <section id="app-wrapper">
             <div class="container">
-                <div class="row">
+                <div class="row mt-20">
                     <div class="text-center">
                         <img src="<?php echo $view['assets']->getUrl('media/images/mautic_logo_lb200.png') ?>" height="50px" />
                         <h5 class="semibold text-muted mt-5"><?php $view['slots']->output('header', ''); ?></h5>
