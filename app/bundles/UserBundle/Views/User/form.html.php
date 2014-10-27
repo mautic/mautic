@@ -18,7 +18,64 @@ if (!empty($userId)) {
 }
 $view['slots']->set("headerTitle", $header);
 ?>
+<!-- start: box layout -->
+<div class="box-layout">
+    <!-- container -->
+    <div class="col-md-9 bg-auto height-auto bdr-r">
+		<div class="pa-md">
+			<div class="form-group mb-0">
+			    <label class="control-label mb-xs"><?php echo $view['translator']->trans('mautic.lead.field.name'); ?></label>
+			    <div class="row">
+			        <div class="col-sm-6">
+			            <?php echo $view['form']->widget($form['firstName'], array('attr' => array('placeholder' => $form['firstName']->vars['label']))); ?>
+			        </div>
+			        <div class="col-sm-6">
+			            <?php echo $view['form']->widget($form['lastName'], array('attr' => array('placeholder' => $form['lastName']->vars['label']))); ?>
+			        </div>
+			    </div>
+			</div>
+			<hr class="mnr-md mnl-md">
+			
+			<div class="form-group mb-0">
+			    <div class="row">
+			        <div class="col-sm-6">
+			        	<label class="control-label mb-xs"><?php echo $view['form']->label($form['role_lookup']); ?></label>
+			            <?php echo $view['form']->widget($form['role_lookup'], array('attr' => array('placeholder' => $form['role_lookup']->vars['label']))); ?>
+			        </div>
+			        <div class="col-sm-6">
+				    	<label class="control-label mb-xs"><?php echo $view['form']->label($form['position']); ?></label>
+			            <?php echo $view['form']->widget($form['position'], array('attr' => array('placeholder' => $form['position']->vars['label']))); ?>
+			        </div>
+			    </div>
+			</div>
+			<hr class="mnr-md mnl-md">
 
-<div class="scrollable">
-    <?php echo $view['form']->form($form); ?>
+			<div class="panel panel-default form-group mb-0">
+				<div class="panel-body">
+				    <div class="row">
+				        <div class="col-sm-6">				        	
+				        	<div class="form-group col-xs-12">
+				        		<label class="control-label mb-xs"><?php echo $view['form']->label($form['username']); ?></label>
+				            	<?php echo $view['form']->widget($form['username'], array('attr' => array('placeholder' => $form['username']->vars['label']))); ?>
+				            </div>
+							<div class="form-group col-xs-12">
+					    		<label class="control-label mb-xs"><?php echo $view['form']->label($form['email']); ?></label>
+				            	<?php echo $view['form']->widget($form['email'], array('attr' => array('placeholder' => $form['email']->vars['label']))); ?>
+				            </div>
+				        </div>
+				        <div class="col-sm-6">
+				            <?php echo $view['form']->widget($form['plainPassword'], array('attr' => array('placeholder' => $form['plainPassword']->vars['label']))); ?>
+				        </div>				        
+				    </div>
+				</div>
+			</div>
+			<hr class="mnr-md mnl-md">
+
+		</div>
+	</div>
+ 	<div class="col-md-3 bg-white height-auto">
+		<div class="pr-lg pl-lg pt-md pb-md">
+			<?php echo $view['form']->form($form); ?>
+		</div>
+	</div>
 </div>
