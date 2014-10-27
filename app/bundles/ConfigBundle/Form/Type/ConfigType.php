@@ -50,17 +50,24 @@ class ConfigType extends AbstractType
                         ),
                         'label'       => 'mautic.config.' . $bundle . '.' . $key,
                         'expanded'    => true,
-                        'multiple'    => false,
                         'empty_value' => false,
-                        'required'    => false,
                         'data'        => (bool) $value
                     ));
-                } elseif ($key == 'api_mode') {
+                } elseif (in_array($key, array('api_mode', 'locale'))) {
+                    switch ($key) {
+                        case 'api_mode':
+                            $choices = array(
+                                'oauth1' => 'mautic.api.config.oauth1',
+                                'oauth2' => 'mautic.api.config.oauth2'
+                            );
+                            break;
+                        case 'locale':
+                            $choices = $this->factory->getParameter('supported_languages');
+                            break;
+                    }
+
                     $builder->add($key, 'choice', array(
-                        'choices'  => array(
-                            'oauth1' => 'mautic.api.config.oauth1',
-                            'oauth2' => 'mautic.api.config.oauth2'
-                        ),
+                        'choices'  => $choices,
                         'label'    => 'mautic.config.' . $bundle . '.' . $key,
                         'required' => false,
                         'attr'     => array(
@@ -77,17 +84,6 @@ class ConfigType extends AbstractType
                         ),
                         'multiple'    => false,
                         'empty_value' => 'mautic.user.user.form.defaulttimezone',
-                        'data'        => $value
-                    ));
-                } elseif ($key == 'locale') {
-                    $builder->add($key, 'choice', array(
-                        'choices'     => $this->factory->getParameter('supported_languages'),
-                        'label'       => 'mautic.config.' . $bundle . '.' . $key,
-                        'label_attr'  => array('class' => 'control-label'),
-                        'attr'        => array(
-                            'class'   => 'form-control'
-                        ),
-                        'multiple'    => false,
                         'data'        => $value
                     ));
                 } else {
