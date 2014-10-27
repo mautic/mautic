@@ -124,7 +124,7 @@ class PublicController extends CommonFormController
         return $this->render('MauticEmailBundle::message.html.php', array(
             'message'  => $msg,
             'type'     => (empty($msgType)) ? 'notice' : $msgType,
-            'template' => $this->factory->getParameter('default_theme')
+            'template' => $this->factory->getParameter('theme')
         ));
     }
 

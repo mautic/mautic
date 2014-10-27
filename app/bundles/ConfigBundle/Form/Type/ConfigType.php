@@ -40,7 +40,7 @@ class ConfigType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        foreach ($options['data'] as $config) {
+        foreach ($options['data'] as $bundle => $config) {
             foreach ($config as $key => $value) {
                 if (in_array($key, array('api_enabled', 'cat_in_page_url'))) {
                     $builder->add($key, 'button_group', array(
@@ -48,6 +48,7 @@ class ConfigType extends AbstractType
                             array(false, true),
                             array('mautic.core.form.no', 'mautic.core.form.yes')
                         ),
+                        'label'       => 'mautic.config.' . $bundle . '.' . $key,
                         'expanded'    => true,
                         'multiple'    => false,
                         'empty_value' => false,
@@ -56,18 +57,20 @@ class ConfigType extends AbstractType
                     ));
                 } elseif ($key == 'api_mode') {
                     $builder->add($key, 'choice', array(
-                        'choices' => array(
+                        'choices'  => array(
                             'oauth1' => 'mautic.api.config.oauth1',
                             'oauth2' => 'mautic.api.config.oauth2'
                         ),
-                        'required'    => false,
-                        'attr'        => array(
+                        'label'    => 'mautic.config.' . $bundle . '.' . $key,
+                        'required' => false,
+                        'attr'     => array(
                             'class' => 'form-control'
                         ),
-                        'data'        => $value
+                        'data'     => $value
                     ));
                 } else {
                     $builder->add($key, 'text', array(
+                        'label'      => 'mautic.config.' . $bundle . '.' . $key,
                         'label_attr' => array('class' => 'control-label'),
                         'attr'       => array('class' => 'form-control'),
                         'required'   => false,
