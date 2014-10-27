@@ -1302,6 +1302,16 @@ blockquote > p:after {
 .alert-tertiary {
   background: #a3e2e4;
 }
+.xdsoft_datetimepicker .xdsoft_calendar td.xdsoft_default,
+.xdsoft_datetimepicker .xdsoft_calendar td.xdsoft_current,
+.xdsoft_datetimepicker .xdsoft_timepicker .xdsoft_time_box > div > div.xdsoft_current {
+  background: #4e5e9e;
+  box-shadow: #495894 0px 1px 3px 0px inset;
+}
+.xdsoft_datetimepicker .xdsoft_calendar td:hover,
+.xdsoft_datetimepicker .xdsoft_timepicker .xdsoft_time_box > div > div:hover {
+  background: #fdb933 !important;
+}
 .content-body .cke_chrome {
   background: #ebedf0;
   border: 1px solid #d5d5d5;

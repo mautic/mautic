@@ -32,18 +32,17 @@ $view['slots']->set("headerTitle", $header.$subheader);
             <div class="row">
                 <div class="col-md-6">
                     <?php echo $view['form']->row($form['title']); ?>
-                </div>
-                <div class="col-md-6">
                     <?php echo $view['form']->row($form['alias']); ?>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6">
                     <?php echo $view['form']->row($form['category_lookup']); ?>
                     <?php echo $view['form']->row($form['category']); ?>
+                    <?php echo $view['form']->row($form['template']); ?>
                 </div>
                 <div class="col-md-6">
-                    <?php echo $view['form']->row($form['template']); ?>
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            [PAGE THUMBNAIL HERE]
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
