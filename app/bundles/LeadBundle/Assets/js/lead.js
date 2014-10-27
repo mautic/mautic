@@ -280,59 +280,6 @@ Mautic.activateLeadOwnerTypeahead = function(el) {
     });
 };
 
-// Mautic.activateTimelineTypeahead = function(timelineForm) {
-//     var events = new Bloodhound({
-//         datumTokenizer: Bloodhound.tokenizers.obj.whitespace('label'),
-//         queryTokenizer: Bloodhound.tokenizers.whitespace,
-//         prefetch: {
-//             url: mauticAjaxUrl + "?action=lead:timelineEventsList",
-//             ajax: {
-//                 beforeSend: function () {
-//                     MauticVars.showLoadingBar = false;
-//                 }
-//             }
-//         },
-//         remote: {
-//             url: mauticAjaxUrl + "?action=lead:timelineEventsList&filter=%QUERY",
-//             ajax: {
-//                 beforeSend: function () {
-//                     MauticVars.showLoadingBar = false;
-//                 }
-//             }
-//         },
-//         dupDetector: function (remoteMatch, localMatch) {
-//             return (remoteMatch.label == localMatch.label);
-//         },
-//         ttl: 1800000,
-//         limit: 5
-//     });
-//     events.initialize();
-//     timelineForm.find("#search").typeahead(
-//         {
-//             hint: true,
-//             highlight: true,
-//             minLength: 2
-//         }
-//         // ,
-//         // {
-//         //     name: 'lead_owners',
-//         //     displayKey: 'label',
-//         //     source: events.ttAdapter()
-//         // }
-//         // ).on('typeahead:selected', function (event, datum) {
-//         //     if (mQuery("#lead_owner").length) {
-//         //         mQuery("#lead_owner").val(datum["value"]);
-//         //     }
-//         // }).on('typeahead:autocompleted', function (event, datum) {
-//         //     if (mQuery("#lead_owner").length) {
-//         //         mQuery("#lead_owner").val(datum["value"]);
-//         //     }
-//         // }
-//     ).on( 'focus', function() {
-//         mQuery(this).typeahead( 'open');
-//     });
-// };
-
 Mautic.leadlistOnLoad = function(container) {
     if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'lead.list');
