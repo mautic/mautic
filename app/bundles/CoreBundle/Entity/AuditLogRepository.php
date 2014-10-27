@@ -72,6 +72,17 @@ class AuditLogRepository extends CommonRepository
         		} else {
                     $detail[1] = '';
                 }
+
+                if (isset($detail[0])) {
+                    if ($detail[0] === true) {
+                        $detail[0] = 'mautic.core.form.yes';
+                    }
+                    if ($detail[0] === false) {
+                        $detail[0] = 'mautic.core.form.no';
+                    }
+                } else {
+                    $detail[0] = '';
+                }
         	}
         }
 

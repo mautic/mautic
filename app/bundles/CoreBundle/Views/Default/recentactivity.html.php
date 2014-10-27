@@ -31,9 +31,13 @@
                     <ul>
                     <?php foreach ($log['details'] as $key => $detail) : ?>
                         <li>
-                            <strong class="text-primary">
+                            <span class="text-primary">
                                 <?php echo ucfirst(preg_replace('/(?!^)[A-Z]{2,}(?=[A-Z][a-z])|[A-Z][a-z]/', ' $0', $key)); ?>:
-                            </strong> <?php echo $view['translator']->trans($detail[1]); ?>
+                            </span>
+                            <?php if ($view['translator']->trans($detail[0])) : ?>
+                            <del><?php echo $view['translator']->trans($detail[0]); ?></del> <i class="fa fa-long-arrow-right"></i>
+                            <?php endif; ?>
+                            <?php echo $view['translator']->trans($detail[1]); ?>
                         </li>
                     <?php endforeach; ?>
                     </ul>
