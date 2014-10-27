@@ -45,23 +45,33 @@ class AuditLogRepository extends CommonRepository
 
         // Format log details which are not strings
         foreach ($logs as &$log) {
+            // Special case for Form Fields
+            if (isset($log['details']['fields']) && is_array($log['details']['fields']) && $log['details']['fields']) {
+                $fields = array();
+                foreach ($log['details']['fields'] as $field) {
+                    if (isset($field['label'][1]) && $field['label'][1]) {
+                        $fields[] = $field['label'][1];
+                    }
+                }
+
+                $log['details']['fields'][1] = implode(', ', $fields);
+
+                if (!$log['details']['fields'][1]) {
+                    unset($log['details']['fields']);
+                }
+            }
+
         	foreach ($log['details'] as &$detail) {
         		if (isset($detail[1])) {
-
                     if ($detail[1] === true) {
                         $detail[1] = 'mautic.core.form.yes';
                     }
                     if ($detail[1] === false) {
                         $detail[1] = 'mautic.core.form.no';
                     }
-                    if (is_array($detail[1])) {
-                        echo "<pre>";var_dump($detail[1]);die("</pre>");
-                    }
         		} else {
                     $detail[1] = '';
                 }
-
-
         	}
         }
 
