@@ -6,23 +6,6 @@
  * @link        http://mautic.com
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-/*
-$items = array(
-    'name' => array(
-        'label'    => '',
-        'route'    => '',
-        'uri'      => '',
-        'attributes' => array(),
-        'labelAttributes' => array(),
-        'linkAttributes' => array(),
-        'childrenAttributes' => array(),
-        'extras' => array(),
-        'display' => true,
-        'displayChildren' => true,
-        'children' => array()
-    )
-);
- */
 
 $items = array(
     'mautic.calendar.menu.index' => array(
@@ -44,6 +27,6 @@ $items = array(
 );
 
 return array(
-    'priority' => 5,
-    'items'    => $items
+    'priority'  => 5,
+    'items'     => $items
 );

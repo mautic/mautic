@@ -12,7 +12,7 @@ use Symfony\Component\Routing\Route;
 
 $collection = new RouteCollection();
 
-$collection->add('mautic_calendar_index', new Route('/', array(
+$collection->add('mautic_calendar_index', new Route('/calendar', array(
     '_controller' => 'MauticCalendarBundle:Default:index'
 )));
 
