@@ -15,13 +15,7 @@ $view->extend('MauticPageBundle:Page:index.html.php');
     <div class="panel-body">
         <div class="box-layout">
             <div class="col-xs-6 va-m">
-                <div class="checkbox-inline custom-primary">
-                    <label class="mb-0">
-                        <input type="checkbox" id="customcheckbox-one0" value="1">
-                        <span></span>
-                        <?php echo $view['translator']->trans('mautic.core.table.selectall'); ?>
-                    </label>
-                </div>
+                <?php echo $view->render('MauticCoreBundle:Helper:search.html.php', array('searchValue' => $searchValue, 'action' => $currentRoute)); ?>
             </div>
             <div class="col-xs-6 va-m text-right">
                 <button type="button" class="btn btn-sm btn-warning"><i class="fa fa-files-o"></i></button>
@@ -33,7 +27,14 @@ $view->extend('MauticPageBundle:Page:index.html.php');
             <table class="table table-hover table-striped table-bordered pagetable-list">
                 <thead>
                 <tr>
-                    <th class="col-page-actions"></th>
+                    <th class="col-page-actions pl-20">
+                        <div class="checkbox-inline custom-primary">
+                        <label class="mb-0 pl-10">
+                            <input type="checkbox" id="customcheckbox-one0" value="1">
+                            <span></span>
+                        </label>
+                        </div>
+                    </th>
                     <?php
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                         'sessionVar' => 'page',

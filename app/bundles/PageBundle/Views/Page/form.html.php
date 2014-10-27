@@ -30,10 +30,20 @@ $view['slots']->set("headerTitle", $header.$subheader);
     <div class="col-md-9 bg-auto height-auto bdr-r">
         <div class="pa-md">
             <div class="row">
-                <div class="col-xs-6">
+                <div class="col-md-6">
                     <?php echo $view['form']->row($form['title']); ?>
+                </div>
+                <div class="col-md-6">
                     <?php echo $view['form']->row($form['alias']); ?>
-                    <?php echo $view['form']->row($form['metaDescription'], array('attr' => array('class' => 'form-control editor'))); ?>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <?php echo $view['form']->row($form['category_lookup']); ?>
+                    <?php echo $view['form']->row($form['category']); ?>
+                </div>
+                <div class="col-md-6">
+                    <?php echo $view['form']->row($form['template']); ?>
                 </div>
             </div>
         </div>
