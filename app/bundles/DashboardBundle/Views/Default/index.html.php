@@ -236,63 +236,9 @@ $view['slots']->set('mauticContent', 'dashboard');
             </div>
     </div>
     <div class="col-md-3 bg-white bdr-l height-auto">
-        <!--
-        we can leverage data from audit_log table
-        and build activity feed from it
-        -->
-        <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm">
-            <div class="panel-heading">
-                <div class="panel-title">Recent Activity</div>
-            </div>
-            <div class="panel-body pt-sm">
-                <ul class="media-list media-list-feed">
-                    <li class="media">
-                        <div class="media-object pull-left mt-xs">
-                            <span class="figure"></span>
-                        </div>
-                        <div class="media-body">
-                            Dan Counsell Create <strong class="text-primary">Awesome Campaign Name</strong>
-                            <p class="fs-12 text-white dark-sm">Jan 16, 2014</p>
-                        </div>
-                    </li>
-                    <li class="media">
-                        <div class="media-object pull-left mt-xs">
-                            <span class="figure"></span>
-                        </div>
-                        <div class="media-body">
-                            Ima Steward Update <strong class="text-primary">Awesome Campaign Name</strong> action
-                            <p class="fs-12 text-white dark-sm">May 1, 2015</p>
-                        </div>
-                    </li>
-                    <li class="media">
-                        <div class="media-object pull-left mt-xs">
-                            <span class="figure"></span>
-                        </div>
-                        <div class="media-body">
-                            Ima Steward Update <strong class="text-primary">Awesome Campaign Name</strong> leads
-                            <p class="fs-12 text-white dark-sm">Aug 2, 2014</p>
-                        </div>
-                    </li>
-                    <li class="media">
-                        <div class="media-object pull-left">
-                            <span class="figure featured bg-success"><span class="fa fa-check"></span></span>
-                        </div>
-                        <div class="media-body">
-                            Dan Counsell Publish <strong class="text-primary">Awesome Campaign Name</strong>
-                            <p class="fs-12 text-white dark-sm">Sep 23, 2014</p>
-                        </div>
-                    </li>
-                    <li class="media">
-                        <div class="media-object pull-left">
-                            <span class="figure"></span>
-                        </div>
-                        <div class="media-body">
-                            Dan Counsell Unpublish <strong class="text-primary">Awesome Campaign Name</strong>
-                            <p class="fs-12 text-white dark-sm">Sep 29, 2014</p>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-        </div>
+
+        <!-- activity feed -->
+        <?php echo $view->render('MauticDashboardBundle:Default:recentactivity.html.php', array('logs' => $logs)); ?>
+
     </div>
 </div>

@@ -47,6 +47,11 @@ class FormModel extends CommonFormModel
         return 'form:forms';
     }
 
+    public function getNameGetter()
+    {
+        return "getName";
+    }
+
 
     /**
      * {@inheritdoc}
