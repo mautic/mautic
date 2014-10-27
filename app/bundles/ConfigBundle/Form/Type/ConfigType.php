@@ -54,7 +54,9 @@ class ConfigType extends AbstractType
                         'empty_value' => false,
                         'data'        => (bool) $value
                     ));
-                } elseif (in_array($key, array('api_mode', 'locale', 'theme', 'ip_lookup_service', 'mailer_spool_type'))) {
+                } elseif (in_array($key, array(
+                    'api_mode', 'locale', 'theme', 'ip_lookup_service', 'mailer_spool_type', 'mailer_transport', 'mailer_encryption', 'mailer_auth_mode'
+                ))) {
                     switch ($key) {
                         case 'api_mode':
                             $choices = array(
@@ -85,6 +87,27 @@ class ConfigType extends AbstractType
                             $choices = array(
                                 'file'   => 'mautic.core.config.mailer_spool_type.file',
                                 'memory' => 'mautic.core.config.mailer_spool_type.memory'
+                            );
+                            break;
+                        case 'mailer_transport':
+                            $choices = array(
+                                'gmail'    => 'mautic.core.config.mailer_transport.gmail',
+                                'mail'     => 'mautic.core.config.mailer_transport.mail',
+                                'sendmail' => 'mautic.core.config.mailer_transport.sendmail',
+                                'smtp'     => 'mautic.core.config.mailer_transport.smtp'
+                            );
+                            break;
+                        case 'mailer_encryption':
+                            $choices = array(
+                                'ssl' => 'mautic.core.config.mailer_encryption.ssl',
+                                'tls' => 'mautic.core.config.mailer_encryption.tls'
+                            );
+                            break;
+                        case 'mailer_auth_mode':
+                            $choices = array(
+                                'plain'    => 'mautic.core.config.mailer_auth_mode.plain',
+                                'login'    => 'mautic.core.config.mailer_auth_mode.login',
+                                'cram-md5' => 'mautic.core.config.mailer_auth_mode.cram-md5',
                             );
                             break;
                     }
