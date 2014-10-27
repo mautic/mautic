@@ -79,6 +79,17 @@ class ConfigType extends AbstractType
                         'empty_value' => 'mautic.user.user.form.defaulttimezone',
                         'data'        => $value
                     ));
+                } elseif ($key == 'locale') {
+                    $builder->add($key, 'choice', array(
+                        'choices'     => $this->factory->getParameter('supported_languages'),
+                        'label'       => 'mautic.config.' . $bundle . '.' . $key,
+                        'label_attr'  => array('class' => 'control-label'),
+                        'attr'        => array(
+                            'class'   => 'form-control'
+                        ),
+                        'multiple'    => false,
+                        'data'        => $value
+                    ));
                 } else {
                     if (in_array($key, array('mailer_password', 'transifex_password'))) {
                         $type = 'password';
