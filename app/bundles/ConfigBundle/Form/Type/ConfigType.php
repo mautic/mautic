@@ -12,6 +12,7 @@ namespace Mautic\ConfigBundle\Form\Type;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\DataTransformer\StringToDatetimeTransformer;
 use Mautic\UserBundle\Form\DataTransformer as Transformers;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -53,7 +54,7 @@ class ConfigType extends AbstractType
                         'empty_value' => false,
                         'data'        => (bool) $value
                     ));
-                } elseif (in_array($key, array('api_mode', 'locale'))) {
+                } elseif (in_array($key, array('api_mode', 'locale', 'theme'))) {
                     switch ($key) {
                         case 'api_mode':
                             $choices = array(
@@ -63,6 +64,9 @@ class ConfigType extends AbstractType
                             break;
                         case 'locale':
                             $choices = $this->factory->getParameter('supported_languages');
+                            break;
+                        case 'theme':
+                            $choices = $this->factory->getInstalledThemes();
                             break;
                     }
 
@@ -89,6 +93,8 @@ class ConfigType extends AbstractType
                 } else {
                     if (in_array($key, array('mailer_password', 'transifex_password'))) {
                         $type = 'password';
+                    } elseif (in_array($key, array('mailer_from_email'))) {
+                        $type = 'email';
                     } else {
                         $type = 'text';
                     }
