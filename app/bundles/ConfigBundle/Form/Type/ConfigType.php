@@ -54,7 +54,7 @@ class ConfigType extends AbstractType
                         'empty_value' => false,
                         'data'        => (bool) $value
                     ));
-                } elseif (in_array($key, array('api_mode', 'locale', 'theme'))) {
+                } elseif (in_array($key, array('api_mode', 'locale', 'theme', 'ip_lookup_service', 'mailer_spool_type'))) {
                     switch ($key) {
                         case 'api_mode':
                             $choices = array(
@@ -67,6 +67,25 @@ class ConfigType extends AbstractType
                             break;
                         case 'theme':
                             $choices = $this->factory->getInstalledThemes();
+                            break;
+                        case 'ip_lookup_service':
+                            // TODO - Write an API endpoint listing our supported services and build this list from that
+                            $choices = array(
+                                'telize'            => 'mautic.core.config.ip_lookup_service.telize',
+                                'freegeoip'         => 'mautic.core.config.ip_lookup_service.freegeoip',
+                                'geobytes'          => 'mautic.core.config.ip_lookup_service.geobytes',
+                                'ipinfodb'          => 'mautic.core.config.ip_lookup_service.ipinfodb',
+                                'geoips'            => 'mautic.core.config.ip_lookup_service.geoips',
+                                'maxmind_country'   => 'mautic.core.config.ip_lookup_service.maxmind_country',
+                                'maxmind_precision' => 'mautic.core.config.ip_lookup_service.maxmind_precision',
+                                'maxmind_omni'      => 'mautic.core.config.ip_lookup_service.maxmind_omni'
+                            );
+                            break;
+                        case 'mailer_spool_type':
+                            $choices = array(
+                                'file'   => 'mautic.core.config.mailer_spool_type.file',
+                                'memory' => 'mautic.core.config.mailer_spool_type.memory'
+                            );
                             break;
                     }
 
