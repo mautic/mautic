@@ -13,11 +13,10 @@
 
 // Copy files to packaging space
 echo "Copying files\n";
-echo "Copying files\n";
 system('cp -r ../addons packaging/');
 system('cp -r ../app packaging/');
-system('cp -r ../assets packaging/');
 system('cp -r ../bin packaging/');
+system('cp -r ../media packaging/');
 system('cp -r ../themes packaging/');
 system('cp -r ../vendor packaging/');
 system('cp ../.htaccess packaging/');

@@ -118,8 +118,8 @@ class AssetsHelper extends BaseAssetsHelper
         if (empty($editorLoaded)) {
             $editorLoaded = true;
             $this->addScript(array(
-                'assets/js/ckeditor/ckeditor.js',
-                'assets/js/ckeditor/adapters/jquery.js'
+                'media/js/ckeditor/ckeditor.js',
+                'media/js/ckeditor/adapters/jquery.js'
             ), 'bodyClose');
         }
     }

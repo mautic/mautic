@@ -8,7 +8,7 @@
  */
 
 $parameters = array(
-    'upload_dir'  => 'assets/files'
+    'upload_dir'  => 'media/files'
 );
 
 return $parameters;

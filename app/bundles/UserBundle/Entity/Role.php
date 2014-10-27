@@ -6,6 +6,7 @@
  * @link        http://mautic.com
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\UserBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -21,10 +22,9 @@ use JMS\Serializer\Annotation as Serializer;
  * @ORM\Entity(repositoryClass="Mautic\UserBundle\Entity\RoleRepository")
  * @Serializer\ExclusionPolicy("all")
  */
-
-
 class Role extends FormEntity
 {
+
     /**
      * @ORM\Column(type="integer")
      * @ORM\Id()
@@ -75,6 +75,14 @@ class Role extends FormEntity
     private $users;
 
     /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->permissions = new ArrayCollection();
+    }
+
+    /**
      * @param ClassMetadata $metadata
      */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
@@ -98,6 +106,7 @@ class Role extends FormEntity
      * Set name
      *
      * @param string $name
+     *
      * @return Role
      */
     public function setName($name)
@@ -121,10 +130,11 @@ class Role extends FormEntity
     /**
      * Add permissions
      *
-     * @param \Mautic\UserBundle\Entity\Permission $permissions
+     * @param Permission $permissions
+     *
      * @return Role
      */
-    public function addPermission(\Mautic\UserBundle\Entity\Permission $permissions)
+    public function addPermission(Permission $permissions)
     {
         $permissions->setRole($this);
 
@@ -136,9 +146,9 @@ class Role extends FormEntity
     /**
      * Remove permissions
      *
-     * @param \Mautic\UserBundle\Entity\Permission $permissions
+     * @param Permission $permissions
      */
-    public function removePermission(\Mautic\UserBundle\Entity\Permission $permissions)
+    public function removePermission(Permission $permissions)
     {
         $this->permissions->removeElement($permissions);
     }
@@ -157,6 +167,7 @@ class Role extends FormEntity
      * Set description
      *
      * @param string $description
+     *
      * @return Role
      */
     public function setDescription($description)
@@ -181,6 +192,7 @@ class Role extends FormEntity
      * Set isAdmin
      *
      * @param boolean $isAdmin
+     *
      * @return Role
      */
     public function setIsAdmin($isAdmin)
@@ -202,18 +214,13 @@ class Role extends FormEntity
     }
 
     /**
-     * @return bool
+     * Get isAdmin
+     *
+     * @return boolean
      */
-    public function isAdmin() {
-        return $this->getIsAdmin();
-    }
-
-    /**
-     * Constructor
-     */
-    public function __construct()
+    public function isAdmin()
     {
-        $this->permissions = new ArrayCollection();
+        return $this->getIsAdmin();
     }
 
     /**
@@ -240,10 +247,11 @@ class Role extends FormEntity
     /**
      * Add users
      *
-     * @param \Mautic\UserBundle\Entity\User $users
+     * @param User $users
+     *
      * @return Role
      */
-    public function addUser(\Mautic\UserBundle\Entity\User $users)
+    public function addUser(User $users)
     {
         $this->users[] = $users;
 
@@ -253,9 +261,9 @@ class Role extends FormEntity
     /**
      * Remove users
      *
-     * @param \Mautic\UserBundle\Entity\User $users
+     * @param User $users
      */
-    public function removeUser(\Mautic\UserBundle\Entity\User $users)
+    public function removeUser(User $users)
     {
         $this->users->removeElement($users);
     }

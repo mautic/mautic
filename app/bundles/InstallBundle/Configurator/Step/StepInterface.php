@@ -5,8 +5,6 @@
  * @author      Mautic
  * @link        http://mautic.com
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- *
- * Based on Sensio\DistributionBundle
  */
 
 namespace Mautic\InstallBundle\Configurator\Step;
@@ -17,6 +15,7 @@ use Symfony\Component\Form\Type\FormTypeInterface;
  * StepInterface.
  *
  * @author Marc Weistroff <marc.weistroff@sensio.com>
+ * @note   This interface is based on Sensio\Bundle\DistributionBundle\Configurator\Step\StepInterface
  */
 interface StepInterface
 {

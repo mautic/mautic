@@ -194,24 +194,30 @@ class StatRepository extends CommonRepository
      * Get a lead's email stat
      *
      * @param integer $leadId
-     * @param array   $ipIds
+     * @param array   $options
      *
      * @return array
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getLeadStats($leadId, array $ipIds = array())
+    public function getLeadStats($leadId, array $options = array())
     {
         $query = $this->createQueryBuilder('s')
             ->select('IDENTITY(s.email) AS email_id, s.dateRead, s.dateSent, e.subject, e.plainText')
             ->leftJoin('MauticEmailBundle:Email', 'e', 'WITH', 'e.id = s.email')
             ->where('s.lead = ' . $leadId);
 
-        if (!empty($ipIds)) {
-            $query->orWhere('s.ipAddress IN (' . implode(',', $ipIds) . ')');
+        if (!empty($options['ipIds'])) {
+            $query->orWhere('s.ipAddress IN (' . implode(',', $options['ipIds']) . ')');
         }
 
-        return $query->getQuery()
-            ->getArrayResult();
+        if (isset($options['filters']['search']) && $options['filters']['search']) {
+            $query->andWhere($query->expr()->orX(
+                $query->expr()->like('e.subject', $query->expr()->literal('%' . $options['filters']['search'] . '%')),
+                $query->expr()->like('e.plainText', $query->expr()->literal('%' . $options['filters']['search'] . '%'))
+            ));
+        }
+
+        return $query->getQuery()->getArrayResult();
     }
 }

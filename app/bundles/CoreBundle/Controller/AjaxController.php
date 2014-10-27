@@ -74,21 +74,6 @@ class AjaxController extends CommonController
         }
     }
 
-    protected function setTableOrderAction(Request $request)
-    {
-        $dataArray = array('success' => 0);
-        $name    = InputHelper::clean($request->request->get("name"));
-        $orderBy = InputHelper::clean($request->request->get("orderby"));
-        if (!empty($name) && !empty($orderBy)) {
-            $dir = $this->get("session")->get("mautic.$name.orderbydir", "ASC");
-            $dir = ($dir == "ASC") ? "DESC" : "ASC";
-            $this->get("session")->set("mautic.$name.orderby", $orderBy);
-            $this->get("session")->set("mautic.$name.orderbydir", $dir);
-            $dataArray['success'] = 1;
-        }
-        return $this->sendJsonResponse($dataArray);
-    }
-
     protected function setTableLimitAction(Request $request)
     {
         $dataArray = array('success' => 0);

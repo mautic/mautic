@@ -8,6 +8,7 @@
  */
 
 //@todo generate stats for results
+/** @var \Mautic\FormBundle\Entity\Form $form */
 ?>
 <!-- left section -->
 <div class="col-md-9 bg-white height-auto">
@@ -16,11 +17,11 @@
         <div class="pr-md pl-md pt-lg pb-lg">
             <div class="box-layout">
                 <div class="col-xs-6 va-m">
-                    <h4 class="fw-sb text-primary">Super Awesome Form</h4>
-                    <p class="text-white dark-lg mb-0">Created on 8 Aug 2014</p>
+                    <h4 class="fw-sb text-primary"><?php echo $form->getName(); ?></h4>
+                    <p class="text-white dark-lg mb-0">Created on <?php echo $view['date']->toDate($form->getDateAdded()); ?></p>
                 </div>
                 <div class="col-xs-6 va-m text-right">
-                    <h4 class="fw-sb"><span class="label label-success">PUBLISH UP</span></h4>
+                    <h4 class="fw-sb"><span class="label label-success"><?php echo strtoupper($form->getPublishStatus()); ?></span></h4>
                 </div>
             </div>
         </div>
@@ -34,23 +35,23 @@
                         <tbody>
                             <tr>
                                 <td width="20%"><span class="fw-b">Description</span></td>
-                                <td>Form description Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+                                <td><?php echo $form->getDescription(); ?></td>
                             </tr>
                             <tr>
                                 <td width="20%"><span class="fw-b">Created By</span></td>
-                                <td>Dan Counsell</td>
+                                <td><?php echo $form->getCreatedBy(); ?></td>
                             </tr>
                             <tr>
                                 <td width="20%"><span class="fw-b">Category</span></td>
-                                <td>Some category</td>
+                                <td><?php echo $form->getCategory(); ?></td>
                             </tr>
                             <tr>
                                 <td width="20%"><span class="fw-b">Publish Up</span></td>
-                                <td>Mar 30, 2014</td>
+                                <td><?php echo $view['date']->toDate($form->getPublishUp()); ?></td>
                             </tr>
                             <tr>
                                 <td width="20%"><span class="fw-b">Publish Down</span></td>
-                                <td>Apr 10, 2014</td>
+                                <td><?php echo $view['date']->toDate($form->getPublishDown()); ?></td>
                             </tr>
                         </tbody>
                     </table>
@@ -69,7 +70,7 @@
         </div>
         <!--/ form detail collapseable toggler -->
 
-        <!-- 
+        <!--
         some stats: need more input on what type of form data to show.
         delete if it is not require
         -->
@@ -256,62 +257,23 @@
 
             <h5 class="fw-sb mb-xs">Form Field</h5>
             <ul class="list-group mb-xs">
-                <li class="list-group-item bg-auto bg-light-xs">
-                    <div class="box-layout">
-                        <div class="col-md-1 va-m">
-                            <h3><span class="fa fa-check text-white dark-xs" data-toggle="tooltip" data-placement="left" title="Require"></span></h3>
+                <?php /** @var \Mautic\FormBundle\Entity\Field $field */
+                foreach ($form->getFields() as $field) : ?>
+                    <li class="list-group-item bg-auto bg-light-xs">
+                        <div class="box-layout">
+                            <div class="col-md-1 va-m">
+                                <h3><span class="fa fa-<?php echo $field->getIsRequired() ? 'check' : 'times'; ?> text-white dark-xs" data-toggle="tooltip" data-placement="left" title="Require"></span></h3>
+                            </div>
+                            <div class="col-md-7 va-m">
+                                <h5 class="fw-sb text-primary mb-xs"><?php echo $field->getLabel(); ?></h5>
+                                <h6 class="text-white dark-md">Field type: <?php echo $field->getType(); ?></h6>
+                            </div>
+                            <div class="col-md-4 va-m text-right">
+                                <em class="text-white dark-sm">Field Order: <?php echo $field->getOrder(); ?></em>
+                            </div>
                         </div>
-                        <div class="col-md-7 va-m">
-                            <h5 class="fw-sb text-primary mb-xs">Field label #1</h5>
-                            <h6 class="text-white dark-md">Field type: text</h6>
-                        </div>
-                        <div class="col-md-4 va-m text-right">
-                            <em class="text-white dark-sm">field_order: #1</em>
-                        </div>
-                    </div>
-                </li>
-                <li class="list-group-item bg-auto bg-light-xs">
-                    <div class="box-layout">
-                        <div class="col-md-1 va-m">
-                            <h3><span class="fa fa-check text-white dark-xs" data-toggle="tooltip" data-placement="left" title="Require"></span></h3>
-                        </div>
-                        <div class="col-md-7 va-m">
-                            <h5 class="fw-sb text-primary mb-xs">Field label #2</h5>
-                            <h6 class="text-white dark-md">Field type: email</h6>
-                        </div>
-                        <div class="col-md-4 va-m text-right">
-                            <em class="text-white dark-sm">field_order: #2</em>
-                        </div>
-                    </div>
-                </li>
-                <li class="list-group-item bg-auto bg-light-xs">
-                    <div class="box-layout">
-                        <div class="col-md-1 va-m">
-                            <h3><span class="fa fa-check text-white dark-xs" data-toggle="tooltip" data-placement="left" title="Require"></span></h3>
-                        </div>
-                        <div class="col-md-7 va-m">
-                            <h5 class="fw-sb text-primary mb-xs">Field label #3</h5>
-                            <h6 class="text-white dark-md">Field type: number</h6>
-                        </div>
-                        <div class="col-md-4 va-m text-right">
-                            <em class="text-white dark-sm">field_order: #3</em>
-                        </div>
-                    </div>
-                </li>
-                <li class="list-group-item bg-auto bg-light-xs">
-                    <div class="box-layout">
-                        <div class="col-md-1 va-m">
-                            <h3><span class="fa fa-times text-white dark-xs" data-toggle="tooltip" data-placement="left" title="Not Require"></span></h3>
-                        </div>
-                        <div class="col-md-7 va-m">
-                            <h5 class="fw-sb text-primary mb-xs">Field label #4</h5>
-                            <h6 class="text-white dark-md">Field type: button</h6>
-                        </div>
-                        <div class="col-md-4 va-m text-right">
-                            <em class="text-white dark-sm">field_order: #4</em>
-                        </div>
-                    </div>
-                </li>
+                    </li>
+                <?php endforeach; ?>
             </ul>
         </div>
         <!--/ #fields-container -->

@@ -9,23 +9,31 @@
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'user');
-$view['slots']->set("headerTitle", $view['translator']->trans('mautic.user.user.header.index'));
-$view['slots']->set('searchUri', $this->container->get('router')->generate('mautic_user_index'));
-$view['slots']->set('searchString', $app->getSession()->get('mautic.user.filter'));
-$view['slots']->set('searchHelp', $view['translator']->trans('mautic.user.user.help.searchcommands'));
 ?>
 
 <?php if ($permissions['create']): ?>
 <?php $view['slots']->start("actions"); ?>
-<li>
-    <a href="<?php echo $this->container->get('router')->generate(
+    <a class="btn btn-default" href="<?php echo $this->container->get('router')->generate(
         'mautic_user_action', array("objectAction" => "new")); ?>"
     data-toggle="ajax"
     data-menu-link="#mautic_user_index">
+    	<i class="fa fa-plus"></i> 
         <?php echo $view["translator"]->trans("mautic.user.user.menu.new"); ?>
     </a>
-</li>
 <?php $view['slots']->stop(); ?>
 <?php endif; ?>
 
-<?php $view['slots']->output('_content'); ?>
+<div class="panel panel-default bdr-t-wdh-0">
+    <div class="panel-body">
+        <div class="box-layout">
+            <div class="col-xs-6 va-m">
+                <?php echo $view->render('MauticCoreBundle:Helper:search.html.php', array('searchValue' => $searchValue, 'action' => $currentRoute)); ?>
+            </div>
+            <div class="col-xs-6 va-m text-right">
+                <button type="button" class="btn btn-sm btn-warning"><i class="fa fa-files-o"></i></button>
+                <button type="button" class="btn btn-sm btn-danger"><i class="fa fa-trash-o"></i></button>
+            </div>
+        </div>
+    </div>
+	<?php $view['slots']->output('_content'); ?>
+</div>

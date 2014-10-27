@@ -97,7 +97,14 @@ $view['slots']->stop();
                     <div class="col-xs-6 va-m">
                         <div class="media">
                             <span class="pull-left img-wrapper img-rounded" style="width:38px">
-                                <img src="<?php echo $view['gravatar']->getImage($fields['core']['email']['value']); ?>" alt="">
+                                <?php $preferred = $lead->getPreferredProfileImage(); ?>
+                                <?php if ($preferred == 'gravatar' || empty($preferred)) : ?>
+                                    <?php $img = $view['gravatar']->getImage($fields['core']['email']['value']); ?>
+                                <?php else : ?>
+                                    <?php $socialData = $lead->getSocialCache(); ?>
+                                    <?php $img = $socialData[$preferred]['profile']['profileImage']; ?>
+                                <?php endif; ?>
+                                <img src="<?php echo $img; ?>" alt="">
                             </span>
                             <div class="media-body">
                                 <h4 class="fw-sb text-primary"><?php echo $lead->getPrimaryIdentifier(); ?></h4>
@@ -223,7 +230,10 @@ $view['slots']->stop();
         <div class="tab-content pa-md">
             <!-- #history-container -->
             <div class="tab-pane fade in active bdr-w-0" id="history-container">
-                <?php echo $view->render('MauticLeadBundle:Lead:history.html.php', array('events' => $events, 'eventTypes' => $eventTypes, 'eventFilter' => $eventFilter, 'lead' => $lead)); ?>
+                <?php echo $view->render('MauticLeadBundle:Lead:historyfilter.html.php', array('events' => $events, 'eventTypes' => $eventTypes, 'eventFilter' => $eventFilter, 'lead' => $lead)); ?>
+                <div id="timeline-container">
+                    <?php echo $view->render('MauticLeadBundle:Lead:history.html.php', array('events' => $events, 'eventTypes' => $eventTypes, 'eventFilter' => $eventFilter, 'lead' => $lead)); ?>
+                </div>
             </div>
             <!--/ #history-container -->
 

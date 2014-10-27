@@ -33,7 +33,7 @@ $collection->add('mautic_user_index', new Route('/users/{page}',
 $collection->add('mautic_user_action', new Route('/users/{objectAction}/{objectId}',
     array(
         '_controller' => 'MauticUserBundle:User:execute',
-        "objectId"      => 0
+        'objectId'      => 0
     )
 ));
 
@@ -50,7 +50,7 @@ $collection->add('mautic_role_index', new Route('/roles/{page}',
 $collection->add('mautic_role_action', new Route('/roles/{objectAction}/{objectId}',
     array(
         '_controller' => 'MauticUserBundle:Role:execute',
-        "objectId"      => 0
+        'objectId'      => 0
     )
 ));
 

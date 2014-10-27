@@ -20,28 +20,33 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Class RoleType
- *
- * @package Mautic\UserBundle\Form\Type
  */
 class RoleType extends AbstractType
 {
 
+    /**
+     * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
+     */
     private $translator;
+
+    /**
+     * @var \Doctrine\ORM\EntityManager
+     */
     private $em;
 
     /**
      * @param MauticFactory $factory
      */
-    public function __construct (MauticFactory $factory) {
+    public function __construct(MauticFactory $factory)
+    {
         $this->translator = $factory->getTranslator();
         $this->em         = $factory->getEntityManager();
     }
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
+     * {@inheritdoc}
      */
-    public function buildForm (FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber());
         $builder->addEventSubscriber(new FormExitSubscriber('user.role', $options));
@@ -105,7 +110,7 @@ class RoleType extends AbstractType
 
 
     /**
-     * @param OptionsResolverInterface $resolver
+     * {@inheritdoc}
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
@@ -116,9 +121,10 @@ class RoleType extends AbstractType
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
-    public function getName() {
+    public function getName()
+    {
         return "role";
     }
 }

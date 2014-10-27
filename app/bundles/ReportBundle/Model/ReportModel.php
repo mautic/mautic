@@ -20,8 +20,6 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
  * Class ReportModel
- * {@inheritdoc}
- * @package Mautic\CoreBundle\Model\FormModel
  */
 class ReportModel extends FormModel
 {
@@ -38,8 +36,6 @@ class ReportModel extends FormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
     public function getPermissionBase()
     {
@@ -48,8 +44,6 @@ class ReportModel extends FormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
     public function getNameGetter()
     {
@@ -59,11 +53,6 @@ class ReportModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param \Mautic\ReportBundle\Entity\Report           $entity
-     * @param \Symfony\Component\Form\FormFactoryInterface $formFactory
-     * @param null                                         $action
-     * @param array                                        $options
-     * @return \Symfony\Component\Form\Form
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function createForm($entity, $formFactory, $action = null, $options = array())
@@ -84,10 +73,9 @@ class ReportModel extends FormModel
     }
 
     /**
-     * Get a specific entity or generate a new one if id is empty
+     * {@inheritdoc}
      *
-     * @param $id
-     * @return Report
+     * @return Report|null
      */
     public function getEntity($id = null)
     {
@@ -101,10 +89,6 @@ class ReportModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param $action
-     * @param $event
-     * @param $entity
-     * @param $isNew
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, $event = false)

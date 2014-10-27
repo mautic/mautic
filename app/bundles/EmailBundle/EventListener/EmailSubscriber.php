@@ -228,7 +228,7 @@ class EmailSubscriber extends CommonSubscriber
 
         // Decide if those events are filtered
         $filter = $event->getEventFilter();
-        $loadAllEvents = empty($filter);
+        $loadAllEvents = !isset($filter[0]);
         $sentEventFilterExists = in_array($eventTypeKeySent, $filter);
         $readEventFilterExists = in_array($eventTypeKeyRead, $filter);
 
@@ -237,17 +237,17 @@ class EmailSubscriber extends CommonSubscriber
         }
 
         $lead    = $event->getLead();
-        $leadIps = array();
+        $options = array('ipIds' => array(), 'filters' => $filter);
 
         /** @var \Mautic\CoreBundle\Entity\IpAddress $ip */
         foreach ($lead->getIpAddresses() as $ip) {
-            $leadIps[] = $ip->getId();
+            $options['ipIds'][] = $ip->getId();
         }
 
         /** @var \Mautic\EmailBundle\Entity\StatRepository $statRepository */
         $statRepository = $this->factory->getEntityManager()->getRepository('MauticEmailBundle:Stat');
 
-        $stats = $statRepository->getLeadStats($lead->getId(), $leadIps);
+        $stats = $statRepository->getLeadStats($lead->getId(), $options);
 
         // Add the events to the event array
         foreach ($stats as $stat) {

@@ -42,6 +42,10 @@ class LeadController extends FormController
             return $this->accessDenied();
         }
 
+        if ($this->request->getMethod() == 'POST') {
+            $this->setTableOrder();
+        }
+
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
         $model   = $this->factory->getModel('lead.lead');
         $session = $this->factory->getSession();

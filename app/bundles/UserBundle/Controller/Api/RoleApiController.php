@@ -15,12 +15,13 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 /**
  * Class RoleApiController
- *
- * @package Mautic\UserBundle\Controller\Api
  */
 class RoleApiController extends CommonApiController
 {
 
+    /**
+     * {@inheritdoc}
+     */
     public function initialize(FilterControllerEvent $event)
     {
         parent::initialize($event);

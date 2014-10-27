@@ -18,9 +18,9 @@ use JMS\Serializer\Annotation as Serializer;
  * @ORM\Entity(repositoryClass="Mautic\UserBundle\Entity\PermissionRepository")
  * @Serializer\ExclusionPolicy("all")
  */
-
 class Permission
 {
+
     /**
      * @ORM\Column(type="integer")
      * @ORM\Id()
@@ -49,7 +49,6 @@ class Permission
      */
     protected $bitwise;
 
-
     /**
      * Get id
      *
@@ -64,6 +63,7 @@ class Permission
      * Set bundle
      *
      * @param string $bundle
+     *
      * @return Permission
      */
     public function setBundle($bundle)
@@ -87,6 +87,7 @@ class Permission
      * Set bitwise
      *
      * @param integer $bitwise
+     *
      * @return Permission
      */
     public function setBitwise($bitwise)
@@ -109,10 +110,11 @@ class Permission
     /**
      * Set role
      *
-     * @param \Mautic\UserBundle\Entity\Role $role
+     * @param Role $role
+     *
      * @return Permission
      */
-    public function setRole(\Mautic\UserBundle\Entity\Role $role = null)
+    public function setRole(Role $role = null)
     {
         $this->role = $role;
 
@@ -122,7 +124,7 @@ class Permission
     /**
      * Get role
      *
-     * @return \Mautic\UserBundle\Entity\Role
+     * @return Role
      */
     public function getRole()
     {
@@ -133,6 +135,7 @@ class Permission
      * Set name
      *
      * @param string $name
+     *
      * @return Permission
      */
     public function setName($name)

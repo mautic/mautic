@@ -12,7 +12,6 @@ namespace Mautic\DashboardBundle\Controller;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Intl\Intl;
 
 /**
  * Class AjaxController
@@ -21,36 +20,6 @@ use Symfony\Component\Intl\Intl;
  */
 class AjaxController extends CommonAjaxController
 {
-
-    /**
-     * Fetch date for the map.
-     * 
-     * @param Request $request
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    protected function mapDataAction(Request $request)
-    {
-        $dataArray  = array('success' => 0, 'stats' => array());
-
-        $countries = array_flip(Intl::getRegionBundle()->getCountryNames());
-
-        /** @var \Mautic\LeadBundle\Entity\LeadRepository $leadRepository */
-        $leadRepository = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:Lead');
-        $leadCountries = $leadRepository->getLeadsCountPerCountries();
-
-        // Convert country names to 2-char code
-        foreach ($leadCountries as $leadCountry) {
-            if (isset($countries[$leadCountry['country']])) {
-                $dataArray['stats'][strtolower($countries[$leadCountry['country']])] = $leadCountry['quantity'];
-            }
-        }
-
-        $dataArray['success'] = 1;
-
-        return $this->sendJsonResponse($dataArray);
-    }
-
     /**
      * Count how many visitors is currently viewing some page.
      * 

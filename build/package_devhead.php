@@ -28,4 +28,4 @@ include_once __DIR__ . '/processfiles.php';
 
 // Step 5 - ZIP it up
 echo "Packaging Mautic\n";
-system('zip -r ../packages/mautic-head.zip addons/ app/ assets/ bin/ themes/ vendor/ .htaccess index.php LICENSE.txt robots.txt > /dev/null');
+system('zip -r ../packages/mautic-head.zip addons/ app/ bin/ media/ themes/ vendor/ .htaccess index.php LICENSE.txt robots.txt > /dev/null');

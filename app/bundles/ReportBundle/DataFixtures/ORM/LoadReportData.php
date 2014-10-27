@@ -19,8 +19,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Class LoadReportData
- *
- * @package Mautic\ReportBundle\DataFixtures\ORM
  */
 class LoadReportData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
 {
@@ -33,7 +31,6 @@ class LoadReportData extends AbstractFixture implements OrderedFixtureInterface,
     /**
      * {@inheritdoc}
      */
-
     public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
@@ -49,11 +46,11 @@ class LoadReportData extends AbstractFixture implements OrderedFixtureInterface,
         $reports = CsvHelper::csv_to_array(__DIR__ . '/fakereportdata.csv');
         foreach ($reports as $count => $rows) {
             $report = new Report();
-            $key = $count+1;
+            $key    = $count + 1;
             foreach ($rows as $col => $val) {
                 if ($val != "NULL") {
                     $setter = "set" . ucfirst($col);
-                    if (in_array($col, array('columns','filters'))) {
+                    if (in_array($col, array('columns', 'filters'))) {
                         $val = unserialize(stripslashes($val));
                     }
                     $report->$setter($val);
@@ -61,12 +58,12 @@ class LoadReportData extends AbstractFixture implements OrderedFixtureInterface,
             }
             $repo->saveEntity($report);
 
-            $this->setReference('report-'.$key, $report);
+            $this->setReference('report-' . $key, $report);
         }
     }
 
     /**
-     * @return int
+     * {@inheritdoc}
      */
     public function getOrder()
     {

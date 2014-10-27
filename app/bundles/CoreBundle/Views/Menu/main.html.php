@@ -32,7 +32,7 @@
             endif;
         ?>
 
-        <li class="nav-group" <?php echo $view["menu_helper"]->parseAttributes($liAttributes); ?> >
+        <li class="nav-group<?php if ($isAncestor) echo ' open'; ?>" <?php echo $view["menu_helper"]->parseAttributes($liAttributes); ?> >
 
             <?php
 

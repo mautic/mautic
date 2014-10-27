@@ -19,12 +19,13 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Class UserApiController
- *
- * @package Mautic\UserBundle\Controller\Api
  */
 class UserApiController extends CommonApiController
 {
 
+    /**
+     * {@inheritdoc}
+     */
     public function initialize(FilterControllerEvent $event)
     {
         parent::initialize($event);

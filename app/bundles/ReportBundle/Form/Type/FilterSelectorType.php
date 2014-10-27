@@ -17,8 +17,6 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * Class FilterSelectorType
- *
- * @package Mautic\ReportBundle\Form\Type
  */
 class FilterSelectorType extends AbstractType
 {

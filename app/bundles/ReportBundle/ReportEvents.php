@@ -11,9 +11,8 @@ namespace Mautic\ReportBundle;
 
 /**
  * Class ReportEvents
- * Events available for ReportBundle
  *
- * @package Mautic\ReportBundle
+ * Events available for ReportBundle
  */
 final class ReportEvents
 {
@@ -21,8 +20,7 @@ final class ReportEvents
     /**
      * The mautic.report_pre_save event is thrown right before a report is persisted.
      *
-     * The event listener receives a
-     * Mautic\ReportBundle\Event\ReportEvent instance.
+     * The event listener receives a Mautic\ReportBundle\Event\ReportEvent instance.
      *
      * @var string
      */
@@ -31,8 +29,7 @@ final class ReportEvents
     /**
      * The mautic.report_post_save event is thrown right after a report is persisted.
      *
-     * The event listener receives a
-     * Mautic\ReportBundle\Event\ReportEvent instance.
+     * The event listener receives a Mautic\ReportBundle\Event\ReportEvent instance.
      *
      * @var string
      */
@@ -41,8 +38,7 @@ final class ReportEvents
     /**
      * The mautic.report_pre_delete event is thrown prior to when a report is deleted.
      *
-     * The event listener receives a
-     * Mautic\ReportBundle\Event\ReportEvent instance.
+     * The event listener receives a Mautic\ReportBundle\Event\ReportEvent instance.
      *
      * @var string
      */
@@ -51,8 +47,7 @@ final class ReportEvents
     /**
      * The mautic.report_post_delete event is thrown after a report is deleted.
      *
-     * The event listener receives a
-     * Mautic\ReportBundle\Event\ReportEvent instance.
+     * The event listener receives a Mautic\ReportBundle\Event\ReportEvent instance.
      *
      * @var string
      */
@@ -62,8 +57,7 @@ final class ReportEvents
      * The mautic.report_on_build event is thrown before displaying the report builder form to allow
      * bundles to specify report sources and columns
      *
-     * The event listener receives a
-     * Mautic\ReportBundle\Event\ReportBuilderEvent instance.
+     * The event listener receives a Mautic\ReportBundle\Event\ReportBuilderEvent instance.
      *
      * @var string
      */
@@ -72,8 +66,7 @@ final class ReportEvents
     /**
      * The mautic.report_on_generate event is thrown when generating a report to build the base query
      *
-     * The event listener receives a
-     * Mautic\ReportBundle\Event\ReportGeneratorEvent instance.
+     * The event listener receives a Mautic\ReportBundle\Event\ReportGeneratorEvent instance.
      *
      * @var string
      */

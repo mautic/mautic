@@ -582,7 +582,7 @@ class Asset extends FormEntity
         if ($this->uploadDir) {
             return $this->uploadDir;
         } else {
-            return 'assets/files';
+            return 'media/files';
         }
     }
 

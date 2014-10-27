@@ -135,7 +135,7 @@ class CampaignSubscriber extends CommonSubscriber
 
         // Decide if those events are filtered
         $filter = $event->getEventFilter();
-        $loadAllEvents = empty($filter);
+        $loadAllEvents = !isset($filter[0]);
         $eventFilterExists = in_array($eventTypeKey, $filter);
 
         if (!$loadAllEvents && !$eventFilterExists) {
@@ -143,17 +143,17 @@ class CampaignSubscriber extends CommonSubscriber
         }
 
         $lead    = $event->getLead();
-        $leadIps = array();
+        $options = array('ipIds' => array(), 'filters' => $filter);
 
         /** @var \Mautic\CoreBundle\Entity\IpAddress $ip */
         foreach ($lead->getIpAddresses() as $ip) {
-            $leadIps[] = $ip->getId();
+            $options['ipIds'][] = $ip->getId();
         }
 
         /** @var \Mautic\CampaignBundle\Entity\LeadEventLogRepository $logRepository */
         $logRepository = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:LeadEventLog');
 
-        $logs = $logRepository->getLeadLogs($lead->getId(), $leadIps);
+        $logs = $logRepository->getLeadLogs($lead->getId(), $options);
 
         // Add the hits to the event array
         foreach ($logs as $log) {

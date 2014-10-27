@@ -7,32 +7,27 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-
-
 namespace Mautic\UserBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Mautic\CoreBundle\Controller\FormController;
-use Mautic\UserBundle\Entity as Entity;
-use Mautic\UserBundle\Form\Type as FormType;
 
 /**
  * Class ProfileController
- *
- * @package Mautic\UserBundle\Controller
  */
 class ProfileController extends FormController
 {
+
     /**
-     * Generate's account page
+     * Generate's account profile
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function indexAction()
     {
         //get current user
         $me    = $this->get('security.context')->getToken()->getUser();
         $model = $this->factory->getModel('user.user');
+
         //set some permissions
         $permissions = array(
             'apiAccess'    => ($this->factory->getParameter('api_enabled')) ?
@@ -54,19 +49,19 @@ class ProfileController extends FormController
         $form->remove('save');
         $form->remove('cancel');
 
-
         $overrides = array();
+
         //make sure this user has access to edit privileged fields
         foreach ($permissions as $permName => $hasAccess) {
-            if ($permName == "apiAccess") continue;
+            if ($permName == 'apiAccess') continue;
 
             if (!$hasAccess) {
                 //set the value to its original
                 switch ($permName) {
-                    case "editName":
+                    case 'editName':
                         $overrides['firstName'] = $me->getFirstName();
                         $overrides['lastName'] = $me->getLastName();
-                        $form->remove("firstName");
+                        $form->remove('firstName');
                         $form->add('firstName_unbound', 'text', array(
                             'label'      => 'mautic.user.user.form.firstname',
                             'label_attr' => array('class' => 'control-label'),
@@ -77,7 +72,7 @@ class ProfileController extends FormController
                             'required'   => false
                         ));
 
-                        $form->remove("lastName");
+                        $form->remove('lastName');
                         $form->add('lastName_unbound', 'text', array(
                             'label'      => 'mautic.user.user.form.lastname',
                             'label_attr' => array('class' => 'control-label'),
@@ -89,9 +84,9 @@ class ProfileController extends FormController
                         ));
                         break;
 
-                    case "editUsername":
+                    case 'editUsername':
                         $overrides['username'] = $me->getUsername();
-                        $form->remove("username");
+                        $form->remove('username');
                         $form->add('username_unbound', 'text', array(
                             'label'      => 'mautic.user.user.form.username',
                             'label_attr' => array('class' => 'control-label'),
@@ -102,9 +97,9 @@ class ProfileController extends FormController
                             'required'   => false
                         ));
                         break;
-                    case "editPosition":
+                    case 'editPosition':
                         $overrides['position'] = $me->getPosition();
-                        $form->remove("position");
+                        $form->remove('position');
                         $form->add('position_unbound', 'text', array(
                             'label'      => 'mautic.user.user.form.position',
                             'label_attr' => array('class' => 'control-label'),
@@ -115,9 +110,9 @@ class ProfileController extends FormController
                             'required'   => false
                         ));
                         break;
-                    case "editEmail":
+                    case 'editEmail':
                         $overrides['email'] = $me->getEmail();
-                        $form->remove("email");
+                        $form->remove('email');
                         $form->add('email_unbound', 'text', array(
                             'label'      => 'mautic.user.user.form.email',
                             'label_attr' => array('class' => 'control-label'),
@@ -144,9 +139,9 @@ class ProfileController extends FormController
             )
         ));
 
-        ///Check for a submitted form and process it
+        //Check for a submitted form and process it
         $submitted = $this->factory->getSession()->get('formProcessed', 0);
-        if ($this->request->getMethod() == "POST" && !$submitted) {
+        if ($this->request->getMethod() == 'POST' && !$submitted) {
             $this->factory->getSession()->set('formProcessed', 1);
 
             //check to see if the password needs to be rehashed
@@ -156,7 +151,7 @@ class ProfileController extends FormController
 
             if ($valid = $this->isFormValid($form)) {
                 foreach ($overrides as $k => $v) {
-                    $func = "set" . ucfirst($k);
+                    $func = 'set' . ucfirst($k);
                     $me->$func($v);
                 }
 
@@ -181,10 +176,7 @@ class ProfileController extends FormController
         }
         $this->factory->getSession()->set('formProcessed', 0);
 
-
-        $formView = $form->createView();
-        $this->factory->getTemplating()->getEngine('MauticUserBundle:Profile:index.html.php')->get('form')
-            ->setTheme($formView, 'MauticUserBundle:FormProfile');
+        $formView = $this->setFormTheme($form, 'MauticUserBundle:Profile:index.html.php', 'MauticUserBundle:FormProfile');
         $parameters = array(
             'permissions' => $permissions,
             'me'          => $me,

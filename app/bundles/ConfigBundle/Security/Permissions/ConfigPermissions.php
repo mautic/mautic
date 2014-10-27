@@ -13,7 +13,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 
 /**
- * Class DahsboardPermissions
+ * Class ConfigPermissions
  */
 class ConfigPermissions extends AbstractPermissions
 {
@@ -33,8 +33,6 @@ class ConfigPermissions extends AbstractPermissions
 
     /**
      * {@inheritdoc}
-     *
-     * @return string|void
      */
     public function getName() {
         return 'config';
@@ -42,9 +40,6 @@ class ConfigPermissions extends AbstractPermissions
 
     /**
      * {@inheritdoc}
-     *
-     * @param FormBuilderInterface $builder
-     * @param array                $options
      */
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {

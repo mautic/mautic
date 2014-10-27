@@ -9,7 +9,6 @@
 
 namespace Mautic\ReportBundle\Entity;
 
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
@@ -18,10 +17,12 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class ReportRepository extends CommonRepository
 {
+
     /**
      * Get a list of entities
      *
-     * @param array      $args
+     * @param array $args
+     *
      * @return Paginator
      */
     public function getEntities($args = array())
@@ -39,9 +40,7 @@ class ReportRepository extends CommonRepository
             $query->setHydrationMode(constant("\\Doctrine\\ORM\\Query::$mode"));
         }
 
-        $results = new Paginator($query);
-
-        return $results;
+        return new Paginator($query);
     }
 
     /**
@@ -49,6 +48,7 @@ class ReportRepository extends CommonRepository
      * @param int    $limit
      * @param int    $start
      * @param bool   $viewOther
+     *
      * @return array
      */
     public function getReportList($search = '', $limit = 10, $start = 0, $viewOther = false)
@@ -77,9 +77,7 @@ class ReportRepository extends CommonRepository
     }
 
     /**
-     * @param QueryBuilder $q
-     * @param              $filter
-     * @return array
+     * {@inheritdoc}
      */
     protected function addCatchAllWhereClause(&$q, $filter)
     {
@@ -99,9 +97,7 @@ class ReportRepository extends CommonRepository
     }
 
     /**
-     * @param QueryBuilder $q
-     * @param              $filter
-     * @return array
+     * {@inheritdoc}
      */
     protected function addSearchCommandWhereClause(&$q, $filter)
     {
@@ -112,7 +108,7 @@ class ReportRepository extends CommonRepository
         $expr            = false;
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.is'):
-                switch($string) {
+                switch ($string) {
                     case $this->translator->trans('mautic.core.searchcommand.ispublished'):
                         $expr = $q->expr()->eq("p.isPublished", 1);
                         break;
@@ -122,7 +118,6 @@ class ReportRepository extends CommonRepository
                     case $this->translator->trans('mautic.core.searchcommand.ismine'):
                         $expr = $q->expr()->eq("IDENTITY(p.createdBy)", $this->currentUser->getId());
                         break;
-
                 }
                 $returnParameter = false;
                 break;
@@ -141,11 +136,11 @@ class ReportRepository extends CommonRepository
             $parameters = array("$unique" => $string);
         }
 
-        return array( $expr, $parameters );
+        return array($expr, $parameters);
     }
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
     public function getSearchCommands()
     {
@@ -159,7 +154,7 @@ class ReportRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     protected function getDefaultOrder()
     {
@@ -169,7 +164,7 @@ class ReportRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getTableAlias()
     {

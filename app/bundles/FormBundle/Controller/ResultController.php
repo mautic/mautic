@@ -49,6 +49,10 @@ class ResultController extends CommonFormController
             return $this->accessDenied();
         }
 
+        if ($this->request->getMethod() == 'POST') {
+            $this->setTableOrder();
+        }
+
         //set limits
         $limit = $this->factory->getSession()->get('mautic.formresult.'.$objectId.'.limit', $this->factory->getParameter('default_pagelimit'));
 

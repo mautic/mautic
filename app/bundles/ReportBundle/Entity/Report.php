@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Entity\FormEntity;
 
 /**
  * Class Report
+ *
  * @ORM\Table(name="reports")
  * @ORM\Entity(repositoryClass="Mautic\ReportBundle\Entity\ReportRepository")
  * @Serializer\ExclusionPolicy("all")
@@ -85,6 +86,7 @@ class Report extends FormEntity
      * Set title
      *
      * @param string $title
+     *
      * @return Report
      */
     public function setTitle($title)
@@ -109,6 +111,7 @@ class Report extends FormEntity
      * Set system
      *
      * @param string $system
+     *
      * @return Report
      */
     public function setSystem($system)
@@ -133,6 +136,7 @@ class Report extends FormEntity
      * Set source
      *
      * @param string $source
+     *
      * @return Report
      */
     public function setSource($source)
@@ -157,6 +161,7 @@ class Report extends FormEntity
      * Set columns
      *
      * @param string $columns
+     *
      * @return Report
      */
     public function setColumns($columns)
@@ -181,6 +186,7 @@ class Report extends FormEntity
      * Set filters
      *
      * @param string $filters
+     *
      * @return Report
      */
     public function setFilters($filters)

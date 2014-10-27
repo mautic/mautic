@@ -13,9 +13,9 @@
 <head>
     <meta charset="UTF-8" />
     <title>Mautic</title>
-    <link rel="icon" type="image/x-icon" href="<?php echo $view['assets']->getUrl('assets/images/favicon.ico') ?>" />
-    <link rel="apple-touch-icon" href="<?php echo $view['assets']->getUrl('assets/images/apple-touch-icon.png') ?>" />
-    <link rel="stylesheet" href="<?php echo $view['assets']->getUrl('assets/css/font-awesome.min.css'); ?>" />
+    <link rel="icon" type="image/x-icon" href="<?php echo $view['assets']->getUrl('media/images/favicon.ico') ?>" />
+    <link rel="apple-touch-icon" href="<?php echo $view['assets']->getUrl('media/images/apple-touch-icon.png') ?>" />
+    <link rel="stylesheet" href="<?php echo $view['assets']->getUrl('media/css/font-awesome.min.css'); ?>" />
 
     <?php $view['assets']->outputSystemStylesheets(); ?>
 </head>

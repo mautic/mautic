@@ -41,7 +41,7 @@ switch ($type) {
 ?>
 <li id="LeadNote<?php echo $id; ?>">
     <div class="panel ">
-        <div class="panel-body np">
+        <div class="panel-body np box-layout">
             <div class="height-auto icon bdr-r bg-dark-xs col-xs-1 text-center">
                 <h3><i class="fa fa-lg fa-fw <?php echo $icon; ?>"></i></h3>
             </div>

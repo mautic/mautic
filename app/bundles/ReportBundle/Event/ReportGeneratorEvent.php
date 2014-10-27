@@ -14,11 +14,10 @@ use Symfony\Component\EventDispatcher\Event;
 
 /**
  * Class ReportGeneratorEvent
- *
- * @package Mautic\ReportBundle\Event
  */
 class ReportGeneratorEvent extends Event
 {
+
     /**
      * Event context
      *
@@ -64,7 +63,6 @@ class ReportGeneratorEvent extends Event
      * Fetch the QueryBuilder object
      *
      * @return QueryBuilder
-     *
      * @throws \RuntimeException
      */
     public function getQueryBuilder()
@@ -92,7 +90,6 @@ class ReportGeneratorEvent extends Event
      * Fetch the ContentTemplate path
      *
      * @return QueryBuilder
-     *
      * @throws \RuntimeException
      */
     public function getContentTemplate()
@@ -101,7 +98,7 @@ class ReportGeneratorEvent extends Event
             return $this->contentTemplate;
         }
 
-        // Defautl content template
+        // Default content template
         return 'MauticReportBundle:Report:details.html.php';
     }
 

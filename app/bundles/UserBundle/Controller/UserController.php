@@ -7,29 +7,25 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-
-
 namespace Mautic\UserBundle\Controller;
 
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\UserBundle\Form\Type as FormType;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class UserController
- *
- * @package Mautic\UserBundle\Controller
  */
 class UserController extends FormController
 {
+
     /**
      * Generate's default user list
      *
-     * @param $page
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @param int $page
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function indexAction($page = 1)
     {
@@ -37,9 +33,13 @@ class UserController extends FormController
             return $this->accessDenied();
         }
 
+        if ($this->request->getMethod() == 'POST') {
+            $this->setTableOrder();
+        }
+
         //set limits
         $limit = $this->factory->getSession()->get('mautic.user.limit', $this->factory->getParameter('default_pagelimit'));
-        $start = ($page === 1) ? 0 : (($page-1) * $limit);
+        $start = ($page === 1) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
         }
@@ -47,14 +47,14 @@ class UserController extends FormController
         $orderBy    = $this->factory->getSession()->get('mautic.user.orderby', 'u.lastName, u.firstName, u.username');
         $orderByDir = $this->factory->getSession()->get('mautic.user.orderbydir', 'ASC');
 
-        $search     = $this->request->get('search', $this->factory->getSession()->get('mautic.user.filter', ''));
+        $search = $this->request->get('search', $this->factory->getSession()->get('mautic.user.filter', ''));
         $this->factory->getSession()->set('mautic.user.filter', $search);
 
         //do some default filtering
-        $filter     = array('string' => $search, 'force' => '');
+        $filter = array('string' => $search, 'force' => '');
 
-        $tmpl       = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
-        $users      = $this->factory->getModel('user.user')->getEntities(
+        $tmpl  = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
+        $users = $this->factory->getModel('user.user')->getEntities(
             array(
                 'start'      => $start,
                 'limit'      => $limit,
@@ -67,13 +67,9 @@ class UserController extends FormController
         $count = count($users);
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page
-            if ($count === 1) {
-                $lastPage = 1;
-            } else {
-                $lastPage = (floor($limit / $count)) ? : 1;
-            }
+            $lastPage = ($count === 1) ? 1 : (floor($limit / $count)) ?: 1;
             $this->factory->getSession()->set('mautic.user.page', $lastPage);
-            $returnUrl   = $this->generateUrl('mautic_user_index', array('page' => $lastPage));
+            $returnUrl = $this->generateUrl('mautic_user_index', array('page' => $lastPage));
 
             return $this->postActionRedirect(array(
                 'returnUrl'       => $returnUrl,
@@ -101,6 +97,7 @@ class UserController extends FormController
 
         $parameters = array(
             'items'       => $users,
+            'searchValue' => $search,
             'page'        => $page,
             'limit'       => $limit,
             'permissions' => $permissions,
@@ -121,28 +118,29 @@ class UserController extends FormController
     /**
      * Generate's form and processes new post data
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function newAction ()
+    public function newAction()
     {
         if (!$this->factory->getSecurity()->isGranted('user:users:create')) {
             return $this->accessDenied();
         }
-        $model      = $this->factory->getModel('user.user');
+        $model = $this->factory->getModel('user.user');
 
         //retrieve the user entity
-        $user       = $model->getEntity();
+        $user = $model->getEntity();
 
         //set the return URL for post actions
-        $returnUrl  = $this->generateUrl('mautic_user_index');
+        $returnUrl = $this->generateUrl('mautic_user_index');
+
         //set the page we came from
-        $page       = $this->factory->getSession()->get('mautic.user.page', 1);
+        $page = $this->factory->getSession()->get('mautic.user.page', 1);
 
         //get the user form factory
-        $action     = $this->generateUrl('mautic_user_action', array('objectAction' => 'new'));
-        $form       = $model->createForm($user, $this->get('form.factory'), $action);
+        $action = $this->generateUrl('mautic_user_action', array('objectAction' => 'new'));
+        $form   = $model->createForm($user, $this->get('form.factory'), $action);
 
-        ///Check for a submitted form and process it
+        //Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
@@ -195,9 +193,7 @@ class UserController extends FormController
             }
         }
 
-        $formView = $form->createView();
-        $this->factory->getTemplating()->getEngine('MauticUserBundle:User:form.html.php')->get('form')
-            ->setTheme($formView, 'MauticUserBundle:FormUser');
+        $formView = $this->setFormTheme($form, 'MauticUserBundle:User:form.html.php', 'MauticUserBundle:FormUser');
 
         return $this->delegateView(array(
             'viewParameters'  => array('form' => $formView),
@@ -213,20 +209,24 @@ class UserController extends FormController
     /**
      * Generates edit form and processes post data
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @param int  $objectId
+     * @param bool $ignorePost
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function editAction ($objectId, $ignorePost = false)
+    public function editAction($objectId, $ignorePost = false)
     {
         if (!$this->factory->getSecurity()->isGranted('user:users:edit')) {
             return $this->accessDenied();
         }
-        $model   = $this->factory->getModel('user.user');
-        $user    = $model->getEntity($objectId);
+        $model = $this->factory->getModel('user.user');
+        $user  = $model->getEntity($objectId);
 
         //set the page we came from
-        $page    = $this->factory->getSession()->get('mautic.user.page', 1);
+        $page = $this->factory->getSession()->get('mautic.user.page', 1);
+
         //set the return URL
-        $returnUrl  = $this->generateUrl('mautic_user_index', array('page' => $page));
+        $returnUrl = $this->generateUrl('mautic_user_index', array('page' => $page));
 
         $postActionVars = array(
             'returnUrl'       => $returnUrl,
@@ -242,10 +242,10 @@ class UserController extends FormController
         if ($user === null) {
             return $this->postActionRedirect(
                 array_merge($postActionVars, array(
-                    'flashes'         => array(
+                    'flashes' => array(
                         array(
-                            'type' => 'error',
-                            'msg'  => 'mautic.user.user.error.notfound',
+                            'type'    => 'error',
+                            'msg'     => 'mautic.user.user.error.notfound',
                             'msgVars' => array('%id%' => $objectId)
                         )
                     )
@@ -310,9 +310,7 @@ class UserController extends FormController
             $form->get('role_lookup')->setData($user->getRole()->getName());
         }
 
-        $formView = $form->createView();
-        $this->factory->getTemplating()->getEngine('MauticUserBundle:User:form.html.php')->get('form')
-            ->setTheme($formView, 'MauticUserBundle:FormUser');
+        $formView = $this->setFormTheme($form, 'MauticUserBundle:User:form.html.php', 'MauticUserBundle:FormUser');
 
         return $this->delegateView(array(
             'viewParameters'  => array('form' => $formView),
@@ -328,7 +326,8 @@ class UserController extends FormController
     /**
      * Deletes a user object
      *
-     * @param         $objectId
+     * @param int $objectId
+     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function deleteAction($objectId) {
@@ -394,8 +393,11 @@ class UserController extends FormController
     }
 
     /**
-     * @param $objectId
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * Contacts a user
+     *
+     * @param int $objectId
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function contactAction($objectId)
     {
@@ -409,8 +411,8 @@ class UserController extends FormController
                 'contentTemplate' => 'MauticUserBundle:User:contact',
                 'flashes'         => array(
                     array(
-                        'type' => 'error',
-                        'msg'  => 'mautic.user.user.error.notfound',
+                        'type'    => 'error',
+                        'msg'     => 'mautic.user.user.error.notfound',
                         'msgVars' => array('%id%' => $objectId)
                     )
                 )
@@ -451,19 +453,19 @@ class UserController extends FormController
 
                     $serializer = $this->get('jms_serializer');
                     $details    = $serializer->serialize(array(
-                        "from"    => $currentUser->getName(),
-                        "to"      => $user->getName(),
-                        "subject" => $subject,
-                        "message" => $body
+                        'from'    => $currentUser->getName(),
+                        'to'      => $user->getName(),
+                        'subject' => $subject,
+                        'message' => $body
                     ), 'json');
 
                     $log = array(
-                        "bundle"    => $bundle,
-                        "object"    => $object,
-                        "objectId"  => $entityId,
-                        "action"    => "communication",
-                        "details"   => $details,
-                        "ipAddress" => $this->request->server->get('REMOTE_ADDR')
+                        'bundle'    => $bundle,
+                        'object'    => $object,
+                        'objectId'  => $entityId,
+                        'action'    => 'communication',
+                        'details'   => $details,
+                        'ipAddress' => $this->request->server->get('REMOTE_ADDR')
                     );
                     $this->factory->getModel('core.auditLog')->writeToLog($log);
 
@@ -480,10 +482,10 @@ class UserController extends FormController
                 return $this->redirect($returnUrl);
             }
         } else {
-            $reEntityId   = InputHelper::int($this->request->get('id'));
-            $reSubject    = InputHelper::clean($this->request->get('subject'));
-            $returnUrl    = InputHelper::clean($this->request->get('returnUrl', $this->generateUrl('mautic_dashboard_index')));
-            $reEntity     = InputHelper::clean($this->request->get('entity'));
+            $reEntityId = InputHelper::int($this->request->get('id'));
+            $reSubject  = InputHelper::clean($this->request->get('subject'));
+            $returnUrl  = InputHelper::clean($this->request->get('returnUrl', $this->generateUrl('mautic_dashboard_index')));
+            $reEntity   = InputHelper::clean($this->request->get('entity'));
 
             $form->get('entity')->setData($reEntity);
             $form->get('id')->setData($reEntityId);
@@ -500,9 +502,7 @@ class UserController extends FormController
             }
         }
 
-        $formView = $form->createView();
-        $this->factory->getTemplating()->getEngine('MauticUserBundle:User:contact.html.php')->get('form')
-            ->setTheme($formView, 'MauticUserBundle:FormUser');
+        $formView = $this->setFormTheme($form, 'MauticUserBundle:User:contact.html.php', 'MauticUserBundle:FormUser');
 
         return $this->delegateView(array(
             'viewParameters'  => array(

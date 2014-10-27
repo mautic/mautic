@@ -9,7 +9,6 @@
 
 namespace Mautic\UserBundle\Entity;
 
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
@@ -22,26 +21,28 @@ class RoleRepository extends CommonRepository
     /**
      * Get a list of roles
      *
-     * @param array      $args
-     * @param Translator $translator
+     * @param array $args
+     *
      * @return Paginator
      */
     public function getEntities($args = array())
     {
-        $q = $this
-            ->createQueryBuilder('r');
+        $q = $this->createQueryBuilder('r');
 
         $this->buildClauses($q, $args);
 
         $query = $q->getQuery();
-        $result = new Paginator($query);
-        return $result;
+
+        return new Paginator($query);
     }
 
     /**
+     * Get a list of roles
+     *
      * @param string $search
      * @param int    $limit
      * @param int    $start
+     *
      * @return array
      */
     public function getRoleList($search = '', $limit = 10, $start = 0)
@@ -52,7 +53,7 @@ class RoleRepository extends CommonRepository
             ->from('MauticUserBundle:Role', 'r');
 
         if (!empty($search)) {
-            $q->andWhere('r.name LIKE :search')
+            $q->where('r.name LIKE :search')
                 ->setParameter('search', "{$search}%");
         }
 
@@ -63,10 +64,12 @@ class RoleRepository extends CommonRepository
                 ->setMaxResults($limit);
         }
 
-        $results = $q->getQuery()->getArrayResult();
-        return $results;
+        return $q->getQuery()->getArrayResult();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function addCatchAllWhereClause(&$q, $filter)
     {
         $unique  = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
@@ -87,6 +90,9 @@ class RoleRepository extends CommonRepository
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function addSearchCommandWhereClause(&$q, $filter)
     {
         $command         = $field = $filter->command;
@@ -120,7 +126,7 @@ class RoleRepository extends CommonRepository
     }
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
     public function getSearchCommands()
     {
@@ -133,7 +139,7 @@ class RoleRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     protected function getDefaultOrder()
     {

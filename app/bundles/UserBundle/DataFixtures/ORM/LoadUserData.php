@@ -18,8 +18,6 @@ use Mautic\UserBundle\Entity\User;
 
 /**
  * Class LoadUserData
- *
- * @package Mautic\UserBundle\DataFixtures\ORM
  */
 class LoadUserData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
 {
@@ -32,7 +30,6 @@ class LoadUserData extends AbstractFixture implements OrderedFixtureInterface, C
     /**
      * {@inheritdoc}
      */
-
     public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
@@ -95,7 +92,7 @@ class LoadUserData extends AbstractFixture implements OrderedFixtureInterface, C
     }
 
     /**
-     * @return int
+     * {@inheritdoc}
      */
     public function getOrder()
     {

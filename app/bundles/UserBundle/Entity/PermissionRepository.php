@@ -11,12 +11,13 @@ namespace Mautic\UserBundle\Entity;
 
 use Doctrine\ORM\Query;
 use Mautic\CoreBundle\Entity\CommonRepository;
-use Mautic\UserBundle\Entity\Role;
+
 /**
  * PermissionRepository
  */
 class PermissionRepository extends CommonRepository
 {
+
     /**
      * Delete all permissions for a specific role
      *
@@ -35,8 +36,9 @@ class PermissionRepository extends CommonRepository
     /**
      * Retrieves array of permissions for a set role.  If $forForm, then the array will contain
      *
-     * @param      Role $role
+     * @param Role $role
      * @param bool $forForm
+     *
      * @return array
      */
     public function getPermissionsByRole(Role $role, $forForm = false) {

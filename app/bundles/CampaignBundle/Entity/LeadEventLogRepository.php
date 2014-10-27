@@ -20,13 +20,13 @@ class LeadEventLogRepository extends EntityRepository
      * Get a lead's page event log
      *
      * @param integer $leadId
-     * @param array   $ipIds
+     * @param array   $options
      *
      * @return array
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getLeadLogs($leadId, array $ipIds = array())
+    public function getLeadLogs($leadId, array $options = array())
     {
         $query = $this->createQueryBuilder('ll')
             ->select('IDENTITY(ll.event) AS event_id,
@@ -42,12 +42,20 @@ class LeadEventLogRepository extends EntityRepository
             ->andWhere('e.eventType = :eventType')
             ->setParameter('eventType', 'trigger');
 
-        if (!empty($ipIds)) {
-            $query->orWhere('ll.ipAddress IN (' . implode(',', $ipIds) . ')');
+        if (!empty($options['ipIds'])) {
+            $query->orWhere('ll.ipAddress IN (' . implode(',', $options['ipIds']) . ')');
         }
 
-        return $query->getQuery()
-            ->getArrayResult();
+        if (isset($options['filters']['search']) && $options['filters']['search']) {
+            $query->andWhere($query->expr()->orX(
+                $query->expr()->like('e.name', $query->expr()->literal('%' . $options['filters']['search'] . '%')),
+                $query->expr()->like('e.description', $query->expr()->literal('%' . $options['filters']['search'] . '%')),
+                $query->expr()->like('c.name', $query->expr()->literal('%' . $options['filters']['search'] . '%')),
+                $query->expr()->like('c.description', $query->expr()->literal('%' . $options['filters']['search'] . '%'))
+            ));
+        }
+
+        return $query->getQuery()->getArrayResult();
     }
 
     /**

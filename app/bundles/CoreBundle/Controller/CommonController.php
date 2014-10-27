@@ -10,6 +10,7 @@
 namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -279,5 +280,22 @@ class CommonController extends Controller implements MauticController
         $application = new Application($this->get('kernel'));
         $application->setAutoExit(false);
         $application->run($input);
+    }
+
+    /**
+     * Updates the table's ordering in the session
+     *
+     * @return void
+     */
+    protected function setTableOrder()
+    {
+        $name    = InputHelper::clean($this->request->query->get('name'));
+        $orderBy = InputHelper::clean($this->request->query->get('orderby'));
+        if (!empty($name) && !empty($orderBy)) {
+            $dir = $this->get('session')->get("mautic.$name.orderbydir", 'ASC');
+            $dir = ($dir == 'ASC') ? 'DESC' : 'ASC';
+            $this->get('session')->set("mautic.$name.orderby", $orderBy);
+            $this->get('session')->set("mautic.$name.orderbydir", $dir);
+        }
     }
 }

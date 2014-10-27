@@ -48,20 +48,25 @@ class DownloadRepository extends CommonRepository
      * Get a lead's page downloads
      *
      * @param integer $leadId
-     * @param array   $ipIds
+     * @param array   $options
      *
      * @return array
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getLeadDownloads($leadId, array $ipIds = array())
+    public function getLeadDownloads($leadId, array $options = array())
     {
         $query = $this->createQueryBuilder('d')
             ->select('IDENTITY(d.asset) AS asset_id, d.dateDownload')
             ->where('d.lead = ' . $leadId);
 
-        if (!empty($ipIds)) {
-            $query->orWhere('d.ipAddress IN (' . implode(',', $ipIds) . ')');
+        if (!empty($options['ipIds'])) {
+            $query->orWhere('d.ipAddress IN (' . implode(',', $options['ipIds']) . ')');
+        }
+
+        if (isset($options['filters']['search']) && $options['filters']['search']) {
+            $query->leftJoin('d.asset', 'a')
+                ->andWhere($query->expr()->like('a.title', $query->expr()->literal('%' . $options['filters']['search'] . '%')));
         }
 
         return $query->getQuery()

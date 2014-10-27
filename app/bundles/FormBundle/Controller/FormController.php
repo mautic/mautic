@@ -46,6 +46,10 @@ class FormController extends CommonFormController
             return $this->accessDenied();
         }
 
+        if ($this->request->getMethod() == 'POST') {
+            $this->setTableOrder();
+        }
+
         //set limits
         $limit = $this->factory->getSession()->get('mautic.form.limit', $this->factory->getParameter('default_pagelimit'));
         $start = ($page === 1) ? 0 : (($page-1) * $limit);

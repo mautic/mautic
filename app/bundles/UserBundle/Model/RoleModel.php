@@ -16,19 +16,14 @@ use Mautic\UserBundle\UserEvents;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\PreconditionRequiredHttpException;
 
-
 /**
  * Class RoleModel
- * {@inheritdoc}
- * @package Mautic\CoreBundle\Model\FormModel
  */
 class RoleModel extends FormModel
 {
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
     public function getRepository()
     {
@@ -37,8 +32,6 @@ class RoleModel extends FormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
     public function getPermissionBase()
     {
@@ -48,9 +41,6 @@ class RoleModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param       $entity
-     * @param       $unlock
-     * @return int
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     public function saveEntity($entity, $unlock = true)
@@ -91,11 +81,11 @@ class RoleModel extends FormModel
 
         $entity->setRawPermissions($rawPermissions);
     }
+
     /**
      * {@inheritdoc}
      *
-     * @param      $entity
-     * @return null|object
+     * @throws PreconditionRequiredHttpException
      */
     public function deleteEntity($entity)
     {
@@ -120,11 +110,6 @@ class RoleModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param      $entity
-     * @param      $formFactory
-     * @param null $action
-     * @param array $options
-     * @return mixed
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function createForm($entity, $formFactory, $action = null, $options = array())
@@ -137,12 +122,8 @@ class RoleModel extends FormModel
         return $formFactory->create('role', $entity, $params);
     }
 
-
     /**
-     * Get a specific entity or generate a new one if id is empty
-     *
-     * @param $id
-     * @return null|object
+     * {@inheritdoc}
      */
     public function getEntity($id = null)
     {
@@ -153,14 +134,9 @@ class RoleModel extends FormModel
         return parent::getEntity($id);
     }
 
-
     /**
      * {@inheritdoc}
      *
-     * @param $action
-     * @param $entity
-     * @param $isNew
-     * @param $event
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, $event = false)
@@ -193,8 +169,8 @@ class RoleModel extends FormModel
             }
             $this->dispatcher->dispatch($name, $event);
             return $event;
-        } else {
-            return false;
         }
+
+        return false;
     }
 }

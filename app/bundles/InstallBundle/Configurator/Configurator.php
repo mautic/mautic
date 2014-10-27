@@ -5,8 +5,6 @@
  * @author      Mautic
  * @link        http://mautic.com
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- *
- * Based on Sensio\DistributionBundle
  */
 
 namespace Mautic\InstallBundle\Configurator;
@@ -19,6 +17,7 @@ use Symfony\Component\Yaml\Yaml;
  * Configurator.
  *
  * @author Marc Weistroff <marc.weistroff@gmail.com>
+ * @note   This class is based on Sensio\Bundle\DistributionBundle\Configurator\Configurator
  */
 class Configurator
 {

@@ -56,6 +56,7 @@ $view['slots']->set('mauticContent', 'dashboard');
     					<div id="dashboard-map"></div>
     				</div>
     			</div>
+                <div id="dashboard-map-data" class="hide"><?php echo json_encode($mapData); ?></div>
     		</div>
     		<ul class="nav nav-tabs pr-md pl-md">
     	        <li class="active"><a href="#email-stats-container" role="tab" data-toggle="tab">Stats</a></li>
@@ -63,54 +64,61 @@ $view['slots']->set('mauticContent', 'dashboard');
     	    </ul>
     	</div>
         <div class="tab-content pa-md">
-                <!-- #email-stats-container -->
-                <div class="tab-pane active fade in bdr-w-0" id="email-stats-container">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="panel panel-default">
+            <!-- #email-stats-container -->
+            <div class="tab-pane active fade in bdr-w-0" id="email-stats-container">
+                <div class="row">
+                    <div class="col-md-4">
+                            <?php if ($popularPages) : ?>
+                            <div class="panel panel-default bdr-t-wdh-0">
                                 <div class="panel-heading">
-                                	<h3 class="panel-title">Most Popular Pages</h3>
+                                    <h3 class="panel-title">Most Popular Pages</h3>
                                 </div>
-                                <?php if ($popularPages) : ?>
-                                <div class="panel-body">
-                                    <table class="table table-striped">
-                                    <tr>
-                                        <th>Title</th>
-                                        <th>Lang</th>
-                                        <th>Hits</th>
-                                    </tr>
-                                    <?php foreach ($popularPages as $page) : ?>
-                                        <tr>
-                                            <td>
-                                                <a href="<?php echo $view['router']->generate('mautic_page_action', array('objectAction' => 'view', 'objectId' => $page['page_id'])); ?>" data-toggle="ajax">
-                                                    <?php echo $page['title']; ?>
-                                                </a>
-                                            </td>
-                                            <td>
-                                                <?php echo $page['lang']; ?>
-                                            </td>
-                                            <td>
-                                                <?php echo $page['hits']; ?>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; ?>
+                                <div class="table-responsive scrollable body-white padding-sm page-list">    
+                                    <table class="table table-hover table-striped table-bordered point-list">
+                                        <thead>
+                                            <tr>
+                                                <th>Title</th>
+                                                <th>Lang</th>
+                                                <th>Hits</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        <?php foreach ($popularPages as $page) : ?>
+                                            <tr>
+                                                <td>
+                                                    <a href="<?php echo $view['router']->generate('mautic_page_action', array('objectAction' => 'view', 'objectId' => $page['page_id'])); ?>" data-toggle="ajax">
+                                                        <?php echo $page['title']; ?>
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    <?php echo $page['lang']; ?>
+                                                </td>
+                                                <td>
+                                                    <?php echo $page['hits']; ?>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                        </tbody>
                                     </table>
                                 </div>
-                                <?php endif; ?>
                             </div>
+                            <?php endif; ?>
                         </div>
                         <div class="col-md-4">
-                           	<div class="panel panel-default">
+                            <?php if ($popularAssets) : ?>
+                            <div class="panel panel-default bdr-t-wdh-0">
                                 <div class="panel-heading">
-                                	<h3 class="panel-title">Most Popular Assets</h3>
+                                    <h3 class="panel-title">Most Popular Assets</h3>
                                 </div>
-                                <?php if ($popularAssets) : ?>
-                                <div class="panel-body">
-                                    <table class="table table-striped">
-                                    <tr>
-                                        <th>Title</th>
-                                        <th>Downloads</th>
-                                    </tr>
+                                <div class="table-responsive scrollable body-white padding-sm page-list">    
+                                <table class="table table-hover table-striped table-bordered point-list">
+                                    <thead>
+                                        <tr>
+                                            <th>Title</th>
+                                            <th>Downloads</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
                                     <?php foreach ($popularAssets as $asset) : ?>
                                         <tr>
                                             <td>
@@ -123,39 +131,44 @@ $view['slots']->set('mauticContent', 'dashboard');
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
-                                    </table>
+                                    </tbody>
+                                </table>
                                 </div>
-                                <?php endif; ?>
                             </div>
+                            <?php endif; ?>
                         </div>
                         <div class="col-md-4">
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                	<h3 class="panel-title">Most Popular Campaigns</h3>
+                            <?php if ($popularCampaigns) : ?>
+                                <div class="panel panel-default bdr-t-wdh-0">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">Most Popular Campaigns</h3>
+                                    </div>
+                                    <div class="table-responsive scrollable body-white padding-sm page-list">    
+                                        <table class="table table-hover table-striped table-bordered point-list">
+                                            <thead>
+                                                <tr>
+                                                    <th>Title</th>
+                                                    <th>Hits</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php foreach ($popularCampaigns as $campaign) : ?>
+                                                    <tr>
+                                                        <td>
+                                                            <a href="<?php echo $view['router']->generate('mautic_campaign_action', array('objectAction' => 'view', 'objectId' => $campaign['campaign_id'])); ?>" data-toggle="ajax">
+                                                                <?php echo $campaign['name']; ?>
+                                                            </a>
+                                                        </td>
+                                                        <td>
+                                                            <?php echo $campaign['hits']; ?>
+                                                        </td>
+                                                    </tr>
+                                                <?php endforeach; ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
-                                <?php if ($popularCampaigns) : ?>
-                                <div class="panel-body">
-                                    <table class="table table-striped">
-                                    <tr>
-                                        <th>Title</th>
-                                        <th>Hits</th>
-                                    </tr>
-                                    <?php foreach ($popularCampaigns as $campaign) : ?>
-                                        <tr>
-                                            <td>
-                                                <a href="<?php echo $view['router']->generate('mautic_campaign_action', array('objectAction' => 'view', 'objectId' => $campaign['campaign_id'])); ?>" data-toggle="ajax">
-                                                    <?php echo $campaign['name']; ?>
-                                                </a>
-                                            </td>
-                                            <td>
-                                                <?php echo $campaign['hits']; ?>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                    </table>
-                                </div>
-                                <?php endif; ?>
-                            </div>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>

@@ -14,18 +14,16 @@ use Mautic\UserBundle\Event\UserEvent;
 use Mautic\UserBundle\UserEvents;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 
 /**
  * Class UserModel
- * {@inheritdoc}
- * @package Mautic\CoreBundle\FormModel
  */
 class UserModel extends FormModel
 {
+
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
     public function getRepository()
     {
@@ -34,8 +32,6 @@ class UserModel extends FormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
     public function getPermissionBase()
     {
@@ -45,9 +41,6 @@ class UserModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param       $entity
-     * @param       $unlock
-     * @return int
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     public function saveEntity($entity, $unlock = true)
@@ -62,34 +55,25 @@ class UserModel extends FormModel
     /**
      * Checks for a new password and rehashes if necessary
      *
-     * @param User $entity
-     * @param      $encoder
-     * @param      $submittedPassword
-     * @return int|string
+     * @param User                     $entity
+     * @param PasswordEncoderInterface $encoder
+     * @param string                   $submittedPassword
+     *
+     * @return string
      */
-    public function checkNewPassword(User $entity, $encoder, $submittedPassword) {
+    public function checkNewPassword(User $entity, PasswordEncoderInterface $encoder, $submittedPassword) {
         if (!empty($submittedPassword)) {
             //hash the clear password submitted via the form
-            $password = $encoder->encodePassword($submittedPassword, $entity->getSalt());
-        } else {
-            //get the original password to save if password is empty from the form
-            $originalPassword = $entity->getPassword();
-            //This is an existing user with a blank password so set the original password
-            $password = $originalPassword;
+            return $encoder->encodePassword($submittedPassword, $entity->getSalt());
         }
 
-        return $password;
+        return $entity->getPassword();
     }
 
 
     /**
      * {@inheritdoc}
      *
-     * @param      $entity
-     * @param      $formFactory
-     * @param null $action
-     * @param array $options
-     * @return mixed
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function createForm($entity, $formFactory, $action = null, $options = array())
@@ -104,10 +88,7 @@ class UserModel extends FormModel
     }
 
     /**
-     * Get a specific entity or generate a new one if id is empty
-     *
-     * @param $id
-     * @return null|object
+     * {@inheritdoc}
      */
     public function getEntity($id = null)
     {
@@ -128,12 +109,8 @@ class UserModel extends FormModel
     }
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      *
-     * @param      $action
-     * @param      $entity
-     * @param bool $isNew
-     * @param      $event
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, $event = false)
@@ -160,24 +137,24 @@ class UserModel extends FormModel
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-
             if (empty($event)) {
                 $event = new UserEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
             $this->dispatcher->dispatch($name, $event);
             return $event;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**
      * Get list of entities for autopopulate fields
      *
-     * @param $type
-     * @param $filter
-     * @param $limit
+     * @param string $type
+     * @param string $filter
+     * @param int    $limit
+     *
      * @return array
      */
     public function getLookupResults($type, $filter = '', $limit = 10)

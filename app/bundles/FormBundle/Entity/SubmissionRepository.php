@@ -200,20 +200,30 @@ class SubmissionRepository extends CommonRepository
     /**
      * Fetch the base submission data from the database
      *
-     * @param array $ips
+     * @param array   $options
      *
      * @return array
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getSubmissions(array $ips = array())
+    public function getSubmissions(array $options = array())
     {
-        $fq = $this->_em->getConnection()->createQueryBuilder();
-        $fq->select('f.form_id, f.page_id, f.date_submitted')
-            ->from(MAUTIC_TABLE_PREFIX . 'form_submissions', 'f');
+        $query = $this->_em->getConnection()->createQueryBuilder();
+        $query->select('fs.form_id, fs.page_id, fs.date_submitted')
+            ->from(MAUTIC_TABLE_PREFIX . 'form_submissions', 'fs');
 
-        if (!empty($ips)) {
-            $fq->where('f.ip_id IN (' . implode(',', $ips) . ')');
+        if (!empty($options['ipIds'])) {
+            $query->where('fs.ip_id IN (' . implode(',', $options['ipIds']) . ')');
         }
 
-        return $fq->execute()->fetchAll();
+        if (isset($options['filters']['search']) && $options['filters']['search']) {
+            $query->leftJoin('fs', MAUTIC_TABLE_PREFIX . 'forms', 'f', 'f.id = fs.form_id')
+                ->andWhere($query->expr()->orX(
+                    $query->expr()->like('f.name', $query->expr()->literal('%' . $options['filters']['search'] . '%')),
+                    $query->expr()->like('f.description', $query->expr()->literal('%' . $options['filters']['search'] . '%'))
+            ));
+        }
+
+        return $query->execute()->fetchAll();;
     }
 }
