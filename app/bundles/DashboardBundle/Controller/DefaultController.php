@@ -66,6 +66,21 @@ class DefaultController extends CommonController
             }
         }
 
+        // Audit Log
+        $logs = $this->factory->getModel('core.auditLog')->getLogForObject(null, null, 10);
+
+        foreach ($logs as &$log) {
+            if (!empty($log['bundle']) && !empty($log['object']) && !empty($log['objectId'])) {
+                $model = $this->factory->getModel($log['bundle'] . '.' . $log['object']);
+                $item = $model->getEntity($log['objectId']);
+                if (method_exists($item, $model->getNameGetter())) {
+                    $log['objectName'] = $item->{$model->getNameGetter()}();
+                } else {
+                    $log['objectName'] = '';
+                }
+            }
+        }
+
         return $this->delegateView(array(
             'viewParameters'  =>  array(
                 'sentReadCount'     => $sentReadCount,
@@ -79,6 +94,7 @@ class DefaultController extends CommonController
                 'popularCampaigns'  => $popularCampaigns,
                 'allSentEmails'     => $allSentEmails,
                 'mapData'           => $mapData,
+                'logs'              => $logs,
                 'security'          => $this->factory->getSecurity()
             ),
             'contentTemplate' => 'MauticDashboardBundle:Default:index.html.php',

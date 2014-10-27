@@ -29,6 +29,10 @@
                         <?php echo $log['userName']; ?>
                     </a>
                     <?php echo $log['action']; ?>
+                    <a href="<?php echo $view['router']->generate('mautic_' . $log['bundle'] . '_action', array('objectAction' => 'view', 'objectId' => $log['objectId'])); ?>" data-toggle="ajax">
+                        <?php echo $log['objectName']; ?>
+                    </a>
+                    <?php echo $log['object']; ?>
                     <p class="fs-12 dark-sm"><small> <?php echo $view['date']->toFull($log['dateAdded']); ?></small></p>
                     <dl>
                     <?php foreach ($log['details'] as $key => $detail) : ?>
