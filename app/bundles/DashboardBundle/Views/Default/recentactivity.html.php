@@ -25,7 +25,9 @@
                 <?php endif; ?>
                 </div>
                 <div class="media-body">
-                    <?php echo $log['userName']; ?>
+                    <a href="<?php echo $view['router']->generate('mautic_user_action', array('objectAction' => 'edit', 'objectId' => $log['userId'])); ?>" data-toggle="ajax">
+                        <?php echo $log['userName']; ?>
+                    </a>
                     <?php echo $log['action']; ?>
                     <a href="<?php echo $view['router']->generate('mautic_' . $log['bundle'] . '_action', array('objectAction' => 'view', 'objectId' => $log['objectId'])); ?>" data-toggle="ajax">
                         <?php echo $log['objectName']; ?>
