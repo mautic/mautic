@@ -54,9 +54,17 @@ class ConfigController extends FormController
                 // Merge the values POSTed with the current data
                 foreach ($formData as $bundle => $bundleConfig) {
                     foreach ($bundleConfig as $key => $value) {
+                        // Special handling for params stored as a boolean value
                         if (in_array($key, array('api_enabled'))) {
                             $formData[$bundle][$key] = (bool) $post->get('config[' . $key . ']', null, true);
                         } else {
+                            $postedValue = $post->get('config[' . $key . ']', null, true);
+
+                            // Check to ensure we don't save a blank password to the config which may remove the user's old password
+                            if (in_array($key, array('mailer_password', 'transifex_password')) && $postedValue == '') {
+                                continue;
+                            }
+
                             $formData[$bundle][$key] = $post->get('config[' . $key . ']', null, true);
                         }
                     }

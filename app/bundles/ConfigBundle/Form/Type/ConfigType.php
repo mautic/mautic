@@ -80,7 +80,13 @@ class ConfigType extends AbstractType
                         'data'        => $value
                     ));
                 } else {
-                    $builder->add($key, 'text', array(
+                    if (in_array($key, array('mailer_password', 'transifex_password'))) {
+                        $type = 'password';
+                    } else {
+                        $type = 'text';
+                    }
+
+                    $builder->add($key, $type, array(
                         'label'      => 'mautic.config.' . $bundle . '.' . $key,
                         'label_attr' => array('class' => 'control-label'),
                         'attr'       => array('class' => 'form-control'),
