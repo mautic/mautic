@@ -20,12 +20,11 @@ if ($tmpl == 'index')
                     $style = !empty($color) ? ' style="background-color: ' . $color . ' !important;"' : '';
                 ?>
                 <div class="shuffle shuffle-item grid col-sm-6 col-lg-4">
-                    <div class="panel ovf-h">
+                    <div class="panel ovf-h" style="border-top: 3px solid <?php echo $color; ?>;">
                         <div class="box-layout">
                             <div class="col-xs-4 va-m">
                                 <div class="panel-body">
                             <span class="img-wrapper img-rounded" style="width:100%">
-                                <span class="label label-default ma-20"<?php echo $style; ?>><?php echo $item->getPoints(); ?></span>
                                 <?php $preferred = $item->getPreferredProfileImage(); ?>
                                 <?php if ($preferred == 'gravatar' || empty($preferred)) : ?>
                                     <?php $img = $view['gravatar']->getImage($fields['core']['email']['value'], '250'); ?>
@@ -41,7 +40,7 @@ if ($tmpl == 'index')
                             <div class="col-xs-8 va-t">
                                 <div class="panel-body">
                                     <div class="pull-right">
-                                        <div class="checkbox-inline custom-primary">
+                                        <div class="checkbox-inline custom-primary mnr-10">
                                             <label class="mb-0">
                                                 <input type="checkbox" value="1">
                                                 <span></span>
