@@ -12,6 +12,7 @@ namespace Mautic\ConfigBundle\Form\Type;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\DataTransformer\StringToDatetimeTransformer;
 use Mautic\UserBundle\Form\DataTransformer as Transformers;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -50,17 +51,69 @@ class ConfigType extends AbstractType
                         ),
                         'label'       => 'mautic.config.' . $bundle . '.' . $key,
                         'expanded'    => true,
-                        'multiple'    => false,
                         'empty_value' => false,
-                        'required'    => false,
                         'data'        => (bool) $value
                     ));
-                } elseif ($key == 'api_mode') {
+                } elseif (in_array($key, array(
+                    'api_mode', 'locale', 'theme', 'ip_lookup_service', 'mailer_spool_type', 'mailer_transport', 'mailer_encryption', 'mailer_auth_mode'
+                ))) {
+                    switch ($key) {
+                        case 'api_mode':
+                            $choices = array(
+                                'oauth1' => 'mautic.api.config.oauth1',
+                                'oauth2' => 'mautic.api.config.oauth2'
+                            );
+                            break;
+                        case 'locale':
+                            $choices = $this->factory->getParameter('supported_languages');
+                            break;
+                        case 'theme':
+                            $choices = $this->factory->getInstalledThemes();
+                            break;
+                        case 'ip_lookup_service':
+                            // TODO - Write an API endpoint listing our supported services and build this list from that
+                            $choices = array(
+                                'telize'            => 'mautic.core.config.ip_lookup_service.telize',
+                                'freegeoip'         => 'mautic.core.config.ip_lookup_service.freegeoip',
+                                'geobytes'          => 'mautic.core.config.ip_lookup_service.geobytes',
+                                'ipinfodb'          => 'mautic.core.config.ip_lookup_service.ipinfodb',
+                                'geoips'            => 'mautic.core.config.ip_lookup_service.geoips',
+                                'maxmind_country'   => 'mautic.core.config.ip_lookup_service.maxmind_country',
+                                'maxmind_precision' => 'mautic.core.config.ip_lookup_service.maxmind_precision',
+                                'maxmind_omni'      => 'mautic.core.config.ip_lookup_service.maxmind_omni'
+                            );
+                            break;
+                        case 'mailer_spool_type':
+                            $choices = array(
+                                'file'   => 'mautic.core.config.mailer_spool_type.file',
+                                'memory' => 'mautic.core.config.mailer_spool_type.memory'
+                            );
+                            break;
+                        case 'mailer_transport':
+                            $choices = array(
+                                'gmail'    => 'mautic.core.config.mailer_transport.gmail',
+                                'mail'     => 'mautic.core.config.mailer_transport.mail',
+                                'sendmail' => 'mautic.core.config.mailer_transport.sendmail',
+                                'smtp'     => 'mautic.core.config.mailer_transport.smtp'
+                            );
+                            break;
+                        case 'mailer_encryption':
+                            $choices = array(
+                                'ssl' => 'mautic.core.config.mailer_encryption.ssl',
+                                'tls' => 'mautic.core.config.mailer_encryption.tls'
+                            );
+                            break;
+                        case 'mailer_auth_mode':
+                            $choices = array(
+                                'plain'    => 'mautic.core.config.mailer_auth_mode.plain',
+                                'login'    => 'mautic.core.config.mailer_auth_mode.login',
+                                'cram-md5' => 'mautic.core.config.mailer_auth_mode.cram-md5',
+                            );
+                            break;
+                    }
+
                     $builder->add($key, 'choice', array(
-                        'choices'  => array(
-                            'oauth1' => 'mautic.api.config.oauth1',
-                            'oauth2' => 'mautic.api.config.oauth2'
-                        ),
+                        'choices'  => $choices,
                         'label'    => 'mautic.config.' . $bundle . '.' . $key,
                         'required' => false,
                         'attr'     => array(
@@ -70,21 +123,37 @@ class ConfigType extends AbstractType
                     ));
                 } elseif ($key == 'default_timezone') {
                     $builder->add($key, 'timezone', array(
-                        'label'    => 'mautic.config.' . $bundle . '.' . $key,
+                        'label'       => 'mautic.config.' . $bundle . '.' . $key,
                         'label_attr'  => array('class' => 'control-label'),
                         'attr'        => array(
-                            'class'   => 'form-control'
+                            'class' => 'form-control'
                         ),
                         'multiple'    => false,
                         'empty_value' => 'mautic.user.user.form.defaulttimezone',
                         'data'        => $value
                     ));
+                } elseif (in_array($key, array('mailer_password', 'transifex_password'))) {
+                    $builder->add($key, 'password', array(
+                        'label'      => 'mautic.config.' . $bundle . '.' . $key,
+                        'label_attr' => array('class' => 'control-label'),
+                        'attr'       => array(
+                            'class'       => 'form-control',
+                            'placeholder' => 'mautic.user.user.form.passwordplaceholder',
+                            'preaddon'    => 'fa fa-lock'
+                        ),
+                        'data'       => $value
+                    ));
                 } else {
-                    $builder->add($key, 'text', array(
+                    if (in_array($key, array('mailer_from_email'))) {
+                        $type = 'email';
+                    } else {
+                        $type = 'text';
+                    }
+
+                    $builder->add($key, $type, array(
                         'label'      => 'mautic.config.' . $bundle . '.' . $key,
                         'label_attr' => array('class' => 'control-label'),
                         'attr'       => array('class' => 'form-control'),
-                        'required'   => false,
                         'data'       => $value
                     ));
                 }

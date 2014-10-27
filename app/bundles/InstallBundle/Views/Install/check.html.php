@@ -75,4 +75,3 @@ $view['slots']->set("headerTitle", $header);
         </div>
         <?php echo $view['form']->form($form); ?>
         <?php endif; ?>
-    </div>
