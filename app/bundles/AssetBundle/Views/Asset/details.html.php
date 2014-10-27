@@ -248,9 +248,7 @@ if ($security->hasEntityAccess($permissions['asset:assets:editown'], $permission
 
         <hr class="hr-w-2" style="width:50%">
 
-        <!--
-        activity feed from it
-        -->
+        <!-- activity feed -->
         <?php echo $view->render('MauticCoreBundle:Default:recentactivity.html.php', array('logs' => $logs)); ?>
     </div>
     <!--/ right section -->

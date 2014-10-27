@@ -74,11 +74,12 @@ class AuditLogModel extends CommonModel
      *
      * @param string $object type
      * @param integer $id of the object
+     * @param intener $limit of items
      * 
      * @return array of logs
      */
-    public function getLogForObject($object, $id)
+    public function getLogForObject($object, $id, $limit = 100)
     {
-        return $this->em->getRepository("MauticCoreBundle:AuditLog")->getLogForObject($object, $id);
+        return $this->em->getRepository("MauticCoreBundle:AuditLog")->getLogForObject($object, $id, $limit);
     }
 }

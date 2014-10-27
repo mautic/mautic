@@ -38,7 +38,7 @@ $view['slots']->set("headerTitle", $view['translator']->trans('mautic.lead.lead.
 
 <?php endif; ?>
 
-<div class="panel panel-default bdr-t-wdh-0">
+<div class="panel panel-default bdr-t-wdh-0 mb-0">
     <div class="panel-body">
         <div class="box-layout">
             <div class="col-xs-6 va-m">
@@ -53,8 +53,6 @@ $view['slots']->set("headerTitle", $view['translator']->trans('mautic.lead.lead.
             </div>
         </div>
     </div>
-</div>
-
-<div class="page-list">
-    <?php $view['slots']->output('_content'); ?>
-</div>
+    <div class="page-list">
+        <?php $view['slots']->output('_content'); ?>
+    </div>

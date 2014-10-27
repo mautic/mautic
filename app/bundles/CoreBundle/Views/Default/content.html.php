@@ -15,10 +15,7 @@ endif;
 
 <div class="content-body">
     <?php echo $view->render('MauticCoreBundle:Default:pageheader.html.php'); ?>
-
-    <div class="container-fluid">
-        <?php $view['slots']->output('_content'); ?>
-    </div>
+	<?php $view['slots']->output('_content'); ?>	
 </div>
 
 <?php $view['slots']->output('modal'); ?>

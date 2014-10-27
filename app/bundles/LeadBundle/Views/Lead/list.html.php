@@ -11,7 +11,6 @@ if ($tmpl == 'index')
 ?>
 
 <?php if (count($items)): ?>
-
 <div class="table-responsive page-list">
     <table class="table table-hover table-striped table-bordered" id="leadTable">
         <thead>
@@ -132,9 +131,7 @@ if ($tmpl == 'index')
         </tbody>
     </table>
 </div>
-
-<div class="clearfix"></div>
-<div class="panel-footer mnl-md mnr-md">
+<div class="panel-footer">
     <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
         "totalItems"      => $totalItems,
         "page"            => $page,
