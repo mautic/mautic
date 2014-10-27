@@ -28,19 +28,19 @@
                     <?php echo $log['userName']; ?>
                     <?php echo $log['action']; ?>
                     <p class="fs-12 dark-sm"><small> <?php echo $view['date']->toFull($log['dateAdded']); ?></small></p>
-                    <ul>
+                    <dl>
                     <?php foreach ($log['details'] as $key => $detail) : ?>
-                        <li>
-                            <span class="text-primary">
-                                <?php echo ucfirst(preg_replace('/(?!^)[A-Z]{2,}(?=[A-Z][a-z])|[A-Z][a-z]/', ' $0', $key)); ?>:
-                            </span>
+                        <dt>
+                            <?php echo ucfirst(preg_replace('/(?!^)[A-Z]{2,}(?=[A-Z][a-z])|[A-Z][a-z]/', ' $0', $key)); ?>:
+                        </dt>
+                        <dd>
                             <?php if ($view['translator']->trans($detail[0])) : ?>
                             <del><?php echo $view['translator']->trans($detail[0]); ?></del> <i class="fa fa-long-arrow-right"></i>
                             <?php endif; ?>
                             <?php echo $view['translator']->trans($detail[1]); ?>
-                        </li>
+                        </dd>
                     <?php endforeach; ?>
-                    </ul>
+                    </dl>
                 </div>
             </li>
             <?php endforeach; ?>
