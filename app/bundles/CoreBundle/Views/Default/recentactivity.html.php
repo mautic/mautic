@@ -32,7 +32,7 @@
                     <?php foreach ($log['details'] as $key => $detail) : ?>
                         <li>
                             <strong class="text-primary">
-                                <?php echo ucfirst($key); ?>
+                                <?php echo ucfirst(preg_replace('/(?!^)[A-Z]{2,}(?=[A-Z][a-z])|[A-Z][a-z]/', ' $0', $key)); ?>
                             </strong>: <?php echo $view['translator']->trans($detail[1]); ?>
                         </li>
                     <?php endforeach; ?>
