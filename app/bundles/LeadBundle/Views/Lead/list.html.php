@@ -134,7 +134,7 @@ if ($tmpl == 'index')
 </div>
 
 <div class="clearfix"></div>
-<div class="panel-footer">
+<div class="panel-footer mnl-md mnr-md">
     <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
         "totalItems"      => $totalItems,
         "page"            => $page,
