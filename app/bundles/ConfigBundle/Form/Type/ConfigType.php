@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\DataTransformer\StringToDatetimeTransformer;
 use Mautic\UserBundle\Form\DataTransformer as Transformers;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
@@ -41,12 +42,38 @@ class ConfigType extends AbstractType
     {
         foreach ($options['data'] as $config) {
             foreach ($config as $key => $value) {
-                $builder->add($key, 'text', array(
-                    'label_attr' => array('class' => 'control-label'),
-                    'attr'       => array('class' => 'form-control'),
-                    'required'   => false,
-                    'data'       => $value
-                ));
+                if (in_array($key, array('api_enabled', 'cat_in_page_url'))) {
+                    $builder->add($key, 'button_group', array(
+                        'choice_list' => new ChoiceList(
+                            array(false, true),
+                            array('mautic.core.form.no', 'mautic.core.form.yes')
+                        ),
+                        'expanded'    => true,
+                        'multiple'    => false,
+                        'empty_value' => false,
+                        'required'    => false,
+                        'data'        => (bool) $value
+                    ));
+                } elseif ($key == 'api_mode') {
+                    $builder->add($key, 'choice', array(
+                        'choices' => array(
+                            'oauth1' => 'mautic.api.config.oauth1',
+                            'oauth2' => 'mautic.api.config.oauth2'
+                        ),
+                        'required'    => false,
+                        'attr'        => array(
+                            'class' => 'form-control'
+                        ),
+                        'data'        => $value
+                    ));
+                } else {
+                    $builder->add($key, 'text', array(
+                        'label_attr' => array('class' => 'control-label'),
+                        'attr'       => array('class' => 'form-control'),
+                        'required'   => false,
+                        'data'       => $value
+                    ));
+                }
             }
         }
 

@@ -54,7 +54,11 @@ class ConfigController extends FormController
                 // Merge the values POSTed with the current data
                 foreach ($formData as $bundle => $bundleConfig) {
                     foreach ($bundleConfig as $key => $value) {
-                        $formData[$bundle][$key] = $post->get('config[' . $key . ']', null, true);
+                        if (in_array($key, array('api_enabled'))) {
+                            $formData[$bundle][$key] = (bool) $post->get('config[' . $key . ']', null, true);
+                        } else {
+                            $formData[$bundle][$key] = $post->get('config[' . $key . ']', null, true);
+                        }
                     }
                 }
 
