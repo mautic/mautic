@@ -68,6 +68,17 @@ class ConfigType extends AbstractType
                         ),
                         'data'     => $value
                     ));
+                } elseif ($key == 'default_timezone') {
+                    $builder->add($key, 'timezone', array(
+                        'label'    => 'mautic.config.' . $bundle . '.' . $key,
+                        'label_attr'  => array('class' => 'control-label'),
+                        'attr'        => array(
+                            'class'   => 'form-control'
+                        ),
+                        'multiple'    => false,
+                        'empty_value' => 'mautic.user.user.form.defaulttimezone',
+                        'data'        => $value
+                    ));
                 } else {
                     $builder->add($key, 'text', array(
                         'label'      => 'mautic.config.' . $bundle . '.' . $key,
