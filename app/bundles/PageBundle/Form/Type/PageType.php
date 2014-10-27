@@ -36,7 +36,7 @@ class PageType extends AbstractType
     public function __construct(MauticFactory $factory) {
         $this->translator   = $factory->getTranslator();
         $this->themes       = $factory->getInstalledThemes('page');
-        $this->defaultTheme = $factory->getParameter('default_theme');
+        $this->defaultTheme = $factory->getParameter('theme');
     }
 
     /**

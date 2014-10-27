@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\DataTransformer\StringToDatetimeTransformer;
 use Mautic\UserBundle\Form\DataTransformer as Transformers;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
@@ -39,14 +40,54 @@ class ConfigType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        foreach ($options['data'] as $config) {
+        foreach ($options['data'] as $bundle => $config) {
             foreach ($config as $key => $value) {
-                $builder->add($key, 'text', array(
-                    'label_attr' => array('class' => 'control-label'),
-                    'attr'       => array('class' => 'form-control'),
-                    'required'   => false,
-                    'data'       => $value
-                ));
+                if (in_array($key, array('api_enabled', 'cat_in_page_url'))) {
+                    $builder->add($key, 'button_group', array(
+                        'choice_list' => new ChoiceList(
+                            array(false, true),
+                            array('mautic.core.form.no', 'mautic.core.form.yes')
+                        ),
+                        'label'       => 'mautic.config.' . $bundle . '.' . $key,
+                        'expanded'    => true,
+                        'multiple'    => false,
+                        'empty_value' => false,
+                        'required'    => false,
+                        'data'        => (bool) $value
+                    ));
+                } elseif ($key == 'api_mode') {
+                    $builder->add($key, 'choice', array(
+                        'choices'  => array(
+                            'oauth1' => 'mautic.api.config.oauth1',
+                            'oauth2' => 'mautic.api.config.oauth2'
+                        ),
+                        'label'    => 'mautic.config.' . $bundle . '.' . $key,
+                        'required' => false,
+                        'attr'     => array(
+                            'class' => 'form-control'
+                        ),
+                        'data'     => $value
+                    ));
+                } elseif ($key == 'default_timezone') {
+                    $builder->add($key, 'timezone', array(
+                        'label'    => 'mautic.config.' . $bundle . '.' . $key,
+                        'label_attr'  => array('class' => 'control-label'),
+                        'attr'        => array(
+                            'class'   => 'form-control'
+                        ),
+                        'multiple'    => false,
+                        'empty_value' => 'mautic.user.user.form.defaulttimezone',
+                        'data'        => $value
+                    ));
+                } else {
+                    $builder->add($key, 'text', array(
+                        'label'      => 'mautic.config.' . $bundle . '.' . $key,
+                        'label_attr' => array('class' => 'control-label'),
+                        'attr'       => array('class' => 'form-control'),
+                        'required'   => false,
+                        'data'       => $value
+                    ));
+                }
             }
         }
 

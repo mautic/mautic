@@ -37,7 +37,7 @@ class EmailType extends AbstractType
     public function __construct(MauticFactory $factory) {
         $this->translator   = $factory->getTranslator();
         $this->themes       = $factory->getInstalledThemes('email');
-        $this->defaultTheme = $factory->getParameter('default_theme');
+        $this->defaultTheme = $factory->getParameter('theme');
         $this->em           = $factory->getEntityManager();
     }
 
