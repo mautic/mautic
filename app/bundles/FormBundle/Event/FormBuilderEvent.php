@@ -14,15 +14,28 @@ use Symfony\Component\EventDispatcher\Event;
 
 /**
  * Class FormBuilderEvent
- *
- * @package Mautic\FormBundle\Event
  */
 class FormBuilderEvent extends Event
 {
+
+    /**
+     * @var array
+     */
     private $actions = array();
+
+    /**
+     * @var array
+     */
     private $fields  = array();
+
+    /**
+     * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
+     */
     private $translator;
 
+    /**
+     * @param \Symfony\Bundle\FrameworkBundle\Translation\Translator $translator
+     */
     public function __construct($translator)
     {
         $this->translator = $translator;
@@ -51,6 +64,9 @@ class FormBuilderEvent extends Event
      *                be used by other subscribers
      *          Mautic\FormBundle\Entity\Action $action
      *          Mautic\FormBundle\Entity\Form $form
+     *
+     * @return void
+     * @throws InvalidArgumentException
      */
     public function addSubmitAction($key, array $action)
     {
@@ -87,8 +103,8 @@ class FormBuilderEvent extends Event
     /**
      * Adds a form field to the list of available fields in the form builder.
      *
-     * @param string $key - unique identifier; it is recommended that it be namespaced i.e. leadbundle.myfield
-     * @param array $action - must contain the following keys
+     * @param string $key   - unique identifier; it is recommended that it be namespaced i.e. leadbundle.myfield
+     * @param array  $field - must contain the following keys
      *  'label'    => (required) what to display in the list
      *  'formType' => (required) name of the form type SERVICE for the field's property column
      *  'template' => (required) template to use for the field's HTML i.e AcmeMyBundle:FormField:thefield.html.php
@@ -102,6 +118,9 @@ class FormBuilderEvent extends Event
      *      addLabelAttributes = true|false
      *      addInputAttributes = true|false
      *      addIsRequired = true|false
+     *
+     * @return void
+     * @throws InvalidArgumentException
      */
 
     public function addFormField($key, array $field)
@@ -125,7 +144,12 @@ class FormBuilderEvent extends Event
     }
 
     /**
+     * @param array $keys
+     * @param array $methods
      * @param array $component
+     *
+     * @return void
+     * @throws InvalidArgumentException
      */
     private function verifyComponent(array $keys, array $methods, array $component)
     {

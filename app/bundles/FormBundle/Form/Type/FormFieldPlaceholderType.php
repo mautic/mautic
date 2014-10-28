@@ -14,17 +14,14 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 /**
  * Class FormFieldPlaceholderType
- *
- * @package Mautic\FormBundle\Form\Type
  */
 class FormFieldPlaceholderType extends AbstractType
 {
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
+     * {@inheritdoc}
      */
-    public function buildForm (FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('placeholder', 'text', array(
             'label'      => 'mautic.form.field.form.property_placeholder',
@@ -35,9 +32,10 @@ class FormFieldPlaceholderType extends AbstractType
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
-    public function getName() {
+    public function getName()
+    {
         return "formfield_placeholder";
     }
 }

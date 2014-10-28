@@ -132,10 +132,20 @@ class Form extends FormEntity
      */
     public $submissionCount;
 
-    public function __clone() {
+    /**
+     * @return void
+     */
+    public function __clone()
+    {
         $this->id = null;
     }
 
+    /**
+     * @param $prop
+     * @param $val
+     *
+     * @return void
+     */
     protected function isChanged($prop, $val)
     {
         $getter  = "get" . ucfirst($prop);
@@ -175,10 +185,12 @@ class Form extends FormEntity
     }
 
     /**
-     * @param Form $form
+     * @param \Symfony\Component\Form\Form $form
+     *
      * @return array
      */
-    static public function determineValidationGroups(\Symfony\Component\Form\Form $form) {
+    public static function determineValidationGroups(\Symfony\Component\Form\Form $form)
+    {
         $data   = $form->getData();
         $groups = array('form');
 
@@ -207,6 +219,7 @@ class Form extends FormEntity
      * Set name
      *
      * @param string $name
+     *
      * @return Form
      */
     public function setName($name)
@@ -231,6 +244,7 @@ class Form extends FormEntity
      * Set description
      *
      * @param string $description
+     *
      * @return Form
      */
     public function setDescription($description)
@@ -253,6 +267,7 @@ class Form extends FormEntity
                 return substr($this->description, 0, $length) . "...";
             }
         }
+
         return $this->description;
     }
 
@@ -260,6 +275,7 @@ class Form extends FormEntity
      * Set cachedHtml
      *
      * @param string $cachedHtml
+     *
      * @return Form
      */
     public function setCachedHtml($cachedHtml)
@@ -283,6 +299,7 @@ class Form extends FormEntity
      * Set postAction
      *
      * @param string $postAction
+     *
      * @return Form
      */
     public function setPostAction($postAction)
@@ -307,6 +324,7 @@ class Form extends FormEntity
      * Set postActionProperty
      *
      * @param string $postActionProperty
+     *
      * @return Form
      */
     public function setPostActionProperty($postActionProperty)
@@ -339,6 +357,7 @@ class Form extends FormEntity
      * Set publishUp
      *
      * @param \DateTime $publishUp
+     *
      * @return Form
      */
     public function setPublishUp($publishUp)
@@ -363,6 +382,7 @@ class Form extends FormEntity
      * Set publishDown
      *
      * @param \DateTime $publishDown
+     *
      * @return Form
      */
     public function setPublishDown($publishDown)
@@ -382,20 +402,22 @@ class Form extends FormEntity
     {
         return $this->publishDown;
     }
+
     /**
      * Constructor
      */
     public function __construct()
     {
-        $this->fields = new ArrayCollection();
+        $this->fields  = new ArrayCollection();
         $this->actions = new ArrayCollection();
     }
 
     /**
      * Add fields
      *
-     * @param $key
-     * @param \Mautic\FormBundle\Entity\Field $field
+     * @param       $key
+     * @param Field $field
+     *
      * @return Form
      */
     public function addField($key, Field $field)
@@ -411,9 +433,9 @@ class Form extends FormEntity
     /**
      * Remove fields
      *
-     * @param \Mautic\FormBundle\Entity\Field $fields
+     * @param Field $fields
      */
-    public function removeField(\Mautic\FormBundle\Entity\Field $fields)
+    public function removeField(Field $fields)
     {
         $this->fields->removeElement($fields);
     }
@@ -432,6 +454,7 @@ class Form extends FormEntity
      * Set alias
      *
      * @param string $alias
+     *
      * @return Form
      */
     public function setAlias($alias)
@@ -455,10 +478,11 @@ class Form extends FormEntity
     /**
      * Add submissions
      *
-     * @param \Mautic\FormBundle\Entity\Submission $submissions
+     * @param Submission $submissions
+     *
      * @return Form
      */
-    public function addSubmission(\Mautic\FormBundle\Entity\Submission $submissions)
+    public function addSubmission(Submission $submissions)
     {
         $this->submissions[] = $submissions;
 
@@ -468,9 +492,9 @@ class Form extends FormEntity
     /**
      * Remove submissions
      *
-     * @param \Mautic\FormBundle\Entity\Submission $submissions
+     * @param Submission $submissions
      */
-    public function removeSubmission(\Mautic\FormBundle\Entity\Submission $submissions)
+    public function removeSubmission(Submission $submissions)
     {
         $this->submissions->removeElement($submissions);
     }
@@ -488,8 +512,9 @@ class Form extends FormEntity
     /**
      * Add actions
      *
-     * @param $key
-     * @param \Mautic\FormBundle\Entity\Action $actions
+     * @param        $key
+     * @param Action $action
+     *
      * @return Form
      */
     public function addAction($key, Action $action)
@@ -505,9 +530,9 @@ class Form extends FormEntity
     /**
      * Remove actions
      *
-     * @param \Mautic\FormBundle\Entity\Action $actions
+     * @param Action $actions
      */
-    public function removeAction(\Mautic\FormBundle\Entity\Action $actions)
+    public function removeAction(Action $actions)
     {
         $this->actions->removeElement($actions);
     }
@@ -525,7 +550,7 @@ class Form extends FormEntity
     /**
      * @return mixed
      */
-    public function getCategory ()
+    public function getCategory()
     {
         return $this->category;
     }
@@ -533,7 +558,7 @@ class Form extends FormEntity
     /**
      * @param mixed $category
      */
-    public function setCategory ($category)
+    public function setCategory($category)
     {
         $this->category = $category;
     }

@@ -11,8 +11,6 @@ namespace Mautic\FormBundle\Helper;
 
 /**
  * Class PointActionHelper
- *
- * @package Mautic\FormBundle\Helper
  */
 class PointActionHelper
 {

@@ -62,15 +62,14 @@ class FormController extends CommonFormController
         $search = $this->request->get('search', $this->factory->getSession()->get('mautic.form.filter', ''));
         $this->factory->getSession()->set('mautic.form.filter', $search);
 
-        $filter      = array('string' => $search, 'force' => array());
+        $filter = array('string' => $search, 'force' => array());
 
         if (!$permissions['form:forms:viewother']) {
-            $filter['force'] =
-                array('column' => 'f.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser());
+            $filter['force'] = array('column' => 'f.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser());
         }
 
-        $orderBy     = $this->factory->getSession()->get('mautic.form.orderby', 'f.name');
-        $orderByDir  = $this->factory->getSession()->get('mautic.form.orderbydir', 'ASC');
+        $orderBy    = $this->factory->getSession()->get('mautic.form.orderby', 'f.name');
+        $orderByDir = $this->factory->getSession()->get('mautic.form.orderbydir', 'ASC');
 
         $forms = $this->factory->getModel('form.form')->getEntities(
             array(
@@ -79,18 +78,16 @@ class FormController extends CommonFormController
                 'filter'     => $filter,
                 'orderBy'    => $orderBy,
                 'orderByDir' => $orderByDir
-            ));
+            )
+        );
 
         $count = count($forms);
+
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page
-            if ($count === 1) {
-                $lastPage = 1;
-            } else {
-                $lastPage = (floor($limit / $count)) ? : 1;
-            }
+            $lastPage = ($count === 1) ? 1 : (floor($limit / $count)) ?: 1;
             $this->factory->getSession()->set('mautic.form.page', $lastPage);
-            $returnUrl   = $this->generateUrl('mautic_form_index', array('page' => $lastPage));
+            $returnUrl = $this->generateUrl('mautic_form_index', array('page' => $lastPage));
 
             return $this->postActionRedirect(array(
                 'returnUrl'       => $returnUrl,
@@ -133,7 +130,7 @@ class FormController extends CommonFormController
      *
      * @param int $objectId
      *
-     * @return JsonResponse|Response
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function viewAction($objectId)
     {
@@ -156,10 +153,10 @@ class FormController extends CommonFormController
                     'activeLink'    => '#mautic_form_index',
                     'mauticContent' => 'form'
                 ),
-                'flashes'         =>array(
+                'flashes'         => array(
                     array(
-                        'type' => 'error',
-                        'msg'  => 'mautic.form.error.notfound',
+                        'type'    => 'error',
+                        'msg'     => 'mautic.form.error.notfound',
                         'msgVars' => array('%id%' => $objectId)
                     )
                 )
@@ -218,7 +215,7 @@ class FormController extends CommonFormController
         }
 
         //set the page we came from
-        $page   = $this->factory->getSession()->get('mautic.form.page', 1);
+        $page = $this->factory->getSession()->get('mautic.form.page', 1);
 
         //set added/updated fields
         $formFields    = $session->get('mautic.formfields.add', array());
@@ -267,7 +264,7 @@ class FormController extends CommonFormController
                             'notice',
                             $this->get('translator')->trans('mautic.form.notice.created', array(
                                 '%name%' => $entity->getName(),
-                                '%url%'          => $this->generateUrl('mautic_form_action', array(
+                                '%url%'  => $this->generateUrl('mautic_form_action', array(
                                     'objectAction' => 'edit',
                                     'objectId'     => $entity->getId()
                                 ))
@@ -279,8 +276,8 @@ class FormController extends CommonFormController
                                 'objectAction' => 'view',
                                 'objectId'     => $entity->getId()
                             );
-                            $returnUrl      = $this->generateUrl('mautic_form_action', $viewParameters);
-                            $template       = 'MauticFormBundle:Form:view';
+                            $returnUrl = $this->generateUrl('mautic_form_action', $viewParameters);
+                            $template  = 'MauticFormBundle:Form:view';
                         } else {
                             //return edit view so that all the session stuff is loaded
                             return $this->editAction($entity->getId(), true);
@@ -345,19 +342,23 @@ class FormController extends CommonFormController
     /**
      * Generates edit form and processes post data
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @param int  $objectId
+     * @param bool $ignorePost
+     *
+     * @return JsonResponse|Response
      */
-    public function editAction ($objectId, $ignorePost = false)
+    public function editAction($objectId, $ignorePost = false)
     {
         $model      = $this->factory->getModel('form.form');
         $entity     = $model->getEntity($objectId);
         $session    = $this->factory->getSession();
         $cleanSlate = true;
+
         //set the page we came from
-        $page    = $this->factory->getSession()->get('mautic.form.page', 1);
+        $page = $this->factory->getSession()->get('mautic.form.page', 1);
 
         //set the return URL
-        $returnUrl  = $this->generateUrl('mautic_form_index', array('page' => $page));
+        $returnUrl = $this->generateUrl('mautic_form_index', array('page' => $page));
 
         $postActionVars = array(
             'returnUrl'       => $returnUrl,
@@ -368,6 +369,7 @@ class FormController extends CommonFormController
                 'mauticContent' => 'form'
             )
         );
+
         //form not found
         if ($entity === null) {
             return $this->postActionRedirect(
@@ -397,7 +399,6 @@ class FormController extends CommonFormController
         if (!$ignorePost && $this->request->getMethod() == 'POST') {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
-
                 //set added/updated fields
                 $formFields     = $session->get('mautic.formfields.add', array());
                 $deletedFields  = $session->get('mautic.formfields.remove', array());
@@ -450,8 +451,8 @@ class FormController extends CommonFormController
                                 'objectAction' => 'view',
                                 'objectId'     => $entity->getId()
                             );
-                            $returnUrl      = $this->generateUrl('mautic_form_action', $viewParameters);
-                            $template       = 'MauticFormBundle:Form:view';
+                            $returnUrl = $this->generateUrl('mautic_form_action', $viewParameters);
+                            $template  = 'MauticFormBundle:Form:view';
                         }
                     }
                 }
@@ -559,13 +560,14 @@ class FormController extends CommonFormController
     /**
      * Clone an entity
      *
-     * @param $objectId
+     * @param int $objectId
+     *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function cloneAction ($objectId)
+    public function cloneAction($objectId)
     {
-        $model   = $this->factory->getModel('form.form');
-        $entity  = $model->getEntity($objectId);
+        $model  = $this->factory->getModel('form.form');
+        $entity = $model->getEntity($objectId);
 
         if ($entity != null) {
             if (!$this->factory->getSecurity()->isGranted('form:forms:create') ||
@@ -588,12 +590,14 @@ class FormController extends CommonFormController
     /**
      * Gives a preview of the form
      *
-     * @param $objectId
+     * @param int $objectId
+     *
+     * @return Response
      */
-    public function previewAction ($objectId)
+    public function previewAction($objectId)
     {
-        $model   = $this->factory->getModel('form.form');
-        $form    = $model->getEntity($objectId);
+        $model = $this->factory->getModel('form.form');
+        $form  = $model->getEntity($objectId);
 
         if ($form === null) {
             $html =
@@ -618,8 +622,9 @@ class FormController extends CommonFormController
     /**
      * Deletes the entity
      *
-     * @param         $objectId
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @param int $objectId
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function deleteAction($objectId) {
         $page        = $this->factory->getSession()->get('mautic.form.page', 1);

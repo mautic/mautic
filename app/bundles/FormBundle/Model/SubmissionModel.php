@@ -21,8 +21,6 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * Class SubmissionModel
- * {@inheritdoc}
- * @package Mautic\CoreBundle\Model\FormModel
  */
 class SubmissionModel extends CommonFormModel
 {
@@ -30,9 +28,9 @@ class SubmissionModel extends CommonFormModel
     /**
      * {@inheritdoc}
      *
-     * @return string
+     * @return \Mautic\FormBundle\Entity\SubmissionRepository
      */
-    public function getRepository ()
+    public function getRepository()
     {
         return $this->em->getRepository('MauticFormBundle:Submission');
     }
@@ -44,7 +42,7 @@ class SubmissionModel extends CommonFormModel
      *
      * @return boolean|string false if no error was encountered; otherwise the error message
      */
-    public function saveSubmission (&$post, &$server, &$form)
+    public function saveSubmission(&$post, &$server, &$form)
     {
         $fieldHelper = new FormFieldHelper($this->translator);
 
@@ -168,8 +166,9 @@ class SubmissionModel extends CommonFormModel
         //set the landing page the form was submitted from if applicable
         if (!empty($post['mauticpage'])) {
             $page = $this->factory->getModel('page.page')->getEntity((int)$post['mauticpage']);
-            if ($page != null)
+            if ($page != null) {
                 $submission->setPage($page);
+            }
         }
 
         $this->saveEntity($submission);
@@ -205,7 +204,6 @@ class SubmissionModel extends CommonFormModel
             $args['action'] = $action;
             $callback       = $settings['callback'];
             if (is_callable($callback)) {
-
                 if (is_array($callback)) {
                     $reflection = new \ReflectionMethod($callback[0], $callback[1]);
                 } elseif (strpos($callback, '::') !== false) {
@@ -241,10 +239,6 @@ class SubmissionModel extends CommonFormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @param array $args
-     *
-     * @return mixed|void
      */
     public function getEntities (array $args = array())
     {
@@ -255,15 +249,14 @@ class SubmissionModel extends CommonFormModel
     }
 
     /**
-     * Export results
-     *
      * @param $format
      * @param $form
      * @param $queryArgs
      *
-     * @return StreamedResponse
+     * @return StreamedResponse|Response
+     * @throws \Exception
      */
-    public function exportResults ($format, $form, $queryArgs)
+    public function exportResults($format, $form, $queryArgs)
     {
         $results    = $this->getEntities($queryArgs);
         $translator = $this->translator;
@@ -328,7 +321,6 @@ class SubmissionModel extends CommonFormModel
                 $response->headers->set('Pragma', 'public');
 
                 return $response;
-                break;
             case 'html':
                 $content = $this->factory->getTemplating()->renderResponse(
                     'MauticFormBundle:Result:export.html.php',
@@ -340,7 +332,6 @@ class SubmissionModel extends CommonFormModel
                 )->getContent();
 
                 return new Response($content);
-                break;
             case 'pdf':
                 $factory  = $this->factory;
                 $response = new StreamedResponse(function () use ($results, $form, $translator, $name, $factory) {
@@ -363,7 +354,6 @@ class SubmissionModel extends CommonFormModel
                 $response->headers->set('Pragma', 'public');
 
                 return $response;
-                break;
             case 'xlsx':
                 if (class_exists('PHPExcel')) {
                     $response = new StreamedResponse(function () use ($results, $form, $translator, $name) {
@@ -430,10 +420,8 @@ class SubmissionModel extends CommonFormModel
                     $response->headers->set('Pragma', 'public');
 
                     return $response;
-                } else {
-                    throw new \Exception('PHPExcel is required to export to Excel spreadsheets');
                 }
-                break;
+                throw new \Exception('PHPExcel is required to export to Excel spreadsheets');
         }
     }
 }

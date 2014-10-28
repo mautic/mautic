@@ -14,8 +14,6 @@ use Mautic\FormBundle\Entity\Field;
 
 /**
  * Class FieldModel
- * {@inheritdoc}
- * @package Mautic\CoreBundle\Model\FormModel
  */
 class FieldModel extends CommonFormModel
 {
@@ -23,7 +21,7 @@ class FieldModel extends CommonFormModel
     /**
      * {@inheritdoc}
      *
-     * @return string
+     * @return \Mautic\FormBundle\Entity\FieldRepository
      */
     public function getRepository()
     {
@@ -32,8 +30,6 @@ class FieldModel extends CommonFormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
     public function getPermissionBase()
     {
@@ -41,10 +37,7 @@ class FieldModel extends CommonFormModel
     }
 
     /**
-     * Get a specific entity or generate a new one if id is empty
-     *
-     * @param $id
-     * @return null|object
+     * {@inheritdoc}
      */
     public function getEntity($id = null)
     {
@@ -52,9 +45,7 @@ class FieldModel extends CommonFormModel
             return new Field();
         }
 
-        $entity = parent::getEntity($id);
-
-        return $entity;
+        return parent::getEntity($id);
     }
 
     /**
@@ -67,7 +58,6 @@ class FieldModel extends CommonFormModel
         $session = $this->factory->getSession();
         $fields = $session->get('mautic.formfields.add', array());
         $remove = $session->get('mautic.formfields.remove', array());
-        $fields = array_diff_key($fields, array_flip($remove));
-        return $fields;
+        return array_diff_key($fields, array_flip($remove));
     }
 }

@@ -143,8 +143,17 @@ class Field
      */
     private $inputAttributes;
 
+    /**
+     * @var array
+     */
     private $changes;
 
+    /**
+     * @param $prop
+     * @param $val
+     *
+     * @return void
+     */
     private function isChanged($prop, $val)
     {
         if ($this->$prop != $val) {
@@ -152,6 +161,9 @@ class Field
         }
     }
 
+    /**
+     * @return array
+     */
     public function getChanges()
     {
         return $this->changes;
@@ -171,7 +183,8 @@ class Field
      * Set label
      *
      * @param string $label
-     * @return FormField
+     *
+     * @return Field
      */
     public function setLabel($label)
     {
@@ -195,7 +208,8 @@ class Field
      * Set alias
      *
      * @param string $alias
-     * @return FormField
+     *
+     * @return Field
      */
     public function setAlias($alias)
     {
@@ -219,7 +233,8 @@ class Field
      * Set type
      *
      * @param string $type
-     * @return FormField
+     *
+     * @return Field
      */
     public function setType($type)
     {
@@ -243,7 +258,8 @@ class Field
      * Set defaultValue
      *
      * @param string $defaultValue
-     * @return FormField
+     *
+     * @return Field
      */
     public function setDefaultValue($defaultValue)
     {
@@ -267,7 +283,8 @@ class Field
      * Set isRequired
      *
      * @param boolean $isRequired
-     * @return FormField
+     *
+     * @return Field
      */
     public function setIsRequired($isRequired)
     {
@@ -289,6 +306,7 @@ class Field
 
     /**
      * Proxy function to getIsRequired
+     *
      * @return bool
      */
     public function isRequired()
@@ -300,7 +318,8 @@ class Field
      * Set order
      *
      * @param integer $order
-     * @return FormField
+     *
+     * @return Field
      */
     public function setOrder($order)
     {
@@ -324,7 +343,8 @@ class Field
      * Set properties
      *
      * @param array $properties
-     * @return FormField
+     *
+     * @return Field
      */
     public function setProperties($properties)
     {
@@ -348,6 +368,7 @@ class Field
      * Set validationMessage
      *
      * @param string $validationMessage
+     *
      * @return Field
      */
     public function setValidationMessage($validationMessage)
@@ -371,10 +392,11 @@ class Field
     /**
      * Set form
      *
-     * @param \Mautic\FormBundle\Entity\Form $form
+     * @param Form $form
+     *
      * @return Field
      */
-    public function setForm(\Mautic\FormBundle\Entity\Form $form)
+    public function setForm(Form $form)
     {
         $this->form = $form;
 
@@ -384,7 +406,7 @@ class Field
     /**
      * Get form
      *
-     * @return \Mautic\FormBundle\Entity\Form
+     * @return Form
      */
     public function getForm()
     {
@@ -395,6 +417,7 @@ class Field
      * Set labelAttributes
      *
      * @param string $labelAttributes
+     *
      * @return Field
      */
     public function setLabelAttributes($labelAttributes)
@@ -419,6 +442,7 @@ class Field
      * Set inputAttributes
      *
      * @param string $inputAttributes
+     *
      * @return Field
      */
     public function setInputAttributes($inputAttributes)
@@ -451,6 +475,7 @@ class Field
      * Set showLabel
      *
      * @param boolean $showLabel
+     *
      * @return Field
      */
     public function setShowLabel($showLabel)
@@ -485,6 +510,7 @@ class Field
      * Set helpMessage
      *
      * @param string $helpMessage
+     *
      * @return Field
      */
     public function setHelpMessage($helpMessage)
@@ -509,6 +535,7 @@ class Field
      * Set isCustom
      *
      * @param boolean $isCustom
+     *
      * @return Field
      */
     public function setIsCustom($isCustom)
@@ -542,6 +569,7 @@ class Field
      * Set customParameters
      *
      * @param array $customParameters
+     *
      * @return Field
      */
     public function setCustomParameters($customParameters)

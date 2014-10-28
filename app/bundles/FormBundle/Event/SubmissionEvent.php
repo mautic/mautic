@@ -14,13 +14,23 @@ use Symfony\Component\EventDispatcher\Event;
 
 /**
  * Class SubmissionEvent
- *
- * @package Mautic\FormBundle\Event
  */
 class SubmissionEvent extends Event
 {
+
+    /**
+     * @var Submission
+     */
     private $entity;
+
+    /**
+     * @var array
+     */
     private $post;
+
+    /**
+     * @var array
+     */
     private $server;
 
     /**

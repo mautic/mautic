@@ -20,10 +20,7 @@ class FormRepository extends CommonRepository
 {
 
     /**
-     * Get a list of entities
-     *
-     * @param array      $args
-     * @return Paginator
+     * {@inheritdoc}
      */
     public function getEntities($args = array())
     {
@@ -39,8 +36,7 @@ class FormRepository extends CommonRepository
         $this->buildClauses($q, $args);
 
         $query = $q->getQuery();
-        $results = new Paginator($query);
-        return $results;
+        return new Paginator($query);
     }
 
     /**
@@ -48,6 +44,8 @@ class FormRepository extends CommonRepository
      * @param int    $limit
      * @param int    $start
      * @param bool   $viewOther
+     *
+     * @return array
      */
     public function getFormList($search = '', $limit = 10, $start = 0, $viewOther = false)
     {
@@ -71,14 +69,11 @@ class FormRepository extends CommonRepository
                 ->setMaxResults($limit);
         }
 
-        $results = $q->getQuery()->getArrayResult();
-        return $results;
+        return $q->getQuery()->getArrayResult();
     }
 
     /**
-     * @param QueryBuilder $q
-     * @param              $filter
-     * @return array
+     * {@inheritdoc}
      */
     protected function addCatchAllWhereClause(&$q, $filter)
     {
@@ -101,9 +96,7 @@ class FormRepository extends CommonRepository
     }
 
     /**
-     * @param QueryBuilder $q
-     * @param              $filter
-     * @return array
+     * {@inheritdoc}
      */
     protected function addSearchCommandWhereClause(&$q, $filter)
     {
@@ -188,7 +181,7 @@ class FormRepository extends CommonRepository
     }
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
     public function getSearchCommands()
     {
@@ -211,7 +204,7 @@ class FormRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     protected function getDefaultOrder()
     {
@@ -221,7 +214,7 @@ class FormRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getTableAlias()
     {

@@ -16,17 +16,14 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * Class FormFieldSelectType
- *
- * @package Mautic\FormBundle\Form\Type
  */
 class FormFieldSelectType extends AbstractType
 {
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
+     * {@inheritdoc}
      */
-    public function buildForm (FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if ($options['field_type'] == 'select') {
             $builder->add('list', 'sortablelist', array());
@@ -59,7 +56,7 @@ class FormFieldSelectType extends AbstractType
     }
 
     /**
-     * @param OptionsResolverInterface $resolver
+     * {@inheritdoc}
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
@@ -70,9 +67,10 @@ class FormFieldSelectType extends AbstractType
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
-    public function getName() {
+    public function getName()
+    {
         return "formfield_select";
     }
 }

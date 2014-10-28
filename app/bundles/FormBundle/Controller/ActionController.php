@@ -11,19 +11,20 @@ namespace Mautic\FormBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\FormBundle\Entity\Action;
-use Mautic\FormBundle\Helper\FormFieldHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * Class ActionController
+ */
 class ActionController extends CommonFormController
 {
 
     /**
      * Generates new form and processes post data
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse
      */
-    public function newAction ()
+    public function newAction()
     {
         $success = 0;
         $valid   = $cancelled = false;
@@ -82,14 +83,13 @@ class ActionController extends CommonFormController
         }
 
         $viewParams = array('type' => $actionType);
+
         if ($cancelled || $valid) {
             $closeModal = true;
         } else {
-            $closeModal         = false;
-            $viewParams['tmpl'] = 'action';
-            $formView           = $form->createView();
-            $this->get('templating')->getEngine('MauticFormBundle:Form:index.html.php')->get('form')
-                ->setTheme($formView, 'MauticFormBundle:FormComponent');
+            $closeModal                 = false;
+            $viewParams['tmpl']         = 'action';
+            $formView                   = $this->setFormTheme($form, 'MauticFormBundle:Form:index.html.php', 'MauticFormBundle:FormComponent');
             $viewParams['form']         = $formView;
             $header                     = $formAction['settings']['label'];
             $viewParams['actionHeader'] = $this->get('translator')->trans($header);
@@ -124,21 +124,23 @@ class ActionController extends CommonFormController
             $response->headers->set('Content-Length', strlen($response->getContent()));
 
             return $response;
-        } else {
-            return $this->ajaxAction(array(
-                'contentTemplate' => 'MauticFormBundle:Builder:' . $viewParams['tmpl'] . '.html.php',
-                'viewParameters'  => $viewParams,
-                'passthroughVars' => $passthroughVars
-            ));
         }
+
+        return $this->ajaxAction(array(
+            'contentTemplate' => 'MauticFormBundle:Builder:' . $viewParams['tmpl'] . '.html.php',
+            'viewParameters'  => $viewParams,
+            'passthroughVars' => $passthroughVars
+        ));
     }
 
     /**
      * Generates edit form and processes post data
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @param int $objectId
+     *
+     * @return JsonResponse
      */
-    public function editAction ($objectId)
+    public function editAction($objectId)
     {
         $session    = $this->factory->getSession();
         $method     = $this->request->getMethod();
@@ -211,11 +213,9 @@ class ActionController extends CommonFormController
             if ($cancelled || $valid) {
                 $closeModal = true;
             } else {
-                $closeModal         = false;
-                $viewParams['tmpl'] = 'action';
-                $formView           = $form->createView();
-                $this->get('templating')->getEngine('MauticFormBundle:Form:index.html.php')->get('form')
-                    ->setTheme($formView, 'MauticFormBundle:FormComponent');
+                $closeModal                 = false;
+                $viewParams['tmpl']         = 'action';
+                $formView                   = $this->setFormTheme($form, 'MauticFormBundle:Form:index.html.php', 'MauticFormBundle:FormComponent');
                 $viewParams['form']         = $formView;
                 $viewParams['actionHeader'] = $this->get('translator')->trans($formAction['settings']['label']);
             }
@@ -249,29 +249,29 @@ class ActionController extends CommonFormController
                 $response->headers->set('Content-Length', strlen($response->getContent()));
 
                 return $response;
-            } else {
-                return $this->ajaxAction(array(
-                    'contentTemplate' => 'MauticFormBundle:Builder:' . $viewParams['tmpl'] . '.html.php',
-                    'viewParameters'  => $viewParams,
-                    'passthroughVars' => $passthroughVars
-                ));
             }
-        } else {
-            $response = new JsonResponse(array('success' => 0));
-            $response->headers->set('Content-Length', strlen($response->getContent()));
 
-            return $response;
+            return $this->ajaxAction(array(
+                'contentTemplate' => 'MauticFormBundle:Builder:' . $viewParams['tmpl'] . '.html.php',
+                'viewParameters'  => $viewParams,
+                'passthroughVars' => $passthroughVars
+            ));
         }
+
+        $response = new JsonResponse(array('success' => 0));
+        $response->headers->set('Content-Length', strlen($response->getContent()));
+
+        return $response;
     }
 
     /**
      * Deletes the entity
      *
-     * @param         $objectId
+     * @param $objectId
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return JsonResponse
      */
-    public function deleteAction ($objectId)
+    public function deleteAction($objectId)
     {
         $session = $this->factory->getSession();
         $actions = $session->get('mautic.formactions.add', array());
@@ -338,11 +338,11 @@ class ActionController extends CommonFormController
     /**
      * Undeletes the entity
      *
-     * @param         $objectId
+     * @param $objectId
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return JsonResponse
      */
-    public function undeleteAction ($objectId)
+    public function undeleteAction($objectId)
     {
         $session = $this->factory->getSession();
         $actions = $session->get('mautic.formactions.add', array());
@@ -358,7 +358,6 @@ class ActionController extends CommonFormController
         $formAction = (array_key_exists($objectId, $actions)) ? $actions[$objectId] : null;
 
         if ($this->request->getMethod() == 'POST' && $formAction !== null) {
-
             //add the field to the delete list
             if (in_array($objectId, $delete)) {
                 $key = array_search($objectId, $delete);

@@ -13,14 +13,19 @@ use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpFoundation\Response;
 
-
+/**
+ * Class PublicController
+ */
 class PublicController extends CommonFormController
 {
+    /**
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
+     */
     public function submitAction()
     {
-        $post    = $this->request->request->get('mauticform');
-        $server  = $this->request->server->all();
-        $return  = (isset($post['return'])) ? $post['return'] : false;
+        $post   = $this->request->request->get('mauticform');
+        $server = $this->request->server->all();
+        $return = (isset($post['return'])) ? $post['return'] : false;
         if (empty($return)) {
             //try to get it from the HTTP_REFERER
             $return = (isset($server['HTTP_REFERER'])) ? $server['HTTP_REFERER'] : false;
@@ -128,11 +133,12 @@ class PublicController extends CommonFormController
         ));
     }
 
-
     /**
      * Generates JS file for automatic form generation
+     *
+     * @return Response
      */
-    public function generateAction ()
+    public function generateAction()
     {
         $formId = InputHelper::int($this->request->get('id'));
         $model  = $this->factory->getModel('form.form');
@@ -152,5 +158,4 @@ class PublicController extends CommonFormController
         $response->headers->set('Content-Type', 'text/javascript');
         return $response;
     }
-
 }
