@@ -63,13 +63,13 @@ class AuditLogRepository extends CommonRepository
 
         	foreach ($log['details'] as &$detail) {
         		if (isset($detail[1])){
-                    $this->booleanToText($detail[1]);
+                    $this->variableToText($detail[1]);
                 } else {
                     $detail[1] = '';
                 }
 
                 if (isset($detail[0])){
-                    $this->booleanToText($detail[0]);
+                    $this->variableToText($detail[0]);
                 } else {
                     $detail[0] = '';
                 }
@@ -80,19 +80,26 @@ class AuditLogRepository extends CommonRepository
     }
 
     /**
-     * If variable is boolean, it returns human alternative.
+     * If variable is boolean/array, it returns human alternative.
      *
      * @param mixed $object
      *
      * @return mixed
      */
-    public function booleanToText(&$variable)
+    public function variableToText(&$variable)
     {
         if ($variable === true) {
             $variable = 'mautic.core.form.yes';
         }
         if ($variable === false) {
             $variable = 'mautic.core.form.no';
+        }
+        if (is_array($variable)) {
+            $tmp = array();
+            foreach ($variable as $key => $var) {
+                $tmp[] = $key . ': ' . $var;
+            }
+            $variable = implode(', ', $tmp);
         }
     }
 }
