@@ -23,7 +23,7 @@ $header = ($email->getId()) ?
 
 $view['slots']->set("headerTitle", $header.$subheader);
 ?>
-
+<?php echo $view['form']->start($form); ?>
 <div class="row">
     <div class="col-md-8">
         <div class="panel panel-default">
@@ -39,7 +39,7 @@ $view['slots']->set("headerTitle", $header.$subheader);
         </div>
     </div>
     <div class="col-md-4">
-        <?php echo $view['form']->form($form); ?>
+        <?php echo $view['form']->end($form); ?>
 
             <div class="hide email-builder">
                 <div class="email-builder-content">
