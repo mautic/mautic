@@ -12,7 +12,7 @@ $item = $event['extra']['page'];
 ?>
 
 <li class="wrapper page-hit">
-	<div class="figure"><span class="icon fa fa-file-text-o"></span></div>
+	<div class="figure"><span class="fa <?php echo isset($icons['page']) ? $icons['page'] : '' ?>"></span></div>
 	<div class="panel">
 	    <div class="panel-body">
 	    	<h3>

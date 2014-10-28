@@ -11,8 +11,8 @@ $item = $event['extra']['log'];
 
 ?>
 
-<li class="wrapper campain-event">
-	<div class="figure"><span class="icon fa fa-clock-o"></span></div>
+<li class="wrapper campaign-event">
+	<div class="figure"><span class="fa <?php echo isset($icons['campaigns']) ? $icons['campaigns'] : '' ?>"></span></div>
 	<div class="panel">
 	    <div class="panel-body">
 	    	<h3>

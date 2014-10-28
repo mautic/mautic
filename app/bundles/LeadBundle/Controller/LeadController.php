@@ -16,6 +16,8 @@ use Mautic\CoreBundle\Controller\FormController;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\SocialBundle\Helper\NetworkIntegrationHelper;
+use Mautic\CoreBundle\Event\IconEvent;
+use Mautic\CoreBundle\CoreEvents;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class LeadController extends FormController
@@ -272,6 +274,10 @@ class LeadController extends FormController
         $socialProfiles    = NetworkIntegrationHelper::getUserProfiles($this->factory, $lead, $fields);
         $socialProfileUrls = NetworkIntegrationHelper::getSocialProfileUrlRegex(false);
 
+        $event = new IconEvent($this->factory->getSecurity());
+        $this->factory->getDispatcher()->dispatch(CoreEvents::FETCH_ICONS, $event);
+        $icons = $event->getIcons();
+
         return $this->delegateView(array(
             'viewParameters'  => array(
                 'lead'              => $lead,
@@ -284,6 +290,7 @@ class LeadController extends FormController
                 'eventTypes'        => $eventTypes,
                 'eventFilter'       => $eventFilter,
                 'upcomingEvents'    => $upcomingEvents,
+                'icons'             => $icons,
                 'noteCount'         => $this->factory->getModel('lead.note')->getNoteCount($lead)
             ),
             'contentTemplate' => 'MauticLeadBundle:Lead:lead.html.php',

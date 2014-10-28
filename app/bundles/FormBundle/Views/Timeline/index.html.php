@@ -13,7 +13,7 @@ $page = $event['extra']['page'];
 ?>
 
 <li class="wrapper form-submitted">
-	<div class="figure"><span class="icon fa fa-pencil-square-o"></span></div>
+	<div class="figure"><span class="fa <?php echo isset($icons['form']) ? $icons['form'] : '' ?>"></span></div>
 	<div class="panel">
 	    <div class="panel-body">
 	    	<h3>

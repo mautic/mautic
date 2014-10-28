@@ -12,7 +12,7 @@ $item = $event['extra']['stats'];
 ?>
 
 <li class="wrapper email-read">
-	<div class="figure"><span class="icon fa fa-send"></span></div>
+	<div class="figure"><span class="fa <?php echo isset($icons['email']) ? $icons['email'] : '' ?>"></span></div>
 	<div class="panel">
 	    <div class="panel-body">
 	    	<h3>
