@@ -17,17 +17,19 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Class FormController
+ */
 class FormController extends CommonFormController
 {
 
     /**
-     * @param int    $page
-     * @param string $view
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @param int $page
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function indexAction($page = 1)
     {
-
         //set some permissions
         $permissions = $this->factory->getSecurity()->isGranted(array(
             'form:forms:viewown',
@@ -129,14 +131,18 @@ class FormController extends CommonFormController
     /**
      * Loads a specific form into the detailed panel
      *
-     * @param $objectId
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @param int $objectId
+     *
+     * @return JsonResponse|Response
      */
     public function viewAction($objectId)
     {
-        $activeForm  = $this->factory->getModel('form.form')->getEntity($objectId);
+        /** @var \Mautic\FormBundle\Model\FormModel $model */
+        $model      = $this->factory->getModel('form');
+        $activeForm = $model->getEntity($objectId);
+
         //set the page we came from
-        $page        = $this->factory->getSession()->get('mautic.form.page', 1);
+        $page = $this->factory->getSession()->get('mautic.form.page', 1);
 
         if ($activeForm === null) {
             //set the return URL
@@ -189,22 +195,21 @@ class FormController extends CommonFormController
                 'activeLink'    => '#mautic_form_index',
                 'mauticContent' => 'form',
                 'route'         => $this->generateUrl('mautic_form_action', array(
-                        'objectAction' => 'view',
-                        'objectId'     => $activeForm->getId())
+                    'objectAction' => 'view',
+                    'objectId'     => $activeForm->getId())
                 )
             )
         ));
-        return $this->indexAction($page, 'view', $activeForm);
     }
 
     /**
      * Generates new form and processes post data
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
      */
-    public function newAction ()
+    public function newAction()
     {
-        $model   = $this->factory->getModel('form.form');
+        $model   = $this->factory->getModel('form');
         $entity  = $model->getEntity();
         $session = $this->factory->getSession();
 
