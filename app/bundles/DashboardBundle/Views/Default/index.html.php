@@ -19,11 +19,20 @@ $view['slots']->set('mauticContent', 'dashboard');
     			        <div class="panel mb-0">
                             <div class="text-center doughnut-wrapper">
                                 <canvas id="open-rate" width="110" height="110" data-sent-count="<?php echo $sentReadCount['sentCount'] ?>" data-read-count="<?php echo $sentReadCount['readCount'] ?>"></canvas>
-        			            <div class="doughnut-inner-text doughnut-open-rate">Open Rate<br><?php echo $openRate ?>%</div>
+        			            <div class="doughnut-inner-text doughnut-open-rate">
+                                <?php echo $view['translator']->trans('mautic.dashboard.label.open.rate'); ?>
+                                <br><?php echo $openRate ?>%
+                                </div>
     			            </div>
                             <ul class="list-group">
-    			                <li class="list-group-item">New Visitors <span class="badge pull-right"><?php echo $newReturningVisitors['new']; ?></span></li>
-    			                <li class="list-group-item">Returning Visitors <span class="badge pull-right"><?php echo $newReturningVisitors['returning']; ?></span></li>
+    			                <li class="list-group-item">
+                                    <?php echo $view['translator']->trans('mautic.dashboard.label.new.visitors'); ?>
+                                    <span class="badge pull-right"><?php echo $newReturningVisitors['new']; ?></span>
+                                </li>
+    			                <li class="list-group-item">
+                                    <?php echo $view['translator']->trans('mautic.dashboard.label.returning.visitors'); ?> 
+                                    <span class="badge pull-right"><?php echo $newReturningVisitors['returning']; ?></span>
+                                </li>
     			            </ul>
     			        </div>
     			    </div>
@@ -31,11 +40,20 @@ $view['slots']->set('mauticContent', 'dashboard');
     			        <div class="panel mb-0">
     			            <div class="text-center doughnut-wrapper">
                                 <canvas id="click-rate" width="110" height="110" data-read-count="<?php echo $sentReadCount['readCount'] ?>" data-click-count="<?php echo $sentReadCount['clickCount'] ?>"></canvas>
-                                <div class="doughnut-inner-text doughnut-click-rate">Click Rate<br><?php echo $clickRate ?>%</div>
+                                <div class="doughnut-inner-text doughnut-click-rate">
+                                    <?php echo $view['translator']->trans('mautic.dashboard.label.click.rate'); ?>
+                                    <br><?php echo $clickRate ?>%
+                                </div>
                             </div>
     			            <ul class="list-group">
-                                <li class="list-group-item">Email Delivered <span class="badge pull-right"><?php echo $allSentEmails; ?></span></li>
-                                <li class="list-group-item">Total Click <span class="badge pull-right"><?php echo $sentReadCount['clickCount'] ?></span></li>
+                                <li class="list-group-item">
+                                    <?php echo $view['translator']->trans('mautic.dashboard.label.email.delivered'); ?>
+                                    <span class="badge pull-right"><?php echo $allSentEmails; ?></span>
+                                </li>
+                                <li class="list-group-item">
+                                    <?php echo $view['translator']->trans('mautic.dashboard.label.total.click'); ?>
+                                    <span class="badge pull-right"><?php echo $sentReadCount['clickCount'] ?></span>
+                                </li>
     			            </ul>
     			        </div>
     			    </div>
@@ -43,8 +61,14 @@ $view['slots']->set('mauticContent', 'dashboard');
     			        <div class="panel mb-0">
                             <div class="text-center pa-20 jumbo-font h150" id="active-visitors">0</div>
                             <ul class="list-group">
-                                <li class="list-group-item">Most Visits this Week<span class="badge pull-right"><?php echo $weekVisitors; ?></span></li>
-                                <li class="list-group-item">Most Visits all Time <span class="badge pull-right"><?php echo $allTimeVisitors; ?></span></li>
+                                <li class="list-group-item">
+                                    <?php echo $view['translator']->trans('mautic.dashboard.label.visits.this.week'); ?>
+                                    <span class="badge pull-right"><?php echo $weekVisitors; ?></span>
+                                </li>
+                                <li class="list-group-item">
+                                    <?php echo $view['translator']->trans('mautic.dashboard.label.visits.all.time'); ?>
+                                    <span class="badge pull-right"><?php echo $allTimeVisitors; ?></span>
+                                </li>
                             </ul>
     			        </div>
     			    </div>
@@ -59,8 +83,16 @@ $view['slots']->set('mauticContent', 'dashboard');
                 <div id="dashboard-map-data" class="hide"><?php echo json_encode($mapData); ?></div>
     		</div>
     		<ul class="nav nav-tabs pr-md pl-md">
-    	        <li class="active"><a href="#email-stats-container" role="tab" data-toggle="tab">Stats</a></li>
-    	        <li class=""><a href="#page-stats-container" role="tab" data-toggle="tab">Inbox</a></li>
+    	        <li class="active">
+                    <a href="#email-stats-container" role="tab" data-toggle="tab">
+                        <?php echo $view['translator']->trans('mautic.dashboard.label.stats'); ?>
+                    </a>
+                </li>
+    	        <li class="">
+                    <a href="#page-stats-container" role="tab" data-toggle="tab">
+                        <?php echo $view['translator']->trans('mautic.dashboard.label.inbox'); ?>
+                    </a>
+                </li>
     	    </ul>
     	</div>
         <div class="tab-content pa-md">
@@ -71,15 +103,17 @@ $view['slots']->set('mauticContent', 'dashboard');
                             <?php if ($popularPages) : ?>
                             <div class="panel panel-default bdr-t-wdh-0">
                                 <div class="panel-heading">
-                                    <h3 class="panel-title">Most Popular Pages</h3>
+                                    <h3 class="panel-title">
+                                        <?php echo $view['translator']->trans('mautic.dashboard.label.most.popular.pages'); ?>
+                                    </h3>
                                 </div>
                                 <div class="table-responsive scrollable body-white padding-sm page-list">    
                                     <table class="table table-hover table-striped table-bordered point-list">
                                         <thead>
                                             <tr>
-                                                <th>Title</th>
-                                                <th>Lang</th>
-                                                <th>Hits</th>
+                                                <th><?php echo $view['translator']->trans('mautic.dashboard.label.title'); ?></th>
+                                                <th><?php echo $view['translator']->trans('mautic.dashboard.label.lang'); ?></th>
+                                                <th><?php echo $view['translator']->trans('mautic.dashboard.label.hits'); ?></th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -108,14 +142,16 @@ $view['slots']->set('mauticContent', 'dashboard');
                             <?php if ($popularAssets) : ?>
                             <div class="panel panel-default bdr-t-wdh-0">
                                 <div class="panel-heading">
-                                    <h3 class="panel-title">Most Popular Assets</h3>
+                                    <h3 class="panel-title">
+                                        <?php echo $view['translator']->trans('mautic.dashboard.label.most.popular.assets'); ?>
+                                    </h3>
                                 </div>
                                 <div class="table-responsive scrollable body-white padding-sm page-list">    
                                 <table class="table table-hover table-striped table-bordered point-list">
                                     <thead>
                                         <tr>
-                                            <th>Title</th>
-                                            <th>Downloads</th>
+                                            <th><?php echo $view['translator']->trans('mautic.dashboard.label.title'); ?></th>
+                                            <th><?php echo $view['translator']->trans('mautic.dashboard.label.downloads'); ?></th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -141,14 +177,16 @@ $view['slots']->set('mauticContent', 'dashboard');
                             <?php if ($popularCampaigns) : ?>
                                 <div class="panel panel-default bdr-t-wdh-0">
                                     <div class="panel-heading">
-                                        <h3 class="panel-title">Most Popular Campaigns</h3>
+                                        <h3 class="panel-title">
+                                            <?php echo $view['translator']->trans('mautic.dashboard.label.most.popular.campaigns'); ?>
+                                        </h3>
                                     </div>
                                     <div class="table-responsive scrollable body-white padding-sm page-list">    
                                         <table class="table table-hover table-striped table-bordered point-list">
                                             <thead>
                                                 <tr>
-                                                    <th>Title</th>
-                                                    <th>Hits</th>
+                                                    <th><?php echo $view['translator']->trans('mautic.dashboard.label.title'); ?></th>
+                                                    <th><?php echo $view['translator']->trans('mautic.dashboard.label.hits'); ?></th>
                                                 </tr>
                                             </thead>
                                             <tbody>
