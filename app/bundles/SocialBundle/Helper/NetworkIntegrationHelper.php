@@ -276,7 +276,7 @@ class NetworkIntegrationHelper
                             $socialCache[$network] = array();
                         }
 
-                        $socialCache[$network]['profile']     = (!empty($profile['profile'])) ? $profile['profile'] : array();
+                        $socialCache[$network]['profile']     = (!empty($profile['profile']))  ? $profile['profile'] : array();
                         $socialCache[$network]['activity']    = (!empty($profile['activity'])) ? $profile['activity'] : array();
                         $socialCache[$network]['lastRefresh'] = $now->toUtcString();
                     } else {

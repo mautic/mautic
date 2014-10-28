@@ -105,7 +105,6 @@ class GooglePlusNetwork extends AbstractNetwork
             $data = $this->makeCall($url);
 
             if (!empty($data) && isset($data->items) && count($data->items)) {
-                $socialCache['has']['activity'] = true;
                 $socialCache['activity'] = array(
                     'posts'  => array(),
                     'photos' => array(),

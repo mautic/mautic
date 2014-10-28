@@ -27,12 +27,12 @@
 <div class="panel-body tab-content">
     <div class="tab-pane active" id="InstagramProfile">
         <?php echo $view->render('MauticLeadBundle:Social/Instagram:profile.html.php', array(
-            'activity' => $details['profile']
+            'profile' => $details['profile']
         )); ?>
     </div>
     <div class="tab-pane" id="InstagramPhotos">
         <?php echo $view->render('MauticLeadBundle:Social/Instagram:photos.html.php', array(
-            'activity' => $details['activity']['photos']
+            'activity' => (!empty($details['activity']['photos'])) ? $details['activity']['photos'] : array()
         )); ?>
     </div>
 </div>

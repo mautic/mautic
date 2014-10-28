@@ -42,19 +42,19 @@
     <div class="tab-pane" id="TwitterTweets">
         <?php echo $view->render('MauticLeadBundle:Social/Twitter:tweets.html.php', array(
             'lead'        => $lead,
-            'activity'    => $details['activity']['tweets']
+            'activity'    => (!empty($details['activity']['tweets'])) ? $details['activity']['tweets'] : array()
         )); ?>
     </div>
     <div class="pa-20 tab-pane" id="TwitterPhotos">
         <?php echo $view->render('MauticLeadBundle:Social/Twitter:photos.html.php', array(
             'lead'      => $lead,
-             'activity' => $details['activity']['photos']
+             'activity' => (!empty($details['activity']['photos'])) ? $details['activity']['photos'] : array()
         )); ?>
     </div>
     <div class="pa-20 tab-pane" id="TwitterTags">
         <?php echo $view->render('MauticLeadBundle:Social/Twitter:tags.html.php', array(
             'lead'      => $lead,
-            'activity' => $details['activity']['tags']
+            'activity' => (!empty($details['activity']['tags'])) ? $details['activity']['tags'] : array()
         )); ?>
     </div>
 </div>

@@ -8,19 +8,19 @@
  */
 ?>
 <div class="media">
-    <?php if (isset($activity['profileImage'])): ?>
+    <?php if (isset($profile['profileImage'])): ?>
         <div class="thumbnail pull-left">
-            <img src="<?php echo  $activity['profileImage']; ?>" width="100px" class="media-object img-rounded" />
+            <img src="<?php echo  $profile['profileImage']; ?>" width="100px" class="media-object img-rounded" />
         </div>
     <?php endif; ?>
     <div class="media-body">
-        <h4 class="media-title"><?php echo $activity['full_name']; ?></h4>
-        <p><a href="https://instagram.com/<?php echo $activity['profileHandle']; ?>" target="_blank"><?php echo $activity['profileHandle']; ?></a></p>
+        <h4 class="media-title"><?php echo $profile['full_name']; ?></h4>
+        <p><a href="https://instagram.com/<?php echo $profile['profileHandle']; ?>" target="_blank"><?php echo $profile['profileHandle']; ?></a></p>
         <p class="text-muted">
-            <?php echo $activity['website']; ?>
+            <?php echo $profile['website']; ?>
         </p>
         <p class="text-muted">
-            <?php echo $activity['bio']; ?>
+            <?php echo $profile['bio']; ?>
         </p>
     </div>
 </div>

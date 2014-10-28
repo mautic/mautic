@@ -45,19 +45,19 @@
     <div class="tab-pane" id="GooglePosts">
         <?php echo $view->render('MauticLeadBundle:Social/GooglePlus:posts.html.php', array(
             'lead'      => $lead,
-            'activity'   => $details['activity']['posts']
+            'activity'  => (!empty($details['activity']['posts'])) ? $details['activity']['posts'] : array()
         )); ?>
     </div>
     <div class="tab-pane" id="GooglePhotos">
         <?php echo $view->render('MauticLeadBundle:Social/GooglePlus:photos.html.php', array(
             'lead'      => $lead,
-            'activity'  => $details['activity']['photos']
+            'activity'  => (!empty($details['activity']['photos'])) ? $details['activity']['photos'] : array()
         )); ?>
     </div>
     <div class="tab-pane" id="GoogleTags">
         <?php echo $view->render('MauticLeadBundle:Social/GooglePlus:tags.html.php', array(
-            'lead'      => $lead,
-            'activity' => $details['activity']['tags']
+            'lead'     => $lead,
+            'activity' => (!empty($details['activity']['tags'])) ? $details['activity']['tags'] : array()
         )); ?>
     </div>
 </div>

@@ -33,7 +33,7 @@
     <div class="tab-pane" id="FoursquareTips">
         <?php echo $view->render('MauticLeadBundle:Social/Foursquare:tips.html.php', array(
             'lead'      => $lead,
-            'activity'   => $details['activity']['tips']
+            'activity'  => (!empty($details['activity']['tips'])) ? $details['activity']['tips'] : array()
         )); ?>
     </div>
 </div>
