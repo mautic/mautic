@@ -77,6 +77,8 @@ class EmailType extends AbstractType
         if (!$isVariant) {
             //add category
             FormHelper::buildForm($this->translator, $builder);
+
+            //add lead lists
             $transformer = new \Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer(
                 $this->em,
                 'MauticLeadBundle:LeadList',

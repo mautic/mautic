@@ -79,6 +79,7 @@ class IdToEntityModelTransformer implements DataTransformerInterface
             foreach ($entity as $e) {
                 $return[] = $e->$func();
             }
+
             return $return;
         }
     }
@@ -113,9 +114,10 @@ class IdToEntityModelTransformer implements DataTransformerInterface
 
             return $entity;
         } else {
-            if (!is_array($id)) {
+            if (empty($id) || !is_array($id)) {
                 return array();
             }
+
             $repo   = $this->em->getRepository($this->repository);
             $prefix = $repo->getTableAlias();
 
