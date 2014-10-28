@@ -38,6 +38,12 @@
                             <?php echo ucfirst(preg_replace('/(?!^)[A-Z]{2,}(?=[A-Z][a-z])|[A-Z][a-z]/', ' $0', $key)); ?>:
                         </dt>
                         <dd>
+                            <?php if (is_object($detail[0]) && get_class($detail[0]) == 'DateTime') : ?>
+                            <?php $detail[0] = $view['date']->toFull($detail[0]); ?>
+                            <?php endif; ?>
+                            <?php if (is_object($detail[1]) && get_class($detail[1]) == 'DateTime') : ?>
+                            <?php $detail[1] = $view['date']->toFull($detail[1]); ?>
+                            <?php endif; ?>
                             <?php if ($view['translator']->trans($detail[0])) : ?>
                             <del><?php echo $view['translator']->trans($detail[0]); ?></del> <i class="fa fa-long-arrow-right"></i>
                             <?php endif; ?>

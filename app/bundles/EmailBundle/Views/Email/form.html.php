@@ -40,7 +40,6 @@ $view['slots']->set("headerTitle", $header.$subheader);
     </div>
     <div class="col-md-4">
         <?php echo $view['form']->end($form); ?>
-
             <div class="hide email-builder">
                 <div class="email-builder-content">
                     <input type="hidden" id="EmailBuilderUrl" value="<?php echo $view['router']->generate('mautic_email_action', array('objectAction' => 'builder', 'objectId' => $email->getSessionId())); ?>" />
