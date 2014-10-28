@@ -192,7 +192,7 @@ $view->extend('MauticEmailBundle:Email:index.html.php');
                                             <?php endif; ?>
                                             </td>
                                             <td class="visible-md visible-lg">
-                                                <?php $catName = ($category = $item->getCategory()) ? $category->getSubject() :
+                                                <?php $catName = ($category = $item->getCategory()) ? $category->getTitle() :
                                                     $view['translator']->trans('mautic.core.form.uncategorized'); ?>
                                                 <span><?php echo $catName; ?></span>
                                             </td>
