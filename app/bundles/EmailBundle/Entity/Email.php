@@ -214,6 +214,11 @@ class Email extends FormEntity
         $metadata->addPropertyConstraint('lists', new LeadListAccess(array(
             'message' => 'mautic.email.list.noaccess'
         )));
+
+
+        $metadata->addPropertyConstraint('lists', new NotBlank(array(
+            'message' => 'mautic.email.list.notblank'
+        )));
     }
 
     /**
