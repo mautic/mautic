@@ -485,7 +485,7 @@ class EmailController extends FormController
 
             $category = $entity->getCategory();
             if ($category && isset($form['category_lookup']))
-                $form->get('category_lookup')->setData($category->getSubject());
+                $form->get('category_lookup')->setData($category->getTitle());
         }
 
         $builderComponents    = $model->getBuilderComponents();
