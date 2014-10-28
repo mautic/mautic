@@ -31,6 +31,11 @@ class InstallController extends CommonController
      */
     public function stepAction($index = 0)
     {
+        // We're going to assume a bit here; if the config file exists already and DB info is provided, assume the app is installed and redirect
+        if ($this->checkIfInstalled()) {
+            return $this->redirect($this->generateUrl('mautic_dashboard_index'));
+        }
+
         /** @var \Mautic\InstallBundle\Configurator\Configurator $configurator */
         $configurator = $this->container->get('mautic.configurator');
 
@@ -232,6 +237,11 @@ class InstallController extends CommonController
      */
     public function finalAction()
     {
+        // We're going to assume a bit here; if the config file exists already and DB info is provided, assume the app is installed and redirect
+        if ($this->checkIfInstalled()) {
+            return $this->redirect($this->generateUrl('mautic_dashboard_index'));
+        }
+
         /** @var \Mautic\InstallBundle\Configurator\Configurator $configurator */
         $configurator = $this->container->get('mautic.configurator');
 
@@ -277,6 +287,31 @@ class InstallController extends CommonController
         }
 
         return '';
+    }
+
+    /**
+     * Checks if the application has been installed and redirects if so
+     *
+     * @return bool
+     */
+    private function checkIfInstalled()
+    {
+        // If the config file doesn't even exist, no point in checking further
+        if (file_exists($this->container->getParameter('kernel.root_dir') . '/config/local.php')) {
+            /** @var \Mautic\InstallBundle\Configurator\Configurator $configurator */
+            $configurator = $this->container->get('mautic.configurator');
+            $params       = $configurator->getParameters();
+            $tmpl         = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
+
+            // Check the DB Driver, Name, and User
+            if ((isset($params['db_driver']) && $params['db_driver'])
+                && (isset($params['db_user']) && $params['db_user'])
+                && (isset($params['db_name']) && $params['db_name'])) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -355,7 +390,7 @@ class InstallController extends CommonController
      *
      * @param \Symfony\Component\Form\Form $form
      *
-     * @return array|boolean Array containing the flash message data on a failure, boolean true on success
+     * @return array|bool Array containing the flash message data on a failure, boolean true on success
      */
     private function performUserAddition($form)
     {
@@ -393,6 +428,11 @@ class InstallController extends CommonController
         return true;
     }
 
+    /**
+     * Installs data fixtures for the application
+     *
+     * @return array|bool Array containing the flash message data on a failure, boolean true on success
+     */
     private function performFixtureInstall()
     {
         try {
