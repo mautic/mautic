@@ -156,12 +156,16 @@ if ($security->hasEntityAccess($permissions['email:emails:editown'], $permission
                                     <td><?php echo is_object($email->getCategory()) ? $email->getCategory()->getTitle() : ''; ?></td>
                                 </tr>
                                 <tr>
-                                    <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.page.page.publish.up'); ?></span></td>
-                                    <td><?php echo (!is_null($email->getPublishUp())) ? $view['date']->toFull($email->getPublishUp()) : ''; ?></td>
+                                    <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.core.date.added'); ?></span></td>
+                                    <td><?php echo (!is_null($email->getDateAdded())) ? $view['date']->toFull($email->getDateAdded()) : ''; ?></td>
                                 </tr>
                                 <tr>
-                                    <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.page.page.publish.down'); ?></span></td>
-                                    <td><?php echo (!is_null($email->getPublishDown())) ? $view['date']->toFull($email->getPublishDown()) : ''; ?></td>
+                                    <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.core.date.modified'); ?></span></td>
+                                    <td><?php echo (!is_null($email->getDateModified())) ? $view['date']->toFull($email->getDateModified()) : ''; ?></td>
+                                </tr>
+                                <tr>
+                                    <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.email.form.template'); ?></span></td>
+                                    <td><?php echo $email->getTemplate(); ?></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -189,10 +193,10 @@ if ($security->hasEntityAccess($permissions['email:emails:editown'], $permission
                     <div class="col-sm-12">
                         <div class="panel">
                             <div class="panel-body box-layout">
-                                <div class="col-xs-4 va-m">
+                                <div class="col-xs-12 va-m">
                                     <h5 class="text-white dark-md fw-sb mb-xs">
                                         <span class="fa fa-download"></span>
-                                        Downloads
+                                        @todo Chart here 
                                     </h5>
                                 </div>
                                 
@@ -212,7 +216,13 @@ if ($security->hasEntityAccess($permissions['email:emails:editown'], $permission
 
         <!-- start: tab-content -->
         <div class="tab-content pa-md">
-
+            <?php if (!empty($variants['parent']) || !empty($variants['children'])): ?>
+            <?php echo $view->render('MauticEmailBundle:AbTest:details.html.php', array(
+                'email'         => $email,
+                'abTestResults' => $abTestResults,
+                'variants'      => $variants
+            )); ?>
+            <?php endif; ?>
         </div>
         <!--/ end: tab-content -->
     </div>
@@ -223,10 +233,19 @@ if ($security->hasEntityAccess($permissions['email:emails:editown'], $permission
         <!-- preview URL -->
         <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
             <div class="panel-heading">
-                <div class="panel-title"><?php echo $view['translator']->trans('mautic.asset.asset.url'); ?></div>
+                <div class="panel-title"><?php echo $view['translator']->trans('mautic.email.recipient.lists'); ?> (<?php
+                echo $stats['combined']['sent'] . '/' . $stats['combined']['total']; ?>)</div>
             </div>
             <div class="panel-body pt-xs">
-
+                <ul class="fa-ul">
+                    <?php
+                    $lists = $email->getLists();
+                    foreach ($lists as $l):
+                    ?>
+                    <li><i class="fa-li fa fa-send"></i><?php echo $l->getName(); ?> (<?php echo (isset($stats[$l->getId()]) ?
+                            $stats[$l->getId()]['sent'] . '/' . $stats[$l->getId()]['total'] : '0/0/0'); ?>)</li>
+                    <?php endforeach; ?>
+                </ul>
             </div>
         </div>
         <!--/ preview URL -->
@@ -240,85 +259,3 @@ if ($security->hasEntityAccess($permissions['email:emails:editown'], $permission
     <input id="itemId" value="<?php echo $email->getId(); ?>" />
 </div>
 <!--/ end: box layout -->
-
-
-
-
-
-
-
-
-
-
-
-<div class="scrollable">
-    <div class="bundle-main-header">
-        <span class="bundle-main-item-primary">
-            <?php
-            if ($category = $email->getCategory()):
-                $catSearch = $view['translator']->trans('mautic.core.searchcommand.category') . ":" . $category->getAlias();
-                $catName = $category->getTitle();
-            else:
-                $catSearch = $view['translator']->trans('mautic.core.searchcommand.is') . ":" .
-                    $view['translator']->trans('mautic.core.searchcommand.isuncategorized');
-                $catName = $view['translator']->trans('mautic.core.form.uncategorized');
-            endif;
-            ?>
-            <a href="<?php echo $view['router']->generate('mautic_email_index', array('search' => $catSearch))?>"
-               data-toggle="ajax">
-                <?php echo $catName; ?>
-            </a>
-            <span> | </span>
-            <span>
-                <?php
-                $author     = $email->getCreatedBy();
-                $authorId   = ($author) ? $author->getId() : 0;
-                $authorName = ($author) ? $author->getName() : "";
-                ?>
-                <a href="<?php echo $view['router']->generate('mautic_user_action', array(
-                    'objectAction' => 'contact',
-                    'objectId'     => $authorId,
-                    'entity'       => 'page.page',
-                    'id'           => $email->getId(),
-                    'returnUrl'    => $view['router']->generate('mautic_email_action', array(
-                        'objectAction' => 'view',
-                        'objectId'     => $email->getId()
-                    ))
-                )); ?>">
-                    <?php echo $authorName; ?>
-                </a>
-            </span>
-            <span> | </span>
-            <span>
-            <?php $langSearch = $view['translator']->trans('mautic.core.searchcommand.lang').":".$email->getLanguage(); ?>
-                <a href="<?php echo $view['router']->generate('mautic_email_index', array('search' => $langSearch)); ?>"
-                   data-toggle="ajax">
-                    <?php echo $email->getLanguage(); ?>
-                </a>
-            </span>
-        </span>
-    </div>
-
-    <h3><?php echo $view['translator']->trans('mautic.email.recipient.lists'); ?> (<?php
-        echo $stats['combined']['sent'] . '/' . $stats['combined']['total']; ?>)</h3>
-    <ul class="fa-ul">
-        <?php
-        $lists = $email->getLists();
-        foreach ($lists as $l):
-        ?>
-        <li><i class="fa-li fa fa-send"></i><?php echo $l->getName(); ?> (<?php echo (isset($stats[$l->getId()]) ?
-                $stats[$l->getId()]['sent'] . '/' . $stats[$l->getId()]['total'] : '0/0/0'); ?>)</li>
-        <?php endforeach; ?>
-    </ul>
-
-    <h3>@todo - Email stats/analytics/AB test results will go here</h3>
-
-    <?php if (!empty($variants['parent']) || !empty($variants['children'])): ?>
-    <?php echo $view->render('MauticEmailBundle:AbTest:details.html.php', array(
-        'email'         => $email,
-        'abTestResults' => $abTestResults,
-        'variants'      => $variants
-    )); ?>
-    <?php endif; ?>
-    '
-</div>
