@@ -25,7 +25,6 @@ $view['slots']->set("headerTitle", $header.$subheader);
 ?>
 <?php echo $view['form']->start($form); ?>
 <div class="row">
-    <?php echo $view['form']->start($form); ?>
     <div class="col-md-8">
         <div class="panel panel-default">
             <div class="panel-heading">
@@ -41,7 +40,6 @@ $view['slots']->set("headerTitle", $header.$subheader);
     </div>
     <div class="col-md-4">
         <?php echo $view['form']->end($form); ?>
-
             <div class="hide email-builder">
                 <div class="email-builder-content">
                     <input type="hidden" id="EmailBuilderUrl" value="<?php echo $view['router']->generate('mautic_email_action', array('objectAction' => 'builder', 'objectId' => $email->getSessionId())); ?>" />
@@ -69,5 +67,4 @@ $view['slots']->set("headerTitle", $header.$subheader);
                 </div>
             </div>
     </div>
-    <?php echo $view['form']->end($form); ?>
 </div>
