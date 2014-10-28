@@ -62,24 +62,14 @@ class AuditLogRepository extends CommonRepository
             }
 
         	foreach ($log['details'] as &$detail) {
-        		if (isset($detail[1])) {
-                    if ($detail[1] === true) {
-                        $detail[1] = 'mautic.core.form.yes';
-                    }
-                    if ($detail[1] === false) {
-                        $detail[1] = 'mautic.core.form.no';
-                    }
-        		} else {
+        		if (isset($detail[1])){
+                    $this->booleanToText($detail[1]);
+                } else {
                     $detail[1] = '';
                 }
 
-                if (isset($detail[0])) {
-                    if ($detail[0] === true) {
-                        $detail[0] = 'mautic.core.form.yes';
-                    }
-                    if ($detail[0] === false) {
-                        $detail[0] = 'mautic.core.form.no';
-                    }
+                if (isset($detail[0])){
+                    $this->booleanToText($detail[0]);
                 } else {
                     $detail[0] = '';
                 }
@@ -87,5 +77,22 @@ class AuditLogRepository extends CommonRepository
         }
 
         return $logs;
+    }
+
+    /**
+     * If variable is boolean, it returns human alternative.
+     *
+     * @param mixed $object
+     *
+     * @return mixed
+     */
+    public function booleanToText(&$variable)
+    {
+        if ($variable === true) {
+            $variable = 'mautic.core.form.yes';
+        }
+        if ($variable === false) {
+            $variable = 'mautic.core.form.no';
+        }
     }
 }
