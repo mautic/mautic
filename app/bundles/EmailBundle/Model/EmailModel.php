@@ -595,7 +595,7 @@ class EmailModel extends FormModel
             }
         }
 
-        return $emailSettings[$email->getId()];
+        return $emailSettings;
     }
 
     /**
@@ -658,15 +658,15 @@ class EmailModel extends FormModel
 
         //how many of this batch should go to which email
         $batchCount  = 0;
-
-        $emailSettings['limit'] = round($count * $emailSettings['weight']);
+        foreach ($emailSettings as $eid => &$details) {
+            $details['limit'] = round($count * $details['weight']);
+        }
 
         //randomize the leads for statistic purposes
         shuffle($sendTo);
 
         //start at the beginning for this batch
-        reset($emailSettings);
-        $useEmail     = $emailSettings;
+        $useEmail     = reset($emailSettings);
         $saveEntities = array();
         foreach ($sendTo as $lead) {
             $idHash = uniqid();
