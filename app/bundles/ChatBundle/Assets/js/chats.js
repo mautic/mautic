@@ -17,7 +17,7 @@ Mautic.updateChatList = function (killTimer) {
         url: mauticAjaxUrl + "?action=chat:updateList",
         dataType: "json",
         success: function (response) {
-            mQuery('#ChatHeader').html('');
+            mQuery('#OffCanvasRightHeaderTitle').html('');
             mQuery('#ChatSubHeader').html('');
 
             mQuery('#ChatList').replaceWith(response.newContent);
@@ -46,7 +46,7 @@ Mautic.startUserChat = function (userId, fromDate) {
         dataType: "json",
         success: function (response) {
             if (response.success) {
-                mQuery('#ChatHeader').html(response.withName);
+                mQuery('#OffCanvasRightHeaderTitle').html(response.withName);
                 if (response.lastSeen) {
                     mQuery('#ChatSubHeader').html(response.lastSeen);
                 }
@@ -79,10 +79,7 @@ Mautic.startChannelChat = function (channelId, fromDate) {
         dataType: "json",
         success: function (response) {
             if (response.success) {
-                mQuery('#ChatHeader').html(response.channelName);
-                if (response.channelDesc) {
-                    mQuery('#ChatSubHeader').html(response.channelDesc);
-                }
+                mQuery('#OffCanvasRightHeaderTitle').html(response.channelName);
 
                 Mautic.updateChatConversation(response);
                 Mautic.activateChatUpdater(response.channelId, 'channel');

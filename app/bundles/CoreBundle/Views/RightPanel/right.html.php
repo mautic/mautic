@@ -11,10 +11,11 @@
 <div class="offcanvas-right" id="OffCanvasRight">
     <!-- start: sidebar header -->
     <div class="sidebar-header box-layout" id="OffCanvasRightHeader">
-        <div class="col-xs-6 va-m">
+        <div class="col-xs-1 height-auto va-m">
             <a href="javascript:void(0);" class="offcanvas-closer"><span class="fa fa-arrow-left fs-16"></span></a>
         </div>
-        <div class="col-xs-6 va-m text-right">
+        <div id="OffCanvasRightHeaderTitle" class="col-xs-10 height-auto va-m text-center"></div>
+        <div class="text-right col-xs-1 height-auto va-m">
             <a href="javascript:void(0);"><span class="fa fa-info fs-16"></span></a>
         </div>
     </div>
