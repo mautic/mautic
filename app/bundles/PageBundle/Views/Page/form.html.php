@@ -26,6 +26,7 @@ $view['slots']->set("headerTitle", $header.$subheader);
 
 <!-- start: box layout -->
 <div class="box-layout">
+    <?php echo $view['form']->start($form); ?>
     <!-- container -->
     <div class="col-md-9 bg-auto height-auto bdr-r">
         <div class="pa-md">
@@ -100,4 +101,5 @@ $view['slots']->set("headerTitle", $header.$subheader);
             ?>
         </div>
     </div>
+    <?php echo $view['form']->end($form); ?>
 </div>
