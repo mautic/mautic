@@ -86,6 +86,10 @@ class LeadListRepository extends CommonRepository
     {
         static $lists = array();
 
+        if (is_object($user)) {
+            $user = $user->getId();
+        }
+
         $key = (int) $user . $alias . $id. (int) $withLeads;
         if (isset($lists[$key])) {
             return $lists[$key];
