@@ -12,11 +12,18 @@ $view->extend('MauticPointBundle:Point:index.html.php');
 
     <?php if (count($items)): ?>
     <div class="panel panel-default bdr-t-wdh-0">
-        <div class="table-responsive scrollable body-white padding-sm page-list">    
-            <table class="table table-hover table-striped table-bordered point-list">
+        <div class="table-responsive scrollable body-white padding-sm page-list">
+            <table class="table table-hover table-striped table-bordered point-list" id="pointTable">
                 <thead>
                 <tr>
-                    <th class="col-point-actions"></th>
+                    <th class="col-point-actions pl-20">
+                        <div class="checkbox-inline custom-primary">
+                            <label class="mb-0 pl-10">
+                                <input type="checkbox" id="customcheckbox-one0" value="1" data-toggle="checkall" data-target="#pointTable">
+                                <span></span>
+                            </label>
+                        </div>
+                    </th>
                     <?php
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                         'sessionVar' => 'point',

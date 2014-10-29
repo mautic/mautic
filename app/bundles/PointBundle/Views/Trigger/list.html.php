@@ -18,10 +18,17 @@ $view->extend('MauticPointBundle:Trigger:index.html.php');
                 </h3>
             </div>
             <div class="table-responsive scrollable body-white padding-sm page-list">
-                    <table class="table table-hover table-striped table-bordered pointtrigger-list">
+                    <table class="table table-hover table-striped table-bordered pointtrigger-list" id="triggerTable">
                         <thead>
                         <tr>
-                            <th class="col-pointtrigger-actions"></th>
+                            <th class="col-pointtrigger-actions pl-20">
+                                <div class="checkbox-inline custom-primary">
+                                    <label class="mb-0 pl-10">
+                                        <input type="checkbox" id="customcheckbox-one0" value="1" data-toggle="checkall" data-target="#triggerTable">
+                                        <span></span>
+                                    </label>
+                                </div>
+                            </th>
                             <?php
                             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                                 'sessionVar' => 'pointtrigger',

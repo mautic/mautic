@@ -24,13 +24,13 @@ if ($tmpl == 'index')
         </div>
     </div>
     <div class="table-responsive scrollable body-white padding-sm page-list">
-            <table class="table table-hover table-striped table-bordered category-list">
+            <table class="table table-hover table-striped table-bordered category-list" id="categoryTable">
                 <thead>
                 <tr>
                     <th class="col-page-actions pl-20">
                         <div class="checkbox-inline custom-primary">
                             <label class="mb-0 pl-10">
-                                <input type="checkbox" id="customcheckbox-one0" value="1">
+                                <input type="checkbox" id="customcheckbox-one0" value="1" data-toggle="checkall" data-target="#categoryTable">
                                 <span></span>
                             </label>
                         </div>
