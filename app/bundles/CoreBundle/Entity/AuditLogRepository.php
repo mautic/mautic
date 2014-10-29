@@ -100,6 +100,9 @@ class AuditLogRepository extends CommonRepository
                 if (is_string($var)) {
                     $tmp[] = $key . ': ' . $var;
                 }
+                if (is_array($var) || is_bool($var)) {
+                    $tmp[] = $this->variableToText($var);
+                }
             }
             $variable = implode(', ', $tmp);
         }
