@@ -403,7 +403,11 @@ class LeadRepository extends CommonRepository
             $q->expr()->like('l.firstname', ":$unique"),
             $q->expr()->like('l.lastname', ":$unique"),
             $q->expr()->like('l.email', ":$unique"),
-            $q->expr()->like('l.company', ":$unique")
+            $q->expr()->like('l.company', ":$unique"),
+            $q->expr()->like('l.city', ":$unique"),
+            $q->expr()->like('l.state', ":$unique"),
+            $q->expr()->like('l.zipcode', ":$unique"),
+            $q->expr()->like('l.country', ":$unique")
         );
 
         if ($filter->not) {

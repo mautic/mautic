@@ -109,6 +109,8 @@ class CommonController extends Controller implements MauticController
      * Redirects controller if not ajax or retrieves html output for ajax request
      *
      * @param array $args [returnUrl, viewParameters, contentTemplate, passthroughVars, flashes, forwardController]
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function postActionRedirect($args = array()) {
         $returnUrl = array_key_exists('returnUrl', $args) ? $args['returnUrl'] : $this->generateUrl('mautic_dashboard_index');
@@ -245,6 +247,8 @@ class CommonController extends Controller implements MauticController
 
     /**
      * Generates access denied message
+     *
+     * @param string $msg
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */

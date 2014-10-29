@@ -23,6 +23,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  */
 class Category extends FormEntity
 {
+
     /**
      * @ORM\Column(type="integer")
      * @ORM\Id()
@@ -58,6 +59,14 @@ class Category extends FormEntity
     private $description;
 
     /**
+     * @ORM\Column(name="color", type="string", nullable=true, length=7)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"categoryDetails"})
+     */
+    private $color;
+
+    /**
      * @ORM\Column(type="string", length=50)
      */
     private $bundle;
@@ -72,6 +81,9 @@ class Category extends FormEntity
         )));
     }
 
+    /**
+     * @return void
+     */
     public function __clone()
     {
         $this->id = null;
@@ -91,6 +103,7 @@ class Category extends FormEntity
      * Set title
      *
      * @param string $title
+     *
      * @return Category
      */
     public function setTitle($title)
@@ -114,6 +127,7 @@ class Category extends FormEntity
      * Set alias
      *
      * @param string $alias
+     *
      * @return Category
      */
     public function setAlias($alias)
@@ -137,6 +151,7 @@ class Category extends FormEntity
      * Set description
      *
      * @param string $description
+     *
      * @return Category
      */
     public function setDescription($description)
@@ -157,18 +172,46 @@ class Category extends FormEntity
     }
 
     /**
-     * @return mixed
+     * Set color
+     *
+     * @param string $color
+     *
+     * @return Category
      */
-    public function getBundle ()
+    public function setColor($color)
     {
-        return $this->bundle;
+        $this->color = $color;
     }
 
     /**
-     * @param mixed $bundle
+     * Get color
+     *
+     * @return string
      */
-    public function setBundle ($bundle)
+    public function getColor()
+    {
+        return $this->color;
+    }
+
+    /**
+     * Set bundle
+     *
+     * @param string $bundle
+     *
+     * @return Category
+     */
+    public function setBundle($bundle)
     {
         $this->bundle = $bundle;
+    }
+
+    /**
+     * Get bundle
+     *
+     * @return string
+     */
+    public function getBundle()
+    {
+        return $this->bundle;
     }
 }

@@ -16,5 +16,4 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class FieldRepository extends CommonRepository
 {
-
 }

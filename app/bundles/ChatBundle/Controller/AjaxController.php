@@ -97,7 +97,6 @@ class AjaxController extends CommonAjaxController
             $dataArray['channelName'] = $this->renderview('MauticChatBundle:Channel:header.html.php', array(
                 'channel' => $channel
             ));
-            $dataArray['channelDesc'] = $channel->getDescription();
             if ($lastRead)  {
                 $dataArray['lastReadId'] = $lastRead['lastRead'];
             }

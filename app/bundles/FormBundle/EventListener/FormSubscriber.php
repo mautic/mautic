@@ -20,14 +20,12 @@ use Mautic\LeadBundle\Event\LeadTimelineEvent;
 
 /**
  * Class FormSubscriber
- *
- * @package Mautic\FormBundle\EventListener
  */
 class FormSubscriber extends CommonSubscriber
 {
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
     static public function getSubscribedEvents()
     {

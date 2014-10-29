@@ -14,19 +14,18 @@ use Mautic\FormBundle\Entity\Form;
 
 /**
  * Class FormEvent
- *
- * @package Mautic\FormBundle\Event
  */
 class FormEvent extends CommonEvent
 {
+
     /**
      * @param Form $form
      * @param bool $isNew
      */
     public function __construct(Form &$form, $isNew = false)
     {
-        $this->entity  =& $form;
-        $this->isNew = $isNew;
+        $this->entity =& $form;
+        $this->isNew  = $isNew;
     }
 
     /**

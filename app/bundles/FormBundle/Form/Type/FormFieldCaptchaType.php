@@ -15,17 +15,14 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * Class FormFieldCaptchaType
- *
- * @package Mautic\FormBundle\Form\Type
  */
 class FormFieldCaptchaType extends AbstractType
 {
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
+     * {@inheritdoc}
      */
-    public function buildForm (FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('captcha', 'text', array(
             'label'      => 'mautic.form.field.form.property_captcha',
@@ -58,9 +55,10 @@ class FormFieldCaptchaType extends AbstractType
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
-    public function getName() {
+    public function getName()
+    {
         return "formfield_captcha";
     }
 }

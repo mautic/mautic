@@ -18,14 +18,12 @@ use Mautic\PageBundle\PageEvents;
 
 /**
  * Class PageSubscriber
- *
- * @package Mautic\FormBundle\EventListener
  */
 class PageSubscriber extends CommonSubscriber
 {
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
     static public function getSubscribedEvents()
     {

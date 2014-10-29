@@ -9,12 +9,19 @@
 
 namespace Mautic\FormBundle\Helper;
 
-use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Validation;
 
+/**
+ * Class FormFieldHelper
+ */
 class FormFieldHelper
 {
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
 
     /**
      * @var array
@@ -94,6 +101,8 @@ class FormFieldHelper
     }
 
     /**
+     * @param array $customFields
+     *
      * @return array
      */
     public function getList($customFields = array())
@@ -124,22 +133,27 @@ class FormFieldHelper
      * Get fields input filter
      *
      * @param $type
+     *
+     * @return string
      */
     public function getFieldFilter($type)
     {
         if (array_key_exists($type, $this->types)) {
             if (isset($this->types[$type]['filter'])) {
-                $filter = $this->types[$type]['filter'];
-            } else {
-                $filter = 'clean';
+                return $this->types[$type]['filter'];
             }
-        } else {
-            $filter = 'alphanum';
+            return 'clean';
         }
-
-        return $filter;
+        return 'alphanum';
     }
 
+    /**
+     * @param      $type
+     * @param      $value
+     * @param null $f
+     *
+     * @return array
+     */
     public function validateFieldValue($type, $value, $f = null)
     {
         $errors = array();

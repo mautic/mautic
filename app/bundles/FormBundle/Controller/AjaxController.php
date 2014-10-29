@@ -15,8 +15,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class AjaxController
- *
- * @package Mautic\FormBundle\Controller
  */
 class AjaxController extends CommonAjaxController
 {
@@ -24,8 +22,10 @@ class AjaxController extends CommonAjaxController
     /**
      * @param Request $request
      * @param string  $name
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    protected function reorderFieldsAction (Request $request, $name = 'fields')
+    protected function reorderFieldsAction(Request $request, $name = 'fields')
     {
         $dataArray  = array('success' => 0);
         $session    = $this->factory->getSession();
@@ -42,7 +42,8 @@ class AjaxController extends CommonAjaxController
 
     /**
      * @param Request $request
-     * @return \Mautic\CoreBundle\Controller\JsonResponse
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function reorderActionsAction(Request $request) {
         return $this->reorderFieldsAction($request, 'actions');

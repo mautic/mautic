@@ -14,17 +14,14 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 /**
  * Class FormFieldTextType
- *
- * @package Mautic\FormBundle\Form\Type
  */
 class FormFieldTextType extends AbstractType
 {
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
+     * {@inheritdoc}
      */
-    public function buildForm (FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('text', 'textarea', array(
             'label'      => 'mautic.form.field.form.property_text',
@@ -35,9 +32,10 @@ class FormFieldTextType extends AbstractType
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
-    public function getName() {
+    public function getName()
+    {
         return "formfield_text";
     }
 }

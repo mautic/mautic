@@ -21,8 +21,6 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
  * Class FormModel
- * {@inheritdoc}
- * @package Mautic\CoreBundle\Model\FormModel
  */
 class FormModel extends CommonFormModel
 {
@@ -30,7 +28,7 @@ class FormModel extends CommonFormModel
     /**
      * {@inheritdoc}
      *
-     * @return string
+     * @return \Mautic\FormBundle\Entity\FormRepository
      */
     public function getRepository()
     {
@@ -39,29 +37,22 @@ class FormModel extends CommonFormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
     public function getPermissionBase()
     {
         return 'form:forms';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getNameGetter()
     {
         return "getName";
     }
 
-
     /**
      * {@inheritdoc}
-     *
-     * @param      $entity
-     * @param      $formFactory
-     * @param null $action
-     * @param array $options
-     * @return mixed
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function createForm($entity, $formFactory, $action = null, $options = array())
     {
@@ -73,10 +64,7 @@ class FormModel extends CommonFormModel
     }
 
     /**
-     * Get a specific entity or generate a new one if id is empty
-     *
-     * @param $id
-     * @return null|object
+     * {@inheritdoc}
      */
     public function getEntity($id = null)
     {
@@ -84,19 +72,13 @@ class FormModel extends CommonFormModel
             return new Form();
         }
 
-        $entity = parent::getEntity($id);
-
-
-        return $entity;
+        return parent::getEntity($id);
     }
 
     /**
      * {@inheritdoc}
      *
-     * @param $action
-     * @param $event
-     * @param $entity
-     * @param $isNew
+     * @return bool|FormEvent|void
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, $event = false)
@@ -224,10 +206,6 @@ class FormModel extends CommonFormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @param       $entity
-     * @param       $unlock
-     * @return mixed
      */
     public function saveEntity($entity, $unlock = true)
     {
@@ -304,8 +282,6 @@ class FormModel extends CommonFormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @param  $entity
      */
     public function deleteEntity($entity)
     {
@@ -372,7 +348,6 @@ class FormModel extends CommonFormModel
             $customComponents['fields']  = $event->getFormFields();
             $customComponents['actions'] = $event->getSubmitActions();
 
-
             $grouped = array();
             foreach ($customComponents['fields'] as $k => $e) {
                 $grouped['fields'][$e['group']][$k] = $e;
@@ -390,23 +365,17 @@ class FormModel extends CommonFormModel
      * Get the document write javascript for the form
      *
      * @param Form $form
+     *
+     * @return string
      */
     public function getAutomaticJavascript(Form $form)
     {
         $html = $form->getCachedHtml();
 
         //replace line breaks with literal symbol and escape quotations
-        $search = array(
-            "\n",
-            '"'
-        );
-        $replace = array(
-            '\n',
-            '\"'
-        );
+        $search  = array("\n", '"');
+        $replace = array('\n', '\"');
         $html = str_replace($search, $replace, $html);
-        $js = "document.write(\"".$html."\");";
-
-        return $js;
+        return "document.write(\"".$html."\");";
     }
 }
