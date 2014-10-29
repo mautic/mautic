@@ -544,7 +544,7 @@ class LeadRepository extends CommonRepository
         $useExpr     =& $expr;
 
         foreach ($filters as $k => $details) {
-            if (empty($details['glue']) || empty($filters[$k + 1]['glue']))
+            if (empty($details['glue']))
                 continue;
 
             $uniqueFilter              = $this->generateRandomParameterName();
