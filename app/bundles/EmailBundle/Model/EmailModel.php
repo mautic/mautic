@@ -448,41 +448,98 @@ class EmailModel extends FormModel
     public function getEmailListStats(Email $entity)
     {
         $lists  = $entity->getLists();
-        $counts = array(
-            'combined' => array(
-                'sent'   => 0,
-                'read'   => 0,
-                'failed' => 0,
-                'total'  => 0
+        $combinedLabel = $this->translator->trans('mautic.email.lists.combined');
+        $combinedColor = '#' . substr(md5($combinedLabel), 0, 6);
+        $datasets = array(
+            array(
+                'data' => array(0, 0, 0, 0),
+                'label' => $combinedLabel,
+                'fillColor' => $this->adjustColor($combinedColor, -30),
+                'highlightFill' => $combinedColor,
+                'highlightStroke' => $this->adjustColor($combinedColor, 10),
+                'strokeColor' => $combinedColor
             )
         );
+
+        $labels = array(
+            $this->translator->trans('mautic.email.total'),
+            $this->translator->trans('mautic.email.read'),
+            $this->translator->trans('mautic.email.failed'),
+            $this->translator->trans('mautic.email.sent')
+        );
+
         if (count($lists)) {
             $listRepo = $this->em->getRepository('MauticLeadBundle:LeadList');
             $statRepo = $this->em->getRepository('MauticEmailBundle:Stat');
             foreach ($lists as $l) {
-                $filters          = $l->getFilters();
-                $recipientCount   = $listRepo->getLeadCount($filters, $l);
-                $counts['combined']['total'] += $recipientCount;
+                $filters        = $l->getFilters();
 
-                $sentCount        = $statRepo->getSentCount($entity->getId(), $l->getId());
-                $counts['combined']['sent'] += $sentCount;
+                $recipientCount = $listRepo->getLeadCount($filters, $l);
+                $datasets[0]['data'][0] += $recipientCount;
+
+                $sentCount      = $statRepo->getSentCount($entity->getId(), $l->getId());
+                $datasets[0]['data'][1] += $sentCount;
 
                 $readCount      = $statRepo->getReadCount($entity->getId(), $l->getId());
-                $counts['combined']['read'] += $readCount;
+                $datasets[0]['data'][2] += $readCount;
 
                 $failedCount    = $statRepo->getFailedCount($entity->getId(), $l->getId());
-                $counts['combined']['failed'] += $readCount;
+                $datasets[0]['data'][3] += $readCount;
 
-                $counts[$l->getId()] = array(
-                    'sent'   => $sentCount,
-                    'read'   => $readCount,
-                    'failed' => $failedCount,
-                    'total'  => $recipientCount
+                $datasets[$l->getId()] = array();
+
+                $datasets[$l->getId()]['data'] = array(
+                    $recipientCount,
+                    $sentCount,
+                    $readCount,
+                    $failedCount
                 );
+
+                $datasets[$l->getId()]['label'] = $l->getName();
+                $color = '#' . substr(md5($datasets[$l->getId()]['label']), 0, 6);
+                $datasets[$l->getId()]['fillColor'] = $this->adjustColor($color, -30);
+                $datasets[$l->getId()]['strokeColor'] = $color;
+                $datasets[$l->getId()]['highlightFill'] = $color;
+                $datasets[$l->getId()]['highlightStroke'] = $this->adjustColor($color, 10);
             }
         }
 
-        return $counts;
+        return array(
+            'datasets' => $datasets,
+            'labels' => $labels);
+    }
+
+    /**
+    * @param $color_code
+    * @param int $percentage_adjuster
+    * @return array|string
+    * @author Jaspreet Chahal
+    */
+    function adjustColor($color_code, $percentage_adjuster = 0) {
+        $percentage_adjuster = round($percentage_adjuster/100,2);
+        if(is_array($color_code)) {
+            $r = $color_code["r"] - (round($color_code["r"])*$percentage_adjuster);
+            $g = $color_code["g"] - (round($color_code["g"])*$percentage_adjuster);
+            $b = $color_code["b"] - (round($color_code["b"])*$percentage_adjuster);
+     
+            return array("r"=> round(max(0,min(255,$r))),
+                "g"=> round(max(0,min(255,$g))),
+                "b"=> round(max(0,min(255,$b))));
+        }
+        else if(preg_match("/#/",$color_code)) {
+            $hex = str_replace("#","",$color_code);
+            $r = (strlen($hex) == 3)? hexdec(substr($hex,0,1).substr($hex,0,1)):hexdec(substr($hex,0,2));
+            $g = (strlen($hex) == 3)? hexdec(substr($hex,1,1).substr($hex,1,1)):hexdec(substr($hex,2,2));
+            $b = (strlen($hex) == 3)? hexdec(substr($hex,2,1).substr($hex,2,1)):hexdec(substr($hex,4,2));
+            $r = round($r - ($r*$percentage_adjuster));
+            $g = round($g - ($g*$percentage_adjuster));
+            $b = round($b - ($b*$percentage_adjuster));
+     
+            return "#".str_pad(dechex( max(0,min(255,$r)) ),2,"0",STR_PAD_LEFT)
+                .str_pad(dechex( max(0,min(255,$g)) ),2,"0",STR_PAD_LEFT)
+                .str_pad(dechex( max(0,min(255,$b)) ),2,"0",STR_PAD_LEFT);
+     
+        }
     }
 
     /**

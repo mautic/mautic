@@ -193,20 +193,26 @@ if ($security->hasEntityAccess($permissions['email:emails:editown'], $permission
                     <div class="col-sm-12">
                         <div class="panel">
                             <div class="panel-body box-layout">
-                                <div class="col-xs-12 va-m">
+                                <div class="col-xs-4 va-m">
                                     <h5 class="text-white dark-md fw-sb mb-xs">
                                         <span class="fa fa-download"></span>
-                                        @todo Chart here 
+                                        Lead Lists comparison 
                                     </h5>
                                 </div>
-                                
+                                <div class="col-xs-8 va-m">
+                                    <?php foreach ($stats['datasets'] as $dataset) : ?>
+                                        <span class="label label-default" style="background-color:<?php echo $dataset['fillColor']; ?>">
+                                            <?php echo $dataset['label']; ?>
+                                        </span>
+                                    <?php endforeach; ?>
+                                </div>
                             </div>
                             <div class="pt-0 pl-15 pb-10 pr-15">
                                 <div>
-                                    <canvas id="download-chart" height="80"></canvas>
+                                    <canvas id="list-compare-chart" height="80"></canvas>
                                 </div>
                             </div>
-                            <div id="download-chart-data" class="hide"><?php //echo json_encode($stats['downloads']['timeStats']); ?></div>
+                            <div id="list-compare-chart-data" class="hide"><?php echo json_encode($stats); ?></div>
                         </div>
                     </div>
                 </div>
@@ -234,7 +240,7 @@ if ($security->hasEntityAccess($permissions['email:emails:editown'], $permission
         <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
             <div class="panel-heading">
                 <div class="panel-title"><?php echo $view['translator']->trans('mautic.email.recipient.lists'); ?> (<?php
-                echo $stats['combined']['sent'] . '/' . $stats['combined']['total']; ?>)</div>
+                echo $stats['datasets'][0]['data'][0] . '/' . $stats['datasets'][0]['data'][3]; ?>)</div>
             </div>
             <div class="panel-body pt-xs">
                 <ul class="fa-ul">
@@ -243,7 +249,7 @@ if ($security->hasEntityAccess($permissions['email:emails:editown'], $permission
                     foreach ($lists as $l):
                     ?>
                     <li><i class="fa-li fa fa-send"></i><?php echo $l->getName(); ?> (<?php echo (isset($stats[$l->getId()]) ?
-                            $stats[$l->getId()]['sent'] . '/' . $stats[$l->getId()]['total'] : '0/0/0'); ?>)</li>
+                            $stats['datasets'][$l->getId()]['data'][0] . '/' . $stats['datasets'][$l->getId()]['data'][3] : '0/0/0'); ?>)</li>
                     <?php endforeach; ?>
                 </ul>
             </div>
