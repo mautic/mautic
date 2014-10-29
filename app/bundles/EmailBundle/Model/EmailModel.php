@@ -531,7 +531,7 @@ class EmailModel extends FormModel
     {
         static $emailSettings = array();
 
-        if (empty($emailSettings[$email->getId])) {
+        if (empty($emailSettings[$email->getId()])) {
             //get a list of variants for A/B testing
             $childrenVariant = $email->getVariantChildren();
 
