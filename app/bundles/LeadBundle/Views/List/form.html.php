@@ -216,104 +216,100 @@ echo $view['form']->start($form);
         <div class="pr-lg pl-lg pt-md pb-md">
             <?php echo $view['form']->row($form['isGlobal']); ?>
             <?php echo $view['form']->row($form['isPublished']); ?>
-            
-            <?php echo $view['form']->end($form); ?>
-        </div>
-    </div>
-
-            <div id="filter-template" class="hide">
-                <div class="panel-footer">
-                    <div class="col-sm-2 pl-0">
-                        <select name="leadlist[filters][glue][]" class="form-control">
-                            <?php foreach ($glueOptions as $v => $l): ?>
-                                <option value="<?php echo $v; ?>"><?php echo $view['translator']->trans($l); ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                </div>
-                <div class="panel-body">
-                    <div class="col-xs-6 col-sm-3 field-name">
-
-                    </div>
-                    <div class="col-xs-6 col-sm-3 padding-none">
-                        <select name="leadlist[filters][operator][]" class="form-control ">
-                            <?php foreach ($operatorOptions as $v => $l): ?>
-                                <option value="<?php echo $v; ?>"><?php echo $view['translator']->trans($l['label']); ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                    <div class="col-xs-10 col-sm-5 padding-none">
-                        <input type="text" class="form-control" name="leadlist[filters][filter][]"
-                               placeholder="<?php echo $view['translator']->trans('mautic.lead.list.form.filtervalue'); ?>" />
-                        <input type="hidden" name="leadlist[filters][display][]" />
-                    </div>
-                    <div class="col-xs-2 col-sm-1">
-                        <a href="#" class="remove-selected btn btn-default text-danger pull-right"><i class="fa fa-trash-o"></i></a>
-                    </div>
-                    <input type="hidden" name="leadlist[filters][field][]" />
-                    <input type="hidden" name="leadlist[filters][type][]" />
-                </div>
-            </div>
-
-            <div id="filter-country-template" class="hide">
-                <div class="col-xs-6 col-sm-2 padding-none">
-                    <select name="leadlist[filters][glue][]" class="form-control ">
-                        <?php foreach ($glueOptions as $v => $l): ?>
-                            <option value="<?php echo $v; ?>"><?php echo $view['translator']->trans($l); ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <div class="col-xs-6 col-sm-3 padding-none">
-                    <select name="leadlist[filters][operator][]" class="form-control ">
-                        <?php foreach ($operatorOptions as $v => $l): ?>
-                            <option value="<?php echo $v; ?>"><?php echo $view['translator']->trans($l['label']); ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <div class="col-xs-12 col-sm-7 padding-none">
-                    <select class="form-control" name="leadlist[filters][filter][]">
-                    <?php foreach ($countries as $c): ?>
-                        <option value="<?php echo $c; ?>"><?php echo $c; ?></option>
-                    <?php endforeach; ?>
-                    </select>
-                    <input type="hidden" name="leadlist[filters][display][]" />
-                </div>
-                <input type="hidden" name="leadlist[filters][field][]" />
-                <input type="hidden" name="leadlist[filters][type][]" />
-                <div class="clearfix"></div>
-            </div>
-
-            <div id="filter-timezone-template" class="hide">
-                <div class="col-xs-6 col-sm-2 padding-none">
-                    <select name="leadlist[filters][glue][]" class="form-control ">
-                        <?php foreach ($glueOptions as $v => $l): ?>
-                            <option value="<?php echo $v; ?>"><?php echo $view['translator']->trans($l); ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <div class="col-xs-6 col-sm-3 padding-none">
-                    <select name="leadlist[filters][operator][]" class="form-control ">
-                        <?php foreach ($operatorOptions as $v => $l): ?>
-                            <option value="<?php echo $v; ?>"><?php echo $view['translator']->trans($l['label']); ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <div class="col-xs-12 col-sm-7 padding-none">
-                    <select class="form-control" name="leadlist[filters][filter][]">
-                        <?php foreach ($timezones as $continent => $zones): ?>
-                            <optgroup label="<?php echo $continent; ?>" />
-                            <?php foreach ($zones as $t): ?>
-                            <option value="<?php echo $t; ?>"><?php echo $t; ?></option>
-                            <?php endforeach; ?>
-                        <?php endforeach; ?>
-                    </select>
-                    <input type="hidden" name="leadlist[filters][display][]" />
-                </div>
-                <input type="hidden" name="leadlist[filters][field][]" />
-                <input type="hidden" name="leadlist[filters][type][]" />
-                <div class="clearfix"></div>
-            </div>
         </div>
     </div>
 </div>
+<?php echo $view['form']->end($form); ?>
 
+<div id="filter-template" class="hide">
+    <div class="panel-footer">
+        <div class="col-sm-2 pl-0">
+            <select name="leadlist[filters][glue][]" class="form-control">
+                <?php foreach ($glueOptions as $v => $l): ?>
+                    <option value="<?php echo $v; ?>"><?php echo $view['translator']->trans($l); ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+    </div>
+    <div class="panel-body">
+        <div class="col-xs-6 col-sm-3 field-name">
+
+        </div>
+        <div class="col-xs-6 col-sm-3 padding-none">
+            <select name="leadlist[filters][operator][]" class="form-control ">
+                <?php foreach ($operatorOptions as $v => $l): ?>
+                    <option value="<?php echo $v; ?>"><?php echo $view['translator']->trans($l['label']); ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+        <div class="col-xs-10 col-sm-5 padding-none">
+            <input type="text" class="form-control" name="leadlist[filters][filter][]"
+                   placeholder="<?php echo $view['translator']->trans('mautic.lead.list.form.filtervalue'); ?>" />
+            <input type="hidden" name="leadlist[filters][display][]" />
+        </div>
+        <div class="col-xs-2 col-sm-1">
+            <a href="#" class="remove-selected btn btn-default text-danger pull-right"><i class="fa fa-trash-o"></i></a>
+        </div>
+        <input type="hidden" name="leadlist[filters][field][]" />
+        <input type="hidden" name="leadlist[filters][type][]" />
+    </div>
+</div>
+
+<div id="filter-country-template" class="hide">
+    <div class="col-xs-6 col-sm-2 padding-none">
+        <select name="leadlist[filters][glue][]" class="form-control ">
+            <?php foreach ($glueOptions as $v => $l): ?>
+                <option value="<?php echo $v; ?>"><?php echo $view['translator']->trans($l); ?></option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+    <div class="col-xs-6 col-sm-3 padding-none">
+        <select name="leadlist[filters][operator][]" class="form-control ">
+            <?php foreach ($operatorOptions as $v => $l): ?>
+                <option value="<?php echo $v; ?>"><?php echo $view['translator']->trans($l['label']); ?></option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+    <div class="col-xs-12 col-sm-7 padding-none">
+        <select class="form-control" name="leadlist[filters][filter][]">
+        <?php foreach ($countries as $c): ?>
+            <option value="<?php echo $c; ?>"><?php echo $c; ?></option>
+        <?php endforeach; ?>
+        </select>
+        <input type="hidden" name="leadlist[filters][display][]" />
+    </div>
+    <input type="hidden" name="leadlist[filters][field][]" />
+    <input type="hidden" name="leadlist[filters][type][]" />
+    <div class="clearfix"></div>
+</div>
+
+<div id="filter-timezone-template" class="hide">
+    <div class="col-xs-6 col-sm-2 padding-none">
+        <select name="leadlist[filters][glue][]" class="form-control ">
+            <?php foreach ($glueOptions as $v => $l): ?>
+                <option value="<?php echo $v; ?>"><?php echo $view['translator']->trans($l); ?></option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+    <div class="col-xs-6 col-sm-3 padding-none">
+        <select name="leadlist[filters][operator][]" class="form-control ">
+            <?php foreach ($operatorOptions as $v => $l): ?>
+                <option value="<?php echo $v; ?>"><?php echo $view['translator']->trans($l['label']); ?></option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+    <div class="col-xs-12 col-sm-7 padding-none">
+        <select class="form-control" name="leadlist[filters][filter][]">
+            <?php foreach ($timezones as $continent => $zones): ?>
+                <optgroup label="<?php echo $continent; ?>" />
+                <?php foreach ($zones as $t): ?>
+                <option value="<?php echo $t; ?>"><?php echo $t; ?></option>
+                <?php endforeach; ?>
+            <?php endforeach; ?>
+        </select>
+        <input type="hidden" name="leadlist[filters][display][]" />
+    </div>
+    <input type="hidden" name="leadlist[filters][field][]" />
+    <input type="hidden" name="leadlist[filters][type][]" />
+    <div class="clearfix"></div>
+</div>
