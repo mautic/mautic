@@ -19,16 +19,6 @@ class FormEvent extends CommonEvent
 {
 
     /**
-     * @var Form
-     */
-    private $entity;
-
-    /**
-     * @var bool
-     */
-    private $isNew;
-
-    /**
      * @param Form $form
      * @param bool $isNew
      */
