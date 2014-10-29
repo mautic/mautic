@@ -1,1 +1,7 @@
 .fc-widget-header table th {padding: 8px 15px;}
+div#calendar > .fc-toolbar {
+	border-bottom: 1px solid #ebedf0;
+	margin-left: -15px;
+	margin-right: -15px;
+	padding: 10px 15px;
+}
