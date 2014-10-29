@@ -97,7 +97,9 @@ class AuditLogRepository extends CommonRepository
         if (is_array($variable)) {
             $tmp = array();
             foreach ($variable as $key => $var) {
-                $tmp[] = $key . ': ' . $var;
+                if (is_string($var)) {
+                    $tmp[] = $key . ': ' . $var;
+                }
             }
             $variable = implode(', ', $tmp);
         }
