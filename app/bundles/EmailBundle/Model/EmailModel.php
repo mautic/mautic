@@ -531,7 +531,7 @@ class EmailModel extends FormModel
     {
         static $emailSettings = array();
 
-        if (empty($emailSettings[$email->getId])) {
+        if (empty($emailSettings[$email->getId()])) {
             //get a list of variants for A/B testing
             $childrenVariant = $email->getVariantChildren();
 
@@ -658,15 +658,15 @@ class EmailModel extends FormModel
 
         //how many of this batch should go to which email
         $batchCount  = 0;
-        foreach ($emailSettings as $eid => &$details) {
-            $details['limit'] = round($count * $details['weight']);
-        }
+
+        $emailSettings['limit'] = round($count * $emailSettings['weight']);
 
         //randomize the leads for statistic purposes
         shuffle($sendTo);
 
         //start at the beginning for this batch
-        $useEmail     = reset($emailSettings);
+        reset($emailSettings);
+        $useEmail     = $emailSettings;
         $saveEntities = array();
         foreach ($sendTo as $lead) {
             $idHash = uniqid();
