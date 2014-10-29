@@ -12,7 +12,7 @@ $showSupport = (isset($abTestResults['supportTemplate']) && isset($abTestResults
 ?>
 <h4><?php echo $view['translator']->trans('mautic.email.variants'); ?>
     <?php if ($showSupport): ?>
-        <button class="btn btn-primary" data-toggle="modal" data-target="#emailAbTestResults">
+        <button class="btn btn-primary pull-right" data-toggle="modal" data-target="#emailAbTestResults">
             <?php echo $view['translator']->trans('mautic.email.abtest.stats'); ?>
         </button>
     <?php endif; ?>
