@@ -22,7 +22,7 @@ endif;
             <div class="col-xs-6 va-m">
                 <div class="checkbox-inline custom-primary">
                     <label class="mb-0">
-                        <input type="checkbox" id="customcheckbox-one0" value="1">
+                        <input type="checkbox" id="customcheckbox-one0" value="1" data-toggle="checkall" data-target="#roleTable">
                         <span></span>
                         <?php echo $view['translator']->trans('mautic.core.table.selectall'); ?>
                     </label>
@@ -35,7 +35,7 @@ endif;
         </div>
     </div>
     <div class="table-responsive scrollable body-white padding-sm page-list">
-        <table class="table table-hover table-striped table-bordered role-list">
+        <table class="table table-hover table-striped table-bordered role-list" id="roleTable">
             <thead>
             <tr>
                 <th class="col-role-actions"></th>

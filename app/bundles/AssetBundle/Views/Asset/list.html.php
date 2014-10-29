@@ -11,13 +11,13 @@ $view->extend('MauticAssetBundle:Asset:index.html.php');
 ?>
 <?php if (count($items)): ?>
     <div class="table-responsive scrollable body-white padding-sm page-list">
-        <table class="table table-hover table-striped table-bordered asset-list">
+        <table class="table table-hover table-striped table-bordered asset-list" id="assetTable">
             <thead>
             <tr>
                 <th class="col-asset-actions pl-20">
                     <div class="checkbox-inline custom-primary">
                         <label class="mb-0 pl-10">
-                            <input type="checkbox" id="customcheckbox-one0" value="1">
+                            <input type="checkbox" id="customcheckbox-one0" value="1" data-toggle="checkall" data-target="#assetTable">
                             <span></span>
                         </label>
                     </div>

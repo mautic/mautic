@@ -1,5 +1,9 @@
 /* ReportBundle */
 
+.col-report-actions {
+    width: 25px;
+}
+
 .columnSelectorButtons {
 	padding-top: 40px;
 }

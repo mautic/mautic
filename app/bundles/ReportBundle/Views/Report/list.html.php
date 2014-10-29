@@ -26,10 +26,10 @@ if ($tmpl == 'index')
         <table class="table table-hover table-striped table-bordered report-list" id="reportTable">
             <thead>
                 <tr>
-                    <th class="col-page-actions pl-20">
+                    <th class="col-report-actions pl-20">
                         <div class="checkbox-inline custom-primary">
                             <label class="mb-0 pl-10">
-                                <input type="checkbox" id="customcheckbox-one0" value="1">
+                                <input type="checkbox" id="customcheckbox-one0" value="1" data-toggle="checkall" data-target="#reportTable">
                                 <span></span>
                             </label>
                         </div>
@@ -39,7 +39,7 @@ if ($tmpl == 'index')
                         'sessionVar' => 'report',
                         'orderBy'    => 'p.title',
                         'text'       => 'mautic.report.report.thead.title',
-                        'class'      => 'col-page-title',
+                        'class'      => 'col-report-title',
                         'default'    => true
                     ));
 
@@ -47,7 +47,7 @@ if ($tmpl == 'index')
                         'sessionVar' => 'report',
                         'orderBy'    => 'p.id',
                         'text'       => 'mautic.report.report.thead.id',
-                        'class'      => 'col-page-id'
+                        'class'      => 'col-report-id'
                     ));
                     ?>
                 </tr>
