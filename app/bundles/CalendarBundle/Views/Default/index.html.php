@@ -11,7 +11,7 @@ $view['slots']->set('mauticContent', 'calendar');
 $view['slots']->set('headerTitle', $view['translator']->trans('mautic.calendar.menu.index'));
 ?>
 
-<div class="panel panel-default mnb-5">
+<div class="panel panel-default mnb-5 bdr-t-wdh-0">
 	<div class="panel-body">
 		<div id="calendar"></div>
 	</div>
