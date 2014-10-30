@@ -40,4 +40,15 @@ class EventCanvasSettingsEndpointsType extends AbstractType
     public function getName() {
         return "campaignevent_canvassettings_endpoints";
     }
+
+
+    /**
+     * @param OptionsResolverInterface $resolver
+     */
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->setDefaults(array(
+            'label' => false
+        ));
+    }
 }
