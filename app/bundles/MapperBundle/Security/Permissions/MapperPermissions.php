@@ -7,22 +7,23 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\SocialBundle\Security\Permissions;
+namespace Mautic\MapperBundle\Security\Permissions;
 
 use Symfony\Component\Form\FormBuilderInterface;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 
 /**
- * Class SocialPermissions
+ * Class MapperPermissions
  *
- * @package Mautic\LeadBundle\Security\Permissions
+ * @package Mautic\MapperBundle\Security\Permissions
  */
-class SocialPermissions extends AbstractPermissions
+class MapperPermissions extends AbstractPermissions
 {
 
     public function __construct($params)
     {
         parent::__construct($params);
+
         $this->permissions = array(
             'config' => array(
                 'full' => 1024
@@ -37,7 +38,7 @@ class SocialPermissions extends AbstractPermissions
      */
     public function getName ()
     {
-        return 'social';
+        return 'mapper';
     }
 
     /**
@@ -49,17 +50,18 @@ class SocialPermissions extends AbstractPermissions
      */
     public function buildForm (FormBuilderInterface &$builder, array $options, array $data)
     {
-        $builder->add('social:config', 'button_group', array(
+        $builder->add('mapper:config', 'button_group', array(
             'choices'  => array(
-                'full' => 'mautic.core.permissions.manage'
+                'full'         => 'mautic.core.permissions.manage'
             ),
-            'label'    => 'mautic.social.permissions.config',
+            'label'    => 'mautic.mapper.permissions.config',
             'expanded' => true,
             'multiple' => true,
             'attr'     => array(
-                'onclick' => 'Mautic.onPermissionChange(this, event, \'social\')'
+                'onclick' => 'Mautic.onPermissionChange(this, event, \'mapper\')'
             ),
             'data'     => (!empty($data['config']) ? $data['config'] : array())
         ));
+
     }
 }

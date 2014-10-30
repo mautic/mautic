@@ -2678,11 +2678,7 @@
                 el.style.left = xy[0] + "px";
                 el.style.top = xy[1] + "px";
             }
-        },
-
-
-
-
+        }
     };
 
 }).call(this);
@@ -8080,7 +8076,7 @@
             var xy = params.xy, wh = params.wh, timestamp = params.timestamp, txy = params.txy, twh = params.twh;
 
             if(params.clearUserDefinedLocation)
-                userDefinedLocation = null;
+                self.userDefinedLocation = null;
 
             this.timestamp = timestamp;
 
