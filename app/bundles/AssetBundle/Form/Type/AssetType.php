@@ -50,7 +50,8 @@ class AssetType extends AbstractType
         $builder->add('file', 'file', array(
             'label'      => 'mautic.asset.asset.form.file.upload',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
+            'attr'       => array('class' => 'form-control'),
+            'required'   => true
         ));
 
         $builder->add('title', 'text', array(

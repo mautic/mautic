@@ -61,40 +61,62 @@ class LeadEventLogRepository extends EntityRepository
     /**
      * Get a lead's upcoming events
      *
-     * @param \Mautic\LeadBundle\Entity\Lead $lead entity
+     * @param array $options
      *
      * @return array
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getUpcomingEvents(\Mautic\LeadBundle\Entity\Lead $lead)
+    public function getUpcomingEvents(array $options = null)
     {
         $leadIps = array();
-
-        /** @var \Mautic\CoreBundle\Entity\IpAddress $ip */
-        foreach ($lead->getIpAddresses() as $ip) {
-            $leadIps[] = $ip->getId();
-        }
 
         $query = $this->createQueryBuilder('ll');
         $query->select('IDENTITY(ll.event) AS event_id,
                     IDENTITY(e.campaign) AS campaign_id,
                     ll.triggerDate,
+                    IDENTITY(ll.lead) AS lead_id,
                     e.name AS eventName,
                     e.description AS eventDescription,
                     c.name AS campaignName,
                     c.description AS campaignDescription')
             ->leftJoin('MauticCampaignBundle:Event', 'e', 'WITH', 'e.id = ll.event')
             ->leftJoin('MauticCampaignBundle:Campaign', 'c', 'WITH', 'c.id = e.campaign')
-            ->where('ll.lead = :leadId')
-            ->setParameter('leadId', $lead->getId())
-            ->andWhere('e.eventType = :eventType')
-            ->setParameter('eventType', 'action')
-            ->andWhere('ll.isScheduled = :scheduled')
-            ->setParameter('scheduled', 1)
-            ->andwhere($query->expr()->gte('ll.triggerDate', ':today'))
-            ->setParameter('today', new \DateTime())
-            ->orderBy('ll.triggerDate');
+            ->where($query->expr()->gte('ll.triggerDate', ':today'))
+            ->setParameter('today', new \DateTime());
+
+        if (isset($options['lead'])) {
+            /** @var \Mautic\CoreBundle\Entity\IpAddress $ip */
+            foreach ($options['lead']->getIpAddresses() as $ip) {
+                $leadIps[] = $ip->getId();
+            }
+
+            $query->andWhere('ll.lead = :leadId')
+                ->setParameter('leadId', $options['lead']->getId());
+        }
+
+        if (isset($options['scheduled'])) {
+            $query->andWhere('ll.isScheduled = :scheduled')
+                ->setParameter('scheduled', $options['scheduled']);
+        }
+
+        if (isset($options['eventType'])) {
+            $query->andwhere('e.eventType = :eventType')
+                ->setParameter('eventType', $options['eventType']);
+        }
+
+        if (isset($options['type'])) {
+            $query->andwhere('e.type = :type')
+                ->setParameter('type', $options['type']);
+        }
+
+        if (isset($options['limit'])) {
+            $query->setMaxResults($options['limit']);
+        } else {
+            $query->setMaxResults(10);
+        }
+
+        $query->orderBy('ll.triggerDate');
 
         if (!empty($ipIds)) {
             $query->orWhere('ll.ipAddress IN (' . implode(',', $ipIds) . ')');

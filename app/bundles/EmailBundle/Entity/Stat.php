@@ -34,7 +34,8 @@ class Stat
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Email")
+     * @ORM\ManyToOne(targetEntity="Email", inversedBy="stats")
+     * @ORM\JoinColumn(name="email_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})
