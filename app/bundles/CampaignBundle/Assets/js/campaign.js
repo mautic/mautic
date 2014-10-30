@@ -222,9 +222,7 @@ Mautic.campaignOnLoad = function (container) {
 
         //make the events draggable
         mQuery('#CampaignEventPanel .list-group-item').draggable({
-            helper: function() {
-                return mQuery('<div><i class="fa fa-lg fa-crosshairs"></i></div>');
-            },
+            helper: 'clone',
             appendTo: '.campaign-builder',
             zIndex: 8000,
             scroll: true,
