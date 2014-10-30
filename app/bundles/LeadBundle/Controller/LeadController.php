@@ -209,10 +209,14 @@ class LeadController extends FormController
      */
     public function viewAction($objectId)
     {
-        $model   = $this->factory->getModel('lead.lead');
-        $lead    = $model->getEntity($objectId);
+        /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+        $model = $this->factory->getModel('lead.lead');
+
+        /** @var \Mautic\LeadBundle\Entity\Lead $lead */
+        $lead = $model->getEntity($objectId);
+
         //set the page we came from
-        $page    = $this->factory->getSession()->get('mautic.lead.page', 1);
+        $page = $this->factory->getSession()->get('mautic.lead.page', 1);
 
         //set some permissions
         $permissions = $this->factory->getSecurity()->isGranted(array(
@@ -278,6 +282,10 @@ class LeadController extends FormController
         $this->factory->getDispatcher()->dispatch(CoreEvents::FETCH_ICONS, $event);
         $icons = $event->getIcons();
 
+        // We need the EmailRepository to check if a lead is flagged as do not contact
+        /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
+        $emailRepo = $this->factory->getModel('email')->getRepository();
+
         return $this->delegateView(array(
             'viewParameters'  => array(
                 'lead'              => $lead,
@@ -291,7 +299,8 @@ class LeadController extends FormController
                 'eventFilter'       => $eventFilter,
                 'upcomingEvents'    => $upcomingEvents,
                 'icons'             => $icons,
-                'noteCount'         => $this->factory->getModel('lead.note')->getNoteCount($lead)
+                'noteCount'         => $this->factory->getModel('lead.note')->getNoteCount($lead),
+                'doNotContact'      => $emailRepo->checkDoNotEmail($fields['core']['email']['value'])
             ),
             'contentTemplate' => 'MauticLeadBundle:Lead:lead.html.php',
             'passthroughVars' => array(

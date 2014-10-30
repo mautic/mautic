@@ -113,6 +113,9 @@ $view['slots']->stop();
                         </div>
                     </div>
                     <div class="col-xs-4 va-m text-right">
+                        <?php if ($doNotContact) : ?>
+                            <h4 class="fw-sb"><span class="label label-danger">DO NOT CONTACT</span></h4>
+                        <?php endif; ?>
                         <?php
                         $color = $lead->getColor();
                         $style = !empty($color) ? ' style="font-color: ' . $color . ' !important;"' : '';
