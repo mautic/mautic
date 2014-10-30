@@ -10,7 +10,7 @@
 namespace Mautic\MapperBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
-use Mautic\MapperBundle\Helper\NetworkIntegrationHelper;
+use Mautic\MapperBundle\Helper\ApplicationIntegrationHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class MapperController extends FormController
@@ -21,16 +21,33 @@ class MapperController extends FormController
             return $this->accessDenied();
         }
 
+        $applications = ApplicationIntegrationHelper::getApplications($this->factory, null, null, true);
+
+        return $this->delegateView(array(
+            'viewParameters'  => array(
+                'applications' => $applications
+            ),
+            'contentTemplate' => "MauticMapperBundle:Dashboard:index.html.php",
+            'passthroughVars' => array(
+                'activeLink'     => '#mautic_mapper_index',
+                'mauticContent'  => 'leadSocial',
+                'route'          => ''
+            )
+        ));
+    }
+
+    public function integrationAction($network)
+    {
+
+    }
+
+    public function integrationObjectAction($network, $object)
+    {
 
     }
 
     public function oAuth2CallbackAction($network)
     {
 
-    }
-
-    public function oAuthStatusAction()
-    {
-        return $this->render('MauticSocialBundle:Social:postauth.html.php');
     }
 }

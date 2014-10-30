@@ -90,7 +90,7 @@ $view['slots']->set('mauticContent', 'dashboard');
                 </li>
     	        <li class="">
                     <a href="#page-stats-container" role="tab" data-toggle="tab">
-                        <?php echo $view['translator']->trans('mautic.dashboard.label.inbox'); ?>
+                        <?php echo $view['translator']->trans('mautic.dashboard.label.upcoming.emails'); ?>
                     </a>
                 </li>
     	    </ul>
@@ -214,61 +214,39 @@ $view['slots']->set('mauticContent', 'dashboard');
 
                 <!-- #page-stats-container -->
                 <div class="tab-pane fade bdr-w-0" id="page-stats-container">
-                    <div class="pa-md clearfix">
-                        <h6 class="pull-left mr-lg"><span class="fa fa-square text-primary mr-xs"></span> Hit</h6>
-                        <h6 class="pull-left mr-lg"><span class="fa fa-square text-warning mr-xs"></span> Conversion</h6>
-                        <h6 class="pull-left"><span class="fa fa-square text-success mr-xs"></span> View</h6>
-                    </div>
+                    
+                    <?php if ($upcomingEmails) : ?>
                     <ul class="list-group mb-0">
+                        <?php foreach ($upcomingEmails as $email): ?>
                         <li class="list-group-item bg-auto bg-light-xs">
                             <div class="box-layout">
                                 <div class="col-md-1 va-m">
-                                    <h3><span class="fa fa-check-circle-o fw-sb text-success" data-toggle="tooltip" data-placement="right" title="" data-original-title="Published"></span></h3>
+                                    <h3><span class="fa <?php echo isset($icons['email']) ? $icons['email'] : ''; ?> fw-sb text-success"></span></h3>
                                 </div>
-                                <div class="col-md-7 va-m">
-                                    <h5 class="fw-sb text-primary"><a href="">Kaleidoscope Conference 2014 <span>[current]</span> <span>[parent]</span></a></h5>
-                                    <span class="text-white dark-sm">kaleidoscope-conference-2014</span>
+                                <div class="col-md-4 va-m">
+                                    <h5 class="fw-sb text-primary">
+                                        <a href="<?php echo $view['router']->generate('mautic_campaign_action', array('objectAction' => 'view', 'objectId' => $email['campaign_id'])); ?>" data-toggle="ajax">
+                                            <?php echo $email['campaignName']; ?>
+                                        </a>
+                                    </h5>
+                                    <span class="text-white dark-sm"><?php echo $email['eventName']; ?></span>
                                 </div>
                                 <div class="col-md-4 va-m text-right">
-                                    <a href="javascript:void(0)" class="btn btn-sm btn-primary">5729</a>
-                                    <a href="javascript:void(0)" class="btn btn-sm btn-warning">3426</a>
-                                    <a href="javascript:void(0)" class="btn btn-sm btn-success">354</a>
+                                    <a class="btn btn-sm btn-success"  href="<?php echo $view['router']->generate('mautic_lead_action', array('objectAction' => 'view', 'objectId' => $email['lead_id'])); ?>" data-toggle="ajax">
+                                        <span class="fa <?php echo isset($icons['lead']) ? $icons['lead'] : ''; ?>"></span>
+                                        <?php echo $email['lead']->getName(); ?>
+                                    </a>
+                                </div>
+                                <div class="col-md-3 va-m text-right">
+                                    <?php echo $view['date']->toFull($email['triggerDate']); ?>
                                 </div>
                             </div>
                         </li>
-                        <li class="list-group-item bg-auto bg-light-xs">
-                            <div class="box-layout">
-                                <div class="col-md-1 va-m">
-                                    <h3><span class="fa fa-check-circle-o fw-sb text-success" data-toggle="tooltip" data-placement="right" title="" data-original-title="Published"></span></h3>
-                                </div>
-                                <div class="col-md-7 va-m">
-                                    <h5 class="fw-sb text-primary"><a href="">Kaleidoscope Conference 2014</a></h5>
-                                    <span class="text-white dark-sm">kaleidoscope-conference-2014</span>
-                                </div>
-                                <div class="col-md-4 va-m text-right">
-                                    <a href="javascript:void(0)" class="btn btn-sm btn-primary">652</a>
-                                    <a href="javascript:void(0)" class="btn btn-sm btn-warning">115</a>
-                                    <a href="javascript:void(0)" class="btn btn-sm btn-success">342</a>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="list-group-item bg-auto bg-light-xs">
-                            <div class="box-layout">
-                                <div class="col-md-1 va-m">
-                                    <h3><span class="fa fa-check-circle-o fw-sb text-success" data-toggle="tooltip" data-placement="right" title="" data-original-title="Published"></span></h3>
-                                </div>
-                                <div class="col-md-7 va-m">
-                                    <h5 class="fw-sb text-primary"><a href="">Copenhagen Conference 2014</a></h5>
-                                    <span class="text-white dark-sm">copenhagen-conference-2014</span>
-                                </div>
-                                <div class="col-md-4 va-m text-right">
-                                    <a href="javascript:void(0)" class="btn btn-sm btn-primary">943</a>
-                                    <a href="javascript:void(0)" class="btn btn-sm btn-warning">7598</a>
-                                    <a href="javascript:void(0)" class="btn btn-sm btn-success">551</a>
-                                </div>
-                            </div>
-                        </li>
+                    <?php endforeach; ?>
                     </ul>
+                    <?php else: ?>
+                        <p><?php echo $view['translator']->trans('mautic.note.no.upcoming.emails'); ?></p>
+                    <?php endif; ?>
                 </div>
                 <!--/ #page-stats-container -->
             </div>

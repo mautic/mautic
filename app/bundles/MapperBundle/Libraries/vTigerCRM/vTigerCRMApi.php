@@ -1,11 +1,11 @@
 <?php
 
-namespace SugarCRM;
+namespace vTigerCRM;
 
-use SugarCRM\Auth\AuthInterface;
-use SugarCRM\Exception\ContextNotFoundException;
+use vTigerCRM\Auth\AuthInterface;
+use vTigerCRM\Exception\ContextNotFoundException;
 
-class SugarCRMApi
+class vTigerCRMApi
 {
     /**
      * Get an API context object
@@ -20,7 +20,7 @@ class SugarCRMApi
         static $contexts = array();
 
         if (!isset($context[$apiContext])) {
-            $class = 'SugarCRM\\Api\\' . $apiContext;
+            $class = 'vTigerCRM\\Api\\' . $apiContext;
             if (class_exists($class)) {
                 $contexts[$apiContext] = new $class($auth);
             } else {
@@ -32,4 +32,4 @@ class SugarCRMApi
     }
 }
 
-include 'AutoLoader.php';
+include 'Autoloader.php';

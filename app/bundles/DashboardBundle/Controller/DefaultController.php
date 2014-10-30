@@ -88,6 +88,16 @@ class DefaultController extends CommonController
         $this->factory->getDispatcher()->dispatch(CoreEvents::FETCH_ICONS, $event);
         $icons = $event->getIcons();
 
+        // Upcoming emails from Campaign Bundle
+        /** @var \Mautic\CampaignBundle\Entity\LeadEventLogRepository $leadEventLogRepository */
+        $leadEventLogRepository = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:LeadEventLog');
+        $upcomingEmails = $leadEventLogRepository->getUpcomingEvents(array('type' => 'email.send', 'scheduled' => 1, 'eventType' => 'action'));
+
+        $leadModel      = $this->factory->getModel('lead.lead');
+        foreach ($upcomingEmails as &$email) {
+            $email['lead'] = $leadModel->getEntity($email['lead_id']);
+        }
+
         return $this->delegateView(array(
             'viewParameters'  =>  array(
                 'sentReadCount'     => $sentReadCount,
@@ -103,6 +113,7 @@ class DefaultController extends CommonController
                 'mapData'           => $mapData,
                 'logs'              => $logs,
                 'icons'             => $icons,
+                'upcomingEmails'    => $upcomingEmails,
                 'security'          => $this->factory->getSecurity()
             ),
             'contentTemplate' => 'MauticDashboardBundle:Default:index.html.php',

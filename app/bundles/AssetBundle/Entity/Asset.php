@@ -15,6 +15,8 @@ use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
  * Class Asset
@@ -778,5 +780,21 @@ class Asset extends FormEntity
     public function getFileContents()
     {
         return file_get_contents($this->getAbsolutePath());
+    }
+
+    /**
+     * @param ClassMetadata $metadata
+     */
+    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    {
+        $request = \Symfony\Component\HttpFoundation\Request::createFromGlobals();
+        $assetFormData = $request->request->get('asset');
+
+        // only for first time
+        if (!isset($assetFormData['unlockId']) || !$assetFormData['unlockId']) {
+            $metadata->addPropertyConstraint('file', new NotBlank(array(
+                'message' => 'mautic.asset.file.notblank'
+            )));
+        }
     }
 }

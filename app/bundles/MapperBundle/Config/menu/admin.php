@@ -20,7 +20,7 @@ if ($security->isGranted('mapper:config:full')) {
             'class' => 'nav-item-name'
         ),
         'extras'          => array(
-            'iconClass' => 'fa-share-alt'
+            'iconClass' => 'fa-cloud'
         )
     );
 }
