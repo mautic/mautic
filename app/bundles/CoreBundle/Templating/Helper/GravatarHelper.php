@@ -22,9 +22,9 @@ class GravatarHelper extends Helper
         self::$devMode = $factory->getEnvironment() == 'dev';
     }
 
-    static public function getImage($email, $size = '250', $default = null)
+    public function getImage($email, $size = '250', $default = null)
     {
-        $localDefault     = 'assets/images/avatar.png';
+        $localDefault     = 'media/images/avatar.png';
         $url              = 'https://www.gravatar.com/avatar/' . md5(strtolower(trim($email))) . '?s='.$size;
 
         if ($default !== false && !self::$devMode) {
