@@ -102,6 +102,9 @@ if ($tmpl == 'index')
                     ?>
                 </td>
                 <td>
+                    <?php if (in_array($item->getId(), $noContactList)) : ?>
+                    <div class="pull-right label label-danger"><i class="fa fa-ban"> </i></div>
+                    <?php endif; ?>
                     <a href="<?php echo $view['router']->generate('mautic_lead_action',
                         array("objectAction" => "view", "objectId" => $item->getId())); ?>"
                        data-toggle="ajax">

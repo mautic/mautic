@@ -174,20 +174,25 @@ class LeadController extends FormController
             }
         }
 
+        // We need the EmailRepository to check if a lead is flagged as do not contact
+        /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
+        $emailRepo = $this->factory->getModel('email')->getRepository();
+
         $parameters = array(
-            'searchValue'  => $search,
-            'items'        => $leads,
-            'page'         => $page,
-            'totalItems'   => $count,
-            'limit'        => $limit,
-            'permissions'  => $permissions,
-            'tmpl'         => $tmpl,
-            'indexMode'    => $indexMode,
-            'lists'        => $lists,
-            'currentList'  => $list,
-            'security'     => $this->factory->getSecurity(),
-            'inSingleList' => $inSingleList,
-            'quickForm'    => $quickFormView
+            'searchValue'   => $search,
+            'items'         => $leads,
+            'page'          => $page,
+            'totalItems'    => $count,
+            'limit'         => $limit,
+            'permissions'   => $permissions,
+            'tmpl'          => $tmpl,
+            'indexMode'     => $indexMode,
+            'lists'         => $lists,
+            'currentList'   => $list,
+            'security'      => $this->factory->getSecurity(),
+            'inSingleList'  => $inSingleList,
+            'quickForm'     => $quickFormView,
+            'noContactList' => $emailRepo->getDoNotEmailList()
         );
 
         return $this->delegateView(array(
