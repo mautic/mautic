@@ -63,13 +63,13 @@ class AuditLogRepository extends CommonRepository
 
         	foreach ($log['details'] as &$detail) {
         		if (isset($detail[1])){
-                    $this->variableToText($detail[1]);
+                    $detail[1] = $this->variableToText($detail[1]);
                 } else {
                     $detail[1] = '';
                 }
 
                 if (isset($detail[0])){
-                    $this->variableToText($detail[0]);
+                    $detail[0] = $this->variableToText($detail[0]);
                 } else {
                     $detail[0] = '';
                 }
@@ -86,7 +86,7 @@ class AuditLogRepository extends CommonRepository
      *
      * @return mixed
      */
-    public function variableToText(&$variable)
+    public function variableToText($variable)
     {
         if ($variable === true) {
             $variable = 'mautic.core.form.yes';
@@ -106,5 +106,7 @@ class AuditLogRepository extends CommonRepository
             }
             $variable = implode(', ', $tmp);
         }
+
+        return $variable;
     }
 }
