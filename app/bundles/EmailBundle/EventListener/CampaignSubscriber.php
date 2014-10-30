@@ -46,16 +46,15 @@ class CampaignSubscriber extends CommonSubscriber
             'callback'    => array('\\Mautic\\EmailBundle\\Helper\\CampaignEventHelper', 'validateEmailTrigger'),
             'formType'    => 'campaigntrigger_email'
         );
-        $event->addTrigger('email.open', $trigger);
+        $event->addLeadAction('email.open', $trigger);
 
         $action = array(
-            'group'       => 'mautic.email.campaign.trigger.group',
             'label'       => 'mautic.email.campaign.action.send',
             'description' => 'mautic.email.campaign.action.send_descr',
             'callback'    => array('\\Mautic\\EmailBundle\\Helper\\CampaignEventHelper', 'sendEmailAction'),
             'formType'    => 'campaignaction_email'
         );
-        $event->addAction('email.send', $action);
+        $event->addOutcome('email.send', $action);
     }
 
     /**

@@ -63,3 +63,23 @@ $container->setDefinition(
     ->addTag('form.type', array(
         'alias' => 'campaignaction_addremovelead'
     ));
+
+$container->setDefinition(
+    'mautic.campaign.type.canvassettings',
+    new Definition(
+        'Mautic\CampaignBundle\Form\Type\EventCanvasSettingsType'
+    )
+)
+    ->addTag('form.type', array(
+        'alias' => 'campaignevent_canvassettings'
+    ));
+
+$container->setDefinition(
+    'mautic.campaign.type.canvassettings.endpoints',
+    new Definition(
+        'Mautic\CampaignBundle\Form\Type\EventCanvasSettingsEndpointsType'
+    )
+)
+    ->addTag('form.type', array(
+        'alias' => 'campaignevent_canvassettings_endpoints'
+    ));

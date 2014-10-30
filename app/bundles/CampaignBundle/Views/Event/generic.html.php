@@ -6,53 +6,38 @@
  * @link        http://mautic.com
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-$containerClass = (!empty($deleted)) ? ' bg-danger' : '';
 
-if (!isset($childrenHtml)) {
-    $childrenHtml = '';
-}
+//for defining the jsPlumb anchors
+$class = ($event['eventType'] == 'leadaction') ? 'decision' : 'nondecision';
 
-if ($event instanceof \Mautic\CampaignBundle\Entity\Event) {
-    $event = $event->convertToArray();
-}
+
+if (!empty($deleted)):
+    $action    = 'undelete';
+    $iconClass = 'fa-undo';
+    $btnClass  = 'btn-warning';
+else:
+    $action    = 'delete';
+    $iconClass = 'fa-times';
+    $btnClass  = 'btn-danger';
+endif;
+
+if (empty($route))
+    $route = 'mautic_campaignevent_action';
+
+//generate style if applicable
+$cs    = $event['canvasSettings'];
+$style = (!empty($cs['droppedX'])) ? ' style="' . "position: absolute; top: {$cs['droppedY']}px; left: {$cs['droppedX']}px;" . '"' : '';
 ?>
 
-<li class="campaign-event-row campaign-event-<?php echo $event['eventType']; ?><?php echo $containerClass; ?>" id="CampaignEvent_<?php echo $id; ?>">
-    <div class="campaign-event-details">
-        <?php
-        if (!empty($inForm)):
-            echo $view->render('MauticCampaignBundle:CampaignBuilder:actions.html.php', array(
-                'deleted'  => (!empty($deleted)) ? $deleted : false,
-                'id'       => $id,
-                'route'    => 'mautic_campaignevent_action',
-                'level'    => $level
-            ));
-        endif;
-        if ($event['eventType'] == 'action'):
-        ?>
-        <div class="pull-right campaign-event-timeframe">
-            <?php if ($event['triggerMode'] == 'immediate'): ?>
-            <i class="fa fa-fw fa-clock-o"></i><?php echo $view['translator']->trans('mautic.campaign.event.inline.triggerimmediately'); ?>
-            <?php elseif ($event['triggerMode'] == 'date'): ?>
-            <i class="fa fa-fw fa-clock-o"></i><?php echo $view['date']->toFull($event['triggerDate']); ?>
-            <?php else: ?>
-            <i class="fa fa-fw fa-clock-o"></i>
-                <?php echo $view['translator']->trans('mautic.campaign.event.inline.triggerinterval', array(
-                    '%interval%' => $event['triggerInterval'],
-                    '%unit%'     => $view['translator']->trans('mautic.campaign.event.intervalunit.' . $event['triggerIntervalUnit'])
-                ));
-            endif;
-            ?>
-        </div>
-        <?php endif; ?>
-        <div class="pull-left">
-            <?php $icon = ($event['eventType'] == 'trigger') ? 'fa-bullseye text-danger' : 'fa-rocket text-success'; ?>
-            <span class="campaign-event-label" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.campaign.event.'.$event['eventType']); ?>"><i class="fa mr5 <?php echo $icon; ?>"></i><?php echo $event['name']; ?></span>
-            <?php if (!empty($event['description'])): ?>
-            <span class="campaign-event-descr"><?php echo $event['description']; ?></span>
-            <?php endif; ?>
-        </div>
-        <div class="clearfix"></div>
+<div <?php echo $style; ?> id="CampaignEvent_<?php echo $event['id'] ?>" class="draggable list-campaign-event list-campaign-<?php echo $class; ?> list-campaign-<?php echo $event['eventType']; ?>">
+    <span class="campaign-event-name"><?php echo $event['name']; ?></span>
+
+    <div class="campaign-event-buttons hide">
+        <a data-toggle="ajaxmodal" data-target="#CampaignEventModal" href="<?php echo $view['router']->generate($route, array('objectAction' => 'edit', 'objectId' => $event['id'])); ?>" class="btn btn-success btn-xs btn-edit">
+            <i class="fa fa-pencil-square-o"></i>
+        </a>
+        <a data-menu-link="mautic_campaign_index" data-toggle="ajax" data-ignore-formexit="true" data-method="POST" data-hide-loadingbar="true" href="<?php echo $view['router']->generate($route, array('objectAction' => $action, 'objectId' => $event['id'])); ?>"  class="btn <?php echo $btnClass; ?> btn-xs">
+            <i class="fa <?php echo $iconClass; ?>"></i>
+        </a>
     </div>
-    <?php echo $childrenHtml; ?>
-</li>
+</div>

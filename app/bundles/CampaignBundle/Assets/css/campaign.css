@@ -10,14 +10,108 @@
     margin-right: 5px;
 }
 
-#campaignBuilder .modal-dialog {
-    width: 100%;
-    height: 100%;
-    padding: 10px;
-    margin: 0;
+.campaign-builder {
+    position: relative;
 }
 
-#campaignBuilder .modal-content {
+.campaign-builder-active {
+    background-color: #fff !important;
+    position: absolute !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    right: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 1030;
+}
+
+.campaign-builder-panel {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: 300px;
     height: 100%;
-    border-radius: 0;
+    padding: 15px;
+    background-color: #d5d4d4;
+    overflow-y: auto;
+}
+
+.campaign-builder-panel .btn-close-builder {
+    width: 100%;
+}
+
+.campaign-builder-content {
+    position: fixed;
+    left: 0;
+    top: 0;
+    right: 250px;
+    height: 100%;
+    position: fixed;
+}
+
+#CampaignCanvas {
+    height: 1000px;
+    overflow-y: auto;
+}
+
+.campaign-builder-panel .panel a.btn {
+    white-space: normal;
+}
+
+._jsPlumb_endpoint {
+    z-index: 1005;
+}
+
+._jsPlumb_connector {
+    z-index: 1000;
+}
+
+.list-campaign-event {
+    width: 200px;
+    height: 45px;
+    position: absolute;
+    margin: 10px;
+    padding: 10px 15px;
+    z-index: 1010;
+    border-radius: 3px;
+}
+
+.list-campaign-event:hover {
+    border:1px solid #123456;
+    box-shadow: 2px 2px 19px #444;
+    -o-box-shadow: 2px 2px 19px #444;
+    -webkit-box-shadow: 2px 2px 19px #444;
+    -moz-box-shadow: 2px 2px 19px #fff;
+    opacity:0.9;
+    filter:alpha(opacity=90);
+}
+
+.list-campaign-event .campaign-event-name {
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.list-campaign-leadaction,  a.list-campaign-leadaction {
+    background-color: #faebcc;
+    border: solid 1px #8a6d3b;
+}
+
+.list-campaign-systemaction, a.list-campaign-systemaction {
+    background-color: #8393a2;
+    border: solid 1px #4f5761;
+    color: #fff;
+}
+
+.list-campaign-outcome, a.list-campaign-outcome {
+    background-color: #47558f;
+    border: solid 1px #343b68;
+    color: #fff;
+}
+
+.campaign-event-buttons {
+    position: absolute;
+    top: -15px;
+    right: 0;
 }

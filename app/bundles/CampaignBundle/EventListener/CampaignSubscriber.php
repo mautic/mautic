@@ -35,8 +35,8 @@ class CampaignSubscriber extends CommonSubscriber
         return array(
             CampaignEvents::CAMPAIGN_POST_SAVE     => array('onCampaignPostSave', 0),
             CampaignEvents::CAMPAIGN_POST_DELETE   => array('onCampaignDelete', 0),
-            CampaignEvents::CAMPAIGN_ON_BUILD      => array('onCampaignBuild', 0),
-            CampaignEvents::CAMPAIGN_ON_LEADCHANGE => array('onCampaignLeadChange', 0),
+            //CampaignEvents::CAMPAIGN_ON_BUILD      => array('onCampaignBuild', 0),
+            //CampaignEvents::CAMPAIGN_ON_LEADCHANGE => array('onCampaignLeadChange', 0),
             LeadEvents::TIMELINE_ON_GENERATE => array('onTimelineGenerate', 0)
         );
     }
@@ -90,23 +90,21 @@ class CampaignSubscriber extends CommonSubscriber
     {
         //Add trigger
         $leadChangeTrigger = array(
-            'group'        => 'mautic.campaign.event.action.group',
             'label'        => 'mautic.campaign.trigger.leadchange',
             'description'  => 'mautic.campaign.trigger.leadchange_descr',
             'formType'     => 'campaigntrigger_leadchange',
             'callback'     => '\Mautic\CampaignBundle\Helper\CampaignEventHelper::validateLeadChangeTrigger'
         );
-        $event->addTrigger('campaign.leadchange', $leadChangeTrigger);
+        $event->addLeadAction('campaign.leadchange', $leadChangeTrigger);
 
         //Add action to actually add/remove lead to a specific lists
         $addRemoveLeadAction = array(
-            'group'        => 'mautic.campaign.event.action.group',
             'label'        => 'mautic.campaign.action.addremovelead',
             'description'  => 'mautic.campaign.action.addremovelead_descr',
             'formType'     => 'campaignaction_addremovelead',
             'callback'     => '\Mautic\CampaignBundle\Helper\CampaignEventHelper::addRemoveLead'
         );
-        $event->addAction('campaign.addremovelead', $addRemoveLeadAction);
+        $event->addLeadAction('campaign.addremovelead', $addRemoveLeadAction);
     }
 
     /**

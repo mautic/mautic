@@ -47,48 +47,43 @@ class CampaignSubscriber extends CommonSubscriber
     {
         //Add triggers
         $trigger = array(
-            'group'        => 'mautic.lead.lead.events.group',
             'label'        => 'mautic.lead.lead.events.leadcreated',
             'description'  => 'mautic.lead.lead.events.leadcreated_descr'
         );
-        $event->addTrigger('lead.created', $trigger);
+        $event->addSystemAction('lead.created', $trigger);
 
         $trigger = array(
-            'group'        => 'mautic.lead.lead.events.group',
             'label'        => 'mautic.lead.lead.events.pointchange',
             'description'  => 'mautic.lead.lead.events.pointchange_descr',
             'formType'     => 'leadpoints_trigger',
             'callback'     => '\Mautic\LeadBundle\Helper\CampaignEventHelper::validatePointChange'
         );
-        $event->addTrigger('lead.pointchange', $trigger);
+        $event->addSystemAction('lead.pointchange', $trigger);
 
         $trigger = array(
-            'group'        => 'mautic.lead.lead.events.group',
             'label'        => 'mautic.lead.lead.events.listchange',
             'description'  => 'mautic.lead.lead.events.listchange_descr',
             'formType'     => 'leadlist_trigger',
             'callback'     => '\Mautic\LeadBundle\Helper\CampaignEventHelper::validateListChange'
         );
-        $event->addTrigger('lead.listchange', $trigger);
+        $event->addSystemAction('lead.listchange', $trigger);
 
         //Add actions
         $action = array(
-            'group'       => 'mautic.lead.lead.events.group',
             'label'       => 'mautic.lead.lead.events.changepoints',
             'description' => 'mautic.lead.lead.events.changepoints_descr',
             'formType'    => 'leadpoints_action',
             'callback'    => '\Mautic\LeadBundle\Helper\CampaignEventHelper::changePoints'
         );
-        $event->addAction('lead.changepoints', $action);
+        $event->addOutcome('lead.changepoints', $action);
 
         $action = array(
-            'group'        => 'mautic.lead.lead.events.group',
             'label'        => 'mautic.lead.lead.events.changelist',
             'description'  => 'mautic.lead.lead.events.changelist_descr',
             'formType'     => 'leadlist_action',
             'callback'     => '\Mautic\LeadBundle\Helper\CampaignEventHelper::changeLists'
         );
-        $event->addAction('lead.changelist', $action);
+        $event->addOutcome('lead.changelist', $action);
     }
 
     /**

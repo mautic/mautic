@@ -143,10 +143,11 @@ class CampaignModel extends CommonFormModel
 
     /**
      * @param Campaign $entity
-     * @param       $sessionEvents
-     * @param       $sessionOrder
+     * @param          $sessionEvents
+     * @param          $sessionConnections
+     * @param          $deletedEvents
      */
-    public function setEvents(Campaign &$entity, $sessionEvents, $sessionOrder, $deletedEvents)
+    public function setEvents(Campaign &$entity, $sessionEvents, $sessionConnections, $deletedEvents)
     {
         $existingEvents = $entity->getEvents();
 
@@ -163,10 +164,15 @@ class CampaignModel extends CommonFormModel
             $event = !$isNew ? $existingEvents[$properties['id']] : new Event();
 
             foreach ($properties as $f => $v) {
+                if ($f == 'id' && strpos($v, 'new') === 0) {
+                    //set the temp ID used to be able to match up connections
+                    $event->setTempId($v);
+                }
+
                 if (in_array($f, array('id', 'order', 'parent')))
                     continue;
 
-                $func = "set" .  ucfirst($f);
+                $func = "set" . ucfirst($f);
                 if (method_exists($event, $func)) {
                     $event->$func($v);
                 }
@@ -177,12 +183,15 @@ class CampaignModel extends CommonFormModel
 
         //determine and set the order and also parent which must be done after the entity has been created and
         //monitored by doctrine
-        $byParent = array();
-        $setParent = function($eventId, $parentId) use (&$byParent, $entity, $events, $deletedEvents) {
+        $byParent  = array();
+        $setParent = function($eventId, $parentId, $anchor) use (&$byParent, $entity, $events, $deletedEvents) {
             //check to see if this event has a parent that has been deleted
             $atTopParent   = false;
             $parentDeleted = false;
             $parent        = $events[$eventId]->getParent();
+
+            $events[$eventId]->setDecisionPath($anchor);
+
             while (!$atTopParent && !$parentDeleted) {
                 if ($parent === null) {
                     $atTopParent = true;
@@ -217,15 +226,17 @@ class CampaignModel extends CommonFormModel
             $byParent[$parentId][] = $eventId;
         };
 
-        if (!empty($sessionOrder)) {
-            //the entities have been reordered manually by user
-            foreach ($sessionOrder as $child => $parent) {
-                if (!isset($events[$child])) {
-                    //likely a deleted event
-                    continue;
-                }
+        if (!empty($sessionConnections)) {
+            //the connections have been manipulated by user
+            foreach ($sessionConnections as $parent => $anchors) {
+                foreach ($anchors as $anchor => $child) {
+                    if (!isset($events[$child])) {
+                        //likely a deleted event
+                        continue;
+                    }
 
-                $setParent($child, $parent);
+                    $setParent($child, $parent, (in_array($anchor, array('yes', 'no')) ? $anchor : null));
+                }
             }
         } else {
             //the entities were not reordered by user
@@ -234,7 +245,7 @@ class CampaignModel extends CommonFormModel
                 $parent   = $e->getParent();
                 $parentId = ($parent === null) ? 'null' : $parent->getId();
 
-                $setParent($id, $parentId);
+                $setParent($id, $parentId, $e->getDecisionPath());
             }
         }
 
@@ -271,17 +282,9 @@ class CampaignModel extends CommonFormModel
             $events = array();
             $event  = new Events\CampaignBuilderEvent($this->translator);
             $this->dispatcher->dispatch(CampaignEvents::CAMPAIGN_ON_BUILD, $event);
-            $events['action']  = $event->getActions();
-            $events['trigger'] = $event->getTriggers();
-
-            $grouped = array();
-            foreach ($events['action'] as $k => $e) {
-                $grouped['action'][$e['group']][$k] = $e;
-            }
-            foreach ($events['trigger'] as $k => $e) {
-                $grouped['trigger'][$e['group']][$k] = $e;
-            }
-            $events['grouped'] = $grouped;
+            $events['leadaction']   = $event->getLeadActions();
+            $events['systemaction'] = $event->getSystemActions();
+            $events['outcome']      = $event->getOutcomes();
         }
 
         return $events;

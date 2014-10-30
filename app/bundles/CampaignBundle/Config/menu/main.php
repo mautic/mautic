@@ -23,33 +23,31 @@ $items = array(
                 ),
                 'extras'=> array(
                     'routeName' => 'mautic_campaign_index'
-                ),
-                'children' => array(
-                    'mautic.campaign.menu.new' => array(
-                        'route'    => 'mautic_campaign_action',
-                        'routeParameters' => array("objectAction"  => "new"),
-                        'extras'  => array(
-                            'routeName' => 'mautic_campaign_action|new'
-                        ),
-                        'display' => false //only used for breadcrumb generation
-                    ),
-                    'mautic.campaign.menu.edit' => array(
-                        'route'           => 'mautic_campaign_action',
-                        'routeParameters' => array("objectAction"  => "edit"),
-                        'extras'  => array(
-                            'routeName' => 'mautic_campaign_action|edit'
-                        ),
-                        'display' => false //only used for breadcrumb generation
-                    ),
-                    'mautic.campaign.menu.view' => array(
-                        'route'           => 'mautic_campaign_action',
-                        'routeParameters' => array("objectAction"  => "view"),
-                        'extras'  => array(
-                            'routeName' => 'mautic_campaign_action|view'
-                        ),
-                        'display' => false //only used for breadcrumb generation
-                    )
                 )
+            ),
+            'mautic.campaign.menu.new' => array(
+                'route'    => 'mautic_campaign_action',
+                'routeParameters' => array("objectAction"  => "new"),
+                'extras'  => array(
+                    'routeName' => 'mautic_campaign_action|new'
+                ),
+                'display' => false //only used for breadcrumb generation
+            ),
+            'mautic.campaign.menu.edit' => array(
+                'route'           => 'mautic_campaign_action',
+                'routeParameters' => array("objectAction"  => "edit"),
+                'extras'  => array(
+                    'routeName' => 'mautic_campaign_action|edit'
+                ),
+                'display' => false //only used for breadcrumb generation
+            ),
+            'mautic.campaign.menu.view' => array(
+                'route'           => 'mautic_campaign_action',
+                'routeParameters' => array("objectAction"  => "view"),
+                'extras'  => array(
+                    'routeName' => 'mautic_campaign_action|view'
+                ),
+                'display' => false //only used for breadcrumb generation
             )
         )
     )

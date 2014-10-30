@@ -37,7 +37,8 @@ class ExceptionController extends \Symfony\Bundle\TwigBundle\Controller\Exceptio
                 'error' => array(
                     'code'      => $code,
                     'text'      => isset(Response::$statusTexts[$code]) ? Response::$statusTexts[$code] : '',
-                    'exception' => $exception->getMessage()
+                    'exception' => $exception->getMessage(),
+                    'trace'     => ($this->debug) ? $exception->getTrace() : ''
                 )
             ), $code);
         } else {

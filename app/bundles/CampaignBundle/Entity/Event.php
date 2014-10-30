@@ -130,13 +130,31 @@ class Event
 
     /**
      * @ORM\ManyToOne(targetEntity="Event", inversedBy="children")
-     * @ORM\JoinColumn(name="parent_id", referencedColumnName="id", nullable=true)
+     * @ORM\JoinColumn(name="parent_id", referencedColumnName="id", nullable=true, onDelete="SET NULL")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"campaignDetails"})
      * @Serializer\MaxDepth(1)
      **/
     private $parent = null;
+
+    /**
+     * @ORM\Column(name="canvas_settings", type="array", nullable=true)
+     */
+    private $canvasSettings = array();
+
+    /**
+     * @ORM\Column(name="decision_path", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"campaignDetails"})
+     **/
+    private $decisionPath;
+
+    /**
+     * @ORM\Column(name="temp_id", nullable=true)
+     **/
+    private $tempId;
 
     /**
      * @ORM\OneToMany(targetEntity="LeadEventLog", mappedBy="event", fetch="EXTRA_LAZY", cascade={"persist", "remove"})
@@ -517,5 +535,53 @@ class Event
     public function setTriggerMode ($triggerMode)
     {
         $this->triggerMode = $triggerMode;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCanvasSettings ()
+    {
+        return $this->canvasSettings;
+    }
+
+    /**
+     * @param array $canvasSettings
+     */
+    public function setCanvasSettings (array $canvasSettings)
+    {
+        $this->canvasSettings = $canvasSettings;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDecisionPath ()
+    {
+        return $this->decisionPath;
+    }
+
+    /**
+     * @param mixed $decisionPath
+     */
+    public function setDecisionPath ($decisionPath)
+    {
+        $this->decisionPath = $decisionPath;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTempId ()
+    {
+        return $this->tempId;
+    }
+
+    /**
+     * @param mixed $tempId
+     */
+    public function setTempId ($tempId)
+    {
+        $this->tempId = $tempId;
     }
 }

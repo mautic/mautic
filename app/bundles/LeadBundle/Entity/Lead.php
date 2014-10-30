@@ -120,7 +120,7 @@ class Lead extends FormEntity
     protected $fields = array();
 
     /**
-     * @ORM\Column(name="preferred_profile_image",type="string")
+     * @ORM\Column(name="preferred_profile_image",type="string", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"full"})

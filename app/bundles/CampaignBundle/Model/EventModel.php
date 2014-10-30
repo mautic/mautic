@@ -248,7 +248,7 @@ class EventModel extends CommonFormModel
                             $lastEvent = $child;
 
                             continue;
-                        } elseif ($child['eventType'] == 'trigger') {
+                        } elseif ($child['eventType'] == 'outcome') {
                             //have hit the next trigger in the drip flow so continue on to the next matching trigger type
                             break;
                         }

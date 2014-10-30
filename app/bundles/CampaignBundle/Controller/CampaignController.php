@@ -221,8 +221,8 @@ class CampaignController extends FormController
                         ));
                         $valid = false;
                     } else {
-                        $order = $session->get('mautic.campaigns.order');
-                        $model->setEvents($entity, $events, $order, $deletedEvents);
+                        $connections = $session->get('mautic.campaigns.connections');
+                        $model->setEvents($entity, $events, $connections, $deletedEvents);
 
                         //form is valid so process the data
                         $model->saveEntity($entity);
@@ -280,8 +280,9 @@ class CampaignController extends FormController
         $events = $model->getEvents();
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'components'  => $events,
+                'eventSettings'  => $events,
                 'campaignEvents' => $addEvents,
+                'tempEventIds'   => $this->associateIdWithTempIds($addEvents),
                 'deletedEvents'  => $deletedEvents,
                 'tmpl'           => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                 'entity'         => $entity,
@@ -367,8 +368,8 @@ class CampaignController extends FormController
                         ));
                         $valid = false;
                     } else {
-                        $order = $session->get('mautic.campaigns.order');
-                        $model->setEvents($entity, $events, $order, $deletedEvents);
+                        $connections = $session->get('mautic.campaigns.connections');
+                        $model->setEvents($entity, $events, $connections, $deletedEvents);
 
                         //form is valid so process the data
                         $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
@@ -446,19 +447,12 @@ class CampaignController extends FormController
             $deletedEvents = array();
         }
 
-        $templateEvents = array();
-        //weed out child events to prevent them from being displayed multiple times
-        foreach ($campaignEvents as $e) {
-            if (empty($e['parent'])) {
-                $templateEvents[] = $e;
-            }
-        }
-
         $events = $model->getEvents();
         return $this->delegateView(array(
             'viewParameters'  => array(
                 'eventSettings'  => $events,
-                'campaignEvents' => $templateEvents,
+                'campaignEvents' => $campaignEvents,
+                'tempEventIds'   => $this->associateIdWithTempIds($campaignEvents),
                 'deletedEvents'  => $deletedEvents,
                 'tmpl'           => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                 'entity'         => $entity,
@@ -564,11 +558,25 @@ class CampaignController extends FormController
     /**
      * Clear field and events from the session
      */
-    public function clearSessionComponents ()
+    private function clearSessionComponents ()
     {
         $session = $this->factory->getSession();
         $session->remove('mautic.campaigns.add');
         $session->remove('mautic.campaigns.remove');
-        $session->remove('mautic.campaigns.order');
+        $session->remove('mautic.campaigns.connections');
+    }
+
+    /**
+     * @param $events
+     *
+     * @return array
+     */
+    private function associateIdWithTempIds($events)
+    {
+        $tempIds = array();
+        foreach ($events as $e) {
+            $tempIds[$e['tempId']] = $e['id'];
+        }
+        return $tempIds;
     }
 }

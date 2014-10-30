@@ -36,8 +36,12 @@ MauticVars.lastSearchStr        = "";
 MauticVars.globalLivecache      = new Array();
 MauticVars.lastGlobalSearchStr  = "";
 
+//used for spinning icons (to show something is in progress)
+MauticVars.iconClasses          = {};
+
 //register the loading bar for ajax page loads
 MauticVars.showLoadingBar       = true;
+
 //prevent multiple ajax calls from multiple clicks
 MauticVars.routeInProgress       = '';
 
@@ -196,6 +200,11 @@ var Mautic = {
             preferredFormat: 'hex'
         });
 
+        //spin icons on button click
+        mQuery(container + ' .btn').on('click.spinningicons', function(event) {
+            Mautic.startIconSpinOnEvent(event);
+        });
+
         //Copy form buttons to the toolbar
         if (mQuery(container + " .bottom-form-buttons").length) {
             //hide the toolbar actions if applicable
@@ -214,6 +223,7 @@ var Mautic = {
                         .appendTo('.toolbar-form-buttons')
                         .on('click.ajaxform', function (event) {
                             event.preventDefault();
+                            Mautic.startIconSpinOnEvent(event);
                             mQuery('#' + id).click();
                         });
                 });
@@ -325,11 +335,6 @@ var Mautic = {
         //keep browser backbutton from loading cached ajax response
         //var ajaxRoute = route + ((/\?/i.test(route)) ? "&ajax=1" : "?ajax=1");
 
-        //little animation to let the user know that something is happening
-        if (typeof event != 'undefined' && event.target) {
-            Mautic.startIconSpinOnEvent(event);
-        }
-
         mQuery.ajax({
             url: route,
             type: method,
@@ -387,22 +392,27 @@ var Mautic = {
      */
     startIconSpinOnEvent: function (event)
     {
-        var hasBtn = mQuery(event.target).hasClass('btn');
-        var hasIcon = mQuery(event.target).hasClass('fa');
-        if ((hasBtn && mQuery(event.target).find('i.fa').length) || hasIcon) {
-            MauticVars.iconButton = (hasIcon) ? event.target :  mQuery(event.target).find('i.fa').first();
-            MauticVars.iconClassesRemoved = mQuery(MauticVars.iconButton).attr('class');
-            var specialClasses = ['fa-fw', 'fa-lg', 'fa-2x', 'fa-3x', 'fa-4x', 'fa-5x', 'fa-li'];
-            var appendClasses  = "";
+        if (event && typeof(event.target) !== 'undefined' && mQuery(event.target).length) {
+            var hasBtn = mQuery(event.target).hasClass('btn');
+            var hasIcon = mQuery(event.target).hasClass('fa');
+            var notDropdown = !mQuery(event.target).hasClass('fa-angle-down');
+            if (((hasBtn && mQuery(event.target).find('i.fa').length) || hasIcon) && notDropdown) {
+                var el              = (hasIcon) ? event.target : mQuery(event.target).find('i.fa').first();
+                var identifierClass = (new Date).getTime();
+                MauticVars.iconClasses[identifierClass] = mQuery(el).attr('class');
 
-            //check for special classes to add to spinner
-            for (var i=0; i<specialClasses.length; i++) {
-                if (mQuery(MauticVars.iconButton).hasClass(specialClasses[i])) {
-                    appendClasses += " " + specialClasses[i];
+                var specialClasses = ['fa-fw', 'fa-lg', 'fa-2x', 'fa-3x', 'fa-4x', 'fa-5x', 'fa-li'];
+                var appendClasses = "";
+
+                //check for special classes to add to spinner
+                for (var i = 0; i < specialClasses.length; i++) {
+                    if (mQuery(el).hasClass(specialClasses[i])) {
+                        appendClasses += " " + specialClasses[i];
+                    }
                 }
+                mQuery(el).removeClass();
+                mQuery(el).addClass('fa fa-spinner fa-spin ' + identifierClass + appendClasses);
             }
-            mQuery(MauticVars.iconButton).removeClass();
-            mQuery(MauticVars.iconButton).addClass('fa fa-spinner fa-spin' + appendClasses);
         }
     },
 
@@ -411,13 +421,11 @@ var Mautic = {
      */
     stopIconSpinPostEvent: function()
     {
-        if (typeof MauticVars.iconClassesRemoved != 'undefined') {
-            if (mQuery(MauticVars.iconButton).hasClass('fa-spin')) {
-                mQuery(MauticVars.iconButton).removeClass('fa fa-spinner fa-spin').addClass(MauticVars.iconClassesRemoved);
-            }
-            delete MauticVars.iconButton;
-            delete MauticVars.iconClassesRemoved;
-        }
+        mQuery.each(MauticVars.iconClasses, function( index, value ) {
+            mQuery('.' + index).removeClass('fa fa-spinner fa-spin ' + index).addClass(value);
+        });
+
+        MauticVars.iconClasses = {};
     },
 
     /**
@@ -669,11 +677,6 @@ var Mautic = {
     ajaxifyModal: function (el, event) {
         var target = mQuery(el).attr('data-target');
 
-        //little animation to let the user know that something is happening
-        if (typeof event != 'undefined' && event.target) {
-            Mautic.startIconSpinOnEvent(event);
-        }
-
         MauticVars.showLoadingBar = false;
 
         var route = mQuery(el).attr('href');
@@ -781,52 +784,6 @@ var Mautic = {
         } else {
             //toggle hidden state
             mQuery(".page-wrapper").toggleClass("hide-left");
-        }
-    },
-
-    /**
-     * Stick a side panel
-     * @param position
-     */
-    stickSidePanel: function (position) {
-        MauticVars.showLoadingBar = false;
-        var query = "action=togglePanel&panel=" + position;
-        mQuery.ajax({
-            url: mauticAjaxUrl,
-            type: "POST",
-            data: query,
-            dataType: "json"
-        });
-
-        if (position == "left") {
-            mQuery(".left-side-bar-pin i").toggleClass("unpinned");
-
-            //auto collapse the left side panel
-            if (mQuery(".left-side-bar-pin i").hasClass("unpinned")) {
-                //prevent firing event multiple times if directly toggling the panel
-                mQuery(".main-panel-wrapper").off("click");
-                mQuery(".main-panel-wrapper").click(function (e) {
-                    e.preventDefault();
-                    if (!mQuery(".page-wrapper").hasClass("hide-left")) {
-                        mQuery(".page-wrapper").addClass("hide-left");
-                    }
-                    //prevent firing event multiple times
-                    mQuery(".main-panel-wrapper").off("click");
-                });
-
-                mQuery(".top-panel").off("click");
-                mQuery(".top-panel").click(function (e) {
-                    if (!mQuery(e.target).parents('.panel-toggle').length) {
-                        //dismiss the panel if clickng anywhere in the top panel except the toggle button
-                        e.preventDefault();
-                        if (!mQuery(".page-wrapper").hasClass("hide-left")) {
-                            mQuery(".page-wrapper").addClass("hide-left");
-                        }
-                        //prevent firing event multiple times
-                        mQuery(".top-panel").off("click");
-                    }
-                });
-            }
         }
     },
 
@@ -1189,9 +1146,6 @@ var Mautic = {
         //clear the lookup cache
         MauticVars.liveCache      = new Array();
         MauticVars.showLoadingBar = false;
-
-        //start icon spin
-        Mautic.startIconSpinOnEvent(event);
 
         if (extra) {
             extra = '&' + extra;

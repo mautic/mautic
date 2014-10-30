@@ -63,6 +63,8 @@ Mautic.launchEmailEditor = function () {
 };
 
 Mautic.closeEmailEditor = function() {
+    Mautic.stopIconSpinPostEvent();
+
     mQuery('.email-builder').addClass('hide');
 
     //make sure editors have lost focus so the content is updated

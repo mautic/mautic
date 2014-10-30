@@ -71,6 +71,8 @@ Mautic.launchPageEditor = function () {
 };
 
 Mautic.closePageEditor = function() {
+    Mautic.stopIconSpinPostEvent();
+
     mQuery('.page-builder').addClass('hide');
 
     //make sure editors have lost focus so the content is updated

@@ -38,7 +38,7 @@ class EventType extends AbstractType
             'required'   => false
         ));
 
-        if ($options['data']['eventType'] == 'action') {
+        if ($options['data']['eventType'] == 'outcome') {
             $triggerMode = (empty($options['data']['triggerMode'])) ? 'immediate' : $options['data']['triggerMode'];
             $builder->add('triggerMode', 'button_group', array(
                 'choices' => array(
@@ -60,15 +60,12 @@ class EventType extends AbstractType
 
             $attr = array(
                 'class'    => 'form-control',
-                'preaddon' => 'symbol-hashtag',
+                'preaddon' => 'fa fa-calendar',
                 'data-toggle' => 'datetime'
             );
-            if ($triggerMode != 'date') {
-                $attr['disabled'] = 'disabled';
-            }
+
             $builder->add('triggerDate', 'text', array(
-                'label'      => 'mautic.campaign.event.triggerdate',
-                'label_attr' => array('class' => 'control-label'),
+                'label'      => false,
                 'attr'       => $attr
             ));
 
@@ -77,12 +74,9 @@ class EventType extends AbstractType
                 'class'    => 'form-control',
                 'preaddon' => 'symbol-hashtag'
             );
-            if ($triggerMode != 'interval') {
-                $attr['disabled'] = 'disabled';
-            }
+
             $builder->add('triggerInterval', 'number', array(
-                'label'      => 'mautic.campaign.event.triggerinterval',
-                'label_attr' => array('class' => 'control-label'),
+                'label'      => false,
                 'attr'       => $attr,
                 'data'       => $data
             ));
@@ -91,9 +85,7 @@ class EventType extends AbstractType
             $attr = array(
                 'class' => 'form-control'
             );
-            if ($triggerMode != 'interval') {
-                $attr['disabled'] = 'disabled';
-            }
+
             $builder->add('triggerIntervalUnit', 'choice', array(
                 'choices'     => array(
                     'i' => 'mautic.campaign.event.intervalunit.i',
@@ -123,6 +115,10 @@ class EventType extends AbstractType
         $builder->add('type', 'hidden');
         $builder->add('eventType', 'hidden');
 
+        $builder->add('canvasSettings', 'campaignevent_canvassettings', array(
+            'label' => false
+        ));
+
         $update = !empty($properties);
         if (!empty($update)) {
             $btnValue = 'mautic.core.form.update';
@@ -135,6 +131,7 @@ class EventType extends AbstractType
         $builder->add('buttons', 'form_buttons', array(
             'save_text' => $btnValue,
             'save_icon' => $btnIcon,
+            'save_onclick' => 'Mautic.submitCampaignEvent(event)',
             'apply_text' => false,
             'container_class' => 'bottom-campaignevent-buttons'
         ));
