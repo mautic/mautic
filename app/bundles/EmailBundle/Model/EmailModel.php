@@ -463,9 +463,9 @@ class EmailModel extends FormModel
 
         $labels = array(
             $this->translator->trans('mautic.email.total'),
+            $this->translator->trans('mautic.email.sent'),
             $this->translator->trans('mautic.email.read'),
-            $this->translator->trans('mautic.email.failed'),
-            $this->translator->trans('mautic.email.sent')
+            $this->translator->trans('mautic.email.failed')
         );
 
         if (count($lists)) {
@@ -484,7 +484,7 @@ class EmailModel extends FormModel
                 $datasets[0]['data'][2] += $readCount;
 
                 $failedCount    = $statRepo->getFailedCount($entity->getId(), $l->getId());
-                $datasets[0]['data'][3] += $readCount;
+                $datasets[0]['data'][3] += $failedCount;
 
                 $datasets[$l->getId()] = array();
 
