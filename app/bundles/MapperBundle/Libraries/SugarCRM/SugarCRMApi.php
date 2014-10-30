@@ -1,11 +1,11 @@
 <?php
 
-namespace ZohoCRM;
+namespace SugarCRM;
 
-use ZohoCRM\Auth\AuthInterface;
-use ZohoCRM\Exception\ContextNotFoundException;
+use SugarCRM\Auth\AuthInterface;
+use SugarCRM\Exception\ContextNotFoundException;
 
-class ZohoCRMApi
+class SugarCRMApi
 {
     /**
      * Get an API context object
@@ -20,7 +20,7 @@ class ZohoCRMApi
         static $contexts = array();
 
         if (!isset($context[$apiContext])) {
-            $class = 'ZohoCRM\\Api\\' . $apiContext;
+            $class = 'SugarCRM\\Api\\' . $apiContext;
             if (class_exists($class)) {
                 $contexts[$apiContext] = new $class($auth);
             } else {
@@ -32,4 +32,4 @@ class ZohoCRMApi
     }
 }
 
-include 'AutoLoader.php';
+include 'Autoloader.php';

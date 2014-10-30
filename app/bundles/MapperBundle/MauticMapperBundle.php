@@ -16,7 +16,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  *
  * @package Mautic\MapperBundle
  */
-class MapperBundle extends Bundle
+class MauticMapperBundle extends Bundle
 {
 
 }

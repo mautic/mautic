@@ -1,29 +1,28 @@
 <?php
 
-namespace Salesforce;
+namespace ZohoCRM;
 
-use Salesforce\Auth\AuthInterface;
-use Salesforce\Exception\ContextNotFoundException;
+use ZohoCRM\Auth\AuthInterface;
+use ZohoCRM\Exception\ContextNotFoundException;
 
-class SalesforceApi
+class ZohoCRMApi
 {
     /**
      * Get an API context object
      *
      * @param string        $apiContext     API context (leads, forms, etc)
      * @param AuthInterface $auth           API Auth object
-     * @param string        $baseUrl        Base URL for API endpoints
      */
-    static function getContext($apiContext, AuthInterface $auth, $apiVersion = 'v20.0')
+    static function getContext($apiContext, AuthInterface $auth)
     {
         $apiContext = ucfirst($apiContext);
 
         static $contexts = array();
 
         if (!isset($context[$apiContext])) {
-            $class = 'Salesforce\\Api\\' . $apiContext;
+            $class = 'ZohoCRM\\Api\\' . $apiContext;
             if (class_exists($class)) {
-                $contexts[$apiContext] = new $class($auth, $apiVersion);
+                $contexts[$apiContext] = new $class($auth);
             } else {
                 throw new ContextNotFoundException("A context of '$apiContext' was not found.");
             }
@@ -33,4 +32,4 @@ class SalesforceApi
     }
 }
 
-include 'AutoLoader.php';
+include 'Autoloader.php';

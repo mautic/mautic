@@ -12,17 +12,23 @@ use Symfony\Component\Routing\Route;
 
 $collection = new RouteCollection();
 
-//register social media
-$collection->add('mautic_mapper_index', new Route('/mapper/config',
+//dashboard integrations
+$collection->add('mautic_mapper_index', new Route('/mapper/dashboard',
     array('_controller' => 'MauticMapperBundle:Mapper:index')
+));
+
+//custom integration
+$collection->add('mautic_mapper_integration', new Route('/mapper/integration/{network}',
+    array('_controller' => 'MauticMapperBundle:Mapper:integration')
+));
+
+//custom integration object mapper
+$collection->add('mautic_mapper_integration_object', new Route('/mapper/integration/{network}/{object}',
+    array('_controller' => 'MauticMapperBundle:Mapper:integrationObject')
 ));
 
 $collection->add('mautic_mapper_callback', new Route('/mapper/oauth2callback/{network}',
     array('_controller' => 'MauticMapperBundle:Mapper:oAuth2Callback')
-));
-
-$collection->add('mautic_mapper_postauth', new Route('/mapper/oauth2/status',
-    array('_controller' => 'MauticMapperBundle:Mapper:oAuthStatus')
 ));
 
 return $collection;
