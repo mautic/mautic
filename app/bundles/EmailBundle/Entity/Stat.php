@@ -43,7 +43,7 @@ class Stat
     private $email;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Mautic\LeadBundle\Entity\Lead", inversedBy="stats")
+     * @ORM\ManyToOne(targetEntity="Mautic\LeadBundle\Entity\Lead")
      * @ORM\JoinColumn(name="lead_id", referencedColumnName="id", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
