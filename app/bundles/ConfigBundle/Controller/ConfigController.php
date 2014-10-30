@@ -91,32 +91,15 @@ class ConfigController extends FormController
                         $this->get('translator')->trans('mautic.config.config.error.not.updated', array(), 'flashes')
                     );
                 }
-
-                $returnUrl = $this->generateUrl('mautic_config_action', array('objectAction' => 'edit'));
-                $viewParams = array();
-                $template = 'MauticConfigBundle:Config:form';
-                $passthroughVars = array(
-                    'activeLink'    => 'mautic_config_index',
-                    'mauticContent' => 'config'
-                );
-            } else {
-                $returnUrl = $this->generateUrl('mautic_dashboard_index');
-                $viewParams = array();
-                $template  = 'MauticDashboardBundle:Default:index';
-                $passthroughVars = array(
-                    'activeLink'    => 'mautic_dashboard_index',
-                    'mauticContent' => 'dashboard'
-                );
             }
 
-            if ($cancelled || $form->get('buttons')->get('save')->isClicked()) {
-                return $this->postActionRedirect(array(
-                    'returnUrl'       => $returnUrl,
-                    'viewParameters'  => $viewParams,
-                    'contentTemplate' => $template,
-                    'passthroughVars' => $passthroughVars
-                ));
+            // If the form is saved or cancelled, redirect back to the dashboard
+            if ($cancelled || !$this->isFormApplied()) {
+                return $this->redirect($this->generateUrl('mautic_dashboard_index'));
             }
+
+            // To get here, the form must have been applied; we must redirect to $this in order to force a proper refresh
+            return $this->redirect($this->generateUrl('mautic_config_action', array('objectAction' => 'edit')));
         }
 
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
@@ -179,5 +162,15 @@ class ConfigController extends FormController
         }
 
         return $params;
+    }
+
+    /**
+     * Checks to see if the form was applied or saved
+     *
+     * @return bool
+     */
+    protected function isFormApplied()
+    {
+        return $this->request->request->get('config[buttons][apply]', false, true) !== false;
     }
 }
