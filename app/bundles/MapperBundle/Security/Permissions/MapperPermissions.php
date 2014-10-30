@@ -14,16 +14,16 @@ use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 
 /**
  * Class MapperPermissions
+ *
+ * @package Mautic\MapperBundle\Security\Permissions
  */
 class MapperPermissions extends AbstractPermissions
 {
 
-    /**
-     * @param array $params
-     */
     public function __construct($params)
     {
         parent::__construct($params);
+
         $this->permissions = array(
             'config' => array(
                 'full' => 1024
@@ -33,20 +33,26 @@ class MapperPermissions extends AbstractPermissions
 
     /**
      * {@inheritdoc}
+     *
+     * @return string|void
      */
-    public function getName()
+    public function getName ()
     {
         return 'mapper';
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @param FormBuilderInterface $builder
+     * @param array                $options
+     * @param array                $data
      */
-    public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
+    public function buildForm (FormBuilderInterface &$builder, array $options, array $data)
     {
         $builder->add('mapper:config', 'button_group', array(
             'choices'  => array(
-                'full' => 'mautic.mapper.permissions.full'
+                'full'         => 'mautic.core.permissions.manage'
             ),
             'label'    => 'mautic.mapper.permissions.config',
             'expanded' => true,
@@ -56,5 +62,6 @@ class MapperPermissions extends AbstractPermissions
             ),
             'data'     => (!empty($data['config']) ? $data['config'] : array())
         ));
+
     }
 }

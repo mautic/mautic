@@ -51,7 +51,7 @@ class SocialPermissions extends AbstractPermissions
     {
         $builder->add('social:config', 'button_group', array(
             'choices'  => array(
-                'full' => 'mautic.social.permissions.full'
+                'full' => 'mautic.core.permissions.manage'
             ),
             'label'    => 'mautic.social.permissions.config',
             'expanded' => true,
