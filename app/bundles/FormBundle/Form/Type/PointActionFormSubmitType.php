@@ -15,12 +15,13 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 /**
  * Class PointActionFormSubmitType
- *
- * @package Mautic\PageBundle\Form\Type
  */
 class PointActionFormSubmitType extends AbstractType
 {
 
+    /**
+     * @var array
+     */
     private $choices = array();
 
     /**
@@ -28,8 +29,7 @@ class PointActionFormSubmitType extends AbstractType
      */
     public function __construct(MauticFactory $factory) {
         $viewOther = $factory->getSecurity()->isGranted('form:forms:viewother');
-        $choices = $factory->getModel('form')->getRepository()
-            ->getFormList('', 0, 0, $viewOther);
+        $choices = $factory->getModel('form')->getRepository()->getFormList('', 0, 0, $viewOther);
         foreach ($choices as $form) {
             $this->choices[$form['id']] = $form['id'] . ':' . $form['name'];
         }
@@ -39,10 +39,9 @@ class PointActionFormSubmitType extends AbstractType
     }
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
+     * {@inheritdoc}
      */
-    public function buildForm (FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $default = (empty($options['data']['delta'])) ? 0 : (int) $options['data']['delta'];
         $builder->add('delta', 'number', array(
@@ -73,9 +72,10 @@ class PointActionFormSubmitType extends AbstractType
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
-    public function getName() {
+    public function getName()
+    {
         return "pointaction_formsubmit";
     }
 }

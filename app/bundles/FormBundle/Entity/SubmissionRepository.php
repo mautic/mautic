@@ -8,6 +8,7 @@
  */
 
 namespace Mautic\FormBundle\Entity;
+
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -18,13 +19,8 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 class SubmissionRepository extends CommonRepository
 {
 
-
     /**
      * {@inheritdoc}
-     *
-     * @param $entity
-     * @param $flush true by default; use false if persisting in batches
-     * @return int
      */
     public function saveEntity($entity, $flush = true)
     {
@@ -42,9 +38,7 @@ class SubmissionRepository extends CommonRepository
     }
 
     /**
-     * @param array $args
-     *
-     * @return Paginator
+     * {@inheritdoc}
      */
     public function getEntities($args = array())
     {
@@ -149,7 +143,9 @@ class SubmissionRepository extends CommonRepository
             ) : $results;
     }
 
-
+    /**
+     * {@inheritdoc}
+     */
     public function getEntity($id = 0)
     {
         $entity = parent::getEntity($id);
@@ -170,6 +166,9 @@ class SubmissionRepository extends CommonRepository
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function getFilterExpr(&$q, $filter)
     {
         if ($filter['column'] == 's.date_submitted') {
@@ -188,7 +187,7 @@ class SubmissionRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     protected function getDefaultOrder()
     {
@@ -200,7 +199,7 @@ class SubmissionRepository extends CommonRepository
     /**
      * Fetch the base submission data from the database
      *
-     * @param array   $options
+     * @param array $options
      *
      * @return array
      * @throws \Doctrine\ORM\NoResultException

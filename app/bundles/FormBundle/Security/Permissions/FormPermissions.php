@@ -15,12 +15,13 @@ use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 
 /**
  * Class FormPermissions
- *
- * @package Mautic\FormBundle\Security\Permissions
  */
 class FormPermissions extends AbstractPermissions
 {
 
+    /**
+     * @param array $params
+     */
     public function __construct($params)
     {
         parent::__construct($params);
@@ -30,22 +31,16 @@ class FormPermissions extends AbstractPermissions
 
     /**
      * {@inheritdoc}
-     *
-     * @return string|void
      */
-    public function getName ()
+    public function getName()
     {
         return 'form';
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     * @param array                $data
      */
-    public function buildForm (FormBuilderInterface &$builder, array $options, array $data)
+    public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {
         $this->addStandardFormFields('form', 'categories', $builder, $data);
         $this->addExtendedFormFields('form', 'forms', $builder, $data);
@@ -53,10 +48,8 @@ class FormPermissions extends AbstractPermissions
 
     /**
      * {@inheritdoc}
-     *
-     * @param array $permissions
      */
-    public function analyzePermissions (array &$permissions)
+    public function analyzePermissions(array &$permissions)
     {
         parent::analyzePermissions($permissions);
 

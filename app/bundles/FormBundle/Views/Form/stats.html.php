@@ -9,6 +9,12 @@
 
 //@todo generate stats for results
 /** @var \Mautic\FormBundle\Entity\Form $form */
+$actions = $form->getActions();
+$formActions = array();
+foreach ($form->getActions() as $action) {
+    $type                    = explode('.', $action->getType());
+    $formActions[$type[0]][] = $action;
+}
 ?>
 <!-- left section -->
 <div class="col-md-9 bg-white height-auto">
@@ -174,69 +180,39 @@
             </div>
             <!--/ header -->
 
-            <h5 class="fw-sb mb-xs">Leads</h5>
-            <ul class="list-group">
-                <li class="list-group-item bg-auto bg-light-xs">
-                    <div class="box-layout">
-                        <div class="col-md-1 va-m">
-                            <h3><span class="fa fa-user text-white dark-xs"></span></h3>
-                        </div>
-                        <div class="col-md-7 va-m">
-                            <h5 class="fw-sb text-primary mb-xs">Action Name #1</h5>
-                            <h6 class="text-white dark-sm">Action description lorem ipsum dolor sit amet</h6>
-                        </div>
-                        <div class="col-md-4 va-m text-right">
-                            <em class="text-white dark-sm">lead.create</em>
-                        </div>
-                    </div>
-                </li>
-                <li class="list-group-item bg-auto bg-light-xs">
-                    <div class="box-layout">
-                        <div class="col-md-1 va-m">
-                            <h3><span class="fa fa-user text-white dark-xs"></span></h3>
-                        </div>
-                        <div class="col-md-7 va-m">
-                            <h5 class="fw-sb text-primary mb-xs">Action Name #2</h5>
-                            <h6 class="text-white dark-sm">Action description lorem ipsum dolor sit amet</h6>
-                        </div>
-                        <div class="col-md-4 va-m text-right">
-                            <em class="text-white dark-sm">lead.points</em>
-                        </div>
-                    </div>
-                </li>
-                <li class="list-group-item bg-auto bg-light-xs">
-                    <div class="box-layout">
-                        <div class="col-md-1 va-m">
-                            <h3><span class="fa fa-user text-white dark-xs"></span></h3>
-                        </div>
-                        <div class="col-md-7 va-m">
-                            <h5 class="fw-sb text-primary mb-xs">Action Name #3</h5>
-                            <h6 class="text-white dark-sm">Action description lorem ipsum dolor sit amet</h6>
-                        </div>
-                        <div class="col-md-4 va-m text-right">
-                            <em class="text-white dark-sm">lead.change</em>
-                        </div>
-                    </div>
-                </li>
-            </ul>
-
-            <h5 class="fw-sb mb-xs">Assets</h5>
-            <ul class="list-group mb-0">
-                <li class="list-group-item bg-auto bg-light-xs">
-                    <div class="box-layout">
-                        <div class="col-md-1 va-m">
-                            <h3><span class="fa fa-cloud-download text-white dark-xs"></span></h3>
-                        </div>
-                        <div class="col-md-7 va-m">
-                            <h5 class="fw-sb text-primary mb-xs">Action Name #1</h5>
-                            <h6 class="text-white dark-sm">Action description lorem ipsum dolor sit amet</h6>
-                        </div>
-                        <div class="col-md-4 va-m text-right">
-                            <em class="text-white dark-sm">assets.download</em>
-                        </div>
-                    </div>
-                </li>
-            </ul>
+            <?php foreach ($formActions as $group => $groupActions) : ?>
+                <h5 class="fw-sb mb-xs"><?php echo ucfirst($group); ?></h5>
+                <ul class="list-group">
+                    <?php /** @var \Mautic\FormBundle\Entity\Action $action */ ?>
+                    <?php foreach ($groupActions as $action) : ?>
+                        <li class="list-group-item bg-auto bg-light-xs">
+                            <div class="box-layout">
+                                <div class="col-md-1 va-m">
+                                    <?php switch ($group) {
+                                        // TODO - Better way of doing this
+                                        case 'lead':
+                                            $icon = 'fa-user';
+                                            break;
+                                        case 'asset':
+                                            $icon = 'fa-cloud-download';
+                                            break;
+                                        default:
+                                            $icon = '';
+                                    } ?>
+                                    <h3><span class="fa <?php echo $icon; ?> text-white dark-xs"></span></h3>
+                                </div>
+                                <div class="col-md-7 va-m">
+                                    <h5 class="fw-sb text-primary mb-xs"><?php echo $action->getName(); ?></h5>
+                                    <h6 class="text-white dark-sm"><?php echo $action->getDescription(); ?></h6>
+                                </div>
+                                <div class="col-md-4 va-m text-right">
+                                    <em class="text-white dark-sm"><?php echo $action->getType(); ?></em>
+                                </div>
+                            </div>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            <?php endforeach; ?>
         </div>
         <!--/ #actions-container -->
 

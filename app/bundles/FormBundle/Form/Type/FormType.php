@@ -22,13 +22,19 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * Class FormType
- *
- * @package Mautic\FormBundle\Form\Type
  */
 class FormType extends AbstractType
 {
 
+    /**
+     * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
+     */
     private $translator;
+
+    /**
+     * @var \Mautic\CoreBundle\Security\Permissions\CorePermissions
+     */
+    private $security;
 
     /**
      * @param MauticFactory $factory
@@ -39,10 +45,9 @@ class FormType extends AbstractType
     }
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
+     * {@inheritdoc}
      */
-    public function buildForm (FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber());
         $builder->addEventSubscriber(new FormExitSubscriber('form.form', $options));
@@ -76,7 +81,6 @@ class FormType extends AbstractType
 
         //add category
         FormHelper::buildForm($this->translator, $builder);
-
 
         if (!empty($options['data']) && $options['data']->getId()) {
             $readonly = !$this->security->hasEntityAccess(
@@ -192,7 +196,7 @@ class FormType extends AbstractType
     }
 
     /**
-     * @param OptionsResolverInterface $resolver
+     * {@inheritdoc}
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
@@ -206,9 +210,10 @@ class FormType extends AbstractType
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
-    public function getName() {
+    public function getName()
+    {
         return "mauticform";
     }
 }

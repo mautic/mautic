@@ -13,6 +13,7 @@ use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailEvent;
+use Mautic\EmailBundle\Event\EmailSendEvent;
 
 /**
  * Class CampaignSubscriber
@@ -60,9 +61,9 @@ class CampaignSubscriber extends CommonSubscriber
     /**
      * Trigger campaign event for sending of an email
      *
-     * @param EmailEvent $event
+     * @param EmailSendEvent $event
      */
-    public function onEmailSend(EmailEvent $event)
+    public function onEmailSend(EmailSendEvent $event)
     {
         $email = $event->getEmail();
         $this->factory->getModel('campaign')->triggerEvent('email.send', $email);

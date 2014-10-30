@@ -123,14 +123,19 @@ class ChannelRepository extends CommonRepository
         unset($results);
 
         unset($qb);
+
+        $expr = $q->expr()->andX(
+            $q->expr()->in('IDENTITY(c.channel)', ':ids'),
+            $q->expr()->notIn('c.fromUser', ':userId')
+        );
+
         $qb = $this->_em->createQueryBuilder();
         $qb->select('c.id, ch.id as channelId')
             ->from('MauticChatBundle:Chat', 'c')
             ->leftJoin('c.channel', 'ch')
-            ->where(
-                $q->expr()->in('IDENTITY(c.channel)', ':ids')
-            )
+            ->where($expr)
             ->setParameter('ids', $ids)
+            ->setParameter('userId', $userId)
             ->orderBy('c.id', 'ASC');
         $counts  = array();
         $results = $qb->getQuery()->getArrayResult();

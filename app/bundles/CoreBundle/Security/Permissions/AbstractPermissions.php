@@ -190,7 +190,9 @@ abstract class AbstractPermissions {
     /**
      * Gives the bundle the opportunity to force certain permissions if another is selected
      *
-     * @param array $permmissions
+     * @param array $permissions
+     *
+     * @return void
      */
     public function analyzePermissions(array &$permissions)
     {

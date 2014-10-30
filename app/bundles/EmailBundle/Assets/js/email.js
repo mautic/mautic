@@ -7,11 +7,21 @@ Mautic.emailOnLoad = function (container) {
     if (mQuery(container + ' form[name="emailform"]').length) {
         Mautic.activateCategoryLookup('emailform', 'email');
     }
+
+    if (typeof Mautic.listCompareChart === 'undefined') {
+        Mautic.renderListCompareChart();
+    }
 };
 
 Mautic.emailUnLoad = function() {
     //remove email builder from body
     mQuery('.email-builder').remove();
+};
+
+Mautic.emailOnUnload = function(id) {
+    if (id === '#app-content') {
+        delete Mautic.listCompareChart;
+    }
 };
 
 Mautic.launchEmailEditor = function () {
@@ -100,4 +110,13 @@ Mautic.emailEditorOnLoad = function (container) {
         scrollSpeed: 100,
         cursorAt: {top: 15, left: 15}
     });
+};
+
+Mautic.renderListCompareChart = function () {
+    if (!mQuery("#list-compare-chart").length) {
+        return;
+    }
+    var options = {};
+    var data = mQuery.parseJSON(mQuery('#list-compare-chart-data').text());
+    Mautic.listCompareChart = new Chart(document.getElementById("list-compare-chart").getContext("2d")).Bar(data, options);
 };

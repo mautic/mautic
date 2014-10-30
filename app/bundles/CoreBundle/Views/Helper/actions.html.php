@@ -18,7 +18,7 @@ if (!isset($extra)) {
 ?>
 <div class="input-group input-group-sm">
     <span class="input-group-addon">
-        <input type="checkbox" class="list-checkbox" name="cb<?php echo $item->getId(); ?>" value="<?php echo $item->getId(); ?>" />
+        <input type="checkbox" data-toggle="selectrow" class="list-checkbox" name="cb<?php echo $item->getId(); ?>" value="<?php echo $item->getId(); ?>" />
       </span>
     <div class="btn-group">
         <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">

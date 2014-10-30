@@ -16,7 +16,7 @@ $view->extend('MauticCampaignBundle:Campaign:index.html.php');
             <div class="col-xs-6 va-m">
                 <div class="checkbox-inline custom-primary">
                     <label class="mb-0">
-                        <input type="checkbox" id="customcheckbox-one0" value="1">
+                        <input type="checkbox" id="customcheckbox-one0" value="1" data-toggle="checkall" data-target="#campaignTable">
                         <span></span>
                         <?php echo $view['translator']->trans('mautic.core.table.selectall'); ?>
                     </label>
@@ -29,7 +29,7 @@ $view->extend('MauticCampaignBundle:Campaign:index.html.php');
         </div>
     </div>
     <div class="table-responsive">
-        <table class="table table-hover table-striped table-bordered campaign-list">
+        <table class="table table-hover table-striped table-bordered campaign-list" id="campaignTable">
             <thead>
             <tr>
                 <th class="col-campaign-actions"></th>

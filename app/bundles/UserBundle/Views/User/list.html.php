@@ -13,13 +13,13 @@ if ($tmpl == 'index'):
 endif;
 ?>
 <div class="table-responsive scrollable body-white padding-sm page-list">
-    <table class="table table-hover table-striped table-bordered user-list">
+    <table class="table table-hover table-striped table-bordered user-list" id="userTable">
         <thead>
         <tr>
             <th class="col-user-actions pl-20">
                 <div class="checkbox-inline custom-primary">
                     <label class="mb-0 pl-10">
-                        <input type="checkbox" id="customcheckbox-one0" value="1">
+                        <input type="checkbox" id="customcheckbox-one0" value="1" data-toggle="checkall" data-target="#userTable">
                         <span></span>
                     </label>
                 </div>

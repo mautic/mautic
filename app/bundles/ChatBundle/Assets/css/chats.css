@@ -21,3 +21,6 @@ li.chat-list:after {
     padding-top: 0 !important;
 }
 
+#ChatUsers li.chat-list img.media-object {
+	width: 40px;
+}

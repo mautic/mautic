@@ -1401,7 +1401,7 @@ a.media {
   padding: 10px 15px;
 }
 .media-list.media-list-contact > .media a:hover,
-.media-list.media-list-contact > .media a:foucs {
+.media-list.media-list-contact > .media a:focus {
   background-color: transparent;
 }
 .media-list.media-list-bubble > .media {

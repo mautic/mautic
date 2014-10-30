@@ -18,17 +18,14 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Class FieldType
- *
- * @package Mautic\LeadBundle\Form\Type
  */
 class FieldType extends AbstractType
 {
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
+     * {@inheritdoc}
      */
-    public function buildForm (FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber());
 
@@ -225,9 +222,8 @@ class FieldType extends AbstractType
         }
     }
 
-
     /**
-     * @param OptionsResolverInterface $resolver
+     * {@inheritdoc}
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
@@ -239,9 +235,10 @@ class FieldType extends AbstractType
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
-    public function getName() {
+    public function getName()
+    {
         return "formfield";
     }
 }

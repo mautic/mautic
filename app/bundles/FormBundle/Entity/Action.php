@@ -78,8 +78,17 @@ class Action
      */
     private $form;
 
+    /**
+     * @var array
+     */
     private $changes;
 
+    /**
+     * @param $prop
+     * @param $val
+     *
+     * @return void
+     */
     private function isChanged($prop, $val)
     {
         if ($this->$prop != $val) {
@@ -87,6 +96,9 @@ class Action
         }
     }
 
+    /**
+     * @return array
+     */
     public function getChanges()
     {
         return $this->changes;
@@ -106,6 +118,7 @@ class Action
      * Set order
      *
      * @param integer $order
+     *
      * @return Action
      */
     public function setOrder($order)
@@ -131,6 +144,7 @@ class Action
      * Set properties
      *
      * @param array $properties
+     *
      * @return Action
      */
     public function setProperties($properties)
@@ -155,10 +169,11 @@ class Action
     /**
      * Set form
      *
-     * @param \Mautic\FormBundle\Entity\Form $form
+     * @param Form $form
+     *
      * @return Action
      */
-    public function setForm(\Mautic\FormBundle\Entity\Form $form)
+    public function setForm(Form $form)
     {
         $this->form = $form;
 
@@ -168,7 +183,7 @@ class Action
     /**
      * Get form
      *
-     * @return \Mautic\FormBundle\Entity\Form
+     * @return Form
      */
     public function getForm()
     {
@@ -179,6 +194,7 @@ class Action
      * Set type
      *
      * @param string $type
+     *
      * @return Action
      */
     public function setType($type)
@@ -207,11 +223,11 @@ class Action
         return get_object_vars($this);
     }
 
-
     /**
      * Set description
      *
      * @param string $description
+     *
      * @return Action
      */
     public function setDescription($description)
@@ -236,6 +252,7 @@ class Action
      * Set name
      *
      * @param string $name
+     *
      * @return Action
      */
     public function setName($name)

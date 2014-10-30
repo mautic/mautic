@@ -11,19 +11,20 @@ namespace Mautic\FormBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\FormBundle\Entity\Field;
-use Mautic\FormBundle\Helper\FormFieldHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * Class FieldController
+ */
 class FieldController extends CommonFormController
 {
 
     /**
      * Generates new form and processes post data
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse
      */
-    public function newAction ()
+    public function newAction()
     {
         $success     = 0;
         $valid       = $cancelled = false;
@@ -69,7 +70,6 @@ class FieldController extends CommonFormController
                     $success = 1;
 
                     //form is valid so process the data
-
                     $keyId = 'new' . uniqid();
 
                     //save the properties to session
@@ -96,13 +96,11 @@ class FieldController extends CommonFormController
         if ($cancelled || $valid) {
             $closeModal = true;
         } else {
-            $closeModal = false;
-            $viewParams['tmpl'] = 'field';
-            $formView = $form->createView();
-            $this->get('templating')->getEngine('MauticFormBundle:Form:index.html.php')->get('form')
-                ->setTheme($formView, 'MauticFormBundle:FormComponent');
-            $viewParams['form'] = $formView;
-            $header = (!empty($customParams)) ? $customParams['label'] : 'mautic.form.field.type.'.$fieldType;
+            $closeModal                = false;
+            $viewParams['tmpl']        = 'field';
+            $formView                  = $this->setFormTheme($form, 'MauticFormBundle:Form:index.html.php', 'MauticFormBundle:FormComponent');
+            $viewParams['form']        = $formView;
+            $header                    = (!empty($customParams)) ? $customParams['label'] : 'mautic.form.field.type.' . $fieldType;
             $viewParams['fieldHeader'] = $this->get('translator')->trans($header);
         }
 
@@ -133,21 +131,23 @@ class FieldController extends CommonFormController
             $response  = new JsonResponse($passthroughVars);
             $response->headers->set('Content-Length', strlen($response->getContent()));
             return $response;
-        } else {
-            return $this->ajaxAction(array(
-                'contentTemplate' => 'MauticFormBundle:Builder:' . $viewParams['tmpl'] . '.html.php',
-                'viewParameters'  => $viewParams,
-                'passthroughVars' => $passthroughVars
-            ));
         }
+
+        return $this->ajaxAction(array(
+            'contentTemplate' => 'MauticFormBundle:Builder:' . $viewParams['tmpl'] . '.html.php',
+            'viewParameters'  => $viewParams,
+            'passthroughVars' => $passthroughVars
+        ));
     }
 
     /**
      * Generates edit form and processes post data
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @param int $objectId
+     *
+     * @return JsonResponse
      */
-    public function editAction ($objectId)
+    public function editAction($objectId)
     {
         $session   = $this->factory->getSession();
         $method    = $this->request->getMethod();
@@ -213,13 +213,11 @@ class FieldController extends CommonFormController
             if ($cancelled || $valid) {
                 $closeModal = true;
             } else {
-                $closeModal = false;
-                $viewParams['tmpl'] = 'field';
-                $formView = $form->createView();
-                $this->get('templating')->getEngine('MauticFormBundle:Form:index.html.php')->get('form')
-                    ->setTheme($formView, 'MauticFormBundle:FormComponent');
-                $viewParams['form'] = $formView;
-                $header = (!empty($customParams)) ? $customParams['label'] : 'mautic.form.field.type.'.$fieldType;
+                $closeModal                = false;
+                $viewParams['tmpl']        = 'field';
+                $formView                  = $this->setFormTheme($form, 'MauticFormBundle:Form:index.html.php', 'MauticFormBundle:FormComponent');
+                $viewParams['form']        = $formView;
+                $header                    = (!empty($customParams)) ? $customParams['label'] : 'mautic.form.field.type.' . $fieldType;
                 $viewParams['fieldHeader'] = $this->get('translator')->trans($header);
             }
 
@@ -253,25 +251,26 @@ class FieldController extends CommonFormController
                 $response  = new JsonResponse($passthroughVars);
                 $response->headers->set('Content-Length', strlen($response->getContent()));
                 return $response;
-            } else {
-                return $this->ajaxAction(array(
-                    'contentTemplate' => 'MauticFormBundle:Builder:' . $viewParams['tmpl'] . '.html.php',
-                    'viewParameters'  => $viewParams,
-                    'passthroughVars' => $passthroughVars
-                ));
             }
-        } else {
-            $response  = new JsonResponse(array('success' => 0));
-            $response->headers->set('Content-Length', strlen($response->getContent()));
-            return $response;
+
+            return $this->ajaxAction(array(
+                'contentTemplate' => 'MauticFormBundle:Builder:' . $viewParams['tmpl'] . '.html.php',
+                'viewParameters'  => $viewParams,
+                'passthroughVars' => $passthroughVars
+            ));
         }
+
+        $response  = new JsonResponse(array('success' => 0));
+        $response->headers->set('Content-Length', strlen($response->getContent()));
+        return $response;
     }
 
     /**
      * Deletes the entity
      *
-     * @param         $objectId
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @param int $objectId
+     *
+     * @return JsonResponse
      */
     public function deleteAction($objectId) {
         $session   = $this->factory->getSession();
@@ -345,8 +344,9 @@ class FieldController extends CommonFormController
     /**
      * Undeletes the entity
      *
-     * @param         $objectId
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @param int $objectId
+     *
+     * @return JsonResponse
      */
     public function undeleteAction($objectId) {
         $session   = $this->factory->getSession();

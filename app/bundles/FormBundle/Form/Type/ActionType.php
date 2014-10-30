@@ -16,17 +16,14 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * Class ActionType
- *
- * @package Mautic\LeadBundle\Form\Type
  */
 class ActionType extends AbstractType
 {
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
+     * {@inheritdoc}
      */
-    public function buildForm (FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber());
 
@@ -75,9 +72,8 @@ class ActionType extends AbstractType
         }
     }
 
-
     /**
-     * @param OptionsResolverInterface $resolver
+     * {@inheritdoc}
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
@@ -89,9 +85,10 @@ class ActionType extends AbstractType
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
-    public function getName() {
+    public function getName()
+    {
         return "formaction";
     }
 }

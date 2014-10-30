@@ -23,8 +23,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Class LoadFormResultData
- *
- * @package Mautic\FormBundle\DataFixtures\ORM
  */
 class LoadFormResultData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
 {
@@ -37,7 +35,6 @@ class LoadFormResultData extends AbstractFixture implements OrderedFixtureInterf
     /**
      * {@inheritdoc}
      */
-
     public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
@@ -90,7 +87,7 @@ class LoadFormResultData extends AbstractFixture implements OrderedFixtureInterf
     }
 
     /**
-     * @return int
+     * {@inheritdoc}
      */
     public function getOrder()
     {

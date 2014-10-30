@@ -808,11 +808,14 @@ var Mautic = {
             confirmAction = 'dismissConfirmation';
         }
 
-        var confirmContainer = mQuery("<div />").attr({ "class": "confirmation-modal" });
-        var confirmInnerDiv = mQuery("<div />").attr({ "class": "confirmation-inner-wrapper"});
-        var confirmMsgSpan = mQuery("<span />").css("display", "block").html(msg);
+        var confirmContainer = mQuery("<div />").attr({ "class": "modal fade confirmation-modal" });
+        var confirmDialogDiv = mQuery("<div />").attr({ "class": "modal-dialog"});
+        var confirmContentDiv = mQuery("<div />").attr({ "class": "modal-content confirmation-inner-wrapper"});
+        var confirmFooterDiv = mQuery("<div />").attr({ "class": "modal-body text-center"});
+        var confirmHeaderDiv = mQuery("<div />").attr({"class": "modal-header"});
+        confirmHeaderDiv.append(mQuery('<h4 />').attr({"class": "modal-title"}).text(msg));
         var confirmButton = mQuery('<button type="button" />')
-            .addClass("btn btn-danger btn-xs")
+            .addClass("btn btn-danger")
             .css("marginRight", "5px")
             .css("marginLeft", "5px")
             .click(function () {
@@ -823,7 +826,7 @@ var Mautic = {
             .html(confirmText);
         if (cancelText) {
             var cancelButton = mQuery('<button type="button" />')
-                .addClass("btn btn-primary btn-xs")
+                .addClass("btn btn-primary")
                 .click(function () {
                     if (typeof Mautic[cancelAction] === "function") {
                         window["Mautic"][cancelAction].apply('window', cancelParams);
@@ -832,15 +835,18 @@ var Mautic = {
                 .html(cancelText);
         }
 
-        confirmInnerDiv.append(confirmMsgSpan);
-        confirmInnerDiv.append(confirmButton);
+        confirmFooterDiv.append(confirmButton);
 
         if (typeof cancelButton != 'undefined') {
-            confirmInnerDiv.append(cancelButton);
+            confirmFooterDiv.append(cancelButton);
         }
 
-        confirmContainer.append(confirmInnerDiv);
-        mQuery('body').append(confirmContainer)
+        confirmContentDiv.append(confirmHeaderDiv);
+        confirmContentDiv.append(confirmFooterDiv);
+
+        confirmContainer.append(confirmDialogDiv.append(confirmContentDiv));
+        mQuery('body').append(confirmContainer);
+        mQuery('.confirmation-modal').modal('show');
     },
 
     /**
@@ -848,7 +854,7 @@ var Mautic = {
      */
     dismissConfirmation: function () {
         if (mQuery('.confirmation-modal').length) {
-            mQuery('.confirmation-modal').remove();
+            mQuery('.confirmation-modal').modal('hide');
         }
     },
 

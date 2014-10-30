@@ -11,15 +11,30 @@ namespace Mautic\FormBundle\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 
+/**
+ * Class PageTokenHelper
+ */
 class PageTokenHelper
 {
 
+    /**
+     * @var MauticFactory
+     */
     private $factory;
+
+    /**
+     * @param MauticFactory $factory
+     */
     public function __construct(MauticFactory $factory)
     {
         $this->factory = $factory;
     }
 
+    /**
+     * @param int $page
+     *
+     * @return string
+     */
     public function getTokenContent($page = 1)
     {
         //get a list of forms
@@ -52,8 +67,7 @@ class PageTokenHelper
         $filter = array('string' => $search, 'force' => array());
 
         if (!$permissions['form:forms:viewother']) {
-            $filter['force'] =
-                array('column' => 'f.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser());
+            $filter['force'] = array('column' => 'f.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser());
         }
 
         $forms = $this->factory->getModel('form.form')->getEntities(
@@ -75,7 +89,7 @@ class PageTokenHelper
             $session->set('mautic.formtoken.page', $page);
         }
 
-        $content = $this->factory->getTemplating()->render('MauticFormBundle:SubscribedEvents\PageToken:list.html.php', array(
+        return $this->factory->getTemplating()->render('MauticFormBundle:SubscribedEvents\PageToken:list.html.php', array(
             'items'       => $forms,
             'page'        => $page,
             'limit'       => $limit,
@@ -83,7 +97,5 @@ class PageTokenHelper
             'tmpl'        => $request->get('tmpl', 'index'),
             'searchValue' => $search
         ));
-
-        return $content;
     }
 }

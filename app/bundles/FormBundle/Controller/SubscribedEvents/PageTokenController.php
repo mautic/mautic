@@ -9,13 +9,21 @@
 
 namespace Mautic\FormBundle\Events\Controller;
 
-use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\Controller\FormController;
 use Mautic\FormBundle\Helper\PageTokenHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-class PageTokenController extends CommonFormController
+/**
+ * Class PageTokenController
+ */
+class PageTokenController extends FormController
 {
 
+    /**
+     * @param int $page
+     *
+     * @return JsonResponse
+     */
     public function indexAction($page = 1)
     {
         $tokenHelper = new PageTokenHelper($this->factory);

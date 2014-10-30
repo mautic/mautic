@@ -14,6 +14,7 @@ if (!empty($inPopup)):
 ?>
 <div id="ChatConversation">
 <?php endif; ?>
+    <div id="ChatHeader"></div>
     <ul class="media-list media-list-bubble" id="ChatMessages">
     <?php
     if (!empty($messages)):

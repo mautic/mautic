@@ -66,6 +66,15 @@ class CategoryType extends AbstractType
             'required'   => false
         ));
 
+        $builder->add('color', 'text', array(
+            'label'      => 'mautic.category.form.color',
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array(
+                'class'       => 'form-control',
+                'data-toggle' => 'color'
+            )
+        ));
+
         $builder->add('isPublished', 'button_group', array(
             'choice_list' => new ChoiceList(
                 array(false, true),

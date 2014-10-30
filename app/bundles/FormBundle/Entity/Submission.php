@@ -75,6 +75,7 @@ class Submission
      * Set dateSubmitted
      *
      * @param \DateTime $dateSubmitted
+     *
      * @return Submission
      */
     public function setDateSubmitted($dateSubmitted)
@@ -98,6 +99,7 @@ class Submission
      * Set referer
      *
      * @param string $referer
+     *
      * @return Submission
      */
     public function setReferer($referer)
@@ -120,10 +122,11 @@ class Submission
     /**
      * Set form
      *
-     * @param \Mautic\FormBundle\Entity\Form $form
+     * @param Form $form
+     *
      * @return Submission
      */
-    public function setForm(\Mautic\FormBundle\Entity\Form $form)
+    public function setForm(Form $form)
     {
         $this->form = $form;
 
@@ -133,7 +136,7 @@ class Submission
     /**
      * Get form
      *
-     * @return \Mautic\FormBundle\Entity\Form
+     * @return Form
      */
     public function getForm()
     {
@@ -144,6 +147,7 @@ class Submission
      * Set ipAddress
      *
      * @param \Mautic\CoreBundle\Entity\IpAddress $ipAddress
+     *
      * @return Submission
      */
     public function setIpAddress(\Mautic\CoreBundle\Entity\IpAddress $ipAddress = null)
@@ -176,6 +180,8 @@ class Submission
     /**
      * Get results
      *
+     * @param $results
+     *
      * @return Submission
      */
     public function setResults($results)
@@ -187,6 +193,7 @@ class Submission
      * Set page
      *
      * @param \Mautic\PageBundle\Entity\Page $page
+     *
      * @return Submission
      */
     public function setPage(\Mautic\PageBundle\Entity\Page $page = null)

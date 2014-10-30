@@ -14,8 +14,6 @@ use Mautic\FormBundle\Entity\Action;
 
 /**
  * Class ActionModel
- * {@inheritdoc}
- * @package Mautic\CoreBundle\Model\FormModel
  */
 class ActionModel extends CommonFormModel
 {
@@ -23,7 +21,7 @@ class ActionModel extends CommonFormModel
     /**
      * {@inheritdoc}
      *
-     * @return string
+     * @return \Mautic\FormBundle\Entity\ActionRepository
      */
     public function getRepository()
     {
@@ -32,8 +30,6 @@ class ActionModel extends CommonFormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
     public function getPermissionBase()
     {
@@ -41,10 +37,7 @@ class ActionModel extends CommonFormModel
     }
 
     /**
-     * Get a specific entity or generate a new one if id is empty
-     *
-     * @param $id
-     * @return null|object
+     * {@inheritdoc}
      */
     public function getEntity($id = null)
     {
@@ -52,8 +45,6 @@ class ActionModel extends CommonFormModel
             return new Action();
         }
 
-        $entity = parent::getEntity($id);
-
-        return $entity;
+        return parent::getEntity($id);
     }
 }
