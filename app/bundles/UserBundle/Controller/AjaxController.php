@@ -43,6 +43,25 @@ class AjaxController extends CommonAjaxController
      *
      * @return \Mautic\CoreBundle\Controller\JsonResponse
      */
+    protected function userListAction(Request $request)
+    {
+        $filter    = InputHelper::clean($request->query->get('filter'));
+        $results   = $this->factory->getModel('user')->getLookupResults('user', $filter);
+        $dataArray = array();
+        foreach ($results as $r) {
+            $dataArray[] = array(
+                'label' => $r['firstName'] . ' ' . $r['lastName'],
+                'value' => $r['id']
+            );
+        }
+        return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return \Mautic\CoreBundle\Controller\JsonResponse
+     */
     protected function positionListAction(Request $request)
     {
         $filter  = InputHelper::clean($request->query->get('filter'));
