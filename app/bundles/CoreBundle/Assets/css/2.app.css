@@ -1302,6 +1302,15 @@ blockquote > p:after {
 .alert-tertiary {
   background: #a3e2e4;
 }
+.alert-growl {
+  background: rgba(0, 0, 0, 0.8);
+  color: #FFFFFF;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 100000;
+  border: 1px solid #000;
+}
 .xdsoft_datetimepicker .xdsoft_calendar td.xdsoft_default,
 .xdsoft_datetimepicker .xdsoft_calendar td.xdsoft_current,
 .xdsoft_datetimepicker .xdsoft_timepicker .xdsoft_time_box > div > div.xdsoft_current {

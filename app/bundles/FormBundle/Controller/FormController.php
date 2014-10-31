@@ -14,7 +14,6 @@ namespace Mautic\FormBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -26,7 +25,7 @@ class FormController extends CommonFormController
     /**
      * @param int $page
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function indexAction($page = 1)
     {
@@ -130,7 +129,7 @@ class FormController extends CommonFormController
      *
      * @param int $objectId
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function viewAction($objectId)
     {
@@ -206,7 +205,7 @@ class FormController extends CommonFormController
     /**
      * Generates new form and processes post data
      *
-     * @return JsonResponse|Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|Response
      */
     public function newAction()
     {
@@ -349,7 +348,7 @@ class FormController extends CommonFormController
      * @param int  $objectId
      * @param bool $ignorePost
      *
-     * @return JsonResponse|Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|Response
      */
     public function editAction($objectId, $ignorePost = false)
     {
@@ -566,7 +565,7 @@ class FormController extends CommonFormController
      *
      * @param int $objectId
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function cloneAction($objectId)
     {
@@ -628,7 +627,7 @@ class FormController extends CommonFormController
      *
      * @param int $objectId
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function deleteAction($objectId) {
         $page        = $this->factory->getSession()->get('mautic.form.page', 1);
@@ -674,6 +673,73 @@ class FormController extends CommonFormController
                     '%id%'   => $objectId
                 )
             );
+        } //else don't do anything
+
+        return $this->postActionRedirect(
+            array_merge($postActionVars, array(
+                'flashes' => $flashes
+            ))
+        );
+    }
+
+    /**
+     * Deletes a group of entities
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function batchDeleteAction() {
+        $page        = $this->factory->getSession()->get('mautic.form.page', 1);
+        $returnUrl   = $this->generateUrl('mautic_form_index', array('page' => $page));
+        $flashes     = array();
+
+        $postActionVars = array(
+            'returnUrl'       => $returnUrl,
+            'viewParameters'  => array('page' => $page),
+            'contentTemplate' => 'MauticFormBundle:Form:index',
+            'passthroughVars' => array(
+                'activeLink'    => '#mautic_form_index',
+                'mauticContent' => 'form'
+            )
+        );
+
+        if ($this->request->getMethod() == 'POST') {
+            $model     = $this->factory->getModel('form');
+            $ids       = json_decode($this->request->query->get('ids', array()));
+            $deleteIds = array();
+
+            // Loop over the IDs to perform access checks pre-delete
+            foreach ($ids as $objectId) {
+                $entity = $model->getEntity($objectId);
+
+                if ($entity === null) {
+                    $flashes[] = array(
+                        'type'    => 'error',
+                        'msg'     => 'mautic.form.error.notfound',
+                        'msgVars' => array('%id%' => $objectId)
+                    );
+                } elseif (!$this->factory->getSecurity()->hasEntityAccess(
+                    'form:forms:deleteown', 'form:forms:deleteother', $entity->getCreatedBy()
+                )) {
+                    $flashes[] = $this->accessDenied(true);
+                } elseif ($model->isLocked($entity)) {
+                    $flashes[] = $this->isLocked($postActionVars, $entity, 'form.form', true);
+                } else {
+                    $deleteIds[] = $objectId;
+                }
+            }
+
+            // Delete everything we are able to
+            if (!empty($deleteIds)) {
+                $entities = $model->deleteEntities($deleteIds);
+
+                $flashes[] = array(
+                    'type' => 'notice',
+                    'msg'  => 'mautic.form.notice.batch_deleted',
+                    'msgVars' => array(
+                        '%count%' => count($entities)
+                    )
+                );
+            }
         } //else don't do anything
 
         return $this->postActionRedirect(

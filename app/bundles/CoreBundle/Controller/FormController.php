@@ -48,11 +48,14 @@ class FormController extends CommonController
     /**
      * Returns view to index with a locked out message
      *
-     * @param        $returnUrl
-     * @param        $entity
-     * @param        $model
+     * @param array                                $postActionVars
+     * @param object                               $entity
+     * @param \Mautic\CoreBundle\Model\CommonModel $model
+     * @param bool                                 $batch          Flag if a batch action is being performed
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|array
      */
-    protected function isLocked($postActionVars, $entity, $model)
+    protected function isLocked($postActionVars, $entity, $model, $batch = false)
     {
         $date      = $entity->getCheckedOut();
         $returnUrl = !empty($postActionVars['returnUrl']) ?
@@ -62,6 +65,7 @@ class FormController extends CommonController
 
         $model        = $this->factory->getModel($model);
         $nameFunction = $model->getNameGetter();
+
         if ($this->factory->getUser()->isAdmin()) {
             $override = $this->get('translator')->trans('mautic.core.override.lock',array(
                 '%url%' => $this->generateUrl('mautic_core_form_action', array(
@@ -75,30 +79,35 @@ class FormController extends CommonController
             ));
         }
 
+        $flash = array(
+            'type' => 'error',
+            'msg'  => 'mautic.core.error.locked',
+            'msgVars' => array(
+                "%name%"        => $entity->$nameFunction(),
+                "%user%"        => $entity->getCheckedOutBy()->getName(),
+                '%contactUrl%'  => $this->generateUrl('mautic_user_action',
+                    array(
+                        'objectAction' => 'contact',
+                        'objectId'     => $entity->getCheckedOutBy()->getId(),
+                        'entity'    => $entityType,
+                        'id'        => $entity->getId(),
+                        'subject'   => 'locked',
+                        'returnUrl' => $returnUrl
+                    )
+                ),
+                '%date%'        => $date->format($this->factory->getParameter('date_format_dateonly')),
+                '%time%'        => $date->format($this->factory->getParameter('date_format_timeonly')),
+                '%datetime%'    => $date->format($this->factory->getParameter('date_format_full')),
+                '%override%'    => $override
+            )
+        );
+        if ($batch) {
+            return $flash;
+        }
+
         return $this->postActionRedirect(
             array_merge($postActionVars, array(
-                'flashes' => array(array(
-                    'type' => 'error',
-                    'msg'  => 'mautic.core.error.locked',
-                    'msgVars' => array(
-                        "%name%"        => $entity->$nameFunction(),
-                        "%user%"        => $entity->getCheckedOutBy()->getName(),
-                        '%contactUrl%'  => $this->generateUrl('mautic_user_action',
-                            array(
-                                'objectAction' => 'contact',
-                                'objectId'     => $entity->getCheckedOutBy()->getId(),
-                                'entity'    => $entityType,
-                                'id'        => $entity->getId(),
-                                'subject'   => 'locked',
-                                'returnUrl' => $returnUrl
-                            )
-                        ),
-                        '%date%'        => $date->format($this->factory->getParameter('date_format_dateonly')),
-                        '%time%'        => $date->format($this->factory->getParameter('date_format_timeonly')),
-                        '%datetime%'    => $date->format($this->factory->getParameter('date_format_full')),
-                        '%override%'    => $override
-                    )
-                ))
+                'flashes' => array($flash)
             ))
         );
     }

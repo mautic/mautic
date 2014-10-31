@@ -296,6 +296,21 @@ class FormModel extends CommonFormModel
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function deleteEntities($ids)
+    {
+        $entities = parent::deleteEntities($ids);
+        $schemaHelper = $this->factory->getSchemaHelper('table');
+        foreach ($entities as $id => $entity) {
+            //delete the associated results table
+            $schemaHelper->deleteTable("form_results_" . $id . "_" . $entity->getAlias());
+        }
+        $schemaHelper->executeChanges();
+        return $entities;
+    }
+
+    /**
      * Generate an array of columns from fields
      *
      * @param Form $form

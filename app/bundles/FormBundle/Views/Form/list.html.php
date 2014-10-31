@@ -24,7 +24,16 @@ if ($tmpl == 'index')
                 </div>
                 <div class="col-xs-6 va-m text-right">
                     <button type="button" class="btn btn-sm btn-warning"><i class="fa fa-files-o"></i></button>
-                    <button type="button" class="btn btn-sm btn-danger"><i class="fa fa-trash-o"></i></button>
+                    <button type="button" class="btn btn-sm btn-danger"
+                       onclick="Mautic.showConfirmation(
+                           '<?php echo $view->escape($view['translator']->trans('mautic.form.form.confirmbatchdelete'), 'js'); ?>',
+                           '<?php echo $view->escape($view['translator']->trans('mautic.core.form.delete'), 'js'); ?>',
+                           'executeBatchAction',
+                           ['<?php echo $view['router']->generate('mautic_form_action', array('objectAction' => 'batchDelete')); ?>',
+                           '#mautic_form_index'],
+                           '<?php echo $view->escape($view['translator']->trans('mautic.core.form.cancel'), 'js'); ?>','',[]);">
+                        <i class="fa fa-trash-o"></i>
+                    </button>
                 </div>
             </div>
         </div>
