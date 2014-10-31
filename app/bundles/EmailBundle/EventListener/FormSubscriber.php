@@ -43,7 +43,7 @@ class FormSubscriber extends CommonSubscriber
             'group'        => 'mautic.email.form.action.group',
             'label'        => 'mautic.email.form.action.sendemail',
             'description'  => 'mautic.email.form.action.sendemail_descr',
-            'formType'     => 'formaction_sendemail',
+            'formType'     => 'email_submitaction_sendemail',
             'callback'     => '\Mautic\EmailBundle\Helper\FormSubmitHelper::sendEmailAction'
         );
 

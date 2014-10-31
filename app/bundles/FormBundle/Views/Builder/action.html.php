@@ -14,5 +14,4 @@
     </div>
 
     <?php echo $view['form']->form($form); ?>
-    '
 </div>
