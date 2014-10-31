@@ -331,7 +331,7 @@ class FormController extends CommonFormController
                 'activeForm'     => $entity,
                 'form'           => $form->createView()
             ),
-            'contentTemplate' => 'MauticFormBundle:Builder:components.html.php',
+            'contentTemplate' => 'MauticFormBundle:Builder:index.html.php',
             'passthroughVars' => array(
                 'activeLink'    => '#mautic_form_index',
                 'mauticContent' => 'form',
@@ -549,7 +549,7 @@ class FormController extends CommonFormController
                 'activeForm'     => $entity,
                 'form'           => $form->createView()
             ),
-            'contentTemplate' => 'MauticFormBundle:Builder:components.html.php',
+            'contentTemplate' => 'MauticFormBundle:Builder:index.html.php',
             'passthroughVars' => array(
                 'activeLink'    => '#mautic_form_index',
                 'mauticContent' => 'form',

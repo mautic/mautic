@@ -18,7 +18,7 @@ $view['slots']->set("headerTitle", $header);
 ?>
 
 <div class="row bundle-content-container">
-    <div class="col-xs-12 col-sm-8 bundle-main bundle-main-left auto-height">
+    <div class="col-xs-12 bundle-main bundle-main-left auto-height">
         <div class="rounded-corners body-white bundle-main-inner-wrapper scrollable padding-md">
             <!-- tabs controls -->
                 <ul class="nav nav-tabs pr-md pl-md">
@@ -49,58 +49,88 @@ $view['slots']->set("headerTitle", $header);
                     </div>
                     <div class="tab-pane fade bdr-w-0" id="fields-container">
                         <?php echo $view->render('MauticFormBundle:Builder:style.html.php'); ?>
-                        <div id="mauticforms_fields">
-                            <?php
-                            foreach ($formFields as $field):
-                                if (!empty($field['isCustom'])):
-                                    $params   = $field['customParameters'];
-                                    $template = $params['template'];
-                                else:
-                                    $template = 'MauticFormBundle:Field:' . $field['type'] . '.html.php';
-                                endif;
-                                echo $view->render($template, array(
-                                    'field'  => $field,
-                                    'inForm' => true,
-                                    'id'     => $field['id'],
-                                    'deleted' => in_array($field['id'], $deletedFields)
-                                ));
-                            endforeach;
-                            ?>
-                            <?php if (!count($formFields)): ?>
-                            <div class="alert alert-info">
-                                <p id='form-field-placeholder'><?php echo $view['translator']->trans('mautic.form.form.addfield'); ?></p>
+                        <div class="row bundle-content-container">
+                            <div id="mauticforms_fields" class="col-xs-12 col-sm-8 bundle-main bundle-main-left auto-height">
+                                <?php
+                                foreach ($formFields as $field):
+                                    if (!empty($field['isCustom'])):
+                                        $params   = $field['customParameters'];
+                                        $template = $params['template'];
+                                    else:
+                                        $template = 'MauticFormBundle:Field:' . $field['type'] . '.html.php';
+                                    endif;
+                                    echo $view->render($template, array(
+                                        'field'  => $field,
+                                        'inForm' => true,
+                                        'id'     => $field['id'],
+                                        'deleted' => in_array($field['id'], $deletedFields)
+                                    ));
+                                endforeach;
+                                ?>
+                                <?php if (!count($formFields)): ?>
+                                <div class="alert alert-info">
+                                    <p id='form-field-placeholder'><?php echo $view['translator']->trans('mautic.form.form.addfield'); ?></p>
+                                </div>
+                                <?php endif; ?>
                             </div>
-                            <?php endif; ?>
+                            <div class="col-xs-12 col-sm-4 bundle-side bundle-side-right auto-height">
+                                <div id="form-fields" class="panel-collapse collapse in">
+                                    <div class="panel-body list-group">
+                                        <?php foreach ($fields as $fieldType => $field): ?>
+                                        <a class="list-group-item" data-toggle="ajaxmodal" data-target="#formComponentModal" href="<?php echo $view['router']->generate('mautic_formfield_action', array('objectAction' => 'new', 'type' => $fieldType, 'tmpl' => 'field')); ?>">
+                                            <div class="padding-sm">
+                                                <?php echo $field; ?>
+                                            </div>
+                                        </a>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="tab-pane fade bdr-w-0" id="actions-container">
-                        <div id="mauticforms_actions">
-                            <?php
-                            foreach ($formActions as $action):
-                                $template = (isset($action['settings']['template'])) ? $action['settings']['template'] :
-                                    'MauticFormBundle:Action:generic.html.php';
-                                echo $view->render($template, array(
-                                    'action'  => $action,
-                                    'inForm'  => true,
-                                    'id'      => $action['id'],
-                                    'deleted' => in_array($action['id'], $deletedActions)
-                                ));
-                            endforeach;
-                            ?>
-                            <?php if (!count($formActions)): ?>
-                                <div class="alert alert-info">
-                                    <p id='form-action-placeholder'><?php echo $view['translator']->trans('mautic.form.form.addaction'); ?></p>
+                        <div class="row bundle-content-container">
+                            <div id="mauticforms_actions" class="col-xs-12 col-sm-8 bundle-main bundle-main-left auto-height">
+                                <?php
+                                foreach ($formActions as $action):
+                                    $template = (isset($action['settings']['template'])) ? $action['settings']['template'] :
+                                        'MauticFormBundle:Action:generic.html.php';
+                                    echo $view->render($template, array(
+                                        'action'  => $action,
+                                        'inForm'  => true,
+                                        'id'      => $action['id'],
+                                        'deleted' => in_array($action['id'], $deletedActions)
+                                    ));
+                                endforeach;
+                                ?>
+                                <?php if (!count($formActions)): ?>
+                                    <div class="alert alert-info">
+                                        <p id='form-action-placeholder'><?php echo $view['translator']->trans('mautic.form.form.addaction'); ?></p>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                            <div class="col-xs-12 col-sm-4 bundle-side bundle-side-right auto-height">
+                                <div id="form-submitactions" class="panel-collapse collapse in">
+                                    <div class="panel-body">
+                                        <?php foreach ($actions as $group => $groupActions): ?>
+                                            <div class="campaign-event-group-header"><?php echo $group; ?></div>
+                                            <div class="campaign-event-group-body list-group">
+                                                <?php foreach ($groupActions as $k => $e): ?>
+                                                    <a data-toggle="ajaxmodal" data-target="#formComponentModal" class="list-group-item" href="<?php echo $view['router']->generate('mautic_formaction_action', array('objectAction' => 'new', 'type' => $k, 'tmpl'=> 'action')); ?>">
+                                                        <div class="padding-sm" data-toggle="tooltip" title="<?php echo  $view['translator']->trans($e['description']); ?>">
+                                                            <span><?php echo $view['translator']->trans($e['label']); ?></span>
+                                                        </div>
+                                                    </a>
+                                                <?php endforeach; ?>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
                                 </div>
-                            <?php endif; ?>
+                            </div>
                         </div>
                     </div>
                 </div>
                 <?php echo $view['form']->end($form); ?>
-            </div>
-        </div>
-        <div class="col-xs-12 col-sm-4 bundle-side bundle-side-right auto-height">
-            <div class="rounded-corners body-white bundle-side-inner-wrapper scrollable padding-md">
-                <?php $view['slots']->output('_content'); ?>
             </div>
         </div>
 
