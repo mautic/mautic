@@ -105,8 +105,6 @@ Mautic.formFieldOnLoad = function (container, response) {
 Mautic.formActionOnLoad = function (container, response) {
     //new action created so append it to the form
     if (response.actionHtml) {
-        console.log(response);
-        console.log(container);
         var newHtml = response.actionHtml;
         var actionId = '#mauticform_action_' + response.actionId;
         if (mQuery(actionId).length) {
@@ -185,23 +183,21 @@ Mautic.formActionOnLoad = function (container, response) {
         });
         users.initialize();
 
-        userLookup.typeahead(
-            {
+        userLookup.typeahead({
                 hint: true,
                 highlight: true,
                 minLength: 2
-            },
-            {
-                name: 'users',
+            },{
+                name: 'formaction_properties_user_lookup',
                 displayKey: 'label',
                 source: users.ttAdapter()
             }).on('typeahead:selected', function (event, datum) {
-                mQuery("#formaction_properties_user").val(datum["value"]);
+                mQuery("#formaction_properties_user_id").val(datum["value"]);
             }).on('typeahead:autocompleted', function (event, datum) {
-                mQuery("#formaction_properties_user").val(datum["value"]);
+                mQuery("#formaction_properties_user_id").val(datum["value"]);
             }).on('keypress', function (event) {
                 if ((event.keyCode || event.which) == 13) {
-                    mQuery('#formaction_properties_user_lookup').typeahead('close');
+                    userLookup.typeahead('close');
                 }
             });
 

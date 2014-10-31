@@ -46,14 +46,12 @@ class FormSubmitActionSendAdminEmailType extends AbstractType
                 'class'       => 'form-control',
                 'tooltip'     => 'mautic.core.help.autocomplete'
             ),
-            'mapped'     => false,
-            'required'   => true
+            // 'mapped'     => false, // @todo load user name from the controller
+            'required'   => false
         ));
 
-        $builder->add('user', 'hidden_entity', array(
-            'required'       => false,
-            'repository'     => 'MauticUserBundle:User',
-            'error_bubbling' => false
+        $builder->add('user_id', 'hidden', array(
+            'required'       => false
         ));
     }
 
