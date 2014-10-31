@@ -24,7 +24,7 @@ foreach ($form->getActions() as $action) {
             <div class="box-layout">
                 <div class="col-xs-6 va-m">
                     <h4 class="fw-sb text-primary"><?php echo $form->getName(); ?></h4>
-                    <p class="text-white dark-lg mb-0">Created on <?php echo $view['date']->toDate($form->getDateAdded()); ?></p>
+                    <p class="text-white dark-lg mb-0"><?php echo $view['translator']->trans('mautic.form.details.created_on', array('%date%' => $view['date']->toDate($form->getDateAdded()))); ?></p>
                 </div>
                 <div class="col-xs-6 va-m text-right">
                     <h4 class="fw-sb"><span class="label label-success"><?php echo strtoupper($form->getPublishStatus()); ?></span></h4>
@@ -40,23 +40,23 @@ foreach ($form->getActions() as $action) {
                     <table class="table table-bordered table-striped mb-0">
                         <tbody>
                             <tr>
-                                <td width="20%"><span class="fw-b">Description</span></td>
+                                <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.form.details.description'); ?></span></td>
                                 <td><?php echo $form->getDescription(); ?></td>
                             </tr>
                             <tr>
-                                <td width="20%"><span class="fw-b">Created By</span></td>
+                                <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.form.details.created_by'); ?></span></td>
                                 <td><?php echo $form->getCreatedBy(); ?></td>
                             </tr>
                             <tr>
-                                <td width="20%"><span class="fw-b">Category</span></td>
+                                <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.form.details.category'); ?></span></td>
                                 <td><?php echo $form->getCategory(); ?></td>
                             </tr>
                             <tr>
-                                <td width="20%"><span class="fw-b">Publish Up</span></td>
+                                <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.form.details.publish_up'); ?></span></td>
                                 <td><?php echo ($form->getPublishUp() === null) ? '' : $view['date']->toDate($form->getPublishUp()); ?></td>
                             </tr>
                             <tr>
-                                <td width="20%"><span class="fw-b">Publish Down</span></td>
+                                <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.form.details.publish_down'); ?></span></td>
                                 <td><?php echo ($form->getPublishDown() === null) ? '' : $view['date']->toDate($form->getPublishDown()); ?></td>
                             </tr>
                         </tbody>
@@ -70,7 +70,7 @@ foreach ($form->getActions() as $action) {
     <div class="bg-auto bg-dark-xs">
         <!-- form detail collapseable toggler -->
         <div class="hr-expand nm">
-            <span data-toggle="tooltip" title="Detail">
+            <span data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.form.details.detail'); ?>">
                 <a href="javascript:void(0)" class="arrow" data-toggle="collapse" data-target="#form-details"><span class="caret"></span></a>
             </span>
         </div>
@@ -157,8 +157,8 @@ foreach ($form->getActions() as $action) {
 
         <!-- tabs controls -->
         <ul class="nav nav-tabs pr-md pl-md">
-            <li class="active"><a href="#actions-container" role="tab" data-toggle="tab">Actions</a></li>
-            <li class=""><a href="#fields-container" role="tab" data-toggle="tab">Fields</a></li>
+            <li class="active"><a href="#actions-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.form.details.actions'); ?></a></li>
+            <li class=""><a href="#fields-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.form.details.fields'); ?></a></li>
         </ul>
         <!--/ tabs controls -->
     </div>
@@ -172,7 +172,7 @@ foreach ($form->getActions() as $action) {
                 <!-- form -->
                 <form action="" class="panel mb-0">
                     <div class="form-control-icon pa-xs">
-                        <input type="text" class="form-control bdr-w-0" placeholder="Filter actions...">
+                        <input type="text" class="form-control bdr-w-0" placeholder="<?php echo $view['translator']->trans('mautic.form.details.filter_actions_placeholder'); ?>">
                         <span class="the-icon fa fa-search text-muted mt-xs"></span><!-- must below `form-control` -->
                     </div>
                 </form>
@@ -223,7 +223,7 @@ foreach ($form->getActions() as $action) {
                 <!-- form -->
                 <form action="" class="panel mb-0">
                     <div class="form-control-icon pa-xs">
-                        <input type="text" class="form-control bdr-w-0" placeholder="Filter fields...">
+                        <input type="text" class="form-control bdr-w-0" placeholder="<?php echo $view['translator']->trans('mautic.form.details.filter_fields_placeholder'); ?>">
                         <span class="the-icon fa fa-search text-muted mt-xs"></span><!-- must below `form-control` -->
                     </div>
                 </form>
@@ -238,14 +238,15 @@ foreach ($form->getActions() as $action) {
                     <li class="list-group-item bg-auto bg-light-xs">
                         <div class="box-layout">
                             <div class="col-md-1 va-m">
-                                <h3><span class="fa fa-<?php echo $field->getIsRequired() ? 'check' : 'times'; ?> text-white dark-xs" data-toggle="tooltip" data-placement="left" title="Require"></span></h3>
+                                <?php $requiredTitle = $field->getIsRequired() ? 'mautic.form.details.required' : 'mautic.form.details.not_required'; ?>
+                                <h3><span class="fa fa-<?php echo $field->getIsRequired() ? 'check' : 'times'; ?> text-white dark-xs" data-toggle="tooltip" data-placement="left" title="<?php echo $view['translator']->trans($requiredTitle); ?>"></span></h3>
                             </div>
                             <div class="col-md-7 va-m">
                                 <h5 class="fw-sb text-primary mb-xs"><?php echo $field->getLabel(); ?></h5>
-                                <h6 class="text-white dark-md">Field type: <?php echo $field->getType(); ?></h6>
+                                <h6 class="text-white dark-md"><?php echo $view['translator']->trans('mautic.form.details.field_type', array('%type%' => $field->getType())); ?></h6>
                             </div>
                             <div class="col-md-4 va-m text-right">
-                                <em class="text-white dark-sm">Field Order: <?php echo $field->getOrder(); ?></em>
+                                <em class="text-white dark-sm"><?php echo $view['translator']->trans('mautic.form.details.field_order', array('%order%' => $field->getOrder())); ?></em>
                             </div>
                         </div>
                     </li>
