@@ -56,3 +56,4 @@ $view['slots']->set("headerTitle", $view['translator']->trans('mautic.lead.lead.
     <div class="page-list">
         <?php $view['slots']->output('_content'); ?>
     </div>
+</div>
