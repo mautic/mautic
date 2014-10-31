@@ -34,18 +34,25 @@ $view['slots']->set("headerTitle", $header);
                 <div class="tab-content pa-md bg-white">
                     <!-- #history-container -->
                     <div class="tab-pane fade in active bdr-w-0" id="details-container">
-
-                        <?php
-                        echo $view['form']->row($form['name']);
-                        echo $view['form']->row($form['description']);
-                        echo $view['form']->row($form['category_lookup']);
-                        echo $view['form']->row($form['category']);
-                        echo $view['form']->row($form['isPublished']);
-                        echo $view['form']->row($form['publishUp']);
-                        echo $view['form']->row($form['publishDown']);
-                        echo $view['form']->row($form['postAction']);
-                        echo $view['form']->row($form['postActionProperty']);
-                    ?>
+                        <div class="row bundle-content-container">
+                            <div class="col-xs-12 col-sm-6 bundle-main bundle-main-left auto-height">
+                                <?php
+                                echo $view['form']->row($form['name']);
+                                echo $view['form']->row($form['description']);
+                                echo $view['form']->row($form['postAction']);
+                                echo $view['form']->row($form['postActionProperty']);
+                            ?>
+                            </div>
+                            <div class="col-xs-12 col-sm-6 bundle-main bundle-main-right auto-height">
+                                <?php
+                                echo $view['form']->row($form['category_lookup']);
+                                echo $view['form']->row($form['category']);
+                                echo $view['form']->row($form['isPublished']);
+                                echo $view['form']->row($form['publishUp']);
+                                echo $view['form']->row($form['publishDown']);
+                            ?>
+                            </div>
+                        </div>
                     </div>
                     <div class="tab-pane fade bdr-w-0" id="fields-container">
                         <?php echo $view->render('MauticFormBundle:Builder:style.html.php'); ?>
