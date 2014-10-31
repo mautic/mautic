@@ -14,7 +14,6 @@ namespace Mautic\FormBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -26,7 +25,7 @@ class FormController extends CommonFormController
     /**
      * @param int $page
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function indexAction($page = 1)
     {
@@ -130,7 +129,7 @@ class FormController extends CommonFormController
      *
      * @param int $objectId
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function viewAction($objectId)
     {
@@ -206,7 +205,7 @@ class FormController extends CommonFormController
     /**
      * Generates new form and processes post data
      *
-     * @return JsonResponse|Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|Response
      */
     public function newAction()
     {
@@ -349,7 +348,7 @@ class FormController extends CommonFormController
      * @param int  $objectId
      * @param bool $ignorePost
      *
-     * @return JsonResponse|Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|Response
      */
     public function editAction($objectId, $ignorePost = false)
     {
@@ -566,7 +565,7 @@ class FormController extends CommonFormController
      *
      * @param int $objectId
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function cloneAction($objectId)
     {
@@ -628,7 +627,7 @@ class FormController extends CommonFormController
      *
      * @param int $objectId
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function deleteAction($objectId) {
         $page        = $this->factory->getSession()->get('mautic.form.page', 1);
@@ -686,11 +685,9 @@ class FormController extends CommonFormController
     /**
      * Deletes a group of entities
      *
-     * @param int $objectId
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function batchDeleteAction($objectId) {
+    public function batchDeleteAction() {
         $page        = $this->factory->getSession()->get('mautic.form.page', 1);
         $returnUrl   = $this->generateUrl('mautic_form_index', array('page' => $page));
         $flashes     = array();
