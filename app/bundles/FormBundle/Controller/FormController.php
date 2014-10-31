@@ -721,12 +721,9 @@ class FormController extends CommonFormController
                 } elseif (!$this->factory->getSecurity()->hasEntityAccess(
                     'form:forms:deleteown', 'form:forms:deleteother', $entity->getCreatedBy()
                 )) {
-                    $flashes[] = array(
-                        'type' => 'error',
-                        'msg'  => 'mautic.core.error.accessdenied'
-                    );
+                    $flashes[] = $this->accessDenied(true);
                 } elseif ($model->isLocked($entity)) {
-                    return $this->isLocked($postActionVars, $entity, 'form.form');
+                    $flashes[] = $this->isLocked($postActionVars, $entity, 'form.form', true);
                 } else {
                     $model->deleteEntity($entity);
 
