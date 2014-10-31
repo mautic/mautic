@@ -31,6 +31,11 @@ class MailHelper
      */
     private $from;
 
+    /*
+     * @var null
+     */
+    private $failures;
+
     /**
      * @param      $mailer
      * @param null $from
@@ -53,6 +58,8 @@ class MailHelper
 
     /**
      * Send the message
+     *
+     * @return bool
      */
     public function send()
     {
@@ -60,7 +67,21 @@ class MailHelper
         if (empty($from)) {
             $this->message->setFrom($this->from);
         }
-        $this->mailer->send($this->message);
+        $this->mailer->send($this->message, $this->failures);
+
+        if (empty($this->failures)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getFailures()
+    {
+        return $this->failures;
     }
 
     /**
