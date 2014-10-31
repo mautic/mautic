@@ -102,7 +102,7 @@ $view['slots']->set("headerTitle", $header);
                     </div>
                     <div class="tab-pane fade bdr-w-0" id="actions-container">
                         <div id="mauticforms_actions">
-                            <div class="available-fields mb-md">
+                            <div class="available-actions mb-md">
                                 <p><?php echo $view['translator']->trans('mautic.form.form.addaction'); ?></p>
                                 <div class="dropdown">
                                     <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
