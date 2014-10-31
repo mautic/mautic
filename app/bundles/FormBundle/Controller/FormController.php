@@ -118,8 +118,7 @@ class FormController extends CommonFormController
             'passthroughVars' => array(
                 'activeLink'     => '#mautic_form_index',
                 'mauticContent'  => 'form',
-                'route'          => $this->generateUrl('mautic_form_index', array('page' => $page)),
-                'replaceContent' => ($tmpl == 'list') ? 'true' : 'false'
+                'route'          => $this->generateUrl('mautic_form_index', array('page' => $page))
             )
         ));
     }
