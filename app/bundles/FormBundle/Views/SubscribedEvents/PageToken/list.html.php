@@ -11,30 +11,23 @@ if ($tmpl == 'index') {
     $view->extend('MauticFormBundle:SubscribedEvents\PageToken:index.html.php');
 }
 ?>
-<div class="page-list" id="form-page-tokens">
+<div id="form-page-tokens">
     <ul class="draggable scrollable">
         <?php
         if (count($items)):
         foreach ($items as $i):?>
             <li class="page-list-item has-click-event" id="form-<?php echo $i[0]->getId(); ?>">
-                <div class="padding-sm">
-                    <span class="list-item-publish-status">
-                        <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php',array(
-                            'item'          => $i[0],
-                            'model'         => 'form.form',
-                            'disableToggle' => true
-                        )); ?>
-
-                    </span>
-                    <span class="list-item-primary">
-                        <?php echo $i[0]->getName(); ?>
-                    </span>
-                    <span class="list-item-secondary list-item-indent" data-toggle="tooltip" data-placement="left"
-                          title="<?php echo $i[0]->getDescription(); ?>">
-                        <?php echo $i[0]->getDescription(true, 30); ?>
-                    </span>
-                    <input type="hidden" class="page-token" value="{form=<?php echo $i[0]->getId(); ?>}" />
+                <div class="panel">
+                    <div class="panel-body np box-layout">
+                        <div class="height-auto icon bdr-r bg-dark-xs col-xs-1 text-center">
+                            <i class="fa fa-fw fa-list"></i>
+                        </div>
+                        <div class="media-body col-xs-11 pa-10">
+                            <?php echo $i[0]->getName(); ?>
+                        </div>
+                    </div>
                 </div>
+                <input type="hidden" class="page-token" value="{form=<?php echo $i[0]->getId(); ?>}" />
             </li>
         <?php endforeach; ?>
     </ul>
@@ -51,6 +44,4 @@ if ($tmpl == 'index') {
         'queryString'     => 'tmpl=list'
     )); ?>
     <?php endif; ?>
-
-    '
 </div>

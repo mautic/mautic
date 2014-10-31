@@ -98,9 +98,7 @@ Mautic.pageEditorOnLoad = function (container) {
     mQuery(container + " ul.draggable li").draggable({
         iframeFix: true,
         iframeId: 'builder-template-content',
-        helper: function() {
-            return mQuery('<div><i class="fa fa-lg fa-crosshairs"></i></div>');
-        },
+        helper: 'clone',
         appendTo: '.page-builder',
         zIndex: 8000,
         scroll: true,
