@@ -2,7 +2,7 @@
 Mautic.reportOnLoad = function (container) {
 	// Activate search if the container exists
 	if (mQuery(container + ' #list-search').length) {
-		Mautic.activateSearchAutocomplete('list-search', 'reportOnLoad');
+		Mautic.activateSearchAutocomplete('list-search', 'report');
 	}
 
 	// Append an index of the number of filters on the edit form
