@@ -202,7 +202,7 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
             <!-- page detail collapseable toggler -->
             <div class="hr-expand nm">
                 <span data-toggle="tooltip" title="Detail">
-                    <a href="javascript:void(0)" class="arrow" data-toggle="collapse" data-target="#page-details"><span class="caret"></span></a>
+                    <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse" data-target="#page-details"><span class="caret"></span> <?php echo $view['translator']->trans('mautic.page.page.details'); ?></a>
                 </span>
             </div>
             <!--/ page detail collapseable toggler -->
