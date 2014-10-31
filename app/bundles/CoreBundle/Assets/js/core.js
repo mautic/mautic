@@ -868,7 +868,7 @@ var Mautic = {
     reorderTableData: function (name, orderby, tmpl, target) {
         var route = window.location.pathname + "?tmpl=" + tmpl + "&name=" + name + "&orderby=" + orderby;
 
-	    Mautic.loadContent(route, '', 'POST', target);
+        Mautic.loadContent(route, '', 'POST', target);
     },
 
     /**
@@ -916,9 +916,12 @@ var Mautic = {
             }
         });
     },
+
     /**
      * Executes an object action
+     *
      * @param action
+     * @param menuLink
      */
     executeAction: function (action, menuLink) {
         //dismiss modal if activated
@@ -938,6 +941,25 @@ var Mautic = {
                 Mautic.processAjaxError(request, textStatus, errorThrown);
             }
         });
+    },
+
+    /**
+     * Executes a batch action
+     *
+     * @param action
+     * @param menuLink
+     */
+    executeBatchAction: function (action, menuLink) {
+	    // Retrieve all of the selected items
+        var items = JSON.stringify(mQuery('input[class=list-checkbox]:checked').map(function() {
+            return mQuery(this).val();
+        }).get());
+
+	    // Append the items to the action to send with the POST
+	    var action = action + '?ids=' + items;
+
+	    // Hand over processing to the executeAction method
+	    Mautic.executeAction(action, menuLink);
     },
 
     /**

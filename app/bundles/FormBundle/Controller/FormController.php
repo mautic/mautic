@@ -684,6 +684,73 @@ class FormController extends CommonFormController
     }
 
     /**
+     * Deletes a group of entities
+     *
+     * @param int $objectId
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function batchDeleteAction($objectId) {
+        $page        = $this->factory->getSession()->get('mautic.form.page', 1);
+        $returnUrl   = $this->generateUrl('mautic_form_index', array('page' => $page));
+        $flashes     = array();
+
+        $postActionVars = array(
+            'returnUrl'       => $returnUrl,
+            'viewParameters'  => array('page' => $page),
+            'contentTemplate' => 'MauticFormBundle:Form:index',
+            'passthroughVars' => array(
+                'activeLink'    => '#mautic_form_index',
+                'mauticContent' => 'form'
+            )
+        );
+
+        if ($this->request->getMethod() == 'POST') {
+            $model  = $this->factory->getModel('form');
+            $ids    = json_decode($this->request->query->get('ids'));
+
+            foreach ($ids as $objectId) {
+                $entity = $model->getEntity($objectId);
+
+                if ($entity === null) {
+                    $flashes[] = array(
+                        'type'    => 'error',
+                        'msg'     => 'mautic.form.error.notfound',
+                        'msgVars' => array('%id%' => $objectId)
+                    );
+                } elseif (!$this->factory->getSecurity()->hasEntityAccess(
+                    'form:forms:deleteown', 'form:forms:deleteother', $entity->getCreatedBy()
+                )) {
+                    $flashes[] = array(
+                        'type' => 'error',
+                        'msg'  => 'mautic.core.error.accessdenied'
+                    );
+                } elseif ($model->isLocked($entity)) {
+                    return $this->isLocked($postActionVars, $entity, 'form.form');
+                } else {
+                    $model->deleteEntity($entity);
+
+                    $identifier = $this->get('translator')->trans($entity->getName());
+                    $flashes[] = array(
+                        'type' => 'notice',
+                        'msg'  => 'mautic.form.notice.deleted',
+                        'msgVars' => array(
+                            '%name%' => $identifier,
+                            '%id%'   => $objectId
+                        )
+                    );
+                }
+            }
+        } //else don't do anything
+
+        return $this->postActionRedirect(
+            array_merge($postActionVars, array(
+                'flashes' => $flashes
+            ))
+        );
+    }
+
+    /**
      * Clear field and actions from the session
      */
     public function clearSessionComponents()
