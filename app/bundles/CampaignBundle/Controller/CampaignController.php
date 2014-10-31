@@ -159,11 +159,15 @@ class CampaignController extends FormController
             return $this->accessDenied();
         }
 
+        // Audit Log
+        $logs = $this->factory->getModel('core.auditLog')->getLogForObject('campaign', $objectId);
+
         return $this->delegateView(array(
             'viewParameters'  => array(
                 'entity'      => $entity,
                 'page'        => $page,
-                'permissions' => $permissions
+                'permissions' => $permissions,
+                'logs'        => $logs
             ),
             'contentTemplate' => 'MauticCampaignBundle:Campaign:details.html.php',
             'passthroughVars' => array(
