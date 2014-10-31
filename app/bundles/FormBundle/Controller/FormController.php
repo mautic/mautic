@@ -707,7 +707,7 @@ class FormController extends CommonFormController
 
         if ($this->request->getMethod() == 'POST') {
             $model  = $this->factory->getModel('form');
-            $ids    = json_decode($this->request->query->get('ids'));
+            $ids    = json_decode($this->request->query->get('ids', array()));
 
             foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
