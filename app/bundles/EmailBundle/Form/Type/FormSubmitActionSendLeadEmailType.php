@@ -13,11 +13,11 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class FormSubmitActionSendEmailType
+ * Class FormSubmitActionSendLeadEmailType
  *
  * @package Mautic\EmailBundle\Form\Type
  */
-class FormSubmitActionSendEmailType extends AbstractType
+class FormSubmitActionSendLeadEmailType extends AbstractType
 {
 
     /**
@@ -38,21 +38,12 @@ class FormSubmitActionSendEmailType extends AbstractType
                 'tooltip' => 'mautic.email.form.submit.emails_descr'
             )
         ));
-
-        $builder->add('message', 'textarea', array(
-            'label'         => 'mautic.email.form.submit.message',
-            'label_attr'    => array('class' => 'control-label'),
-            'attr'       => array(
-                'class'   => 'form-control',
-                'tooltip' => 'mautic.email.form.submit.message_descr'
-            )
-        ));
     }
 
     /**
      * @return string
      */
     public function getName() {
-        return "email_submitaction_sendemail";
+        return "email_submitaction_sendemail_lead";
     }
 }
