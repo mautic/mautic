@@ -180,10 +180,14 @@ class FormController extends CommonFormController
 
         ), "RETURN_ARRAY");
 
+        // Audit Log
+        $logs = $this->factory->getModel('core.auditLog')->getLogForObject('form', $objectId);
+
         return $this->delegateView(array(
             'viewParameters'  => array(
                 'activeForm'  => $activeForm,
                 'page'        => $page,
+                'logs'        => $logs,
                 'permissions' => $permissions,
                 'security'    => $this->factory->getSecurity()
             ),

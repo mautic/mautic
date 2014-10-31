@@ -56,7 +56,7 @@ $view['slots']->set("headerTitle", $activeForm->getName());
     <div class="box-layout">
         <?php
         echo $view->render('MauticFormBundle:Form:stats.html.php', array('form' => $activeForm));
-        echo $view->render('MauticFormBundle:Form:copy.html.php', array('form' => $activeForm));
+        echo $view->render('MauticFormBundle:Form:copy.html.php', array('form' => $activeForm, 'logs' => $logs));
         ?>
     </div>
     <!--/ end: box layout -->

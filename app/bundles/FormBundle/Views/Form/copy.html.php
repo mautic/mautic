@@ -30,58 +30,10 @@
     and build activity feed from it
     -->
     <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mb-0">
-        <div class="panel-heading">
-            <div class="panel-title">Recent Activity</div>
-        </div>
-        <div class="panel-body pt-sm">
-            <ul class="media-list media-list-feed">
-                <li class="media">
-                    <div class="media-object pull-left mt-xs">
-                        <span class="figure"></span>
-                    </div>
-                    <div class="media-body">
-                        Dan Counsell Create <strong class="text-primary">Super Awesome Form</strong>
-                        <p class="fs-12 text-white dark-sm">Jan 16, 2014</p>
-                    </div>
-                </li>
-                <li class="media">
-                    <div class="media-object pull-left mt-xs">
-                        <span class="figure"></span>
-                    </div>
-                    <div class="media-body">
-                        Ima Steward Update <strong class="text-primary">Super Awesome Form</strong> action
-                        <p class="fs-12 text-white dark-sm">May 1, 2015</p>
-                    </div>
-                </li>
-                <li class="media">
-                    <div class="media-object pull-left mt-xs">
-                        <span class="figure"></span>
-                    </div>
-                    <div class="media-body">
-                        Ima Steward Update <strong class="text-primary">Super Awesome Form</strong> leads
-                        <p class="fs-12 text-white dark-sm">Aug 2, 2014</p>
-                    </div>
-                </li>
-                <li class="media">
-                    <div class="media-object pull-left">
-                        <span class="figure featured bg-success"><span class="fa fa-check"></span></span>
-                    </div>
-                    <div class="media-body">
-                        Dan Counsell Publish <strong class="text-primary">Super Awesome Form</strong>
-                        <p class="fs-12 text-white dark-sm">Sep 23, 2014</p>
-                    </div>
-                </li>
-                <li class="media">
-                    <div class="media-object pull-left">
-                        <span class="figure"></span>
-                    </div>
-                    <div class="media-body">
-                        Dan Counsell Unpublish <strong class="text-primary">Super Awesome Form</strong>
-                        <p class="fs-12 text-white dark-sm">Sep 29, 2014</p>
-                    </div>
-                </li>
-            </ul>
-        </div>
+        
+        <!-- recent activity -->
+        <?php echo $view->render('MauticCoreBundle:Default:recentactivity.html.php', array('logs' => $logs)); ?>
+        
     </div>
 </div>
 <!--/ right section -->
