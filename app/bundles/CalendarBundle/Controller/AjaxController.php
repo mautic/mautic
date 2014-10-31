@@ -15,10 +15,31 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class AjaxController
- *
- * @package Mautic\CalendarBundle\Controller
  */
 class AjaxController extends CommonAjaxController
 {
+
+    /**
+     * Generates the calendar data
+     *
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function generateDataAction(Request $request)
+    {
+        $dates = array(
+            'start_date' => $request->query->get('start'),
+            'end_date'   => $request->query->get('end')
+        );
+
+        /* @type \Mautic\CalendarBundle\Model\CalendarModel $model */
+        $model  = $this->factory->getModel('calendar');
+        $events = $model->getCalendarEvents($dates);
+
+        $dataArray = array();
+
+        return $this->sendJsonResponse($dataArray);
+    }
 
 }
