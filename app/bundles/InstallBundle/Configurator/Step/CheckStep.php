@@ -100,6 +100,10 @@ class CheckStep implements StepInterface
             }
         }
 
+        if (get_magic_quotes_gpc()) {
+            $messages[] = 'mautic.install.magic_quotes_enabled';
+        }
+
         if (!function_exists('json_encode')) {
             $messages[] = 'mautic.install.function.jsonencode';
         }
