@@ -37,9 +37,7 @@ class AjaxController extends CommonAjaxController
         $model  = $this->factory->getModel('calendar');
         $events = $model->getCalendarEvents($dates);
 
-        $dataArray = array();
-
-        return $this->sendJsonResponse($dataArray);
+        return $this->sendJsonResponse($events);
     }
 
 }

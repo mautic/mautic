@@ -30,6 +30,7 @@ class CalendarModel extends FormModel
     {
         $event = new CalendarGeneratorEvent($dates);
         $this->dispatcher->dispatch(CalendarEvents::CALENDAR_ON_GENERATE, $event);
+
         return $event->getEvents();
     }
 }

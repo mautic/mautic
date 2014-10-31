@@ -24,6 +24,11 @@ class CalendarGeneratorEvent extends Event
     private $dates;
 
     /**
+     * @var array
+     */
+    private $events = array();
+
+    /**
      * @param array $dates
      */
     public function __construct(array $dates)
@@ -32,6 +37,20 @@ class CalendarGeneratorEvent extends Event
     }
 
     /**
+     * Adds an array of events to the container
+     *
+     * @param array $events
+     *
+     * @return void
+     */
+    public function addEvents(array $events)
+    {
+        $this->events = array_merge($this->events, $events);
+    }
+
+    /**
+     * Fetches the event dates
+     *
      * @return array
      */
     public function getDates()
@@ -39,7 +58,13 @@ class CalendarGeneratorEvent extends Event
         return $this->dates;
     }
 
+    /**
+     * Fetches the events container
+     *
+     * @return array
+     */
     public function getEvents()
     {
+        return $this->events;
     }
 }
