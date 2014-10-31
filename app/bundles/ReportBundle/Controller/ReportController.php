@@ -469,11 +469,15 @@ class ReportController extends FormController
         //set what page currently on so that we can return here after form submission/cancellation
         $this->factory->getSession()->set('mautic.report.' . $entity->getId() . '.page', $reportPage);
 
+        // Audit Log
+        $logs = $this->factory->getModel('core.auditLog')->getLogForObject('report', $reportId);
+
         return $this->delegateView(array(
             'viewParameters'  =>  array(
                 'result'     => $result,
                 'report'     => $entity,
                 'reportPage' => $page,
+                'logs'       => $logs,
                 'tmpl'       => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                 'limit'      => $limit,
                 'security'   => $security,
