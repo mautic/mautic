@@ -52,20 +52,7 @@ class FormType extends AbstractType
         $builder->addEventSubscriber(new CleanFormSubscriber());
         $builder->addEventSubscriber(new FormExitSubscriber('form.form', $options));
 
-        $builder->add("forms-panel-wrapper-start", 'panel_wrapper_start', array(
-            'attr' => array(
-                'id' => "forms-panel"
-            )
-        ));
-
         //details
-        $builder->add("details-panel-start", 'panel_start', array(
-            'label'      => 'mautic.form.form.panel.details',
-            'dataParent' => '#forms-panel',
-            'bodyId'     => 'details-panel',
-            'bodyAttr'   => array('class' => 'in')
-        ));
-
         $builder->add('name', 'text', array(
             'label'      => 'mautic.form.form.name',
             'label_attr' => array('class' => 'control-label'),
@@ -161,28 +148,6 @@ class FormType extends AbstractType
             'attr'       => array('class' => 'form-control'),
             'required'   => $required
         ));
-
-        $builder->add("details-panel-end", 'panel_end');
-
-        //fields
-        $builder->add("fields-panel-start", 'panel_start', array(
-            'label' => 'mautic.form.form.panel.fields',
-            'dataParent' => '#forms-panel',
-            'bodyId'     => 'fields-panel'
-        ));
-
-        $builder->add("fields-panel-end", 'panel_end');
-
-        //submit actions
-        $builder->add("actions-panel-start", 'panel_start', array(
-            'label' => 'mautic.form.form.panel.actions',
-            'dataParent' => '#forms-panel',
-            'bodyId'     => 'actions-panel'
-        ));
-
-        $builder->add("actions-panel-end", 'panel_end');
-
-        $builder->add("forms-panel-wrapper-end", 'panel_wrapper_end');
 
         $builder->add('tempId', 'hidden', array(
             'mapped' => false

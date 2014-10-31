@@ -9,15 +9,10 @@
 
 namespace Mautic\CalendarBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Request;
 use Mautic\CoreBundle\Controller\CommonController;
-use Symfony\Component\Intl\Intl;
 
 /**
  * Class DefaultController
- *
- * @package Mautic\CalendarBundle\Controller
  */
 class DefaultController extends CommonController
 {
@@ -25,19 +20,11 @@ class DefaultController extends CommonController
     /**
      * Generates the default view
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function indexAction()
     {
-    	$model = $this->factory->getModel('calendar.calendar');
-
-        $search = $this->request->get('search', $this->factory->getSession()->get('mautic.asset.filter', ''));
-        $this->factory->getSession()->set('mautic.asset.filter', $search);
-
         return $this->delegateView(array(
-            'viewParameters'  =>  array(
-                'searchValue' => $search
-            ),
             'contentTemplate' => 'MauticCalendarBundle:Default:index.html.php',
             'passthroughVars' => array(
                 'activeLink'     => '#mautic_calendar_index',

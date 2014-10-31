@@ -10,9 +10,12 @@
 namespace Mautic\FormBundle\EventListener;
 
 use Mautic\ApiBundle\Event\RouteEvent;
+use Mautic\CalendarBundle\CalendarEvents;
+use Mautic\CalendarBundle\Event\CalendarGeneratorEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\FormBundle\Event as Events;
 use Mautic\FormBundle\FormEvents;
 use Mautic\LeadBundle\LeadEvents;
@@ -34,7 +37,8 @@ class FormSubscriber extends CommonSubscriber
             CoreEvents::BUILD_COMMAND_LIST   => array('onBuildCommandList', 0),
             FormEvents::FORM_POST_SAVE       => array('onFormPostSave', 0),
             FormEvents::FORM_POST_DELETE     => array('onFormDelete', 0),
-            LeadEvents::TIMELINE_ON_GENERATE => array('onTimelineGenerate', 0)
+            LeadEvents::TIMELINE_ON_GENERATE => array('onTimelineGenerate', 0),
+            CalendarEvents::CALENDAR_ON_GENERATE => array('onCalendarGenerate', 0)
         );
     }
 
@@ -197,5 +201,38 @@ class FormSubscriber extends CommonSubscriber
                 'contentTemplate' => 'MauticFormBundle:Timeline:index.html.php'
             ));
         }
+    }
+
+    /**
+     * Adds events to the calendar
+     *
+     * @param CalendarGeneratorEvent $event
+     *
+     * @return void
+     * @todo   This method is only a model and should be removed when actual data is being populated
+     */
+    public function onCalendarGenerate(CalendarGeneratorEvent $event)
+    {
+        $dates = $event->getDates();
+
+        $query = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+        $query->select('fs.referer AS title, fs.date_submitted AS start')
+            ->from(MAUTIC_TABLE_PREFIX . 'form_submissions', 'fs')
+            ->where($query->expr()->andX(
+                $query->expr()->gte('fs.date_submitted', ':start'),
+                $query->expr()->lte('fs.date_submitted', ':end')
+            ))
+            ->setParameter('start', $dates['start_date'])
+            ->setParameter('end', $dates['end_date']);
+
+        $results = $query->execute()->fetchAll();
+
+        // We need to convert the date to a ISO8601 compliant string
+        foreach ($results as &$object) {
+            $date = new DateTimeHelper($object['start']);
+            $object['start'] = $date->toLocalString(\DateTime::ISO8601);
+        }
+
+        $event->addEvents($results);
     }
 }
