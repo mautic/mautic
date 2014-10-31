@@ -53,11 +53,11 @@ foreach ($form->getActions() as $action) {
                             </tr>
                             <tr>
                                 <td width="20%"><span class="fw-b">Publish Up</span></td>
-                                <td><?php echo $view['date']->toDate($form->getPublishUp()); ?></td>
+                                <td><?php echo ($form->getPublishUp() === null) ? '' : $view['date']->toDate($form->getPublishUp()); ?></td>
                             </tr>
                             <tr>
                                 <td width="20%"><span class="fw-b">Publish Down</span></td>
-                                <td><?php echo $view['date']->toDate($form->getPublishDown()); ?></td>
+                                <td><?php echo ($form->getPublishDown() === null) ? '' : $view['date']->toDate($form->getPublishDown()); ?></td>
                             </tr>
                         </tbody>
                     </table>
