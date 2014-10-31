@@ -12,20 +12,14 @@ if ($tmpl == 'index') {
 }
 ?>
 <div id="form-page-tokens">
-    <ul class="draggable scrollable">
+    <ul class="draggable scrollable list-unstyled">
         <?php
         if (count($items)):
         foreach ($items as $i):?>
-            <li class="page-list-item has-click-event" id="form-<?php echo $i[0]->getId(); ?>">
-                <div class="panel">
-                    <div class="panel-body np box-layout">
-                        <div class="height-auto icon bdr-r bg-dark-xs col-xs-1 text-center">
-                            <i class="fa fa-fw fa-list"></i>
-                        </div>
-                        <div class="media-body col-xs-11 pa-10">
-                            <?php echo $i[0]->getName(); ?>
-                        </div>
-                    </div>
+            <li class="ma-5 page-list-item has-click-event" id="form-<?php echo $i[0]->getId(); ?>">
+                <div class="panel pa-5">
+                    <i class="fa fa-fw fa-list"></i>
+                    <?php echo $i[0]->getName(); ?>
                 </div>
                 <input type="hidden" class="page-token" value="{form=<?php echo $i[0]->getId(); ?>}" />
             </li>
@@ -33,15 +27,16 @@ if ($tmpl == 'index') {
     </ul>
 
     <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
-        "totalItems"      => count($items),
-        "page"            => $page,
-        "limit"           => $limit,
-        "fixedLimit"      => true,
-        "baseUrl"         => $view['router']->generate('mautic_formtoken_index'),
-        "paginationClass" => "xs",
-        'sessionVar'      => 'formtoken',
-        'ignoreFormExit'  => true,
-        'queryString'     => 'tmpl=list'
+        "totalItems"        => count($items),
+        "page"              => $page,
+        "limit"             => $limit,
+        "fixedLimit"        => true,
+        "baseUrl"           => $view['router']->generate('mautic_formtoken_index'),
+        "paginationWrapper" => 'text-center',
+        "paginationClass"   => "xs",
+        'sessionVar'        => 'formtoken',
+        'ignoreFormExit'    => true,
+        'queryString'       => 'tmpl=list'
     )); ?>
     <?php endif; ?>
 </div>
