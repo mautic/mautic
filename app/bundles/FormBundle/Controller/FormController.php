@@ -703,9 +703,11 @@ class FormController extends CommonFormController
         );
 
         if ($this->request->getMethod() == 'POST') {
-            $model  = $this->factory->getModel('form');
-            $ids    = json_decode($this->request->query->get('ids', array()));
+            $model     = $this->factory->getModel('form');
+            $ids       = json_decode($this->request->query->get('ids', array()));
+            $deleteIds = array();
 
+            // Loop over the IDs to perform access checks pre-delete
             foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
 
@@ -722,18 +724,21 @@ class FormController extends CommonFormController
                 } elseif ($model->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'form.form', true);
                 } else {
-                    $model->deleteEntity($entity);
-
-                    $identifier = $this->get('translator')->trans($entity->getName());
-                    $flashes[] = array(
-                        'type' => 'notice',
-                        'msg'  => 'mautic.form.notice.deleted',
-                        'msgVars' => array(
-                            '%name%' => $identifier,
-                            '%id%'   => $objectId
-                        )
-                    );
+                    $deleteIds[] = $objectId;
                 }
+            }
+
+            // Delete everything we are able to
+            if (!empty($deleteIds)) {
+                $entities = $model->deleteEntities($deleteIds);
+
+                $flashes[] = array(
+                    'type' => 'notice',
+                    'msg'  => 'mautic.form.notice.batch_deleted',
+                    'msgVars' => array(
+                        '%count%' => count($entities)
+                    )
+                );
             }
         } //else don't do anything
 

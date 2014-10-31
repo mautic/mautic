@@ -246,6 +246,8 @@ class FormModel extends CommonModel
             if ($entity !== null) {
                 $event = $this->dispatchEvent("pre_delete", $entity);
                 $this->getRepository()->deleteEntity($entity, false);
+                //set the id for use in events
+                $entity->deletedId = $id;
                 $this->dispatchEvent("post_delete", $entity, false, $event);
             }
             if ((($k + 1) % $batchSize) === 0) {
