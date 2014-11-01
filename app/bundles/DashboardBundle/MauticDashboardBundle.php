@@ -13,10 +13,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
  * Class MauticDashboardBundle
- *
- * @package Mautic\DashboardBundle
  */
 class MauticDashboardBundle extends Bundle
 {
-
 }

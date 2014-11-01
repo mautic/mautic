@@ -9,16 +9,11 @@
 
 namespace Mautic\DashboardBundle\Model;
 
-use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel;
-use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
  * Class DashboardModel
- * {@inheritdoc}
- * @package Mautic\CoreBundle\Model\FormModel
  */
 class DashboardModel extends FormModel
 {
-
 }
