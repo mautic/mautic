@@ -194,13 +194,39 @@ if ($security->hasEntityAccess($permissions['asset:assets:editown'], $permission
                                     <span class="text-white dark-md fw-sb mb-xs">|</span>
                                     <span class="text-white dark-md fw-sb mb-xs">Unique: <?php echo $stats['downloads']['unique']; ?></span>
                                 </div>
-                                <div class="col-xs-4 va-m text-right">
-                                    <div class="btn-group">
-                                        <a href="#" class="btn btn-sm btn-default" onclick="Mautic.updateDownloadChart(this, 24, 'H');return false;">Hourly</a>
-                                        <a href="#" class="btn btn-sm btn-default active" onclick="Mautic.updateDownloadChart(this, 30, 'D');return false;">Dayly</a>
-                                        <a href="#" class="btn btn-sm btn-default" onclick="Mautic.updateDownloadChart(this, 20, 'W');return false;">Weekly</a>
-                                        <a href="#" class="btn btn-sm btn-default" onclick="Mautic.updateDownloadChart(this, 24, 'M');return false;">Monthly</a>
-                                        <a href="#" class="btn btn-sm btn-default" onclick="Mautic.updateDownloadChart(this, 10, 'Y');return false;">Yearly</a>
+                                <div class="col-xs-4 va-m">
+                                    <div class="dropdown pull-right">
+                                        <button id="time-scopes" class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+                                            <span class="button-label">Daily</span>
+                                            <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu" role="menu" aria-labelledby="time-scopes">
+                                            <li role="presentation">
+                                                <a href="#" onclick="Mautic.updateDownloadChart(this, 24, 'H');return false;" role="menuitem" tabindex="-1">
+                                                    Hourly
+                                                </a>
+                                            </li>
+                                            <li role="presentation">
+                                                <a href="#" class="bg-primary" onclick="Mautic.updateDownloadChart(this, 30, 'D');return false;" role="menuitem" tabindex="-1">
+                                                    Dayly
+                                                </a>
+                                            </li>
+                                            <li role="presentation">
+                                                <a href="#" onclick="Mautic.updateDownloadChart(this, 20, 'W');return false;" role="menuitem" tabindex="-1">
+                                                    Weekly
+                                                </a>
+                                            </li>
+                                            <li role="presentation">
+                                                <a href="#" onclick="Mautic.updateDownloadChart(this, 24, 'M');return false;" role="menuitem" tabindex="-1">
+                                                    Monthly
+                                                </a>
+                                            </li>
+                                            <li role="presentation">
+                                                <a href="#" onclick="Mautic.updateDownloadChart(this, 10, 'Y');return false;" role="menuitem" tabindex="-1">
+                                                    Yearly
+                                                </a>
+                                            </li>
+                                        </ul>
                                     </div>
                                 </div>
                             </div>
