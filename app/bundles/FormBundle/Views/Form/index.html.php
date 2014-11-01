@@ -29,6 +29,7 @@ $view['slots']->set('searchHelp', $view['translator']->trans('mautic.form.form.h
         'action'      => $currentRoute,
         'menuLink'    => 'mautic_form_index',
         'langVar'     => 'form',
+        'routeBase'   => 'form',
         'delete'      => $permissions['form:forms:deleteown'] || $permissions['form:forms:deleteother']
     )); ?>
     <div class="page-list">

@@ -733,7 +733,7 @@ class FormController extends CommonFormController
 
                 $flashes[] = array(
                     'type' => 'notice',
-                    'msg'  => 'mautic.form.notice.batch_deleted',
+                    'msg'  => 'mautic.form.form.notice.batch_deleted',
                     'msgVars' => array(
                         '%count%' => count($entities)
                     )

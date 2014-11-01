@@ -21,7 +21,7 @@
                    '<?php echo $view->escape($view['translator']->trans('mautic.' . $langVar . '.form.confirmbatchdelete'), 'js'); ?>',
                    '<?php echo $view->escape($view['translator']->trans('mautic.core.form.delete'), 'js'); ?>',
                    'executeBatchAction',
-                   ['<?php echo $view['router']->generate('mautic_form_action', array('objectAction' => 'batchDelete')); ?>',
+                   ['<?php echo $view['router']->generate('mautic_' . $routeBase . '_action', array('objectAction' => 'batchDelete')); ?>',
                    '#<?php echo $menuLink; ?>'],
                    '<?php echo $view->escape($view['translator']->trans('mautic.core.form.cancel'), 'js'); ?>','',[]);">
                 <i class="fa fa-trash-o"></i>
