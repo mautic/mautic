@@ -17,6 +17,38 @@ if ($tmpl == 'index') {
 }
 ?>
 
+<?php
+$view['slots']->start('actions');
+if ($security->hasEntityAccess($permissions['report:reports:editown'], $permissions['report:reports:editother'],
+    $report->getCreatedBy())): ?>
+    <a href="<?php echo $this->container->get('router')->generate(
+        'mautic_report_action', array("objectAction" => "edit", "objectId" => $report->getId())); ?>"
+       data-toggle="ajax"
+       class="btn btn-default"
+       data-menu-link="#mautic_report_index">
+        <i class="fa fa-fw fa-pencil-square-o"></i>
+        <?php echo $view["translator"]->trans("mautic.core.form.edit"); ?>
+    </a>
+<?php endif; ?>
+<?php if ($security->hasEntityAccess($permissions['report:reports:deleteown'], $permissions['report:reports:deleteother'],
+    $report->getCreatedBy())): ?>
+    <a href="javascript:void(0);"
+       class="btn btn-default"
+       onclick="Mautic.showConfirmation(
+           '<?php echo $view->escape($view["translator"]->trans("mautic.report.report.confirmdelete",
+           array("%name%" => $report->getTitle() . " (" . $report->getId() . ")")), 'js'); ?>',
+           '<?php echo $view->escape($view["translator"]->trans("mautic.core.form.delete"), 'js'); ?>',
+           'executeAction',
+           ['<?php echo $view['router']->generate('mautic_report_action',
+           array("objectAction" => "delete", "objectId" => $report->getId())); ?>',
+           '#mautic_report_index'],
+           '<?php echo $view->escape($view["translator"]->trans("mautic.core.form.cancel"), 'js'); ?>','',[]);">
+        <span><i class="fa fa-fw fa-trash-o"></i><?php echo $view['translator']->trans('mautic.core.form.delete'); ?></span>
+    </a>
+<?php endif; ?>
+
+<?php $view['slots']->stop(); ?>
+
 <!--<div class="panel panel-default page-list">
     <div class="panel-heading">
         <h3 class="panel-title"><?php echo $header; ?></h3>
