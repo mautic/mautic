@@ -32,6 +32,63 @@ class UpdateHelper
     }
 
     /**
+     * Fetches a download package from the remote server
+     *
+     * @param string $kernelRoot
+     * @param string $version
+     * @param string $stability
+     *
+     * @return array
+     */
+    public function fetchPackage($kernelRoot, $version, $stability = 'stable')
+    {
+        $target = '';
+
+        // Get our HTTP client
+        $connector = HttpFactory::getHttp();
+
+        // GET the update data
+        // TODO - Change to the proper URL format for packages when ready
+        try {
+            $data = $connector->get('http://mautic.org/downloads/development/mautic-head.zip');
+        } catch (\Exception $exception) {
+            return array(
+                'error'   => true,
+                'message' => 'mautic.core.updater.error.fetching.package'
+            );
+        }
+
+        if ($data->code != 200) {
+            return array(
+                'error'   => true,
+                'message' => 'mautic.core.updater.error.fetching.updates'
+            );
+        }
+
+        // Parse the Content-Disposition header to get the file name if it exists
+        if (isset($response->headers['Content-Disposition']) && preg_match("/\s*filename\s?=\s?(.*)/", $response->headers['Content-Disposition'], $parts)) {
+            $target = trim(rtrim($parts[1], ";"), '"');
+        }
+
+        // If we don't already have a filename, extract it based on the URL
+        if (!$target) {
+            // TODO - Change this to be based on the real URL when that changes
+            $target = 'mautic-head.zip';
+        }
+
+        // Set the filesystem target
+        $target = $kernelRoot . '/cache/' . $target;
+
+        // Write the response to the filesystem
+        file_put_contents($target, $data->body);
+
+        // Return an array for the sake of consistency
+        return array(
+            'error' => false
+        );
+    }
+
+    /**
      * Retrieves the update data from our home server
      *
      * @return array
