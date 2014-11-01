@@ -8,6 +8,7 @@
  */
 
 $parameters = array(
+    'send_server_data'             => false,
     'theme'                        => 'Mauve',
     'db_driver'                    => 'pdo_mysql',
     'db_host'                      => 'localhost',

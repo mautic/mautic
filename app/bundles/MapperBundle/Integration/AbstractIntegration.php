@@ -14,6 +14,7 @@ use Mautic\MapperBundle\Entity\ApplicationIntegration;
 use Mautic\MapperBundle\Entity\ApplicationIntegrationRepository;
 use Mautic\MapperBundle\Entity\ApplicationObjectMapper;
 use Mautic\MapperBundle\Entity\ApplicationObjectMapperRepository;
+use Mautic\MapperBundle\Helper\ApiHelper;
 
 abstract class AbstractIntegration
 {
@@ -107,6 +108,37 @@ abstract class AbstractIntegration
      * @return string
      */
     abstract public function getSettings();
+
+    /**
+     * Return Mautic fields according with supported object name
+     *
+     * @param $objectName
+     */
+    abstract public function getMauticObject($objectName);
+
+    /**
+     * Return Api Object fields according with supported object name
+     *
+     * @param $objectName
+     */
+    abstract public function getApiObject($objectName);
+
+    /**
+     * Return Api Object fields according with supported object name
+     *
+     * @param $objectName
+     */
+    abstract public function getObjectOptions($objectName, $response);
+
+    /**
+     * Return Api Authentication Object
+     *
+     * @return mixed
+     */
+    public function getApiAuth()
+    {
+        return ApiHelper::getApiAuth($this->getAppAlias(), $this);
+    }
 
     /**
      * @return ApplicationIntegrationRepository

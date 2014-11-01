@@ -60,7 +60,8 @@ class LoadConfigurationCommand extends ContainerAwareCommand
         // Merge in the rest of our configuration data
         $data = array_merge($data, array(
            'secret' => hash('sha1', uniqid(mt_rand())),
-           'default_pagelimit' => 10
+           'default_pagelimit' => 10,
+           'send_server_data' => true
         ));
 
         $configurator->mergeParameters($data);

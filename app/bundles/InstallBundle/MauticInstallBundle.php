@@ -11,6 +11,7 @@ namespace Mautic\InstallBundle;
 
 use Mautic\InstallBundle\Configurator\Step\CheckStep;
 use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
+use Mautic\InstallBundle\Configurator\Step\StatsStep;
 use Mautic\InstallBundle\Configurator\Step\UserStep;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -33,5 +34,6 @@ class MauticInstallBundle extends Bundle
         $configurator->addStep(new CheckStep($configurator->getParameters(), $configurator->isFileWritable(), $this->container->getParameter('kernel.root_dir')));
         $configurator->addStep(new DoctrineStep($configurator->getParameters()));
         $configurator->addStep(new UserStep());
+        $configurator->addStep(new StatsStep());
     }
 }

@@ -8,6 +8,7 @@
  */
 
 namespace Mautic\MapperBundle\Integration;
+use Mautic\MapperBundle\Helper\ApiHelper;
 
 /**
  * Class SugarCRMIntegration
@@ -55,6 +56,75 @@ class SugarCRMIntegration extends AbstractIntegration
         return array(
             'Leads'
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param $objectName
+     */
+    public function getMauticObject($objectName)
+    {
+        $supportedObjects = $this->getSupportedObjects();
+
+        switch ($objectName)
+        {
+            case $supportedObjects[0]:
+                $entities = $this->factory->getModel('lead.field')->getEntities();
+                break;
+        }
+
+        return $entities;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param $objectName
+     */
+    public function getApiObject($objectName)
+    {
+        $sugarAuth = $this->getApiAuth();
+        ApiHelper::checkApiAuthentication($this->factory, $this->getAppAlias(), $this);
+        $supportedObjects = $this->getSupportedObjects();
+
+        switch ($objectName)
+        {
+            case $supportedObjects[0]:
+                $objectResponse = \SugarCRM\SugarCRMApi::getContext("object", $sugarAuth)->getInfo($objectName);
+                break;
+        }
+
+        return $objectResponse;
+    }
+
+    /**
+     * Convert Response from a array option: text, value
+     *
+     * @param $objectName
+     * @param $response
+     * @return array
+     */
+    public function getObjectOptions($objectName, $response)
+    {
+        $supportedObjects = $this->getSupportedObjects();
+
+        $options = array();
+        switch ($objectName)
+        {
+            case $supportedObjects[0]:
+                foreach ($response['fields'] as $field) {
+                    if (!isset($field['name'])) continue;
+                    $option  = array(
+                        'value' => $field['name'],
+                        'text' => $field['name']
+                    );
+                    $options[] = $option;
+                }
+                break;
+        }
+
+        return $options;
     }
 
     /**

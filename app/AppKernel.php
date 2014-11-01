@@ -59,7 +59,7 @@ class AppKernel extends Kernel
             $this->boot();
         }
 
-        if (strpos('installer', $request->getRequestUri()) !== false && !$this->isInstalled()) {
+        if (strpos($request->getRequestUri(), 'installer') === false && !$this->isInstalled()) {
             return new RedirectResponse($this->getContainer()->get('router')->generate('mautic_installer_home'));
         }
 

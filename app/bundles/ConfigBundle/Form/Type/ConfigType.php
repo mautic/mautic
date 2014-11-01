@@ -43,7 +43,7 @@ class ConfigType extends AbstractType
     {
         foreach ($options['data'] as $bundle => $config) {
             foreach ($config as $key => $value) {
-                if (in_array($key, array('api_enabled', 'cat_in_page_url'))) {
+                if (in_array($key, array('api_enabled', 'cat_in_page_url', 'send_server_data'))) {
                     $builder->add($key, 'button_group', array(
                         'choice_list' => new ChoiceList(
                             array(false, true),
