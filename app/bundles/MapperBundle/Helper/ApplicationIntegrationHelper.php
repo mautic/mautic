@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @package     Mautic
  * @copyright   2014 Mautic, NP. All rights reserved.
@@ -14,7 +13,7 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\MapperBundle\Integration\AbstractIntegration;
 use Symfony\Component\Finder\Finder;
 
-class ApplicationIntegrationHelper
+abstract class ApplicationIntegrationHelper
 {
 
     static $factory;
