@@ -9,6 +9,7 @@ Mautic.pageOnLoad = function (container) {
     }
 
     Mautic.renderPageViewsBarChart(container);
+    Mautic.renderPageReturningVisitsDoughnut()
 };
 
 Mautic.pageUnLoad = function() {
@@ -19,6 +20,7 @@ Mautic.pageUnLoad = function() {
 Mautic.pageOnUnload = function(id) {
     if (id === '#app-content') {
         delete Mautic.pageViewsBarChartObject;
+        delete Mautic.pageReturningVisitsDoughnut;
     }
 };
 
@@ -139,3 +141,37 @@ Mautic.renderPageViewsBarChart = function (container) {
         Mautic.pageViewsBarChartObject = new Chart(ctx).Bar(data, options);
     }
 };
+
+Mautic.renderPageReturningVisitsDoughnut = function () {
+    // Initilize chart only for first time
+    if (typeof Mautic.pageReturningVisitsDoughnut === 'object') {
+        return;
+    }
+    var element = mQuery('#returning-rate');
+    var total = +element.attr('data-hit-count');
+    var unique = +element.attr('data-unique-hit-count');
+    var returning = total - unique;
+    var options = {
+        responsive: false,
+        tooltipFontSize: 10,
+        tooltipTemplate: "<%if (label){%><%}%><%= value %>% <%=label%>"};
+    if (!total) {
+        return;
+    }
+    var data = [
+        {
+            value: Math.round(returning / total * 100),
+            color:"#4E5D9D",
+            highlight: "#353F6A",
+            label: "Returning"
+        },
+        {
+            value: Math.round(unique / total * 100),
+            color: "#00b49c",
+            highlight: "#007A69",
+            label: "New"
+        }
+    ];
+    var ctx = document.getElementById("returning-rate").getContext("2d");
+    Mautic.pageReturningVisitsDoughnut = new Chart(ctx).Pie(data, options);
+}

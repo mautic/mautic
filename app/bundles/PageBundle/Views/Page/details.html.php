@@ -216,7 +216,9 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                         <div class="panel ovf-h bg-auto bg-light-xs">
                             <div class="panel-body box-layout">
                                 <div class="col-xs-8 va-m">
-                                    <h5 class="dark-md fw-sb mb-xs"><?php echo $view['translator']->trans('mautic.page.page.pageviews'); ?></h5>
+                                    <h5 class="dark-md fw-sb mb-xs">
+                                        <?php echo $view['translator']->trans('mautic.page.page.pageviews'); ?>
+                                    </h5>
                                     <h2 class="fw-b"><?php echo $activePage->getHits(); ?></h2>
                                 </div>
                                 <div class="col-xs-4 va-t text-right">
@@ -233,24 +235,26 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                     </div>
                     <div class="col-md-4">
                         <div class="panel ovf-h bg-auto bg-light-xs">
-                            <div class="panel-body box-layout">
+                            <div class="panel-body box-layout pb-0">
                                 <div class="col-xs-8 va-m">
-                                    <h5 class="dark-md fw-sb mb-xs"><?php echo $view['translator']->trans('mautic.page.page.conversions'); ?></h5>
-                                    <h2 class="fw-b">162</h2>
+                                    <h5 class="dark-md fw-sb mb-xs">
+                                        <?php echo $view['translator']->trans('mautic.page.page.new.returning'); ?>
+                                    </h5>
+                                    <?php if ($activePage->getHits()) : ?>
+                                        <h2 class="fw-b">
+                                            <?php echo round($activePage->getUniqueHits() / $activePage->getHits() * 100); ?>
+                                            /
+                                            <?php echo round(($activePage->getHits() - $activePage->getUniqueHits()) / $activePage->getHits() * 100); ?>
+                                            %
+                                        </h2>
+                                    <?php endif; ?>
                                 </div>
                                 <div class="col-xs-4 va-t text-right">
                                     <h3 class="text-white dark-sm"><span class="fa fa-arrows-h"></span></h3>
                                 </div>
                             </div>
-                            <div class="plugin-sparkline text-right pr-md pl-md"
-                            sparkHeight="34"
-                            sparkWidth="180"
-                            sparkType="bar"
-                            sparkBarWidth="8"
-                            sparkBarSpacing="3"
-                            sparkZeroAxis="false"
-                            sparkBarColor="#F86B4F">
-                                156,162,185,102,144,156,150,114,198,117,120,138
+                            <div class="text-center">
+                                <canvas id="returning-rate" width="110" height="110" data-hit-count="<?php echo $activePage->getHits(); ?>" data-unique-hit-count="<?php echo $activePage->getUniqueHits(); ?>"></canvas>
                             </div>
                         </div>
                     </div>
