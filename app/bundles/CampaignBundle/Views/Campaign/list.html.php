@@ -10,29 +10,18 @@ if ($tmpl == 'index')
 $view->extend('MauticCampaignBundle:Campaign:index.html.php');
 ?>
 <?php if (count($items)): ?>
-<div class="panel panel-default">
-    <div class="panel-body">
-        <div class="box-layout">
-            <div class="col-xs-6 va-m">
-                <div class="checkbox-inline custom-primary">
-                    <label class="mb-0">
-                        <input type="checkbox" id="customcheckbox-one0" value="1" data-toggle="checkall" data-target="#campaignTable">
-                        <span></span>
-                        <?php echo $view['translator']->trans('mautic.core.table.selectall'); ?>
-                    </label>
-                </div>
-            </div>
-            <div class="col-xs-6 va-m text-right">
-                <button type="button" class="btn btn-sm btn-warning"><i class="fa fa-files-o"></i></button>
-                <button type="button" class="btn btn-sm btn-danger"><i class="fa fa-trash-o"></i></button>
-            </div>
-        </div>
-    </div>
-    <div class="table-responsive">
+    <div class="table-responsive scrollable body-white padding-sm page-list">
         <table class="table table-hover table-striped table-bordered campaign-list" id="campaignTable">
             <thead>
             <tr>
-                <th class="visible-md visible-lg col-campaign-actions"></th>
+                <th class="visible-md visible-lg col-campaign-actions pl-20">
+                    <div class="checkbox-inline custom-primary">
+                        <label class="mb-0 pl-10">
+                            <input type="checkbox" id="customcheckbox-one0" value="1" data-toggle="checkall" data-target="#campaignTable">
+                            <span></span>
+                        </label>
+                    </div>
+                </th>
                 <?php
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'campaign',
@@ -65,9 +54,16 @@ $view->extend('MauticCampaignBundle:Campaign:index.html.php');
                         <?php
                         echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
                             'item'      => $item,
-                            'edit'      => $permissions['campaign:campaigns:edit'],
+                            'edit'      => $security->hasEntityAccess(
+                                    $permissions['campaign:campaigns:editown'],
+                                    $permissions['campaign:campaigns:editother'],
+                                    $item->getCreatedBy()
+                            ),
                             'clone'     => $permissions['campaign:campaigns:create'],
-                            'delete'    => $permissions['campaign:campaigns:delete'],
+                            'delete'    => $security->hasEntityAccess(
+                                    $permissions['campaign:campaigns:deleteown'],
+                                    $permissions['campaign:campaigns:deleteother'],
+                                    $item->getCreatedBy()),
                             'routeBase' => 'campaign',
                             'menuLink'  => 'mautic_campaign_index',
                             'langVar'   => 'campaign'
