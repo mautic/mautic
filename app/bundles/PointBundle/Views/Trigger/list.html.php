@@ -1,4 +1,4 @@
-`<?php
+<?php
 /**
  * @package     Mautic
  * @copyright   2014 Mautic, NP. All rights reserved.
