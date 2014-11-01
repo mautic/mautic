@@ -93,7 +93,7 @@ class OAuth extends ApiAuth implements AuthInterface
      */
     public function setup ($clientKey = null, $clientSecret = null, $accessToken = null, $accessTokenSecret = null,
                            $accessTokenExpires = null, $callback = null, $accessTokenUrl = null,
-                           $authorizationUrl = null, $requestTokenUrl = null, $scope = null, $refreshToken = null, $username = null, $password = null, $sugarcrm_url = null)
+                           $authorizationUrl = null, $requestTokenUrl = null, $scope = null, $refreshToken = null, $username = null, $password = null, $url = null)
     {
         $this->_client_id           = $clientKey;
         $this->_client_secret       = $clientSecret;
@@ -105,7 +105,7 @@ class OAuth extends ApiAuth implements AuthInterface
         $this->_authorize_url       = $authorizationUrl;
         $this->_username            = $username;
         $this->_password            = $password;
-        $this->_sugarcrm_url        = $sugarcrm_url;
+        $this->_sugarcrm_url        = $url;
 
         if (!empty($scope)) {
             $this->setScope($scope);
