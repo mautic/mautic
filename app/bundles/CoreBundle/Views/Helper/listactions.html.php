@@ -7,6 +7,10 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+if (!isset($extra)) {
+    $extra = array();
+}
+
 ?>
 <div class="panel-body">
     <div class="box-layout">
@@ -21,7 +25,7 @@
                    '<?php echo $view->escape($view['translator']->trans('mautic.' . $langVar . '.form.confirmbatchdelete'), 'js'); ?>',
                    '<?php echo $view->escape($view['translator']->trans('mautic.core.form.delete'), 'js'); ?>',
                    'executeBatchAction',
-                   ['<?php echo $view['router']->generate('mautic_' . $routeBase . '_action', array('objectAction' => 'batchDelete')); ?>',
+                   ['<?php echo $view['router']->generate('mautic_' . $routeBase . '_action', array_merge(array('objectAction' => 'batchDelete'), $extra)); ?>',
                    '#<?php echo $menuLink; ?>'],
                    '<?php echo $view->escape($view['translator']->trans('mautic.core.form.cancel'), 'js'); ?>','',[]);">
                 <i class="fa fa-trash-o"></i>
