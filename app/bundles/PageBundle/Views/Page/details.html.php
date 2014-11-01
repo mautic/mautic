@@ -140,11 +140,10 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
             <!-- page detail header -->
             <div class="pr-md pl-md pt-lg pb-lg">
                 <div class="box-layout">
-                    <div class="col-xs-6 va-m">
-                        <h4 class="fw-sb text-primary"><?php echo $activePage->getTitle(); ?></h4>
-                        <p class="text-white dark-lg mb-0">Created on <?php echo $view['date']->toDate($activePage->getDateAdded()); ?></p>
+                    <div class="col-xs-10">
+                        <p class="text-muted"><?php echo $activePage->getMetaDescription(); ?></p>
                     </div>
-                    <div class="col-xs-6 va-m text-right">
+                    <div class="col-xs-2 text-right">
                         <?php switch ($activePage->getPublishStatus()) {
                             case 'published':
                                 $labelColor = "success";
@@ -171,8 +170,8 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                         <table class="table table-bordered table-striped mb-0">
                             <tbody>
                                 <tr>
-                                    <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.core.description'); ?></span></td>
-                                    <td><?php echo $activePage->getMetaDescription(); ?></td>
+                                    <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.core.created'); ?></span></td>
+                                    <td><?php echo $view['date']->toDate($activePage->getDateAdded()); ?></td>
                                 </tr>
                                 <tr>
                                     <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.core.author'); ?></span></td>
