@@ -72,7 +72,7 @@ $view->extend('MauticPointBundle:Point:index.html.php');
                         'model'      => 'point'
                     )); ?>
                     <a href="<?php echo $view['router']->generate('mautic_point_action',
-                        array("objectAction" => "view", "objectId" => $item->getId())); ?>"
+                        array("objectAction" => "edit", "objectId" => $item->getId())); ?>"
                        data-toggle="ajax">
                         <?php echo $item->getName(); ?>
                     </a>

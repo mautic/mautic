@@ -10,9 +10,6 @@
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'page');
 $view['slots']->set("headerTitle", $view['translator']->trans('mautic.page.page.header.index'));
-$view['slots']->set('searchUri', $view['router']->generate('mautic_page_index', array('page' => $page)));
-$view['slots']->set('searchString', $app->getSession()->get('mautic.page.filter'));
-$view['slots']->set('searchHelp', $view['translator']->trans('mautic.page.page.help.searchcommands'));
 ?>
 
 <?php if ($permissions['page:pages:create']): ?>

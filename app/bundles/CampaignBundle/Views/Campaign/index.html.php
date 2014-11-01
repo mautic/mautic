@@ -10,9 +10,6 @@
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'campaign');
 $view['slots']->set("headerTitle", $view['translator']->trans('mautic.campaigns.header.index'));
-$view['slots']->set('searchUri', $view['router']->generate('mautic_campaign_index', array('page' => $page)));
-$view['slots']->set('searchString', $app->getSession()->get('mautic.campaign.filter'));
-$view['slots']->set('searchHelp', $view['translator']->trans('mautic.core.help.searchcommands'));
 ?>
 
 <?php if ($permissions['campaign:campaigns:create']): ?>
@@ -24,4 +21,16 @@ $view['slots']->set('searchHelp', $view['translator']->trans('mautic.core.help.s
     <?php $view['slots']->stop(); ?>
 <?php endif; ?>
 
-<?php $view['slots']->output('_content'); ?>
+<div class="panel panel-default bdr-t-wdh-0 mb-0">
+	<?php echo $view->render('MauticCoreBundle:Helper:listactions.html.php', array(
+        'searchValue' => $searchValue,
+        'action'      => $currentRoute,
+        'menuLink'    => 'mautic_campaign_index',
+        'langVar'     => 'campaign.campaign',
+        'routeBase'   => 'campaign',
+        'delete'      => $permissions['campaign:campaigns:deleteown'] || $permissions['campaign:campaigns:deleteother']
+    )); ?>
+    <div class="page-list">
+		<?php $view['slots']->output('_content'); ?>
+	</div>
+</div>
