@@ -9,16 +9,28 @@
 
 namespace Mautic\CalendarBundle\Model;
 
-use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CalendarBundle\CalendarEvents;
+use Mautic\CalendarBundle\Event\CalendarGeneratorEvent;
 use Mautic\CoreBundle\Model\FormModel;
-use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
  * Class CalendarModel
- * {@inheritdoc}
- * @package Mautic\CoreBundle\Model\FormModel
  */
 class CalendarModel extends FormModel
 {
 
+    /**
+     * Collects data for the calendar display
+     *
+     * @param array $dates Associative array containing a 'start_date' and 'end_date' key
+     *
+     * @return array
+     */
+    public function getCalendarEvents(array $dates)
+    {
+        $event = new CalendarGeneratorEvent($dates);
+        $this->dispatcher->dispatch(CalendarEvents::CALENDAR_ON_GENERATE, $event);
+
+        return $event->getEvents();
+    }
 }

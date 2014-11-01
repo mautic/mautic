@@ -27,10 +27,30 @@ $view['slots']->set('searchHelp', $view['translator']->trans('mautic.category.he
         )); ?>"
        data-toggle="ajax"
        data-menu-link="#mautic_category_index">
-        <i class="fa fa-plus"></i> 
+        <i class="fa fa-plus"></i>
         <?php echo $view["translator"]->trans("mautic.category.menu.new"); ?>
     </a>
     <?php $view['slots']->stop(); ?>
 <?php endif; ?>
 
-<?php $view['slots']->output('_content'); ?>
+<div class="panel panel-default bdr-t-wdh-0 mb-0">
+    <?php //TODO - Restore these buttons to the listactions when custom content is supported
+    /*<div class="btn-group">
+        <button type="button" class="btn btn-default"><i class="fa fa-upload"></i></button>
+        <button type="button" class="btn btn-default"><i class="fa fa-archive"></i></button>
+    </div>*/ ?>
+    <?php echo $view->render('MauticCoreBundle:Helper:listactions.html.php', array(
+        'searchValue' => $searchValue,
+        'action'      => $currentRoute,
+        'menuLink'    => 'mautic_category_index',
+        'langVar'     => 'category',
+        'routeBase'   => 'category',
+        'delete'      => $permissions[$bundle . ':categories:delete'],
+        'extra'       => array(
+            'bundle' => $bundle
+        )
+    )); ?>
+    <div class="page-list">
+        <?php $view['slots']->output('_content'); ?>
+    </div>
+</div>

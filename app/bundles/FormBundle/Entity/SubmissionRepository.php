@@ -223,6 +223,6 @@ class SubmissionRepository extends CommonRepository
             ));
         }
 
-        return $query->execute()->fetchAll();;
+        return $query->execute()->fetchAll();
     }
 }

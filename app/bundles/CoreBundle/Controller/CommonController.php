@@ -248,29 +248,38 @@ class CommonController extends Controller implements MauticController
     /**
      * Generates access denied message
      *
-     * @param string $msg
+     * @param bool   $batch Flag if a batch action is being performed
+     * @param string $msg   Message to display to the user
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|array
+     * @throws AccessDeniedHttpException
      */
-    public function accessDenied($msg = 'mautic.core.error.accessdenied')
+    public function accessDenied($batch = false, $msg = 'mautic.core.error.accessdenied')
     {
         $user = $this->factory->getUser();
+
         if (!$user instanceof User && !$user->getId()) {
             throw new AccessDeniedHttpException($this->get('translator')->trans('mautic.core.url.error.401'));
-        } else {
-            return $this->postActionRedirect(array(
-                'returnUrl'       => $this->generateUrl('mautic_dashboard_index'),
-                'contentTemplate' => 'MauticCoreBundle:Default:index',
-                'passthroughVars' => array(
-                    'activeLink' => '#mautic_dashboard_index',
-                    'route'      => $this->generateUrl('mautic_dashboard_index')
-                ),
-                'flashes'         => array(array(
-                    'type' => 'error',
-                    'msg'  => $msg
-                ))
-            ));
         }
+
+        $flash = array(
+            'type' => 'error',
+            'msg'  => $msg
+        );
+
+        if ($batch) {
+            return $flash;
+        }
+
+        return $this->postActionRedirect(array(
+            'returnUrl'       => $this->generateUrl('mautic_dashboard_index'),
+            'contentTemplate' => 'MauticCoreBundle:Default:index',
+            'passthroughVars' => array(
+                'activeLink' => '#mautic_dashboard_index',
+                'route'      => $this->generateUrl('mautic_dashboard_index')
+            ),
+            'flashes'         => array($flash)
+        ));
     }
 
     /**

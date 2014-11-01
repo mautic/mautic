@@ -768,7 +768,9 @@ class EmailModel extends FormModel
             $stat->setDateSent(new \DateTime());
             $stat->setEmail($useEmail['entity']);
             $stat->setLead($this->em->getReference('MauticLeadBundle:Lead', $lead['id']));
-            $stat->setList($this->em->getReference('MauticLeadBundle:LeadList', $listId));
+            if ($listId) {
+                $stat->setList($this->em->getReference('MauticLeadBundle:LeadList', $listId));
+            }
             $stat->setEmailAddress($lead['email']);
             $stat->setTrackingHash($idHash);
             $saveEntities[] = $stat;
@@ -789,6 +791,74 @@ class EmailModel extends FormModel
             return $saveEntities;
         } else {
             $this->saveEntities($saveEntities);
+        }
+    }
+
+    /**
+     * Send an email to lead(s)
+     *
+     * @param       $email
+     * @param       $users
+     *
+     * @return mixed
+     * @throws \Doctrine\ORM\ORMException
+     */
+    public function sendEmailToUser($email, $users)
+    {
+        if (!is_array($users)) {
+            $user = array('id' => $users);
+            $users = array($user);
+        }
+
+        $dispatcher   = $this->factory->getDispatcher();
+        $hasListeners = $dispatcher->hasListeners(EmailEvents::EMAIL_ON_SEND);
+        $templating   = $this->factory->getTemplating();
+        $slotsHelper  = $templating->getEngine('MauticEmailBundle::public.html.php')->get('slots');
+        /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
+        $emailRepo    = $this->getRepository();
+        //get email settings such as templates, weights, etc
+        $emailSettings = $this->getEmailSettings($email);
+        $emailSettings = reset($emailSettings);
+
+        //noone to send to so bail
+        if (empty($users)) {
+            return array();
+        }
+
+        foreach ($users as $user) {
+            $idHash = uniqid();
+            $content = $email->getContent();
+
+            if (!isset($user['email'])) {
+                /** @var \Mautic\UserBundle\Model\UserModel $model */
+                $userModel  = $this->factory->getModel('user');
+                $userEntity  = $userModel->getEntity($user['id']);
+                $user['email'] = $userEntity->getEmail();
+                $user['firstname'] = $userEntity->getFirstName();
+                $user['lastname'] = $userEntity->getLastName();
+            }
+
+            $mailer = $this->factory->getMailer();
+            $mailer->setTemplate('MauticEmailBundle::public.html.php', array(
+                'slots'    => $emailSettings['slots'],
+                'content'  => $content,
+                'email'    => $emailSettings['entity'],
+                'template' => $emailSettings['template'],
+                'idHash'   => $idHash,
+
+            ));
+            $mailer->message->setTo(array($user['email'] => $user['firstname'] . ' ' . $user['lastname']));
+            $mailer->message->setSubject($emailSettings['entity']->getSubject());
+
+            if ($plaintext = $emailSettings['entity']->getPlainText()) {
+                $mailer->message->addPart($plaintext, 'text/plain');
+            }
+
+            //queue the message
+            $mailer->send();
+
+            //save some memory
+            unset($mailer);
         }
     }
 

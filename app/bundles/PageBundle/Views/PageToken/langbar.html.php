@@ -22,8 +22,5 @@ $count = count($pages);
         <?php endif; ?>
     </span>
     <?php $count--; ?>
-    <?php if ($count): ?>
-    <span> | </span>
-    <?php endif; ?>
     <?php endforeach; ?>
 </div>

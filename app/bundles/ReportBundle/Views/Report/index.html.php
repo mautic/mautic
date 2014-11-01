@@ -22,10 +22,22 @@ $view['slots']->set('searchHelp', $view['translator']->trans('mautic.report.repo
             data-toggle="ajax"
             class="btn btn-default"
             data-menu-link="#mautic_report_index">
-            	<i class="fa fa-plus"></i> 
+            	<i class="fa fa-plus"></i>
             	<?php echo $view["translator"]->trans("mautic.report.report.menu.new"); ?>
         </a>
     <?php $view['slots']->stop(); ?>
 <?php endif; ?>
 
-<?php $view['slots']->output('_content'); ?>
+<div class="panel panel-default bdr-t-wdh-0 mb-0">
+    <?php echo $view->render('MauticCoreBundle:Helper:listactions.html.php', array(
+        'searchValue' => $searchValue,
+        'action'      => $currentRoute,
+        'menuLink'    => 'mautic_report_index',
+        'langVar'     => 'report.report',
+        'routeBase'   => 'report',
+        'delete'      => $permissions['report:reports:deleteown'] || $permissions['report:reports:deleteother']
+    )); ?>
+    <div class="page-list">
+        <?php $view['slots']->output('_content'); ?>
+    </div>
+</div>

@@ -29,8 +29,10 @@ class CampaignController extends FormController
         $permissions = $this->factory->getSecurity()->isGranted(array(
             'campaign:campaigns:view',
             'campaign:campaigns:create',
-            'campaign:campaigns:edit',
-            'campaign:campaigns:delete',
+            'campaign:campaigns:editown',
+            'campaign:campaigns:editother',
+            'campaign:campaigns:deleteown',
+            'campaign:campaigns:deleteother',
             'campaign:campaigns:publish'
 
         ), "RETURN_ARRAY");
@@ -101,7 +103,8 @@ class CampaignController extends FormController
                 'page'        => $page,
                 'limit'       => $limit,
                 'permissions' => $permissions,
-                'tmpl'        => $tmpl
+                'tmpl'        => $tmpl,
+                'security'    => $this->factory->getSecurity()
             ),
             'contentTemplate' => 'MauticCampaignBundle:Campaign:list.html.php',
             'passthroughVars' => array(
@@ -129,8 +132,10 @@ class CampaignController extends FormController
         $permissions = $this->factory->getSecurity()->isGranted(array(
             'campaign:campaigns:view',
             'campaign:campaigns:create',
-            'campaign:campaigns:edit',
-            'campaign:campaigns:delete',
+            'campaign:campaigns:editown',
+            'campaign:campaigns:editother',
+            'campaign:campaigns:deleteown',
+            'campaign:campaigns:deleteother',
             'campaign:campaigns:publish'
         ), "RETURN_ARRAY");
 
@@ -159,11 +164,15 @@ class CampaignController extends FormController
             return $this->accessDenied();
         }
 
+        // Audit Log
+        $logs = $this->factory->getModel('core.auditLog')->getLogForObject('campaign', $objectId);
+
         return $this->delegateView(array(
             'viewParameters'  => array(
                 'entity'      => $entity,
                 'page'        => $page,
-                'permissions' => $permissions
+                'permissions' => $permissions,
+                'logs'        => $logs
             ),
             'contentTemplate' => 'MauticCampaignBundle:Campaign:details.html.php',
             'passthroughVars' => array(

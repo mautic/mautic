@@ -11,46 +11,32 @@ if ($tmpl == 'index') {
     $view->extend('MauticFormBundle:SubscribedEvents\PageToken:index.html.php');
 }
 ?>
-<div class="page-list" id="form-page-tokens">
-    <ul class="draggable scrollable">
+<div id="form-page-tokens">
+    <ul class="draggable scrollable list-unstyled">
         <?php
         if (count($items)):
         foreach ($items as $i):?>
-            <li class="page-list-item has-click-event" id="form-<?php echo $i[0]->getId(); ?>">
-                <div class="padding-sm">
-                    <span class="list-item-publish-status">
-                        <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php',array(
-                            'item'          => $i[0],
-                            'model'         => 'form.form',
-                            'disableToggle' => true
-                        )); ?>
-
-                    </span>
-                    <span class="list-item-primary">
-                        <?php echo $i[0]->getName(); ?>
-                    </span>
-                    <span class="list-item-secondary list-item-indent" data-toggle="tooltip" data-placement="left"
-                          title="<?php echo $i[0]->getDescription(); ?>">
-                        <?php echo $i[0]->getDescription(true, 30); ?>
-                    </span>
-                    <input type="hidden" class="page-token" value="{form=<?php echo $i[0]->getId(); ?>}" />
+            <li class="ma-5 page-list-item has-click-event" id="form-<?php echo $i[0]->getId(); ?>">
+                <div class="panel pa-5">
+                    <i class="fa fa-fw fa-list"></i>
+                    <?php echo $i[0]->getName(); ?>
                 </div>
+                <input type="hidden" class="page-token" value="{form=<?php echo $i[0]->getId(); ?>}" />
             </li>
         <?php endforeach; ?>
     </ul>
 
     <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
-        "totalItems"      => count($items),
-        "page"            => $page,
-        "limit"           => $limit,
-        "fixedLimit"      => true,
-        "baseUrl"         => $view['router']->generate('mautic_formtoken_index'),
-        "paginationClass" => "xs",
-        'sessionVar'      => 'formtoken',
-        'ignoreFormExit'  => true,
-        'queryString'     => 'tmpl=list'
+        "totalItems"        => count($items),
+        "page"              => $page,
+        "limit"             => $limit,
+        "fixedLimit"        => true,
+        "baseUrl"           => $view['router']->generate('mautic_formtoken_index'),
+        "paginationWrapper" => 'text-center',
+        "paginationClass"   => "xs",
+        'sessionVar'        => 'formtoken',
+        'ignoreFormExit'    => true,
+        'queryString'       => 'tmpl=list'
     )); ?>
     <?php endif; ?>
-
-    '
 </div>

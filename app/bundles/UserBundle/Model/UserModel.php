@@ -164,6 +164,9 @@ class UserModel extends FormModel
             case 'role':
                 $results = $this->em->getRepository('MauticUserBundle:Role')->getRoleList($filter, $limit);
                 break;
+            case 'user':
+                $results = $this->em->getRepository('MauticUserBundle:User')->getUserList($filter, $limit);
+                break;
             case 'position':
                 $results = $this->em->getRepository('MauticUserBundle:User')->getPositionList($filter, $limit);
                 break;

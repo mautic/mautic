@@ -86,6 +86,10 @@ var Mautic = {
             return Mautic.ajaxifyLink(this, event);
         });
 
+        mQuery(".sidebar-left a[data-toggle='ajax']").on('click.ajax', function (event) {
+            mQuery("html").removeClass('sidebar-open-ltr');
+        });
+
         //initialize forms
         mQuery(container + " form[data-toggle='ajax']").each(function (index) {
             Mautic.ajaxifyForm(mQuery(this).attr('name'));
@@ -395,8 +399,13 @@ var Mautic = {
         if (event && typeof(event.target) !== 'undefined' && mQuery(event.target).length) {
             var hasBtn = mQuery(event.target).hasClass('btn');
             var hasIcon = mQuery(event.target).hasClass('fa');
-            var notDropdown = !mQuery(event.target).hasClass('fa-angle-down');
-            if (((hasBtn && mQuery(event.target).find('i.fa').length) || hasIcon) && notDropdown) {
+
+            var i = (hasBtn && mQuery(event.target).find('i.fa').length) ? mQuery(event.target).find('i.fa') : event.target;
+
+            var notDropdown = mQuery(i).attr('class').indexOf('fa-angle');
+            var notDirection = mQuery(i).attr('class').indexOf('fa-caret');
+
+            if (((hasBtn && mQuery(event.target).find('i.fa').length) || hasIcon) && notDropdown == -1 && notDirection == -1) {
                 var el              = (hasIcon) ? event.target : mQuery(event.target).find('i.fa').first();
                 var identifierClass = (new Date).getTime();
                 MauticVars.iconClasses[identifierClass] = mQuery(el).attr('class');
@@ -868,7 +877,7 @@ var Mautic = {
     reorderTableData: function (name, orderby, tmpl, target) {
         var route = window.location.pathname + "?tmpl=" + tmpl + "&name=" + name + "&orderby=" + orderby;
 
-	    Mautic.loadContent(route, '', 'POST', target);
+        Mautic.loadContent(route, '', 'POST', target);
     },
 
     /**
@@ -916,9 +925,12 @@ var Mautic = {
             }
         });
     },
+
     /**
      * Executes an object action
+     *
      * @param action
+     * @param menuLink
      */
     executeAction: function (action, menuLink) {
         //dismiss modal if activated
@@ -938,6 +950,25 @@ var Mautic = {
                 Mautic.processAjaxError(request, textStatus, errorThrown);
             }
         });
+    },
+
+    /**
+     * Executes a batch action
+     *
+     * @param action
+     * @param menuLink
+     */
+    executeBatchAction: function (action, menuLink) {
+	    // Retrieve all of the selected items
+        var items = JSON.stringify(mQuery('input[class=list-checkbox]:checked').map(function() {
+            return mQuery(this).val();
+        }).get());
+
+	    // Append the items to the action to send with the POST
+	    var action = action + '?ids=' + items;
+
+	    // Hand over processing to the executeAction method
+	    Mautic.executeAction(action, menuLink);
     },
 
     /**

@@ -38,15 +38,27 @@ class FormSubscriber extends CommonSubscriber
      */
     public function onFormBuilder(FormBuilderEvent $event)
     {
-        //add form submit actions
+        // Add form submit actions
+        // Send email to admin user
         $action = array(
             'group'        => 'mautic.email.form.action.group',
-            'label'        => 'mautic.email.form.action.sendemail',
-            'description'  => 'mautic.email.form.action.sendemail_descr',
-            'formType'     => 'formaction_sendemail',
-            'callback'     => '\Mautic\EmailBundle\Helper\FormSubmitHelper::sendEmailAction'
+            'label'        => 'mautic.email.form.action.sendemail.admin',
+            'description'  => 'mautic.email.form.action.sendemail.admin.descr',
+            'formType'     => 'email_submitaction_sendemail_admin',
+            'callback'     => '\Mautic\EmailBundle\Helper\FormSubmitHelper::onFormSubmit'
         );
 
-        $event->addSubmitAction('email.send', $action);
+        $event->addSubmitAction('email.send.admin', $action);
+
+        // Send email to lead
+        $action = array(
+            'group'        => 'mautic.email.form.action.group',
+            'label'        => 'mautic.email.form.action.sendemail.lead',
+            'description'  => 'mautic.email.form.action.sendemail.lead.descr',
+            'formType'     => 'email_submitaction_sendemail_lead',
+            'callback'     => '\Mautic\EmailBundle\Helper\FormSubmitHelper::onFormSubmit'
+        );
+
+        $event->addSubmitAction('email.send.lead', $action);
     }
 }

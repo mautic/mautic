@@ -640,6 +640,73 @@ class LeadController extends FormController
     }
 
     /**
+     * Deletes a group of entities
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function batchDeleteAction() {
+        $page        = $this->factory->getSession()->get('mautic.lead.page', 1);
+        $returnUrl   = $this->generateUrl('mautic_lead_index', array('page' => $page));
+        $flashes     = array();
+
+        $postActionVars = array(
+            'returnUrl'       => $returnUrl,
+            'viewParameters'  => array('page' => $page),
+            'contentTemplate' => 'MauticLeadBundle:Lead:index',
+            'passthroughVars' => array(
+                'activeLink'    => '#mautic_lead_index',
+                'mauticContent' => 'lead'
+            )
+        );
+
+        if ($this->request->getMethod() == 'POST') {
+            $model     = $this->factory->getModel('lead');
+            $ids       = json_decode($this->request->query->get('ids', array()));
+            $deleteIds = array();
+
+            // Loop over the IDs to perform access checks pre-delete
+            foreach ($ids as $objectId) {
+                $entity = $model->getEntity($objectId);
+
+                if ($entity === null) {
+                    $flashes[] = array(
+                        'type'    => 'error',
+                        'msg'     => 'mautic.lead.lead.error.notfound',
+                        'msgVars' => array('%id%' => $objectId)
+                    );
+                } elseif (!$this->factory->getSecurity()->hasEntityAccess(
+                    'lead:leads:deleteown', 'lead:leads:deleteother', $entity->getCreatedBy()
+                )) {
+                    $flashes[] = $this->accessDenied(true);
+                } elseif ($model->isLocked($entity)) {
+                    $flashes[] = $this->isLocked($postActionVars, $entity, 'lead', true);
+                } else {
+                    $deleteIds[] = $objectId;
+                }
+            }
+
+            // Delete everything we are able to
+            if (!empty($deleteIds)) {
+                $entities = $model->deleteEntities($deleteIds);
+
+                $flashes[] = array(
+                    'type' => 'notice',
+                    'msg'  => 'mautic.lead.lead.notice.batch_deleted',
+                    'msgVars' => array(
+                        '%count%' => count($entities)
+                    )
+                );
+            }
+        } //else don't do anything
+
+        return $this->postActionRedirect(
+            array_merge($postActionVars, array(
+                'flashes' => $flashes
+            ))
+        );
+    }
+
+    /**
      * Add/remove lead from a list
      *
      * @param $objectId

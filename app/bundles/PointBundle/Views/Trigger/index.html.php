@@ -27,4 +27,16 @@ $view['slots']->set('searchHelp', $view['translator']->trans('mautic.core.help.s
     <?php $view['slots']->stop(); ?>
 <?php endif; ?>
 
-<?php $view['slots']->output('_content'); ?>
+<div class="panel panel-default bdr-t-wdh-0 mb-0">
+    <?php echo $view->render('MauticCoreBundle:Helper:listactions.html.php', array(
+        'searchValue' => $searchValue,
+        'action'      => $currentRoute,
+        'menuLink'    => 'mautic_pointtrigger_index',
+        'langVar'     => 'point.trigger',
+        'routeBase'   => 'pointtrigger',
+        'delete'      => $permissions['point:triggers:delete']
+    )); ?>
+    <div class="page-list">
+        <?php $view['slots']->output('_content'); ?>
+    </div>
+</div>

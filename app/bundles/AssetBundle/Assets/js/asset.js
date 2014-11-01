@@ -53,10 +53,12 @@ Mautic.renderDownloadChart = function (chartData) {
 
 Mautic.updateDownloadChart = function(element, amount, unit) {
 	var element = mQuery(element);
-	var wrapper = element.parent();
+	var wrapper = element.closest('ul');
+	var button  = mQuery('#time-scopes .button-label');
 	var assetId = Mautic.getAssetId();
-	wrapper.find('a').removeClass('active');
-	element.addClass('active');
+	wrapper.find('a').removeClass('bg-primary');
+	element.addClass('bg-primary');
+	button.text(element.text());
 	var query = "action=asset:updateDownloadChart&amount=" + amount + "&unit=" + unit + "&assetId=" + assetId;
     mQuery.ajax({
         url: mauticAjaxUrl,

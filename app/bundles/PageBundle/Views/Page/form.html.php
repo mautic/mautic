@@ -54,30 +54,20 @@ $view['slots']->set("headerTitle", $header.$subheader);
             </div>
             <div class="page-builder-panel">
                 <p>
-                    <button class="btn btn-danger btn-close-builder" onclick="Mautic.closePageEditor();"><?php echo $view['translator']->trans('mautic.page.page.builder.close'); ?></button>
+                    <button class="btn btn-primary btn-close-builder" onclick="Mautic.closePageEditor();"><?php echo $view['translator']->trans('mautic.page.page.builder.close'); ?></button>
                 </p>
-                <div><em><?php echo $view['translator']->trans('mautic.page.page.token.help'); ?></em></div>
+                <div class="well well-small"><?php echo $view['translator']->trans('mautic.page.page.token.help'); ?></div>
                 <div class="panel-group margin-sm-top" id="page_tokens">
                     <?php foreach ($tokens as $k => $t): ?>
                     <?php $id = \Mautic\CoreBundle\Helper\InputHelper::alphanum($k); ?>
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
-                                <a style="display: block;" data-toggle="collapse" data-parent="#page_tokens" href="#<?php echo $id; ?>">
-                                    <span class="pull-left">
-                                        <?php echo $t['header']; ?>
-                                    </span>
-                                    <span class="pull-right">
-                                        <i class="fa fa-lg fa-fw fa-angle-down"></i>
-                                    </span>
-                                    <div class="clearfix"></div>
-                                </a>
+                                <?php echo $t['header']; ?>
                             </h4>
                         </div>
-                        <div id="<?php echo $id; ?>" class="panel-collapse collapse">
-                            <div class="panel-body">
-                                <?php echo $t['content']; ?>
-                            </div>
+                        <div class="panel-body">
+                            <?php echo $t['content']; ?>
                         </div>
                     </div>
                     <?php endforeach; ?>

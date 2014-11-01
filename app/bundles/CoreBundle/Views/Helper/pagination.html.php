@@ -30,6 +30,7 @@ $totalPages = ($limit) ? (int) ceil($totalItems / $limit) : 1;
 
 $pageClass = (!isset($paginationClass)) ? "" : " pagination-$paginationClass";
 $menuLink  = (!empty($menuLinkId)) ? " data-menu-link=\"$menuLinkId\"" : "";
+$paginationWrapper = isset($paginationWrapper) ? $paginationWrapper :  "pagination-wrapper pull-left ml-md mr-md";
 
 $queryString = '?tmpl=' . $tmpl . (isset($queryString) ? $queryString : '');
 
@@ -64,7 +65,7 @@ $formExit = (!empty($ignoreFormExit)) ? ' data-ignore-formexit="true"' : '';
     </div>
 <?php endif; ?>
 
-<div class="pagination-wrapper pull-left ml-md mr-md">
+<div class="<?php echo $paginationWrapper; ?>">
     <ul class="pagination nm <?php echo $pageClass; ?>">
         <?php
         $urlPage = $page - $range;

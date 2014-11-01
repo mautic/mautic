@@ -10,21 +10,21 @@
 ?>
 <div class="page-header-block" id="flashes">
     <?php foreach ($view['session']->getFlash('notice') as $message): ?>
-    <div class="alert alert-success alert-dismissable">
+    <div class="alert alert-growl alert-dismissable">
         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
         <span><?php echo $message; ?></span>
     </div>
     <?php endforeach; ?>
 
     <?php foreach ($view['session']->getFlash('warning') as $message): ?>
-    <div class="alert alert-warning alert-dismissable">
+    <div class="alert alert-growl alert-dismissable">
         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
         <span><?php echo $message; ?></span>
     </div>
     <?php endforeach; ?>
 
     <?php foreach ($view['session']->getFlash('error') as $message): ?>
-    <div class="alert alert-danger alert-dismissable">
+    <div class="alert alert-growl alert-dismissable">
         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
         <span><?php echo $message; ?></span>
     </div>
