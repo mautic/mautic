@@ -219,9 +219,6 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                                     <h5 class="dark-md fw-sb mb-xs">
                                         <?php echo $view['translator']->trans('mautic.page.page.pageviews'); ?>
                                     </h5>
-                                    <?php if ($activePage->getHits()) : ?>
-                                        <h2 class="fw-b"><?php echo $activePage->getHits(); ?></h2>
-                                    <?php endif; ?>
                                 </div>
                                 <div class="col-xs-4 va-t text-right">
                                     <h3 class="text-white dark-sm"><span class="fa fa-eye"></span></h3>
@@ -229,7 +226,7 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                             </div>
                             <div class="pt-0 pl-10 pb-0 pr-10">
                                 <div>
-                                    <canvas id="page-views-chart" height="94"></canvas>
+                                    <canvas id="page-views-chart" height="93"></canvas>
                                 </div>
                             </div>
                             <div id="page-views-chart-data" class="hide"><?php echo json_encode($last30); ?></div>
@@ -242,17 +239,9 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                                     <h5 class="dark-md fw-sb mb-xs">
                                         <?php echo $view['translator']->trans('mautic.page.page.new.returning'); ?>
                                     </h5>
-                                    <?php if ($activePage->getHits()) : ?>
-                                        <h2 class="fw-b">
-                                            <?php echo round($activePage->getUniqueHits() / $activePage->getHits() * 100); ?>
-                                            /
-                                            <?php echo round(($activePage->getHits() - $activePage->getUniqueHits()) / $activePage->getHits() * 100); ?>
-                                            %
-                                        </h2>
-                                    <?php endif; ?>
                                 </div>
                                 <div class="col-xs-4 va-t text-right">
-                                    <h3 class="text-white dark-sm"><span class="fa fa-arrows-h"></span></h3>
+                                    <h3 class="text-white dark-sm"><span class="fa fa-bookmark-o"></span></h3>
                                 </div>
                             </div>
                             <div class="text-center">
@@ -267,12 +256,9 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                                     <h5 class="dark-md fw-sb mb-xs">
                                         <?php echo $view['translator']->trans('mautic.page.page.time.on.page'); ?>
                                     </h5>
-                                    <?php if ($activePage->getHits()) : ?>
-                                        <h2 class="fw-b">average <?php echo isset($stats['dwellTime'][$activePage->getId()]['average']) ? $stats['dwellTime'][$activePage->getId()]['average'] : ''; ?>s</h2>
-                                    <?php endif; ?>
                                 </div>
                                 <div class="col-xs-4 va-t text-right">
-                                    <h3 class="text-white dark-sm"><span class="fa fa-newspaper-o"></span></h3>
+                                    <h3 class="text-white dark-sm"><span class="fa fa-clock-o"></span></h3>
                                 </div>
                             </div>
                             <div class="text-center">
