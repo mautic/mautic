@@ -186,44 +186,44 @@ if ($security->hasEntityAccess($permissions['asset:assets:editown'], $permission
                                 <div class="col-xs-4 va-m">
                                     <h5 class="text-white dark-md fw-sb mb-xs">
                                         <span class="fa fa-download"></span>
-                                        Downloads
+                                        <?php echo $view['translator']->trans('mautic.asset.asset.downloads'); ?>
                                     </h5>
                                 </div>
                                 <div class="col-xs-4 va-m text-center">
-                                    <span class="text-white dark-md fw-sb mb-xs">Total: <?php echo $stats['downloads']['total']; ?></span>
+                                    <span class="text-white dark-md fw-sb mb-xs"><?php echo $view['translator']->trans('mautic.asset.asset.downloads.total', array('count' => $stats['downloads']['total'])); ?></span>
                                     <span class="text-white dark-md fw-sb mb-xs">|</span>
-                                    <span class="text-white dark-md fw-sb mb-xs">Unique: <?php echo $stats['downloads']['unique']; ?></span>
+                                    <span class="text-white dark-md fw-sb mb-xs"><?php echo $view['translator']->trans('mautic.asset.asset.downloads.unique', array('count' => $stats['downloads']['unique'])); ?></span>
                                 </div>
                                 <div class="col-xs-4 va-m">
                                     <div class="dropdown pull-right">
                                         <button id="time-scopes" class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
-                                            <span class="button-label">Daily</span>
+                                            <span class="button-label"><?php echo $view['translator']->trans('mautic.asset.asset.downloads.daily'); ?></span>
                                             <span class="caret"></span>
                                         </button>
                                         <ul class="dropdown-menu" role="menu" aria-labelledby="time-scopes">
                                             <li role="presentation">
                                                 <a href="#" onclick="Mautic.updateDownloadChart(this, 24, 'H');return false;" role="menuitem" tabindex="-1">
-                                                    Hourly
+                                                    <?php echo $view['translator']->trans('mautic.asset.asset.downloads.hourly'); ?>
                                                 </a>
                                             </li>
                                             <li role="presentation">
                                                 <a href="#" class="bg-primary" onclick="Mautic.updateDownloadChart(this, 30, 'D');return false;" role="menuitem" tabindex="-1">
-                                                    Dayly
+                                                    <?php echo $view['translator']->trans('mautic.asset.asset.downloads.daily'); ?>
                                                 </a>
                                             </li>
                                             <li role="presentation">
                                                 <a href="#" onclick="Mautic.updateDownloadChart(this, 20, 'W');return false;" role="menuitem" tabindex="-1">
-                                                    Weekly
+                                                    <?php echo $view['translator']->trans('mautic.asset.asset.downloads.weekly'); ?>
                                                 </a>
                                             </li>
                                             <li role="presentation">
                                                 <a href="#" onclick="Mautic.updateDownloadChart(this, 24, 'M');return false;" role="menuitem" tabindex="-1">
-                                                    Monthly
+                                                    <?php echo $view['translator']->trans('mautic.asset.asset.downloads.monthly'); ?>
                                                 </a>
                                             </li>
                                             <li role="presentation">
                                                 <a href="#" onclick="Mautic.updateDownloadChart(this, 10, 'Y');return false;" role="menuitem" tabindex="-1">
-                                                    Yearly
+                                                    <?php echo $view['translator']->trans('mautic.asset.asset.downloads.yearly'); ?>
                                                 </a>
                                             </li>
                                         </ul>
