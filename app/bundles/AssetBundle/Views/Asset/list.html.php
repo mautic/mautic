@@ -10,7 +10,7 @@ if ($tmpl == 'index')
 $view->extend('MauticAssetBundle:Asset:index.html.php');
 ?>
 <?php if (count($items)): ?>
-    <div class="table-responsive scrollable body-white padding-sm page-list">
+    <div class="table-responsive page-list">
         <table class="table table-hover table-striped table-bordered asset-list" id="assetTable">
             <thead>
             <tr>
