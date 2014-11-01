@@ -44,4 +44,57 @@ class SugarCRMIntegration extends AbstractIntegration
     {
         return 'app/bundles/MapperBundle/Assets/images/applications/sugarcrm_128.png';
     }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return array
+     */
+    public function getSupportedObjects()
+    {
+        return array(
+            'Leads'
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param null $request
+     * @return array|string
+     */
+    public function getSettings($request = null)
+    {
+        $fields = array(
+            'clientKey',
+            'clientSecret',
+            'url',
+            'username',
+            'password',
+            'accessToken',
+            'accessTokenExpires'
+        );
+        $data = $this->getEntity()->getApiKeys();
+        if (!empty($request)) {
+            foreach ($fields as $field) {
+                if (isset($request[$field]) && !empty($request[$field])) {
+                    $data[$field] = $request[$field];
+                }
+            }
+        }
+
+        $settings = array(
+            'clientKey'          => !empty($data['clientKey']) ? $data['clientKey'] : '' ,
+            'clientSecret'       => !empty($data['clientSecret']) ? $data['clientSecret'] : '' ,
+            'callback'           => $this->getCallbackLink(),
+            'url'                => !empty($data['url']) ? $data['url'] : '' ,
+            'username'           => !empty($data['username']) ? $data['username'] : '' ,
+            'password'           => !empty($data['password']) ? $data['password'] : '' ,
+            'accessToken'        => !empty($data['accessToken']) ? $data['accessToken'] : '' ,
+            'accessTokenExpires' => !empty($data['accessTokenExpires']) ? $data['accessTokenExpires'] : '' ,
+            'requestTokenUrl'    => !empty($data['url']) ? sprintf('%s/rest/v10/oauth2/token', $data['url']) : ''
+        );
+
+        return $settings;
+    }
 }
