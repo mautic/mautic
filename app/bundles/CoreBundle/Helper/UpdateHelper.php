@@ -53,6 +53,13 @@ class UpdateHelper
             );
         }
 
+        if ($data->code != 200) {
+            return array(
+                'error'   => true,
+                'message' => 'mautic.core.updater.error.fetching.updates'
+            );
+        }
+
         // Check which update stream the usser wants to see data for
         // TODO - When the param exists, use it instead of hardcoding to stable
         $stability = 'stable';
