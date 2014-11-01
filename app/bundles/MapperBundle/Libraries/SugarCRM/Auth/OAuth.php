@@ -209,7 +209,7 @@ class OAuth extends ApiAuth implements AuthInterface
             return false;
         }
 
-        if (is_null($this->_access_token)) {
+        if (is_null($this->_access_token) || $this->_access_token == false) {
             $oauth2_token_arguments = array(
                 "grant_type" => "password",
                 "client_id" => $this->_client_id,

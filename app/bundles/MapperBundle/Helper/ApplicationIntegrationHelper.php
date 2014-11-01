@@ -11,6 +11,7 @@
 namespace Mautic\MapperBundle\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\MapperBundle\Integration\AbstractIntegration;
 use Symfony\Component\Finder\Finder;
 
 class ApplicationIntegrationHelper
@@ -18,6 +19,13 @@ class ApplicationIntegrationHelper
 
     static $factory;
 
+    /**
+     * @param MauticFactory $factory
+     * @param null $services
+     * @param null $withFeatures
+     * @param bool $alphabetical
+     * @return mixed
+     */
     public static function getApplications(MauticFactory $factory, $services = null, $withFeatures = null, $alphabetical = false)
     {
         static $integrations;
@@ -30,18 +38,36 @@ class ApplicationIntegrationHelper
         }
         $available = array();
         foreach ($finder as $file) {
-            $available[] = basename($file->getBaseName(),'.php');
+            $available[] = substr(basename($file->getBaseName(),'.php'),0, -11);
         }
 
         if (empty($integrations)) {
             foreach ($available as $a) {
-                if (!isset($integrations[$a])) {
-                    $class = "\\Mautic\\MapperBundle\\Integration\\{$a}";
-                    $integrations[$a] = new $class($factory);
+                $key = strtolower($a);
+                if (!isset($integrations[$key])) {
+                    $class = "\\Mautic\\MapperBundle\\Integration\\{$a}Integration";
+                    $integrations[$key] = new $class($factory);
                 }
             }
         }
 
         return $integrations;
+    }
+
+    /**
+     * @param MauticFactory $factory
+     * @param $application
+     * @return AbstractIntegration
+     * @throws \RuntimeException
+     */
+    public static function getApplication(MauticFactory $factory, $application)
+    {
+        $integrations = self::getApplications($factory, null, null, true);
+
+        if (array_key_exists($application, $integrations)) {
+            return $integrations[$application];
+        }
+
+        throw new \RuntimeException($application);
     }
 }
