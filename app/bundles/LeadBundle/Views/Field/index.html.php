@@ -21,25 +21,22 @@ $view['slots']->set("headerTitle", $view['translator']->trans('mautic.lead.field
 <?php $view['slots']->stop(); ?>
 
 <div class="panel panel-default bdr-t-wdh-0">
-    <div class="panel-body">
-        <div class="box-layout">
-            <div class="col-xs-6 va-m">
-                <?php echo $view->render('MauticCoreBundle:Helper:search.html.php', array('searchValue' => $searchValue, 'action' => $currentRoute)); ?>
-            </div>
-            <div class="col-xs-6 va-m text-right">
-                <button type="button" class="btn btn-warning"><i class="fa fa-files-o"></i></button>
-                <button type="button" class="btn btn-danger"><i class="fa fa-trash-o"></i></button>
-            </div>
-        </div>
-    </div>
+    <?php echo $view->render('MauticCoreBundle:Helper:listactions.html.php', array(
+        'searchValue' => $searchValue,
+        'action'      => $currentRoute,
+        'menuLink'    => 'mautic_leadfield_index',
+        'langVar'     => 'lead.field',
+        'routeBase'   => 'leadfield',
+        'delete'      => $permissions['lead:fields:full']
+    )); ?>
     <div class="table-responsive">
-        <table class="table table-hover table-striped table-bordered leadfield-list">
+        <table class="table table-hover table-striped table-bordered leadfield-list" id="leadFieldTable">
             <thead>
                 <th class="col-leadfield-orderhandle"></th>
                 <th class="col-leadfield-actions pl-20">
                     <div class="checkbox-inline custom-primary">
                         <label class="mb-0 pl-10">
-                            <input type="checkbox" id="customcheckbox-one0" value="1">
+                            <input type="checkbox" id="customcheckbox-one0" value="1" data-toggle="checkall" data-target="#leadFieldTable">
                             <span></span>
                         </label>
                     </div>

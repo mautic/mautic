@@ -23,11 +23,14 @@ class FieldController extends FormController
      */
     public function indexAction()
     {
+        //set some permissions
+        $permissions = $this->factory->getSecurity()->isGranted(array('lead:fields:full'), 'RETURN_ARRAY');
+
         $session = $this->factory->getSession();
         $search  = $this->request->get('search', $session->get('mautic.leadfield.filter', ''));
         $session->set('mautic.leadfield.filter', $search);
 
-        if (!$this->factory->getSecurity()->isGranted('lead:fields:full')) {
+        if (!$permissions['lead:fields:full']) {
             return $this->accessDenied();
         }
         $items = $this->factory->getModel('lead.field')->getEntities(array('filter' => $search));
@@ -35,7 +38,8 @@ class FieldController extends FormController
         return $this->delegateView(array(
             'viewParameters'  => array(
                 'items'       => $items,
-                'searchValue' => $search
+                'searchValue' => $search,
+                'permissions' => $permissions
             ),
             'contentTemplate' => 'MauticLeadBundle:Field:index.html.php',
             'passthroughVars' => array(
@@ -316,6 +320,73 @@ class FieldController extends FormController
                     '%id%'   => $objectId
                 )
             );
+        } //else don't do anything
+
+        return $this->postActionRedirect(
+            array_merge($postActionVars, array(
+                'flashes' => $flashes
+            ))
+        );
+    }
+
+    /**
+     * Deletes a group of entities
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function batchDeleteAction() {
+        if (!$this->factory->getSecurity()->isGranted('lead:fields:full')) {
+            return $this->accessDenied();
+        }
+
+        $returnUrl = $this->generateUrl('mautic_leadfield_index');
+        $flashes     = array();
+
+        $postActionVars = array(
+            'returnUrl'       => $returnUrl,
+            'contentTemplate' => 'MauticLeadBundle:Field:index',
+            'passthroughVars' => array(
+                'activeLink'    => '#mautic_leadfield_index',
+                'mauticContent' => 'lead'
+            )
+        );
+
+        if ($this->request->getMethod() == 'POST') {
+            $model     = $this->factory->getModel('lead.field');
+            $ids       = json_decode($this->request->query->get('ids', array()));
+            $deleteIds = array();
+
+            // Loop over the IDs to perform access checks pre-delete
+            foreach ($ids as $objectId) {
+                $entity = $model->getEntity($objectId);
+
+                if ($entity === null) {
+                    $flashes[] = array(
+                        'type'    => 'error',
+                        'msg'     => 'mautic.lead.field.error.notfound',
+                        'msgVars' => array('%id%' => $objectId)
+                    );
+                } elseif ($field->isFixed()) {
+                    $flashes[] = $this->accessDenied(true);
+                } elseif ($model->isLocked($entity)) {
+                    $flashes[] = $this->isLocked($postActionVars, $entity, 'lead.field', true);
+                } else {
+                    $deleteIds[] = $objectId;
+                }
+            }
+
+            // Delete everything we are able to
+            if (!empty($deleteIds)) {
+                $entities = $model->deleteEntities($deleteIds);
+
+                $flashes[] = array(
+                    'type' => 'notice',
+                    'msg'  => 'mautic.lead.field.notice.batch_deleted',
+                    'msgVars' => array(
+                        '%count%' => count($entities)
+                    )
+                );
+            }
         } //else don't do anything
 
         return $this->postActionRedirect(
