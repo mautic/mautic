@@ -71,4 +71,13 @@ final class ReportEvents
      * @var string
      */
     const REPORT_ON_GENERATE = 'mautic.report_on_generate';
+
+    /**
+     * The mautic.report_on_graph_generate event is thrown to generate a graph data
+     *
+     * The event listener receives a Mautic\ReportBundle\Event\ReportGraphEvent instance.
+     *
+     * @var string
+     */
+    const REPORT_ON_GRAPH_GENERATE = 'mautic.report_on_graph_generate';
 }

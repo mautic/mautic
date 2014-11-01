@@ -186,7 +186,7 @@ if ($security->hasEntityAccess($permissions['asset:assets:editown'], $permission
                                 <div class="col-xs-4 va-m">
                                     <h5 class="text-white dark-md fw-sb mb-xs">
                                         <span class="fa fa-download"></span>
-                                        <?php echo $view['translator']->trans('mautic.asset.asset.downloads'); ?>
+                                        <?php echo $view['translator']->trans('mautic.asset.graph.line.downloads'); ?>
                                     </h5>
                                 </div>
                                 <div class="col-xs-4 va-m text-center">

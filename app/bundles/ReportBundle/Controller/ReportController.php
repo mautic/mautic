@@ -13,6 +13,8 @@ namespace Mautic\ReportBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\ReportBundle\Generator\ReportGenerator;
+use Mautic\ReportBundle\Event\ReportGraphEvent;
+use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\HttpFoundation;
 
 /**
@@ -536,6 +538,10 @@ class ReportController extends FormController
         //set what page currently on so that we can return here after form submission/cancellation
         $this->factory->getSession()->set('mautic.report.' . $entity->getId() . '.page', $reportPage);
 
+        $event = new ReportGraphEvent($entity);
+        $this->factory->getDispatcher()->dispatch(ReportEvents::REPORT_ON_GRAPH_GENERATE, $event);
+        $graphs = $event->getGraphs();
+
         // Audit Log
         $logs = $this->factory->getModel('core.auditLog')->getLogForObject('report', $reportId);
 
@@ -544,6 +550,7 @@ class ReportController extends FormController
                 'result'     => $result,
                 'report'     => $entity,
                 'reportPage' => $page,
+                'graphs'     => $graphs,
                 'logs'       => $logs,
                 'tmpl'       => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                 'limit'      => $limit,
