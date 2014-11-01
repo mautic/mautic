@@ -32,7 +32,7 @@ $view->extend('MauticCampaignBundle:Campaign:index.html.php');
         <table class="table table-hover table-striped table-bordered campaign-list" id="campaignTable">
             <thead>
             <tr>
-                <th class="col-campaign-actions"></th>
+                <th class="visible-md visible-lg col-campaign-actions"></th>
                 <?php
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'campaign',
@@ -46,14 +46,14 @@ $view->extend('MauticCampaignBundle:Campaign:index.html.php');
                     'sessionVar' => 'campaign',
                     'orderBy'    => 'c.description',
                     'text'       => 'mautic.campaign.thead.description',
-                    'class'      => 'col-campaign-description'
+                    'class'      => 'visible-md visible-lg col-campaign-description'
                 ));
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'campaign',
                     'orderBy'    => 'c.id',
                     'text'       => 'mautic.campaign.thead.id',
-                    'class'      => 'col-campaign-id'
+                    'class'      => 'visible-md visible-lg col-campaign-id'
                 ));
                 ?>
             </tr>
@@ -61,7 +61,7 @@ $view->extend('MauticCampaignBundle:Campaign:index.html.php');
             <tbody>
             <?php foreach ($items as $item): ?>
                 <tr>
-                    <td>
+                    <td class="visible-md visible-lg">
                         <?php
                         echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
                             'item'      => $item,

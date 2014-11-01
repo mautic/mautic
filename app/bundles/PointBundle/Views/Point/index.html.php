@@ -21,10 +21,22 @@ $view['slots']->set('searchHelp', $view['translator']->trans('mautic.core.help.s
         'mautic_point_action', array("objectAction" => "new")); ?>"
         data-toggle="ajax"
         data-menu-link="#mautic_point_index">
-        <i class="fa fa-plus"></i> 
+        <i class="fa fa-plus"></i>
         <?php echo $view["translator"]->trans("mautic.point.menu.new"); ?>
     </a>
     <?php $view['slots']->stop(); ?>
 <?php endif; ?>
 
-<?php $view['slots']->output('_content'); ?>
+<div class="panel panel-default bdr-t-wdh-0 mb-0">
+    <?php echo $view->render('MauticCoreBundle:Helper:listactions.html.php', array(
+        'searchValue' => $searchValue,
+        'action'      => $currentRoute,
+        'menuLink'    => 'mautic_point_index',
+        'langVar'     => 'point',
+        'routeBase'   => 'point',
+        'delete'      => $permissions['point:points:delete']
+    )); ?>
+    <div class="page-list">
+        <?php $view['slots']->output('_content'); ?>
+    </div>
+</div>

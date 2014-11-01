@@ -18,23 +18,22 @@ $view['slots']->set("headerTitle", $view['translator']->trans('mautic.asset.asse
         'mautic_asset_action', array("objectAction" => "new")); ?>"
        data-toggle="ajax"
        data-menu-link="#mautic_asset_index">
-        <i class="fa fa-plus"></i> 
+        <i class="fa fa-plus"></i>
         <?php echo $view["translator"]->trans("mautic.asset.asset.menu.new"); ?>
     </a>
     <?php $view['slots']->stop(); ?>
 <?php endif; ?>
 
-<div class="panel panel-default bdr-t-wdh-0">
-    <div class="panel-body">
-        <div class="box-layout">
-            <div class="col-xs-6 va-m">
-                <?php echo $view->render('MauticCoreBundle:Helper:search.html.php', array('searchValue' => $searchValue, 'action' => $currentRoute)); ?>
-            </div>
-            <div class="col-xs-6 va-m text-right">
-                <button type="button" class="btn btn-warning"><i class="fa fa-files-o"></i></button>
-                <button type="button" class="btn btn-danger"><i class="fa fa-trash-o"></i></button>
-            </div>
-        </div>
+<div class="panel panel-default bdr-t-wdh-0 mb-0">
+    <?php echo $view->render('MauticCoreBundle:Helper:listactions.html.php', array(
+        'searchValue' => $searchValue,
+        'action'      => $currentRoute,
+        'menuLink'    => 'mautic_asset_index',
+        'langVar'     => 'asset.asset',
+        'routeBase'   => 'asset',
+        'delete'      => $permissions['asset:assets:deleteown'] || $permissions['asset:assets:deleteother']
+    )); ?>
+    <div class="page-list">
+        <?php $view['slots']->output('_content'); ?>
     </div>
-	<?php $view['slots']->output('_content'); ?>
 </div>

@@ -22,11 +22,10 @@ foreach ($form->getActions() as $action) {
         <!-- form detail header -->
         <div class="pr-md pl-md pt-lg pb-lg">
             <div class="box-layout">
-                <div class="col-xs-6 va-m">
-                    <h4 class="fw-sb text-primary"><?php echo $form->getName(); ?></h4>
-                    <p class="text-white dark-lg mb-0"><?php echo $view['translator']->trans('mautic.form.details.created_on', array('%date%' => $view['date']->toDate($form->getDateAdded()))); ?></p>
+                <div class="col-xs-10">
+                    <p class="text-muted"><?php echo $form->getDescription(); ?></p>
                 </div>
-                <div class="col-xs-6 va-m text-right">
+                <div class="col-xs-2 text-right">
                     <h4 class="fw-sb"><span class="label label-success"><?php echo strtoupper($form->getPublishStatus()); ?></span></h4>
                 </div>
             </div>
@@ -40,8 +39,8 @@ foreach ($form->getActions() as $action) {
                     <table class="table table-bordered table-striped mb-0">
                         <tbody>
                             <tr>
-                                <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.form.details.description'); ?></span></td>
-                                <td><?php echo $form->getDescription(); ?></td>
+                                <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.form.details.created_on'); ?></span></td>
+                                <td></td>
                             </tr>
                             <tr>
                                 <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.form.details.created_by'); ?></span></td>
