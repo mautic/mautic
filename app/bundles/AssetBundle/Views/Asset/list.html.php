@@ -14,7 +14,7 @@ $view->extend('MauticAssetBundle:Asset:index.html.php');
         <table class="table table-hover table-striped table-bordered asset-list" id="assetTable">
             <thead>
             <tr>
-                <th class="col-asset-actions pl-20">
+                <th class="visible-md visible-lg col-asset-actions pl-20">
                     <div class="checkbox-inline custom-primary">
                         <label class="mb-0 pl-10">
                             <input type="checkbox" id="customcheckbox-one0" value="1" data-toggle="checkall" data-target="#assetTable">
@@ -56,14 +56,14 @@ $view->extend('MauticAssetBundle:Asset:index.html.php');
                     'sessionVar' => 'asset',
                     'orderBy'    => 'a.download_count',
                     'text'       => 'mautic.asset.asset.thead.download.count',
-                    'class'      => 'col-asset-download-count'
+                    'class'      => 'visible-md visible-lg col-asset-download-count'
                 ));
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'asset',
                     'orderBy'    => 'a.id',
                     'text'       => 'mautic.asset.asset.thead.id',
-                    'class'      => 'col-asset-id'
+                    'class'      => 'visible-md visible-lg col-asset-id'
                 ));
                 ?>
             </tr>
@@ -71,7 +71,7 @@ $view->extend('MauticAssetBundle:Asset:index.html.php');
             <tbody>
             <?php foreach ($items as $item): ?>
                 <tr>
-                    <td>
+                    <td class="visible-md visible-lg">
                         <?php
                         echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
                             'item'      => $item,

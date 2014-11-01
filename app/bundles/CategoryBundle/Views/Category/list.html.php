@@ -15,7 +15,7 @@ if ($tmpl == 'index')
             <table class="table table-hover table-striped table-bordered category-list" id="categoryTable">
                 <thead>
                 <tr>
-                    <th class="col-page-actions pl-20">
+                    <th class="visible-md visible-lg col-page-actions pl-20">
                         <div class="checkbox-inline custom-primary">
                             <label class="mb-0 pl-10">
                                 <input type="checkbox" id="customcheckbox-one0" value="1" data-toggle="checkall" data-target="#categoryTable">
@@ -28,7 +28,7 @@ if ($tmpl == 'index')
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                         'sessionVar' => 'category',
                         'text'       => '',
-                        'class'      => 'visible-md visible-lg col-category-color'
+                        'class'      => 'col-category-color'
                     ));
 
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
@@ -58,7 +58,7 @@ if ($tmpl == 'index')
                 <tbody>
                 <?php foreach ($items as $item): ?>
                     <tr>
-                        <td>
+                        <td class="visible-md visible-lg">
                             <?php
                             echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
                                 'item'      => $item,

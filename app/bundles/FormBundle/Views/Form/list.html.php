@@ -15,7 +15,7 @@ if ($tmpl == 'index') {
     <table class="table table-hover table-striped table-bordered" id="formTable">
         <thead>
             <tr>
-                <th class="col-form-actions pl-20">
+                <th class="visible-md visible-lg col-form-actions pl-20">
                     <div class="checkbox-inline custom-primary">
                         <label class="mb-0 pl-10">
                             <input type="checkbox" id="customcheckbox-one0" value="1" data-toggle="checkall" data-target="#formTable">
@@ -65,7 +65,7 @@ if ($tmpl == 'index') {
         <tbody>
         <?php foreach ($items as $i): ?>
             <tr>
-                <td>
+                <td class="visible-md visible-lg">
                     <?php
                     echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
                         'item'      => $i[0],

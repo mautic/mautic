@@ -15,7 +15,7 @@ if ($tmpl == 'index')
     <table class="table table-hover table-striped table-bordered" id="leadTable">
         <thead>
             <tr>
-                <th class="col-lead-actions pl-20">
+                <th class="col-lead-actions pl-20 visible-md visible-lg">
                     <div class="checkbox-inline custom-primary">
                         <label class="mb-0 pl-10">
                             <input type="checkbox" id="customcheckbox-one0" value="1" data-toggle="checkall" data-target="#leadTable">
@@ -61,7 +61,7 @@ if ($tmpl == 'index')
             <?php /** @var \Mautic\LeadBundle\Entity\Lead $item */ ?>
             <?php $fields = $item->getFields(); ?>
             <tr>
-                <td>
+                <td class="visible-md visible-lg">
                     <?php
                     $hasEditAccess = $security->hasEntityAccess(
                         $permissions['lead:leads:editown'],

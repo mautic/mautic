@@ -15,7 +15,7 @@ $view->extend('MauticPointBundle:Point:index.html.php');
     <table class="table table-hover table-striped table-bordered point-list" id="pointTable">
         <thead>
         <tr>
-            <th class="col-point-actions pl-20">
+            <th class="visible-md visible-lg col-point-actions pl-20">
                 <div class="checkbox-inline custom-primary">
                     <label class="mb-0 pl-10">
                         <input type="checkbox" id="customcheckbox-one0" value="1" data-toggle="checkall" data-target="#pointTable">
@@ -36,7 +36,7 @@ $view->extend('MauticPointBundle:Point:index.html.php');
                 'sessionVar' => 'point',
                 'orderBy'    => 'p.description',
                 'text'       => 'mautic.point.thead.description',
-                'class'      => 'col-point-description'
+                'class'      => 'visible-md visible-lg col-point-description'
             ));
 
             echo '<th class="col-point-action">' . $view['translator']->trans('mautic.point.thead.action') . '</th>';
@@ -45,7 +45,7 @@ $view->extend('MauticPointBundle:Point:index.html.php');
                 'sessionVar' => 'point',
                 'orderBy'    => 'p.id',
                 'text'       => 'mautic.point.thead.id',
-                'class'      => 'col-point-id'
+                'class'      => 'visible-md visible-lg col-point-id'
             ));
             ?>
         </tr>
@@ -53,7 +53,7 @@ $view->extend('MauticPointBundle:Point:index.html.php');
         <tbody>
         <?php foreach ($items as $item): ?>
             <tr>
-                <td>
+                <td class="visible-md visible-lg">
                     <?php
                     echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
                         'item'      => $item,
@@ -82,7 +82,7 @@ $view->extend('MauticPointBundle:Point:index.html.php');
                 $type   = $item->getType();
                 $action = (isset($actions[$type])) ? $actions[$type]['label'] : '';
                 ?>
-                <td class="visible-md visible-lg"><?php echo $view['translator']->trans($action); ?></td>
+                <td><?php echo $view['translator']->trans($action); ?></td>
                 <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
             </tr>
         <?php endforeach; ?>
