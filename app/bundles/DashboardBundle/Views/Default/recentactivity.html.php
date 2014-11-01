@@ -26,31 +26,12 @@
                     <a href="<?php echo $view['router']->generate('mautic_user_action', array('objectAction' => 'edit', 'objectId' => $log['userId'])); ?>" data-toggle="ajax">
                         <?php echo $log['userName']; ?>
                     </a>
-                    <?php echo $log['action']; ?>
+                    <?php echo $view['translator']->trans('mautic.core.' . $log['action'] . '.past.tense'); ?>
                     <a href="<?php echo $view['router']->generate('mautic_' . $log['bundle'] . '_action', array('objectAction' => 'view', 'objectId' => $log['objectId'])); ?>" data-toggle="ajax">
                         <?php echo $log['objectName']; ?>
                     </a>
                     <?php echo $log['object']; ?>
                     <p class="fs-12 dark-sm"><small> <?php echo $view['date']->toFull($log['dateAdded']); ?></small></p>
-                    <dl>
-                    <?php foreach ($log['details'] as $key => $detail) : ?>
-                        <dt>
-                            <?php echo ucfirst(preg_replace('/(?!^)[A-Z]{2,}(?=[A-Z][a-z])|[A-Z][a-z]/', ' $0', $key)); ?>:
-                        </dt>
-                        <dd>
-                            <?php if (is_object($detail[0]) && get_class($detail[0]) == 'DateTime') : ?>
-                            <?php $detail[0] = $view['date']->toFull($detail[0]); ?>
-                            <?php endif; ?>
-                            <?php if (is_object($detail[1]) && get_class($detail[1]) == 'DateTime') : ?>
-                            <?php $detail[1] = $view['date']->toFull($detail[1]); ?>
-                            <?php endif; ?>
-                            <?php if ($view['translator']->trans($detail[0])) : ?>
-                            <del><?php echo $view['translator']->trans($detail[0]); ?></del> <i class="fa fa-long-arrow-right"></i>
-                            <?php endif; ?>
-                            <?php echo $view['translator']->trans($detail[1]); ?>
-                        </dd>
-                    <?php endforeach; ?>
-                    </dl>
                 </div>
             </li>
             <?php endforeach; ?>

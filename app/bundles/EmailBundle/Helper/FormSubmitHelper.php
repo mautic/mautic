@@ -21,7 +21,7 @@ class FormSubmitHelper
      *
      * @return array
      */
-    public static function onFormSubmit(Action $action, MauticFactory $factory)
+    public static function onFormSubmit(Action $action, MauticFactory $factory, $feedback)
     {
         $properties = $action->getProperties();
         $emailId  = $properties['email'];
@@ -32,9 +32,34 @@ class FormSubmitHelper
 
         //make sure the email still exists and is published
         if ($email != null && $email->isPublished()) {
+
+        	// Deal with Admin email
 	        if (isset($properties['user_id']) && $properties['user_id']) {
 		        $model->sendEmailToUser($email, $properties['user_id']);
 		    }
+
+		    // Deal with Lead email
+		    if (!empty($feedback['lead.create']['lead'])) {
+		    	//the lead was just created via the lead.create action
+		    	$currentLead = $feedback['lead.create']['lead'];
+		    } else {
+		        $model = $factory->getModel('lead');
+		        $currentLead = $model->getCurrentLead();
+		    }
+
+		    if (isset($currentLead)) {
+		    	$leadFields = $currentLead->getFields();
+		    	if (isset($leadFields['core']['email']['value']) && $leadFields['core']['email']['value']) {
+		    		$leadCredentials = array(
+		    			'email' 	=> $leadFields['core']['email']['value'],
+		    			'id' 		=> $currentLead->getId(),
+		    			'firstname' => $currentLead->getName(),
+		    			'lastname' 	=> ''
+		    		);
+		    		$model->sendEmail($email, array($leadCredentials));
+		    	}
+		    }
+		    
         }
     }
 }
