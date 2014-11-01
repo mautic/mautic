@@ -15,7 +15,6 @@ use Symfony\Component\Form\Type\FormTypeInterface;
  * StepInterface.
  *
  * @author Marc Weistroff <marc.weistroff@sensio.com>
- * @note   This interface is based on Sensio\Bundle\DistributionBundle\Configurator\Step\StepInterface
  */
 interface StepInterface
 {

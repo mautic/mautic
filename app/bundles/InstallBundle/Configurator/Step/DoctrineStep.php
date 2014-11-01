@@ -16,7 +16,6 @@ use Symfony\Component\Validator\Constraints as Assert;
  * Doctrine Step.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- * @note   This class is based on Sensio\Bundle\DistributionBundle\Configurator\Step\DoctrineStep
  */
 class DoctrineStep implements StepInterface
 {
