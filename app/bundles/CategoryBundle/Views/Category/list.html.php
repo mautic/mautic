@@ -24,6 +24,13 @@ if ($tmpl == 'index')
                         </div>
                     </th>
                     <?php
+
+                    echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                        'sessionVar' => 'category',
+                        'text'       => '',
+                        'class'      => 'visible-md visible-lg col-category-color'
+                    ));
+
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                         'sessionVar' => 'category',
                         'orderBy'    => 'c.title',
@@ -66,6 +73,9 @@ if ($tmpl == 'index')
                                 )
                             ));
                             ?>
+                        </td>
+                        <td>
+                            <span class="label label-default pa-10" style="background: <?php echo $item->getColor(); ?>;"> </span>
                         </td>
                         <td>
                             <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php',array(
