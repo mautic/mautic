@@ -176,3 +176,11 @@ $container->setDefinition(
     ->addTag('form.type', array(
         'alias' => 'leadnote',
     ));
+
+
+$container
+    ->setDefinition('mautic.validator.leadlistaccess', new Definition(
+        'Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccessValidator',
+        array(new Reference('mautic.factory'))
+    ))
+    ->addTag('validator.constraint_validator', array('alias' => 'leadlist_access'));

@@ -1513,6 +1513,11 @@ a.list-group-item:focus {
   color: #596776;
   background-color: #f0f0f0;
 }
+.scrollable-menu {
+  height: auto;
+  max-height: 200px;
+  overflow-x: hidden;
+}
 .nav > li > a {
   font-weight: normal;
 }

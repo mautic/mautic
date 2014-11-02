@@ -12,7 +12,7 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Entity\FormEntity;
-use Mautic\LeadBundle\Form\Constraints\UniqueUserAlias;
+use Mautic\LeadBundle\Form\Validator\Constraints\UniqueUserAlias;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints as Assert;
 use JMS\Serializer\Annotation as Serializer;
@@ -259,15 +259,16 @@ class LeadList extends FormEntity
      * @param \Mautic\LeadBundle\Entity\Lead $lead
      * @return Channel
      */
-    public function addLead(\Mautic\LeadBundle\Entity\Lead $lead)
+    public function addLead(\Mautic\LeadBundle\Entity\Lead $lead, $checkAgainstExcluded = false)
     {
-        if (!$this->includedLeads->contains($lead)) {
-            $this->includedLeads[] = $lead;
+        if ($checkAgainstExcluded) {
+            if (!$this->excludedLeads->contains($lead)) {
+                $this->includedLeads[] = $lead;
+            }
+        } else {
+            $this->includeLead($lead);
         }
 
-        if ($this->excludedLeads->contains($lead)) {
-            $this->removeExcludedLead($lead);
-        }
         return $this;
     }
 
@@ -276,13 +277,18 @@ class LeadList extends FormEntity
      *
      * @param \Mautic\LeadBundle\Entity\Lead $users
      */
-    public function removeLead(\Mautic\LeadBundle\Entity\Lead $lead)
+    public function removeLead(\Mautic\LeadBundle\Entity\Lead $lead, $checkAgainstExcluded = false)
     {
-        $this->includedLeads->removeElement($lead);
-
-        if (!$this->includedLeads->contains($lead)) {
+        if ($checkAgainstExcluded) {
+            //if the lead is in the excluded list, it was manually added there so don't remove it
+            if (!$this->excludedLeads->contains($lead) && $this->includedLeads->contains($lead)) {
+                $this->includedLeads->removeElement($lead);
+            }
+        } else {
             $this->excludeLead($lead);
         }
+
+        return $this;
     }
 
     /**
@@ -299,7 +305,6 @@ class LeadList extends FormEntity
      * Add lead
      *
      * @param \Mautic\LeadBundle\Entity\Lead $lead
-     * @return Channel
      */
     public function excludeLead(\Mautic\LeadBundle\Entity\Lead $lead)
     {
@@ -308,19 +313,22 @@ class LeadList extends FormEntity
         }
 
         if ($this->includedLeads->contains($lead)) {
-            $this->removeLead($lead);
+            $this->includedLeads->removeElement($lead);
         }
-        return $this;
     }
 
     /**
-     * Remove lead
-     *
-     * @param \Mautic\LeadBundle\Entity\Lead $users
+     * @param Lead $lead
      */
-    public function removeExcludedLead(\Mautic\LeadBundle\Entity\Lead $lead)
+    public function includeLead(\Mautic\LeadBundle\Entity\Lead $lead)
     {
-        $this->excludedLeads->removeElement($lead);
+        if (!$this->includedLeads->contains($lead)) {
+            $this->includedLeads[] = $lead;
+        }
+
+        if ($this->excludedLeads->contains($lead)) {
+            $this->excludedLeads->removeElement($lead);
+        }
     }
 
     /**

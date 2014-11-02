@@ -31,10 +31,10 @@ class MailHelper
      */
     private $from;
 
-    /*
-     * @var null
+    /**
+     * @var
      */
-    private $failures;
+    private $errors = array();
 
     /**
      * @param      $mailer
@@ -53,7 +53,15 @@ class MailHelper
      */
     public function getMessageInstance()
     {
-        return \Swift_Message::newInstance();
+        try {
+            $message = \Swift_Message::newInstance();
+
+            return $message;
+        } catch (Exception $e) {
+            $this->errors[] = $e->getMessage();
+
+            return false;
+        }
     }
 
     /**
@@ -63,13 +71,28 @@ class MailHelper
      */
     public function send()
     {
-        $from = $this->message->getFrom();
-        if (empty($from)) {
-            $this->message->setFrom($this->from);
-        }
-        $this->mailer->send($this->message, $this->failures);
+        if (empty($this->errors)) {
+            $from = $this->message->getFrom();
+            if (empty($from)) {
+                $this->message->setFrom($this->from);
+            }
 
-        if (empty($this->failures)) {
+            try {
+                $failures = array();
+                $this->mailer->send($this->message, $failures);
+
+                if (!empty($failures)) {
+                    $this->errors['failures'] = $failures;
+                }
+
+            } catch (Exception $e) {
+                $this->errors[] = $e->getMessage();
+            }
+
+            $this->mailer->send($this->message, $this->failures);
+        }
+
+        if (empty($this->errors)) {
             return true;
         } else {
             return false;
@@ -77,11 +100,11 @@ class MailHelper
     }
 
     /**
-     * @return mixed
+     * @return array
      */
-    public function getFailures()
+    public function getErrors()
     {
-        return $this->failures;
+        return $this->errors;
     }
 
     /**

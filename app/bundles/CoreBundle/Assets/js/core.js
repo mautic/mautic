@@ -566,6 +566,8 @@ var Mautic = {
             //activate content specific stuff
             Mautic.onPageLoad(response.target, response, ignoreContentSpecificOnLoad);
         }
+
+        Mautic.stopIconSpinPostEvent();
     },
 
     /**

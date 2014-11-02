@@ -462,9 +462,9 @@ class Lead extends FormEntity
      * @param $alias
      * @param $value
      */
-    public function addUpdatedField($alias, $value)
+    public function addUpdatedField($alias, $value, $oldValue = '')
     {
-        $this->changes['fields'][$alias] = $value;
+        $this->changes['fields'][$alias] = array($oldValue, $value);
         $this->updatedFields[$alias]     = $value;
     }
 
