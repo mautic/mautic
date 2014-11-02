@@ -56,9 +56,8 @@ echo $view['form']->start($form);
                 $filterForm   = $form['filters'];
                 $filterValues = $filterForm->vars['data'] ?: array();
                 $form['filters']->setRendered();
-                $feedbackClass = ($app->getRequest()->getMethod() == 'POST' && !empty($filterForm->vars['errors'])) ? " has-error" : "";
                 ?>
-                    <div class="form-group <?php echo $feedbackClass; ?>">
+                    <div class="form-group">
                         <?php echo $view['form']->errors($filterForm); ?>
                         <div class="available-filters mb-md">
                             <div class="dropdown">
@@ -66,12 +65,12 @@ echo $view['form']->start($form);
                                     <?php echo $view['translator']->trans('mautic.lead.list.form.filters.add'); ?>
                                     <span class="caret"></span>
                                 </button>
-                                <ul class="dropdown-menu" role="menu">
+                                <ul class="dropdown-menu scrollable-menu" role="menu">
                                     <?php foreach ($choices as $value => $params): ?>
                                         <?php $list = (!empty($params['properties']['list'])) ? $params['properties']['list'] : ''; ?>
                                         <?php $callback = (!empty($params['properties']['callback'])) ? $params['properties']['callback'] : ''; ?>
-                                        <li id="available_<?php echo $value; ?>">
-                                            <a class="list-group-item" href="javascript:void(0);" onclick="Mautic.addLeadListFilter('<?php echo $value; ?>');" data-field-type="<?php echo $params['properties']['type']; ?>" data-field-list="<?php echo $list; ?>" data-field-callback="<?php echo $callback; ?>">
+                                        <li>
+                                            <a id="available_<?php echo $value; ?>" class="list-group-item" href="javascript:void(0);" onclick="Mautic.addLeadListFilter('<?php echo $value; ?>');" data-field-type="<?php echo $params['properties']['type']; ?>" data-field-list="<?php echo $list; ?>" data-field-callback="<?php echo $callback; ?>">
                                                 <span class="leadlist-filter-name"><?php echo $view['translator']->trans($params['label']); ?></span>
                                             </a>
                                         </li>
@@ -99,6 +98,8 @@ echo $view['form']->start($form);
                                                     </select>
                                                 </div>
                                             </div>
+                                        <?php else: ?>
+                                            <input name="leadlist[filters][glue][]" type="hidden" value="and" />
                                         <?php endif; ?>
                                         <div class="panel-body">
                                             <div class="col-xs-6 col-sm-3 field-name">
@@ -198,7 +199,7 @@ echo $view['form']->start($form);
                                                     <?php endswitch; ?>
                                             </div>
                                             <div class="col-xs-2 col-sm-1">
-                                                <a href="#" class="remove-selected btn btn-default text-danger pull-right"><i class="fa fa-trash-o"></i></a>
+                                                <a href="javascript: void(0);" class="remove-selected btn btn-default text-danger pull-right"><i class="fa fa-trash-o"></i></a>
                                             </div>
                                             <input type="hidden" name="leadlist[filters][field][]" value="<?php echo $filter['field']; ?>" />
                                             <input type="hidden" name="leadlist[filters][type][]" value="<?php echo $filter['type']; ?>" />
