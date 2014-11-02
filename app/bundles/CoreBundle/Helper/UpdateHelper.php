@@ -61,7 +61,7 @@ class UpdateHelper
         if ($data->code != 200) {
             return array(
                 'error'   => true,
-                'message' => 'mautic.core.updater.error.fetching.updates'
+                'message' => 'mautic.core.updater.error.fetching.package'
             );
         }
 
