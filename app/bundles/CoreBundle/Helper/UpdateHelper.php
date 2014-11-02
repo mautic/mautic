@@ -91,10 +91,25 @@ class UpdateHelper
     /**
      * Retrieves the update data from our home server
      *
+     * @param string $kernelRoot
+     * @param bool   $overrideCache
+     *
      * @return array
      */
-    public function fetchData()
+    public function fetchData($kernelRoot, $overrideCache = false)
     {
+        $cacheFile = $kernelRoot . '/cache/lastUpdateCheck.txt';
+
+        // Check if we have a cache file and try to return cached data if so
+        if (!$overrideCache && is_readable($cacheFile)) {
+            $update = (array) json_decode(file_get_contents($cacheFile));
+
+            // If we're within the cache time, return the cached data
+            if ($update['checkedTime'] > strtotime('-3 hours')) {
+                return $update;
+            }
+        }
+
         // Get our HTTP client
         $connector = HttpFactory::getHttp();
 
@@ -140,12 +155,17 @@ class UpdateHelper
             );
         }
 
-        // If we got this far, the user is able to update to the latest version
-        return array(
+        // If we got this far, the user is able to update to the latest version, cache the data first
+        $data = array(
             'error'        => false,
             'message'      => 'mautic.core.updater.update.available',
             'version'      => $latestVersion->version,
-            'announcement' => $latestVersion->announcement
+            'announcement' => $latestVersion->announcement,
+            'checkedTime'  => time()
         );
+
+        file_put_contents($cacheFile, json_encode($data));
+
+        return $data;
     }
 }
