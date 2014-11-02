@@ -13,11 +13,7 @@ Mautic.reportOnLoad = function (container) {
 	Mautic.initGraphs();
 };
 
-Mautic.reportGraphs = {
-	'line': {},
-	'bar': {},
-	'pie': {}
-};
+Mautic.reportGraphs = {};
 
 Mautic.preprocessSaveReportForm = function(form) {
 	var selectedColumns = mQuery(form + ' #report_columns');
@@ -120,12 +116,43 @@ Mautic.initGraphs = function () {
 		var mGraph = mQuery(graph);
 		if (mGraph.hasClass('graph-line')) {
 			var id = mGraph.attr('id');
-			if (typeof Mautic.reportGraphs.line[id] === 'undefined') {
+			if (typeof Mautic.reportGraphs[id] === 'undefined') {
 				var graphData = mQuery.parseJSON(mQuery('#' + id + '-data').text());
-				Mautic.reportGraphs.line[id] = Mautic.renderLineGraph(graph.getContext("2d"), graphData);
+				Mautic.reportGraphs[id] = Mautic.renderLineGraph(graph.getContext("2d"), graphData);
 			}
 		}
 	});
+}
+
+Mautic.updateReportGraph = function(element, options) {
+	var id = options.graphName.replace(/\./g, '-');
+	var element = mQuery(element);
+	var wrapper = element.closest('ul');
+	var button  = mQuery('#time-scopes .button-label');
+	var reportId = Mautic.getReportId();
+	wrapper.find('a').removeClass('bg-primary');
+	element.addClass('bg-primary');
+	button.text(element.text());
+	var query = "action=report:updateGraph&reportId=" + reportId + '&' + mQuery.param(options);
+    mQuery.ajax({
+        url: mauticAjaxUrl,
+        type: "POST",
+        data: query,
+        dataType: "json",
+        success: function (response) {
+            if (response.success) {
+            	Mautic.reportGraphs[id].destroy();
+            	delete Mautic.reportGraphs[id];
+            	var mGraph = mQuery('#' + id);
+            	if (typeof response.graph.line != 'undefined') {
+            		Mautic.reportGraphs[id] = Mautic.renderLineGraph(mGraph.get(0).getContext("2d"), response.graph.line[0]);
+            	}
+            }
+        },
+        error: function (request, textStatus, errorThrown) {
+            Mautic.processAjaxError(request, textStatus, errorThrown);
+        }
+    });
 }
 
 Mautic.renderLineGraph = function (canvas, chartData) {
@@ -146,3 +173,7 @@ Mautic.renderLineGraph = function (canvas, chartData) {
 	};
     return new Chart(canvas).Line(data, options);
 };
+
+Mautic.getReportId = function() {
+	return mQuery('#reportId').val();
+}

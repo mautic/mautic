@@ -32,6 +32,13 @@ class ReportGraphEvent extends Event
     private $report;
 
     /**
+     * Options of graphs
+     *
+     * @var array
+     */
+    private $options = array();
+
+    /**
      * Constructor
      *
      * @param Report $report Entity
@@ -62,12 +69,12 @@ class ReportGraphEvent extends Event
     }
 
     /**
-     * Set the QueryBuilder object
+     * Set the graph array
      *
      * @param string $type (line, bar, pie, ..)
      * @param array $data prepared for this chart
      *
-     * @return array
+     * @return void
      */
     public function setGraph($type, $data)
     {
@@ -75,6 +82,41 @@ class ReportGraphEvent extends Event
             $this->graphs[$type] = array();
         }
         $this->graphs[$type][] = $data;
+    }
+
+    /**
+     * Fetch the options array
+     *
+     * @return array
+     */
+    public function getOptions()
+    {
+        return $this->options;
+    }
+
+    /**
+     * Set the option
+     *
+     * @param string $key
+     * @param string $value
+     *
+     * @return void
+     */
+    public function setOption($key, $value)
+    {
+        $this->options[$key] = $value;
+    }
+
+    /**
+     * Set the options
+     *
+     * @param array $options
+     *
+     * @return void
+     */
+    public function setOptions($options)
+    {
+        $this->options = $options;
     }
 
     /**
