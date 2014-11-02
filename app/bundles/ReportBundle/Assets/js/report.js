@@ -13,7 +13,11 @@ Mautic.reportOnLoad = function (container) {
 	Mautic.initGraphs();
 };
 
-Mautic.reportGraphs = {};
+Mautic.reportOnUnload = function(id) {
+	if (id === '#app-content') {
+		delete Mautic.reportGraphs;
+	}
+};
 
 Mautic.preprocessSaveReportForm = function(form) {
 	var selectedColumns = mQuery(form + ' #report_columns');
@@ -111,6 +115,7 @@ Mautic.checkReportCondition = function(selector) {
 };
 
 Mautic.initGraphs = function () {
+	Mautic.reportGraphs = {};
 	var graphs = mQuery('canvas.graph');
 	mQuery.each(graphs, function(i, graph){
 		var mGraph = mQuery(graph);
