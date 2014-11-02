@@ -35,12 +35,11 @@ class UpdateHelper
      * Fetches a download package from the remote server
      *
      * @param string $kernelRoot
-     * @param string $version
-     * @param string $stability
+     * @param string $package
      *
      * @return array
      */
-    public function fetchPackage($kernelRoot, $version, $stability = 'stable')
+    public function fetchPackage($kernelRoot, $package)
     {
         $target = '';
 
@@ -48,9 +47,8 @@ class UpdateHelper
         $connector = HttpFactory::getHttp();
 
         // GET the update data
-        // TODO - Change to the proper URL format for packages when ready
         try {
-            $data = $connector->get('http://mautic.org/downloads/development/mautic-head.zip');
+            $data = $connector->get($package);
         } catch (\Exception $exception) {
             return array(
                 'error'   => true,
@@ -65,19 +63,8 @@ class UpdateHelper
             );
         }
 
-        // Parse the Content-Disposition header to get the file name if it exists
-        if (isset($response->headers['Content-Disposition']) && preg_match("/\s*filename\s?=\s?(.*)/", $response->headers['Content-Disposition'], $parts)) {
-            $target = trim(rtrim($parts[1], ";"), '"');
-        }
-
-        // If we don't already have a filename, extract it based on the URL
-        if (!$target) {
-            // TODO - Change this to be based on the real URL when that changes
-            $target = 'mautic-head.zip';
-        }
-
         // Set the filesystem target
-        $target = $kernelRoot . '/cache/' . $target;
+        $target = $kernelRoot . '/cache/' . basename($package);
 
         // Write the response to the filesystem
         file_put_contents($target, $data->body);
@@ -114,9 +101,8 @@ class UpdateHelper
         $connector = HttpFactory::getHttp();
 
         // GET the update data
-        // TODO - Change to the real URL at some point
         try {
-            $data    = $connector->get('http://mautic/update.json');
+            $data    = $connector->get('http://mautic.org/downloads/update.json');
             $updates = json_decode($data->body);
         } catch (\Exception $exception) {
             return array(
@@ -161,6 +147,7 @@ class UpdateHelper
             'message'      => 'mautic.core.updater.update.available',
             'version'      => $latestVersion->version,
             'announcement' => $latestVersion->announcement,
+            'package'      => $latestVersion->package,
             'checkedTime'  => time()
         );
 

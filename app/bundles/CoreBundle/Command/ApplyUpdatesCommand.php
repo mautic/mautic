@@ -99,7 +99,7 @@ EOT
         $updateHelper = new UpdateHelper($this->getContainer()->get('mautic.factory'));
 
         // Fetch the update package
-        $package = $updateHelper->fetchPackage($this->getContainer()->getParameter('kernel.root_dir'), $update['version']);
+        $package = $updateHelper->fetchPackage($this->getContainer()->getParameter('kernel.root_dir'), $update['package']);
 
         if ($package['error']) {
             $output->writeln('<error>' . $translator->trans($package['message']) . '</error>');
@@ -107,8 +107,7 @@ EOT
             return 1;
         }
 
-        // TODO - Change the name reference to use the real names when we have it
-        $zipFile = $this->getContainer()->getParameter('kernel.root_dir') . '/cache/mautic-head.zip';
+        $zipFile = $this->getContainer()->getParameter('kernel.root_dir') . '/cache/' . basename($update['package']);
 
         $zipper = new \ZipArchive();
         $archive = $zipper->open($zipFile);
