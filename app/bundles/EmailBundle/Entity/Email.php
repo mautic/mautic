@@ -125,6 +125,7 @@ class Email extends FormEntity
 
     /**
      * @ORM\ManyToOne(targetEntity="Mautic\CategoryBundle\Entity\Category")
+     * @ORM\JoinColumn(onDelete="SET NULL")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"emailDetails", "emailList"})
