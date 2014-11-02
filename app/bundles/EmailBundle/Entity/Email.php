@@ -13,7 +13,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Entity\FormEntity;
 use JMS\Serializer\Annotation as Serializer;
-use Mautic\EmailBundle\Form\Validator\Constraints\LeadListAccess;
+use Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccess;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -208,6 +208,7 @@ class Email extends FormEntity
     public function __construct()
     {
         $this->lists = new ArrayCollection();
+        $this->stats = new ArrayCollection();
     }
 
     /**
@@ -222,7 +223,6 @@ class Email extends FormEntity
         $metadata->addPropertyConstraint('lists', new LeadListAccess(array(
             'message' => 'mautic.email.list.noaccess'
         )));
-
 
         $metadata->addPropertyConstraint('lists', new NotBlank(array(
             'message' => 'mautic.email.list.notblank'
@@ -686,5 +686,13 @@ class Email extends FormEntity
         } else {
             return (!empty($this->variantParent) || count($this->variantChildren)) ? true : false;
         }
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getStats ()
+    {
+        return $this->stats;
     }
 }

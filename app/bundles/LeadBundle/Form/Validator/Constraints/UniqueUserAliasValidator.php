@@ -7,7 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\LeadBundle\Form\Constraints;
+namespace Mautic\LeadBundle\Form\Validator\Constraints;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Security\Core\SecurityContext;

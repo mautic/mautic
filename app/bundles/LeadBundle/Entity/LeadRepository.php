@@ -297,7 +297,8 @@ class LeadRepository extends CommonRepository
         //DBAL
         $dq = $this->_em->getConnection()->createQueryBuilder();
         $dq->select('count(*) as count')
-            ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l');
+            ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
+            ->leftJoin('l', MAUTIC_TABLE_PREFIX . 'lead_lists_included_leads', 'll', 'l.id = ll.lead_id');
         $this->buildWhereClause($dq, $args);
 
         //get a total count
@@ -506,10 +507,10 @@ class LeadRepository extends CommonRepository
                 //obtain the list details
                 $list = $this->_em->getRepository("MauticLeadBundle:LeadList")->findOneByAlias($string);
                 if (!empty($list)) {
-                    $expr = $this->getListFilterExpr($list->getFilters(), $parameters, $q, $filter->not, $list);
+                    $expr = $q->expr()->eq('ll.leadlist_id', (int) $list->getId());
                 } else {
                     //force a bad expression as the list doesn't exist
-                    $expr = $q->expr()->eq('l.id', 0);
+                    $expr = $q->expr()->eq('ll.leadlist_id', 0);
                 }
                 break;
         }
@@ -525,193 +526,6 @@ class LeadRepository extends CommonRepository
             ($returnParameter) ? $parameters : array()
         );
 
-    }
-
-    /**
-     * @param      $filters
-     * @param      $parameters
-     * @param      $q
-     * @param bool $not
-     * @param null|List|array $list
-     *
-     * @return mixed
-     */
-    public function getListFilterExpr($filters, &$parameters, &$q, $not = false, $list = null)
-    {
-        $group       = false;
-        $options     = $this->getFilterExpressionFunctions();
-        $expr        = $q->expr()->orX();
-        $useExpr     =& $expr;
-
-        foreach ($filters as $k => $details) {
-            if (empty($details['glue']))
-                continue;
-
-            $uniqueFilter              = $this->generateRandomParameterName();
-            $parameters[$uniqueFilter] = $details['filter'];
-
-            $uniqueFilter              = ":$uniqueFilter";
-            //DQL does not have a not() function so we have to use the opposite
-            $func                      = (!$not) ? $options[$details['operator']]['func'] :
-                $options[$details['operator']]['oFunc'];
-            $field                     = "l.{$details['field']}";
-
-            //the next one will determine the group
-            $glue = (isset($filters[$k + 1])) ? $filters[$k + 1]['glue'] : $details['glue'];
-            if ($glue == "or" || $details['glue'] == 'or') {
-                //create the group if it doesn't exist
-                if ($group === false) {
-                    $group = $q->expr()->orX();
-                }
-
-                //set expression var to the grouped one
-                unset($useExpr);
-                $useExpr =& $group;
-            } else {
-                if ($group !== false) {
-                    //add the group
-                    $expr->add($group);
-                    //reset the group
-                    $group = false;
-                }
-
-                //reset the expression var to be used
-                unset($useExpr);
-                $useExpr =& $expr;
-            }
-            if ($func == 'notEmpty') {
-                $useExpr->add(
-                    $q->expr()->andX(
-                        $q->expr()->isNotNull($field, $uniqueFilter),
-                        $q->expr()->neq($field, $q->expr()->literal(''))
-                    )
-                );
-            } elseif ($func == 'empty') {
-                $useExpr->add(
-                    $q->expr()->orX(
-                        $q->expr()->isNull($field, $uniqueFilter),
-                        $q->expr()->eq($field, $q->expr()->literal(''))
-                    )
-                );
-            } else {
-                $useExpr->add($q->expr()->$func($field, $uniqueFilter));
-            }
-        }
-        if ($group !== false) {
-            //add the group if not added yet
-            $expr->add($group);
-        }
-
-        //add manually added leads
-        if ($list !== null) {
-            if ($list instanceof LeadList) {
-                $includedLeads = $list->getIncludedLeads();
-                $excludedLeads = $list->getExcludedLeads();
-            } else {
-                $includedLeads = $list['includedLeads'];
-                $excludedLeads = $list['excludedLeads'];
-            }
-
-            $includeIds  = array();
-            foreach ($includedLeads as $lead) {
-                $includeIds[] = ($lead instanceof Lead) ? $lead->getId() : $lead['id'];
-            }
-
-            $excludeIds    = array();
-            foreach ($excludedLeads as $lead) {
-                $excludeIds[] = ($lead instanceof Lead) ? $lead->getId() : $lead['id'];
-            }
-
-            $manualExpr = $q->expr()->andX();
-            if (!empty($includeIds)) {
-                $manualExpr->add(
-                    $q->expr()->in('l.id', $includeIds)
-                );
-            }
-
-            if (!empty($excludeIds)) {
-                $manualExpr->add(
-                    $q->expr()->notIn('l.id', $excludeIds)
-                );
-            }
-
-            if ($manualExpr->count()) {
-                $returnExpr = $q->expr()->orX();
-                $returnExpr->add($expr);
-                $returnExpr->add($manualExpr);
-                return $returnExpr;
-            }
-        }
-
-        return $expr;
-    }
-
-    public function getFilterExpressionFunctions($operator = null)
-    {
-        $operatorOptions = array(
-            '='      =>
-                array(
-                    'label' => 'mautic.lead.list.form.operator.equals',
-                    'func'  => 'eq',
-                    'oFunc' => 'neq'
-                ),
-            '!='     =>
-                array(
-                    'label' => 'mautic.lead.list.form.operator.notequals',
-                    'func'  => 'neq',
-                    'oFunc' => 'eq'
-                ),
-            '&#62;'   =>
-                array(
-                    'label' => 'mautic.lead.list.form.operator.greaterthan',
-                    'func'  => 'gt',
-                    'oFunc' => 'lt'
-                ),
-            '&#62;='   =>
-                array(
-                    'label' => 'mautic.lead.list.form.operator.greaterthanequals',
-                    'func'  => 'gte',
-                    'oFunc' => 'lt'
-                ),
-            '&#60;'    =>
-                array(
-                    'label' => 'mautic.lead.list.form.operator.lessthan',
-                    'func'  => 'lt',
-                    'oFunc' => 'gt'
-                ),
-            '&#60;='   =>
-                array(
-                    'label' => 'mautic.lead.list.form.operator.lessthanequals',
-                    'func'  => 'lte',
-                    'oFunc' => 'gt'
-                ),
-            'empty'  =>
-                array(
-                    'label' => 'mautic.lead.list.form.operator.isempty',
-                    'func'  => 'empty', //special case
-                    'oFunc' => 'notEmpty'
-                ),
-            '!empty' =>
-                array(
-                    'label' => 'mautic.lead.list.form.operator.isnotempty',
-                    'func'  => 'notEmpty', //special case
-                    'oFunc' => 'empty'
-                ),
-            'like'   =>
-                array(
-                    'label' => 'mautic.lead.list.form.operator.islike',
-                    'func'  => 'like',
-                    'oFunc' => 'notLike'
-                ),
-            '!like'  =>
-                array(
-                    'label' => 'mautic.lead.list.form.operator.isnotlike',
-                    'func'  => 'notLike',
-                    'oFunc' => 'like'
-                )
-        );
-
-        return ($operator === null) ? $operatorOptions : $operatorOptions[$operator];
     }
 
     /**

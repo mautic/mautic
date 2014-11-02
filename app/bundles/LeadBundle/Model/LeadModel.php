@@ -205,7 +205,7 @@ class LeadModel extends FormModel
                 $newValue = (isset($data[$alias])) ? $data[$alias] : "";
                 if ($curValue !== $newValue && (!empty($newValue) || (empty($newValue) && $overwriteWithBlank))) {
                     $field['value'] = $newValue;
-                    $lead->addUpdatedField($alias, $newValue);
+                    $lead->addUpdatedField($alias, $newValue, $curValue);
                 }
 
                 //if empty, check for social media data to plug the hole
@@ -374,8 +374,8 @@ class LeadModel extends FormModel
                     //let's create a lead
                     $lead = new Lead();
                     $lead->addIpAddress($ip);
-                    $this->saveEntity($lead);
                     $lead->setNewlyCreated(true);
+                    $this->saveEntity($lead);
                     $leadId = $lead->getId();
                 }
             } else {
@@ -384,14 +384,58 @@ class LeadModel extends FormModel
                     //let's create a lead
                     $lead = new Lead();
                     $lead->addIpAddress($ip);
-                    $this->saveEntity($lead);
                     $lead->setNewlyCreated(true);
+                    $this->saveEntity($lead);
                     $leadId = $lead->getId();
                 }
             }
             $this->setLeadCookie($leadId);
         }
         return ($returnTracking) ? array($lead, $trackingId, $generated) : $lead;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param       $entity
+     * @param       $unlock
+     */
+    public function saveEntity($entity, $unlock = true)
+    {
+        parent::saveEntity($entity, $unlock);
+
+        //regenerate the lists leads if there are changes AND the lead wasn't created by getCurrentLead
+        $changes = $entity->getChanges();
+        if (!$entity->isNewlyCreated() && !empty($changes)) {
+            $this->regenerateLeadLists($entity);
+        }
+    }
+
+    /**
+     * Regenerate the lists this lead currently belongs to
+     *
+     * @param Lead $lead
+     */
+    public function regenerateLeadLists(Lead $lead)
+    {
+        $lists = $this->getLists($lead);
+        $model = $this->factory->getModel('lead.list');
+        foreach ($lists as $l) {
+            $model->regenerateListLeads($l);
+        }
+    }
+
+    /**
+     * Get a list of lists this lead belongs to
+     *
+     * @param $lead
+     *
+     * @return mixed
+     */
+    public function getLists(Lead $lead)
+    {
+        $repo = $this->em->getRepository('MauticLeadBundle:LeadList');
+        return $repo->getLeadLists($lead->getId());
     }
 
     /**

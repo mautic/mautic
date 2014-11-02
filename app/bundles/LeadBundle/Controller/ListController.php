@@ -371,7 +371,7 @@ class ListController extends FormController
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function addleadAction($objectId)
+    public function addLeadDecision($objectId)
     {
         return $this->changeList($objectId, 'add');
     }

@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\DataTransformer\StringToDatetimeTransformer;
 use Mautic\UserBundle\Form\DataTransformer as Transformers;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
@@ -36,16 +37,20 @@ class LeadListType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $model  = $this->factory->getModel('lead.list');
-        $lists  = $model->getUserLists();
-
-        $choices = array();
-        foreach ($lists as $l) {
-            $choices[$l['id']] = $l['name'];
-        }
-
+        /** @var \Mautic\LeadBundle\Model\ListModel $model */
+        $model = $this->factory->getModel('lead.list');
         $resolver->setDefaults(array(
-            'choices' => $choices
+            'choices' => function (Options $options) use ($model) {
+                $lists = (empty($options['global_only'])) ? $model->getUserLists() : $model->getGlobalLists();
+
+                $choices = array();
+                foreach ($lists as $l) {
+                    $choices[$l['id']] = $l['name'];
+                }
+
+                return $choices;
+            },
+            'global_only' => false
         ));
     }
 

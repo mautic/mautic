@@ -53,6 +53,7 @@ class ListModel extends FormModel
     public function saveEntity($entity, $unlock = true)
     {
         $isNew = ($entity->getId()) ? false : true;
+        $repo  = $this->getRepository();
 
         //set some defaults
         $this->setTimestamps($entity, $isNew, $unlock);
@@ -83,9 +84,47 @@ class ListModel extends FormModel
         }
         $entity->setAlias($alias);
 
+        $this->regenerateLeadList($entity, $isNew);
+
         $event = $this->dispatchEvent("pre_save", $entity, $isNew);
-        $this->getRepository()->saveEntity($entity);
+        $repo->saveEntity($entity);
         $this->dispatchEvent("post_save", $entity, $isNew, $event);
+    }
+
+    /**
+     *
+     *
+     * @param LeadList $entity
+     * @param          $isNew
+     *
+     * @throws \Doctrine\ORM\ORMException
+     */
+    public function regenerateListLeads(LeadList $entity, $isNew = false)
+    {
+        $repo = $this->getRepository();
+
+        if (!$isNew) {
+            $id = $entity->getId();
+
+            $oldLeadList = $repo->getLeadsByList(array('id' => $id), true);
+            $newLeadList = $repo->getLeadsByList(array('id' => $id, 'filters' => $entity->getFilters()), true, true);
+
+            $addLeads    = array_diff($newLeadList[$id], $oldLeadList[$id]);
+            $removeLeads = array_diff($oldLeadList[$id], $newLeadList[$id]);
+        } else {
+            $newLeadList = $repo->getLeadsByList(array('id' => 'new', 'filters' => $entity->getFilters()), true);
+
+            $addLeads    = $newLeadList['new'];
+            $removeLeads = array();
+        }
+
+        foreach ($addLeads as $l) {
+            $entity->addLead($this->em->getReference('MauticLeadBundle:Lead', $l), true);
+        }
+
+        foreach ($removeLeads as $l) {
+            $entity->removeLead($this->em->getReference('MauticLeadBundle:Lead', $l), true);
+        }
     }
 
     /**
@@ -174,9 +213,8 @@ class ListModel extends FormModel
      */
     public function getFilterExpressionFunctions()
     {
-        return $this->em->getRepository('MauticLeadBundle:Lead')->getFilterExpressionFunctions();
+        return $this->em->getRepository('MauticLeadBundle:LeadList')->getFilterExpressionFunctions();
     }
-
 
     /**
      * Get a list of field choices for filters
@@ -247,6 +285,19 @@ class ListModel extends FormModel
         $user  = (!$this->security->isGranted('lead:lists:viewother')) ?
             $this->factory->getUser() : false;
         $lists = $this->em->getRepository('MauticLeadBundle:LeadList')->getLists($user, $alias, '', $withLeads);
+        return $lists;
+    }
+
+    /**
+     * Get a list of global lead lists
+     *
+     * @param bool $withLeads
+     *
+     * @return mixed
+     */
+    public function getGlobalLists($withLeads = false)
+    {
+        $lists = $this->em->getRepository('MauticLeadBundle:LeadList')->getGlobalLists($withLeads);
         return $lists;
     }
 
