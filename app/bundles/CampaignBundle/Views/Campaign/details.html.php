@@ -11,18 +11,20 @@ $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'campaign');
 $view['slots']->set("headerTitle", $entity->getName());
 ?>
-<?php $view['slots']->start("actions"); ?>
-<?php if ($permissions['campaign:campaigns:edit']): ?>
-<a href="<?php echo $this->container->get('router')->generate(
-    'mautic_campaign_action', array("objectAction" => "edit", "objectId" => $entity->getId())); ?>"
-   data-toggle="ajax"
-   data-menu-link="#mautic_campaign_index"
-   class="btn btn-default">
-    <i class="fa fa-fw fa-pencil-square-o"></i><?php echo $view["translator"]->trans("mautic.core.form.edit"); ?>
-</a>
+<?php
+$view['slots']->start('actions');
+if ($security->hasEntityAccess($permissions['campaign:campaigns:editown'], $permissions['campaign:campaigns:editother'],
+    $activePage->getCreatedBy())): ?>
+    <a href="<?php echo $this->container->get('router')->generate(
+        'mautic_campaign_action', array("objectAction" => "edit", "objectId" => $entity->getId())); ?>"
+       data-toggle="ajax"
+       data-menu-link="#mautic_campaign_index"
+       class="btn btn-default">
+        <i class="fa fa-fw fa-pencil-square-o"></i><?php echo $view["translator"]->trans("mautic.core.form.edit"); ?>
+    </a>
 <?php endif; ?>
-<?php if ($permissions['campaign:campaigns:delete']): ?>
-<a href="javascript:void(0);"
+<?php if ($security->hasEntityAccess($permissions['campaign:campaigns:deleteown'], $permissions['campaign:campaigns:deleteother'],
+    $activePage->getCreatedBy())): ?><a href="javascript:void(0);"
    onclick="Mautic.showConfirmation(
        '<?php echo $view->escape($view["translator"]->trans("mautic.campaign.confirmdelete",
        array("%name%" => $entity->getName() . " (" . $entity->getId() . ")")), 'js'); ?>',
