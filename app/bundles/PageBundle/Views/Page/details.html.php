@@ -140,11 +140,10 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
             <!-- page detail header -->
             <div class="pr-md pl-md pt-lg pb-lg">
                 <div class="box-layout">
-                    <div class="col-xs-6 va-m">
-                        <h4 class="fw-sb text-primary"><?php echo $activePage->getTitle(); ?></h4>
-                        <p class="text-white dark-lg mb-0">Created on <?php echo $view['date']->toDate($activePage->getDateAdded()); ?></p>
+                    <div class="col-xs-10">
+                        <p class="text-muted"><?php echo $activePage->getMetaDescription(); ?></p>
                     </div>
-                    <div class="col-xs-6 va-m text-right">
+                    <div class="col-xs-2 text-right">
                         <?php switch ($activePage->getPublishStatus()) {
                             case 'published':
                                 $labelColor = "success";
@@ -171,8 +170,8 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                         <table class="table table-bordered table-striped mb-0">
                             <tbody>
                                 <tr>
-                                    <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.core.description'); ?></span></td>
-                                    <td><?php echo $activePage->getMetaDescription(); ?></td>
+                                    <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.core.created'); ?></span></td>
+                                    <td><?php echo $view['date']->toDate($activePage->getDateAdded()); ?></td>
                                 </tr>
                                 <tr>
                                     <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.core.author'); ?></span></td>
@@ -217,8 +216,9 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                         <div class="panel ovf-h bg-auto bg-light-xs">
                             <div class="panel-body box-layout">
                                 <div class="col-xs-8 va-m">
-                                    <h5 class="dark-md fw-sb mb-xs"><?php echo $view['translator']->trans('mautic.page.page.pageviews'); ?></h5>
-                                    <h2 class="fw-b"><?php echo $activePage->getHits(); ?></h2>
+                                    <h5 class="dark-md fw-sb mb-xs">
+                                        <?php echo $view['translator']->trans('mautic.page.page.pageviews'); ?>
+                                    </h5>
                                 </div>
                                 <div class="col-xs-4 va-t text-right">
                                     <h3 class="text-white dark-sm"><span class="fa fa-eye"></span></h3>
@@ -226,7 +226,7 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                             </div>
                             <div class="pt-0 pl-10 pb-0 pr-10">
                                 <div>
-                                    <canvas id="page-views-chart" height="35"></canvas>
+                                    <canvas id="page-views-chart" height="93"></canvas>
                                 </div>
                             </div>
                             <div id="page-views-chart-data" class="hide"><?php echo json_encode($last30); ?></div>
@@ -234,47 +234,44 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                     </div>
                     <div class="col-md-4">
                         <div class="panel ovf-h bg-auto bg-light-xs">
-                            <div class="panel-body box-layout">
+                            <div class="panel-body box-layout pb-0">
                                 <div class="col-xs-8 va-m">
-                                    <h5 class="dark-md fw-sb mb-xs"><?php echo $view['translator']->trans('mautic.page.page.conversions'); ?></h5>
-                                    <h2 class="fw-b">162</h2>
+                                    <h5 class="dark-md fw-sb mb-xs">
+                                        <?php echo $view['translator']->trans('mautic.page.page.new.returning'); ?>
+                                    </h5>
                                 </div>
                                 <div class="col-xs-4 va-t text-right">
-                                    <h3 class="text-white dark-sm"><span class="fa fa-arrows-h"></span></h3>
+                                    <h3 class="text-white dark-sm"><span class="fa fa-bookmark-o"></span></h3>
                                 </div>
                             </div>
-                            <div class="plugin-sparkline text-right pr-md pl-md"
-                            sparkHeight="34"
-                            sparkWidth="180"
-                            sparkType="bar"
-                            sparkBarWidth="8"
-                            sparkBarSpacing="3"
-                            sparkZeroAxis="false"
-                            sparkBarColor="#F86B4F">
-                                156,162,185,102,144,156,150,114,198,117,120,138
+                            <div class="text-center">
+                                <canvas id="returning-rate" width="110" height="110" data-hit-count="<?php echo $activePage->getHits(); ?>" data-unique-hit-count="<?php echo $activePage->getUniqueHits(); ?>"></canvas>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="panel ovf-h bg-auto bg-light-xs">
-                            <div class="panel-body box-layout">
+                            <div class="panel-body box-layout pb-0">
                                 <div class="col-xs-8 va-m">
-                                    <h5 class="dark-md fw-sb mb-xs"><?php echo $view['translator']->trans('mautic.page.page.ads.click'); ?></h5>
-                                    <h2 class="fw-b">192</h2>
+                                    <h5 class="dark-md fw-sb mb-xs">
+                                        <?php echo $view['translator']->trans('mautic.page.page.time.on.page'); ?>
+                                    </h5>
                                 </div>
                                 <div class="col-xs-4 va-t text-right">
-                                    <h3 class="text-white dark-sm"><span class="fa fa-newspaper-o"></span></h3>
+                                    <h3 class="text-white dark-sm"><span class="fa fa-clock-o"></span></h3>
                                 </div>
                             </div>
-                            <div class="plugin-sparkline text-right pr-md pl-md"
-                            sparkHeight="34"
-                            sparkWidth="180"
-                            sparkType="bar"
-                            sparkBarWidth="8"
-                            sparkBarSpacing="3"
-                            sparkZeroAxis="false"
-                            sparkBarColor="#FDB933">
-                                115,195,185,110,182,192,168,185,138,176,119,109
+                            <div class="text-center">
+                                <canvas 
+                                    id="time-rate" 
+                                    width="110" 
+                                    height="110" 
+                                    data-0-1="<?php echo isset($stats['dwellTime'][$activePage->getId()]['0-1']) ? $stats['dwellTime'][$activePage->getId()]['0-1'] : ''; ?>" 
+                                    data-1-5="<?php echo isset($stats['dwellTime'][$activePage->getId()]['1-5']) ? $stats['dwellTime'][$activePage->getId()]['1-5'] : ''; ?>" 
+                                    data-5-10="<?php echo isset($stats['dwellTime'][$activePage->getId()]['5-10']) ? $stats['dwellTime'][$activePage->getId()]['5-10'] : ''; ?>" 
+                                    data-10+="<?php echo isset($stats['dwellTime'][$activePage->getId()]['10+']) ? $stats['dwellTime'][$activePage->getId()]['10+'] : ''; ?>" 
+                                    data-count="<?php echo isset($stats['dwellTime'][$activePage->getId()]['count']) ? $stats['dwellTime'][$activePage->getId()]['count'] : ''; ?>">
+                                </canvas>
                             </div>
                         </div>
                     </div>
@@ -284,8 +281,16 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
 
             <!-- tabs controls -->
             <ul class="nav nav-tabs pr-md pl-md">
-                <li class="active"><a href="#translation-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.page.page.translations'); ?></a></li>
-                <li class=""><a href="#variants-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.page.page.variants'); ?></a></li>
+                <li class="active">
+                    <a href="#translation-container" role="tab" data-toggle="tab">
+                        <?php echo $view['translator']->trans('mautic.page.page.translations'); ?>
+                    </a>
+                </li>
+                <li class="">
+                    <a href="#variants-container" role="tab" data-toggle="tab">
+                        <?php echo $view['translator']->trans('mautic.page.page.variants'); ?>
+                    </a>
+                </li>
             </ul>
             <!--/ tabs controls -->
         </div>
@@ -381,7 +386,7 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                 <!-- header -->
                 <div class="box-layout mb-lg">
                     <!-- form -->
-                    <form action="" class="panel col-xs-8 va-m">
+                    <form action="" class="panel col-xs-10 va-m">
                         <div class="form-control-icon pa-xs">
                             <input type="text" class="form-control bdr-w-0" placeholder="Filter variants...">
                             <span class="the-icon fa fa-search text-muted mt-xs"></span><!-- must below `form-control` -->
@@ -390,7 +395,7 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                     <!--/ form -->
 
                     <!-- button -->
-                    <div class="col-xs-4 va-m text-right">
+                    <div class="col-xs-2 va-m text-right">
                         <a href="#" class="btn btn-primary"><?php echo $view['translator']->trans('mautic.page.page.ab.test.stats'); ?></a>
                     </div>
                 </div>

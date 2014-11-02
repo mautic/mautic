@@ -768,7 +768,9 @@ class EmailModel extends FormModel
             $stat->setDateSent(new \DateTime());
             $stat->setEmail($useEmail['entity']);
             $stat->setLead($this->em->getReference('MauticLeadBundle:Lead', $lead['id']));
-            $stat->setList($this->em->getReference('MauticLeadBundle:LeadList', $listId));
+            if ($listId) {
+                $stat->setList($this->em->getReference('MauticLeadBundle:LeadList', $listId));
+            }
             $stat->setEmailAddress($lead['email']);
             $stat->setTrackingHash($idHash);
             $saveEntities[] = $stat;

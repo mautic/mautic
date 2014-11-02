@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Event\MenuEvent;
 use Mautic\CoreBundle\Event\RouteEvent;
 use Mautic\CoreBundle\Event\IconEvent;
 use Mautic\ApiBundle\Event as ApiEvents;
+use Mautic\InstallBundle\Controller\InstallController;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -139,7 +140,7 @@ class CoreSubscriber extends CommonSubscriber
         }
 
         //update the user's activity marker
-        if (!defined('MAUTIC_ACTIVITY_CHECKED')) {
+        if (!($controller[0] instanceof InstallController) && !defined('MAUTIC_ACTIVITY_CHECKED')) {
             //prevent multiple updates
             $user = $this->factory->getUser();
             //slight delay to prevent too many updates

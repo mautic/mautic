@@ -135,6 +135,7 @@ class CategoryController extends FormController
             'passthroughVars' => array(
                 'activeLink'     => '#mautic_'.$bundle.'category_index',
                 'mauticContent'  => 'category',
+                'route'          => $this->generateUrl('mautic_category_index', $viewParams),
                 'replaceContent' => ($tmpl == 'list') ? 'true': 'false'
             )
         ));
@@ -418,6 +419,78 @@ class CategoryController extends FormController
                     '%id%'   => $objectId
                 )
             );
+        } //else don't do anything
+
+        return $this->postActionRedirect(
+            array_merge($postActionVars, array(
+                'flashes' => $flashes
+            ))
+        );
+    }
+
+    /**
+     * Deletes a group of entities
+     *
+     * @param string $bundle
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function batchDeleteAction($bundle) {
+        $session     = $this->factory->getSession();
+        $page        = $session->get('mautic.category.page', 1);
+        $viewParams  = array(
+            'page'   => $page,
+            'bundle' => $bundle
+        );
+        $returnUrl   = $this->generateUrl('mautic_category_index', $viewParams);
+        $flashes     = array();
+
+        $postActionVars = array(
+            'returnUrl'       => $returnUrl,
+            'viewParameters'  => $viewParams,
+            'contentTemplate' => 'MauticCategoryBundle:Category:index',
+            'passthroughVars' => array(
+                'activeLink'    => 'mautic_'.$bundle.'category_index',
+                'mauticContent' => 'category'
+            )
+        );
+
+        if ($this->request->getMethod() == 'POST') {
+            $model     = $this->factory->getModel('category');
+            $ids       = json_decode($this->request->query->get('ids', array()));
+            $deleteIds = array();
+
+            // Loop over the IDs to perform access checks pre-delete
+            foreach ($ids as $objectId) {
+                $entity = $model->getEntity($objectId);
+
+                if ($entity === null) {
+                    $flashes[] = array(
+                        'type'    => 'error',
+                        'msg'     => 'mautic.category.error.notfound',
+                        'msgVars' => array('%id%' => $objectId)
+                    );
+                } elseif (!$this->factory->getSecurity()->isGranted($bundle.':categories:delete')) {
+                    $flashes[] = $this->accessDenied(true);
+                } elseif ($model->isLocked($entity)) {
+                    $flashes[] = $this->isLocked($postActionVars, $entity, 'category', true);
+                } else {
+                    $deleteIds[] = $objectId;
+                }
+            }
+
+            // Delete everything we are able to
+            if (!empty($deleteIds)) {
+                $entities = $model->deleteEntities($deleteIds);
+
+                $flashes[] = array(
+                    'type' => 'notice',
+                    'msg'  => 'mautic.category.notice.batch_deleted',
+                    'msgVars' => array(
+                        '%count%' => count($entities)
+                    )
+                );
+            }
         } //else don't do anything
 
         return $this->postActionRedirect(

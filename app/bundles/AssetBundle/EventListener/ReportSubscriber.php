@@ -12,6 +12,7 @@ namespace Mautic\AssetBundle\EventListener;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
+use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\ReportEvents;
 
 /**
@@ -29,7 +30,8 @@ class ReportSubscriber extends CommonSubscriber
     {
         return array(
             ReportEvents::REPORT_ON_BUILD    => array('onReportBuilder', 0),
-            ReportEvents::REPORT_ON_GENERATE => array('onReportGenerate', 0)
+            ReportEvents::REPORT_ON_GENERATE => array('onReportGenerate', 0),
+            ReportEvents::REPORT_ON_GRAPH_GENERATE => array('onReportGraphGenerate', 0)
         );
     }
 
@@ -91,6 +93,42 @@ class ReportSubscriber extends CommonSubscriber
         $queryBuilder->leftJoin('a', MAUTIC_TABLE_PREFIX . 'asset_downloads', 'ad', 'a.id = ad.asset_id');
 
         $event->setQueryBuilder($queryBuilder);
-        $event->setContentTemplate('MauticAssetBundle:Report:details.html.php');
+    }
+
+    /**
+     * Initialize the QueryBuilder object to generate reports from
+     *
+     * @param ReportGeneratorEvent $event
+     *
+     * @return void
+     */
+    public function onReportGraphGenerate(ReportGraphEvent $event)
+    {
+        $report = $event->getReport();
+        // Context check, we only want to fire for Asset reports
+        if ($report->getSource() != 'assets')
+        {
+            return;
+        }
+
+        // Generate data for Downloads line graph
+        $unit = 'D';
+        $downloadRepo = $this->factory->getEntityManager()->getRepository('MauticAssetBundle:Download');
+
+        $data = $downloadRepo->prepareDownloadsGraphDataBefore(30, $unit);
+
+        $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+        $queryBuilder->from(MAUTIC_TABLE_PREFIX . 'asset_downloads', 'ad');
+        $queryBuilder->leftJoin('ad', MAUTIC_TABLE_PREFIX . 'assets', 'a', 'a.id = ad.asset_id');
+        $queryBuilder->select('ad.asset_id as asset, ad.date_download as dateDownload');
+        $event->buildWhere($queryBuilder);
+        $queryBuilder->andwhere($queryBuilder->expr()->gte('ad.date_download', ':date'))
+            ->setParameter('date', $data['fromDate']->format('Y-m-d H:i:s'));
+        $downloads = $queryBuilder->execute()->fetchAll();
+
+        $timeStats = $downloadRepo->prepareDownloadsGraphDataAfter($data, $downloads, $unit);
+        $timeStats['name'] = 'mautic.asset.graph.line.downloads';
+
+        $event->setGraph('line', $timeStats);
     }
 }

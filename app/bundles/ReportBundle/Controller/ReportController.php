@@ -13,6 +13,8 @@ namespace Mautic\ReportBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\ReportBundle\Generator\ReportGenerator;
+use Mautic\ReportBundle\Event\ReportGraphEvent;
+use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\HttpFoundation;
 
 /**
@@ -197,6 +199,73 @@ class ReportController extends FormController
                     '%id%'   => $objectId
                 )
             );
+        } //else don't do anything
+
+        return $this->postActionRedirect(
+            array_merge($postActionVars, array(
+                'flashes' => $flashes
+            ))
+        );
+    }
+
+    /**
+     * Deletes a group of entities
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function batchDeleteAction() {
+        $page        = $this->factory->getSession()->get('mautic.report.page', 1);
+        $returnUrl   = $this->generateUrl('mautic_report_index', array('page' => $page));
+        $flashes     = array();
+
+        $postActionVars = array(
+            'returnUrl'       => $returnUrl,
+            'viewParameters'  => array('page' => $page),
+            'contentTemplate' => 'MauticReportBundle:Report:index',
+            'passthroughVars' => array(
+                'activeLink'    => '#mautic_report_index',
+                'mauticContent' => 'report'
+            )
+        );
+
+        if ($this->request->getMethod() == 'POST') {
+            $model     = $this->factory->getModel('report');
+            $ids       = json_decode($this->request->query->get('ids', array()));
+            $deleteIds = array();
+
+            // Loop over the IDs to perform access checks pre-delete
+            foreach ($ids as $objectId) {
+                $entity = $model->getEntity($objectId);
+
+                if ($entity === null) {
+                    $flashes[] = array(
+                        'type'    => 'error',
+                        'msg'     => 'mautic.report.report.error.notfound',
+                        'msgVars' => array('%id%' => $objectId)
+                    );
+                } elseif (!$this->factory->getSecurity()->hasEntityAccess(
+                    'report:reports:deleteown', 'report:reports:deleteother', $entity->getCreatedBy()
+                )) {
+                    $flashes[] = $this->accessDenied(true);
+                } elseif ($model->isLocked($entity)) {
+                    $flashes[] = $this->isLocked($postActionVars, $entity, 'report', true);
+                } else {
+                    $deleteIds[] = $objectId;
+                }
+            }
+
+            // Delete everything we are able to
+            if (!empty($deleteIds)) {
+                $entities = $model->deleteEntities($deleteIds);
+
+                $flashes[] = array(
+                    'type' => 'notice',
+                    'msg'  => 'mautic.report.report.notice.batch_deleted',
+                    'msgVars' => array(
+                        '%count%' => count($entities)
+                    )
+                );
+            }
         } //else don't do anything
 
         return $this->postActionRedirect(
@@ -469,6 +538,10 @@ class ReportController extends FormController
         //set what page currently on so that we can return here after form submission/cancellation
         $this->factory->getSession()->set('mautic.report.' . $entity->getId() . '.page', $reportPage);
 
+        $event = new ReportGraphEvent($entity);
+        $this->factory->getDispatcher()->dispatch(ReportEvents::REPORT_ON_GRAPH_GENERATE, $event);
+        $graphs = $event->getGraphs();
+
         // Audit Log
         $logs = $this->factory->getModel('core.auditLog')->getLogForObject('report', $reportId);
 
@@ -477,6 +550,7 @@ class ReportController extends FormController
                 'result'     => $result,
                 'report'     => $entity,
                 'reportPage' => $page,
+                'graphs'     => $graphs,
                 'logs'       => $logs,
                 'tmpl'       => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                 'limit'      => $limit,

@@ -50,15 +50,11 @@ $view['slots']->set("headerTitle", $activeForm->getName());
 <?php endif; ?>
 <?php $view['slots']->stop(); ?>
 
-<!-- reset container-fluid padding -->
-<div class="mna-md">
-    <!-- start: box layout -->
-    <div class="box-layout">
-        <?php
-        echo $view->render('MauticFormBundle:Form:stats.html.php', array('form' => $activeForm));
-        echo $view->render('MauticFormBundle:Form:copy.html.php', array('form' => $activeForm, 'logs' => $logs));
-        ?>
-    </div>
-    <!--/ end: box layout -->
-</div>
-<!--/ reset container-fluid padding -->
+  <!-- start: box layout -->
+  <div class="box-layout">
+      <?php
+      echo $view->render('MauticFormBundle:Form:stats.html.php', array('form' => $activeForm));
+      echo $view->render('MauticFormBundle:Form:copy.html.php', array('form' => $activeForm, 'logs' => $logs));
+      ?>
+  </div>
+  <!--/ end: box layout -->

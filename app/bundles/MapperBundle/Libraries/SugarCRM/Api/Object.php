@@ -16,8 +16,6 @@ class Object extends Api
             'type_filter'=> 'modules'
         );
         $request_url = sprintf('%s/rest/v10/metadata',$tokenData['sugarcrm_url']);
-
-
         $response = $this->auth->makeRequest($request_url, $parameters);
 
         return $response['modules']['Leads'];

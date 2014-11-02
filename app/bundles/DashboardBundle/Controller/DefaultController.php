@@ -9,8 +9,6 @@
 
 namespace Mautic\DashboardBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Request;
 use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\Intl\Intl;
 use Mautic\CoreBundle\Event\IconEvent;
@@ -18,8 +16,6 @@ use Mautic\CoreBundle\CoreEvents;
 
 /**
  * Class DefaultController
- *
- * @package Mautic\DashboardBundle\Controller
  */
 class DefaultController extends CommonController
 {
@@ -27,20 +23,20 @@ class DefaultController extends CommonController
     /**
      * Generates the default view
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function indexAction()
     {
-    	$model = $this->factory->getModel('dashboard.dashboard');
+        $model = $this->factory->getModel('dashboard.dashboard');
 
-        $sentReadCount = $this->factory->getModel('email.email')->getRepository()->getSentReadCount();
+        $sentReadCount        = $this->factory->getModel('email.email')->getRepository()->getSentReadCount();
         $newReturningVisitors = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit')->getNewReturningVisitorsCount();
-        $weekVisitors = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit')->countVisitors(604800);
-        $allTimeVisitors = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit')->countVisitors(0);
-        $allSentEmails = $this->factory->getEntityManager()->getRepository('MauticEmailBundle:Stat')->getSentCount();
-        $popularPages = $this->factory->getModel('page.page')->getRepository()->getPopularPages();
-        $popularAssets = $this->factory->getModel('asset.asset')->getRepository()->getPopularAssets();
-        $popularCampaigns = $this->factory->getModel('campaign.campaign')->getRepository()->getPopularCampaigns();
+        $weekVisitors         = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit')->countVisitors(604800);
+        $allTimeVisitors      = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit')->countVisitors(0);
+        $allSentEmails        = $this->factory->getEntityManager()->getRepository('MauticEmailBundle:Stat')->getSentCount();
+        $popularPages         = $this->factory->getModel('page.page')->getRepository()->getPopularPages();
+        $popularAssets        = $this->factory->getModel('asset.asset')->getRepository()->getPopularAssets();
+        $popularCampaigns     = $this->factory->getModel('campaign.campaign')->getRepository()->getPopularCampaigns();
 
         $openRate = 0;
 
@@ -59,7 +55,7 @@ class DefaultController extends CommonController
 
         /** @var \Mautic\LeadBundle\Entity\LeadRepository $leadRepository */
         $leadRepository = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:Lead');
-        $leadCountries = $leadRepository->getLeadsCountPerCountries();
+        $leadCountries  = $leadRepository->getLeadsCountPerCountries();
 
         // Convert country names to 2-char code
         foreach ($leadCountries as $leadCountry) {
@@ -93,7 +89,8 @@ class DefaultController extends CommonController
         $leadEventLogRepository = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:LeadEventLog');
         $upcomingEmails = $leadEventLogRepository->getUpcomingEvents(array('type' => 'email.send', 'scheduled' => 1, 'eventType' => 'action'));
 
-        $leadModel      = $this->factory->getModel('lead.lead');
+        $leadModel = $this->factory->getModel('lead.lead');
+
         foreach ($upcomingEmails as &$email) {
             $email['lead'] = $leadModel->getEntity($email['lead_id']);
         }

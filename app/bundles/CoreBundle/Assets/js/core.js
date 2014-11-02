@@ -86,6 +86,10 @@ var Mautic = {
             return Mautic.ajaxifyLink(this, event);
         });
 
+        mQuery(".sidebar-left a[data-toggle='ajax']").on('click.ajax', function (event) {
+            mQuery("html").removeClass('sidebar-open-ltr');
+        });
+
         //initialize forms
         mQuery(container + " form[data-toggle='ajax']").each(function (index) {
             Mautic.ajaxifyForm(mQuery(this).attr('name'));

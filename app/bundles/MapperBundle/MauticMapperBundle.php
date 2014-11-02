@@ -20,3 +20,9 @@ class MauticMapperBundle extends Bundle
 {
 
 }
+
+//import api libraries
+require_once __DIR__.'/Libraries/Salesforce/SalesforceApi.php';
+require_once __DIR__.'/Libraries/SugarCRM/SugarCRMApi.php';
+require_once __DIR__.'/Libraries/vTigerCRM/vTigerCRMApi.php';
+require_once __DIR__.'/Libraries/ZohoCRM/ZohoCRMApi.php';

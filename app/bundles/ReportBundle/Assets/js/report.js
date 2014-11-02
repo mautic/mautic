@@ -9,6 +9,14 @@ Mautic.reportOnLoad = function (container) {
 	if (mQuery('div[id=report_filters]').length) {
 		mQuery('div[id=report_filters]').data('index', mQuery('#report_filters > div').length);
 	}
+
+	Mautic.initGraphs();
+};
+
+Mautic.reportGraphs = {
+	'line': {},
+	'bar': {},
+	'pie': {}
 };
 
 Mautic.preprocessSaveReportForm = function(form) {
@@ -104,4 +112,37 @@ Mautic.checkReportCondition = function(selector) {
 	} else {
 		mQuery('#' + valueInput).prop('disabled', false);
 	}
+};
+
+Mautic.initGraphs = function () {
+	var graphs = mQuery('canvas.graph');
+	mQuery.each(graphs, function(i, graph){
+		var mGraph = mQuery(graph);
+		if (mGraph.hasClass('graph-line')) {
+			var id = mGraph.attr('id');
+			if (typeof Mautic.reportGraphs.line[id] === 'undefined') {
+				var graphData = mQuery.parseJSON(mQuery('#' + id + '-data').text());
+				Mautic.reportGraphs.line[id] = Mautic.renderLineGraph(graph.getContext("2d"), graphData);
+			}
+		}
+	});
+}
+
+Mautic.renderLineGraph = function (canvas, chartData) {
+    var options = {};
+    var data = {
+	    labels: chartData.labels,
+	    datasets: [
+	        {
+	            fillColor: "rgba(151,187,205,0.2)",
+	            strokeColor: "rgba(151,187,205,1)",
+	            pointColor: "rgba(151,187,205,1)",
+	            pointStrokeColor: "#fff",
+	            pointHighlightFill: "#fff",
+	            pointHighlightStroke: "rgba(151,187,205,1)",
+	            data: chartData.values
+	        }
+	    ]
+	};
+    return new Chart(canvas).Line(data, options);
 };

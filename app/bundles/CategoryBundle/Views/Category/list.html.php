@@ -11,23 +11,11 @@ if ($tmpl == 'index')
 ?>
 
 <?php if (count($items)): ?>
-<div class="panel panel-default page-list bdr-t-wdh-0">
-    <div class="panel-body">
-        <div class="box-layout">
-            <div class="col-xs-6 va-m">
-                <?php echo isset($currentRoute) ? $view->render('MauticCoreBundle:Helper:search.html.php', array('searchValue' => $searchValue, 'action' => $currentRoute)) : ''; ?>
-            </div>
-            <div class="col-xs-6 va-m text-right">
-                <button type="button" class="btn btn-sm btn-warning"><i class="fa fa-files-o"></i></button>
-                <button type="button" class="btn btn-sm btn-danger"><i class="fa fa-trash-o"></i></button>
-            </div>
-        </div>
-    </div>
-    <div class="table-responsive scrollable body-white padding-sm page-list">
+    <div class="table-responsive page-list">
             <table class="table table-hover table-striped table-bordered category-list" id="categoryTable">
                 <thead>
                 <tr>
-                    <th class="col-page-actions pl-20">
+                    <th class="visible-md visible-lg col-page-actions pl-20">
                         <div class="checkbox-inline custom-primary">
                             <label class="mb-0 pl-10">
                                 <input type="checkbox" id="customcheckbox-one0" value="1" data-toggle="checkall" data-target="#categoryTable">
@@ -36,6 +24,13 @@ if ($tmpl == 'index')
                         </div>
                     </th>
                     <?php
+
+                    echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                        'sessionVar' => 'category',
+                        'text'       => '',
+                        'class'      => 'col-category-color'
+                    ));
+
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                         'sessionVar' => 'category',
                         'orderBy'    => 'c.title',
@@ -63,7 +58,7 @@ if ($tmpl == 'index')
                 <tbody>
                 <?php foreach ($items as $item): ?>
                     <tr>
-                        <td>
+                        <td class="visible-md visible-lg">
                             <?php
                             echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
                                 'item'      => $item,
@@ -78,6 +73,9 @@ if ($tmpl == 'index')
                                 )
                             ));
                             ?>
+                        </td>
+                        <td>
+                            <span class="label label-default pa-10" style="background: <?php echo $item->getColor(); ?>;"> </span>
                         </td>
                         <td>
                             <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php',array(
@@ -109,7 +107,6 @@ if ($tmpl == 'index')
         )); ?>
         </div>
     </div>
-</div>
 <?php else: ?>
     <?php echo $view->render('MauticCoreBundle:Default:noresults.html.php'); ?>
 <?php endif; ?>

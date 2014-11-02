@@ -303,11 +303,15 @@ class InstallController extends CommonController
             $params       = $configurator->getParameters();
             $tmpl         = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
-            // Check the DB Driver, Name, and User
+            // Check the DB Driver, Name, User, and send stats param
             if ((isset($params['db_driver']) && $params['db_driver'])
                 && (isset($params['db_user']) && $params['db_user'])
-                && (isset($params['db_name']) && $params['db_name'])) {
-                return true;
+                && (isset($params['db_name']) && $params['db_name'])
+                && (isset($params['send_server_stats']) && $params['send_server_stats'])) {
+                // We need to allow users to the final step, so one last check here
+                if (strpos($this->request->getRequestUri(), 'installer/final') === false) {
+                    return true;
+                }
             }
         }
 

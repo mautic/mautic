@@ -39,20 +39,20 @@ $view['slots']->set("headerTitle", $view['translator']->trans('mautic.lead.lead.
 <?php endif; ?>
 
 <div class="panel panel-default bdr-t-wdh-0 mb-0">
-    <div class="panel-body">
-        <div class="box-layout">
-            <div class="col-xs-6 va-m">
-                <?php echo $view->render('MauticCoreBundle:Helper:search.html.php', array('searchValue' => $searchValue, 'action' => $currentRoute)); ?>
-            </div>
-            <div class="col-xs-6 va-m text-right">
-                <div class="btn-group">
-                    <button type="button" class="btn btn-default"><i class="fa fa-upload"></i></button>
-                    <button type="button" class="btn btn-default"><i class="fa fa-archive"></i></button>
-                </div>
-                <button type="button" class="btn btn-danger"><i class="fa fa-trash-o"></i></button>
-            </div>
-        </div>
-    </div>
+    <?php //TODO - Restore these buttons to the listactions when custom content is supported
+    /*<div class="btn-group">
+        <button type="button" class="btn btn-default"><i class="fa fa-upload"></i></button>
+        <button type="button" class="btn btn-default"><i class="fa fa-archive"></i></button>
+    </div>*/ ?>
+    <?php echo $view->render('MauticCoreBundle:Helper:listactions.html.php', array(
+        'searchValue' => $searchValue,
+        'action'      => $currentRoute,
+        'menuLink'    => 'mautic_lead_index',
+        'langVar'     => 'lead.lead',
+        'routeBase'   => 'lead',
+        'delete'      => $permissions['lead:leads:deleteown'] || $permissions['lead:leads:deleteother']
+    )); ?>
     <div class="page-list">
         <?php $view['slots']->output('_content'); ?>
     </div>
+</div>

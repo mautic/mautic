@@ -77,7 +77,7 @@ class DownloadRepository extends CommonRepository
      * Get hit count per day for last 30 days
      *
      * @param integer $assetId
-     * @param integer $amount
+     * @param integer $amount of units
      * @param char $unit: php.net/manual/en/dateinterval.construct.php#refsect1-dateinterval.construct-parameters
      *
      * @return array
@@ -86,10 +86,31 @@ class DownloadRepository extends CommonRepository
      */
     public function getDownloads($assetId, $amount = 30, $unit = 'D')
     {
-        $isTime = '';
+        $data = $this->prepareDownloadsGraphDataBefore($amount, $unit);
+        
+        $query = $this->createQueryBuilder('d');
+        
+        $query->select('IDENTITY(d.asset), d.dateDownload')
+            ->where($query->expr()->eq('IDENTITY(d.asset)', (int) $assetId))
+            ->andwhere($query->expr()->gte('d.dateDownload', ':date'))
+            ->setParameter('date', $data['fromDate']);
 
+        $downloads = $query->getQuery()->getArrayResult();
+
+        return $this->prepareDownloadsGraphDataAfter($data, $downloads, $unit);
+    }
+
+    /**
+     * Get proper date label format depending on what date scope we want to display
+     *
+     * @param char $unit: php.net/manual/en/dateinterval.construct.php#refsect1-dateinterval.construct-parameters
+     *
+     * @return string
+     */
+    public function getDateLabelFromat($unit = 'D')
+    {
+        $format = '';
         if ($unit == 'H') {
-            $isTime = 'T';
             $format = 'H:00';
         } elseif ($unit == 'D') {
             $format = 'jS F';
@@ -100,6 +121,27 @@ class DownloadRepository extends CommonRepository
         } elseif ($unit == 'Y') {
             $format = 'Y';
         }
+        return $format;
+    }
+
+    /**
+     * Prepares data structure of labels and values needed for line graph.
+     * fromDate variable can be used for SQL query as a limit.
+     *
+     * @param integer $amount of units
+     * @param char $unit: php.net/manual/en/dateinterval.construct.php#refsect1-dateinterval.construct-parameters
+     *
+     * @return array
+     */
+    public function prepareDownloadsGraphDataBefore($amount = 30, $unit = 'D')
+    {
+        $isTime = '';
+
+        if ($unit == 'H') {
+            $isTime = 'T';
+        }
+
+        $format = $this->getDateLabelFromat($unit);
 
         $date = new \DateTime();
         $oneUnit = new \DateInterval('P'.$isTime.'1'.$unit);
@@ -111,19 +153,30 @@ class DownloadRepository extends CommonRepository
             $data['values'][$i] = 0;
             $date->sub($oneUnit);
         }
-        
-        $query = $this->createQueryBuilder('d');
-        
-        $query->select('IDENTITY(d.asset), d.dateDownload')
-            ->where($query->expr()->eq('IDENTITY(d.asset)', (int) $assetId))
-            ->andwhere($query->expr()->gte('d.dateDownload', ':date'))
-            ->setParameter('date', $date);
 
-        $downloads = $query->getQuery()->getArrayResult();
+        $data['fromDate'] = $date;
 
+        return $data;
+    }
+
+    /**
+     * Fills into graph data values grouped by time unit
+     *
+     * @param array $data from prepareDownloadsGraphDataBefore
+     * @param array $downloads from database
+     * @param char $unit: php.net/manual/en/dateinterval.construct.php#refsect1-dateinterval.construct-parameters
+     *
+     * @return array
+     */
+    public function prepareDownloadsGraphDataAfter($data, $downloads, $unit)
+    {
         // Group hits by date
         foreach ($downloads as $download) {
-            $oneItem = $download['dateDownload']->format($format);
+            if (is_string($download['dateDownload'])) {
+                $download['dateDownload'] = new \DateTime($download['dateDownload']);
+            }
+
+            $oneItem = $download['dateDownload']->format($this->getDateLabelFromat($unit));
             if (($itemKey = array_search($oneItem, $data['labels'])) !== false) {
                 $data['values'][$itemKey]++;
             }

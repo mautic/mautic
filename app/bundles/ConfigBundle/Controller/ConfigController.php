@@ -132,6 +132,10 @@ class ConfigController extends FormController
         // List config keys we do not want the user to change via the UI
         $doNotChange = array('db_driver', 'db_host', 'db_table_prefix', 'db_name', 'db_user', 'db_password', 'db_path', 'db_port', 'secret');
 
+        // List config keys that are dev mode only
+        if ($this->factory->getEnvironment() == 'prod') {
+            $doNotChange = array_merge($doNotChange, array('transifex_username', 'transifex_password'));
+        }
         // Import the current local configuration, $parameters is defined in this file
         require $this->container->getParameter('kernel.root_dir') . '/config/local.php';
         $localParams = $parameters;

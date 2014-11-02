@@ -316,8 +316,26 @@ class HitRepository extends CommonRepository
                 'sum'     => array_sum($time),
                 'min'     => min($time),
                 'max'     => max($time),
-                'average' => count($time) ? round(array_sum($time) / count($time)) : 0
+                'average' => count($time) ? round(array_sum($time) / count($time)) : 0,
+                '0-1'     => 0,
+                '1-5'     => 0,
+                '5-10'    => 0,
+                '10+'     => 0,
+                'count'   => count($time)
             );
+            if ($time) {
+                foreach ($time as $seconds) {
+                    if ($seconds <= 60) {
+                        $stats[$pid]['0-1']++;
+                    } elseif ($seconds > 60 && $seconds <= 300) {
+                        $stats[$pid]['1-5']++;
+                    } elseif ($seconds > 300 && $seconds <= 600) {
+                        $stats[$pid]['5-10']++;
+                    } elseif ($seconds > 600) {
+                        $stats[$pid]['10+']++;
+                    }
+                }
+            }
         }
 
         return (!is_array($pageIds) && array_key_exists('$pageIds', $stats)) ? $stats[$pageIds] : $stats;

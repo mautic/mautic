@@ -30,7 +30,8 @@ $container->loadFromExtension('security', array(
         'install'              => array(
             'pattern'   => '^/installer',
             'anonymous' => true,
-            'context'   => 'mautic'
+            'context'   => 'mautic',
+            'security'  => false
         ),
         'dev'                  => array(
             'pattern'   => '^/(_(profiler|wdt)|css|images|js)/',

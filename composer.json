@@ -35,7 +35,8 @@
 
         "ircmaxell/password-compat": "~1.0",
         "mpdf/mpdf": "v5.7.2",
-        "phpoffice/phpexcel": "1.8.0"
+        "phpoffice/phpexcel": "1.8.0",
+	    "joomla/http": "~1.1"
 
     },
     "require-dev": {

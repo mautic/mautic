@@ -14,17 +14,17 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
 ?>
 
 <?php if (count($items)): ?>
-    <div class="table-responsive">
-        <table class="table table-hover table-striped table-bordered leadlist-list">
+    <div class="table-responsive page-list">
+        <table class="table table-hover table-striped table-bordered" id="leadListTable">
             <thead>
             <tr>
                 <th class="col-leadlist-actions pl-20">
                     <div class="checkbox-inline custom-primary">
-                    <label class="mb-0 pl-10">
-                        <input type="checkbox" id="customcheckbox-one0" value="1">
-                        <span></span>
-                    </label>
-                </div>
+                        <label class="mb-0 pl-10">
+                            <input type="checkbox" id="customcheckbox-one0" value="1" data-toggle="checkall" data-target="#leadListTable">
+                            <span></span>
+                        </label>
+                    </div>
                 </th>
                 <th class="col-leadlist-name"><?php echo $view['translator']->trans('mautic.lead.list.thead.name'); ?></th>
                 <th class="visible-md visible-lg col-leadlist-descr"><?php echo $view['translator']->trans('mautic.lead.list.thead.descr'); ?></th>
