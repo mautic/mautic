@@ -123,6 +123,19 @@ EOT
         // Extract the archive file now in place
         $zipper->extractTo(dirname($this->getContainer()->getParameter('kernel.root_dir')));
 
+        // Clear the dev and prod cache instances to reset the system
+        $command = $this->getApplication()->find('cache:clear');
+        $input = new ArrayInput(array(
+            'command'          => 'cache:clear',
+            '--env'            => 'prod'
+        ));
+        $command->run($input, $output);
+        $input = new ArrayInput(array(
+            'command'          => 'cache:clear',
+            '--env'            => 'dev'
+        ));
+        $command->run($input, $output);
+
         // TODO - Updates will include a list of deleted files, process those
 
         // TODO - When we have updated the packaging script to include compiled JS files, remove this step
