@@ -144,4 +144,3 @@ if ($security->hasEntityAccess($permissions['report:reports:editown'], $permissi
 </div>
 <!--/ end: box layout -->
 <input type="hidden" name="reportId" id="reportId" value="<?php echo $report->getId(); ?>" />
-
