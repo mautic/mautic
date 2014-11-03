@@ -19,9 +19,9 @@ use Symfony\Component\EventDispatcher\Event;
  */
 class CampaignBuilderEvent extends Event
 {
-    private $leadActions   = array();
-    private $systemActions = array();
-    private $outcomes      = array();
+    private $leadDecisions   = array();
+    private $systemChanges = array();
+    private $actions      = array();
     private $translator;
 
     public function __construct ($translator)
@@ -46,9 +46,9 @@ class CampaignBuilderEvent extends Event
      *                              Mautic\LeadBundle\Entity\Lead $lead
      *                              array $event
      */
-    public function addLeadAction ($key, array $action)
+    public function addLeadDecision ($key, array $action)
     {
-        if (array_key_exists($key, $this->leadActions)) {
+        if (array_key_exists($key, $this->leadDecisions)) {
             throw new InvalidArgumentException("The key, '$key' is already used by another lead action. Please use a different key.");
         }
 
@@ -62,7 +62,7 @@ class CampaignBuilderEvent extends Event
         $action['label']       = $this->translator->trans($action['label']);
         $action['description'] = (isset($action['description'])) ? $this->translator->trans($action['description']) : '';
 
-        $this->leadActions[$key] = $action;
+        $this->leadDecisions[$key] = $action;
     }
 
     /**
@@ -70,19 +70,19 @@ class CampaignBuilderEvent extends Event
      *
      * @return array
      */
-    public function getLeadActions ()
+    public function getLeadDecisions ()
     {
         static $sorted = false;
 
         if (empty($sorted)) {
-            uasort($this->leadActions, function ($a, $b) {
+            uasort($this->leadDecisions, function ($a, $b) {
                 return strnatcasecmp(
                     $a['label'], $b['label']);
             });
             $sorted = true;
         }
 
-        return $this->leadActions;
+        return $this->leadDecisions;
     }
 
 
@@ -103,9 +103,9 @@ class CampaignBuilderEvent extends Event
      *                              Mautic\SystemBundle\Entity\System $lead
      *                              array $event
      */
-    public function addSystemAction ($key, array $action)
+    public function addSystemChange ($key, array $action)
     {
-        if (array_key_exists($key, $this->leadActions)) {
+        if (array_key_exists($key, $this->leadDecisions)) {
             throw new InvalidArgumentException("The key, '$key' is already used by another system action. Please use a different key.");
         }
 
@@ -119,7 +119,7 @@ class CampaignBuilderEvent extends Event
         $action['label']       = $this->translator->trans($action['label']);
         $action['description'] = (isset($action['description'])) ? $this->translator->trans($action['description']) : '';
 
-        $this->systemActions[$key] = $action;
+        $this->systemChanges[$key] = $action;
     }
 
     /**
@@ -127,19 +127,19 @@ class CampaignBuilderEvent extends Event
      *
      * @return array
      */
-    public function getSystemActions ()
+    public function getSystemChanges ()
     {
         static $sorted = false;
 
         if (empty($sorted)) {
-            uasort($this->systemActions, function ($a, $b) {
+            uasort($this->systemChanges, function ($a, $b) {
                 return strnatcasecmp(
                     $a['label'], $b['label']);
             });
             $sorted = true;
         }
 
-        return $this->systemActions;
+        return $this->systemChanges;
     }
 
     /**
@@ -156,9 +156,9 @@ class CampaignBuilderEvent extends Event
      *                              Mautic\LeadBundle\Entity\Lead $lead
      *                              array $event
      */
-    public function addOutcome ($key, array $outcome)
+    public function addAction ($key, array $outcome)
     {
-        if (array_key_exists($key, $this->outcomes)) {
+        if (array_key_exists($key, $this->actions)) {
             throw new InvalidArgumentException("The key, '$key' is already used by another outcome. Please use a different key.");
         }
 
@@ -174,27 +174,27 @@ class CampaignBuilderEvent extends Event
         $outcome['label']       = $this->translator->trans($outcome['label']);
         $outcome['description'] = (isset($outcome['description'])) ? $this->translator->trans($outcome['description']) : '';
 
-        $this->outcomes[$key] = $outcome;
+        $this->actions[$key] = $outcome;
     }
 
     /**
-     * Get outcomes
+     * Get actions
      *
      * @return array
      */
-    public function getOutcomes ()
+    public function getActions ()
     {
         static $sorted = false;
 
         if (empty($sorted)) {
-            uasort($this->outcomes, function ($a, $b) {
+            uasort($this->actions, function ($a, $b) {
                 return strnatcasecmp(
                     $a['label'], $b['label']);
             });
             $sorted = true;
         }
 
-        return $this->outcomes;
+        return $this->actions;
     }
 
     /**

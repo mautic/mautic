@@ -17,9 +17,6 @@
 
     <?php echo $view['form']->widget($form['canvasSettings']['droppedX']); ?>
     <?php echo $view['form']->widget($form['canvasSettings']['droppedY']); ?>
-    <?php echo $view['form']->widget($form['canvasSettings']['yes']); ?>
-    <?php echo $view['form']->widget($form['canvasSettings']['no']); ?>
-    <?php echo $view['form']->widget($form['canvasSettings']['bottom']); ?>
 
     <?php echo $view['form']->row($form['name']); ?>
 

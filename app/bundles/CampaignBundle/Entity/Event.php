@@ -66,7 +66,7 @@ class Event
     private $description;
 
     /**
-     * @ORM\Column(name="event_order", type="decimal", scale=2)
+     * @ORM\Column(name="event_order", type="integer")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"campaignDetails"})

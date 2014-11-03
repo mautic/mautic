@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class EventController extends CommonFormController
 {
-    private $supportedEventTypes = array('leadaction', 'systemaction', 'outcome');
+    private $supportedEventTypes = array('decision', 'systemaction', 'action');
 
     /**
      * Generates new form and processes post data

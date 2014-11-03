@@ -29,10 +29,8 @@ class CampaignController extends FormController
         $permissions = $this->factory->getSecurity()->isGranted(array(
             'campaign:campaigns:view',
             'campaign:campaigns:create',
-            'campaign:campaigns:editown',
-            'campaign:campaigns:editother',
-            'campaign:campaigns:deleteown',
-            'campaign:campaigns:deleteother',
+            'campaign:campaigns:edit',
+            'campaign:campaigns:delete',
             'campaign:campaigns:publish'
 
         ), "RETURN_ARRAY");
@@ -103,8 +101,7 @@ class CampaignController extends FormController
                 'page'        => $page,
                 'limit'       => $limit,
                 'permissions' => $permissions,
-                'tmpl'        => $tmpl,
-                'security'    => $this->factory->getSecurity()
+                'tmpl'        => $tmpl
             ),
             'contentTemplate' => 'MauticCampaignBundle:Campaign:list.html.php',
             'passthroughVars' => array(
@@ -132,10 +129,8 @@ class CampaignController extends FormController
         $permissions = $this->factory->getSecurity()->isGranted(array(
             'campaign:campaigns:view',
             'campaign:campaigns:create',
-            'campaign:campaigns:editown',
-            'campaign:campaigns:editother',
-            'campaign:campaigns:deleteown',
-            'campaign:campaigns:deleteother',
+            'campaign:campaigns:edit',
+            'campaign:campaigns:delete',
             'campaign:campaigns:publish'
         ), "RETURN_ARRAY");
 
@@ -231,10 +226,18 @@ class CampaignController extends FormController
                         $valid = false;
                     } else {
                         $connections = $session->get('mautic.campaigns.connections');
-                        $model->setEvents($entity, $events, $connections, $deletedEvents);
+                        $events = $model->setEvents($entity, $events, $connections, $deletedEvents);
 
                         //form is valid so process the data
                         $model->saveEntity($entity);
+
+                        //trigger the first action in dripflow if published and first event is an action
+                        if ($entity->isPublished()) {
+                            $firstEvent = reset($events);
+                            if ($firstEvent->getEventType() == 'action') {
+                                $model->triggerEvent($firstEvent->getType());
+                            }
+                        }
 
                         $this->request->getSession()->getFlashBag()->add(
                             'notice',
@@ -302,8 +305,8 @@ class CampaignController extends FormController
                 'activeLink'    => '#mautic_campaign_index',
                 'mauticContent' => 'campaign',
                 'route'         => $this->generateUrl('mautic_campaign_action', array(
-                        'objectAction' => (!empty($valid) ? 'edit' : 'new'), //valid means a new form was applied
-                        'objectId'     => $entity->getId())
+                    'objectAction' => (!empty($valid) ? 'edit' : 'new'), //valid means a new form was applied
+                    'objectId'     => $entity->getId())
                 )
             )
         ));

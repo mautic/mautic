@@ -265,9 +265,9 @@ class LeadSubscriber extends CommonSubscriber
      */
     public function onUserDelete(UserEvent $event)
     {
-        $this->factory->getModel('lead.lead')->disassociateOwner($event->getUser()->getId());
+        //not needed as set onDelete="SET NULL" on the entity association
+        //$this->factory->getModel('lead.lead')->disassociateOwner($event->getUser()->getId());
     }
-
 
     /**
      * Add a note entry to the audit log

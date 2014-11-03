@@ -23,8 +23,12 @@ class CampaignEventHelper
      *
      * @return bool
      */
-    public static function validateLeadChangeTrigger(CampaignLeadChangeEvent $passthrough, $event)
+    public static function validateLeadChangeTrigger(CampaignLeadChangeEvent $passthrough = null, $event)
     {
+        if ($passthrough == null) {
+            return true;
+        }
+        
         $limitToCampaigns = $event['properties']['campaigns'];
         $action           = $event['properties']['action'];
 
@@ -67,7 +71,11 @@ class CampaignEventHelper
 
         if (!empty($removeFromCampaigns)) {
             foreach ($removeFromCampaigns as $c) {
-                $campaignModel->removeLead($em->getReference('MauticCampaignBundle:Campaign', $c), $lead);
+                if ($c == 'this') {
+                    $c = $event['campaign']['id'];
+                }
+
+                $campaignModel->removeLead($em->getReference('MauticCampaignBundle:Campaign', $c), $lead, true);
             }
             $leadsModified = true;
         }

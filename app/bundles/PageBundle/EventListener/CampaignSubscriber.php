@@ -49,7 +49,7 @@ class CampaignSubscriber extends CommonSubscriber
             'formType'    => 'campaigntrigger_pagehit',
             'callback'    => '\Mautic\PageBundle\Helper\CampaignEventHelper::onPageHit'
         );
-        $event->addLeadAction('page.pagehit', $pageHitTrigger);
+        $event->addLeadDecision('page.pagehit', $pageHitTrigger);
     }
 
     /**

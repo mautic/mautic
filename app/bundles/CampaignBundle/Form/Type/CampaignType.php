@@ -27,6 +27,7 @@ class CampaignType extends AbstractType
 {
 
     private $translator;
+    private $em;
 
     /**
      * @param MauticFactory $factory
@@ -34,6 +35,7 @@ class CampaignType extends AbstractType
     public function __construct(MauticFactory $factory) {
         $this->translator = $factory->getTranslator();
         $this->security   = $factory->getSecurity();
+        $this->em         = $factory->getEntityManager();
     }
 
     /**
@@ -69,7 +71,7 @@ class CampaignType extends AbstractType
             $data     = false;
         } else {
             $readonly = false;
-            $data     = true;
+            $data     = false;
         }
 
         $builder->add('isPublished', 'button_group', array(
@@ -118,6 +120,26 @@ class CampaignType extends AbstractType
         if (!empty($options["action"])) {
             $builder->setAction($options["action"]);
         }
+
+        //add lead lists
+        $transformer = new \Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer(
+            $this->em,
+            'MauticLeadBundle:LeadList',
+            'id',
+            true
+        );
+        $builder->add(
+            $builder->create('lists', 'leadlist_choices', array(
+                'label'      => 'mautic.campaign.form.list',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array(
+                    'class' => 'form-control'
+                ),
+                'multiple' => true,
+                'expanded' => false
+            ))
+                ->addModelTransformer($transformer)
+        );
 
         $builder->add('buttons', 'form_buttons', array(
             'pre_extra_buttons' => array(

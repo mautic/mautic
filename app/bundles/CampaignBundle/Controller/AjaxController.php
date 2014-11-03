@@ -37,9 +37,9 @@ class AjaxController extends CommonAjaxController
         $remove         = InputHelper::int($request->request->get('remove'));
 
         if ($remove) {
-            unset($connections[$source][$sourceEndpoint]);
+            unset($connections[$source][$sourceEndpoint][$target]);
         } else {
-            $connections[$source][$sourceEndpoint] = $target;
+            $connections[$source][$sourceEndpoint][$target] = $targetEndpoint;
         }
 
         $session->set('mautic.campaigns.connections', $connections);
@@ -47,20 +47,24 @@ class AjaxController extends CommonAjaxController
         //update the source's canvasSettings
         $events = $session->get('mautic.campaigns.add', array());
         if (isset($events[$source])) {
-            $events[$source]['canvasSettings'][$sourceEndpoint]['targetId']       = $target;
-            $events[$source]['canvasSettings'][$sourceEndpoint]['targetEndpoint'] = $targetEndpoint;
+            $events[$source]['canvasSettings']['endpoints'][$sourceEndpoint][$target] = $targetEndpoint;
             $session->set('mautic.campaigns.add', $events);
         }
 
         return $this->sendJsonResponse(array('connections' => $connections, 'events' => $events));
     }
 
+    /**
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
     protected function updateCoordinatesAction (Request $request)
     {
         $session = $this->factory->getSession();
         $x       = InputHelper::int($request->request->get('droppedX'));
         $y       = InputHelper::int($request->request->get('droppedY'));
-        $id      = InputHelper::int($request->request->get('eventId'));
+        $id      = str_replace('CampaignEvent_', '', InputHelper::clean($request->request->get('eventId')));
 
         //update the source's canvasSettings
         $events = $session->get('mautic.campaigns.add', array());

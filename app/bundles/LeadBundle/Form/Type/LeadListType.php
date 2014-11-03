@@ -23,13 +23,13 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  */
 class LeadListType extends AbstractType
 {
-    private $factory;
+    private $model;
 
     /**
      * @param MauticFactory       $factory
      */
     public function __construct(MauticFactory $factory) {
-        $this->factory    = $factory;
+        $this->model = $factory->getModel('lead.list');;
     }
 
     /**
@@ -38,7 +38,7 @@ class LeadListType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         /** @var \Mautic\LeadBundle\Model\ListModel $model */
-        $model = $this->factory->getModel('lead.list');
+        $model = $this->model;
         $resolver->setDefaults(array(
             'choices' => function (Options $options) use ($model) {
                 $lists = (empty($options['global_only'])) ? $model->getUserLists() : $model->getGlobalLists();

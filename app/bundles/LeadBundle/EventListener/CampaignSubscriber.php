@@ -50,7 +50,7 @@ class CampaignSubscriber extends CommonSubscriber
             'label'        => 'mautic.lead.lead.events.leadcreated',
             'description'  => 'mautic.lead.lead.events.leadcreated_descr'
         );
-        $event->addSystemAction('lead.created', $trigger);
+        $event->addSystemChange('lead.created', $trigger);
 
         $trigger = array(
             'label'        => 'mautic.lead.lead.events.pointchange',
@@ -58,7 +58,7 @@ class CampaignSubscriber extends CommonSubscriber
             'formType'     => 'leadpoints_trigger',
             'callback'     => '\Mautic\LeadBundle\Helper\CampaignEventHelper::validatePointChange'
         );
-        $event->addSystemAction('lead.pointchange', $trigger);
+        $event->addSystemChange('lead.pointchange', $trigger);
 
         $trigger = array(
             'label'        => 'mautic.lead.lead.events.listchange',
@@ -66,7 +66,7 @@ class CampaignSubscriber extends CommonSubscriber
             'formType'     => 'leadlist_trigger',
             'callback'     => '\Mautic\LeadBundle\Helper\CampaignEventHelper::validateListChange'
         );
-        $event->addSystemAction('lead.listchange', $trigger);
+        $event->addSystemChange('lead.listchange', $trigger);
 
         //Add actions
         $action = array(
@@ -75,7 +75,7 @@ class CampaignSubscriber extends CommonSubscriber
             'formType'    => 'leadpoints_action',
             'callback'    => '\Mautic\LeadBundle\Helper\CampaignEventHelper::changePoints'
         );
-        $event->addOutcome('lead.changepoints', $action);
+        $event->addAction('lead.changepoints', $action);
 
         $action = array(
             'label'        => 'mautic.lead.lead.events.changelist',
@@ -83,7 +83,7 @@ class CampaignSubscriber extends CommonSubscriber
             'formType'     => 'leadlist_action',
             'callback'     => '\Mautic\LeadBundle\Helper\CampaignEventHelper::changeLists'
         );
-        $event->addOutcome('lead.changelist', $action);
+        $event->addAction('lead.changelist', $action);
     }
 
     /**

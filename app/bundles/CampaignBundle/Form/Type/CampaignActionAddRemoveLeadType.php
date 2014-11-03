@@ -41,7 +41,8 @@ class CampaignActionAddRemoveLeadType extends AbstractType
             'attr'       => array(
                 'class' => 'form-control'
             ),
-            'required'   => false
+            'required'   => false,
+            'include_this' => true
         ));
     }
 

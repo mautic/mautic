@@ -93,7 +93,7 @@
     white-space: nowrap;
 }
 
-.list-campaign-leadaction,  a.list-campaign-leadaction {
+.list-campaign-decision,  a.list-campaign-decision {
     background-color: #faebcc;
     border: solid 1px #8a6d3b;
 }
@@ -104,7 +104,7 @@
     color: #fff;
 }
 
-.list-campaign-outcome, a.list-campaign-outcome {
+.list-campaign-action, a.list-campaign-action {
     background-color: #47558f;
     border: solid 1px #343b68;
     color: #fff;
@@ -114,4 +114,10 @@
     position: absolute;
     top: -15px;
     right: 0;
+}
+
+.campaign-builder .list-group-item.ui-draggable-dragging {
+    width: 206px;
+    padding: 10px 15px;
+    border-radius: 6px;
 }

@@ -750,7 +750,7 @@ class LeadController extends FormController
                 'lead:leads:editown', 'lead:leads:editother', $lead->getOwner()
             )) {
             /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */
-            $campaignModel = $this->factory->getModel('campaign');
+            $campaignModel  = $this->factory->getModel('campaign');
             $campaigns      = $campaignModel->getPublishedCampaigns(true);
             $leadsCampaigns = $campaignModel->getLeadCampaigns($lead, true);
 

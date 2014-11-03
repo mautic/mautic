@@ -11,6 +11,7 @@ namespace Mautic\CampaignBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
@@ -21,20 +22,14 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 class CampaignListType extends AbstractType
 {
 
-    private $choices = array();
+    private $model;
 
     /**
      * @param MauticFactory $factory
      */
     public function __construct(MauticFactory $factory) {
-        $campaigns = $factory->getModel('campaign')->getRepository()->getPublishedCampaigns(null, null, true);
-
-        foreach ($campaigns as $campaign) {
-            $this->choices[$campaign['id']] = $campaign['id'] . ':' . $campaign['name'];
-        }
-
-        //sort by language
-        ksort($this->choices);
+        $this->model = $factory->getModel('campaign');
+        $this->thisString = $factory->getTranslator()->trans('mautic.campaign.form.thiscampaign');
     }
 
     /**
@@ -42,12 +37,30 @@ class CampaignListType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
+        $model = $this->model;
+        $msg   = $this->thisString;
         $resolver->setDefaults(array(
-            'choices'       => $this->choices,
+            'choices'       => function (Options $options) use ($model, $msg) {
+                $choices = array();
+                $campaigns = $model->getRepository()->getPublishedCampaigns(null, null, true);
+                foreach ($campaigns as $campaign) {
+                    $choices[$campaign['id']] = $campaign['id'] . ':' . $campaign['name'];
+                }
+
+                //sort by language
+                ksort($choices);
+
+                if ($options['include_this']) {
+                    $choices = array('this' => $msg) + $choices;
+                }
+
+                return $choices;
+            },
             'empty_value'   => false,
             'expanded'      => false,
             'multiple'      => true,
-            'required'      => false
+            'required'      => false,
+            'include_this'  => false
         ));
     }
 

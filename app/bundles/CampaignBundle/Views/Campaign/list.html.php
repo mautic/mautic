@@ -54,16 +54,9 @@ $view->extend('MauticCampaignBundle:Campaign:index.html.php');
                         <?php
                         echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
                             'item'      => $item,
-                            'edit'      => $security->hasEntityAccess(
-                                    $permissions['campaign:campaigns:editown'],
-                                    $permissions['campaign:campaigns:editother'],
-                                    $item->getCreatedBy()
-                            ),
+                            'edit'      => $permissions['campaign:campaigns:edit'],
                             'clone'     => $permissions['campaign:campaigns:create'],
-                            'delete'    => $security->hasEntityAccess(
-                                    $permissions['campaign:campaigns:deleteown'],
-                                    $permissions['campaign:campaigns:deleteother'],
-                                    $item->getCreatedBy()),
+                            'delete'    => $permissions['campaign:campaigns:delete'],
                             'routeBase' => 'campaign',
                             'menuLink'  => 'mautic_campaign_index',
                             'langVar'   => 'campaign'

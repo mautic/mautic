@@ -25,6 +25,10 @@ class CampaignEventHelper
      */
     public static function onPageHit($factory, $passthrough, $event)
     {
+        if ($passthrough == null) {
+            return true;
+        }
+
         $pageHit = $passthrough->getPage();
 
         if ($pageHit instanceof Page) {
