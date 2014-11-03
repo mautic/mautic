@@ -51,48 +51,50 @@ $view['slots']->set("headerTitle", $view['translator']->trans('mautic.user.accou
 
     <!-- container -->
     <div class="col-md-9 bg-auto height-auto bdr-l">
-        <?php echo $view['form']->start($userForm); ?>
-        <div class="tab-pane fade in active bdr-rds-0 bdr-w-0" id="profile">
-            <div class="pa-md bg-auto bg-light-xs bdr-b">
-                <h4 class="fw-sb"><?php echo $view['translator']->trans('mautic.user.account.header.details'); ?></h4>
-            </div>
-            <div class="pa-md">
-                <div class="col-md-6">
-                    <?php
-                    echo ($permissions['editUsername']) ? $view['form']->row($userForm['username']) : $view['form']->row($userForm['username_unbound']);
-                    echo ($permissions['editName']) ? $view['form']->row($userForm['firstName']) : $view['form']->row($userForm['firstName_unbound']);
-                    echo ($permissions['editName']) ? $view['form']->row($userForm['lastName']) : $view['form']->row($userForm['lastName_unbound']);
-                    echo ($permissions['editPosition']) ? $view['form']->row($userForm['position']) : $view['form']->row($userForm['position_unbound']);
-                    echo ($permissions['editEmail']) ? $view['form']->row($userForm['email']) : $view['form']->row($userForm['email_unbound']);
-                    ?>
-                </div>
-                <div class="col-md-6">
-                    <?php
-                    echo $view['form']->row($userForm['timezone']);
-                    echo $view['form']->row($userForm['locale']);
-                    echo $view['form']->row($userForm['currentPassword']);
-                    echo $view['form']->row($userForm['plainPassword']['password']);
-                    echo $view['form']->row($userForm['plainPassword']['confirm']);
-                    ?>
-                </div>
-            </div>
-        </div>
-        <?php echo $view['form']->end($userForm); ?>
-
-        <?php if ($permissions['apiAccess']): ?>
-            <div class="tab-pane fade in active bdr-rds-0 bdr-w-0" id="clients">
+        <div class="tab-content">
+            <div class="tab-pane fade in active bdr-rds-0 bdr-w-0" id="profile">
+                <?php echo $view['form']->start($userForm); ?>
                 <div class="pa-md bg-auto bg-light-xs bdr-b">
-                    <h4 class="fw-sb"><?php echo $view['translator']->trans('mautic.user.account.header.authorizedclients'); ?></h4>
+                    <h4 class="fw-sb"><?php echo $view['translator']->trans('mautic.user.account.header.details'); ?></h4>
                 </div>
                 <div class="pa-md">
-                    <?php echo $view['actions']->render(
-                        new Symfony\Component\HttpKernel\Controller\ControllerReference(
-                            'MauticApiBundle:Client:authorizedClients'
-                        ));
-                    ?>
+                    <div class="col-md-6">
+                        <?php
+                        echo ($permissions['editUsername']) ? $view['form']->row($userForm['username']) : $view['form']->row($userForm['username_unbound']);
+                        echo ($permissions['editName']) ? $view['form']->row($userForm['firstName']) : $view['form']->row($userForm['firstName_unbound']);
+                        echo ($permissions['editName']) ? $view['form']->row($userForm['lastName']) : $view['form']->row($userForm['lastName_unbound']);
+                        echo ($permissions['editPosition']) ? $view['form']->row($userForm['position']) : $view['form']->row($userForm['position_unbound']);
+                        echo ($permissions['editEmail']) ? $view['form']->row($userForm['email']) : $view['form']->row($userForm['email_unbound']);
+                        ?>
+                    </div>
+                    <div class="col-md-6">
+                        <?php
+                        echo $view['form']->row($userForm['timezone']);
+                        echo $view['form']->row($userForm['locale']);
+                        echo $view['form']->row($userForm['currentPassword']);
+                        echo $view['form']->row($userForm['plainPassword']['password']);
+                        echo $view['form']->row($userForm['plainPassword']['confirm']);
+                        ?>
+                    </div>
                 </div>
+                <?php echo $view['form']->end($userForm); ?>
             </div>
-        <?php endif; ?>
+
+            <?php if ($permissions['apiAccess']): ?>
+                <div class="tab-pane fade bdr-rds-0 bdr-w-0" id="clients">
+                    <div class="pa-md bg-auto bg-light-xs bdr-b">
+                        <h4 class="fw-sb"><?php echo $view['translator']->trans('mautic.user.account.header.authorizedclients'); ?></h4>
+                    </div>
+                    <div class="pa-md">
+                        <?php echo $view['actions']->render(
+                            new Symfony\Component\HttpKernel\Controller\ControllerReference(
+                                'MauticApiBundle:Client:authorizedClients'
+                            ));
+                        ?>
+                    </div>
+                </div>
+            <?php endif; ?>
+        </div>
     </div>
     <!--/ end: container -->
 </div>
