@@ -28,7 +28,7 @@ $view['slots']->set("headerTitle", $view['translator']->trans('mautic.campaigns.
         'menuLink'    => 'mautic_campaign_index',
         'langVar'     => 'campaign.campaign',
         'routeBase'   => 'campaign',
-        'delete'      => $permissions['campaign:campaigns:deleteown'] || $permissions['campaign:campaigns:deleteother']
+        'delete'      => $permissions['campaign:campaigns:delete']
     )); ?>
     <div class="page-list">
 		<?php $view['slots']->output('_content'); ?>

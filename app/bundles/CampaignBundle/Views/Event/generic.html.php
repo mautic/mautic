@@ -8,8 +8,7 @@
  */
 
 //for defining the jsPlumb anchors
-$class = ($event['eventType'] == 'leadaction') ? 'decision' : 'nondecision';
-
+$class = ($event['eventType'] == 'decision') ? 'list-campaign-decision' : 'list-campaign-nondecision list-campaign-' . $event['eventType'];
 
 if (!empty($deleted)):
     $action    = 'undelete';
@@ -29,7 +28,7 @@ $cs    = $event['canvasSettings'];
 $style = (!empty($cs['droppedX'])) ? ' style="' . "position: absolute; top: {$cs['droppedY']}px; left: {$cs['droppedX']}px;" . '"' : '';
 ?>
 
-<div <?php echo $style; ?> id="CampaignEvent_<?php echo $event['id'] ?>" class="draggable list-campaign-event list-campaign-<?php echo $class; ?> list-campaign-<?php echo $event['eventType']; ?>">
+<div <?php echo $style; ?> id="CampaignEvent_<?php echo $event['id'] ?>" class="draggable list-campaign-event <?php echo $class; ?>">
     <span class="campaign-event-name"><?php echo $event['name']; ?></span>
 
     <div class="campaign-event-buttons hide">

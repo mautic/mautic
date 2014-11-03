@@ -9,8 +9,6 @@
 
 namespace Mautic\CampaignBundle\EventListener;
 
-//todo - subscribe to lead delete event to remove records pertaining to the specific lead
-
 use Mautic\ApiBundle\Event\RouteEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Event as MauticEvents;
@@ -35,8 +33,8 @@ class CampaignSubscriber extends CommonSubscriber
         return array(
             CampaignEvents::CAMPAIGN_POST_SAVE     => array('onCampaignPostSave', 0),
             CampaignEvents::CAMPAIGN_POST_DELETE   => array('onCampaignDelete', 0),
-            //CampaignEvents::CAMPAIGN_ON_BUILD      => array('onCampaignBuild', 0),
-            //CampaignEvents::CAMPAIGN_ON_LEADCHANGE => array('onCampaignLeadChange', 0),
+            CampaignEvents::CAMPAIGN_ON_BUILD      => array('onCampaignBuild', 0),
+            CampaignEvents::CAMPAIGN_ON_LEADCHANGE => array('onCampaignLeadChange', 0),
             LeadEvents::TIMELINE_ON_GENERATE => array('onTimelineGenerate', 0)
         );
     }
@@ -95,7 +93,7 @@ class CampaignSubscriber extends CommonSubscriber
             'formType'     => 'campaigntrigger_leadchange',
             'callback'     => '\Mautic\CampaignBundle\Helper\CampaignEventHelper::validateLeadChangeTrigger'
         );
-        $event->addLeadAction('campaign.leadchange', $leadChangeTrigger);
+        $event->addSystemChange('campaign.leadchange', $leadChangeTrigger);
 
         //Add action to actually add/remove lead to a specific lists
         $addRemoveLeadAction = array(
@@ -104,7 +102,7 @@ class CampaignSubscriber extends CommonSubscriber
             'formType'     => 'campaignaction_addremovelead',
             'callback'     => '\Mautic\CampaignBundle\Helper\CampaignEventHelper::addRemoveLead'
         );
-        $event->addLeadAction('campaign.addremovelead', $addRemoveLeadAction);
+        $event->addAction('campaign.addremovelead', $addRemoveLeadAction);
     }
 
     /**

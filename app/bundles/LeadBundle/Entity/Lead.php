@@ -37,7 +37,7 @@ class Lead extends FormEntity
 
     /**
      * @ORM\ManyToOne(targetEntity="Mautic\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="owner_id", referencedColumnName="id", nullable=true)
+     * @ORM\JoinColumn(name="owner_id", referencedColumnName="id", nullable=true, onDelete="SET NULL")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"leadDetails"})

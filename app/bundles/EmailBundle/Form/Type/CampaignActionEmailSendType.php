@@ -26,7 +26,7 @@ class CampaignActionEmailSendType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        $builder->add('emails', 'email_list', array(
+        $builder->add('email', 'email_list', array(
             'label'      => 'mautic.email.form.sendemails',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array(

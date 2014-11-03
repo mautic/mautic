@@ -32,10 +32,6 @@ class EventCanvasSettingsType extends AbstractType
         $builder->add('droppedX', 'hidden');
 
         $builder->add('droppedY', 'hidden');
-
-        $builder->add('yes', 'campaignevent_canvassettings_endpoints');
-        $builder->add('no', 'campaignevent_canvassettings_endpoints');
-        $builder->add('bottom', 'campaignevent_canvassettings_endpoints');
     }
 
     /**

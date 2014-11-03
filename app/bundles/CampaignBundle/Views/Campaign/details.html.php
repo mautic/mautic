@@ -13,8 +13,7 @@ $view['slots']->set("headerTitle", $entity->getName());
 ?>
 <?php
 $view['slots']->start('actions');
-if ($security->hasEntityAccess($permissions['campaign:campaigns:editown'], $permissions['campaign:campaigns:editother'],
-    $activePage->getCreatedBy())): ?>
+if ($permissions['campaign:campaigns:edit']): ?>
     <a href="<?php echo $this->container->get('router')->generate(
         'mautic_campaign_action', array("objectAction" => "edit", "objectId" => $entity->getId())); ?>"
        data-toggle="ajax"
@@ -23,8 +22,7 @@ if ($security->hasEntityAccess($permissions['campaign:campaigns:editown'], $perm
         <i class="fa fa-fw fa-pencil-square-o"></i><?php echo $view["translator"]->trans("mautic.core.form.edit"); ?>
     </a>
 <?php endif; ?>
-<?php if ($security->hasEntityAccess($permissions['campaign:campaigns:deleteown'], $permissions['campaign:campaigns:deleteother'],
-    $activePage->getCreatedBy())): ?><a href="javascript:void(0);"
+<?php if ($permissions['campaign:campaigns:delete']): ?><a href="javascript:void(0);"
    onclick="Mautic.showConfirmation(
        '<?php echo $view->escape($view["translator"]->trans("mautic.campaign.confirmdelete",
        array("%name%" => $entity->getName() . " (" . $entity->getId() . ")")), 'js'); ?>',
@@ -105,7 +103,7 @@ if ($security->hasEntityAccess($permissions['campaign:campaigns:editown'], $perm
             </div>
             <!--/ campaign detail collapseable toggler -->
 
-            <!-- 
+            <!--
             some stats: need more input on what type of campaign data to show.
             delete if it is not require
             -->
@@ -473,10 +471,10 @@ if ($security->hasEntityAccess($permissions['campaign:campaigns:editown'], $perm
 
     <!-- right section -->
     <div class="col-md-3 bg-white bdr-l height-auto">
-        
+
         <!-- recent activity -->
         <?php echo $view->render('MauticCoreBundle:Default:recentactivity.html.php', array('logs' => $logs)); ?>
-        
+
     </div>
     <!--/ right section -->
 </div>

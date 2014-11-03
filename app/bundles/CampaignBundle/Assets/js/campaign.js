@@ -16,6 +16,8 @@ Mautic.campaignOnLoad = function (container) {
     }
 
     if (mQuery('#CampaignEventPanel').length) {
+        //used to prevent unnecessary ajax calls back to server when re-establishing connections on load
+        Mautic.campaignBuilderIgnoreUpdateConnectionCallback = false;
 
         //activate jsPlumb
         jsPlumb.ready(function() {
@@ -47,7 +49,9 @@ Mautic.campaignOnLoad = function (container) {
             };
 
             Mautic.campaignBuilderInstance.bind("connection", function(info, originalEvent) {
-                Mautic.updateCampaignConnections(info);
+                if (!Mautic.campaignBuilderIgnoreUpdateConnectionCallback) {
+                    Mautic.updateCampaignConnections(info);
+                }
             });
 
             Mautic.campaignBuilderInstance.bind("connectionDetached", function(info, originalEvent) {
@@ -68,7 +72,7 @@ Mautic.campaignOnLoad = function (container) {
                     height: 21,
                     fillStyle: "#d5d4d4"
                 },
-                connector:"Straight",
+                connector: ["Bezier", { curviness: 25 } ],
                 connectorOverlays: Mautic.campaignOverlayOptions,
                 isTarget: true,
                 dropOptions: {
@@ -106,7 +110,8 @@ Mautic.campaignOnLoad = function (container) {
                     lineWidth: 4
                 },
                 connectorOverlays: Mautic.campaignOverlayOptions,
-                connector:"Straight"
+                connector: ["Bezier", { curviness: 25 } ],
+                maxConnections: 10
             };
 
             Mautic.campaignBuilderYesAnchor = [0, 1, 0, 1, 30, 0, "yes"];
@@ -122,8 +127,9 @@ Mautic.campaignOnLoad = function (container) {
                     strokeStyle: "#00b49c",
                     lineWidth: 4
                 },
-                connector:"Straight",
-                connectorOverlays: Mautic.campaignOverlayOptions
+                connector: ["Bezier", { curviness: 25 } ],
+                connectorOverlays: Mautic.campaignOverlayOptions,
+                maxConnections: 10
             };
 
             Mautic.campaignBuilderNoAnchor = [1, 1, 0, 1, -30, 0, "no"];
@@ -140,7 +146,8 @@ Mautic.campaignOnLoad = function (container) {
                     lineWidth: 4
                 },
                 connectorOverlays: Mautic.campaignOverlayOptions,
-                connector:"Straight"
+                connector: ["Bezier", { curviness: 25 } ],
+                maxConnections: 10
             };
 
 
@@ -232,7 +239,7 @@ Mautic.campaignOnLoad = function (container) {
         });
 
         // set hover and double click functions for the event buttons
-        mQuery('#CampaignCanvas .list-group-item').off('.eventbuttons')
+        mQuery('#CampaignCanvas .list-campaign-event').off('.eventbuttons')
             .on('mouseover.eventbuttons', function() {
                 mQuery(this).find('.campaign-event-buttons').removeClass('hide');
             })
@@ -280,7 +287,7 @@ Mautic.campaignEventOnLoad = function (container, response) {
 
             mQuery(eventId).css({'left': x + 'px', 'top': y + 'px'});
 
-            if (response.eventType == 'leadaction') {
+            if (response.eventType == 'decision') {
                 Mautic.campaignBuilderInstance.addEndpoint(document.getElementById(domEventId), {anchor: Mautic.campaignBuilderTopAnchor}, Mautic.campaignBuilderTopEndpoint);
                 Mautic.campaignBuilderInstance.addEndpoint(document.getElementById(domEventId), {anchor: Mautic.campaignBuilderYesAnchor}, Mautic.campaignBuilderYesEndpoint);
                 Mautic.campaignBuilderInstance.addEndpoint(document.getElementById(domEventId), {anchor: Mautic.campaignBuilderNoAnchor}, Mautic.campaignBuilderNoEndpoint);

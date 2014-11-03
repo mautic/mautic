@@ -23,15 +23,29 @@ class CampaignEventHelper
      *
      * @return bool
      */
-    public static function validateEmailTrigger(Email $passthrough, $event)
+    public static function validateEmailTrigger(Email $passthrough = null, $event)
     {
+        if ($passthrough == null) {
+            return true;
+        }
+
+        //check to see if the parent event is a "send email" event and that it matches the current email opened
+        if (
+            empty($event['parent']) ||
+            $event['parent']['type'] != 'email.send' ||
+            $passthrough->getId() != $event['parent']['type']['properties']['email']
+        ) {
+            return false;
+        }
+
+        /*
         $limitToEmails = $event['properties']['email'];
 
         //check against selected emails
         if (!empty($limitToEmails) && !in_array($passthrough->getId(), $limitToEmails)) {
             return false;
         }
-
+        */
         return true;
     }
 

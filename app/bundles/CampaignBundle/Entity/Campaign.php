@@ -13,6 +13,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccess;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -69,6 +70,7 @@ class Campaign extends FormEntity
 
     /**
      * @ORM\ManyToOne(targetEntity="Mautic\CategoryBundle\Entity\Category")
+     * @ORM\JoinColumn(onDelete="SET NULL")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"campaignDetails", "campaignList"})
@@ -90,12 +92,20 @@ class Campaign extends FormEntity
     private $leads;
 
     /**
+     * @ORM\ManyToMany(targetEntity="Mautic\LeadBundle\Entity\LeadList", fetch="EXTRA_LAZY", indexBy="id")
+     * @ORM\JoinTable(name="campaign_leadlist_xref")
+     * @ORM\JoinColumn(name="list_id", referencedColumnName="id", nullable=true)
+     **/
+    private $lists;
+
+    /**
      * Constructor
      */
     public function __construct()
     {
         $this->events = new ArrayCollection();
         $this->leads  = new ArrayCollection();
+        $this->lists  = new ArrayCollection();
     }
 
     /**
@@ -105,6 +115,14 @@ class Campaign extends FormEntity
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank(array(
             'message' => 'mautic.campaign.name.notblank'
+        )));
+
+        $metadata->addPropertyConstraint('lists', new LeadListAccess(array(
+            'message' => 'mautic.campaign.lists.notblank'
+        )));
+
+        $metadata->addPropertyConstraint('lists', new Assert\NotBlank(array(
+            'message' => 'mautic.campaign.lists.notblank'
         )));
     }
 
@@ -321,4 +339,36 @@ class Campaign extends FormEntity
     {
         return $this->leads;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getLists ()
+    {
+        return $this->lists;
+    }
+
+    /**
+     * Add list
+     *
+     * @param \Mautic\LeadBundle\Entity\LeadList $list
+     * @return Email
+     */
+    public function addList(\Mautic\LeadBundle\Entity\LeadList $list)
+    {
+        $this->lists[] = $list;
+
+        return $this;
+    }
+
+    /**
+     * Remove list
+     *
+     * @param \Mautic\LeadBundle\Entity\LeadList $list
+     */
+    public function removeList(\Mautic\LeadBundle\Entity\LeadList $list)
+    {
+        $this->lists->removeElement($list);
+    }
+
 }

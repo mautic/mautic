@@ -12,6 +12,7 @@ namespace Mautic\CoreBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\UserBundle\Entity\User;
 
 /**
  * Class FormEntity
@@ -40,12 +41,20 @@ class FormEntity
 
     /**
      * @ORM\ManyToOne(targetEntity="Mautic\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="created_by", referencedColumnName="id", nullable=true)
+     * @ORM\JoinColumn(name="created_by", referencedColumnName="id", nullable=true, onDelete="SET NULL")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"publishDetails"})
      */
     private $createdBy;
+
+    /**
+     * @ORM\Column(name="created_by_user", type="string", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"publishDetails"})
+     */
+    private $createdByUser;
 
     /**
      * @ORM\Column(name="date_modified", type="datetime", nullable=true)
@@ -57,12 +66,20 @@ class FormEntity
 
     /**
      * @ORM\ManyToOne(targetEntity="Mautic\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="modified_by", referencedColumnName="id", nullable=true)
+     * @ORM\JoinColumn(name="modified_by", referencedColumnName="id", nullable=true, onDelete="SET NULL")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"publishDetails"})
      */
     private $modifiedBy;
+
+    /**
+     * @ORM\Column(name="modified_by_user", type="string", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"publishDetails"})
+     */
+    private $modifiedByUser;
 
     /**
      * @ORM\Column(name="checked_out", type="datetime", nullable=true)
@@ -71,9 +88,17 @@ class FormEntity
 
     /**
      * @ORM\ManyToOne(targetEntity="Mautic\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="checked_out_by", referencedColumnName="id", nullable=true)
+     * @ORM\JoinColumn(name="checked_out_by", referencedColumnName="id", nullable=true, onDelete="SET NULL")
      */
     private $checkedOutBy;
+
+    /**
+     * @ORM\Column(name="checked_out_by_user", type="string", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"publishDetails"})
+     */
+    private $checkedOutByUser;
 
     /**
      * @var
@@ -155,7 +180,7 @@ class FormEntity
      * Set dateAdded
      *
      * @param \DateTime $dateAdded
-     * @return LeadList
+     * @return mixed
      */
     public function setDateAdded ($dateAdded)
     {
@@ -178,7 +203,7 @@ class FormEntity
      * Set dateModified
      *
      * @param \DateTime $dateModified
-     * @return LeadList
+     * @return mixed
      */
     public function setDateModified ($dateModified)
     {
@@ -201,7 +226,7 @@ class FormEntity
      * Set checkedOut
      *
      * @param \DateTime $checkedOut
-     * @return LeadList
+     * @return mixed
      */
     public function setCheckedOut ($checkedOut)
     {
@@ -224,11 +249,14 @@ class FormEntity
      * Set createdBy
      *
      * @param \Mautic\UserBundle\Entity\User $createdBy
-     * @return LeadList
+     * @return mixed
      */
-    public function setCreatedBy (\Mautic\UserBundle\Entity\User $createdBy = null)
+    public function setCreatedBy (User $createdBy = null)
     {
         $this->createdBy = $createdBy;
+        if ($createdBy != null) {
+            $this->createdByUser = $createdBy->getName();
+        }
 
         return $this;
     }
@@ -247,11 +275,15 @@ class FormEntity
      * Set modifiedBy
      *
      * @param \Mautic\UserBundle\Entity\User $modifiedBy
-     * @return LeadList
+     * @return mixed
      */
-    public function setModifiedBy (\Mautic\UserBundle\Entity\User $modifiedBy = null)
+    public function setModifiedBy (User $modifiedBy = null)
     {
         $this->modifiedBy = $modifiedBy;
+
+        if ($modifiedBy != null) {
+            $this->modifiedByUser = $modifiedBy->getName();
+        }
 
         return $this;
     }
@@ -270,11 +302,16 @@ class FormEntity
      * Set checkedOutBy
      *
      * @param \Mautic\UserBundle\Entity\User $checkedOutBy
-     * @return LeadList
+     * @return mixed
      */
-    public function setCheckedOutBy (\Mautic\UserBundle\Entity\User $checkedOutBy = null)
+    public function setCheckedOutBy (User $checkedOutBy = null)
     {
         $this->checkedOutBy = $checkedOutBy;
+
+        if ($checkedOutBy != null) {
+            $this->checkedOutByUser = $checkedOutBy->getName();
+        }
+
 
         return $this;
     }
@@ -348,5 +385,29 @@ class FormEntity
     {
         $id = $this->getId();
         return (empty($id)) ? true : false;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCheckedOutByUser ()
+    {
+        return $this->checkedOutByUser;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCreatedByUser ()
+    {
+        return $this->createdByUser;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getModifiedByUser ()
+    {
+        return $this->modifiedByUser;
     }
 }

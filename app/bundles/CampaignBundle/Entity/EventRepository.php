@@ -22,16 +22,19 @@ class EventRepository extends CommonRepository
      *
      * @param $type
      * @param $eventType
+     * @param $campaigns
+     * @param $topLevelOnly
      *
      * @return array
      */
-    public function getPublishedByType($type, $eventType = null)
+    public function getPublishedByType($type, $eventType = null, array $campaigns = null)
     {
         $now = new \DateTime();
         $q = $this->createQueryBuilder('e')
-            ->select('c, e, ec, ecc')
+            ->select('c, e, ec, ep, ecc')
             ->join('e.campaign', 'c')
             ->leftJoin('e.children', 'ec')
+            ->leftJoin('e.parent', 'ep')
             ->leftJoin('ec.campaign', 'ecc')
             ->orderBy('e.order');
 
@@ -51,6 +54,11 @@ class EventRepository extends CommonRepository
         $q->where($expr)
             ->setParameter('now', $now)
             ->setParameter('type', $type);
+
+        if (!empty($campaigns)) {
+            $q->andWhere($q->expr()->in('c.id', ':campaigns'))
+                ->setParameter('campaigns', $campaigns);
+        }
 
         $results = $q->getQuery()->getArrayResult();
 
@@ -93,8 +101,9 @@ class EventRepository extends CommonRepository
 
         $now = new \DateTime();
         $q = $this->createQueryBuilder('e')
-            ->select('c, e, ec')
+            ->select('c, e, ec, ep')
             ->join('e.campaign', 'c')
+            ->leftJoin('e.parent', 'ep')
             ->leftJoin('e.children', 'ec')
             ->orderBy('c.id, e.order');
 

@@ -151,11 +151,11 @@ class LeadListRepository extends CommonRepository
      * Get lists for a specific lead
      *
      * @param      $leadId
-     * @param bool $globalOnly
+     * @param bool $forList
      *
      * @return mixed
      */
-    public function getLeadLists($leadId)
+    public function getLeadLists($leadId, $forList = false)
     {
         static $return = array();
 
@@ -163,8 +163,13 @@ class LeadListRepository extends CommonRepository
             $q = $this->_em->createQueryBuilder()
                 ->from('MauticLeadBundle:LeadList', 'l', 'l.id');
 
-            $q->select('l')
-                ->leftJoin('l.includedLeads', 'il');
+            if ($forList) {
+                $q->select('partial l.{id, alias, name}');
+            } else {
+                $q->select('l');
+            }
+
+            $q->leftJoin('l.includedLeads', 'il');
 
             $q->where(
                 $q->expr()->eq('il.id', (int) $leadId)

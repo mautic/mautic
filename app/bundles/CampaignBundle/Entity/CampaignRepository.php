@@ -36,12 +36,13 @@ class CampaignRepository extends CommonRepository
 
         $now = new \DateTime();
         if ($forList) {
-            $q->select('c.id, c.name');
+            $q->select('c.id, c.name, ll.id');
         } else {
-            $q->select('c, l');
+            $q->select('c, l, ll.id');
         }
 
         $q->leftJoin('c.leads', 'l')
+            ->leftJoin('c.lists', 'll')
             ->leftJoin('c.events', 'e')
             ->leftJoin('e.log', 'o')
             ->where($this->getPublishedByDateExpression($q))
@@ -57,6 +58,49 @@ class CampaignRepository extends CommonRepository
             $q->andWhere(
                 $q->expr()->eq('IDENTITY(l.lead)', (int) $leadId)
             );
+            $q->andWhere(
+                $q->expr()->eq('o.manuallyRemoved', ':manuallyRemoved')
+            )->setParameter('manuallyRemoved', false);
+        }
+
+        $results = $q->getQuery()->getArrayResult();
+        return $results;
+    }
+
+    /**
+     * Returns a list of all published (and active) campaigns that specific lead lists are part of
+     *
+     * @param array $leadLists
+     * @param bool $forList If true, returns ID and name only
+     * @param array $ignoreIds array of IDs to ignore (because they are already known)
+     *
+     * @return array
+     */
+    public function getPublishedCampaignsByLeadLists(array $leadLists, $forList = false, array $ignoreIds = array())
+    {
+        $q   = $this->_em->createQueryBuilder()
+            ->from('MauticCampaignBundle:Campaign', 'c', 'c.id');
+
+        $now = new \DateTime();
+        if ($forList) {
+            $q->select('c.id, c.name, ll.id');
+        } else {
+            $q->select('c, ll.id, l');
+        }
+
+        $q->leftJoin('c.lists', 'll')
+            ->leftJoin('c.leads', 'l')
+            ->where($this->getPublishedByDateExpression($q))
+            ->setParameter('now', $now);
+
+        $q->andWhere(
+            $q->expr()->in('ll.id', ':lists')
+        )->setParameter('lists', $leadLists);
+
+        if (!empty($ignoreIds)) {
+            $q->andWhere(
+                $q->expr()->notIn('c.id', ':ignoreIds')
+            )->setParameter('ignoreIds', $ignoreIds);
         }
 
         $results = $q->getQuery()->getArrayResult();

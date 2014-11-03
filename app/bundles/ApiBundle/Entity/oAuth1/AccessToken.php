@@ -27,13 +27,13 @@ class AccessToken extends BaseAccessToken
 
     /**
      * @ORM\ManyToOne(targetEntity="Consumer")
-     * @ORM\JoinColumn(name="consumer_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="consumer_id", referencedColumnName="id", onDelete="CASCADE")
      */
     protected $consumer;
 
     /**
      * @ORM\ManyToOne(targetEntity="Mautic\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")
      */
     protected $user;
 

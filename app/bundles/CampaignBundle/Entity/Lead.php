@@ -24,12 +24,14 @@ class Lead
     /**
      * @ORM\Id()
      * @ORM\ManyToOne(targetEntity="Campaign", inversedBy="leads")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $campaign;
 
     /**
      * @ORM\Id()
      * @ORM\ManyToOne(targetEntity="Mautic\LeadBundle\Entity\Lead")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $lead;
 
@@ -37,6 +39,11 @@ class Lead
      * @ORM\Column(name="date_added", type="datetime")
      **/
     private $dateAdded;
+
+    /**
+     * @ORM\Column(name="manually_removed", type="boolean")
+     */
+    private $manuallyRemoved = false;
 
     /**
      * @return mixed
@@ -84,5 +91,29 @@ class Lead
     public function setCampaign ($campaign)
     {
         $this->campaign = $campaign;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getManuallyRemoved ()
+    {
+        return $this->manuallyRemoved;
+    }
+
+    /**
+     * @param mixed $manuallyRemoved
+     */
+    public function setManuallyRemoved ($manuallyRemoved)
+    {
+        $this->manuallyRemoved = $manuallyRemoved;
+    }
+
+    /**
+     * @return bool
+     */
+    public function wasManuallyRemoved()
+    {
+        return $this->manuallyRemoved;
     }
 }

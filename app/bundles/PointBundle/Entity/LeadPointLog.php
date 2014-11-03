@@ -30,6 +30,7 @@ class LeadPointLog
     /**
      * @ORM\Id()
      * @ORM\ManyToOne(targetEntity="Mautic\LeadBundle\Entity\Lead")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $lead;
 

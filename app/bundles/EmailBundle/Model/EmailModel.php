@@ -521,7 +521,7 @@ class EmailModel extends FormModel
             $r = $color_code["r"] - (round($color_code["r"])*$percentage_adjuster);
             $g = $color_code["g"] - (round($color_code["g"])*$percentage_adjuster);
             $b = $color_code["b"] - (round($color_code["b"])*$percentage_adjuster);
-     
+
             return array("r"=> round(max(0,min(255,$r))),
                 "g"=> round(max(0,min(255,$g))),
                 "b"=> round(max(0,min(255,$b))));
@@ -534,11 +534,11 @@ class EmailModel extends FormModel
             $r = round($r - ($r*$percentage_adjuster));
             $g = round($g - ($g*$percentage_adjuster));
             $b = round($b - ($b*$percentage_adjuster));
-     
+
             return "#".str_pad(dechex( max(0,min(255,$r)) ),2,"0",STR_PAD_LEFT)
                 .str_pad(dechex( max(0,min(255,$g)) ),2,"0",STR_PAD_LEFT)
                 .str_pad(dechex( max(0,min(255,$b)) ),2,"0",STR_PAD_LEFT);
-     
+
         }
     }
 
