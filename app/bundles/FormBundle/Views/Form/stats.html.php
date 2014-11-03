@@ -39,16 +39,16 @@ foreach ($form->getActions() as $action) {
                     <table class="table table-bordered table-striped mb-0">
                         <tbody>
                             <tr>
-                                <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.form.details.created_on'); ?></span></td>
-                                <td></td>
+                                <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.form.details.created'); ?></span></td>
+                                <td><?php echo $view['date']->toFull($form->getDateAdded()); ?></td>
                             </tr>
                             <tr>
                                 <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.form.details.created_by'); ?></span></td>
-                                <td><?php echo $form->getCreatedBy(); ?></td>
+                                <td><?php echo ($form->getCreatedBy() === null) ? '' : $form->getCreatedBy()->getName(); ?></td>
                             </tr>
                             <tr>
                                 <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.form.details.category'); ?></span></td>
-                                <td><?php echo $form->getCategory(); ?></td>
+                                <td><?php echo ($form->getCategory() === null) ? '' : $form->getCategory()->getTitle(); ?></td>
                             </tr>
                             <tr>
                                 <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.form.details.publish_up'); ?></span></td>
