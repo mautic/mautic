@@ -193,7 +193,7 @@ class FormSubscriber extends CommonSubscriber
             $event->addEvent(array(
                 'event'     => $eventTypeKey,
                 'eventLabel' => $eventTypeName,
-                'timestamp' => new \DateTime($row['date_submitted']),
+                'timestamp' => new \DateTime($row['dateSubmitted']),
                 'extra'     => array(
                     'form'  => $formModel->getEntity($row['form_id']),
                     'page'  => $pageModel->getEntity($row['page_id'])

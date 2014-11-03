@@ -122,11 +122,14 @@ class CampaignController extends FormController
      */
     public function viewAction ($objectId)
     {
-        $entity = $this->factory->getModel('campaign')->getEntity($objectId);
+        $entity      = $this->factory->getModel('campaign')->getEntity($objectId);
         //set the page we came from
-        $page = $this->factory->getSession()->get('mautic.campaign.page', 1);
+        $page        = $this->factory->getSession()->get('mautic.campaign.page', 1);
+        $model       = $this->factory->getModel('campaign.campaign');
+        $security    = $this->factory->getSecurity();
+        $activePage  = $model->getEntity($objectId);
 
-        $permissions = $this->factory->getSecurity()->isGranted(array(
+        $permissions = $security->isGranted(array(
             'campaign:campaigns:view',
             'campaign:campaigns:create',
             'campaign:campaigns:edit',
@@ -167,6 +170,8 @@ class CampaignController extends FormController
                 'entity'      => $entity,
                 'page'        => $page,
                 'permissions' => $permissions,
+                'activePage'  => $activePage,
+                'security'    => $security,
                 'logs'        => $logs
             ),
             'contentTemplate' => 'MauticCampaignBundle:Campaign:details.html.php',

@@ -220,4 +220,92 @@ class StatRepository extends CommonRepository
 
         return $query->getQuery()->getArrayResult();
     }
+
+    /**
+     * Get proper date label format depending on what date scope we want to display
+     *
+     * @param char $unit: php.net/manual/en/dateinterval.construct.php#refsect1-dateinterval.construct-parameters
+     *
+     * @return string
+     */
+    public function getDateLabelFromat($unit = 'D')
+    {
+        $format = '';
+        if ($unit == 'H') {
+            $format = 'H:00';
+        } elseif ($unit == 'D') {
+            $format = 'jS F';
+        } elseif ($unit == 'W') {
+            $format = 'W';
+        } elseif ($unit == 'M') {
+            $format = 'F y';
+        } elseif ($unit == 'Y') {
+            $format = 'Y';
+        }
+        return $format;
+    }
+
+    /**
+     * Prepares data structure of labels and values needed for line graph.
+     * fromDate variable can be used for SQL query as a limit.
+     *
+     * @param integer $amount of units
+     * @param char $unit: php.net/manual/en/dateinterval.construct.php#refsect1-dateinterval.construct-parameters
+     *
+     * @return array
+     */
+    public function prepareStatsGraphDataBefore($amount = 30, $unit = 'D')
+    {
+        $isTime = '';
+
+        if ($unit == 'H') {
+            $isTime = 'T';
+        }
+
+        $format = $this->getDateLabelFromat($unit);
+
+        $date = new \DateTime();
+        $oneUnit = new \DateInterval('P'.$isTime.'1'.$unit);
+        $data = array('labels' => array(), 'values' => array());
+
+        // Prefill $data arrays
+        for ($i = 0; $i < $amount; $i++) {
+            $data['labels'][$i] = $date->format($format);
+            $data['values'][$i] = 0;
+            $date->sub($oneUnit);
+        }
+
+        $data['fromDate'] = $date;
+
+        return $data;
+    }
+
+    /**
+     * Fills into graph data values grouped by time unit
+     *
+     * @param array $data from prepareStatsGraphDataBefore
+     * @param array $stats from database
+     * @param char $unit: php.net/manual/en/dateinterval.construct.php#refsect1-dateinterval.construct-parameters
+     *
+     * @return array
+     */
+    public function prepareStatsGraphDataAfter($data, $stats, $unit)
+    {
+        // Group hits by date
+        foreach ($stats as $stat) {
+            if (is_string($stat['dateSent'])) {
+                $stat['dateSent'] = new \DateTime($stat['dateSent']);
+            }
+
+            $oneItem = $stat['dateSent']->format($this->getDateLabelFromat($unit));
+            if (($itemKey = array_search($oneItem, $data['labels'])) !== false) {
+                $data['values'][$itemKey]++;
+            }
+        }
+
+        $data['values'] = array_reverse($data['values']);
+        $data['labels'] = array_reverse($data['labels']);
+
+        return $data;
+    }
 }

@@ -35,12 +35,11 @@ class UpdateHelper
      * Fetches a download package from the remote server
      *
      * @param string $kernelRoot
-     * @param string $version
-     * @param string $stability
+     * @param string $package
      *
      * @return array
      */
-    public function fetchPackage($kernelRoot, $version, $stability = 'stable')
+    public function fetchPackage($kernelRoot, $package)
     {
         $target = '';
 
@@ -48,9 +47,8 @@ class UpdateHelper
         $connector = HttpFactory::getHttp();
 
         // GET the update data
-        // TODO - Change to the proper URL format for packages when ready
         try {
-            $data = $connector->get('http://mautic.org/downloads/development/mautic-head.zip');
+            $data = $connector->get($package);
         } catch (\Exception $exception) {
             return array(
                 'error'   => true,
@@ -61,23 +59,12 @@ class UpdateHelper
         if ($data->code != 200) {
             return array(
                 'error'   => true,
-                'message' => 'mautic.core.updater.error.fetching.updates'
+                'message' => 'mautic.core.updater.error.fetching.package'
             );
         }
 
-        // Parse the Content-Disposition header to get the file name if it exists
-        if (isset($response->headers['Content-Disposition']) && preg_match("/\s*filename\s?=\s?(.*)/", $response->headers['Content-Disposition'], $parts)) {
-            $target = trim(rtrim($parts[1], ";"), '"');
-        }
-
-        // If we don't already have a filename, extract it based on the URL
-        if (!$target) {
-            // TODO - Change this to be based on the real URL when that changes
-            $target = 'mautic-head.zip';
-        }
-
         // Set the filesystem target
-        $target = $kernelRoot . '/cache/' . $target;
+        $target = $kernelRoot . '/cache/' . basename($package);
 
         // Write the response to the filesystem
         file_put_contents($target, $data->body);
@@ -91,17 +78,31 @@ class UpdateHelper
     /**
      * Retrieves the update data from our home server
      *
+     * @param string $kernelRoot
+     * @param bool   $overrideCache
+     *
      * @return array
      */
-    public function fetchData()
+    public function fetchData($kernelRoot, $overrideCache = false)
     {
+        $cacheFile = $kernelRoot . '/cache/lastUpdateCheck.txt';
+
+        // Check if we have a cache file and try to return cached data if so
+        if (!$overrideCache && is_readable($cacheFile)) {
+            $update = (array) json_decode(file_get_contents($cacheFile));
+
+            // If we're within the cache time, return the cached data
+            if ($update['checkedTime'] > strtotime('-3 hours')) {
+                return $update;
+            }
+        }
+
         // Get our HTTP client
         $connector = HttpFactory::getHttp();
 
         // GET the update data
-        // TODO - Change to the real URL at some point
         try {
-            $data    = $connector->get('http://mautic/update.json');
+            $data    = $connector->get('http://mautic.org/downloads/update.json');
             $updates = json_decode($data->body);
         } catch (\Exception $exception) {
             return array(
@@ -140,12 +141,18 @@ class UpdateHelper
             );
         }
 
-        // If we got this far, the user is able to update to the latest version
-        return array(
+        // If we got this far, the user is able to update to the latest version, cache the data first
+        $data = array(
             'error'        => false,
             'message'      => 'mautic.core.updater.update.available',
             'version'      => $latestVersion->version,
-            'announcement' => $latestVersion->announcement
+            'announcement' => $latestVersion->announcement,
+            'package'      => $latestVersion->package,
+            'checkedTime'  => time()
         );
+
+        file_put_contents($cacheFile, json_encode($data));
+
+        return $data;
     }
 }

@@ -7,7 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\PageBundle\EventListener;
+namespace Mautic\FormBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
@@ -18,7 +18,7 @@ use Mautic\ReportBundle\ReportEvents;
 /**
  * Class ReportSubscriber
  *
- * @package Mautic\PageBundle\EventListener
+ * @package Mautic\ReportBundle\EventListener
  */
 class ReportSubscriber extends CommonSubscriber
 {
@@ -44,21 +44,32 @@ class ReportSubscriber extends CommonSubscriber
      */
     public function onReportBuilder(ReportBuilderEvent $event)
     {
-        $metadata = $this->factory->getEntityManager()->getClassMetadata('Mautic\\PageBundle\\Entity\\Page');
-        $fields   = $metadata->getFieldNames();
+        $metadataForm = $this->factory->getEntityManager()->getClassMetadata('Mautic\\FormBundle\\Entity\\Form');
+        $metadataSubmission = $this->factory->getEntityManager()->getClassMetadata('Mautic\\FormBundle\\Entity\\Submission');
+        $formFields = $metadataForm->getFieldNames();
+        $submissionFields = $metadataSubmission->getFieldNames();
+
+        // Unset submission id
+        unset($submissionFields[0]);
+
         $columns  = array();
 
-        foreach ($fields as $field) {
-            $fieldData = $metadata->getFieldMapping($field);
-            $columns['p.' . $fieldData['columnName']] = array('label' => $field, 'type' => $fieldData['type']);
+        foreach ($formFields as $field) {
+            $fieldData = $metadataForm->getFieldMapping($field);
+            $columns['f.' . $fieldData['columnName']] = array('label' => $field, 'type' => $fieldData['type']);
+        }
+
+        foreach ($submissionFields as $field) {
+            $fieldData = $metadataSubmission->getFieldMapping($field);
+            $columns['fs.' . $fieldData['columnName']] = array('label' => $field, 'type' => $fieldData['type']);
         }
 
         $data = array(
-            'display_name' => 'mautic.page.page.report.table',
+            'display_name' => 'mautic.form.form.report.table',
             'columns'      => $columns
         );
 
-        $event->addTable('pages', $data);
+        $event->addTable('forms', $data);
     }
 
     /**
@@ -70,15 +81,16 @@ class ReportSubscriber extends CommonSubscriber
      */
     public function onReportGenerate(ReportGeneratorEvent $event)
     {
-        // Context check, we only want to fire for Page reports
-        if ($event->getContext() != 'pages')
+        // Context check, we only want to fire for Form reports
+        if ($event->getContext() != 'forms')
         {
             return;
         }
 
         $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
 
-        $queryBuilder->from(MAUTIC_TABLE_PREFIX . 'pages', 'p');
+        $queryBuilder->from(MAUTIC_TABLE_PREFIX . 'forms', 'f');
+        $queryBuilder->leftJoin('f', MAUTIC_TABLE_PREFIX . 'form_submissions', 'fs', 'f.id = fs.form_id');
 
         $event->setQueryBuilder($queryBuilder);
     }
@@ -93,16 +105,16 @@ class ReportSubscriber extends CommonSubscriber
     public function onReportGraphGenerate(ReportGraphEvent $event)
     {
         $report = $event->getReport();
-        // Context check, we only want to fire for Asset reports
-        if ($report->getSource() != 'pages')
+        // Context check, we only want to fire for Forms reports
+        if ($report->getSource() != 'forms')
         {
             return;
         }
 
         $options = $event->getOptions();
 
-        if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.page.graph.line.hits') {
-            // Generate data for Downloads line graph
+        if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.form.graph.line.submissions') {
+            // Generate data for submissions line graph
             $unit = 'D';
             $amount = 30;
 
@@ -114,21 +126,21 @@ class ReportSubscriber extends CommonSubscriber
                 $unit = $options['unit'];
             }
             
-            $hitRepo = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit');
+            $submissionRepo = $this->factory->getEntityManager()->getRepository('MauticFormBundle:Submission');
 
-            $data = $hitRepo->prepareHitsGraphDataBefore($amount, $unit);
+            $data = $submissionRepo->prepareSubmissionsGraphDataBefore($amount, $unit);
 
             $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
-            $queryBuilder->from(MAUTIC_TABLE_PREFIX . 'page_hits', 'ph');
-            $queryBuilder->leftJoin('ph', MAUTIC_TABLE_PREFIX . 'pages', 'p', 'p.id = ph.page_id');
-            $queryBuilder->select('ph.page_id as page, ph.date_hit as dateHit');
+            $queryBuilder->from(MAUTIC_TABLE_PREFIX . 'form_submissions', 'fs');
+            $queryBuilder->leftJoin('fs', MAUTIC_TABLE_PREFIX . 'forms', 'f', 'f.id = fs.form_id');
+            $queryBuilder->select('fs.form_id as form, fs.date_submitted as dateSubmitted');
             $event->buildWhere($queryBuilder);
-            $queryBuilder->andwhere($queryBuilder->expr()->gte('ph.date_hit', ':date'))
+            $queryBuilder->andwhere($queryBuilder->expr()->gte('fs.date_submitted', ':date'))
                 ->setParameter('date', $data['fromDate']->format('Y-m-d H:i:s'));
-            $hits = $queryBuilder->execute()->fetchAll();
+            $submissions = $queryBuilder->execute()->fetchAll();
 
-            $timeStats = $hitRepo->prepareHitsGraphDataAfter($data, $hits, $unit);
-            $timeStats['name'] = 'mautic.page.graph.line.hits';
+            $timeStats = $submissionRepo->prepareSubmissionsGraphDataAfter($data, $submissions, $unit);
+            $timeStats['name'] = 'mautic.form.graph.line.submissions';
 
             $event->setGraph('line', $timeStats);
         }

@@ -7,7 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\PageBundle\EventListener;
+namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
@@ -18,7 +18,7 @@ use Mautic\ReportBundle\ReportEvents;
 /**
  * Class ReportSubscriber
  *
- * @package Mautic\PageBundle\EventListener
+ * @package Mautic\EmailBundle\EventListener
  */
 class ReportSubscriber extends CommonSubscriber
 {
@@ -44,21 +44,32 @@ class ReportSubscriber extends CommonSubscriber
      */
     public function onReportBuilder(ReportBuilderEvent $event)
     {
-        $metadata = $this->factory->getEntityManager()->getClassMetadata('Mautic\\PageBundle\\Entity\\Page');
-        $fields   = $metadata->getFieldNames();
+        $metadataEmail = $this->factory->getEntityManager()->getClassMetadata('Mautic\\EmailBundle\\Entity\\Email');
+        $metadataStat = $this->factory->getEntityManager()->getClassMetadata('Mautic\\EmailBundle\\Entity\\Stat');
+        $emailFields = $metadataEmail->getFieldNames();
+        $statFields = $metadataStat->getFieldNames();
+
+        // Unset stat id
+        unset($statFields[0]);
+
         $columns  = array();
 
-        foreach ($fields as $field) {
-            $fieldData = $metadata->getFieldMapping($field);
-            $columns['p.' . $fieldData['columnName']] = array('label' => $field, 'type' => $fieldData['type']);
+        foreach ($emailFields as $field) {
+            $fieldData = $metadataEmail->getFieldMapping($field);
+            $columns['a.' . $fieldData['columnName']] = array('label' => $field, 'type' => $fieldData['type']);
+        }
+
+        foreach ($statFields as $field) {
+            $fieldData = $metadataStat->getFieldMapping($field);
+            $columns['ad.' . $fieldData['columnName']] = array('label' => $field, 'type' => $fieldData['type']);
         }
 
         $data = array(
-            'display_name' => 'mautic.page.page.report.table',
+            'display_name' => 'mautic.email.email.report.table',
             'columns'      => $columns
         );
 
-        $event->addTable('pages', $data);
+        $event->addTable('emails', $data);
     }
 
     /**
@@ -70,15 +81,16 @@ class ReportSubscriber extends CommonSubscriber
      */
     public function onReportGenerate(ReportGeneratorEvent $event)
     {
-        // Context check, we only want to fire for Page reports
-        if ($event->getContext() != 'pages')
+        // Context check, we only want to fire for Email reports
+        if ($event->getContext() != 'emails')
         {
             return;
         }
 
         $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
 
-        $queryBuilder->from(MAUTIC_TABLE_PREFIX . 'pages', 'p');
+        $queryBuilder->from(MAUTIC_TABLE_PREFIX . 'emails', 'e');
+        $queryBuilder->leftJoin('e', MAUTIC_TABLE_PREFIX . 'email_stats', 'es', 'e.id = es.email_id');
 
         $event->setQueryBuilder($queryBuilder);
     }
@@ -93,16 +105,16 @@ class ReportSubscriber extends CommonSubscriber
     public function onReportGraphGenerate(ReportGraphEvent $event)
     {
         $report = $event->getReport();
-        // Context check, we only want to fire for Asset reports
-        if ($report->getSource() != 'pages')
+        // Context check, we only want to fire for Email reports
+        if ($report->getSource() != 'emails')
         {
             return;
         }
 
         $options = $event->getOptions();
 
-        if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.page.graph.line.hits') {
-            // Generate data for Downloads line graph
+        if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.email.graph.line.stats') {
+            // Generate data for Stats line graph
             $unit = 'D';
             $amount = 30;
 
@@ -114,21 +126,21 @@ class ReportSubscriber extends CommonSubscriber
                 $unit = $options['unit'];
             }
             
-            $hitRepo = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit');
+            $statRepo = $this->factory->getEntityManager()->getRepository('MauticEmailBundle:Stat');
 
-            $data = $hitRepo->prepareHitsGraphDataBefore($amount, $unit);
+            $data = $statRepo->prepareStatsGraphDataBefore($amount, $unit);
 
             $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
-            $queryBuilder->from(MAUTIC_TABLE_PREFIX . 'page_hits', 'ph');
-            $queryBuilder->leftJoin('ph', MAUTIC_TABLE_PREFIX . 'pages', 'p', 'p.id = ph.page_id');
-            $queryBuilder->select('ph.page_id as page, ph.date_hit as dateHit');
+            $queryBuilder->from(MAUTIC_TABLE_PREFIX . 'email_stats', 'es');
+            $queryBuilder->leftJoin('es', MAUTIC_TABLE_PREFIX . 'emails', 'e', 'e.id = es.email_id');
+            $queryBuilder->select('es.email_id as email, es.date_sent as dateSent');
             $event->buildWhere($queryBuilder);
-            $queryBuilder->andwhere($queryBuilder->expr()->gte('ph.date_hit', ':date'))
+            $queryBuilder->andwhere($queryBuilder->expr()->gte('es.date_sent', ':date'))
                 ->setParameter('date', $data['fromDate']->format('Y-m-d H:i:s'));
-            $hits = $queryBuilder->execute()->fetchAll();
+            $stats = $queryBuilder->execute()->fetchAll();
 
-            $timeStats = $hitRepo->prepareHitsGraphDataAfter($data, $hits, $unit);
-            $timeStats['name'] = 'mautic.page.graph.line.hits';
+            $timeStats = $statRepo->prepareStatsGraphDataAfter($data, $stats, $unit);
+            $timeStats['name'] = 'mautic.email.graph.line.stats';
 
             $event->setGraph('line', $timeStats);
         }

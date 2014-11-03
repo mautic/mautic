@@ -28,10 +28,13 @@ class AuditLogRepository extends CommonRepository
     public function getLogForObject($object = null, $id = null, $limit = 100)
     {
         $query = $this->createQueryBuilder('al')
-            ->select('al.userName, al.userId, al.bundle, al.object, al.objectId, al.action, al.details, al.dateAdded, al.ipAddress');
+            ->select('al.userName, al.userId, al.bundle, al.object, al.objectId, al.action, al.details, al.dateAdded, al.ipAddress')
+            ->where('al.object != :category')
+            ->setParameter('category', 'category');
 
         if ($object && $id) {
-            $query->where('al.object = :object')
+            $query
+                ->andWhere('al.object = :object')
                 ->andWhere('al.objectId = :id')
                 ->setParameter('object', $object)
                 ->setParameter('id', $id);

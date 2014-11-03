@@ -123,6 +123,14 @@ $container->loadFromExtension('knp_menu', array(
     'default_renderer' => 'mautic'
 ));
 
+//MigrationsBundle Configuration
+$container->loadFromExtension('doctrine_migrations', array(
+    'dir_name'   => '%kernel.root_dir%/migrations',
+    'namespace'  => 'Mautic\\Migrations',
+    'table_name' => 'migrations',
+    'name'       => 'Mautic Migrations'
+));
+
 if ($container->getParameter('mautic.api_enabled')) {
     //FOS Rest
     $container->loadFromExtension('fos_rest', array(

@@ -111,24 +111,38 @@ class ReportSubscriber extends CommonSubscriber
             return;
         }
 
-        // Generate data for Downloads line graph
-        $unit = 'D';
-        $downloadRepo = $this->factory->getEntityManager()->getRepository('MauticAssetBundle:Download');
+        $options = $event->getOptions();
 
-        $data = $downloadRepo->prepareDownloadsGraphDataBefore(30, $unit);
+        if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.asset.graph.line.downloads') {
+            // Generate data for Downloads line graph
+            $unit = 'D';
+            $amount = 30;
 
-        $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
-        $queryBuilder->from(MAUTIC_TABLE_PREFIX . 'asset_downloads', 'ad');
-        $queryBuilder->leftJoin('ad', MAUTIC_TABLE_PREFIX . 'assets', 'a', 'a.id = ad.asset_id');
-        $queryBuilder->select('ad.asset_id as asset, ad.date_download as dateDownload');
-        $event->buildWhere($queryBuilder);
-        $queryBuilder->andwhere($queryBuilder->expr()->gte('ad.date_download', ':date'))
-            ->setParameter('date', $data['fromDate']->format('Y-m-d H:i:s'));
-        $downloads = $queryBuilder->execute()->fetchAll();
+            if (isset($options['amount'])) {
+                $amount = $options['amount'];
+            }
 
-        $timeStats = $downloadRepo->prepareDownloadsGraphDataAfter($data, $downloads, $unit);
-        $timeStats['name'] = 'mautic.asset.graph.line.downloads';
+            if (isset($options['unit'])) {
+                $unit = $options['unit'];
+            }
+            
+            $downloadRepo = $this->factory->getEntityManager()->getRepository('MauticAssetBundle:Download');
 
-        $event->setGraph('line', $timeStats);
+            $data = $downloadRepo->prepareDownloadsGraphDataBefore($amount, $unit);
+
+            $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+            $queryBuilder->from(MAUTIC_TABLE_PREFIX . 'asset_downloads', 'ad');
+            $queryBuilder->leftJoin('ad', MAUTIC_TABLE_PREFIX . 'assets', 'a', 'a.id = ad.asset_id');
+            $queryBuilder->select('ad.asset_id as asset, ad.date_download as dateDownload');
+            $event->buildWhere($queryBuilder);
+            $queryBuilder->andwhere($queryBuilder->expr()->gte('ad.date_download', ':date'))
+                ->setParameter('date', $data['fromDate']->format('Y-m-d H:i:s'));
+            $downloads = $queryBuilder->execute()->fetchAll();
+
+            $timeStats = $downloadRepo->prepareDownloadsGraphDataAfter($data, $downloads, $unit);
+            $timeStats['name'] = 'mautic.asset.graph.line.downloads';
+
+            $event->setGraph('line', $timeStats);
+        }
     }
 }

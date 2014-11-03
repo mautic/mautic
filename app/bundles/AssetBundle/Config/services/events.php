@@ -48,7 +48,7 @@ $container->setDefinition(
 )
     ->addTag('kernel.event_subscriber');
 
-    $container->setDefinition(
+$container->setDefinition(
     'mautic.asset.reportbundle.subscriber',
     new Definition(
         'Mautic\AssetBundle\EventListener\ReportSubscriber',

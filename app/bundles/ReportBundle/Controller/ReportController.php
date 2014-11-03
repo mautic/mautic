@@ -542,16 +542,12 @@ class ReportController extends FormController
         $this->factory->getDispatcher()->dispatch(ReportEvents::REPORT_ON_GRAPH_GENERATE, $event);
         $graphs = $event->getGraphs();
 
-        // Audit Log
-        $logs = $this->factory->getModel('core.auditLog')->getLogForObject('report', $reportId);
-
         return $this->delegateView(array(
             'viewParameters'  =>  array(
                 'result'     => $result,
                 'report'     => $entity,
                 'reportPage' => $page,
                 'graphs'     => $graphs,
-                'logs'       => $logs,
                 'tmpl'       => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                 'limit'      => $limit,
                 'security'   => $security,

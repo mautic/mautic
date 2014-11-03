@@ -49,6 +49,20 @@ Mautic.formOnLoad = function (container) {
             mQuery(this).find('.form-buttons').addClass('hide');
         });
     }
+
+    if (typeof Mautic.formSubmissionChart === 'undefined') {
+        Mautic.renderSubmissionChart();
+    }
+};
+
+Mautic.getFormId = function() {
+    return mQuery('input#formId').val();
+}
+
+Mautic.formOnUnload = function(id) {
+    if (id === '#app-content') {
+        delete Mautic.formSubmissionChart;
+    }
 };
 
 Mautic.formFieldOnLoad = function (container, response) {
@@ -215,3 +229,60 @@ Mautic.onPostSubmitActionChange = function(value) {
     mQuery('#mauticform_postActionProperty').next().html('');
     mQuery('#mauticform_postActionProperty').parent().removeClass('has-error');
 };
+
+Mautic.renderSubmissionChart = function (chartData) {
+    if (!mQuery('#submission-chart').length) {
+        return;
+    }
+    if (!chartData) {
+        chartData = mQuery.parseJSON(mQuery('#submission-chart-data').text());
+    }
+    var ctx = document.getElementById("submission-chart").getContext("2d");
+    var options = {};
+    var data = {
+        labels: chartData.labels,
+        datasets: [
+            {
+                fillColor: "rgba(151,187,205,0.2)",
+                strokeColor: "rgba(151,187,205,1)",
+                pointColor: "rgba(151,187,205,1)",
+                pointStrokeColor: "#fff",
+                pointHighlightFill: "#fff",
+                pointHighlightStroke: "rgba(151,187,205,1)",
+                data: chartData.values
+            }
+        ]
+    };
+
+    if (typeof Mautic.formSubmissionChart === 'undefined') {
+        Mautic.formSubmissionChart = new Chart(ctx).Line(data, options);
+    } else {
+        Mautic.formSubmissionChart.destroy();
+        Mautic.formSubmissionChart = new Chart(ctx).Line(data, options);
+    }
+};
+
+Mautic.updateSubmissionChart = function(element, amount, unit) {
+    var element = mQuery(element);
+    var wrapper = element.closest('ul');
+    var button  = mQuery('#time-scopes .button-label');
+    var formId = Mautic.getFormId();
+    wrapper.find('a').removeClass('bg-primary');
+    element.addClass('bg-primary');
+    button.text(element.text());
+    var query = "action=form:updateSubmissionChart&amount=" + amount + "&unit=" + unit + "&formId=" + formId;
+    mQuery.ajax({
+        url: mauticAjaxUrl,
+        type: "POST",
+        data: query,
+        dataType: "json",
+        success: function (response) {
+            if (response.success) {
+                Mautic.renderSubmissionChart(response.stats);
+            }
+        },
+        error: function (request, textStatus, errorThrown) {
+            Mautic.processAjaxError(request, textStatus, errorThrown);
+        }
+    });
+}
