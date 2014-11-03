@@ -178,6 +178,9 @@ class FormController extends CommonFormController
 
         ), "RETURN_ARRAY");
 
+        // Submission stats per time period
+        $timeStats = $this->factory->getEntityManager()->getRepository('MauticFormBundle:Submission')->getSubmissionsSince($activeForm->getId());
+
         // Audit Log
         $logs = $this->factory->getModel('core.auditLog')->getLogForObject('form', $objectId);
 
@@ -187,7 +190,10 @@ class FormController extends CommonFormController
                 'page'        => $page,
                 'logs'        => $logs,
                 'permissions' => $permissions,
-                'security'    => $this->factory->getSecurity()
+                'security'    => $this->factory->getSecurity(),
+                'stats'       => array(
+                    'submissionsInTime' => $timeStats,
+                )
             ),
             'contentTemplate' => 'MauticFormBundle:Form:details.html.php',
             'passthroughVars' => array(

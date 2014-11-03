@@ -174,10 +174,7 @@ if ($security->hasEntityAccess($permissions['asset:assets:editown'], $permission
             </div>
             <!--/ page detail collapseable toggler -->
 
-            <!--
-            some stats: need more input on what type of form data to show.
-            delete if it is not require
-            -->
+            <!-- some stats -->
             <div class="pa-md">
                 <div class="row">
                     <div class="col-sm-12">
@@ -240,7 +237,7 @@ if ($security->hasEntityAccess($permissions['asset:assets:editown'], $permission
                     </div>
                 </div>
             </div>
-            <!--/ some stats -->
+            <!--/ stats -->
         </div>
 
         <!-- start: tab-content -->

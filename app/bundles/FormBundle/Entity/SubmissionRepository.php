@@ -208,11 +208,21 @@ class SubmissionRepository extends CommonRepository
     public function getSubmissions(array $options = array())
     {
         $query = $this->_em->getConnection()->createQueryBuilder();
-        $query->select('fs.form_id, fs.page_id, fs.date_submitted')
+        $query->select('fs.form_id, fs.page_id, fs.date_submitted AS dateSubmitted')
             ->from(MAUTIC_TABLE_PREFIX . 'form_submissions', 'fs');
 
         if (!empty($options['ipIds'])) {
             $query->where('fs.ip_id IN (' . implode(',', $options['ipIds']) . ')');
+        }
+
+        if (!empty($options['id'])) {
+            $query->andWhere($query->expr()->eq('fs.form_id', ':id'))
+            ->setParameter('id', $options['id']);
+        }
+
+        if (!empty($options['fromDate'])) {
+            $query->andWhere($query->expr()->gte('fs.date_submitted', ':fromDate'))
+            ->setParameter('fromDate', $options['fromDate']->format('Y-m-d H:i:s'));
         }
 
         if (isset($options['filters']['search']) && $options['filters']['search']) {
@@ -224,6 +234,15 @@ class SubmissionRepository extends CommonRepository
         }
 
         return $query->execute()->fetchAll();
+    }
+
+    public function getSubmissionsSince($formId, $amount = 30, $unit = 'D')
+    {
+        $data = $this->prepareSubmissionsGraphDataBefore($amount, $unit);
+
+        $submissions = $this->getSubmissions(array('id' => $formId, 'fromDate' => $data['fromDate']));
+
+        return $this->prepareSubmissionsGraphDataAfter($data, $submissions, $unit);
     }
 
     /**
