@@ -116,6 +116,9 @@ class EmailController extends FormController
         //retrieve a list of categories
         $categories = $this->factory->getModel('category')->getLookupResults('email', '', 0);
 
+        //retrieve a list of Lead Lists
+        $lists = $this->factory->getModel('lead.list')->getUserLists();
+
         return $this->delegateView(array(
             'viewParameters'  =>  array(
                 'searchValue' => $search,
@@ -130,8 +133,11 @@ class EmailController extends FormController
                     array(
                         'column'    => 'category',
                         'name'      => 'mautic.email.filter.categories',
-                        'items'     => $categories,
-                        'selected'  => array()
+                        'items'     => $categories
+                    ), array(
+                        'column'    => 'lists',
+                        'name'      => 'mautic.email.filter.lists',
+                        'items'     => $lists
                     )
                 )
             ),
