@@ -21,12 +21,13 @@ class ClientRepository extends CommonRepository
 
     public function getUserClients(User $user)
     {
-        $result = $this->createQueryBuilder('c')
-            ->join('c.users', 'u')
-            ->where("u.id = " . $user->getId())
-            ->getQuery()
-            ->getResult();
-        return $result;
+        $query = $this->createQueryBuilder($this->getTableAlias());
+
+        $query->join('c.users', 'u')
+            ->where($query->expr()->andX('u.id', ':userId'))
+            ->setParameter('userId', $user->getId());
+
+        return $query->getQuery()->getResult();
     }
 
     /**
@@ -76,4 +77,11 @@ class ClientRepository extends CommonRepository
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getTableAlias()
+    {
+        return 'c';
+    }
 }
