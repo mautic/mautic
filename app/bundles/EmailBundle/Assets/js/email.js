@@ -11,6 +11,8 @@ Mautic.emailOnLoad = function (container) {
     if (typeof Mautic.listCompareChart === 'undefined') {
         Mautic.renderListCompareChart();
     }
+
+    Mautic.initializeEmailFilters(container);
 };
 
 Mautic.emailUnLoad = function() {
@@ -120,3 +122,19 @@ Mautic.renderListCompareChart = function () {
     var data = mQuery.parseJSON(mQuery('#list-compare-chart-data').text());
     Mautic.listCompareChart = new Chart(document.getElementById("list-compare-chart").getContext("2d")).Bar(data, options);
 };
+
+Mautic.initializeEmailFilters = function(container) {
+    var emailForm = mQuery(container + ' #email-filters');
+    if (emailForm.length) {
+        emailForm.on('change', function() {
+            emailForm.submit();
+        }).on('keyup', function() {
+            emailForm.delay(200).submit();
+        }).on('submit', function(e) {
+            e.preventDefault();
+            var formData = emailForm.serialize();
+            var request = window.location.pathname + '?tmpl=list&name=email&' + formData;
+            Mautic.loadContent(request, '', 'POST', '.page-list');
+        });
+    }
+}

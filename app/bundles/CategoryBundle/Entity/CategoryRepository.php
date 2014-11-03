@@ -55,7 +55,7 @@ class CategoryRepository extends CommonRepository
     public function getCategoryList($bundle, $search = '', $limit = 10, $start = 0)
     {
         $q = $this->createQueryBuilder('c');
-        $q->select('partial c.{id, title, alias}');
+        $q->select('partial c.{id, title, alias, color}');
 
         $q->where('c.isPublished = true');
         $q->andWhere('c.bundle = :bundle')
