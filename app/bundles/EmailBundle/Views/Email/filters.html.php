@@ -25,8 +25,7 @@
                         <div class="list-group custom-primary">
                             <?php foreach ($filter['items'] as $item) : ?>
                                 <?php if (isset($item['title']) && $item['title']) : ?>
-                                <a href="javascript:void(0);" class="list-group-item">
-                                <label>
+                                <label class="col-sm-12 list-group-item">
                                     <input 
                                         name="emailFilters[<?php echo $filter['column']; ?>][]"
                                         type="checkbox"
@@ -34,9 +33,8 @@
                                         <?php //echo in_array($typeKey, $eventFilter) ? 'checked' : ''; ?> />
                                     <span class="mr-0"></span> 
                                     <?php echo $item['title']; ?>
-                                    </label>
                                     <i class="fa fa-square mr5 pull-right" <?php echo (isset($item['color']) && $item['color']) ? 'style="color:' . $item['color'] . '"' : ''; ?>></i>
-                                </a>
+                                </label>
                                 <?php endif; ?>
                             <?php endforeach; ?>
                         </div>
