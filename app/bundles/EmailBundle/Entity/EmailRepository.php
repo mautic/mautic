@@ -66,7 +66,8 @@ class EmailRepository extends CommonRepository
             ->createQueryBuilder()
             ->select('e')
             ->from('MauticEmailBundle:Email', 'e', 'e.id')
-            ->leftJoin('e.category', 'c');
+            ->leftJoin('e.category', 'c')
+            ->leftJoin('e.lists', 'l');
 
         $this->buildClauses($q, $args);
 

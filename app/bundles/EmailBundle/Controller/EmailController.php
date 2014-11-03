@@ -61,10 +61,12 @@ class EmailController extends FormController
 
         if ($filters) {
             foreach ($filters as $clmn => $fltr) {
+                $fltrClmn = ($clmn == 'lists') ? 'l.id' : 'e.'.$clmn;
+
                 if (is_array($fltr)) {
-                    $filter['force'][] = array('column' => 'e.' . $clmn, 'expr' => 'in', 'value' => $fltr);
+                    $filter['force'][] = array('column' => $fltrClmn, 'expr' => 'in', 'value' => $fltr);
                 } else {
-                    $filter['force'][] = array('column' => 'e.' . $clmn, 'expr' => 'eq', 'value' => $fltr);
+                    $filter['force'][] = array('column' => $fltrClmn, 'expr' => 'eq', 'value' => $fltr);
                 }
             }
         }
