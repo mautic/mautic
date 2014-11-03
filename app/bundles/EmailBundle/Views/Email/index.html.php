@@ -27,4 +27,12 @@ $view['slots']->set('searchHelp', $view['translator']->trans('mautic.email.help.
     <?php $view['slots']->stop(); ?>
 <?php endif; ?>
 
-<?php $view['slots']->output('_content'); ?>
+<div class="panel panel-default bdr-t-wdh-0 mb-0">
+	<!-- filters -->
+    <?php echo $view->render('MauticEmailBundle:Email:filters.html.php',array('filters' => $filters)); ?>
+    <!--/ filters -->
+    <div class="page-list">
+		<?php $view['slots']->output('_content'); ?>
+	</div>
+</div>
+

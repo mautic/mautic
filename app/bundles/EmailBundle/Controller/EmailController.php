@@ -52,11 +52,22 @@ class EmailController extends FormController
         }
 
         $search = $this->request->get('search', $this->factory->getSession()->get('mautic.email.filter', ''));
+        $filters = $this->request->get('emailFilters', array());
         $this->factory->getSession()->set('mautic.email.filter', $search);
 
         $filter = array('string' => $search, 'force' => array(
             array('column' => 'e.variantParent', 'expr' => 'isNull')
         ));
+
+        if ($filters) {
+            foreach ($filters as $clmn => $fltr) {
+                if (is_array($fltr)) {
+                    $filter['force'][] = array('column' => 'e.' . $clmn, 'expr' => 'in', 'value' => $fltr);
+                } else {
+                    $filter['force'][] = array('column' => 'e.' . $clmn, 'expr' => 'eq', 'value' => $fltr);
+                }
+            }
+        }
 
         if (!$permissions['email:emails:viewother']) {
             $filter['force'][] =
@@ -103,19 +114,26 @@ class EmailController extends FormController
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
         //retrieve a list of categories
-        $categories = $this->factory->getModel('email')->getLookupResults('category', '', 0);
+        $categories = $this->factory->getModel('category')->getLookupResults('email', '', 0);
 
         return $this->delegateView(array(
             'viewParameters'  =>  array(
                 'searchValue' => $search,
                 'items'       => $emails,
-                'categories'  => $categories,
                 'page'        => $page,
                 'limit'       => $limit,
                 'permissions' => $permissions,
                 'model'       => $model,
                 'tmpl'        => $tmpl,
-                'security'    => $this->factory->getSecurity()
+                'security'    => $this->factory->getSecurity(),
+                'filters'     => array(
+                    array(
+                        'column'    => 'category',
+                        'name'      => 'mautic.email.filter.categories',
+                        'items'     => $categories,
+                        'selected'  => array()
+                    )
+                )
             ),
             'contentTemplate' => 'MauticEmailBundle:Email:list.html.php',
             'passthroughVars' => array(
