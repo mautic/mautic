@@ -138,6 +138,7 @@ class Point extends FormEntity
      * Set order
      *
      * @param integer $order
+     *
      * @return Action
      */
     public function setOrder($order)
@@ -163,6 +164,7 @@ class Point extends FormEntity
      * Set properties
      *
      * @param array $properties
+     *
      * @return Action
      */
     public function setProperties($properties)
@@ -187,10 +189,11 @@ class Point extends FormEntity
     /**
      * Set rage
      *
-     * @param \Mautic\PointBundle\Entity\Point $point
+     * @param Point $point
+     *
      * @return Action
      */
-    public function setPoint(\Mautic\PointBundle\Entity\Point $point)
+    public function setPoint(Point $point)
     {
         $this->point = $point;
 
@@ -200,7 +203,7 @@ class Point extends FormEntity
     /**
      * Get rage
      *
-     * @return \Mautic\PointBundle\Entity\Point
+     * @return Point
      */
     public function getPoint()
     {
@@ -211,6 +214,7 @@ class Point extends FormEntity
      * Set type
      *
      * @param string $type
+     *
      * @return Action
      */
     public function setType($type)
@@ -239,11 +243,11 @@ class Point extends FormEntity
         return get_object_vars($this);
     }
 
-
     /**
      * Set description
      *
      * @param string $description
+     *
      * @return Action
      */
     public function setDescription($description)
@@ -268,6 +272,7 @@ class Point extends FormEntity
      * Set name
      *
      * @param string $name
+     *
      * @return Action
      */
     public function setName($name)
@@ -292,6 +297,7 @@ class Point extends FormEntity
      * Add log
      *
      * @param LeadPointLog $log
+     *
      * @return Log
      */
     public function addLog(LeadPointLog $log)
@@ -325,6 +331,7 @@ class Point extends FormEntity
      * Set publishUp
      *
      * @param \DateTime $publishUp
+     *
      * @return Point
      */
     public function setPublishUp($publishUp)
@@ -349,6 +356,7 @@ class Point extends FormEntity
      * Set publishDown
      *
      * @param \DateTime $publishDown
+     *
      * @return Point
      */
     public function setPublishDown($publishDown)
@@ -372,7 +380,7 @@ class Point extends FormEntity
     /**
      * @return mixed
      */
-    public function getCategory ()
+    public function getCategory()
     {
         return $this->category;
     }
@@ -380,7 +388,7 @@ class Point extends FormEntity
     /**
      * @param mixed $category
      */
-    public function setCategory ($category)
+    public function setCategory($category)
     {
         $this->category = $category;
     }

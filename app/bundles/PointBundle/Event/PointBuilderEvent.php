@@ -9,20 +9,30 @@
 
 namespace Mautic\PointBundle\Event;
 
-use Symfony\Component\Process\Exception\InvalidArgumentException;
+use Symfony\Bundle\FrameworkBundle\Translation\Translator;
 use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\Process\Exception\InvalidArgumentException;
 
 /**
  * Class PointBuilderEvent
- *
- * @package Mautic\PointBundle\Event
  */
 class PointBuilderEvent extends Event
 {
+
+    /**
+     * @var array
+     */
     private $actions = array();
+
+    /**
+     * @var Translator
+     */
     private $translator;
 
-    public function __construct($translator)
+    /**
+     * @param Translator $translator
+     */
+    public function __construct(Translator $translator)
     {
         $this->translator = $translator;
     }
@@ -30,8 +40,8 @@ class PointBuilderEvent extends Event
     /**
      * Adds an action to the list of available .
      *
-     * @param string $key - a unique identifier; it is recommended that it be namespaced i.e. lead.action
-     * @param array $action - can contain the following keys:
+     * @param string $key    - a unique identifier; it is recommended that it be namespaced i.e. lead.action
+     * @param array  $action - can contain the following keys:
      *  'group'       => (required) translation string to group actions by
      *  'label'       => (required) what to display in the list
      *  'description' => (optional) short description of event
@@ -50,6 +60,9 @@ class PointBuilderEvent extends Event
      *              'name' => string
      *              'properties' => array()
      *         )
+     *
+     * @return void
+     * @throws InvalidArgumentException
      */
     public function addAction($key, array $action)
     {
@@ -83,8 +96,10 @@ class PointBuilderEvent extends Event
         return $this->actions;
     }
 
-    /*
+    /**
      * Gets a list of actions supported by the choice form field
+     *
+     * @return array
      */
     public function getActionList()
     {
@@ -97,7 +112,12 @@ class PointBuilderEvent extends Event
     }
 
     /**
+     * @param array $keys
+     * @param array $methods
      * @param array $component
+     *
+     * @return void
+     * @throws InvalidArgumentException
      */
     private function verifyComponent(array $keys, array $methods, array $component)
     {

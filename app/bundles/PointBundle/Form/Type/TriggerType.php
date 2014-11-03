@@ -20,27 +20,33 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * Class TriggerType
- *
- * @package Mautic\PointBundle\Form\Type
  */
 class TriggerType extends AbstractType
 {
 
+    /**
+     * @var \Mautic\CoreBundle\Security\Permissions\CorePermissions
+     */
+    private $security;
+
+    /**
+     * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
+     */
     private $translator;
 
     /**
      * @param MauticFactory $factory
      */
-    public function __construct(MauticFactory $factory) {
+    public function __construct(MauticFactory $factory)
+    {
         $this->translator = $factory->getTranslator();
         $this->security   = $factory->getSecurity();
     }
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
+     * {@inheritdoc}
      */
-    public function buildForm (FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber());
         $builder->addEventSubscriber(new FormExitSubscriber('point', $options));
@@ -151,7 +157,7 @@ class TriggerType extends AbstractType
     }
 
     /**
-     * @param OptionsResolverInterface $resolver
+     * {@inheritdoc}
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
@@ -161,9 +167,10 @@ class TriggerType extends AbstractType
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
-    public function getName() {
+    public function getName()
+    {
         return "pointtrigger";
     }
 }

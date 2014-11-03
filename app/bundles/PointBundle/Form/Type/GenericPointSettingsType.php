@@ -19,14 +19,11 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * Class GenericPointSettingsType
- *
- * @package Mautic\PointBundle\Form\Type
  */
 class GenericPointSettingsType extends AbstractType
 {
     /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
+     * {@inheritdoc}
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
@@ -45,9 +42,10 @@ class GenericPointSettingsType extends AbstractType
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
-    public function getName() {
+    public function getName()
+    {
         return "genericpoint_settings";
     }
 }

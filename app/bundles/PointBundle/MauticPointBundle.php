@@ -13,10 +13,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
  * Class MauticPointBundle
- *
- * @package Mautic\PointBundle
  */
 class MauticPointBundle extends Bundle
 {
-
 }

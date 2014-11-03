@@ -15,8 +15,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class AjaxController
- *
- * @package Mautic\PointBundle\Controller
  */
 class AjaxController extends CommonAjaxController
 {
@@ -26,7 +24,7 @@ class AjaxController extends CommonAjaxController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    protected function reorderTriggerEventsAction (Request $request)
+    protected function reorderTriggerEventsAction(Request $request)
     {
         $dataArray  = array('success' => 0);
         $session    = $this->factory->getSession();
@@ -61,18 +59,13 @@ class AjaxController extends CommonAjaxController
             $actions = $model->getPointActions();
 
             if (isset($actions['actions'][$type])) {
-                $formType = (!empty($actions['actions'][$type]['formType'])) ? $actions['actions'][$type]['formType'] :
-                    'genericpoint_settings';
+                $formType = (!empty($actions['actions'][$type]['formType'])) ? $actions['actions'][$type]['formType'] : 'genericpoint_settings';
+                $form     = $this->get('form.factory')->create('pointaction', array(), array('formType' => $formType));
+                $formView = $this->setFormTheme($form, 'MauticPointBundle:Point:actionform.html.php', 'MauticPointBundle:PointForm');
+                $html     = $this->renderView('MauticPointBundle:Point:actionform.html.php', array('form' => $formView));
 
-                $form = $this->get('form.factory')->create('pointaction', array(), array('formType' => $formType));
-                $formView = $form->createView();
-                $this->factory->getTemplating()->getEngine('MauticPointBundle:Point:actionform.html.php')->get('form')
-                    ->setTheme($formView, 'MauticPointBundle:PointForm');
-                $html = $this->renderView('MauticPointBundle:Point:actionform.html.php', array(
-                    'form' => $formView
-                ));
                 //replace pointaction with point
-                $html = str_replace('pointaction', 'point', $html);
+                $html                 = str_replace('pointaction', 'point', $html);
                 $dataArray['html']    = $html;
                 $dataArray['success'] = 1;
             }

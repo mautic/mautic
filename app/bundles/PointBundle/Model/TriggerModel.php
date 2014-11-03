@@ -20,8 +20,6 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
  * Class TriggerModel
- * {@inheritdoc}
- * @package Mautic\CoreBundle\Model\FormModel
  */
 class TriggerModel extends CommonFormModel
 {
@@ -29,13 +27,18 @@ class TriggerModel extends CommonFormModel
     /**
      * {@inheritdoc}
      *
-     * @return string
+     * @return \Mautic\PointBundle\Entity\TriggerRepository
      */
     public function getRepository()
     {
         return $this->em->getRepository('MauticPointBundle:Trigger');
     }
 
+    /**
+     * Retrieves an instance of the TriggerEventRepository
+     *
+     * @return \Mautic\PointBundle\Entity\TriggerEventRepository
+     */
     public function getEventRepository()
     {
         return $this->em->getRepository('MauticPointBundle:TriggerEvent');
@@ -43,8 +46,6 @@ class TriggerModel extends CommonFormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
     public function getPermissionBase()
     {
@@ -54,12 +55,7 @@ class TriggerModel extends CommonFormModel
     /**
      * {@inheritdoc}
      *
-     * @param      $entity
-     * @param      $formFactory
-     * @param null $action
-     * @param array $options
-     * @return mixed
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws MethodNotAllowedHttpException
      */
     public function createForm($entity, $formFactory, $action = null, $options = array())
     {
@@ -143,10 +139,9 @@ class TriggerModel extends CommonFormModel
     }
 
     /**
-     * Get a specific entity or generate a new one if id is empty
+     * {@inheritdoc}
      *
-     * @param $id
-     * @return null|object
+     * @return Trigger|null
      */
     public function getEntity($id = null)
     {
@@ -154,19 +149,13 @@ class TriggerModel extends CommonFormModel
             return new Trigger();
         }
 
-        $entity = parent::getEntity($id);
-
-        return $entity;
+        return parent::getEntity($id);
     }
 
     /**
      * {@inheritdoc}
      *
-     * @param $action
-     * @param $event
-     * @param $entity
-     * @param $isNew
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, $event = false)
     {
@@ -198,14 +187,16 @@ class TriggerModel extends CommonFormModel
 
             $this->dispatcher->dispatch($name, $event);
             return $event;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**
      * @param Trigger $entity
-     * @param       $sessionEvents
+     * @param array   $sessionEvents
+     *
+     * @return void
      */
     public function setEvents(Trigger &$entity, $sessionEvents)
     {
@@ -233,7 +224,8 @@ class TriggerModel extends CommonFormModel
     }
 
     /**
-     * Gets array of custom events from bundles subscribed PointEvents::POINT_ON_BUILD
+     * Gets array of custom events from bundles subscribed PointEvents::TRIGGER_ON_BUILD
+     *
      * @return mixed
      */
     public function getEvents()
@@ -255,8 +247,9 @@ class TriggerModel extends CommonFormModel
      * Triggers a specific event
      *
      * @param TriggerEvent $event
-     * @param Lead $lead
-     * @param bool $checkApplied
+     * @param Lead         $lead
+     * @param bool         $checkApplied
+     *
      * @return bool Was event triggered
      */
     public function triggerEvent(TriggerEvent $event, Lead $lead = null, $checkApplied = true)

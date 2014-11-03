@@ -15,8 +15,6 @@ use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 
 /**
  * Class PointPermissions
- *
- * @package Mautic\PointBundle\Security\Permissions
  */
 class PointPermissions extends AbstractPermissions
 {
@@ -35,19 +33,14 @@ class PointPermissions extends AbstractPermissions
 
     /**
      * {@inheritdoc}
-     *
-     * @return string|void
      */
-    public function getName() {
+    public function getName()
+    {
         return 'point';
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     * @param array                $data
      */
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {
@@ -58,10 +51,8 @@ class PointPermissions extends AbstractPermissions
 
     /**
      * {@inheritdoc}
-     *
-     * @param array $permissions
      */
-    public function analyzePermissions (array &$permissions)
+    public function analyzePermissions(array &$permissions)
     {
         parent::analyzePermissions($permissions);
 

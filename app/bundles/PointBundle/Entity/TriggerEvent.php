@@ -116,6 +116,7 @@ class TriggerEvent
      * Set order
      *
      * @param integer $order
+     *
      * @return TriggerEvent
      */
     public function setOrder($order)
@@ -141,6 +142,7 @@ class TriggerEvent
      * Set properties
      *
      * @param array $properties
+     *
      * @return TriggerEvent
      */
     public function setProperties($properties)
@@ -165,10 +167,11 @@ class TriggerEvent
     /**
      * Set trigger
      *
-     * @param \Mautic\PointBundle\Entity\Trigger $trigger
+     * @param Trigger $trigger
+     *
      * @return TriggerTriggerEvent
      */
-    public function setTrigger(\Mautic\PointBundle\Entity\Trigger $trigger)
+    public function setTrigger(Trigger $trigger)
     {
         $this->trigger = $trigger;
 
@@ -178,7 +181,7 @@ class TriggerEvent
     /**
      * Get trigger
      *
-     * @return \Mautic\PointBundle\Entity\Trigger
+     * @return Trigger
      */
     public function getTrigger()
     {
@@ -189,6 +192,7 @@ class TriggerEvent
      * Set type
      *
      * @param string $type
+     *
      * @return TriggerEvent
      */
     public function setType($type)
@@ -217,11 +221,11 @@ class TriggerEvent
         return get_object_vars($this);
     }
 
-
     /**
      * Set description
      *
      * @param string $description
+     *
      * @return TriggerEvent
      */
     public function setDescription($description)
@@ -246,6 +250,7 @@ class TriggerEvent
      * Set name
      *
      * @param string $name
+     *
      * @return TriggerEvent
      */
     public function setName($name)
@@ -270,6 +275,7 @@ class TriggerEvent
      * Add log
      *
      * @param LeadPointLog $log
+     *
      * @return Log
      */
     public function addLog(LeadPointLog $log)

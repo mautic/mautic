@@ -14,8 +14,6 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
  * Class TriggerRepository
- *
- * @package Mautic\PointBundle\Entity
  */
 class TriggerRepository extends CommonRepository
 {
@@ -54,15 +52,16 @@ class TriggerRepository extends CommonRepository
         return $results;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getTableAlias()
     {
         return 't';
     }
 
     /**
-     * @param QueryBuilder $q
-     * @param              $filter
-     * @return array
+     * {@inheritdoc}
      */
     protected function addCatchAllWhereClause(&$q, $filter)
     {
@@ -73,9 +72,7 @@ class TriggerRepository extends CommonRepository
     }
 
     /**
-     * @param QueryBuilder $q
-     * @param              $filter
-     * @return array
+     * {@inheritdoc}
      */
     protected function addSearchCommandWhereClause(&$q, $filter)
     {
@@ -83,7 +80,7 @@ class TriggerRepository extends CommonRepository
     }
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
     public function getSearchCommands()
     {

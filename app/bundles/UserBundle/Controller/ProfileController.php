@@ -40,7 +40,7 @@ class ProfileController extends FormController
         );
 
         $action = $this->generateUrl('mautic_user_account');
-        $form   = $model->createForm($me, $this->get('form.factory'), $action, array('ignore_formexit' => true));
+        $form   = $model->createForm($me, $this->get('form.factory'), $action);
 
         //remove items that cannot be edited by person themselves
         $form->remove('role');

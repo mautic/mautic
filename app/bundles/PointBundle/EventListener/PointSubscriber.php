@@ -19,22 +19,20 @@ use Mautic\LeadBundle\LeadEvents;
 
 /**
  * Class PointSubscriber
- *
- * @package Mautic\PointBundle\EventListener
  */
 class PointSubscriber extends CommonSubscriber
 {
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
     static public function getSubscribedEvents()
     {
         return array(
             PointEvents::POINT_POST_SAVE     => array('onPointPostSave', 0),
             PointEvents::POINT_POST_DELETE   => array('onPointDelete', 0),
-            PointEvents::TRIGGER_POST_SAVE     => array('onTriggerPostSave', 0),
-            PointEvents::TRIGGER_POST_DELETE   => array('onTriggerDelete', 0),
+            PointEvents::TRIGGER_POST_SAVE   => array('onTriggerPostSave', 0),
+            PointEvents::TRIGGER_POST_DELETE => array('onTriggerDelete', 0),
             LeadEvents::TIMELINE_ON_GENERATE => array('onTimelineGenerate', 0)
         );
     }

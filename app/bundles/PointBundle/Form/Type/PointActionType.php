@@ -16,15 +16,12 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * Class PointActionType
- *
- * @package Mautic\PointBundle\Form\Type
  */
 class PointActionType extends AbstractType
 {
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
+     * {@inheritdoc}
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
@@ -33,6 +30,9 @@ class PointActionType extends AbstractType
         ));
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
@@ -41,9 +41,10 @@ class PointActionType extends AbstractType
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
-    public function getName() {
+    public function getName()
+    {
         return "pointaction";
     }
 }

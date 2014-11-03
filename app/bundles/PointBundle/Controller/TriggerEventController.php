@@ -13,19 +13,23 @@ use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\PointBundle\Entity\TriggerEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
+/**
+ * Class TriggerEventController
+ */
 class TriggerEventController extends CommonFormController
 {
+
     /**
      * Generates new form and processes post data
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse
      */
-    public function newAction ()
+    public function newAction()
     {
-        $success     = 0;
-        $valid       = $cancelled = false;
-        $method      = $this->request->getMethod();
-        $session     = $this->factory->getSession();
+        $success = 0;
+        $valid   = $cancelled = false;
+        $method  = $this->request->getMethod();
+        $session = $this->factory->getSession();
 
         if ($method == 'POST') {
             $triggerEvent = $this->request->request->get('triggerevent');
@@ -75,8 +79,6 @@ class TriggerEventController extends CommonFormController
                     }
                     $actions[$keyId]  = $triggerEvent;
                     $session->set('mautic.pointtriggers.add', $actions);
-                } else {
-                    $success = 0;
                 }
             }
         }
@@ -103,8 +105,8 @@ class TriggerEventController extends CommonFormController
 
         if (!empty($keyId) ) {
             //prevent undefined errors
-            $entity      = new TriggerEvent();
-            $blank       = $entity->convertToArray();
+            $entity       = new TriggerEvent();
+            $blank        = $entity->convertToArray();
             $triggerEvent = array_merge($blank, $triggerEvent);
 
             $template = (empty($triggerEvent['settings']['template'])) ? 'MauticPointBundle:Action:generic.html.php'
@@ -125,27 +127,29 @@ class TriggerEventController extends CommonFormController
             $response  = new JsonResponse($passthroughVars);
             $response->headers->set('Content-Length', strlen($response->getContent()));
             return $response;
-        } else {
-            return $this->ajaxAction(array(
-                'contentTemplate' => 'MauticPointBundle:TriggerBuilder:' . $viewParams['tmpl'] . '.html.php',
-                'viewParameters'  => $viewParams,
-                'passthroughVars' => $passthroughVars
-            ));
         }
+
+        return $this->ajaxAction(array(
+            'contentTemplate' => 'MauticPointBundle:TriggerBuilder:' . $viewParams['tmpl'] . '.html.php',
+            'viewParameters'  => $viewParams,
+            'passthroughVars' => $passthroughVars
+        ));
     }
 
     /**
      * Generates edit form and processes post data
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @param int $objectId
+     *
+     * @return JsonResponse
      */
-    public function editAction ($objectId)
+    public function editAction($objectId)
     {
-        $session    = $this->factory->getSession();
-        $method     = $this->request->getMethod();
-        $actions    = $session->get('mautic.pointtriggers.add', array());
-        $success    = 0;
-        $valid      = $cancelled = false;
+        $session      = $this->factory->getSession();
+        $method       = $this->request->getMethod();
+        $actions      = $session->get('mautic.pointtriggers.add', array());
+        $success      = 0;
+        $valid        = $cancelled = false;
         $triggerEvent = (array_key_exists($objectId, $actions)) ? $actions[$objectId] : null;
 
         if ($triggerEvent !== null) {
@@ -238,30 +242,32 @@ class TriggerEventController extends CommonFormController
                 $response  = new JsonResponse($passthroughVars);
                 $response->headers->set('Content-Length', strlen($response->getContent()));
                 return $response;
-            } else {
-                return $this->ajaxAction(array(
-                    'contentTemplate' => 'MauticPointBundle:TriggerBuilder:' . $viewParams['tmpl'] . '.html.php',
-                    'viewParameters'  => $viewParams,
-                    'passthroughVars' => $passthroughVars
-                ));
             }
-        } else {
-            $response  = new JsonResponse(array('success' => 0));
-            $response->headers->set('Content-Length', strlen($response->getContent()));
-            return $response;
+
+            return $this->ajaxAction(array(
+                'contentTemplate' => 'MauticPointBundle:TriggerBuilder:' . $viewParams['tmpl'] . '.html.php',
+                'viewParameters'  => $viewParams,
+                'passthroughVars' => $passthroughVars
+            ));
         }
+
+        $response  = new JsonResponse(array('success' => 0));
+        $response->headers->set('Content-Length', strlen($response->getContent()));
+        return $response;
     }
 
     /**
      * Deletes the entity
      *
-     * @param         $objectId
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @param int $objectId
+     *
+     * @return JsonResponse
      */
-    public function deleteAction($objectId) {
-        $session   = $this->factory->getSession();
-        $actions   = $session->get('mautic.pointtriggers.add', array());
-        $delete    = $session->get('mautic.pointtriggers.remove', array());
+    public function deleteAction($objectId)
+    {
+        $session = $this->factory->getSession();
+        $actions = $session->get('mautic.pointtriggers.add', array());
+        $delete  = $session->get('mautic.pointtriggers.remove', array());
 
         //ajax only for form fields
         if (!$this->request->isXmlHttpRequest() ||
@@ -316,10 +322,12 @@ class TriggerEventController extends CommonFormController
     /**
      * Undeletes the entity
      *
-     * @param         $objectId
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @param int $objectId
+     *
+     * @return JsonResponse
      */
-    public function undeleteAction($objectId) {
+    public function undeleteAction($objectId)
+    {
         $session   = $this->factory->getSession();
         $actions   = $session->get('mautic.pointtriggers.add', array());
         $delete    = $session->get('mautic.pointtriggers.remove', array());

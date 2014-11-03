@@ -9,8 +9,9 @@
 
 namespace Mautic\PointBundle\Event;
 
-use Symfony\Component\Process\Exception\InvalidArgumentException;
+use Symfony\Bundle\FrameworkBundle\Translation\Translator;
 use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\Process\Exception\InvalidArgumentException;
 
 /**
  * Class TriggerBuilderEvent
@@ -19,10 +20,21 @@ use Symfony\Component\EventDispatcher\Event;
  */
 class TriggerBuilderEvent extends Event
 {
-    private $events = array();
+
+    /**
+     * @var array
+     */
+    private $actions = array();
+
+    /**
+     * @var Translator
+     */
     private $translator;
 
-    public function __construct($translator)
+    /**
+     * @param Translator $translator
+     */
+    public function __construct(Translator $translator)
     {
         $this->translator = $translator;
     }
@@ -54,6 +66,9 @@ class TriggerBuilderEvent extends Event
      *                  'color'  => string
      *              )
      *         )
+     *
+     * @return void
+     * @throws InvalidArgumentException
      */
     public function addEvent($key, array $action)
     {
@@ -88,7 +103,12 @@ class TriggerBuilderEvent extends Event
     }
 
     /**
+     * @param array $keys
+     * @param array $methods
      * @param array $component
+     *
+     * @return void
+     * @throws InvalidArgumentException
      */
     private function verifyComponent(array $keys, array $methods, array $component)
     {
