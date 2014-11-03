@@ -53,7 +53,7 @@ $container->setDefinition('mautic.form.type.campaignaction_email', new Definitio
     ));
 
 $container->setDefinition('mautic.validator.leadlistaccess', new Definition(
-        'Mautic\EmailBundle\Form\Validator\Constraints\LeadListAccessValidator',
+        'Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccessValidator',
         array(new Reference('mautic.factory'))
     ))
     ->addTag('validator.constraint_validator', array('alias' => 'leadlist_access'));
