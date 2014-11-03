@@ -38,3 +38,12 @@ $container->setDefinition(
     )
 )
     ->addTag('kernel.event_subscriber');
+
+$container->setDefinition(
+    'mautic.form.reportbundle.subscriber',
+    new Definition(
+        'Mautic\FormBundle\EventListener\ReportSubscriber',
+        array(new Reference('mautic.factory'))
+    )
+)
+    ->addTag('kernel.event_subscriber');
