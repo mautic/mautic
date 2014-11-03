@@ -15,11 +15,12 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 /**
  * Class PointRepository
- *
- * @package Mautic\PointBundle\Entity
  */
 class PointRepository extends CommonRepository
 {
+    /**
+     * {@inheritdoc}
+     */
     public function getTableAlias()
     {
         return 'p';
@@ -28,7 +29,7 @@ class PointRepository extends CommonRepository
     /**
      * Get array of published actions based on type
      *
-     * @param $type
+     * @param string $type
      *
      * @return array
      */
@@ -57,13 +58,12 @@ class PointRepository extends CommonRepository
             ->setParameter('now', $now)
             ->setParameter('type', $type);
 
-        $results = $q->getQuery()->getResult();
-        return $results;
+        return $q->getQuery()->getResult();
     }
 
     /**
-     * @param $type
-     * @param $leadId
+     * @param string $type
+     * @param int    $leadId
      *
      * @return array
      */
@@ -86,6 +86,7 @@ class PointRepository extends CommonRepository
         $results = $q->execute()->fetchAll();
 
         $return = array();
+
         foreach ($results as $r) {
             $return[$r['id']] = $r;
         }
@@ -94,9 +95,7 @@ class PointRepository extends CommonRepository
     }
 
     /**
-     * @param QueryBuilder $q
-     * @param              $filter
-     * @return array
+     * {@inheritdoc}
      */
     protected function addCatchAllWhereClause(&$q, $filter)
     {
@@ -107,9 +106,7 @@ class PointRepository extends CommonRepository
     }
 
     /**
-     * @param QueryBuilder $q
-     * @param              $filter
-     * @return array
+     * {@inheritdoc}
      */
     protected function addSearchCommandWhereClause(&$q, $filter)
     {
@@ -117,7 +114,7 @@ class PointRepository extends CommonRepository
     }
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
     public function getSearchCommands()
     {

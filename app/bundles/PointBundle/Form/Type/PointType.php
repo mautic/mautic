@@ -20,25 +20,31 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * Class PointType
- *
- * @package Mautic\PointBundle\Form\Type
  */
 class PointType extends AbstractType
 {
 
+    /**
+     * @var \Mautic\CoreBundle\Security\Permissions\CorePermissions
+     */
+    private $security;
+
+    /**
+     * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
+     */
     private $translator;
 
     /**
      * @param MauticFactory $factory
      */
-    public function __construct(MauticFactory $factory) {
+    public function __construct(MauticFactory $factory)
+    {
         $this->translator = $factory->getTranslator();
         $this->security   = $factory->getSecurity();
     }
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
+     * {@inheritdoc}
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
@@ -145,7 +151,7 @@ class PointType extends AbstractType
     }
 
     /**
-     * @param OptionsResolverInterface $resolver
+     * {@inheritdoc}
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
@@ -159,9 +165,10 @@ class PointType extends AbstractType
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
-    public function getName() {
+    public function getName()
+    {
         return "point";
     }
 }

@@ -15,17 +15,18 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Class TriggerController
+ */
 class TriggerController extends FormController
 {
     /**
-     * @param int    $page
-     * @param string $view
+     * @param int $page
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function indexAction ($page = 1)
+    public function indexAction($page = 1)
     {
-
         //set some permissions
         $permissions = $this->factory->getSecurity()->isGranted(array(
             'point:triggers:view',
@@ -69,12 +70,7 @@ class TriggerController extends FormController
 
         $count = count($triggers);
         if ($count && $count < ($start + 1)) {
-            //the number of entities are now less then the current page so redirect to the last page
-            if ($count === 1) {
-                $lastPage = 1;
-            } else {
-                $lastPage = (floor($limit / $count)) ?: 1;
-            }
+            $lastPage = ($count === 1) ? 1 : (floor($limit / $count)) ?: 1;
             $this->factory->getSession()->set('mautic.point.trigger.page', $lastPage);
             $returnUrl = $this->generateUrl('mautic_pointtrigger_index', array('page' => $lastPage));
 
@@ -114,15 +110,16 @@ class TriggerController extends FormController
     }
 
     /**
-     * View a specific point
+     * View a specific trigger
      *
-     * @param $objectId
+     * @param int $objectId
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function viewAction ($objectId)
+    public function viewAction($objectId)
     {
         $entity = $this->factory->getModel('point.trigger')->getEntity($objectId);
+
         //set the page we came from
         $page = $this->factory->getSession()->get('mautic.point.trigger.page', 1);
 
@@ -175,16 +172,14 @@ class TriggerController extends FormController
                 )
             )
         ));
-
-        return $this->indexAction($page, 'view', $entity);
     }
 
     /**
      * Generates new form and processes post data
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function newAction ()
+    public function newAction()
     {
         $model   = $this->factory->getModel('point.trigger');
         $entity  = $model->getEntity();
@@ -236,17 +231,17 @@ class TriggerController extends FormController
                             ), 'flashes')
                         );
 
-                        if ($form->get('buttons')->get('save')->isClicked()) {
-                            $viewParameters = array(
-                                'objectAction' => 'view',
-                                'objectId'     => $entity->getId()
-                            );
-                            $returnUrl      = $this->generateUrl('mautic_pointtrigger_action', $viewParameters);
-                            $template       = 'MauticPointBundle:Trigger:view';
-                        } else {
+                        if (!$form->get('buttons')->get('save')->isClicked()) {
                             //return edit view so that all the session stuff is loaded
                             return $this->editAction($entity->getId(), true);
                         }
+
+                        $viewParameters = array(
+                            'objectAction' => 'view',
+                            'objectId'     => $entity->getId()
+                        );
+                        $returnUrl      = $this->generateUrl('mautic_pointtrigger_action', $viewParameters);
+                        $template       = 'MauticPointBundle:Trigger:view';
                     }
                 }
             } else {
@@ -298,9 +293,12 @@ class TriggerController extends FormController
     /**
      * Generates edit form and processes post data
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @param int  $objectId
+     * @param bool $ignorePost
+     *
+     * @return JsonResponse|Response
      */
-    public function editAction ($objectId, $ignorePost = false)
+    public function editAction($objectId, $ignorePost = false)
     {
         $model      = $this->factory->getModel('point.trigger');
         $entity     = $model->getEntity($objectId);
@@ -321,6 +319,7 @@ class TriggerController extends FormController
                 'mauticContent' => 'pointTrigger'
             )
         );
+
         //form not found
         if ($entity === null) {
             return $this->postActionRedirect(
@@ -463,11 +462,11 @@ class TriggerController extends FormController
     /**
      * Clone an entity
      *
-     * @param $objectId
+     * @param int $objectId
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function cloneAction ($objectId)
+    public function cloneAction($objectId)
     {
         $model  = $this->factory->getModel('point.trigger');
         $entity = $model->getEntity($objectId);
@@ -489,11 +488,11 @@ class TriggerController extends FormController
     /**
      * Deletes the entity
      *
-     * @param         $objectId
+     * @param $objectId
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function deleteAction ($objectId)
+    public function deleteAction($objectId)
     {
         $page      = $this->factory->getSession()->get('mautic.point.trigger.page', 1);
         $returnUrl = $this->generateUrl('mautic_pointtrigger_index', array('page' => $page));
@@ -550,7 +549,8 @@ class TriggerController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function batchDeleteAction() {
+    public function batchDeleteAction()
+    {
         $page      = $this->factory->getSession()->get('mautic.point.trigger.page', 1);
         $returnUrl = $this->generateUrl('mautic_pointtrigger_index', array('page' => $page));
         $flashes   = array();
@@ -613,7 +613,7 @@ class TriggerController extends FormController
     /**
      * Clear field and events from the session
      */
-    public function clearSessionComponents ()
+    public function clearSessionComponents()
     {
         $session = $this->factory->getSession();
         $session->remove('mautic.pointtriggers.add');

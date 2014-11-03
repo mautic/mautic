@@ -15,14 +15,12 @@ use Mautic\LeadBundle\LeadEvents;
 
 /**
  * Class LeadSubscriber
- *
- * @package Mautic\PointBundle\EventListener
  */
 class LeadSubscriber extends CommonSubscriber
 {
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
     static public function getSubscribedEvents()
     {

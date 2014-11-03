@@ -14,19 +14,28 @@ use Mautic\PointBundle\Entity\Trigger;
 
 /**
  * Class TriggerEvent
- *
- * @package Mautic\TriggerBundle\Event
  */
 class TriggerEvent extends CommonEvent
 {
+
+    /**
+     * @var Trigger
+     */
+    private $entity;
+
+    /**
+     * @var bool
+     */
+    private $isNew;
+
     /**
      * @param Trigger $trigger
-     * @param bool $isNew
+     * @param bool    $isNew
      */
     public function __construct(Trigger &$trigger, $isNew = false)
     {
-        $this->entity  =& $trigger;
-        $this->isNew = $isNew;
+        $this->entity =& $trigger;
+        $this->isNew  = $isNew;
     }
 
     /**

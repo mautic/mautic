@@ -10,10 +10,9 @@
 namespace Mautic\PointBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
-use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 /**
- * ActionRepository
+ * TriggerEventRepository
  */
 class TriggerEventRepository extends CommonRepository
 {
@@ -21,7 +20,7 @@ class TriggerEventRepository extends CommonRepository
     /**
      * Get array of published triggers based on point total
      *
-     * @param $points
+     * @param int $points
      *
      * @return array
      */
@@ -42,14 +41,13 @@ class TriggerEventRepository extends CommonRepository
         $q->where($expr)
             ->setParameter('now', $now);
 
-        $results = $q->getQuery()->getResult();
-        return $results;
+        return $q->getQuery()->getResult();
     }
 
     /**
      * Get array of published actions based on type
      *
-     * @param $type
+     * @param string $type
      *
      * @return array
      */
@@ -75,8 +73,7 @@ class TriggerEventRepository extends CommonRepository
     }
 
     /**
-     * @param $type
-     * @param $leadId
+     * @param int $leadId
      *
      * @return array
      */
@@ -94,6 +91,7 @@ class TriggerEventRepository extends CommonRepository
         $results = $q->execute()->fetchAll();
 
         $return = array();
+
         foreach ($results as $r) {
             $return[$r['id']] = $r;
         }
@@ -103,8 +101,7 @@ class TriggerEventRepository extends CommonRepository
 
 
     /**
-     * @param $type
-     * @param $eventId
+     * @param int $eventId
      *
      * @return array
      */
@@ -118,6 +115,7 @@ class TriggerEventRepository extends CommonRepository
             ->fetchAll();
 
         $return = array();
+
         foreach ($results as $r) {
             $return[] = $r['lead_id'];
         }

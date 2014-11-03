@@ -16,15 +16,12 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * Class TriggerEventType
- *
- * @package Mautic\PointBundle\Form\Type
  */
 class TriggerEventType extends AbstractType
 {
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
+     * {@inheritdoc}
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
@@ -75,9 +72,8 @@ class TriggerEventType extends AbstractType
         }
     }
 
-
     /**
-     * @param OptionsResolverInterface $resolver
+     * {@inheritdoc}
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
@@ -89,9 +85,10 @@ class TriggerEventType extends AbstractType
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
-    public function getName() {
+    public function getName()
+    {
         return "pointtriggerevent";
     }
 }

@@ -14,8 +14,6 @@ use Mautic\PointBundle\Entity\TriggerEvent;
 
 /**
  * Class TriggerEventModel
- * {@inheritdoc}
- * @package Mautic\CoreBundle\Model\FormModel
  */
 class TriggerEventModel extends CommonFormModel
 {
@@ -23,7 +21,7 @@ class TriggerEventModel extends CommonFormModel
     /**
      * {@inheritdoc}
      *
-     * @return string
+     * @return \Mautic\PointBundle\Entity\TriggerEventRepository
      */
     public function getRepository()
     {
@@ -32,8 +30,6 @@ class TriggerEventModel extends CommonFormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
     public function getPermissionBase()
     {
@@ -41,10 +37,9 @@ class TriggerEventModel extends CommonFormModel
     }
 
     /**
-     * Get a specific entity or generate a new one if id is empty
+     * {@inheritdoc}
      *
-     * @param $id
-     * @return null|object
+     * @return TriggerEvent|null
      */
     public function getEntity($id = null)
     {
@@ -52,8 +47,6 @@ class TriggerEventModel extends CommonFormModel
             return new TriggerEvent();
         }
 
-        $entity = parent::getEntity($id);
-
-        return $entity;
+        return parent::getEntity($id);
     }
 }

@@ -13,16 +13,18 @@ use Mautic\CoreBundle\Controller\FormController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Class PointController
+ */
 class PointController extends FormController
 {
     /**
-     * @param int    $page
-     * @param string $view
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @param int $page
+     *
+     * @return JsonResponse|Response
      */
     public function indexAction($page = 1)
     {
-
         //set some permissions
         $permissions = $this->factory->getSecurity()->isGranted(array(
             'point:points:view',
@@ -30,7 +32,6 @@ class PointController extends FormController
             'point:points:edit',
             'point:points:delete',
             'point:points:publish'
-
         ), "RETURN_ARRAY");
 
         if (!$permissions['point:points:view']) {
@@ -43,7 +44,7 @@ class PointController extends FormController
 
         //set limits
         $limit = $this->factory->getSession()->get('mautic.point.limit', $this->factory->getParameter('default_pagelimit'));
-        $start = ($page === 1) ? 0 : (($page-1) * $limit);
+        $start = ($page === 1) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
         }
@@ -51,27 +52,21 @@ class PointController extends FormController
         $search = $this->request->get('search', $this->factory->getSession()->get('mautic.point.filter', ''));
         $this->factory->getSession()->set('mautic.point.filter', $search);
 
-        $filter      = array('string' => $search, 'force' => array());
-        $orderBy     = $this->factory->getSession()->get('mautic.point.orderby', 'p.name');
-        $orderByDir  = $this->factory->getSession()->get('mautic.point.orderbydir', 'ASC');
+        $filter     = array('string' => $search, 'force' => array());
+        $orderBy    = $this->factory->getSession()->get('mautic.point.orderby', 'p.name');
+        $orderByDir = $this->factory->getSession()->get('mautic.point.orderbydir', 'ASC');
 
-        $points = $this->factory->getModel('point')->getEntities(
-            array(
-                'start'      => $start,
-                'limit'      => $limit,
-                'filter'     => $filter,
-                'orderBy'    => $orderBy,
-                'orderByDir' => $orderByDir
-            ));
+        $points = $this->factory->getModel('point')->getEntities(array(
+            'start'      => $start,
+            'limit'      => $limit,
+            'filter'     => $filter,
+            'orderBy'    => $orderBy,
+            'orderByDir' => $orderByDir
+        ));
 
         $count = count($points);
         if ($count && $count < ($start + 1)) {
-            //the number of entities are now less then the current page so redirect to the last page
-            if ($count === 1) {
-                $lastPage = 1;
-            } else {
-                $lastPage = (floor($limit / $count)) ? : 1;
-            }
+            $lastPage = ($count === 1) ? 1 : (floor($limit / $count)) ?: 1;
             $this->factory->getSession()->set('mautic.point.page', $lastPage);
             $returnUrl   = $this->generateUrl('mautic_point_index', array('page' => $lastPage));
 
@@ -117,8 +112,9 @@ class PointController extends FormController
     /**
      * View a specific point
      *
-     * @param $objectId
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @param int $objectId
+     *
+     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function viewAction($objectId)
     {
@@ -175,15 +171,14 @@ class PointController extends FormController
                 )
             )
         ));
-        return $this->indexAction($page, 'view', $entity);
     }
 
     /**
      * Generates new form and processes post data
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function newAction ()
+    public function newAction()
     {
         $model   = $this->factory->getModel('point');
         $entity  = $model->getEntity();
@@ -193,7 +188,7 @@ class PointController extends FormController
         }
 
         //set the page we came from
-        $page   = $this->factory->getSession()->get('mautic.point.page', 1);
+        $page = $this->factory->getSession()->get('mautic.point.page', 1);
 
         $actionType = ($this->request->getMethod() == 'POST') ? $this->request->request->get('point[type]', '', true) : '';
 
@@ -278,18 +273,21 @@ class PointController extends FormController
     /**
      * Generates edit form and processes post data
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @param int  $objectId
+     * @param bool $ignorePost
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function editAction ($objectId, $ignorePost = false)
+    public function editAction($objectId, $ignorePost = false)
     {
-        $model      = $this->factory->getModel('point');
-        $entity     = $model->getEntity($objectId);
+        $model  = $this->factory->getModel('point');
+        $entity = $model->getEntity($objectId);
 
         //set the page we came from
-        $page    = $this->factory->getSession()->get('mautic.point.page', 1);
+        $page = $this->factory->getSession()->get('mautic.point.page', 1);
 
         //set the return URL
-        $returnUrl  = $this->generateUrl('mautic_point_index', array('page' => $page));
+        $returnUrl = $this->generateUrl('mautic_point_index', array('page' => $page));
 
         $postActionVars = array(
             'returnUrl'       => $returnUrl,
@@ -300,6 +298,7 @@ class PointController extends FormController
                 'mauticContent' => 'point'
             )
         );
+
         //form not found
         if ($entity === null) {
             return $this->postActionRedirect(
@@ -406,10 +405,11 @@ class PointController extends FormController
     /**
      * Clone an entity
      *
-     * @param $objectId
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @param int $objectId
+     *
+     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function cloneAction ($objectId)
+    public function cloneAction($objectId)
     {
         $model   = $this->factory->getModel('point');
         $entity  = $model->getEntity($objectId);
@@ -431,13 +431,15 @@ class PointController extends FormController
     /**
      * Deletes the entity
      *
-     * @param         $objectId
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @param int $objectId
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function deleteAction($objectId) {
-        $page        = $this->factory->getSession()->get('mautic.point.page', 1);
-        $returnUrl   = $this->generateUrl('mautic_point_index', array('page' => $page));
-        $flashes     = array();
+    public function deleteAction($objectId)
+    {
+        $page      = $this->factory->getSession()->get('mautic.point.page', 1);
+        $returnUrl = $this->generateUrl('mautic_point_index', array('page' => $page));
+        $flashes   = array();
 
         $postActionVars = array(
             'returnUrl'       => $returnUrl,
@@ -490,10 +492,11 @@ class PointController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function batchDeleteAction() {
-        $page        = $this->factory->getSession()->get('mautic.point.page', 1);
-        $returnUrl   = $this->generateUrl('mautic_point_index', array('page' => $page));
-        $flashes     = array();
+    public function batchDeleteAction()
+    {
+        $page      = $this->factory->getSession()->get('mautic.point.page', 1);
+        $returnUrl = $this->generateUrl('mautic_point_index', array('page' => $page));
+        $flashes   = array();
 
         $postActionVars = array(
             'returnUrl'       => $returnUrl,

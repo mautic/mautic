@@ -20,8 +20,6 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
  * Class PointModel
- * {@inheritdoc}
- * @package Mautic\CoreBundle\Model\FormModel
  */
 class PointModel extends CommonFormModel
 {
@@ -29,7 +27,7 @@ class PointModel extends CommonFormModel
     /**
      * {@inheritdoc}
      *
-     * @return string
+     * @return \Mautic\PointBundle\Entity\PointRepository
      */
     public function getRepository()
     {
@@ -38,8 +36,6 @@ class PointModel extends CommonFormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
     public function getPermissionBase()
     {
@@ -49,12 +45,7 @@ class PointModel extends CommonFormModel
     /**
      * {@inheritdoc}
      *
-     * @param      $entity
-     * @param      $formFactory
-     * @param null $action
-     * @param array $options
-     * @return mixed
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws MethodNotAllowedHttpException
      */
     public function createForm($entity, $formFactory, $action = null, $options = array())
     {
@@ -68,10 +59,9 @@ class PointModel extends CommonFormModel
     }
 
     /**
-     * Get a specific entity or generate a new one if id is empty
+     * {@inheritdoc}
      *
-     * @param $id
-     * @return null|object
+     * @return Point|null
      */
     public function getEntity($id = null)
     {
@@ -79,19 +69,13 @@ class PointModel extends CommonFormModel
             return new Point();
         }
 
-        $entity = parent::getEntity($id);
-
-        return $entity;
+        return parent::getEntity($id);
     }
 
     /**
      * {@inheritdoc}
      *
-     * @param $action
-     * @param $event
-     * @param $entity
-     * @param $isNew
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, $event = false)
     {
@@ -124,13 +108,14 @@ class PointModel extends CommonFormModel
 
             $this->dispatcher->dispatch($name, $event);
             return $event;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**
      * Gets array of custom actions from bundles subscribed PointEvents::POINT_ON_BUILD
+     *
      * @return mixed
      */
     public function getPointActions()
@@ -153,8 +138,10 @@ class PointModel extends CommonFormModel
      * Triggers a specific point change
      *
      * @param $type
-     * @param mixed $passsthrough passthrough from function triggering action to the callback function
+     * @param mixed $passthrough passthrough from function triggering action to the callback function
      * @param mixed $typeId Something unique to the triggering event to prevent  unnecessary duplicate calls
+     *
+     * @return void
      */
     public function triggerAction($type, $passthrough = null, $typeId = null)
     {

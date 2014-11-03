@@ -15,10 +15,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 /**
  * Class PointRepository
- *
- * @package Mautic\PointBundle\Entity
  */
 class LeadPointLogRepository extends CommonRepository
 {
-    
 }

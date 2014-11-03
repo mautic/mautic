@@ -150,6 +150,7 @@ class Trigger extends FormEntity
      * Set description
      *
      * @param string $description
+     *
      * @return Trigger
      */
     public function setDescription($description)
@@ -174,6 +175,7 @@ class Trigger extends FormEntity
      * Set name
      *
      * @param string $name
+     *
      * @return Trigger
      */
     public function setName($name)
@@ -197,8 +199,9 @@ class Trigger extends FormEntity
     /**
      * Add events
      *
-     * @param $key
-     * @param \Mautic\PointBundle\Entity\TriggerEvent $event
+     * @param              $key
+     * @param TriggerEvent $event
+     *
      * @return Point
      */
     public function addTriggerEvent($key, TriggerEvent $event)
@@ -214,9 +217,9 @@ class Trigger extends FormEntity
     /**
      * Remove events
      *
-     * @param \Mautic\PointBundle\Entity\TriggerEvent $event
+     * @param TriggerEvent $event
      */
-    public function removeTriggerEvent(\Mautic\PointBundle\Entity\TriggerEvent $event)
+    public function removeTriggerEvent(TriggerEvent $event)
     {
         $this->events->removeElement($event);
     }
@@ -235,6 +238,7 @@ class Trigger extends FormEntity
      * Set publishUp
      *
      * @param \DateTime $publishUp
+     *
      * @return Point
      */
     public function setPublishUp($publishUp)
@@ -259,6 +263,7 @@ class Trigger extends FormEntity
      * Set publishDown
      *
      * @param \DateTime $publishDown
+     *
      * @return Point
      */
     public function setPublishDown($publishDown)
@@ -290,7 +295,7 @@ class Trigger extends FormEntity
     /**
      * @param mixed $points
      */
-    public function setPoints ($points)
+    public function setPoints($points)
     {
         $this->isChanged('points', $points);
         $this->points = $points;
@@ -299,7 +304,7 @@ class Trigger extends FormEntity
     /**
      * @return mixed
      */
-    public function getColor ()
+    public function getColor()
     {
         return $this->color;
     }
@@ -307,7 +312,7 @@ class Trigger extends FormEntity
     /**
      * @param mixed $color
      */
-    public function setColor ($color)
+    public function setColor($color)
     {
         $this->color = $color;
     }
@@ -315,7 +320,7 @@ class Trigger extends FormEntity
     /**
      * @return mixed
      */
-    public function getTriggerExistingLeads ()
+    public function getTriggerExistingLeads()
     {
         return $this->triggerExistingLeads;
     }
@@ -323,7 +328,7 @@ class Trigger extends FormEntity
     /**
      * @param mixed $triggerExistingLeads
      */
-    public function setTriggerExistingLeads ($triggerExistingLeads)
+    public function setTriggerExistingLeads($triggerExistingLeads)
     {
         $this->triggerExistingLeads = $triggerExistingLeads;
     }
@@ -331,7 +336,7 @@ class Trigger extends FormEntity
     /**
      * @return mixed
      */
-    public function getCategory ()
+    public function getCategory()
     {
         return $this->category;
     }
@@ -339,7 +344,7 @@ class Trigger extends FormEntity
     /**
      * @param mixed $category
      */
-    public function setCategory ($category)
+    public function setCategory($category)
     {
         $this->category = $category;
     }

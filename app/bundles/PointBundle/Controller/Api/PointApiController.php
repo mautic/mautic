@@ -15,12 +15,13 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 /**
  * Class PointApiController
- *
- * @package Mautic\PointBundle\Controller\Api
  */
 class PointApiController extends CommonApiController
 {
 
+    /**
+     * {@inheritdoc}
+     */
     public function initialize(FilterControllerEvent $event)
     {
         parent::initialize($event);
