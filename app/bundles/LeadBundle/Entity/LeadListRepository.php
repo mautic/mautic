@@ -150,35 +150,63 @@ class LeadListRepository extends CommonRepository
     /**
      * Get lists for a specific lead
      *
-     * @param      $leadId
+     * @param      $lead
      * @param bool $forList
      *
      * @return mixed
      */
-    public function getLeadLists($leadId, $forList = false)
+    public function getLeadLists($lead, $forList = false)
     {
         static $return = array();
 
-        if (empty($return[$leadId])) {
+        if (is_array($lead)) {
             $q = $this->_em->createQueryBuilder()
                 ->from('MauticLeadBundle:LeadList', 'l', 'l.id');
 
             if ($forList) {
-                $q->select('partial l.{id, alias, name}');
+                $q->select('partial l.{id, alias, name}, partial il.{id}');
             } else {
-                $q->select('l');
+                $q->select('l, partial il.{id}');
             }
 
             $q->leftJoin('l.includedLeads', 'il');
 
             $q->where(
-                $q->expr()->eq('il.id', (int) $leadId)
-            );
+                $q->expr()->in('il.id', ':leads')
+            )->setParameter('leads', $lead);
 
-            $return[$leadId] = $q->getQuery()->getResult();
+            $result = $q->getQuery()->getArrayResult();
+
+            $return = array();
+            foreach ($result as $r) {
+                foreach($r['includedLeads'] as $l) {
+                    $return[$l['id']][$r['id']] = $r;
+                }
+            }
+
+            return $return;
+        } else {
+            if (empty($return[$lead])) {
+                $q = $this->_em->createQueryBuilder()
+                    ->from('MauticLeadBundle:LeadList', 'l', 'l.id');
+
+                if ($forList) {
+                    $q->select('partial l.{id, alias, name}');
+                } else {
+                    $q->select('l');
+                }
+
+                $q->leftJoin('l.includedLeads', 'il');
+
+                $q->where(
+                    $q->expr()->eq('il.id', (int)$lead)
+                );
+
+                $return[$lead] = $q->getQuery()->getResult();
+            }
+
+            return $return[$lead];
         }
-
-        return $return[$leadId];
     }
 
     /**
@@ -263,9 +291,12 @@ class LeadListRepository extends CommonRepository
             if ($l instanceof LeadList) {
                 $id      = $l->getId();
                 $filters = $l->getFilters();
-            } else {
+            } elseif (is_array($l)) {
                 $id      = $l['id'];
                 $filters = (!$dynamic) ? array() : $l['filters'];
+            } elseif (!$dynamic) {
+                $id      = $l;
+                $filters = array();
             }
 
             if (!$dynamic) {
@@ -288,7 +319,7 @@ class LeadListRepository extends CommonRepository
                         if ($idOnly) {
                             $currentOnlyLeads[$id][] = $r['lead_id'];
                         } else {
-                            $currentOnlyLeads[$id][$r['lead_id']] = $r;
+                            $currentOnlyLeads[$id][$r['id']] = $r;
                         }
                     }
                     unset($filters, $parameters, $q, $expr);

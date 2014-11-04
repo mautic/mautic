@@ -33,7 +33,7 @@ class PointsChangeLog
 
 
     /**
-     * @ORM\ManyToOne(targetEntity="Mautic\CoreBundle\Entity\IpAddress", cascade={"merge", "persist", "refresh", "detach"})
+     * @ORM\ManyToOne(targetEntity="Mautic\CoreBundle\Entity\IpAddress", cascade={"merge", "persist"})
      * @ORM\JoinColumn(name="ip_id", referencedColumnName="id", nullable=false)
      */
     private $ipAddress;

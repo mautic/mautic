@@ -35,7 +35,7 @@ class LeadPointLog
     private $lead;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Mautic\CoreBundle\Entity\IpAddress")
+     * @ORM\ManyToOne(targetEntity="Mautic\CoreBundle\Entity\IpAddress", cascade={"merge", "persist"})
      **/
     private $ipAddress;
 

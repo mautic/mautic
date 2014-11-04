@@ -59,7 +59,7 @@ class Lead extends FormEntity
     private $pointsChangeLog;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Mautic\CoreBundle\Entity\IpAddress", cascade={"merge", "persist", "refresh", "detach"}, fetch="EXTRA_LAZY", indexBy="ipAddress")
+     * @ORM\ManyToMany(targetEntity="Mautic\CoreBundle\Entity\IpAddress", cascade={"merge", "persist"}, fetch="EXTRA_LAZY", indexBy="ipAddress")
      * @ORM\JoinTable(name="lead_ips_xref",
      *   joinColumns={@ORM\JoinColumn(name="lead_id", referencedColumnName="id")},
      *   inverseJoinColumns={@ORM\JoinColumn(name="ip_id", referencedColumnName="id")}
@@ -153,6 +153,14 @@ class Lead extends FormEntity
     public function __construct()
     {
         $this->ipAddresses = new ArrayCollection();
+    }
+
+    /**
+     * @return array
+     */
+    public function convertToArray()
+    {
+        return get_object_vars($this);
     }
 
     /**

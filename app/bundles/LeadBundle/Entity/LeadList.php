@@ -76,13 +76,13 @@ class LeadList extends FormEntity
     private $isGlobal = false;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Lead", fetch="EXTRA_LAZY")
+     * @ORM\ManyToMany(targetEntity="Lead", fetch="EXTRA_LAZY", indexBy="id")
      * @ORM\JoinTable(name="lead_lists_included_leads")
      */
     private $includedLeads;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Lead", fetch="EXTRA_LAZY")
+     * @ORM\ManyToMany(targetEntity="Lead", fetch="EXTRA_LAZY", indexBy="id")
      * @ORM\JoinTable(name="lead_lists_excluded_leads")
      */
     private $excludedLeads;
@@ -257,14 +257,16 @@ class LeadList extends FormEntity
      * Add lead
      *
      * @param \Mautic\LeadBundle\Entity\Lead $lead
-     * @return Channel
+
      */
     public function addLead(\Mautic\LeadBundle\Entity\Lead $lead, $checkAgainstExcluded = false)
     {
         if ($checkAgainstExcluded) {
             if (!$this->excludedLeads->contains($lead)) {
                 $this->includedLeads[] = $lead;
+                return true;
             }
+            return false;
         } else {
             $this->includeLead($lead);
         }
@@ -283,7 +285,9 @@ class LeadList extends FormEntity
             //if the lead is in the excluded list, it was manually added there so don't remove it
             if (!$this->excludedLeads->contains($lead) && $this->includedLeads->contains($lead)) {
                 $this->includedLeads->removeElement($lead);
+                return true;
             }
+            return false;
         } else {
             $this->excludeLead($lead);
         }
