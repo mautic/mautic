@@ -1,2 +1,5 @@
-"title",system,"source","columns","filters"
-"Top Viewed Pages",1,"pages","a:2:{i:0;s:5:\"title\";i:1;s:4:\"hits\";}","a:2:{i:0;a:3:{s:6:\"column\";s:4:\"hits\";s:9:\"condition\";s:3:\"gte\";s:5:\"value\";s:2:\"50\";}i:1;a:3:{s:6:\"column\";s:5:\"title\";s:9:\"condition\";s:3:\"neq\";s:5:\"value\";s:6:\"Report\";}}"
+"title","system","source","columns","filters"
+"Hits of all published Pages","1","pages","a:0:{}","a:1:{i:0;a:3:{s:6:""column"";s:14:""p.is_published"";s:9:""condition"";s:2:""eq"";s:5:""value"";s:1:""1"";}}"
+"Downloads of all Assets","0","assets","a:0:{}","a:0:{}"
+"Submissions of published Forms","0","forms","a:0:{}","a:1:{i:0;a:3:{s:6:""column"";s:14:""f.is_published"";s:9:""condition"";s:2:""eq"";s:5:""value"";s:1:""1"";}}"
+"All Sent Emails","0","emails","a:0:{}","a:0:{}"
