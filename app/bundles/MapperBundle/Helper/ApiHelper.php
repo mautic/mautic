@@ -32,12 +32,11 @@ abstract class ApiHelper
 
     /**
      * @param MauticFactory $factory
-     * @param string $application
-     * @param AbstractIntegration $applicationIntegration
-     * @param $integrationAuth
+     * @param $application
      */
-    static public function checkApiAuthentication(MauticFactory $factory, $application, $applicationIntegration)
+    static public function checkApiAuthentication(MauticFactory $factory, $application)
     {
+        $applicationIntegration = ApplicationIntegrationHelper::getApplication($factory, $application);
         $integrationAuth = self::getApiAuth($application, $applicationIntegration);
         if ($integrationAuth->validateAccessToken()) {
             if ($integrationAuth->accessTokenUpdated()) {

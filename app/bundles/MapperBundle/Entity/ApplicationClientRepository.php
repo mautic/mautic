@@ -12,8 +12,8 @@ namespace Mautic\MapperBundle\Entity;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * ApplicationIntegrationRepository
+ * ApplicationClientRepository
  */
-class ApplicationIntegrationRepository extends CommonRepository
+class ApplicationClientRepository extends CommonRepository
 {
 }

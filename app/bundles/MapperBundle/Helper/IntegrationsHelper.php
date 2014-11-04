@@ -13,7 +13,7 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\MapperBundle\Integration\AbstractIntegration;
 use Symfony\Component\Finder\Finder;
 
-abstract class ApplicationIntegrationHelper
+abstract class IntegrationsHelper
 {
 
     static $factory;
@@ -25,7 +25,7 @@ abstract class ApplicationIntegrationHelper
      * @param bool $alphabetical
      * @return mixed
      */
-    public static function getApplications(MauticFactory $factory, $services = null, $withFeatures = null, $alphabetical = false)
+    public static function getApplications(MauticFactory $factory, $alphabetical = false)
     {
         static $integrations;
 
@@ -61,12 +61,12 @@ abstract class ApplicationIntegrationHelper
      */
     public static function getApplication(MauticFactory $factory, $application)
     {
-        $integrations = self::getApplications($factory, null, null, true);
+        $integrations = self::getApplications($factory, true);
 
         if (array_key_exists($application, $integrations)) {
             return $integrations[$application];
         }
 
-        throw new \RuntimeException($application);
+        return false;
     }
 }

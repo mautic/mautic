@@ -29,12 +29,12 @@ class ApplicationObjectMapper
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Mautic\MapperBundle\Entity\ApplicationIntegration")
-     * @ORM\JoinColumn(name="application_integration_id", referencedColumnName="id", nullable=true)
+     * @ORM\ManyToOne(targetEntity="Mautic\MapperBundle\Entity\ApplicationClient")
+     * @ORM\JoinColumn(name="application_client_id", referencedColumnName="id", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      */
-    private $applicationIntegrationId;
+    private $applicationClientId;
 
     /**
      * @ORM\Column(type="string", name="object_name")
@@ -115,12 +115,12 @@ class ApplicationObjectMapper
     /**
      * Set owner
      *
-     * @param \Mautic\MapperBundle\Entity\ApplicationIntegration $owner
+     * @param \Mautic\MapperBundle\Entity\ApplicationClient $client
      * @return ApplicationObjectMapper
      */
-    public function setApplicationIntegrationId(ApplicationIntegration $applicationIntegration = null)
+    public function setApplicationClientId(ApplicationClient $client = null)
     {
-        $this->applicationIntegrationId = $applicationIntegration;
+        $this->applicationClientId = $client;
 
         return $this;
     }
@@ -130,9 +130,9 @@ class ApplicationObjectMapper
      *
      * @return ApplicationIntegration
      */
-    public function getApplicationIntegrationId()
+    public function getApplicationClientId()
     {
-        return $this->applicationIntegrationId;
+        return $this->applicationClientId;
     }
 
     /**

@@ -19,10 +19,6 @@ use Mautic\MapperBundle\Helper\ApiHelper;
 abstract class AbstractIntegration
 {
     protected $factory;
-    protected $repository;
-    protected $objectsRepository;
-    protected $entity;
-    protected $data;
 
     /**
      * @param MauticFactory $factory
@@ -30,8 +26,6 @@ abstract class AbstractIntegration
     public function __construct(MauticFactory $factory)
     {
         $this->factory = $factory;
-        $this->repository = $this->factory->getEntityManager()->getRepository('MauticMapperBundle:ApplicationIntegration');
-        $this->objectsRepository = $this->factory->getEntityManager()->getRepository('MauticMapperBundle:ApplicationObjectMapper');
     }
 
     /**
@@ -59,9 +53,9 @@ abstract class AbstractIntegration
      *
      * @return string
      */
-    public function getAppLink()
+    public function getClientLink()
     {
-        return $this->factory->getRouter()->generate('mautic_mapper_integration',array('application' => $this->getAppAlias()));
+        return $this->factory->getRouter()->generate('mautic_mapper_client_index',array('application' => $this->getAppAlias()));
     }
 
     /**
@@ -138,73 +132,5 @@ abstract class AbstractIntegration
     public function getApiAuth()
     {
         return ApiHelper::getApiAuth($this->getAppAlias(), $this);
-    }
-
-    /**
-     * @return ApplicationIntegrationRepository
-     */
-    public function getRepository()
-    {
-        return $this->repository;
-    }
-
-    /**
-     * Return Application Integration Entity
-     *
-     * @return ApplicationIntegration
-     */
-    public function getEntity()
-    {
-        $this->entity = $this->repository->findOneBy(array('name' => $this->getAppName()));
-        if (is_null($this->entity)) {
-            $this->entity = new ApplicationIntegration();
-        }
-        $this->entity->setName($this->getAppName());
-
-        return $this->entity;
-    }
-
-    /**
-     * @return ApplicationObjectMapperRepository
-     */
-    public function getObjectsRepository()
-    {
-        return $this->factory->getEntityManager()->getRepository('MauticMapperBundle:ApplicationObjectMapper');
-    }
-
-    /**
-     * @return array
-     */
-    public function getMappedObjects()
-    {
-        $objects = $this->getObjectsRepository()->findBy(
-            array('applicationIntegrationId' => $this->getEntity()->getId()),
-            array('objectName' => 'ASC')
-        );
-        if (empty($objects)) {
-            foreach ($this->getSupportedObjects() as $objectName) {
-                $object = new ApplicationObjectMapper();
-                $object->setObjectName($objectName);
-                $objects[] = $object;
-            }
-        }
-
-        return $objects;
-    }
-
-    public function getMappedObject($object)
-    {
-        $objectEntity = $this->getObjectsRepository()->findOneBy(
-            array(
-                'applicationIntegrationId' => $this->getEntity()->getId(),
-                'objectName' => $object
-            )
-        );
-        if (empty($objectEntity)) {
-            $objectEntity = new ApplicationObjectMapper();
-            $objectEntity->setObjectName($object);
-        }
-
-        return $objectEntity;
     }
 }
