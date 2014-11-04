@@ -12,7 +12,7 @@ namespace Mautic\MapperBundle\EventListener;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Mautic\MapperBundle\Event as MapperEvents;
+use Mautic\MapperBundle\Event\MapperDashboardEvent;
 
 /**
  * Class MapperSubscriber
@@ -47,7 +47,8 @@ class MapperSubscriber implements EventSubscriberInterface
 
     static public function getSubscribedEvents ()
     {
-        return array();
+        return array(
+        );
     }
 
     /**
@@ -56,25 +57,16 @@ class MapperSubscriber implements EventSubscriberInterface
      * @param IconEvent $event
      * @param           $name
      */
-    protected function buildIcons(MapperEvents\MapperDashboardEvent $event)
+    protected function buildIcons(MapperDashboardEvent $event)
     {
         $security = $event->getSecurity();
         $request  = $this->factory->getRequest();
         $bundles = $this->factory->getParameter('bundles');
-        $icons = array();
 
         foreach ($bundles as $bundle) {
             //check common place
-            $path = $bundle['directory'] . "/Config/mapper/client.php";
-            if (!file_exists($path)) {
-                //else check for just a mapper.php file
-                $path = $bundle['directory'] . "/Config/mapper.php";
-                $recheck = true;
-            } else {
-                $recheck = false;
-            }
-
-            if (!$recheck || file_exists($path)) {
+            $path = $bundle['directory'] . "/Config/mapper.php";
+            if (file_exists($path)) {
                 $config = include $path;
                 if (!isset($config['application'])) {
                     continue;

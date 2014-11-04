@@ -13,11 +13,11 @@ use Mautic\MapperBundle\MapperEvents;
 use Mautic\MapperBundle\Event\MapperDashboardEvent;
 
 /**
- * Class CoreSubscriber
+ * Class MapperListener
  *
  * @package Mautic\MapperBundle\EventListener
  */
-class CoreSubscriber extends MapperSubscriber
+class MapperListener extends MapperSubscriber
 {
     /**
      * @return array

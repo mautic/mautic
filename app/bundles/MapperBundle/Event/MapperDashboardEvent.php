@@ -13,7 +13,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Class IconEvent
+ * Class MapperDashboardEvent
  *
  * @package Mautic\CoreBundle\Event
  */
@@ -44,9 +44,9 @@ class MapperDashboardEvent extends Event
     /**
      * Add icon
      */
-    public function addApplication($type, $icon)
+    public function addApplication($bundle, $config)
     {
-        $this->applications[$type] = $icon;
+        $this->applications[$bundle] = $config;
     }
 
     /**
