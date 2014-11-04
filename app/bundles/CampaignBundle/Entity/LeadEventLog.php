@@ -24,6 +24,7 @@ class LeadEventLog
     /**
      * @ORM\Id()
      * @ORM\ManyToOne(targetEntity="Event", inversedBy="log")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $event;
 
@@ -33,6 +34,11 @@ class LeadEventLog
      * @ORM\JoinColumn(onDelete="CASCADE")
      **/
     private $lead;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Campaign")
+     **/
+    private $campaign;
 
     /**
      * @ORM\ManyToOne(targetEntity="Mautic\CoreBundle\Entity\IpAddress", cascade={"merge", "persist"})
@@ -148,5 +154,21 @@ class LeadEventLog
     public function setTriggerDate ($triggerDate)
     {
         $this->triggerDate = $triggerDate;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCampaign ()
+    {
+        return $this->campaign;
+    }
+
+    /**
+     * @param mixed $campaign
+     */
+    public function setCampaign ($campaign)
+    {
+        $this->campaign = $campaign;
     }
 }

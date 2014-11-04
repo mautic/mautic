@@ -28,6 +28,7 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                 </th>
                 <th class="col-leadlist-name"><?php echo $view['translator']->trans('mautic.lead.list.thead.name'); ?></th>
                 <th class="visible-md visible-lg col-leadlist-descr"><?php echo $view['translator']->trans('mautic.lead.list.thead.descr'); ?></th>
+                <th class="visible-md visible-lg col-leadlist-leadcount"><?php echo $view['translator']->trans('mautic.lead.list.thead.leadcount'); ?></th>
                 <th class="visible-md visible-lg col-leadlist-id"><?php echo $view['translator']->trans('mautic.lead.list.thead.id'); ?></th>
             </tr>
             </thead>
@@ -68,6 +69,7 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                         <?php endif; ?>
                     </td>
                     <td class="visible-md visible-lg"><?php echo $item->getDescription(); ?></td>
+                    <td class="visible-md visible-lg"><?php echo count($item->getIncludedLeads()); ?></td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 </tr>
             <?php endforeach; ?>

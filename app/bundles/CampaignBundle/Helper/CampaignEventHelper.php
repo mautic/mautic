@@ -28,7 +28,7 @@ class CampaignEventHelper
         if ($passthrough == null) {
             return true;
         }
-        
+
         $limitToCampaigns = $event['properties']['campaigns'];
         $action           = $event['properties']['action'];
 
@@ -64,7 +64,7 @@ class CampaignEventHelper
 
         if (!empty($addToCampaigns)) {
             foreach ($addToCampaigns as $c) {
-                $campaignModel->addLead($em->getReference('MauticCampaignBundle:Campaign', $c), $lead);
+                $campaignModel->addLead($em->getReference('MauticCampaignBundle:Campaign', $c), $lead, true);
             }
             $leadsModified = true;
         }

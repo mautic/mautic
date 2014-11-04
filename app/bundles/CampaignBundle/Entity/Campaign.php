@@ -136,9 +136,6 @@ class Campaign extends FormEntity
             if ($currentId != $newId) {
                 $this->changes[$prop] = array($currentId, $newId);
             }
-        } elseif ($prop == 'events') {
-            //changes are already computed so just add them
-            $this->changes[$prop][$val[0]] = $val[1];
         } elseif ($current != $val) {
             $this->changes[$prop] = array($current, $val);
         }
@@ -212,7 +209,7 @@ class Campaign extends FormEntity
     public function addEvent($key, Event $event)
     {
         if ($changes = $event->getChanges()) {
-            $this->isChanged('events', array($key, $changes));
+            $this->changes['events']['added'][$key] = array($key, $changes);
         }
         $this->events[$key] = $event;
 
@@ -226,6 +223,8 @@ class Campaign extends FormEntity
      */
     public function removeEvent(\Mautic\CampaignBundle\Entity\Event $event)
     {
+        $this->changes['events']['removed'][$event->getId()] = $event->getName();
+
         $this->events->removeElement($event);
     }
 
@@ -314,6 +313,8 @@ class Campaign extends FormEntity
     public function addLead($key, Lead $lead)
     {
         if (!$this->leads->contains($lead)) {
+            $leadEntity = $lead->getLead();
+            $this->changes['leads']['added'][$leadEntity->getId()] = $leadEntity->getPrimaryIdentifier();
             $this->leads[$key] = $lead;
         }
 
@@ -327,6 +328,8 @@ class Campaign extends FormEntity
      */
     public function removeLead(Lead $lead)
     {
+        $leadEntity = $lead->getLead();
+        $this->changes['leads']['removed'][$leadEntity->getId()] = $leadEntity->getPrimaryIdentifier();
         $this->leads->removeElement($lead);
     }
 
@@ -358,7 +361,7 @@ class Campaign extends FormEntity
     {
         $this->lists[] = $list;
 
-        $this->changes['lists']['added'][] = $list->getId();
+        $this->changes['lists']['added'][$list->getId()] = $list->getName();
 
         return $this;
     }
@@ -370,9 +373,8 @@ class Campaign extends FormEntity
      */
     public function removeList(\Mautic\LeadBundle\Entity\LeadList $list)
     {
+        $this->changes['lists']['removed'][$list->getId()] = $list->getName();
         $this->lists->removeElement($list);
-
-        $this->changes['lists']['removed'][] = $list->getId();
     }
 
 }

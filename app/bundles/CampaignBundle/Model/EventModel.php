@@ -220,6 +220,7 @@ class EventModel extends CommonFormModel
                     $log = new LeadEventLog();
                     $log->setIpAddress($ipAddress);
                     $log->setEvent($this->em->getReference('MauticCampaignBundle:Event', $event['id']));
+                    $log->setCampaign($this->em->getReference('MauticCampaignBundle:Campaign', $event['campaign']['id']));
                     $log->setLead($lead);
                     $log->setDateTriggered(new \DateTime());
                     $persist[] = $log;
@@ -269,6 +270,7 @@ class EventModel extends CommonFormModel
                                 $log = new LeadEventLog();
                                 $log->setIpAddress($ipAddress);
                                 $log->setEvent($this->em->getReference('MauticCampaignBundle:Event', $child['id']));
+                                $log->setCampaign($this->em->getReference('MauticCampaignBundle:Campaign', $event['campaign']['id']));
                                 $log->setLead($lead);
                                 $log->setIsScheduled(true);
                                 $log->setTriggerDate($triggerOn);
@@ -284,6 +286,7 @@ class EventModel extends CommonFormModel
                             $log = new LeadEventLog();
                             $log->setIpAddress($ipAddress);
                             $log->setEvent($this->em->getReference('MauticCampaignBundle:Event', $child['id']));
+                            $log->setCampaign($this->em->getReference('MauticCampaignBundle:Campaign', $event['campaign']['id']));
                             $log->setLead($lead);
                             $log->setDateTriggered(new \DateTime());
                             $persist[] = $log;
@@ -339,6 +342,7 @@ class EventModel extends CommonFormModel
                 $log = new LeadEventLog();
                 $log->setIpAddress($ipAddress);
                 $log->setEvent($this->em->getReference('MauticCampaignBundle:Event', $eventId));
+                $log->setCampaign($campaign);
                 $log->setLead($lead);
                 $log->setIsScheduled(true);
                 $log->setTriggerDate($triggerOn);
@@ -348,6 +352,7 @@ class EventModel extends CommonFormModel
                 $log = new LeadEventLog();
                 $log->setIpAddress($ipAddress);
                 $log->setEvent($this->em->getReference('MauticCampaignBundle:Event', $eventId));
+                $log->setCampaign($campaign);
                 $log->setLead($lead);
                 $log->setDateTriggered(new \DateTime());
                 $persist[] = $log;
