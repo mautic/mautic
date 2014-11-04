@@ -85,7 +85,7 @@ class CampaignRepository extends CommonRepository
         if ($forList) {
             $q->select('c.id, c.name, ll.id');
         } else {
-            $q->select('c, ll.id, l');
+            $q->select('c, ll');
         }
 
         $q->leftJoin('c.lists', 'll')
@@ -103,7 +103,7 @@ class CampaignRepository extends CommonRepository
             )->setParameter('ignoreIds', $ignoreIds);
         }
 
-        $results = $q->getQuery()->getArrayResult();
+        $results = ($forList) ? $q->getQuery()->getArrayResult() : $q->getQuery()->getResult();
         return $results;
     }
 

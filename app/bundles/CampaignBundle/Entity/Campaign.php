@@ -358,6 +358,8 @@ class Campaign extends FormEntity
     {
         $this->lists[] = $list;
 
+        $this->changes['lists']['added'][] = $list->getId();
+
         return $this;
     }
 
@@ -369,6 +371,8 @@ class Campaign extends FormEntity
     public function removeList(\Mautic\LeadBundle\Entity\LeadList $list)
     {
         $this->lists->removeElement($list);
+
+        $this->changes['lists']['removed'][] = $list->getId();
     }
 
 }

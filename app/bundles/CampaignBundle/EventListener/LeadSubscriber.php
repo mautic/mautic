@@ -24,7 +24,7 @@ class LeadSubscriber extends CommonSubscriber
     /**
      * @return array
      */
-    static public function getSubscribedEvents()
+    static public function getSubscribedEvents ()
     {
         return array(
             LeadEvents::LEAD_LIST_CHANGE => array('onLeadListChange', 0)
@@ -37,24 +37,34 @@ class LeadSubscriber extends CommonSubscriber
      *
      * @param ListChangeEvent $event
      */
-    public function onLeadListChange(ListChangeEvent $event)
+    public function onLeadListChange (ListChangeEvent $event)
     {
         /** @var \Mautic\CampaignBundle\Model\CampaignModel $model */
-        $model  = $this->factory->getModel('campaign');
-        $lead   = $event->getLead();
-        $list   = $event->getList();
-        $action = $event->wasAdded() ? 'added' : 'removed';
-        $em     = $this->factory->getEntityManager();
+        $model     = $this->factory->getModel('campaign');
+        $leadModel = $this->factory->getModel('lead');
+        $lead      = $event->getLead();
+        $list      = $event->getList();
+        $action    = $event->wasAdded() ? 'added' : 'removed';
 
         //get campaigns for the list
-        $listCampaigns = $model->getRepository()->getPublishedCampaignsByLeadLists(array($list->getId()), true);
+        $listCampaigns = $model->getRepository()->getPublishedCampaignsByLeadLists(array($list->getId()));
+
+        $leadLists   = $leadModel->getLists($lead);
+        $leadListIds = array_keys($leadLists);
 
         if (!empty($listCampaigns)) {
             foreach ($listCampaigns as $c) {
                 if ($action == 'added') {
-                    $model->addLead($em->getReference('MauticCampaignBundle:Campaign', $c['id']), $lead);
+                    $model->addLead($c, $lead);
                 } else {
-                    $model->removeLead($em->getReference('MauticCampaignBundle:Campaign', $c['id']), $lead);
+                    $lists           = $c->getLists();
+                    $campaignListIds = array_keys($lists->toArray());
+
+                    if (array_intersect($leadListIds, $campaignListIds)) {
+                        break;
+                    }
+
+                    $model->removeLead($c, $lead);
                 }
             }
         }

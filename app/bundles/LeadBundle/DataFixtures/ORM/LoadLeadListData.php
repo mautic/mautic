@@ -50,7 +50,7 @@ class LoadLeadListData extends AbstractFixture implements OrderedFixtureInterfac
         $list->setName($translator->trans('mautic.lead.list.us', array(), 'fixtures'));
         $list->setAlias($translator->trans('mautic.lead.list.usalias', array(), 'fixtures'));
         $list->setCreatedBy($adminUser);
-        $list->setIsGlobal(false);
+        $list->setIsGlobal(true);
         $list->setFilters(array(
             array(
                 'glue'      => 'and',

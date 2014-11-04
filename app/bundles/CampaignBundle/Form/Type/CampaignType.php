@@ -136,7 +136,8 @@ class CampaignType extends AbstractType
                     'class' => 'form-control'
                 ),
                 'multiple' => true,
-                'expanded' => false
+                'expanded' => false,
+                'global_only' => true
             ))
                 ->addModelTransformer($transformer)
         );

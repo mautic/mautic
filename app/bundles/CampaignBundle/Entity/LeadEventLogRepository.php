@@ -125,4 +125,62 @@ class LeadEventLogRepository extends EntityRepository
         return $query->getQuery()
             ->getArrayResult();
     }
+
+    /**
+     * @param int        $campaignId
+     * @param null       $eventId
+     * @param null|array $leadIds
+     */
+    public function getCampaignLog($campaignId, $eventId = null, $leadIds = null)
+    {
+        $q = $this->_em->createQueryBuilder()
+            ->select('o, partial l.{id}, partial e.{id}')
+            ->from('MauticCampaignBundle:LeadEventLog', 'o');
+
+        $q->leftJoin('o.lead', 'l')
+            ->leftJoin('o.event', 'e')
+            ->leftJoin('e.campaign', 'c');
+
+        $expr = $q->expr()->andX(
+            $q->expr()->eq('c.id', ':campaign')
+        );
+
+        if (!empty($event)) {
+            $expr->add(
+                $q->expr()->eq('e.id', ':event')
+            );
+            $q->setParameter('event', $eventId);
+        }
+
+        if (!empty($leadIds)) {
+            if (!is_array($leadIds)) {
+                $leadIds = array($leadIds);
+            }
+            $expr->add(
+                $q->expr()->in('l.id', ':leads')
+            );
+            $q->setParameter('leads', $leadIds);
+        }
+
+        $q->where($expr)
+            ->setParameter('campaign', $campaignId);
+
+        $results = $q->getQuery()->getArrayResult();
+
+        $return = array();
+
+        if (!empty($leadIds)) {
+            //group by lead id then event id
+            foreach ($results as $l) {
+                $return[$l['lead']['id']][$l['event']['id']][] = $l;
+            }
+        } else {
+            //group by event id
+            foreach ($results as $l) {
+                $return[$l['event']['id']][] = $l;
+            }
+        }
+
+        return $return;
+    }
 }

@@ -395,23 +395,6 @@ class LeadModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @param       $entity
-     * @param       $unlock
-     */
-    public function saveEntity($entity, $unlock = true)
-    {
-        parent::saveEntity($entity, $unlock);
-
-        //regenerate the lists leads if there are changes AND the lead wasn't created by getCurrentLead
-        $changes = $entity->getChanges();
-        if (!$entity->isNewlyCreated() && !empty($changes)) {
-            $this->regenerateLeadLists($entity);
-        }
-    }
-
-    /**
      * Regenerate the lists this lead currently belongs to
      *
      * @param Lead $lead
@@ -420,8 +403,8 @@ class LeadModel extends FormModel
     {
         $lists = $this->getLists($lead);
         $model = $this->factory->getModel('lead.list');
-        foreach ($lists as $l) {
-            $model->regenerateListLeads($l);
+        foreach ($lists as $lid => $list) {
+            $model->regenerateListLeads($list);
         }
     }
 
@@ -565,7 +548,6 @@ class LeadModel extends FormModel
                     $searchForLists[] = $l;
                 }
             }
-
 
             if (!empty($searchForLists)) {
                 $listEntities = $leadListModel->getEntities(array(

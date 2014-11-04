@@ -7,10 +7,11 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CampaignBundle\Helper;
+namespace Mautic\EmailBundle\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\LeadBundle\Entity\Lead;
 
 class CampaignEventHelper
 {
@@ -60,14 +61,29 @@ class CampaignEventHelper
     {
         $emailSent = false;
 
-        if (!empty($lead['email'])) {
+        if ($lead instanceof Lead) {
+            $fields = $lead->getFields();
+
+            $leadCredentials = array(
+                'id' 		=> $lead->getId(),
+                'email' 	=> $fields['core']['email']['value'],
+                'firstname' => $fields['core']['firstname']['value'],
+                'lastname' 	=> $fields['core']['lastname']['value']
+            );
+        } else {
+            $leadCredentials = $lead;
+        }
+
+        if (!empty($leadCredentials['email'])) {
             /** @var \Mautic\EmailBundle\Model\EmailModel $emailModel */
             $emailModel = $factory->getModel('email');
+
             $emailId = $event['properties']['email'];
-            $email = $emailModel->getEntity($emailId);
+            $email   = $emailModel->getEntity($emailId);
 
             if ($email != null) {
-                $emailModel->sendEmail($email, $lead);
+
+                $emailModel->sendEmail($email, array($leadCredentials['id'] => $leadCredentials));
                 $emailSent = true;
             }
         }

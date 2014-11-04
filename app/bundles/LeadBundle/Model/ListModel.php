@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Event\LeadListEvent;
+use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -84,7 +85,7 @@ class ListModel extends FormModel
         }
         $entity->setAlias($alias);
 
-        $this->regenerateLeadList($entity, $isNew);
+        $this->regenerateListLeads($entity, $isNew, false);
 
         $event = $this->dispatchEvent("pre_save", $entity, $isNew);
         $repo->saveEntity($entity);
@@ -96,34 +97,49 @@ class ListModel extends FormModel
      *
      * @param LeadList $entity
      * @param          $isNew
+     * @param          $persist
      *
      * @throws \Doctrine\ORM\ORMException
      */
-    public function regenerateListLeads(LeadList $entity, $isNew = false)
+    public function regenerateListLeads(LeadList $entity, $isNew = false, $persist = true)
     {
-        $repo = $this->getRepository();
-
         if (!$isNew) {
             $id = $entity->getId();
 
-            $oldLeadList = $repo->getLeadsByList(array('id' => $id), true);
-            $newLeadList = $repo->getLeadsByList(array('id' => $id, 'filters' => $entity->getFilters()), true, true);
+            $oldLeadList = $this->getLeadsByList(array('id' => $id), true);
+            $newLeadList = $this->getLeadsByList(array('id' => $id, 'filters' => $entity->getFilters()), true, true);
 
             $addLeads    = array_diff($newLeadList[$id], $oldLeadList[$id]);
             $removeLeads = array_diff($oldLeadList[$id], $newLeadList[$id]);
         } else {
-            $newLeadList = $repo->getLeadsByList(array('id' => 'new', 'filters' => $entity->getFilters()), true);
+            $newLeadList = $this->getLeadsByList(array('id' => 'new', 'filters' => $entity->getFilters()), true);
 
             $addLeads    = $newLeadList['new'];
             $removeLeads = array();
         }
 
         foreach ($addLeads as $l) {
-            $entity->addLead($this->em->getReference('MauticLeadBundle:Lead', $l), true);
+            $lead = $this->em->getReference('MauticLeadBundle:Lead', $l);
+            if ($entity->addLead($lead, true)) {
+                if ($this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_CHANGE)) {
+                    $event = new ListChangeEvent($lead, $entity, true);
+                    $this->dispatcher->dispatch(LeadEvents::LEAD_LIST_CHANGE, $event);
+                }
+            }
         }
 
         foreach ($removeLeads as $l) {
-            $entity->removeLead($this->em->getReference('MauticLeadBundle:Lead', $l), true);
+            $lead = $this->em->getReference('MauticLeadBundle:Lead', $l);
+            if ($entity->removeLead($lead, true)) {
+                if ($this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_CHANGE)) {
+                    $event = new ListChangeEvent($lead, $entity, false);
+                    $this->dispatcher->dispatch(LeadEvents::LEAD_LIST_CHANGE, $event);
+                }
+            }
+        }
+
+        if ($persist) {
+            $this->getRepository()->saveEntity($entity);
         }
     }
 
@@ -317,5 +333,17 @@ class ListModel extends FormModel
     public function removeLead($lead, $lists)
     {
         $this->factory->getModel('lead')->removeFromLists($lead, $lists);
+    }
+
+    /**
+     * @param      $lists
+     * @param bool $idOnly
+     * @param bool $dynamic
+     *
+     * @return mixed
+     */
+    public function getLeadsByList($lists, $idOnly = false, $dynamic = false)
+    {
+        return $this->getRepository()->getLeadsByList($lists, $idOnly, $dynamic);
     }
 }

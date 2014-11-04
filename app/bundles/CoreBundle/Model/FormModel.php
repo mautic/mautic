@@ -132,6 +132,9 @@ class FormModel extends CommonModel
         //iterate over the results so the events are dispatched on each delete
         $batchSize = 20;
         foreach ($entities as $k => $entity) {
+            if (!method_exists($entity, 'getId')) {
+                die(Var_dump($entity));
+            }
             $isNew = ($entity->getId()) ? false : true;
 
             //set some defaults

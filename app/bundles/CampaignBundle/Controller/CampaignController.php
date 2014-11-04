@@ -197,6 +197,10 @@ class CampaignController extends FormController
     {
         /** @var \Mautic\CampaignBundle\Model\CampaignModel $model */
         $model   = $this->factory->getModel('campaign');
+
+        /** @var \Mautic\CampaignBundle\Model\EventModel $model */
+        $eventModel = $this->factory->getModel('campaign.event');
+
         $entity  = $model->getEntity();
         $session = $this->factory->getSession();
 
@@ -211,8 +215,9 @@ class CampaignController extends FormController
         $addEvents     = $session->get('mautic.campaigns.add', array());
         $deletedEvents = $session->get('mautic.campaigns.remove', array());
 
-        $action = $this->generateUrl('mautic_campaign_action', array('objectAction' => 'new'));
-        $form   = $model->createForm($entity, $this->get('form.factory'), $action);
+        $action        = $this->generateUrl('mautic_campaign_action', array('objectAction' => 'new'));
+        $form          = $model->createForm($entity, $this->get('form.factory'), $action);
+        $eventSettings = $model->getEvents();
 
         ///Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
@@ -231,16 +236,20 @@ class CampaignController extends FormController
                         $valid = false;
                     } else {
                         $connections = $session->get('mautic.campaigns.connections');
-                        $events = $model->setEvents($entity, $events, $connections, $deletedEvents);
+                        $processedEvents = $model->setEvents($entity, $events, $connections, $deletedEvents);
 
                         //form is valid so process the data
                         $model->saveEntity($entity);
 
                         //trigger the first action in dripflow if published and first event is an action
                         if ($entity->isPublished()) {
-                            $firstEvent = reset($events);
-                            if ($firstEvent->getEventType() == 'action') {
-                                $model->triggerEvent($firstEvent->getType());
+                            //check for top level action events
+                            foreach ($processedEvents as $id => $e) {
+                                $parent = $e->getParent();
+                                if ($e->getEventType() == 'action' && $parent === null) {
+                                    //check the callback function for the event to make sure it even applies based on its settings
+                                    $eventModel->triggerCampaignStartingAction($entity, $e->convertToArray(), $eventSettings['action'][$e->getType()]);
+                                }
                             }
                         }
 
@@ -294,10 +303,9 @@ class CampaignController extends FormController
             $addEvents = $deletedEvents = array();
         }
 
-        $events = $model->getEvents();
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'eventSettings'  => $events,
+                'eventSettings'  => $eventSettings,
                 'campaignEvents' => $addEvents,
                 'tempEventIds'   => $this->associateIdWithTempIds($addEvents),
                 'deletedEvents'  => $deletedEvents,
@@ -326,6 +334,10 @@ class CampaignController extends FormController
     {
         /** @var \Mautic\CampaignBundle\Model\CampaignModel $model */
         $model      = $this->factory->getModel('campaign');
+
+        /** @var \Mautic\CampaignBundle\Model\EventModel $model */
+        $eventModel = $this->factory->getModel('campaign.event');
+
         $entity     = $model->getEntity($objectId);
         $session    = $this->factory->getSession();
         $cleanSlate = true;
@@ -367,6 +379,8 @@ class CampaignController extends FormController
         $action = $this->generateUrl('mautic_campaign_action', array('objectAction' => 'edit', 'objectId' => $objectId));
         $form   = $model->createForm($entity, $this->get('form.factory'), $action);
 
+        $eventSettings = $model->getEvents();
+
         ///Check for a submitted form and process it
         if (!$ignorePost && $this->request->getMethod() == 'POST') {
             $valid = false;
@@ -386,10 +400,22 @@ class CampaignController extends FormController
                         $valid = false;
                     } else {
                         $connections = $session->get('mautic.campaigns.connections');
-                        $model->setEvents($entity, $events, $connections, $deletedEvents);
+                        $processedEvents = $model->setEvents($entity, $events, $connections, $deletedEvents);
 
                         //form is valid so process the data
                         $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
+
+                        //trigger the first action in dripflow if published and first event is an action
+                        if ($entity->isPublished()) {
+                            //check for top level action events
+                            foreach ($processedEvents as $id => $e) {
+                                $parent = $e->getParent();
+                                if ($e->getEventType() == 'action' && $parent === null) {
+                                    //check the callback function for the event to make sure it even applies based on its settings
+                                    $eventModel->triggerCampaignStartingAction($entity, $e->convertToArray(), $eventSettings['action'][$e->getType()]);
+                                }
+                            }
+                        }
 
                         if (!empty($deletedEvents)) {
                             $this->factory->getModel('campaign.event')->deleteEvents($entity->getEvents(), $addEvents, $deletedEvents);
@@ -464,10 +490,9 @@ class CampaignController extends FormController
             $deletedEvents = array();
         }
 
-        $events = $model->getEvents();
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'eventSettings'  => $events,
+                'eventSettings'  => $eventSettings,
                 'campaignEvents' => $campaignEvents,
                 'tempEventIds'   => $this->associateIdWithTempIds($campaignEvents),
                 'deletedEvents'  => $deletedEvents,

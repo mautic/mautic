@@ -53,13 +53,12 @@ class FormSubmitHelper
 		    		$leadCredentials = array(
 		    			'email' 	=> $leadFields['core']['email']['value'],
 		    			'id' 		=> $currentLead->getId(),
-		    			'firstname' => $currentLead->getName(),
-		    			'lastname' 	=> ''
+		    			'firstname' => $leadFields['core']['firstname']['value'],
+		    			'lastname' 	=> $leadFields['core']['lastname']['value']
 		    		);
-		    		$model->sendEmail($email, array($leadCredentials));
+		    		$model->sendEmail($email, array($leadCredentials['id'] => $leadCredentials));
 		    	}
 		    }
-		    
         }
     }
 }

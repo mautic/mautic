@@ -546,14 +546,17 @@ class EmailModel extends FormModel
      * Send an email to lead lists
      *
      * @param Email $email
+     * @param array $lists
      */
-    public function sendEmailToLists(Email $email)
+    public function sendEmailToLists(Email $email, $lists = null)
     {
         //get the leads
-        $lists     = $email->getLists();
+        if (empty($lists)) {
+            $lists = $email->getLists();
+        }
 
-        $listRepo  = $this->em->getRepository('MauticLeadBundle:LeadList');
-        $listLeads = $listRepo->getLeadsByList($lists);
+        $listModel  = $this->factory->getModel('lead.list');
+        $listLeads = $listModel->getLeadsByList($lists);
 
         //get email settings such as templates, weights, etc
         $emailSettings = $this->getEmailSettings($email);
@@ -669,7 +672,7 @@ class EmailModel extends FormModel
      */
     public function sendEmail($email, $leads, $emailSettings = array(), $listId = null, $returnEntities = false)
     {
-        if (!is_array($leads)) {
+        if (isset($leads['id'])) {
             $leads = array($leads['id'] => $leads);
         }
 

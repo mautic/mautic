@@ -204,7 +204,7 @@ class EventModel extends CommonFormModel
                 $settings = $availableEvents[$event['eventType']][$type];
 
                 //has this event already been examined via a parent's children?
-                //all events have to be queried since this particular event could be anywhere in the dripflow
+                //all events of this triggering type has to be queried since this particular event could be anywhere in the dripflow
                 if (in_array($event['id'], $examinedEvents)) {
                     continue;
                 }
@@ -302,6 +302,63 @@ class EventModel extends CommonFormModel
         }
     }
 
+
+    public function triggerCampaignStartingAction($campaign, $event, $settings)
+    {
+        static $leads = array();
+
+        /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */
+        $campaignModel = $this->factory->getModel('campaign');
+
+        $campaignId = $campaign->getId();
+        $eventId    = $event['id'];
+
+        //IP address for the log
+        /** @var \Mautic\CoreBundle\Entity\IpAddress $ipAddress */
+        $ipAddress = $this->factory->getIpAddress();
+
+        $eventLog    = $campaignModel->getEventLog($campaignId, $eventId, $leads);
+        $leadDetails = $campaignModel->getLeadDetails($campaignId, $leads);
+
+        $leads = $campaign->getLeads();
+
+        foreach ($leads as $campaignLead) {
+            $lead = $campaignLead->getLead();
+            $l = $lead->convertToArray();
+            $id = $l['id'];
+
+            //add the date of when the lead was added to this campaign
+            $event['stats']['campaign']['dateAdded'] = !empty($leadDetails[$id]) ?
+                $leadDetails[$id][0]['dateAdded'] : new \DateTime();
+            //add the date of when the event was invoked triggered if applicable
+            $event['stats']['event']['dateTriggered'] = (isset($eventLog[$id][$eventId])) ?
+                $eventLog[$id][$eventId]['dateTriggered'] : new \DateTime();
+
+            list ($timeAppropriate, $triggerOn) = $this->checkEventTiming($event, $event);
+            if (!$timeAppropriate) {
+                $log = new LeadEventLog();
+                $log->setIpAddress($ipAddress);
+                $log->setEvent($this->em->getReference('MauticCampaignBundle:Event', $eventId));
+                $log->setLead($lead);
+                $log->setIsScheduled(true);
+                $log->setTriggerDate($triggerOn);
+
+                $persist[] = $log;
+            } elseif ($this->invokeEventCallback($event, $settings, $l)) {
+                $log = new LeadEventLog();
+                $log->setIpAddress($ipAddress);
+                $log->setEvent($this->em->getReference('MauticCampaignBundle:Event', $eventId));
+                $log->setLead($lead);
+                $log->setDateTriggered(new \DateTime());
+                $persist[] = $log;
+            }
+        }
+
+        if (!empty($persist)) {
+            $this->getRepository()->saveEntities($persist);
+        }
+    }
+
     /**
      * Invoke the event's callback function
      *
@@ -312,7 +369,7 @@ class EventModel extends CommonFormModel
      *
      * @return bool|mixed
      */
-    public function invokeEventCallback ($event, $settings, $lead, $passthrough = null)
+    public function invokeEventCallback ($event, $settings, $lead = null, $passthrough = null)
     {
         $args = array(
             'passthrough' => $passthrough,
