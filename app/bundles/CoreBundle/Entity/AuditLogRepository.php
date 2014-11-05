@@ -25,7 +25,7 @@ class AuditLogRepository extends CommonRepository
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getLogForObject($object = null, $id = null, $limit = 100)
+    public function getLogForObject($object = null, $id = null, $limit = 10)
     {
         $query = $this->createQueryBuilder('al')
             ->select('al.userName, al.userId, al.bundle, al.object, al.objectId, al.action, al.details, al.dateAdded, al.ipAddress')

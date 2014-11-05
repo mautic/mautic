@@ -78,7 +78,7 @@ class AuditLogModel extends CommonModel
      * 
      * @return array of logs
      */
-    public function getLogForObject($object, $id, $limit = 100)
+    public function getLogForObject($object, $id, $limit = 10)
     {
         return $this->em->getRepository("MauticCoreBundle:AuditLog")->getLogForObject($object, $id, $limit);
     }
