@@ -8,7 +8,6 @@
  */
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set("headerTitle", "Integrations");
-$view['slots']->set('mauticContent', 'Integrations');
 ?>
 <div class="box-layout">
     <div class="np col-md-12 height-auto bg-white">
@@ -24,8 +23,8 @@ $view['slots']->set('mauticContent', 'Integrations');
                     <div class="col-md-3">
                         <div class="panel mb-0">
                             <div class="text-center doughnut-wrapper">
-                                <a href="<?php echo $application->getAppLink(); ?>">
-                                    <img src="<?php echo $view['assets']->getUrl($application->getImage()); ?>">
+                                <a href="<?php echo $application['link']; ?>">
+                                    <img src="<?php echo $view['assets']->getUrl($application['icon']); ?>">
                                 </a>
                             </div>
                         </div>

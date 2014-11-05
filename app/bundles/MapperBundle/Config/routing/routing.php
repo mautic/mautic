@@ -13,23 +13,35 @@ use Symfony\Component\Routing\Route;
 $collection = new RouteCollection();
 
 $collection->add('mautic_mapper_index', new Route('/mapper/dashboard',
+    array('_controller' => 'MauticMapperBundle:Dashboard:index')
+));
+
+$collection->add('mautic_mapper_client_index', new Route('/mapper/client/{application}/{page}',
+    array(
+        '_controller' => 'MauticMapperBundle:Client:index',
+        'page'        => 1,
+    ), array(
+        'page' => '\d+'
+    )
+));
+
+$collection->add('mautic_mapper_client_action', new Route('/mapper/client/{application}/{objectAction}/{objectId}',
+    array(
+        '_controller' => 'MauticMapperBundle:Client:executeClient',
+        'objectId'    => 0
+    )
+));
+
+$collection->add('mautic_mapper_client_object_index', new Route('/mapper/objects/{application}/{client}',
     array('_controller' => 'MauticMapperBundle:Mapper:index')
 ));
 
-$collection->add('mautic_mapper_integration', new Route('/mapper/integration/{application}',
-    array('_controller' => 'MauticMapperBundle:Mapper:integration')
+$collection->add('mautic_mapper_client_object_assign', new Route('/mapper/objects/{application}/{client}/{object}',
+    array('_controller' => 'MauticMapperBundle:Mapper:index')
 ));
 
-$collection->add('mautic_mapper_save', new Route('/mapper/integration/save/{application}',
-    array('_controller' => 'MauticMapperBundle:Mapper:save')
-));
-
-$collection->add('mautic_mapper_integration_object', new Route('/mapper/integration/{application}/{object}',
-    array('_controller' => 'MauticMapperBundle:Mapper:integrationObject')
-));
-
-$collection->add('mautic_mapper_callback', new Route('/mapper/oauth2callback/{application}',
-    array('_controller' => 'MauticMapperBundle:Mapper:oAuth2Callback')
+$collection->add('mautic_mapper_authentication_callback', new Route('/mapper/oauth2callback/{application}',
+    array('_controller' => 'MauticMapperBundle:Client:oAuth2Callback')
 ));
 
 return $collection;

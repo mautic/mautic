@@ -14,11 +14,11 @@ use JMS\Serializer\Annotation as Serializer;
 
 /**
  * Class ApplicationIntegration
- * @ORM\Table(name="mapper_application_integration_settings")
- * @ORM\Entity(repositoryClass="Mautic\MapperBundle\Entity\ApplicationIntegrationRepository")
+ * @ORM\Table(name="mapper_application_clients")
+ * @ORM\Entity(repositoryClass="Mautic\MapperBundle\Entity\ApplicationClientRepository")
  * @Serializer\ExclusionPolicy("all")
  */
-class ApplicationIntegration
+class ApplicationClient
 {
     /**
      * @ORM\Column(type="integer")
@@ -31,7 +31,17 @@ class ApplicationIntegration
     /**
      * @ORM\Column(type="string")
      */
-    private $name;
+    private $title;
+
+    /**
+     * @ORM\Column(type="string")
+     */
+    private $alias;
+
+    /**
+     * @ORM\Column(type="string", name="application")
+     */
+    private $application;
 
     /**
      * @ORM\Column(type="array", name="api_keys")
@@ -58,19 +68,11 @@ class ApplicationIntegration
     }
 
     /**
-     * @return mixed
-     */
-    public function getName ()
-    {
-        return $this->name;
-    }
-
-    /**
      * Get id
      *
      * @return integer
      */
-    public function getId()
+    public function getId ()
     {
         return $this->id;
     }
@@ -84,5 +86,43 @@ class ApplicationIntegration
         $this->name = $name;
 
         return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getName ()
+    {
+        return $this->name;
+    }
+
+    public function getAlias()
+    {
+        return $this->alias;
+    }
+
+    public function setAlias($alias)
+    {
+        $this->alias = $alias;
+    }
+
+    public function getTitle ()
+    {
+        return $this->title;
+    }
+
+    public function setTitle ($title)
+    {
+        $this->title = $title;
+    }
+
+    public function getApplication ()
+    {
+        return $this->application;
+    }
+
+    public function setApplication ($application)
+    {
+        $this->application = $application;
     }
 }
