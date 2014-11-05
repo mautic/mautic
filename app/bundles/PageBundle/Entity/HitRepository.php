@@ -12,6 +12,7 @@ namespace Mautic\PageBundle\Entity;
 use Doctrine\ORM\Query;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\CoreBundle\Helper\GraphHelper;
 
 /**
  * Class HitRepository
@@ -276,20 +277,25 @@ class HitRepository extends CommonRepository
      *
      * @return array
      */
-    public function getDwellTimes($pageIds, \DateTime $fromDate = null)
+    public function getDwellTimes($pageIds = null, \DateTime $fromDate = null, $q = null)
     {
-        $inIds = (!is_array($pageIds)) ? array($pageIds) : $pageIds;
+        if (!$q) {
+            $q  = $this->_em->getConnection()->createQueryBuilder();
+        }
 
-        $q  = $this->_em->getConnection()->createQueryBuilder();
         $q->select('h.id, h.page_id, h.date_hit, h.date_left, h.tracking_id')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h')
-            ->leftJoin('h', MAUTIC_TABLE_PREFIX.'pages', 'p', 'h.page_id = p.id')
-            ->where(
+            ->leftJoin('h', MAUTIC_TABLE_PREFIX.'pages', 'p', 'h.page_id = p.id');
+
+        if ($pageIds) {
+            $inIds = (!is_array($pageIds)) ? array($pageIds) : $pageIds;
+            $q->where(
                 $q->expr()->andX(
                     $q->expr()->in('h.page_id', $inIds),
                     $q->expr()->isNotNull('h.date_left')
                 )
             );
+        }
 
         if ($fromDate !== null) {
             //make sure the date is UTC
@@ -298,6 +304,7 @@ class HitRepository extends CommonRepository
                 $q->expr()->gte('h.date_hit', $q->expr()->literal($dt->toUtcString()))
             );
         }
+        
         $q->orderBy('h.date_hit', 'ASC');
         $results = $q->execute()->fetchAll();
 
@@ -306,36 +313,56 @@ class HitRepository extends CommonRepository
         foreach ($results as $r) {
             $dateHit  = new \DateTime($r['date_hit']);
             $dateLeft = new \DateTime($r['date_left']);
-            $times[$r['page_id']][] = ($dateLeft->getTimestamp() - $dateHit->getTimestamp());
+            if ($pageIds) {
+                $times[$r['page_id']][] = ($dateLeft->getTimestamp() - $dateHit->getTimestamp());
+            } else {
+                $times[] = ($dateLeft->getTimestamp() - $dateHit->getTimestamp());
+            }
         }
 
         //now loop to create stats
         $stats = array();
-        foreach ($times as $pid => $time) {
-            $stats[$pid] = array(
-                'sum'     => array_sum($time),
-                'min'     => min($time),
-                'max'     => max($time),
-                'average' => count($time) ? round(array_sum($time) / count($time)) : 0,
-                '0-1'     => 0,
-                '1-5'     => 0,
-                '5-10'    => 0,
-                '10+'     => 0,
-                'count'   => count($time)
+        if ($pageIds) {
+            foreach ($times as $pid => $time) {
+                $stats[$pid] = array(
+                    'sum'     => array_sum($time),
+                    'min'     => min($time),
+                    'max'     => max($time),
+                    'average' => count($time) ? round(array_sum($time) / count($time)) : 0,
+                    'count'   => count($time)
+                );
+                if ($time) {
+                    $timesOnSite = GraphHelper::getTimesOnSite();
+                    foreach ($time as $seconds) {
+                        foreach($timesOnSite as $tkey => $tos) {
+                            if ($seconds > $tos['from'] && $seconds <= $tos['till']) {
+                                $timesOnSite[$tkey]['value']++;
+                            }
+                        }
+                    }
+                }
+                $stats[$pid]['timesOnSite'] = $timesOnSite;
+            }
+        } else {
+            $stats = array(
+                'sum'     => array_sum($times),
+                'min'     => min($times),
+                'max'     => max($times),
+                'average' => count($times) ? round(array_sum($times) / count($times)) : 0,
+                'count'   => count($times)
             );
-            if ($time) {
-                foreach ($time as $seconds) {
-                    if ($seconds <= 60) {
-                        $stats[$pid]['0-1']++;
-                    } elseif ($seconds > 60 && $seconds <= 300) {
-                        $stats[$pid]['1-5']++;
-                    } elseif ($seconds > 300 && $seconds <= 600) {
-                        $stats[$pid]['5-10']++;
-                    } elseif ($seconds > 600) {
-                        $stats[$pid]['10+']++;
+            if ($times) {
+                $timesOnSite = GraphHelper::getTimesOnSite();
+                foreach ($times as $seconds) {
+                    foreach($timesOnSite as $tkey => $tos) {
+                        if ($seconds > $tos['from'] && $seconds <= $tos['till']) {
+                            $timesOnSite[$tkey]['value']++;
+                        }
                     }
                 }
             }
+            $stats['timesOnSite'] = $timesOnSite;
+            $stats['iconClass'] = 'fa-clock-o';
         }
 
         return (!is_array($pageIds) && array_key_exists('$pageIds', $stats)) ? $stats[$pageIds] : $stats;

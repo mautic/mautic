@@ -101,6 +101,7 @@ class ReportSubscriber extends CommonSubscriber
         }
 
         $options = $event->getOptions();
+        $hitRepo = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit');
 
         if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.page.graph.line.hits') {
             // Generate data for Downloads line graph
@@ -130,6 +131,16 @@ class ReportSubscriber extends CommonSubscriber
             $timeStats['name'] = 'mautic.page.graph.line.hits';
 
             $event->setGraph('line', $timeStats);
+        }
+
+        if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.page.graph.pie.time.on.site') {
+            $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+            $event->buildWhere($queryBuilder);
+            $hitStats = $hitRepo->getDwellTimes(null, null, $queryBuilder);
+            $dwellTimes = array();
+            $dwellTimes['data'] = $hitStats['timesOnSite'];
+            $dwellTimes['name'] = 'mautic.page.graph.pie.time.on.site';
+            $event->setGraph('pie', $dwellTimes);
         }
     }
 }

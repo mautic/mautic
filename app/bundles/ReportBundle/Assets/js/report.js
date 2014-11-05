@@ -126,6 +126,13 @@ Mautic.initGraphs = function () {
 				Mautic.reportGraphs[id] = Mautic.renderLineGraph(graph.getContext("2d"), graphData);
 			}
 		}
+		if (mGraph.hasClass('graph-pie')) {
+			var id = mGraph.attr('id');
+			if (typeof Mautic.reportGraphs[id] === 'undefined') {
+				var graphData = mQuery.parseJSON(mQuery('#' + id + '-data').text());
+				Mautic.reportGraphs[id] = Mautic.renderPieGraph(graph.getContext("2d"), graphData);
+			}
+		}
 	});
 }
 
@@ -178,6 +185,14 @@ Mautic.renderLineGraph = function (canvas, chartData) {
 	};
     return new Chart(canvas).Line(data, options);
 };
+
+Mautic.renderPieGraph = function (canvas, chartData) {
+    var options = {
+        responsive: false,
+        tooltipFontSize: 10,
+        tooltipTemplate: "<%if (label){%><%}%><%= value %>x <%=label%>"};
+    Mautic.pageTimePie = new Chart(canvas).Pie(chartData, options);
+}
 
 Mautic.getReportId = function() {
 	return mQuery('#reportId').val();

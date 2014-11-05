@@ -265,13 +265,9 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                                 <canvas 
                                     id="time-rate" 
                                     width="110" 
-                                    height="110" 
-                                    data-0-1="<?php echo isset($stats['dwellTime'][$activePage->getId()]['0-1']) ? $stats['dwellTime'][$activePage->getId()]['0-1'] : ''; ?>" 
-                                    data-1-5="<?php echo isset($stats['dwellTime'][$activePage->getId()]['1-5']) ? $stats['dwellTime'][$activePage->getId()]['1-5'] : ''; ?>" 
-                                    data-5-10="<?php echo isset($stats['dwellTime'][$activePage->getId()]['5-10']) ? $stats['dwellTime'][$activePage->getId()]['5-10'] : ''; ?>" 
-                                    data-10+="<?php echo isset($stats['dwellTime'][$activePage->getId()]['10+']) ? $stats['dwellTime'][$activePage->getId()]['10+'] : ''; ?>" 
-                                    data-count="<?php echo isset($stats['dwellTime'][$activePage->getId()]['count']) ? $stats['dwellTime'][$activePage->getId()]['count'] : ''; ?>">
+                                    height="110">
                                 </canvas>
+                                <div id="times-on-site-data" class="hide"><?php echo json_encode($stats['dwellTime'][$activePage->getId()]['timesOnSite']); ?></div>
                             </div>
                         </div>
                     </div>

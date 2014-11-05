@@ -9,8 +9,8 @@ Mautic.pageOnLoad = function (container) {
     }
 
     Mautic.renderPageViewsBarChart(container);
-    Mautic.renderPageReturningVisitsDoughnut();
-    Mautic.renderPageTimeDoughnut();
+    Mautic.renderPageReturningVisitsPie();
+    Mautic.renderPageTimePie();
 };
 
 Mautic.pageUnLoad = function() {
@@ -21,8 +21,8 @@ Mautic.pageUnLoad = function() {
 Mautic.pageOnUnload = function(id) {
     if (id === '#app-content') {
         delete Mautic.pageViewsBarChartObject;
-        delete Mautic.pageReturningVisitsDoughnut;
-        delete Mautic.pageTimeDoughnut;
+        delete Mautic.pageReturningVisitsPie;
+        delete Mautic.pageTimePie;
     }
 };
 
@@ -144,9 +144,9 @@ Mautic.renderPageViewsBarChart = function (container) {
     }
 };
 
-Mautic.renderPageReturningVisitsDoughnut = function () {
+Mautic.renderPageReturningVisitsPie = function () {
     // Initilize chart only for first time
-    if (typeof Mautic.pageReturningVisitsDoughnut === 'object') {
+    if (typeof Mautic.pageReturningVisitsPie === 'object') {
         return;
     }
     var element = mQuery('#returning-rate');
@@ -175,51 +175,20 @@ Mautic.renderPageReturningVisitsDoughnut = function () {
         }
     ];
     var ctx = document.getElementById("returning-rate").getContext("2d");
-    Mautic.pageReturningVisitsDoughnut = new Chart(ctx).Pie(data, options);
+    Mautic.pageReturningVisitsPie = new Chart(ctx).Pie(data, options);
 }
 
-Mautic.renderPageTimeDoughnut = function () {
+Mautic.renderPageTimePie = function () {
     // Initilize chart only for first time
-    if (typeof Mautic.pageTimeDoughnut === 'object') {
+    if (typeof Mautic.pageTimePie === 'object') {
         return;
     }
-    var minutes = [];
     var element = mQuery('#time-rate');
-    var count = +element.attr('data-count');
-    minutes.push(+element.attr('data-0-1'));
-    minutes.push(+element.attr('data-1-5'));
-    minutes.push(+element.attr('data-5-10'));
-    minutes.push(+element.attr('data-10+'));
     var options = {
         responsive: false,
         tooltipFontSize: 10,
-        tooltipTemplate: "<%if (label){%><%}%><%= value %>% <%=label%>"};
-    if (!count) {
-        return;
-    }
-    var data = [
-        {
-            value: Math.round(minutes[0] / count * 100),
-            color:"#4E5D9D",
-            highlight: "#353F6A",
-            label: "< 1m"
-        },{
-            value: Math.round(minutes[1] / count * 100),
-            color: "#00b49c",
-            highlight: "#007A69",
-            label: "1-5m"
-        },{
-            value: Math.round(minutes[2] / count * 100),
-            color:"#fd9572",
-            highlight: "#D53601",
-            label: "5-10m"
-        },{
-            value: Math.round(minutes[3] / count * 100),
-            color: "#fdb933",
-            highlight: "#D98C0A",
-            label: ">10m"
-        }
-    ];
+        tooltipTemplate: "<%if (label){%><%}%><%= value %>x <%=label%>"};
+    var timesOnSiteData = mQuery.parseJSON(mQuery('#times-on-site-data').text());
     var ctx = document.getElementById("time-rate").getContext("2d");
-    Mautic.pageTimeDoughnut = new Chart(ctx).Pie(data, options);
+    Mautic.pageTimePie = new Chart(ctx).Pie(timesOnSiteData, options);
 }
