@@ -1,10 +1,10 @@
 /* LeadBundle */
 
-.col-leadfield-id {
+.col-leadfield-id, .col-leadlist-id {
     width: 75px;
 }
 
-.col-leadfield-statusicons {
+.col-leadfield-statusicons, .col-leadlist-leadcount {
     width: 100px;
 }
 

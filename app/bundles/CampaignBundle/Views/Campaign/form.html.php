@@ -23,6 +23,10 @@ $view['slots']->set("headerTitle", $header);
     <!-- container -->
     <div class="col-md-9 bg-auto height-auto bdr-r">
         <div class="pa-md">
+            <?php if (!empty($form['isPublished']->vars['data'])): ?>
+                <div class="alert alert-danger"><h4><?php echo $view['translator']->trans('mautic.campaign.modify.warning'); ?></h4></div>
+            <?php endif; ?>
+
             <?php
             echo $view['form']->row($form['name']);
             echo $view['form']->row($form['description']);

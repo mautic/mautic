@@ -12,6 +12,7 @@ namespace Mautic\CampaignBundle\Model;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\LeadBundle\Entity\Lead;
 
 /**
  * Class EventModel
@@ -163,9 +164,10 @@ class EventModel extends CommonFormModel
         }
 
         //get the events for the triggering event
+        /** @var \Mautic\CampaignBundle\Entity\EventRepository $eventRepo */
         $eventRepo = $this->getRepository();
         if (empty($eventList[$type])) {
-            $eventList[$type] = $eventRepo->getPublishedByType($type, $leadCampaigns);
+            $eventList[$type] = $eventRepo->getPublishedByType($type, $leadCampaigns, $lead->getId());
         }
         $events = $eventList[$type];
 
@@ -217,9 +219,11 @@ class EventModel extends CommonFormModel
 
                 if (!isset($leadsEvents[$event['id']])) {
                     //log the triggering event
-                    $log = new LeadEventLog();
+                    $log = new
+                    LeadEventLog();
                     $log->setIpAddress($ipAddress);
                     $log->setEvent($this->em->getReference('MauticCampaignBundle:Event', $event['id']));
+                    $log->setCampaign($this->em->getReference('MauticCampaignBundle:Campaign', $event['campaign']['id']));
                     $log->setLead($lead);
                     $log->setDateTriggered(new \DateTime());
                     $persist[] = $log;
@@ -269,6 +273,7 @@ class EventModel extends CommonFormModel
                                 $log = new LeadEventLog();
                                 $log->setIpAddress($ipAddress);
                                 $log->setEvent($this->em->getReference('MauticCampaignBundle:Event', $child['id']));
+                                $log->setCampaign($this->em->getReference('MauticCampaignBundle:Campaign', $event['campaign']['id']));
                                 $log->setLead($lead);
                                 $log->setIsScheduled(true);
                                 $log->setTriggerDate($triggerOn);
@@ -284,6 +289,7 @@ class EventModel extends CommonFormModel
                             $log = new LeadEventLog();
                             $log->setIpAddress($ipAddress);
                             $log->setEvent($this->em->getReference('MauticCampaignBundle:Event', $child['id']));
+                            $log->setCampaign($this->em->getReference('MauticCampaignBundle:Campaign', $event['campaign']['id']));
                             $log->setLead($lead);
                             $log->setDateTriggered(new \DateTime());
                             $persist[] = $log;
@@ -302,52 +308,50 @@ class EventModel extends CommonFormModel
         }
     }
 
-
+    /**
+     * Trigger the first action in a campaign if a decision is not involved
+     *
+     * @param $campaign
+     * @param $event
+     * @param $settings
+     *
+     * @throws \Doctrine\ORM\ORMException
+     */
     public function triggerCampaignStartingAction($campaign, $event, $settings)
     {
-        static $leads = array();
-
         /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */
         $campaignModel = $this->factory->getModel('campaign');
-
-        $campaignId = $campaign->getId();
-        $eventId    = $event['id'];
+        $eventId       = $event['id'];
 
         //IP address for the log
         /** @var \Mautic\CoreBundle\Entity\IpAddress $ipAddress */
         $ipAddress = $this->factory->getIpAddress();
 
-        $eventLog    = $campaignModel->getEventLog($campaignId, $eventId, $leads);
-        $leadDetails = $campaignModel->getLeadDetails($campaignId, $leads);
-
-        $leads = $campaign->getLeads();
+        $leads = $campaignModel->getCampaignLeads($campaign, $eventId);
 
         foreach ($leads as $campaignLead) {
             $lead = $campaignLead->getLead();
-            $l = $lead->convertToArray();
-            $id = $l['id'];
 
             //add the date of when the lead was added to this campaign
-            $event['stats']['campaign']['dateAdded'] = !empty($leadDetails[$id]) ?
-                $leadDetails[$id][0]['dateAdded'] : new \DateTime();
-            //add the date of when the event was invoked triggered if applicable
-            $event['stats']['event']['dateTriggered'] = (isset($eventLog[$id][$eventId])) ?
-                $eventLog[$id][$eventId]['dateTriggered'] : new \DateTime();
+            $event['stats']['campaign']['dateAdded'] = $campaignLead->getDateAdded();
+            $event['stats']['event']['dateTriggered'] = new \DateTime();
 
             list ($timeAppropriate, $triggerOn) = $this->checkEventTiming($event, $event);
             if (!$timeAppropriate) {
                 $log = new LeadEventLog();
                 $log->setIpAddress($ipAddress);
                 $log->setEvent($this->em->getReference('MauticCampaignBundle:Event', $eventId));
+                $log->setCampaign($campaign);
                 $log->setLead($lead);
                 $log->setIsScheduled(true);
                 $log->setTriggerDate($triggerOn);
 
                 $persist[] = $log;
-            } elseif ($this->invokeEventCallback($event, $settings, $l)) {
+            } elseif ($this->invokeEventCallback($event, $settings, $lead)) {
                 $log = new LeadEventLog();
                 $log->setIpAddress($ipAddress);
                 $log->setEvent($this->em->getReference('MauticCampaignBundle:Event', $eventId));
+                $log->setCampaign($campaign);
                 $log->setLead($lead);
                 $log->setDateTriggered(new \DateTime());
                 $persist[] = $log;
@@ -377,6 +381,12 @@ class EventModel extends CommonFormModel
             'lead'        => $lead,
             'factory'     => $this->factory
         );
+
+        if ($lead instanceof Lead) {
+            /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+            $leadModel     = $this->factory->getModel('lead');
+            $lead->setFields($leadModel->getLeadDetails($lead));
+        }
 
         if (is_callable($settings['callback'])) {
             if (is_array($settings['callback'])) {

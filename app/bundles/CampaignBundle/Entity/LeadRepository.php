@@ -48,4 +48,40 @@ class LeadRepository extends EntityRepository
 
         return $return;
     }
+
+    /**
+     * Get leads for a specific campaign
+     *
+     * @param      $campaignId
+     * @param null $eventId
+     */
+    public function getLeads($campaignId, $eventId = null)
+    {
+        $q = $this->_em->createQueryBuilder()
+            ->from('MauticCampaignBundle:Lead', 'lc')
+            ->select('lc, l')
+            ->leftJoin('lc.campaign', 'c')
+            ->leftJoin('lc.lead', 'l');
+        $q->where(
+            $q->expr()->eq('c.id', ':campaign')
+        )->setParameter('campaign', $campaignId);
+
+        if ($eventId != null) {
+            $dq = $this->_em->createQueryBuilder();
+            $dq->select('el.id')
+                ->from('MauticCampaignBundle:LeadEventLog', 'ell')
+                ->leftJoin('ell.lead', 'el')
+                ->leftJoin('ell.event', 'ev')
+                ->where(
+                    $dq->expr()->eq('ev.id', ':eventId')
+                );
+
+            $q->andWhere('l.id NOT IN('.$dq->getDQL().')')
+                ->setParameter('eventId', $eventId);
+        }
+
+        $result = $q->getQuery()->getResult();
+
+        return $result;
+    }
 }

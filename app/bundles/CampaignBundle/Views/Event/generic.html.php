@@ -10,16 +10,6 @@
 //for defining the jsPlumb anchors
 $class = ($event['eventType'] == 'decision') ? 'list-campaign-decision' : 'list-campaign-nondecision list-campaign-' . $event['eventType'];
 
-if (!empty($deleted)):
-    $action    = 'undelete';
-    $iconClass = 'fa-undo';
-    $btnClass  = 'btn-warning';
-else:
-    $action    = 'delete';
-    $iconClass = 'fa-times';
-    $btnClass  = 'btn-danger';
-endif;
-
 if (empty($route))
     $route = 'mautic_campaignevent_action';
 
@@ -35,8 +25,8 @@ $style = (!empty($cs['droppedX'])) ? ' style="' . "position: absolute; top: {$cs
         <a data-toggle="ajaxmodal" data-target="#CampaignEventModal" href="<?php echo $view['router']->generate($route, array('objectAction' => 'edit', 'objectId' => $event['id'])); ?>" class="btn btn-success btn-xs btn-edit">
             <i class="fa fa-pencil-square-o"></i>
         </a>
-        <a data-menu-link="mautic_campaign_index" data-toggle="ajax" data-ignore-formexit="true" data-method="POST" data-hide-loadingbar="true" href="<?php echo $view['router']->generate($route, array('objectAction' => $action, 'objectId' => $event['id'])); ?>"  class="btn <?php echo $btnClass; ?> btn-xs">
-            <i class="fa <?php echo $iconClass; ?>"></i>
+        <a data-menu-link="mautic_campaign_index" data-toggle="ajax" data-ignore-formexit="true" data-method="POST" data-hide-loadingbar="true" href="<?php echo $view['router']->generate($route, array('objectAction' => 'delete', 'objectId' => $event['id'])); ?>"  class="btn btn-danger btn-xs">
+            <i class="fa fa-times"></i>
         </a>
     </div>
 </div>

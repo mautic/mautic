@@ -46,6 +46,11 @@ class Lead
     private $manuallyRemoved = false;
 
     /**
+     * @ORM\Column(name="manually_added", type="boolean")
+     */
+    private $manuallyAdded = false;
+
+    /**
      * @return mixed
      */
     public function getDateAdded ()
@@ -115,5 +120,29 @@ class Lead
     public function wasManuallyRemoved()
     {
         return $this->manuallyRemoved;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getManuallyAdded ()
+    {
+        return $this->manuallyAdded;
+    }
+
+    /**
+     * @param mixed $manuallyAdded
+     */
+    public function setManuallyAdded ($manuallyAdded)
+    {
+        $this->manuallyAdded = $manuallyAdded;
+    }
+
+    /**
+     * @return bool
+     */
+    public function wasManuallyAdded()
+    {
+        return $this->manuallyAdded;
     }
 }

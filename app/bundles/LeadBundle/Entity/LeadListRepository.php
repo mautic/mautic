@@ -308,7 +308,7 @@ class LeadListRepository extends CommonRepository
                     } else {
                         $q->select('l.*')
                             ->from(MAUTIC_TABLE_PREFIX . 'leads', 'l')
-                            ->leftJoin('l', MAUTIC_TABLE_PREFIX . 'lead_lists_included_leads', 'll', 'l.id = ll.lead_id');
+                            ->join('l', MAUTIC_TABLE_PREFIX . 'lead_lists_included_leads', 'll', 'l.id = ll.lead_id');
                     }
 
                     $q ->where($q->expr()->eq('ll.leadlist_id', ':list'))
@@ -322,6 +322,7 @@ class LeadListRepository extends CommonRepository
                             $currentOnlyLeads[$id][$r['id']] = $r;
                         }
                     }
+
                     unset($filters, $parameters, $q, $expr);
                 }
                 $return[$id] = $currentOnlyLeads[$id];

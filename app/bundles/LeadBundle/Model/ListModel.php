@@ -112,8 +112,7 @@ class ListModel extends FormModel
             $addLeads    = array_diff($newLeadList[$id], $oldLeadList[$id]);
             $removeLeads = array_diff($oldLeadList[$id], $newLeadList[$id]);
         } else {
-            $newLeadList = $this->getLeadsByList(array('id' => 'new', 'filters' => $entity->getFilters()), true);
-
+            $newLeadList = $this->getLeadsByList(array('id' => 'new', 'filters' => $entity->getFilters()), true, true);
             $addLeads    = $newLeadList['new'];
             $removeLeads = array();
         }

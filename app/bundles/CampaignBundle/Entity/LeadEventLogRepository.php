@@ -183,4 +183,18 @@ class LeadEventLogRepository extends EntityRepository
 
         return $return;
     }
+
+    /**
+     * @param $campaignId
+     * @param $leadId
+     */
+    public function removeScheduledEvents($campaignId, $leadId)
+    {
+        $conn = $this->_em->getConnection();
+        $conn->delete(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', array(
+            'lead_id'     => (int) $leadId,
+            'campaign_id' => (int) $campaignId,
+            'is_scheduled' => 1
+        ));
+    }
 }
