@@ -10,6 +10,7 @@
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Helper\GraphHelper;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
@@ -125,10 +126,8 @@ class ReportSubscriber extends CommonSubscriber
             if (isset($options['unit'])) {
                 $unit = $options['unit'];
             }
-            
-            $statRepo = $this->factory->getEntityManager()->getRepository('MauticEmailBundle:Stat');
 
-            $data = $statRepo->prepareStatsGraphDataBefore($amount, $unit);
+            $data = GraphHelper::prepareLineGraphData($amount, $unit);
 
             $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
             $queryBuilder->from(MAUTIC_TABLE_PREFIX . 'email_stats', 'es');
@@ -139,7 +138,7 @@ class ReportSubscriber extends CommonSubscriber
                 ->setParameter('date', $data['fromDate']->format('Y-m-d H:i:s'));
             $stats = $queryBuilder->execute()->fetchAll();
 
-            $timeStats = $statRepo->prepareStatsGraphDataAfter($data, $stats, $unit);
+            $timeStats = GraphHelper::mergeLineGraphData($data, $stats, $unit, 'dateSent');
             $timeStats['name'] = 'mautic.email.graph.line.stats';
 
             $event->setGraph('line', $timeStats);

@@ -10,6 +10,7 @@
 namespace Mautic\AssetBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Helper\GraphHelper;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
@@ -125,10 +126,8 @@ class ReportSubscriber extends CommonSubscriber
             if (isset($options['unit'])) {
                 $unit = $options['unit'];
             }
-            
-            $downloadRepo = $this->factory->getEntityManager()->getRepository('MauticAssetBundle:Download');
 
-            $data = $downloadRepo->prepareDownloadsGraphDataBefore($amount, $unit);
+            $data = GraphHelper::prepareLineGraphData($amount, $unit);
 
             $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
             $queryBuilder->from(MAUTIC_TABLE_PREFIX . 'asset_downloads', 'ad');
@@ -139,7 +138,7 @@ class ReportSubscriber extends CommonSubscriber
                 ->setParameter('date', $data['fromDate']->format('Y-m-d H:i:s'));
             $downloads = $queryBuilder->execute()->fetchAll();
 
-            $timeStats = $downloadRepo->prepareDownloadsGraphDataAfter($data, $downloads, $unit);
+            $timeStats = GraphHelper::mergeLineGraphData($data, $downloads, $unit, 'dateDownload');
             $timeStats['name'] = 'mautic.asset.graph.line.downloads';
 
             $event->setGraph('line', $timeStats);

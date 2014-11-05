@@ -10,6 +10,7 @@
 namespace Mautic\FormBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Helper\GraphHelper;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
@@ -125,10 +126,8 @@ class ReportSubscriber extends CommonSubscriber
             if (isset($options['unit'])) {
                 $unit = $options['unit'];
             }
-            
-            $submissionRepo = $this->factory->getEntityManager()->getRepository('MauticFormBundle:Submission');
 
-            $data = $submissionRepo->prepareSubmissionsGraphDataBefore($amount, $unit);
+            $data = GraphHelper::prepareLineGraphData($amount, $unit);
 
             $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
             $queryBuilder->from(MAUTIC_TABLE_PREFIX . 'form_submissions', 'fs');
@@ -139,7 +138,7 @@ class ReportSubscriber extends CommonSubscriber
                 ->setParameter('date', $data['fromDate']->format('Y-m-d H:i:s'));
             $submissions = $queryBuilder->execute()->fetchAll();
 
-            $timeStats = $submissionRepo->prepareSubmissionsGraphDataAfter($data, $submissions, $unit);
+            $timeStats = GraphHelper::mergeLineGraphData($data, $submissions, $unit, 'dateSubmitted');
             $timeStats['name'] = 'mautic.form.graph.line.submissions';
 
             $event->setGraph('line', $timeStats);

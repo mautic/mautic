@@ -10,6 +10,7 @@
 namespace Mautic\PageBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Helper\GraphHelper;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
@@ -113,10 +114,8 @@ class ReportSubscriber extends CommonSubscriber
             if (isset($options['unit'])) {
                 $unit = $options['unit'];
             }
-            
-            $hitRepo = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit');
 
-            $data = $hitRepo->prepareHitsGraphDataBefore($amount, $unit);
+            $data = GraphHelper::prepareLineGraphData($amount, $unit);
 
             $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
             $queryBuilder->from(MAUTIC_TABLE_PREFIX . 'page_hits', 'ph');
@@ -127,7 +126,7 @@ class ReportSubscriber extends CommonSubscriber
                 ->setParameter('date', $data['fromDate']->format('Y-m-d H:i:s'));
             $hits = $queryBuilder->execute()->fetchAll();
 
-            $timeStats = $hitRepo->prepareHitsGraphDataAfter($data, $hits, $unit);
+            $timeStats = GraphHelper::mergeLineGraphData($data, $hits, $unit, 'dateHit');
             $timeStats['name'] = 'mautic.page.graph.line.hits';
 
             $event->setGraph('line', $timeStats);
