@@ -21,13 +21,12 @@ class EventRepository extends CommonRepository
      * Get array of published events based on type
      *
      * @param $type
-     * @param $eventType
      * @param $campaigns
-     * @param $topLevelOnly
+     * @param $leadId
      *
      * @return array
      */
-    public function getPublishedByType($type, $eventType = null, array $campaigns = null)
+    public function getPublishedByType($type, array $campaigns = null, $leadId = null)
     {
         $now = new \DateTime();
         $q = $this->createQueryBuilder('e')
@@ -44,13 +43,6 @@ class EventRepository extends CommonRepository
             $q->expr()->eq('e.type', ':type')
         );
 
-        if (!empty($eventType)) {
-            $expr->add(
-                $q->expr()->eq('e.eventType', ':eventType')
-            );
-            $q->setParameter('eventType', ':eventType');
-        }
-
         $q->where($expr)
             ->setParameter('now', $now)
             ->setParameter('type', $type);
@@ -58,6 +50,21 @@ class EventRepository extends CommonRepository
         if (!empty($campaigns)) {
             $q->andWhere($q->expr()->in('c.id', ':campaigns'))
                 ->setParameter('campaigns', $campaigns);
+        }
+
+        if ($leadId != null) {
+            $dq = $this->_em->createQueryBuilder();
+            $dq->select('ellev.id')
+                ->from('MauticCampaignBundle:LeadEventLog', 'ell')
+                ->leftJoin('ell.event', 'ellev')
+                ->leftJoin('ell.lead', 'el')
+                ->where('ellev.id = e.id')
+                ->andWhere(
+                    $dq->expr()->eq('el.id', ':leadId')
+                );
+
+            $q->andWhere('e.id NOT IN('.$dq->getDQL().')')
+                ->setParameter('leadId', $leadId);
         }
 
         $results = $q->getQuery()->getArrayResult();

@@ -55,9 +55,7 @@ Mautic.campaignOnLoad = function (container) {
             });
 
             Mautic.campaignBuilderInstance.bind("connectionDetached", function(info, originalEvent) {
-                if (typeof originalEvent !== 'undefined') {
-                    Mautic.updateCampaignConnections(info, true);
-                }
+                Mautic.updateCampaignConnections(info, true);
             });
 
             Mautic.campaignOverlayOptions = [
@@ -96,7 +94,7 @@ Mautic.campaignOnLoad = function (container) {
                 }
             };
 
-            Mautic.campaignBuilderBottomAnchor = [ 0.5, 1, 0, 1, 0, 0, "bottom" ];
+            Mautic.campaignBuilderBottomAnchor = [ 0.5, 1, 0, 1, 0, 0];
             Mautic.campaignBuilderBottomEndpoint = {
                 endpoint: "Dot",
                 paintStyle: {
@@ -114,7 +112,7 @@ Mautic.campaignOnLoad = function (container) {
                 maxConnections: 10
             };
 
-            Mautic.campaignBuilderYesAnchor = [0, 1, 0, 1, 30, 0, "yes"];
+            Mautic.campaignBuilderYesAnchor = [0, 1, 0, 1, 30, 0];
             Mautic.campaignBuilderYesEndpoint = {
                 endpoints: "Dot",
                 paintStyle: {
@@ -132,7 +130,7 @@ Mautic.campaignOnLoad = function (container) {
                 maxConnections: 10
             };
 
-            Mautic.campaignBuilderNoAnchor = [1, 1, 0, 1, -30, 0, "no"];
+            Mautic.campaignBuilderNoAnchor = [1, 1, 0, 1, -30, 0];
             Mautic.campaignBuilderNoEndpoint = {
                 endpoint: "Dot",
                 paintStyle: {
@@ -188,18 +186,26 @@ Mautic.campaignOnLoad = function (container) {
                 //manually loop through each so a UUID can be set for reconnecting connections
                 mQuery("#CampaignCanvas .list-campaign-event").each( function() {
                     var id = mQuery(this).attr('id');
-                    Mautic.campaignBuilderInstance.addEndpoint(document.getElementById(id), {anchor: Mautic.campaignBuilderTopAnchor, uuid: id + "_top"}, Mautic.campaignBuilderTopEndpoint);
+                    var theAnchor = Mautic.campaignBuilderTopAnchor;
+                    theAnchor[6] = 'no ' + id;
+                    Mautic.campaignBuilderInstance.addEndpoint(document.getElementById(id), {anchor: theAnchor, uuid: id + "_top"}, Mautic.campaignBuilderTopEndpoint);
                 });
 
                 mQuery("#CampaignCanvas .list-campaign-nondecision").each( function() {
                     var id = mQuery(this).attr('id');
-                    Mautic.campaignBuilderInstance.addEndpoint(document.getElementById(id), {anchor: Mautic.campaignBuilderBottomAnchor, uuid: id + "_bottom"}, Mautic.campaignBuilderBottomEndpoint);
+                    var theAnchor = Mautic.campaignBuilderBottomAnchor;
+                    theAnchor[6] = 'bottom ' + id;
+                    Mautic.campaignBuilderInstance.addEndpoint(document.getElementById(id), {anchor: theAnchor, uuid: id + "_bottom"}, Mautic.campaignBuilderBottomEndpoint);
                 });
 
                 mQuery("#CampaignCanvas .list-campaign-decision").each( function() {
                     var id = mQuery(this).attr('id');
-                    Mautic.campaignBuilderInstance.addEndpoint(document.getElementById(id), {anchor: Mautic.campaignBuilderYesAnchor, uuid: id + "_yes"}, Mautic.campaignBuilderYesEndpoint);
-                    Mautic.campaignBuilderInstance.addEndpoint(document.getElementById(id), {anchor: Mautic.campaignBuilderNoAnchor, uuid: id + "_no"}, Mautic.campaignBuilderNoEndpoint);
+                    var theAnchor = Mautic.campaignBuilderYesAnchor;
+                    theAnchor[6] = 'yes ' + id;
+                    Mautic.campaignBuilderInstance.addEndpoint(document.getElementById(id), {anchor: theAnchor, uuid: id + "_yes"}, Mautic.campaignBuilderYesEndpoint);
+                    var theAnchor = Mautic.campaignBuilderNoAnchor;
+                    theAnchor[6] = 'no ' + id;
+                    Mautic.campaignBuilderInstance.addEndpoint(document.getElementById(id), {anchor: theAnchor, uuid: id + "_no"}, Mautic.campaignBuilderNoEndpoint);
                 });
 
                 //enable drag and drop
@@ -261,7 +267,20 @@ Mautic.campaignOnLoad = function (container) {
  */
 Mautic.campaignEventOnLoad = function (container, response) {
     //new action created so append it to the form
-    if (response.eventHtml) {
+    if (response.deleted) {
+        var domEventId = 'CampaignEvent_' + response.eventId;
+        var eventId    = '#' + domEventId;
+
+        //remove the connections
+        Mautic.campaignBuilderInstance.detachAllConnections(document.getElementById(domEventId));
+
+        mQuery('.' + domEventId).each( function() {
+           mQuery(this).remove();
+        });
+
+        //remove the div
+        mQuery(eventId).remove();
+    } else if (response.eventHtml) {
         var newHtml = response.eventHtml;
         var domEventId = 'CampaignEvent_' + response.eventId;
         var eventId    = '#' + domEventId;
@@ -288,15 +307,23 @@ Mautic.campaignEventOnLoad = function (container, response) {
             mQuery(eventId).css({'left': x + 'px', 'top': y + 'px'});
 
             if (response.eventType == 'decision') {
-                Mautic.campaignBuilderInstance.addEndpoint(document.getElementById(domEventId), {anchor: Mautic.campaignBuilderTopAnchor}, Mautic.campaignBuilderTopEndpoint);
-                Mautic.campaignBuilderInstance.addEndpoint(document.getElementById(domEventId), {anchor: Mautic.campaignBuilderYesAnchor}, Mautic.campaignBuilderYesEndpoint);
-                Mautic.campaignBuilderInstance.addEndpoint(document.getElementById(domEventId), {anchor: Mautic.campaignBuilderNoAnchor}, Mautic.campaignBuilderNoEndpoint);
+                var theAnchor = Mautic.campaignBuilderTopAnchor;
+                theAnchor[6] = 'top ' + id;
+                Mautic.campaignBuilderInstance.addEndpoint(document.getElementById(domEventId), {anchor: theAnchor, uuid: id + "_top"}, Mautic.campaignBuilderTopEndpoint);
+                var theAnchor = Mautic.campaignBuilderYesAnchor;
+                theAnchor[6] = 'yes ' + id;
+                Mautic.campaignBuilderInstance.addEndpoint(document.getElementById(domEventId), {anchor: theAnchor, uuid: id + "_yes"}, Mautic.campaignBuilderYesEndpoint);
+                var theAnchor = Mautic.campaignBuilderNoAnchor;
+                theAnchor[6] = 'no ' + id;
+                Mautic.campaignBuilderInstance.addEndpoint(document.getElementById(domEventId), {anchor: theAnchor, uuid: id + "_no"}, Mautic.campaignBuilderNoEndpoint);
             } else {
-                Mautic.campaignBuilderInstance.addEndpoint(document.getElementById(domEventId), {anchor: Mautic.campaignBuilderTopAnchor}, Mautic.campaignBuilderTopEndpoint);
-                Mautic.campaignBuilderInstance.addEndpoint(document.getElementById(domEventId), {anchor: Mautic.campaignBuilderBottomAnchor}, Mautic.campaignBuilderBottomEndpoint);
+                var theAnchor = Mautic.campaignBuilderTopAnchor;
+                theAnchor[6] = 'top ' + id;
+                Mautic.campaignBuilderInstance.addEndpoint(document.getElementById(domEventId), {anchor: theAnchor, uuid: id + "_top"}, Mautic.campaignBuilderTopEndpoint);
+                var theAnchor = Mautic.campaignBuilderBottomAnchor;
+                theAnchor[6] = 'bottom ' + id;
+                Mautic.campaignBuilderInstance.addEndpoint(document.getElementById(domEventId), {anchor: theAnchor, uuid: id + "_bottom"}, Mautic.campaignBuilderBottomEndpoint);
             }
-
-            var newField = true;
         }
 
         Mautic.campaignBuilderInstance.draggable(document.getElementById(domEventId), Mautic.campaignDragOptions);

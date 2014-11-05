@@ -293,6 +293,26 @@ class LeadModel extends FormModel
     }
 
     /**
+     * Gets the details of a lead
+     *
+     * @param $lead
+     *
+     * @return mixed
+     */
+    public function getLeadDetails($lead)
+    {
+        static $details = array();
+
+        $leadId = ($lead instanceof Lead) ? $lead->getId() : (int) $lead;
+
+        if (!isset($details[$leadId])) {
+            $details[$leadId] = $this->getRepository()->getFieldValues($leadId);
+        }
+
+        return $details[$leadId];
+    }
+
+    /**
      * Reorganizes a field list to be keyed by field's group then alias
      *
      * @param $fields

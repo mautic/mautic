@@ -698,13 +698,18 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
-     * @param $campaign
+     * Get leads for a campaign.  If $event is passed in, only leads who have not triggered the event are returned
+     *
+     * @param      $campaign
+     * @param null $event
+     *
+     * @return mixed
      */
-    public function getCampaignLeads($campaign)
+    public function getCampaignLeads($campaign, $event = null)
     {
         $campaignId = ($campaign instanceof Campaign) ? $campaign->getId() : $campaign;
-
-        $leads = $this->em->getRepository('MauticCampaignBundle:Lead')->getLeads($campaignId);
+        $eventId    = (is_array($event) && isset($event['id'])) ? $event['id'] : $event;
+        $leads = $this->em->getRepository('MauticCampaignBundle:Lead')->getLeads($campaignId, $eventId);
 
         return $leads;
     }

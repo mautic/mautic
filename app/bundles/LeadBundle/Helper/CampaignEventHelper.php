@@ -60,7 +60,7 @@ class CampaignEventHelper
 
         $somethingHappened = false;
 
-        if (!empty($points)) {
+        if ($lead != null && !empty($points)) {
             $lead->addToPoints($points);
 
             //add a lead point change log
@@ -68,7 +68,7 @@ class CampaignEventHelper
             $log->setDelta($points);
             $log->setLead($lead);
             $log->setType('campaign');
-            $log->setEventName("{$event['campaign']['id']}: {$event['campaign']['name']}");
+            $log->setEventName("{$event['campaign']->getId()}: {$event['campaign']->getName()}");
             $log->setActionName("{$event['id']}: {$event['name']}");
             $log->setIpAddress($factory->getIpAddress());
             $log->setDateAdded(new \DateTime());

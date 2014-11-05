@@ -72,7 +72,7 @@ class CampaignEventHelper
         if (!empty($removeFromCampaigns)) {
             foreach ($removeFromCampaigns as $c) {
                 if ($c == 'this') {
-                    $c = $event['campaign']['id'];
+                    $c = $event['campaign']->getId();
                 }
 
                 $campaignModel->removeLead($em->getReference('MauticCampaignBundle:Campaign', $c), $lead, true);

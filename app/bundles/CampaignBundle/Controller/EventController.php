@@ -293,26 +293,13 @@ class EventController extends CommonFormController
                 $session->set('mautic.campaigns.remove', $delete);
             }
 
-            $template = (empty($event['settings']['template'])) ? 'MauticCampaignBundle:Event:generic.html.php'
-                : $event['settings']['template'];
-
-            //prevent undefined errors
-            $entity = new Event();
-            $blank  = $entity->convertToArray();
-            $event  = array_merge($blank, $event);
-
             $dataArray = array(
                 'mauticContent' => 'campaignEvent',
                 'success'       => 1,
                 'route'         => false,
                 'eventId'       => $objectId,
-                'eventHtml'     => $this->renderView($template, array(
-                    'inForm'       => true,
-                    'event'        => $event,
-                    'id'           => $objectId,
-                    'deleted'      => true,
-                    'level'        => $this->request->get('level', 1),
-                ))
+                'deleted'       => 1,
+                'event'         => $event
             );
         } else {
             $dataArray = array('success' => 0);
