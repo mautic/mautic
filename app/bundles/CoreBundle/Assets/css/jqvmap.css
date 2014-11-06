@@ -28,14 +28,16 @@
 	-webkit-border-radius: 3px;
 	-moz-border-radius: 3px;
 	border-radius: 3px;
-	background: #000000;
+	background: #B7B7B7;
 	padding: 3px;
 	color: white;
-	width: 10px;
-	height: 10px;
+	width: 24px;
+	height: 24px;
 	cursor: pointer;
 	line-height: 10px;
 	text-align: center;
+	font-size: 20px;
+	line-height: 17px;
 }
 .jqvmap-zoomin
 {
@@ -43,7 +45,7 @@
 }
 .jqvmap-zoomout
 {
-	top: 30px;
+	top: 40px;
 }
 .jqvmap-region
 {
