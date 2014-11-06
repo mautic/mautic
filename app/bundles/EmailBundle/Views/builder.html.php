@@ -40,9 +40,6 @@ mQuery(document).ready( function() {
                         },
                         dataType: "html"
                     });
-                },
-                focus: function (event) {
-                    mQuery('#' + content_id).find('.mautic-content-placeholder').remove();
                 }
             }
         });
@@ -55,15 +52,14 @@ $css = <<<CSS
 .mautic-editable { min-height: 75px; width: 100%; border: solid 1px #d5d4d4; margin-top: 3px; margin-bottom: 3px; }
 .mautic-content-placeholder { height: 100%; width: 100%; text-align: center; margin-top: 25px; }
 .mautic-editable.over-droppable { border: solid 1px #d5d4d4; }
+div[contentEditable=true]:empty:not(:focus):before{ content:attr(data-placeholder) }
 CSS;
 $view['assets']->addStyleDeclaration($css);
 
 //Set the slots
 foreach ($slots as $slot) {
     $value = isset($content[$slot]) ? $content[$slot] : "";
-    if (empty($value))
-        $value = "<div class='mautic-content-placeholder'>" . $view['translator']->trans('mautic.email.builder.addcontent') . '</div>';
-    $view['slots']->set($slot, "<div id='slot-".$slot."' class='mautic-editable' contenteditable=true>".$value."</div>");
+    $view['slots']->set($slot, "<div id=\"slot-{$slot}\" class=\"mautic-editable\" contenteditable=true data-placeholder=\"{$view['translator']->trans('mautic.page.page.builder.addcontent')}\">{$value}</div>");
 }
 
 //add builder toolbar
