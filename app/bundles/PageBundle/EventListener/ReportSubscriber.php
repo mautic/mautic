@@ -101,6 +101,7 @@ class ReportSubscriber extends CommonSubscriber
         }
 
         $options = $event->getOptions();
+        $hitRepo = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit');
 
         if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.page.graph.line.hits') {
             // Generate data for Downloads line graph
@@ -130,6 +131,43 @@ class ReportSubscriber extends CommonSubscriber
             $timeStats['name'] = 'mautic.page.graph.line.hits';
 
             $event->setGraph('line', $timeStats);
+        }
+
+        if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.page.graph.pie.time.on.site') {
+            $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+            $event->buildWhere($queryBuilder);
+            $hitStats = $hitRepo->getDwellTimes(null, null, $queryBuilder);
+            $graphData = array();
+            $graphData['data'] = $hitStats['timesOnSite'];
+            $graphData['name'] = 'mautic.page.graph.pie.time.on.site';
+            $graphData['iconClass'] = 'fa-clock-o';
+            $event->setGraph('pie', $graphData);
+        }
+
+        if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.page.graph.pie.new.vs.returning') {
+            if (!isset($hitstats)) {
+                $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+                $event->buildWhere($queryBuilder);
+                $hitStats = $hitRepo->getDwellTimes(null, null, $queryBuilder);
+            }
+            $graphData = array();
+            $graphData['data'] = $hitStats['newVsReturning'];
+            $graphData['name'] = 'mautic.page.graph.pie.new.vs.returning';
+            $graphData['iconClass'] = 'fa-bookmark-o';
+            $event->setGraph('pie', $graphData);
+        }
+
+        if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.page.graph.pie.languages') {
+            if (!isset($hitstats)) {
+                $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+                $event->buildWhere($queryBuilder);
+                $hitStats = $hitRepo->getDwellTimes(null, null, $queryBuilder);
+            }
+            $graphData = array();
+            $graphData['data'] = $hitStats['languages'];
+            $graphData['name'] = 'mautic.page.graph.pie.languages';
+            $graphData['iconClass'] = 'fa-globe';
+            $event->setGraph('pie', $graphData);
         }
     }
 }

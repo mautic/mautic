@@ -90,6 +90,22 @@ if ($security->hasEntityAccess($permissions['report:reports:editown'], $permissi
             <?php endif; ?>
         </div>
 
+        <div class="pa-md">
+            <div class="row">
+                <?php if (isset($graphs['pie']) && $graphs['pie']) : ?>
+                <?php foreach ($graphs['pie'] as $graph) : ?>
+                <!-- Overview Chart -->
+                <div class="col-md-4">
+                    <!-- area spline chart -->
+                    <?php echo $view->render('MauticReportBundle:Graph:Pie.html.php', array('graph' => $graph)); ?>
+                    <!--/ area spline chart -->
+                </div>
+                <!--/ Overview Chart -->
+                <?php endforeach; ?>
+                <?php endif; ?>
+            </div>
+        </div>
+
         <!-- table section -->
         <!-- <div class="panel panel-default page-list">
             <div class="table-responsive panel-collapse pull out">

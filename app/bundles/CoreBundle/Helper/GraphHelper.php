@@ -14,6 +14,66 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 class GraphHelper
 {
     /**
+     * Colors which can be used in graphs
+     */
+    public static $colors = array(
+        array(
+            'color' => '#4E5D9D',
+            'highlight' => '#353F6A'),
+        array(
+            'color' => '#00b49c',
+            'highlight' => '#007A69'),
+        array(
+            'color' => '#fd9572',
+            'highlight' => '#D53601'),
+        array(
+            'color' => '#fdb933',
+            'highlight' => '#D98C0A')
+    );
+
+    /**
+     * Time on site labels
+     */
+    public static $timesOnSite = array(
+        array(
+            'label' => '< 1m',
+            'value' => 0,
+            'from' => 0,
+            'till' => 60),
+        array(
+            'label' => '1 - 5m',
+            'value' => 0,
+            'from' => 60,
+            'till' => 300),
+        array(
+            'label' => '5 - 10m',
+            'value' => 0,
+            'from' => 300,
+            'till' => 600),
+        array(
+            'label' => '> 10m',
+            'value' => 0,
+            'from' => 600,
+            'till' => 999999),
+    );
+
+    public static function getTimesOnSite()
+    {
+        $timesOnSite = self::$timesOnSite;
+        $colors = self::$colors;
+        foreach ($timesOnSite as $key => $tos) {
+            if (isset($colors[$key])) {
+                $timesOnSite[$key]['color'] = $colors[$key]['color'];
+                $timesOnSite[$key]['highlight'] = $colors[$key]['highlight'];
+            } else {
+                $timesOnSite[$key]['color'] = '#4E5D9D';
+                $timesOnSite[$key]['highlight'] = '#353F6A';
+            }
+        }
+        return $timesOnSite;
+    }
+
+    /**
      * Get proper date label format depending on what date scope we want to display
      *
      * @param char $unit: php.net/manual/en/dateinterval.construct.php#refsect1-dateinterval.construct-parameters
