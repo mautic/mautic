@@ -291,8 +291,7 @@ class HitRepository extends CommonRepository
             $inIds = (!is_array($pageIds)) ? array($pageIds) : $pageIds;
             $q->where(
                 $q->expr()->andX(
-                    $q->expr()->in('h.page_id', $inIds),
-                    $q->expr()->isNotNull('h.date_left')
+                    $q->expr()->in('h.page_id', $inIds)
                 )
             );
         }
@@ -310,18 +309,20 @@ class HitRepository extends CommonRepository
 
         //loop to structure
         $times = array();
-        $returning = array();
+        $trackingIds = array();
         $languages = array();
         foreach ($results as $r) {
             $dateHit  = new \DateTime($r['date_hit']);
             $dateLeft = new \DateTime($r['date_left']);
             if ($pageIds) {
                 $times[$r['page_id']][] = ($dateLeft->getTimestamp() - $dateHit->getTimestamp());
-                if (!isset($returning[$r['page_id']])) {
-                    $returning[$r['page_id']] = array();
+                if (!isset($trackingIds[$r['page_id']])) {
+                    $trackingIds[$r['page_id']] = array();
                 }
-                if (!in_array($r['tracking_id'], $returning)) {
-                    $returning[$r['page_id']][] = $r['tracking_id'];
+                if (array_key_exists($r['tracking_id'], $trackingIds[$r['page_id']])) {
+                    $trackingIds[$r['page_id']][$r['tracking_id']]++;
+                } else {
+                    $trackingIds[$r['page_id']][$r['tracking_id']] = 1;
                 }
                 if (!isset($languages[$r['page_id']])) {
                     $languages[$r['page_id']] = array();
@@ -333,8 +334,10 @@ class HitRepository extends CommonRepository
                 }
             } else {
                 $times[] = ($dateLeft->getTimestamp() - $dateHit->getTimestamp());
-                if (!in_array($r['tracking_id'], $returning)) {
-                    $returning[] = $r['tracking_id'];
+                if (array_key_exists($r['tracking_id'], $trackingIds)) {
+                    $trackingIds[$r['tracking_id']]++;
+                } else {
+                    $trackingIds[$r['tracking_id']] = 1;
                 }
                 if (array_key_exists($r['page_language'], $languages)) {
                     $languages[$r['page_language']]++;
@@ -349,20 +352,39 @@ class HitRepository extends CommonRepository
         if ($pageIds) {
             foreach ($times as $pid => $time) {
                 $stats[$pid] = $this->countStats($time);
-                $stats[$pid]['returning'] = count($returning[$pid]);
-                $stats[$pid]['new'] = $stats[$pid]['count'] - $stats[$pid]['returning'];
+                $stats[$pid]['returning'] = $this->countReturning($trackingIds[$pid]);
+                $stats[$pid]['new'] = count($trackingIds[$pid]) - $stats[$pid]['returning'];
                 $stats[$pid]['newVsReturning'] = $this->getNewVsReturningGraphData($stats[$pid]['new'], $stats[$pid]['returning']);
                 $stats[$pid]['languages'] = $this->getLaguageGraphData($languages[$pid]);
             }
         } else {
             $stats = $this->countStats($times);
-            $stats['returning'] = count($returning);
-            $stats['new'] = $stats['count'] - $stats['returning'];
+            $stats['returning'] = $this->countReturning($trackingIds);
+            $stats['new'] = count($trackingIds) - $stats['returning'];
             $stats['newVsReturning'] = $this->getNewVsReturningGraphData($stats['new'], $stats['returning']);
             $stats['languages'] = $this->getLaguageGraphData($languages);
         }
 
         return (!is_array($pageIds) && array_key_exists('$pageIds', $stats)) ? $stats[$pageIds] : $stats;
+    }
+
+    /**
+     * Count returning visitors
+     *
+     * @param array $visitors
+     *
+     * @return array
+     */
+    public function countReturning($visitors)
+    {
+        $returning = 0;
+        foreach ($visitors as $visitor) {
+            if ($visitor > 1) {
+                $returning++;
+            }
+        }
+
+        return $returning;
     }
 
     /**

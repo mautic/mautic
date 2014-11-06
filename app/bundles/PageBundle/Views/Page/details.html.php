@@ -250,7 +250,6 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                                     <?php echo json_encode($stats['dwellTime'][$activePage->getId()]['newVsReturning']); ?>
                                 </div>
                             </div>
-                            <pre><?php print_r($stats['dwellTime'][$activePage->getId()]['newVsReturning']); ?></pre>
                         </div>
                     </div>
                     <div class="col-md-4">
