@@ -143,9 +143,9 @@ class HitRepository extends CommonRepository
     public function getReturningCount($args = array())
     {
         $q = $this->createQueryBuilder('h');
-        $q->select('COUNT(h.ipAddress) as returning')
-            ->groupBy('h.ipAddress')
-            ->having($q->expr()->gt('COUNT(h.ipAddress)', 1));
+        $q->select('COUNT(h.trackingId) as returning')
+            ->groupBy('h.trackingId')
+            ->having($q->expr()->gt('COUNT(h.trackingId)', 1));
         $results = $q->getQuery()->getResult();
 
         return count($results);
@@ -160,7 +160,7 @@ class HitRepository extends CommonRepository
     public function getUniqueCount($args = array())
     {
         $q = $this->createQueryBuilder('h');
-        $q->select('COUNT(DISTINCT h.ipAddress) as unique');
+        $q->select('COUNT(DISTINCT h.trackingId) as unique');
         $results = $q->getQuery()->getSingleResult();
 
         if (!isset($results['unique'])) {
