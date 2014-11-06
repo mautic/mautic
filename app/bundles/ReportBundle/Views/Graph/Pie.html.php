@@ -27,6 +27,25 @@
             width="210" 
             height="210">
         </canvas>
-        <div id="<?php echo str_replace('.', '-', $graph['name']); ?>-data" class="hide"><?php echo json_encode($graph['data']); ?></div>
+        <div id="<?php echo str_replace('.', '-', $graph['name']); ?>-data" class="hide">
+            <?php echo json_encode($graph['data']); ?>
+        </div>
+        <div class="labels pb-10">
+            <?php if (isset($graph['data']) && $graph['data']) : ?>
+                <?php foreach ($graph['data'] as $item) : ?>
+                    <?php $style = 'style="'; ?>
+                    <?php if (isset($item['color'])) : ?>
+                        <?php $style .= 'background:' . $item['color']; ?>
+                    <?php endif; ?>
+                    <?php $style .= '"'; ?>
+                    <span class="label label-default" <?php echo $style; ?>>
+                        <?php echo $item['label'] ?>:
+                        <?php if (isset($item['value'])) : ?>
+                            <?php echo $item['value'] ?>x
+                        <?php endif; ?>
+                    </span>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </div>
     </div>
 </div>
