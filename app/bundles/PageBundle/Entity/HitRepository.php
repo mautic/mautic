@@ -310,62 +310,88 @@ class HitRepository extends CommonRepository
 
         //loop to structure
         $times = array();
+        $returning = array();
         foreach ($results as $r) {
             $dateHit  = new \DateTime($r['date_hit']);
             $dateLeft = new \DateTime($r['date_left']);
             if ($pageIds) {
                 $times[$r['page_id']][] = ($dateLeft->getTimestamp() - $dateHit->getTimestamp());
+                if (!isset($returning[$r['page_id']])) {
+                    $returning[$r['page_id']] = array();
+                }
+                if (!in_array($r['tracking_id'], $returning)) {
+                    $returning[$r['page_id']][] = $r['tracking_id'];
+                }
             } else {
                 $times[] = ($dateLeft->getTimestamp() - $dateHit->getTimestamp());
+                if (!in_array($r['tracking_id'], $returning)) {
+                    $returning[] = $r['tracking_id'];
+                }
             }
+            
         }
 
         //now loop to create stats
         $stats = array();
         if ($pageIds) {
             foreach ($times as $pid => $time) {
-                $stats[$pid] = array(
-                    'sum'     => array_sum($time),
-                    'min'     => min($time),
-                    'max'     => max($time),
-                    'average' => count($time) ? round(array_sum($time) / count($time)) : 0,
-                    'count'   => count($time)
-                );
-                if ($time) {
-                    $timesOnSite = GraphHelper::getTimesOnSite();
-                    foreach ($time as $seconds) {
-                        foreach($timesOnSite as $tkey => $tos) {
-                            if ($seconds > $tos['from'] && $seconds <= $tos['till']) {
-                                $timesOnSite[$tkey]['value']++;
-                            }
-                        }
-                    }
-                }
-                $stats[$pid]['timesOnSite'] = $timesOnSite;
+                $stats[$pid] = $this->countStats($time);
+                $stats[$pid]['returning'] = count($returning[$pid]);
+                $stats[$pid]['new'] = $stats[$pid]['count'] - $stats[$pid]['returning'];
+                $stats[$pid]['newVsReturning'] = $this->getNewVsReturningGraphData($stats[$pid]['new'], $stats[$pid]['returning']);
             }
         } else {
-            $stats = array(
-                'sum'     => array_sum($times),
-                'min'     => min($times),
-                'max'     => max($times),
-                'average' => count($times) ? round(array_sum($times) / count($times)) : 0,
-                'count'   => count($times)
-            );
-            if ($times) {
-                $timesOnSite = GraphHelper::getTimesOnSite();
-                foreach ($times as $seconds) {
-                    foreach($timesOnSite as $tkey => $tos) {
-                        if ($seconds > $tos['from'] && $seconds <= $tos['till']) {
-                            $timesOnSite[$tkey]['value']++;
-                        }
+            $stats = $this->countStats($times);
+            $stats['returning'] = count($returning);
+            $stats['new'] = $stats['count'] - $stats['returning'];
+            $stats['newVsReturning'] = $this->getNewVsReturningGraphData($stats['new'], $stats['returning']);
+        }
+        
+        // 'unique'  => isset($times[0]['unique_hits']) ? $times[0]['unique_hits'] : 0
+        return (!is_array($pageIds) && array_key_exists('$pageIds', $stats)) ? $stats[$pageIds] : $stats;
+    }
+
+    public function countStats($times)
+    {
+        $stats = array(
+            'sum'     => array_sum($times),
+            'min'     => min($times),
+            'max'     => max($times),
+            'average' => count($times) ? round(array_sum($times) / count($times)) : 0,
+            'count'   => count($times)
+        );
+        if ($times) {
+            $timesOnSite = GraphHelper::getTimesOnSite();
+            foreach ($times as $seconds) {
+                foreach($timesOnSite as $tkey => $tos) {
+                    if ($seconds > $tos['from'] && $seconds <= $tos['till']) {
+                        $timesOnSite[$tkey]['value']++;
                     }
                 }
             }
-            $stats['timesOnSite'] = $timesOnSite;
-            $stats['iconClass'] = 'fa-clock-o';
         }
+        $stats['timesOnSite'] = $timesOnSite;
 
-        return (!is_array($pageIds) && array_key_exists('$pageIds', $stats)) ? $stats[$pageIds] : $stats;
+        return $stats;
+    }
+
+    public function getNewVsReturningGraphData($new, $returning)
+    {
+        $colors = GraphHelper::$colors;
+        return array(
+            array(
+                'label' => 'New',
+                'color' => $colors[0]['color'],
+                'highlight' => $colors[0]['highlight'],
+                'value' => $new
+            ),
+            array(
+                'label' => 'Returning',
+                'color' => $colors[1]['color'],
+                'highlight' => $colors[1]['highlight'],
+                'value' => $returning
+            )
+        );
     }
 
     /**

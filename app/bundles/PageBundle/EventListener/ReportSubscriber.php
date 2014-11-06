@@ -137,10 +137,24 @@ class ReportSubscriber extends CommonSubscriber
             $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
             $event->buildWhere($queryBuilder);
             $hitStats = $hitRepo->getDwellTimes(null, null, $queryBuilder);
-            $dwellTimes = array();
-            $dwellTimes['data'] = $hitStats['timesOnSite'];
-            $dwellTimes['name'] = 'mautic.page.graph.pie.time.on.site';
-            $event->setGraph('pie', $dwellTimes);
+            $graphData = array();
+            $graphData['data'] = $hitStats['timesOnSite'];
+            $graphData['name'] = 'mautic.page.graph.pie.time.on.site';
+            $graphData['iconClass'] = 'fa-clock-o';
+            $event->setGraph('pie', $graphData);
+        }
+
+        if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.page.graph.pie.new.vs.returning') {
+            if (!isset($hitstats)) {
+                $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+                $event->buildWhere($queryBuilder);
+                $hitStats = $hitRepo->getDwellTimes(null, null, $queryBuilder);
+            }
+            $graphData = array();
+            $graphData['data'] = $hitStats['newVsReturning'];
+            $graphData['name'] = 'mautic.page.graph.pie.new.vs.returning';
+            $graphData['iconClass'] = 'fa-bookmark-o';
+            $event->setGraph('pie', $graphData);
         }
     }
 }

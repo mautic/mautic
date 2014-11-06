@@ -78,7 +78,7 @@ class ReportGraphEvent extends Event
      */
     public function setGraph($type, $data)
     {
-        if (!isset($this->graph[$type])) {
+        if (!isset($this->graphs[$type])) {
             $this->graphs[$type] = array();
         }
         $this->graphs[$type][] = $data;

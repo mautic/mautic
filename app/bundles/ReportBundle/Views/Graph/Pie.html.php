@@ -17,7 +17,7 @@
             </h5>
         </div>
         <div class="col-xs-4 va-t text-right">
-            <h3 class="text-white dark-sm"><span class="fa <?php echo isset($graph['name']) ? $graph['name'] : ''; ?>"></span></h3>
+            <h3 class="text-white dark-sm"><span class="fa <?php echo isset($graph['iconClass']) ? $graph['iconClass'] : ''; ?>"></span></h3>
         </div>
     </div>
     <div class="text-center">
