@@ -243,6 +243,9 @@ class FormModel extends CommonFormModel
         if ($entity->getId()) {
             $this->createTableSchema($entity, $isNew);
         }
+
+        //bypass model function as events aren't needed for this
+        $this->getRepository()->saveEntity($entity);
     }
 
     /**
