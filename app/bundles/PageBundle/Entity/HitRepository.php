@@ -283,7 +283,7 @@ class HitRepository extends CommonRepository
             $q  = $this->_em->getConnection()->createQueryBuilder();
         }
 
-        $q->select('h.id, h.page_id, h.date_hit, h.date_left, h.tracking_id')
+        $q->select('h.id, h.page_id, h.date_hit, h.date_left, h.tracking_id, h.page_language')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h')
             ->leftJoin('h', MAUTIC_TABLE_PREFIX.'pages', 'p', 'h.page_id = p.id');
 
@@ -311,6 +311,7 @@ class HitRepository extends CommonRepository
         //loop to structure
         $times = array();
         $returning = array();
+        $languages = array();
         foreach ($results as $r) {
             $dateHit  = new \DateTime($r['date_hit']);
             $dateLeft = new \DateTime($r['date_left']);
@@ -322,13 +323,25 @@ class HitRepository extends CommonRepository
                 if (!in_array($r['tracking_id'], $returning)) {
                     $returning[$r['page_id']][] = $r['tracking_id'];
                 }
+                if (!isset($languages[$r['page_id']])) {
+                    $languages[$r['page_id']] = array();
+                }
+                if (array_key_exists($r['page_language'], $languages)) {
+                    $languages[$r['page_id']][$r['page_language']]++;
+                } else {
+                    $languages[$r['page_id']][$r['page_language']] = 1;
+                }
             } else {
                 $times[] = ($dateLeft->getTimestamp() - $dateHit->getTimestamp());
                 if (!in_array($r['tracking_id'], $returning)) {
                     $returning[] = $r['tracking_id'];
                 }
+                if (array_key_exists($r['page_language'], $languages)) {
+                    $languages[$r['page_language']]++;
+                } else {
+                    $languages[$r['page_language']] = 1;
+                }
             }
-            
         }
 
         //now loop to create stats
@@ -339,18 +352,26 @@ class HitRepository extends CommonRepository
                 $stats[$pid]['returning'] = count($returning[$pid]);
                 $stats[$pid]['new'] = $stats[$pid]['count'] - $stats[$pid]['returning'];
                 $stats[$pid]['newVsReturning'] = $this->getNewVsReturningGraphData($stats[$pid]['new'], $stats[$pid]['returning']);
+                $stats[$pid]['languages'] = $this->getLaguageGraphData($languages[$pid]);
             }
         } else {
             $stats = $this->countStats($times);
             $stats['returning'] = count($returning);
             $stats['new'] = $stats['count'] - $stats['returning'];
             $stats['newVsReturning'] = $this->getNewVsReturningGraphData($stats['new'], $stats['returning']);
+            $stats['languages'] = $this->getLaguageGraphData($languages);
         }
-        
-        // 'unique'  => isset($times[0]['unique_hits']) ? $times[0]['unique_hits'] : 0
+
         return (!is_array($pageIds) && array_key_exists('$pageIds', $stats)) ? $stats[$pageIds] : $stats;
     }
 
+    /**
+     * Count stats from hit times
+     *
+     * @param array $times
+     *
+     * @return array
+     */
     public function countStats($times)
     {
         $stats = array(
@@ -375,6 +396,14 @@ class HitRepository extends CommonRepository
         return $stats;
     }
 
+    /**
+     * Prepare data structure for New vs Returning graph
+     *
+     * @param integer $new
+     * @param integer $returning
+     *
+     * @return array
+     */
     public function getNewVsReturningGraphData($new, $returning)
     {
         $colors = GraphHelper::$colors;
@@ -392,6 +421,35 @@ class HitRepository extends CommonRepository
                 'value' => $returning
             )
         );
+    }
+
+    /**
+     * Prepare data structure for New vs Returning graph
+     *
+     * @param integer $new
+     * @param integer $returning
+     *
+     * @return array
+     */
+    public function getLaguageGraphData($languages)
+    {
+        $colors = GraphHelper::$colors;
+        $graphData = array();
+        $i = 0;
+        foreach($languages as $language => $count) {
+            if (!isset($colors[$i])) {
+                $i = 0;
+            }
+            $color = $colors[$i];
+            $graphData[] = array(
+                'label' => $language,
+                'color' => $colors[$i]['color'],
+                'highlight' => $colors[$i]['highlight'],
+                'value' => $count
+            );
+            $i++;
+        }
+        return $graphData;
     }
 
     /**

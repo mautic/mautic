@@ -156,5 +156,18 @@ class ReportSubscriber extends CommonSubscriber
             $graphData['iconClass'] = 'fa-bookmark-o';
             $event->setGraph('pie', $graphData);
         }
+
+        if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.page.graph.pie.languages') {
+            if (!isset($hitstats)) {
+                $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+                $event->buildWhere($queryBuilder);
+                $hitStats = $hitRepo->getDwellTimes(null, null, $queryBuilder);
+            }
+            $graphData = array();
+            $graphData['data'] = $hitStats['languages'];
+            $graphData['name'] = 'mautic.page.graph.pie.languages';
+            $graphData['iconClass'] = 'fa-globe';
+            $event->setGraph('pie', $graphData);
+        }
     }
 }
