@@ -489,4 +489,30 @@ class HitRepository extends CommonRepository
             ->setParameter('datetime', $dt->toUtcString());
         $q->execute();
     }
+
+    /**
+     * Get list of referers ordered by it's count
+     *
+     * @param QueryBuilder $query
+     * @param integer $limit
+     * @param integer $offset
+     *
+     * @return array
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function getReferers($query, $limit = 10, $offset = 0)
+    {
+        $query->select('h.referer, count(h.referer) as sessions')
+            ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h')
+            ->leftJoin('h', MAUTIC_TABLE_PREFIX.'pages', 'p', 'h.page_id = p.id')
+            ->groupBy('h.referer')
+            ->orderBy('sessions', 'DESC')
+            ->setMaxResults($limit)
+            ->setFirstResult($offset);
+
+        $results = $query->execute()->fetchAll();
+
+        return $results;
+    }
 }
