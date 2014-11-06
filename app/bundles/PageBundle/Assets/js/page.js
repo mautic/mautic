@@ -149,33 +149,13 @@ Mautic.renderPageReturningVisitsPie = function () {
     if (typeof Mautic.pageReturningVisitsPie === 'object') {
         return;
     }
-    var element = mQuery('#returning-rate');
-    var total = +element.attr('data-hit-count');
-    var unique = +element.attr('data-unique-hit-count');
-    var returning = total - unique;
+    var graphData = mQuery.parseJSON(mQuery('#returning-data').text());
     var options = {
         responsive: false,
         tooltipFontSize: 10,
         tooltipTemplate: "<%if (label){%><%}%><%= value %>% <%=label%>"};
-    if (!total) {
-        return;
-    }
-    var data = [
-        {
-            value: Math.round(returning / total * 100),
-            color:"#4E5D9D",
-            highlight: "#353F6A",
-            label: "Returning"
-        },
-        {
-            value: Math.round(unique / total * 100),
-            color: "#00b49c",
-            highlight: "#007A69",
-            label: "New"
-        }
-    ];
     var ctx = document.getElementById("returning-rate").getContext("2d");
-    Mautic.pageReturningVisitsPie = new Chart(ctx).Pie(data, options);
+    Mautic.pageReturningVisitsPie = new Chart(ctx).Pie(graphData, options);
 }
 
 Mautic.renderPageTimePie = function () {

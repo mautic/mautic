@@ -245,8 +245,12 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                                 </div>
                             </div>
                             <div class="text-center">
-                                <canvas id="returning-rate" width="110" height="110" data-hit-count="<?php echo $activePage->getHits(); ?>" data-unique-hit-count="<?php echo $activePage->getUniqueHits(); ?>"></canvas>
+                                <canvas id="returning-rate" width="110" height="110"></canvas>
+                                <div id="returning-data" class="hide">
+                                    <?php echo json_encode($stats['dwellTime'][$activePage->getId()]['newVsReturning']); ?>
+                                </div>
                             </div>
+                            <pre><?php print_r($stats['dwellTime'][$activePage->getId()]['newVsReturning']); ?></pre>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -267,7 +271,9 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                                     width="110" 
                                     height="110">
                                 </canvas>
-                                <div id="times-on-site-data" class="hide"><?php echo json_encode($stats['dwellTime'][$activePage->getId()]['timesOnSite']); ?></div>
+                                <div id="times-on-site-data" class="hide">
+                                    <?php echo json_encode($stats['dwellTime'][$activePage->getId()]['timesOnSite']); ?>
+                                </div>
                             </div>
                         </div>
                     </div>
