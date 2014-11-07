@@ -14,9 +14,9 @@ use Symfony\Component\Translation\TranslatorInterface;
 class FormHelper
 {
 
-    public static function buildForm(TranslatorInterface $translator, &$builder)
+    public static function buildForm(TranslatorInterface $translator, &$builder, $overrides = array())
     {
-            $builder->add('category_lookup', 'text', array(
+        $attr = array(
             'label'      => 'mautic.category.form.category',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
@@ -26,7 +26,11 @@ class FormHelper
             ),
             'mapped'     => false,
             'required'   => false
-        ));
+        );
+
+        $attr = array_merge($attr, $overrides);
+
+        $builder->add('category_lookup', 'text', $attr);
 
         $builder->add('category', 'hidden_entity', array(
             'required'       => false,
