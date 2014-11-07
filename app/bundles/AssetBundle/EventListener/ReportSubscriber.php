@@ -172,5 +172,15 @@ class ReportSubscriber extends CommonSubscriber
             $graphData['link'] = 'mautic_asset_action';
             $event->setGraph('table', $graphData);
         }
+
+        if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.asset.graph.pie.statuses') {
+            $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+            $items = $downloadRepo->getHttpStatuses($queryBuilder);
+            $graphData = array();
+            $graphData['data'] = $items;
+            $graphData['name'] = 'mautic.asset.graph.pie.statuses';
+            $graphData['iconClass'] = 'fa-globe';
+            $event->setGraph('pie', $graphData);
+        }
     }
 }

@@ -152,4 +152,43 @@ class DownloadRepository extends CommonRepository
 
         return $results;
     }
+
+    /**
+     * Get pie graph data for http statuses
+     *
+     * @param QueryBuilder $query
+     *
+     * @return array
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function getHttpStatuses($query)
+    {
+        $query->select('ad.code as status, count(ad.code) as count')
+            ->from(MAUTIC_TABLE_PREFIX.'assets', 'a')
+            ->leftJoin('a', MAUTIC_TABLE_PREFIX.'asset_downloads', 'ad', 'ad.asset_id = a.id')
+            ->groupBy('ad.code')
+            ->orderBy('count', 'DESC');
+
+        $results = $query->execute()->fetchAll();
+
+        $colors = GraphHelper::$colors;
+        $graphData = array();
+        $i = 0;
+        foreach($results as $result) {
+            if (!isset($colors[$i])) {
+                $i = 0;
+            }
+            $color = $colors[$i];
+            $graphData[] = array(
+                'label' => $result['status'],
+                'color' => $colors[$i]['color'],
+                'highlight' => $colors[$i]['highlight'],
+                'value' => (int) $result['count']
+            );
+            $i++;
+        }
+
+        return $graphData;
+    }
 }
