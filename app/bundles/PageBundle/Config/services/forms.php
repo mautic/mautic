@@ -37,9 +37,9 @@ $container->setDefinition('mautic.form.type.pointaction_pointhit', new Definitio
     ));
 
 $container->setDefinition('mautic.form.type.pagehit.campaign_trigger', new Definition(
-    'Mautic\PageBundle\Form\Type\CampaignTriggerPageHitType'))
+    'Mautic\PageBundle\Form\Type\CampaignEventPageHitType'))
     ->addTag('form.type', array(
-        'alias' => 'campaigntrigger_pagehit',
+        'alias' => 'campaignevent_pagehit',
     ));
 
 $container->setDefinition('mautic.form.type.pagelist', new Definition(

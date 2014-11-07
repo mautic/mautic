@@ -38,18 +38,18 @@ $container->setDefinition('mautic.form.type.email_list', new Definition(
         'alias' => 'email_list',
     ));
 
-$container->setDefinition('mautic.form.type.campaigntrigger_email', new Definition(
-    'Mautic\EmailBundle\Form\Type\CampaignTriggerEmailOpenType'
+$container->setDefinition('mautic.form.type.campaignevent_email', new Definition(
+    'Mautic\EmailBundle\Form\Type\CampaignEventEmailOpenType'
 ))
     ->addTag('form.type', array(
-        'alias' => 'campaigntrigger_email',
+        'alias' => 'campaignevent_email',
     ));
 
-$container->setDefinition('mautic.form.type.campaignaction_email', new Definition(
-    'Mautic\EmailBundle\Form\Type\CampaignActionEmailSendType'
+$container->setDefinition('mautic.form.type.campaignevent_email', new Definition(
+    'Mautic\EmailBundle\Form\Type\CampaignEventEmailSendType'
 ))
     ->addTag('form.type', array(
-        'alias' => 'campaignaction_email',
+        'alias' => 'campaignevent_email',
     ));
 
 $container->setDefinition('mautic.validator.leadlistaccess', new Definition(

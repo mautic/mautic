@@ -10,26 +10,26 @@
 namespace Mautic\AssetBundle\Helper;
 
 /**
- * Class CampaignTriggerHelper
+ * Class CampaignEventHelper
  *
  * @package Mautic\AssetBundle\Helper
  */
-class CampaignTriggerHelper
+class CampaignEventHelper
 {
 
     /**
-     * @param $passthrough
+     * @param $eventDetails
      * @param $event
      *
      * @return bool
      */
-    public static function validateAssetDownloadTrigger($passthrough = null, $event)
+    public static function validateAssetDownloadTrigger($eventDetails = null, $event)
     {
-        if ($passthrough == null) {
+        if ($eventDetails == null) {
             return true;
         }
 
-        $assetId       = $passthrough->getId();
+        $assetId       = $eventDetails->getId();
         $limitToAssets = $event['properties']['assets'];
 
         if (!empty($limitToAssets) && !in_array($assetId, $limitToAssets)) {

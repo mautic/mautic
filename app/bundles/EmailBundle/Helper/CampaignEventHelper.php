@@ -19,14 +19,14 @@ class CampaignEventHelper
     /**
      * Determine if this campaign applies
      *
-     * @param CampaignLeadChangeEvent $passthrough
+     * @param $eventDetails
      * @param $event
      *
      * @return bool
      */
-    public static function validateEmailTrigger(Email $passthrough = null, $event)
+    public static function validateEmailTrigger(Email $eventDetails = null, $event)
     {
-        if ($passthrough == null) {
+        if ($eventDetails == null) {
             return true;
         }
 
@@ -34,7 +34,7 @@ class CampaignEventHelper
         if (
             empty($event['parent']) ||
             $event['parent']['type'] != 'email.send' ||
-            $passthrough->getId() != $event['parent']['type']['properties']['email']
+            $eventDetails->getId() != $event['parent']['type']['properties']['email']
         ) {
             return false;
         }
@@ -43,7 +43,7 @@ class CampaignEventHelper
         $limitToEmails = $event['properties']['email'];
 
         //check against selected emails
-        if (!empty($limitToEmails) && !in_array($passthrough->getId(), $limitToEmails)) {
+        if (!empty($limitToEmails) && !in_array($eventDetails->getId(), $limitToEmails)) {
             return false;
         }
         */

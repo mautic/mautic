@@ -7,17 +7,17 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\EmailBundle\Form\Type;
+namespace Mautic\AssetBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class CampaignActionEmailSendType
+ * Class CampaignEventAssetDownloadType
  *
- * @package Mautic\EmailBundle\Form\Type
+ * @package Mautic\AssetBundle\Form\Type
  */
-class CampaignActionEmailSendType extends AbstractType
+class CampaignEventAssetDownloadType extends AbstractType
 {
 
     /**
@@ -26,14 +26,13 @@ class CampaignActionEmailSendType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        $builder->add('email', 'email_list', array(
-            'label'      => 'mautic.email.form.sendemails',
-            'label_attr' => array('class' => 'control-label'),
+        $builder->add('assets', 'asset_list', array(
+            'label'         => 'mautic.asset.campaign.event.assets',
+            'label_attr'    => array('class' => 'control-label'),
             'attr'       => array(
-                'class' => 'form-control',
-                'tooltip' => 'mautic.email.form.sendemails_descr'
-            ),
-            'multiple'   => false
+                'class'   => 'form-control',
+                'tooltip' => 'mautic.asset.campaign.event.assets.descr'
+            )
         ));
     }
 
@@ -41,6 +40,6 @@ class CampaignActionEmailSendType extends AbstractType
      * @return string
      */
     public function getName() {
-        return "campaignaction_email";
+        return "campaignevent_assetdownload";
     }
 }

@@ -32,16 +32,13 @@ class AjaxController extends CommonAjaxController
         $connections    = $session->get('mautic.campaigns.connections', array());
         $source         = str_replace('CampaignEvent_', '', InputHelper::clean($request->request->get('source')));
         $target         = str_replace('CampaignEvent_', '', InputHelper::clean($request->request->get('target')));
-        $sourceEndpoint = InputHelper::clean($request->request->get('sourceEndpoint'));
-        $targetEndpoint = InputHelper::clean($request->request->get('targetEndpoint'));
+        $ep             = InputHelper::clean($request->request->get('sourceEndpoint'));
+        $sourceEndpoint = substr($ep, 0, strrpos($ep, ' '));
+        $ep             = InputHelper::clean($request->request->get('targetEndpoint'));
+        $targetEndpoint = substr($ep, 0, strrpos($ep, ' '));
         $remove         = InputHelper::int($request->request->get('remove'));
 
-        if ($remove) {
-            unset($connections[$source][$sourceEndpoint][$target]);
-        } else {
-            $connections[$source][$sourceEndpoint][$target] = $targetEndpoint;
-        }
-
+        $connections[$source][$sourceEndpoint][$target] = ($remove) ? '' : $targetEndpoint;
         $session->set('mautic.campaigns.connections', $connections);
 
         //update the source's canvasSettings

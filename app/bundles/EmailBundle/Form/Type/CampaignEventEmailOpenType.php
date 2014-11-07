@@ -7,32 +7,33 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\PageBundle\Form\Type;
+namespace Mautic\EmailBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class CampaignTriggerPageHitType
+ * Class CampaignEventEmailOpenType
  *
- * @package Mautic\PageBundle\Form\Type
+ * @package Mautic\EmailBundle\Form\Type
  */
-class CampaignTriggerPageHitType extends AbstractType
+class CampaignEventEmailOpenType extends AbstractType
 {
+
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        $builder->add('pages', 'page_list', array(
-            'label'         => 'mautic.page.campaign.trigger.form.pages',
-            'label_attr'    => array('class' => 'control-label'),
+        $builder->add('emails', 'email_list', array(
+            'label'      => 'mautic.email.form.limittoemails',
+            'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
-                'class'   => 'form-control',
-                'tooltip' => 'mautic.page.campaign.trigger.form.pages.descr'
-            )
+                'class' => 'form-control',
+                'tooltip' => 'mautic.email.form.limittoemails_descr'
+            ),
+            'required'   => false
         ));
     }
 
@@ -40,6 +41,6 @@ class CampaignTriggerPageHitType extends AbstractType
      * @return string
      */
     public function getName() {
-        return "campaigntrigger_pagehit";
+        return "campaignevent_email";
     }
 }

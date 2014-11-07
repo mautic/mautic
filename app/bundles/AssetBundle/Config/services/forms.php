@@ -37,11 +37,11 @@ $container->setDefinition('mautic.form.type.pointaction_assetdownload', new Defi
         'alias' => 'pointaction_assetdownload',
     ));
 
-$container->setDefinition('mautic.form.type.campaigntrigger_assetdownload', new Definition(
-    'Mautic\AssetBundle\Form\Type\CampaignTriggerAssetDownloadType'
+$container->setDefinition('mautic.form.type.campaignevent_assetdownload', new Definition(
+    'Mautic\AssetBundle\Form\Type\CampaignEventAssetDownloadType'
 ))
     ->addTag('form.type', array(
-        'alias' => 'campaigntrigger_assetdownload',
+        'alias' => 'campaignevent_assetdownload',
     ));
 
 $container->setDefinition('mautic.form.type.formsubmit_assetdownload', new Definition(

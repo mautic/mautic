@@ -53,7 +53,7 @@ class PointBuilderEvent extends Event
      *      The callback function can receive the following arguments by name (via ReflectionMethod::invokeArgs())
      *          Mautic\CoreBundle\Factory\MauticFactory $factory
      *          Mautic\LeadBundle\Entity\Lead $lead
-     *          $passthrough - variable sent from firing function to call back function
+     *          $eventDetails - variable sent from firing function to call back function
      *          array $action = array(
      *              'id' => int
      *              'type' => string

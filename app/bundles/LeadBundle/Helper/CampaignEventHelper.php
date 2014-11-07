@@ -102,22 +102,22 @@ class CampaignEventHelper
     }
 
     /**
-     * @param ListChangeEvent $passthrough
+     * @param ListChangeEvent $eventDetails
      * @param                 $event
      *
      * @return bool
      */
-    public static function validateListChange (ListChangeEvent $passthrough, $event)
+    public static function validateListChange (ListChangeEvent $eventDetails, $event)
     {
         $limitAddTo      = $event['properties']['addedTo'];
         $limitRemoveFrom = $event['properties']['removedFrom'];
-        $list            = $passthrough->getList();
+        $list            = $eventDetails->getList();
 
-        if ($passthrough->wasAdded() && !empty($limitAddTo) && !in_array($list->getId(), $limitAddTo)) {
+        if ($eventDetails->wasAdded() && !empty($limitAddTo) && !in_array($list->getId(), $limitAddTo)) {
             return false;
         }
 
-        if ($passthrough->wasRemoved() && !empty($limitRemoveFrom) && !in_array($list->getId(), $limitRemoveFrom)) {
+        if ($eventDetails->wasRemoved() && !empty($limitRemoveFrom) && !in_array($list->getId(), $limitRemoveFrom)) {
             return false;
         }
 

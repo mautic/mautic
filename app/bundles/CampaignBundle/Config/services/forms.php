@@ -47,21 +47,21 @@ $container->setDefinition(
 $container->setDefinition(
     'mautic.campaign.type.trigger.leadchange',
     new Definition(
-        'Mautic\CampaignBundle\Form\Type\CampaignTriggerLeadChangeType'
+        'Mautic\CampaignBundle\Form\Type\CampaignEventLeadChangeType'
     )
 )
     ->addTag('form.type', array(
-        'alias' => 'campaigntrigger_leadchange'
+        'alias' => 'campaignevent_leadchange'
     ));
 
 $container->setDefinition(
     'mautic.campaign.type.action.addremovelead',
     new Definition(
-        'Mautic\CampaignBundle\Form\Type\CampaignActionAddRemoveLeadType'
+        'Mautic\CampaignBundle\Form\Type\CampaignEventAddRemoveLeadType'
     )
 )
     ->addTag('form.type', array(
-        'alias' => 'campaignaction_addremovelead'
+        'alias' => 'campaignevent_addremovelead'
     ));
 
 $container->setDefinition(

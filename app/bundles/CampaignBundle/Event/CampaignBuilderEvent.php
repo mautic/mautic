@@ -41,7 +41,7 @@ class CampaignBuilderEvent extends Event
      *                            The callback function should return a bool to determine if the trigger's actions
      *                            should be executed.  For example, only trigger actions for specific entities.
      *                            it can can receive the following arguments by name (via ReflectionMethod::invokeArgs())
-     *                              mixed $passthrough Whatever the bundle passes when triggering the event
+     *                              mixed $eventDetails Whatever the bundle passes when triggering the event
      *                              Mautic\CoreBundle\Factory\MauticFactory $factory
      *                              Mautic\LeadBundle\Entity\Lead $lead
      *                              array $event
@@ -98,7 +98,7 @@ class CampaignBuilderEvent extends Event
      *                            The callback function should return a bool to determine if the trigger's actions
      *                            should be executed.  For example, only trigger actions for specific entities.
      *                            it can can receive the following arguments by name (via ReflectionMethod::invokeArgs())
-     *                              mixed $passthrough Whatever the bundle passes when triggering the event
+     *                              mixed $eventDetails Whatever the bundle passes when triggering the event
      *                              Mautic\CoreBundle\Factory\MauticFactory $factory
      *                              Mautic\SystemBundle\Entity\System $lead
      *                              array $event

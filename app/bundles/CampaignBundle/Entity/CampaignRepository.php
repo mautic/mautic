@@ -36,9 +36,9 @@ class CampaignRepository extends CommonRepository
 
         $now = new \DateTime();
         if ($forList) {
-            $q->select('c.id, c.name, ll.id');
+            $q->select('partial c.{id, name}, partial ll.{id}');
         } else {
-            $q->select('c, l, ll.id');
+            $q->select('c, l, partial ll.{id}');
         }
 
         $q->leftJoin('c.leads', 'l')
@@ -59,7 +59,7 @@ class CampaignRepository extends CommonRepository
                 $q->expr()->eq('IDENTITY(l.lead)', (int) $leadId)
             );
             $q->andWhere(
-                $q->expr()->eq('o.manuallyRemoved', ':manuallyRemoved')
+                $q->expr()->eq('l.manuallyRemoved', ':manuallyRemoved')
             )->setParameter('manuallyRemoved', false);
         }
 
@@ -83,7 +83,7 @@ class CampaignRepository extends CommonRepository
 
         $now = new \DateTime();
         if ($forList) {
-            $q->select('c.id, c.name, ll.id');
+            $q->select('partial c.{id, name}, partial ll.{id}');
         } else {
             $q->select('c, ll');
         }

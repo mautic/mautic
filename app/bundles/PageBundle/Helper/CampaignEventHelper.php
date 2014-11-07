@@ -18,18 +18,18 @@ class CampaignEventHelper
 {
     /**
      * @param $factory
-     * @param $passthrough
+     * @param $eventDetails
      * @param $event
      *
      * @return bool
      */
-    public static function onPageHit($factory, $passthrough, $event)
+    public static function onPageHit($factory, $eventDetails, $event)
     {
-        if ($passthrough == null) {
+        if ($eventDetails == null) {
             return true;
         }
 
-        $pageHit = $passthrough->getPage();
+        $pageHit = $eventDetails->getPage();
 
         if ($pageHit instanceof Page) {
             /** @var \Mautic\PageBundle\Model\PageModel $pageModel */
