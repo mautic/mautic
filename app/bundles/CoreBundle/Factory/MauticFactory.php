@@ -456,6 +456,6 @@ class MauticFactory
      */
     public function getLogger()
     {
-        return $this->container->get('logger');
+        return $this->container->get('monolog.logger.mautic');
     }
 }
