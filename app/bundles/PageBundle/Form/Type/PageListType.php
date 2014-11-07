@@ -31,7 +31,7 @@ class PageListType extends AbstractType
         $choices = $factory->getModel('page')->getRepository()
             ->getPageList('', 0, 0, $viewOther, 'variant');
         foreach ($choices as $page) {
-            $this->choices[$page['language']][$page['id']] = $page['id'] . ':' . $page['title'] . ' (' . $page['alias'] . ')';
+            $this->choices[$page['language']][$page['id']] = "{$page['title']} ({$page['id']})";
         }
 
         //sort by language

@@ -74,23 +74,19 @@ class PageType extends AbstractType
             'attr'       => array('class' => 'form-control')
         ));
 
-        if (!$isVariant) {
-            $builder->add('alias', 'text', array(
-                'label'      => 'mautic.page.page.form.alias',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array(
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.page.page.help.alias',
-                ),
-                'required'   => false
-            ));
-        }
+        $builder->add('alias', 'text', array(
+            'label'      => 'mautic.page.page.form.alias',
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array(
+                'class'   => 'form-control',
+                'tooltip' => 'mautic.page.page.help.alias',
+            ),
+            'required'   => false,
+            'disabled'   => $isVariant
+        ));
 
-        if (!$isVariant) {
-            //add category
-            FormHelper::buildForm($this->translator, $builder);
-
-        }
+        //add category
+        FormHelper::buildForm($this->translator, $builder, array('disabled' => $isVariant));
 
         //build a list
         $template = $options['data']->getTemplate();
@@ -112,34 +108,35 @@ class PageType extends AbstractType
             'data'          => $template
         ));
 
-        if (!$isVariant) {
-            $builder->add('language', 'locale', array(
-                'label'      => 'mautic.page.page.form.language',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array(
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.page.page.form.language.help',
-                ),
-                'required'   => false
-            ));
+        $builder->add('language', 'locale', array(
+            'label'      => 'mautic.page.page.form.language',
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array(
+                'class'   => 'form-control',
+                'tooltip' => 'mautic.page.page.form.language.help',
+            ),
+            'required'   => false,
+            'disabled'   => $isVariant
+        ));
 
-            $builder->add('translationParent_lookup', 'text', array(
-                'label'      => 'mautic.page.page.form.translationparent',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array(
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.page.page.form.translationparent.help'
-                ),
-                'mapped'     => false,
-                'required'   => false
-            ));
+        $builder->add('translationParent_lookup', 'text', array(
+            'label'      => 'mautic.page.page.form.translationparent',
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array(
+                'class'   => 'form-control',
+                'tooltip' => 'mautic.page.page.form.translationparent.help'
+            ),
+            'mapped'     => false,
+            'required'   => false,
+            'disabled'   => $isVariant
+        ));
 
-            $builder->add('translationParent', 'hidden_entity', array(
-                'required'       => false,
-                'repository'     => 'MauticPageBundle:Page',
-                'error_bubbling' => false
-            ));
-        }
+        $builder->add('translationParent', 'hidden_entity', array(
+            'required'       => false,
+            'repository'     => 'MauticPageBundle:Page',
+            'error_bubbling' => false,
+            'disabled'   => $isVariant
+        ));
 
         $builder->add('isPublished', 'button_group', array(
             'choice_list' => new ChoiceList(
@@ -153,31 +150,29 @@ class PageType extends AbstractType
             'required'      => false
         ));
 
-        if (!$isVariant) {
-            $builder->add('publishUp', 'datetime', array(
-                'widget'     => 'single_text',
-                'label'      => 'mautic.core.form.publishup',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array(
-                    'class'       => 'form-control',
-                    'data-toggle' => 'datetime'
-                ),
-                'format'     => 'yyyy-MM-dd HH:mm',
-                'required'   => false
-            ));
+        $builder->add('publishUp', 'datetime', array(
+            'widget'     => 'single_text',
+            'label'      => 'mautic.core.form.publishup',
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array(
+                'class'       => 'form-control',
+                'data-toggle' => 'datetime'
+            ),
+            'format'     => 'yyyy-MM-dd HH:mm',
+            'required'   => false
+        ));
 
-            $builder->add('publishDown', 'datetime', array(
-                'widget'     => 'single_text',
-                'label'      => 'mautic.core.form.publishdown',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array(
-                    'class'       => 'form-control',
-                    'data-toggle' => 'datetime'
-                ),
-                'format'     => 'yyyy-MM-dd HH:mm',
-                'required'   => false
-            ));
-        }
+        $builder->add('publishDown', 'datetime', array(
+            'widget'     => 'single_text',
+            'label'      => 'mautic.core.form.publishdown',
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array(
+                'class'       => 'form-control',
+                'data-toggle' => 'datetime'
+            ),
+            'format'     => 'yyyy-MM-dd HH:mm',
+            'required'   => false
+        ));
 
         $builder->add('metaDescription', 'textarea', array(
             'label'      => 'mautic.page.page.form.metadescription',
@@ -196,30 +191,6 @@ class PageType extends AbstractType
                 'label' => 'mautic.page.page.panel.abtest',
                 'dataParent' => '#page-panel',
                 'bodyId'     => 'abtest-panel'
-            ));
-
-            $builder->add('publishUp', 'datetime', array(
-                'widget'     => 'single_text',
-                'label'      => 'mautic.core.form.publishup',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array(
-                    'class'       => 'form-control',
-                    'data-toggle' => 'datetime'
-                ),
-                'format'     => 'yyyy-MM-dd HH:mm',
-                'required'   => false
-            ));
-
-            $builder->add('publishDown', 'datetime', array(
-                'widget'     => 'single_text',
-                'label'      => 'mautic.core.form.publishdown',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array(
-                    'class'       => 'form-control',
-                    'data-toggle' => 'datetime'
-                ),
-                'format'     => 'yyyy-MM-dd HH:mm',
-                'required'   => false
             ));
 
             $builder->add('variant_settings', 'pagevariant', array(
