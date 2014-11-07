@@ -207,5 +207,22 @@ class ReportSubscriber extends CommonSubscriber
             $graphData['link'] = 'mautic_email_action';
             $event->setGraph('table', $graphData);
         }
+
+        if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.email.table.most.emails.read.percent') {
+            $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+            $event->buildWhere($queryBuilder);
+            $queryBuilder->select('e.id, e.subject as title, round(e.read_count / e.sent_count * 100) as ratio')
+                ->groupBy('e.id')
+                ->orderBy('ratio', 'DESC');
+            $limit = 10;
+            $offset = 0;
+            $items = $statRepo->getMostEmails($queryBuilder, $limit, $offset, 'e.id, e.subject as title, sum(es.is_read) as "read"');
+            $graphData = array();
+            $graphData['data'] = $items;
+            $graphData['name'] = 'mautic.email.table.most.emails.read.percent';
+            $graphData['iconClass'] = 'fa-tachometer';
+            $graphData['link'] = 'mautic_email_action';
+            $event->setGraph('table', $graphData);
+        }
     }
 }
