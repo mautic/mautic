@@ -126,4 +126,30 @@ class DownloadRepository extends CommonRepository
 
         return $results;
     }
+
+    /**
+     * Get list of asset referrals ordered by it's count
+     *
+     * @param QueryBuilder $query
+     * @param integer $limit
+     * @param integer $offset
+     *
+     * @return array
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function getTopReferrers($query, $limit = 10, $offset = 0)
+    {
+        $query->select('ad.referer, count(ad.referer) as downloads')
+            ->from(MAUTIC_TABLE_PREFIX.'assets', 'a')
+            ->leftJoin('a', MAUTIC_TABLE_PREFIX.'asset_downloads', 'ad', 'ad.asset_id = a.id')
+            ->groupBy('ad.referer')
+            ->orderBy('downloads', 'DESC')
+            ->setMaxResults($limit)
+            ->setFirstResult($offset);
+
+        $results = $query->execute()->fetchAll();
+
+        return $results;
+    }
 }
