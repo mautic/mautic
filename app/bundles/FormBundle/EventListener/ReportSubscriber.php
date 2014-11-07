@@ -145,6 +145,20 @@ class ReportSubscriber extends CommonSubscriber
             $event->setGraph('line', $timeStats);
         }
 
+        if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.form.table.top.referrers') {
+            $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+            $event->buildWhere($queryBuilder);
+            $limit = 10;
+            $offset = 0;
+            $items = $submissionRepo->getTopReferrers($queryBuilder, $limit, $offset);
+            $graphData = array();
+            $graphData['data'] = $items;
+            $graphData['name'] = 'mautic.form.table.top.referrers';
+            $graphData['iconClass'] = 'fa-sign-in';
+            $graphData['link'] = 'mautic_form_action';
+            $event->setGraph('table', $graphData);
+        }
+
         if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.form.table.most.submitted') {
             $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
             $event->buildWhere($queryBuilder);

@@ -247,7 +247,33 @@ class SubmissionRepository extends CommonRepository
     }
 
     /**
-     * Get list of referers ordered by it's count
+     * Get list of forms ordered by it's count
+     *
+     * @param QueryBuilder $query
+     * @param integer $limit
+     * @param integer $offset
+     *
+     * @return array
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function getTopReferrers($query, $limit = 10, $offset = 0)
+    {
+        $query->select('fs.referer, count(fs.referer) as sessions')
+            ->from(MAUTIC_TABLE_PREFIX . 'form_submissions', 'fs')
+            ->leftJoin('fs', MAUTIC_TABLE_PREFIX . 'forms', 'f', 'f.id = fs.form_id')
+            ->groupBy('fs.referer')
+            ->orderBy('sessions', 'DESC')
+            ->setMaxResults($limit)
+            ->setFirstResult($offset);
+
+        $results = $query->execute()->fetchAll();
+
+        return $results;
+    }
+
+    /**
+     * Get list of forms ordered by it's count
      *
      * @param QueryBuilder $query
      * @param integer $limit
