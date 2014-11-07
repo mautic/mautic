@@ -53,54 +53,6 @@ if ($security->hasEntityAccess($permissions['asset:assets:editown'], $permission
             <div class="pr-md pl-md pt-lg pb-lg">
                 <div class="box-layout">
                     <div class="col-xs-6 va-m">
-                        <h4 class="fw-sb text-primary">
-                            <i class="<?php echo $activeAsset->getIconClass(); ?>"></i>
-                            <span> | </span>
-                            <?php echo $activeAsset->getFileSize(); ?> kB
-                            <span> | </span>
-                            <?php
-                            if ($category = $activeAsset->getCategory()):
-                                $catSearch = $view['translator']->trans('mautic.core.searchcommand.category') . ":" . $category->getAlias();
-                                $catName = $category->getTitle();
-                            else:
-                                $catSearch = $view['translator']->trans('mautic.core.searchcommand.is') . ":" .
-                                    $view['translator']->trans('mautic.core.searchcommand.isuncategorized');
-                                $catName = $view['translator']->trans('mautic.core.form.uncategorized');
-                            endif;
-                            ?>
-                            <a href="<?php echo $view['router']->generate('mautic_asset_index', array('search' => $catSearch))?>"
-                               data-toggle="ajax">
-                                <?php echo $catName; ?>
-                            </a>
-                            <span> | </span>
-                            <span>
-                                <?php
-                                $author     = $activeAsset->getCreatedBy();
-                                $authorId   = ($author) ? $author->getId() : 0;
-                                $authorName = ($author) ? $author->getName() : "";
-                                ?>
-                                <a href="<?php echo $view['router']->generate('mautic_user_action', array(
-                                    'objectAction' => 'contact',
-                                    'objectId'     => $authorId,
-                                    'entity'       => 'asset.asset',
-                                    'id'           => $activeAsset->getId(),
-                                    'returnUrl'    => $view['router']->generate('mautic_asset_action', array(
-                                        'objectAction' => 'view',
-                                        'objectId'     => $activeAsset->getId()
-                                    ))
-                                )); ?>">
-                                    <?php echo $authorName; ?>
-                                </a>
-                            </span>
-                            <span> | </span>
-                            <span>
-                            <?php $langSearch = $view['translator']->trans('mautic.asset.asset.searchcommand.lang').":".$activeAsset->getLanguage(); ?>
-                                <a href="<?php echo $view['router']->generate('mautic_asset_index', array('search' => $langSearch)); ?>"
-                                   data-toggle="ajax">
-                                    <?php echo $activeAsset->getLanguage(); ?>
-                                </a>
-                            </span>
-                        </h4>
                         <p class="text-white dark-lg mb-0">Created on <?php echo $view['date']->toDate($activeAsset->getDateAdded()); ?></p>
                     </div>
                     <div class="col-xs-6 va-m text-right">
@@ -124,7 +76,7 @@ if ($security->hasEntityAccess($permissions['asset:assets:editown'], $permission
             <!--/ page detail header -->
 
             <!-- page detail collapseable -->
-            <div class="collapse" id="page-details">
+            <div class="collapse" id="asset-details">
                 <div class="pr-md pl-md pb-md">
                     <div class="panel shd-none mb-0">
                         <table class="table table-bordered table-striped mb-0">
@@ -153,10 +105,6 @@ if ($security->hasEntityAccess($permissions['asset:assets:editown'], $permission
                                     <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.asset.asset.path.relative'); ?></span></td>
                                     <td><?php echo (!is_null($activeAsset->getWebPath())) ? $activeAsset->getWebPath() : ''; ?></td>
                                 </tr>
-                                <tr>
-                                    <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.asset.asset.url'); ?></span></td>
-                                    <td><?php echo (!is_null($assetUrl)) ? $assetUrl : ''; ?></td>
-                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -169,7 +117,7 @@ if ($security->hasEntityAccess($permissions['asset:assets:editown'], $permission
             <!-- page detail collapseable toggler -->
             <div class="hr-expand nm">
                 <span data-toggle="tooltip" title="Detail">
-                    <a href="javascript:void(0)" class="arrow" data-toggle="collapse" data-target="#page-details"><span class="caret"></span></a>
+                    <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse" data-target="#asset-details"><span class="caret"></span> <?php echo $view['translator']->trans('mautic.asset.asset.header.info'); ?></a>
                 </span>
             </div>
             <!--/ page detail collapseable toggler -->
