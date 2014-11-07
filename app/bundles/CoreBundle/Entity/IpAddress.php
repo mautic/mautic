@@ -65,7 +65,9 @@ class IpAddress {
     {
         $this->ipAddress = $ipAddress;
 
-        if (empty($this->ipDetails) && $this->ipAddress != '127.0.0.1') {
+        $ignoreIps = array('127.0.0.1', '::1');
+
+        if (empty($this->ipDetails) && !in_array($ipAddress, $ignoreIps)) {
             //@todo - configure other IP services
             if (!empty($params)) {
                 switch ($params['ip_lookup_service']) {
