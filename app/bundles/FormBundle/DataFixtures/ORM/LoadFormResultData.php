@@ -91,6 +91,6 @@ class LoadFormResultData extends AbstractFixture implements OrderedFixtureInterf
      */
     public function getOrder()
     {
-        return 8;
+        return 9;
     }
 }
