@@ -269,13 +269,10 @@ class StatRepository extends CommonRepository
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getMostEmailsSent($query, $limit = 10, $offset = 0)
+    public function getMostEmails($query, $limit = 10, $offset = 0)
     {
-        $query->select('e.id, e.subject as title, count(es.id) as sent')
-            ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'es')
+        $query->from(MAUTIC_TABLE_PREFIX.'email_stats', 'es')
             ->leftJoin('es', MAUTIC_TABLE_PREFIX.'emails', 'e', 'es.email_id = e.id')
-            ->groupBy('e.id')
-            ->orderBy('sent', 'DESC')
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 

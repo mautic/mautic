@@ -159,13 +159,33 @@ class ReportSubscriber extends CommonSubscriber
         if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.email.table.most.emails.sent') {
             $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
             $event->buildWhere($queryBuilder);
+            $queryBuilder->select('e.id, e.subject as title, count(es.id) as sent')
+                ->groupBy('e.id')
+                ->orderBy('sent', 'DESC');
             $limit = 10;
             $offset = 0;
-            $items = $statRepo->getMostEmailsSent($queryBuilder, $limit, $offset);
+            $items = $statRepo->getMostEmails($queryBuilder, $limit, $offset);
             $graphData = array();
             $graphData['data'] = $items;
             $graphData['name'] = 'mautic.email.table.most.emails.sent';
             $graphData['iconClass'] = 'fa-paper-plane-o';
+            $graphData['link'] = 'mautic_email_action';
+            $event->setGraph('table', $graphData);
+        }
+
+        if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.email.table.most.emails.read') {
+            $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+            $event->buildWhere($queryBuilder);
+            $queryBuilder->select('e.id, e.subject as title, sum(es.is_read) as "read"')
+                ->groupBy('e.id')
+                ->orderBy('"read"', 'DESC');
+            $limit = 10;
+            $offset = 0;
+            $items = $statRepo->getMostEmails($queryBuilder, $limit, $offset, 'e.id, e.subject as title, sum(es.is_read) as "read"');
+            $graphData = array();
+            $graphData['data'] = $items;
+            $graphData['name'] = 'mautic.email.table.most.emails.read';
+            $graphData['iconClass'] = 'fa-eye';
             $graphData['link'] = 'mautic_email_action';
             $event->setGraph('table', $graphData);
         }
