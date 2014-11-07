@@ -192,7 +192,22 @@ class ReportSubscriber extends CommonSubscriber
             $graphData = array();
             $graphData['data'] = $items;
             $graphData['name'] = 'mautic.page.table.most.visited';
-            $graphData['iconClass'] = 'fa-sign-in';
+            $graphData['iconClass'] = 'fa-eye';
+            $graphData['link'] = 'mautic_page_action';
+            $event->setGraph('table', $graphData);
+        }
+
+        if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.page.table.most.visited.unique') {
+            $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+            $event->buildWhere($queryBuilder);
+            $limit = 10;
+            $offset = 0;
+            $items = $hitRepo->getMostVisited($queryBuilder, $limit, $offset, 'p.unique_hits', 'sessions');
+            $graphData = array();
+            $graphData['data'] = $items;
+            $graphData['name'] = 'mautic.page.table.most.visited.unique';
+            $graphData['iconClass'] = 'fa-eye';
+            $graphData['link'] = 'mautic_page_action';
             $event->setGraph('table', $graphData);
         }
     }
