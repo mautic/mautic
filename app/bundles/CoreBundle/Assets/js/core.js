@@ -204,6 +204,11 @@ var Mautic = {
             preferredFormat: 'hex'
         });
 
+        //convert multiple selects into chosen
+        mQuery("select[multiple]").chosen({
+            placeholder_text_multiple: ' '
+        });
+
         //spin icons on button click
         mQuery(container + ' .btn').on('click.spinningicons', function(event) {
             Mautic.startIconSpinOnEvent(event);
@@ -421,6 +426,11 @@ var Mautic = {
                 }
                 mQuery(el).removeClass();
                 mQuery(el).addClass('fa fa-spinner fa-spin ' + identifierClass + appendClasses);
+
+                //set a timeout in case it doesn't get reset
+                setTimeout(function() {
+                    Mautic.stopIconSpinPostEvent(identifierClass);
+                }, 5000);
             }
         }
     },
@@ -428,13 +438,18 @@ var Mautic = {
     /**
      * Stops the icon spinning after an event is complete
      */
-    stopIconSpinPostEvent: function()
+    stopIconSpinPostEvent: function(specificId)
     {
-        mQuery.each(MauticVars.iconClasses, function( index, value ) {
-            mQuery('.' + index).removeClass('fa fa-spinner fa-spin ' + index).addClass(value);
-        });
+        if (typeof specificId != 'undefined' && specificId in MauticVars.iconClasses) {
+            mQuery('.' + specificId).removeClass('fa fa-spinner fa-spin ' + specificId).addClass(MauticVars.iconClasses[specificId]);
+            delete MauticVars.iconClasses[specificId];
+        } else {
+            mQuery.each(MauticVars.iconClasses, function( index, value ) {
+                mQuery('.' + index).removeClass('fa fa-spinner fa-spin ' + index).addClass(value);
+            });
 
-        MauticVars.iconClasses = {};
+            MauticVars.iconClasses = {};
+        }
     },
 
     /**
