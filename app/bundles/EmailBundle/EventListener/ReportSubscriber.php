@@ -189,5 +189,23 @@ class ReportSubscriber extends CommonSubscriber
             $graphData['link'] = 'mautic_email_action';
             $event->setGraph('table', $graphData);
         }
+
+        if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.email.table.most.emails.failed') {
+            $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+            $event->buildWhere($queryBuilder);
+            $queryBuilder->select('e.id, e.subject as title, sum(es.is_failed) as failed')
+                ->andWhere('es.is_failed > 0')
+                ->groupBy('e.id')
+                ->orderBy('failed', 'DESC');
+            $limit = 10;
+            $offset = 0;
+            $items = $statRepo->getMostEmails($queryBuilder, $limit, $offset, 'e.id, e.subject as title, sum(es.is_read) as "read"');
+            $graphData = array();
+            $graphData['data'] = $items;
+            $graphData['name'] = 'mautic.email.table.most.emails.failed';
+            $graphData['iconClass'] = 'fa-exclamation-triangle';
+            $graphData['link'] = 'mautic_email_action';
+            $event->setGraph('table', $graphData);
+        }
     }
 }
