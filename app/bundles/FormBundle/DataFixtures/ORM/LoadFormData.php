@@ -122,6 +122,10 @@ class LoadFormData extends AbstractFixture implements OrderedFixtureInterface, C
 
         //create the tables
         foreach ($formEntities as $form) {
+            //create the HTML
+            $model->generateHtml($form);
+
+            //create the schema
             $model->createTableSchema($form, true, true);
         }
     }

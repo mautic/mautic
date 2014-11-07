@@ -219,6 +219,24 @@ class FormModel extends CommonFormModel
         //save the form so that the ID is available for the form html
         parent::saveEntity($entity, $unlock);
 
+
+        //now build the form table
+        if ($entity->getId()) {
+            $this->createTableSchema($entity, $isNew);
+        }
+
+        $this->generateHtml($entity);
+    }
+
+    /**
+     * Generate the form's html
+     *
+     * @param Form $entity
+     * @param bool $persist
+     */
+    public function generateHtml(Form $entity, $persist = true)
+    {
+
         //generate cached HTML and JS
         $templating = $this->factory->getTemplating();
 
@@ -239,13 +257,10 @@ class FormModel extends CommonFormModel
         $html = $style . $html . $script;
         $entity->setCachedHtml($html);
 
-        //now build the form table
-        if ($entity->getId()) {
-            $this->createTableSchema($entity, $isNew);
+        if ($persist) {
+            //bypass model function as events aren't needed for this
+            $this->getRepository()->saveEntity($entity);
         }
-
-        //bypass model function as events aren't needed for this
-        $this->getRepository()->saveEntity($entity);
     }
 
     /**
