@@ -100,4 +100,30 @@ class DownloadRepository extends CommonRepository
 
         return GraphHelper::mergeLineGraphData($data, $downloads, $unit, 'dateDownload');
     }
+
+    /**
+     * Get list of assets ordered by it's download count
+     *
+     * @param QueryBuilder $query
+     * @param integer $limit
+     * @param integer $offset
+     *
+     * @return array
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function getMostDownloaded($query, $limit = 10, $offset = 0)
+    {
+        $query->select('a.title, a.id, count(ad.id) as downloads')
+            ->from(MAUTIC_TABLE_PREFIX.'assets', 'a')
+            ->leftJoin('a', MAUTIC_TABLE_PREFIX.'asset_downloads', 'ad', 'ad.asset_id = a.id')
+            ->groupBy('a.id')
+            ->orderBy('downloads', 'DESC')
+            ->setMaxResults($limit)
+            ->setFirstResult($offset);
+
+        $results = $query->execute()->fetchAll();
+
+        return $results;
+    }
 }
