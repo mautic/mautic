@@ -93,9 +93,24 @@ $container->setDefinition(
     ));
 
 $container->setDefinition('mautic.form.type.pointaction_formsubmit', new Definition(
-    'Mautic\FormBundle\Form\Type\PointActionFormSubmitType',
-    array(new Reference('mautic.factory'))
+    'Mautic\FormBundle\Form\Type\PointActionFormSubmitType'
 ))
     ->addTag('form.type', array(
         'alias' => 'pointaction_formsubmit',
+    ));
+
+$container->setDefinition('mautic.form.type.form_list', new Definition(
+    'Mautic\FormBundle\Form\Type\FormListType',
+    array(new Reference('mautic.factory'))
+))
+    ->addTag('form.type', array(
+        'alias' => 'form_list'
+    ));
+
+
+$container->setDefinition('mautic.form.type.campaignevent_formsubmit', new Definition(
+    'Mautic\FormBundle\Form\Type\CampaignEventFormSubmitType'
+))
+    ->addTag('form.type', array(
+        'alias' => 'campaignevent_formsubmit',
     ));

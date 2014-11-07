@@ -16,14 +16,14 @@ class PointActionHelper
 {
 
     /**
-     * @param $passthrough
+     * @param $eventDetails
      * @param $action
      *
      * @return int
      */
-    public static function onFormSubmit($passthrough, $action)
+    public static function onFormSubmit($eventDetails, $action)
     {
-        $form         = $passthrough->getForm();
+        $form         = $eventDetails->getForm();
         $formId       = $form->getId();
         $limitToForms = $action['properties']['forms'];
 

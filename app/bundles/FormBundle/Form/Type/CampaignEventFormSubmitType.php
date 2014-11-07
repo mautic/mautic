@@ -14,35 +14,22 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class PointActionFormSubmitType
+ * Class CampaignEventFormSubmitType
  */
-class PointActionFormSubmitType extends AbstractType
+class CampaignEventFormSubmitType extends AbstractType
 {
     /**
      * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $default = (empty($options['data']['delta'])) ? 0 : (int) $options['data']['delta'];
-        $builder->add('delta', 'number', array(
-            'label'      => 'mautic.point.action.delta',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       =>
-                array(
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.point.action.delta.help'
-                ),
-            'precision'  => 0,
-            'data'       => $default
-        ));
-
         $builder->add('forms', 'form_list', array(
-            'label'         => 'mautic.form.point.action.forms',
+            'label'         => 'mautic.form.campaign.event.forms',
             'label_attr'    => array('class' => 'control-label'),
             'required'      => false,
             'attr'       => array(
                 'class'   => 'form-control',
-                'tooltip' => 'mautic.form.point.action.forms.descr'
+                'tooltip' => 'mautic.form.campaign.event.forms_descr'
             )
         ));
     }
@@ -52,6 +39,6 @@ class PointActionFormSubmitType extends AbstractType
      */
     public function getName()
     {
-        return "pointaction_formsubmit";
+        return "campaignevent_formsubmit";
     }
 }
