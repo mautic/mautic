@@ -113,6 +113,7 @@ class ReportSubscriber extends CommonSubscriber
         }
 
         $options = $event->getOptions();
+        $submissionRepo = $this->factory->getEntityManager()->getRepository('MauticFormBundle:Submission');
 
         if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.form.graph.line.submissions') {
             // Generate data for submissions line graph
@@ -142,6 +143,20 @@ class ReportSubscriber extends CommonSubscriber
             $timeStats['name'] = 'mautic.form.graph.line.submissions';
 
             $event->setGraph('line', $timeStats);
+        }
+
+        if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.form.table.most.submitted') {
+            $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+            $event->buildWhere($queryBuilder);
+            $limit = 10;
+            $offset = 0;
+            $items = $submissionRepo->getMostSubmitted($queryBuilder, $limit, $offset);
+            $graphData = array();
+            $graphData['data'] = $items;
+            $graphData['name'] = 'mautic.form.table.most.submitted';
+            $graphData['iconClass'] = 'fa-check-square-o';
+            $graphData['link'] = 'mautic_form_action';
+            $event->setGraph('table', $graphData);
         }
     }
 }
