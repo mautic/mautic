@@ -191,7 +191,6 @@ Mautic.renderPieGraph = function (canvas, chartData) {
         responsive: false,
         tooltipFontSize: 10,
         tooltipTemplate: "<%if (label){%><%}%><%= value %>x <%=label%>"};
-    console.log(chartData);
     Mautic.pageTimePie = new Chart(canvas).Pie(chartData, options);
 }
 

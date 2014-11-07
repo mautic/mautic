@@ -175,6 +175,7 @@ class ReportSubscriber extends CommonSubscriber
 
         if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.asset.graph.pie.statuses') {
             $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+            $event->buildWhere($queryBuilder);
             $items = $downloadRepo->getHttpStatuses($queryBuilder);
             $graphData = array();
             $graphData['data'] = $items;

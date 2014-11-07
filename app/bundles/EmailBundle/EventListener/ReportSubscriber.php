@@ -113,6 +113,7 @@ class ReportSubscriber extends CommonSubscriber
         }
 
         $options = $event->getOptions();
+        $statRepo = $this->factory->getEntityManager()->getRepository('MauticEmailBundle:Stat');
 
         if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.email.graph.line.stats') {
             // Generate data for Stats line graph
@@ -142,6 +143,31 @@ class ReportSubscriber extends CommonSubscriber
             $timeStats['name'] = 'mautic.email.graph.line.stats';
 
             $event->setGraph('line', $timeStats);
+        }
+
+        if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.email.graph.pie.ignored.read.failed') {
+            $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+            $event->buildWhere($queryBuilder);
+            $items = $statRepo->getIgnoredReadFailed($queryBuilder);
+            $graphData = array();
+            $graphData['data'] = $items;
+            $graphData['name'] = 'mautic.email.graph.pie.ignored.read.failed';
+            $graphData['iconClass'] = 'fa-flag-checkered';
+            $event->setGraph('pie', $graphData);
+        }
+
+        if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.email.table.most.emails.sent') {
+            $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+            $event->buildWhere($queryBuilder);
+            $limit = 10;
+            $offset = 0;
+            $items = $statRepo->getMostEmailsSent($queryBuilder, $limit, $offset);
+            $graphData = array();
+            $graphData['data'] = $items;
+            $graphData['name'] = 'mautic.email.table.most.emails.sent';
+            $graphData['iconClass'] = 'fa-paper-plane-o';
+            $graphData['link'] = 'mautic_email_action';
+            $event->setGraph('table', $graphData);
         }
     }
 }
