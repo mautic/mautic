@@ -169,5 +169,18 @@ class ReportSubscriber extends CommonSubscriber
             $graphData['iconClass'] = 'fa-globe';
             $event->setGraph('pie', $graphData);
         }
+
+        if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.page.table.referrers') {
+            $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+            $event->buildWhere($queryBuilder);
+            $limit = 10;
+            $offset = 0;
+            $items = $hitRepo->getReferers($queryBuilder, $limit, $offset);
+            $graphData = array();
+            $graphData['data'] = $items;
+            $graphData['name'] = 'mautic.page.table.referrers';
+            $graphData['iconClass'] = 'fa-sign-in';
+            $event->setGraph('table', $graphData);
+        }
     }
 }

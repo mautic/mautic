@@ -143,9 +143,9 @@ class HitRepository extends CommonRepository
     public function getReturningCount($args = array())
     {
         $q = $this->createQueryBuilder('h');
-        $q->select('COUNT(h.ipAddress) as returning')
-            ->groupBy('h.ipAddress')
-            ->having($q->expr()->gt('COUNT(h.ipAddress)', 1));
+        $q->select('COUNT(h.trackingId) as returning')
+            ->groupBy('h.trackingId')
+            ->having($q->expr()->gt('COUNT(h.trackingId)', 1));
         $results = $q->getQuery()->getResult();
 
         return count($results);
@@ -160,7 +160,7 @@ class HitRepository extends CommonRepository
     public function getUniqueCount($args = array())
     {
         $q = $this->createQueryBuilder('h');
-        $q->select('COUNT(DISTINCT h.ipAddress) as unique');
+        $q->select('COUNT(DISTINCT h.trackingId) as unique');
         $results = $q->getQuery()->getSingleResult();
 
         if (!isset($results['unique'])) {
@@ -488,5 +488,31 @@ class HitRepository extends CommonRepository
             ->where('id = ' . (int) $lastHitId)
             ->setParameter('datetime', $dt->toUtcString());
         $q->execute();
+    }
+
+    /**
+     * Get list of referers ordered by it's count
+     *
+     * @param QueryBuilder $query
+     * @param integer $limit
+     * @param integer $offset
+     *
+     * @return array
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function getReferers($query, $limit = 10, $offset = 0)
+    {
+        $query->select('h.referer, count(h.referer) as sessions')
+            ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h')
+            ->leftJoin('h', MAUTIC_TABLE_PREFIX.'pages', 'p', 'h.page_id = p.id')
+            ->groupBy('h.referer')
+            ->orderBy('sessions', 'DESC')
+            ->setMaxResults($limit)
+            ->setFirstResult($offset);
+
+        $results = $query->execute()->fetchAll();
+
+        return $results;
     }
 }
