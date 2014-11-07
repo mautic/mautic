@@ -26,15 +26,27 @@
             <thead>
                 <tr>
                     <?php foreach ($graph['data'][0] as $key => $value) : ?>
-                    <th><?php echo ucfirst($key); ?></th>
+                        <?php if ($key != 'id') : ?>
+                            <th><?php echo ucfirst($key); ?></th>
+                        <?php endif; ?>
                     <?php endforeach; ?>
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($graph['data'] as $row) : ?>
+                <?php foreach ($graph['data'] as $rowKey => $row) : ?>
                 <tr>
-                    <?php foreach ($row as $cell) : ?>
-                    <td><?php echo $view['assets']->makeLinks($cell); ?></td>
+                    <?php foreach ($row as $cellName => $cell) : ?>
+                        <?php if (array_key_exists('id', $graph['data'][0]) && $cellName == 'title') : ?>
+                            <td>
+                                <a href="<?php echo $view['router']->generate('mautic_page_action',
+                                    array("objectAction" => "view", "objectId" => $row['id'])); ?>"
+                                   data-toggle="ajax">
+                                    <?php echo $cell; ?>
+                                </a>
+                            </td>
+                        <?php elseif ($cellName != 'id') : ?>
+                            <td><?php echo $view['assets']->makeLinks($cell); ?></td>
+                        <?php endif; ?>
                     <?php endforeach; ?>
                 </tr>
                 <?php endforeach; ?>
