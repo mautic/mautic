@@ -209,7 +209,18 @@ class CampaignModel extends CommonFormModel
             if (isset($sessionConnections[$id])) {
                 foreach ($sessionConnections[$id] as $sourceEndpoint => $children) {
                     foreach ($children as $child => $targetEndpoint) {
-                        if (!empty($targetEndpoint)) {
+                        if (!isset($events[$child])) {
+                            if (strpos($child, 'new') === false && in_array($child, $tempIds)) {
+                                unset($canvasSettings['endpoints'][$sourceEndpoint][$child]);
+                                $childId = array_search($child, $tempIds);
+                                unset($canvasSettings['endpoints'][$sourceEndpoint][$childId]);
+                            } else {
+                                unset($canvasSettings['endpoints'][$sourceEndpoint][$child]);
+                            }
+
+                            unset($canvasSettings['endpoints'][$sourceEndpoint][$child]);
+
+                        } elseif (!empty($targetEndpoint)) {
                             $anchor = in_array($sourceEndpoint, array('yes', 'no')) ? $sourceEndpoint : null;
                             $events[$child]->setDecisionPath($anchor);
 
