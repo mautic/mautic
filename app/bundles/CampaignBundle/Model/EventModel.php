@@ -136,10 +136,10 @@ class EventModel extends CommonFormModel
         static $leadCampaigns = array(), $eventList = array(), $availableEvents = array(), $leadsEvents = array(), $examinedEvents = array();
 
         $logger = $this->factory->getLogger();
-$logger->info('campaign triggered for event type ' . $type);
+        $logger->debug('CAMPAIGN: Campaign triggered for event type ' . $type);
         //only trigger events for anonymous users (to prevent populating full of user/company data)
         if (!$this->security->isAnonymous()) {
-            $logger->info('not anonymous; abort');
+            $logger->debug('CAMPAIGN: lead not anonymous; abort');
             return false;
         }
 
@@ -181,7 +181,7 @@ $logger->info('campaign triggered for event type ' . $type);
 
         //make sure there are events before continuing
         if (!count($availableEvents) || empty($events)) {
-            $logger->info('no events');
+            $logger->debug('CAMPAIGN: no events found so abort');
             return false;
         }
 
@@ -201,9 +201,9 @@ $logger->info('campaign triggered for event type ' . $type);
             foreach ($campaignEvents as $k => $event) {
                 //check to see if this has been fired sequentially
                 if (!empty($event['parent'])) {
-                    if (!isset($leadEvents[$event['parent']['id']])) {
+                    if (!isset($leadsEvents[$event['parent']['id']])) {
                         //this event has a parent that has not been triggered for this lead so break out
-                        $logger->info('parent not fired; abort');
+                        $logger->debug('CAMPAIGN: ' . 'parent (ID# ' . $event['parent']['id'] . ') for ID# ' . $event['id'] . ' has not been triggered yet; abort');
                         break;
                     }
                 }
@@ -213,14 +213,14 @@ $logger->info('campaign triggered for event type ' . $type);
                 //has this event already been examined via a parent's children?
                 //all events of this triggering type has to be queried since this particular event could be anywhere in the dripflow
                 if (in_array($event['id'], $examinedEvents)) {
-                    $logger->info($event['id'] . ' already examined; continue');
+                    $logger->debug('CAMPAIGN: ID# ' . $event['id'] . ' already processed this round; continue');
                     continue;
                 }
                 $examinedEvents[] = $event['id'];
 
                 //check the callback function for the event to make sure it even applies based on its settings
                 if (!$this->invokeEventCallback($event, $settings, $lead, $eventDetails)) {
-                    $logger->info($event['id'] . ' callback check failed; continue');
+                    $logger->debug('CAMPAIGN: ID# ' . $event['id'] . ' callback check failed; continue');
                     continue;
                 }
 
@@ -235,15 +235,15 @@ $logger->info('campaign triggered for event type ' . $type);
                     foreach ($event['children'] as $child) {
                         if (isset($leadsEvents[$child['id']])) {
                             //this child event has already been fired for this lead so move on to the next event
-                            $logger->info($child['id'] . ' child already fired; continue');
+                            $logger->debug('CAMPAIGN: ID# ' . $child['id'] . ' already triggered; continue');
                             continue;
                         } elseif ($child['eventType'] != 'action') {
                             //hit a triggering type event so move on
-                            $logger->info($child['id'] . ' child is action; continue');
+                            $logger->debug('CAMPAIGN: ID# ' . $child['id'] . ' is an action; continue');
                             continue;
                         } else if (($child['decisionPath'] == 'no' && !$systemTriggered) || ($child['decisionPath'] == 'yes' && $systemTriggered)) {
                             //decision path doesn't match how the event is triggered so continue to next path
-                            $logger->info($child['id'] . ' child decision path not match; continue');
+                            $logger->debug('CAMPAIGN: ID# ' . $child['id'] . ' decision path is not applicable; continue');
                             continue;
                         }
 
@@ -260,7 +260,7 @@ $logger->info('campaign triggered for event type ' . $type);
 
                         list ($timeAppropriate, $triggerOn) = $this->checkEventTiming($event, $child);
                         if (!$timeAppropriate) {
-                            $logger->info($child['id'] . ' child timeframe not appropriate; continue');
+                            $logger->debug('CAMPAIGN: ID# ' . $child['id'] . ' time-frame is not appropriate and thus scheduled for ' . $triggerOn . '; continue');
                             if ($child['decisionPath'] != 'no') {
                                 //schedule and move on to the next action
 
@@ -280,7 +280,7 @@ $logger->info('campaign triggered for event type ' . $type);
 
                         //trigger the action
                         if ($this->invokeEventCallback($child, $settings, $lead, $eventDetails)) {
-                            $logger->info($child['id'] . ' child execution success');
+                            $logger->debug('CAMPAIGN: ID# ' . $child['id'] . ' successfully executed and logged.');
                             $log = new LeadEventLog();
                             $log->setIpAddress($ipAddress);
                             $log->setEvent($this->em->getReference('MauticCampaignBundle:Event', $child['id']));
@@ -289,7 +289,7 @@ $logger->info('campaign triggered for event type ' . $type);
                             $log->setDateTriggered(new \DateTime());
                             $persist[] = $log;
                         } else {
-                            $logger->info($child['id'] . ' child execution failed');
+                            $logger->debug('CAMPAIGN: ID# ' . $child['id'] . ' execution failed.');
                         }
                     }
                 }
