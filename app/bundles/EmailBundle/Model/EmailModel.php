@@ -308,11 +308,13 @@ class EmailModel extends FormModel
         //save the IP to the lead
         $lead = $stat->getLead();
         if ($lead !== null) {
+            $leadModel = $this->factory->getModel('lead');
             if (!$lead->getIpAddresses()->contains($ipAddress)) {
                 $lead->addIpAddress($ipAddress);
-                $leadModel = $this->factory->getModel('lead');
                 $leadModel->saveEntity($lead, true);
             }
+
+            $leadModel->setLeadCookie($lead->getId());
         }
 
         if ($this->dispatcher->hasListeners(EmailEvents::EMAIL_ON_OPEN)) {
