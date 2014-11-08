@@ -44,9 +44,9 @@ class CampaignSubscriber extends CommonSubscriber
     {
         //Add trigger
         $pageHitTrigger = array(
-            'label'       => 'mautic.page.campaign.trigger.pagehit',
-            'description' => 'mautic.page.campaign.trigger.pagehit_descr',
-            'formType'    => 'campaigntrigger_pagehit',
+            'label'       => 'mautic.page.campaign.event.pagehit',
+            'description' => 'mautic.page.campaign.event.pagehit_descr',
+            'formType'    => 'campaignevent_pagehit',
             'callback'    => '\Mautic\PageBundle\Helper\CampaignEventHelper::onPageHit'
         );
         $event->addLeadDecision('page.pagehit', $pageHitTrigger);

@@ -49,89 +49,6 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
 <?php endif; ?>
 <?php $view['slots']->stop(); ?>
 
-<!--<div class="scrollable">
-    <div class="bundle-main-header">
-        <span class="bundle-main-item-primary">
-            <?php
-            if ($category = $activePage->getCategory()):
-                $catSearch = $view['translator']->trans('mautic.core.searchcommand.category') . ":" . $category->getAlias();
-                $catName = $category->getTitle();
-            else:
-                $catSearch = $view['translator']->trans('mautic.core.searchcommand.is') . ":" .
-                    $view['translator']->trans('mautic.core.searchcommand.isuncategorized');
-                $catName = $view['translator']->trans('mautic.core.form.uncategorized');
-            endif;
-            ?>
-            <a href="<?php echo $view['router']->generate('mautic_page_index', array('search' => $catSearch))?>"
-               data-toggle="ajax">
-                <?php echo $catName; ?>
-            </a>
-            <span>
-                <?php
-                $author     = $activePage->getCreatedBy();
-                $authorId   = ($author) ? $author->getId() : 0;
-                $authorName = ($author) ? $author->getName() : "";
-                ?>
-                <a href="<?php echo $view['router']->generate('mautic_user_action', array(
-                    'objectAction' => 'contact',
-                    'objectId'     => $authorId,
-                    'entity'       => 'page.page',
-                    'id'           => $activePage->getId(),
-                    'returnUrl'    => $view['router']->generate('mautic_page_action', array(
-                        'objectAction' => 'view',
-                        'objectId'     => $activePage->getId()
-                    ))
-                )); ?>">
-                    <?php echo $authorName; ?>
-                </a>
-            </span>
-            <span>
-            <?php $langSearch = $view['translator']->trans('mautic.core.searchcommand.lang').":".$activePage->getLanguage(); ?>
-                <a href="<?php echo $view['router']->generate('mautic_page_index', array('search' => $langSearch)); ?>"
-                   data-toggle="ajax">
-                    <?php echo $activePage->getLanguage(); ?>
-                </a>
-            </span>
-        </span>
-    </div>
-
-    <div class="form-group margin-md-top">
-        <?php if (!empty($variants['parent'])): ?>
-        <label><?php echo $view['translator']->trans('mautic.page.page.urlvariant'); ?></label>
-        <?php else: ?>
-        <label><?php echo $view['translator']->trans('mautic.page.page.url'); ?></label>
-        <?php endif; ?>
-        <div class="input-group">
-            <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly
-                   value="<?php echo $pageUrl; ?>" />
-            <span class="input-group-btn">
-                <button class="btn btn-default" onclick="window.open('<?php echo $pageUrl; ?>', '_blank');">
-                    <i class="fa fa-external-link"></i>
-                </button>
-            </span>
-        </div>
-    </div>
-
-    <h3>@todo - landing page stats/analytics/AB test results will go here</h3>
-    <?php echo "<pre>".print_r($stats, true)."</pre>"; ?>
-
-    <?php
-    echo $view->render('MauticPageBundle:Page:translations.html.php', array(
-        'page'         => $activePage,
-        'translations' => $translations
-    ));
-    ?>
-
-    <?php if (!empty($variants['parent']) || !empty($variants['children'])): ?>
-    <?php echo $view->render('MauticPageBundle:AbTest:details.html.php', array(
-        'page'          => $activePage,
-        'abTestResults' => $abTestResults,
-        'variants'      => $variants
-    )); ?>
-    <?php endif; ?>
-    '
-</div>-->
-
 <!-- start: box layout -->
 <div class="box-layout">
     <!-- left section -->
@@ -265,9 +182,9 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                                 </div>
                             </div>
                             <div class="text-center">
-                                <canvas 
-                                    id="time-rate" 
-                                    width="110" 
+                                <canvas
+                                    id="time-rate"
+                                    width="110"
                                     height="110">
                                 </canvas>
                                 <div id="times-on-site-data" class="hide">
@@ -300,18 +217,6 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
         <div class="tab-content pa-md">
             <!-- #translation-container -->
             <div class="tab-pane active fade in bdr-w-0" id="translation-container">
-                <!-- header -->
-                <div class="mb-lg">
-                    <!-- form -->
-                    <form action="" class="panel mb-0">
-                        <div class="form-control-icon pa-xs">
-                            <input type="text" class="form-control bdr-w-0" placeholder="Filter translation...">
-                            <span class="the-icon fa fa-search text-muted mt-xs"></span><!-- must below `form-control` -->
-                        </div>
-                    </form>
-                    <!--/ form -->
-                </div>
-                <!--/ header -->
 
                 <!-- start: related translations list -->
                 <?php if (count($translations['children']) || $translations['parent']) : ?>
@@ -386,18 +291,9 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
             <div class="tab-pane fade bdr-w-0" id="variants-container">
                 <!-- header -->
                 <div class="box-layout mb-lg">
-                    <!-- form -->
-                    <form action="" class="panel col-xs-10 va-m">
-                        <div class="form-control-icon pa-xs">
-                            <input type="text" class="form-control bdr-w-0" placeholder="Filter variants...">
-                            <span class="the-icon fa fa-search text-muted mt-xs"></span><!-- must below `form-control` -->
-                        </div>
-                    </form>
-                    <!--/ form -->
-
                     <!-- button -->
                     <div class="col-xs-2 va-m text-right">
-                        <a href="#" class="btn btn-primary"><?php echo $view['translator']->trans('mautic.page.page.ab.test.stats'); ?></a>
+                        <a href="javascript: void(0);" data-toggle="modal" class="btn btn-primary"><?php echo $view['translator']->trans('mautic.page.page.ab.test.stats'); ?></a>
                     </div>
                 </div>
                 <!--/ header -->
@@ -503,7 +399,7 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
 
         <!-- recent activity -->
         <?php echo $view->render('MauticCoreBundle:Default:recentactivity.html.php', array('logs' => $logs)); ?>
-        
+
     </div>
     <!--/ right section -->
 </div>

@@ -129,7 +129,7 @@ class Event
     private $children;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Event", inversedBy="children")
+     * @ORM\ManyToOne(targetEntity="Event", inversedBy="children", cascade={"persist"})
      * @ORM\JoinColumn(name="parent_id", referencedColumnName="id", nullable=true, onDelete="SET NULL")
      * @Serializer\Expose
      * @Serializer\Since("1.0")

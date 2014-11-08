@@ -18,14 +18,14 @@ class CampaignEventHelper
     /**
      * Determine if this campaign applies
      *
-     * @param CampaignLeadChangeEvent $passthrough
+     * @param $eventDetails
      * @param $event
      *
      * @return bool
      */
-    public static function validateLeadChangeTrigger(CampaignLeadChangeEvent $passthrough = null, $event)
+    public static function validateLeadChangeTrigger(CampaignLeadChangeEvent $eventDetails = null, $event)
     {
-        if ($passthrough == null) {
+        if ($eventDetails == null) {
             return true;
         }
 
@@ -39,7 +39,7 @@ class CampaignEventHelper
 
         //check against the selected action (was lead removed or added)
         $func = 'was' . ucfirst($action);
-        if (!$passthrough->$func()) {
+        if (!$eventDetails->$func()) {
             return false;
         }
 

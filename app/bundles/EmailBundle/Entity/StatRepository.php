@@ -12,6 +12,7 @@ namespace Mautic\EmailBundle\Entity;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\CoreBundle\Helper\GraphHelper;
 
 /**
  * Class StatRepository
@@ -219,5 +220,63 @@ class StatRepository extends CommonRepository
         }
 
         return $query->getQuery()->getArrayResult();
+    }
+
+    /**
+     * Get pie graph data for Sent, Read and Failed email count
+     *
+     * @param QueryBuilder $query
+     *
+     * @return array
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function getIgnoredReadFailed($query)
+    {
+        $query->select('count(es.id) as sent, sum(es.is_read) as "read", sum(es.is_failed) as failed')
+            ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'es')
+            ->leftJoin('es', MAUTIC_TABLE_PREFIX.'emails', 'e', 'es.email_id = e.id');
+
+        $results = $query->execute()->fetch();
+        
+        $results['ignored'] = $results['sent'] - $results['read'] - $results['failed'];
+        unset($results['sent']);
+        $colors = GraphHelper::$colors;
+        $graphData = array();
+        $i = 0;
+        foreach($results as $result => $count) {
+            if (!isset($colors[$i])) {
+                $i = 0;
+            }
+            $color = $colors[$i];
+            $graphData[] = array(
+                'label' => $result,
+                'color' => $colors[$i]['color'],
+                'highlight' => $colors[$i]['highlight'],
+                'value' => (int) $count
+            );
+            $i++;
+        }
+        return $graphData;
+    }
+
+    /**
+     * Get pie graph data for Sent, Read and Failed email count
+     *
+     * @param QueryBuilder $query
+     *
+     * @return array
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function getMostEmails($query, $limit = 10, $offset = 0)
+    {
+        $query->from(MAUTIC_TABLE_PREFIX.'email_stats', 'es')
+            ->leftJoin('es', MAUTIC_TABLE_PREFIX.'emails', 'e', 'es.email_id = e.id')
+            ->setMaxResults($limit)
+            ->setFirstResult($offset);
+
+        $results = $query->execute()->fetchAll();
+        return $results;
     }
 }

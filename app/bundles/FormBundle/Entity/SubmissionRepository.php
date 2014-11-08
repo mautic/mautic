@@ -245,4 +245,59 @@ class SubmissionRepository extends CommonRepository
 
         return GraphHelper::mergeLineGraphData($data, $submissions, $unit, 'dateSubmitted');
     }
+
+    /**
+     * Get list of forms ordered by it's count
+     *
+     * @param QueryBuilder $query
+     * @param integer $limit
+     * @param integer $offset
+     *
+     * @return array
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function getTopReferrers($query, $limit = 10, $offset = 0)
+    {
+        $query->select('fs.referer, count(fs.referer) as sessions')
+            ->from(MAUTIC_TABLE_PREFIX . 'form_submissions', 'fs')
+            ->leftJoin('fs', MAUTIC_TABLE_PREFIX . 'forms', 'f', 'f.id = fs.form_id')
+            ->groupBy('fs.referer')
+            ->orderBy('sessions', 'DESC')
+            ->setMaxResults($limit)
+            ->setFirstResult($offset);
+
+        $results = $query->execute()->fetchAll();
+
+        return $results;
+    }
+
+    /**
+     * Get list of forms ordered by it's count
+     *
+     * @param QueryBuilder $query
+     * @param integer $limit
+     * @param integer $offset
+     *
+     * @return array
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function getMostSubmitted($query, $limit = 10, $offset = 0, $column = 'fs.id', $as = 'submissions')
+    {
+        if ($as) {
+            $as = ' as ' . $as;
+        }
+        $query->select('f.name as title, f.id, count(' . $column . ')' . $as)
+            ->from(MAUTIC_TABLE_PREFIX . 'form_submissions', 'fs')
+            ->leftJoin('fs', MAUTIC_TABLE_PREFIX . 'forms', 'f', 'f.id = fs.form_id')
+            ->groupBy('f.id')
+            ->orderBy($column, 'DESC')
+            ->setMaxResults($limit)
+            ->setFirstResult($offset);
+
+        $results = $query->execute()->fetchAll();
+
+        return $results;
+    }
 }

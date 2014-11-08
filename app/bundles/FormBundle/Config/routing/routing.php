@@ -75,5 +75,8 @@ $collection->add('mautic_form_generateform', new Route('/p/form/generate.js',
     array('_controller' => 'MauticFormBundle:Public:generate')
 ));
 
+$collection->add('mautic_form_postmessage', new Route('/p/form/message',
+    array('_controller' => 'MauticFormBundle:Public:message')
+));
 
 return $collection;

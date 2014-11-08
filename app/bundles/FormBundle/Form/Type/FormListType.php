@@ -7,58 +7,59 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\PageBundle\Form\Type;
+namespace Mautic\FormBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * Class PageListType
- *
- * @package Mautic\PageBundle\Form\Type
+ * Class PointActionFormSubmitType
  */
-class PageListType extends AbstractType
+class FormListType extends AbstractType
 {
 
+    /**
+     * @var array
+     */
     private $choices = array();
 
     /**
      * @param MauticFactory $factory
      */
     public function __construct(MauticFactory $factory) {
-        $viewOther = $factory->getSecurity()->isGranted('page:pages:viewother');
-        $choices = $factory->getModel('page')->getRepository()
-            ->getPageList('', 0, 0, $viewOther, 'variant');
-        foreach ($choices as $page) {
-            $this->choices[$page['language']][$page['id']] = "{$page['title']} ({$page['id']})";
+        $viewOther = $factory->getSecurity()->isGranted('form:forms:viewother');
+        $choices = $factory->getModel('form')->getRepository()->getFormList('', 0, 0, $viewOther);
+
+        foreach ($choices as $form) {
+            $this->choices[$form['id']] = "{$form['name']} ({$form['id']})";
         }
 
         //sort by language
         ksort($this->choices);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
             'choices'       => $this->choices,
-            'empty_value'   => false,
             'expanded'      => false,
             'multiple'      => true,
-            'required'      => false
+            'empty_value'   => false,
         ));
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
-    public function getName() {
-        return "page_list";
+    public function getName()
+    {
+        return "form_list";
     }
 
+    /**
+     * @return null|string|\Symfony\Component\Form\FormTypeInterface
+     */
     public function getParent()
     {
         return 'choice';

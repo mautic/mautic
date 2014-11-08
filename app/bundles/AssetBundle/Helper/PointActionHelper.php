@@ -18,14 +18,14 @@ class PointActionHelper
 {
 
     /**
-     * @param $passthrough
+     * @param $eventDetails
      * @param $action
      *
      * @return int
      */
-    public static function onAssetDownload($passthrough, $action)
+    public static function onAssetDownload($eventDetails, $action)
     {
-        $assetId       = $passthrough->getId();
+        $assetId       = $eventDetails->getId();
         $limitToAssets = $action['properties']['assets'];
 
         if (!empty($limitToAssets) && !in_array($assetId, $limitToAssets)) {

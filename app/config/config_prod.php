@@ -19,19 +19,33 @@ $container->loadFromExtension("doctrine", array(
 */
 
 $container->loadFromExtension("monolog", array(
+    "channels" => array(
+        "mautic",
+    ),
     "handlers" => array(
         "main"    => array(
             "type"         => "fingers_crossed",
             "action_level" => "error",
-            "handler"      => "nested"
+            "handler"      => "nested",
+            "channels" => array(
+                "!mautic"
+            ),
         ),
         "nested"  => array(
             "type"  => "stream",
-            "path"  => "%kernel.logs_dir%/%kernel.environment%.log",
+            "path"  => "%kernel.logs_dir%/%kernel.environment%.php",
             "level" => "debug"
         ),
         "console" => array(
             "type" => "console"
+        ),
+        "mautic"    => array(
+            "type"  => "stream",
+            "path"  => "%kernel.logs_dir%/mautic_%kernel.environment%.php",
+            "level" => "error",
+            'channels' => array(
+                'mautic',
+            ),
         )
     )
 ));

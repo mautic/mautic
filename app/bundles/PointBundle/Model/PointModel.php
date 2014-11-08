@@ -138,12 +138,12 @@ class PointModel extends CommonFormModel
      * Triggers a specific point change
      *
      * @param $type
-     * @param mixed $passthrough passthrough from function triggering action to the callback function
+     * @param mixed $eventDetails passthrough from function triggering action to the callback function
      * @param mixed $typeId Something unique to the triggering event to prevent  unnecessary duplicate calls
      *
      * @return void
      */
-    public function triggerAction($type, $passthrough = null, $typeId = null)
+    public function triggerAction($type, $eventDetails = null, $typeId = null)
     {
         //only trigger actions for anonymous users
         if (!$this->security->isAnonymous()) {
@@ -198,7 +198,7 @@ class PointModel extends CommonFormModel
                 ),
                 'lead'        => $lead,
                 'factory'     => $this->factory,
-                'passthrough' => $passthrough
+                'eventDetails' => $eventDetails
             );
 
             $callback = (isset($settings['callback'])) ? $settings['callback'] :

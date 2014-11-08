@@ -18,24 +18,37 @@ $container->loadFromExtension("web_profiler", array(
 ));
 
 $container->loadFromExtension("monolog", array(
+    'channels' => array(
+        'mautic',
+    ),
     "handlers" => array(
         "main"    => array(
             "type"  => "stream",
-            "path"  => "%kernel.logs_dir%/%kernel.environment%.log",
-            "level" => "debug"
+            "path"  => "%kernel.logs_dir%/%kernel.environment%.php",
+            "level" => "debug",
+            "channels" => array(
+                "!mautic"
+            )
         ),
         "console" => array(
             "type"   => "console",
             "bubble" => false
         ),
+        "mautic"    => array(
+            "type"  => "stream",
+            "path"  => "%kernel.logs_dir%/mautic_%kernel.environment%.php",
+            "level" => "debug",
+            'channels' => array(
+                'mautic',
+            )
+        )
         // uncomment to get logging in your browser
         // you may have to allow bigger header sizes in your Web server configuration
-
+        /*
         "firephp" => array(
             "type"  => "firephp",
             "level" => "info"
         ),
-        /*
         "chromephp" => array(
             "type"  => "chromephp",
             "level" => "info"

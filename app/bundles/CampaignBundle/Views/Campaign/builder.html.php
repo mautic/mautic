@@ -107,7 +107,6 @@
 ?>
 <script>
     Mautic.campaignBuilderReconnectEndpoints = function() {
-        Mautic.campaignBuilderIgnoreUpdateConnectionCallback = true;
         <?php //recreate jsPlumb connections
         foreach ($campaignEvents as $e):
             if (isset($e['canvasSettings']['endpoints'])):
@@ -122,6 +121,5 @@
             endif;
         endforeach;
         ?>
-        Mautic.campaignBuilderIgnoreUpdateConnectionCallback = false;
     };
 </script>

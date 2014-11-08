@@ -113,6 +113,7 @@ class ReportSubscriber extends CommonSubscriber
         }
 
         $options = $event->getOptions();
+        $downloadRepo = $this->factory->getEntityManager()->getRepository('MauticAssetBundle:Download');
 
         if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.asset.graph.line.downloads') {
             // Generate data for Downloads line graph
@@ -142,6 +143,45 @@ class ReportSubscriber extends CommonSubscriber
             $timeStats['name'] = 'mautic.asset.graph.line.downloads';
 
             $event->setGraph('line', $timeStats);
+        }
+
+        if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.asset.table.most.downloaded') {
+            $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+            $event->buildWhere($queryBuilder);
+            $limit = 10;
+            $offset = 0;
+            $items = $downloadRepo->getMostDownloaded($queryBuilder, $limit, $offset);
+            $graphData = array();
+            $graphData['data'] = $items;
+            $graphData['name'] = 'mautic.asset.table.most.downloaded';
+            $graphData['iconClass'] = 'fa-download';
+            $graphData['link'] = 'mautic_asset_action';
+            $event->setGraph('table', $graphData);
+        }
+
+        if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.asset.table.top.referrers') {
+            $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+            $event->buildWhere($queryBuilder);
+            $limit = 10;
+            $offset = 0;
+            $items = $downloadRepo->getTopReferrers($queryBuilder, $limit, $offset);
+            $graphData = array();
+            $graphData['data'] = $items;
+            $graphData['name'] = 'mautic.asset.table.top.referrers';
+            $graphData['iconClass'] = 'fa-download';
+            $graphData['link'] = 'mautic_asset_action';
+            $event->setGraph('table', $graphData);
+        }
+
+        if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.asset.graph.pie.statuses') {
+            $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+            $event->buildWhere($queryBuilder);
+            $items = $downloadRepo->getHttpStatuses($queryBuilder);
+            $graphData = array();
+            $graphData['data'] = $items;
+            $graphData['name'] = 'mautic.asset.graph.pie.statuses';
+            $graphData['iconClass'] = 'fa-globe';
+            $event->setGraph('pie', $graphData);
         }
     }
 }

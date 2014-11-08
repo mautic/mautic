@@ -424,12 +424,13 @@ class MauticFactory
         }
 
         if (empty($ipAddress[$ip])) {
-            $ipAddress = $this->getEntityManager()->getRepository('MauticCoreBundle:IpAddress')
-                ->findOneByIpAddress($ip);
+            $repo = $this->getEntityManager()->getRepository('MauticCoreBundle:IpAddress');
+            $ipAddress = $repo->findOneByIpAddress($ip);
 
             if ($ipAddress === null) {
                 $ipAddress = new IpAddress();
                 $ipAddress->setIpAddress($ip, $this->getSystemParameters());
+                $repo->saveEntity($ipAddress);
             }
 
             $ipAddresses[$ip] = $ipAddress;
@@ -446,5 +447,15 @@ class MauticFactory
     public function getVersion()
     {
         return $this->container->get('kernel')->getVersion();
+    }
+
+    /**
+     * Get Symfony's logger
+     *
+     * @return object
+     */
+    public function getLogger()
+    {
+        return $this->container->get('monolog.logger.mautic');
     }
 }

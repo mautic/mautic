@@ -515,4 +515,33 @@ class HitRepository extends CommonRepository
 
         return $results;
     }
+
+    /**
+     * Get list of referers ordered by it's count
+     *
+     * @param QueryBuilder $query
+     * @param integer $limit
+     * @param integer $offset
+     *
+     * @return array
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function getMostVisited($query, $limit = 10, $offset = 0, $column = 'p.hits', $as = '')
+    {
+        if ($as) {
+            $as = ' as ' . $as;
+        }
+        $query->select('p.title, p.id, ' . $column . $as)
+            ->from(MAUTIC_TABLE_PREFIX.'pages', 'p')
+            ->leftJoin('p', MAUTIC_TABLE_PREFIX.'page_hits', 'h', 'h.page_id = p.id')
+            ->groupBy('p.id')
+            ->orderBy($column, 'DESC')
+            ->setMaxResults($limit)
+            ->setFirstResult($offset);
+
+        $results = $query->execute()->fetchAll();
+
+        return $results;
+    }
 }

@@ -13,11 +13,11 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class CampaignTriggerLeadChangeType
+ * Class CampaignEventLeadChangeType
  *
  * @package Mautic\CampaignBundle\Form\Type
  */
-class CampaignTriggerLeadChangeType extends AbstractType
+class CampaignEventLeadChangeType extends AbstractType
 {
 
     /**
@@ -56,6 +56,6 @@ class CampaignTriggerLeadChangeType extends AbstractType
      * @return string
      */
     public function getName() {
-        return "campaigntrigger_leadchange";
+        return "campaignevent_leadchange";
     }
 }

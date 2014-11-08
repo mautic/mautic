@@ -161,8 +161,9 @@ class CampaignModel extends CommonFormModel
     {
         $existingEvents = $entity->getEvents();
 
+        $events = $tempIds = $hierarchy = $parentUpdated = array();
+
         //set the events from session
-        $events = array();
         foreach ($sessionEvents as $id => $properties) {
             $isNew = (!empty($properties['id']) && isset($existingEvents[$properties['id']])) ? false : true;
             $event = !$isNew ? $existingEvents[$properties['id']] : new Event();
@@ -180,11 +181,15 @@ class CampaignModel extends CommonFormModel
                 if (method_exists($event, $func)) {
                     $event->$func($v);
                 }
-                $event->setCampaign($entity);
-                $events[$id] = $event;
+            }
+
+            $event->setCampaign($entity);
+            $events[$id] = $event;
+
+            if (strpos($id, 'new') === false) {
+                $tempIds[$event->getTempId()] = $id;
             }
         }
-
 
         foreach ($deletedEvents as $deleteMe) {
             if (isset($existingEvents[$deleteMe])) {
@@ -193,85 +198,70 @@ class CampaignModel extends CommonFormModel
             }
         }
 
-        $hierarchy = array();
-
-        //set parents which must be done after the entity has been created and monitored by doctrine
-        $setParent = function ($eventId, $parentId, $anchor) use (&$hierarchy, $entity, $events, $deletedEvents) {
-            //check to see if this event has a parent that has been deleted
-            $atTopParent   = false;
-            $parentDeleted = false;
-            $parent        = $events[$eventId]->getParent();
-
-            $events[$eventId]->setDecisionPath($anchor);
-
-            while (!$atTopParent && !$parentDeleted) {
-                if ($parent === null) {
-                    $atTopParent = true;
-                } else {
-                    //has this parent been deleted?
-                    if (in_array($parent->getId(), $deletedEvents)) {
-                        $parentDeleted = true;
-                    } else {
-                        //check to see if this parent has a parent of its own
-                        $parent = $events[$parent->getId()]->getParent();
-                    }
-                }
-            }
-
-            if ($parentDeleted) {
-                //parent has been deleted so don't save this event
-                $entity->removeEvent($events[$eventId]);
-                unset($events[$eventId]);
-
-                return;
-            }
-
-            if ($parentId != 'null') {
-                if (isset($events[$parentId])) {
-                    $events[$eventId]->setParent($events[$parentId]);
-                }
-            } else {
-                $events[$eventId]->removeParent();
-            }
-
-            $hierarchy[$eventId] = $parentId;
-        };
-
-        $tempIds = array();
+        //loop again now to assign parents and cleanup endpoints which must be done after $tempIds has been populated
         foreach ($events as $id => $e) {
+            $canvasSettings = $e->getCanvasSettings();
+
+            if (!isset($canvasSettings['endpoints'])) {
+                $canvasSettings['endpoints'] = array();
+            }
+
             if (isset($sessionConnections[$id])) {
                 foreach ($sessionConnections[$id] as $sourceEndpoint => $children) {
                     foreach ($children as $child => $targetEndpoint) {
-                        $setParent($child, $id, (in_array($sourceEndpoint, array('yes', 'no')) ? $sourceEndpoint : null));
-                    }
-                }
-            } else {
-                //set the parent order
-                $parent   = $e->getParent();
-                $parentId = ($parent === null) ? 'null' : $parent->getId();
+                        if (!isset($events[$child])) {
+                            if (strpos($child, 'new') === false && in_array($child, $tempIds)) {
+                                unset($canvasSettings['endpoints'][$sourceEndpoint][$child]);
+                                $childId = array_search($child, $tempIds);
+                                unset($canvasSettings['endpoints'][$sourceEndpoint][$childId]);
+                            } else {
+                                unset($canvasSettings['endpoints'][$sourceEndpoint][$child]);
+                            }
 
-                $setParent($id, $parentId, $e->getDecisionPath());
-            }
+                            unset($canvasSettings['endpoints'][$sourceEndpoint][$child]);
 
-            $tempIds[$e->getTempId()] = $id;
-        }
+                        } elseif (!empty($targetEndpoint)) {
+                            $anchor = in_array($sourceEndpoint, array('yes', 'no')) ? $sourceEndpoint : null;
+                            $events[$child]->setDecisionPath($anchor);
 
-        //loop again now to cleanup endpoints
-        foreach ($events as $id => $e) {
-            //cleanup endpoints while here
-            $canvasSettings = $e->getCanvasSettings();
-            if (isset($canvasSettings['endpoints'])) {
-                foreach ($canvasSettings['endpoints'] as $sourceEndpoint => &$targets) {
-                    foreach ($targets as $targetId => $targetEndpoint) {
-                        //check to see if there are both a temp ID and ID for target
-                        if (strpos($targetId, 'new') !== false && isset($targets[$tempIds[$targetId]])) {
-                            //campaign has been edited
-                            unset($targets[$targetId]);
+                            $events[$child]->setParent($events[$id]);
+                            $hierarchy[$child] = $id;
+                            $parentUpdated[] = $child;
+                        } elseif (!in_array($child, $parentUpdated)) {
+                            if (strpos($child, 'new') === false && in_array($child, $tempIds)) {
+                                unset($canvasSettings['endpoints'][$sourceEndpoint][$child]);
+                                $childId = array_search($child, $tempIds);
+                                unset($canvasSettings['endpoints'][$sourceEndpoint][$childId]);
+                            } else {
+                                unset($canvasSettings['endpoints'][$sourceEndpoint][$child]);
+                            }
+
+                            unset($canvasSettings['endpoints'][$sourceEndpoint][$child]);
+
+                            $events[$child]->removeParent();
+                            $hierarchy[$child] = 'null';
                         }
                     }
                 }
+            } else {
+                //get the parent for ordering
+                $parent = $events[$id]->getParent();
+                $hierarchy[$id] = ($parent !== null) ? $parent->getId() : 'null';
             }
+
+            //cleanup endpoints while here
+            foreach ($canvasSettings['endpoints'] as $sourceEndpoint => &$targets) {
+                foreach ($targets as $targetId => $targetEndpoint) {
+                    //check to see if there are both a temp ID and ID for target
+                    if (strpos($targetId, 'new') !== false && isset($tempIds[$targetId]) && isset($targets[$tempIds[$targetId]])) {
+                        //campaign has been edited
+                        unset($targets[$targetId]);
+                    }
+                }
+            }
+
             $e->setCanvasSettings($canvasSettings);
+            $entity->addEvent($id, $e);
         }
 
         //set event order used when querying the events
@@ -337,15 +327,15 @@ class CampaignModel extends CommonFormModel
      * Proxy for EventModel::triggerEvent
      *
      * @param       $eventType
-     * @param mixed $passthrough
+     * @param mixed $eventDetails
      * @param mixed $eventTypeId
      */
-    public function triggerEvent ($eventType, $passthrough = null, $eventTypeId = null)
+    public function triggerEvent ($eventType, $eventDetails = null, $eventTypeId = null)
     {
         /** @var \Mautic\CampaignBundle\Model\EventModel $eventModel */
         $eventModel = $this->factory->getModel('campaign.event');
 
-        return $eventModel->triggerEvent($eventType, $passthrough, $eventTypeId);
+        return $eventModel->triggerEvent($eventType, $eventDetails, $eventTypeId);
     }
 
     /**

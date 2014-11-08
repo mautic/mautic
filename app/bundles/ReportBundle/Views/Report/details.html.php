@@ -103,11 +103,7 @@ if ($security->hasEntityAccess($permissions['report:reports:editown'], $permissi
                 <!--/ Overview Chart -->
                 <?php endforeach; ?>
                 <?php endif; ?>
-            </div>
-        </div>
 
-        <div class="pa-md">
-            <div class="row">
                 <?php if (isset($graphs['table']) && $graphs['table']) : ?>
                 <?php foreach ($graphs['table'] as $graph) : ?>
                 <!-- Overview Chart -->

@@ -221,6 +221,7 @@ class Email extends FormEntity
             'message' => 'mautic.email.subject.notblank'
         )));
 
+        /*
         $metadata->addPropertyConstraint('lists', new LeadListAccess(array(
             'message' => 'mautic.email.list.noaccess'
         )));
@@ -228,6 +229,7 @@ class Email extends FormEntity
         $metadata->addPropertyConstraint('lists', new NotBlank(array(
             'message' => 'mautic.email.list.notblank'
         )));
+        */
     }
 
     /**

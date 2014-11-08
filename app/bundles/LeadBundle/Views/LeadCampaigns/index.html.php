@@ -10,8 +10,7 @@ $leadId   = $lead->getId();
 $leadName = $lead->getPrimaryIdentifier();
 ?>
 <table class="table table-condensed table-border">
-    <?php foreach ($campaigns as $c): ?>
-    <?php
+    <?php foreach ($campaigns as $c):
         $switch  = $c['inCampaign'] ? 'fa-toggle-on' : 'fa-toggle-off';
         $bgClass = $c['inCampaign'] ? 'text-success' : 'text-danger';
     ?>

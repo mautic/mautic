@@ -147,19 +147,6 @@ foreach ($form->getActions() as $action) {
     <div class="tab-content pa-md">
         <!-- #actions-container -->
         <div class="tab-pane active fade in bdr-w-0" id="actions-container">
-            <!-- header -->
-            <div class="mb-lg">
-                <!-- form -->
-                <form action="" class="panel mb-0">
-                    <div class="form-control-icon pa-xs">
-                        <input type="text" class="form-control bdr-w-0" placeholder="<?php echo $view['translator']->trans('mautic.form.details.filter_actions_placeholder'); ?>">
-                        <span class="the-icon fa fa-search text-muted mt-xs"></span><!-- must below `form-control` -->
-                    </div>
-                </form>
-                <!--/ form -->
-            </div>
-            <!--/ header -->
-
             <?php foreach ($formActions as $group => $groupActions) : ?>
                 <h5 class="fw-sb mb-xs"><?php echo ucfirst($group); ?></h5>
                 <ul class="list-group">
@@ -198,18 +185,6 @@ foreach ($form->getActions() as $action) {
 
         <!-- #fields-container -->
         <div class="tab-pane fade bdr-w-0" id="fields-container">
-            <!-- header -->
-            <div class="mb-lg">
-                <!-- form -->
-                <form action="" class="panel mb-0">
-                    <div class="form-control-icon pa-xs">
-                        <input type="text" class="form-control bdr-w-0" placeholder="<?php echo $view['translator']->trans('mautic.form.details.filter_fields_placeholder'); ?>">
-                        <span class="the-icon fa fa-search text-muted mt-xs"></span><!-- must below `form-control` -->
-                    </div>
-                </form>
-                <!--/ form -->
-            </div>
-            <!--/ header -->
 
             <h5 class="fw-sb mb-xs">Form Field</h5>
             <ul class="list-group mb-xs">

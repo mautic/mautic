@@ -13,11 +13,11 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class CampaignActionAddRemoveLeadType
+ * Class CampaignEventAddRemoveLeadType
  *
  * @package Mautic\CampaignBundle\Form\Type
  */
-class CampaignActionAddRemoveLeadType extends AbstractType
+class CampaignEventAddRemoveLeadType extends AbstractType
 {
 
     /**
@@ -50,6 +50,6 @@ class CampaignActionAddRemoveLeadType extends AbstractType
      * @return string
      */
     public function getName() {
-        return "campaignaction_addremovelead";
+        return "campaignevent_addremovelead";
     }
 }

@@ -20,15 +20,15 @@ class PointActionHelper
 
     /**
      * @param $factory
-     * @param $passthrough
+     * @param $eventDetails
      * @param $action
      *
      * @return int
      */
-    public static function onPageHit($factory, $passthrough, $action)
+    public static function onPageHit($factory, $eventDetails, $action)
     {
 
-        $pageHit      = $passthrough->getPage();
+        $pageHit = $eventDetails->getPage();
 
         if ($pageHit instanceof Page) {
             /** @var \Mautic\PageBundle\Model\PageModel $pageModel */

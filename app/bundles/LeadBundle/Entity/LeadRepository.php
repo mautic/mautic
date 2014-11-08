@@ -335,7 +335,8 @@ class LeadRepository extends CommonRepository
             //ORM
 
             //build the order by id since the order was applied above
-            //unfortunately, can't use MySQL's FIELD function since we have to be cross-platform
+            //unfortunately, doctrine does not have a way to natively support this and can't use MySQL's FIELD function
+            //since we have to be cross-platform; it's way ugly
             $order = '(CASE';
             foreach ($ids as $count => $id) {
                 $order .= ' WHEN l.id = ' . $id . ' THEN ' . $count;

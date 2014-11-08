@@ -37,7 +37,6 @@ class PublicController extends CommonFormController
             $query  = (strpos($return, '?') === false) ? '?' : '&';
         }
 
-
         $translator = $this->get('translator');
 
         //check to ensure there is a formid
@@ -126,9 +125,31 @@ class PublicController extends CommonFormController
             $msg = $postActionProperty;
         }
 
+        $session = $this->factory->getSession();
+        $session->set('mautic.emailbundle.message', array(
+            'message'  => $msg,
+            'type'     => (empty($msgType)) ? 'notice' : $msgType
+        ));
+
+        return $this->redirect($this->generateUrl('mautic_form_postmessage'));
+    }
+
+    /**
+     * Displays a message
+     *
+     * @return Response
+     */
+    public function messageAction()
+    {
+        $session = $this->factory->getSession();
+        $message = $session->get('mautic.emailbundle.message', array());
+
+        $msg     = (!empty($message['message'])) ? $message['message'] : '';
+        $msgType = (!empty($message['type'])) ? $message['type'] : 'notice';
+
         return $this->render('MauticEmailBundle::message.html.php', array(
             'message'  => $msg,
-            'type'     => (empty($msgType)) ? 'notice' : $msgType,
+            'type'     => $msgType,
             'template' => $this->factory->getParameter('theme')
         ));
     }
