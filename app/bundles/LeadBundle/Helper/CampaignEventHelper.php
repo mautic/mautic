@@ -68,7 +68,7 @@ class CampaignEventHelper
             $log->setDelta($points);
             $log->setLead($lead);
             $log->setType('campaign');
-            $log->setEventName("{$event['campaign']->getId()}: {$event['campaign']->getName()}");
+            $log->setEventName("{$event['campaign']['id']}: {$event['campaign']['name']}");
             $log->setActionName("{$event['id']}: {$event['name']}");
             $log->setIpAddress($factory->getIpAddress());
             $log->setDateAdded(new \DateTime());
