@@ -115,7 +115,26 @@
                         $useId = (strpos($targetId, 'new') === 0 && isset($tempEventIds[$targetId])) ? $tempEventIds[$targetId] : $targetId;
                         $source = "CampaignEvent_{$e['id']}";
                         $target = "CampaignEvent_{$useId}";
-                        echo "if (mQuery(\"#{$source}\").length && mQuery(\"#{$target}\").length) { Mautic.campaignBuilderInstance.connect({uuids:[\"{$source}_{$sourceEndpoint}\", \"{$target}_{$targetEndpoint}\"]}); }\n";
+                        $label  = "";
+                        if (isset($campaignEvents[$useId])):
+                            $targetEvent = $campaignEvents[$useId];
+                            if ($targetEvent['triggerMode'] == 'interval'):
+                                $labelText = $view['translator']->trans('mautic.campaign.connection.trigger.interval.label', array(
+                                    '%number%' => $targetEvent['triggerInterval'],
+                                    '%unit%'   => $view['translator']->transChoice('mautic.campaign.event.intervalunit.' . $targetEvent['triggerIntervalUnit'], $targetEvent['triggerInterval'])
+                                ));
+                            elseif ($targetEvent['triggerMode'] == 'date'):
+                                $labelText = $view['translator']->trans('mautic.campaign.connection.trigger.date.label', array(
+                                    '%time%' => $view['date']->toTime($targetEvent['triggerDate']),
+                                    '%date%' => $view['date']->toShort($targetEvent['triggerDate'])
+                                ));
+                            endif;
+
+                            if (!empty($labelText)):
+                                $label = " ep.addOverlay([\"Label\", {label: \"$labelText\", location: 0.65, id: \"{$source}_{$target}_connectionLabel\", cssClass: \"_jsPlumb_label\"}]); ";
+                            endif;
+                        endif;
+                        echo "if (mQuery(\"#{$source}\").length && mQuery(\"#{$target}\").length) { var ep = Mautic.campaignBuilderInstance.connect({uuids:[\"{$source}_{$sourceEndpoint}\", \"{$target}_{$targetEndpoint}\"]});$label}\n\n";
                     endforeach;
                 endforeach;
             endif;

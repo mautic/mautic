@@ -61,6 +61,11 @@ class LeadEventLog
     private $triggerDate;
 
     /**
+     * @ORM\Column(name="system_triggered", type="boolean")
+     */
+    private $systemTriggered = false;
+
+    /**
      * @return mixed
      */
     public function getDateTriggered ()
@@ -170,5 +175,21 @@ class LeadEventLog
     public function setCampaign ($campaign)
     {
         $this->campaign = $campaign;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSystemTriggered ()
+    {
+        return $this->systemTriggered;
+    }
+
+    /**
+     * @param mixed $systemTriggered
+     */
+    public function setSystemTriggered ($systemTriggered)
+    {
+        $this->systemTriggered = $systemTriggered;
     }
 }

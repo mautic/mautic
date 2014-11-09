@@ -88,11 +88,11 @@ class EventType extends AbstractType
 
             $builder->add('triggerIntervalUnit', 'choice', array(
                 'choices'     => array(
-                    'i' => 'mautic.campaign.event.intervalunit.i',
-                    'h' => 'mautic.campaign.event.intervalunit.h',
-                    'd' => 'mautic.campaign.event.intervalunit.d',
-                    'm' => 'mautic.campaign.event.intervalunit.m',
-                    'y' => 'mautic.campaign.event.intervalunit.y',
+                    'i' => 'mautic.campaign.event.intervalunit.choice.i',
+                    'h' => 'mautic.campaign.event.intervalunit.choice.h',
+                    'd' => 'mautic.campaign.event.intervalunit.choice.d',
+                    'm' => 'mautic.campaign.event.intervalunit.choice.m',
+                    'y' => 'mautic.campaign.event.intervalunit.choice.y',
                 ),
                 'multiple'    => false,
                 'label_attr'  => array('class' => 'control-label'),

@@ -64,6 +64,21 @@
     z-index: 1005;
 }
 
+._jsPlumb_endpoint.dragActive {
+    /* changes endpoint when dragging connector */
+}
+
+._jsPlumb_label {
+    background-color: white;
+    opacity:0.9;
+    padding:0.3em;
+    border-radius:0.5em;
+    border: 1px solid #47535f;
+    cursor:pointer;
+    z-index: 1004;
+    color: #47535f;
+}
+
 ._jsPlumb_connector {
     z-index: 1000;
 }
@@ -84,8 +99,19 @@
     -o-box-shadow: 2px 2px 19px #444;
     -webkit-box-shadow: 2px 2px 19px #444;
     -moz-box-shadow: 2px 2px 19px #fff;
-    opacity:0.9;
+    /* opacity:0.9;
     filter:alpha(opacity=90);
+    */
+}
+
+.campaign-event-buttons {
+    position: absolute;
+    top: -10px;
+    right: -15px;
+}
+
+.campaign-event-buttons .btn-delete {
+    border-radius: 10px;
 }
 
 .list-campaign-event .campaign-event-name {
@@ -108,12 +134,6 @@
     background-color: #47558f;
     border: solid 1px #343b68;
     color: #fff;
-}
-
-.campaign-event-buttons {
-    position: absolute;
-    top: -15px;
-    right: 0;
 }
 
 .campaign-builder .list-group-item.ui-draggable-dragging {

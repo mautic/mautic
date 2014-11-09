@@ -242,7 +242,7 @@ class EventRepository extends CommonRepository
         $q->where($expr)
             ->setParameter('now', $date);
 
-        $results = $q->getQuery()->getResult();
+        $results = $q->getQuery()->getArrayResult();
 
         return $results;
     }
