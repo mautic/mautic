@@ -135,7 +135,7 @@ class DateHelper extends Helper
      */
     public function getShortFormat()
     {
-        return $this->format['short'];
+        return $this->formats['short'];
     }
 
     /**
