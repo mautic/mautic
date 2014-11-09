@@ -31,7 +31,15 @@ class PhpHandler extends StreamHandler
             }
             $this->errorMessage = null;
             set_error_handler(array($this, 'customErrorHandler'));
-            $this->stream = fopen($this->url, 'a');
+            if (!file_exists($this->url)) {
+                $this->stream = fopen($this->url, 'a');
+
+                //write php line to it
+                fwrite($this->stream, (string) '<?php die("access denied!"); ?>' . "\n\n");
+            } else {
+                $this->stream = fopen($this->url, 'a');
+            }
+
             if ($this->filePermission !== null) {
                 @chmod($this->url, $this->filePermission);
             }
@@ -39,13 +47,6 @@ class PhpHandler extends StreamHandler
             if (!is_resource($this->stream)) {
                 $this->stream = null;
                 throw new \UnexpectedValueException(sprintf('The stream or file "%s" could not be opened: '.$this->errorMessage, $this->url));
-            }
-
-
-            //check to see if the resource has anything written to it
-            if (filesize($this->url) === 0) {
-                //write php line to it
-                fwrite($this->stream, (string) '<?php die("access denied!"); ?>' . "\n\n");
             }
         }
 
