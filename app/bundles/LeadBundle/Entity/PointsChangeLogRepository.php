@@ -166,27 +166,12 @@ class PointsChangeLogRepository extends CommonRepository
      */
     public function getGenderRatio($query)
     {
-        $results = array();
-        $results['males'] = $this->countValue(clone $query, 'l.gender', 'male');
-        $results['female'] = $this->countValue(clone $query, 'l.gender', 'female');
+        $results = array(
+            'male' => $this->countValue(clone $query, 'l.gender', 'male'),
+            'female' => $this->countValue(clone $query, 'l.gender', 'female')
+        );
 
-        $colors = GraphHelper::$colors;
-        $graphData = array();
-        $i = 0;
-        foreach($results as $result => $count) {
-            if (!isset($colors[$i])) {
-                $i = 0;
-            }
-            $color = $colors[$i];
-            $graphData[] = array(
-                'label' => $result,
-                'color' => $colors[$i]['color'],
-                'highlight' => $colors[$i]['highlight'],
-                'value' => (int) $count
-            );
-            $i++;
-        }
-        return $graphData;
+        return GraphHelper::preparePieGraphData($results);
     }
 
     /**

@@ -145,14 +145,14 @@ class ReportSubscriber extends CommonSubscriber
             $event->setGraph('line', $timeStats);
         }
 
-        if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.email.graph.pie.ignored.read.failed') {
+        if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.email.graph.pie.gender') {
             $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
             $event->buildWhere($queryBuilder);
             $items = $pointLogRepo->getGenderRatio($queryBuilder);
             $graphData = array();
             $graphData['data'] = $items;
-            $graphData['name'] = 'mautic.email.graph.pie.ignored.read.failed';
-            $graphData['iconClass'] = 'fa-flag-checkered';
+            $graphData['name'] = 'mautic.email.graph.pie.gender';
+            $graphData['iconClass'] = 'fa-female';
             $event->setGraph('pie', $graphData);
         }
 
