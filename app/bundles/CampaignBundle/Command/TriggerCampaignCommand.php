@@ -23,7 +23,9 @@ class TriggerCampaignCommand extends ContainerAwareCommand
         $this
             ->setName('mautic:campaign:trigger')
             ->setDescription('Trigger timed events for published campaigns.')
-            ->addOption('--campaign-id', null, InputOption::VALUE_OPTIONAL, 'Trigger events for a specific campaign.  Otherwise, all campaigns will be triggered.', null);
+            ->addOption('--campaign-id', null, InputOption::VALUE_OPTIONAL, 'Trigger events for a specific campaign.  Otherwise, all campaigns will be triggered.', null)
+            ->addOption('--scheduled-only', null, InputOption::VALUE_NONE, 'Trigger only scheduled events')
+            ->addOption('--negative-only', null, InputOption::VALUE_NONE, 'Trigger only negative events, i.e. with a "no" decision path.');
     }
 
     protected function execute (InputInterface $input, OutputInterface $output)
@@ -34,7 +36,19 @@ class TriggerCampaignCommand extends ContainerAwareCommand
         $factory    = $container->get('mautic.factory');
         /** @var \Mautic\CampaignBundle\Model\EventModel $model */
         $model      = $factory->getModel('campaign.event');
-        $model->triggerScheduledEvents($campaignId);
+
+        $scheduleOnly = $input->getOption('scheduled-only');
+        $negativeOnly = $input->getOption('negative-only');
+
+        if (!$negativeOnly) {
+            //trigger scheduled events
+            $model->triggerScheduledEvents($campaignId);
+        }
+
+        if (!$scheduleOnly) {
+            //find and trigger "no" path events
+            $model->triggerNegativeEvents($campaignId);
+        }
 
         return true;
     }

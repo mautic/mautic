@@ -310,11 +310,6 @@ var Mautic = {
 
         mQuery(container + " *[data-toggle='tooltip']").tooltip('destroy');
 
-        //unload tinymce editor so that it can be reloaded if needed with new ajax content
-        mQuery(container + " textarea[data-toggle='editor']").each(function (index) {
-            mQuery(this).tinymce().remove();
-        });
-
         //unload lingering modals from body so that there will not be multiple modals generated from new ajaxed content
         mQuery(container + " *[data-toggle='modal']").each(function (index) {
             var target = mQuery(this).attr('data-target');

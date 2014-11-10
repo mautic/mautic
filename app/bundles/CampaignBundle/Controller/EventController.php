@@ -120,10 +120,8 @@ class EventController extends CommonFormController
 
             $passthroughVars['eventId']   = $keyId;
             $passthroughVars['eventHtml'] = $this->renderView($template, array(
-                'inForm' => true,
                 'event'  => $event,
                 'id'     => $keyId,
-                'level'  => 1
             ));
             $passthroughVars['eventType'] = $eventType;
         }
@@ -236,11 +234,10 @@ class EventController extends CommonFormController
                         : $event['settings']['template'];
 
                     $passthroughVars['eventId']   = $objectId;
-                    $passthroughVars['eventHtml'] = $this->renderView($template, array(
-                        'inForm' => true,
+                    $passthroughVars['updateHtml'] = $this->renderView($template, array(
                         'event'  => $event,
                         'id'     => $objectId,
-                        'level'  => 1
+                        'update' => true
                     ));
                     $passthroughVars['eventType'] = $eventType;
 
@@ -379,11 +376,8 @@ class EventController extends CommonFormController
                 'route'         => false,
                 'eventId'       => $objectId,
                 'eventHtml'     => $this->renderView($template, array(
-                    'inForm'       => true,
                     'event'        => $event,
-                    'id'           => $objectId,
-                    'deleted'      => true,
-                    'level'        => $this->request->get('level', 1),
+                    'id'           => $objectId
                 ))
             );
         } else {

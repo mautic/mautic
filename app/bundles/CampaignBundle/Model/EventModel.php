@@ -128,11 +128,10 @@ class EventModel extends CommonFormModel
      * @param       $type
      * @param mixed $eventDetails
      * @param mixed $typeId
-     * @param mixed $systemTriggered
      *
      * @return bool|mixed
      */
-    public function triggerEvent ($type, $eventDetails = null, $typeId = null, $systemTriggered = false)
+    public function triggerEvent ($type, $eventDetails = null, $typeId = null)
     {
         static $leadCampaigns = array(), $eventList = array(), $availableEvents = array(), $leadsEvents = array(), $examinedEvents = array();
 
@@ -204,14 +203,14 @@ class EventModel extends CommonFormModel
                 if (!empty($event['parent'])) {
                     if (!isset($leadsEvents[$event['parent']['id']])) {
                         //this event has a parent that has not been triggered for this lead so break out
-                        $logger->debug('CAMPAIGN: ' . 'parent (ID# ' . $event['parent']['id'] . ') for ID# ' . $event['id'] . ' has not been triggered yet; abort');
+                        $logger->debug('CAMPAIGN: parent (ID# ' . $event['parent']['id'] . ') for ID# ' . $event['id'] . ' has not been triggered yet; abort');
                         break;
                     }
                     $parentLog = $leadsEvents[$event['parent']['id']];
 
                     if ($parentLog['isScheduled']) {
                         //this event has a parent that is scheduled and thus not triggered
-                        $logger->debug('CAMPAIGN: ' . 'parent (ID# ' . $event['parent']['id'] . ') for ID# ' . $event['id'] . ' has not been triggered yet because it\'s scheduled; abort');
+                        $logger->debug('CAMPAIGN: parent (ID# ' . $event['parent']['id'] . ') for ID# ' . $event['id'] . ' has not been triggered yet because it\'s scheduled; abort');
                     } else {
                         $parentTriggeredDate = $parentLog['dateTriggered'];
                     }
@@ -230,7 +229,7 @@ class EventModel extends CommonFormModel
                 $examinedEvents[] = $event['id'];
 
                 //check the callback function for the event to make sure it even applies based on its settings
-                if (!$this->invokeEventCallback($event, $settings, $lead, $eventDetails, $systemTriggered)) {
+                if (!$this->invokeEventCallback($event, $settings, $lead, $eventDetails)) {
                     $logger->debug('CAMPAIGN: ID# ' . $event['id'] . ' callback check failed; continue');
                     continue;
                 }
@@ -245,10 +244,6 @@ class EventModel extends CommonFormModel
                             //hit a triggering type event so move on
                             $logger->debug('CAMPAIGN: ID# ' . $child['id'] . ' is an action; continue');
                             continue;
-                        } elseif (($child['decisionPath'] == 'no' && !$systemTriggered) || ($child['decisionPath'] == 'yes' && $systemTriggered)) {
-                            //decision path doesn't match how the event is triggered so continue to next event
-                            $logger->debug('CAMPAIGN: ID# ' . $child['id'] . ' decision path ('. $child['decisionPath'] . ') is not applicable; continue');
-                            continue;
                         }
 
                         $settings = $availableEvents[$child['eventType']][$child['type']];
@@ -256,12 +251,12 @@ class EventModel extends CommonFormModel
                         //store in case a child was pulled with events
                         $examinedEvents[] = $child['id'];
 
-                        $timing = $this->checkEventTiming($child, $parentTriggeredDate, $systemTriggered);
+                        $timing = $this->checkEventTiming($child, $parentTriggeredDate);
                         if ($timing instanceof \DateTime) {
                             //lead actively triggered this event, a decision wasn't involved, or it was system triggered and a "no" path so schedule the event to be fired at the defined time
                             $logger->debug('CAMPAIGN: ID# ' . $child['id'] . ' timing is not appropriate and thus scheduled for ' . $timing . '; continue');
 
-                            $log = $this->getLogEntity($child['id'], $event['campaign']['id'], $lead, $ipAddress, $systemTriggered);
+                            $log = $this->getLogEntity($child['id'], $event['campaign']['id'], $lead, $ipAddress);
                             $log->setIsScheduled(true);
                             $log->setTriggerDate($timing);
                             $persist[] = $log;
@@ -274,9 +269,9 @@ class EventModel extends CommonFormModel
                         }
 
                         //trigger the action
-                        if ($this->invokeEventCallback($child, $settings, $lead, $eventDetails, $systemTriggered)) {
+                        if ($this->invokeEventCallback($child, $settings, $lead, $eventDetails)) {
                             $logger->debug('CAMPAIGN: ID# ' . $child['id'] . ' successfully executed and logged.');
-                            $persist[] = $this->getLogEntity($child['id'], $event['campaign']['id'], $lead, $ipAddress, $systemTriggered);
+                            $persist[] = $this->getLogEntity($child['id'], $event['campaign']['id'], $lead, $ipAddress);
                         } else {
                             $logger->debug('CAMPAIGN: ID# ' . $child['id'] . ' execution failed.');
                         }
@@ -295,45 +290,6 @@ class EventModel extends CommonFormModel
     }
 
     /**
-     * @param      $event
-     * @param      $campaign
-     * @param null $lead
-     * @param null $ipAddress
-     * @param bool $systemTriggered
-     *
-     * @return LeadEventLog
-     * @throws \Doctrine\ORM\ORMException
-     */
-    public function getLogEntity($event, $campaign, $lead = null, $ipAddress= null, $systemTriggered = false)
-    {
-        $log = new LeadEventLog();
-
-        if ($ipAddress == null) {
-            $ipAddress = $this->factory->getIpAddress();
-        }
-        $log->setIpAddress($ipAddress);
-
-        if (!$event instanceof Event) {
-            $event = $this->em->getReference('MauticCampaignBundle:Event', $event);
-        }
-        $log->setEvent($event);
-
-        if (!$campaign instanceof Campaign) {
-            $campaign = $this->em->getReference('MauticCampaignBundle:Campaign', $campaign);
-        }
-        $log->setCampaign($campaign);
-
-        if ($lead == null) {
-            $leadModel = $this->factory->getModel('lead');
-            $lead = $leadModel->getCurrentLead();
-        }
-        $log->setLead($lead);
-        $log->setDateTriggered(new \DateTime());
-        $log->setSystemTriggered($systemTriggered);
-        return $log;
-    }
-
-    /**
      * Trigger the first action in a campaign if a decision is not involved
      *
      * @param $campaign
@@ -348,10 +304,6 @@ class EventModel extends CommonFormModel
         $campaignModel = $this->factory->getModel('campaign');
         $eventId       = $event['id'];
 
-        //IP address for the log
-        /** @var \Mautic\CoreBundle\Entity\IpAddress $ipAddress */
-        $ipAddress = $this->factory->getIpAddress();
-
         $leads = $campaignModel->getCampaignLeads($campaign, $eventId);
 
         foreach ($leads as $campaignLead) {
@@ -359,24 +311,154 @@ class EventModel extends CommonFormModel
 
             $timing = $this->checkEventTiming($event, new \DateTime(), true);
             if ($timing instanceof \DateTime) {
-                $log = new LeadEventLog();
-                $log->setIpAddress($ipAddress);
-                $log->setEvent($this->em->getReference('MauticCampaignBundle:Event', $eventId));
-                $log->setCampaign($campaign);
+                $log = $this->getLogEntity($event['id'], $campaign, $lead, null, true);
                 $log->setLead($lead);
                 $log->setIsScheduled(true);
                 $log->setTriggerDate($timing);
 
                 $persist[] = $log;
             } elseif ($timing && $this->invokeEventCallback($event, $settings, $lead, true)) {
-                $log = new LeadEventLog();
-                $log->setIpAddress($ipAddress);
-                $log->setEvent($this->em->getReference('MauticCampaignBundle:Event', $eventId));
-                $log->setCampaign($campaign);
-                $log->setLead($lead);
+                $log = $this->getLogEntity($event['id'], $campaign, $lead, null, true);
                 $log->setDateTriggered(new \DateTime());
+
                 $persist[] = $log;
             } //else do nothing
+        }
+
+        if (!empty($persist)) {
+            $this->getRepository()->saveEntities($persist);
+        }
+    }
+
+    /**
+     * Trigger events that are scheduled
+     *
+     * @param mixed $campaignId
+     */
+    public function triggerScheduledEvents ($campaignId = null)
+    {
+        $repo            = $this->getRepository();
+        $events          = $repo->getPublishedScheduled($campaignId);
+        $campaignModel   = $this->factory->getModel('campaign');
+        $leadModel       = $this->factory->getModel('lead');
+        $availableEvents = $campaignModel->getEvents();
+        $persist         = array();
+
+        foreach ($events as $e) {
+            /** @var \Mautic\CampaignBundle\Entity\Event $event */
+            $event     = $e['event'];
+            $eventType = $event['eventType'];
+            $type      = $event['type'];
+            if (!isset($availableEvents[$eventType][$type])) {
+                continue;
+            }
+
+            $settings = $availableEvents[$eventType][$type];
+
+            $lead = $leadModel->getEntity($e['lead']['id']);
+
+            //trigger the action
+            if ($this->invokeEventCallback($event, $settings, $lead, null, true)) {
+                $e->setTriggerDate(null);
+                $e->setIsScheduled(false);
+                $e->setDateTriggered(new \DateTime());
+                $persist[] = $e;
+            }
+        }
+
+        if (!empty($persist)) {
+            $this->getRepository()->saveEntities($persist);
+        }
+    }
+
+    /**
+     * Find and trigger the negative events, i.e. the events with a no decision path
+     *
+     * @param null $campaignId
+     */
+    public function triggerNegativeEvents ($campaignId = null)
+    {
+        //get a list of pending events
+        $events          = $this->getRepository()->getNegativePendingEvents($campaignId);
+        /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */
+        $campaignModel   = $this->factory->getModel('campaign');
+        /** @var \Mautic\CampaignBundle\Model\EventModel $eventModel */
+        $eventModel      = $this->factory->getModel('campaign.event');
+        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+        $leadModel       = $this->factory->getModel('lead');
+        $eventRepo       = $eventModel->getRepository();
+
+        $logger          = $this->factory->getLogger();
+        $logger->debug('CAMPAIGN: Triggering negative events');
+
+        //get settings for events
+        $availableEvents = $campaignModel->getEvents();
+
+        //used to cache stuff to prevent duplicate db calls
+        $leadsEventCache = array();
+        $leadEntityCache = array();
+
+        //persist all entities at once
+        $persist = array();
+
+        foreach ($events as $event) {
+            $settings = $availableEvents[$event['eventType']][$event['type']];
+
+            if (!empty($event['campaign']['leads'])) {
+                foreach ($event['campaign']['leads'] as $lead) {
+                    if (empty($leadsEventCache[$lead['lead_id']])) {
+                        $leadsEventCache[$lead['lead_id']] = $eventRepo->getLeadTriggeredEvents($lead['lead_id']);
+                    }
+
+                    $leadsEvents = $leadsEventCache[$lead['lead_id']];
+
+                    if (empty($event['parent'])) {
+                        $logger->debug('CAMPAIGN: ID# ' . $event['id'] . ' has no parent and thus not applicable.');
+                        continue;
+                    }
+
+                    $grandparent = $event['parent']['parent'];
+
+                    if (empty($grandparent)) {
+                        //use the date added to the campaign
+                        $fromDate = $lead['dateAdded'];
+                    } else {
+                        if (!isset($leadsEvents[$grandparent['id']])) {
+                            $logger->debug('CAMPAIGN: grandparent (ID# ' . $grandparent['id'] . ') for ID# ' . $event['id'] . ' has not been triggered; continue');
+                            continue;
+                        }
+
+                        $grandparentLog = $leadsEvents[$grandparent['id']]['log'][0];
+                        if ($grandparentLog['isScheduled']) {
+                            //this event has a parent that is scheduled and thus not triggered
+                            $logger->debug('CAMPAIGN: grandparent (ID# ' . $grandparent['id'] . ') for ID# ' . $event['id'] . ' is scheduled; continue');
+                            continue;
+                        } else {
+                            $fromDate = $grandparentLog['dateTriggered'];
+                        }
+                    }
+
+                    $timing = $this->checkEventTiming($event, $fromDate, true);
+                    if ($timing) {
+                        if (empty($leadEntityCache[$lead['lead_id']])) {
+                            $leadEntityCache[$lead['lead_id']] = $leadModel->getEntity($lead['lead_id']);
+                        }
+
+                        if ($this->invokeEventCallback($event, $settings, $leadEntityCache[$lead['lead_id']], true)) {
+                            $logger->debug('CAMPAIGN: ID# ' . $event['id'] . ' execution successful and logged.');
+
+                            $log = $this->getLogEntity($event['id'], $event['campaign']['id'], $leadEntityCache[$lead['lead_id']], null, true);
+                            $log->setDateTriggered(new \DateTime());
+
+                            $persist[] = $log;
+                        } else {
+                            $logger->debug('CAMPAIGN: ID# ' . $event['id'] . ' execution failed.');
+                        }//else do nothing
+                    } else {
+                        $logger->debug('CAMPAIGN: Timing not appropriate for ID# ' . $event['id']);
+                    }//else do nothing
+                }
+            }
         }
 
         if (!empty($persist)) {
@@ -449,6 +531,10 @@ class EventModel extends CommonFormModel
     {
         $now = new \DateTime();
 
+        if ($action instanceof Event) {
+            $action = $action->convertToArray();
+        }
+
         $negate = ($action['decisionPath'] == 'no' && $systemTriggered);
 
         if ($action['triggerMode'] == 'interval') {
@@ -459,9 +545,25 @@ class EventModel extends CommonFormModel
                 $triggerOn = new \DateTime();
             }
 
-            $interval     = $action['triggerInterval'];
-            $intervalUnit = $action['triggerIntervalUnit'];
-            $dv           = new \DateInterval("P{$interval}" . strtoupper($intervalUnit));
+            $interval = $action['triggerInterval'];
+            $unit     = strtoupper($action['triggerIntervalUnit']);
+
+            switch ($unit) {
+                case 'Y':
+                case 'M':
+                case 'D':
+                    $dt = "P{$interval}{$unit}";
+                    break;
+                case 'I':
+                    $dt = "PT{$interval}M";
+                    break;
+                case 'H':
+                case 'S':
+                    $dt = "PT{$interval}{$unit}";
+                    break;
+            }
+
+            $dv = new \DateInterval($dt);
             $triggerOn->add($dv);
 
             if ($negate) {
@@ -489,43 +591,41 @@ class EventModel extends CommonFormModel
     }
 
     /**
-     * Trigger events that are scheduled
+     * @param      $event
+     * @param      $campaign
+     * @param null $lead
+     * @param null $ipAddress
+     * @param bool $systemTriggered
      *
-     * @param mixed $campaignId
+     * @return LeadEventLog
+     * @throws \Doctrine\ORM\ORMException
      */
-    public function triggerScheduledEvents ($campaignId = null)
+    public function getLogEntity($event, $campaign, $lead = null, $ipAddress= null, $systemTriggered = false)
     {
-        $repo            = $this->getRepository();
-        $events          = $repo->getPublishedScheduled($campaignId);
-        $campaignModel   = $this->factory->getModel('campaign');
-        $leadModel       = $this->factory->getModel('lead');
-        $availableEvents = $campaignModel->getEvents();
-        $persist         = array();
+        $log = new LeadEventLog();
 
-        foreach ($events as $e) {
-            /** @var \Mautic\CampaignBundle\Entity\Event $event */
-            $event     = $e['event'];
-            $eventType = $event['eventType'];
-            $type      = $event['type'];
-            if (!isset($availableEvents[$eventType][$type])) {
-                continue;
-            }
-
-            $settings = $availableEvents[$eventType][$type];
-
-            $lead = $leadModel->getEntity($e['lead']['id']);
-
-            //trigger the action
-            if ($this->invokeEventCallback($event, $settings, $lead, null, true)) {
-                $e->setTriggerDate(null);
-                $e->setIsScheduled(false);
-                $e->setDateTriggered(new \DateTime());
-                $persist[] = $e;
-            }
+        if ($ipAddress == null) {
+            $ipAddress = $this->factory->getIpAddress();
         }
+        $log->setIpAddress($ipAddress);
 
-        if (!empty($persist)) {
-            $this->getRepository()->saveEntities($persist);
+        if (!$event instanceof Event) {
+            $event = $this->em->getReference('MauticCampaignBundle:Event', $event);
         }
+        $log->setEvent($event);
+
+        if (!$campaign instanceof Campaign) {
+            $campaign = $this->em->getReference('MauticCampaignBundle:Campaign', $campaign);
+        }
+        $log->setCampaign($campaign);
+
+        if ($lead == null) {
+            $leadModel = $this->factory->getModel('lead');
+            $lead = $leadModel->getCurrentLead();
+        }
+        $log->setLead($lead);
+        $log->setDateTriggered(new \DateTime());
+        $log->setSystemTriggered($systemTriggered);
+        return $log;
     }
 }
