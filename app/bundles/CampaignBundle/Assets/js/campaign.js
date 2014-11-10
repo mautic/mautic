@@ -206,212 +206,214 @@ Mautic.launchCampaignEditor = function() {
     mQuery('.campaign-builder').removeClass('hide');
 
     if (typeof Mautic.campaignBuilderInstance == 'undefined') {
-        jsPlumb.ready(function() {
-            Mautic.campaignBuilderInstance = jsPlumb.getInstance({
-                Container: document.querySelector("#CampaignCanvas")
-            });
+        Mautic.campaignBuilderInstance = jsPlumb.getInstance({
+            Container: document.querySelector("#CampaignCanvas")
+        });
 
-            Mautic.updateCampaignConnections = function (info, remove) {
-                remove = (remove) ? 1 : 0;
+        Mautic.updateCampaignConnections = function (info, remove) {
+            remove = (remove) ? 1 : 0;
 
-                var sourceId = info.connection.sourceId;
-                var targetId = info.connection.targetId;
-                var sourceEndpoint = info.sourceEndpoint.anchor.cssClass;
-                var targetEndpoint = info.targetEndpoint.anchor.cssClass;
+            var sourceId = info.connection.sourceId;
+            var targetId = info.connection.targetId;
+            var sourceEndpoint = info.sourceEndpoint.anchor.cssClass;
+            var targetEndpoint = info.targetEndpoint.anchor.cssClass;
 
-                var query = "action=campaign:updateConnections&source=" + sourceId + "&target=" + targetId + "&remove=" + remove + "&sourceEndpoint=" + sourceEndpoint + "&targetEndpoint=" + targetEndpoint;
-                mQuery.ajax({
-                    url: mauticAjaxUrl,
-                    type: "POST",
-                    data: query,
-                    dataType: "json",
-                    success: function (response) {
-                        if (!remove && response.label) {
-                            info.connection.addOverlay(["Label", {
-                                label: response.label,
-                                location: 0.65,
-                                cssClass: '_jsPlumb_label',
-                                id: sourceId + "_" + targetId + "_connectionLabel"
-                            }]);
-                        }
-                    },
-                    error: function (request, textStatus, errorThrown) {
-                        Mautic.processAjaxError(request, textStatus, errorThrown);
+            var query = "action=campaign:updateConnections&source=" + sourceId + "&target=" + targetId + "&remove=" + remove + "&sourceEndpoint=" + sourceEndpoint + "&targetEndpoint=" + targetEndpoint;
+            mQuery.ajax({
+                url: mauticAjaxUrl,
+                type: "POST",
+                data: query,
+                dataType: "json",
+                success: function (response) {
+                    if (!remove && response.label) {
+                        info.connection.addOverlay(["Label", {
+                            label: response.label,
+                            location: 0.65,
+                            cssClass: '_jsPlumb_label',
+                            id: sourceId + "_" + targetId + "_connectionLabel"
+                        }]);
                     }
+                },
+                error: function (request, textStatus, errorThrown) {
+                    Mautic.processAjaxError(request, textStatus, errorThrown);
+                }
+            });
+        };
+
+        Mautic.campaignBuilderInstance.bind("connection", function (info, originalEvent) {
+
+            if (typeof originalEvent != 'undefined') {
+                Mautic.updateCampaignConnections(info);
+            }
+        });
+
+        Mautic.campaignBuilderInstance.bind("connectionDetached", function (info, originalEvent) {
+            Mautic.updateCampaignConnections(info, true);
+        });
+
+        var overlayOptions = [["Arrow", {width: 15, length: 15, location: 0.5}]];
+        var endpoint = "Dot";
+        var connector = ["Bezier", {curviness: 25}];
+        var connectorStyleLineWidth = 3;
+
+        Mautic.campaignBuilderTopAnchor = [0.5, 0, 0, -1, 0, 0];
+        Mautic.campaignBuilderTopEndpoint = {
+            endpoint: endpoint,
+            paintStyle: {
+                fillStyle: "#d5d4d4"
+            },
+            connector: connector,
+            connectorOverlays: overlayOptions,
+            isTarget: true,
+            beforeDrop: function (params) {
+                //ensure that a yes/no isn't looping back to this endpoint
+                var currentConnections = Mautic.campaignBuilderInstance.select({
+                    source: params.targetId,
+                    target: params.sourceId
                 });
-            };
 
-            Mautic.campaignBuilderInstance.bind("connection", function (info, originalEvent) {
-
-                if (typeof originalEvent != 'undefined') {
-                    Mautic.updateCampaignConnections(info);
+                if (currentConnections.length >= 1) {
+                    return false;
                 }
-            });
 
-            Mautic.campaignBuilderInstance.bind("connectionDetached", function (info, originalEvent) {
-                Mautic.updateCampaignConnections(info, true);
-            });
+                //ensure that the connections are not looping back into the same event
+                return params.sourceId != params.targetId;
+            }
+        };
 
-            var overlayOptions = [["Arrow", {width: 15, length: 15, location: 0.5}]];
-            var endpoint = "Dot";
-            var connector = ["Bezier", {curviness: 25}];
-            var connectorStyleLineWidth = 3;
+        Mautic.campaignBuilderBottomAnchor = [0.5, 1, 0, 1, 0, 0];
+        Mautic.campaignBuilderBottomEndpoint = {
+            endpoint: endpoint,
+            paintStyle: {
+                fillStyle: "#d5d4d4"
+            },
+            connector: connector,
+            connectorOverlays: overlayOptions,
+            maxConnections: -1,
+            isSource: true,
+            connectorStyle: {
+                strokeStyle: "#d5d4d4",
+                lineWidth: connectorStyleLineWidth
+            }
+        };
 
-            Mautic.campaignBuilderTopAnchor = [0.5, 0, 0, -1, 0, 0];
-            Mautic.campaignBuilderTopEndpoint = {
-                endpoint: endpoint,
-                paintStyle: {
-                    fillStyle: "#d5d4d4"
-                },
-                connector: connector,
-                connectorOverlays: overlayOptions,
-                isTarget: true,
-                beforeDrop: function (params) {
-                    //ensure that a yes/no isn't looping back to this endpoint
-                    var currentConnections = Mautic.campaignBuilderInstance.select({
-                        source: params.targetId,
-                        target: params.sourceId
+        Mautic.campaignBuilderYesAnchor = [0, 1, 0, 1, 30, 0];
+        Mautic.campaignBuilderYesEndpoint = {
+            endpoint: endpoint,
+            paintStyle: {
+                fillStyle: "#00b49c"
+            },
+            connector: connector,
+            connectorOverlays: overlayOptions,
+            maxConnections: -1,
+            isSource: true,
+            connectorStyle: {
+                strokeStyle: "#00b49c",
+                lineWidth: connectorStyleLineWidth
+            }
+        };
+
+        Mautic.campaignBuilderNoAnchor = [1, 1, 0, 1, -30, 0];
+        Mautic.campaignBuilderNoEndpoint = {
+            endpoint: endpoint,
+            paintStyle: {
+                fillStyle: "#f86b4f"
+            },
+            connector: connector,
+            connectorOverlays: overlayOptions,
+            maxConnections: -1,
+            isSource: true,
+            connectorStyle: {
+                strokeStyle: "#f86b4f",
+                lineWidth: connectorStyleLineWidth
+            }
+        };
+
+        Mautic.campaignDragOptions = {
+            start: function (params) {
+                //double clicking activates the stop function so add a catch to prevent unnecessary ajax calls
+                this.startingPosition = mQuery(params.el).position();
+            },
+            stop: function (params) {
+                //use jQuery as well to ensure consistency with comparison
+                var endingPosition = mQuery(params.el).position();
+
+                if (this.startingPosition.left !== endingPosition.left || this.startingPosition.top !== endingPosition.top) {
+
+                    //update coordinates
+                    mQuery('#droppedX').val(params.pos[0]);
+                    mQuery('#droppedY').val(params.pos[1]);
+
+                    var query = "action=campaign:updateCoordinates&droppedX=" + params.pos[0] + "&droppedY=" + params.pos[1] + "&eventId=" + mQuery(params.el).attr('id');
+                    mQuery.ajax({
+                        url: mauticAjaxUrl,
+                        type: "POST",
+                        data: query,
+                        dataType: "json",
+                        success: function (response) {
+
+                        },
+                        error: function (request, textStatus, errorThrown) {
+                            Mautic.processAjaxError(request, textStatus, errorThrown);
+                        }
                     });
-
-                    if (currentConnections.length >= 1) {
-                        return false;
-                    }
-
-                    //ensure that the connections are not looping back into the same event
-                    return params.sourceId != params.targetId;
                 }
-            };
+            }
+        };
 
-            Mautic.campaignBuilderBottomAnchor = [0.5, 1, 0, 1, 0, 0];
-            Mautic.campaignBuilderBottomEndpoint = {
-                endpoint: endpoint,
-                paintStyle: {
-                    fillStyle: "#d5d4d4"
-                },
-                connector: connector,
-                connectorOverlays: overlayOptions,
-                maxConnections: -1,
-                isSource: true,
-                connectorStyle: {
-                    strokeStyle: "#d5d4d4",
-                    lineWidth: connectorStyleLineWidth
-                }
-            };
+        Mautic.campaignBuilderInstance.setSuspendDrawing(true);
 
-            Mautic.campaignBuilderYesAnchor = [0, 1, 0, 1, 30, 0];
-            Mautic.campaignBuilderYesEndpoint = {
-                endpoint: endpoint,
-                paintStyle: {
-                    fillStyle: "#00b49c"
-                },
-                connector: connector,
-                connectorOverlays: overlayOptions,
-                maxConnections: -1,
-                isSource: true,
-                connectorStyle: {
-                    strokeStyle: "#00b49c",
-                    lineWidth: connectorStyleLineWidth
-                }
-            };
-
-            Mautic.campaignBuilderNoAnchor = [1, 1, 0, 1, -30, 0];
-            Mautic.campaignBuilderNoEndpoint = {
-                endpoint: endpoint,
-                paintStyle: {
-                    fillStyle: "#f86b4f"
-                },
-                connector: connector,
-                connectorOverlays: overlayOptions,
-                maxConnections: -1,
-                isSource: true,
-                connectorStyle: {
-                    strokeStyle: "#f86b4f",
-                    lineWidth: connectorStyleLineWidth
-                }
-            };
-
-            Mautic.campaignDragOptions = {
-                start: function (params) {
-                    //double clicking activates the stop function so add a catch to prevent unnecessary ajax calls
-                    this.startingPosition = mQuery(params.el).position();
-                },
-                stop: function (params) {
-                    //use jQuery as well to ensure consistency with comparison
-                    var endingPosition = mQuery(params.el).position();
-
-                    if (this.startingPosition.left !== endingPosition.left || this.startingPosition.top !== endingPosition.top) {
-
-                        //update coordinates
-                        mQuery('#droppedX').val(params.pos[0]);
-                        mQuery('#droppedY').val(params.pos[1]);
-
-                        var query = "action=campaign:updateCoordinates&droppedX=" + params.pos[0] + "&droppedY=" + params.pos[1] + "&eventId=" + mQuery(params.el).attr('id');
-                        mQuery.ajax({
-                            url: mauticAjaxUrl,
-                            type: "POST",
-                            data: query,
-                            dataType: "json",
-                            success: function (response) {
-
-                            },
-                            error: function (request, textStatus, errorThrown) {
-                                Mautic.processAjaxError(request, textStatus, errorThrown);
-                            }
-                        });
-                    }
-                }
-            };
-
-            //manually loop through each so a UUID can be set for reconnecting connections
-            mQuery("#CampaignCanvas .list-campaign-event").each(function () {
-                var id = mQuery(this).attr('id');
-                var theAnchor = Mautic.campaignBuilderTopAnchor;
-                theAnchor[6] = 'top ' + id;
-                Mautic.campaignBuilderInstance.addEndpoint(id, {
-                    anchor: theAnchor,
-                    uuid: id + "_top"
-                }, Mautic.campaignBuilderTopEndpoint);
-            });
-
-            mQuery("#CampaignCanvas .list-campaign-nondecision").each(function () {
-                var id = mQuery(this).attr('id');
-                var theAnchor = Mautic.campaignBuilderBottomAnchor;
-                theAnchor[6] = 'bottom ' + id;
-                Mautic.campaignBuilderInstance.addEndpoint(id, {
-                    anchor: theAnchor,
-                    uuid: id + "_bottom"
-                }, Mautic.campaignBuilderBottomEndpoint);
-            });
-
-            mQuery("#CampaignCanvas .list-campaign-decision").each(function () {
-                var id = mQuery(this).attr('id');
-                var theAnchor = Mautic.campaignBuilderYesAnchor;
-                theAnchor[6] = 'yes ' + id;
-                Mautic.campaignBuilderInstance.addEndpoint(id, {
-                    anchor: theAnchor,
-                    uuid: id + "_yes"
-                }, Mautic.campaignBuilderYesEndpoint);
-                var theAnchor = Mautic.campaignBuilderNoAnchor;
-                theAnchor[6] = 'no ' + id;
-                Mautic.campaignBuilderInstance.addEndpoint(id, {
-                    anchor: theAnchor,
-                    uuid: id + "_no"
-                }, Mautic.campaignBuilderNoEndpoint);
-            });
-
-            //enable drag and drop
-            Mautic.campaignBuilderInstance.draggable(document.querySelectorAll("#CampaignCanvas .list-campaign-event"), Mautic.campaignDragOptions);
-
-            //activate existing connections
-            Mautic.campaignBuilderReconnectEndpoints();
+        //manually loop through each so a UUID can be set for reconnecting connections
+        mQuery("#CampaignCanvas .list-campaign-event").each(function () {
+            var id = mQuery(this).attr('id');
+            var theAnchor = Mautic.campaignBuilderTopAnchor;
+            theAnchor[6] = 'top ' + id;
+            Mautic.campaignBuilderInstance.addEndpoint(id, {
+                anchor: theAnchor,
+                uuid: id + "_top"
+            }, Mautic.campaignBuilderTopEndpoint);
         });
 
-        mQuery('.campaign-builder-content').scroll(function() {
-            Mautic.campaignBuilderInstance.repaintEverything();
+        mQuery("#CampaignCanvas .list-campaign-nondecision").each(function () {
+            var id = mQuery(this).attr('id');
+            var theAnchor = Mautic.campaignBuilderBottomAnchor;
+            theAnchor[6] = 'bottom ' + id;
+            Mautic.campaignBuilderInstance.addEndpoint(id, {
+                anchor: theAnchor,
+                uuid: id + "_bottom"
+            }, Mautic.campaignBuilderBottomEndpoint);
         });
 
-        Mautic.campaignBuilderInstance.repaintEverything();
+        mQuery("#CampaignCanvas .list-campaign-decision").each(function () {
+            var id = mQuery(this).attr('id');
+            var theAnchor = Mautic.campaignBuilderYesAnchor;
+            theAnchor[6] = 'yes ' + id;
+            Mautic.campaignBuilderInstance.addEndpoint(id, {
+                anchor: theAnchor,
+                uuid: id + "_yes"
+            }, Mautic.campaignBuilderYesEndpoint);
+            var theAnchor = Mautic.campaignBuilderNoAnchor;
+            theAnchor[6] = 'no ' + id;
+            Mautic.campaignBuilderInstance.addEndpoint(id, {
+                anchor: theAnchor,
+                uuid: id + "_no"
+            }, Mautic.campaignBuilderNoEndpoint);
+        });
+
+        //enable drag and drop
+        Mautic.campaignBuilderInstance.draggable(document.querySelectorAll("#CampaignCanvas .list-campaign-event"), Mautic.campaignDragOptions);
+
+        //activate existing connections
+        Mautic.campaignBuilderReconnectEndpoints();
+
+        Mautic.campaignBuilderInstance.setSuspendDrawing(false, true);
     }
+
+    mQuery('.campaign-builder-content').scroll(function() {
+        Mautic.campaignBuilderInstance.repaintEverything();
+    });
+
+    Mautic.campaignBuilderInstance.repaintEverything();
 };
 
 /**
