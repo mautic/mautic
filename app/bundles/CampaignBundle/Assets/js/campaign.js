@@ -129,24 +129,24 @@ Mautic.campaignEventOnLoad = function (container, response) {
             if (response.eventType == 'decision') {
                 var theAnchor = Mautic.campaignBuilderTopAnchor;
                 theAnchor[6] = 'top ' + domEventId;
-                Mautic.campaignBuilderInstance.addEndpoint(document.getElementById(domEventId), {anchor: theAnchor, uuid: domEventId + "_top"}, Mautic.campaignBuilderTopEndpoint);
+                Mautic.campaignBuilderInstance.addEndpoint(domEventId, {anchor: theAnchor, uuid: domEventId + "_top"}, Mautic.campaignBuilderTopEndpoint);
                 var theAnchor = Mautic.campaignBuilderYesAnchor;
-                theAnchor[6] = '                Mautic.campaignBuilderInstance.addEndpoint(document.getElementById(domEventId), {anchor: theAnchor, uuid: domEventId + "_yes"}, Mautic.campaignBuilderYesEndpoint);
-uilderYesEndpoint);
+                theAnchor[6] = 'yes ' + domEventId;
+                Mautic.campaignBuilderInstance.addEndpoint(domEventId, {anchor: theAnchor, uuid: domEventId + "_yes"}, Mautic.campaignBuilderYesEndpoint);
                 var theAnchor = Mautic.campaignBuilderNoAnchor;
                 theAnchor[6] = 'no ' + domEventId;
-                Mautic.campaignBuilderInstance.addEndpoint(document.getElementById(domEventId), {anchor: theAnchor, uuid: domEventId + "_no"}, Mautic.campaignBuilderNoEndpoint);
+                Mautic.campaignBuilderInstance.addEndpoint(domEventId, {anchor: theAnchor, uuid: domEventId + "_no"}, Mautic.campaignBuilderNoEndpoint);
             } else {
                 var theAnchor = Mautic.campaignBuilderTopAnchor;
-                theAnchor[6] = '                Mautic.campaignBuilderInstance.addEndpoint(document.getElementById(domEventId), {anchor: theAnchor, uuid: domEventId + "_top"}, Mautic.campaignBuilderTopEndpoint);
-uilderTopEndpoint);
+                theAnchor[6] = 'top ' + domEventId;
+                Mautic.campaignBuilderInstance.addEndpoint(domEventId, {anchor: theAnchor, uuid: domEventId + "_top"}, Mautic.campaignBuilderTopEndpoint);
                 var theAnchor = Mautic.campaignBuilderBottomAnchor;
-                               Mautic.campaignBuilderInstance.addEndpoint(document.getElementById(domEventId), {anchor: theAnchor, uuid: domEventId + "_bottom"}, Mautic.campaignBuilderBottomEndpoint);
- Mautic.campaignBuilderBottomEndpoint);
+                theAnchor[6] = 'bottom ' + domEventId;
+                Mautic.campaignBuilderInstance.addEndpoint(domEventId, {anchor: theAnchor, uuid: domEventId + "_bottom"}, Mautic.campaignBuilderBottomEndpoint);
             }
         }
 
-        Mautic.campaignBuilderInstance.draggable(document.getElementById(domEventId), Mautic.campaignDragOptions);
+        Mautic.campaignBuilderInstance.draggable(domEventId, Mautic.campaignDragOptions);
 
         //activate new stuff
         mQuery(eventId + " a[data-toggle='ajax']").click(function (event) {
