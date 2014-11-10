@@ -428,21 +428,7 @@ class HitRepository extends CommonRepository
      */
     public function getNewVsReturningGraphData($new, $returning)
     {
-        $colors = GraphHelper::$colors;
-        return array(
-            array(
-                'label' => 'New',
-                'color' => $colors[0]['color'],
-                'highlight' => $colors[0]['highlight'],
-                'value' => $new
-            ),
-            array(
-                'label' => 'Returning',
-                'color' => $colors[1]['color'],
-                'highlight' => $colors[1]['highlight'],
-                'value' => $returning
-            )
-        );
+        return GraphHelper::preparePieGraphData(array('new' => $new, 'returning' => $returning));
     }
 
     /**
@@ -455,23 +441,7 @@ class HitRepository extends CommonRepository
      */
     public function getLaguageGraphData($languages)
     {
-        $colors = GraphHelper::$colors;
-        $graphData = array();
-        $i = 0;
-        foreach($languages as $language => $count) {
-            if (!isset($colors[$i])) {
-                $i = 0;
-            }
-            $color = $colors[$i];
-            $graphData[] = array(
-                'label' => $language,
-                'color' => $colors[$i]['color'],
-                'highlight' => $colors[$i]['highlight'],
-                'value' => $count
-            );
-            $i++;
-        }
-        return $graphData;
+        return GraphHelper::preparePieGraphData($languages);
     }
 
     /**
