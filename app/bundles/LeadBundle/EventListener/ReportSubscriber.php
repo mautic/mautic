@@ -174,8 +174,23 @@ class ReportSubscriber extends CommonSubscriber
             $graphData = array();
             $graphData['data'] = $items;
             $graphData['name'] = 'mautic.lead.table.top.events';
-            $graphData['iconClass'] = 'fa-asterisk';
-            $graphData['link'] = 'mautic_lead_action';
+            $graphData['iconClass'] = 'fa-paw';
+            $event->setGraph('table', $graphData);
+        }
+
+        if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.lead.table.top.actions') {
+            $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+            $event->buildWhere($queryBuilder);
+            $queryBuilder->select('lp.action_name as title, count(lp.action_name) as actions')
+                ->groupBy('lp.action_name')
+                ->orderBy('actions', 'DESC');
+            $limit = 10;
+            $offset = 0;
+            $items = $pointLogRepo->getMost($queryBuilder, $limit, $offset);
+            $graphData = array();
+            $graphData['data'] = $items;
+            $graphData['name'] = 'mautic.lead.table.top.actions';
+            $graphData['iconClass'] = 'fa-space-shuttle';
             $event->setGraph('table', $graphData);
         }
     }
