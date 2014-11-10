@@ -407,13 +407,14 @@ Mautic.launchCampaignEditor = function() {
         Mautic.campaignBuilderReconnectEndpoints();
 
         Mautic.campaignBuilderInstance.setSuspendDrawing(false, true);
-    }
 
-    mQuery('.campaign-builder-content').scroll(function() {
+        mQuery('.campaign-builder-content').scroll(function() {
+            Mautic.campaignBuilderInstance.repaintEverything();
+        });
+    } else {
+
         Mautic.campaignBuilderInstance.repaintEverything();
-    });
-
-    Mautic.campaignBuilderInstance.repaintEverything();
+    }
 };
 
 /**
