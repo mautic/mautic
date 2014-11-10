@@ -142,9 +142,9 @@ class GraphHelper
      *
      * @return array
      */
-    public static function mergeLineGraphData($graphData, $items, $unit, $dateName)
+    public static function mergeLineGraphData($graphData, $items, $unit, $dateName, $deltaName = null)
     {
-        // Group hits by date
+        // Group items by date
         foreach ($items as $item) {
             if (is_string($item[$dateName])) {
                 $item[$dateName] = new \DateTime($item[$dateName]);
@@ -152,7 +152,11 @@ class GraphHelper
 
             $oneItem = $item[$dateName]->format(self::getDateLabelFromat($unit));
             if (($itemKey = array_search($oneItem, $graphData['labels'])) !== false) {
-                $graphData['values'][$itemKey]++;
+                if ($deltaName) {
+                    $graphData['values'][$itemKey] += $item['delta'];
+                } else {
+                    $graphData['values'][$itemKey]++;
+                }
             }
         }
 
