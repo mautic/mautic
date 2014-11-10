@@ -5,7 +5,7 @@
  *
  * @param container
  */
-Mautic.campaignBuilderIgnoreUpdateConnectionCallback = true;
+
 Mautic.campaignOnLoad = function (container) {
     if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'campaign');
@@ -51,6 +51,15 @@ Mautic.campaignOnLoad = function (container) {
             });
     }
 };
+
+/**
+ * Delete the builder instance so it's regenerated when reopening the campaign event builder
+ */
+Mautic.campaignOnUnload = function() {
+    if (typeof Mautic.campaignBuilderInstance !== 'undefined') {
+        delete Mautic.campaignBuilderInstance;
+    }
+}
 
 /**
  * Setup the campaign event view
