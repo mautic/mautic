@@ -2,23 +2,25 @@ var MauticVars = {};
 var mQuery = jQuery.noConflict(true);
 window.jQuery = mQuery;
 
-if (typeof mauticContent !== 'undefined') {
-    (function ($) {
-        $("html").Core({
-            console: false
+mQuery( document ).ready(function() {
+    if (typeof mauticContent !== 'undefined') {
+        (function ($) {
+            $("html").Core({
+                console: false
+            });
+        })(mQuery);
+    }
+
+    if (typeof Mousetrap != 'undefined') {
+        Mousetrap.bind('shift+d', function(e) {
+            mQuery('#mautic_dashboard_index').click();
         });
-    })(mQuery);
-}
 
-if (typeof Mousetrap != 'undefined') {
-    Mousetrap.bind('shift+d', function(e) {
-        mQuery('#mautic_dashboard_index').click();
-    });
-
-    Mousetrap.bind('shift+right', function(e) {
-        mQuery('.navbar-right > button.navbar-toggle').click();
-    });
-}
+        Mousetrap.bind('shift+right', function(e) {
+            mQuery('.navbar-right > button.navbar-toggle').click();
+        });
+    }
+});
 
 //Fix for back/forward buttons not loading ajax content with History.pushState()
 MauticVars.manualStateChange = true;
@@ -308,11 +310,6 @@ var Mautic = {
 
         mQuery(container + " *[data-toggle='tooltip']").tooltip('destroy');
 
-        //unload tinymce editor so that it can be reloaded if needed with new ajax content
-        mQuery(container + " textarea[data-toggle='editor']").each(function (index) {
-            mQuery(this).tinymce().remove();
-        });
-
         //unload lingering modals from body so that there will not be multiple modals generated from new ajaxed content
         mQuery(container + " *[data-toggle='modal']").each(function (index) {
             var target = mQuery(this).attr('data-target');
@@ -449,31 +446,6 @@ var Mautic = {
             });
 
             MauticVars.iconClasses = {};
-        }
-    },
-
-    /**
-     * Opens or closes submenus in main navigation
-     * @param link
-     */
-    toggleSubMenu: function (link, event) {
-        if (mQuery(link).length) {
-            //get the parent li element
-            var parent = mQuery(link).parent();
-            var child = mQuery(parent).find("ul").first();
-            if (child.length) {
-                var toggle = event.target;
-
-                if (child.hasClass("subnav-closed")) {
-                    //open the submenu
-                    child.removeClass("subnav-closed").addClass("subnav-open");
-                    mQuery(toggle).removeClass("fa-angle-right").addClass("fa-angle-down");
-                } else if (child.hasClass("subnav-open")) {
-                    //close the submenu
-                    child.removeClass("subnav-open").addClass("subnav-closed");
-                    mQuery(toggle).removeClass("fa-angle-down").addClass("fa-angle-right");
-                }
-            }
         }
     },
 
@@ -771,45 +743,6 @@ var Mautic = {
 
         if (response.closeModal) {
             mQuery(target).modal('hide');
-        }
-    },
-
-    /**
-     * Show/hide side panels
-     * @param position
-     */
-    toggleSidePanel: function (position) {
-        //spring the right panel back into place after clicking elsewhere
-        if (position == "right") {
-            //toggle active state
-            mQuery(".page-wrapper").toggleClass("right-active");
-            //prevent firing event multiple times if directly toggling the panel
-            mQuery(".main-panel-wrapper").off("click");
-            mQuery(".main-panel-wrapper").click(function (e) {
-                e.preventDefault();
-                if (mQuery(".page-wrapper").hasClass("right-active")) {
-                    mQuery(".page-wrapper").removeClass("right-active");
-                }
-                //prevent firing event multiple times
-                mQuery(".main-panel-wrapper").off("click");
-            });
-
-            mQuery(".top-panel").off("click");
-            mQuery(".top-panel").click(function (e) {
-                if (!mQuery(e.target).parents('.panel-toggle').length) {
-                    //dismiss the panel if clickng anywhere in the top panel except the toggle button
-                    e.preventDefault();
-                    if (mQuery(".page-wrapper").hasClass("right-active")) {
-                        mQuery(".page-wrapper").removeClass("right-active");
-                    }
-                    //prevent firing event multiple times
-                    mQuery(".top-panel").off("click");
-                }
-            });
-
-        } else {
-            //toggle hidden state
-            mQuery(".page-wrapper").toggleClass("hide-left");
         }
     },
 

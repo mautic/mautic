@@ -27,7 +27,7 @@ class ProcessEmailQueueCommand extends ContainerAwareCommand
             ->setDescription('Processes SwiftMail\'s mail queue')
             ->addOption('--message-limit', null, InputOption::VALUE_OPTIONAL, 'Limit number of messages sent at a time. Defaults to value set in config.')
             ->addOption('--time-limit', null, InputOption::VALUE_OPTIONAL, 'Limit the number of seconds per batch. Defaults to value set in config.')
-            ->addOption('--do-not-clear', null, InputOption::VALUE_OPTIONAL, 'By default, failed messages older than the --recover-timeout setting will be attempted one more time then deleted if it fails again.  If this is set, sending of failed messages will continue to be attempted.')
+            ->addOption('--do-not-clear', null, InputOption::VALUE_NONE, 'By default, failed messages older than the --recover-timeout setting will be attempted one more time then deleted if it fails again.  If this is set, sending of failed messages will continue to be attempted.')
             ->addOption('--recover-timeout', null, InputOption::VALUE_OPTIONAL, 'Sets the amount of time in seconds before attempting to resend failed messages.  Defaults to value set in config.')
             ->addOption('--clear-timeout', null, InputOption::VALUE_OPTIONAL, 'Sets the amount of time in seconds before deleting failed messages.  Defaults to value set in config.');
     }
@@ -46,7 +46,7 @@ class ProcessEmailQueueCommand extends ContainerAwareCommand
             $timeout = $container->getParameter('mautic.mailer_spool_clear_timeout');
         }
 
-        if ($skipClear === null) {
+        if (!$skipClear) {
             //Swift mailer's send command does not handle failed messages well rather it will retry sending forever
             //so let's first handle emails stuck in the queue and remove them if necessary
             $transport = $this->getContainer()->get('swiftmailer.transport.real');

@@ -47,3 +47,12 @@ $container->setDefinition(
     )
 )
     ->addTag('kernel.event_subscriber');
+
+$container->setDefinition(
+    'mautic.lead.reportbundle.subscriber',
+    new Definition(
+        'Mautic\LeadBundle\EventListener\ReportSubscriber',
+        array(new Reference('mautic.factory'))
+    )
+)
+    ->addTag('kernel.event_subscriber');

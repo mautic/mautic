@@ -142,9 +142,9 @@ class GraphHelper
      *
      * @return array
      */
-    public static function mergeLineGraphData($graphData, $items, $unit, $dateName)
+    public static function mergeLineGraphData($graphData, $items, $unit, $dateName, $deltaName = null)
     {
-        // Group hits by date
+        // Group items by date
         foreach ($items as $item) {
             if (is_string($item[$dateName])) {
                 $item[$dateName] = new \DateTime($item[$dateName]);
@@ -152,12 +152,60 @@ class GraphHelper
 
             $oneItem = $item[$dateName]->format(self::getDateLabelFromat($unit));
             if (($itemKey = array_search($oneItem, $graphData['labels'])) !== false) {
-                $graphData['values'][$itemKey]++;
+                if ($deltaName) {
+                    $graphData['values'][$itemKey] += $item['delta'];
+                } else {
+                    $graphData['values'][$itemKey]++;
+                }
             }
         }
 
         $graphData['values'] = array_reverse($graphData['values']);
         $graphData['labels'] = array_reverse($graphData['labels']);
+
+        return $graphData;
+    }
+
+    /**
+     * Fills into Pie graph data values from database
+     *
+     * @param array  $data from database
+     *
+     * @return array
+     */
+    public static function preparePieGraphData($data)
+    {
+        $colors = self::$colors;
+        $graphData = array();
+        $i = 0;
+        $suma = 0;
+
+        foreach($data as $count) {
+            $suma += $count;
+        }
+
+        foreach($data as $label => $count) {
+
+            if (!isset($colors[$i])) {
+                $i = 0;
+            }
+
+            $percent = 0;
+
+            if ($suma > 0) {
+                $percent = $count / $suma * 100;
+            }
+            
+            $color = $colors[$i];
+            $graphData[] = array(
+                'label' => $label,
+                'color' => $colors[$i]['color'],
+                'highlight' => $colors[$i]['highlight'],
+                'value' => (int) $count,
+                'percent' => $percent
+            );
+            $i++;
+        }
 
         return $graphData;
     }

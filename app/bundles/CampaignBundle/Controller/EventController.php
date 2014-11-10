@@ -120,10 +120,8 @@ class EventController extends CommonFormController
 
             $passthroughVars['eventId']   = $keyId;
             $passthroughVars['eventHtml'] = $this->renderView($template, array(
-                'inForm' => true,
                 'event'  => $event,
                 'id'     => $keyId,
-                'level'  => 1
             ));
             $passthroughVars['eventType'] = $eventType;
         }
@@ -224,24 +222,41 @@ class EventController extends CommonFormController
                 'route'         => false
             );
 
-            //prevent undefined errors
-            $entity = new Event();
-            $blank  = $entity->convertToArray();
-            $event  = array_merge($blank, $event);
-
-            $template = (empty($event['settings']['template'])) ? 'MauticCampaignBundle:Event:generic.html.php'
-                : $event['settings']['template'];
-
-            $passthroughVars['eventId']   = $objectId;
-            $passthroughVars['eventHtml'] = $this->renderView($template, array(
-                'inForm' => true,
-                'event'  => $event,
-                'id'     => $objectId,
-                'level'  => 1
-            ));
-            $passthroughVars['eventType'] = $eventType;
-
             if ($closeModal) {
+                if ($success) {
+
+                    //prevent undefined errors
+                    $entity = new Event();
+                    $blank  = $entity->convertToArray();
+                    $event  = array_merge($blank, $event);
+
+                    $template = (empty($event['settings']['template'])) ? 'MauticCampaignBundle:Event:generic.html.php'
+                        : $event['settings']['template'];
+
+                    $passthroughVars['eventId']   = $objectId;
+                    $passthroughVars['updateHtml'] = $this->renderView($template, array(
+                        'event'  => $event,
+                        'id'     => $objectId,
+                        'update' => true
+                    ));
+                    $passthroughVars['eventType'] = $eventType;
+
+                    $translator = $this->factory->getTranslator();
+
+                    if ($event['triggerMode'] == 'interval') {
+                        $passthroughVars['label'] = $translator->trans('mautic.campaign.connection.trigger.interval.label', array(
+                            '%number%' => $event['triggerInterval'],
+                            '%unit%'   => $translator->transChoice('mautic.campaign.event.intervalunit.' . $event['triggerIntervalUnit'], $event['triggerInterval'])
+                        ));
+                    } elseif ($event['triggerMode'] == 'date') {
+                        /** @var \Mautic\CoreBundle\Templating\Helper\DateHelper $dh */
+                        $dh    = $this->container->get('mautic.core.template.helper.date');
+                        $passthroughVars['label'] = $translator->trans('mautic.campaign.connection.trigger.date.label', array(
+                            '%time%' => $dh->toTime($event['triggerDate']),
+                            '%date%' => $dh->toShort($event['triggerDate'])
+                        ));
+                    }
+                }
                 //just close the modal
                 $passthroughVars['closeModal'] = 1;
                 $response                      = new JsonResponse($passthroughVars);
@@ -361,11 +376,8 @@ class EventController extends CommonFormController
                 'route'         => false,
                 'eventId'       => $objectId,
                 'eventHtml'     => $this->renderView($template, array(
-                    'inForm'       => true,
                     'event'        => $event,
-                    'id'           => $objectId,
-                    'deleted'      => true,
-                    'level'        => $this->request->get('level', 1),
+                    'id'           => $objectId
                 ))
             );
         } else {

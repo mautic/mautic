@@ -22,11 +22,11 @@ class EventRepository extends CommonRepository
      *
      * @param $type
      * @param $campaigns
-     * @param $leadId
-     *
+     * @param $leadId           If included, only events that have not been triggered by the lead yet will be included
+     * @param $positivePathOnly If negative, all events including those with a negative path will be returned
      * @return array
      */
-    public function getPublishedByType($type, array $campaigns = null, $leadId = null)
+    public function getPublishedByType($type, array $campaigns = null, $leadId = null, $positivePathOnly = true)
     {
         $now = new \DateTime();
         $q = $this->createQueryBuilder('e')
@@ -65,6 +65,13 @@ class EventRepository extends CommonRepository
 
             $q->andWhere('e.id NOT IN('.$dq->getDQL().')')
                 ->setParameter('leadId', $leadId);
+        }
+
+        if ($positivePathOnly) {
+            $q->andWhere(
+                $q->expr()->neq('e.decisionPath', $q->expr()->literal('no'))
+            );
+
         }
 
         $results = $q->getQuery()->getArrayResult();
@@ -205,7 +212,7 @@ class EventRepository extends CommonRepository
      * Get a list of scheduled events
      *
      * @param mixed $campaignId
-     * @param \DateTime $date
+     * @param \DateTime $date   Defaults to events scheduled before now
      *
      * @return array
      */
@@ -242,7 +249,53 @@ class EventRepository extends CommonRepository
         $q->where($expr)
             ->setParameter('now', $date);
 
-        $results = $q->getQuery()->getResult();
+        $results = $q->getQuery()->getArrayResult();
+
+        return $results;
+    }
+
+    /**
+     * Find the negative events, i.e. the events with a no decision path that do not have a "yes" decision that's been triggered
+     *
+     * @param null $campaignId
+     */
+    public function getNegativePendingEvents($campaignId = null)
+    {
+        $now = new \DateTime();
+        $q = $this->createQueryBuilder('e')
+            ->select('c, e, ep, epp, l')
+            ->join('e.campaign', 'c')
+            ->leftJoin('c.leads', 'l')
+            ->leftJoin('e.parent', 'ep')
+            ->leftJoin('ep.parent', 'epp')
+            ->orderBy('e.order');
+
+        //make sure the published up and down dates are good
+        $expr = $this->getPublishedByDateExpression($q, 'c');
+
+        $q->where($expr)
+            ->setParameter('now', $now);
+
+        if (!empty($campaignId)) {
+            $q->andWhere($q->expr()->eq('c.id', ':campaign'))
+                ->setParameter('campaign', $campaignId);
+        }
+
+        //only the "no" decision path
+        $q->andWhere(
+            $q->expr()->eq('e.decisionPath', $q->expr()->literal('no'))
+        );
+
+        //only events that have not been fired yet
+        $dq = $this->_em->createQueryBuilder();
+        $dq->select('ellev.id')
+            ->from('MauticCampaignBundle:LeadEventLog', 'ell')
+            ->leftJoin('ell.event', 'ellev')
+            ->where('ellev.id = e.id');
+
+        $q->andWhere('e.id NOT IN('.$dq->getDQL().')');
+
+        $results = $q->getQuery()->getArrayResult();
 
         return $results;
     }
