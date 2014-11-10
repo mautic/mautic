@@ -50,21 +50,23 @@ class AjaxController extends CommonAjaxController
 
         $label = '';
         if (!$remove) {
-            $event      = $events[$target];
-            $translator = $this->factory->getTranslator();
+            $event = $events[$target];
+            if (isset($event['triggerMode'])) {
+                $translator = $this->factory->getTranslator();
 
-            if ($event['triggerMode'] == 'interval') {
-                $label = $translator->trans('mautic.campaign.connection.trigger.interval.label', array(
-                    '%number%' => $event['triggerInterval'],
-                    '%unit%'   => $translator->transChoice('mautic.campaign.event.intervalunit.' . $event['triggerIntervalUnit'], $event['triggerInterval'])
-                ));
-            } elseif ($event['triggerMode'] == 'date') {
-                /** @var \Mautic\CoreBundle\Templating\Helper\DateHelper $dh */
-                $dh    = $this->container->get('mautic.core.template.helper.date');
-                $label = $translator->trans('mautic.campaign.connection.trigger.date.label', array(
-                    '%time%' => $dh->toTime($event['triggerDate']),
-                    '%date%' => $dh->toShort($event['triggerDate'])
-                ));
+                if ($event['triggerMode'] == 'interval') {
+                    $label = $translator->trans('mautic.campaign.connection.trigger.interval.label', array(
+                        '%number%' => $event['triggerInterval'],
+                        '%unit%'   => $translator->transChoice('mautic.campaign.event.intervalunit.' . $event['triggerIntervalUnit'], $event['triggerInterval'])
+                    ));
+                } elseif ($event['triggerMode'] == 'date') {
+                    /** @var \Mautic\CoreBundle\Templating\Helper\DateHelper $dh */
+                    $dh    = $this->container->get('mautic.core.template.helper.date');
+                    $label = $translator->trans('mautic.campaign.connection.trigger.date.label', array(
+                        '%time%' => $dh->toTime($event['triggerDate']),
+                        '%date%' => $dh->toShort($event['triggerDate'])
+                    ));
+                }
             }
         }
 
