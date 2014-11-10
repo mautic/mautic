@@ -16,14 +16,14 @@
 
 .campaign-builder-active {
     background-color: #fff !important;
-    position: absolute !important;
+    position: fixed !important;
     top: 0 !important;
-    bottom: 0 !important;
     right: 0 !important;
     left: 0 !important;
     width: 100% !important;
-    height: 100% !important;
+    height: 10000px !important;
     z-index: 1030;
+    overflow-y: auto;
 }
 
 .campaign-builder-panel {
@@ -32,7 +32,6 @@
     bottom: 0;
     right: 0;
     width: 300px;
-    height: 100%;
     padding: 15px;
     background-color: #d5d4d4;
     overflow-y: auto;
@@ -46,14 +45,16 @@
     position: fixed;
     left: 0;
     top: 0;
-    right: 250px;
-    height: 100%;
-    position: fixed;
+    right: 300px;
+    height: auto;
+    width: auto;
+    bottom: 0;
+    overflow: auto;
 }
 
 #CampaignCanvas {
-    height: 1000px;
-    overflow-y: auto;
+    height: 10000px;
+    width: 10000px;
 }
 
 .campaign-builder-panel .panel a.btn {
