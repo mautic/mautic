@@ -179,6 +179,23 @@ class ReportSubscriber extends CommonSubscriber
             $event->setGraph('table', $graphData);
         }
 
+        if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.lead.table.top.cities') {
+            $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+            $event->buildWhere($queryBuilder);
+            $queryBuilder->select('l.city as title, count(l.city) as quantity')
+                ->groupBy('l.city')
+                ->orderBy('quantity', 'DESC');
+            $limit = 10;
+            $offset = 0;
+
+            $items = $pointLogRepo->getMostLeads($queryBuilder, $limit, $offset);
+            $graphData = array();
+            $graphData['data'] = $items;
+            $graphData['name'] = 'mautic.lead.table.top.cities';
+            $graphData['iconClass'] = 'fa-university';
+            $event->setGraph('table', $graphData);
+        }
+
         if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.lead.table.top.events') {
             $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
             $event->buildWhere($queryBuilder);
