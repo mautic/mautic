@@ -153,12 +153,29 @@ class ReportSubscriber extends CommonSubscriber
                 ->orderBy('points', 'DESC');
             $limit = 10;
             $offset = 0;
-            $items = $pointLogRepo->getMost($queryBuilder, $limit, $offset);
+            $items = $pointLogRepo->getMostPoints($queryBuilder, $limit, $offset);
             $graphData = array();
             $graphData['data'] = $items;
             $graphData['name'] = 'mautic.lead.table.most.points';
             $graphData['iconClass'] = 'fa-asterisk';
             $graphData['link'] = 'mautic_lead_action';
+            $event->setGraph('table', $graphData);
+        }
+
+        if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.lead.table.top.countries') {
+            $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+            $event->buildWhere($queryBuilder);
+            $queryBuilder->select('l.country as title, count(l.country) as quantity')
+                ->groupBy('l.country')
+                ->orderBy('quantity', 'DESC');
+            $limit = 10;
+            $offset = 0;
+
+            $items = $pointLogRepo->getMostLeads($queryBuilder, $limit, $offset);
+            $graphData = array();
+            $graphData['data'] = $items;
+            $graphData['name'] = 'mautic.lead.table.top.countries';
+            $graphData['iconClass'] = 'fa-globe';
             $event->setGraph('table', $graphData);
         }
 
@@ -170,7 +187,7 @@ class ReportSubscriber extends CommonSubscriber
                 ->orderBy('events', 'DESC');
             $limit = 10;
             $offset = 0;
-            $items = $pointLogRepo->getMost($queryBuilder, $limit, $offset);
+            $items = $pointLogRepo->getMostPoints($queryBuilder, $limit, $offset);
             $graphData = array();
             $graphData['data'] = $items;
             $graphData['name'] = 'mautic.lead.table.top.events';
@@ -186,7 +203,7 @@ class ReportSubscriber extends CommonSubscriber
                 ->orderBy('actions', 'DESC');
             $limit = 10;
             $offset = 0;
-            $items = $pointLogRepo->getMost($queryBuilder, $limit, $offset);
+            $items = $pointLogRepo->getMostPoints($queryBuilder, $limit, $offset);
             $graphData = array();
             $graphData['data'] = $items;
             $graphData['name'] = 'mautic.lead.table.top.actions';

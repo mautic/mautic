@@ -115,7 +115,7 @@ class PointsChangeLogRepository extends CommonRepository
     }
 
     /**
-     * Get table stat data
+     * Get table stat data from point log table
      *
      * @param QueryBuilder $query
      *
@@ -123,10 +123,30 @@ class PointsChangeLogRepository extends CommonRepository
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getMost($query, $limit = 10, $offset = 0)
+    public function getMostPoints($query, $limit = 10, $offset = 0)
     {
         $query->from(MAUTIC_TABLE_PREFIX.'lead_points_change_log', 'lp')
             ->leftJoin('lp', MAUTIC_TABLE_PREFIX.'leads', 'l', 'lp.lead_id = l.id')
+            ->setMaxResults($limit)
+            ->setFirstResult($offset);
+
+        $results = $query->execute()->fetchAll();
+        return $results;
+    }
+
+    /**
+     * Get table stat data from lead table
+     *
+     * @param QueryBuilder $query
+     *
+     * @return array
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function getMostLeads($query, $limit = 10, $offset = 0)
+    {
+        $query->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
+            ->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_points_change_log', 'lp', 'lp.lead_id = l.id')
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
