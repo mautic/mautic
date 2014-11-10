@@ -10,6 +10,7 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Helper\GraphHelper;
 use Doctrine\ORM\Query;
 
 /**
@@ -152,5 +153,61 @@ class PointsChangeLogRepository extends CommonRepository
 
         $results = $query->execute()->fetchAll();
         return $results;
+    }
+
+    /**
+     * Get pie graph data for gender ratio
+     *
+     * @param QueryBuilder $query
+     *
+     * @return array
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function getGenderRatio($query)
+    {
+        $results = array();
+        $results['males'] = $this->countValue(clone $query, 'l.gender', 'male');
+        $results['female'] = $this->countValue(clone $query, 'l.gender', 'female');
+
+        $colors = GraphHelper::$colors;
+        $graphData = array();
+        $i = 0;
+        foreach($results as $result => $count) {
+            if (!isset($colors[$i])) {
+                $i = 0;
+            }
+            $color = $colors[$i];
+            $graphData[] = array(
+                'label' => $result,
+                'color' => $colors[$i]['color'],
+                'highlight' => $colors[$i]['highlight'],
+                'value' => (int) $count
+            );
+            $i++;
+        }
+        return $graphData;
+    }
+
+    /**
+     * Count a value in a column
+     *
+     * @param QueryBuilder $query
+     *
+     * @return array
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function countValue($query, $column, $value)
+    {
+        $query->select('count(' . $column . ') as quantity')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
+            ->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_points_change_log', 'lp', 'lp.lead_id = l.id')
+            ->andwhere($query->expr()->eq($column, ':value'))
+            ->setParameter('value', $value);
+
+        $result = $query->execute()->fetch();
+
+        return $result['quantity'];
     }
 }
