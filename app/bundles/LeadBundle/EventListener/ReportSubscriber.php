@@ -145,5 +145,21 @@ class ReportSubscriber extends CommonSubscriber
             $event->setGraph('line', $timeStats);
         }
 
+        if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.lead.table.most.points') {
+            $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+            $event->buildWhere($queryBuilder);
+            $queryBuilder->select('l.id, l.email as title, sum(lp.delta) as points')
+                ->groupBy('l.id')
+                ->orderBy('points', 'DESC');
+            $limit = 10;
+            $offset = 0;
+            $items = $pointLogRepo->getMost($queryBuilder, $limit, $offset);
+            $graphData = array();
+            $graphData['data'] = $items;
+            $graphData['name'] = 'mautic.lead.table.most.points';
+            $graphData['iconClass'] = 'fa-asterisk';
+            $graphData['link'] = 'mautic_lead_action';
+            $event->setGraph('table', $graphData);
+        }
     }
 }

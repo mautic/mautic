@@ -113,4 +113,24 @@ class PointsChangeLogRepository extends CommonRepository
 
         return $query->getQuery()->getArrayResult();
     }
+
+    /**
+     * Get table stat data
+     *
+     * @param QueryBuilder $query
+     *
+     * @return array
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function getMost($query, $limit = 10, $offset = 0)
+    {
+        $query->from(MAUTIC_TABLE_PREFIX.'lead_points_change_log', 'lp')
+            ->leftJoin('lp', MAUTIC_TABLE_PREFIX.'leads', 'l', 'lp.lead_id = l.id')
+            ->setMaxResults($limit)
+            ->setFirstResult($offset);
+
+        $results = $query->execute()->fetchAll();
+        return $results;
+    }
 }
