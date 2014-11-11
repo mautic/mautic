@@ -55,7 +55,7 @@ $activePanelClasses  = ($app->getSession()->get('left-panel', 'default') == 'unp
         <!--/ end: app-wrapper -->
 
         <script>
-            Mautic.onPageLoad();
+            Mautic.onPageLoad('body');
             <?php if ($app->getEnvironment() === "dev"): ?>
 
             <?php endif; ?>

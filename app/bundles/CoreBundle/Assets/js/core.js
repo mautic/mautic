@@ -73,13 +73,7 @@ var Mautic = {
     /**
      * Initiate various functions on page load, manual or ajax
      */
-    onPageLoad: function (container, response, ignoreContentSpecificOnLoad) {
-        if (typeof ignoreContentSpecificOnLoad == 'undefined') {
-            var ignoreContentSpecificOnLoad = false;
-        }
-
-        container = typeof container !== 'undefined' ? container : 'body';
-
+    onPageLoad: function (container, response) {
         //initiate links
         mQuery(container + " a[data-toggle='ajax']").off('click.ajax');
         mQuery(container + " a[data-toggle='ajax']").on('click.ajax', function (event) {
@@ -248,11 +242,15 @@ var Mautic = {
         }
 
         //run specific on loads
-        if (!ignoreContentSpecificOnLoad) {
-            var contentSpecific = (response && response.mauticContent) ? response.mauticContent : mauticContent;
-            if (typeof Mautic[contentSpecific + "OnLoad"] == 'function') {
-                Mautic[contentSpecific + "OnLoad"](container, response);
-            }
+        var contentSpecific = false;
+        if (response && response.mauticContent) {
+            contentSpecific = response.mauticContent;
+        } else if (container == 'body') {
+            contentSpecific = mauticContent;
+        }
+
+        if (contentSpecific && typeof Mautic[contentSpecific + "OnLoad"] == 'function') {
+            Mautic[contentSpecific + "OnLoad"](container, response);
         }
 
         if (container == 'body') {
@@ -306,26 +304,33 @@ var Mautic = {
      */
     onPageUnload: function (container, response) {
         //unload tooltips so they don't double show
-        container = typeof container !== 'undefined' ? container : 'body';
+        if (typeof container != 'undefined') {
+            mQuery(container + " *[data-toggle='tooltip']").tooltip('destroy');
 
-        mQuery(container + " *[data-toggle='tooltip']").tooltip('destroy');
-
-        //unload lingering modals from body so that there will not be multiple modals generated from new ajaxed content
-        mQuery(container + " *[data-toggle='modal']").each(function (index) {
-            var target = mQuery(this).attr('data-target');
-            mQuery(target).remove();
-        });
-
-        mQuery(container + " *[data-toggle='ajaxmodal']").each(function (index) {
-            if (mQuery(this).attr('data-ignore-removemodal') != 'true') {
+            //unload lingering modals from body so that there will not be multiple modals generated from new ajaxed content
+            mQuery(container + " *[data-toggle='modal']").each(function (index) {
                 var target = mQuery(this).attr('data-target');
                 mQuery(target).remove();
-            }
-        });
+            });
+
+            mQuery(container + " *[data-toggle='ajaxmodal']").each(function (index) {
+                if (mQuery(this).attr('data-ignore-removemodal') != 'true') {
+                    var target = mQuery(this).attr('data-target');
+                    mQuery(target).remove();
+                }
+            });
+        }
 
         //run specific unloads
-        if (typeof Mautic[mauticContent + "OnUnload"] == 'function') {
-            Mautic[mauticContent + "OnUnload"](container, response);
+        var contentSpecific = false;
+        if (response && response.mauticContent) {
+            contentSpecific = response.mauticContent;
+        } else if (container == '#app-content') {
+            contentSpecific = mauticContent;
+        }
+
+        if (contentSpecific && typeof Mautic[contentSpecific + "OnUnload"] == 'function') {
+            Mautic[response.mauticContent + "OnUnload"](container, response);
         }
     },
 
@@ -335,12 +340,8 @@ var Mautic = {
      * @param link
      * @param method
      * @param target
-     * @param event
      */
-    loadContent: function (route, link, method, target, event) {
-        //keep browser backbutton from loading cached ajax response
-        //var ajaxRoute = route + ((/\?/i.test(route)) ? "&ajax=1" : "?ajax=1");
-
+    loadContent: function (route, link, method, target) {
         mQuery.ajax({
             url: route,
             type: method,
@@ -362,10 +363,6 @@ var Mautic = {
 
                         if (typeof response.activeLink === 'undefined' && link) {
                             response.activeLink = link;
-                        }
-
-                        if (mQuery(".page-wrapper").hasClass("right-active")) {
-                            mQuery(".page-wrapper").removeClass("right-active");
                         }
 
                         Mautic.processPageContent(response);
@@ -427,7 +424,7 @@ var Mautic = {
                 //set a timeout in case it doesn't get reset
                 setTimeout(function() {
                     Mautic.stopIconSpinPostEvent(identifierClass);
-                }, 5000);
+                }, 10000);
             }
         }
     },
@@ -480,25 +477,14 @@ var Mautic = {
      * Updates new content
      * @param response
      */
-    processPageContent: function (response, ignoreContentSpecificOnLoad) {
+    processPageContent: function (response) {
         if (response) {
             if (!response.target) {
                 response.target = '#app-content';
             }
 
-            //update type of content displayed
-            if (response.mauticContent) {
-                mauticContent = response.mauticContent;
-            }
-
             //inactive tooltips, etc
             Mautic.onPageUnload(response.target, response);
-
-            if (response.route) {
-                //update URL in address bar
-                MauticVars.manualStateChange = false;
-                History.pushState(null, "Mautic", response.route);
-            }
 
             //set content
             if (response.newContent) {
@@ -509,37 +495,48 @@ var Mautic = {
                 }
             }
 
-            window.setTimeout(function() {
-                mQuery("#flashes .alert").fadeTo(500, 0).slideUp(500, function(){
-                    mQuery(this).remove();
-                });
-            }, 7000);
-
-            if (response.activeLink) {
-                //remove current classes from menu items
-                mQuery(".side-panel-nav").find(".current").removeClass("current");
-
-                //remove ancestor classes
-                mQuery(".side-panel-nav").find(".current_ancestor").removeClass("current_ancestor");
-
-                var link = response.activeLink;
-                if (link !== undefined && link.charAt(0) != '#') {
-                    link = "#" + link;
+            if (response.target == '#app-content') {
+                if (response.route) {
+                    //update URL in address bar
+                    MauticVars.manualStateChange = false;
+                    History.pushState(null, "Mautic", response.route);
                 }
 
-                //add current class
-                var parent = mQuery(link).parent();
-                mQuery(parent).addClass("current");
+                //update type of content displayed
+                if (response.mauticContent) {
+                    mauticContent = response.mauticContent;
+                }
 
-                //add current_ancestor classes
-                mQuery(parent).parentsUntil(".side-panel-nav", "li").addClass("current_ancestor");
-            }
+                window.setTimeout(function () {
+                    mQuery("#flashes .alert").fadeTo(500, 0).slideUp(500, function () {
+                        mQuery(this).remove();
+                    });
+                }, 7000);
 
-            //scroll to the top
-            if (response.target == '#app-content') {
+                if (response.activeLink) {
+                    //remove current classes from menu items
+                    mQuery(".side-panel-nav").find(".current").removeClass("current");
+
+                    //remove ancestor classes
+                    mQuery(".side-panel-nav").find(".current_ancestor").removeClass("current_ancestor");
+
+                    var link = response.activeLink;
+                    if (link !== undefined && link.charAt(0) != '#') {
+                        link = "#" + link;
+                    }
+
+                    //add current class
+                    var parent = mQuery(link).parent();
+                    mQuery(parent).addClass("current");
+
+                    //add current_ancestor classes
+                    mQuery(parent).parentsUntil(".side-panel-nav", "li").addClass("current_ancestor");
+                }
+
                 mQuery('body').animate({
                     scrollTop: 0
                 }, 0);
+
             } else {
                 var overflow = mQuery(response.target).css('overflow');
                 var overflowY = mQuery(response.target).css('overflowY');
@@ -551,7 +548,7 @@ var Mautic = {
             }
 
             //activate content specific stuff
-            Mautic.onPageLoad(response.target, response, ignoreContentSpecificOnLoad);
+            Mautic.onPageLoad(response.target, response);
         }
 
         Mautic.stopIconSpinPostEvent();
@@ -662,7 +659,7 @@ var Mautic = {
             target = null;
         }
 
-        Mautic.loadContent(route, link, method, target, event);
+        Mautic.loadContent(route, link, method, target);
     },
 
     /**
@@ -734,9 +731,6 @@ var Mautic = {
         } else {
             mQuery(target + ' .modal-body').html(response.newContent);
         }
-
-        //inactive tooltips, etc
-        Mautic.onPageUnload(target, response);
 
         //activate content specific stuff
         Mautic.onPageLoad(target, response);
