@@ -123,6 +123,7 @@
                                 ));
                             elseif ($targetEvent['triggerMode'] == 'date'):
                                 $labelText = $view['translator']->trans('mautic.campaign.connection.trigger.date.label', array(
+                                    '%full%' => $view['date']->toFull($event['triggerDate']),
                                     '%time%' => $view['date']->toTime($targetEvent['triggerDate']),
                                     '%date%' => $view['date']->toShort($targetEvent['triggerDate'])
                                 ));

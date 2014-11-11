@@ -167,7 +167,7 @@ class CampaignController extends FormController
 
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'entity'      => $entity,
+                'campaign'    => $entity,
                 'page'        => $page,
                 'permissions' => $permissions,
                 'activePage'  => $activePage,

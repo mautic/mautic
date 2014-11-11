@@ -9,13 +9,13 @@
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'campaign');
-$view['slots']->set("headerTitle", $entity->getName());
+$view['slots']->set("headerTitle", $campaign->getName());
 ?>
 <?php
 $view['slots']->start('actions');
 if ($permissions['campaign:campaigns:edit']): ?>
     <a href="<?php echo $this->container->get('router')->generate(
-        'mautic_campaign_action', array("objectAction" => "edit", "objectId" => $entity->getId())); ?>"
+        'mautic_campaign_action', array("objectAction" => "edit", "objectId" => $campaign->getId())); ?>"
        data-toggle="ajax"
        data-menu-link="#mautic_campaign_index"
        class="btn btn-default">
@@ -25,11 +25,11 @@ if ($permissions['campaign:campaigns:edit']): ?>
 <?php if ($permissions['campaign:campaigns:delete']): ?><a href="javascript:void(0);"
    onclick="Mautic.showConfirmation(
        '<?php echo $view->escape($view["translator"]->trans("mautic.campaign.confirmdelete",
-       array("%name%" => $entity->getName() . " (" . $entity->getId() . ")")), 'js'); ?>',
+       array("%name%" => $campaign->getName() . " (" . $campaign->getId() . ")")), 'js'); ?>',
        '<?php echo $view->escape($view["translator"]->trans("mautic.core.form.delete"), 'js'); ?>',
        'executeAction',
        ['<?php echo $view['router']->generate('mautic_campaign_action',
-       array("objectAction" => "delete", "objectId" => $entity->getId())); ?>',
+       array("objectAction" => "delete", "objectId" => $campaign->getId())); ?>',
        '#mautic_campaign_index'],
        '<?php echo $view->escape($view["translator"]->trans("mautic.core.form.cancel"), 'js'); ?>','',[]);"
     class="btn btn-default">
@@ -37,9 +37,6 @@ if ($permissions['campaign:campaigns:edit']): ?>
 </a>
 <?php endif; ?>
 <?php $view['slots']->stop(); ?>
-
-<?php //@todo - output campaign details/actions ?>
-<!--@todo - output campaign details/actions-->
 
 <!-- start: box layout -->
 <div class="box-layout">
@@ -50,11 +47,25 @@ if ($permissions['campaign:campaigns:edit']): ?>
             <div class="pr-md pl-md pt-lg pb-lg">
                 <div class="box-layout">
                     <div class="col-xs-6 va-m">
-                        <h4 class="fw-sb">Super Awesome Campaign</h4>
-                        <p class="text-white dark-sm mb-0">Created on 7 Jan 2014</p>
+                        <p class="text-white dark-sm mb-0"><?php echo $campaign->getDescription(); ?></p>
                     </div>
                     <div class="col-xs-6 va-m text-right">
-                        <h4 class="fw-sb"><span class="label label-success">PUBLISH UP</span></h4>
+                        <?php
+                        $publishedStatus = $campaign->getPublishStatus();
+                        switch ($publishedStatus) {
+                            case 'published':
+                                $labelColor = "success";
+                                break;
+                            case 'unpublished':
+                            case 'expired'    :
+                                $labelColor = "danger";
+                                break;
+                            case 'pending':
+                                $labelColor = "warning";
+                                break;
+                        } ?>
+                        <?php $labelText = strtoupper($view['translator']->trans('mautic.core.form.' . $publishedStatus)); ?>
+                        <h4 class="fw-sb"><span class="label label-<?php echo $labelColor; ?>"><?php echo $labelText; ?></span></h4>
                     </div>
                 </div>
             </div>
@@ -65,28 +76,7 @@ if ($permissions['campaign:campaigns:edit']): ?>
                 <div class="pr-md pl-md pb-md">
                     <div class="panel shd-none mb-0">
                         <table class="table table-bordered table-striped mb-0">
-                            <tbody>
-                                <tr>
-                                    <td width="20%"><span class="fw-b">Description</span></td>
-                                    <td>Campaign description Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
-                                </tr>
-                                <tr>
-                                    <td width="20%"><span class="fw-b">Created By</span></td>
-                                    <td>Dan Counsell</td>
-                                </tr>
-                                <tr>
-                                    <td width="20%"><span class="fw-b">Category</span></td>
-                                    <td>Some category</td>
-                                </tr>
-                                <tr>
-                                    <td width="20%"><span class="fw-b">Publish Up</span></td>
-                                    <td>Mar 30, 2014</td>
-                                </tr>
-                                <tr>
-                                    <td width="20%"><span class="fw-b">Publish Down</span></td>
-                                    <td>Apr 10, 2014</td>
-                                </tr>
-                            </tbody>
+                            <?php echo $view->render('MauticCoreBundle:Helper:details.html.php', array('entity' => $campaign)); ?>
                         </table>
                     </div>
                 </div>
@@ -98,7 +88,7 @@ if ($permissions['campaign:campaigns:edit']): ?>
             <!-- campaign detail collapseable toggler -->
             <div class="hr-expand nm">
                 <span data-toggle="tooltip" title="Detail">
-                    <a href="javascript:void(0)" class="arrow" data-toggle="collapse" data-target="#campaign-details"><span class="caret"></span></a>
+                    <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse" data-target="#campaign-details"><span class="caret"></span>  <?php echo $view['translator']->trans('mautic.core.details'); ?></a>
                 </span>
             </div>
             <!--/ campaign detail collapseable toggler -->
