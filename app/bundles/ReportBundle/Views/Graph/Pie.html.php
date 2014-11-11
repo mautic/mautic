@@ -43,6 +43,9 @@
                         <?php if (isset($item['value'])) : ?>
                             <?php echo $item['value'] ?>x
                         <?php endif; ?>
+                        <?php if (isset($item['percent'])) : ?>
+                            (<?php echo round($item['percent'], 1) ?>%)
+                        <?php endif; ?>
                     </span>
                 <?php endforeach; ?>
             <?php endif; ?>
