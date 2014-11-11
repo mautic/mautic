@@ -16,10 +16,14 @@ CKEDITOR.editorConfig = function( config ) {
 
 	config.toolbar =
 	[
-		{ name: 'basicstyles', items : [ 'Bold','Italic' ] },
-		{ name: 'paragraph', items : [ 'NumberedList','BulletedList' ] },
-		{ name: 'clipboard', items : [ 'Cut', 'Copy', 'Paste','PasteText','PasteFromWord','-','Undo','Redo' ] },
-		{ name: 'insert', items : [ 'Image','Table' ] }
-	];
-
+        { name: 'basicstyles', items : [ 'Bold','Italic' ] },
+        { name: 'paragraph', items : [ 'NumberedList','BulletedList' ] },
+        { name: 'links', items : [ 'Link','Unlink','Anchor' ] },
+        { name: 'clipboard', items : [ 'Cut', 'Copy', 'Paste','PasteText','PasteFromWord','-','Undo','Redo' ] },
+        { name: 'insert', items : [ 'Image','Table' ] },
+        { name: 'tools', items : [ 'Sourcedialog' ] },
+        '/',
+        { name: 'styles', items : [ 'Styles','Format','Font','FontSize' ] },
+        { name: 'colors', items : [ 'TextColor','BGColor' ] }
+    ];
 };
