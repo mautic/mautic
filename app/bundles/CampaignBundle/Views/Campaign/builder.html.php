@@ -112,9 +112,10 @@
                         $useId = (strpos($targetId, 'new') === 0 && isset($tempEventIds[$targetId])) ? $tempEventIds[$targetId] : $targetId;
                         $source = "CampaignEvent_{$e['id']}";
                         $target = "CampaignEvent_{$useId}";
-                        $label  = "";
+                        $label  = '';
                         if (isset($campaignEvents[$useId])):
                             $targetEvent = $campaignEvents[$useId];
+                            $labelText   = '';
                             if ($targetEvent['triggerMode'] == 'interval'):
                                 $labelText = $view['translator']->trans('mautic.campaign.connection.trigger.interval.label', array(
                                     '%number%' => $targetEvent['triggerInterval'],
