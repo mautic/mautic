@@ -40,31 +40,31 @@ $view['slots']->set("headerTitle", $header.$subheader);
     </div>
     <div class="col-md-4">
         <?php echo $view['form']->end($form); ?>
-            <div class="hide email-builder">
-                <div class="email-builder-content">
-                    <input type="hidden" id="EmailBuilderUrl" value="<?php echo $view['router']->generate('mautic_email_action', array('objectAction' => 'builder', 'objectId' => $email->getSessionId())); ?>" />
-                </div>
-                <div class="email-builder-panel">
-                    <p>
-                        <button class="btn btn-primary btn-close-builder" onclick="Mautic.closeEmailEditor();"><?php echo $view['translator']->trans('mautic.email.builder.close'); ?></button>
-                    </p>
-                    <div class="well well-sm margin-md-top"><em><?php echo $view['translator']->trans('mautic.email.token.help'); ?></em></div>
-                    <div class="panel-group" id="email_tokens">
-                        <?php foreach ($tokens as $k => $t): ?>
-                        <?php $id = \Mautic\CoreBundle\Helper\InputHelper::alphanum($k); ?>
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h4 class="panel-title">
-                                    <?php echo $t['header']; ?>
-                                </h4>
-                            </div>
-                            <div class="panel-body">
-                                <?php echo $t['content']; ?>
-                            </div>
+        <div class="hide builder email-builder">
+            <div class="builder-content">
+                <input type="hidden" id="EmailBuilderUrl" value="<?php echo $view['router']->generate('mautic_email_action', array('objectAction' => 'builder', 'objectId' => $email->getSessionId())); ?>" />
+            </div>
+            <div class="builder-panel">
+                <p>
+                    <button type="button" class="btn btn-primary btn-close-builder" onclick="Mautic.closeEmailEditor();"><?php echo $view['translator']->trans('mautic.email.builder.close'); ?></button>
+                </p>
+                <div class="well well-sm margin-md-top"><em><?php echo $view['translator']->trans('mautic.email.token.help'); ?></em></div>
+                <div class="panel-group" id="email_tokens">
+                    <?php foreach ($tokens as $k => $t): ?>
+                    <?php $id = \Mautic\CoreBundle\Helper\InputHelper::alphanum($k); ?>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <?php echo $t['header']; ?>
+                            </h4>
                         </div>
-                        <?php endforeach; ?>
+                        <div class="panel-body">
+                            <?php echo $t['content']; ?>
+                        </div>
                     </div>
+                    <?php endforeach; ?>
                 </div>
             </div>
+        </div>
     </div>
 </div>

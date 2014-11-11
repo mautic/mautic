@@ -209,8 +209,8 @@ Mautic.updateCampaignEventLinks = function () {
 Mautic.launchCampaignEditor = function() {
     Mautic.stopIconSpinPostEvent();
 
-    mQuery('.campaign-builder').addClass('campaign-builder-active');
-    mQuery('.campaign-builder').removeClass('hide');
+    mQuery('.builder').addClass('builder-active');
+    mQuery('.builder').removeClass('hide');
 
     if (typeof Mautic.campaignBuilderInstance == 'undefined') {
         Mautic.campaignBuilderInstance = jsPlumb.getInstance({
@@ -415,7 +415,7 @@ Mautic.launchCampaignEditor = function() {
 
         Mautic.campaignBuilderInstance.setSuspendDrawing(false, true);
 
-        mQuery('.campaign-builder-content').scroll(function() {
+        mQuery('.builder-content').scroll(function() {
             Mautic.campaignBuilderInstance.repaintEverything();
         });
     } else {
@@ -447,7 +447,7 @@ Mautic.campaignToggleTimeframes = function() {
 };
 
 Mautic.closeCampaignBuilder = function() {
-    mQuery('.campaign-builder').addClass('hide');
+    mQuery('.builder').addClass('hide');
 };
 
 Mautic.submitCampaignEvent = function(e) {

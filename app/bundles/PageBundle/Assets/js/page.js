@@ -17,7 +17,7 @@ Mautic.pageOnLoad = function (container) {
 
 Mautic.pageUnLoad = function() {
     //remove page builder from body
-    mQuery('.page-builder').remove();
+    mQuery('.builder').remove();
 };
 
 Mautic.pageOnUnload = function(id) {
@@ -43,7 +43,7 @@ Mautic.launchPageEditor = function () {
         id: "builder-template-content"
     })
         .attr('src', src)
-        .appendTo('.page-builder-content')
+        .appendTo('.builder-content')
         .load(function () {
             var $this = mQuery(this);
             var contents = $this.contents();
@@ -69,17 +69,17 @@ Mautic.launchPageEditor = function () {
         });
 
     //make the panel full screen
-    mQuery('.page-builder').addClass('page-builder-active');
+    mQuery('.builder').addClass('builder-active');
     //show it
-    mQuery('.page-builder').removeClass('hide');
+    mQuery('.builder').removeClass('hide');
 
-    Mautic.pageEditorOnLoad('.page-builder-panel');
+    Mautic.pageEditorOnLoad('.builder-panel');
 };
 
 Mautic.closePageEditor = function() {
     Mautic.stopIconSpinPostEvent();
 
-    mQuery('.page-builder').addClass('hide');
+    mQuery('.builder').addClass('hide');
 
     //make sure editors have lost focus so the content is updated
     mQuery('#builder-template-content').contents().find('.mautic-editable').each(function (index) {
@@ -103,7 +103,7 @@ Mautic.pageEditorOnLoad = function (container) {
         iframeFix: true,
         iframeId: 'builder-template-content',
         helper: 'clone',
-        appendTo: '.page-builder',
+        appendTo: '.builder',
         zIndex: 8000,
         scroll: true,
         scrollSensitivity: 100,

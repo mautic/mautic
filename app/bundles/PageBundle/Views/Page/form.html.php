@@ -48,11 +48,11 @@ $view['slots']->set("headerTitle", $header.$subheader);
             </div>
         </div>
 
-        <div class="hide page-builder">
-            <div class="page-builder-content">
+        <div class="hide builder page-builder">
+            <div class="builder-content">
                 <input type="hidden" id="pageBuilderUrl" value="<?php echo $view['router']->generate('mautic_page_action', array('objectAction' => 'builder', 'objectId' => $activePage->getSessionId())); ?>" />
             </div>
-            <div class="page-builder-panel">
+            <div class="builder-panel">
                 <p>
                     <button type="button" class="btn btn-primary btn-close-builder" onclick="Mautic.closePageEditor();"><?php echo $view['translator']->trans('mautic.page.page.builder.close'); ?></button>
                 </p>

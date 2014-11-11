@@ -7,8 +7,8 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
-<div class="hide campaign-builder">
-    <div class="campaign-builder-content">
+<div class="hide builder campaign-builder">
+    <div class="builder-content">
         <div id="CampaignCanvas">
         <?php
         foreach ($campaignEvents as $event):
@@ -17,7 +17,7 @@
         ?>
         </div>
     </div>
-    <div class="campaign-builder-panel" id="CampaignEvents">
+    <div class="builder-panel" id="CampaignEvents">
         <p>
             <button type="button" class="btn btn-primary btn-close-builder" onclick="Mautic.closeCampaignBuilder();"><?php echo $view['translator']->trans('mautic.campaign.campaign.close.builder'); ?></button>
         </p>
