@@ -29,7 +29,7 @@ mQuery(document).ready( function() {
                 blur: function (event) {
                     var data = event.editor.getData();
 
-                    var request = mQuery.ajax({
+                    mQuery.ajax({
                         url: mauticAjaxUrl + '?action=page:setBuilderContent',
                         type: "POST",
                         data: {

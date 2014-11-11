@@ -14,7 +14,7 @@ $collection = new RouteCollection();
 
 $collection->add('mautic_formtoken_index', new Route('/forms/pagetokens/{page}',
     array(
-        '_controller' => 'MauticFormBundle:PageToken:index',
+        '_controller' => 'MauticFormBundle:SubscribedEvents\PageToken:index',
         'page'        => 1
     ),
     array(

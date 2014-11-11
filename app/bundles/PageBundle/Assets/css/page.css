@@ -13,7 +13,7 @@
 }
 .page-builder-active {
     background-color: #fff !important;
-    position: absolute !important;
+    position: fixed !important;
     top: 0 !important;
     bottom: 0 !important;
     right: 0 !important;
@@ -54,4 +54,8 @@
 
 .ui-draggable-iframeFix {
     z-index: 9999 !important;
+}
+
+[data-token] {
+    cursor: pointer;
 }

@@ -9,20 +9,9 @@
 $searchBtnClass = (!empty($searchValue)) ? "fa-eraser" : "fa-search";
 ?>
 <div class="input-group ma-5">
-    <input type="search"
-           class="form-control"
-           id="form-token-search" name="search"
-           placeholder="<?php echo $view['translator']->trans('mautic.core.form.search'); ?>"
-           value="<?php echo $searchValue; ?>"
-           autocomplete="off"
-           data-toggle="livesearch"
-           data-target="#form-page-tokens"
-           data-action="<?php echo $view['router']->generate('mautic_formtoken_index', array('page' => $page)); ?>"
-           data-overlay="false"
-        />
+    <input type="search" class="form-control" id="formTokenSearch" name="search" placeholder="<?php echo $view['translator']->trans('mautic.core.form.search'); ?>" value="<?php echo $searchValue; ?>" autocomplete="off" data-toggle="livesearch" data-target="#formTokens" data-action="<?php echo $view['router']->generate('mautic_formtoken_index', array('page' => $page)); ?>" />
     <div class="input-group-btn">
-        <button class="btn btn-default btn-search btn-filter"
-                data-livesearch-parent="form-token-search">
+        <button type="button" class="btn btn-default btn-search btn-filter" data-livesearch-parent="formTokenSearch">
             <i class="fa <?php echo $searchBtnClass; ?> fa-fw"></i>
         </button>
     </div>

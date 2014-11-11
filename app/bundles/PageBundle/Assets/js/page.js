@@ -5,12 +5,14 @@ Mautic.pageOnLoad = function (container) {
     }
 
     if (mQuery(container + ' form[name="page"]').length) {
+        //form view
        Mautic.activateCategoryLookup('page', 'page');
+    } else {
+        //list view
+        Mautic.renderPageViewsBarChart(container);
+        Mautic.renderPageReturningVisitsPie();
+        Mautic.renderPageTimePie();
     }
-
-    Mautic.renderPageViewsBarChart(container);
-    Mautic.renderPageReturningVisitsPie();
-    Mautic.renderPageTimePie();
 };
 
 Mautic.pageUnLoad = function() {
@@ -51,8 +53,10 @@ Mautic.launchPageEditor = function () {
                 drop: function (event, ui) {
                     var instance = mQuery(this).attr("id");
                     var editor   = document.getElementById('builder-template-content').contentWindow.CKEDITOR.instances;
-                    var token = mQuery(ui.draggable).find('input.page-token').val();
-                    editor[instance].insertText(token);
+                    var token    = mQuery(ui.draggable).data('token');
+                    if (token) {
+                        editor[instance].insertText(token);
+                    }
                     mQuery(this).removeClass('over-droppable');
                 },
                 over: function (e, ui) {
@@ -64,8 +68,6 @@ Mautic.launchPageEditor = function () {
             });
         });
 
-    //Append to body to break out of the main panel
-    mQuery('.page-builder').appendTo('body');
     //make the panel full screen
     mQuery('.page-builder').addClass('page-builder-active');
     //show it
@@ -87,19 +89,17 @@ Mautic.closePageEditor = function() {
     setTimeout( function() {
         //kill the draggables
         mQuery('#builder-template-content').contents().find('.mautic-editable').droppable('destroy');
-        mQuery("ul.draggable li").draggable('destroy');
+        mQuery("*[data-token]").draggable('destroy');
 
         //kill the iframe
         mQuery('#builder-template-content').remove();
 
-        //move the page builder back into form
-        mQuery('.page-builder').appendTo('.bundle-main-inner-wrapper');
     }, 3000);
 };
 
 Mautic.pageEditorOnLoad = function (container) {
     //activate builder drag and drop
-    mQuery(container + " ul.draggable li").draggable({
+    mQuery(container + " *[data-token]").draggable({
         iframeFix: true,
         iframeId: 'builder-template-content',
         helper: 'clone',

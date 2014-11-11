@@ -54,10 +54,10 @@ $view['slots']->set("headerTitle", $header.$subheader);
             </div>
             <div class="page-builder-panel">
                 <p>
-                    <button class="btn btn-primary btn-close-builder" onclick="Mautic.closePageEditor();"><?php echo $view['translator']->trans('mautic.page.page.builder.close'); ?></button>
+                    <button type="button" class="btn btn-primary btn-close-builder" onclick="Mautic.closePageEditor();"><?php echo $view['translator']->trans('mautic.page.page.builder.close'); ?></button>
                 </p>
                 <div class="well well-small"><?php echo $view['translator']->trans('mautic.page.page.token.help'); ?></div>
-                <div class="panel-group margin-sm-top" id="page_tokens">
+                <div class="panel-group margin-sm-top" id="pagetTokensPanel">
                     <?php foreach ($tokens as $k => $t): ?>
                     <?php $id = \Mautic\CoreBundle\Helper\InputHelper::alphanum($k); ?>
                     <div class="panel panel-default">
