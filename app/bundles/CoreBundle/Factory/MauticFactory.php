@@ -423,6 +423,11 @@ class MauticFactory
             $ip      = $request->server->get('REMOTE_ADDR');
         }
 
+        if (empty($ip)) {
+            //assume local as the ip is empty
+            $ip = '127.0.0.1';
+        }
+
         if (empty($ipAddress[$ip])) {
             $repo = $this->getEntityManager()->getRepository('MauticCoreBundle:IpAddress');
             $ipAddress = $repo->findOneByIpAddress($ip);
