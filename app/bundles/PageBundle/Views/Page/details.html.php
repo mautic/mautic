@@ -111,7 +111,7 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
             <div class="pa-md">
                 <div class="row">
                     <div class="col-md-4">
-                        <div class="panel ovf-h bg-auto bg-light-xs">
+                        <div class="panel ovf-h bg-auto bg-light-xs page-stat-charts">
                             <div class="panel-body box-layout">
                                 <div class="col-xs-8 va-m">
                                     <h5 class="dark-md fw-sb mb-xs">

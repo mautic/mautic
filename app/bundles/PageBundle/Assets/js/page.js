@@ -7,8 +7,8 @@ Mautic.pageOnLoad = function (container) {
     if (mQuery(container + ' form[name="page"]').length) {
         //form view
        Mautic.activateCategoryLookup('page', 'page');
-    } else {
-        //list view
+    } else if (mQuery(container + ' .page-stat-charts').length) {
+        //details view
         Mautic.renderPageViewsBarChart(container);
         Mautic.renderPageReturningVisitsPie();
         Mautic.renderPageTimePie();
