@@ -3993,7 +3993,7 @@ lesshat-selector {
 .ui-draggable-iframeFix {
   z-index: 9999 !important;
 }
-[data-token] {
+.builder [data-token] {
   cursor: pointer;
 }
 .chosen-select {

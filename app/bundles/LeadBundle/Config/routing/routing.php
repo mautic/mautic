@@ -12,6 +12,16 @@ use Symfony\Component\Routing\Route;
 
 $collection = new RouteCollection();
 
+$collection->add('mautic_lead_emailtoken_index', new Route('/leads/emailtokens/{page}',
+    array(
+        '_controller' => 'MauticLeadBundle:SubscribedEvents\EmailToken:index',
+        'page'        => 1
+    ),
+    array(
+        'page'    => '\d+'
+    )
+));
+
 $collection->add('mautic_leadlist_index', new Route('/leads/lists/{page}',
     array(
         '_controller' => 'MauticLeadBundle:List:index',

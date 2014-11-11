@@ -51,8 +51,10 @@ Mautic.launchEmailEditor = function () {
                 drop: function (event, ui) {
                     var instance = mQuery(this).attr("id");
                     var editor   = document.getElementById('builder-template-content').contentWindow.CKEDITOR.instances;
-                    var token = mQuery(ui.draggable).find('input.email-token').val();
-                    editor[instance].insertText(token);
+                    var token    = mQuery(ui.draggable).data('token');
+                    if (token) {
+                        editor[instance].insertText(token);
+                    }
                     mQuery(this).removeClass('over-droppable');
                 },
                 over: function (e, ui) {
@@ -85,7 +87,7 @@ Mautic.closeEmailEditor = function() {
     setTimeout( function() {
         //kill the draggables
         mQuery('#builder-template-content').contents().find('.mautic-editable').droppable('destroy');
-        mQuery("ul.draggable li").draggable('destroy');
+        mQuery("*[data-token]").draggable('destroy');
 
         //kill the iframe
         mQuery('#builder-template-content').remove();
@@ -95,12 +97,10 @@ Mautic.closeEmailEditor = function() {
 
 Mautic.emailEditorOnLoad = function (container) {
     //activate builder drag and drop
-    mQuery(container + " a[data-token]").draggable({
+    mQuery(container + " *[data-token]").draggable({
         iframeFix: true,
         iframeId: 'builder-template-content',
-        helper: function() {
-            return mQuery('<div><i class="fa fa-lg fa-crosshairs"></i></div>');
-        },
+        helper: 'clone',
         appendTo: '.builder',
         zIndex: 8000,
         scroll: true,

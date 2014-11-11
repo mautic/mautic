@@ -49,19 +49,16 @@ $view['slots']->set("headerTitle", $header.$subheader);
                     <button type="button" class="btn btn-primary btn-close-builder" onclick="Mautic.closeEmailEditor();"><?php echo $view['translator']->trans('mautic.email.builder.close'); ?></button>
                 </p>
                 <div class="well well-sm margin-md-top"><em><?php echo $view['translator']->trans('mautic.email.token.help'); ?></em></div>
-                <div class="panel-group" id="email_tokens">
+                <div class="panel-group margin-sm-top" id="pageTokensPanel">
                     <?php foreach ($tokens as $k => $t): ?>
-                    <?php $id = \Mautic\CoreBundle\Helper\InputHelper::alphanum($k); ?>
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h4 class="panel-title">
-                                <?php echo $t['header']; ?>
-                            </h4>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4 class="panel-title"><?php echo $t['header']; ?></h4>
+                            </div>
+                            <div class="panel-body">
+                                <?php echo $t['content']; ?>
+                            </div>
                         </div>
-                        <div class="panel-body">
-                            <?php echo $t['content']; ?>
-                        </div>
-                    </div>
                     <?php endforeach; ?>
                 </div>
             </div>

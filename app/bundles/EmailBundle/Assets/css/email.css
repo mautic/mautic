@@ -9,5 +9,16 @@
 }
 
 .email-builder .builder-panel .panel-body {
-    padding: 0;
+    padding: 5px 0;
+}
+
+.email-builder .btn-block.ui-draggable-dragging {
+    width: 104px;
+    height: 68px;
+    margin: 6px 12px;
+    white-space: normal;
+}
+
+.email-builder .list-group-item {
+    background-color: #fff;
 }

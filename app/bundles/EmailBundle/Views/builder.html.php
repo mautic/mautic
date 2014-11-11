@@ -51,7 +51,7 @@ $view['assets']->addScriptDeclaration($custom);
 $css = <<<CSS
 .mautic-editable { min-height: 75px; width: 100%; border: solid 1px #d5d4d4; margin-top: 3px; margin-bottom: 3px; }
 .mautic-content-placeholder { height: 100%; width: 100%; text-align: center; margin-top: 25px; }
-.mautic-editable.over-droppable { border: solid 1px #d5d4d4; }
+.mautic-editable.over-droppable { border: dashed 1px #4e5e9e; }
 div[contentEditable=true]:empty:not(:focus):before{ content:attr(data-placeholder) }
 CSS;
 $view['assets']->addStyleDeclaration($css);

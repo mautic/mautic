@@ -60,9 +60,9 @@ class PageTokenHelper
         }
 
         $request = $this->factory->getRequest();
-        $search  = $request->get('search', $session->get('mautic.formtoken.filter', ''));
+        $search  = $request->get('search', $session->get('mautic.form.pagetoken.filter', ''));
 
-        $session->set('mautic.formtoken.filter', $search);
+        $session->set('mautic.form.pagetoken.filter', $search);
 
         $filter = array('string' => $search, 'force' => array());
 
@@ -86,7 +86,7 @@ class PageTokenHelper
             } else {
                 $page = (floor($limit / $count)) ? : 1;
             }
-            $session->set('mautic.formtoken.page', $page);
+            $session->set('mautic.form.pagetoken.page', $page);
         }
 
         return $this->factory->getTemplating()->render('MauticFormBundle:SubscribedEvents\PageToken:list.html.php', array(

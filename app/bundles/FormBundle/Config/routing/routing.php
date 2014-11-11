@@ -12,7 +12,7 @@ use Symfony\Component\Routing\Route;
 
 $collection = new RouteCollection();
 
-$collection->add('mautic_formtoken_index', new Route('/forms/pagetokens/{page}',
+$collection->add('mautic_form_pagetoken_index', new Route('/forms/pagetokens/{page}',
     array(
         '_controller' => 'MauticFormBundle:SubscribedEvents\PageToken:index',
         'page'        => 1
