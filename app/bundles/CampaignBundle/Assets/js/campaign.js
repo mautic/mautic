@@ -55,10 +55,8 @@ Mautic.campaignOnLoad = function (container) {
 /**
  * Delete the builder instance so it's regenerated when reopening the campaign event builder
  */
-Mautic.campaignOnUnload = function() {
-    if (typeof Mautic.campaignBuilderInstance !== 'undefined') {
-        delete Mautic.campaignBuilderInstance;
-    }
+Mautic.campaignOnUnload = function(container) {
+    delete Mautic.campaignBuilderInstance;
 }
 
 /**

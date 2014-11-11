@@ -289,14 +289,17 @@ class CampaignModel extends CommonFormModel
      */
     private function buildOrder ($hierarchy, &$events, &$entity, $root = 'null', $order = 1)
     {
+        $count = count($hierarchy);
+
         foreach ($hierarchy as $eventId => $parent) {
-            if ($parent == $root) {
+            if ($parent == $root || $count === 1) {
                 $events[$eventId]->setOrder($order);
                 $entity->addEvent($eventId, $events[$eventId]);
 
                 unset($hierarchy[$eventId]);
-
-                $this->buildOrder($hierarchy, $events, $entity, $eventId, $order + 1);
+                if (count($hierarchy)) {
+                    $this->buildOrder($hierarchy, $events, $entity, $eventId, $order + 1);
+                }
             }
         }
     }
