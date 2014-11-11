@@ -11,8 +11,8 @@ namespace Mautic\MapperBundle\Model;
 
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel;
-use Mautic\MapperBundle\Entity\ApplicationClient;
-use Mautic\MapperBundle\Form\Type\ApplicationClientType;
+use Mautic\MapperBundle\Entity\ApplicationObjectMapper;
+use Mautic\MapperBundle\Form\Type\ApplicationObjectMapperType;
 
 /**
  * Class ApplicationClientModel
@@ -22,18 +22,18 @@ class ApplicationClientModel extends FormModel
 {
     public function getRepository()
     {
-        return $this->em->getRepository('MauticMapperBundle:ApplicationClient');
+        return $this->em->getRepository('MauticMapperBundle:ApplicationObjectMapper');
     }
 
     public function getNameGetter()
     {
-        return "getTitle";
+        return "getObjectName";
     }
 
     public function getPermissionBase()
     {
         $request = $this->factory->getRequest();
-        $bundle  = $request->get('application');
+        $bundle  = $request->get('bundle');
         return $bundle.':ApplicationClient';
     }
 

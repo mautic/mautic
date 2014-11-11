@@ -16,7 +16,7 @@ use Mautic\MapperBundle\Entity\ApplicationObjectMapper;
 use Mautic\MapperBundle\Entity\ApplicationObjectMapperRepository;
 use Mautic\MapperBundle\Helper\ApiHelper;
 
-abstract class AbstractIntegration
+abstract class AbstractMapper
 {
     protected $factory;
 

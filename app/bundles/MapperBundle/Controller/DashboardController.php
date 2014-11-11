@@ -29,14 +29,6 @@ class DashboardController extends CommonController
         $this->factory->getDispatcher()->dispatch(MapperEvents::FETCH_ICONS, $event);
         $applications = $event->getApplications();
 
-        /**
-         * @todo Debug
-         * @debug This ia debug
-         */
-        echo '<pre>';
-        print_r($applications);
-        die('@DEBUG '.__FILE__);
-
         return $this->delegateView(array(
             'viewParameters'  =>  array(
                 'applications' => $applications

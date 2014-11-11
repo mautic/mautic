@@ -20,4 +20,5 @@ final class MapperEvents
      * @var string
      */
     const FETCH_ICONS = 'mapper.on_fetch_icons';
+    const FORM_ON_BUILD = 'mapper.on_form_build';
 }

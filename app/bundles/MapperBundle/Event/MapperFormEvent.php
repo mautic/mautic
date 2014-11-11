@@ -13,16 +13,16 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Class MapperDashboardEvent
+ * Class MapperFormEvent
  *
- * @package Mautic\CoreBundle\Event
+ * @package Mautic\MapperBundle\Event
  */
-class MapperDashboardEvent extends Event
+class MapperFormEvent extends Event
 {
     /**
      * @var
      */
-    protected $applications = array();
+    protected $fields = array();
 
     protected $security;
 
@@ -44,9 +44,9 @@ class MapperDashboardEvent extends Event
     /**
      * Add icon
      */
-    public function addApplication($config)
+    public function addField($config)
     {
-        $this->applications[] = $config;
+        $this->fields[] = $config;
     }
 
     /**
@@ -54,8 +54,8 @@ class MapperDashboardEvent extends Event
      *
      * @return mixed
      */
-    public function getApplications()
+    public function getFields()
     {
-        return $this->applications;
+        return $this->fields;
     }
 }
