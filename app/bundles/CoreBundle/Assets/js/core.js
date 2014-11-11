@@ -495,13 +495,13 @@ var Mautic = {
                 }
             }
 
-            if (response.target == '#app-content') {
-                if (response.route) {
-                    //update URL in address bar
-                    MauticVars.manualStateChange = false;
-                    History.pushState(null, "Mautic", response.route);
-                }
+            if (response.route) {
+                //update URL in address bar
+                MauticVars.manualStateChange = false;
+                History.pushState(null, "Mautic", response.route);
+            }
 
+            if (response.target == '#app-content') {
                 //update type of content displayed
                 if (response.mauticContent) {
                     mauticContent = response.mauticContent;

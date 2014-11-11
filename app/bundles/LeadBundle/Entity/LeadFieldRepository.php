@@ -33,6 +33,7 @@ class LeadFieldRepository extends CommonRepository
             ->from('MauticLeadBundle:LeadField', 'f', 'f.alias');
 
         $this->buildClauses($q, $args);
+
         $query = $q->getQuery();
 
         if (isset($args['hydration_mode'])) {
@@ -100,6 +101,16 @@ class LeadFieldRepository extends CommonRepository
         return array(
             $expr,
             array("$unique" => $string)
+        );
+    }
+
+    /**
+     * @return string
+     */
+    protected function getDefaultOrder()
+    {
+        return array(
+            array('f.order', 'ASC')
         );
     }
 }
