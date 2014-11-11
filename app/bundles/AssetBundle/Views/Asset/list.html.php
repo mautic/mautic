@@ -40,7 +40,7 @@ $view->extend('MauticAssetBundle:Asset:index.html.php');
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'asset',
-                    'orderBy'    => 'a.author',
+                    'orderBy'    => 'a.createdByUser',
                     'text'       => 'mautic.asset.asset.thead.author',
                     'class'      => 'visible-md visible-lg col-asset-author'
                 ));
@@ -108,7 +108,7 @@ $view->extend('MauticAssetBundle:Asset:index.html.php');
                             $view['translator']->trans('mautic.core.form.uncategorized'); ?>
                         <span><?php echo $catName; ?></span>
                     </td>
-                    <td class="visible-md visible-lg"><?php echo $item->getAuthor(); ?></td>
+                    <td class="visible-md visible-lg"><?php echo $item->getCreatedByUser(); ?></td>
                     <td class="visible-md visible-lg"><?php echo $item->getLanguage(); ?></td>
                     <td class="visible-md visible-lg"><?php echo $item->getDownloadCount(); ?></td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>

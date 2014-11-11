@@ -86,14 +86,6 @@ class Asset extends FormEntity
     private $alias;
 
     /**
-     * @ORM\Column(name="author", type="string", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"assetDetails"})
-     */
-    private $author;
-
-    /**
      * @ORM\Column(name="lang", type="string")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
@@ -427,30 +419,6 @@ class Asset extends FormEntity
     public function getCategory()
     {
         return $this->category;
-    }
-
-    /**
-     * Set author
-     *
-     * @param string $author
-     * @return Asset
-     */
-    public function setAuthor($author)
-    {
-        $this->isChanged('author', $author);
-        $this->author = $author;
-
-        return $this;
-    }
-
-    /**
-     * Get author
-     *
-     * @return string
-     */
-    public function getAuthor()
-    {
-        return $this->author;
     }
 
     /**

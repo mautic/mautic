@@ -80,10 +80,7 @@ class PageModel extends FormModel
         $now = new \DateTime();
 
         //set the author for new pages
-        if ($entity->isNew()) {
-            $user = $this->factory->getUser();
-            $entity->setAuthor($user->getName());
-        } else {
+        if (!$entity->isNew()) {
             //increase the revision
             $revision = $entity->getRevision();
             $revision++;

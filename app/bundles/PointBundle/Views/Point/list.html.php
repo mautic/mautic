@@ -71,11 +71,7 @@ $view->extend('MauticPointBundle:Point:index.html.php');
                         'item'       => $item,
                         'model'      => 'point'
                     )); ?>
-                    <a href="<?php echo $view['router']->generate('mautic_point_action',
-                        array("objectAction" => "edit", "objectId" => $item->getId())); ?>"
-                       data-toggle="ajax">
-                        <?php echo $item->getName(); ?>
-                    </a>
+                    <?php echo $item->getName(); ?>
                 </td>
                 <td class="visible-md visible-lg"><?php echo $item->getDescription(); ?></td>
                 <?php

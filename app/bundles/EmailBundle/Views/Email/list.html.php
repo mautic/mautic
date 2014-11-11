@@ -34,7 +34,7 @@ $view->extend('MauticEmailBundle:Email:index.html.php');
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'email',
-                    'orderBy'    => 'e.author',
+                    'orderBy'    => 'e.createdByUser',
                     'text'       => 'mautic.email.thead.author',
                     'class'      => 'visible-md visible-lg col-email-author'
                 ));
@@ -139,7 +139,7 @@ $view->extend('MauticEmailBundle:Email:index.html.php');
                             $view['translator']->trans('mautic.core.form.uncategorized'); ?>
                         <span><?php echo $catName; ?></span>
                     </td>
-                    <td class="visible-md visible-lg"><?php echo $item->getAuthor(); ?></td>
+                    <td class="visible-md visible-lg"><?php echo $item->getCreatedByUser(); ?></td>
                     <td class="visible-md visible-lg"><?php echo $item->getLanguage(); ?></td>
                     <td class="visible-md visible-lg"><?php echo $item->getSentCount(); ?></td>
                     <td class="visible-md visible-lg"><?php echo $item->getReadCount(); ?></td>

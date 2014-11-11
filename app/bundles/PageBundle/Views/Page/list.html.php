@@ -41,7 +41,7 @@ $view->extend('MauticPageBundle:Page:index.html.php');
 
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                         'sessionVar' => 'page',
-                        'orderBy'    => 'p.author',
+                        'orderBy'    => 'p.createdByUser',
                         'text'       => 'mautic.page.page.thead.author',
                         'class'      => 'visible-md visible-lg col-page-author'
                     ));
@@ -126,7 +126,7 @@ $view->extend('MauticPageBundle:Page:index.html.php');
                                 $view['translator']->trans('mautic.core.form.uncategorized'); ?>
                             <span><?php echo $catName; ?></span>
                         </td>
-                        <td class="visible-md visible-lg"><?php echo $item->getAuthor(); ?></td>
+                        <td class="visible-md visible-lg"><?php echo $item->getCreatedByUser(); ?></td>
                         <td class="visible-md visible-lg"><?php echo $item->getLanguage(); ?></td>
                         <td class="visible-md visible-lg"><?php echo $item->getHits(); ?></td>
                         <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>

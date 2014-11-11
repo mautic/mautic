@@ -85,7 +85,9 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                 <div class="pr-md pl-md pb-md">
                     <div class="panel shd-none mb-0">
                         <table class="table table-bordered table-striped mb-0">
-                            <?php echo $view->render('MauticCoreBundle:Helper:details.html.php', array('entity' => $activePage)); ?>
+                            <tbody>
+                                <?php echo $view->render('MauticCoreBundle:Helper:details.html.php', array('entity' => $activePage)); ?>
+                            </tbody>
                         </table>
                     </div>
                 </div>
