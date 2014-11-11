@@ -166,7 +166,7 @@ class EventModel extends CommonFormModel
             $leadCampaigns = $campaignModel->getLeadCampaigns($lead, true);
         }
 
-        //get the list of events for the triggering event
+        //get the list of events that match the triggering event and is in the campaigns this lead belongs to
         /** @var \Mautic\CampaignBundle\Entity\EventRepository $eventRepo */
         $eventRepo = $this->getRepository();
         if (empty($eventList[$type])) {
@@ -424,14 +424,14 @@ class EventModel extends CommonFormModel
                         $fromDate = $lead['dateAdded'];
                     } else {
                         if (!isset($leadsEvents[$grandparent['id']])) {
-                            $logger->debug('CAMPAIGN: grandparent (ID# ' . $grandparent['id'] . ') for ID# ' . $event['id'] . ' has not been triggered; continue');
+                            $logger->debug('CAMPAIGN: grandparent ID# ' . $grandparent['id'] . ' <- parent ID# ' . $event['parent']['id'] . ' <- ID# ' . $event['id'] . ' has not been triggered; continue');
                             continue;
                         }
 
                         $grandparentLog = $leadsEvents[$grandparent['id']]['log'][0];
                         if ($grandparentLog['isScheduled']) {
                             //this event has a parent that is scheduled and thus not triggered
-                            $logger->debug('CAMPAIGN: grandparent (ID# ' . $grandparent['id'] . ') for ID# ' . $event['id'] . ' is scheduled; continue');
+                            $logger->debug('CAMPAIGN: grandparent ID# ' . $grandparent['id'] . ' <- parent ID# ' . $event['parent']['id'] . ' <- ID# ' . $event['id'] . ' is scheduled; continue');
                             continue;
                         } else {
                             $fromDate = $grandparentLog['dateTriggered'];
@@ -564,15 +564,20 @@ class EventModel extends CommonFormModel
             }
 
             $dv = new \DateInterval($dt);
-            $triggerOn->add($dv);
 
             if ($negate) {
                 //if the set interval has passed since the parent event was triggered, then return true to trigger
                 //the event; otherwise false to do nothing
-                return ($triggerOn >= $now) ? true : false;
-            } elseif ($triggerOn > $now) {
-                //the event is to be scheduled based on the time interval
-                return $triggerOn;
+                $now->sub($dv);
+
+                return ($now >= $triggerOn) ? true : false;
+            } else {
+                $triggerOn->add($dv);
+
+                if ($triggerOn > $now) {
+                    //the event is to be scheduled based on the time interval
+                    return $triggerOn;
+                }
             }
         } elseif ($action['triggerMode'] == 'date') {
             $pastDue = $action['triggerDate'] >= $now;
