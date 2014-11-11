@@ -85,28 +85,7 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                 <div class="pr-md pl-md pb-md">
                     <div class="panel shd-none mb-0">
                         <table class="table table-bordered table-striped mb-0">
-                            <tbody>
-                                <tr>
-                                    <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.core.created'); ?></span></td>
-                                    <td><?php echo $view['date']->toDate($activePage->getDateAdded()); ?></td>
-                                </tr>
-                                <tr>
-                                    <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.core.author'); ?></span></td>
-                                    <td><?php echo $activePage->getAuthor(); ?></td>
-                                </tr>
-                                <tr>
-                                    <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.core.category'); ?></span></td>
-                                    <td><?php echo is_object($activePage->getCategory()) ? $activePage->getCategory()->getTitle() : ''; ?></td>
-                                </tr>
-                                <tr>
-                                    <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.page.page.publish.up'); ?></span></td>
-                                    <td><?php echo (!is_null($activePage->getPublishUp())) ? $view['date']->toFull($activePage->getPublishUp()) : ''; ?></td>
-                                </tr>
-                                <tr>
-                                    <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.page.page.publish.down'); ?></span></td>
-                                    <td><?php echo (!is_null($activePage->getPublishDown())) ? $view['date']->toFull($activePage->getPublishDown()) : ''; ?></td>
-                                </tr>
-                            </tbody>
+                            <?php echo $view->render('MauticCoreBundle:Helper:details.html.php', array('entity' => $activePage)); ?>
                         </table>
                     </div>
                 </div>
@@ -118,7 +97,7 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
             <!-- page detail collapseable toggler -->
             <div class="hr-expand nm">
                 <span data-toggle="tooltip" title="Detail">
-                    <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse" data-target="#page-details"><span class="caret"></span> <?php echo $view['translator']->trans('mautic.page.page.details'); ?></a>
+                    <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse" data-target="#page-details"><span class="caret"></span> <?php echo $view['translator']->trans('mautic.core.details'); ?></a>
                 </span>
             </div>
             <!--/ page detail collapseable toggler -->
