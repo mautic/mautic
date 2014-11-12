@@ -169,21 +169,7 @@ Mautic.updateReportGraph = function(element, options) {
 
 Mautic.renderLineGraph = function (canvas, chartData) {
     var options = {};
-    var data = {
-	    labels: chartData.labels,
-	    datasets: [
-	        {
-	            fillColor: "rgba(151,187,205,0.2)",
-	            strokeColor: "rgba(151,187,205,1)",
-	            pointColor: "rgba(151,187,205,1)",
-	            pointStrokeColor: "#fff",
-	            pointHighlightFill: "#fff",
-	            pointHighlightStroke: "rgba(151,187,205,1)",
-	            data: chartData.values
-	        }
-	    ]
-	};
-    return new Chart(canvas).Line(data, options);
+    return new Chart(canvas).Line(chartData, options);
 };
 
 Mautic.renderPieGraph = function (canvas, chartData) {

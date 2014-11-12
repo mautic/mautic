@@ -19,16 +19,20 @@ class GraphHelper
     public static $colors = array(
         array(
             'color' => '#4E5D9D',
-            'highlight' => '#353F6A'),
+            'highlight' => '#353F6A',
+            'fill' => 'rgba(78, 93, 157, 0.2)'),
         array(
             'color' => '#00b49c',
-            'highlight' => '#007A69'),
+            'highlight' => '#007A69',
+            'fill' => 'rgba(0, 180, 156, 0.2)'),
         array(
             'color' => '#fd9572',
-            'highlight' => '#D53601'),
+            'highlight' => '#D53601',
+            'fill' => 'rgba(253, 149, 114, 0.2)'),
         array(
             'color' => '#fdb933',
-            'highlight' => '#D98C0A')
+            'highlight' => '#D98C0A',
+            'fill' => 'rgba(253, 185, 51, 0.2)')
     );
 
     /**
@@ -106,7 +110,7 @@ class GraphHelper
      *
      * @return array
      */
-    public static function prepareLineGraphData($amount = 30, $unit = 'D')
+    public static function prepareLineGraphData($amount = 30, $unit = 'D', $datasetLabels = array('Dataset 1'))
     {
         $isTime = '';
 
@@ -118,13 +122,33 @@ class GraphHelper
 
         $date = new \DateTime();
         $oneUnit = new \DateInterval('P'.$isTime.'1'.$unit);
-        $data = array('labels' => array(), 'values' => array());
+        $data = array('labels' => array(), 'datasets' => array());
+        $i = 0;
 
         // Prefill $data arrays
-        for ($i = 0; $i < $amount; $i++) {
-            $data['labels'][$i] = $date->format($format);
-            $data['values'][$i] = 0;
-            $date->sub($oneUnit);
+        foreach ($datasetLabels as $key => $label) {
+            if (!isset(self::$colors[$i])) {
+                $i = 0;
+            }
+
+            $data['datasets'][$key] = array(
+                'label' => $label,
+                'fillColor' => self::$colors[$i]['fill'],
+                'strokeColor' => self::$colors[$i]['highlight'],
+                'pointColor' => self::$colors[$i]['highlight'],
+                'pointStrokeColor' => '#fff',
+                'pointHighlightFill' => '#fff',
+                'pointHighlightStroke' => self::$colors[$i]['highlight'],
+                'data' => array()
+            );
+            $i++;
+            for ($i = 0; $i < $amount; $i++) {
+                if ($key === 0) {
+                    $data['labels'][$i] = $date->format($format);
+                    $date->sub($oneUnit);
+                }
+                $data['datasets'][$key]['data'][$i] = 0;
+            }
         }
 
         $data['fromDate'] = $date;
@@ -142,9 +166,20 @@ class GraphHelper
      *
      * @return array
      */
-    public static function mergeLineGraphData($graphData, $items, $unit, $dateName, $deltaName = null)
+    public static function mergeLineGraphData($graphData, $items, $unit, $dateName, $deltaName = null, $average = false)
     {
-        // Group items by date
+        $datasetKey = 0;
+
+        foreach ($graphData['datasets'] as $key => $dataset) {
+            if ($dataset['label'] == $dateName) {
+                $datasetKey = $key;
+            }
+        }
+
+        if ($average) {
+            $graphData['datasets'][$datasetKey]['count'] = array();
+        }
+
         foreach ($items as $item) {
             if (is_string($item[$dateName])) {
                 $item[$dateName] = new \DateTime($item[$dateName]);
@@ -153,15 +188,34 @@ class GraphHelper
             $oneItem = $item[$dateName]->format(self::getDateLabelFromat($unit));
             if (($itemKey = array_search($oneItem, $graphData['labels'])) !== false) {
                 if ($deltaName) {
-                    $graphData['values'][$itemKey] += $item['delta'];
+                    if ($average) {
+                        if (isset($graphData['datasets'][$datasetKey]['count'][$itemKey])) {
+                            $graphData['datasets'][$datasetKey]['count'][$itemKey]++;
+                        } else {
+                            $graphData['datasets'][$datasetKey]['count'][$itemKey] = 1;
+                        }
+                    }
+                    $graphData['datasets'][$datasetKey]['data'][$itemKey] += $item[$deltaName];
                 } else {
-                    $graphData['values'][$itemKey]++;
+                    $graphData['datasets'][$datasetKey]['data'][$itemKey]++;
                 }
             }
         }
 
-        $graphData['values'] = array_reverse($graphData['values']);
-        $graphData['labels'] = array_reverse($graphData['labels']);
+        if ($average) {
+            foreach ($graphData['datasets'][$datasetKey]['data'] as $key => $value) {
+                if (isset($graphData['datasets'][$datasetKey]['count'][$key]) && $graphData['datasets'][$datasetKey]['count'][$key]) {
+                    $graphData['datasets'][$datasetKey]['data'][$key] /= $graphData['datasets'][$datasetKey]['count'][$key];
+                }
+            }
+        }
+
+        $graphData['datasets'][$datasetKey]['data'] = array_reverse($graphData['datasets'][$datasetKey]['data']);
+            
+        
+        if ($datasetKey === 0) {
+            $graphData['labels'] = array_reverse($graphData['labels']);
+        }
 
         return $graphData;
     }
