@@ -11,7 +11,7 @@ $searchBtnClass = (!empty($searchValue)) ? "fa-eraser" : "fa-search";
 <div class="input-group ma-5">
     <input type="search" class="form-control" id="leadEmailTokenSearch" name="search" placeholder="<?php echo $view['translator']->trans('mautic.core.form.search'); ?>" value="<?php echo $searchValue; ?>" autocomplete="off" data-toggle="livesearch" data-target="#leadEmailTokens" data-action="<?php echo $view['router']->generate('mautic_lead_emailtoken_index', array('page' => $page)); ?>" />
     <div class="input-group-btn">
-        <button type="button" class="btn btn-default btn-search btn-filter" data-livesearch-parent="leadEmailTokenSearch">
+        <button type="button" class="btn btn-default btn-search btn-filter btn-nospin" data-livesearch-parent="leadEmailTokenSearch">
             <i class="fa <?php echo $searchBtnClass; ?> fa-fw"></i>
         </button>
     </div>
