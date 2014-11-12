@@ -39,6 +39,9 @@ class AuditLogSubscriber extends CommonSubscriber
     {
         $lead = $event->getLead();
 
+        $filter = $event->getEventFilter();
+        $loadAllEvents = !isset($filter[0]);
+
         /** @var \Mautic\CoreBundle\Model\AuditLogModel $model */
         $model = $this->factory->getModel('core.auditLog');
         $rows  = $model->getEntities(array(
@@ -66,8 +69,15 @@ class AuditLogSubscriber extends CommonSubscriber
         // Add the entries to the event array
         /** @var \Mautic\CoreBundle\Entity\AuditLog $row */
         foreach ($rows as $row) {
+            $eventTypeKey      = 'lead.' . $row->getAction();
+            $eventFilterExists = in_array($eventTypeKey, $filter);
+
+            if (!$loadAllEvents && !$eventFilterExists) {
+                continue;
+            }
+
             $event->addEvent(array(
-                'event'     => 'lead.' . $row->getAction(),
+                'event'     => $eventTypeKey,
                 'timestamp' => $row->getDateAdded(),
                 'extra'     => array(
                     'details' => $row->getDetails(),
