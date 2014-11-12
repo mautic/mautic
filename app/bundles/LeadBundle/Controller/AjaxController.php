@@ -177,10 +177,10 @@ class AjaxController extends CommonAjaxController
      */
     protected function updateTimelineAction (Request $request)
     {
-        $dataArray      = array('success' => 0);
-        $filters        = InputHelper::clean($request->request->get('eventFilters'));
-        $search         = InputHelper::clean($request->request->get('search'));
-        $leadId         = InputHelper::int($request->request->get('leadId'));
+        $dataArray = array('success' => 0);
+        $filters   = InputHelper::clean($request->request->get('eventFilters'));
+        $search    = InputHelper::clean($request->request->get('search'));
+        $leadId    = InputHelper::int($request->request->get('leadId'));
 
         if (!empty($leadId)) {
             //find the lead
@@ -191,14 +191,7 @@ class AjaxController extends CommonAjaxController
 
                 $session = $this->factory->getSession();
 
-                // Set which events to load. Empty array == all.
-                $eventFilter = $session->get('mautic.lead.' . $leadId . '.timeline.filter');
-
-                if ($filters) {
-                    $eventFilter = $filters;
-                } else {
-                    $eventFilter = array();
-                }
+                $eventFilter = ($filters) ? $filters : array();
 
                 $session->set('mautic.lead.' . $leadId . '.timeline.filter', $eventFilter);
 
@@ -206,10 +199,10 @@ class AjaxController extends CommonAjaxController
 
                 // Trigger the TIMELINE_ON_GENERATE event to fetch the timeline events from subscribed bundles
                 $dispatcher = $this->factory->getDispatcher();
-                $event = new LeadTimelineEvent($lead, $eventFilter);
+                $event      = new LeadTimelineEvent($lead, $eventFilter);
                 $dispatcher->dispatch(LeadEvents::TIMELINE_ON_GENERATE, $event);
 
-                $events = $event->getEvents();
+                $events     = $event->getEvents();
                 $eventTypes = $event->getEventTypes();
 
                 $event = new IconEvent($this->factory->getSecurity());
@@ -217,14 +210,16 @@ class AjaxController extends CommonAjaxController
                 $icons = $event->getIcons();
 
                 $timeline = $this->renderView('MauticLeadBundle:Lead:history.html.php', array(
-                    'events'        => $events,
-                    'eventTypes'    => $eventTypes,
-                    'eventFilter'   => $eventFilter,
-                    'icons'         => $icons,
-                    'lead'          => $lead));
+                        'events'      => $events,
+                        'eventTypes'  => $eventTypes,
+                        'eventFilter' => $eventFilter,
+                        'icons'       => $icons,
+                        'lead'        => $lead)
+                );
 
-                $dataArray['success']  = 1;
-                $dataArray['timeline'] = $timeline;
+                $dataArray['success']      = 1;
+                $dataArray['timeline']     = $timeline;
+                $dataArray['historyCount'] = count($events);
             }
         }
 

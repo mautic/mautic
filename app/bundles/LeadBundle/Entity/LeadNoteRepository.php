@@ -40,18 +40,32 @@ class LeadNoteRepository extends CommonRepository
 
     /**
      * @param $leadId
+     * @param $filter
+     * @param $noteTypes
      *
      * @return mixed
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getNoteCount($leadId)
+    public function getNoteCount($leadId, $filter = null, $noteTypes = null)
     {
         $q = $this
             ->createQueryBuilder('n');
         $q->select('count(n.id) as noteCount')
             ->where($q->expr()->eq('IDENTITY(n.lead)', ':lead'))
             ->setParameter('lead', $leadId);
+
+        if ($filter != null) {
+            $q->andWhere(
+                $q->expr()->like('n.text', ":filter")
+            )->setParameter('filter', '%'.$filter.'%');
+        }
+
+        if ($noteTypes != null) {
+            $q->andWhere(
+                $q->expr()->in('n.type', ":noteTypes")
+            )->setParameter('noteTypes', $noteTypes);
+        }
 
         $results = $q->getQuery()->getArrayResult();
         return $results[0]['noteCount'];

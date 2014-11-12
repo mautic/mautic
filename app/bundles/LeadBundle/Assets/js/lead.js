@@ -544,6 +544,7 @@ Mautic.refreshLeadTimeline = function(form) {
         success: function (response) {
             if (response.success) {
                 mQuery('#timeline-container').html(response.timeline);
+                mQuery('#HistoryCount').html(response.historyCount);
             }
         },
         error: function (request, textStatus, errorThrown) {
@@ -555,6 +556,7 @@ Mautic.refreshLeadTimeline = function(form) {
 Mautic.refreshLeadNotes = function(form) {
     Mautic.postForm(mQuery(form), function (response) {
         response.target = '#NoteList';
+        mQuery('#NoteCount').html(response.noteCount);
         Mautic.processPageContent(response);
     });
 };

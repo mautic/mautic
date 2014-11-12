@@ -10,6 +10,7 @@
 namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Entity\LeadNote;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -39,18 +40,18 @@ class NoteController extends FormController
         $session = $this->factory->getSession();
 
         //set limits
-        $limit = $session->get('mautic.leadnote.limit', $this->factory->getParameter('default_pagelimit'));
+        $limit = $session->get('mautic.lead.'.$lead->getId().'.note.limit', $this->factory->getParameter('default_pagelimit'));
         $start = ($page === 1) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
         }
 
-        $search = $this->request->get('search', $session->get('mautic.leadnote.filter', ''));
-        $session->set('mautic.leadnote.filter', $search);
+        $search = $this->request->get('search', $session->get('mautic.lead.'.$lead->getId().'.note.filter', ''));
+        $session->set('mautic.lead.'.$lead->getId().'.note.filter', $search);
 
         //do some default filtering
-        $orderBy    = $this->factory->getSession()->get('mautic.leadnote.orderby', 'n.dateTime');
-        $orderByDir = $this->factory->getSession()->get('mautic.leadnote.orderbydir', 'DESC');
+        $orderBy    = $this->factory->getSession()->get('mautic.lead.'.$lead->getId().'.note.orderby', 'n.dateTime');
+        $orderByDir = $this->factory->getSession()->get('mautic.lead.'.$lead->getId().'.note.orderbydir', 'DESC');
 
         $model = $this->factory->getModel('lead.note');
 
@@ -62,8 +63,14 @@ class NoteController extends FormController
             )
         );
 
+        $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
+
         $session = $this->factory->getSession();
-        $noteType = $this->request->request->get('noteTypes', $session->get('mautic.lead.'.$lead->getId().'.notetype.filter', array()), true);
+
+        $noteType = InputHelper::clean($this->request->request->get('noteTypes', array(), true));
+        if (empty($noteType) && $tmpl == 'index') {
+            $noteType = $session->get('mautic.lead.'.$lead->getId().'.notetype.filter', array());
+        }
         $session->set('mautic.lead.'.$lead->getId().'.notetype.filter', $noteType);
 
         $noteTypes = array(
@@ -104,7 +111,7 @@ class NoteController extends FormController
                 'search'      => $search,
                 'noteType'    => $noteType,
                 'noteTypes'   => $noteTypes,
-                'tmpl'        => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
+                'tmpl'        => $tmpl,
                 'permissions' => array(
                     'edit'   => $security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getOwner()),
                     'delete' => $security->hasEntityAccess('lead:leads:deleteown', 'lead:leads:deleteown', $lead->getOwner()),
@@ -113,7 +120,7 @@ class NoteController extends FormController
             'passthroughVars' => array(
                 'route'         => false,
                 'mauticContent' => 'leadNote',
-                'noteCount'     => $model->getNoteCount($lead)
+                'noteCount'     => count($items)
             ),
             'contentTemplate' => 'MauticLeadBundle:Note:list.html.php'
         ));
