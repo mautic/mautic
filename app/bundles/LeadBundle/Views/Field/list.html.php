@@ -14,21 +14,23 @@ if ($tmpl == 'index')
 <div class="table-responsive">
     <table class="table table-hover table-striped table-bordered leadfield-list" id="leadFieldTable">
         <thead>
-        <th class="col-leadfield-orderhandle"></th>
-        <th class="col-leadfield-actions pl-20">
-            <div class="checkbox-inline custom-primary">
-                <label class="mb-0 pl-10">
-                    <input type="checkbox" id="customcheckbox-one0" value="1" data-toggle="checkall" data-target="#leadFieldTable">
-                    <span></span>
-                </label>
-            </div>
-        </th>
-        <th class="col-leadfield-label"><?php echo $view['translator']->trans('mautic.lead.field.thead.label'); ?></th>
-        <th class="visible-md visible-lg col-leadfield-alias"><?php echo $view['translator']->trans('mautic.lead.field.thead.alias'); ?></th>
-        <th class="visible-md visible-lg col-leadfield-group"><?php echo $view['translator']->trans('mautic.lead.field.thead.group'); ?></th>
-        <th class="col-leadfield-type"><?php echo $view['translator']->trans('mautic.lead.field.thead.type'); ?></th>
-        <th class="visible-md visible-lg col-leadfield-id"><?php echo $view['translator']->trans('mautic.lead.field.thead.id'); ?></th>
-        <th class="visible-md visible-lg col-leadfield-statusicons"></th>
+            <tr>
+                <th class="col-leadfield-orderhandle"></th>
+                <th class="col-leadfield-actions pl-20">
+                    <div class="checkbox-inline custom-primary">
+                        <label class="mb-0 pl-10">
+                            <input type="checkbox" id="customcheckbox-one0" value="1" data-toggle="checkall" data-target="#leadFieldTable">
+                            <span></span>
+                        </label>
+                    </div>
+                </th>
+                <th class="col-leadfield-label"><?php echo $view['translator']->trans('mautic.lead.field.thead.label'); ?></th>
+                <th class="visible-md visible-lg col-leadfield-alias"><?php echo $view['translator']->trans('mautic.lead.field.thead.alias'); ?></th>
+                <th class="visible-md visible-lg col-leadfield-group"><?php echo $view['translator']->trans('mautic.lead.field.thead.group'); ?></th>
+                <th class="col-leadfield-type"><?php echo $view['translator']->trans('mautic.lead.field.thead.type'); ?></th>
+                <th class="visible-md visible-lg col-leadfield-id"><?php echo $view['translator']->trans('mautic.lead.field.thead.id'); ?></th>
+                <th class="visible-md visible-lg col-leadfield-statusicons"></th>
+            </tr>
         </thead>
         <tbody>
         <?php foreach ($items as $item): ?>
