@@ -5,7 +5,7 @@
  *
  * @param container
  */
-Mautic.campaignBuilderIgnoreUpdateConnectionCallback = true;
+
 Mautic.campaignOnLoad = function (container) {
     if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'campaign');
@@ -51,6 +51,13 @@ Mautic.campaignOnLoad = function (container) {
             });
     }
 };
+
+/**
+ * Delete the builder instance so it's regenerated when reopening the campaign event builder
+ */
+Mautic.campaignOnUnload = function(container) {
+    delete Mautic.campaignBuilderInstance;
+}
 
 /**
  * Setup the campaign event view
@@ -202,8 +209,8 @@ Mautic.updateCampaignEventLinks = function () {
 Mautic.launchCampaignEditor = function() {
     Mautic.stopIconSpinPostEvent();
 
-    mQuery('.campaign-builder').addClass('campaign-builder-active');
-    mQuery('.campaign-builder').removeClass('hide');
+    mQuery('.builder').addClass('builder-active');
+    mQuery('.builder').removeClass('hide');
 
     if (typeof Mautic.campaignBuilderInstance == 'undefined') {
         Mautic.campaignBuilderInstance = jsPlumb.getInstance({
@@ -407,13 +414,14 @@ Mautic.launchCampaignEditor = function() {
         Mautic.campaignBuilderReconnectEndpoints();
 
         Mautic.campaignBuilderInstance.setSuspendDrawing(false, true);
-    }
 
-    mQuery('.campaign-builder-content').scroll(function() {
+        mQuery('.builder-content').scroll(function() {
+            Mautic.campaignBuilderInstance.repaintEverything();
+        });
+    } else {
+
         Mautic.campaignBuilderInstance.repaintEverything();
-    });
-
-    Mautic.campaignBuilderInstance.repaintEverything();
+    }
 };
 
 /**
@@ -439,7 +447,7 @@ Mautic.campaignToggleTimeframes = function() {
 };
 
 Mautic.closeCampaignBuilder = function() {
-    mQuery('.campaign-builder').addClass('hide');
+    mQuery('.builder').addClass('hide');
 };
 
 Mautic.submitCampaignEvent = function(e) {

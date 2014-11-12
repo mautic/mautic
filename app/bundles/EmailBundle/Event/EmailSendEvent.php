@@ -24,18 +24,21 @@ class EmailSendEvent extends CommonEvent
     private $slotsHelper;
     private $idHash;
     private $lead;
+    private $source;
 
     /**
      * @param Email $email
      * @param       $lead
      * @param       $idHash
+     * @param       $source
      */
-    public function __construct(Email &$email, $lead = null, $idHash = '')
+    public function __construct(Email &$email, $lead = null, $idHash = '', $source = array())
     {
         $this->entity  =& $email;
         $this->content = $email->getContent();
         $this->idHash  = $idHash;
         $this->lead    = $lead;
+        $this->source  = $source;
     }
 
     /**
@@ -112,5 +115,13 @@ class EmailSendEvent extends CommonEvent
     public function getIdHash()
     {
         return $this->idHash;
+    }
+
+    /**
+     * @return array
+     */
+    public function getSource()
+    {
+        return $this->source;
     }
 }

@@ -5,17 +5,19 @@ Mautic.pageOnLoad = function (container) {
     }
 
     if (mQuery(container + ' form[name="page"]').length) {
+        //form view
        Mautic.activateCategoryLookup('page', 'page');
+    } else if (mQuery(container + ' .page-stat-charts').length) {
+        //details view
+        Mautic.renderPageViewsBarChart(container);
+        Mautic.renderPageReturningVisitsPie();
+        Mautic.renderPageTimePie();
     }
-
-    Mautic.renderPageViewsBarChart(container);
-    Mautic.renderPageReturningVisitsPie();
-    Mautic.renderPageTimePie();
 };
 
 Mautic.pageUnLoad = function() {
     //remove page builder from body
-    mQuery('.page-builder').remove();
+    mQuery('.builder').remove();
 };
 
 Mautic.pageOnUnload = function(id) {
@@ -41,7 +43,7 @@ Mautic.launchPageEditor = function () {
         id: "builder-template-content"
     })
         .attr('src', src)
-        .appendTo('.page-builder-content')
+        .appendTo('.builder-content')
         .load(function () {
             var $this = mQuery(this);
             var contents = $this.contents();
@@ -51,8 +53,10 @@ Mautic.launchPageEditor = function () {
                 drop: function (event, ui) {
                     var instance = mQuery(this).attr("id");
                     var editor   = document.getElementById('builder-template-content').contentWindow.CKEDITOR.instances;
-                    var token = mQuery(ui.draggable).find('input.page-token').val();
-                    editor[instance].insertText(token);
+                    var token    = mQuery(ui.draggable).data('token');
+                    if (token) {
+                        editor[instance].insertText(token);
+                    }
                     mQuery(this).removeClass('over-droppable');
                 },
                 over: function (e, ui) {
@@ -64,20 +68,18 @@ Mautic.launchPageEditor = function () {
             });
         });
 
-    //Append to body to break out of the main panel
-    mQuery('.page-builder').appendTo('body');
     //make the panel full screen
-    mQuery('.page-builder').addClass('page-builder-active');
+    mQuery('.builder').addClass('builder-active');
     //show it
-    mQuery('.page-builder').removeClass('hide');
+    mQuery('.builder').removeClass('hide');
 
-    Mautic.pageEditorOnLoad('.page-builder-panel');
+    Mautic.pageEditorOnLoad('.builder-panel');
 };
 
 Mautic.closePageEditor = function() {
     Mautic.stopIconSpinPostEvent();
 
-    mQuery('.page-builder').addClass('hide');
+    mQuery('.builder').addClass('hide');
 
     //make sure editors have lost focus so the content is updated
     mQuery('#builder-template-content').contents().find('.mautic-editable').each(function (index) {
@@ -87,23 +89,21 @@ Mautic.closePageEditor = function() {
     setTimeout( function() {
         //kill the draggables
         mQuery('#builder-template-content').contents().find('.mautic-editable').droppable('destroy');
-        mQuery("ul.draggable li").draggable('destroy');
+        mQuery("*[data-token]").draggable('destroy');
 
         //kill the iframe
         mQuery('#builder-template-content').remove();
 
-        //move the page builder back into form
-        mQuery('.page-builder').appendTo('.bundle-main-inner-wrapper');
     }, 3000);
 };
 
 Mautic.pageEditorOnLoad = function (container) {
     //activate builder drag and drop
-    mQuery(container + " ul.draggable li").draggable({
+    mQuery(container + " *[data-token]").draggable({
         iframeFix: true,
         iframeId: 'builder-template-content',
         helper: 'clone',
-        appendTo: '.page-builder',
+        appendTo: '.builder',
         zIndex: 8000,
         scroll: true,
         scrollSensitivity: 100,

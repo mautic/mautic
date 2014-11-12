@@ -23,9 +23,10 @@ $view['slots']->set("headerTitle", "Integrations");
                     <div class="col-md-3">
                         <div class="panel mb-0">
                             <div class="text-center doughnut-wrapper">
-                                <a href="<?php echo $application['link']; ?>">
+                                <a href="<?php echo $this->container->get('router')->generate('mautic_mapper_client_index', array("application"  => $application['bundle'])); ?>">
                                     <img src="<?php echo $view['assets']->getUrl($application['icon']); ?>">
                                 </a>
+                                <p><?php echo $application['name']; ?></p>
                             </div>
                         </div>
                     </div>

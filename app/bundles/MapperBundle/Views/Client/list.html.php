@@ -62,7 +62,11 @@ if ($tmpl == 'index')
                         ?>
                     </td>
                     <td>
-                        <?php echo $item->getTitle(); ?> (<?php echo $item->getAlias(); ?>)
+                        <a href="<?php echo $this->container->get('router')->generate(
+                            'mautic_mapper_client_objects_index', array(
+                            "application"  => $application,
+                            "client" => $item->getAlias()
+                        )); ?>"><?php echo $item->getTitle(); ?></a>
                     </td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 </tr>

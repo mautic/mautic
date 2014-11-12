@@ -82,8 +82,7 @@ class CampaignEventHelper
             $email   = $emailModel->getEntity($emailId);
 
             if ($email != null) {
-
-                $emailModel->sendEmail($email, array($leadCredentials['id'] => $leadCredentials));
+                $emailModel->sendEmail($email, array($leadCredentials['id'] => $leadCredentials), array('campaign', $event['campaign']['id']));
                 $emailSent = true;
             }
         }

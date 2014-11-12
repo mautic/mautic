@@ -49,61 +49,11 @@ if ($security->hasEntityAccess($permissions['asset:assets:editown'], $permission
     <!-- left section -->
     <div class="col-md-9 bg-white height-auto">
         <div class="bg-auto">
-            <!-- page detail header -->
+            <!-- asset detail header -->
             <div class="pr-md pl-md pt-lg pb-lg">
                 <div class="box-layout">
-                    <div class="col-xs-6 va-m">
-                        <h4 class="fw-sb text-primary">
-                            <i class="<?php echo $activeAsset->getIconClass(); ?>"></i>
-                            <span> | </span>
-                            <?php echo $activeAsset->getFileSize(); ?> kB
-                            <span> | </span>
-                            <?php
-                            if ($category = $activeAsset->getCategory()):
-                                $catSearch = $view['translator']->trans('mautic.core.searchcommand.category') . ":" . $category->getAlias();
-                                $catName = $category->getTitle();
-                            else:
-                                $catSearch = $view['translator']->trans('mautic.core.searchcommand.is') . ":" .
-                                    $view['translator']->trans('mautic.core.searchcommand.isuncategorized');
-                                $catName = $view['translator']->trans('mautic.core.form.uncategorized');
-                            endif;
-                            ?>
-                            <a href="<?php echo $view['router']->generate('mautic_asset_index', array('search' => $catSearch))?>"
-                               data-toggle="ajax">
-                                <?php echo $catName; ?>
-                            </a>
-                            <span> | </span>
-                            <span>
-                                <?php
-                                $author     = $activeAsset->getCreatedBy();
-                                $authorId   = ($author) ? $author->getId() : 0;
-                                $authorName = ($author) ? $author->getName() : "";
-                                ?>
-                                <a href="<?php echo $view['router']->generate('mautic_user_action', array(
-                                    'objectAction' => 'contact',
-                                    'objectId'     => $authorId,
-                                    'entity'       => 'asset.asset',
-                                    'id'           => $activeAsset->getId(),
-                                    'returnUrl'    => $view['router']->generate('mautic_asset_action', array(
-                                        'objectAction' => 'view',
-                                        'objectId'     => $activeAsset->getId()
-                                    ))
-                                )); ?>">
-                                    <?php echo $authorName; ?>
-                                </a>
-                            </span>
-                            <span> | </span>
-                            <span>
-                            <?php $langSearch = $view['translator']->trans('mautic.asset.asset.searchcommand.lang').":".$activeAsset->getLanguage(); ?>
-                                <a href="<?php echo $view['router']->generate('mautic_asset_index', array('search' => $langSearch)); ?>"
-                                   data-toggle="ajax">
-                                    <?php echo $activeAsset->getLanguage(); ?>
-                                </a>
-                            </span>
-                        </h4>
-                        <p class="text-white dark-lg mb-0">Created on <?php echo $view['date']->toDate($activeAsset->getDateAdded()); ?></p>
-                    </div>
-                    <div class="col-xs-6 va-m text-right">
+                    <div class="col-xs-10"></div>
+                    <div class="col-xs-2 text-right">
                         <?php switch ($activeAsset->getPublishStatus()) {
                             case 'published':
                                 $labelColor = "success";
@@ -121,58 +71,39 @@ if ($security->hasEntityAccess($permissions['asset:assets:editown'], $permission
                     </div>
                 </div>
             </div>
-            <!--/ page detail header -->
+            <!--/ asset detail header -->
 
-            <!-- page detail collapseable -->
-            <div class="collapse" id="page-details">
+            <!-- asset detail collapseable -->
+            <div class="collapse" id="asset-details">
                 <div class="pr-md pl-md pb-md">
                     <div class="panel shd-none mb-0">
                         <table class="table table-bordered table-striped mb-0">
                             <tbody>
-                                <tr>
-                                    <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.core.author'); ?></span></td>
-                                    <td><?php echo $activeAsset->getAuthor(); ?></td>
-                                </tr>
-                                <tr>
-                                    <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.core.category'); ?></span></td>
-                                    <td><?php echo is_object($activeAsset->getCategory()) ? $activeAsset->getCategory()->getTitle() : ''; ?></td>
-                                </tr>
-                                <tr>
-                                    <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.page.page.publish.up'); ?></span></td>
-                                    <td><?php echo (!is_null($activeAsset->getPublishUp())) ? $view['date']->toFull($activeAsset->getPublishUp()) : ''; ?></td>
-                                </tr>
-                                <tr>
-                                    <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.page.page.publish.down'); ?></span></td>
-                                    <td><?php echo (!is_null($activeAsset->getPublishDown())) ? $view['date']->toFull($activeAsset->getPublishDown()) : ''; ?></td>
-                                </tr>
-                                <tr>
-                                    <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.asset.asset.size'); ?></span></td>
-                                    <td><?php echo (!is_null($activeAsset->getFileSize())) ? $activeAsset->getFileSize() . ' kB' : ''; ?></td>
-                                </tr>
-                                <tr>
-                                    <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.asset.asset.path.relative'); ?></span></td>
-                                    <td><?php echo (!is_null($activeAsset->getWebPath())) ? $activeAsset->getWebPath() : ''; ?></td>
-                                </tr>
-                                <tr>
-                                    <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.asset.asset.url'); ?></span></td>
-                                    <td><?php echo (!is_null($assetUrl)) ? $assetUrl : ''; ?></td>
-                                </tr>
+                            <?php echo $view->render('MauticCoreBundle:Helper:details.html.php', array('entity' => $activeAsset)); ?>
+                            <tr>
+                                <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.asset.asset.size'); ?></span></td>
+                                <td><?php echo (!is_null($activeAsset->getFileSize())) ? $activeAsset->getFileSize() . ' kB' : ''; ?></td>
+                            </tr>
+                            <tr>
+                                <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.asset.asset.path.relative'); ?></span></td>
+                                <td><?php echo (!is_null($activeAsset->getWebPath())) ? $activeAsset->getWebPath() : ''; ?></td>
+                            </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
-            <!--/ page detail collapseable -->
+            <!--/ asset detail collapseable -->
         </div>
 
         <div class="bg-auto bg-dark-xs">
-            <!-- page detail collapseable toggler -->
+            <!-- asset detail collapseable toggler -->
             <div class="hr-expand nm">
                 <span data-toggle="tooltip" title="Detail">
-                    <a href="javascript:void(0)" class="arrow" data-toggle="collapse" data-target="#page-details"><span class="caret"></span></a>
+                    <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse" data-target="#asset-details"><span class="caret"></span> <?php echo $view['translator']->trans('mautic.core.details'); ?></a>
                 </span>
             </div>
-            <!--/ page detail collapseable toggler -->
+            <!--/ asset detail collapseable toggler -->
 
             <!-- some stats -->
             <div class="pa-md">

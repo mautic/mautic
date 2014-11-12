@@ -48,23 +48,20 @@ $view['slots']->set("headerTitle", $header.$subheader);
             </div>
         </div>
 
-        <div class="hide page-builder">
-            <div class="page-builder-content">
+        <div class="hide builder page-builder">
+            <div class="builder-content">
                 <input type="hidden" id="pageBuilderUrl" value="<?php echo $view['router']->generate('mautic_page_action', array('objectAction' => 'builder', 'objectId' => $activePage->getSessionId())); ?>" />
             </div>
-            <div class="page-builder-panel">
+            <div class="builder-panel">
                 <p>
-                    <button class="btn btn-primary btn-close-builder" onclick="Mautic.closePageEditor();"><?php echo $view['translator']->trans('mautic.page.page.builder.close'); ?></button>
+                    <button type="button" class="btn btn-primary btn-close-builder" onclick="Mautic.closePageEditor();"><?php echo $view['translator']->trans('mautic.page.page.builder.close'); ?></button>
                 </p>
                 <div class="well well-small"><?php echo $view['translator']->trans('mautic.page.page.token.help'); ?></div>
-                <div class="panel-group margin-sm-top" id="page_tokens">
+                <div class="panel-group margin-sm-top" id="pageTokensPanel">
                     <?php foreach ($tokens as $k => $t): ?>
-                    <?php $id = \Mautic\CoreBundle\Helper\InputHelper::alphanum($k); ?>
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            <h4 class="panel-title">
-                                <?php echo $t['header']; ?>
-                            </h4>
+                            <h4 class="panel-title"><?php echo $t['header']; ?></h4>
                         </div>
                         <div class="panel-body">
                             <?php echo $t['content']; ?>

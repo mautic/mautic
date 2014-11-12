@@ -109,6 +109,14 @@ class Campaign extends FormEntity
     }
 
     /**
+     * @return array
+     */
+    public function convertToArray()
+    {
+        return get_object_vars($this);
+    }
+
+    /**
      * @param ClassMetadata $metadata
      */
     public static function loadValidatorMetadata(ClassMetadata $metadata)

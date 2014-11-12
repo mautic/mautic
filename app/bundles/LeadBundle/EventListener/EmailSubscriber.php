@@ -13,6 +13,7 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
+use Mautic\LeadBundle\Helper\EmailTokenHelper;
 
 /**
  * Class EmailSubscriber
@@ -37,14 +38,8 @@ class EmailSubscriber extends CommonSubscriber
     public function onEmailBuild(EmailBuilderEvent $event)
     {
         //add email tokens
-        $fields = $this->factory->getModel('lead.field')->getEntities(array(
-            'filter' => array('isPublished' => true),
-            'hydration_mode' => 'HYDRATE_ARRAY'
-        ));
-        $content = $this->templating->render('MauticLeadBundle:EmailToken:token.html.php', array(
-            'fields' => $fields
-        ));
-        $event->addTokenSection('lead.leadtokens', 'mautic.lead.email.header.index', $content);
+        $tokenHelper = new EmailTokenHelper($this->factory);
+        $event->addTokenSection('lead.emailtokens', 'mautic.lead.email.header.index', $tokenHelper->getTokenContent());
     }
 
     public function onEmailGenerate(EmailSendEvent $event)

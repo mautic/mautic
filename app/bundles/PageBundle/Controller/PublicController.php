@@ -27,7 +27,7 @@ class PublicController extends CommonFormController
         $entity     = $model->getEntityBySlugs($slug1, $slug2, $slug3);
 
         if (!empty($entity)) {
-            $published    = $entity->isPublished();
+            $published = $entity->isPublished();
 
             //make sure the page is published or deny access if not
             if ((!$published) && (!$security->hasEntityAccess(

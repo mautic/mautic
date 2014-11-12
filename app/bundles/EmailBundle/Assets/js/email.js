@@ -17,7 +17,7 @@ Mautic.emailOnLoad = function (container) {
 
 Mautic.emailUnLoad = function() {
     //remove email builder from body
-    mQuery('.email-builder').remove();
+    mQuery('.builder').remove();
 };
 
 Mautic.emailOnUnload = function(id) {
@@ -41,7 +41,7 @@ Mautic.launchEmailEditor = function () {
         id: "builder-template-content"
     })
         .attr('src', src)
-        .appendTo('.email-builder-content')
+        .appendTo('.builder-content')
         .load(function () {
             var $this = mQuery(this);
             var contents = $this.contents();
@@ -51,8 +51,10 @@ Mautic.launchEmailEditor = function () {
                 drop: function (event, ui) {
                     var instance = mQuery(this).attr("id");
                     var editor   = document.getElementById('builder-template-content').contentWindow.CKEDITOR.instances;
-                    var token = mQuery(ui.draggable).find('input.email-token').val();
-                    editor[instance].insertText(token);
+                    var token    = mQuery(ui.draggable).data('token');
+                    if (token) {
+                        editor[instance].insertText(token);
+                    }
                     mQuery(this).removeClass('over-droppable');
                 },
                 over: function (e, ui) {
@@ -64,20 +66,18 @@ Mautic.launchEmailEditor = function () {
             });
         });
 
-    //Append to body to break out of the main panel
-    mQuery('.email-builder').appendTo('body');
     //make the panel full screen
-    mQuery('.email-builder').addClass('email-builder-active');
+    mQuery('.builder').addClass('builder-active');
     //show it
-    mQuery('.email-builder').removeClass('hide');
+    mQuery('.builder').removeClass('hide');
 
-    Mautic.pageEditorOnLoad('.email-builder-panel');
+    Mautic.emailEditorOnLoad('.builder-panel');
 };
 
 Mautic.closeEmailEditor = function() {
     Mautic.stopIconSpinPostEvent();
 
-    mQuery('.email-builder').addClass('hide');
+    mQuery('.builder').addClass('hide');
 
     //make sure editors have lost focus so the content is updated
     mQuery('#builder-template-content').contents().find('.mautic-editable').each(function (index) {
@@ -87,25 +87,21 @@ Mautic.closeEmailEditor = function() {
     setTimeout( function() {
         //kill the draggables
         mQuery('#builder-template-content').contents().find('.mautic-editable').droppable('destroy');
-        mQuery("ul.draggable li").draggable('destroy');
+        mQuery("*[data-token]").draggable('destroy');
 
         //kill the iframe
         mQuery('#builder-template-content').remove();
 
-        //move the email builder back into form
-        mQuery('.email-builder').appendTo('.bundle-main-inner-wrapper');
     }, 3000);
 };
 
 Mautic.emailEditorOnLoad = function (container) {
     //activate builder drag and drop
-    mQuery(container + " ul.draggable li").draggable({
+    mQuery(container + " *[data-token]").draggable({
         iframeFix: true,
         iframeId: 'builder-template-content',
-        helper: function() {
-            return mQuery('<div><i class="fa fa-lg fa-crosshairs"></i></div>');
-        },
-        appendTo: '.email-builder',
+        helper: 'clone',
+        appendTo: '.builder',
         zIndex: 8000,
         scroll: true,
         scrollSensitivity: 100,

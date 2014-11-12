@@ -32,12 +32,14 @@ $collection->add('mautic_mapper_client_action', new Route('/mapper/client/{appli
     )
 ));
 
-$collection->add('mautic_mapper_client_object_index', new Route('/mapper/objects/{application}/{client}',
+$collection->add('mautic_mapper_client_objects_index', new Route('/mapper/objects/{application}/{client}',
     array('_controller' => 'MauticMapperBundle:Mapper:index')
 ));
 
-$collection->add('mautic_mapper_client_object_assign', new Route('/mapper/objects/{application}/{client}/{object}',
-    array('_controller' => 'MauticMapperBundle:Mapper:index')
+$collection->add('mautic_mapper_client_object_action', new Route('/mapper/objects/{application}/{client}/{object}/{action}',
+    array(
+        '_controller' => 'MauticMapperBundle:Mapper:executeMapper'
+    )
 ));
 
 $collection->add('mautic_mapper_authentication_callback', new Route('/mapper/oauth2callback/{application}',

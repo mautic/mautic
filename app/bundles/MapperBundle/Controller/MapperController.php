@@ -10,140 +10,77 @@
 namespace Mautic\MapperBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
-use Mautic\MapperBundle\Entity\Application;
-use Mautic\MapperBundle\Entity\ApplicationIntegration;
-use Mautic\MapperBundle\Entity\ApplicationIntegrationRepository;
-use Mautic\MapperBundle\Helper\ApiHelper;
-use Mautic\MapperBundle\Helper\ApplicationIntegrationHelper;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class MapperController extends FormController
 {
-    public function indexAction()
+    /**
+     * @param        $bundle
+     * @param        $objectAction
+     * @param int    $objectId
+     * @param string $objectModel
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function executeMapperAction($application, $client, $object, $objectAction = '') {
+        if (method_exists($this, "{$objectAction}MapperAction")) {
+            return $this->{"{$objectAction}MapperAction"}($application, $client, $object);
+        } else {
+            return $this->accessDenied();
+        }
+    }
+
+    public function indexAction($application, $client)
     {
-        if (!$this->factory->getSecurity()->isGranted('mapper:config:full')) {
+        if (!$this->factory->getSecurity()->isGranted($application.':mapper:create')) {
             return $this->accessDenied();
         }
 
-        $applications = ApplicationIntegrationHelper::getApplications($this->factory, null, null, true);
+        $entities = array();
+        $bundles = $this->factory->getParameter('bundles');
+        $bundle = $bundles[ucfirst($application)];
+
+        $finder = new Finder();
+        $finder->files()->name('*Mapper.php')->in($bundle['directory'] . '/Mapper');
+        $finder->sortByName();
+        foreach ($finder as $file) {
+            $class = sprintf('\\Mautic\%s\Mapper\%s', $bundle['bundle'], substr($file->getBaseName(), 0, -4));
+            $object = new $class;
+            $entities[] = $object;
+        }
+
+        //set some permissions
+        $permissions = $this->factory->getSecurity()->isGranted(array(
+            $application.':mapper:view',
+            $application.':mapper:create',
+            $application.':mapper:edit',
+            $application.':mapper:delete'
+        ), "RETURN_ARRAY");
+
+        $viewParams = array(
+            'client'   => $client,
+            'application' => $application
+        );
+
+        $tmpl = $this->request->get('tmpl', 'index');
 
         return $this->delegateView(array(
+            'returnUrl'       => $this->generateUrl('mautic_mapper_client_objects_index', $viewParams),
             'viewParameters'  => array(
-                'applications' => $applications
+                'application' => $application,
+                'client'      => $client,
+                'items'       => $entities,
+                'permissions' => $permissions,
+                'tmpl'        => $tmpl
             ),
-            'contentTemplate' => "MauticMapperBundle:Dashboard:index.html.php",
+            'contentTemplate' => 'MauticMapperBundle:Mapper:list.html.php',
             'passthroughVars' => array(
-                'activeLink'     => '#mautic_mapper_index',
-                'mauticContent'  => 'leadSocial',
-                'route'          => ''
+                'activeLink'     => '#mautic_'.$application.'client_'.$client.'objects_index',
+                'mauticContent'  => 'clients',
+                'route'          => $this->generateUrl('mautic_mapper_client_objects_index', $viewParams),
+                'replaceContent' => ($tmpl == 'list') ? 'true': 'false'
             )
         ));
-    }
-
-    public function saveAction($application)
-    {
-        $object = ApplicationIntegrationHelper::getApplication($this->factory, $application);
-
-        $postActionVars = array(
-            'returnUrl'       => $object->getAppLink(),
-        );
-
-        ///Check for a submitted form and process it
-        if ($this->request->getMethod() == 'POST') {
-            $entity = $object->getEntity();
-            $entity->setApiKeys($object->getSettings($_POST));
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($entity);
-            $em->flush();
-        }
-
-        return $this->postActionRedirect(
-            array_merge($postActionVars)
-        );
-    }
-
-    /**
-     * Display Application if they're not setup already
-     * If yes they try to authenticate
-     * else they show object from particular application
-     *
-     * @param $application
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
-     */
-    public function integrationAction($application)
-    {
-        $appIntegration = ApplicationIntegrationHelper::getApplication($this->factory, $application);
-
-        $viewData = array(
-            'viewParameters' => array(
-                'appIntegration' => $appIntegration
-            ),
-            'contentTemplate' => null
-        );
-
-        $integrationAuth = ApiHelper::getApiAuth($application, $appIntegration);
-
-        if ($integrationAuth->validateAccessToken()) {
-            ApiHelper::checkApiAuthentication($this->factory, $application, $appIntegration);
-            $viewData['contentTemplate'] = 'MauticMapperBundle:Mapper:index.html.php';
-            $viewData['viewParameters']['router'] = $this->factory->getRouter();
-        } else {
-            $viewData['viewParameters']['formName'] = 'form_'.$application;
-            $viewData['contentTemplate'] = sprintf('MauticMapperBundle:Application:%s.html.php',$application);
-        }
-
-        return $this->delegateView($viewData);
-    }
-
-    public function integrationObjectAction($application, $object)
-    {
-        $appIntegration = ApplicationIntegrationHelper::getApplication($this->factory, $application);
-        $objectEntity = $appIntegration->getMappedObject($object);
-
-        ApiHelper::checkApiAuthentication($this->factory, $application, $appIntegration);
-
-        $sourceFields = $appIntegration->getMauticObject($object);
-        $targetFields = $appIntegration->getApiObject($object);
-        $targetOptions = $appIntegration->getObjectOptions($object, $targetFields);
-
-        $viewData = array(
-            'viewParameters' => array(
-                'appIntegration' => $appIntegration,
-                'appObject' => $appIntegration->getMappedObject($object),
-                'sourceFields' => $sourceFields,
-                'targetFields' => $targetFields,
-                'targetOptions' => $targetOptions
-            ),
-            'contentTemplate' => sprintf('MauticMapperBundle:Mapper:%s.fields.html.php', $application)
-        );
-
-        return $this->delegateView($viewData);
-    }
-
-
-
-    /**
-     * Get Response from Authentication and store on database
-     *
-     * @param $application
-     */
-    public function oAuth2CallbackAction($application)
-    {
-        $appIntegration = ApplicationIntegrationHelper::getApplication($this->factory, $application);
-
-        $postActionVars = array(
-            'returnUrl'       => $appIntegration->getAppLink(),
-        );
-
-        ApiHelper::checkApiAuthentication($this->factory, $application, $appIntegration);
-
-        die('return');
-
-        return $this->postActionRedirect(
-            array_merge($postActionVars, array(
-                'flashes' => $flashes
-            ))
-        );
-
     }
 }

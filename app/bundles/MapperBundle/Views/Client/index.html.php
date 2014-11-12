@@ -8,7 +8,7 @@
  */
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
-$view['slots']->set('mauticContent', $applicationObject->getAppName());
+$view['slots']->set('mauticContent', $application);
 $view['slots']->set("headerTitle", $view['translator']->trans('mautic.mapper.header.index'));
 $view['slots']->set('searchUri', $view['router']->generate('mautic_mapper_client_index', array(
     'page'   => $page,

@@ -10,7 +10,7 @@
 namespace Mautic\MapperBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
-use Mautic\MapperBundle\Helper\IntegrationsHelper;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class ClientController extends FormController
@@ -34,8 +34,6 @@ class ClientController extends FormController
     public function indexAction($application, $page = 1)
     {
         $session = $this->factory->getSession();
-
-        $applicationObject = IntegrationsHelper::getApplication($this->factory, $application);
 
         //set some permissions
         $permissions = $this->factory->getSecurity()->isGranted(array(
@@ -117,7 +115,6 @@ class ClientController extends FormController
         return $this->delegateView(array(
             'returnUrl'       => $this->generateUrl('mautic_mapper_client_index', $viewParams),
             'viewParameters'  => array(
-                'applicationObject' => $applicationObject,
                 'application' => $application,
                 'searchValue' => $search,
                 'items'       => $entities,
@@ -151,13 +148,11 @@ class ClientController extends FormController
             return $this->accessDenied();
         }
 
-        $applicationObject = IntegrationsHelper::getApplication($this->factory, $application);
-
         //set the page we came from
         $page   = $session->get('mautic.mapper.page', 1);
         $action = $this->generateUrl('mautic_mapper_client_action', array(
             'objectAction' => 'new',
-            'application'       => $application
+            'application'  => $application
         ));
 
         //create the form
@@ -210,8 +205,7 @@ class ClientController extends FormController
         return $this->delegateView(array(
             'viewParameters' => array(
                 'form'   => $form->createView(),
-                'application' => $application,
-                'applicationObject' => $applicationObject
+                'application' => $application
             ),
             'contentTemplate' => 'MauticMapperBundle:Client:form.html.php',
             'passthroughVars' => array(
@@ -232,7 +226,110 @@ class ClientController extends FormController
      */
     public function editAction ($application, $objectId, $ignorePost = false)
     {
+        $session    = $this->factory->getSession();
+        $model      = $this->factory->getModel('mapper.ApplicationClient');
+        $entity     = $model->getEntity($objectId);
 
+        //set the page we came from
+        $page       = $session->get('mautic.mapper.page', 1);
+        $viewParams = array(
+            'page'   => $page,
+            'application' => $application
+        );
+        //set the return URL
+        $returnUrl  = $this->generateUrl('mautic_mapper_client_index', $viewParams);
+
+        $postActionVars = array(
+            'returnUrl'       => $returnUrl,
+            'viewParameters'  => $viewParams,
+            'contentTemplate' => 'MauticMapperBundle:Client:index',
+            'passthroughVars' => array(
+                'activeLink'    => 'mautic_'.$application.'client_index',
+                'mauticContent' => 'client'
+            )
+        );
+
+        //not found
+        if ($entity === null) {
+            return $this->postActionRedirect(
+                array_merge($postActionVars, array(
+                    'flashes' => array(
+                        array(
+                            'type' => 'error',
+                            'msg'  => 'mautic.mapper.error.notfound',
+                            'msgVars' => array('%id%' => $objectId)
+                        )
+                    )
+                ))
+            );
+        }  elseif (!$this->factory->getSecurity()->isGranted($application.':mapper:view')) {
+            return $this->accessDenied();
+        } elseif ($model->isLocked($entity)) {
+            //deny access if the entity is locked
+            return $this->isLocked($postActionVars, $entity, 'mapper.ApplicationClient');
+        }
+
+        //Create the form
+        $action = $this->generateUrl('mautic_mapper_client_action', array(
+            'objectAction' => 'edit',
+            'objectId'     => $objectId,
+            'application'  => $application
+        ));
+        $form = $model->createForm($entity, $this->get('form.factory'), $action, array('application' => $application));
+        ///Check for a submitted form and process it
+        if (!$ignorePost && $this->request->getMethod() == 'POST') {
+            $valid = false;
+            if (!$cancelled = $this->isFormCancelled($form)) {
+                //form is valid so process the data
+                $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
+
+                $this->request->getSession()->getFlashBag()->add(
+                    'notice',
+                    $this->get('translator')->trans('mautic.mapper.notice.updated', array(
+                        '%name%' => $entity->getTitle(),
+                        '%url%'  => $this->generateUrl('mautic_mapper_client_action', array(
+                                'objectAction' => 'edit',
+                                'objectId'     => $entity->getId(),
+                                'application'  => $application
+                            ))
+                    ), 'flashes')
+                );
+            } else {
+                //unlock the entity
+                $model->unlockEntity($entity);
+            }
+
+            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+                return $this->postActionRedirect(
+                    array_merge($postActionVars, array(
+                        'returnUrl'       => $this->generateUrl('mautic_mapper_client_index', $viewParams),
+                        'viewParameters'  => $viewParams,
+                        'contentTemplate' => 'MauticMapperBundle:Client:index'
+                    ))
+                );
+            }
+        } else {
+            //lock the entity
+            $model->lockEntity($entity);
+        }
+
+        return $this->delegateView(array(
+            'viewParameters' => array(
+                'form'           => $form->createView(),
+                'activeCategory' => $entity,
+                'application'    => $application
+            ),
+            'contentTemplate' => 'MauticMapperBundle:Client:form.html.php',
+            'passthroughVars' => array(
+                'activeLink'    => '#mautic_page_index',
+                'mauticContent' => 'page',
+                'route'         => $this->generateUrl('mautic_mapper_client_action', array(
+                        'objectAction' => 'edit',
+                        'objectId'     => $entity->getId(),
+                        'application'  => $application
+                    ))
+            )
+        ));
     }
 
     /**
@@ -243,6 +340,129 @@ class ClientController extends FormController
      */
     public function deleteAction($application, $objectId)
     {
+        $session     = $this->factory->getSession();
+        $page        = $session->get('mautic.mapper.page', 1);
+        $viewParams = array(
+            'page'   => $page,
+            'application' => $application
+        );
+        $returnUrl   = $this->generateUrl('mautic_mapper_client_index', $viewParams);
+        $flashes     = array();
 
+        $postActionVars = array(
+            'returnUrl'       => $returnUrl,
+            'viewParameters'  => $viewParams,
+            'contentTemplate' => 'MauticMapperBundle:Client:index',
+            'passthroughVars' => array(
+                'activeLink'    => 'mautic_'.$application.'client_index',
+                'mauticContent' => 'client'
+            )
+        );
+
+        if ($this->request->getMethod() == 'POST') {
+            $model  = $this->factory->getModel('mapper.ApplicationClient');
+            $entity = $model->getEntity($objectId);
+
+            if ($entity === null) {
+                $flashes[] = array(
+                    'type'    => 'error',
+                    'msg'     => 'mautic.mapper.error.notfound',
+                    'msgVars' => array('%id%' => $objectId)
+                );
+            } elseif (!$this->factory->getSecurity()->isGranted($application.':mapper:delete')) {
+                return $this->accessDenied();
+            } elseif ($model->isLocked($entity)) {
+                return $this->isLocked($postActionVars, $entity, 'mapper.ApplicationClient');
+            }
+
+            $model->deleteEntity($entity);
+
+            $flashes[] = array(
+                'type' => 'notice',
+                'msg'  => 'mautic.mapper.notice.deleted',
+                'msgVars' => array(
+                    '%name%' => $entity->getTitle(),
+                    '%id%'   => $objectId
+                )
+            );
+        } //else don't do anything
+
+        return $this->postActionRedirect(
+            array_merge($postActionVars, array(
+                'flashes' => $flashes
+            ))
+        );
+    }
+
+    /**
+     * Deletes a group of entities
+     *
+     * @param string $bundle
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function batchDeleteAction($application) {
+        $session     = $this->factory->getSession();
+        $page        = $session->get('mautic.mapper.page', 1);
+        $viewParams  = array(
+            'page'   => $page,
+            'application' => $application
+        );
+        $returnUrl   = $this->generateUrl('mautic_mapper_client_index', $viewParams);
+        $flashes     = array();
+
+        $postActionVars = array(
+            'returnUrl'       => $returnUrl,
+            'viewParameters'  => $viewParams,
+            'contentTemplate' => 'MauticMapperBundle:Client:index',
+            'passthroughVars' => array(
+                'activeLink'    => 'mautic_'.$application.'client_index',
+                'mauticContent' => 'client'
+            )
+        );
+
+        if ($this->request->getMethod() == 'POST') {
+            $model     = $this->factory->getModel('mapper.ApplicationClient');
+            $ids       = json_decode($this->request->query->get('ids', array()));
+            $deleteIds = array();
+
+            // Loop over the IDs to perform access checks pre-delete
+            foreach ($ids as $objectId) {
+                $entity = $model->getEntity($objectId);
+
+                if ($entity === null) {
+                    $flashes[] = array(
+                        'type'    => 'error',
+                        'msg'     => 'mautic.mapper.error.notfound',
+                        'msgVars' => array('%id%' => $objectId)
+                    );
+                } elseif (!$this->factory->getSecurity()->isGranted($application.':mapper:delete')) {
+                    $flashes[] = $this->accessDenied(true);
+                } elseif ($model->isLocked($entity)) {
+                    $flashes[] = $this->isLocked($postActionVars, $entity, 'ApplicationClient', true);
+                } else {
+                    $deleteIds[] = $objectId;
+                }
+            }
+
+            // Delete everything we are able to
+            if (!empty($deleteIds)) {
+                $entities = $model->deleteEntities($deleteIds);
+
+                $flashes[] = array(
+                    'type' => 'notice',
+                    'msg'  => 'mautic.mapper.notice.batch_deleted',
+                    'msgVars' => array(
+                        '%count%' => count($entities)
+                    )
+                );
+            }
+        } //else don't do anything
+
+        return $this->postActionRedirect(
+            array_merge($postActionVars, array(
+                'flashes' => $flashes
+            ))
+        );
     }
 }

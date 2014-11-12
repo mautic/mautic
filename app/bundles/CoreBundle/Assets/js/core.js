@@ -73,13 +73,7 @@ var Mautic = {
     /**
      * Initiate various functions on page load, manual or ajax
      */
-    onPageLoad: function (container, response, ignoreContentSpecificOnLoad) {
-        if (typeof ignoreContentSpecificOnLoad == 'undefined') {
-            var ignoreContentSpecificOnLoad = false;
-        }
-
-        container = typeof container !== 'undefined' ? container : 'body';
-
+    onPageLoad: function (container, response) {
         //initiate links
         mQuery(container + " a[data-toggle='ajax']").off('click.ajax');
         mQuery(container + " a[data-toggle='ajax']").on('click.ajax', function (event) {
@@ -212,7 +206,7 @@ var Mautic = {
         });
 
         //spin icons on button click
-        mQuery(container + ' .btn').on('click.spinningicons', function(event) {
+        mQuery(container + ' .btn:not(.btn-nospin)').on('click.spinningicons', function(event) {
             Mautic.startIconSpinOnEvent(event);
         });
 
@@ -248,11 +242,15 @@ var Mautic = {
         }
 
         //run specific on loads
-        if (!ignoreContentSpecificOnLoad) {
-            var contentSpecific = (response && response.mauticContent) ? response.mauticContent : mauticContent;
-            if (typeof Mautic[contentSpecific + "OnLoad"] == 'function') {
-                Mautic[contentSpecific + "OnLoad"](container, response);
-            }
+        var contentSpecific = false;
+        if (response && response.mauticContent) {
+            contentSpecific = response.mauticContent;
+        } else if (container == 'body') {
+            contentSpecific = mauticContent;
+        }
+
+        if (contentSpecific && typeof Mautic[contentSpecific + "OnLoad"] == 'function') {
+            Mautic[contentSpecific + "OnLoad"](container, response);
         }
 
         if (container == 'body') {
@@ -306,26 +304,33 @@ var Mautic = {
      */
     onPageUnload: function (container, response) {
         //unload tooltips so they don't double show
-        container = typeof container !== 'undefined' ? container : 'body';
+        if (typeof container != 'undefined') {
+            mQuery(container + " *[data-toggle='tooltip']").tooltip('destroy');
 
-        mQuery(container + " *[data-toggle='tooltip']").tooltip('destroy');
-
-        //unload lingering modals from body so that there will not be multiple modals generated from new ajaxed content
-        mQuery(container + " *[data-toggle='modal']").each(function (index) {
-            var target = mQuery(this).attr('data-target');
-            mQuery(target).remove();
-        });
-
-        mQuery(container + " *[data-toggle='ajaxmodal']").each(function (index) {
-            if (mQuery(this).attr('data-ignore-removemodal') != 'true') {
+            //unload lingering modals from body so that there will not be multiple modals generated from new ajaxed content
+            mQuery(container + " *[data-toggle='modal']").each(function (index) {
                 var target = mQuery(this).attr('data-target');
                 mQuery(target).remove();
-            }
-        });
+            });
+
+            mQuery(container + " *[data-toggle='ajaxmodal']").each(function (index) {
+                if (mQuery(this).attr('data-ignore-removemodal') != 'true') {
+                    var target = mQuery(this).attr('data-target');
+                    mQuery(target).remove();
+                }
+            });
+        }
 
         //run specific unloads
-        if (typeof Mautic[mauticContent + "OnUnload"] == 'function') {
-            Mautic[mauticContent + "OnUnload"](container, response);
+        var contentSpecific = false;
+        if (response && response.mauticContent) {
+            contentSpecific = response.mauticContent;
+        } else if (container == '#app-content') {
+            contentSpecific = mauticContent;
+        }
+
+        if (contentSpecific && typeof Mautic[contentSpecific + "OnUnload"] == 'function') {
+            Mautic[response.mauticContent + "OnUnload"](container, response);
         }
     },
 
@@ -335,12 +340,8 @@ var Mautic = {
      * @param link
      * @param method
      * @param target
-     * @param event
      */
-    loadContent: function (route, link, method, target, event) {
-        //keep browser backbutton from loading cached ajax response
-        //var ajaxRoute = route + ((/\?/i.test(route)) ? "&ajax=1" : "?ajax=1");
-
+    loadContent: function (route, link, method, target) {
         mQuery.ajax({
             url: route,
             type: method,
@@ -362,10 +363,6 @@ var Mautic = {
 
                         if (typeof response.activeLink === 'undefined' && link) {
                             response.activeLink = link;
-                        }
-
-                        if (mQuery(".page-wrapper").hasClass("right-active")) {
-                            mQuery(".page-wrapper").removeClass("right-active");
                         }
 
                         Mautic.processPageContent(response);
@@ -427,7 +424,7 @@ var Mautic = {
                 //set a timeout in case it doesn't get reset
                 setTimeout(function() {
                     Mautic.stopIconSpinPostEvent(identifierClass);
-                }, 5000);
+                }, 10000);
             }
         }
     },
@@ -480,25 +477,14 @@ var Mautic = {
      * Updates new content
      * @param response
      */
-    processPageContent: function (response, ignoreContentSpecificOnLoad) {
+    processPageContent: function (response) {
         if (response) {
             if (!response.target) {
                 response.target = '#app-content';
             }
 
-            //update type of content displayed
-            if (response.mauticContent) {
-                mauticContent = response.mauticContent;
-            }
-
             //inactive tooltips, etc
             Mautic.onPageUnload(response.target, response);
-
-            if (response.route) {
-                //update URL in address bar
-                MauticVars.manualStateChange = false;
-                History.pushState(null, "Mautic", response.route);
-            }
 
             //set content
             if (response.newContent) {
@@ -509,37 +495,48 @@ var Mautic = {
                 }
             }
 
-            window.setTimeout(function() {
-                mQuery("#flashes .alert").fadeTo(500, 0).slideUp(500, function(){
-                    mQuery(this).remove();
-                });
-            }, 7000);
-
-            if (response.activeLink) {
-                //remove current classes from menu items
-                mQuery(".side-panel-nav").find(".current").removeClass("current");
-
-                //remove ancestor classes
-                mQuery(".side-panel-nav").find(".current_ancestor").removeClass("current_ancestor");
-
-                var link = response.activeLink;
-                if (link !== undefined && link.charAt(0) != '#') {
-                    link = "#" + link;
-                }
-
-                //add current class
-                var parent = mQuery(link).parent();
-                mQuery(parent).addClass("current");
-
-                //add current_ancestor classes
-                mQuery(parent).parentsUntil(".side-panel-nav", "li").addClass("current_ancestor");
+            if (response.route) {
+                //update URL in address bar
+                MauticVars.manualStateChange = false;
+                History.pushState(null, "Mautic", response.route);
             }
 
-            //scroll to the top
             if (response.target == '#app-content') {
+                //update type of content displayed
+                if (response.mauticContent) {
+                    mauticContent = response.mauticContent;
+                }
+
+                window.setTimeout(function () {
+                    mQuery("#flashes .alert").fadeTo(500, 0).slideUp(500, function () {
+                        mQuery(this).remove();
+                    });
+                }, 7000);
+
+                if (response.activeLink) {
+                    //remove current classes from menu items
+                    mQuery(".side-panel-nav").find(".current").removeClass("current");
+
+                    //remove ancestor classes
+                    mQuery(".side-panel-nav").find(".current_ancestor").removeClass("current_ancestor");
+
+                    var link = response.activeLink;
+                    if (link !== undefined && link.charAt(0) != '#') {
+                        link = "#" + link;
+                    }
+
+                    //add current class
+                    var parent = mQuery(link).parent();
+                    mQuery(parent).addClass("current");
+
+                    //add current_ancestor classes
+                    mQuery(parent).parentsUntil(".side-panel-nav", "li").addClass("current_ancestor");
+                }
+
                 mQuery('body').animate({
                     scrollTop: 0
                 }, 0);
+
             } else {
                 var overflow = mQuery(response.target).css('overflow');
                 var overflowY = mQuery(response.target).css('overflowY');
@@ -551,7 +548,7 @@ var Mautic = {
             }
 
             //activate content specific stuff
-            Mautic.onPageLoad(response.target, response, ignoreContentSpecificOnLoad);
+            Mautic.onPageLoad(response.target, response);
         }
 
         Mautic.stopIconSpinPostEvent();
@@ -662,7 +659,7 @@ var Mautic = {
             target = null;
         }
 
-        Mautic.loadContent(route, link, method, target, event);
+        Mautic.loadContent(route, link, method, target);
     },
 
     /**
@@ -734,9 +731,6 @@ var Mautic = {
         } else {
             mQuery(target + ' .modal-body').html(response.newContent);
         }
-
-        //inactive tooltips, etc
-        Mautic.onPageUnload(target, response);
 
         //activate content specific stuff
         Mautic.onPageLoad(target, response);
@@ -971,6 +965,10 @@ var Mautic = {
     },
 
     activateLiveSearch: function(el, searchStrVar, liveCacheVar) {
+        if (!mQuery(el).length) {
+            return;
+        }
+
         mQuery(el).on('keyup', {}, function (event) {
             var searchStr = mQuery(el).val().trim();
             var diff = searchStr.length - MauticVars[searchStrVar].length;
@@ -992,7 +990,7 @@ var Mautic = {
             if (
                 !MauticVars.searchIsActive &&
                 (
-                    searchStr in MauticVars[liveCacheVar] ||
+                    //searchStr in MauticVars[liveCacheVar] ||
                     diff >= 3 ||
                     event.which == 32 || event.keyCode == 32 ||
                     event.which == 13 || event.keyCode == 13
@@ -1016,13 +1014,6 @@ var Mautic = {
         //find associated button
         var btn = "button[data-livesearch-parent='" + mQuery(el).attr('id') + "']";
         if (mQuery(btn).length) {
-            if (mQuery(el).val()) {
-                mQuery(btn).attr('data-livesearch-action', 'clear');
-                mQuery(btn + ' i').removeClass('fa-search').addClass('fa-eraser');
-            } else {
-                mQuery(btn).attr('data-livesearch-action', 'search');
-                mQuery(btn + ' i').removeClass('fa-eraser').addClass('fa-search');
-            }
             mQuery(btn).on('click', {'parent': mQuery(el).attr('id')}, function (event) {
                 Mautic.filterList(event,
                     event.data.parent,
@@ -1032,6 +1023,14 @@ var Mautic = {
                     mQuery(this).attr('data-livesearch-action')
                 );
             });
+
+            if (mQuery(el).val()) {
+                mQuery(btn).attr('data-livesearch-action', 'clear');
+                mQuery(btn + ' i').removeClass('fa-search').addClass('fa-eraser');
+            } else {
+                mQuery(btn).attr('data-livesearch-action', 'search');
+                mQuery(btn + ' i').removeClass('fa-eraser').addClass('fa-search');
+            }
         }
     },
 
@@ -1045,7 +1044,8 @@ var Mautic = {
 
         var el = mQuery('#' + elId);
         //only submit if the element exists, its a livesearch, or on button click
-        if (el.length && (e.data.livesearch || mQuery(e.target).prop("tagName") == 'BUTTON')) {
+
+        if (el.length && (e.data.livesearch || mQuery(e.target).prop('tagName') == 'BUTTON' || mQuery(e.target).parent().prop('tagName') == 'BUTTON')) {
             var value = el.val().trim();
             //should the content be cleared?
             if (!value) {
@@ -1070,7 +1070,8 @@ var Mautic = {
             }
 
             //make the request
-            if (value && value in MauticVars[liveCacheVar]) {
+            //@TODO reevaluate search caching as it seems to cause issues
+            if (false && value && value in MauticVars[liveCacheVar]) {
                 var response = {"newContent": MauticVars[liveCacheVar][value]};
                 response.target = target;
                 Mautic.processPageContent(response);

@@ -33,7 +33,7 @@ class PublicController extends CommonFormController
             //the lead needs to have fields populated
             $lead = $this->factory->getModel('lead')->getLead($statLead->getId());
 
-            $published    = $entity->isPublished();
+            $published = $entity->isPublished();
 
             //make sure the page is published or deny access if not
             if ((!$published) && (!$security->hasEntityAccess(

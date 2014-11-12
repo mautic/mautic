@@ -37,7 +37,7 @@ class BuilderSubscriber extends CommonSubscriber
     public function onEmailBuild(EmailBuilderEvent $event)
     {
         //add email tokens
-        $content = $this->templating->render('MauticEmailBundle:EmailToken:token.html.php');
+        $content = $this->templating->render('MauticEmailBundle:SubscribedEvents\EmailToken:token.html.php');
         $event->addTokenSection('email.emailtokens', 'mautic.email.header.index', $content);
 
         //add AB Test Winner Criteria
@@ -47,7 +47,6 @@ class BuilderSubscriber extends CommonSubscriber
             'callback' => '\Mautic\EmailBundle\Helper\AbTestHelper::determineOpenRateWinner'
         );
         $event->addAbTestWinnerCriteria('email.openrate', $openRate);
-
     }
 
     public function onEmailGenerate(EmailSendEvent $event)

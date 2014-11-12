@@ -80,10 +80,7 @@ class PageModel extends FormModel
         $now = new \DateTime();
 
         //set the author for new pages
-        if ($entity->isNew()) {
-            $user = $this->factory->getUser();
-            $entity->setAuthor($user->getName());
-        } else {
+        if (!$entity->isNew()) {
             //increase the revision
             $revision = $entity->getRevision();
             $revision++;
@@ -258,9 +255,10 @@ class PageModel extends FormModel
      *
      * @param $entity
      * @param $absolute
+     * @param $clickthrough
      * @return mixed
      */
-    public function generateUrl($entity, $absolute = true)
+    public function generateUrl($entity, $absolute = true, $clickthrough = array())
     {
         $pageSlug = $entity->getId() . ':' . $entity->getAlias();
 
@@ -290,6 +288,10 @@ class PageModel extends FormModel
 
         $pageUrl  = $this->factory->getRouter()->generate('mautic_page_public', $slugs, $absolute);
 
+        if (!empty($clickthrough)) {
+            $pageUrl .= (!empty($clickthrough)) ? '?ct=' . base64_encode(serialize($clickthrough)) : '';
+        }
+
         return $pageUrl;
     }
 
@@ -303,7 +305,33 @@ class PageModel extends FormModel
         $hit = new Hit();
         $hit->setDateHit(new \Datetime());
 
-        list($lead, $trackingId, $generated) = $this->factory->getModel('lead')->getCurrentLead(true);
+        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+        $leadModel = $this->factory->getModel('lead');
+
+        //check for any clickthrough info
+        $clickthrough = $request->get('ct', false);
+        if (!empty($clickthrough)) {
+            $clickthrough = unserialize(base64_decode($clickthrough));
+
+            if (!empty($clickthrough['lead'])) {
+                $lead = $leadModel->getEntity($clickthrough['lead']);
+                if ($lead !== null) {
+                    $leadModel->setLeadCookie($clickthrough['lead']);
+                    list($trackingId, $generated) = $this->getTrackingCookie();
+                    $leadClickthrough = true;
+                }
+            }
+
+            if (!empty($clickthrough['source'])) {
+                $hit->setSource($clickthrough['source'][0]);
+                $hit->setSourceId($clickthrough['source'][1]);
+            }
+        }
+
+        if (empty($leadClickthrough)) {
+            list($lead, $trackingId, $generated) = $leadModel->getCurrentLead(true);
+        }
+
         $hit->setTrackingId($trackingId);
         $hit->setLead($lead);
 
