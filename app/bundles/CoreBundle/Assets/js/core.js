@@ -206,7 +206,7 @@ var Mautic = {
         });
 
         //spin icons on button click
-        mQuery(container + ' .btn').on('click.spinningicons', function(event) {
+        mQuery(container + ' .btn:not(.btn-nospin)').on('click.spinningicons', function(event) {
             Mautic.startIconSpinOnEvent(event);
         });
 
@@ -965,6 +965,10 @@ var Mautic = {
     },
 
     activateLiveSearch: function(el, searchStrVar, liveCacheVar) {
+        if (!mQuery(el).length) {
+            return;
+        }
+
         mQuery(el).on('keyup', {}, function (event) {
             var searchStr = mQuery(el).val().trim();
             var diff = searchStr.length - MauticVars[searchStrVar].length;
@@ -986,7 +990,7 @@ var Mautic = {
             if (
                 !MauticVars.searchIsActive &&
                 (
-                    searchStr in MauticVars[liveCacheVar] ||
+                    //searchStr in MauticVars[liveCacheVar] ||
                     diff >= 3 ||
                     event.which == 32 || event.keyCode == 32 ||
                     event.which == 13 || event.keyCode == 13
@@ -1010,13 +1014,6 @@ var Mautic = {
         //find associated button
         var btn = "button[data-livesearch-parent='" + mQuery(el).attr('id') + "']";
         if (mQuery(btn).length) {
-            if (mQuery(el).val()) {
-                mQuery(btn).attr('data-livesearch-action', 'clear');
-                mQuery(btn + ' i').removeClass('fa-search').addClass('fa-eraser');
-            } else {
-                mQuery(btn).attr('data-livesearch-action', 'search');
-                mQuery(btn + ' i').removeClass('fa-eraser').addClass('fa-search');
-            }
             mQuery(btn).on('click', {'parent': mQuery(el).attr('id')}, function (event) {
                 Mautic.filterList(event,
                     event.data.parent,
@@ -1026,6 +1023,14 @@ var Mautic = {
                     mQuery(this).attr('data-livesearch-action')
                 );
             });
+
+            if (mQuery(el).val()) {
+                mQuery(btn).attr('data-livesearch-action', 'clear');
+                mQuery(btn + ' i').removeClass('fa-search').addClass('fa-eraser');
+            } else {
+                mQuery(btn).attr('data-livesearch-action', 'search');
+                mQuery(btn + ' i').removeClass('fa-eraser').addClass('fa-search');
+            }
         }
     },
 
@@ -1039,7 +1044,8 @@ var Mautic = {
 
         var el = mQuery('#' + elId);
         //only submit if the element exists, its a livesearch, or on button click
-        if (el.length && (e.data.livesearch || mQuery(e.target).prop("tagName") == 'BUTTON')) {
+
+        if (el.length && (e.data.livesearch || mQuery(e.target).prop('tagName') == 'BUTTON' || mQuery(e.target).parent().prop('tagName') == 'BUTTON')) {
             var value = el.val().trim();
             //should the content be cleared?
             if (!value) {
@@ -1064,7 +1070,8 @@ var Mautic = {
             }
 
             //make the request
-            if (value && value in MauticVars[liveCacheVar]) {
+            //@TODO reevaluate search caching as it seems to cause issues
+            if (false && value && value in MauticVars[liveCacheVar]) {
                 var response = {"newContent": MauticVars[liveCacheVar][value]};
                 response.target = target;
                 Mautic.processPageContent(response);
