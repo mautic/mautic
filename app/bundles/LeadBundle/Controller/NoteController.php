@@ -54,15 +54,36 @@ class NoteController extends FormController
 
         $model = $this->factory->getModel('lead.note');
 
+        $force = array(
+            array(
+                'column' => 'n.lead',
+                'expr'   => 'eq',
+                'value'  => $lead
+            )
+        );
+
+        $session = $this->factory->getSession();
+        $noteType = $this->request->request->get('noteTypes', $session->get('mautic.lead.'.$lead->getId().'.notetype.filter', array()), true);
+        $session->set('mautic.lead.'.$lead->getId().'.notetype.filter', $noteType);
+
+        $noteTypes = array(
+            'general' => 'mautic.lead.note.type.general',
+            'email'   => 'mautic.lead.note.type.email',
+            'call'    => 'mautic.lead.note.type.call',
+            'meeting' => 'mautic.lead.note.type.meeting',
+        );
+
+        if (!empty($noteType)) {
+            $force[] = array(
+                'column' => 'n.type',
+                'expr'   => 'in',
+                'value'  => $noteType
+            );
+        }
+
         $items = $model->getEntities(array(
             'filter'         => array(
-                'force' => array(
-                    array(
-                        'column' => 'n.lead',
-                        'expr'   => 'eq',
-                        'value'  => $lead
-                    )
-                ),
+                'force' => $force,
                 'string' => $search
             ),
             'start'          => $start,
@@ -81,6 +102,8 @@ class NoteController extends FormController
                 'page'        => $page,
                 'limit'       => $limit,
                 'search'      => $search,
+                'noteType'    => $noteType,
+                'noteTypes'   => $noteTypes,
                 'tmpl'        => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                 'permissions' => array(
                     'edit'   => $security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getOwner()),

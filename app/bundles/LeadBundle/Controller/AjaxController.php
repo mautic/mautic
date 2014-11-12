@@ -102,17 +102,27 @@ class AjaxController extends CommonAjaxController
                 $socialProfiles    = NetworkIntegrationHelper::getUserProfiles($this->factory, $lead, $fields, true, $network);
                 $socialProfileUrls = NetworkIntegrationHelper::getSocialProfileUrlRegex(false);
                 $networks          = array();
-                foreach ($socialProfiles as $name => $details) {
-                    $networks[$name]['newContent'] = $this->renderView('MauticLeadBundle:Social/' . $name . ':view.html.php', array(
+                $socialCount       = count($socialProfiles);
+                if (empty($network) || empty($socialCount)) {
+                    $dataArray['completeProfile'] = $this->renderView('MauticLeadBundle:Social:index.html.php', array(
+                        'socialProfiles'    => $socialProfiles,
                         'lead'              => $lead,
-                        'details'           => $details,
-                        'network'           => $name,
                         'socialProfileUrls' => $socialProfileUrls
                     ));
+                    $dataArray['socialCount'] = $socialCount;
+                } else {
+                    foreach ($socialProfiles as $name => $details) {
+                        $networks[$name]['newContent'] = $this->renderView('MauticLeadBundle:Social/' . $name . ':view.html.php', array(
+                            'lead'              => $lead,
+                            'details'           => $details,
+                            'network'           => $name,
+                            'socialProfileUrls' => $socialProfileUrls
+                        ));
+                    }
+                    $dataArray['profiles'] = $networks;
                 }
 
-                $dataArray['success']  = 1;
-                $dataArray['profiles'] = $networks;
+                $dataArray['success'] = 1;
             }
         }
 
@@ -138,10 +148,20 @@ class AjaxController extends CommonAjaxController
             $lead  = $model->getEntity($leadId);
 
             if ($lead !== null && $this->factory->getSecurity()->hasEntityAccess('lead:leads:editown', 'lead:leads:editown', $lead->getOwner())) {
-                $socialCache = NetworkIntegrationHelper::clearNetworkCache($this->factory, $lead, $network);
-
                 $dataArray['success']  = 1;
-                $dataArray['socialCount'] = count($socialCache);
+
+                $socialProfiles    = NetworkIntegrationHelper::clearNetworkCache($this->factory, $lead, $network);
+                $socialCount       = count($socialProfiles);
+
+                if (empty($socialCount)) {
+                    $dataArray['completeProfile'] = $this->renderView('MauticLeadBundle:Social:index.html.php', array(
+                        'socialProfiles'    => $socialProfiles,
+                        'lead'              => $lead,
+                        'socialProfileUrls' => NetworkIntegrationHelper::getSocialProfileUrlRegex(false)
+                    ));
+                }
+
+                $dataArray['socialCount'] = $socialCount;
             }
         }
 
