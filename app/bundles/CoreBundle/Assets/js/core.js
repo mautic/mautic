@@ -971,10 +971,20 @@ var Mautic = {
 
         mQuery(el).on('keyup', {}, function (event) {
             var searchStr = mQuery(el).val().trim();
-            var diff = searchStr.length - MauticVars[searchStrVar].length;
-            var overlayEnabled = mQuery(el).attr('data-overlay');
+            var target    = mQuery(el).attr('data-target');
+            var diff      = searchStr.length - MauticVars[searchStrVar].length;
 
-            if (overlayEnabled != 'false') {
+            if (diff < 0) {
+                diff = parseInt(diff) * -1;
+            }
+
+            var overlayEnabled   = mQuery(el).attr('data-overlay');
+
+            var spaceKeyPressed  = (event.which == 32 || event.keyCode == 32);
+            var enterKeyPressed  = (event.which == 13 || event.keyCode == 13);
+            var deleteKeyPressed = (event.which == 8 || event.keyCode == 8);
+
+            if (!deleteKeyPressed && overlayEnabled != 'false') {
                 var overlay = mQuery('<div />', {"class": "content-overlay"}).html(mQuery(el).attr('data-overlay-text'));
                 if (mQuery(el).attr('data-overlay-background')) {
                     overlay.css('background', mQuery(el).attr('data-overlay-background'));
@@ -982,7 +992,6 @@ var Mautic = {
                 if (mQuery(el).attr('data-overlay-color')) {
                     overlay.css('color', mQuery(el).attr('data-overlay-color'));
                 }
-                var target = mQuery(el).attr('data-target');
                 var overlayTarget = mQuery(el).attr('data-overlay-target');
                 if (!overlayTarget) overlayTarget = target;
             }
@@ -991,9 +1000,10 @@ var Mautic = {
                 !MauticVars.searchIsActive &&
                 (
                     //searchStr in MauticVars[liveCacheVar] ||
+                    (!searchStr && MauticVars[searchStrVar].length) ||
                     diff >= 3 ||
-                    event.which == 32 || event.keyCode == 32 ||
-                    event.which == 13 || event.keyCode == 13
+                    spaceKeyPressed ||
+                    enterKeyPressed
                 )
             ) {
                 MauticVars.searchIsActive = true;
