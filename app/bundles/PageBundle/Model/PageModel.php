@@ -289,7 +289,7 @@ class PageModel extends FormModel
         $pageUrl  = $this->factory->getRouter()->generate('mautic_page_public', $slugs, $absolute);
 
         if (!empty($clickthrough)) {
-            $pageUrl = (!empty($clickthrough)) ? '?ct=' . base64_encode(serialize($clickthrough)) : '';
+            $pageUrl .= (!empty($clickthrough)) ? '?ct=' . base64_encode(serialize($clickthrough)) : '';
         }
 
         return $pageUrl;
@@ -311,7 +311,7 @@ class PageModel extends FormModel
         //check for any clickthrough info
         $clickthrough = $request->get('ct', false);
         if (!empty($clickthrough)) {
-            $clickthrough = base64_decode(unserialize($clickthrough));
+            $clickthrough = unserialize(base64_decode($clickthrough));
 
             if (!empty($clickthrough['lead'])) {
                 $lead = $leadModel->getEntity($clickthrough['lead']);

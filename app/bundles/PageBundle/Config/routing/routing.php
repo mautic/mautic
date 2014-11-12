@@ -12,6 +12,16 @@ use Symfony\Component\Routing\Route;
 
 $collection = new RouteCollection();
 
+$collection->add('mautic_page_emailtoken_index', new Route('/pages/emailtokens/{page}',
+    array(
+        '_controller' => 'MauticPageBundle:SubscribedEvents\EmailToken:index',
+        'page'        => 1
+    ),
+    array(
+        'page'    => '\d+'
+    )
+));
+
 $collection->add('mautic_page_index', new Route('/pages/{page}',
     array(
         '_controller' => 'MauticPageBundle:Page:index',
