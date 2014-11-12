@@ -562,7 +562,7 @@ class EmailModel extends FormModel
         $saveEntities  = array();
 
         foreach ($listLeads as $listId => $leads) {
-            $listSaveEntities = $this->sendEmail($email, $leads, $emailSettings, $listId, true);
+            $listSaveEntities = $this->sendEmail($email, $leads, array('email', $email->getId()), $emailSettings, $listId, true);
             if (!empty($listSaveEntities)) {
                 $saveEntities = array_merge($saveEntities, $listSaveEntities);
             }
@@ -662,6 +662,7 @@ class EmailModel extends FormModel
      *
      * @param       $email
      * @param       $leads
+     * @param       $source array('model', 'id')
      * @param array $emailSettings
      * @param null  $listId
      * @param bool  $returnEntities
@@ -669,7 +670,7 @@ class EmailModel extends FormModel
      * @return mixed
      * @throws \Doctrine\ORM\ORMException
      */
-    public function sendEmail($email, $leads, $emailSettings = array(), $listId = null, $returnEntities = false)
+    public function sendEmail($email, $leads, $source = null, $emailSettings = array(), $listId = null, $returnEntities = false)
     {
         if (isset($leads['id'])) {
             $leads = array($leads['id'] => $leads);
@@ -731,7 +732,7 @@ class EmailModel extends FormModel
             $idHash = uniqid();
 
             if ($hasListeners) {
-                $event = new EmailSendEvent($useEmail['entity'], $lead, $idHash);
+                $event = new EmailSendEvent($useEmail['entity'], $lead, $idHash, $source);
                 $event->setSlotsHelper($slotsHelper);
                 $dispatcher->dispatch(EmailEvents::EMAIL_ON_SEND, $event);
                 $content = $event->getContent();
@@ -775,6 +776,11 @@ class EmailModel extends FormModel
             }
             $stat->setEmailAddress($lead['email']);
             $stat->setTrackingHash($idHash);
+            if (!empty($source)) {
+                $stat->setSource($source[0]);
+                $stat->setSourceId($source[1]);
+            }
+
             $saveEntities[] = $stat;
 
             //increase the sent counts

@@ -298,8 +298,12 @@ class EventModel extends CommonFormModel
      *
      * @throws \Doctrine\ORM\ORMException
      */
-    public function triggerCampaignStartingAction($campaign, $event, $settings)
+    public function triggerCampaignStartingAction($campaign, $eventEntity, $settings)
     {
+        //convert to array to match triggerEvent
+        $event = $eventEntity->convertToArray();
+        $event['campaign'] = $campaign->convertToArray();
+
         /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */
         $campaignModel = $this->factory->getModel('campaign');
         $eventId       = $event['id'];
