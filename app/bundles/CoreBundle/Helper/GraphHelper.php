@@ -88,7 +88,7 @@ class GraphHelper
     {
         $format = '';
         if ($unit == 'H') {
-            $format = 'H:00';
+            $format = 'l ga';
         } elseif ($unit == 'D') {
             $format = 'jS F';
         } elseif ($unit == 'W') {
@@ -175,23 +175,25 @@ class GraphHelper
         }
 
         foreach ($items as $item) {
-            if (is_string($item[$dateName])) {
-                $item[$dateName] = new \DateTime($item[$dateName]);
-            }
+            if (isset($item[$dateName]) && $item[$dateName]) {
+                if (is_string($item[$dateName])) {
+                    $item[$dateName] = new \DateTime($item[$dateName]);
+                }
 
-            $oneItem = $item[$dateName]->format(self::getDateLabelFromat($unit));
-            if (($itemKey = array_search($oneItem, $graphData['labels'])) !== false) {
-                if ($deltaName) {
-                    if ($average) {
-                        if (isset($graphData['datasets'][$datasetKey]['count'][$itemKey])) {
-                            $graphData['datasets'][$datasetKey]['count'][$itemKey]++;
-                        } else {
-                            $graphData['datasets'][$datasetKey]['count'][$itemKey] = 1;
+                $oneItem = $item[$dateName]->format(self::getDateLabelFromat($unit));
+                if (($itemKey = array_search($oneItem, $graphData['labels'])) !== false) {
+                    if ($deltaName) {
+                        if ($average) {
+                            if (isset($graphData['datasets'][$datasetKey]['count'][$itemKey])) {
+                                $graphData['datasets'][$datasetKey]['count'][$itemKey]++;
+                            } else {
+                                $graphData['datasets'][$datasetKey]['count'][$itemKey] = 1;
+                            }
                         }
+                        $graphData['datasets'][$datasetKey]['data'][$itemKey] += $item[$deltaName];
+                    } else {
+                        $graphData['datasets'][$datasetKey]['data'][$itemKey]++;
                     }
-                    $graphData['datasets'][$datasetKey]['data'][$itemKey] += $item[$deltaName];
-                } else {
-                    $graphData['datasets'][$datasetKey]['data'][$itemKey]++;
                 }
             }
         }

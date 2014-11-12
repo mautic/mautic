@@ -133,14 +133,14 @@ class ReportSubscriber extends CommonSubscriber
             $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
             $queryBuilder->from(MAUTIC_TABLE_PREFIX . 'email_stats', 'es');
             $queryBuilder->leftJoin('es', MAUTIC_TABLE_PREFIX . 'emails', 'e', 'e.id = es.email_id');
-            $queryBuilder->select('es.email_id as email, es.date_sent as dateSent, is_read, is_failed');
+            $queryBuilder->select('es.email_id as email, es.date_sent as dateSent, es.date_read as dateRead, is_failed');
             $event->buildWhere($queryBuilder);
             $queryBuilder->andwhere($queryBuilder->expr()->gte('es.date_sent', ':date'))
                 ->setParameter('date', $timeStats['fromDate']->format('Y-m-d H:i:s'));
             $stats = $queryBuilder->execute()->fetchAll();
 
             $timeStats = GraphHelper::mergeLineGraphData($timeStats, $stats, $unit, 0, 'dateSent');
-            $timeStats = GraphHelper::mergeLineGraphData($timeStats, $stats, $unit, 1, 'dateSent', 'is_read');
+            $timeStats = GraphHelper::mergeLineGraphData($timeStats, $stats, $unit, 1, 'dateRead');
             $timeStats = GraphHelper::mergeLineGraphData($timeStats, $stats, $unit, 2, 'dateSent', 'is_failed');
             $timeStats['name'] = 'mautic.email.graph.line.stats';
 
