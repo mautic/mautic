@@ -124,6 +124,6 @@ $items = array(
 );
 
 return array(
-    'priority' => 2,
+    'priority' => 3,
     'items'    => $items
 );
