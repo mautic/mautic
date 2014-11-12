@@ -123,25 +123,25 @@ class GraphHelper
         $date = new \DateTime();
         $oneUnit = new \DateInterval('P'.$isTime.'1'.$unit);
         $data = array('labels' => array(), 'datasets' => array());
-        $i = 0;
+        $j = 0;
 
         // Prefill $data arrays
         foreach ($datasetLabels as $key => $label) {
-            if (!isset(self::$colors[$i])) {
-                $i = 0;
+            if (!isset(self::$colors[$j])) {
+                $j = 0;
             }
 
             $data['datasets'][$key] = array(
                 'label' => $label,
-                'fillColor' => self::$colors[$i]['fill'],
-                'strokeColor' => self::$colors[$i]['highlight'],
-                'pointColor' => self::$colors[$i]['highlight'],
+                'fillColor' => self::$colors[$j]['fill'],
+                'strokeColor' => self::$colors[$j]['highlight'],
+                'pointColor' => self::$colors[$j]['highlight'],
                 'pointStrokeColor' => '#fff',
                 'pointHighlightFill' => '#fff',
-                'pointHighlightStroke' => self::$colors[$i]['highlight'],
+                'pointHighlightStroke' => self::$colors[$j]['highlight'],
                 'data' => array()
             );
-            $i++;
+            $j++;
             for ($i = 0; $i < $amount; $i++) {
                 if ($key === 0) {
                     $data['labels'][$i] = $date->format($format);
@@ -152,6 +152,8 @@ class GraphHelper
         }
 
         $data['fromDate'] = $date;
+
+        $data['labels'] = array_reverse($data['labels']);
 
         return $data;
     }
@@ -166,16 +168,8 @@ class GraphHelper
      *
      * @return array
      */
-    public static function mergeLineGraphData($graphData, $items, $unit, $dateName, $deltaName = null, $average = false)
+    public static function mergeLineGraphData($graphData, $items, $unit, $datasetKey, $dateName, $deltaName = null, $average = false)
     {
-        $datasetKey = 0;
-
-        foreach ($graphData['datasets'] as $key => $dataset) {
-            if ($dataset['label'] == $dateName) {
-                $datasetKey = $key;
-            }
-        }
-
         if ($average) {
             $graphData['datasets'][$datasetKey]['count'] = array();
         }
@@ -208,13 +202,6 @@ class GraphHelper
                     $graphData['datasets'][$datasetKey]['data'][$key] /= $graphData['datasets'][$datasetKey]['count'][$key];
                 }
             }
-        }
-
-        $graphData['datasets'][$datasetKey]['data'] = array_reverse($graphData['datasets'][$datasetKey]['data']);
-            
-        
-        if ($datasetKey === 0) {
-            $graphData['labels'] = array_reverse($graphData['labels']);
         }
 
         return $graphData;

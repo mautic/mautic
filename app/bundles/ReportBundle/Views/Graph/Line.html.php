@@ -12,10 +12,19 @@
 <div class="panel">
     <div class="panel-body box-layout">
         <div class="col-xs-6 va-m">
-            <h5 class="text-white dark-md fw-sb mb-xs">
+            <h5 class="text-white dark-md fw-sb mb-xs pull-left">
                 <span class="fa fa-download"></span>
                 <?php echo $view['translator']->trans($graph['name']); ?>
             </h5>
+            <?php if (isset($graph['datasets']) && count($graph['datasets']) > 1) : ?>
+                <div class="pull-left pl-20">
+                    <?php foreach ($graph['datasets'] as $dataset) : ?>
+                        <span class="label label-default" style="background:<?php echo $dataset['strokeColor']; ?>">
+                            <?php echo $dataset['label']; ?>
+                        </span>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
         </div>
         <div class="col-xs-6 va-m">
             <div class="dropdown pull-right">

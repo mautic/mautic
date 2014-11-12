@@ -128,7 +128,7 @@ class ReportSubscriber extends CommonSubscriber
                 $unit = $options['unit'];
             }
 
-            $timeStats = GraphHelper::prepareLineGraphData($amount, $unit);
+            $timeStats = GraphHelper::prepareLineGraphData($amount, $unit, array('points'));
 
             $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
             $queryBuilder->from(MAUTIC_TABLE_PREFIX . 'lead_points_change_log', 'lp');
@@ -139,7 +139,7 @@ class ReportSubscriber extends CommonSubscriber
                 ->setParameter('date', $timeStats['fromDate']->format('Y-m-d H:i:s'));
             $points = $queryBuilder->execute()->fetchAll();
 
-            $timeStats = GraphHelper::mergeLineGraphData($timeStats, $points, $unit, 'dateAdded', 'delta');
+            $timeStats = GraphHelper::mergeLineGraphData($timeStats, $points, $unit, 0, 'dateAdded', 'delta');
             $timeStats['name'] = 'mautic.lead.graph.line.points';
 
             $event->setGraph('line', $timeStats);

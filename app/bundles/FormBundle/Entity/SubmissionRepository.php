@@ -239,11 +239,11 @@ class SubmissionRepository extends CommonRepository
 
     public function getSubmissionsSince($formId, $amount = 30, $unit = 'D')
     {
-        $data = GraphHelper::prepareLineGraphData($amount, $unit);
+        $data = GraphHelper::prepareLineGraphData($amount, $unit, array('submissions'));
 
         $submissions = $this->getSubmissions(array('id' => $formId, 'fromDate' => $data['fromDate']));
 
-        return GraphHelper::mergeLineGraphData($data, $submissions, $unit, 'dateSubmitted');
+        return GraphHelper::mergeLineGraphData($data, $submissions, $unit, 0, 'dateSubmitted');
     }
 
     /**

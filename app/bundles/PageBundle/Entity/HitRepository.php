@@ -398,8 +398,8 @@ class HitRepository extends CommonRepository
     {
         $stats = array(
             'sum'     => array_sum($times),
-            'min'     => min($times),
-            'max'     => max($times),
+            'min'     => count($times) ? min($times) : 0,
+            'max'     => count($times) ? max($times) : 0,
             'average' => count($times) ? round(array_sum($times) / count($times)) : 0,
             'count'   => count($times)
         );
@@ -412,8 +412,11 @@ class HitRepository extends CommonRepository
                     }
                 }
             }
+            $stats['timesOnSite'] = $timesOnSite;
+        } else {
+            $stats['timesOnSite'] = array();
         }
-        $stats['timesOnSite'] = $timesOnSite;
+        
 
         return $stats;
     }

@@ -128,7 +128,7 @@ class ReportSubscriber extends CommonSubscriber
                 $unit = $options['unit'];
             }
 
-            $data = GraphHelper::prepareLineGraphData($amount, $unit);
+            $data = GraphHelper::prepareLineGraphData($amount, $unit, array('downloaded'));
 
             $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
             $queryBuilder->from(MAUTIC_TABLE_PREFIX . 'asset_downloads', 'ad');
@@ -139,7 +139,7 @@ class ReportSubscriber extends CommonSubscriber
                 ->setParameter('date', $data['fromDate']->format('Y-m-d H:i:s'));
             $downloads = $queryBuilder->execute()->fetchAll();
 
-            $timeStats = GraphHelper::mergeLineGraphData($data, $downloads, $unit, 'dateDownload');
+            $timeStats = GraphHelper::mergeLineGraphData($data, $downloads, $unit, 0, 'dateDownload');
             $timeStats['name'] = 'mautic.asset.graph.line.downloads';
 
             $event->setGraph('line', $timeStats);

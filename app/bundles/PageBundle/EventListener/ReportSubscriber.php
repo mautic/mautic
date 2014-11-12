@@ -127,7 +127,7 @@ class ReportSubscriber extends CommonSubscriber
                 ->setParameter('date', $data['fromDate']->format('Y-m-d H:i:s'));
             $hits = $queryBuilder->execute()->fetchAll();
 
-            $timeStats = GraphHelper::mergeLineGraphData($data, $hits, $unit, 'dateHit');
+            $timeStats = GraphHelper::mergeLineGraphData($data, $hits, $unit, 0, 'dateHit');
             $timeStats['name'] = 'mautic.page.graph.line.hits';
 
             $event->setGraph('line', $timeStats);
@@ -171,7 +171,7 @@ class ReportSubscriber extends CommonSubscriber
                 unset($hits[$key]['dateLeft']);
             }
 
-            $timeStats = GraphHelper::mergeLineGraphData($data, $hits, $unit, 'dateHit', 'timeOnSite', true);
+            $timeStats = GraphHelper::mergeLineGraphData($data, $hits, $unit, 0, 'dateHit', 'timeOnSite', true);
             $timeStats['name'] = 'mautic.page.graph.line.time.on.site';
 
             $event->setGraph('line', $timeStats);
