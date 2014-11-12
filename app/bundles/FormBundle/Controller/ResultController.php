@@ -126,8 +126,7 @@ class ResultController extends CommonFormController
                 'route'         => $this->generateUrl('mautic_form_results', array(
                     'objectId'       => $objectId,
                     'page'           => $page
-                )),
-                'replaceContent' => ($tmpl == 'list') ? 'true' : 'false'
+                ))
             )
         ));
     }

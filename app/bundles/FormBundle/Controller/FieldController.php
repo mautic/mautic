@@ -324,7 +324,6 @@ class FieldController extends CommonFormController
                 'target'         => '#mauticform_'.$objectId,
                 'route'          => false,
                 'fieldId'        => $objectId,
-                'replaceContent' => true,
                 'fieldHtml'      => $this->renderView($template, array(
                     'inForm'  => true,
                     'field'   => $formField,
@@ -400,7 +399,6 @@ class FieldController extends CommonFormController
                 'target'         => '#mauticform_'.$objectId,
                 'route'          => false,
                 'fieldId'        => $objectId,
-                'replaceContent' => true,
                 'fieldHtml'      => $this->renderView($template, array(
                     'inForm'  => true,
                     'field'   => $formField,

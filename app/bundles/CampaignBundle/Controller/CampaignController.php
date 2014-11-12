@@ -107,8 +107,7 @@ class CampaignController extends FormController
             'passthroughVars' => array(
                 'activeLink'     => '#mautic_campaign_index',
                 'mauticContent'  => 'campaign',
-                'route'          => $this->generateUrl('mautic_campaign_index', array('page' => $page)),
-                'replaceContent' => ($tmpl == 'list') ? 'true' : 'false'
+                'route'          => $this->generateUrl('mautic_campaign_index', array('page' => $page))
             )
         ));
     }

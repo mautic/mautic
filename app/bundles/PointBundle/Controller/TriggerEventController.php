@@ -302,7 +302,6 @@ class TriggerEventController extends CommonFormController
                 'target'         => '#triggerEvent' . $objectId,
                 'route'          => false,
                 'actionId'       => $objectId,
-                'replaceContent' => true,
                 'actionHtml'     => $this->renderView($template, array(
                     'inForm'      => true,
                     'action'      => $triggerEvent,
@@ -367,7 +366,6 @@ class TriggerEventController extends CommonFormController
                 'target'         => '#triggerEvent' . $objectId,
                 'route'          => false,
                 'actionId'       => $objectId,
-                'replaceContent' => true,
                 'actionHtml'     => $this->renderView($template, array(
                     'inForm'      => true,
                     'action'      => $triggerEvent,

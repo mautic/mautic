@@ -116,8 +116,7 @@ class ConfigController extends FormController
             'passthroughVars' => array(
                 'activeLink'     => '#mautic_config_index',
                 'mauticContent'  => 'config',
-                'route'          => $this->generateUrl('mautic_config_action', array('objectAction' => 'edit')),
-                'replaceContent' => ($tmpl == 'list') ? 'true' : 'false'
+                'route'          => $this->generateUrl('mautic_config_action', array('objectAction' => 'edit'))
             )
         ));
     }

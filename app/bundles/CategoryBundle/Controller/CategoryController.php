@@ -135,8 +135,7 @@ class CategoryController extends FormController
             'passthroughVars' => array(
                 'activeLink'     => '#mautic_'.$bundle.'category_index',
                 'mauticContent'  => 'category',
-                'route'          => $this->generateUrl('mautic_category_index', $viewParams),
-                'replaceContent' => ($tmpl == 'list') ? 'true': 'false'
+                'route'          => $this->generateUrl('mautic_category_index', $viewParams)
             )
         ));
     }

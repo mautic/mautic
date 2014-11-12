@@ -547,6 +547,10 @@ var Mautic = {
                 }
             }
 
+            if (response.overlayEnabled) {
+                mQuery(response.overlayTarget + ' .content-overlay').remove();
+            }
+
             //activate content specific stuff
             Mautic.onPageLoad(response.target, response);
         }
@@ -978,13 +982,18 @@ var Mautic = {
                 diff = parseInt(diff) * -1;
             }
 
-            var overlayEnabled   = mQuery(el).attr('data-overlay');
+            var overlayEnabled = mQuery(el).attr('data-overlay');
+            if (!overlayEnabled || overlayEnabled == 'false') {
+                overlayEnabled = false;
+            } else {
+                overlayEnabled = true;
+            }
 
             var spaceKeyPressed  = (event.which == 32 || event.keyCode == 32);
             var enterKeyPressed  = (event.which == 13 || event.keyCode == 13);
             var deleteKeyPressed = (event.which == 8 || event.keyCode == 8);
 
-            if (!deleteKeyPressed && overlayEnabled != 'false') {
+            if (!deleteKeyPressed && overlayEnabled) {
                 var overlay = mQuery('<div />', {"class": "content-overlay"}).html(mQuery(el).attr('data-overlay-text'));
                 if (mQuery(el).attr('data-overlay-background')) {
                     overlay.css('background', mQuery(el).attr('data-overlay-background'));
@@ -1010,12 +1019,15 @@ var Mautic = {
                 MauticVars[searchStrVar] = searchStr;
                 event.data.livesearch = true;
 
-                if (overlayEnabled != 'false') {
-                    mQuery(overlayTarget + ' .content-overlay').remove();
-                }
-
-                Mautic.filterList(event, mQuery(el).attr('id'), mQuery(el).attr('data-action'), target, liveCacheVar);
-            } else if (overlayEnabled != 'false') {
+                Mautic.filterList(event,
+                    mQuery(el).attr('id'),
+                    mQuery(el).attr('data-action'),
+                    target,
+                    liveCacheVar,
+                    overlayEnabled,
+                    overlayTarget
+                );
+            } else if (overlayEnabled) {
                 if (!mQuery(overlayTarget + ' .content-overlay').length) {
                     mQuery(overlayTarget).prepend(overlay);
                 }
@@ -1030,7 +1042,9 @@ var Mautic = {
                     mQuery('#' + event.data.parent).attr('data-action'),
                     mQuery('#' + event.data.parent).attr('data-target'),
                     'liveCache',
-                    mQuery(this).attr('data-livesearch-action')
+                    mQuery(this).attr('data-livesearch-action'),
+                    overlayEnabled,
+                    overlayTarget
                 );
             });
 
@@ -1047,7 +1061,7 @@ var Mautic = {
     /**
      * Filters list based on search contents
      */
-    filterList: function (e, elId, route, target, liveCacheVar, action) {
+    filterList: function (e, elId, route, target, liveCacheVar, action, overlayEnabled, overlayTarget) {
         if (typeof liveCacheVar == 'undefined') {
             liveCacheVar = "liveCache";
         }
@@ -1083,7 +1097,10 @@ var Mautic = {
             //@TODO reevaluate search caching as it seems to cause issues
             if (false && value && value in MauticVars[liveCacheVar]) {
                 var response = {"newContent": MauticVars[liveCacheVar][value]};
-                response.target = target;
+                response.target         = target;
+                response.overlayEnabled = overlayEnabled;
+                response.overlayTarget  = overlayTarget;
+
                 Mautic.processPageContent(response);
                 MauticVars.searchIsActive = false;
             } else {
@@ -1103,7 +1120,10 @@ var Mautic = {
                             MauticVars[liveCacheVar][value] = response.newContent;
                         }
                         //note the target to be updated
-                        response.target = target;
+                        response.target         = target;
+                        response.overlayEnabled = overlayEnabled;
+                        response.overlayTarget  = overlayTarget;
+
                         Mautic.processPageContent(response);
 
                         MauticVars.searchIsActive = false;

@@ -317,7 +317,6 @@ class ActionController extends CommonFormController
                 'target'         => '#mauticform_' . $objectId,
                 'route'          => false,
                 'actionId'       => $objectId,
-                'replaceContent' => true,
                 'actionHtml'     => $this->renderView($template, array(
                     'inForm'  => true,
                     'action'  => $formAction,
@@ -389,7 +388,6 @@ class ActionController extends CommonFormController
                 'target'         => '#mauticform_' . $objectId,
                 'route'          => false,
                 'actionId'       => $objectId,
-                'replaceContent' => true,
                 'actionHtml'     => $this->renderView($template, array(
                     'inForm'  => true,
                     'action'  => $formAction,
