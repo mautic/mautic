@@ -982,6 +982,11 @@ var Mautic = {
                 diff = parseInt(diff) * -1;
             }
 
+            var spaceKeyPressed  = (event.which == 32 || event.keyCode == 32);
+            var enterKeyPressed  = (event.which == 13 || event.keyCode == 13);
+            var deleteKeyPressed = (event.which == 8 || event.keyCode == 8);
+
+
             var overlayEnabled = mQuery(el).attr('data-overlay');
             if (!overlayEnabled || overlayEnabled == 'false') {
                 overlayEnabled = false;
@@ -989,9 +994,8 @@ var Mautic = {
                 overlayEnabled = true;
             }
 
-            var spaceKeyPressed  = (event.which == 32 || event.keyCode == 32);
-            var enterKeyPressed  = (event.which == 13 || event.keyCode == 13);
-            var deleteKeyPressed = (event.which == 8 || event.keyCode == 8);
+            var overlayTarget = mQuery(el).attr('data-overlay-target');
+            if (!overlayTarget) overlayTarget = target;
 
             if (!deleteKeyPressed && overlayEnabled) {
                 var overlay = mQuery('<div />', {"class": "content-overlay"}).html(mQuery(el).attr('data-overlay-text'));
@@ -1001,8 +1005,6 @@ var Mautic = {
                 if (mQuery(el).attr('data-overlay-color')) {
                     overlay.css('color', mQuery(el).attr('data-overlay-color'));
                 }
-                var overlayTarget = mQuery(el).attr('data-overlay-target');
-                if (!overlayTarget) overlayTarget = target;
             }
 
             if (
@@ -1042,9 +1044,7 @@ var Mautic = {
                     mQuery('#' + event.data.parent).attr('data-action'),
                     mQuery('#' + event.data.parent).attr('data-target'),
                     'liveCache',
-                    mQuery(this).attr('data-livesearch-action'),
-                    overlayEnabled,
-                    overlayTarget
+                    mQuery(this).attr('data-livesearch-action')
                 );
             });
 
