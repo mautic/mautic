@@ -244,6 +244,10 @@ var Mautic = {
             mQuery(container + " textarea.editor").ckeditor();
         }
 
+        if (mQuery(container + " textarea.advanced_editor").length) {
+            mQuery(container + " textarea.advanced_editor").ckeditor({ toolbar: 'advanced' });
+        }
+
         //run specific on loads
         var contentSpecific = false;
         if (response && response.mauticContent) {

@@ -47,7 +47,7 @@ class PointType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber());
+        $builder->addEventSubscriber(new CleanFormSubscriber(array('description' => 'html')));
         $builder->addEventSubscriber(new FormExitSubscriber('point', $options));
 
         $builder->add('name', 'text', array(
@@ -59,7 +59,7 @@ class PointType extends AbstractType
         $builder->add('description', 'textarea', array(
             'label'      => 'mautic.point.form.description',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control'),
+            'attr'       => array('class' => 'form-control editor'),
             'required'   => false
         ));
 

@@ -26,6 +26,7 @@ mQuery(document).ready( function() {
     mQuery("div[contenteditable='true']").each(function (index) {
         var content_id = mQuery(this).attr('id');
         CKEDITOR.inline(content_id, {
+            toolbar: 'advanced',
             on: {
                 blur: function (event) {
                     var data = event.editor.getData();
