@@ -9,7 +9,6 @@
 
 namespace Mautic\AssetBundle\Form\Type;
 
-use Mautic\CategoryBundle\Helper\FormHelper;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
@@ -70,7 +69,9 @@ class AssetType extends AbstractType
             'required'   => false
         ));
 
-        FormHelper::buildForm($this->translator, $builder);
+        $builder->add('category', 'category', array(
+            'bundle' => 'asset'
+        ));
 
         $builder->add('language', 'locale', array(
             'label'      => 'mautic.asset.asset.form.language',

@@ -471,12 +471,6 @@ class FormController extends CommonFormController
                 $viewParameters  = array('page' => $page);
                 $returnUrl = $this->generateUrl('mautic_form_index', $viewParameters);
                 $template  = 'MauticFormBundle:Form:index';
-
-                //set the lookup values
-                $category = $entity->getCategory();
-                if ($category && isset($form['category_lookup'])) {
-                    $form->get('category_lookup')->setData($category->getName());
-                }
             }
 
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {

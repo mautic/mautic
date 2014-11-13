@@ -73,9 +73,10 @@ class EventRepository extends CommonRepository
                     $q->expr()->neq('e.decisionPath',
                         $q->expr()->literal('no')
                     ),
-                $q->expr()->isNull('e.decisionPath')
+                    $q->expr()->isNull('e.decisionPath')
                 )
             );
+
         }
 
         $results = $q->getQuery()->getArrayResult();

@@ -34,7 +34,6 @@ $view['slots']->set("headerTitle", $header.$subheader);
                 <div class="col-md-6">
                     <?php echo $view['form']->row($form['title']); ?>
                     <?php echo $view['form']->row($form['alias']); ?>
-                    <?php echo $view['form']->row($form['category_lookup']); ?>
                     <?php echo $view['form']->row($form['category']); ?>
                     <?php echo $view['form']->row($form['template']); ?>
                 </div>
@@ -75,7 +74,6 @@ $view['slots']->set("headerTitle", $header.$subheader);
     <div class="col-md-3 bg-white height-auto">
         <div class="pr-lg pl-lg pt-md pb-md">
             <?php
-                echo $view['form']->row($form['category_lookup']);
                 echo $view['form']->row($form['category']);
                 echo $view['form']->row($form['language']);
                 echo $view['form']->row($form['template']);

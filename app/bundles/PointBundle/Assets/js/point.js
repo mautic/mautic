@@ -3,19 +3,11 @@ Mautic.pointOnLoad = function (container) {
     if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'point');
     }
-
-    if (mQuery(container + ' form[name="point"]').length) {
-        Mautic.activateCategoryLookup('point', 'point');
-    }
 };
 
 Mautic.pointTriggerOnLoad = function (container) {
     if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'point.trigger');
-    }
-
-    if (mQuery(container + ' form[name="pointtrigger"]').length) {
-        Mautic.activateCategoryLookup('pointtrigger', 'point');
     }
 
     if (mQuery('#triggerEvents')) {

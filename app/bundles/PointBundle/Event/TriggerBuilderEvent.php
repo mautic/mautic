@@ -24,7 +24,7 @@ class TriggerBuilderEvent extends Event
     /**
      * @var array
      */
-    private $actions = array();
+    private $events = array();
 
     /**
      * @var Translator
