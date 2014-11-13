@@ -17,3 +17,12 @@ $container->setDefinition('mautic.form.type.category', new Definition(
     ->addTag('form.type', array(
         'alias' => 'category',
     ));
+
+
+$container->setDefinition('mautic.form.type.category_form', new Definition(
+    'Mautic\CategoryBundle\Form\Type\CategoryType',
+    array(new Reference('mautic.factory'))
+))
+    ->addTag('form.type', array(
+        'alias' => 'category_form',
+    ));

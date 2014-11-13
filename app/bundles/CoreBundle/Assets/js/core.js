@@ -57,7 +57,7 @@ mQuery.ajaxSetup({
     complete: function () {
         setTimeout(function () {
             mQuery("body").removeClass("loading-content");
-        }, 500);
+        }, 1000);
 
         //change default back to show
         MauticVars.showLoadingBar = true;
@@ -73,7 +73,7 @@ var Mautic = {
     /**
      * Initiate various functions on page load, manual or ajax
      */
-    onPageLoad: function (container, response) {
+    onPageLoad: function (container, response, inModal) {
         //initiate links
         mQuery(container + " a[data-toggle='ajax']").off('click.ajax');
         mQuery(container + " a[data-toggle='ajax']").on('click.ajax', function (event) {
@@ -215,27 +215,56 @@ var Mautic = {
 
         //Copy form buttons to the toolbar
         if (mQuery(container + " .bottom-form-buttons").length) {
-            //hide the toolbar actions if applicable
-            mQuery('.toolbar-action-buttons').addClass('hide');
+            if (inModal) {
+                if (mQuery(container + ' .modal-form-buttons').length) {
+                    //hide the bottom buttons
+                    mQuery(container + ' .bottom-form-buttons').addClass('hide');
+                    var buttons = mQuery(container + " .bottom-form-buttons").html();
 
-            if (mQuery('.toolbar-form-buttons').hasClass('hide')) {
-                //hide the bottom buttons
-                mQuery('.bottom-form-buttons').addClass('hide');
-                var buttons = mQuery(container + " .bottom-form-buttons").html();
-                mQuery(buttons).filter("button").each(function (i, v) {
-                    //get the ID
-                    var id = mQuery(this).attr('id');
-                    var button = mQuery("<button type='button' />")
-                        .addClass(mQuery(this).attr('class'))
-                        .html(mQuery(this).html())
-                        .appendTo('.toolbar-form-buttons')
-                        .on('click.ajaxform', function (event) {
-                            event.preventDefault();
-                            Mautic.startIconSpinOnEvent(event);
-                            mQuery('#' + id).click();
-                        });
-                });
-                mQuery('.toolbar-form-buttons').removeClass('hide');
+                    //make sure working with a clean slate
+                    mQuery(container + ' .modal-form-buttons').html('');
+
+                    mQuery(buttons).filter("button").each(function (i, v) {
+                        //get the ID
+                        var id = mQuery(this).attr('id');
+                        var button = mQuery("<button type='button' />")
+                            .addClass(mQuery(this).attr('class'))
+                            .html(mQuery(this).html())
+                            .appendTo(container + ' .modal-form-buttons')
+                            .on('click.ajaxform', function (event) {
+                                event.preventDefault();
+                                Mautic.startIconSpinOnEvent(event);
+                                mQuery('#' + id).click();
+                            });
+                    });
+                }
+            } else {
+                //hide the toolbar actions if applicable
+                mQuery('.toolbar-action-buttons').addClass('hide');
+
+                if (mQuery('.toolbar-form-buttons').hasClass('hide')) {
+                    //hide the bottom buttons
+                    mQuery(container + ' .bottom-form-buttons').addClass('hide');
+                    var buttons = mQuery(container + " .bottom-form-buttons").html();
+
+                    //make sure working with a clean slate
+                    mQuery(container + ' .toolbar-form-buttons').html('');
+
+                    mQuery(buttons).filter("button").each(function (i, v) {
+                        //get the ID
+                        var id = mQuery(this).attr('id');
+                        var button = mQuery("<button type='button' />")
+                            .addClass(mQuery(this).attr('class'))
+                            .html(mQuery(this).html())
+                            .appendTo('.toolbar-form-buttons')
+                            .on('click.ajaxform', function (event) {
+                                event.preventDefault();
+                                Mautic.startIconSpinOnEvent(event);
+                                mQuery('#' + id).click();
+                            });
+                    });
+                    mQuery('.toolbar-form-buttons').removeClass('hide');
+                }
             }
         }
 
@@ -260,7 +289,7 @@ var Mautic = {
             Mautic[contentSpecific + "OnLoad"](container, response);
         }
 
-        if (container == 'body') {
+        if (!inModal && container == 'body') {
             //activate global live search
             var engine = new Bloodhound({
                 datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
@@ -741,7 +770,7 @@ var Mautic = {
         }
 
         //activate content specific stuff
-        Mautic.onPageLoad(target, response);
+        Mautic.onPageLoad(target, response, true);
 
         if (response.closeModal) {
             mQuery(target).modal('hide');
