@@ -97,15 +97,15 @@ class HitRepository extends CommonRepository
         $query->select('IDENTITY(h.page), h.dateHit');
 
         if (isset($args['page_id'])) {
-            $query->where($query->expr()->eq('IDENTITY(h.page)', (int) $args['page_id']));
+            $query->andWhere($query->expr()->eq('IDENTITY(h.page)', (int) $args['page_id']));
         }
 
         if (isset($args['source'])) {
-            $query->where($query->expr()->eq('h.source', $args['source']));
+            $query->andWhere($query->expr()->eq('h.source', $query->expr()->literal($args['source'])));
         }
 
         if (isset($args['source_id'])) {
-            $query->where($query->expr()->eq('h.sourceId', (int) $args['source_id']));
+            $query->andWhere($query->expr()->eq('h.sourceId', (int) $args['source_id']));
         }
 
         $query->andwhere($query->expr()->gte('h.dateHit', ':date'))
