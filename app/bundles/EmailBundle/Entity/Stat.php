@@ -11,6 +11,7 @@ namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
+use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
 
@@ -27,27 +28,18 @@ class Stat
      * @ORM\Column(type="integer")
      * @ORM\Id()
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $id;
 
     /**
      * @ORM\ManyToOne(targetEntity="Email", inversedBy="stats")
      * @ORM\JoinColumn(name="email_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      **/
     private $email;
 
     /**
      * @ORM\ManyToOne(targetEntity="Mautic\LeadBundle\Entity\Lead")
      * @ORM\JoinColumn(name="lead_id", referencedColumnName="id", nullable=true, onDelete="SET NULL")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      **/
     private $lead;
 
@@ -58,58 +50,37 @@ class Stat
     /**
      * @ORM\ManyToOne(targetEntity="Mautic\LeadBundle\Entity\LeadList")
      * @ORM\JoinColumn(name="list_id", referencedColumnName="id", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      **/
     private $list;
 
     /**
      * @ORM\ManyToOne(targetEntity="Mautic\CoreBundle\Entity\IpAddress", cascade={"merge", "persist"})
      * @ORM\JoinColumn(name="ip_id", referencedColumnName="id", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $ipAddress;
 
     /**
      * @ORM\Column(name="date_sent", type="datetime")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $dateSent;
 
     /**
      * @ORM\Column(name="is_read", type="boolean")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $isRead = false;
 
     /**
      * @ORM\Column(name="is_failed", type="boolean")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $isFailed = false;
 
     /**
      * @ORM\Column(name="viewed_in_browser", type="boolean")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $viewedInBrowser = false;
 
     /**
      * @ORM\Column(name="date_read", type="datetime", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $dateRead;
 
@@ -122,6 +93,16 @@ class Stat
      * @ORM\Column(name="retry_count", type="string", nullable=true)
      */
     private $retryCount = 0;
+
+    /**
+     * @ORM\Column(name="source", type="string", nullable=true)
+     */
+    private $source;
+
+    /**
+     * @ORM\Column(name="source_id", type="integer", nullable=true)
+     */
+    private $sourceId;
 
     /**
      * @return mixed
@@ -345,5 +326,37 @@ class Stat
     public function setViewedInBrowser ($viewedInBrowser)
     {
         $this->viewedInBrowser = $viewedInBrowser;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSource ()
+    {
+        return $this->source;
+    }
+
+    /**
+     * @param mixed $source
+     */
+    public function setSource ($source)
+    {
+        $this->source = $source;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSourceId ()
+    {
+        return $this->sourceId;
+    }
+
+    /**
+     * @param mixed $sourceId
+     */
+    public function setSourceId ($sourceId)
+    {
+        $this->sourceId = (int) $sourceId;
     }
 }

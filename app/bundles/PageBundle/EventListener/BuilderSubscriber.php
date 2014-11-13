@@ -42,7 +42,7 @@ class BuilderSubscriber extends CommonSubscriber
     public function onPageBuild(Events\PageBuilderEvent $event)
     {
         //add page tokens
-        $content = $this->templating->render('MauticPageBundle:PageToken:token.html.php');
+        $content = $this->templating->render('MauticPageBundle:SubscribedEvents\PageToken:token.html.php');
         $event->addTokenSection('page.pagetokens', 'mautic.page.page.header.index', $content);
 
         //add AB Test Winner Criteria
@@ -105,7 +105,7 @@ class BuilderSubscriber extends CommonSubscriber
             $content .= "</div>\n";
 
             //load the css into the header by calling the sharebtn_css view
-            $this->factory->getTemplating()->render('MauticPageBundle:PageToken:sharebtn_css.html.php');
+            $this->factory->getTemplating()->render('MauticPageBundle:SubscribedEvents\PageToken:sharebtn_css.html.php');
         }
 
         return $content;
@@ -169,7 +169,7 @@ class BuilderSubscriber extends CommonSubscriber
             if (empty($related)) {
                 return;
             } else {
-                $langbar = $this->templating->render('MauticPageBundle:PageToken:langbar.html.php', array('pages' => $related));
+                $langbar = $this->templating->render('MauticPageBundle:SubscribedEvents\PageToken:langbar.html.php', array('pages' => $related));
             }
         }
 

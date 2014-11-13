@@ -33,7 +33,7 @@ class ApplicationClientModel extends FormModel
     public function getPermissionBase()
     {
         $request = $this->factory->getRequest();
-        $bundle  = $request->get('bundle');
+        $bundle  = $request->get('application');
         return $bundle.':ApplicationClient';
     }
 
@@ -118,16 +118,10 @@ class ApplicationClientModel extends FormModel
      */
     public function deleteEntity($entity)
     {
-        $bundle = $entity->getBundle();
-
-        //if it doesn't have a dot, then assume the model will be $bundle.$bundle
-        $modelName = (strpos($bundle, '.') === false) ? $bundle.'.'.$bundle : $bundle;
-        $model     = $this->factory->getModel($modelName);
-
-        $repo       = $model->getRepository();
+        $repo       = $this->getRepository();
         $tableAlias = $repo->getTableAlias();
 
-        $entities = $model->getEntities(array(
+        $entities = $this->getEntities(array(
             'filter' => array(
                 'force' => array(
                     array(
@@ -140,7 +134,7 @@ class ApplicationClientModel extends FormModel
         ));
 
         if (!empty($entities)) {
-            $model->saveEntities($entities, false);
+            $this->saveEntities($entities, false);
         }
 
         parent::deleteEntity($entity);

@@ -10,7 +10,7 @@ if ($tmpl == 'index')
 $view->extend('MauticCampaignBundle:Campaign:index.html.php');
 ?>
 <?php if (count($items)): ?>
-    <div class="table-responsive scrollable body-white padding-sm page-list">
+    <div class="table-responsive scrollable body-white padding-sm">
         <table class="table table-hover table-striped table-bordered campaign-list" id="campaignTable">
             <thead>
             <tr>

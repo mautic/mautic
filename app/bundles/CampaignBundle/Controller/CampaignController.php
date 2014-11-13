@@ -107,8 +107,7 @@ class CampaignController extends FormController
             'passthroughVars' => array(
                 'activeLink'     => '#mautic_campaign_index',
                 'mauticContent'  => 'campaign',
-                'route'          => $this->generateUrl('mautic_campaign_index', array('page' => $page)),
-                'replaceContent' => ($tmpl == 'list') ? 'true' : 'false'
+                'route'          => $this->generateUrl('mautic_campaign_index', array('page' => $page))
             )
         ));
     }
@@ -167,7 +166,7 @@ class CampaignController extends FormController
 
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'entity'      => $entity,
+                'campaign'    => $entity,
                 'page'        => $page,
                 'permissions' => $permissions,
                 'activePage'  => $activePage,
@@ -248,7 +247,7 @@ class CampaignController extends FormController
                                 $parent = $e->getParent();
                                 if ($e->getEventType() == 'action' && $parent === null) {
                                     //check the callback function for the event to make sure it even applies based on its settings
-                                    $eventModel->triggerCampaignStartingAction($entity, $e->convertToArray(), $eventSettings['action'][$e->getType()]);
+                                    $eventModel->triggerCampaignStartingAction($entity, $e, $eventSettings['action'][$e->getType()]);
                                 }
                             }
                         }
@@ -412,7 +411,7 @@ class CampaignController extends FormController
                                 $parent = $e->getParent();
                                 if ($e->getEventType() == 'action' && $parent === null) {
                                     //check the callback function for the event to make sure it even applies based on its settings
-                                    $eventModel->triggerCampaignStartingAction($entity, $e->convertToArray(), $eventSettings['action'][$e->getType()]);
+                                    $eventModel->triggerCampaignStartingAction($entity, $e, $eventSettings['action'][$e->getType()]);
                                 }
                             }
                         }

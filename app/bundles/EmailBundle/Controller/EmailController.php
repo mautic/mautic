@@ -147,8 +147,7 @@ class EmailController extends FormController
             'passthroughVars' => array(
                 'activeLink'     => '#mautic_email_index',
                 'mauticContent'  => 'email',
-                'route'          => $this->generateUrl('mautic_email_index', array('page' => $page)),
-                'replaceContent' => ($tmpl == 'list') ? 'true' : 'false'
+                'route'          => $this->generateUrl('mautic_email_index', array('page' => $page))
             )
         ));
     }

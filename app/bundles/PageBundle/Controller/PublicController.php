@@ -27,7 +27,7 @@ class PublicController extends CommonFormController
         $entity     = $model->getEntityBySlugs($slug1, $slug2, $slug3);
 
         if (!empty($entity)) {
-            $published    = $entity->isPublished();
+            $published = $entity->isPublished();
 
             //make sure the page is published or deny access if not
             if ((!$published) && (!$security->hasEntityAccess(
@@ -248,8 +248,26 @@ class PublicController extends CommonFormController
         $response = TrackingPixelHelper::getResponse($this->request);
 
         //Create page entry
-        $this->factory->getModel('page.page')->hitPage(null, $this->request);
+        $this->factory->getModel('page')->hitPage(null, $this->request);
 
         return $response;
+    }
+
+    /**
+     * @param $redirectId
+     */
+    public function redirectAction($redirectId)
+    {
+
+        $redirectModel = $this->factory->getModel('page.redirect');
+        $redirect      = $redirectModel->getRedirect($redirectId, false, false);
+
+        if (empty($redirect)) {
+            throw $this->createNotFoundException($this->factory->getTranslator()->trans('mautic.core.url.error.404'));
+        }
+
+        $this->factory->getModel('page')->hitPage($redirect, $this->request);
+
+        return $this->redirect($redirect->getUrl());
     }
 }

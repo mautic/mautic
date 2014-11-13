@@ -128,7 +128,7 @@ class ReportSubscriber extends CommonSubscriber
                 $unit = $options['unit'];
             }
 
-            $data = GraphHelper::prepareLineGraphData($amount, $unit);
+            $data = GraphHelper::prepareLineGraphData($amount, $unit, array('submissions'));
 
             $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
             $queryBuilder->from(MAUTIC_TABLE_PREFIX . 'form_submissions', 'fs');
@@ -139,7 +139,7 @@ class ReportSubscriber extends CommonSubscriber
                 ->setParameter('date', $data['fromDate']->format('Y-m-d H:i:s'));
             $submissions = $queryBuilder->execute()->fetchAll();
 
-            $timeStats = GraphHelper::mergeLineGraphData($data, $submissions, $unit, 'dateSubmitted');
+            $timeStats = GraphHelper::mergeLineGraphData($data, $submissions, $unit, 0, 'dateSubmitted');
             $timeStats['name'] = 'mautic.form.graph.line.submissions';
 
             $event->setGraph('line', $timeStats);

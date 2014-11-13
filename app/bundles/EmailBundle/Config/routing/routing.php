@@ -49,4 +49,11 @@ $collection->add('mautic_email_unsubscribe', new Route('/p/email/unsubscribe/{id
     )
 ));
 
+//resubscribe URL
+$collection->add('mautic_email_resubscribe', new Route('/p/email/resubscribe/{idHash}',
+    array(
+        '_controller' => 'MauticEmailBundle:Public:resubscribe',
+    )
+));
+
 return $collection;

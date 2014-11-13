@@ -31,15 +31,17 @@ class LeadFieldRepository extends CommonRepository
             ->createQueryBuilder('f')
             ->select('f')
             ->from('MauticLeadBundle:LeadField', 'f', 'f.alias');
-        $this->buildWhereClause($q, $args);
+
+        $this->buildClauses($q, $args);
+
+        $query = $q->getQuery();
 
         if (isset($args['hydration_mode'])) {
             $mode = strtoupper($args['hydration_mode']);
-            $results = $q->getQuery()->getResult(constant("\\Doctrine\\ORM\\Query::$mode"));
-        } else {
-            $results = $q->getQuery()->getResult();
+            $query->setHydrationMode(constant("\\Doctrine\\ORM\\Query::$mode"));
         }
 
+        $results = new Paginator($query);
         return $results;
     }
 
@@ -69,5 +71,46 @@ class LeadFieldRepository extends CommonRepository
         $aliases = array_merge($aliases, $leadRepo);
 
         return $aliases;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTableAlias()
+    {
+        return 'f';
+    }
+
+    /**
+     * @param QueryBuilder $q
+     * @param              $filter
+     * @return array
+     */
+    protected function addCatchAllWhereClause(&$q, $filter)
+    {
+        $unique  = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
+        $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
+
+        $expr = $q->expr()->orX(
+            $q->expr()->like('f.label',  ':'.$unique),
+            $q->expr()->like('f.alias', ':'.$unique)
+        );
+        if ($filter->not) {
+            $expr = $q->expr()->not($expr);
+        }
+        return array(
+            $expr,
+            array("$unique" => $string)
+        );
+    }
+
+    /**
+     * @return string
+     */
+    protected function getDefaultOrder()
+    {
+        return array(
+            array('f.order', 'ASC')
+        );
     }
 }

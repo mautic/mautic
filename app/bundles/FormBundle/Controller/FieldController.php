@@ -70,7 +70,7 @@ class FieldController extends CommonFormController
                     $success = 1;
 
                     //form is valid so process the data
-                    $keyId = 'new' . uniqid();
+                    $keyId = 'new' . hash('sha1', uniqid(mt_rand()));
 
                     //save the properties to session
                     $fields          = $session->get('mautic.formfields.add');
@@ -324,7 +324,6 @@ class FieldController extends CommonFormController
                 'target'         => '#mauticform_'.$objectId,
                 'route'          => false,
                 'fieldId'        => $objectId,
-                'replaceContent' => true,
                 'fieldHtml'      => $this->renderView($template, array(
                     'inForm'  => true,
                     'field'   => $formField,
@@ -400,7 +399,6 @@ class FieldController extends CommonFormController
                 'target'         => '#mauticform_'.$objectId,
                 'route'          => false,
                 'fieldId'        => $objectId,
-                'replaceContent' => true,
                 'fieldHtml'      => $this->renderView($template, array(
                     'inForm'  => true,
                     'field'   => $formField,

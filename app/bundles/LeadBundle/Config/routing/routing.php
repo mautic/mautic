@@ -12,6 +12,16 @@ use Symfony\Component\Routing\Route;
 
 $collection = new RouteCollection();
 
+$collection->add('mautic_lead_emailtoken_index', new Route('/leads/emailtokens/{page}',
+    array(
+        '_controller' => 'MauticLeadBundle:SubscribedEvents\EmailToken:index',
+        'page'        => 1
+    ),
+    array(
+        'page'    => '\d+'
+    )
+));
+
 $collection->add('mautic_leadlist_index', new Route('/leads/lists/{page}',
     array(
         '_controller' => 'MauticLeadBundle:List:index',
@@ -28,8 +38,13 @@ $collection->add('mautic_leadlist_action', new Route('/leads/lists/{objectAction
     )
 ));
 
-$collection->add('mautic_leadfield_index', new Route('/leads/fields',
-    array('_controller' => 'MauticLeadBundle:Field:index')
+$collection->add('mautic_leadfield_index', new Route('/leads/fields/{page}',
+    array(
+        '_controller' => 'MauticLeadBundle:Field:index',
+        'page'        => 1
+    ), array(
+        'page'    => '\d+'
+    )
 ));
 
 $collection->add('mautic_leadfield_action', new Route('/leads/fields/{objectAction}/{objectId}',

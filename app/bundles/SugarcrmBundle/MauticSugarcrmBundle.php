@@ -7,11 +7,16 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-$config = array();
+namespace Mautic\SugarcrmBundle;
 
-$config['application'] = array(
-    'name' => 'Sugar CRM',
-    'icon' => 'app/SugarcrmBundle/assets/images/sugarcrm_128.png'
-);
+use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-return $config;
+/**
+ * Class MauticSugarcrmBundle
+ *
+ * @package Mautic\SugarcrmBundle
+ */
+class MauticSugarcrmBundle extends Bundle
+{
+
+}

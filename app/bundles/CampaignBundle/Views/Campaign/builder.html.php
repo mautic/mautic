@@ -7,8 +7,8 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
-<div class="hide campaign-builder">
-    <div class="campaign-builder-content">
+<div class="hide builder campaign-builder">
+    <div class="builder-content">
         <div id="CampaignCanvas">
         <?php
         foreach ($campaignEvents as $event):
@@ -17,9 +17,9 @@
         ?>
         </div>
     </div>
-    <div class="campaign-builder-panel" id="CampaignEvents">
+    <div class="builder-panel" id="CampaignEvents">
         <p>
-            <button class="btn btn-primary btn-close-builder" onclick="Mautic.closeCampaignBuilder();"><?php echo $view['translator']->trans('mautic.campaign.campaign.close.builder'); ?></button>
+            <button type="button" class="btn btn-primary btn-close-builder" onclick="Mautic.closeCampaignBuilder();"><?php echo $view['translator']->trans('mautic.campaign.campaign.close.builder'); ?></button>
         </p>
 
         <div><em><?php echo $view['translator']->trans('mautic.campaign.event.drag.help'); ?></em></div>
@@ -112,9 +112,10 @@
                         $useId = (strpos($targetId, 'new') === 0 && isset($tempEventIds[$targetId])) ? $tempEventIds[$targetId] : $targetId;
                         $source = "CampaignEvent_{$e['id']}";
                         $target = "CampaignEvent_{$useId}";
-                        $label  = "";
+                        $label  = '';
                         if (isset($campaignEvents[$useId])):
                             $targetEvent = $campaignEvents[$useId];
+                            $labelText   = '';
                             if ($targetEvent['triggerMode'] == 'interval'):
                                 $labelText = $view['translator']->trans('mautic.campaign.connection.trigger.interval.label', array(
                                     '%number%' => $targetEvent['triggerInterval'],
@@ -122,6 +123,7 @@
                                 ));
                             elseif ($targetEvent['triggerMode'] == 'date'):
                                 $labelText = $view['translator']->trans('mautic.campaign.connection.trigger.date.label', array(
+                                    '%full%' => $view['date']->toFull($event['triggerDate']),
                                     '%time%' => $view['date']->toTime($targetEvent['triggerDate']),
                                     '%date%' => $view['date']->toShort($targetEvent['triggerDate'])
                                 ));

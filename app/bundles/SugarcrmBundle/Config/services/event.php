@@ -12,11 +12,28 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Parameter;
 
-//Mautic event listener
+//Mapper event listener
 $container->setDefinition(
-    'mautic.mapper.listener',
+    'mautic.sugarcrm.mapper.event_listener',
+    new Definition('Mautic\SugarcrmBundle\EventListener\MapperListener',
+        array(new Reference('mautic.factory'))
+    )
+)
+    ->addTag('kernel.event_listener', array(
+        'event'  => 'mapper.on_fetch_icons',
+        'method' => 'onFetchIcons'
+    ))
+    ->addTag('kernel.event_listener', array(
+        'event'  => 'mapper.on_form_build',
+        'method' => 'onFormBuild'
+    ));
+
+
+//Mapper Subscriber
+$container->setDefinition(
+    'mautic.mapper.subscriber',
     new Definition(
-        'Mautic\MapperBundle\EventListener\MapperListener',
+        'Mautic\MapperBundle\EventListener\MapperSubscriber',
         array(new Reference('mautic.factory'))
     )
 )

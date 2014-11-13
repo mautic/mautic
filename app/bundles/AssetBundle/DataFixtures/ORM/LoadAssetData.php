@@ -55,7 +55,6 @@ class LoadAssetData extends AbstractFixture implements OrderedFixtureInterface, 
             ->setDownloadCount(1)
             ->setUniqueDownloadCount(1)
             ->setRevision(1)
-            ->setAuthor('Admin Admin')
             ->setLanguage('en');
 
         try {

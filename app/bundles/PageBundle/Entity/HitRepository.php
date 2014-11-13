@@ -25,22 +25,28 @@ class HitRepository extends CommonRepository
     /**
      * Get a count of unique hits for the current tracking ID
      *
-     * @param $pageId
+     * @param Page|Redirect $page
      * @param $trackingId
      *
      * @return int
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getHitCountForTrackingId($pageId, $trackingId)
+    public function getHitCountForTrackingId($page, $trackingId)
     {
-        $count = $this->createQueryBuilder('h')
-            ->select('count(h.id) as num')
-            ->where('IDENTITY(h.page) = ' .$pageId)
-            ->andWhere('h.trackingId = :id')
-            ->setParameter('id', $trackingId)
-            ->getQuery()
-            ->getSingleResult();
+        $q = $this->createQueryBuilder('h')
+            ->select('count(h.id) as num');
+
+        if ($page instanceof Page) {
+            $q->where('IDENTITY(h.page) = ' .$page->getId());
+        } elseif ($page instanceof Redirect) {
+            $q->where('IDENTITY(h.redirect) = ' .$page->getId());
+        }
+
+        $q->andWhere('h.trackingId = :id')
+        ->setParameter('id', $trackingId);
+
+        $count = $q->getQuery()->getSingleResult();
 
         return (int) $count['num'];
     }
@@ -94,9 +100,9 @@ class HitRepository extends CommonRepository
             $data['values'][$i] = 0;
             $date->sub($oneDay);
         }
-        
+
         $query = $this->createQueryBuilder('h');
-        
+
         $query->select('IDENTITY(h.page), h.dateHit')
             ->where($query->expr()->eq('IDENTITY(h.page)', (int) $pageId))
             ->andwhere($query->expr()->gte('h.dateHit', ':date'))
@@ -189,7 +195,7 @@ class HitRepository extends CommonRepository
             $query->where($query->expr()->gte('h.dateHit', ':date'))
                 ->setParameter('date', $now);
         }
-        
+
         if ($notLeft) {
             $query->andWhere($query->expr()->isNull('h.dateLeft'));
         }
@@ -303,7 +309,7 @@ class HitRepository extends CommonRepository
                 $q->expr()->gte('h.date_hit', $q->expr()->literal($dt->toUtcString()))
             );
         }
-        
+
         $q->orderBy('h.date_hit', 'ASC');
         $results = $q->execute()->fetchAll();
 
@@ -398,8 +404,8 @@ class HitRepository extends CommonRepository
     {
         $stats = array(
             'sum'     => array_sum($times),
-            'min'     => min($times),
-            'max'     => max($times),
+            'min'     => count($times) ? min($times) : 0,
+            'max'     => count($times) ? max($times) : 0,
             'average' => count($times) ? round(array_sum($times) / count($times)) : 0,
             'count'   => count($times)
         );
@@ -412,8 +418,11 @@ class HitRepository extends CommonRepository
                     }
                 }
             }
+            $stats['timesOnSite'] = $timesOnSite;
+        } else {
+            $stats['timesOnSite'] = array();
         }
-        $stats['timesOnSite'] = $timesOnSite;
+
 
         return $stats;
     }
@@ -428,21 +437,7 @@ class HitRepository extends CommonRepository
      */
     public function getNewVsReturningGraphData($new, $returning)
     {
-        $colors = GraphHelper::$colors;
-        return array(
-            array(
-                'label' => 'New',
-                'color' => $colors[0]['color'],
-                'highlight' => $colors[0]['highlight'],
-                'value' => $new
-            ),
-            array(
-                'label' => 'Returning',
-                'color' => $colors[1]['color'],
-                'highlight' => $colors[1]['highlight'],
-                'value' => $returning
-            )
-        );
+        return GraphHelper::preparePieGraphData(array('new' => $new, 'returning' => $returning));
     }
 
     /**
@@ -455,23 +450,7 @@ class HitRepository extends CommonRepository
      */
     public function getLaguageGraphData($languages)
     {
-        $colors = GraphHelper::$colors;
-        $graphData = array();
-        $i = 0;
-        foreach($languages as $language => $count) {
-            if (!isset($colors[$i])) {
-                $i = 0;
-            }
-            $color = $colors[$i];
-            $graphData[] = array(
-                'label' => $language,
-                'color' => $colors[$i]['color'],
-                'highlight' => $colors[$i]['highlight'],
-                'value' => $count
-            );
-            $i++;
-        }
-        return $graphData;
+        return GraphHelper::preparePieGraphData($languages);
     }
 
     /**

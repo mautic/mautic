@@ -5,17 +5,19 @@ Mautic.pageOnLoad = function (container) {
     }
 
     if (mQuery(container + ' form[name="page"]').length) {
+        //form view
        Mautic.activateCategoryLookup('page', 'page');
+    } else if (mQuery(container + ' .page-stat-charts').length) {
+        //details view
+        Mautic.renderPageViewsBarChart(container);
+        Mautic.renderPageReturningVisitsPie();
+        Mautic.renderPageTimePie();
     }
-
-    Mautic.renderPageViewsBarChart(container);
-    Mautic.renderPageReturningVisitsPie();
-    Mautic.renderPageTimePie();
 };
 
 Mautic.pageUnLoad = function() {
     //remove page builder from body
-    mQuery('.page-builder').remove();
+    mQuery('.builder').remove();
 };
 
 Mautic.pageOnUnload = function(id) {
@@ -41,7 +43,7 @@ Mautic.launchPageEditor = function () {
         id: "builder-template-content"
     })
         .attr('src', src)
-        .appendTo('.page-builder-content')
+        .appendTo('.builder-content')
         .load(function () {
             var $this = mQuery(this);
             var contents = $this.contents();
@@ -50,9 +52,15 @@ Mautic.launchPageEditor = function () {
                 iframeFix: true,
                 drop: function (event, ui) {
                     var instance = mQuery(this).attr("id");
-                    var editor   = document.getElementById('builder-template-content').contentWindow.CKEDITOR.instances;
-                    var token = mQuery(ui.draggable).find('input.page-token').val();
-                    editor[instance].insertText(token);
+                    var predrop  = mQuery(ui.draggable).data('predrop');
+                    if (predrop) {
+                        Mautic[predrop](event, ui, instance);
+                    } else {
+                        var token  = mQuery(ui.draggable).data('token');
+                        if (token) {
+                            Mautic.insertPageBuilderToken(instance, token);
+                        }
+                    }
                     mQuery(this).removeClass('over-droppable');
                 },
                 over: function (e, ui) {
@@ -64,20 +72,22 @@ Mautic.launchPageEditor = function () {
             });
         });
 
-    //Append to body to break out of the main panel
-    mQuery('.page-builder').appendTo('body');
     //make the panel full screen
-    mQuery('.page-builder').addClass('page-builder-active');
+    mQuery('.builder').addClass('builder-active');
     //show it
-    mQuery('.page-builder').removeClass('hide');
+    mQuery('.builder').removeClass('hide');
 
-    Mautic.pageEditorOnLoad('.page-builder-panel');
+    Mautic.pageEditorOnLoad('.builder-panel');
+};
+
+Mautic.getPageBuilderEditorInstances = function() {
+    return document.getElementById('builder-template-content').contentWindow.CKEDITOR.instances;
 };
 
 Mautic.closePageEditor = function() {
     Mautic.stopIconSpinPostEvent();
 
-    mQuery('.page-builder').addClass('hide');
+    mQuery('.builder').addClass('hide');
 
     //make sure editors have lost focus so the content is updated
     mQuery('#builder-template-content').contents().find('.mautic-editable').each(function (index) {
@@ -87,23 +97,21 @@ Mautic.closePageEditor = function() {
     setTimeout( function() {
         //kill the draggables
         mQuery('#builder-template-content').contents().find('.mautic-editable').droppable('destroy');
-        mQuery("ul.draggable li").draggable('destroy');
+        mQuery("*[data-token]").draggable('destroy');
 
         //kill the iframe
         mQuery('#builder-template-content').remove();
 
-        //move the page builder back into form
-        mQuery('.page-builder').appendTo('.bundle-main-inner-wrapper');
     }, 3000);
 };
 
 Mautic.pageEditorOnLoad = function (container) {
     //activate builder drag and drop
-    mQuery(container + " ul.draggable li").draggable({
+    mQuery(container + " *[data-token]").draggable({
         iframeFix: true,
         iframeId: 'builder-template-content',
         helper: 'clone',
-        appendTo: '.page-builder',
+        appendTo: '.builder',
         zIndex: 8000,
         scroll: true,
         scrollSensitivity: 100,
@@ -156,7 +164,7 @@ Mautic.renderPageReturningVisitsPie = function () {
         tooltipTemplate: "<%if (label){%><%}%><%= value %>% <%=label%>"};
     var ctx = document.getElementById("returning-rate").getContext("2d");
     Mautic.pageReturningVisitsPie = new Chart(ctx).Pie(graphData, options);
-}
+};
 
 Mautic.renderPageTimePie = function () {
     // Initilize chart only for first time
@@ -171,4 +179,33 @@ Mautic.renderPageTimePie = function () {
     var timesOnSiteData = mQuery.parseJSON(mQuery('#times-on-site-data').text());
     var ctx = document.getElementById("time-rate").getContext("2d");
     Mautic.pageTimePie = new Chart(ctx).Pie(timesOnSiteData, options);
-}
+};
+
+Mautic.showPageEmailTokenExternalLinkModal = function (event, ui, editorId) {
+    var token  = mQuery(ui.draggable).data('token');
+    mQuery('#ExternalLinkModal input[name="editor"]').val(editorId);
+    mQuery('#ExternalLinkModal input[name="token"]').val(token);
+
+    //append the modal to the builder or else it won't display
+    mQuery('#ExternalLinkModal').appendTo('body');
+
+    mQuery('#ExternalLinkModal').modal('show');
+};
+
+Mautic.insertPageEmailTokenExternalUrl = function () {
+    var editorId = mQuery('#ExternalLinkModal input[name="editor"]').val();
+    var token    = mQuery('#ExternalLinkModal input[name="token"]').val();
+    var url      = mQuery('#ExternalLinkModal input[name="link"]').val();
+
+    token = token.replace("%url%", url);
+
+    Mautic.insertPageBuilderToken(editorId, token);
+};
+
+Mautic.insertPageBuilderToken = function(editorId, token) {
+    var editor = Mautic.getPageBuilderEditorInstances();
+    editor[editorId].insertText(token);
+    mQuery('#ExternalLinkModal').modal('hide');
+
+    mQuery('#ExternalLinkModal input[name="link"]').val('');
+};

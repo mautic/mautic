@@ -87,7 +87,7 @@ class DownloadRepository extends CommonRepository
      */
     public function getDownloads($assetId, $amount = 30, $unit = 'D')
     {
-        $data = GraphHelper::prepareLineGraphData($amount, $unit);
+        $data = GraphHelper::prepareLineGraphData($amount, $unit, array('downloaded'));
         
         $query = $this->createQueryBuilder('d');
         
@@ -98,7 +98,7 @@ class DownloadRepository extends CommonRepository
 
         $downloads = $query->getQuery()->getArrayResult();
 
-        return GraphHelper::mergeLineGraphData($data, $downloads, $unit, 'dateDownload');
+        return GraphHelper::mergeLineGraphData($data, $downloads, $unit, 0, 'dateDownload');
     }
 
     /**

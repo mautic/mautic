@@ -13,6 +13,8 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Mautic\MapperBundle\Event\MapperDashboardEvent;
+use Mautic\MapperBundle\Event\MapperFormEvent;
+use Mautic\MapperBundle\MapperEvents;
 
 /**
  * Class MapperSubscriber
@@ -48,6 +50,8 @@ class MapperSubscriber implements EventSubscriberInterface
     static public function getSubscribedEvents ()
     {
         return array(
+            MapperEvents::FETCH_ICONS           => array('onFetchIcons', 0),
+            MapperEvents::FORM_ON_BUILD         => array('onFormBuilder', 0)
         );
     }
 
@@ -57,22 +61,18 @@ class MapperSubscriber implements EventSubscriberInterface
      * @param IconEvent $event
      * @param           $name
      */
-    protected function buildIcons(MapperDashboardEvent $event)
+    public function onFetchIcons(MapperDashboardEvent $event)
     {
-        $security = $event->getSecurity();
-        $request  = $this->factory->getRequest();
-        $bundles = $this->factory->getParameter('bundles');
 
-        foreach ($bundles as $bundle) {
-            //check common place
-            $path = $bundle['directory'] . "/Config/mapper.php";
-            if (file_exists($path)) {
-                $config = include $path;
-                if (!isset($config['application'])) {
-                    continue;
-                }
-                $event->addApplication(basename($bundle['directory']), $config['application']);
-            }
-        }
+    }
+
+    /**
+     * Add Client form extra fields
+     *
+     * @param FormBuilderEvent $event
+     */
+    public function onFormBuilder(MapperFormEvent $event)
+    {
+
     }
 }

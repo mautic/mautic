@@ -24,7 +24,8 @@ class FormSubmitHelper
     public static function onFormSubmit(Action $action, MauticFactory $factory, $feedback)
     {
         $properties = $action->getProperties();
-        $emailId  = $properties['email'];
+        $emailId    = $properties['email'];
+        $form       = $action->getForm();
 
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model  = $factory->getModel('email');
@@ -56,7 +57,7 @@ class FormSubmitHelper
 		    			'firstname' => $leadFields['core']['firstname']['value'],
 		    			'lastname' 	=> $leadFields['core']['lastname']['value']
 		    		);
-		    		$model->sendEmail($email, array($leadCredentials['id'] => $leadCredentials));
+		    		$model->sendEmail($email, array($leadCredentials['id'] => $leadCredentials), array('form', $form->getId()));
 		    	}
 		    }
         }

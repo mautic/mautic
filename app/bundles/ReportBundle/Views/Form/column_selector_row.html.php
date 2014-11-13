@@ -19,10 +19,10 @@ $labelClass = (empty($form->vars['label_attr']['class'])) ? 'control-label' : $f
             </div>
             <div class="columnSelectorButtons col-xs-1">
                 <div class="text-center">
-                    <button type="button" id="column-move-left" class="btn btn-sm btn-default" onclick="Mautic.moveReportColumns('<?php echo $form->vars['id']; ?>', '<?php echo $form->vars['id'] . '_available'; ?>');"><i class="fa fa-caret-square-o-left"></i></button>
+                    <button type="button" id="column-move-left" class="btn btn-sm btn-default btn-nospin" onclick="Mautic.moveReportColumns('<?php echo $form->vars['id']; ?>', '<?php echo $form->vars['id'] . '_available'; ?>');"><i class="fa fa-caret-square-o-left"></i></button>
                 </div>
                 <div class="text-center">
-                    <button type="button" id="column-move-right" class="btn btn-sm btn-default" onclick="Mautic.moveReportColumns('<?php echo $form->vars['id'] . '_available'; ?>', '<?php echo $form->vars['id']; ?>');"><i class="fa fa-caret-square-o-right"></i></button>
+                    <button type="button" id="column-move-right" class="btn btn-sm btn-default btn-nospin" onclick="Mautic.moveReportColumns('<?php echo $form->vars['id'] . '_available'; ?>', '<?php echo $form->vars['id']; ?>');"><i class="fa fa-caret-square-o-right"></i></button>
                 </div>
             </div>
             <div class="choice-wrapper col-xs-5">
@@ -41,10 +41,10 @@ $labelClass = (empty($form->vars['label_attr']['class'])) ? 'control-label' : $f
             </div>
             <div class="columnSelectorButtons col-xs-1">
                 <div class="text-center">
-                    <button type="button" id="column-move-left" class="btn btn-sm btn-default" onclick="Mautic.reorderColumns('<?php echo $form->vars['id']; ?>', 'up');"><i class="fa fa-caret-square-o-up"></i></button>
+                    <button type="button" id="column-move-left" class="btn btn-sm btn-default btn-nospin" onclick="Mautic.reorderColumns('<?php echo $form->vars['id']; ?>', 'up');"><i class="fa fa-caret-square-o-up"></i></button>
                 </div>
                 <div class="text-center">
-                    <button type="button" id="column-move-right" class="btn btn-sm btn-default" onclick="Mautic.reorderColumns('<?php echo $form->vars['id']; ?>', 'down');"><i class="fa fa-caret-square-o-down"></i></button>
+                    <button type="button" id="column-move-right" class="btn btn-sm btn-default btn-nospin" onclick="Mautic.reorderColumns('<?php echo $form->vars['id']; ?>', 'down');"><i class="fa fa-caret-square-o-down"></i></button>
                 </div>
             </div>
         </div>

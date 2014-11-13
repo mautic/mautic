@@ -21,30 +21,84 @@ class FieldController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction()
+    public function indexAction($page = 1)
     {
         //set some permissions
         $permissions = $this->factory->getSecurity()->isGranted(array('lead:fields:full'), 'RETURN_ARRAY');
 
         $session = $this->factory->getSession();
-        $search  = $this->request->get('search', $session->get('mautic.leadfield.filter', ''));
-        $session->set('mautic.leadfield.filter', $search);
 
         if (!$permissions['lead:fields:full']) {
             return $this->accessDenied();
         }
-        $items = $this->factory->getModel('lead.field')->getEntities(array('filter' => $search));
+
+        $limit = $session->get('mautic.leadfield.limit', $this->factory->getParameter('default_pagelimit'));
+        $search = $this->request->get('search', $session->get('mautic.leadfield.filter', ''));
+        $session->set('mautic.leadfilter.filter', $search);
+
+        //do some default filtering
+        $orderBy    = $this->factory->getSession()->get('mautic.leadfilter.orderby', 'f.order');
+        $orderByDir = $this->factory->getSession()->get('mautic.leadfilter.orderbydir', 'ASC');
+
+        $start = ($page === 1) ? 0 : (($page - 1) * $limit);
+        if ($start < 0) {
+            $start = 0;
+        }
+
+        $request = $this->factory->getRequest();
+        $search  = $request->get('search', $session->get('mautic.lead.emailtoken.filter', ''));
+
+        $session->set('mautic.lead.emailtoken.filter', $search);
+
+        $fields = $this->factory->getModel('lead.field')->getEntities(array(
+            'start'          => $start,
+            'limit'          => $limit,
+            'filter'         => array('string' => $search),
+            'orderBy'        => $orderBy,
+            'orderByDir'     => $orderByDir
+        ));
+        $count  = count($fields);
+
+        if ($count && $count < ($start + 1)) {
+            //the number of entities are now less then the current page so redirect to the last page
+            if ($count === 1) {
+                $lastPage = 1;
+            } else {
+                $lastPage = (floor($limit / $count)) ?: 1;
+            }
+            $session->set('mautic.leadfield.page', $lastPage);
+            $returnUrl = $this->generateUrl('mautic_leadfield_index', array('page' => $lastPage));
+
+            return $this->postActionRedirect(array(
+                'returnUrl'       => $returnUrl,
+                'viewParameters'  => array('page' => $lastPage),
+                'contentTemplate' => 'MauticLeadBundle:Field:index',
+                'passthroughVars' => array(
+                    'activeLink'    => '#mautic_leadfield_index',
+                    'mauticContent' => 'leadfield'
+                )
+            ));
+        }
+
+        //set what page currently on so that we can return here after form submission/cancellation
+        $session->set('mautic.leadfield.page', $page);
+
+        $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'items'       => $items,
+                'items'       => $fields,
                 'searchValue' => $search,
-                'permissions' => $permissions
+                'permissions' => $permissions,
+                'tmpl'        => $tmpl,
+                'totalItems'  => $count,
+                'limit'       => $limit,
+                'page'        => $page
             ),
-            'contentTemplate' => 'MauticLeadBundle:Field:index.html.php',
+            'contentTemplate' => 'MauticLeadBundle:Field:list.html.php',
             'passthroughVars' => array(
                 'activeLink'    => '#mautic_leadfield_index',
-                'route'         => $this->generateUrl('mautic_leadfield_index'),
+                'route'         => $this->generateUrl('mautic_leadfield_index', array('page' => $page)),
                 'mauticContent' => 'leadfield'
             )
         ));

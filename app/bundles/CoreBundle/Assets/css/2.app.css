@@ -3952,6 +3952,50 @@ lesshat-selector {
 .ovf-h {
   overflow: hidden;
 }
+.builder {
+  position: relative;
+}
+.builder-active {
+  background-color: #fff;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1030;
+}
+.builder-panel {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 300px;
+  height: 100%;
+  padding: 15px;
+  background-color: #d5d4d4;
+  overflow-y: auto;
+}
+.builder-panel .btn-close-builder {
+  width: 100%;
+}
+.builder-content {
+  left: 0;
+  top: 0;
+  right: 300px;
+  height: 100%;
+  position: fixed;
+}
+.builder-panel .panel a.btn {
+  white-space: normal;
+}
+.ui-draggable-iframeFix {
+  z-index: 9999 !important;
+}
+.builder [data-token] {
+  cursor: pointer;
+}
 .chosen-select {
   width: 100%;
 }
@@ -4374,4 +4418,13 @@ lesshat-selector {
   background: #fff;
   text-align: center;
   z-index: 10000;
+}
+.content-overlay {
+  position: absolute;
+  background: #fbfbfb;
+  z-index: 1050;
+  width: 100%;
+  height: 100%;
+  padding-left: 15px;
+  font-weight: bold;
 }

@@ -33,7 +33,7 @@ class PublicController extends CommonFormController
             //the lead needs to have fields populated
             $lead = $this->factory->getModel('lead')->getLead($statLead->getId());
 
-            $published    = $entity->isPublished();
+            $published = $entity->isPublished();
 
             //make sure the page is published or deny access if not
             if ((!$published) && (!$security->hasEntityAccess(
@@ -117,7 +117,43 @@ class PublicController extends CommonFormController
             $model->setDoNotContact($stat, $translator->trans('mautic.email.dnc.unsubscribed'), 'unsubscribed');
 
             $message = $translator->trans('mautic.email.unsubscribed.success', array(
-                '%email%' => $stat->getEmailAddress()
+                '%email%' => $stat->getEmailAddress(),
+                '%resubscribeUrl%' => $this->generateUrl('mautic_email_resubscribe', array('idHash' => $idHash))
+            ));
+        } else {
+            $email = $lead = false;
+        }
+
+        return $this->render('MauticEmailBundle::message.html.php', array(
+            'message'  => $message,
+            'type'     => 'notice',
+            'email'    => $email,
+            'lead'     => $lead,
+            'template' => $template
+        ));
+    }
+
+    /**
+     * @param $idHash
+     */
+    public function resubscribeAction($idHash)
+    {
+        //find the email
+        $model      = $this->factory->getModel('email');
+        $translator = $this->get('translator');
+        $stat       = $model->getEmailStatus($idHash);
+
+        if (!empty($stat)) {
+            $email = $stat->getEmail();
+            $lead  = $stat->getLead();
+
+            $template = $email->getTemplate();
+
+            $model->removeDoNotContact($stat->getEmailAddress());
+
+            $message = $translator->trans('mautic.email.resubscribed.success', array(
+                '%email%' => $stat->getEmailAddress(),
+                '%unsubscribeUrl%' => $this->generateUrl('mautic_email_unsubscribe', array('idHash' => $idHash))
             ));
         } else {
             $email = $lead = false;

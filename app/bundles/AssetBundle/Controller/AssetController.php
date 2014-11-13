@@ -121,8 +121,7 @@ class AssetController extends FormController
             'passthroughVars' => array(
                 'activeLink'     => '#mautic_asset_index',
                 'mauticContent'  => 'asset',
-                'route'          => $this->generateUrl('mautic_asset_index', array('asset' => $asset)),
-                'replaceContent' => ($tmpl == 'list') ? 'true' : 'false'
+                'route'          => $this->generateUrl('mautic_asset_index', array('asset' => $asset))
             )
         ));
     }

@@ -71,9 +71,6 @@ class FieldModel extends FormModel
      */
     public function getEntities(array $args = array())
     {
-        $args['orderBy']    = 'f.order';
-        $args['orderByDir'] = 'ASC';
-
         return $this->em->getRepository('MauticLeadBundle:LeadField')->getEntities($args);
     }
 

@@ -14,6 +14,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
+use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageEvent;
 use Mautic\PageBundle\Event\PageHitEvent;
@@ -80,10 +81,7 @@ class PageModel extends FormModel
         $now = new \DateTime();
 
         //set the author for new pages
-        if ($entity->isNew()) {
-            $user = $this->factory->getUser();
-            $entity->setAuthor($user->getName());
-        } else {
+        if (!$entity->isNew()) {
             //increase the revision
             $revision = $entity->getRevision();
             $revision++;
@@ -174,7 +172,7 @@ class PageModel extends FormModel
     {
         if ($id === null) {
             $entity = new Page();
-            $entity->setSessionId('new_' . uniqid());
+            $entity->setSessionId('new_' . hash('sha1', uniqid(mt_rand())));
         } else {
             $entity = parent::getEntity($id);
             if ($entity !== null) {
@@ -258,9 +256,10 @@ class PageModel extends FormModel
      *
      * @param $entity
      * @param $absolute
+     * @param $clickthrough
      * @return mixed
      */
-    public function generateUrl($entity, $absolute = true)
+    public function generateUrl($entity, $absolute = true, $clickthrough = array())
     {
         $pageSlug = $entity->getId() . ':' . $entity->getAlias();
 
@@ -289,6 +288,7 @@ class PageModel extends FormModel
         }
 
         $pageUrl  = $this->factory->getRouter()->generate('mautic_page_public', $slugs, $absolute);
+        $pageUrl .= (!empty($clickthrough)) ? '?ct=' . base64_encode(serialize($clickthrough)) : '';
 
         return $pageUrl;
     }
@@ -303,7 +303,33 @@ class PageModel extends FormModel
         $hit = new Hit();
         $hit->setDateHit(new \Datetime());
 
-        list($lead, $trackingId, $generated) = $this->factory->getModel('lead')->getCurrentLead(true);
+        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+        $leadModel = $this->factory->getModel('lead');
+
+        //check for any clickthrough info
+        $clickthrough = $request->get('ct', false);
+        if (!empty($clickthrough)) {
+            $clickthrough = unserialize(base64_decode($clickthrough));
+
+            if (!empty($clickthrough['lead'])) {
+                $lead = $leadModel->getEntity($clickthrough['lead']);
+                if ($lead !== null) {
+                    $leadModel->setLeadCookie($clickthrough['lead']);
+                    list($trackingId, $generated) = $leadModel->getTrackingCookie();
+                    $leadClickthrough = true;
+                }
+            }
+
+            if (!empty($clickthrough['source'])) {
+                $hit->setSource($clickthrough['source'][0]);
+                $hit->setSourceId($clickthrough['source'][1]);
+            }
+        }
+
+        if (empty($leadClickthrough)) {
+            list($lead, $trackingId, $generated) = $leadModel->getCurrentLead(true);
+        }
+
         $hit->setTrackingId($trackingId);
         $hit->setLead($lead);
 
@@ -317,28 +343,33 @@ class PageModel extends FormModel
         }
 
         if (!empty($page)) {
-            $hit->setPage($page);
-
             $hitCount = $page->getHits();
             $hitCount++;
             $page->setHits($hitCount);
 
             //check for a hit from tracking id
             $countById = $this->em
-                ->getRepository('MauticPageBundle:Hit')->getHitCountForTrackingId($page->getId(), $trackingId);
+                ->getRepository('MauticPageBundle:Hit')->getHitCountForTrackingId($page, $trackingId);
             if (empty($countById)) {
                 $uniqueHitCount = $page->getUniqueHits();
                 $uniqueHitCount++;
                 $page->setUniqueHits($uniqueHitCount);
+            }
 
-                $variantHitCount = $page->getVariantHits();
-                $variantHitCount++;
-                $page->setVariantHits($variantHitCount);
+            if ($page instanceof Page) {
+                $hit->setPage($page);
+                $hit->setPageLanguage($page->getLanguage());
+
+                if ($countById) {
+                    $variantHitCount = $page->getVariantHits();
+                    $variantHitCount++;
+                    $page->setVariantHits($variantHitCount);
+                }
+            } elseif ($page instanceof Redirect) {
+                $hit->setRedirect($page);
             }
 
             $this->em->persist($page);
-
-            $hit->setPageLanguage($page->getLanguage());
         }
 
         //check for existing IP
@@ -373,15 +404,24 @@ class PageModel extends FormModel
             $hit->setBrowserLanguages($languages);
         }
 
-        $pageURL = 'http';
-        if ($request->server->get("HTTPS") == "on") {$pageURL .= "s";}
-        $pageURL .= "://";
-        if ($request->server->get("SERVER_PORT") != "80") {
-            $pageURL .= $request->server->get("SERVER_NAME").":".$request->server->get("SERVER_PORT").
-                $request->server->get("REQUEST_URI");
+        if ($page instanceof Redirect) {
+            //use the configured redirect URL
+            $pageURL = $page->getUrl();
         } else {
-            $pageURL .= $request->server->get("SERVER_NAME").$request->server->get("REQUEST_URI");
+            //use current URL
+            $pageURL = 'http';
+            if ($request->server->get("HTTPS") == "on") {
+                $pageURL .= "s";
+            }
+            $pageURL .= "://";
+            if ($request->server->get("SERVER_PORT") != "80") {
+                $pageURL .= $request->server->get("SERVER_NAME") . ":" . $request->server->get("SERVER_PORT") .
+                    $request->server->get("REQUEST_URI");
+            } else {
+                $pageURL .= $request->server->get("SERVER_NAME") . $request->server->get("REQUEST_URI");
+            }
         }
+
         $hit->setUrl($pageURL);
 
         if ($this->dispatcher->hasListeners(PageEvents::PAGE_ON_HIT)) {

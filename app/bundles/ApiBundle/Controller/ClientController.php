@@ -99,8 +99,7 @@ class ClientController extends FormController
             'contentTemplate' => 'MauticApiBundle:Client:list.html.php',
             'passthroughVars' => array(
                 'route'          => $this->generateUrl('mautic_client_index', array('page' => $page)),
-                'mauticContent'  => 'client',
-                'replaceContent' => ($tmpl == 'list') ? 'true' : 'false'
+                'mauticContent'  => 'client'
             )
         ));
     }

@@ -131,8 +131,7 @@ class PageController extends FormController
             'passthroughVars' => array(
                 'activeLink'     => '#mautic_page_index',
                 'mauticContent'  => 'page',
-                'route'          => $this->generateUrl('mautic_page_index', array('page' => $page)),
-                'replaceContent' => ($tmpl == 'list') ? 'true' : 'false'
+                'route'          => $this->generateUrl('mautic_page_index', array('page' => $page))
             )
         ));
     }

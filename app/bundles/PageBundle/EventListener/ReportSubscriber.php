@@ -116,7 +116,7 @@ class ReportSubscriber extends CommonSubscriber
                 $unit = $options['unit'];
             }
 
-            $data = GraphHelper::prepareLineGraphData($amount, $unit);
+            $data = GraphHelper::prepareLineGraphData($amount, $unit, array('dateHit'));
 
             $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
             $queryBuilder->from(MAUTIC_TABLE_PREFIX . 'page_hits', 'ph');
@@ -127,8 +127,52 @@ class ReportSubscriber extends CommonSubscriber
                 ->setParameter('date', $data['fromDate']->format('Y-m-d H:i:s'));
             $hits = $queryBuilder->execute()->fetchAll();
 
-            $timeStats = GraphHelper::mergeLineGraphData($data, $hits, $unit, 'dateHit');
+            $timeStats = GraphHelper::mergeLineGraphData($data, $hits, $unit, 0, 'dateHit');
             $timeStats['name'] = 'mautic.page.graph.line.hits';
+
+            $event->setGraph('line', $timeStats);
+        }
+
+        if (!$options || isset($options['graphName']) && $options['graphName'] == 'mautic.page.graph.line.time.on.site') {
+            // Generate data for Downloads line graph
+            $unit = 'D';
+            $amount = 30;
+
+            if (isset($options['amount'])) {
+                $amount = $options['amount'];
+            }
+
+            if (isset($options['unit'])) {
+                $unit = $options['unit'];
+            }
+
+            $data = GraphHelper::prepareLineGraphData($amount, $unit, array('dateHit'));
+
+            $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
+            $queryBuilder->from(MAUTIC_TABLE_PREFIX . 'page_hits', 'ph');
+            $queryBuilder->leftJoin('ph', MAUTIC_TABLE_PREFIX . 'pages', 'p', 'p.id = ph.page_id');
+            $queryBuilder->select('ph.page_id as page, ph.date_hit as dateHit, ph.date_left as dateLeft');
+            $event->buildWhere($queryBuilder);
+            $queryBuilder->andwhere($queryBuilder->expr()->gte('ph.date_hit', ':date'))
+                ->setParameter('date', $data['fromDate']->format('Y-m-d H:i:s'));
+            $hits = $queryBuilder->execute()->fetchAll();
+
+            // Count time on site
+            foreach ($hits as $key => $hit) {
+                if ($hit['dateLeft']) {
+                    $dateHit = new \DateTime($hit['dateHit']);
+                    $dateLeft = new \DateTime($hit['dateLeft']);
+                    $hits[$key]['timeOnSite'] = $dateLeft->getTimestamp() - $dateHit->getTimestamp();
+                    $hits[$key]['timeOnSiteDate'] = $hit['dateHit'];
+                } else {
+                    $hits[$key]['timeOnSite'] = 0;
+                    $hits[$key]['timeOnSiteDate'] = $hit['dateHit'];
+                }
+                unset($hits[$key]['dateLeft']);
+            }
+
+            $timeStats = GraphHelper::mergeLineGraphData($data, $hits, $unit, 0, 'dateHit', 'timeOnSite', true);
+            $timeStats['name'] = 'mautic.page.graph.line.time.on.site';
 
             $event->setGraph('line', $timeStats);
         }

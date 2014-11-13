@@ -239,26 +239,12 @@ Mautic.renderSubmissionChart = function (chartData) {
     }
     var ctx = document.getElementById("submission-chart").getContext("2d");
     var options = {};
-    var data = {
-        labels: chartData.labels,
-        datasets: [
-            {
-                fillColor: "rgba(151,187,205,0.2)",
-                strokeColor: "rgba(151,187,205,1)",
-                pointColor: "rgba(151,187,205,1)",
-                pointStrokeColor: "#fff",
-                pointHighlightFill: "#fff",
-                pointHighlightStroke: "rgba(151,187,205,1)",
-                data: chartData.values
-            }
-        ]
-    };
 
     if (typeof Mautic.formSubmissionChart === 'undefined') {
-        Mautic.formSubmissionChart = new Chart(ctx).Line(data, options);
+        Mautic.formSubmissionChart = new Chart(ctx).Line(chartData, options);
     } else {
         Mautic.formSubmissionChart.destroy();
-        Mautic.formSubmissionChart = new Chart(ctx).Line(data, options);
+        Mautic.formSubmissionChart = new Chart(ctx).Line(chartData, options);
     }
 };
 

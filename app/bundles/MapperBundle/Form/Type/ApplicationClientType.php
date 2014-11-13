@@ -17,6 +17,8 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Mautic\MapperBundle\MapperEvents;
+use Mautic\MapperBundle\Event\MapperFormEvent;
 
 /**
  * Class ApplicationClientType
@@ -31,6 +33,7 @@ class ApplicationClientType extends AbstractType
      */
     public function __construct(MauticFactory $factory) {
         $this->translator = $factory->getTranslator();
+        $this->factory = $factory;
     }
 
     /**
@@ -47,7 +50,12 @@ class ApplicationClientType extends AbstractType
             'attr'       => array('class' => 'form-control')
         ));
 
-
+        $event = new MapperFormEvent($this->factory->getSecurity());
+        $this->factory->getDispatcher()->dispatch(MapperEvents::FORM_ON_BUILD, $event);
+        $extraFields = $event->getFields();
+        foreach($extraFields as $extraField) {
+            $builder->add($extraField['child'], $extraField['type'], $extraField['params']);
+        }
 
         $builder->add('application', 'hidden', array(
             'data' => $options['application']

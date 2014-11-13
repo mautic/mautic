@@ -11,6 +11,8 @@ namespace Mautic\PageBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
+use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
 
 /**
@@ -26,148 +28,100 @@ class Hit
      * @ORM\Column(type="integer")
      * @ORM\Id()
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $id;
 
     /**
      * @ORM\Column(name="date_hit", type="datetime")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $dateHit;
 
     /**
      * @ORM\Column(name="date_left", type="datetime", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $dateLeft;
 
     /**
      * @ORM\ManyToOne(targetEntity="Page")
-     * @ORM\JoinColumn(name="page_id", referencedColumnName="id", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @ORM\JoinColumn(name="page_id", referencedColumnName="id", nullable=true, onDelete="SET NULL")
      */
     private $page;
 
     /**
+     * @ORM\ManyToOne(targetEntity="Redirect")
+     * @ORM\JoinColumn(name="redirect_id", referencedColumnName="id", nullable=true, onDelete="SET NULL")
+     */
+    private $redirect;
+
+    /**
      * @ORM\ManyToOne(targetEntity="Mautic\LeadBundle\Entity\Lead")
      * @ORM\JoinColumn(name="lead_id", referencedColumnName="id", nullable=true, onDelete="SET NULL")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $lead;
 
     /**
      * @ORM\ManyToOne(targetEntity="Mautic\CoreBundle\Entity\IpAddress", cascade={"merge", "persist"})
      * @ORM\JoinColumn(name="ip_id", referencedColumnName="id", nullable=false)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $ipAddress;
 
     /**
      * @ORM\Column(type="string", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $country;
 
     /**
      * @ORM\Column(type="string", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $region;
 
     /**
      * @ORM\Column(type="string", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $city;
 
     /**
      * @ORM\Column(type="string", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $isp;
 
     /**
      * @ORM\Column(type="string", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $organization;
 
     /**
      * @ORM\Column(type="integer")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $code;
 
     /**
      * @ORM\Column(type="string", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $referer;
 
     /**
      * @ORM\Column(type="string")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $url;
 
     /**
      * @ORM\Column(name="user_agent", type="string", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $userAgent;
 
     /**
      * @ORM\Column(name="remote_host", type="string", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $remoteHost;
 
     /**
      * @ORM\Column(name="page_language", type="string", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $pageLanguage;
 
     /**
      * @ORM\Column(name="browser_languages", type="array", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $browserLanguages = array();
 
@@ -175,6 +129,16 @@ class Hit
      * @ORM\Column(type="string", name="tracking_id")
      **/
     private $trackingId;
+
+    /**
+     * @ORM\Column(name="source", type="string", nullable=true)
+     */
+    private $source;
+
+    /**
+     * @ORM\Column(name="source_id", type="integer", nullable=true)
+     */
+    private $sourceId;
 
     /**
      * Get id
@@ -585,5 +549,53 @@ class Hit
     public function setLead (Lead $lead)
     {
         $this->lead = $lead;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSource ()
+    {
+        return $this->source;
+    }
+
+    /**
+     * @param mixed $source
+     */
+    public function setSource ($source)
+    {
+        $this->source = $source;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSourceId ()
+    {
+        return $this->sourceId;
+    }
+
+    /**
+     * @param mixed $sourceId
+     */
+    public function setSourceId ($sourceId)
+    {
+        $this->sourceId = (int) $sourceId;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getRedirect ()
+    {
+        return $this->redirect;
+    }
+
+    /**
+     * @param mixed $redirect
+     */
+    public function setRedirect (Redirect $redirect)
+    {
+        $this->redirect = $redirect;
     }
 }

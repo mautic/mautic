@@ -7,7 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\FormBundle\Events\Controller;
+namespace Mautic\FormBundle\Controller\SubscribedEvents;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\FormBundle\Helper\PageTokenHelper;
@@ -30,8 +30,6 @@ class PageTokenController extends FormController
 
         $dataArray = array(
             'newContent'     => $tokenHelper->getTokenContent($page),
-            'target'         => '#form-page-tokens',
-            'replaceContent' => 'true',
             'mauticContent'  => 'pageEditor'
         );
 

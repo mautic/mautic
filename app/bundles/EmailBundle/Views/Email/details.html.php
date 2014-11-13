@@ -64,64 +64,15 @@ if ($security->hasEntityAccess($permissions['email:emails:editown'], $permission
 <?php endif; ?>
 <?php $view['slots']->stop(); ?>
 
-
-
 <!-- start: box layout -->
 <div class="box-layout">
     <!-- left section -->
     <div class="col-md-9 bg-white height-auto">
         <div class="bg-auto">
-            <!-- page detail header -->
+            <!-- email detail header -->
             <div class="pr-md pl-md pt-lg pb-lg">
                 <div class="box-layout">
-                    <div class="col-xs-6 va-m">
-                        <h4 class="fw-sb text-primary">
-                            <?php
-                            if ($category = $email->getCategory()):
-                                $catSearch = $view['translator']->trans('mautic.core.searchcommand.category') . ":" . $category->getAlias();
-                                $catName = $category->getTitle();
-                            else:
-                                $catSearch = $view['translator']->trans('mautic.core.searchcommand.is') . ":" .
-                                    $view['translator']->trans('mautic.core.searchcommand.isuncategorized');
-                                $catName = $view['translator']->trans('mautic.core.form.uncategorized');
-                            endif;
-                            ?>
-                            <a href="<?php echo $view['router']->generate('mautic_asset_index', array('search' => $catSearch))?>"
-                               data-toggle="ajax">
-                                <?php echo $catName; ?>
-                            </a>
-                            <span> | </span>
-                            <span>
-                                <?php
-                                $author     = $email->getCreatedBy();
-                                $authorId   = ($author) ? $author->getId() : 0;
-                                $authorName = ($author) ? $author->getName() : "";
-                                ?>
-                                <a href="<?php echo $view['router']->generate('mautic_user_action', array(
-                                    'objectAction' => 'contact',
-                                    'objectId'     => $authorId,
-                                    'entity'       => 'asset.asset',
-                                    'id'           => $email->getId(),
-                                    'returnUrl'    => $view['router']->generate('mautic_asset_action', array(
-                                        'objectAction' => 'view',
-                                        'objectId'     => $email->getId()
-                                    ))
-                                )); ?>">
-                                    <?php echo $authorName; ?>
-                                </a>
-                            </span>
-                            <span> | </span>
-                            <span>
-                            <?php $langSearch = $view['translator']->trans('mautic.asset.asset.searchcommand.lang').":".$email->getLanguage(); ?>
-                                <a href="<?php echo $view['router']->generate('mautic_asset_index', array('search' => $langSearch)); ?>"
-                                   data-toggle="ajax">
-                                    <?php echo $email->getLanguage(); ?>
-                                </a>
-                            </span>
-                        </h4>
-                        <p class="text-white dark-lg mb-0">Created on <?php echo $view['date']->toDate($email->getDateAdded()); ?></p>
-                    </div>
-                    <div class="col-xs-6 va-m text-right">
+                    <div class="col-xs-2 text-right">
                         <?php switch ($email->getPublishStatus()) {
                             case 'published':
                                 $labelColor = "success";
@@ -139,30 +90,15 @@ if ($security->hasEntityAccess($permissions['email:emails:editown'], $permission
                     </div>
                 </div>
             </div>
-            <!--/ page detail header -->
+            <!--/ email detail header -->
 
-            <!-- page detail collapseable -->
-            <div class="collapse" id="page-details">
+            <!-- email detail collapseable -->
+            <div class="collapse" id="email-details">
                 <div class="pr-md pl-md pb-md">
                     <div class="panel shd-none mb-0">
                         <table class="table table-bordered table-striped mb-0">
                             <tbody>
-                                <tr>
-                                    <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.core.author'); ?></span></td>
-                                    <td><?php echo $email->getAuthor(); ?></td>
-                                </tr>
-                                <tr>
-                                    <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.core.category'); ?></span></td>
-                                    <td><?php echo is_object($email->getCategory()) ? $email->getCategory()->getTitle() : ''; ?></td>
-                                </tr>
-                                <tr>
-                                    <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.core.date.added'); ?></span></td>
-                                    <td><?php echo (!is_null($email->getDateAdded())) ? $view['date']->toFull($email->getDateAdded()) : ''; ?></td>
-                                </tr>
-                                <tr>
-                                    <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.core.date.modified'); ?></span></td>
-                                    <td><?php echo (!is_null($email->getDateModified())) ? $view['date']->toFull($email->getDateModified()) : ''; ?></td>
-                                </tr>
+                                <?php echo $view->render('MauticCoreBundle:Helper:details.html.php', array('entity' => $email)); ?>
                                 <tr>
                                     <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.email.form.template'); ?></span></td>
                                     <td><?php echo $email->getTemplate(); ?></td>
@@ -172,17 +108,17 @@ if ($security->hasEntityAccess($permissions['email:emails:editown'], $permission
                     </div>
                 </div>
             </div>
-            <!--/ page detail collapseable -->
+            <!--/ email detail collapseable -->
         </div>
 
         <div class="bg-auto bg-dark-xs">
-            <!-- page detail collapseable toggler -->
+            <!-- email detail collapseable toggler -->
             <div class="hr-expand nm">
                 <span data-toggle="tooltip" title="Detail">
-                    <a href="javascript:void(0)" class="arrow" data-toggle="collapse" data-target="#page-details"><span class="caret"></span></a>
+                    <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse" data-target="#email-details"><span class="caret"></span> <?php echo $view['translator']->trans('mautic.core.details'); ?></a>
                 </span>
             </div>
-            <!--/ page detail collapseable toggler -->
+            <!--/ email detail collapseable toggler -->
 
             <!--
             some stats: need more input on what type of form data to show.
@@ -196,7 +132,7 @@ if ($security->hasEntityAccess($permissions['email:emails:editown'], $permission
                                 <div class="col-xs-4 va-m">
                                     <h5 class="text-white dark-md fw-sb mb-xs">
                                         <span class="fa fa-download"></span>
-                                        Lead Lists comparison 
+                                        Lead Lists comparison
                                     </h5>
                                 </div>
                                 <div class="col-xs-8 va-m">

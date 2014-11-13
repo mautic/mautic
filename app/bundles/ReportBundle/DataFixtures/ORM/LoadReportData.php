@@ -67,6 +67,6 @@ class LoadReportData extends AbstractFixture implements OrderedFixtureInterface,
      */
     public function getOrder()
     {
-        return 7;
+        return 5;
     }
 }

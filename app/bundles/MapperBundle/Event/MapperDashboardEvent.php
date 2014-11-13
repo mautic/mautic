@@ -44,9 +44,9 @@ class MapperDashboardEvent extends Event
     /**
      * Add icon
      */
-    public function addApplication($bundle, $config)
+    public function addApplication($config)
     {
-        $this->applications[$bundle] = $config;
+        $this->applications[] = $config;
     }
 
     /**

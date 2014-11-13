@@ -66,7 +66,7 @@ class TriggerEventController extends CommonFormController
                     $success = 1;
 
                     //form is valid so process the data
-                    $keyId = 'new' . uniqid();
+                    $keyId = 'new' . hash('sha1', uniqid(mt_rand()));
 
                     //save the properties to session
                     $actions          = $session->get('mautic.pointtriggers.add');
@@ -302,7 +302,6 @@ class TriggerEventController extends CommonFormController
                 'target'         => '#triggerEvent' . $objectId,
                 'route'          => false,
                 'actionId'       => $objectId,
-                'replaceContent' => true,
                 'actionHtml'     => $this->renderView($template, array(
                     'inForm'      => true,
                     'action'      => $triggerEvent,
@@ -367,7 +366,6 @@ class TriggerEventController extends CommonFormController
                 'target'         => '#triggerEvent' . $objectId,
                 'route'          => false,
                 'actionId'       => $objectId,
-                'replaceContent' => true,
                 'actionHtml'     => $this->renderView($template, array(
                     'inForm'      => true,
                     'action'      => $triggerEvent,

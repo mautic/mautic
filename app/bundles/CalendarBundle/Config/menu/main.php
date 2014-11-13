@@ -27,6 +27,6 @@ $items = array(
 );
 
 return array(
-    'priority'  => 5,
+    'priority'  => 2,
     'items'     => $items
 );

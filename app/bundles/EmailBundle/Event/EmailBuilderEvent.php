@@ -34,11 +34,13 @@ class EmailBuilderEvent extends Event
             throw new InvalidArgumentException("The key, '$key' is already used by another subscriber. Please use a different key.");
         }
 
-        $header = $this->translator->trans($header);
-        $this->tokens[$key] = array(
-            "header"  => $header,
-            "content" => $content
-        );
+        if (!empty($content)) {
+            $header             = $this->translator->trans($header);
+            $this->tokens[$key] = array(
+                "header"  => $header,
+                "content" => $content
+            );
+        }
     }
 
     /**

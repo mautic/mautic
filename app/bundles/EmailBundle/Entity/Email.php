@@ -50,14 +50,6 @@ class Email extends FormEntity
     private $template;
 
     /**
-     * @ORM\Column(name="author", type="string", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"emailDetails"})
-     */
-    private $author;
-
-    /**
      * @ORM\Column(name="lang", type="string")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
@@ -260,23 +252,6 @@ class Email extends FormEntity
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getAuthor ()
-    {
-        return $this->author;
-    }
-
-    /**
-     * @param mixed $author
-     */
-    public function setAuthor ($author)
-    {
-        $this->isChanged('author', $author);
-        $this->author = $author;
     }
 
     /**

@@ -103,72 +103,7 @@ class PointController extends FormController
             'passthroughVars' => array(
                 'activeLink'     => '#mautic_point_index',
                 'mauticContent'  => 'point',
-                'route'          => $this->generateUrl('mautic_point_index', array('page' => $page)),
-                'replaceContent' => ($tmpl == 'list') ? 'true' : 'false'
-            )
-        ));
-    }
-
-    /**
-     * View a specific point
-     *
-     * @param int $objectId
-     *
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
-     */
-    public function viewAction($objectId)
-    {
-        $entity  = $this->factory->getModel('point')->getEntity($objectId);
-        //set the page we came from
-        $page        = $this->factory->getSession()->get('mautic.point.page', 1);
-
-        $permissions = $this->factory->getSecurity()->isGranted(array(
-            'point:points:view',
-            'point:points:create',
-            'point:points:edit',
-            'point:points:delete',
-            'point:points:publish'
-
-        ), "RETURN_ARRAY");
-
-        if ($entity === null) {
-            //set the return URL
-            $returnUrl  = $this->generateUrl('mautic_point_index', array('page' => $page));
-
-            return $this->postActionRedirect(array(
-                'returnUrl'       => $returnUrl,
-                'viewParameters'  => array('page' => $page),
-                'contentTemplate' => 'MauticPointBundle:Point:index',
-                'passthroughVars' => array(
-                    'activeLink'    => '#mautic_point_index',
-                    'mauticContent' => 'point'
-                ),
-                'flashes'         =>array(
-                    array(
-                        'type' => 'error',
-                        'msg'  => 'mautic.point.error.notfound',
-                        'msgVars' => array('%id%' => $objectId)
-                    )
-                )
-            ));
-        } elseif (!$permissions['point:points:view']) {
-            return $this->accessDenied();
-        }
-
-        return $this->delegateView(array(
-            'viewParameters'  => array(
-                'entity'      => $entity,
-                'page'        => $page,
-                'permissions' => $permissions
-            ),
-            'contentTemplate' => 'MauticPointBundle:Point:details.html.php',
-            'passthroughVars' => array(
-                'activeLink'    => '#mautic_point_index',
-                'mauticContent' => 'point',
-                'route'         => $this->generateUrl('mautic_point_action', array(
-                        'objectAction' => 'view',
-                        'objectId'     => $entity->getId())
-                )
+                'route'          => $this->generateUrl('mautic_point_index', array('page' => $page))
             )
         ));
     }

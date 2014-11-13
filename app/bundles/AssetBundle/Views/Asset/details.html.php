@@ -49,13 +49,11 @@ if ($security->hasEntityAccess($permissions['asset:assets:editown'], $permission
     <!-- left section -->
     <div class="col-md-9 bg-white height-auto">
         <div class="bg-auto">
-            <!-- page detail header -->
+            <!-- asset detail header -->
             <div class="pr-md pl-md pt-lg pb-lg">
                 <div class="box-layout">
-                    <div class="col-xs-6 va-m">
-                        <p class="text-white dark-lg mb-0">Created on <?php echo $view['date']->toDate($activeAsset->getDateAdded()); ?></p>
-                    </div>
-                    <div class="col-xs-6 va-m text-right">
+                    <div class="col-xs-10"></div>
+                    <div class="col-xs-2 text-right">
                         <?php switch ($activeAsset->getPublishStatus()) {
                             case 'published':
                                 $labelColor = "success";
@@ -73,54 +71,38 @@ if ($security->hasEntityAccess($permissions['asset:assets:editown'], $permission
                     </div>
                 </div>
             </div>
-            <!--/ page detail header -->
-
-            <!-- page detail collapseable -->
+            <!--/ asset detail header -->
+            <!-- asset detail collapseable -->
             <div class="collapse" id="asset-details">
                 <div class="pr-md pl-md pb-md">
                     <div class="panel shd-none mb-0">
                         <table class="table table-bordered table-striped mb-0">
                             <tbody>
-                                <tr>
-                                    <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.core.author'); ?></span></td>
-                                    <td><?php echo $activeAsset->getAuthor(); ?></td>
-                                </tr>
-                                <tr>
-                                    <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.core.category'); ?></span></td>
-                                    <td><?php echo is_object($activeAsset->getCategory()) ? $activeAsset->getCategory()->getTitle() : ''; ?></td>
-                                </tr>
-                                <tr>
-                                    <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.page.page.publish.up'); ?></span></td>
-                                    <td><?php echo (!is_null($activeAsset->getPublishUp())) ? $view['date']->toFull($activeAsset->getPublishUp()) : ''; ?></td>
-                                </tr>
-                                <tr>
-                                    <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.page.page.publish.down'); ?></span></td>
-                                    <td><?php echo (!is_null($activeAsset->getPublishDown())) ? $view['date']->toFull($activeAsset->getPublishDown()) : ''; ?></td>
-                                </tr>
-                                <tr>
-                                    <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.asset.asset.size'); ?></span></td>
-                                    <td><?php echo (!is_null($activeAsset->getFileSize())) ? $activeAsset->getFileSize() . ' kB' : ''; ?></td>
-                                </tr>
-                                <tr>
-                                    <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.asset.asset.path.relative'); ?></span></td>
-                                    <td><?php echo (!is_null($activeAsset->getWebPath())) ? $activeAsset->getWebPath() : ''; ?></td>
-                                </tr>
+                            <?php echo $view->render('MauticCoreBundle:Helper:details.html.php', array('entity' => $activeAsset)); ?>
+                            <tr>
+                                <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.asset.asset.size'); ?></span></td>
+                                <td><?php echo (!is_null($activeAsset->getFileSize())) ? $activeAsset->getFileSize() . ' kB' : ''; ?></td>
+                            </tr>
+                            <tr>
+                                <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.asset.asset.path.relative'); ?></span></td>
+                                <td><?php echo (!is_null($activeAsset->getWebPath())) ? $activeAsset->getWebPath() : ''; ?></td>
+                            </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
-            <!--/ page detail collapseable -->
+            <!--/ asset detail collapseable -->
         </div>
 
         <div class="bg-auto bg-dark-xs">
-            <!-- page detail collapseable toggler -->
+            <!-- asset detail collapseable toggler -->
             <div class="hr-expand nm">
                 <span data-toggle="tooltip" title="Detail">
-                    <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse" data-target="#asset-details"><span class="caret"></span> <?php echo $view['translator']->trans('mautic.asset.asset.header.info'); ?></a>
+                    <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse" data-target="#asset-details"><span class="caret"></span> <?php echo $view['translator']->trans('mautic.core.details'); ?></a>
                 </span>
             </div>
-            <!--/ page detail collapseable toggler -->
+            <!--/ asset detail collapseable toggler -->
 
             <!-- some stats -->
             <div class="pa-md">

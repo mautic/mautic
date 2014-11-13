@@ -73,7 +73,7 @@ class EventController extends CommonFormController
                     $success = 1;
 
                     //form is valid so process the data
-                    $keyId = 'new' . uniqid();
+                    $keyId = 'new' . hash('sha1', uniqid(mt_rand()));
 
                     //save the properties to session
                     $addEvents   = $session->get('mautic.campaigns.add');
@@ -252,6 +252,7 @@ class EventController extends CommonFormController
                         /** @var \Mautic\CoreBundle\Templating\Helper\DateHelper $dh */
                         $dh    = $this->container->get('mautic.core.template.helper.date');
                         $passthroughVars['label'] = $translator->trans('mautic.campaign.connection.trigger.date.label', array(
+                            '%full%' => $dh->toFull($event['triggerDate']),
                             '%time%' => $dh->toTime($event['triggerDate']),
                             '%date%' => $dh->toShort($event['triggerDate'])
                         ));
