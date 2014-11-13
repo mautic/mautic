@@ -148,21 +148,20 @@ class CategoryController extends FormController
     public function newAction ($bundle)
     {
         $session = $this->factory->getSession();
-        $model   = $this->factory->getModel('category.category');
+        $model   = $this->factory->getModel('category');
         $entity  = $model->getEntity();
+        $success = $closeModal = 0;
+        $cancelled = $valid = false;
 
-        if (!$this->factory->getSecurity()->isGranted($bundle.':categories:create')) {
+        //not found
+       if (!$this->factory->getSecurity()->isGranted($bundle.':categories:create')) {
             return $this->accessDenied();
         }
-
-        //set the page we came from
-        $page   = $session->get('mautic.category.page', 1);
+        //Create the form
         $action = $this->generateUrl('mautic_category_action', array(
             'objectAction' => 'new',
             'bundle'       => $bundle
         ));
-
-        //create the form
         $form = $model->createForm($entity, $this->get('form.factory'), $action, array('bundle' => $bundle));
 
         ///Check for a submitted form and process it
@@ -170,60 +169,46 @@ class CategoryController extends FormController
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
+                    $success = 1;
+
                     //form is valid so process the data
-                    $model->saveEntity($entity);
-
-                    $this->request->getSession()->getFlashBag()->add(
-                        'notice',
-                        $this->get('translator')->trans('mautic.category.notice.created', array(
-                            '%name%' => $entity->getTitle(),
-                            '%url%'          => $this->generateUrl('mautic_category_action', array(
-                                'objectAction' => 'edit',
-                                'objectId'     => $entity->getId(),
-                                'bundle'       => $bundle
-                            ))
-                        ), 'flashes')
-                    );
-
-                    if (!$form->get('buttons')->get('save')->isClicked()) {
-                        //return edit view so that all the session stuff is loaded
-                        return $this->editAction($entity->getId(), true);
-                    }
+                    $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
                 }
-            }
-
-            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
-                $viewParameters  = array(
-                    'page'   => $page,
-                    'bundle' => $bundle
-                );
-                return $this->postActionRedirect(array(
-                    'returnUrl'       => $this->generateUrl('mautic_category_index', $viewParameters),
-                    'viewParameters'  => $viewParameters,
-                    'contentTemplate' => 'MauticCategoryBundle:Category:index',
-                    'passthroughVars' => array(
-                        'activeLink'    => 'mautic_'.$bundle.'category_index',
-                        'mauticContent' => 'category'
-                    )
-                ));
+            } else {
+                $success = 1;
             }
         }
 
-        return $this->delegateView(array(
-            'viewParameters' => array(
-                'form'   => $form->createView(),
-                'bundle' => $bundle,
-            ),
-            'contentTemplate' => 'MauticCategoryBundle:Category:form.html.php',
-            'passthroughVars' => array(
-                'activeLink'    => 'mautic_'.$bundle.'category_index',
-                'mauticContent' => 'page',
-                'route'         => $this->generateUrl('mautic_category_action', array(
-                    'objectAction' => 'new',
-                    'bundle'       => $bundle
-                ))
-            )
-        ));
+        $closeModal = ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked()));
+
+        $passthroughVars = array(
+            'mauticContent' => 'category',
+            'success'       => $success,
+            'route'         => false,
+            'indexRoute'    => ($cancelled) ? false : $this->generateUrl('mautic_category_index', array(
+                'page' => $session->get('mautic.category.page'),
+                'bundle' => $bundle
+            ))
+        );
+
+        if ($closeModal) {
+            //just close the modal
+            $passthroughVars['closeModal'] = 1;
+            $response                      = new JsonResponse($passthroughVars);
+            $response->headers->set('Content-Length', strlen($response->getContent()));
+
+            return $response;
+        } else {
+            return $this->ajaxAction(array(
+                'contentTemplate' => 'MauticCategoryBundle:Category:form.html.php',
+                'viewParameters' => array(
+                    'form'           => $form->createView(),
+                    'activeCategory' => $entity,
+                    'bundle'         => $bundle
+                ),
+                'passthroughVars' => $passthroughVars
+            ));
+        }
     }
 
     /**
@@ -233,46 +218,20 @@ class CategoryController extends FormController
      */
     public function editAction ($bundle, $objectId, $ignorePost = false)
     {
-        $session    = $this->factory->getSession();
-        $model      = $this->factory->getModel('category.category');
-        $entity     = $model->getEntity($objectId);
-        //set the page we came from
-        $page       = $session->get('mautic.category.page', 1);
-        $viewParams = array(
-            'page'   => $page,
-            'bundle' => $bundle
-        );
-        //set the return URL
-        $returnUrl  = $this->generateUrl('mautic_category_index', $viewParams);
-
-        $postActionVars = array(
-            'returnUrl'       => $returnUrl,
-            'viewParameters'  => $viewParams,
-            'contentTemplate' => 'MauticCategoryBundle:Category:index',
-            'passthroughVars' => array(
-                'activeLink'    => 'mautic_'.$bundle.'category_index',
-                'mauticContent' => 'category'
-            )
-        );
+        $session = $this->factory->getSession();
+        $model   = $this->factory->getModel('category');
+        $entity  = $model->getEntity($objectId);
+        $success = $closeModal = 0;
+        $cancelled = $valid = false;
 
         //not found
         if ($entity === null) {
-            return $this->postActionRedirect(
-                array_merge($postActionVars, array(
-                    'flashes' => array(
-                        array(
-                            'type' => 'error',
-                            'msg'  => 'mautic.category.error.notfound',
-                            'msgVars' => array('%id%' => $objectId)
-                        )
-                    )
-                ))
-            );
+            $closeModal = true;
         }  elseif (!$this->factory->getSecurity()->isGranted($bundle.':categories:view')) {
             return $this->accessDenied();
         } elseif ($model->isLocked($entity)) {
             //deny access if the entity is locked
-            return $this->isLocked($postActionVars, $entity, 'category.category');
+            //return $this->isLocked($postActionVars, $entity, 'category.category');
         }
 
         //Create the form
@@ -288,57 +247,52 @@ class CategoryController extends FormController
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
+                    $success = 1;
+
                     //form is valid so process the data
                     $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
-
-                    $this->request->getSession()->getFlashBag()->add(
-                        'notice',
-                        $this->get('translator')->trans('mautic.category.notice.updated', array(
-                            '%name%' => $entity->getTitle(),
-                            '%url%'  => $this->generateUrl('mautic_category_action', array(
-                                'objectAction' => 'edit',
-                                'objectId'     => $entity->getId(),
-                                'bundle'       => $bundle
-                            ))
-                        ), 'flashes')
-                    );
                 }
             } else {
+                $success = 1;
+
                 //unlock the entity
                 $model->unlockEntity($entity);
-            }
-
-            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
-                return $this->postActionRedirect(
-                    array_merge($postActionVars, array(
-                        'returnUrl'       => $this->generateUrl('mautic_category_index', $viewParams),
-                        'viewParameters'  => $viewParams,
-                        'contentTemplate' => 'MauticCategoryBundle:Category:index'
-                    ))
-                );
             }
         } else {
             //lock the entity
             $model->lockEntity($entity);
         }
 
-        return $this->delegateView(array(
-            'viewParameters' => array(
-                'form'           => $form->createView(),
-                'activeCategory' => $entity,
-                'bundle'         => $bundle
-            ),
-            'contentTemplate' => 'MauticCategoryBundle:Category:form.html.php',
-            'passthroughVars' => array(
-                'activeLink'    => '#mautic_page_index',
-                'mauticContent' => 'page',
-                'route'         => $this->generateUrl('mautic_category_action', array(
-                    'objectAction' => 'edit',
-                    'objectId'     => $entity->getId(),
-                    'bundle'       => $bundle
-                ))
-            )
-        ));
+        $closeModal = ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked()));
+
+        $passthroughVars = array(
+            'mauticContent' => 'category',
+            'success'       => $success,
+            'route'         => false,
+            'indexRoute'    => ($cancelled) ? false : $this->generateUrl('mautic_category_index', array(
+                'page' => $session->get('mautic.category.page'),
+                'bundle' => $bundle
+            ))
+        );
+
+        if ($closeModal) {
+            //just close the modal
+            $passthroughVars['closeModal'] = 1;
+            $response                      = new JsonResponse($passthroughVars);
+            $response->headers->set('Content-Length', strlen($response->getContent()));
+
+            return $response;
+        } else {
+            return $this->ajaxAction(array(
+                'contentTemplate' => 'MauticCategoryBundle:Category:form.html.php',
+                'viewParameters' => array(
+                    'form'           => $form->createView(),
+                    'activeCategory' => $entity,
+                    'bundle'         => $bundle
+                ),
+                'passthroughVars' => $passthroughVars
+            ));
+        }
     }
 
     /**

@@ -175,6 +175,24 @@ if ($security->hasEntityAccess($permissions['email:emails:editown'], $permission
         <!-- preview URL -->
         <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
             <div class="panel-heading">
+                <div class="panel-title"><?php echo $view['translator']->trans('mautic.email.urlvariant'); ?></div>
+            </div>
+            <div class="panel-body pt-xs">
+                <div class="input-group">
+                    <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly
+                           value="<?php echo $previewUrl; ?>" />
+                <span class="input-group-btn">
+                    <button class="btn btn-default" onclick="window.open('<?php echo $previewUrl; ?>', '_blank');">
+                        <i class="fa fa-external-link"></i>
+                    </button>
+                </span>
+                </div>
+            </div>
+        </div>
+        <!--/ preview URL -->
+
+        <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
+            <div class="panel-heading">
                 <div class="panel-title"><?php echo $view['translator']->trans('mautic.email.recipient.lists'); ?> (<?php
                 echo $stats['datasets'][0]['data'][0] . '/' . $stats['datasets'][0]['data'][3]; ?>)</div>
             </div>
@@ -190,7 +208,6 @@ if ($security->hasEntityAccess($permissions['email:emails:editown'], $permission
                 </ul>
             </div>
         </div>
-        <!--/ preview URL -->
 
         <hr class="hr-w-2" style="width:50%">
 

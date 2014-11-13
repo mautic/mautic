@@ -4,10 +4,6 @@ Mautic.emailOnLoad = function (container) {
         Mautic.activateSearchAutocomplete('list-search', 'email');
     }
 
-    if (mQuery(container + ' form[name="emailform"]').length) {
-        Mautic.activateCategoryLookup('emailform', 'email');
-    }
-
     if (typeof Mautic.listCompareChart === 'undefined') {
         Mautic.renderListCompareChart();
     }

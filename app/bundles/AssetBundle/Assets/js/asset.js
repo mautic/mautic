@@ -1,8 +1,5 @@
 //AssetBundle
 Mautic.assetOnLoad = function (container) {
-    if (mQuery(container + ' form[name="asset"]').length) {
-       Mautic.activateCategoryLookup('asset', 'asset');
-    }
     if (typeof Mautic.renderDownloadChartObject === 'undefined') {
 	    Mautic.renderDownloadChart();
 	}
@@ -16,7 +13,7 @@ Mautic.assetOnUnload = function(id) {
 
 Mautic.getAssetId = function() {
 	return mQuery('input#itemId').val();
-} 
+}
 
 Mautic.renderDownloadChart = function (chartData) {
 	if (!mQuery('#download-chart').length) {
@@ -27,7 +24,7 @@ Mautic.renderDownloadChart = function (chartData) {
     }
     var ctx = document.getElementById("download-chart").getContext("2d");
     var options = {};
-    
+
 	if (typeof Mautic.renderDownloadChartObject === 'undefined') {
 	    Mautic.renderDownloadChartObject = new Chart(ctx).Line(chartData, options);
     } else {

@@ -11,9 +11,18 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
 $container->setDefinition('mautic.form.type.category', new Definition(
-    'Mautic\CategoryBundle\Form\Type\CategoryType',
+    'Mautic\CategoryBundle\Form\Type\CategoryListType',
     array(new Reference('mautic.factory'))
 ))
     ->addTag('form.type', array(
         'alias' => 'category',
+    ));
+
+
+$container->setDefinition('mautic.form.type.category_form', new Definition(
+    'Mautic\CategoryBundle\Form\Type\CategoryType',
+    array(new Reference('mautic.factory'))
+))
+    ->addTag('form.type', array(
+        'alias' => 'category_form',
     ));

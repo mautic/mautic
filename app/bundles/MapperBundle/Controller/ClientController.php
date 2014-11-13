@@ -464,4 +464,9 @@ class ClientController extends FormController
             ))
         );
     }
+
+    public function oAuth2CallbackAction($application, $client)
+    {
+
+    }
 }

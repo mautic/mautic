@@ -52,8 +52,6 @@ class PublicController extends CommonFormController
                 return $this->redirect($url, 301);
             }
 
-            $userAccess = $security->hasEntityAccess('asset:assets:viewown', 'asset:assets:viewother', $entity->getCreatedBy());
-
             //all the checks pass so provide the asset for download
 
             $dispatcher = $this->get('event_dispatcher');
@@ -65,10 +63,17 @@ class PublicController extends CommonFormController
 
             $model->trackDownload($entity, $this->request, 200);
 
+            try {
+                $contents = $entity->getFileContents();
+            } catch (\Exception $e) {
+                $model->trackDownload($entity, $this->request, 404);
+                throw $this->createNotFoundException($translator->trans('mautic.core.url.error.404'));
+            }
+
             $response = new Response();
             $response->headers->set('Content-Type', $entity->getFileMimeType());
             $response->headers->set('Content-Disposition', 'attachment;filename="'.$entity->getOriginalFileName());
-            $response->setContent($entity->getFileContents());
+            $response->setContent($contents);
 
             return $response;
 

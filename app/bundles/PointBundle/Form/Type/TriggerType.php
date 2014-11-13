@@ -9,7 +9,6 @@
 
 namespace Mautic\PointBundle\Form\Type;
 
-use Mautic\CategoryBundle\Helper\FormHelper;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
@@ -48,7 +47,7 @@ class TriggerType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber());
+        $builder->addEventSubscriber(new CleanFormSubscriber(array('description' => 'html')));
         $builder->addEventSubscriber(new FormExitSubscriber('point', $options));
 
         $builder->add('name', 'text', array(
@@ -65,7 +64,9 @@ class TriggerType extends AbstractType
         ));
 
         //add category
-        FormHelper::buildForm($this->translator, $builder);
+        $builder->add('category', 'category', array(
+            'bundle' => 'point'
+        ));
 
         $builder->add('points', 'number', array(
             'label'      => 'mautic.point.trigger.form.points',

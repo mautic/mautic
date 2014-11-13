@@ -9,7 +9,6 @@
 
 namespace Mautic\EmailBundle\Form\Type;
 
-use Mautic\CategoryBundle\Helper\FormHelper;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
@@ -76,7 +75,9 @@ class EmailType extends AbstractType
 
         if (!$isVariant) {
             //add category
-            FormHelper::buildForm($this->translator, $builder);
+            $builder->add('category', 'category', array(
+                'bundle' => 'email'
+            ));
 
             //add lead lists
             $transformer = new \Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer(

@@ -9,15 +9,12 @@
 
 namespace Mautic\FormBundle\Form\Type;
 
-use Mautic\CategoryBundle\Helper\FormHelper;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
@@ -49,7 +46,7 @@ class FormType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber());
+        $builder->addEventSubscriber(new CleanFormSubscriber(array('description' => 'html')));
         $builder->addEventSubscriber(new FormExitSubscriber('form.form', $options));
 
         //details
@@ -59,15 +56,17 @@ class FormType extends AbstractType
             'attr'       => array('class' => 'form-control')
         ));
 
-        $builder->add('description', 'text', array(
+        $builder->add('description', 'textarea', array(
             'label'      => 'mautic.form.form.description',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control'),
+            'attr'       => array('class' => 'form-control editor'),
             'required'   => false
         ));
 
         //add category
-        FormHelper::buildForm($this->translator, $builder);
+        $builder->add('category', 'category', array(
+            'bundle' => 'form'
+        ));
 
         if (!empty($options['data']) && $options['data']->getId()) {
             $readonly = !$this->security->hasEntityAccess(

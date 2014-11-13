@@ -25,7 +25,7 @@ echo $view['form']->start($form);
     	<div class="row">
     		<div class="col-md-6">
 		        <div class="pa-md">
-				    <?php		    
+				    <?php
 					echo $view['form']->row($form['name']);
 					echo $view['form']->row($form['description']);
 
@@ -47,7 +47,6 @@ echo $view['form']->start($form);
  	<div class="col-md-3 bg-white height-auto">
 		<div class="pr-lg pl-lg pt-md pb-md">
 			<?php
-				echo $view['form']->row($form['category_lookup']);
 				echo $view['form']->row($form['category']);
 				echo $view['form']->row($form['isPublished']);
 				echo $view['form']->row($form['publishUp']);

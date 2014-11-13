@@ -95,10 +95,7 @@ if ($permissions['campaign:campaigns:edit']): ?>
             </div>
             <!--/ campaign detail collapseable toggler -->
 
-            <!--
-            some stats: need more input on what type of campaign data to show.
-            delete if it is not require
-            -->
+            <!-- stats -->
             <div class="pa-md">
                 <div class="row">
                     <div class="col-md-4">
@@ -118,7 +115,7 @@ if ($permissions['campaign:campaigns:edit']): ?>
                                     <canvas id="campaign-leads-chart" height="93"></canvas>
                                 </div>
                             </div>
-                            <div id="campaign-leads-chart-data" class="hide"><?php echo json_encode($hits); ?></div>
+                            <div id="campaign-leads-chart-data" class="hide"><?php echo json_encode($leadStats); ?></div>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -163,290 +160,44 @@ if ($permissions['campaign:campaigns:edit']): ?>
                     </div>
                 </div>
             </div>
-            <!--/ some stats -->
-
-            <!-- tabs controls -->
-            <ul class="nav nav-tabs pr-md pl-md">
-                <li class="active"><a href="#event-container" role="tab" data-toggle="tab">Event Lists</a></li>
-                <li class=""><a href="#lead-container" role="tab" data-toggle="tab">Lead Lists</a></li>
-            </ul>
-            <!--/ tabs controls -->
+            <!--/ stats -->
         </div>
 
         <!-- start: tab-content -->
         <div class="tab-content pa-md">
             <!-- #events-container -->
             <div class="tab-pane active fade in bdr-w-0" id="event-container">
-                <!-- header -->
-                <div class="mb-lg">
-                    <!-- form -->
-                    <form action="" class="panel mb-0">
-                        <div class="form-control-icon pa-xs">
-                            <input type="text" class="form-control bdr-w-0" placeholder="Filter event...">
-                            <span class="the-icon fa fa-search text-muted mt-xs"></span><!-- must below `form-control` -->
-                        </div>
-                    </form>
-                    <!--/ form -->
-                </div>
 
                 <!-- start: trigger type event -->
                 <ul class="list-group">
-                    <li class="list-group-item bg-auto bg-light-xs">
-                        <div class="box-layout">
-                            <div class="col-md-1 va-m">
-                                <h3><span class="fa fa-bullseye text-danger"></span></h3>
-                            </div>
-                            <div class="col-md-7 va-m">
-                                <h5 class="fw-sb text-primary mb-xs">Campaign Event Name #1</h5>
-                                <h6 class="text-white dark-sm">Event description lorem ipsum dolor sit amet</h6>
-                            </div>
-                            <div class="col-md-4 va-m text-right">
-                                <em class="text-white dark-sm">asset.download</em>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item bg-auto bg-light-xs">
-                        <div class="box-layout">
-                            <div class="col-md-1 va-m">
-                                <h3><span class="fa fa-bullseye text-danger"></span></h3>
-                            </div>
-                            <div class="col-md-7 va-m">
-                                <h5 class="fw-sb text-primary mb-xs">Campaign Event Name #2</h5>
-                                <h6 class="text-white dark-sm">Event description lorem ipsum dolor sit amet</h6>
-                            </div>
-                            <div class="col-md-4 va-m text-right">
-                                <em class="text-white dark-sm">campaign.leadchange</em>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item bg-auto bg-light-xs">
-                        <div class="box-layout">
-                            <div class="col-md-1 va-m">
-                                <h3><span class="fa fa-bullseye text-danger"></span></h3>
-                            </div>
-                            <div class="col-md-7 va-m">
-                                <h5 class="fw-sb text-primary mb-xs">Campaign Event Name #3</h5>
-                                <h6 class="text-white dark-sm">Event description lorem ipsum dolor sit amet</h6>
-                            </div>
-                            <div class="col-md-4 va-m text-right">
-                                <em class="text-white dark-sm">page.pagehit</em>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item bg-auto bg-light-xs">
-                        <div class="box-layout">
-                            <div class="col-md-1 va-m">
-                                <h3><span class="fa fa-bullseye text-danger"></span></h3>
-                            </div>
-                            <div class="col-md-7 va-m">
-                                <h5 class="fw-sb text-primary mb-xs">Campaign Event Name #4</h5>
-                                <h6 class="text-white dark-sm">Event description lorem ipsum dolor sit amet</h6>
-                            </div>
-                            <div class="col-md-4 va-m text-right">
-                                <em class="text-white dark-sm">email.open</em>
-                            </div>
-                        </div>
-                    </li>
+                    <?php if (isset($events) && is_array($events)) : ?>
+                        <?php foreach ($events as $event) : ?>
+                            <li class="list-group-item bg-auto bg-light-xs">
+                                <div class="box-layout">
+                                    <div class="col-md-1 va-m">
+                                        <h3>
+                                            <?php if ($event['eventType'] == 'decision') : ?>
+                                                <span class="fa fa-bullseye text-danger"></span>
+                                            <?php else : ?>
+                                                <span class="fa fa-rocket text-success"></span>
+                                            <?php endif; ?>
+                                        </h3>
+                                    </div>
+                                    <div class="col-md-7 va-m">
+                                        <h5 class="fw-sb text-primary mb-xs"><?php echo $event['name']; ?></h5>
+                                        <!-- <h6 class="text-white dark-sm">Event description lorem ipsum dolor sit amet</h6> -->
+                                    </div>
+                                    <div class="col-md-4 va-m text-right">
+                                        <em class="text-white dark-sm"><?php echo $event['type']; ?></em>
+                                    </div>
+                                </div>
+                            </li>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </ul>
                 <!--/ end: trigger type event -->
-
-                <!-- start: action type event -->
-                <ul class="list-group mb-0">
-                    <li class="list-group-item bg-auto bg-light-xs">
-                        <div class="box-layout">
-                            <div class="col-md-1 va-m">
-                                <h3><span class="fa fa-rocket text-success"></span></h3>
-                            </div>
-                            <div class="col-md-7 va-m">
-                                <h5 class="fw-sb text-primary mb-xs">Campaign Event Name #1</h5>
-                                <h6 class="text-white dark-sm">Event description lorem ipsum dolor sit amet</h6>
-                            </div>
-                            <div class="col-md-4 va-m text-right">
-                                <em class="text-white dark-sm">campaign.addremovelead</em>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item bg-auto bg-light-xs">
-                        <div class="box-layout">
-                            <div class="col-md-1 va-m">
-                                <h3><span class="fa fa-rocket text-success"></span></h3>
-                            </div>
-                            <div class="col-md-7 va-m">
-                                <h5 class="fw-sb text-primary mb-xs">Campaign Event Name #2</h5>
-                                <h6 class="text-white dark-sm">Event description lorem ipsum dolor sit amet</h6>
-                            </div>
-                            <div class="col-md-4 va-m text-right">
-                                <em class="text-white dark-sm">campaign.addremovelead</em>
-                            </div>
-                        </div>
-                    </li>
-                </ul>
-                <!--/ end: action type event -->
             </div>
             <!--/ #events-container -->
-
-            <!-- #lead-container -->
-            <div class="tab-pane fade bdr-w-0" id="lead-container">
-                <!-- header -->
-                <div class="box-layout mb-lg">
-                    <!-- form -->
-                    <form action="" class="panel col-xs-8 va-m">
-                        <div class="form-control-icon pa-xs">
-                            <input type="text" class="form-control bdr-w-0" placeholder="Filter leads...">
-                            <span class="the-icon fa fa-search text-muted mt-xs"></span><!-- must below `form-control` -->
-                        </div>
-                    </form>
-                    <!--/ form -->
-
-                    <!-- button -->
-                    <div class="col-xs-4 va-m text-right">
-                        <div class="btn-group">
-                            <a href="javascript:void(0)" class="btn btn-default active"><span class="fa fa-th-large"></span></a>
-                            <a href="javascript:void(0)" class="btn btn-default"><span class="fa fa-th-list"></span></a>
-                        </div>
-                    </div>
-                </div>
-                <!--/ header -->
-
-                <ul class="row list-unstyled">
-                    <li class="col-sm-4 mb-md">
-                        <div class="list-group mb-0">
-                            <a href="javascript:void(0)" class="list-group-item box-layout">
-                                <span class="col-xs-3 va-m">
-                                    <span class="pull-left img-wrapper img-rounded">
-                                        <img class="media-object" src="https://s3.amazonaws.com/uifaces/faces/twitter/_shahedk/128.jpg" style="width:42px">
-                                    </span>
-                                </span>
-                                <span class="col-xs-9 va-m">
-                                    <h5 class="media-body fw-sb mb-2">Castor Acosta</h5>
-                                    <p class="text-white dark-sm mb-0 ellipsis">dolor@lacus.com</p>
-                                </span>
-                            </a>
-                        </div>
-                    </li>
-                    <li class="col-sm-4 mb-md">
-                        <div class="list-group mb-0">
-                            <a href="javascript:void(0)" class="list-group-item box-layout">
-                                <span class="col-xs-3 va-m">
-                                    <span class="pull-left img-wrapper img-rounded">
-                                        <img class="media-object" src="https://s3.amazonaws.com/uifaces/faces/twitter/chadengle/128.jpg" style="width:42px">
-                                    </span>
-                                </span>
-                                <span class="col-xs-9 va-m">
-                                    <h5 class="media-body fw-sb mb-2">Asher Peterson</h5>
-                                    <p class="text-white dark-sm mb-0 ellipsis">consectetuer@justoProinnon.net</p>
-                                </span>
-                            </a>
-                        </div>
-                    </li>
-                    <li class="col-sm-4 mb-md">
-                        <div class="list-group mb-0">
-                            <a href="javascript:void(0)" class="list-group-item box-layout">
-                                <span class="col-xs-3 va-m">
-                                    <span class="pull-left img-wrapper img-rounded">
-                                        <img class="media-object" src="https://s3.amazonaws.com/uifaces/faces/twitter/stylecampaign/128.jpg" style="width:42px">
-                                    </span>
-                                </span>
-                                <span class="col-xs-9 va-m">
-                                    <h5 class="media-body fw-sb mb-2">Tanner Logan</h5>
-                                    <p class="text-white dark-sm mb-0 ellipsis">nulla@purusin.net</p>
-                                </span>
-                            </a>
-                        </div>
-                    </li>
-                    <li class="col-sm-4 mb-md">
-                        <div class="list-group mb-0">
-                            <a href="javascript:void(0)" class="list-group-item box-layout">
-                                <span class="col-xs-3 va-m">
-                                    <span class="pull-left img-wrapper img-rounded">
-                                        <img class="media-object" src="https://s3.amazonaws.com/uifaces/faces/twitter/chexee/128.jpg" style="width:42px">
-                                    </span>
-                                </span>
-                                <span class="col-xs-9 va-m">
-                                    <h5 class="media-body fw-sb mb-2">Violet Dorsey</h5>
-                                    <p class="text-white dark-sm mb-0 ellipsis">eleifend@fermentumrisus.edu</p>
-                                </span>
-                            </a>
-                        </div>
-                    </li>
-                    <li class="col-sm-4 mb-md">
-                        <div class="list-group mb-0">
-                            <a href="javascript:void(0)" class="list-group-item box-layout">
-                                <span class="col-xs-3 va-m">
-                                    <span class="pull-left img-wrapper img-rounded">
-                                        <img class="media-object" src="https://s3.amazonaws.com/uifaces/faces/twitter/emieljanson/128.jpg" style="width:42px">
-                                    </span>
-                                </span>
-                                <span class="col-xs-9 va-m">
-                                    <h5 class="media-body fw-sb mb-2">Bruce Frederick</h5>
-                                    <p class="text-white dark-sm mb-0 ellipsis">nisi@at.net</p>
-                                </span>
-                            </a>
-                        </div>
-                    </li>
-                    <li class="col-sm-4 mb-md">
-                        <div class="list-group mb-0">
-                            <a href="javascript:void(0)" class="list-group-item box-layout">
-                                <span class="col-xs-3 va-m">
-                                    <span class="pull-left img-wrapper img-rounded">
-                                        <img class="media-object" src="https://s3.amazonaws.com/uifaces/faces/twitter/jayrobinson/128.jpg" style="width:42px">
-                                    </span>
-                                </span>
-                                <span class="col-xs-9 va-m">
-                                    <h5 class="media-body fw-sb mb-2">Igor Gonzales</h5>
-                                    <p class="text-white dark-sm mb-0 ellipsis">mi.lorem@leoCras.ca</p>
-                                </span>
-                            </a>
-                        </div>
-                    </li>
-                    <li class="col-sm-4 mb-md">
-                        <div class="list-group mb-0">
-                            <a href="javascript:void(0)" class="list-group-item box-layout">
-                                <span class="col-xs-3 va-m">
-                                    <span class="pull-left img-wrapper img-rounded">
-                                        <img class="media-object" src="https://s3.amazonaws.com/uifaces/faces/twitter/walterstephanie/128.jpg" style="width:42px">
-                                    </span>
-                                </span>
-                                <span class="col-xs-9 va-m">
-                                    <h5 class="media-body fw-sb mb-2">Bethany Tyler</h5>
-                                    <p class="text-white dark-sm mb-0 ellipsis">sit.amet.diam@dui.com</p>
-                                </span>
-                            </a>
-                        </div>
-                    </li>
-                    <li class="col-sm-4 mb-md">
-                        <div class="list-group mb-0">
-                            <a href="javascript:void(0)" class="list-group-item box-layout">
-                                <span class="col-xs-3 va-m">
-                                    <span class="pull-left img-wrapper img-rounded">
-                                        <img class="media-object" src="https://s3.amazonaws.com/uifaces/faces/twitter/liang/128.jpg" style="width:42px">
-                                    </span>
-                                </span>
-                                <span class="col-xs-9 va-m">
-                                    <h5 class="media-body fw-sb mb-2">Tamara Mcmillan</h5>
-                                    <p class="text-white dark-sm mb-0 ellipsis">blandit.viverra@turpis.co.uk</p>
-                                </span>
-                            </a>
-                        </div>
-                    </li>
-                    <li class="col-sm-4 mb-md">
-                        <div class="list-group mb-0">
-                            <a href="javascript:void(0)" class="list-group-item box-layout">
-                                <span class="col-xs-3 va-m">
-                                    <span class="pull-left img-wrapper img-rounded">
-                                        <img class="media-object" src="https://s3.amazonaws.com/uifaces/faces/twitter/yalozhkin/128.jpg" style="width:42px">
-                                    </span>
-                                </span>
-                                <span class="col-xs-9 va-m">
-                                    <h5 class="media-body fw-sb mb-2">Cody Delacruz</h5>
-                                    <p class="text-white dark-sm mb-0 ellipsis">sagittis.felis@Nulla.com</p>
-                                </span>
-                            </a>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-            <!--/ #lead-container -->
         </div>
         <!--/ end: tab-content -->
     </div>

@@ -25,7 +25,34 @@ if (!isset($extra)) {
             <i class="fa fa-angle-down "></i>
         </button>
         <ul class="pull-<?php echo $pull; ?> page-list-actions dropdown-menu" role="menu">
-            <?php if (!empty($edit)): ?>
+            <?php
+            if (!empty($customTop)):
+            foreach ($customTop as $c): ?>
+            <li>
+                <?php
+                $attr = '';
+                if (isset($menuLink)):
+                    $attr .= ' data-menu-link="' . $menuLink . '"';
+                endif;
+                if (isset($c['attr'])):
+                    foreach ($c['attr'] as $k => $v):
+                        $attr .= " $k=" . '"' . $v . '"';
+                    endforeach;
+                endif;
+                ?>
+                <a<?php echo $attr; ?>>
+                            <span>
+                                <?php if (isset($c['icon'])): ?>
+                                    <i class="fa fa-fw <?php echo $c['icon']; ?>"></i>
+                                <?php endif; ?>
+                                <?php echo $view['translator']->trans($c['label']); ?>
+                            </span>
+                </a>
+            </li>
+            <?php
+            endforeach;
+            endif;
+            if (!empty($edit)): ?>
                 <li>
                     <a href="<?php echo $view['router']->generate('mautic_' . $routeBase . '_action',
                         array_merge(array("objectAction" => "edit", "objectId" => $item->getId()), $extra)); ?>"

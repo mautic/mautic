@@ -93,7 +93,7 @@ class CategoryModel extends FormModel
         if (!empty($action)) {
             $options['action'] = $action;
         }
-        return $formFactory->create('category', $entity, $options);
+        return $formFactory->create('category_form', $entity, $options);
     }
 
     /**

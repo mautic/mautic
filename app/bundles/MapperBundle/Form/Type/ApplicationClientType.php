@@ -51,7 +51,7 @@ class ApplicationClientType extends AbstractType
         ));
 
         $event = new MapperFormEvent($this->factory->getSecurity());
-        $this->factory->getDispatcher()->dispatch(MapperEvents::FORM_ON_BUILD, $event);
+        $this->factory->getDispatcher()->dispatch(MapperEvents::CLIENT_FORM_ON_BUILD, $event);
         $extraFields = $event->getFields();
         foreach($extraFields as $extraField) {
             $builder->add($extraField['child'], $extraField['type'], $extraField['params']);

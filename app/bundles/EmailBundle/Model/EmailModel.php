@@ -327,17 +327,18 @@ class EmailModel extends FormModel
     /**
      * Get array of email builder tokens from bundles subscribed EmailEvents::EMAIL_ON_BUILD
      *
-     * @param $component null | tokens | abTestWinnerCriteria
+     * @param null|Email  $email
+     * @param null|string $component null | tokens | abTestWinnerCriteria
      *
      * @return mixed
      */
-    public function getBuilderComponents($component = null)
+    public function getBuilderComponents(Email $email = null, $component = null)
     {
         static $components;
 
         if (empty($components)) {
             $components = array();
-            $event      = new EmailBuilderEvent($this->translator);
+            $event      = new EmailBuilderEvent($this->translator, $email);
             $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_BUILD, $event);
             $components['tokens'] = $event->getTokenSections();
             $components['abTestWinnerCriteria'] = $event->getAbTestWinnerCriteria();

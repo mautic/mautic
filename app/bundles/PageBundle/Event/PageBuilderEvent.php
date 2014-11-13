@@ -9,6 +9,7 @@
 
 namespace Mautic\PageBundle\Event;
 
+use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
 use Symfony\Component\EventDispatcher\Event;
 
@@ -22,10 +23,12 @@ class PageBuilderEvent extends Event
     private $tokens               = array();
     private $abTestWinnerCriteria = array();
     private $translator;
+    private $page = null;
 
-    public function __construct($translator)
+    public function __construct($translator, Page $page = null)
     {
         $this->translator = $translator;
+        $this->page       = $page;
     }
 
     public function addTokenSection($key, $header, $content)
@@ -128,5 +131,13 @@ class PageBuilderEvent extends Event
                 throw new InvalidArgumentException($criteria[$m] . ' is not callable.  Please ensure that it exists and that it is a fully qualified namespace.');
             }
         }
+    }
+
+    /**
+     * @return Page|null
+     */
+    public function getPage()
+    {
+        return $this->page;
     }
 }

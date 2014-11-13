@@ -110,6 +110,17 @@ class ApplicationClientModel extends FormModel
         return $entity;
     }
 
+    public function loadByAlias($alias = null)
+    {
+        $repo       = $this->getRepository();
+
+        if ($alias === null || $repo->checkUniqueAlias($alias) > 1 || $repo->checkUniqueAlias($alias) == 0) {
+            return new ApplicationClient();
+        }
+
+        return $this->getEntity($repo->getIdByAlias($alias));
+    }
+
     /**
      * Delete an entity
      *

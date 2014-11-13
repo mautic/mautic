@@ -25,60 +25,39 @@ class Download
      * @ORM\Column(type="integer")
      * @ORM\Id()
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $id;
 
     /**
      * @ORM\Column(name="date_download", type="datetime")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $dateDownload;
 
     /**
      * @ORM\ManyToOne(targetEntity="Asset")
      * @ORM\JoinColumn(name="asset_id", referencedColumnName="id", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $asset;
 
     /**
      * @ORM\ManyToOne(targetEntity="Mautic\CoreBundle\Entity\IpAddress", cascade={"merge", "persist"})
      * @ORM\JoinColumn(name="ip_id", referencedColumnName="id", nullable=false)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $ipAddress;
 
     /**
      * @ORM\ManyToOne(targetEntity="Mautic\LeadBundle\Entity\Lead")
-     * @ORM\JoinColumn(name="lead_id", referencedColumnName="id", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
+     * @ORM\JoinColumn(name="lead_id", referencedColumnName="id", nullable=true))
      */
     private $lead;
 
     /**
      * @ORM\Column(type="integer")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $code;
 
     /**
      * @ORM\Column(type="string", nullable=true)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"full"})
      */
     private $referer;
 
@@ -86,6 +65,17 @@ class Download
      * @ORM\Column(type="string", name="tracking_id")
      **/
     private $trackingId;
+
+
+    /**
+     * @ORM\Column(name="source", type="string", nullable=true)
+     */
+    private $source;
+
+    /**
+     * @ORM\Column(name="source_id", type="integer", nullable=true)
+     */
+    private $sourceId;
 
     /**
      * Get id
@@ -249,5 +239,38 @@ class Download
     public function setLead ($lead)
     {
         $this->lead = $lead;
+    }
+
+
+    /**
+     * @return mixed
+     */
+    public function getSource ()
+    {
+        return $this->source;
+    }
+
+    /**
+     * @param mixed $source
+     */
+    public function setSource ($source)
+    {
+        $this->source = $source;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSourceId ()
+    {
+        return $this->sourceId;
+    }
+
+    /**
+     * @param mixed $sourceId
+     */
+    public function setSourceId ($sourceId)
+    {
+        $this->sourceId = (int) $sourceId;
     }
 }

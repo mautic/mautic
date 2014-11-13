@@ -57,7 +57,16 @@ $activePanelClasses  = ($app->getSession()->get('left-panel', 'default') == 'unp
         <script>
             Mautic.onPageLoad('body');
             <?php if ($app->getEnvironment() === "dev"): ?>
-
+            mQuery( document ).ajaxComplete(function(event, XMLHttpRequest, ajaxOption){
+                if(XMLHttpRequest.responseJSON && typeof XMLHttpRequest.responseJSON.ignore_wdt == 'undefined' && XMLHttpRequest.getResponseHeader('x-debug-token')) {
+                    MauticVars.showLoadingBar = false;
+                    mQuery('[class*="sf-tool"]').remove();
+                    mQuery('[id*="sfTool"]').remove();
+                    mQuery.get(mauticBaseUrl + '_wdt/'+XMLHttpRequest.getResponseHeader('x-debug-token'),function(data){
+                        mQuery('body').append(data);
+                    });
+                }
+            });
             <?php endif; ?>
         </script>
         <?php $view['assets']->outputScripts("bodyClose"); ?>

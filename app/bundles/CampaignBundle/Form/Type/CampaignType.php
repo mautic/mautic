@@ -9,7 +9,6 @@
 
 namespace Mautic\CampaignBundle\Form\Type;
 
-use Mautic\CategoryBundle\Helper\FormHelper;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
@@ -44,7 +43,7 @@ class CampaignType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber());
+        $builder->addEventSubscriber(new CleanFormSubscriber(array('description' => 'html')));
         $builder->addEventSubscriber(new FormExitSubscriber('campaign', $options));
 
         $builder->add('name', 'text', array(
@@ -53,15 +52,17 @@ class CampaignType extends AbstractType
             'attr'       => array('class' => 'form-control')
         ));
 
-        $builder->add('description', 'text', array(
+        $builder->add('description', 'textarea', array(
             'label'      => 'mautic.campaign.form.description',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control'),
+            'attr'       => array('class' => 'form-control editor'),
             'required'   => false
         ));
 
         //add category
-        FormHelper::buildForm($this->translator, $builder);
+        $builder->add('category', 'category', array(
+            'bundle' => 'campaign'
+        ));
 
         if (!empty($options['data']) && $options['data']->getId()) {
             $readonly = !$this->security->isGranted('campaign:campaigns:publish');

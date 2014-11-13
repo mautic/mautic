@@ -12,13 +12,6 @@
     padding: 5px 0;
 }
 
-.email-builder .btn-block.ui-draggable-dragging {
-    width: 104px;
-    height: 68px;
-    margin: 6px 12px;
-    white-space: normal;
-}
-
-.email-builder .list-group-item {
+.email-builder .list-group-item.ui-draggable-dragging {
     background-color: #fff;
 }

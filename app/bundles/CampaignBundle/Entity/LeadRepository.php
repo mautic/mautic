@@ -10,6 +10,7 @@
 namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\ORM\EntityRepository;
+use Mautic\CoreBundle\Helper\GraphHelper;
 
 /**
  * LeadRepository
@@ -83,5 +84,43 @@ class LeadRepository extends EntityRepository
         $result = $q->getQuery()->getResult();
 
         return $result;
+    }
+
+    /**
+     * Fetch Lead stats for some period of time.
+     * 
+     * @param integer $quantity of units
+     * @param string $unit of time php.net/manual/en/class.dateinterval.php#dateinterval.props
+     * @param array $args
+     *
+     * @return mixed
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function getLeadStats($quantity, $unit, $args = array())
+    {
+        $graphData = GraphHelper::prepareLineGraphData($quantity, $unit, array('viewed'));
+
+        // Load points for selected period
+        $q = $this->createQueryBuilder('cl');
+        $q->select('cl.dateAdded');
+
+        $q->andwhere($q->expr()->gte('cl.dateAdded', ':date'))
+            ->setParameter('date', $graphData['fromDate'])
+            ->orderBy('cl.dateAdded', 'ASC');
+
+        $leads = $q->getQuery()->getArrayResult();
+
+        // Count total until date
+        $q2 = $this->createQueryBuilder('cl');
+        $q2->select('count(cl.lead) as total');
+        
+        $q2->andwhere($q->expr()->lt('cl.dateAdded', ':date'))
+            ->setParameter('date', $graphData['fromDate']);
+
+        $total = $q2->getQuery()->getSingleResult();
+        $total = (int) $total['total'];
+
+        return GraphHelper::mergeLineGraphData($graphData, $leads, $unit, 0, 'dateAdded', null, false, $total);
     }
 }

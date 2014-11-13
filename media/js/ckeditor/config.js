@@ -14,13 +14,22 @@ CKEDITOR.editorConfig = function( config ) {
     config.filebrowserImageBrowseUrl = mauticBasePath + '/assets/js/ckeditor/filemanager/index.html?type=Images';
     config.filebrowserImageUploadUrl = mauticBasePath + '/assets/js/ckeditor/filemanager/connectors/php/filemanager.php?command=QuickUpload&type;=Images';
 
-	config.toolbar =
+    config.toolbar =
+        [
+            { name: 'basicstyles', items : [ 'Bold','Italic' ] },
+            { name: 'paragraph', items : [ 'NumberedList','BulletedList' ] },
+            { name: 'clipboard', items : [ 'Cut', 'Copy', 'Paste','PasteText','PasteFromWord','-','Undo','Redo' ] },
+            { name: 'tools', items : [ 'Sourcedialog' ] }
+        ];
+
+	config.toolbar_advanced =
 	[
-        { name: 'basicstyles', items : [ 'Bold','Italic' ] },
-        { name: 'paragraph', items : [ 'NumberedList','BulletedList' ] },
-        { name: 'links', items : [ 'Link','Unlink','Anchor' ] },
+        { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ], items: [ 'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat' ] },
         { name: 'clipboard', items : [ 'Cut', 'Copy', 'Paste','PasteText','PasteFromWord','-','Undo','Redo' ] },
         { name: 'insert', items : [ 'Image','Table' ] },
+        '/',
+        { name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align', 'bidi' ], items: [ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', 'CreateDiv', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-', 'BidiLtr', 'BidiRtl' ] },
+        { name: 'links', items : [ 'Link','Unlink','Anchor' ] },
         { name: 'tools', items : [ 'Sourcedialog' ] },
         '/',
         { name: 'styles', items : [ 'Styles','Format','Font','FontSize' ] },

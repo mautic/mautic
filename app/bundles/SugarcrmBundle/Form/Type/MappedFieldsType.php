@@ -10,6 +10,8 @@
 
 namespace Mautic\SugarcrmBundle\Form\Type;
 
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\SugarcrmBundle\Mapper\LeadMapper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -22,11 +24,40 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 class MappedFieldsType extends AbstractType
 {
     /**
+     * @var \Mautic\CoreBundle\Factory\MauticFactory
+     */
+    protected $factory;
+
+    /**
+     * @param $config
+     */
+    public function __construct(MauticFactory $factory)
+    {
+        $this->factory = $factory;
+    }
+
+    /**
      * @param FormBuilderInterface $builder
      * @param array                $options
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
+        $request = $this->factory->getRequest();
+        $object = $request->get('object');
 
+        switch (strtolower($object))
+        {
+            case 'lead':
+                $leadMapper = new LeadMapper();
+                $leadMapper->buildForm($this->factory, $builder, $options);
+                break;
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public function getName() {
+        return "mappedfields";
     }
 }

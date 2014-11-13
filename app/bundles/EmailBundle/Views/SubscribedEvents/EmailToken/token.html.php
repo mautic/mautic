@@ -8,7 +8,7 @@
  */
 ?>
 <div id="emailEmailTokens">
-    <p class="row">
+    <div class="row ml-2 mr-2 mb-2">
         <div class="col-sm-6">
             <a href="#" data-toggle="tooltip" data-token="{unsubscribe_text}" class="btn btn-default btn-block" title="<?php echo $view['translator']->trans('mautic.email.token.unsubscribe_text.descr'); ?>">
                 <i class="fa fa-file-text-o"></i><br />
@@ -22,7 +22,7 @@
             </a>
         </div>
     </div>
-    <p class="row">
+    <div class="row ml-2 mr-2">
         <div class="col-sm-6">
             <a href="#" data-toggle="tooltip" data-token="{webview_text}" class="btn btn-default btn-block" title="<?php echo $view['translator']->trans('mautic.email.token.webview_text.descr'); ?>">
                 <i class="fa fa-file-text-o"></i><br />
@@ -35,5 +35,5 @@
                 <?php echo $view['translator']->trans('mautic.email.token.webview_url'); ?>
             </a>
         </div>
-    </p>
+    </div>
 </div>

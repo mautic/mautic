@@ -439,17 +439,18 @@ class PageModel extends FormModel
     /**
      * Get array of page builder tokens from bundles subscribed PageEvents::PAGE_ON_BUILD
      *
+     * @param $page
      * @param $component null | pageTokens | abTestWinnerCriteria
      *
      * @return mixed
      */
-    public function getBuilderComponents($component = null)
+    public function getBuilderComponents($page = null, $component = null)
     {
         static $components;
 
         if (empty($components)) {
             $components = array();
-            $event      = new PageBuilderEvent($this->translator);
+            $event      = new PageBuilderEvent($this->translator, $page);
             $this->dispatcher->dispatch(PageEvents::PAGE_ON_BUILD, $event);
             $components['pageTokens']           = $event->getTokenSections();
             $components['abTestWinnerCriteria'] = $event->getAbTestWinnerCriteria();

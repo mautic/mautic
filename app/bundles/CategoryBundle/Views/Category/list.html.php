@@ -11,7 +11,7 @@ if ($tmpl == 'index')
 ?>
 
 <?php if (count($items)): ?>
-    <div class="table-responsive page-list">
+    <div class="table-responsive">
             <table class="table table-hover table-striped table-bordered category-list" id="categoryTable">
                 <thead>
                 <tr>
@@ -62,7 +62,7 @@ if ($tmpl == 'index')
                             <?php
                             echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
                                 'item'      => $item,
-                                'edit'      => $permissions[$bundle.':categories:edit'],
+                                'edit'      => false,
                                 'delete'    => $permissions[$bundle.':categories:delete'],
                                 'routeBase' => 'category',
                                 'menuLink'  => 'mautic_category_index',
@@ -70,6 +70,23 @@ if ($tmpl == 'index')
                                 'nameGetter' => 'getTitle',
                                 'extra'      => array(
                                     'bundle' => $bundle
+                                ),
+                                'customTop'    => array(
+                                    array(
+                                        'attr' => array(
+                                            'data-toggle' => 'ajaxmodal',
+                                            'data-target' => '#CategoryFormModal',
+                                            'data-ignore-removemodal' => 'true',
+                                            'data-header' => $view['translator']->trans('mautic.category.header.edit', array("%name%" => $item->getTitle())),
+                                            'href'        => $view['router']->generate('mautic_category_action', array(
+                                                'objectAction' => 'edit',
+                                                'objectId' => $item->getId(),
+                                                'bundle'   => $bundle
+                                            )),
+                                        ),
+                                        'icon' => 'fa-pencil-square-o',
+                                        'label' => 'mautic.core.form.edit'
+                                    )
                                 )
                             ));
                             ?>

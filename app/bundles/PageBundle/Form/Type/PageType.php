@@ -9,7 +9,6 @@
 
 namespace Mautic\PageBundle\Form\Type;
 
-use Mautic\CategoryBundle\Helper\FormHelper;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
@@ -86,7 +85,9 @@ class PageType extends AbstractType
         ));
 
         //add category
-        FormHelper::buildForm($this->translator, $builder, array('disabled' => $isVariant));
+        $builder->add('category', 'category', array(
+            'bundle' => 'page'
+        ));
 
         //build a list
         $template = $options['data']->getTemplate();

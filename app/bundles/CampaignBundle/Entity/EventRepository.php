@@ -69,7 +69,12 @@ class EventRepository extends CommonRepository
 
         if ($positivePathOnly) {
             $q->andWhere(
-                $q->expr()->neq('e.decisionPath', $q->expr()->literal('no'))
+                $q->expr()->orX(
+                    $q->expr()->neq('e.decisionPath',
+                        $q->expr()->literal('no')
+                    ),
+                    $q->expr()->isNull('e.decisionPath')
+                )
             );
 
         }
@@ -298,5 +303,43 @@ class EventRepository extends CommonRepository
         $results = $q->getQuery()->getArrayResult();
 
         return $results;
+    }
+
+    /**
+     * Get array of events with stats
+     *
+     * @param array $args
+     * @return array
+     */
+    public function getEvents($args = array())
+    {
+        $now = new \DateTime();
+        $q = $this->createQueryBuilder('e')
+            ->select('e, ec, ep')
+            ->leftJoin('e.children', 'ec')
+            ->leftJoin('e.parent', 'ep')
+            ->orderBy('e.order');
+
+
+        if (!empty($args['campaigns'])) {
+            $q->andWhere($q->expr()->in('e.campaign', ':campaigns'))
+                ->setParameter('campaigns', $args['campaigns']);
+        }
+
+        if (isset($args['positivePathOnly'])) {
+            $q->andWhere(
+                $q->expr()->orX(
+                    $q->expr()->neq('e.decisionPath',
+                        $q->expr()->literal('no')
+                    ),
+                    $q->expr()->isNull('e.decisionPath')
+                )
+            );
+
+        }
+
+        $events = $q->getQuery()->getArrayResult();
+
+        return $events;
     }
 }

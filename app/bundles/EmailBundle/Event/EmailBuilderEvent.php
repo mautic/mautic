@@ -9,6 +9,7 @@
 
 namespace Mautic\EmailBundle\Event;
 
+use Mautic\EmailBundle\Entity\Email;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
 use Symfony\Component\EventDispatcher\Event;
 
@@ -22,10 +23,12 @@ class EmailBuilderEvent extends Event
     private $tokens = array();
     private $abTestWinnerCriteria = array();
     private $translator;
+    private $email = null;
 
-    public function __construct($translator)
+    public function __construct($translator, Email $email = null)
     {
         $this->translator = $translator;
+        $this->email      = $email;
     }
 
     public function addTokenSection($key, $header, $content)
@@ -131,5 +134,13 @@ class EmailBuilderEvent extends Event
                 throw new InvalidArgumentException($criteria[$m] . ' is not callable.  Please ensure that it exists and that it is a fully qualified namespace.');
             }
         }
+    }
+
+    /**
+     * @return Email|null
+     */
+    public function getEmail()
+    {
+        return $this->email;
     }
 }
