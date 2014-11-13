@@ -519,6 +519,9 @@ Mautic.renderCampaignEmailSentPie = function () {
         return;
     }
     var element = mQuery('#emails-sent-rate');
+    if (!element.length) {
+        return;
+    }
     var options = {
         responsive: false,
         tooltipFontSize: 10,
