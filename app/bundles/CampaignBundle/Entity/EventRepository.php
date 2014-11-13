@@ -70,7 +70,9 @@ class EventRepository extends CommonRepository
         if ($positivePathOnly) {
             $q->andWhere(
                 $q->expr()->orX(
-                    $q->expr()->neq('e.decisionPath', $q->expr()->literal('no')),
+                    $q->expr()->neq('e.decisionPath',
+                        $q->expr()->literal('no')
+                    ),
                     $q->expr()->isNull('e.decisionPath')
                 )
             );
