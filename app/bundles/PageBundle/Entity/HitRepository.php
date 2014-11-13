@@ -80,48 +80,32 @@ class HitRepository extends CommonRepository
     }
 
     /**
-     * Get hit count per day for last 30 days
+     * Get hit per time period
      *
-     * @param integer $pageId
+     * @param array $args
      *
      * @return array
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getHitsForLast30Days($pageId)
+    public function getHits($amount, $unit, $args = array())
     {
-        $date = new \DateTime();
-        $oneDay = new \DateInterval('P1D');
-        $data = array('labels' => array(), 'values' => array());
-
-        // Prefill $data arrays
-        for ($i = 0; $i < 30; $i++) {
-            $data['labels'][$i] = $date->format('Y-m-d');
-            $data['values'][$i] = 0;
-            $date->sub($oneDay);
-        }
+        $data = GraphHelper::prepareLineGraphData($amount, $unit, array('viewed'));
 
         $query = $this->createQueryBuilder('h');
 
-        $query->select('IDENTITY(h.page), h.dateHit')
-            ->where($query->expr()->eq('IDENTITY(h.page)', (int) $pageId))
-            ->andwhere($query->expr()->gte('h.dateHit', ':date'))
-            ->setParameter('date', $date);
+        $query->select('IDENTITY(h.page), h.dateHit');
+
+        if (isset($args['page_id'])) {
+            $query->where($query->expr()->eq('IDENTITY(h.page)', (int) $args['page_id']));
+        }
+
+        $query->andwhere($query->expr()->gte('h.dateHit', ':date'))
+            ->setParameter('date', $data['fromDate']);
 
         $hits = $query->getQuery()->getArrayResult();
 
-        // Group hits by date
-        foreach ($hits as $hit) {
-            $day = $hit['dateHit']->format('Y-m-d');
-            if (($dayKey = array_search($day, $data['labels'])) !== false) {
-                $data['values'][$dayKey]++;
-            }
-        }
-
-        $data['values'] = array_reverse($data['values']);
-        $data['labels'] = array_reverse($data['labels']);
-
-        return $data;
+        return GraphHelper::mergeLineGraphData($data, $hits, $unit, 0, 'dateHit');;
     }
 
     /**

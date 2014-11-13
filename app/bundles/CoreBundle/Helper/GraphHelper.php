@@ -134,6 +134,7 @@ class GraphHelper
             $data['datasets'][$key] = array(
                 'label' => $label,
                 'fillColor' => self::$colors[$j]['fill'],
+                'highlightFill' => self::$colors[$j]['color'],
                 'strokeColor' => self::$colors[$j]['highlight'],
                 'pointColor' => self::$colors[$j]['highlight'],
                 'pointStrokeColor' => '#fff',
@@ -205,6 +206,8 @@ class GraphHelper
                 }
             }
         }
+
+        unset($graphData['fromDate']);
 
         return $graphData;
     }
