@@ -21,8 +21,8 @@ if (!isset($extra)) {
         <input type="checkbox" data-toggle="selectrow" class="list-checkbox" name="cb<?php echo $item->getId(); ?>" value="<?php echo $item->getId(); ?>" />
       </span>
     <div class="btn-group">
-        <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">
-            <i class="fa fa-angle-down"></i>
+        <button type="button" class="btn btn-default btn-sm dropdown-toggle btn-nospin" data-toggle="dropdown">
+            <i class="fa fa-angle-down "></i>
         </button>
         <ul class="pull-<?php echo $pull; ?> page-list-actions dropdown-menu" role="menu">
             <?php if (!empty($edit)): ?>

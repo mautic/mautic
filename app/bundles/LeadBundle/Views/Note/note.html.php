@@ -48,7 +48,7 @@ switch ($type) {
             <div class="media-body col-xs-11 pa-10">
                 <div class="pull-right btn-group">
                     <?php if ($permissions['edit']): ?>
-                        <a class="btn btn-default btn-xs" href="<?php echo $this->container->get('router')->generate('mautic_leadnote_action', array('leadId' => $lead->getId(), 'objectAction' => 'edit', 'objectId' => $id)); ?>" data-toggle="ajaxmodal" data-target="#leadModal" data-header="<?php echo $view['translator']->trans('mautic.lead.note.header.edit'); ?>"><i class="fa fa-pencil"></i></a>
+                        <a class="btn btn-default btn-xs" href="<?php echo $this->container->get('router')->generate('mautic_leadnote_action', array('leadId' => $lead->getId(), 'objectAction' => 'edit', 'objectId' => $id)); ?>" data-toggle="ajaxmodal" data-target="#leadModal" data-ignore-removemodal="true" data-header="<?php echo $view['translator']->trans('mautic.lead.note.header.edit'); ?>"><i class="fa fa-pencil"></i></a>
                     <?php endif; ?>
                      <?php if ($permissions['delete']): ?>
                          <a class="btn btn-default btn-xs" href="javascript:void(0);" onclick="Mautic.showConfirmation('<?php echo $view->escape($view["translator"]->trans('mautic.lead.note.confirmdelete'), 'js'); ?>', '<?php echo $view->escape($view["translator"]->trans("mautic.core.form.delete"), 'js'); ?>', 'executeAction', ['<?php echo $view['router']->generate('mautic_leadnote_action', array('objectAction' => 'delete', 'objectId' => $id, 'leadId' => $lead->getId())); ?>', ''], '<?php echo $view->escape($view["translator"]->trans("mautic.core.form.cancel"), 'js'); ?>','',[]);"><i class="fa fa-trash text-danger"></i></a>

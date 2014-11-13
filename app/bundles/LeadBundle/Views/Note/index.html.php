@@ -8,14 +8,28 @@
  */
 ?>
 <div class="box-layout mb-lg">
-	<div class="panel col-xs-10 va-m">
-	    <div class="form-control-icon pa-xs input-group">
-	        <input type="text" name="search" value="<?php echo $search; ?>" id="NoteFilter" class="form-control bdr-w-0" placeholder="<?php echo $view['translator']->trans('mautic.core.search.placeholder'); ?>" data-toggle="livesearch" data-target="#NoteList" data-action="<?php echo $view['router']->generate('mautic_leadnote_index', array('leadId' => $lead->getId(), 'page' => 1)); ?>">
-	        <span class="the-icon fa fa-search text-muted mt-xs"></span><!-- must below `form-control` -->
-	    </div>
+	<div class="col-xs-10 va-m">
+        <form action="<?php echo $view['router']->generate('mautic_leadnote_index', array('page' => $page, 'leadId' => $lead->getId(), 'tmpl' => 'list')); ?>" class="panel" id="note-filters" method="post">
+            <div class="form-control-icon pa-xs">
+                <input type="text" name="search" value="<?php echo $search; ?>" id="NoteFilter" class="form-control bdr-w-0" placeholder="<?php echo $view['translator']->trans('mautic.core.search.placeholder'); ?>" data-toggle="livesearch" data-target="#NoteList" data-action="<?php echo $view['router']->generate('mautic_leadnote_index', array('leadId' => $lead->getId(), 'page' => 1)); ?>">
+                <span class="the-icon fa fa-search text-muted mt-xs"></span><!-- must below `form-control` -->
+            </div>
+            <input type="hidden" name="leadId" id="leadId" value="<?php echo $lead->getId(); ?>" />
+            <div class="panel-footer text-muted">
+                <?php foreach ($noteTypes as $typeKey => $typeName) : ?>
+                    <div class="checkbox-inline custom-primary">
+                        <label class="mb-0">
+                            <input name="noteTypes[]" type="checkbox" value="<?php echo $typeKey; ?>"<?php echo in_array($typeKey, $noteType) ? ' checked' : ''; ?> />
+                            <span class="mr-0"></span>
+                            <?php echo $view['translator']->trans($typeName); ?>
+                        </label>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </form>
 	</div>
-	<div class="col-xs-2 va-m">
-		<a class="btn btn-primary btn-leadnote-add pull-right" href="<?php echo $this->container->get('router')->generate('mautic_leadnote_action', array('leadId' => $lead->getId(), 'objectAction' => 'new')); ?>" data-toggle="ajaxmodal" data-target="#leadModal" data-header="<?php echo $view['translator']->trans('mautic.lead.note.header.new'); ?>"><i class="fa fa-plus fa-lg"></i> Add Note</a>
+	<div class="col-xs-2 va-t">
+		<a class="btn btn-primary btn-leadnote-add pull-right" href="<?php echo $view['router']->generate('mautic_leadnote_action', array('leadId' => $lead->getId(), 'objectAction' => 'new')); ?>" data-toggle="ajaxmodal" data-target="#leadModal" data-ignore-remove=true data-header="<?php echo $view['translator']->trans('mautic.lead.note.header.new'); ?>"><i class="fa fa-plus fa-lg"></i> Add Note</a>
 	</div>
 </div>
 

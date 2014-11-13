@@ -302,7 +302,7 @@ class LeadController extends FormController
                 'eventFilter'       => $eventFilter,
                 'upcomingEvents'    => $upcomingEvents,
                 'icons'             => $icons,
-                'noteCount'         => $this->factory->getModel('lead.note')->getNoteCount($lead),
+                'noteCount'         => $this->factory->getModel('lead.note')->getNoteCount($lead, true),
                 'doNotContact'      => $emailRepo->checkDoNotEmail($fields['core']['email']['value'])
             ),
             'contentTemplate' => 'MauticLeadBundle:Lead:lead.html.php',

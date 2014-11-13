@@ -11,7 +11,7 @@
 <!-- form -->
 <form action="" class="panel" id="timeline-filters">
     <div class="form-control-icon pa-xs">
-        <input type="text" class="form-control bdr-w-0" name="search" id="search" placeholder="Search...">
+        <input type="text" class="form-control bdr-w-0" name="search" id="search" placeholder="<?php echo $view['translator']->trans('mautic.core.search.placeholder'); ?>">
         <span class="the-icon fa fa-search text-muted mt-xs"></span><!-- must below `form-control` -->
     </div>
     <?php if (isset($eventTypes) && is_array($eventTypes)) : ?>
@@ -19,12 +19,8 @@
             <?php foreach ($eventTypes as $typeKey => $typeName) : ?>
             <div class="checkbox-inline custom-primary">
                 <label class="mb-0">
-                    <input 
-                        name="eventFilters[]"
-                        type="checkbox"
-                        value="<?php echo $typeKey; ?>"
-                        <?php echo in_array($typeKey, $eventFilter) ? 'checked' : ''; ?> />
-                    <span class="mr-0"></span> 
+                    <input name="eventFilters[]" type="checkbox" value="<?php echo $typeKey; ?>"<?php echo in_array($typeKey, $eventFilter) ? ' checked' : ''; ?> />
+                    <span class="mr-0"></span>
                     <?php echo $typeName; ?>
                 </label>
             </div>

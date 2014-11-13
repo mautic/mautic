@@ -103,8 +103,7 @@ class TriggerController extends FormController
             'passthroughVars' => array(
                 'activeLink'     => '#mautic_pointtrigger_index',
                 'mauticContent'  => 'pointTrigger',
-                'route'          => $this->generateUrl('mautic_pointtrigger_index', array('page' => $page)),
-                'replaceContent' => ($tmpl == 'list') ? 'true' : 'false'
+                'route'          => $this->generateUrl('mautic_pointtrigger_index', array('page' => $page))
             )
         ));
     }

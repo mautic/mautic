@@ -88,4 +88,7 @@ $items = array(
     )
 );
 
-return $items;
+return array(
+    'priority' => 10,
+    'items'    => $items
+);

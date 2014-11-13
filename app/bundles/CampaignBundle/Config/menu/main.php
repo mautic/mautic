@@ -60,4 +60,7 @@ $items = array(
     $security
 );
 
-return $items;
+return array(
+    'priority' => 4,
+    'items'    => $items
+);

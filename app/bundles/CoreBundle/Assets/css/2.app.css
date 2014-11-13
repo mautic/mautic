@@ -4419,3 +4419,12 @@ lesshat-selector {
   text-align: center;
   z-index: 10000;
 }
+.content-overlay {
+  position: absolute;
+  background: #fbfbfb;
+  z-index: 1050;
+  width: 100%;
+  height: 100%;
+  padding-left: 15px;
+  font-weight: bold;
+}

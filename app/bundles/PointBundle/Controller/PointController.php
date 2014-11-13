@@ -103,8 +103,7 @@ class PointController extends FormController
             'passthroughVars' => array(
                 'activeLink'     => '#mautic_point_index',
                 'mauticContent'  => 'point',
-                'route'          => $this->generateUrl('mautic_point_index', array('page' => $page)),
-                'replaceContent' => ($tmpl == 'list') ? 'true' : 'false'
+                'route'          => $this->generateUrl('mautic_point_index', array('page' => $page))
             )
         ));
     }

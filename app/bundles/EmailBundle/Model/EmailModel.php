@@ -181,7 +181,7 @@ class EmailModel extends FormModel
     {
         if ($id === null) {
             $entity = new Email();
-            $entity->setSessionId('new_' . uniqid());
+            $entity->setSessionId('new_' . hash('sha1', uniqid(mt_rand())));
         } else {
             $entity = parent::getEntity($id);
             if ($entity !== null) {
@@ -905,5 +905,15 @@ class EmailModel extends FormModel
 
             $em->flush();
         }
+    }
+
+    /**
+     * Remove email from DNC list
+     *
+     * @param $email
+     */
+    public function removeDoNotContact($email)
+    {
+        $this->getRepository()->removeFromDoNotEmailList($email);
     }
 }

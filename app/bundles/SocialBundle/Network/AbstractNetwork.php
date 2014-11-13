@@ -83,7 +83,7 @@ abstract class AbstractNetwork
             true //absolute
         );
 
-        $state = uniqid();
+        $state = hash('sha1', uniqid(mt_rand()));
         $url = $this->getAuthenticationUrl()
             . '?client_id={clientId}' //placeholder to be replaced by whatever is the field
             . '&response_type=code'

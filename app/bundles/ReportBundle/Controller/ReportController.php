@@ -121,8 +121,7 @@ class ReportController extends FormController
             'passthroughVars' => array(
                 'activeLink'     => '#mautic_report_index',
                 'mauticContent'  => 'report',
-                'route'          => $this->generateUrl('mautic_report_index', array('page' => $page)),
-                'replaceContent' => ($tmpl == 'list') ? 'true' : 'false'
+                'route'          => $this->generateUrl('mautic_report_index', array('page' => $page))
             )
         ));
     }
