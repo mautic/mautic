@@ -48,7 +48,7 @@ class RoleType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber());
+        $builder->addEventSubscriber(new CleanFormSubscriber(array('description' => 'html')));
         $builder->addEventSubscriber(new FormExitSubscriber('user.role', $options));
 
         $builder->add('name', 'text', array(
@@ -57,10 +57,10 @@ class RoleType extends AbstractType
             'attr'       => array('class' => 'form-control')
         ));
 
-        $builder->add('description', 'text', array(
+        $builder->add('description', 'textarea', array(
             'label'      => 'mautic.user.role.form.description',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control'),
+            'attr'       => array('class' => 'form-control editor'),
             'required' => false
         ));
 

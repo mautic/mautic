@@ -62,7 +62,6 @@ class CategoryListType extends AbstractType
             'empty_value'=> 'mautic.core.form.uncategorized',
             'attr'       => array(
                 'class'       => 'form-control chosen',
-                'tooltip'     => 'mautic.core.help.autocomplete'
             ),
             'required'   => false
         ));

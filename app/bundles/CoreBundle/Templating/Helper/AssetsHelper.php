@@ -120,7 +120,7 @@ class AssetsHelper extends BaseAssetsHelper
             $this->addScript(array(
                 'media/js/ckeditor/ckeditor.js',
                 'media/js/ckeditor/adapters/jquery.js'
-            ), 'bodyClose');
+            ));
         }
     }
 
