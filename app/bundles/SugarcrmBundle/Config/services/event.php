@@ -24,8 +24,12 @@ $container->setDefinition(
         'method' => 'onFetchIcons'
     ))
     ->addTag('kernel.event_listener', array(
-        'event'  => 'mapper.on_form_build',
-        'method' => 'onFormBuild'
+        'event'  => 'mapper.on_client_form_build',
+        'method' => 'onClientFormBuild'
+    ))
+    ->addTag('kernel.event_listener', array(
+        'event'  => 'mapper.on_object_form_build',
+        'method' => 'onObjectFormBuild'
     ));
 
 

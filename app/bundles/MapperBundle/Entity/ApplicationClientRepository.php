@@ -16,4 +16,25 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class ApplicationClientRepository extends CommonRepository
 {
+    /**
+     * @param      $alias
+     * @param null $id
+     * @param null $entity
+     * @return mixed
+     */
+    public function getIdByAlias($alias, $entity = null)
+    {
+        $q = $this->createQueryBuilder('e')
+            ->select('e.id')
+            ->where('e.alias = :alias');
+        $q->setParameter('alias', $alias);
+
+        if (!empty($entity)) {
+            $q->andWhere('e.id != :id');
+            $q->setParameter('id', $entity->getId());
+        }
+
+        $results = $q->getQuery()->getSingleResult();
+        return $results['id'];
+    }
 }

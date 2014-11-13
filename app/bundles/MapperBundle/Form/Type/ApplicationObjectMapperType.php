@@ -21,10 +21,10 @@ use Mautic\MapperBundle\MapperEvents;
 use Mautic\MapperBundle\Event\MapperFormEvent;
 
 /**
- * Class ApplicationClientType
+ * Class ApplicationObjectMapperType
  * @package Mautic\MapperBundle\Form\Type
  */
-class ApplicationClientType extends AbstractType
+class ApplicationObjectMapperType extends AbstractType
 {
     private $translator;
 
@@ -42,23 +42,20 @@ class ApplicationClientType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new FormExitSubscriber('mapper.ApplicationClient', $options));
-
-        $builder->add('title', 'text', array(
-            'label'      => 'mautic.mapper.form.title',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
-        ));
+        $builder->addEventSubscriber(new FormExitSubscriber('mapper.ApplicationObjectMapper', $options));
 
         $event = new MapperFormEvent($this->factory->getSecurity());
-        $this->factory->getDispatcher()->dispatch(MapperEvents::CLIENT_FORM_ON_BUILD, $event);
+        $this->factory->getDispatcher()->dispatch(MapperEvents::OBJECT_FORM_ON_BUILD, $event);
         $extraFields = $event->getFields();
         foreach($extraFields as $extraField) {
             $builder->add($extraField['child'], $extraField['type'], $extraField['params']);
         }
 
-        $builder->add('application', 'hidden', array(
-            'data' => $options['application']
+        $builder->add('objectName', 'hidden', array(
+            'data' => $options['objectName']
+        ));
+        $builder->add('applicationClientId', 'hidden', array(
+            'data' => $options['applicationClientId']
         ));
 
         $builder->add('buttons', 'form_buttons');
@@ -74,16 +71,16 @@ class ApplicationClientType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'Mautic\MapperBundle\Entity\ApplicationClient'
+            'data_class' => 'Mautic\MapperBundle\Entity\ApplicationObjectMapper'
         ));
 
-        $resolver->setRequired(array('application'));
+        $resolver->setRequired(array('objectName', 'applicationClientId'));
     }
 
     /**
      * @return string
      */
     public function getName() {
-        return "applicationclient";
+        return "applicationobjectmapper";
     }
 }

@@ -35,10 +35,8 @@ class MapperListener
      *
      * @param MapperFormEvent $event
      */
-    public function onFormBuild(MapperFormEvent $event)
+    public function onClientFormBuild(MapperFormEvent $event)
     {
-        $data = array();
-
         $field = array(
             'child' => 'apikeys',
             'type' => 'apikeys',
@@ -50,5 +48,25 @@ class MapperListener
         );
 
         $event->addField($field);
+    }
+
+    public function onObjectFormBuild(MapperFormEvent $event)
+    {
+        $field = array(
+            'child' => 'mappedfields',
+            'type' => 'mappedfields',
+            'params' => array(
+                'label'       => 'mautic.sugarcrm.form.mapped.fields',
+                'required'    => false,
+                'label_attr'  => array('class' => 'control-label')
+            )
+        );
+
+        $event->addField($field);
+    }
+
+    public function onCallbackApi()
+    {
+
     }
 }

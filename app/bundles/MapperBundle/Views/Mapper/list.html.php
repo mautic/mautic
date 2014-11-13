@@ -47,7 +47,7 @@ if ($tmpl == 'index') {
                             "application"  => $application,
                             "client" => $client,
                             "object" => $item->getBaseName(),
-                            "action" => 'mapper'
+                            "objectAction" => 'edit'
                         )); ?>"><?php echo $item->getBaseName(); ?></a>
                     </td>
                     <td class="visible-md visible-lg"><?php echo $item->getBaseName(); ?></td>

@@ -144,4 +144,9 @@ class ApplicationObjectMapper
     {
         return $this->id;
     }
+
+    public function getTitle()
+    {
+        return $this->getObjectName();
+    }
 }
