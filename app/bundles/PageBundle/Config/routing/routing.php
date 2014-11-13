@@ -12,9 +12,9 @@ use Symfony\Component\Routing\Route;
 
 $collection = new RouteCollection();
 
-$collection->add('mautic_page_emailtoken_index', new Route('/pages/emailtokens/{page}',
+$collection->add('mautic_page_buildertoken_index', new Route('/pages/buildertokens/{page}',
     array(
-        '_controller' => 'MauticPageBundle:SubscribedEvents\EmailToken:index',
+        '_controller' => 'MauticPageBundle:SubscribedEvents\BuilderToken:index',
         'page'        => 1
     ),
     array(

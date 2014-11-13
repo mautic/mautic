@@ -14,6 +14,10 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\PageBundle\Event as Events;
 use Mautic\PageBundle\PageEvents;
 use Mautic\SocialBundle\Helper\NetworkIntegrationHelper;
+use Mautic\EmailBundle\EmailEvents;
+use Mautic\EmailBundle\Event\EmailBuilderEvent;
+use Mautic\EmailBundle\Event\EmailSendEvent;
+use Mautic\PageBundle\Helper\BuilderTokenHelper;
 
 /**
  * Class BuilderSubscriber
@@ -29,8 +33,11 @@ class BuilderSubscriber extends CommonSubscriber
     static public function getSubscribedEvents()
     {
         return array(
-            PageEvents::PAGE_ON_DISPLAY    => array('onPageDisplay', 0),
-            PageEvents::PAGE_ON_BUILD      => array('onPageBuild', 0)
+            PageEvents::PAGE_ON_DISPLAY   => array('onPageDisplay', 0),
+            PageEvents::PAGE_ON_BUILD     => array('onPageBuild', 0),
+            EmailEvents::EMAIL_ON_BUILD   => array('onEmailBuild', 0),
+            EmailEvents::EMAIL_ON_SEND    => array('onEmailGenerate', 0),
+            EmailEvents::EMAIL_ON_DISPLAY => array('onEmailGenerate', 0)
         );
     }
 
@@ -43,7 +50,11 @@ class BuilderSubscriber extends CommonSubscriber
     {
         //add page tokens
         $content = $this->templating->render('MauticPageBundle:SubscribedEvents\PageToken:token.html.php');
-        $event->addTokenSection('page.pagetokens', 'mautic.page.page.header.index', $content);
+        $event->addTokenSection('page.extratokens', 'mautic.page.builder.header.extra', $content);
+
+        //add email tokens
+        $tokenHelper = new BuilderTokenHelper($this->factory);
+        $event->addTokenSection('page.pagetokens', 'mautic.page.builder.header.index', $tokenHelper->getTokenContent());
 
         //add AB Test Winner Criteria
         $bounceRate = array(
@@ -79,6 +90,8 @@ class BuilderSubscriber extends CommonSubscriber
                 $buttons = $this->renderSocialShareButtons($page, $event->getSlotsHelper());
                 $html    = str_ireplace('{sharebuttons}', $buttons, $html);
             }
+
+            $this->renderPageUrl($html, array('source' => array('page', $page->getId())));
         }
 
         $event->setContent($content);
@@ -174,5 +187,64 @@ class BuilderSubscriber extends CommonSubscriber
         }
 
         return $langbar;
+    }
+
+    public function onEmailBuild (EmailBuilderEvent $event)
+    {
+        //add email tokens
+        $tokenHelper = new BuilderTokenHelper($this->factory);
+        $event->addTokenSection('page.emailtokens', 'mautic.page.builder.header.index', $tokenHelper->getTokenContent());
+    }
+
+    public function onEmailGenerate (EmailSendEvent $event)
+    {
+        $content       = $event->getContent();
+        $source        = $event->getSource();
+        $clickthrough  = array('source' => $source);
+        $lead          = $event->getLead();
+        if ($lead !== null) {
+            $clickthrough['lead'] = $lead['id'];
+        }
+
+        foreach ($content as $slot => &$html) {
+            $this->renderPageUrl($html, $clickthrough);
+        }
+
+        $event->setContent($content);
+    }
+
+    protected function renderPageUrl(&$html, $clickthrough = null)
+    {
+        static $pages = array(), $links = array();
+
+        $pagelinkRegex     = '/{pagelink=(.*?)}/';
+        $externalLinkRegex = '/{externallink=(.*?)}/';
+
+        $pageModel     = $this->factory->getModel('page');
+        $redirectModel = $this->factory->getModel('page.redirect');
+
+        preg_match_all($pagelinkRegex, $html, $matches);
+        if (!empty($matches[1])) {
+            foreach ($matches[1] as $match) {
+                if (empty($pages[$match])) {
+                    $pages[$match] = $pageModel->getEntity($match);
+                }
+
+                $url  = ($pages[$match] !== null) ? $pageModel->generateUrl($pages[$match], true, $clickthrough) : '';
+                $html = str_ireplace('{pagelink=' . $match . '}', $url, $html);
+            }
+        }
+
+        preg_match_all($externalLinkRegex, $html, $matches);
+        if (!empty($matches[1])) {
+            foreach ($matches[1] as $match) {
+                if (empty($links[$match])) {
+                    $links[$match] = $redirectModel->getRedirect($match, true);
+                }
+
+                $url  = ($links[$match] !== null) ? $redirectModel->generateRedirectUrl($links[$match], $clickthrough) : '';
+                $html = str_ireplace('{externallink=' . $match . '}', $url, $html);
+            }
+        }
     }
 }

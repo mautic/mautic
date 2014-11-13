@@ -203,7 +203,7 @@ class PageController extends FormController
         $abTestResults = array();
         if (!empty($lastCriteria) && empty($variantError)) {
             //there is a criteria to compare the pages against so let's shoot the page over to the criteria function to do its thing
-            $criteria = $model->getBuilderComponents('abTestWinnerCriteria');
+            $criteria = $model->getBuilderComponents($activePage, 'abTestWinnerCriteria');
             if (isset($criteria['criteria'][$lastCriteria])) {
                 $testSettings = $criteria['criteria'][$lastCriteria];
 
@@ -380,7 +380,7 @@ class PageController extends FormController
             }
         }
 
-        $builderComponents    = $model->getBuilderComponents();
+        $builderComponents    = $model->getBuilderComponents($entity);
         return $this->delegateView(array(
             'viewParameters'  =>  array(
                 'form'        => $form->createView(),
@@ -516,7 +516,7 @@ class PageController extends FormController
 
         $formView = $this->setFormTheme($form, 'MauticPageBundle:Page:form.html.php', 'MauticPageBundle:FormVariant');
 
-        $builderComponents    = $model->getBuilderComponents();
+        $builderComponents    = $model->getBuilderComponents($entity);
         return $this->delegateView(array(
             'viewParameters'  =>  array(
                 'form'        => $formView,

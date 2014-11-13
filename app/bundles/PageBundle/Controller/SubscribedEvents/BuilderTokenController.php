@@ -10,13 +10,13 @@
 namespace Mautic\PageBundle\Controller\SubscribedEvents;
 
 use Mautic\CoreBundle\Controller\FormController;
-use Mautic\PageBundle\Helper\EmailTokenHelper;
+use Mautic\PageBundle\Helper\BuilderTokenHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
- * Class EmailTokenController
+ * Class BuilderTokenController
  */
-class EmailTokenController extends FormController
+class BuilderTokenController extends FormController
 {
     /**
      * @param int $page
@@ -25,7 +25,7 @@ class EmailTokenController extends FormController
      */
     public function indexAction($page = 1)
     {
-        $tokenHelper = new EmailTokenHelper($this->factory);
+        $tokenHelper = new BuilderTokenHelper($this->factory);
 
         $dataArray = array(
             'newContent'     => $tokenHelper->getTokenContent($page),

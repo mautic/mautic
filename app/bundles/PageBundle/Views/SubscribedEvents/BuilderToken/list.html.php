@@ -8,10 +8,10 @@
  */
 
 if ($tmpl == 'index') {
-    $view->extend('MauticPageBundle:SubscribedEvents\EmailToken:index.html.php');
+    $view->extend('MauticPageBundle:SubscribedEvents\BuilderToken:index.html.php');
 }
 ?>
-<div id="pageEmailTokens">
+<div id="pageBuilderTokens">
     <ul class="list-group">
         <?php
         if (count($items)):
@@ -29,13 +29,13 @@ if ($tmpl == 'index') {
         "page"              => $page,
         "limit"             => $limit,
         "fixedLimit"        => true,
-        "baseUrl"           => $view['router']->generate('mautic_page_emailtoken_index'),
+        "baseUrl"           => $view['router']->generate('mautic_page_buildertoken_index'),
         "paginationWrapper" => 'text-center',
         "paginationClass"   => "sm",
-        'sessionVar'        => 'page.emailtoken',
+        'sessionVar'        => 'page.buildertoken',
         'ignoreFormExit'    => true,
         'queryString'       => 'tmpl=list',
-        'target'            => '#pageEmailTokens'
+        'target'            => '#pageBuilderTokens'
     )); ?>
     <?php endif; ?>
 </div>

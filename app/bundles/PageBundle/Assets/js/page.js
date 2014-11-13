@@ -168,7 +168,7 @@ Mautic.renderPageTimePie = function () {
     Mautic.pageTimePie = new Chart(ctx).Pie(timesOnSiteData, options);
 };
 
-Mautic.showPageEmailTokenExternalLinkModal = function (event, ui, editorId) {
+Mautic.showPageBuilderTokenExternalLinkModal = function (event, ui, editorId) {
     var token  = mQuery(ui.draggable).data('token');
     mQuery('#ExternalLinkModal input[name="editor"]').val(editorId);
     mQuery('#ExternalLinkModal input[name="token"]').val(token);
@@ -179,7 +179,7 @@ Mautic.showPageEmailTokenExternalLinkModal = function (event, ui, editorId) {
     mQuery('#ExternalLinkModal').modal('show');
 };
 
-Mautic.insertPageEmailTokenExternalUrl = function () {
+Mautic.insertPageBuilderTokenExternalUrl = function () {
     var editorId = mQuery('#ExternalLinkModal input[name="editor"]').val();
     var token    = mQuery('#ExternalLinkModal input[name="token"]').val();
     var url      = mQuery('#ExternalLinkModal input[name="link"]').val();

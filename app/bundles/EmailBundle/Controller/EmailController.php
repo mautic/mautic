@@ -221,7 +221,7 @@ class EmailController extends FormController
         $abTestResults = array();
         if (!empty($lastCriteria) && empty($variantError)) {
             //there is a criteria to compare the pages against so let's shoot the page over to the criteria function to do its thing
-            $criteria = $model->getBuilderComponents('abTestWinnerCriteria');
+            $criteria = $model->getBuilderComponents($email, 'abTestWinnerCriteria');
             if (isset($criteria['criteria'][$lastCriteria])) {
                 $testSettings = $criteria['criteria'][$lastCriteria];
 
@@ -386,7 +386,7 @@ class EmailController extends FormController
             }
         }
 
-        $builderComponents    = $model->getBuilderComponents();
+        $builderComponents    = $model->getBuilderComponents($entity);
         return $this->delegateView(array(
             'viewParameters'  =>  array(
                 'form'        => $form->createView(),
@@ -515,7 +515,7 @@ class EmailController extends FormController
             $model->lockEntity($entity);
         }
 
-        $builderComponents    = $model->getBuilderComponents();
+        $builderComponents    = $model->getBuilderComponents($entity);
         return $this->delegateView(array(
             'viewParameters'  =>  array(
                 'form'        => $form->createView(),

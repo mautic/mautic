@@ -12,9 +12,9 @@ namespace Mautic\PageBundle\Helper;
 use Mautic\CoreBundle\Factory\MauticFactory;
 
 /**
- * Class EmailTokenHelper
+ * Class BuilderTokenHelper
  */
-class EmailTokenHelper
+class BuilderTokenHelper
 {
 
     /**
@@ -59,9 +59,9 @@ class EmailTokenHelper
         }
 
         $request = $this->factory->getRequest();
-        $search  = $request->get('search', $session->get('mautic.page.emailtoken.filter', ''));
+        $search  = $request->get('search', $session->get('mautic.page.buildertoken.filter', ''));
 
-        $session->set('mautic.page.emailtoken.filter', $search);
+        $session->set('mautic.page.buildertoken.filter', $search);
 
         $filter = array('string' => $search, 'force' => array(
             array('column' => 'p.variantParent', 'expr' => 'isNull')
@@ -87,10 +87,10 @@ class EmailTokenHelper
             } else {
                 $page = (floor($limit / $count)) ? : 1;
             }
-            $session->set('mautic.page.emailtoken.page', $page);
+            $session->set('mautic.page.buildertoken.page', $page);
         }
 
-        return $this->factory->getTemplating()->render('MauticPageBundle:SubscribedEvents\EmailToken:list.html.php', array(
+        return $this->factory->getTemplating()->render('MauticPageBundle:SubscribedEvents\BuilderToken:list.html.php', array(
             'items'       => $pages,
             'page'        => $page,
             'limit'       => $limit,
