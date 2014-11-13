@@ -906,4 +906,14 @@ class EmailModel extends FormModel
             $em->flush();
         }
     }
+
+    /**
+     * Remove email from DNC list
+     *
+     * @param $email
+     */
+    public function removeDoNotContact($email)
+    {
+        $this->getRepository()->removeFromDoNotEmailList($email);
+    }
 }

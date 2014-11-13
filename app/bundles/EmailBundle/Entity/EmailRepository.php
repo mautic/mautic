@@ -55,6 +55,22 @@ class EmailRepository extends CommonRepository
     }
 
     /**
+     * Remove email from DNE list
+     *
+     * @param $email
+     */
+    public function removeFromDoNotEmailList($email)
+    {
+        $qb = $this->_em->createQueryBuilder();
+
+        $qb->delete('MauticEmailBundle:DoNotEmail', 'd')
+            ->andWhere($qb->expr()->eq('d.emailAddress', ':email'))
+            ->setParameter(':email', $email);
+
+        $qb->getQuery()->execute();
+    }
+
+    /**
      * Get a list of entities
      *
      * @param array      $args
