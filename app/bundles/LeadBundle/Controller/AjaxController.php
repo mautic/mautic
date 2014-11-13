@@ -283,28 +283,4 @@ class AjaxController extends CommonAjaxController
 
         return $this->sendJsonResponse($dataArray);
     }
-
-    /**
-     * @param Request $request
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    protected function engagementGraphAction (Request $request)
-    {
-        // $dataArray  = array('success' => 0);
-        // $leadId     = InputHelper::int($request->request->get('leadId'));
-        // $quantity = InputHelper::int($request->request->get('quantity'));
-        // $unit       = InputHelper::clean($request->request->get('unit'));
-
-        // if (!empty($leadId) && !empty($quantity) && !empty($unit)) {
-            /** @var \Mautic\LeadBundle\Entity\PointChangeLogRepository $pointsLogRepository */
-        //     $pointsLogRepository = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:PointsChangeLog');
-        //     $results = $pointsLogRepository->getLeadPoints($leadId, $quantity, $unit);
-        //     $dataArray['labels'] = $results['labels'];
-        //     $dataArray['data'] = $results['data'];
-        //     $dataArray['success'] = 1;
-        // }
-
-        // return $this->sendJsonResponse($dataArray);
-    }
 }

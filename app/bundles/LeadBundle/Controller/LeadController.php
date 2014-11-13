@@ -291,7 +291,7 @@ class LeadController extends FormController
 
         /** @var \Mautic\LeadBundle\Entity\PointChangeLogRepository $pointsLogRepository */
         $pointsLogRepository = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:PointsChangeLog');
-        $pointStats = $pointsLogRepository->getLeadPoints($lead->getId(), 6, 'M');
+        $pointStats = $pointsLogRepository->getLeadPoints(6, 'M', array('lead_id' => $lead->getId()));
 
         return $this->delegateView(array(
             'viewParameters'  => array(

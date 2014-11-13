@@ -22,24 +22,28 @@ class PointsChangeLogRepository extends CommonRepository
     /**
      * Fetch Lead's points for some period of time.
      * 
-     * @param integer $leadId
      * @param integer $quantity of units
      * @param string $unit of time php.net/manual/en/class.dateinterval.php#dateinterval.props
+     * @param array $args
      *
      * @return mixed
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getLeadPoints($leadId, $quantity, $unit)
+    public function getLeadPoints($quantity, $unit, $args = array())
     {
         $graphData = GraphHelper::prepareLineGraphData($quantity, $unit, array('viewed'));
 
         // Load points for selected period
         $q = $this->createQueryBuilder('pl');
-        $q->select('pl.delta, pl.dateAdded')
-            ->where($q->expr()->eq('IDENTITY(pl.lead)', ':lead'))
-            ->setParameter('lead', $leadId)
-            ->andwhere($q->expr()->gte('pl.dateAdded', ':date'))
+        $q->select('pl.delta, pl.dateAdded');
+
+        if (isset($args['lead_id'])) {
+            $q->where($q->expr()->eq('IDENTITY(pl.lead)', ':lead'))
+                ->setParameter('lead', $args['lead_id']);
+        }
+
+        $q->andwhere($q->expr()->gte('pl.dateAdded', ':date'))
             ->setParameter('date', $graphData['fromDate'])
             ->orderBy('pl.dateAdded', 'ASC');
 
@@ -47,10 +51,14 @@ class PointsChangeLogRepository extends CommonRepository
 
         // Count total until date
         $q2 = $this->createQueryBuilder('pl');
-        $q2->select('sum(pl.delta) as total')
-            ->where($q->expr()->eq('IDENTITY(pl.lead)', ':lead'))
-            ->setParameter('lead', $leadId)
-            ->andwhere($q->expr()->lt('pl.dateAdded', ':date'))
+        $q2->select('sum(pl.delta) as total');
+
+        if (isset($args['lead_id'])) {
+            $q2->where($q->expr()->eq('IDENTITY(pl.lead)', ':lead'))
+                ->setParameter('lead', $args['lead_id']);
+        }
+        
+        $q2->andwhere($q->expr()->lt('pl.dateAdded', ':date'))
             ->setParameter('date', $graphData['fromDate']);
 
         $total = $q2->getQuery()->getSingleResult();

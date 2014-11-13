@@ -691,7 +691,6 @@ Mautic.renderEngagementChart = function() {
     }
     var canvas = document.getElementById("chart-engagement");
     var chartData = mQuery.parseJSON(mQuery('#chart-engagement-data').text());
-    var leadId = canvas.getAttribute('data-item-id');
     Mautic.leadEngagementChart = new Chart(canvas.getContext("2d")).Line(chartData);
 };
 
