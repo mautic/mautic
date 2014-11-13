@@ -152,7 +152,7 @@ if ($permissions['campaign:campaigns:edit']): ?>
                             <div class="panel-body box-layout">
                                 <div class="col-xs-8 va-m">
                                     <h5 class="dark-md fw-sb mb-xs">
-                                        <?php echo $view['translator']->trans('mautic.page.page.pageviews'); ?>
+                                        <?php echo $view['translator']->trans('mautic.campaign.campaign.pageviews'); ?>
                                     </h5>
                                 </div>
                                 <div class="col-xs-4 va-t text-right">
@@ -161,10 +161,10 @@ if ($permissions['campaign:campaigns:edit']): ?>
                             </div>
                             <div class="pt-0 pl-10 pb-0 pr-10">
                                 <div>
-                                    <canvas id="page-views-chart" height="93"></canvas>
+                                    <canvas id="campaign-views-chart" height="93"></canvas>
                                 </div>
                             </div>
-                            <div id="page-views-chart-data" class="hide"><?php //echo json_encode($last30); ?></div>
+                            <div id="campaign-views-chart-data" class="hide"><?php echo json_encode($hits); ?></div>
                         </div>
                     </div>
                 </div>
