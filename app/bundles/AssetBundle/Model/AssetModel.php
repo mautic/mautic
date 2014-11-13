@@ -80,7 +80,32 @@ class AssetModel extends FormModel
         $download = new Download();
         $download->setDateDownload(new \Datetime());
 
-        list($lead, $trackingId, $generated) = $this->factory->getModel('lead')->getCurrentLead(true);
+        $leadModel = $this->factory->getModel('lead');
+
+        //check for any clickthrough info
+        $clickthrough = $request->get('ct', false);
+        if (!empty($clickthrough)) {
+            $clickthrough = unserialize(base64_decode($clickthrough));
+
+            if (!empty($clickthrough['lead'])) {
+                $lead = $leadModel->getEntity($clickthrough['lead']);
+                if ($lead !== null) {
+                    $leadModel->setLeadCookie($clickthrough['lead']);
+                    list($trackingId, $generated) = $leadModel->getTrackingCookie();
+                    $leadClickthrough = true;
+                }
+            }
+
+            if (!empty($clickthrough['source'])) {
+                $download->setSource($clickthrough['source'][0]);
+                $download->setSourceId($clickthrough['source'][1]);
+            }
+        }
+
+        if (empty($leadClickthrough)) {
+            list($lead, $trackingId, $generated) = $leadModel->getCurrentLead(true);
+        }
+
         $download->setLead($lead);
         $download->setTrackingId($trackingId);
 
@@ -248,9 +273,11 @@ class AssetModel extends FormModel
      *
      * @param $entity
      * @param $absolute
+     * @param $clickthrough
+     *
      * @return mixed
      */
-    public function generateUrl($entity, $absolute = true)
+    public function generateUrl($entity, $absolute = true, $clickthrough = array())
     {
         $assetSlug = $entity->getId() . ':' . $entity->getAlias();
 
@@ -259,6 +286,7 @@ class AssetModel extends FormModel
         );
 
         $assetUrl  = $this->factory->getRouter()->generate('mautic_asset_download', $slugs, $absolute);
+        $assetUrl .= (!empty($clickthrough)) ? '?ct=' . base64_encode(serialize($clickthrough)) : '';
 
         return $assetUrl;
     }

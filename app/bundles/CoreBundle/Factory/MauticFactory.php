@@ -100,7 +100,8 @@ class MauticFactory
      * Retrieves user currently logged in
      *
      * @param $allowNull
-     * @return mixed
+     *
+     * @return null|User
      */
     public function getUser($allowNull = false)
     {

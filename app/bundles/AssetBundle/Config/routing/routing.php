@@ -12,6 +12,16 @@ use Symfony\Component\Routing\Route;
 
 $collection = new RouteCollection();
 
+$collection->add('mautic_asset_buildertoken_index', new Route('/asset/buildertokens/{page}',
+    array(
+        '_controller' => 'MauticAssetBundle:SubscribedEvents\BuilderToken:index',
+        'page'        => 1
+    ),
+    array(
+        'page'    => '\d+'
+    )
+));
+
 $collection->add('mautic_asset_index', new Route('/assets/{page}',
     array(
         '_controller' => 'MauticAssetBundle:Asset:index',
