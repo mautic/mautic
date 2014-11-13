@@ -10,7 +10,7 @@
 
 <!-- timeline -->
 <ul class="timeline">
-    <li class="header ellipsis bg-white">Recent Events</li>
+    <li class="header ellipsis bg-white"><?php echo $view['translator']->trans('mautic.lead.lead.header.recent.events'); ?></li>
     <li class="wrapper">
         <ul class="events">
             <?php foreach ($events as $event) : ?>
