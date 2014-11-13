@@ -25,22 +25,28 @@ class HitRepository extends CommonRepository
     /**
      * Get a count of unique hits for the current tracking ID
      *
-     * @param $pageId
+     * @param Page|Redirect $page
      * @param $trackingId
      *
      * @return int
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getHitCountForTrackingId($pageId, $trackingId)
+    public function getHitCountForTrackingId($page, $trackingId)
     {
-        $count = $this->createQueryBuilder('h')
-            ->select('count(h.id) as num')
-            ->where('IDENTITY(h.page) = ' .$pageId)
-            ->andWhere('h.trackingId = :id')
-            ->setParameter('id', $trackingId)
-            ->getQuery()
-            ->getSingleResult();
+        $q = $this->createQueryBuilder('h')
+            ->select('count(h.id) as num');
+
+        if ($page instanceof Page) {
+            $q->where('IDENTITY(h.page) = ' .$page->getId());
+        } elseif ($page instanceof Redirect) {
+            $q->where('IDENTITY(h.redirect) = ' .$page->getId());
+        }
+
+        $q->andWhere('h.trackingId = :id')
+        ->setParameter('id', $trackingId);
+
+        $count = $q->getQuery()->getSingleResult();
 
         return (int) $count['num'];
     }
@@ -94,9 +100,9 @@ class HitRepository extends CommonRepository
             $data['values'][$i] = 0;
             $date->sub($oneDay);
         }
-        
+
         $query = $this->createQueryBuilder('h');
-        
+
         $query->select('IDENTITY(h.page), h.dateHit')
             ->where($query->expr()->eq('IDENTITY(h.page)', (int) $pageId))
             ->andwhere($query->expr()->gte('h.dateHit', ':date'))
@@ -189,7 +195,7 @@ class HitRepository extends CommonRepository
             $query->where($query->expr()->gte('h.dateHit', ':date'))
                 ->setParameter('date', $now);
         }
-        
+
         if ($notLeft) {
             $query->andWhere($query->expr()->isNull('h.dateLeft'));
         }
@@ -303,7 +309,7 @@ class HitRepository extends CommonRepository
                 $q->expr()->gte('h.date_hit', $q->expr()->literal($dt->toUtcString()))
             );
         }
-        
+
         $q->orderBy('h.date_hit', 'ASC');
         $results = $q->execute()->fetchAll();
 
@@ -416,7 +422,7 @@ class HitRepository extends CommonRepository
         } else {
             $stats['timesOnSite'] = array();
         }
-        
+
 
         return $stats;
     }

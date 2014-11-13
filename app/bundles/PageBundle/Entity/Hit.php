@@ -43,9 +43,15 @@ class Hit
 
     /**
      * @ORM\ManyToOne(targetEntity="Page")
-     * @ORM\JoinColumn(name="page_id", referencedColumnName="id", nullable=true)
+     * @ORM\JoinColumn(name="page_id", referencedColumnName="id", nullable=true, onDelete="SET NULL")
      */
     private $page;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Redirect")
+     * @ORM\JoinColumn(name="redirect_id", referencedColumnName="id", nullable=true, onDelete="SET NULL")
+     */
+    private $redirect;
 
     /**
      * @ORM\ManyToOne(targetEntity="Mautic\LeadBundle\Entity\Lead")
@@ -575,5 +581,21 @@ class Hit
     public function setSourceId ($sourceId)
     {
         $this->sourceId = (int) $sourceId;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getRedirect ()
+    {
+        return $this->redirect;
+    }
+
+    /**
+     * @param mixed $redirect
+     */
+    public function setRedirect (Redirect $redirect)
+    {
+        $this->redirect = $redirect;
     }
 }

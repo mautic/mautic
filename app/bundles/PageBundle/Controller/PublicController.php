@@ -248,8 +248,26 @@ class PublicController extends CommonFormController
         $response = TrackingPixelHelper::getResponse($this->request);
 
         //Create page entry
-        $this->factory->getModel('page.page')->hitPage(null, $this->request);
+        $this->factory->getModel('page')->hitPage(null, $this->request);
 
         return $response;
+    }
+
+    /**
+     * @param $redirectId
+     */
+    public function redirectAction($redirectId)
+    {
+
+        $redirectModel = $this->factory->getModel('page.redirect');
+        $redirect      = $redirectModel->getRedirect($redirectId, false, false);
+
+        if (empty($redirect)) {
+            throw $this->createNotFoundException($this->factory->getTranslator()->trans('mautic.core.url.error.404'));
+        }
+
+        $this->factory->getModel('page')->hitPage($redirect, $this->request);
+
+        return $this->redirect($redirect->getUrl());
     }
 }

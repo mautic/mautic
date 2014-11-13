@@ -456,7 +456,7 @@ class LeadModel extends FormModel
         $trackingId = $cookies->get('mautic_session_id');
         $generated  = false;
         if (empty($trackingId)) {
-            $trackingId = uniqid();
+            $trackingId = hash('sha1', uniqid(mt_rand()));
             $generated  = true;
         }
 

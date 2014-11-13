@@ -52,4 +52,10 @@ $collection->add('mautic_page_public', new Route('/p/page/{slug1}/{slug2}/{slug3
     )
 ));
 
+$collection->add('mautic_page_redirect', new Route('/p/redirect/{redirectId}',
+    array(
+        '_controller' => 'MauticPageBundle:Public:redirect',
+    )
+));
+
 return $collection;
