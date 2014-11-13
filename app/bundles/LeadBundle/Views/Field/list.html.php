@@ -9,7 +9,6 @@
 if ($tmpl == 'index')
     $view->extend('MauticLeadBundle:Field:index.html.php');
 ?>
-
 <?php if (count($items)): ?>
 <div class="table-responsive">
     <table class="table table-hover table-striped table-bordered leadfield-list" id="leadFieldTable">
