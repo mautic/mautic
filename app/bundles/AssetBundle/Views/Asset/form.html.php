@@ -20,7 +20,7 @@ $view['slots']->set('mauticContent', 'asset');
     <!-- container -->
     <div class="col-md-9 bg-auto height-auto bdr-r">
         <div class="pa-md">
-		    <?php		    
+		    <?php
 			echo $view['form']->row($form['file']);
 			echo $view['form']->row($form['title']);
 			echo $view['form']->row($form['alias']);
@@ -30,7 +30,6 @@ $view['slots']->set('mauticContent', 'asset');
  	<div class="col-md-3 bg-white height-auto">
 		<div class="pr-lg pl-lg pt-md pb-md">
 			<?php
-				echo $view['form']->row($form['category_lookup']);
 				echo $view['form']->row($form['category']);
 				echo $view['form']->row($form['language']);
 				echo $view['form']->row($form['isPublished']);

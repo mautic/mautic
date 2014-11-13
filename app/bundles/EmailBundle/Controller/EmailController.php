@@ -511,10 +511,6 @@ class EmailController extends FormController
         } else {
             //lock the entity
             $model->lockEntity($entity);
-
-            $category = $entity->getCategory();
-            if ($category && isset($form['category_lookup']))
-                $form->get('category_lookup')->setData($category->getTitle());
         }
 
         $builderComponents    = $model->getBuilderComponents();

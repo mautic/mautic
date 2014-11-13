@@ -205,6 +205,9 @@ var Mautic = {
             placeholder_text_multiple: ' '
         });
 
+        //convert single selects that have opted in into chosen
+        mQuery(".chosen").chosen();
+
         //spin icons on button click
         mQuery(container + ' .btn:not(.btn-nospin)').on('click.spinningicons', function(event) {
             Mautic.startIconSpinOnEvent(event);

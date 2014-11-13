@@ -62,7 +62,6 @@ $view['slots']->set("headerTitle", $header);
                 echo $view['form']->row($form['points']);
                 echo $view['form']->row($form['color']);
                 echo $view['form']->row($form['triggerExistingLeads']);
-                echo $view['form']->row($form['category_lookup']);
                 echo $view['form']->row($form['category']);
                 echo $view['form']->row($form['isPublished']);
                 echo $view['form']->row($form['publishUp']);

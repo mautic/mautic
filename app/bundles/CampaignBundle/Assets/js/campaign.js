@@ -11,10 +11,6 @@ Mautic.campaignOnLoad = function (container) {
         Mautic.activateSearchAutocomplete('list-search', 'campaign');
     }
 
-    if (mQuery(container + ' form[name="campaign"]').length) {
-        Mautic.activateCategoryLookup('campaign', 'campaign');
-    }
-
     if (mQuery('#CampaignEventPanel').length) {
         //update the coordinates on drop
         mQuery('#CampaignCanvas').droppable({

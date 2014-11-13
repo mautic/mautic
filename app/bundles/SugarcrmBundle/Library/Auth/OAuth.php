@@ -77,8 +77,8 @@ class OAuth extends ApiAuth implements AuthInterface
     private $_password;
 
     /**
-     * @param null   $clientKey
-     * @param null   $clientSecret
+     * @param null   $client_key
+     * @param null   $client_secret
      * @param null   $accessToken
      * @param null   $accessTokenSecret
      * @param null   $accessTokenExpires
@@ -91,12 +91,12 @@ class OAuth extends ApiAuth implements AuthInterface
      * @param null   $username
      * @param null   $password
      */
-    public function setup ($clientKey = null, $clientSecret = null, $accessToken = null, $accessTokenSecret = null,
+    public function setup ($client_key = null, $client_secret = null, $accessToken = null, $accessTokenSecret = null,
                            $accessTokenExpires = null, $callback = null, $accessTokenUrl = null,
                            $authorizationUrl = null, $requestTokenUrl = null, $scope = null, $refreshToken = null, $username = null, $password = null, $url = null)
     {
-        $this->_client_id           = $clientKey;
-        $this->_client_secret       = $clientSecret;
+        $this->_client_id           = $client_key;
+        $this->_client_secret       = $client_secret;
         $this->_access_token        = $accessToken;
         $this->_access_token_secret = $accessTokenSecret;
         $this->_callback            = $callback;
@@ -219,6 +219,10 @@ class OAuth extends ApiAuth implements AuthInterface
                 "platform" => "base"
             );
             $response = $this->makeRequest($this->_request_token_url.'/?method=oauth_request_token', $oauth2_token_arguments, 'POST');
+
+            if (is_null($response)) {
+                
+            }
 
             $this->_access_token_updated = true;
             $this->_access_token = $response['access_token'];
