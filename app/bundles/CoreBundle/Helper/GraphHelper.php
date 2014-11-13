@@ -169,7 +169,7 @@ class GraphHelper
      *
      * @return array
      */
-    public static function mergeLineGraphData($graphData, $items, $unit, $datasetKey, $dateName, $deltaName = null, $average = false)
+    public static function mergeLineGraphData($graphData, $items, $unit, $datasetKey, $dateName, $deltaName = null, $average = false, $incremental = false)
     {
         if ($average) {
             $graphData['datasets'][$datasetKey]['count'] = array();
@@ -204,6 +204,16 @@ class GraphHelper
                 if (isset($graphData['datasets'][$datasetKey]['count'][$key]) && $graphData['datasets'][$datasetKey]['count'][$key]) {
                     $graphData['datasets'][$datasetKey]['data'][$key] /= $graphData['datasets'][$datasetKey]['count'][$key];
                 }
+            }
+        }
+
+        if ($incremental) {
+            foreach ($graphData['datasets'][$datasetKey]['data'] as $key => $value) {
+                if ($graphData['datasets'][$datasetKey]['data'][$key]) {
+                    $incremental += $graphData['datasets'][$datasetKey]['data'][$key];
+                }
+                
+                $graphData['datasets'][$datasetKey]['data'][$key] = $incremental;
             }
         }
 

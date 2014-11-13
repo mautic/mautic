@@ -215,6 +215,7 @@ $view['slots']->stop();
                                     <canvas class="chart" id="chart-engagement" height="50" data-item-id="<?php echo $lead->getId(); ?>"></canvas>
                                 </div>
                             </div>
+                            <div id="chart-engagement-data" class="hide"><?php echo json_encode($pointStats); ?></div>
                         </div>
                     </div>
                 </div>

@@ -102,26 +102,23 @@ if ($permissions['campaign:campaigns:edit']): ?>
             <div class="pa-md">
                 <div class="row">
                     <div class="col-md-4">
-                        <div class="panel ovf-h bg-auto bg-light-xs">
+                        <div class="panel ovf-h bg-auto bg-light-xs campaign-stat-charts">
                             <div class="panel-body box-layout">
                                 <div class="col-xs-8 va-m">
-                                    <h5 class="text-white dark-md fw-sb mb-xs">Asset Download</h5>
-                                    <h2 class="fw-b">285</h2>
+                                    <h5 class="dark-md fw-sb mb-xs">
+                                        <?php echo $view['translator']->trans('mautic.campaign.campaign.leads'); ?>
+                                    </h5>
                                 </div>
                                 <div class="col-xs-4 va-t text-right">
-                                    <h3 class="text-white dark-sm"><span class="fa fa-cloud-download"></span></h3>
+                                    <h3 class="text-white dark-sm"><span class="fa fa-user"></span></h3>
                                 </div>
                             </div>
-                            <div class="plugin-sparkline text-right pr-md pl-md"
-                            sparkHeight="34"
-                            sparkWidth="180"
-                            sparkType="bar"
-                            sparkBarWidth="8"
-                            sparkBarSpacing="3"
-                            sparkZeroAxis="false"
-                            sparkBarColor="#00B49C">
-                                129,137,186,167,200,115,118,162,112,106,104,106
+                            <div class="pt-0 pl-10 pb-0 pr-10">
+                                <div>
+                                    <canvas id="campaign-leads-chart" height="93"></canvas>
+                                </div>
                             </div>
+                            <div id="campaign-leads-chart-data" class="hide"><?php echo json_encode($hits); ?></div>
                         </div>
                     </div>
                     <div class="col-md-4">

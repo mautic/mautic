@@ -291,20 +291,20 @@ class AjaxController extends CommonAjaxController
      */
     protected function engagementGraphAction (Request $request)
     {
-        $dataArray  = array('success' => 0);
-        $leadId     = InputHelper::int($request->request->get('leadId'));
-        $quantity = InputHelper::int($request->request->get('quantity'));
-        $unit       = InputHelper::clean($request->request->get('unit'));
+        // $dataArray  = array('success' => 0);
+        // $leadId     = InputHelper::int($request->request->get('leadId'));
+        // $quantity = InputHelper::int($request->request->get('quantity'));
+        // $unit       = InputHelper::clean($request->request->get('unit'));
 
-        if (!empty($leadId) && !empty($quantity) && !empty($unit)) {
+        // if (!empty($leadId) && !empty($quantity) && !empty($unit)) {
             /** @var \Mautic\LeadBundle\Entity\PointChangeLogRepository $pointsLogRepository */
-            $pointsLogRepository = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:PointsChangeLog');
-            $results = $pointsLogRepository->getLeadPoints($leadId, $quantity, $unit);
-            $dataArray['labels'] = $results['labels'];
-            $dataArray['data'] = $results['data'];
-            $dataArray['success'] = 1;
-        }
+        //     $pointsLogRepository = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:PointsChangeLog');
+        //     $results = $pointsLogRepository->getLeadPoints($leadId, $quantity, $unit);
+        //     $dataArray['labels'] = $results['labels'];
+        //     $dataArray['data'] = $results['data'];
+        //     $dataArray['success'] = 1;
+        // }
 
-        return $this->sendJsonResponse($dataArray);
+        // return $this->sendJsonResponse($dataArray);
     }
 }

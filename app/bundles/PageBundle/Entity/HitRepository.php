@@ -113,7 +113,7 @@ class HitRepository extends CommonRepository
 
         $hits = $query->getQuery()->getArrayResult();
 
-        return GraphHelper::mergeLineGraphData($data, $hits, $unit, 0, 'dateHit');;
+        return GraphHelper::mergeLineGraphData($data, $hits, $unit, 0, 'dateHit');
     }
 
     /**
