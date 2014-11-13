@@ -31,7 +31,7 @@ class EmailSubscriber extends CommonSubscriber
         return array(
             EmailEvents::EMAIL_ON_BUILD   => array('onEmailBuild', 0),
             EmailEvents::EMAIL_ON_SEND    => array('onEmailGenerate', 0),
-            EmailEvents::EMAIL_ON_DISPLAY => array('onEmailGenerate', 0)
+            EmailEvents::EMAIL_ON_DISPLAY => array('onEmailDisplay', 0)
         );
     }
 
@@ -40,6 +40,13 @@ class EmailSubscriber extends CommonSubscriber
         //add email tokens
         $tokenHelper = new EmailTokenHelper($this->factory);
         $event->addTokenSection('lead.emailtokens', 'mautic.lead.email.header.index', $tokenHelper->getTokenContent());
+    }
+
+    public function onEmailDisplay(EmailSendEvent $event)
+    {
+        if ($this->factory->getSecurity()->isAnonymous()) {
+            $this->onEmailGenerate($event);
+        } //else this is a user previewing so leave lead fields tokens in place
     }
 
     public function onEmailGenerate(EmailSendEvent $event)

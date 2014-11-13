@@ -53,8 +53,11 @@ class EmailSubscriber extends CommonSubscriber
         $pageModel     = $this->factory->getModel('page');
         $redirectModel = $this->factory->getModel('page.redirect');
         $source        = $event->getSource();
+        $clickthrough  = array('source' => $source);
         $lead          = $event->getLead();
-        $clickthrough  = array('source' => $source, 'lead' => $lead['id']);
+        if ($lead !== null) {
+            $clickthrough['lead'] = $lead['id'];
+        }
 
         foreach ($content as $slot => &$html) {
             preg_match_all($pagelinkRegex, $html, $matches);
