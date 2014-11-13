@@ -36,13 +36,13 @@ $collection->add('mautic_mapper_client_objects_index', new Route('/mapper/object
     array('_controller' => 'MauticMapperBundle:Mapper:index')
 ));
 
-$collection->add('mautic_mapper_client_object_action', new Route('/mapper/objects/{application}/{client}/{object}/{action}',
+$collection->add('mautic_mapper_client_object_action', new Route('/mapper/objects/{application}/{client}/{object}/{objectAction}',
     array(
         '_controller' => 'MauticMapperBundle:Mapper:executeMapper'
     )
 ));
 
-$collection->add('mautic_mapper_authentication_callback', new Route('/mapper/oauth2callback/{application}',
+$collection->add('mautic_mapper_authentication_callback', new Route('/mapper/oauth2callback/{application}/{client}',
     array('_controller' => 'MauticMapperBundle:Client:oAuth2Callback')
 ));
 

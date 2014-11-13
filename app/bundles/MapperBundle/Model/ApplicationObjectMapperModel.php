@@ -15,10 +15,10 @@ use Mautic\MapperBundle\Entity\ApplicationObjectMapper;
 use Mautic\MapperBundle\Form\Type\ApplicationObjectMapperType;
 
 /**
- * Class ApplicationClientModel
+ * Class ApplicationObjectMapper
  * @package Mautic\MapperBundle\Model
  */
-class ApplicationClientModel extends FormModel
+class ApplicationObjectMapperModel extends FormModel
 {
     public function getRepository()
     {
@@ -33,43 +33,8 @@ class ApplicationClientModel extends FormModel
     public function getPermissionBase()
     {
         $request = $this->factory->getRequest();
-        $bundle  = $request->get('bundle');
-        return $bundle.':ApplicationClient';
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @param       $entity
-     * @param       $unlock
-     * @return mixed
-     */
-    public function saveEntity($entity, $unlock = true)
-    {
-        $alias = $entity->getAlias();
-        if (empty($alias)) {
-            $alias = strtolower(InputHelper::alphanum($entity->getTitle(), true));
-        } else {
-            $alias = strtolower(InputHelper::alphanum($alias, true));
-        }
-
-        //make sure alias is not already taken
-        $repo      = $this->getRepository();
-        $testAlias = $alias;
-        $count     = $repo->checkUniqueAlias($testAlias, $entity);
-        $aliasTag  = $count;
-
-        while ($count) {
-            $testAlias = $alias . $aliasTag;
-            $count     = $repo->checkUniqueAlias($testAlias, $entity);
-            $aliasTag++;
-        }
-        if ($testAlias != $alias) {
-            $alias = $testAlias;
-        }
-        $entity->setAlias($alias);
-
-        parent::saveEntity($entity, $unlock);
+        $bundle  = $request->get('application');
+        return $bundle.':ApplicationObjectMapper';
     }
 
     /**
@@ -84,13 +49,13 @@ class ApplicationClientModel extends FormModel
      */
     public function createForm($entity, $formFactory, $action = null, $options = array())
     {
-        if (!$entity instanceof ApplicationClient) {
-            throw new MethodNotAllowedHttpException(array('ApplicationClient'));
+        if (!$entity instanceof ApplicationObjectMapper) {
+            throw new MethodNotAllowedHttpException(array('ApplicationObjectMapper'));
         }
         if (!empty($action)) {
             $options['action'] = $action;
         }
-        return $formFactory->create(new ApplicationClientType($this->factory), $entity, $options);
+        return $formFactory->create(new ApplicationObjectMapperType($this->factory), $entity, $options);
     }
 
     /**
@@ -99,13 +64,18 @@ class ApplicationClientModel extends FormModel
      * @param $id
      * @return null|object
      */
-    public function getEntity($id = null)
+    public function getEntity($object = null, $client_id = null)
     {
-        if ($id === null) {
-            return new ApplicationClient();
+        if ($object === null && $client_id === null) {
+            return new ApplicationObjectMapper($this->factory);
         }
 
-        $entity = parent::getEntity($id);
+        $repo = $this->getRepository();
+        $entity = $repo->findOneBy(array('objectName' => $object, 'applicationClientId' => $client_id));
+
+        if ($entity === null) {
+            return new ApplicationObjectMapper($this->factory);
+        }
 
         return $entity;
     }

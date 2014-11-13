@@ -51,7 +51,9 @@ class MapperSubscriber implements EventSubscriberInterface
     {
         return array(
             MapperEvents::FETCH_ICONS           => array('onFetchIcons', 0),
-            MapperEvents::FORM_ON_BUILD         => array('onFormBuilder', 0)
+            MapperEvents::CLIENT_FORM_ON_BUILD  => array('onClientFormBuild', 0),
+            MapperEvents::OBJECT_FORM_ON_BUILD  => array('onObjectFormBuild',0),
+            MapperEvents::CALLBACK_API          => array('onCallbackApi', 0)
         );
     }
 
@@ -71,7 +73,17 @@ class MapperSubscriber implements EventSubscriberInterface
      *
      * @param FormBuilderEvent $event
      */
-    public function onFormBuilder(MapperFormEvent $event)
+    public function onClientFormBuild(MapperFormEvent $event)
+    {
+
+    }
+
+    /**
+     * Add Client form extra fields
+     *
+     * @param FormBuilderEvent $event
+     */
+    public function onObjectFormBuild(MapperFormEvent $event)
     {
 
     }
