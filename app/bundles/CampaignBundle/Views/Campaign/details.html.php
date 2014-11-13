@@ -118,7 +118,7 @@ if ($permissions['campaign:campaigns:edit']): ?>
                                     <canvas id="campaign-leads-chart" height="93"></canvas>
                                 </div>
                             </div>
-                            <div id="campaign-leads-chart-data" class="hide"><?php echo json_encode($hits); ?></div>
+                            <div id="campaign-leads-chart-data" class="hide"><?php echo json_encode($leadStats); ?></div>
                         </div>
                     </div>
                     <div class="col-md-4">

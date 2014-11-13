@@ -170,6 +170,9 @@ class CampaignController extends FormController
         // Sent emails stats
         $emailsSent = $this->factory->getEntityManager()->getRepository('MauticEmailBundle:Stat')->getIgnoredReadFailed(null, array('source_id' => $entity->getId(), 'source' => 'campaign'));
 
+        // Lead count stats
+        $leadStats = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:Lead')->getLeadStats(30, 'D');
+        
         return $this->delegateView(array(
             'viewParameters'  => array(
                 'campaign'    => $entity,
@@ -179,7 +182,8 @@ class CampaignController extends FormController
                 'security'    => $security,
                 'logs'        => $logs,
                 'hits'        => $hits,
-                'emailsSent'  => $emailsSent
+                'emailsSent'  => $emailsSent,
+                'leadStats'   => $leadStats
             ),
             'contentTemplate' => 'MauticCampaignBundle:Campaign:details.html.php',
             'passthroughVars' => array(

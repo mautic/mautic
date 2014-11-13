@@ -53,6 +53,7 @@ Mautic.campaignOnLoad = function (container) {
 
     Mautic.renderCampaignViewsBarChart();
     Mautic.renderCampaignEmailSentPie();
+    Mautic.renderCampaignLeadsBarChart();
 };
 
 /**
@@ -63,6 +64,7 @@ Mautic.campaignOnUnload = function(container) {
     if (container === '#app-content') {
         delete Mautic.campaignViewsBarChart;
         delete Mautic.campaignEmailSentPie;
+        delete Mautic.campaignLeadsBarChart;
     }
 }
 
@@ -486,6 +488,28 @@ Mautic.renderCampaignViewsBarChart = function (container) {
     }
     if (typeof Mautic.campaignViewsBarChart === 'undefined') {
         Mautic.campaignViewsBarChart = new Chart(ctx).Bar(chartData, options);
+    }
+};
+
+Mautic.renderCampaignLeadsBarChart = function (container) {
+    if (!mQuery('#campaign-leads-chart').length) {
+        return;
+    }
+    chartData = mQuery.parseJSON(mQuery('#campaign-leads-chart-data').text());
+    if (typeof chartData.labels === "undefined") {
+        return;
+    }
+    var ctx = document.getElementById("campaign-leads-chart").getContext("2d");
+    var options = {
+         scaleShowGridLines : false,
+         barShowStroke : false,
+         barValueSpacing : 1,
+         showScale: false,
+         tooltipFontSize: 10,
+         tooltipCaretSize: 0
+    }
+    if (typeof Mautic.campaignLeadsBarChart === 'undefined') {
+        Mautic.campaignLeadsBarChart = new Chart(ctx).Bar(chartData, options);
     }
 };
 
