@@ -70,7 +70,7 @@ class FieldController extends CommonFormController
                     $success = 1;
 
                     //form is valid so process the data
-                    $keyId = 'new' . uniqid();
+                    $keyId = 'new' . hash('sha1', uniqid(mt_rand()));
 
                     //save the properties to session
                     $fields          = $session->get('mautic.formfields.add');
