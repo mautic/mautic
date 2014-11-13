@@ -125,7 +125,7 @@ Mautic.renderPageViewsBarChart = function (container) {
         return;
     }
     chartData = mQuery.parseJSON(mQuery('#page-views-chart-data').text());
-    if (typeof chartData.labels === "undefined" || typeof chartData.values === "undefined") {
+    if (typeof chartData.labels === "undefined") {
         return;
     }
     var ctx = document.getElementById("page-views-chart").getContext("2d");
@@ -137,18 +137,8 @@ Mautic.renderPageViewsBarChart = function (container) {
          tooltipFontSize: 10,
          tooltipCaretSize: 0
     }
-    var data = {
-        labels: chartData.labels,
-        datasets: [
-            {
-                fillColor: "#00b49c",
-                highlightFill: "#028473",
-                data: chartData.values
-            }
-        ]
-    };
     if (typeof Mautic.pageViewsBarChartObject === 'undefined') {
-        Mautic.pageViewsBarChartObject = new Chart(ctx).Bar(data, options);
+        Mautic.pageViewsBarChartObject = new Chart(ctx).Bar(chartData, options);
     }
 };
 

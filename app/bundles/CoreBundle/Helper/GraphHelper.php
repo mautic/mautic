@@ -134,6 +134,7 @@ class GraphHelper
             $data['datasets'][$key] = array(
                 'label' => $label,
                 'fillColor' => self::$colors[$j]['fill'],
+                'highlightFill' => self::$colors[$j]['color'],
                 'strokeColor' => self::$colors[$j]['highlight'],
                 'pointColor' => self::$colors[$j]['highlight'],
                 'pointStrokeColor' => '#fff',
@@ -168,7 +169,7 @@ class GraphHelper
      *
      * @return array
      */
-    public static function mergeLineGraphData($graphData, $items, $unit, $datasetKey, $dateName, $deltaName = null, $average = false)
+    public static function mergeLineGraphData($graphData, $items, $unit, $datasetKey, $dateName, $deltaName = null, $average = false, $incremental = false)
     {
         if ($average) {
             $graphData['datasets'][$datasetKey]['count'] = array();
@@ -205,6 +206,18 @@ class GraphHelper
                 }
             }
         }
+
+        if ($incremental) {
+            foreach ($graphData['datasets'][$datasetKey]['data'] as $key => $value) {
+                if ($graphData['datasets'][$datasetKey]['data'][$key]) {
+                    $incremental += $graphData['datasets'][$datasetKey]['data'][$key];
+                }
+                
+                $graphData['datasets'][$datasetKey]['data'][$key] = $incremental;
+            }
+        }
+
+        unset($graphData['fromDate']);
 
         return $graphData;
     }

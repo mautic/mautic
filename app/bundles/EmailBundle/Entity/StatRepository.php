@@ -226,38 +226,36 @@ class StatRepository extends CommonRepository
      * Get pie graph data for Sent, Read and Failed email count
      *
      * @param QueryBuilder $query
+     * @param array $args
      *
      * @return array
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getIgnoredReadFailed($query)
+    public function getIgnoredReadFailed($query = null, $args = array())
     {
+        if (!$query) {
+            $query = $this->_em->getConnection()->createQueryBuilder();
+        }
+
         $query->select('count(es.id) as sent, sum(es.is_read) as "read", sum(es.is_failed) as failed')
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'es')
             ->leftJoin('es', MAUTIC_TABLE_PREFIX.'emails', 'e', 'es.email_id = e.id');
+
+        if (isset($args['source'])) {
+            $query->andWhere($query->expr()->eq('es.source', $query->expr()->literal($args['source'])));
+        }
+
+        if (isset($args['source_id'])) {
+            $query->andWhere($query->expr()->eq('es.source_id', (int) $args['source_id']));
+        }
 
         $results = $query->execute()->fetch();
         
         $results['ignored'] = $results['sent'] - $results['read'] - $results['failed'];
         unset($results['sent']);
-        $colors = GraphHelper::$colors;
-        $graphData = array();
-        $i = 0;
-        foreach($results as $result => $count) {
-            if (!isset($colors[$i])) {
-                $i = 0;
-            }
-            $color = $colors[$i];
-            $graphData[] = array(
-                'label' => $result,
-                'color' => $colors[$i]['color'],
-                'highlight' => $colors[$i]['highlight'],
-                'value' => (int) $count
-            );
-            $i++;
-        }
-        return $graphData;
+
+        return GraphHelper::preparePieGraphData($results);
     }
 
     /**

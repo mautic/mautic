@@ -22,67 +22,49 @@ class PointsChangeLogRepository extends CommonRepository
     /**
      * Fetch Lead's points for some period of time.
      * 
-     * @param integer $leadId
      * @param integer $quantity of units
      * @param string $unit of time php.net/manual/en/class.dateinterval.php#dateinterval.props
+     * @param array $args
      *
      * @return mixed
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getLeadPoints($leadId, $quantity, $unit)
+    public function getLeadPoints($quantity, $unit, $args = array())
     {
-        $values = array();
-        $labels = array();
-        $date = new \DateTime();
-        $timeInterval = new \DateInterval('P1'.$unit);
-        $labelFormat = 'F'; // @TODO: F = month name. Must be different for days, weeks, years
-        
-        // Create Labels array
-        for ($i = 0; $i < $quantity; $i++) {
-            $labels[] = $date->format($labelFormat);
-            $date->sub($timeInterval);
-        }
+        $graphData = GraphHelper::prepareLineGraphData($quantity, $unit, array('viewed'));
 
         // Load points for selected period
         $q = $this->createQueryBuilder('pl');
-        $q->select('pl.delta, pl.dateAdded')
-            ->where($q->expr()->eq('IDENTITY(pl.lead)', ':lead'))
-            ->setParameter('lead', $leadId)
-            ->andwhere($q->expr()->gte('pl.dateAdded', ':date'))
-            ->setParameter('date', $date)
-            ->orderBy('pl.dateAdded', 'DESC');
+        $q->select('pl.delta, pl.dateAdded');
+
+        if (isset($args['lead_id'])) {
+            $q->where($q->expr()->eq('IDENTITY(pl.lead)', ':lead'))
+                ->setParameter('lead', $args['lead_id']);
+        }
+
+        $q->andwhere($q->expr()->gte('pl.dateAdded', ':date'))
+            ->setParameter('date', $graphData['fromDate'])
+            ->orderBy('pl.dateAdded', 'ASC');
 
         $points = $q->getQuery()->getArrayResult();
 
-        // Count total
+        // Count total until date
         $q2 = $this->createQueryBuilder('pl');
-        $q2->select('sum(pl.delta) as total')
-            ->where($q->expr()->eq('IDENTITY(pl.lead)', ':lead'))
-            ->setParameter('lead', $leadId);
+        $q2->select('sum(pl.delta) as total');
+
+        if (isset($args['lead_id'])) {
+            $q2->where($q->expr()->eq('IDENTITY(pl.lead)', ':lead'))
+                ->setParameter('lead', $args['lead_id']);
+        }
+        
+        $q2->andwhere($q->expr()->lt('pl.dateAdded', ':date'))
+            ->setParameter('date', $graphData['fromDate']);
 
         $total = $q2->getQuery()->getSingleResult();
         $total = (int) $total['total'];
 
-        // Calculate points for months.
-        foreach ($points as $point) {
-            $key = array_search($point['dateAdded']->format($labelFormat), $labels);
-            $values[$key] = $total;
-            $total -= $point['delta'];
-        }
-
-        // Populate all months
-        for ($i = ($quantity - 1); $i >= 0; $i--) {
-            if (isset($values[$i])) {
-                $total = $values[$i];
-            } else {
-                $values[$i] = $total;
-            }
-        }
-
-        ksort($values);
-
-        return array('labels' => array_reverse($labels), 'data' => array_reverse($values));
+        return GraphHelper::mergeLineGraphData($graphData, $points, $unit, 0, 'dateAdded', 'delta', false, $total);
     }
 
     /**

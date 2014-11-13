@@ -164,6 +164,12 @@ class CampaignController extends FormController
         // Audit Log
         $logs = $this->factory->getModel('core.auditLog')->getLogForObject('campaign', $objectId);
 
+        // Hit count per day for last 30 days
+        $hits = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit')->getHits(30, 'D', array('source_id' => $entity->getId(), 'source' => 'campaign'));
+
+        // Sent emails stats
+        $emailsSent = $this->factory->getEntityManager()->getRepository('MauticEmailBundle:Stat')->getIgnoredReadFailed(null, array('source_id' => $entity->getId(), 'source' => 'campaign'));
+
         return $this->delegateView(array(
             'viewParameters'  => array(
                 'campaign'    => $entity,
@@ -171,7 +177,9 @@ class CampaignController extends FormController
                 'permissions' => $permissions,
                 'activePage'  => $activePage,
                 'security'    => $security,
-                'logs'        => $logs
+                'logs'        => $logs,
+                'hits'        => $hits,
+                'emailsSent'  => $emailsSent
             ),
             'contentTemplate' => 'MauticCampaignBundle:Campaign:details.html.php',
             'passthroughVars' => array(
