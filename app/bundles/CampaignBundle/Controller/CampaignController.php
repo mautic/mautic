@@ -161,6 +161,8 @@ class CampaignController extends FormController
             return $this->accessDenied();
         }
 
+        $events = $hits = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:Event')->getEvents(array('campaigns' => array($entity->getId())));
+
         // Audit Log
         $logs = $this->factory->getModel('core.auditLog')->getLogForObject('campaign', $objectId);
 
@@ -183,7 +185,8 @@ class CampaignController extends FormController
                 'logs'        => $logs,
                 'hits'        => $hits,
                 'emailsSent'  => $emailsSent,
-                'leadStats'   => $leadStats
+                'leadStats'   => $leadStats,
+                'events'      => $events
             ),
             'contentTemplate' => 'MauticCampaignBundle:Campaign:details.html.php',
             'passthroughVars' => array(
