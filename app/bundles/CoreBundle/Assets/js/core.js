@@ -402,13 +402,6 @@ var Mautic = {
             var i = (hasBtn && mQuery(event.target).find('i.fa').length) ? mQuery(event.target).find('i.fa') : event.target;
 
             if ((hasBtn && mQuery(event.target).find('i.fa').length) || hasIcon) {
-                var notDropdown = mQuery(i).attr('class').indexOf('fa-angle');
-                var notDirection = mQuery(i).attr('class').indexOf('fa-caret');
-
-                if (notDropdown != -1 && notDirection != -1) {
-                    return;
-                }
-
                 var el              = (hasIcon) ? event.target : mQuery(event.target).find('i.fa').first();
                 var identifierClass = (new Date).getTime();
                 MauticVars.iconClasses[identifierClass] = mQuery(el).attr('class');
