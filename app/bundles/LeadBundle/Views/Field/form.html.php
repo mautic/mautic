@@ -19,10 +19,10 @@ if (!empty($userId)) {
 $view['slots']->set("headerTitle", $header);
 ?>
 <div class="box-layout">
+    <?php echo $view['form']->start($form); ?>
     <!-- container -->
     <div class="col-md-9 bg-auto height-auto bdr-r">
         <div class="pa-md">
-            <?php echo $view['form']->start($form); ?>
             <?php echo $view['form']->row($form['label']); ?>
             <?php echo $view['form']->row($form['alias']); ?>
             <?php echo $view['form']->row($form['type']); ?>
