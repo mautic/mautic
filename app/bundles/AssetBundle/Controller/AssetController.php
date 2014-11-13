@@ -20,7 +20,7 @@ class AssetController extends FormController
      * @param int    $asset
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction($asset = 1)
+    public function indexAction($page = 1)
     {
 
         $model = $this->factory->getModel('asset.asset');
@@ -48,7 +48,7 @@ class AssetController extends FormController
 
         //set limits
         $limit = $this->factory->getSession()->get('mautic.asset.limit', $this->factory->getParameter('default_assetlimit'));
-        $start = ($asset === 1) ? 0 : (($asset-1) * $limit);
+        $start = ($page === 1) ? 0 : (($page-1) * $limit);
         if ($start < 0) {
             $start = 0;
         }
@@ -79,16 +79,16 @@ class AssetController extends FormController
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current asset so redirect to the last asset
             if ($count === 1) {
-                $lastAsset = 1;
+                $lastPage = 1;
             } else {
-                $lastAsset = (floor($limit / $count)) ? : 1;
+                $lastPage = (floor($limit / $count)) ? : 1;
             }
-            $this->factory->getSession()->set('mautic.asset.asset', $lastAsset);
-            $returnUrl   = $this->generateUrl('mautic_asset_index', array('asset' => $lastAsset));
+            $this->factory->getSession()->set('mautic.asset.asset', $lastPage);
+            $returnUrl   = $this->generateUrl('mautic_asset_index', array('page' => $lastPage));
 
             return $this->postActionRedirect(array(
                 'returnUrl'       => $returnUrl,
-                'viewParameters'  => array('asset' => $lastAsset),
+                'viewParameters'  => array('asset' => $lastPage),
                 'contentTemplate' => 'MauticAssetBundle:Asset:index',
                 'passthroughVars' => array(
                     'activeLink'    => '#mautic_asset_index',
@@ -98,30 +98,30 @@ class AssetController extends FormController
         }
 
         //set what asset currently on so that we can return here after form submission/cancellation
-        $this->factory->getSession()->set('mautic.asset.asset', $asset);
+        $this->factory->getSession()->set('mautic.asset.page', $page);
 
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
         //retrieve a list of categories
-        $categories = $this->factory->getModel('asset.asset')->getLookupResults('category', '', 0);
+        $categories = $this->factory->getModel('asset')->getLookupResults('category', '', 0);
 
         return $this->delegateView(array(
             'viewParameters'  =>  array(
                 'searchValue' => $search,
                 'items'       => $assets,
                 'categories'  => $categories,
-                'asset'       => $asset,
                 'limit'       => $limit,
                 'permissions' => $permissions,
                 'model'       => $model,
                 'tmpl'        => $tmpl,
+                'page'        => $page,
                 'security'    => $this->factory->getSecurity()
             ),
             'contentTemplate' => 'MauticAssetBundle:Asset:list.html.php',
             'passthroughVars' => array(
                 'activeLink'     => '#mautic_asset_index',
                 'mauticContent'  => 'asset',
-                'route'          => $this->generateUrl('mautic_asset_index', array('asset' => $asset))
+                'route'          => $this->generateUrl('mautic_asset_index', array('page' => $page))
             )
         ));
     }

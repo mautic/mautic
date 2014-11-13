@@ -10,7 +10,7 @@ if ($tmpl == 'index')
 $view->extend('MauticAssetBundle:Asset:index.html.php');
 ?>
 <?php if (count($items)): ?>
-    <div class="table-responsive page-list">
+    <div class="table-responsive">
         <table class="table table-hover table-striped table-bordered asset-list" id="assetTable">
             <thead>
             <tr>
@@ -116,6 +116,17 @@ $view->extend('MauticAssetBundle:Asset:index.html.php');
             <?php endforeach; ?>
             </tbody>
         </table>
+    </div>
+
+    <div class="panel-footer">
+        <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
+            "totalItems"      => count($items),
+            "page"            => $page,
+            "limit"           => $limit,
+            "menuLinkId"      => 'mautic_asset_index',
+            "baseUrl"         => $view['router']->generate('mautic_asset_index'),
+            'sessionVar'      => 'asset'
+        )); ?>
     </div>
 <?php else: ?>
     <?php echo $view->render('MauticCoreBundle:Default:noresults.html.php'); ?>
