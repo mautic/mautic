@@ -11,7 +11,7 @@ if ($tmpl == 'index')
 ?>
 
 <?php if (count($items)): ?>
-    <div class="table-responsive page-list">
+    <div class="table-responsive">
             <table class="table table-hover table-striped table-bordered category-list" id="categoryTable">
                 <thead>
                 <tr>
