@@ -11,7 +11,7 @@ $view->extend('MauticPointBundle:Trigger:index.html.php');
 ?>
 
 <?php if (count($items)): ?>
-<div class="table-responsive page-list">
+<div class="table-responsive">
     <table class="table table-hover table-striped table-bordered pointtrigger-list" id="triggerTable">
         <thead>
         <tr>

@@ -289,6 +289,10 @@ class LeadController extends FormController
         /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
         $emailRepo = $this->factory->getModel('email')->getRepository();
 
+        /** @var \Mautic\LeadBundle\Entity\PointChangeLogRepository $pointsLogRepository */
+        $pointsLogRepository = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:PointsChangeLog');
+        $pointStats = $pointsLogRepository->getLeadPoints(6, 'M', array('lead_id' => $lead->getId()));
+
         return $this->delegateView(array(
             'viewParameters'  => array(
                 'lead'              => $lead,
@@ -302,7 +306,8 @@ class LeadController extends FormController
                 'eventFilter'       => $eventFilter,
                 'upcomingEvents'    => $upcomingEvents,
                 'icons'             => $icons,
-                'noteCount'         => $this->factory->getModel('lead.note')->getNoteCount($lead),
+                'pointStats'        => $pointStats,
+                'noteCount'         => $this->factory->getModel('lead.note')->getNoteCount($lead, true),
                 'doNotContact'      => $emailRepo->checkDoNotEmail($fields['core']['email']['value'])
             ),
             'contentTemplate' => 'MauticLeadBundle:Lead:lead.html.php',

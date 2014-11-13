@@ -158,6 +158,7 @@ class EventModel extends CommonFormModel
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel = $this->factory->getModel('lead');
         $lead      = $leadModel->getCurrentLead();
+        $logger->debug('CAMPAIGN: Current Lead ID: ' . $lead->getId());
 
         //get the lead's campaigns so we have when the lead was added
         /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */

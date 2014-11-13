@@ -83,7 +83,7 @@ echo $view['form']->start($form);
                                     <?php $i = 0; ?>
                                     <?php foreach ($filterValues as $filter): ?>
                                     <?php if (!isset($choices[$filter['field']])) continue; ?>
-                                    <?php $randomId = "id_" . uniqid(); ?>
+                                    <?php $randomId = "id_" . hash('sha1', uniqid(mt_rand())); ?>
                                         <div class="panel">
                                         <?php if ($i != 0): ?>
                                             <div class="panel-footer">

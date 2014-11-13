@@ -102,17 +102,27 @@ class AjaxController extends CommonAjaxController
                 $socialProfiles    = NetworkIntegrationHelper::getUserProfiles($this->factory, $lead, $fields, true, $network);
                 $socialProfileUrls = NetworkIntegrationHelper::getSocialProfileUrlRegex(false);
                 $networks          = array();
-                foreach ($socialProfiles as $name => $details) {
-                    $networks[$name]['newContent'] = $this->renderView('MauticLeadBundle:Social/' . $name . ':view.html.php', array(
+                $socialCount       = count($socialProfiles);
+                if (empty($network) || empty($socialCount)) {
+                    $dataArray['completeProfile'] = $this->renderView('MauticLeadBundle:Social:index.html.php', array(
+                        'socialProfiles'    => $socialProfiles,
                         'lead'              => $lead,
-                        'details'           => $details,
-                        'network'           => $name,
                         'socialProfileUrls' => $socialProfileUrls
                     ));
+                    $dataArray['socialCount'] = $socialCount;
+                } else {
+                    foreach ($socialProfiles as $name => $details) {
+                        $networks[$name]['newContent'] = $this->renderView('MauticLeadBundle:Social/' . $name . ':view.html.php', array(
+                            'lead'              => $lead,
+                            'details'           => $details,
+                            'network'           => $name,
+                            'socialProfileUrls' => $socialProfileUrls
+                        ));
+                    }
+                    $dataArray['profiles'] = $networks;
                 }
 
-                $dataArray['success']  = 1;
-                $dataArray['profiles'] = $networks;
+                $dataArray['success'] = 1;
             }
         }
 
@@ -138,10 +148,20 @@ class AjaxController extends CommonAjaxController
             $lead  = $model->getEntity($leadId);
 
             if ($lead !== null && $this->factory->getSecurity()->hasEntityAccess('lead:leads:editown', 'lead:leads:editown', $lead->getOwner())) {
-                $socialCache = NetworkIntegrationHelper::clearNetworkCache($this->factory, $lead, $network);
-
                 $dataArray['success']  = 1;
-                $dataArray['socialCount'] = count($socialCache);
+
+                $socialProfiles    = NetworkIntegrationHelper::clearNetworkCache($this->factory, $lead, $network);
+                $socialCount       = count($socialProfiles);
+
+                if (empty($socialCount)) {
+                    $dataArray['completeProfile'] = $this->renderView('MauticLeadBundle:Social:index.html.php', array(
+                        'socialProfiles'    => $socialProfiles,
+                        'lead'              => $lead,
+                        'socialProfileUrls' => NetworkIntegrationHelper::getSocialProfileUrlRegex(false)
+                    ));
+                }
+
+                $dataArray['socialCount'] = $socialCount;
             }
         }
 
@@ -157,10 +177,10 @@ class AjaxController extends CommonAjaxController
      */
     protected function updateTimelineAction (Request $request)
     {
-        $dataArray      = array('success' => 0);
-        $filters        = InputHelper::clean($request->request->get('eventFilters'));
-        $search         = InputHelper::clean($request->request->get('search'));
-        $leadId         = InputHelper::int($request->request->get('leadId'));
+        $dataArray = array('success' => 0);
+        $filters   = InputHelper::clean($request->request->get('eventFilters'));
+        $search    = InputHelper::clean($request->request->get('search'));
+        $leadId    = InputHelper::int($request->request->get('leadId'));
 
         if (!empty($leadId)) {
             //find the lead
@@ -171,14 +191,7 @@ class AjaxController extends CommonAjaxController
 
                 $session = $this->factory->getSession();
 
-                // Set which events to load. Empty array == all.
-                $eventFilter = $session->get('mautic.lead.' . $leadId . '.timeline.filter');
-
-                if ($filters) {
-                    $eventFilter = $filters;
-                } else {
-                    $eventFilter = array();
-                }
+                $eventFilter = ($filters) ? $filters : array();
 
                 $session->set('mautic.lead.' . $leadId . '.timeline.filter', $eventFilter);
 
@@ -186,10 +199,10 @@ class AjaxController extends CommonAjaxController
 
                 // Trigger the TIMELINE_ON_GENERATE event to fetch the timeline events from subscribed bundles
                 $dispatcher = $this->factory->getDispatcher();
-                $event = new LeadTimelineEvent($lead, $eventFilter);
+                $event      = new LeadTimelineEvent($lead, $eventFilter);
                 $dispatcher->dispatch(LeadEvents::TIMELINE_ON_GENERATE, $event);
 
-                $events = $event->getEvents();
+                $events     = $event->getEvents();
                 $eventTypes = $event->getEventTypes();
 
                 $event = new IconEvent($this->factory->getSecurity());
@@ -197,14 +210,16 @@ class AjaxController extends CommonAjaxController
                 $icons = $event->getIcons();
 
                 $timeline = $this->renderView('MauticLeadBundle:Lead:history.html.php', array(
-                    'events'        => $events,
-                    'eventTypes'    => $eventTypes,
-                    'eventFilter'   => $eventFilter,
-                    'icons'         => $icons,
-                    'lead'          => $lead));
+                        'events'      => $events,
+                        'eventTypes'  => $eventTypes,
+                        'eventFilter' => $eventFilter,
+                        'icons'       => $icons,
+                        'lead'        => $lead)
+                );
 
-                $dataArray['success']  = 1;
-                $dataArray['timeline'] = $timeline;
+                $dataArray['success']      = 1;
+                $dataArray['timeline']     = $timeline;
+                $dataArray['historyCount'] = count($events);
             }
         }
 
@@ -264,30 +279,6 @@ class AjaxController extends CommonAjaxController
                 $campaignModel->$class($campaign, $lead);
                 $dataArray['success'] = 1;
             }
-        }
-
-        return $this->sendJsonResponse($dataArray);
-    }
-
-    /**
-     * @param Request $request
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    protected function engagementGraphAction (Request $request)
-    {
-        $dataArray  = array('success' => 0);
-        $leadId     = InputHelper::int($request->request->get('leadId'));
-        $quantity = InputHelper::int($request->request->get('quantity'));
-        $unit       = InputHelper::clean($request->request->get('unit'));
-
-        if (!empty($leadId) && !empty($quantity) && !empty($unit)) {
-            /** @var \Mautic\LeadBundle\Entity\PointChangeLogRepository $pointsLogRepository */
-            $pointsLogRepository = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:PointsChangeLog');
-            $results = $pointsLogRepository->getLeadPoints($leadId, $quantity, $unit);
-            $dataArray['labels'] = $results['labels'];
-            $dataArray['data'] = $results['data'];
-            $dataArray['success'] = 1;
         }
 
         return $this->sendJsonResponse($dataArray);

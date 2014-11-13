@@ -75,6 +75,19 @@ Mautic.leadOnLoad = function (container) {
         });
     }
 
+    //Note type filters
+    var noteForm = mQuery(container + ' #note-filters');
+    if (noteForm.length) {
+        noteForm.on('change', function() {
+            noteForm.submit();
+        }).on('keyup', function() {
+            noteForm.delay(200).submit();
+        }).on('submit', function(e) {
+            e.preventDefault();
+            Mautic.refreshLeadNotes(noteForm);
+        });
+    }
+
     if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'lead.lead');
     }
@@ -118,7 +131,7 @@ Mautic.leadOnLoad = function (container) {
         .on("fa.sidebar.maximize", function () { grid.shuffle("update"); });
 
     if (typeof Mautic.leadEngagementChart === 'undefined') {
-        Mautic.loadEngagementChart();
+        Mautic.renderEngagementChart();
     }
 };
 
@@ -473,12 +486,17 @@ Mautic.refreshLeadSocialProfile = function(network, leadId, event) {
         dataType: "json",
         success: function (response) {
             if (response.success) {
-                //loop through each network
-                mQuery.each(response.profiles, function( index, value ){
-                    if (mQuery('#' + index + 'CompleteProfile').length) {
-                        mQuery('#' + index + 'CompleteProfile').html(value.newContent);
-                    }
-                });
+                if (response.completeProfile) {
+                    mQuery('#social-container').html(response.completeProfile);
+                    mQuery('#SocialCount').html(response.socialCount);
+                } else {
+                    //loop through each network
+                    mQuery.each(response.profiles, function (index, value) {
+                        if (mQuery('#' + index + 'CompleteProfile').length) {
+                            mQuery('#' + index + 'CompleteProfile').html(value.newContent);
+                        }
+                    });
+                }
             }
             Mautic.stopIconSpinPostEvent();
         },
@@ -501,6 +519,9 @@ Mautic.clearLeadSocialProfile = function(network, leadId, event) {
             if (response.success) {
                 //activate the click to remove the panel
                 mQuery('.' + network + '-panelremove').click();
+                if (response.completeProfile) {
+                    mQuery('#social-container').html(response.completeProfile);
+                }
                 mQuery('#SocialCount').html(response.socialCount);
             }
 
@@ -523,11 +544,20 @@ Mautic.refreshLeadTimeline = function(form) {
         success: function (response) {
             if (response.success) {
                 mQuery('#timeline-container').html(response.timeline);
+                mQuery('#HistoryCount').html(response.historyCount);
             }
         },
         error: function (request, textStatus, errorThrown) {
             Mautic.processAjaxError(request, textStatus, errorThrown);
         }
+    });
+};
+
+Mautic.refreshLeadNotes = function(form) {
+    Mautic.postForm(mQuery(form), function (response) {
+        response.target = '#NoteList';
+        mQuery('#NoteCount').html(response.noteCount);
+        Mautic.processPageContent(response);
     });
 };
 
@@ -655,47 +685,13 @@ Mautic.leadNoteOnLoad = function (container, response) {
     }
 };
 
-Mautic.loadEngagementChart = function() {
-    if (mQuery("#chart-engagement").length) {
-        var canvas = document.getElementById("chart-engagement");
-
-        if (canvas === null) {
-            return;
-        }
-
-        var leadId = canvas.getAttribute('data-item-id');
-        var query = "action=lead:engagementGraph&leadId=" + leadId + "&quantity=" + 6 + "&unit=" + "M";
-
-        mQuery.ajax({
-            url: mauticAjaxUrl,
-            type: "POST",
-            data: query,
-            dataType: "json",
-            success: function (response) {
-                if (response.success) {
-                    var chartData = {
-                        labels: response.labels,
-                        datasets: [
-                            {
-                                label: "Engagement",
-                                fillColor: "rgba(151,187,205,0.2)",
-                                strokeColor: "rgba(151,187,205,1)",
-                                pointColor: "rgba(151,187,205,1)",
-                                pointStrokeColor: "#fff",
-                                pointHighlightFill: "#fff",
-                                pointHighlightStroke: "rgba(151,187,205,1)",
-                                data: response.data
-                            }
-                        ]
-                    };
-                    Mautic.leadEngagementChart = new Chart(canvas.getContext("2d")).Line(chartData);
-                }
-            },
-            error: function (request, textStatus, errorThrown) {
-                Mautic.processAjaxError(request, textStatus, errorThrown);
-            }
-        });
+Mautic.renderEngagementChart = function() {
+    if (!mQuery("#chart-engagement").length) {
+        return;
     }
+    var canvas = document.getElementById("chart-engagement");
+    var chartData = mQuery.parseJSON(mQuery('#chart-engagement-data').text());
+    Mautic.leadEngagementChart = new Chart(canvas.getContext("2d")).Line(chartData);
 };
 
 Mautic.showSocialMediaImageModal = function(imgSrc)

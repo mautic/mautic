@@ -401,10 +401,7 @@ var Mautic = {
 
             var i = (hasBtn && mQuery(event.target).find('i.fa').length) ? mQuery(event.target).find('i.fa') : event.target;
 
-            var notDropdown = mQuery(i).attr('class').indexOf('fa-angle');
-            var notDirection = mQuery(i).attr('class').indexOf('fa-caret');
-
-            if (((hasBtn && mQuery(event.target).find('i.fa').length) || hasIcon) && notDropdown == -1 && notDirection == -1) {
+            if ((hasBtn && mQuery(event.target).find('i.fa').length) || hasIcon) {
                 var el              = (hasIcon) ? event.target : mQuery(event.target).find('i.fa').first();
                 var identifierClass = (new Date).getTime();
                 MauticVars.iconClasses[identifierClass] = mQuery(el).attr('class');
@@ -545,6 +542,10 @@ var Mautic = {
                         scrollTop: 0
                     }, 0);
                 }
+            }
+
+            if (response.overlayEnabled) {
+                mQuery(response.overlayTarget + ' .content-overlay').remove();
             }
 
             //activate content specific stuff
@@ -971,10 +972,29 @@ var Mautic = {
 
         mQuery(el).on('keyup', {}, function (event) {
             var searchStr = mQuery(el).val().trim();
-            var diff = searchStr.length - MauticVars[searchStrVar].length;
-            var overlayEnabled = mQuery(el).attr('data-overlay');
+            var target    = mQuery(el).attr('data-target');
+            var diff      = searchStr.length - MauticVars[searchStrVar].length;
 
-            if (overlayEnabled != 'false') {
+            if (diff < 0) {
+                diff = parseInt(diff) * -1;
+            }
+
+            var spaceKeyPressed  = (event.which == 32 || event.keyCode == 32);
+            var enterKeyPressed  = (event.which == 13 || event.keyCode == 13);
+            var deleteKeyPressed = (event.which == 8 || event.keyCode == 8);
+
+
+            var overlayEnabled = mQuery(el).attr('data-overlay');
+            if (!overlayEnabled || overlayEnabled == 'false') {
+                overlayEnabled = false;
+            } else {
+                overlayEnabled = true;
+            }
+
+            var overlayTarget = mQuery(el).attr('data-overlay-target');
+            if (!overlayTarget) overlayTarget = target;
+
+            if (!deleteKeyPressed && overlayEnabled) {
                 var overlay = mQuery('<div />', {"class": "content-overlay"}).html(mQuery(el).attr('data-overlay-text'));
                 if (mQuery(el).attr('data-overlay-background')) {
                     overlay.css('background', mQuery(el).attr('data-overlay-background'));
@@ -982,30 +1002,31 @@ var Mautic = {
                 if (mQuery(el).attr('data-overlay-color')) {
                     overlay.css('color', mQuery(el).attr('data-overlay-color'));
                 }
-                var target = mQuery(el).attr('data-target');
-                var overlayTarget = mQuery(el).attr('data-overlay-target');
-                if (!overlayTarget) overlayTarget = target;
             }
 
             if (
                 !MauticVars.searchIsActive &&
                 (
                     //searchStr in MauticVars[liveCacheVar] ||
+                    (!searchStr && MauticVars[searchStrVar].length) ||
                     diff >= 3 ||
-                    event.which == 32 || event.keyCode == 32 ||
-                    event.which == 13 || event.keyCode == 13
+                    spaceKeyPressed ||
+                    enterKeyPressed
                 )
             ) {
                 MauticVars.searchIsActive = true;
                 MauticVars[searchStrVar] = searchStr;
                 event.data.livesearch = true;
 
-                if (overlayEnabled != 'false') {
-                    mQuery(overlayTarget + ' .content-overlay').remove();
-                }
-
-                Mautic.filterList(event, mQuery(el).attr('id'), mQuery(el).attr('data-action'), target, liveCacheVar);
-            } else if (overlayEnabled != 'false') {
+                Mautic.filterList(event,
+                    mQuery(el).attr('id'),
+                    mQuery(el).attr('data-action'),
+                    target,
+                    liveCacheVar,
+                    overlayEnabled,
+                    overlayTarget
+                );
+            } else if (overlayEnabled) {
                 if (!mQuery(overlayTarget + ' .content-overlay').length) {
                     mQuery(overlayTarget).prepend(overlay);
                 }
@@ -1037,7 +1058,7 @@ var Mautic = {
     /**
      * Filters list based on search contents
      */
-    filterList: function (e, elId, route, target, liveCacheVar, action) {
+    filterList: function (e, elId, route, target, liveCacheVar, action, overlayEnabled, overlayTarget) {
         if (typeof liveCacheVar == 'undefined') {
             liveCacheVar = "liveCache";
         }
@@ -1073,7 +1094,10 @@ var Mautic = {
             //@TODO reevaluate search caching as it seems to cause issues
             if (false && value && value in MauticVars[liveCacheVar]) {
                 var response = {"newContent": MauticVars[liveCacheVar][value]};
-                response.target = target;
+                response.target         = target;
+                response.overlayEnabled = overlayEnabled;
+                response.overlayTarget  = overlayTarget;
+
                 Mautic.processPageContent(response);
                 MauticVars.searchIsActive = false;
             } else {
@@ -1093,7 +1117,10 @@ var Mautic = {
                             MauticVars[liveCacheVar][value] = response.newContent;
                         }
                         //note the target to be updated
-                        response.target = target;
+                        response.target         = target;
+                        response.overlayEnabled = overlayEnabled;
+                        response.overlayTarget  = overlayTarget;
+
                         Mautic.processPageContent(response);
 
                         MauticVars.searchIsActive = false;

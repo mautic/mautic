@@ -6,13 +6,10 @@
  * @link        http://mautic.com
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'leadlist');
 $view['slots']->set("headerTitle", $view['translator']->trans('mautic.lead.list.header.index'));
-
 ?>
-
 <?php $view['slots']->start("actions"); ?>
 	<a class="btn btn-default" href="<?php echo $this->container->get('router')->generate(
 	        'mautic_leadlist_action', array("objectAction" => "new")); ?>" data-toggle="ajax">
@@ -21,7 +18,7 @@ $view['slots']->set("headerTitle", $view['translator']->trans('mautic.lead.list.
 	</a>
 <?php $view['slots']->stop(); ?>
 
-<div class="panel panel-default page-list bdr-t-wdh-0">
+<div class="panel panel-default bdr-t-wdh-0">
     <?php echo $view->render('MauticCoreBundle:Helper:listactions.html.php', array(
         'searchValue' => $searchValue,
         'action'      => $currentRoute,

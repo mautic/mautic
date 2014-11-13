@@ -50,6 +50,10 @@ Mautic.campaignOnLoad = function (container) {
                 mQuery(this).find('.btn-edit').first().click();
             });
     }
+
+    Mautic.renderCampaignViewsBarChart();
+    Mautic.renderCampaignEmailSentPie();
+    Mautic.renderCampaignLeadsBarChart();
 };
 
 /**
@@ -57,6 +61,11 @@ Mautic.campaignOnLoad = function (container) {
  */
 Mautic.campaignOnUnload = function(container) {
     delete Mautic.campaignBuilderInstance;
+    if (container === '#app-content') {
+        delete Mautic.campaignViewsBarChart;
+        delete Mautic.campaignEmailSentPie;
+        delete Mautic.campaignLeadsBarChart;
+    }
 }
 
 /**
@@ -458,4 +467,63 @@ Mautic.submitCampaignEvent = function(e) {
     mQuery('#campaignevent_canvasSettings_decisionPath').val(mQuery('#decisionPath').val());
 
     mQuery('form[name="campaignevent"]').submit();
+};
+
+Mautic.renderCampaignViewsBarChart = function (container) {
+    if (!mQuery('#campaign-views-chart').length) {
+        return;
+    }
+    chartData = mQuery.parseJSON(mQuery('#campaign-views-chart-data').text());
+    if (typeof chartData.labels === "undefined") {
+        return;
+    }
+    var ctx = document.getElementById("campaign-views-chart").getContext("2d");
+    var options = {
+         scaleShowGridLines : false,
+         barShowStroke : false,
+         barValueSpacing : 1,
+         showScale: false,
+         tooltipFontSize: 10,
+         tooltipCaretSize: 0
+    }
+    if (typeof Mautic.campaignViewsBarChart === 'undefined') {
+        Mautic.campaignViewsBarChart = new Chart(ctx).Bar(chartData, options);
+    }
+};
+
+Mautic.renderCampaignLeadsBarChart = function (container) {
+    if (!mQuery('#campaign-leads-chart').length) {
+        return;
+    }
+    chartData = mQuery.parseJSON(mQuery('#campaign-leads-chart-data').text());
+    if (typeof chartData.labels === "undefined") {
+        return;
+    }
+    var ctx = document.getElementById("campaign-leads-chart").getContext("2d");
+    var options = {
+         scaleShowGridLines : false,
+         barShowStroke : false,
+         barValueSpacing : 1,
+         showScale: false,
+         tooltipFontSize: 10,
+         tooltipCaretSize: 0
+    }
+    if (typeof Mautic.campaignLeadsBarChart === 'undefined') {
+        Mautic.campaignLeadsBarChart = new Chart(ctx).Bar(chartData, options);
+    }
+};
+
+Mautic.renderCampaignEmailSentPie = function () {
+    // Initilize chart only for first time
+    if (typeof Mautic.campaignEmailSentPie === 'object') {
+        return;
+    }
+    var element = mQuery('#emails-sent-rate');
+    var options = {
+        responsive: false,
+        tooltipFontSize: 10,
+        tooltipTemplate: "<%if (label){%><%}%><%= value %>x <%=label%>"};
+    var timesOnSiteData = mQuery.parseJSON(mQuery('#emails-sent-data').text());
+    var ctx = document.getElementById("emails-sent-rate").getContext("2d");
+    Mautic.campaignEmailSentPie = new Chart(ctx).Pie(timesOnSiteData, options);
 };

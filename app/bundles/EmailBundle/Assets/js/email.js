@@ -50,10 +50,15 @@ Mautic.launchEmailEditor = function () {
                 iframeFix: true,
                 drop: function (event, ui) {
                     var instance = mQuery(this).attr("id");
-                    var editor   = document.getElementById('builder-template-content').contentWindow.CKEDITOR.instances;
-                    var token    = mQuery(ui.draggable).data('token');
-                    if (token) {
-                        editor[instance].insertText(token);
+                    var predrop  = mQuery(ui.draggable).data('predrop');
+                    if (predrop) {
+                        Mautic[predrop](event, ui, instance);
+                    } else {
+                        var editor = Mautic.getEmailBuilderEditorInstances();
+                        var token  = mQuery(ui.draggable).data('token');
+                        if (token) {
+                            editor[instance].insertText(token);
+                        }
                     }
                     mQuery(this).removeClass('over-droppable');
                 },
@@ -72,6 +77,10 @@ Mautic.launchEmailEditor = function () {
     mQuery('.builder').removeClass('hide');
 
     Mautic.emailEditorOnLoad('.builder-panel');
+};
+
+Mautic.getEmailBuilderEditorInstances = function() {
+    return document.getElementById('builder-template-content').contentWindow.CKEDITOR.instances;
 };
 
 Mautic.closeEmailEditor = function() {
@@ -133,4 +142,9 @@ Mautic.initializeEmailFilters = function(container) {
             Mautic.loadContent(request, '', 'POST', '.page-list');
         });
     }
-}
+};
+
+Mautic.insertEmailBuilderToken = function(editorId, token) {
+    var editor = Mautic.getEmailBuilderEditorInstances();
+    editor[instance].insertText(token);
+};

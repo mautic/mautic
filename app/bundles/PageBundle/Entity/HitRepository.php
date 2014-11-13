@@ -25,22 +25,28 @@ class HitRepository extends CommonRepository
     /**
      * Get a count of unique hits for the current tracking ID
      *
-     * @param $pageId
+     * @param Page|Redirect $page
      * @param $trackingId
      *
      * @return int
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getHitCountForTrackingId($pageId, $trackingId)
+    public function getHitCountForTrackingId($page, $trackingId)
     {
-        $count = $this->createQueryBuilder('h')
-            ->select('count(h.id) as num')
-            ->where('IDENTITY(h.page) = ' .$pageId)
-            ->andWhere('h.trackingId = :id')
-            ->setParameter('id', $trackingId)
-            ->getQuery()
-            ->getSingleResult();
+        $q = $this->createQueryBuilder('h')
+            ->select('count(h.id) as num');
+
+        if ($page instanceof Page) {
+            $q->where('IDENTITY(h.page) = ' .$page->getId());
+        } elseif ($page instanceof Redirect) {
+            $q->where('IDENTITY(h.redirect) = ' .$page->getId());
+        }
+
+        $q->andWhere('h.trackingId = :id')
+        ->setParameter('id', $trackingId);
+
+        $count = $q->getQuery()->getSingleResult();
 
         return (int) $count['num'];
     }
@@ -74,48 +80,40 @@ class HitRepository extends CommonRepository
     }
 
     /**
-     * Get hit count per day for last 30 days
+     * Get hit per time period
      *
-     * @param integer $pageId
+     * @param array $args
      *
      * @return array
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getHitsForLast30Days($pageId)
+    public function getHits($amount, $unit, $args = array())
     {
-        $date = new \DateTime();
-        $oneDay = new \DateInterval('P1D');
-        $data = array('labels' => array(), 'values' => array());
+        $data = GraphHelper::prepareLineGraphData($amount, $unit, array('viewed'));
 
-        // Prefill $data arrays
-        for ($i = 0; $i < 30; $i++) {
-            $data['labels'][$i] = $date->format('Y-m-d');
-            $data['values'][$i] = 0;
-            $date->sub($oneDay);
-        }
-        
         $query = $this->createQueryBuilder('h');
-        
-        $query->select('IDENTITY(h.page), h.dateHit')
-            ->where($query->expr()->eq('IDENTITY(h.page)', (int) $pageId))
-            ->andwhere($query->expr()->gte('h.dateHit', ':date'))
-            ->setParameter('date', $date);
+
+        $query->select('IDENTITY(h.page), h.dateHit');
+
+        if (isset($args['page_id'])) {
+            $query->andWhere($query->expr()->eq('IDENTITY(h.page)', (int) $args['page_id']));
+        }
+
+        if (isset($args['source'])) {
+            $query->andWhere($query->expr()->eq('h.source', $query->expr()->literal($args['source'])));
+        }
+
+        if (isset($args['source_id'])) {
+            $query->andWhere($query->expr()->eq('h.sourceId', (int) $args['source_id']));
+        }
+
+        $query->andwhere($query->expr()->gte('h.dateHit', ':date'))
+            ->setParameter('date', $data['fromDate']);
 
         $hits = $query->getQuery()->getArrayResult();
 
-        // Group hits by date
-        foreach ($hits as $hit) {
-            $day = $hit['dateHit']->format('Y-m-d');
-            if (($dayKey = array_search($day, $data['labels'])) !== false) {
-                $data['values'][$dayKey]++;
-            }
-        }
-
-        $data['values'] = array_reverse($data['values']);
-        $data['labels'] = array_reverse($data['labels']);
-
-        return $data;
+        return GraphHelper::mergeLineGraphData($data, $hits, $unit, 0, 'dateHit');
     }
 
     /**
@@ -189,7 +187,7 @@ class HitRepository extends CommonRepository
             $query->where($query->expr()->gte('h.dateHit', ':date'))
                 ->setParameter('date', $now);
         }
-        
+
         if ($notLeft) {
             $query->andWhere($query->expr()->isNull('h.dateLeft'));
         }
@@ -303,7 +301,7 @@ class HitRepository extends CommonRepository
                 $q->expr()->gte('h.date_hit', $q->expr()->literal($dt->toUtcString()))
             );
         }
-        
+
         $q->orderBy('h.date_hit', 'ASC');
         $results = $q->execute()->fetchAll();
 
@@ -416,7 +414,7 @@ class HitRepository extends CommonRepository
         } else {
             $stats['timesOnSite'] = array();
         }
-        
+
 
         return $stats;
     }

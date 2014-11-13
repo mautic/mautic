@@ -10,7 +10,7 @@ if ($tmpl == 'index')
 $view->extend('MauticEmailBundle:Email:index.html.php');
 ?>
 
-<div class="col-md-9 bg-auto height-auto bdr-l table-responsive page-list pt-10">
+<div class="col-md-9 bg-auto height-auto bdr-l table-responsive pt-10">
     <?php if (count($items)): ?>
         <table class="table table-hover table-striped table-bordered email-list">
             <thead>

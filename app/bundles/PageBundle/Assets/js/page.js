@@ -52,10 +52,14 @@ Mautic.launchPageEditor = function () {
                 iframeFix: true,
                 drop: function (event, ui) {
                     var instance = mQuery(this).attr("id");
-                    var editor   = document.getElementById('builder-template-content').contentWindow.CKEDITOR.instances;
-                    var token    = mQuery(ui.draggable).data('token');
-                    if (token) {
-                        editor[instance].insertText(token);
+                    var predrop  = mQuery(ui.draggable).data('predrop');
+                    if (predrop) {
+                        Mautic[predrop](event, ui, instance);
+                    } else {
+                        var token  = mQuery(ui.draggable).data('token');
+                        if (token) {
+                            Mautic.insertPageBuilderToken(instance, token);
+                        }
                     }
                     mQuery(this).removeClass('over-droppable');
                 },
@@ -74,6 +78,10 @@ Mautic.launchPageEditor = function () {
     mQuery('.builder').removeClass('hide');
 
     Mautic.pageEditorOnLoad('.builder-panel');
+};
+
+Mautic.getPageBuilderEditorInstances = function() {
+    return document.getElementById('builder-template-content').contentWindow.CKEDITOR.instances;
 };
 
 Mautic.closePageEditor = function() {
@@ -117,7 +125,7 @@ Mautic.renderPageViewsBarChart = function (container) {
         return;
     }
     chartData = mQuery.parseJSON(mQuery('#page-views-chart-data').text());
-    if (typeof chartData.labels === "undefined" || typeof chartData.values === "undefined") {
+    if (typeof chartData.labels === "undefined") {
         return;
     }
     var ctx = document.getElementById("page-views-chart").getContext("2d");
@@ -129,18 +137,8 @@ Mautic.renderPageViewsBarChart = function (container) {
          tooltipFontSize: 10,
          tooltipCaretSize: 0
     }
-    var data = {
-        labels: chartData.labels,
-        datasets: [
-            {
-                fillColor: "#00b49c",
-                highlightFill: "#028473",
-                data: chartData.values
-            }
-        ]
-    };
     if (typeof Mautic.pageViewsBarChartObject === 'undefined') {
-        Mautic.pageViewsBarChartObject = new Chart(ctx).Bar(data, options);
+        Mautic.pageViewsBarChartObject = new Chart(ctx).Bar(chartData, options);
     }
 };
 
@@ -156,7 +154,7 @@ Mautic.renderPageReturningVisitsPie = function () {
         tooltipTemplate: "<%if (label){%><%}%><%= value %>% <%=label%>"};
     var ctx = document.getElementById("returning-rate").getContext("2d");
     Mautic.pageReturningVisitsPie = new Chart(ctx).Pie(graphData, options);
-}
+};
 
 Mautic.renderPageTimePie = function () {
     // Initilize chart only for first time
@@ -171,4 +169,33 @@ Mautic.renderPageTimePie = function () {
     var timesOnSiteData = mQuery.parseJSON(mQuery('#times-on-site-data').text());
     var ctx = document.getElementById("time-rate").getContext("2d");
     Mautic.pageTimePie = new Chart(ctx).Pie(timesOnSiteData, options);
-}
+};
+
+Mautic.showPageEmailTokenExternalLinkModal = function (event, ui, editorId) {
+    var token  = mQuery(ui.draggable).data('token');
+    mQuery('#ExternalLinkModal input[name="editor"]').val(editorId);
+    mQuery('#ExternalLinkModal input[name="token"]').val(token);
+
+    //append the modal to the builder or else it won't display
+    mQuery('#ExternalLinkModal').appendTo('body');
+
+    mQuery('#ExternalLinkModal').modal('show');
+};
+
+Mautic.insertPageEmailTokenExternalUrl = function () {
+    var editorId = mQuery('#ExternalLinkModal input[name="editor"]').val();
+    var token    = mQuery('#ExternalLinkModal input[name="token"]').val();
+    var url      = mQuery('#ExternalLinkModal input[name="link"]').val();
+
+    token = token.replace("%url%", url);
+
+    Mautic.insertPageBuilderToken(editorId, token);
+};
+
+Mautic.insertPageBuilderToken = function(editorId, token) {
+    var editor = Mautic.getPageBuilderEditorInstances();
+    editor[editorId].insertText(token);
+    mQuery('#ExternalLinkModal').modal('hide');
+
+    mQuery('#ExternalLinkModal input[name="link"]').val('');
+};

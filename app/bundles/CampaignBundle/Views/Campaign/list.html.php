@@ -7,12 +7,12 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 if ($tmpl == 'index')
-$view->extend('MauticCampaignBundle:Campaign:index.html.php');
+    $view->extend('MauticCampaignBundle:Campaign:index.html.php');
 ?>
 <?php if (count($items)): ?>
-    <div class="table-responsive scrollable body-white padding-sm page-list">
-        <table class="table table-hover table-striped table-bordered campaign-list" id="campaignTable">
-            <thead>
+<div class="table-responsive">
+    <table class="table table-hover table-striped table-bordered campaign-list" id="campaignTable">
+        <thead>
             <tr>
                 <th class="visible-md visible-lg col-campaign-actions pl-20">
                     <div class="checkbox-inline custom-primary">
@@ -46,51 +46,50 @@ $view->extend('MauticCampaignBundle:Campaign:index.html.php');
                 ));
                 ?>
             </tr>
-            </thead>
-            <tbody>
-            <?php foreach ($items as $item): ?>
-                <tr>
-                    <td class="visible-md visible-lg">
-                        <?php
-                        echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
-                            'item'      => $item,
-                            'edit'      => $permissions['campaign:campaigns:edit'],
-                            'clone'     => $permissions['campaign:campaigns:create'],
-                            'delete'    => $permissions['campaign:campaigns:delete'],
-                            'routeBase' => 'campaign',
-                            'menuLink'  => 'mautic_campaign_index',
-                            'langVar'   => 'campaign'
-                        ));
-                        ?>
-                    </td>
-                    <td>
-                        <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php',array(
-                            'item'       => $item,
-                            'model'      => 'campaign'
-                        )); ?>
-                        <a href="<?php echo $view['router']->generate('mautic_campaign_action',
-                            array("objectAction" => "view", "objectId" => $item->getId())); ?>"
-                           data-toggle="ajax">
-                            <?php echo $item->getName(); ?>
-                        </a>
-                    </td>
-                    <td class="visible-md visible-lg"><?php echo $item->getDescription(); ?></td>
-                    <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
-                </tr>
-            <?php endforeach; ?>
-            </tbody>
-        </table>
-    </div>
-    <div class="panel-footer">
-        <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
-            "totalItems"      => count($items),
-            "page"            => $page,
-            "limit"           => $limit,
-            "menuLinkId"      => 'mautic_campaign_index',
-            "baseUrl"         => $view['router']->generate('mautic_campaign_index'),
-            'sessionVar'      => 'campaign'
-        )); ?>
-    </div>
+        </thead>
+        <tbody>
+        <?php foreach ($items as $item): ?>
+            <tr>
+                <td class="visible-md visible-lg">
+                    <?php
+                    echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
+                        'item'      => $item,
+                        'edit'      => $permissions['campaign:campaigns:edit'],
+                        'clone'     => $permissions['campaign:campaigns:create'],
+                        'delete'    => $permissions['campaign:campaigns:delete'],
+                        'routeBase' => 'campaign',
+                        'menuLink'  => 'mautic_campaign_index',
+                        'langVar'   => 'campaign'
+                    ));
+                    ?>
+                </td>
+                <td>
+                    <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php',array(
+                        'item'       => $item,
+                        'model'      => 'campaign'
+                    )); ?>
+                    <a href="<?php echo $view['router']->generate('mautic_campaign_action',
+                        array("objectAction" => "view", "objectId" => $item->getId())); ?>"
+                       data-toggle="ajax">
+                        <?php echo $item->getName(); ?>
+                    </a>
+                </td>
+                <td class="visible-md visible-lg"><?php echo $item->getDescription(); ?></td>
+                <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
+            </tr>
+        <?php endforeach; ?>
+        </tbody>
+    </table>
+</div>
+<div class="panel-footer">
+    <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
+        "totalItems"      => count($items),
+        "page"            => $page,
+        "limit"           => $limit,
+        "menuLinkId"      => 'mautic_campaign_index',
+        "baseUrl"         => $view['router']->generate('mautic_campaign_index'),
+        'sessionVar'      => 'campaign'
+    )); ?>
 </div>
  <?php else: ?>
     <?php echo $view->render('MauticCoreBundle:Default:noresults.html.php'); ?>

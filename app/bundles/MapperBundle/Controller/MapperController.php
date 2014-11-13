@@ -78,8 +78,7 @@ class MapperController extends FormController
             'passthroughVars' => array(
                 'activeLink'     => '#mautic_'.$application.'client_'.$client.'objects_index',
                 'mauticContent'  => 'clients',
-                'route'          => $this->generateUrl('mautic_mapper_client_objects_index', $viewParams),
-                'replaceContent' => ($tmpl == 'list') ? 'true': 'false'
+                'route'          => $this->generateUrl('mautic_mapper_client_objects_index', $viewParams)
             )
         ));
     }

@@ -76,8 +76,8 @@ class EmailController extends FormController
                 array('column' => 'e.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser());
         }
 
-        $orderBy     = $this->factory->getSession()->get('mautic.page.orderby', 'e.subject');
-        $orderByDir  = $this->factory->getSession()->get('mautic.page.orderbydir', 'DESC');
+        $orderBy     = $this->factory->getSession()->get('mautic.email.orderby', 'e.subject');
+        $orderByDir  = $this->factory->getSession()->get('mautic.email.orderbydir', 'DESC');
 
         $emails = $model->getEntities(
             array(
@@ -147,8 +147,7 @@ class EmailController extends FormController
             'passthroughVars' => array(
                 'activeLink'     => '#mautic_email_index',
                 'mauticContent'  => 'email',
-                'route'          => $this->generateUrl('mautic_email_index', array('page' => $page)),
-                'replaceContent' => ($tmpl == 'list') ? 'true' : 'false'
+                'route'          => $this->generateUrl('mautic_email_index', array('page' => $page))
             )
         ));
     }

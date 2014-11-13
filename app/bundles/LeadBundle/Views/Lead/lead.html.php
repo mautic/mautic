@@ -154,19 +154,35 @@ $view['slots']->stop();
                                         <tbody>
                                              <?php if ($group == 'core') : ?>
                                                 <tr>
-                                                    <td width="20%"><span class="fw-b">Company</span></td>
+                                                    <td width="20%">
+                                                        <span class="fw-b">
+                                                            <?php echo $view['translator']->trans('mautic.lead.lead.field.company'); ?>
+                                                        </span>
+                                                    </td>
                                                     <td><?php echo $lead->getSecondaryIdentifier(); ?></td>
                                                 </tr>
                                                 <tr>
-                                                    <td width="20%"><span class="fw-b">Position</span></td>
+                                                    <td width="20%">
+                                                        <span class="fw-b">
+                                                            <?php echo $view['translator']->trans('mautic.lead.field.position'); ?>
+                                                        </span>
+                                                    </td>
                                                     <td><?php echo $fields['core']['position']['value']; ?></td>
                                                 </tr>
                                                 <tr>
-                                                    <td width="20%"><span class="fw-b">Email</span></td>
+                                                    <td width="20%">
+                                                        <span class="fw-b">
+                                                            <?php echo $view['translator']->trans('mautic.lead.lead.field.email'); ?>
+                                                        </span>
+                                                    </td>
                                                     <td><?php echo $fields['core']['email']['value']; ?></td>
                                                 </tr>
                                                 <tr>
-                                                    <td width="20%"><span class="fw-b">Phone</span></td>
+                                                    <td width="20%">
+                                                        <span class="fw-b">
+                                                            <?php echo $view['translator']->trans('mautic.lead.field.type.tel'); ?>
+                                                        </span>
+                                                    </td>
                                                     <td><?php echo $fields['core']['phone']['value']; ?></td>
                                                 </tr>
                                             <?php else: ?>
@@ -204,7 +220,9 @@ $view['slots']->stop();
                         <div class="panel">
                             <div class="panel-body box-layout">
                                 <div class="col-xs-8 va-m">
-                                        <h5 class="text-white dark-md fw-sb mb-xs">Engagements</h5>
+                                    <h5 class="text-white dark-md fw-sb mb-xs">
+                                        <?php echo $view['translator']->trans('mautic.lead.field.header.engagements'); ?>
+                                    </h5>
                                 </div>
                                 <div class="col-xs-4 va-t text-right">
                                         <h3 class="text-white dark-sm"><span class="fa fa-eye"></span></h3>
@@ -212,9 +230,10 @@ $view['slots']->stop();
                             </div>
                             <div class="pt-0 pl-15 pb-10 pr-15">
                                 <div>
-                                    <canvas class="chart" id="chart-engagement" height="50" data-item-id="<?php echo $lead->getId(); ?>"></canvas>
+                                    <canvas class="chart" id="chart-engagement" height="50"></canvas>
                                 </div>
                             </div>
+                            <div id="chart-engagement-data" class="hide"><?php echo json_encode($pointStats); ?></div>
                         </div>
                     </div>
                 </div>
@@ -222,9 +241,30 @@ $view['slots']->stop();
 
             <!-- tabs controls -->
             <ul class="nav nav-tabs pr-md pl-md">
-                <li class="active"><a href="#history-container" role="tab" data-toggle="tab"><span class="label label-primary mr-sm" id="HistoryCount"><?php echo count($events); ?></span> <?php echo $view['translator']->trans('mautic.lead.lead.tab.history'); ?></a></li>
-                <li class=""><a href="#notes-container" role="tab" data-toggle="tab"><span class="label label-primary mr-sm" id="NoteCount"><?php echo $noteCount; ?></span> <?php echo $view['translator']->trans('mautic.lead.lead.tab.notes'); ?></a></li>
-                <li class=""><a href="#social-container" role="tab" data-toggle="tab"><span class="label label-primary mr-sm" id="SocialCount"><?php echo count($socialProfiles); ?></span> <?php echo $view['translator']->trans('mautic.lead.lead.tab.social'); ?></a></li>
+                <li class="active">
+                    <a href="#history-container" role="tab" data-toggle="tab">
+                        <span class="label label-primary mr-sm" id="HistoryCount">
+                            <?php echo count($events); ?>
+                        </span>
+                        <?php echo $view['translator']->trans('mautic.lead.lead.tab.history'); ?>
+                    </a>
+                </li>
+                <li class="">
+                    <a href="#notes-container" role="tab" data-toggle="tab">
+                        <span class="label label-primary mr-sm" id="NoteCount">
+                            <?php echo $noteCount; ?>
+                        </span>
+                        <?php echo $view['translator']->trans('mautic.lead.lead.tab.notes'); ?>
+                    </a>
+                </li>
+                <li class="">
+                    <a href="#social-container" role="tab" data-toggle="tab">
+                        <span class="label label-primary mr-sm" id="SocialCount">
+                            <?php echo count($socialProfiles); ?>
+                        </span>
+                        <?php echo $view['translator']->trans('mautic.lead.lead.tab.social'); ?>
+                    </a>
+                </li>
             </ul>
             <!--/ tabs controls -->
         </div>
@@ -264,10 +304,14 @@ $view['slots']->stop();
         <!-- form HTML -->
         <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
             <div class="panel-heading">
-                <div class="panel-title">Contact</div>
+                <div class="panel-title">
+                    <?php echo $view['translator']->trans('mautic.lead.field.header.contact'); ?>
+                </div>
             </div>
             <div class="panel-body pt-sm">
-                <h6 class="fw-sb">Address</h6>
+                <h6 class="fw-sb">
+                    <?php echo $view['translator']->trans('mautic.lead.field.address'); ?>
+                </h6>
                 <address class="text-muted">
                     <?php echo $fields['core']['address1']['value']; ?><br>
                     <?php if (!empty($fields['core']['address2']['value'])) : echo $fields['core']['address2']['value'] . '<br>'; endif ?>
@@ -275,13 +319,13 @@ $view['slots']->stop();
                     <abbr title="Phone">P:</abbr> <?php echo $fields['core']['phone']['value']; ?>
                 </address>
 
-                <h6 class="fw-sb">Email</h6>
+                <h6 class="fw-sb"><?php echo $view['translator']->trans('mautic.lead.lead.field.email'); ?></h6>
                 <p class="text-muted"><?php echo $fields['core']['email']['value']; ?></p>
 
-                <h6 class="fw-sb">Phone - home</h6>
+                <h6 class="fw-sb"><?php echo $view['translator']->trans('mautic.lead.field.type.tel.home'); ?></h6>
                 <p class="text-muted"><?php echo $fields['core']['phone']['value']; ?></p>
 
-                <h6 class="fw-sb">Phone - mobile</h6>
+                <h6 class="fw-sb"><?php echo $view['translator']->trans('mautic.lead.field.type.tel.mobile'); ?></h6>
                 <p class="text-muted mb-0"><?php echo $fields['core']['mobile']['value']; ?></p>
             </div>
         </div>
@@ -292,7 +336,7 @@ $view['slots']->stop();
 
         <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mb-0">
             <div class="panel-heading">
-                <div class="panel-title">Upcoming Events</div>
+                <div class="panel-title"><?php echo $view['translator']->trans('mautic.lead.lead.upcoming.events'); ?></div>
             </div>
             <div class="panel-body pt-sm">
                 <ul class="media-list media-list-feed">

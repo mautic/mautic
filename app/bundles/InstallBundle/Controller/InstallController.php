@@ -224,8 +224,7 @@ class InstallController extends CommonController
             'passthroughVars' => array(
                 'activeLink'     => '#mautic_installer_index',
                 'mauticContent'  => 'installer',
-                'route'          => $this->generateUrl('mautic_installer_step', array('index' => $index)),
-                'replaceContent' => ($tmpl == 'list') ? 'true' : 'false'
+                'route'          => $this->generateUrl('mautic_installer_step', array('index' => $index))
             )
         ));
     }
@@ -262,8 +261,7 @@ class InstallController extends CommonController
             'passthroughVars' => array(
                 'activeLink'     => '#mautic_installer_index',
                 'mauticContent'  => 'installer',
-                'route'          => $this->generateUrl('mautic_installer_final'),
-                'replaceContent' => ($tmpl == 'list') ? 'true' : 'false'
+                'route'          => $this->generateUrl('mautic_installer_final')
             )
         ));
     }

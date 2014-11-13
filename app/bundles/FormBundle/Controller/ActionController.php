@@ -63,7 +63,7 @@ class ActionController extends CommonFormController
                     $success = 1;
 
                     //form is valid so process the data
-                    $keyId = 'new' . uniqid();
+                    $keyId = 'new' . hash('sha1', uniqid(mt_rand()));
 
                     //save the properties to session
                     $actions          = $session->get('mautic.formactions.add');
@@ -317,7 +317,6 @@ class ActionController extends CommonFormController
                 'target'         => '#mauticform_' . $objectId,
                 'route'          => false,
                 'actionId'       => $objectId,
-                'replaceContent' => true,
                 'actionHtml'     => $this->renderView($template, array(
                     'inForm'  => true,
                     'action'  => $formAction,
@@ -389,7 +388,6 @@ class ActionController extends CommonFormController
                 'target'         => '#mauticform_' . $objectId,
                 'route'          => false,
                 'actionId'       => $objectId,
-                'replaceContent' => true,
                 'actionHtml'     => $this->renderView($template, array(
                     'inForm'  => true,
                     'action'  => $formAction,

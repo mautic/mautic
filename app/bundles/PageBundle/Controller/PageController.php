@@ -131,8 +131,7 @@ class PageController extends FormController
             'passthroughVars' => array(
                 'activeLink'     => '#mautic_page_index',
                 'mauticContent'  => 'page',
-                'route'          => $this->generateUrl('mautic_page_index', array('page' => $page)),
-                'replaceContent' => ($tmpl == 'list') ? 'true' : 'false'
+                'route'          => $this->generateUrl('mautic_page_index', array('page' => $page))
             )
         ));
     }
@@ -246,7 +245,7 @@ class PageController extends FormController
         $logs = $this->factory->getModel('core.auditLog')->getLogForObject('page', $activePage->getId());
 
         // Hit count per day for last 30 days
-        $last30 = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit')->getHitsForLast30Days($activePage->getId());
+        $last30 = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit')->getHits(30, 'D', array('page_id' => $activePage->getId()));
 
         //get related translations
         list($translationParent, $translationChildren) = $model->getTranslations($activePage);

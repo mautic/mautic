@@ -73,7 +73,7 @@ class EmailTokenHelper
                 'limit'          => $limit,
                 'filter'         => $filter,
                 'orderBy'        => 'f.label',
-                'orderByDir'     => 'DESC',
+                'orderByDir'     => 'ASC',
                 'hydration_mode' => 'HYDRATE_ARRAY'
             ));
         $count  = count($fields);

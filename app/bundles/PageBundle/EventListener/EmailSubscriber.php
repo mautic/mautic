@@ -44,23 +44,40 @@ class EmailSubscriber extends CommonSubscriber
 
     public function onEmailGenerate (EmailSendEvent $event)
     {
-        $content      = $event->getContent();
-        $regex        = '/{pagelink=(.*?)}/';
-        $model        = $this->factory->getModel('page');
-        $pages        = array();
+        static $pages = array(), $links = array();
 
-        $source = $event->getSource();
+        $content           = $event->getContent();
+        $pagelinkRegex     = '/{pagelink=(.*?)}/';
+        $externalLinkRegex = '/{externallink=(.*?)}/';
+
+        $pageModel     = $this->factory->getModel('page');
+        $redirectModel = $this->factory->getModel('page.redirect');
+        $source        = $event->getSource();
+        $lead          = $event->getLead();
+        $clickthrough  = array('source' => $source, 'lead' => $lead['id']);
 
         foreach ($content as $slot => &$html) {
-            preg_match_all($regex, $html, $matches);
+            preg_match_all($pagelinkRegex, $html, $matches);
             if (!empty($matches[1])) {
                 foreach ($matches[1] as $match) {
                     if (empty($pages[$match])) {
-                        $page          = $model->getEntity($match);
-
-                        $pages[$match] = ($page !== null) ? $model->generateUrl($page, true, array('source' => $source)) : '';
+                        $pages[$match] = $pageModel->getEntity($match);
                     }
-                    $html = str_ireplace('{pagelink=' . $match . '}', $pages[$match], $html);
+
+                    $url  = ($pages[$match] !== null) ? $pageModel->generateUrl($pages[$match], true, $clickthrough) : '';
+                    $html = str_ireplace('{pagelink=' . $match . '}', $url, $html);
+                }
+            }
+
+            preg_match_all($externalLinkRegex, $html, $matches);
+            if (!empty($matches[1])) {
+                foreach ($matches[1] as $match) {
+                    if (empty($links[$match])) {
+                        $links[$match] = $redirectModel->getRedirect($match, true);
+                    }
+
+                    $url  = ($links[$match] !== null) ? $redirectModel->generateRedirectUrl($links[$match], $clickthrough) : '';
+                    $html = str_ireplace('{externallink=' . $match . '}', $url, $html);
                 }
             }
         }

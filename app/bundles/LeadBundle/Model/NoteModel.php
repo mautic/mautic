@@ -128,11 +128,15 @@ class NoteModel extends FormModel
 
     /**
      * @param Lead $lead
-     *
+     * @param      $useFilters
      * @return mixed
      */
-    public function getNoteCount(Lead $lead)
+    public function getNoteCount(Lead $lead, $useFilters = false)
     {
-        return $this->getRepository()->getNoteCount($lead->getId());
+        $session = $this->factory->getSession();
+        $filter   = ($useFilters) ? $session->get('mautic.lead.'.$lead->getId().'.note.filter', '') : null;
+        $noteType = ($useFilters) ? $session->get('mautic.lead.'.$lead->getId().'.notetype.filter', array()) : null;
+
+        return $this->getRepository()->getNoteCount($lead->getId(), $filter, $noteType);
     }
 }
