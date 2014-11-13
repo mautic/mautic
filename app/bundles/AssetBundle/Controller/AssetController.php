@@ -410,11 +410,6 @@ class AssetController extends FormController
         } else {
             //lock the entity
             $model->lockEntity($entity);
-
-            //set the lookup values
-            $category = $entity->getCategory();
-            if ($category && isset($form['category_lookup']))
-                $form->get('category_lookup')->setData($category->getTitle());
         }
 
         $formView = $this->setFormTheme($form, 'MauticAssetBundle:Asset:form.html.php', 'MauticAssetBundle:FormVariant');

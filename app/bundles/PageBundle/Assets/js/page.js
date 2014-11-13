@@ -4,10 +4,7 @@ Mautic.pageOnLoad = function (container) {
         Mautic.activateSearchAutocomplete('list-search', 'page.page');
     }
 
-    if (mQuery(container + ' form[name="page"]').length) {
-        //form view
-       Mautic.activateCategoryLookup('page', 'page');
-    } else if (mQuery(container + ' .page-stat-charts').length) {
+    if (mQuery(container + ' .page-stat-charts').length) {
         //details view
         Mautic.renderPageViewsBarChart(container);
         Mautic.renderPageReturningVisitsPie();

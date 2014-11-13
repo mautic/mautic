@@ -45,7 +45,6 @@ $view['slots']->set("headerTitle", $header);
                             </div>
                             <div class="col-xs-12 col-sm-6 bundle-main bundle-main-right auto-height">
                                 <?php
-                                echo $view['form']->row($form['category_lookup']);
                                 echo $view['form']->row($form['category']);
                                 echo $view['form']->row($form['isPublished']);
                                 echo $view['form']->row($form['publishUp']);

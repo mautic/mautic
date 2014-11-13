@@ -512,9 +512,6 @@ class PageController extends FormController
             $parent = $entity->getTranslationParent();
             if ($parent && isset($form['translationParent_lookup']))
                 $form->get('translationParent_lookup')->setData($parent->getTitle());
-            $category = $entity->getCategory();
-            if ($category && isset($form['category_lookup']))
-                $form->get('category_lookup')->setData($category->getTitle());
         }
 
         $formView = $this->setFormTheme($form, 'MauticPageBundle:Page:form.html.php', 'MauticPageBundle:FormVariant');
