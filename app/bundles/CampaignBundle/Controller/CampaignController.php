@@ -165,11 +165,14 @@ class CampaignController extends FormController
         $campaignLeadRepo = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:Lead');
         $events = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:Event')->getEvents(array('campaigns' => array($entity->getId())));
         $leadCount = $campaignLeadRepo->countLeads($entity->getId());
+        $campaignLogs = $eventLogRepo->getCampaignLog($entity->getId());
 
         foreach ($events  as &$event) {
-            $event['log'] = $eventLogRepo->getCampaignLog($entity->getId(), $event['id']);
-            $event['logCount'] = count($event['log']);
+            $event['logCount'] = 0;
             $event['percent'] = 0;
+            if (isset($campaignLogs[$event['id']])) {
+                $event['logCount'] = count($campaignLogs[$event['id']]);
+            }
             if ($leadCount) {
                 $event['percent'] = round($event['logCount'] / $leadCount * 100);
             }

@@ -169,10 +169,11 @@ if ($permissions['campaign:campaigns:edit']): ?>
             <div class="tab-pane active fade in bdr-w-0" id="event-container">
 
                 <!-- start: trigger type event -->
-                <ul class="list-group">
+                <ul class="list-group campaign-event-list">
                     <?php if (isset($events) && is_array($events)) : ?>
                         <?php foreach ($events as $event) : ?>
                             <li class="list-group-item bg-auto bg-light-xs">
+                                <div class="progress-bar progress-bar-success" style="width:<?php echo $event['percent']; ?>%"></div>
                                 <div class="box-layout">
                                     <div class="col-md-1 va-m">
                                         <h3>
