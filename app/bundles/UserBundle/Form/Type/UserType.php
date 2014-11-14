@@ -97,23 +97,6 @@ class UserType extends AbstractType
             )
         ));
 
-        $builder->add(
-            $builder->create('role', 'entity', array(
-                'label'      => 'mautic.user.user.form.role',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array(
-                    'class'   => 'form-control chosen'
-                ),
-                'class'         => 'MauticUserBundle:Role',
-                'property'      => 'name',
-                'query_builder' => function(EntityRepository $er) {
-                    return $er->createQueryBuilder('r')
-                        ->where('r.isPublished = true')
-                        ->orderBy('r.name', 'ASC');
-                }
-            )
-        ));
-
         $existing = (!empty($options['data']) && $options['data']->getId());
         $placeholder = ($existing) ?
             $this->translator->trans('mautic.user.user.form.passwordplaceholder') : '';
@@ -172,20 +155,44 @@ class UserType extends AbstractType
             'empty_value' => 'mautic.user.user.form.defaultlocale'
         ));
 
-        $builder->add('isPublished', 'button_group', array(
-            'choice_list' => new ChoiceList(
-                array(false, true),
-                array('mautic.core.form.no', 'mautic.core.form.yes')
-            ),
-            'expanded'      => true,
-            'multiple'      => false,
-            'label'         => 'mautic.core.form.ispublished',
-            'empty_value'   => false,
-            'required'      => false
-        ));
+        if (empty($options['in_profile'])) {
+            $builder->add(
+                $builder->create('role', 'entity', array(
+                        'label'         => 'mautic.user.user.form.role',
+                        'label_attr'    => array('class' => 'control-label'),
+                        'attr'          => array(
+                            'class' => 'form-control chosen'
+                        ),
+                        'class'         => 'MauticUserBundle:Role',
+                        'property'      => 'name',
+                        'query_builder' => function (EntityRepository $er) {
+                            return $er->createQueryBuilder('r')
+                                ->where('r.isPublished = true')
+                                ->orderBy('r.name', 'ASC');
+                        }
+                    )
+                ));
 
-        if (empty($options['ignore_formexit'])) {
+            $builder->add('isPublished', 'button_group', array(
+                'choice_list' => new ChoiceList(
+                    array(false, true),
+                    array('mautic.core.form.no', 'mautic.core.form.yes')
+                ),
+                'expanded'    => true,
+                'multiple'    => false,
+                'label'       => 'mautic.core.form.ispublished',
+                'empty_value' => false,
+                'required'    => false
+            ));
+
             $builder->add('buttons', 'form_buttons');
+
+        } else {
+
+            $builder->add('buttons', 'form_buttons', array(
+                'save_text' => 'mautic.core.form.apply',
+                'apply_text' => false
+            ));
         }
 
         if (!empty($options["action"])) {
@@ -204,7 +211,8 @@ class UserType extends AbstractType
                 'Mautic\UserBundle\Entity\User',
                 'determineValidationGroups',
             ),
-            'ignore_formexit' => false
+            'ignore_formexit' => false,
+            'in_profile' => false
         ));
     }
 

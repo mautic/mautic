@@ -40,13 +40,7 @@ class ProfileController extends FormController
         );
 
         $action = $this->generateUrl('mautic_user_account');
-        $form   = $model->createForm($me, $this->get('form.factory'), $action);
-
-        //remove items that cannot be edited by person themselves
-        $form->remove('role');
-        $form->remove('isPublished');
-        $form->remove('save');
-        $form->remove('cancel');
+        $form   = $model->createForm($me, $this->get('form.factory'), $action, array('in_profile' => true));
 
         $overrides = array();
 
