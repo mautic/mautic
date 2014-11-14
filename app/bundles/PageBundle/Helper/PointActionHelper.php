@@ -25,7 +25,7 @@ class PointActionHelper
      *
      * @return int
      */
-    public static function onPageHit($factory, $eventDetails, $action)
+    public static function validatePageHit($factory, $eventDetails, $action)
     {
 
         $pageHit = $eventDetails->getPage();
@@ -44,9 +44,9 @@ class PointActionHelper
 
         if (!empty($limitToPages) && !in_array($pageHitId, $limitToPages)) {
             //no points change
-            return 0;
+            return false;
         }
 
-        return $action['properties']['delta'];
+        return true;
     }
 }

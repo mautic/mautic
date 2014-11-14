@@ -19,16 +19,6 @@ class PointEvent extends CommonEvent
 {
 
     /**
-     * @var Point
-     */
-    private $entity;
-
-    /**
-     * @var bool
-     */
-    private $isNew;
-
-    /**
      * @param Point $point
      * @param bool  $isNew
      */

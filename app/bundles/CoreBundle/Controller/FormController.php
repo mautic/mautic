@@ -7,7 +7,6 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 namespace Mautic\CoreBundle\Controller;
-
 use Symfony\Component\Form\Form;
 
 /**
@@ -167,21 +166,5 @@ class FormController extends CommonController
         } else {
             $this->accessDenied();
         }
-    }
-
-    /**
-     * Sets a specific theme for the form
-     *
-     * @param $form
-     * @param $template
-     * @param $theme
-     * @return mixed
-     */
-    protected function setFormTheme(Form $form, $template, $theme)
-    {
-        $formView = $form->createView();
-        $this->factory->getTemplating()->getEngine($template)->get('form')
-            ->setTheme($formView, $theme);
-        return $formView;
     }
 }

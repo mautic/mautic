@@ -21,7 +21,7 @@ class PointActionHelper
      *
      * @return int
      */
-    public static function onFormSubmit($eventDetails, $action)
+    public static function validateFormSubmit($eventDetails, $action)
     {
         $form         = $eventDetails->getForm();
         $formId       = $form->getId();
@@ -29,9 +29,9 @@ class PointActionHelper
 
         if (!empty($limitToForms) && !in_array($formId, $limitToForms)) {
             //no points change
-            return 0;
+            return false;
         }
 
-        return $action['properties']['delta'];
+        return true;
     }
 }

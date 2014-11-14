@@ -133,6 +133,7 @@ class PointController extends FormController
             'pointActions' => $actions,
             'actionType'   => $actionType
         ));
+        $viewParameters  = array('page' => $page);
 
         ///Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
@@ -154,19 +155,14 @@ class PointController extends FormController
                     );
 
                     if ($form->get('buttons')->get('save')->isClicked()) {
-                        $viewParameters = array(
-                            'objectAction' => 'view',
-                            'objectId'     => $entity->getId()
-                        );
-                        $returnUrl      = $this->generateUrl('mautic_point_action', $viewParameters);
-                        $template       = 'MauticPointBundle:Point:view';
+                        $returnUrl      = $this->generateUrl('mautic_point_index', $viewParameters);
+                        $template       = 'MauticPointBundle:Point:index';
                     } else {
                         //return edit view so that all the session stuff is loaded
                         return $this->editAction($entity->getId(), true);
                     }
                 }
             } else {
-                $viewParameters  = array('page' => $page);
                 $returnUrl = $this->generateUrl('mautic_point_index', $viewParameters);
                 $template  = 'MauticPointBundle:Point:index';
             }
@@ -221,12 +217,14 @@ class PointController extends FormController
         //set the page we came from
         $page = $this->factory->getSession()->get('mautic.point.page', 1);
 
+        $viewParameters = array('page' => $page);
+
         //set the return URL
-        $returnUrl = $this->generateUrl('mautic_point_index', array('page' => $page));
+        $returnUrl      = $this->generateUrl('mautic_point_index', array('page' => $page));
 
         $postActionVars = array(
             'returnUrl'       => $returnUrl,
-            'viewParameters'  => array('page' => $page),
+            'viewParameters'  => $viewParameters,
             'contentTemplate' => 'MauticPointBundle:Point:index',
             'passthroughVars' => array(
                 'activeLink'    => '#mautic_point_index',
@@ -285,19 +283,14 @@ class PointController extends FormController
                     );
 
                     if ($form->get('buttons')->get('save')->isClicked()) {
-                        $viewParameters = array(
-                            'objectAction' => 'view',
-                            'objectId'     => $entity->getId()
-                        );
-                        $returnUrl      = $this->generateUrl('mautic_point_action', $viewParameters);
-                        $template       = 'MauticPointBundle:Point:view';
+                        $returnUrl = $this->generateUrl('mautic_point_index', $viewParameters);
+                        $template  = 'MauticPointBundle:Point:index';
                     }
                 }
             } else {
                 //unlock the entity
                 $model->unlockEntity($entity);
 
-                $viewParameters  = array('page' => $page);
                 $returnUrl = $this->generateUrl('mautic_point_index', $viewParameters);
                 $template  = 'MauticPointBundle:Point:index';
             }

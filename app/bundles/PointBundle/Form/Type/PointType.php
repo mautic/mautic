@@ -74,6 +74,17 @@ class PointType extends AbstractType
             ),
         ));
 
+        $builder->add('delta', 'number', array(
+            'label'      => 'mautic.point.action.delta',
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       =>
+                array(
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.point.action.delta.help'
+                ),
+            'precision'  => 0
+        ));
+
         $type = (!empty($options['actionType'])) ? $options['actionType'] : $options['data']->getType();
         if ($type) {
             $formType   =  (!empty($options['pointActions']['actions'][$type]['formType'])) ?

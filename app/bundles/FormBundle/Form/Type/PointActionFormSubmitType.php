@@ -23,19 +23,6 @@ class PointActionFormSubmitType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $default = (empty($options['data']['delta'])) ? 0 : (int) $options['data']['delta'];
-        $builder->add('delta', 'number', array(
-            'label'      => 'mautic.point.action.delta',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       =>
-                array(
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.point.action.delta.help'
-                ),
-            'precision'  => 0,
-            'data'       => $default
-        ));
-
         $builder->add('forms', 'form_list', array(
             'label'         => 'mautic.form.point.action.forms',
             'label_attr'    => array('class' => 'control-label'),

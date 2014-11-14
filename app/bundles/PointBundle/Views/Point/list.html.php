@@ -39,6 +39,13 @@ $view->extend('MauticPointBundle:Point:index.html.php');
                 'class'      => 'visible-md visible-lg col-point-description'
             ));
 
+            echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
+                'sessionVar' => 'point',
+                'orderBy'    => 'p.delta',
+                'text'       => 'mautic.point.thead.delta',
+                'class'      => 'visible-md visible-lg col-point-delta'
+            ));
+
             echo '<th class="col-point-action">' . $view['translator']->trans('mautic.point.thead.action') . '</th>';
 
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
@@ -74,6 +81,7 @@ $view->extend('MauticPointBundle:Point:index.html.php');
                     <?php echo $item->getName(); ?>
                 </td>
                 <td class="visible-md visible-lg"><?php echo $item->getDescription(); ?></td>
+                <td class="visible-md visible-lg"><?php echo $item->getDelta(); ?></td>
                 <?php
                 $type   = $item->getType();
                 $action = (isset($actions[$type])) ? $actions[$type]['label'] : '';
