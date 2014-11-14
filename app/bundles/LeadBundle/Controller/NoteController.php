@@ -197,11 +197,9 @@ class NoteController extends FormController
             return $response;
         } else {
 
-            $formView = $this->setFormTheme($form, 'MauticLeadBundle:Note:form.html.php', 'MauticLeadBundle:FormRow12');
-
             return $this->delegateView(array(
                 'viewParameters'  => array(
-                    'form'        => $formView,
+                    'form'        => $form->createView(),
                     'lead'        => $lead,
                     'permissions' => $permissions
                 ),
@@ -281,11 +279,9 @@ class NoteController extends FormController
             return $response;
         } else {
 
-            $formView = $this->setFormTheme($form, 'MauticLeadBundle:Note:form.html.php', 'MauticLeadBundle:FormRow12');
-
             return $this->delegateView(array(
                 'viewParameters'  => array(
-                    'form'        => $formView,
+                    'form'        => $form->createView(),
                     'lead'        => $lead,
                     'permissions' => $permissions
                 ),

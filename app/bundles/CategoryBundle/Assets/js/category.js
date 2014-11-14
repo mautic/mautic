@@ -7,10 +7,5 @@ Mautic.categoryOnLoad = function (container, response) {
 
     if (response && response.closeModal) {
         mQuery(container + ' .modal-form-buttons').html('');
-
-        if (response.indexRoute) {
-            //refresh content
-            Mautic.loadContent(response.indexRoute);
-        }
     }
 };

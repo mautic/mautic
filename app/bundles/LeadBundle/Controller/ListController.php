@@ -172,13 +172,9 @@ class ListController extends FormController
             }
         }
 
-        $formView = $form->createView();
-        $this->factory->getTemplating()->getEngine('MauticLeadBundle:List:form.html.php')->get('form')
-            ->setTheme($formView, 'MauticLeadBundle:FormRow12');
-
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'form'            => $formView,
+                'form'            => $form->createView(),
                 'choices'         => $model->getChoiceFields(),
                 'operatorOptions' => $model->getFilterExpressionFunctions()
             ),
@@ -277,13 +273,10 @@ class ListController extends FormController
             //lock the entity
             $model->lockEntity($list);
         }
-        $formView = $form->createView();
-        $this->factory->getTemplating()->getEngine('MauticLeadBundle:List:form.html.php')->get('form')
-            ->setTheme($formView, 'MauticLeadBundle:FormRow12');
 
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'form'            => $formView,
+                'form'            => $form->createView(),
                 'choices'         => $model->getChoiceFields(),
                 'operatorOptions' => $model->getFilterExpressionFunctions()
             ),

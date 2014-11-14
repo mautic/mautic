@@ -347,7 +347,7 @@ class LeadRepository extends CommonRepository
             //ORM - generates lead entities
             $q = $this
                 ->createQueryBuilder('l');
-            $q->select('l, u, i, ' . $order)
+            $q->select('l, u, i,' . $order)
                 ->leftJoin('l.ipAddresses', 'i')
                 ->leftJoin('l.owner', 'u');
 

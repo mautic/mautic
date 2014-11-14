@@ -181,23 +181,22 @@ class CategoryController extends FormController
 
         $closeModal = ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked()));
 
-        $passthroughVars = array(
-            'mauticContent' => 'category',
-            'success'       => $success,
-            'route'         => false,
-            'indexRoute'    => ($cancelled) ? false : $this->generateUrl('mautic_category_index', array(
-                'page' => $session->get('mautic.category.page'),
-                'bundle' => $bundle
-            ))
-        );
-
         if ($closeModal) {
-            //just close the modal
-            $passthroughVars['closeModal'] = 1;
-            $response                      = new JsonResponse($passthroughVars);
-            $response->headers->set('Content-Length', strlen($response->getContent()));
+            $viewParameters = array(
+                'page'   => $session->get('mautic.category.page'),
+                'bundle' => $bundle
+            );
 
-            return $response;
+            return $this->postActionRedirect(array(
+                'returnUrl'       => $this->generateUrl('mautic_category_index', $viewParameters),
+                'viewParameters'  => $viewParameters,
+                'contentTemplate' => 'MauticCategoryBundle:Category:index',
+                'passthroughVars' => array(
+                    'activeLink'    => '#mautic_'.$bundle.'category_index',
+                    'mauticContent' => 'category',
+                    'closeModal'    => 1
+                )
+            ));
         } else {
             return $this->ajaxAction(array(
                 'contentTemplate' => 'MauticCategoryBundle:Category:form.html.php',
@@ -206,7 +205,11 @@ class CategoryController extends FormController
                     'activeCategory' => $entity,
                     'bundle'         => $bundle
                 ),
-                'passthroughVars' => $passthroughVars
+                'passthroughVars' => array(
+                    'mauticContent' => 'category',
+                    'success'       => $success,
+                    'route'         => false
+                )
             ));
         }
     }
@@ -265,32 +268,35 @@ class CategoryController extends FormController
 
         $closeModal = ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked()));
 
-        $passthroughVars = array(
-            'mauticContent' => 'category',
-            'success'       => $success,
-            'route'         => false,
-            'indexRoute'    => ($cancelled) ? false : $this->generateUrl('mautic_category_index', array(
-                'page' => $session->get('mautic.category.page'),
-                'bundle' => $bundle
-            ))
-        );
-
         if ($closeModal) {
-            //just close the modal
-            $passthroughVars['closeModal'] = 1;
-            $response                      = new JsonResponse($passthroughVars);
-            $response->headers->set('Content-Length', strlen($response->getContent()));
+            $viewParameters = array(
+                'page'   => $session->get('mautic.category.page'),
+                'bundle' => $bundle
+            );
 
-            return $response;
+            return $this->postActionRedirect(array(
+                'returnUrl'       => $this->generateUrl('mautic_category_index', $viewParameters),
+                'viewParameters'  => $viewParameters,
+                'contentTemplate' => 'MauticCategoryBundle:Category:index',
+                'passthroughVars' => array(
+                    'activeLink'    => '#mautic_'.$bundle.'category_index',
+                    'mauticContent' => 'category',
+                    'closeModal'    => 1
+                )
+            ));
         } else {
             return $this->ajaxAction(array(
                 'contentTemplate' => 'MauticCategoryBundle:Category:form.html.php',
-                'viewParameters' => array(
+                'viewParameters'  => array(
                     'form'           => $form->createView(),
                     'activeCategory' => $entity,
                     'bundle'         => $bundle
                 ),
-                'passthroughVars' => $passthroughVars
+                'passthroughVars' => array(
+                    'mauticContent' => 'category',
+                    'success'       => $success,
+                    'route'         => false
+                )
             ));
         }
     }

@@ -133,7 +133,7 @@ class CommonController extends Controller implements MauticController
             }
         }
 
-        if (!$this->request->isXmlHttpRequest()) {
+        if (!$this->request->isXmlHttpRequest() || !empty($args['ignoreAjax'])) {
             $code = (isset($args['responseCode'])) ? $args['responseCode'] : 302;
             return $this->redirect($returnUrl, $code);
         } else {

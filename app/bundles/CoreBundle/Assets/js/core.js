@@ -333,6 +333,8 @@ var Mautic = {
 
         // instantiate the plugin
         mQuery('.flotchart').flotChart();
+
+        Mautic.stopIconSpinPostEvent();
     },
 
     /**
@@ -587,8 +589,6 @@ var Mautic = {
             //activate content specific stuff
             Mautic.onPageLoad(response.target, response);
         }
-
-        Mautic.stopIconSpinPostEvent();
     },
 
     /**
@@ -760,20 +760,33 @@ var Mautic = {
     },
 
     processModalContent: function (response, target) {
-        //load the content
-        if (mQuery(target + ' .loading-placeholder').length) {
-            mQuery(target + ' .loading-placeholder').addClass('hide');
-            mQuery(target + ' .modal-body-content').html(response.newContent);
-            mQuery(target + ' .modal-body-content').removeClass('hide');
-        } else {
-            mQuery(target + ' .modal-body').html(response.newContent);
-        }
-
-        //activate content specific stuff
-        Mautic.onPageLoad(target, response, true);
-
-        if (response.closeModal) {
+        if (response.closeModal && response.newContent) {
             mQuery(target).modal('hide');
+            mQuery('.modal-backdrop').remove();
+            //assume the content is to refresh main app
+            Mautic.processPageContent(response);
+        } else {
+            if (response.closeModal) {
+                mQuery(target).modal('hide');
+
+                if (response.mauticContent) {
+                    if (typeof Mautic[response.mauticContent + "OnLoad"] == 'function') {
+                        Mautic[response.mauticContent + "OnLoad"](target, response);
+                    }
+                }
+            } else {
+                //load the content
+                if (mQuery(target + ' .loading-placeholder').length) {
+                    mQuery(target + ' .loading-placeholder').addClass('hide');
+                    mQuery(target + ' .modal-body-content').html(response.newContent);
+                    mQuery(target + ' .modal-body-content').removeClass('hide');
+                } else {
+                    mQuery(target + ' .modal-body').html(response.newContent);
+                }
+
+                //activate content specific stuff
+                Mautic.onPageLoad(target, response, true);
+            }
         }
     },
 
