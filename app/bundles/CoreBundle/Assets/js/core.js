@@ -357,6 +357,13 @@ var Mautic = {
                     mQuery(target).remove();
                 }
             });
+
+            //destroy ckeditor instances
+            if (typeof CKEDITOR != 'undefined') {
+                for (name in CKEDITOR.instances) {
+                    CKEDITOR.instances[name].destroy()
+                }
+            }
         }
 
         //run specific unloads
