@@ -97,7 +97,7 @@ if ($permissions['campaign:campaigns:edit']): ?>
 
             <!-- stats -->
             <div class="pa-md">
-                <div class="row">
+                <div class="row stat-boxes">
                     <div class="col-md-4">
                         <div class="panel ovf-h bg-auto bg-light-xs campaign-stat-charts">
                             <div class="panel-body box-layout">

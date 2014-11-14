@@ -4435,3 +4435,6 @@ lesshat-selector {
   padding-left: 15px;
   font-weight: bold;
 }
+.stat-boxes .panel {
+  height: 164px;
+}

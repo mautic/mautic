@@ -109,7 +109,7 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
             delete if it is not require
             -->
             <div class="pa-md">
-                <div class="row">
+                <div class="row stat-boxes">
                     <div class="col-md-4">
                         <div class="panel ovf-h bg-auto bg-light-xs page-stat-charts">
                             <div class="panel-body box-layout">
