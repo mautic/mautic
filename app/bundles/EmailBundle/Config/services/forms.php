@@ -71,3 +71,10 @@ $container->setDefinition('mautic.form.type.formsubmit_sendemail_lead', new Defi
     ->addTag('form.type', array(
         'alias' => 'email_submitaction_sendemail_lead',
     ));
+
+$container->setDefinition('mautic.form.type.pointaction_email', new Definition(
+    'Mautic\EmailBundle\Form\Type\PointActionType'
+))
+    ->addTag('form.type', array(
+        'alias' => 'pointaction_email',
+    ));
