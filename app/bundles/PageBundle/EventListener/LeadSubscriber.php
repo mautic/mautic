@@ -6,41 +6,28 @@
  * @link        http://mautic.com
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
-namespace Mautic\PointBundle\EventListener;
+namespace Mautic\PageBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
-use Mautic\LeadBundle\Event\PointsChangeEvent;
 use Mautic\LeadBundle\LeadEvents;
 
 /**
  * Class LeadSubscriber
+ *
+ * @package Mautic\PageBundle\EventListener
  */
 class LeadSubscriber extends CommonSubscriber
 {
 
     /**
-     * {@inheritdoc}
+     * @return array
      */
     static public function getSubscribedEvents()
     {
         return array(
-            LeadEvents::LEAD_POINTS_CHANGE => array('onLeadPointsChange', 0),
             LeadEvents::TIMELINE_ON_GENERATE => array('onTimelineGenerate', 0)
         );
-    }
-
-    /**
-     * Trigger applicable events for the lead
-     *
-     * @param PointsChangeEvent $event
-     */
-    public function onLeadPointsChange(PointsChangeEvent $event)
-    {
-        /** @var \Mautic\PointBundle\Model\TriggerModel */
-        $model = $this->factory->getModel('point.trigger');
-        $model->triggerEvents($event->getLead());
     }
 
     /**
@@ -51,8 +38,8 @@ class LeadSubscriber extends CommonSubscriber
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
         // Set available event types
-        $eventTypeKey = 'point.gained';
-        $eventTypeName = $this->translator->trans('mautic.point.event.gained');
+        $eventTypeKey = 'page.hit';
+        $eventTypeName = $this->translator->trans('mautic.page.event.hit');
         $event->addEventType($eventTypeKey, $eventTypeName);
 
         // Decide if those events are filtered
@@ -73,20 +60,22 @@ class LeadSubscriber extends CommonSubscriber
         }
 
         /** @var \Mautic\PageBundle\Entity\HitRepository $hitRepository */
-        $logRepository = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:PointsChangeLog');
+        $hitRepository = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit');
 
-        $logs = $logRepository->getLeadTimelineEvents($lead->getId(), $options);
+        $hits = $hitRepository->getLeadHits($lead->getId(), $options);
 
-        // Add the logs to the event array
-        foreach ($logs as $log) {
+        $model = $this->factory->getModel('page.page');
+
+        // Add the hits to the event array
+        foreach ($hits as $hit) {
             $event->addEvent(array(
                 'event'     => $eventTypeKey,
                 'eventLabel' => $eventTypeName,
-                'timestamp' => $log['dateAdded'],
+                'timestamp' => $hit['dateHit'],
                 'extra'     => array(
-                    'log' => $log
+                    'page' => $model->getEntity($hit['page_id'])
                 ),
-                'contentTemplate' => 'MauticPointBundle:Timeline:index.html.php'
+                'contentTemplate' => 'MauticPageBundle:Timeline:index.html.php'
             ));
         }
     }

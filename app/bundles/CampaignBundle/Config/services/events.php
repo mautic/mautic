@@ -22,7 +22,7 @@ $container->setDefinition(
     ->addTag('kernel.event_subscriber');
 
 $container->setDefinition(
-    'mautic.campaign.leadsubscriber',
+    'mautic.campaign.leadbundle.subscriber',
     new Definition(
         'Mautic\CampaignBundle\EventListener\LeadSubscriber',
         array(new Reference('mautic.factory'))

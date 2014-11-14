@@ -107,7 +107,7 @@ $view['slots']->stop();
                                 <img src="<?php echo $img; ?>" alt="">
                             </span>
                             <div class="media-body">
-                                <h4 class="fw-sb text-primary"><?php echo $lead->getPrimaryIdentifier(); ?></h4>
+                                <h4 class="fw-sb text-primary"><?php echo $view['translator']->trans($lead->getPrimaryIdentifier()); ?></h4>
                                     <p class="text-white dark-lg mb-0"><?php echo $fields['core']['position']['value'] == '' ? '' :  $fields['core']['position']['value'] . ', '; ?> <?php echo $lead->getSecondaryIdentifier(); ?></p>
                             </div>
                         </div>
@@ -152,47 +152,12 @@ $view['slots']->stop();
                                 <div class="panel shd-none mb-0">
                                     <table class="table table-bordered table-striped mb-0">
                                         <tbody>
-                                             <?php if ($group == 'core') : ?>
+                                            <?php foreach ($fields[$group] as $field): ?>
                                                 <tr>
-                                                    <td width="20%">
-                                                        <span class="fw-b">
-                                                            <?php echo $view['translator']->trans('mautic.lead.lead.field.company'); ?>
-                                                        </span>
-                                                    </td>
-                                                    <td><?php echo $lead->getSecondaryIdentifier(); ?></td>
+                                                    <td width="20%"><span class="fw-b"><?php echo $field['label']; ?></span></td>
+                                                    <td><?php echo $field['value']; ?></td>
                                                 </tr>
-                                                <tr>
-                                                    <td width="20%">
-                                                        <span class="fw-b">
-                                                            <?php echo $view['translator']->trans('mautic.lead.field.position'); ?>
-                                                        </span>
-                                                    </td>
-                                                    <td><?php echo $fields['core']['position']['value']; ?></td>
-                                                </tr>
-                                                <tr>
-                                                    <td width="20%">
-                                                        <span class="fw-b">
-                                                            <?php echo $view['translator']->trans('mautic.lead.lead.field.email'); ?>
-                                                        </span>
-                                                    </td>
-                                                    <td><?php echo $fields['core']['email']['value']; ?></td>
-                                                </tr>
-                                                <tr>
-                                                    <td width="20%">
-                                                        <span class="fw-b">
-                                                            <?php echo $view['translator']->trans('mautic.lead.field.type.tel'); ?>
-                                                        </span>
-                                                    </td>
-                                                    <td><?php echo $fields['core']['phone']['value']; ?></td>
-                                                </tr>
-                                            <?php else: ?>
-                                                <?php foreach ($fields[$group] as $field): ?>
-                                                    <tr>
-                                                        <td width="20%"><span class="fw-b"><?php echo $field['label']; ?></span></td>
-                                                        <td><?php echo $field['value']; ?></td>
-                                                    </tr>
-                                                <?php endforeach; ?>
-                                            <?php endif; ?>
+                                            <?php endforeach; ?>
                                         </tbody>
                                     </table>
                                 </div>

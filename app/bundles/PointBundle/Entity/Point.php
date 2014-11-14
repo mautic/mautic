@@ -76,12 +76,12 @@ class Point extends FormEntity
     private $publishDown;
 
     /**
-     * @ORM\Column(name="action_order", type="integer")
+     * @ORM\Column(name="delta", type="integer")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"pointDetails"})
      */
-    private $order = 0;
+    private $delta = 0;
 
     /**
      * @ORM\Column(type="array")
@@ -135,32 +135,6 @@ class Point extends FormEntity
     }
 
     /**
-     * Set order
-     *
-     * @param integer $order
-     *
-     * @return Action
-     */
-    public function setOrder($order)
-    {
-        $this->isChanged('order', $order);
-
-        $this->order = $order;
-
-        return $this;
-    }
-
-    /**
-     * Get order
-     *
-     * @return integer
-     */
-    public function getOrder()
-    {
-        return $this->order;
-    }
-
-    /**
      * Set properties
      *
      * @param array $properties
@@ -184,30 +158,6 @@ class Point extends FormEntity
     public function getProperties()
     {
         return $this->properties;
-    }
-
-    /**
-     * Set rage
-     *
-     * @param Point $point
-     *
-     * @return Action
-     */
-    public function setPoint(Point $point)
-    {
-        $this->point = $point;
-
-        return $this;
-    }
-
-    /**
-     * Get rage
-     *
-     * @return Point
-     */
-    public function getPoint()
-    {
-        return $this->point;
     }
 
     /**
@@ -391,5 +341,21 @@ class Point extends FormEntity
     public function setCategory($category)
     {
         $this->category = $category;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDelta ()
+    {
+        return $this->delta;
+    }
+
+    /**
+     * @param mixed $delta
+     */
+    public function setDelta ($delta)
+    {
+        $this->delta = (int) $delta;
     }
 }

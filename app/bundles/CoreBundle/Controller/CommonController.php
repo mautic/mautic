@@ -15,6 +15,7 @@ use Mautic\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -310,5 +311,21 @@ class CommonController extends Controller implements MauticController
             $this->get('session')->set("mautic.$name.orderby", $orderBy);
             $this->get('session')->set("mautic.$name.orderbydir", $dir);
         }
+    }
+
+    /**
+     * Sets a specific theme for the form
+     *
+     * @param $form
+     * @param $template
+     * @param $theme
+     * @return mixed
+     */
+    protected function setFormTheme(Form $form, $template, $theme)
+    {
+        $formView = $form->createView();
+        $this->factory->getTemplating()->getEngine($template)->get('form')
+            ->setTheme($formView, $theme);
+        return $formView;
     }
 }

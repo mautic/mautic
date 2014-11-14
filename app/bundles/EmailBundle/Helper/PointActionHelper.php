@@ -7,12 +7,10 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\AssetBundle\Helper;
+namespace Mautic\EmailBundle\Helper;
 
 /**
  * Class PointActionHelper
- *
- * @package Mautic\AssetBundle\Helper
  */
 class PointActionHelper
 {
@@ -23,12 +21,12 @@ class PointActionHelper
      *
      * @return int
      */
-    public static function validateAssetDownload($eventDetails, $action)
+    public static function validateEmail($eventDetails, $action)
     {
-        $assetId       = $eventDetails->getId();
-        $limitToAssets = $action['properties']['assets'];
+        $emailId       = $eventDetails->getId();
+        $limitToEmails = $action['properties']['emails'];
 
-        if (!empty($limitToAssets) && !in_array($assetId, $limitToAssets)) {
+        if (!empty($limitToEmails) && !in_array($emailId, $limitToEmails)) {
             //no points change
             return false;
         }

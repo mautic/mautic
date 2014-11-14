@@ -42,14 +42,13 @@ class PointBuilderEvent extends Event
      *
      * @param string $key    - a unique identifier; it is recommended that it be namespaced i.e. lead.action
      * @param array  $action - can contain the following keys:
-     *  'group'       => (required) translation string to group actions by
      *  'label'       => (required) what to display in the list
      *  'description' => (optional) short description of event
      *  'template'    => (optional) template to use for the action's HTML in the point builder
      *      i.e AcmeMyBundle:PointAction:theaction.html.php
      *  'formType'    => (optional) name of the form type SERVICE for the action; will use a default form with point change only
-     *  'callback'    => (optional) callback function that will be passed when the action is triggered; default
-     *                         will be to change point points only; THIS SHOULD RETURN THE POINTS DELTA
+     *  'callback'    => (optional) callback function that will be passed when the action is triggered; return true to
+     *                       change the configured points or false to ignore the action
      *      The callback function can receive the following arguments by name (via ReflectionMethod::invokeArgs())
      *          Mautic\CoreBundle\Factory\MauticFactory $factory
      *          Mautic\LeadBundle\Entity\Lead $lead
@@ -72,13 +71,12 @@ class PointBuilderEvent extends Event
 
         //check for required keys and that given functions are callable
         $this->verifyComponent(
-            array('group', 'label'),
+            array('label'),
             array('callback'),
             $action
         );
 
-        //translate the group
-        $action['group'] = $this->translator->trans($action['group']);
+        $action['label'] = $this->translator->trans($action['label']);
         $this->actions[$key] = $action;
     }
 
@@ -91,7 +89,7 @@ class PointBuilderEvent extends Event
     {
         uasort($this->actions, function ($a, $b) {
             return strnatcasecmp(
-                $a['group'], $b['group']);
+                $a['label'], $b['label']);
         });
         return $this->actions;
     }
@@ -106,7 +104,7 @@ class PointBuilderEvent extends Event
         $list = array();
         $actions = $this->getActions();
         foreach ($actions as $k => $a) {
-            $list[$a['group']][$k] = $a['label'];
+            $list[$k] = $a['label'];
         }
         return $list;
     }

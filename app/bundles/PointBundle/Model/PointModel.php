@@ -195,6 +195,7 @@ class PointModel extends CommonFormModel
                     'type'       => $action->getType(),
                     'name'       => $action->getName(),
                     'properties' => $action->getProperties(),
+                    'points'     => $action->getDelta()
                 ),
                 'lead'        => $lead,
                 'factory'     => $this->factory,
@@ -225,13 +226,14 @@ class PointModel extends CommonFormModel
                 $pointsChange = $reflection->invokeArgs($this, $pass);
 
                 if ($pointsChange) {
-                    $lead->addToPoints($pointsChange);
+                    $delta = $action->getDelta();
+                    $lead->addToPoints($delta);
                     $parsed = explode('.', $action->getType());
                     $lead->addPointsChangeLogEntry(
                         $parsed[0],
                         $action->getId() . ": " . $action->getName(),
                         $parsed[1],
-                        $pointsChange,
+                        $delta,
                         $ipAddress
                     );
 

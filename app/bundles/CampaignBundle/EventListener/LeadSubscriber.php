@@ -12,6 +12,7 @@ namespace Mautic\CampaignBundle\EventListener;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Event\LeadTimelineEvent;
 
 /**
  * Class LeadSubscriber
@@ -27,7 +28,8 @@ class LeadSubscriber extends CommonSubscriber
     static public function getSubscribedEvents ()
     {
         return array(
-            LeadEvents::LEAD_LIST_CHANGE => array('onLeadListChange', 0)
+            LeadEvents::LEAD_LIST_CHANGE => array('onLeadListChange', 0),
+            LeadEvents::TIMELINE_ON_GENERATE => array('onTimelineGenerate', 0)
         );
     }
 
@@ -67,6 +69,54 @@ class LeadSubscriber extends CommonSubscriber
                     $model->removeLead($c, $lead);
                 }
             }
+        }
+    }
+
+    /**
+     * Compile events for the lead timeline
+     *
+     * @param LeadTimelineEvent $event
+     */
+    public function onTimelineGenerate(LeadTimelineEvent $event)
+    {
+        // Set available event types
+        $eventTypeKey = 'campaign.evented';
+        $eventTypeName = $this->translator->trans('mautic.campaign.event.triggered');
+        $event->addEventType($eventTypeKey, $eventTypeName);
+
+        // Decide if those events are filtered
+        $filter = $event->getEventFilter();
+        $loadAllEvents = !isset($filter[0]);
+        $eventFilterExists = in_array($eventTypeKey, $filter);
+
+        if (!$loadAllEvents && !$eventFilterExists) {
+            return;
+        }
+
+        $lead    = $event->getLead();
+        $options = array('ipIds' => array(), 'filters' => $filter);
+
+        /** @var \Mautic\CoreBundle\Entity\IpAddress $ip */
+        foreach ($lead->getIpAddresses() as $ip) {
+            $options['ipIds'][] = $ip->getId();
+        }
+
+        /** @var \Mautic\CampaignBundle\Entity\LeadEventLogRepository $logRepository */
+        $logRepository = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:LeadEventLog');
+
+        $logs = $logRepository->getLeadLogs($lead->getId(), $options);
+
+        // Add the hits to the event array
+        foreach ($logs as $log) {
+            $event->addEvent(array(
+                'event'     => $eventTypeKey,
+                'eventLabel' => $eventTypeName,
+                'timestamp' => $log['dateTriggered'],
+                'extra'     => array(
+                    'log' => $log
+                ),
+                'contentTemplate' => 'MauticCampaignBundle:Timeline:index.html.php'
+            ));
         }
     }
 }

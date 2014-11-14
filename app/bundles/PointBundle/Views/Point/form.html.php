@@ -28,17 +28,19 @@ echo $view['form']->start($form);
 				    <?php
 					echo $view['form']->row($form['name']);
 					echo $view['form']->row($form['description']);
-
-				    if (isset($form['properties'])):
-				    	echo $view['form']->row($form['properties']);
-				    endif;
 				    ?>
 				</div>
 			</div>
 			<div class="col-md-6">
 				<div class="pa-md">
+                    <?php echo $view['form']->row($form['delta']); ?>
 					<?php echo $view['form']->row($form['type']); ?>
 					<div id="pointActionProperties">
+                        <?php
+                        if (isset($form['properties'])):
+                            echo $view['form']->row($form['properties']);
+                        endif;
+                        ?>
 					</div>
 				</div>
 			</div>

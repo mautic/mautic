@@ -358,10 +358,12 @@ var Mautic = {
                 }
             });
 
-            //destroy ckeditor instances
-            if (typeof CKEDITOR != 'undefined') {
-                for (name in CKEDITOR.instances) {
-                    CKEDITOR.instances[name].destroy()
+            if (container == '#app-content') {
+                //destroy ckeditor instances
+                if (typeof CKEDITOR != 'undefined') {
+                    for (name in CKEDITOR.instances) {
+                        CKEDITOR.instances[name].destroy()
+                    }
                 }
             }
         }

@@ -32,8 +32,7 @@ class PointSubscriber extends CommonSubscriber
             PointEvents::POINT_POST_SAVE     => array('onPointPostSave', 0),
             PointEvents::POINT_POST_DELETE   => array('onPointDelete', 0),
             PointEvents::TRIGGER_POST_SAVE   => array('onTriggerPostSave', 0),
-            PointEvents::TRIGGER_POST_DELETE => array('onTriggerDelete', 0),
-            LeadEvents::TIMELINE_ON_GENERATE => array('onTimelineGenerate', 0)
+            PointEvents::TRIGGER_POST_DELETE => array('onTriggerDelete', 0)
         );
     }
 
@@ -115,53 +114,5 @@ class PointSubscriber extends CommonSubscriber
             "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
         );
         $this->factory->getModel('core.auditLog')->writeToLog($log);
-    }
-
-    /**
-     * Compile events for the lead timeline
-     *
-     * @param LeadTimelineEvent $event
-     */
-    public function onTimelineGenerate(LeadTimelineEvent $event)
-    {
-        // Set available event types
-        $eventTypeKey = 'point.gained';
-        $eventTypeName = $this->translator->trans('mautic.point.event.gained');
-        $event->addEventType($eventTypeKey, $eventTypeName);
-
-        // Decide if those events are filtered
-        $filter = $event->getEventFilter();
-        $loadAllEvents = !isset($filter[0]);
-        $eventFilterExists = in_array($eventTypeKey, $filter);
-
-        if (!$loadAllEvents && !$eventFilterExists) {
-            return;
-        }
-
-        $lead    = $event->getLead();
-        $options = array('ipIds' => array(), 'filters' => $filter);
-
-        /** @var \Mautic\CoreBundle\Entity\IpAddress $ip */
-        foreach ($lead->getIpAddresses() as $ip) {
-            $options['ipIds'][] = $ip->getId();
-        }
-
-        /** @var \Mautic\PageBundle\Entity\HitRepository $hitRepository */
-        $logRepository = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:PointsChangeLog');
-
-        $logs = $logRepository->getLeadTimelineEvents($lead->getId(), $options);
-
-        // Add the logs to the event array
-        foreach ($logs as $log) {
-            $event->addEvent(array(
-                'event'     => $eventTypeKey,
-                'eventLabel' => $eventTypeName,
-                'timestamp' => $log['dateAdded'],
-                'extra'     => array(
-                    'log' => $log
-                ),
-                'contentTemplate' => 'MauticPointBundle:Timeline:index.html.php'
-            ));
-        }
     }
 }

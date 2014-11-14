@@ -36,9 +36,7 @@ class FormSubscriber extends CommonSubscriber
             CoreEvents::GLOBAL_SEARCH        => array('onGlobalSearch', 0),
             CoreEvents::BUILD_COMMAND_LIST   => array('onBuildCommandList', 0),
             FormEvents::FORM_POST_SAVE       => array('onFormPostSave', 0),
-            FormEvents::FORM_POST_DELETE     => array('onFormDelete', 0),
-            LeadEvents::TIMELINE_ON_GENERATE => array('onTimelineGenerate', 0),
-            CalendarEvents::CALENDAR_ON_GENERATE => array('onCalendarGenerate', 0)
+            FormEvents::FORM_POST_DELETE     => array('onFormDelete', 0)
         );
     }
 
@@ -149,90 +147,5 @@ class FormSubscriber extends CommonSubscriber
             "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
         );
         $this->factory->getModel('core.auditLog')->writeToLog($log);
-    }
-
-    /**
-     * Compile events for the lead timeline
-     *
-     * @param LeadTimelineEvent $event
-     */
-    public function onTimelineGenerate(LeadTimelineEvent $event)
-    {
-        // Set available event types
-        $eventTypeKey = 'form.submitted';
-        $eventTypeName = $this->translator->trans('mautic.form.event.submitted');
-        $event->addEventType($eventTypeKey, $eventTypeName);
-
-        // Decide if those events are filtered
-        $filter = $event->getEventFilter();
-        $loadAllEvents = !isset($filter[0]);
-        $eventFilterExists = in_array($eventTypeKey, $filter);
-
-        if (!$loadAllEvents && !$eventFilterExists) {
-            return;
-        }
-
-        $lead    = $event->getLead();
-        $options = array('ipIds' => array(), 'filters' => $filter);
-
-        /** @var \Mautic\CoreBundle\Entity\IpAddress $ip */
-        foreach ($lead->getIpAddresses() as $ip) {
-            $options['ipIds'][] = $ip->getId();
-        }
-
-        /** @var \Mautic\FormBundle\Entity\SubmissionRepository $submissionRepository */
-        $submissionRepository = $this->factory->getEntityManager()->getRepository('MauticFormBundle:Submission');
-
-        $rows = $submissionRepository->getSubmissions($options);
-
-        $pageModel = $this->factory->getModel('page.page');
-        $formModel = $this->factory->getModel('form.form');
-
-        // Add the submissions to the event array
-        foreach ($rows as $row) {
-            $event->addEvent(array(
-                'event'     => $eventTypeKey,
-                'eventLabel' => $eventTypeName,
-                'timestamp' => new \DateTime($row['dateSubmitted']),
-                'extra'     => array(
-                    'form'  => $formModel->getEntity($row['form_id']),
-                    'page'  => $pageModel->getEntity($row['page_id'])
-                ),
-                'contentTemplate' => 'MauticFormBundle:Timeline:index.html.php'
-            ));
-        }
-    }
-
-    /**
-     * Adds events to the calendar
-     *
-     * @param CalendarGeneratorEvent $event
-     *
-     * @return void
-     * @todo   This method is only a model and should be removed when actual data is being populated
-     */
-    public function onCalendarGenerate(CalendarGeneratorEvent $event)
-    {
-        $dates = $event->getDates();
-
-        $query = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
-        $query->select('fs.referer AS title, fs.date_submitted AS start')
-            ->from(MAUTIC_TABLE_PREFIX . 'form_submissions', 'fs')
-            ->where($query->expr()->andX(
-                $query->expr()->gte('fs.date_submitted', ':start'),
-                $query->expr()->lte('fs.date_submitted', ':end')
-            ))
-            ->setParameter('start', $dates['start_date'])
-            ->setParameter('end', $dates['end_date']);
-
-        $results = $query->execute()->fetchAll();
-
-        // We need to convert the date to a ISO8601 compliant string
-        foreach ($results as &$object) {
-            $date = new DateTimeHelper($object['start']);
-            $object['start'] = $date->toLocalString(\DateTime::ISO8601);
-        }
-
-        $event->addEvents($results);
     }
 }
