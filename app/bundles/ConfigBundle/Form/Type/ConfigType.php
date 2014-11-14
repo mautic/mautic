@@ -91,8 +91,11 @@ class ConfigType extends AbstractType
                             break;
                         case 'mailer_transport':
                             $choices = array(
-                                'gmail'    => 'mautic.core.config.mailer_transport.gmail',
                                 'mail'     => 'mautic.core.config.mailer_transport.mail',
+                                'mautic.transport.mandrill' => 'mautic.core.config.mailer_transport.mandrill',
+                                'mautic.transport.sendgrid' => 'mautic.core.config.mailer_transport.sendgrid',
+                                'mautic.transport.amazon'   => 'mautic.core.config.mailer_transport.amazon',
+                                'gmail'    => 'mautic.core.config.mailer_transport.gmail',
                                 'sendmail' => 'mautic.core.config.mailer_transport.sendmail',
                                 'smtp'     => 'mautic.core.config.mailer_transport.smtp'
                             );
