@@ -170,6 +170,24 @@ class LeadSubscriber extends CommonSubscriber
                     $model = $this->factory->getModel('lead');
                     $model->regenerateLeadLists($lead);
                 }
+
+                if (isset($details['dateIdentified'])) {
+                    //log the day lead was identified
+                    $log = array(
+                        "bundle"    => "lead",
+                        "object"    => "lead",
+                        "objectId"  => $lead->getId(),
+                        "action"    => "identified",
+                        "details"   => $details,
+                        "ipAddress" => $this->request->server->get('REMOTE_ADDR')
+                    );
+                    $this->factory->getModel('core.auditLog')->writeToLog($log);
+
+                    //trigger lead identified event
+                    if ($this->dispatcher->hasListeners(LeadEvents::LEAD_IDENTIFIED)) {
+                        $this->dispatcher->dispatch(LeadEvents::LEAD_IDENTIFIED, $event);
+                    }
+                }
             }
         }
     }

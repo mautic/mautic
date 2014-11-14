@@ -19,6 +19,7 @@ use Mautic\CoreBundle\Entity\IpAddress;
  * Class Lead
  * @ORM\Table(name="leads")
  * @ORM\Entity(repositoryClass="Mautic\LeadBundle\Entity\LeadRepository")
+ * @ORM\HasLifecycleCallbacks
  * @Serializer\XmlRoot("lead")
  * @Serializer\ExclusionPolicy("all")
  */
@@ -105,6 +106,14 @@ class Lead extends FormEntity
     private $newlyCreated = false;
 
     /**
+     * @ORM\Column(name="date_identified", type="datetime", nullable=true)
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     * @Serializer\Groups({"leadDetails"})
+     */
+    private $dateIdentified;
+
+    /**
      * @ORM\OneToMany(targetEntity="LeadNote", mappedBy="lead", cascade={"remove"}, orphanRemoval=true, fetch="EXTRA_LAZY")
      * @ORM\OrderBy({"dateAdded" = "DESC"})
      */
@@ -126,6 +135,13 @@ class Lead extends FormEntity
      * @Serializer\Groups({"full"})
      */
     private $preferredProfileImage;
+
+    /**
+     * Changed to true if the lead was anonymous before updating fields
+     *
+     * @var null
+     */
+    private $wasAnonymous = null;
 
     protected function isChanged($prop, $val)
     {
@@ -472,6 +488,9 @@ class Lead extends FormEntity
      */
     public function addUpdatedField($alias, $value, $oldValue = '')
     {
+        if ($this->wasAnonymous == null) {
+            $this->wasAnonymous = $this->isAnonymous();
+        }
         $this->changes['fields'][$alias] = array($oldValue, $value);
         $this->updatedFields[$alias]     = $value;
     }
@@ -551,5 +570,36 @@ class Lead extends FormEntity
     public function getPreferredProfileImage()
     {
         return $this->preferredProfileImage;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDateIdentified ()
+    {
+        return $this->dateIdentified;
+    }
+
+    /**
+     * @param mixed $dateIdentified
+     */
+    public function setDateIdentified ($dateIdentified)
+    {
+        $this->dateIdentified = $dateIdentified;
+    }
+
+    /**
+     * @ORM\preUpdate
+     * @ORM\prePersist
+     */
+    public function checkDateIdentified()
+    {
+        if ($this->dateIdentified == null && $this->wasAnonymous) {
+            //check the changes to see if the user is now known
+            if (!$this->isAnonymous()) {
+                $this->dateIdentified = new \DateTime();
+                $this->changes['dateIdentified'] = array('', $this->dateIdentified);
+            }
+        }
     }
 }

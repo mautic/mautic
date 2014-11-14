@@ -78,6 +78,16 @@ final class LeadEvents
     const LEAD_POST_DELETE   = 'mautic.lead_post_delete';
 
     /**
+     * The mautic.lead_identified event is thrown when a lead first becomes known, i.e. name, email, company
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\LeadEvent instance.
+     *
+     * @var string
+     */
+    const LEAD_IDENTIFIED   = 'mautic.lead_identified';
+
+    /**
      * The mautic.lead_list_pre_save event is thrown right before a lead_list is persisted.
      *
      * The event listener receives a
