@@ -377,9 +377,9 @@ class TriggerModel extends CommonFormModel
      */
     public function getColorForLeadPoints($points)
     {
-        static $triggers = array();
+        static $triggers;
 
-        if (empty($triggers)) {
+        if (!is_array($triggers)) {
             $triggers = $this->getRepository()->getTriggerColors();
         }
 
