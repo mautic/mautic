@@ -136,4 +136,21 @@ class ClientModel extends FormModel
     {
         return $this->getRepository()->getUserClients($user);
     }
+
+    public function revokeAccess($entity)
+    {
+        if (!$entity instanceof Client && !$entity instanceof Consumer) {
+            throw new MethodNotAllowedHttpException(array('Client', 'Consumer'));
+        }
+
+        $me = $this->factory->getUser();
+
+        //remove the user from the client
+        if ($this->apiMode == 'oauth2') {
+            $entity->removeUser($me);
+            $this->saveEntity($entity);
+        } else {
+            $this->getRepository()->deleteAccessTokens($entity, $me);
+        }
+    }
 }

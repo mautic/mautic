@@ -7,7 +7,6 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
-
 <table class="table table-striped table-hover">
     <thead>
         <tr>

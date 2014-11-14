@@ -192,10 +192,8 @@ class UserController extends FormController
             }
         }
 
-        $formView = $this->setFormTheme($form, 'MauticUserBundle:User:form.html.php', 'MauticUserBundle:FormUser');
-
         return $this->delegateView(array(
-            'viewParameters'  => array('form' => $formView),
+            'viewParameters'  => array('form' => $form->createView()),
             'contentTemplate' => 'MauticUserBundle:User:form.html.php',
             'passthroughVars' => array(
                 'activeLink'    => '#mautic_user_new',
@@ -309,10 +307,8 @@ class UserController extends FormController
             $form->get('role_lookup')->setData($user->getRole()->getName());
         }
 
-        $formView = $this->setFormTheme($form, 'MauticUserBundle:User:form.html.php', 'MauticUserBundle:FormUser');
-
         return $this->delegateView(array(
-            'viewParameters'  => array('form' => $formView),
+            'viewParameters'  => array('form' => $form->createView()),
             'contentTemplate' => 'MauticUserBundle:User:form.html.php',
             'passthroughVars' => array(
                 'activeLink'    => '#mautic_user_index',
@@ -501,11 +497,9 @@ class UserController extends FormController
             }
         }
 
-        $formView = $this->setFormTheme($form, 'MauticUserBundle:User:contact.html.php', 'MauticUserBundle:FormUser');
-
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'form' => $formView,
+                'form' => $form->createView(),
                 'user' => $user
             ),
             'contentTemplate' => 'MauticUserBundle:User:contact.html.php',

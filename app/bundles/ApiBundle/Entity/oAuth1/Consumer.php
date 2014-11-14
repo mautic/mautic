@@ -50,6 +50,11 @@ class Consumer extends BaseConsumer
     protected $callback;
 
     /**
+     * @ORM\OneToMany(targetEntity="AccessToken", mappedBy="consumer", indexBy="id", fetch="EXTRA_LAZY")
+     */
+    protected $accessTokens;
+
+    /**
      * @param ClassMetadata $metadata
      */
     public static function loadValidatorMetadata(ClassMetadata $metadata)

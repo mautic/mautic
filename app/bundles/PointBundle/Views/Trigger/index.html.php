@@ -26,7 +26,7 @@ $view['slots']->set('searchHelp', $view['translator']->trans('mautic.core.help.s
     </a>
     <?php $view['slots']->stop(); ?>
 <?php endif; ?>
-r
+
 <div class="panel panel-default bdr-t-wdh-0 mb-0">
     <?php echo $view->render('MauticCoreBundle:Helper:listactions.html.php', array(
         'searchValue' => $searchValue,

@@ -115,14 +115,20 @@ class ClientController extends FormController
         return $this->render('MauticApiBundle:Client:authorized.html.php', array('clients' => $clients));
     }
 
+    /**
+     * @param $clientId
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function revokeAction($clientId)
     {
         $success = 0;
         $flashes = array();
+
         if ($this->request->getMethod() == 'POST') {
-            $me      = $this->get('security.context')->getToken()->getUser();
             $model   = $this->factory->getModel('api.client');
-            $client  = $model->getEntity($clientId);
+
+            $client = $model->getEntity($clientId);
 
             if ($client === null) {
                 $flashes[] = array(
@@ -133,9 +139,7 @@ class ClientController extends FormController
             } else {
                 $name = $client->getName();
 
-                //remove the user from the client
-                $client->removeUser($me);
-                $model->saveEntity($client);
+                $model->revokeAccess($client);
 
                 $flashes[] = array(
                     'type'    => 'notice',
@@ -146,13 +150,12 @@ class ClientController extends FormController
                 );
             }
         }
-        $returnUrl = $this->generateUrl('mautic_user_account');
+
         return $this->postActionRedirect(array(
-            'returnUrl'       => $returnUrl,
+            'returnUrl'       => $this->generateUrl('mautic_user_account'),
             'contentTemplate' => 'MauticUserBundle:Profile:index',
             'passthroughVars' => array(
-                'success'       => $success,
-                'mauticContent' => 'client'
+                'success'       => $success
             ),
             'flashes'         => $flashes
         ));

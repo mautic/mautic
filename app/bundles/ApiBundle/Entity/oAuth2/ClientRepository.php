@@ -24,7 +24,7 @@ class ClientRepository extends CommonRepository
         $query = $this->createQueryBuilder($this->getTableAlias());
 
         $query->join('c.users', 'u')
-            ->where($query->expr()->andX('u.id', ':userId'))
+            ->where($query->expr()->eq('u.id', ':userId'))
             ->setParameter('userId', $user->getId());
 
         return $query->getQuery()->getResult();

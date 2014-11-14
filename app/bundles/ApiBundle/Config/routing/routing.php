@@ -72,7 +72,7 @@ $collection->add('mautic_oauth2_server_auth_login_check', new Route('/oauth/v2/a
 ));
 
 //Clients
-$collection->add('mautic_client_index', new Route('/clients/{page}',
+$collection->add('mautic_client_index', new Route('/credentials/{page}',
     array(
         '_controller' => 'MauticApiBundle:Client:index',
         'page'        => 1
@@ -82,7 +82,7 @@ $collection->add('mautic_client_index', new Route('/clients/{page}',
     )
 ));
 
-$collection->add('mautic_client_action', new Route('/clients/{objectAction}/{objectId}',
+$collection->add('mautic_client_action', new Route('/credentials/{objectAction}/{objectId}',
     array(
         '_controller' => 'MauticApiBundle:Client:execute',
         "objectId"      => 0

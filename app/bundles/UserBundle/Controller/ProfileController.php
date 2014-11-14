@@ -176,11 +176,10 @@ class ProfileController extends FormController
         }
         $this->factory->getSession()->set('formProcessed', 0);
 
-        $formView = $this->setFormTheme($form, 'MauticUserBundle:Profile:index.html.php', 'MauticUserBundle:FormProfile');
         $parameters = array(
             'permissions' => $permissions,
             'me'          => $me,
-            'userForm'    => $formView
+            'userForm'    => $form->createView()
         );
 
         return $this->delegateView(array(

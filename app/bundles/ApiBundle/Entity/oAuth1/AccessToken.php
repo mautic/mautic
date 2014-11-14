@@ -26,7 +26,7 @@ class AccessToken extends BaseAccessToken
     protected $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Consumer")
+     * @ORM\ManyToOne(targetEntity="Consumer", inversedBy="accessTokens")
      * @ORM\JoinColumn(name="consumer_id", referencedColumnName="id", onDelete="CASCADE")
      */
     protected $consumer;

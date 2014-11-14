@@ -21,13 +21,39 @@ class ConsumerRepository extends CommonRepository
 
     public function getUserClients(User $user)
     {
-        $query = $this->createQueryBuilder($this->getTableAlias());
+        $q = $this->_em->createQueryBuilder();
 
-        $query->join('c.users', 'u')
-            ->where($query->expr()->andX('u.id', ':userId'))
-            ->setParameter('userId', $user->getId());
+        $q->select('c')
+            ->from('MauticApiBundle:oAuth1\Consumer', 'c')
+            ->leftJoin('c.accessTokens', 'a')
+            ->where($q->expr()->eq('a.user', ':user'))
+            ->setParameter('user', $user)
+            ->groupBy('c.id');
 
-        return $query->getQuery()->getResult();
+        return $q->getQuery()->getResult();
+    }
+
+    /**
+     * @param Consumer $consumer
+     * @param User     $user
+     */
+    public function deleteAccessTokens(Consumer $consumer, User $user)
+    {
+        $qb = $this->_em->createQueryBuilder();
+
+        $qb->delete('MauticApiBundle:oAuth1\AccessToken', 'a')
+            ->andWhere(
+                $qb->expr()->andX(
+                    $qb->expr()->eq('a.consumer', ':consumer'),
+                    $qb->expr()->eq('a.user', ':user')
+                )
+            )
+            ->setParameters(array(
+                'consumer' => $consumer,
+                'user'     => $user
+            ));
+
+        $qb->getQuery()->execute();
     }
 
     /**
