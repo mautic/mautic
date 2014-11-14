@@ -9,7 +9,9 @@
 
 namespace Mautic\UserBundle\Form\Type;
 
+use Doctrine\ORM\EntityRepository;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Symfony\Component\Form\AbstractType;
@@ -95,20 +97,21 @@ class UserType extends AbstractType
             )
         ));
 
-        $builder->add('role_lookup', 'text', array(
-            'label'      => 'mautic.user.user.form.role',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array(
-                'class'   => 'form-control',
-                'tooltip' => 'mautic.core.help.autocomplete',
-            ),
-            'mapped'     => false
-        ));
-
-        $builder->add('role', 'hidden_entity', array(
-            'required'   => true,
-            'repository' => 'MauticUserBundle:Role',
-            'error_bubbling' => false,
+        $builder->add(
+            $builder->create('role', 'entity', array(
+                'label'      => 'mautic.user.user.form.role',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array(
+                    'class'   => 'form-control chosen'
+                ),
+                'class'         => 'MauticUserBundle:Role',
+                'property'      => 'name',
+                'query_builder' => function(EntityRepository $er) {
+                    return $er->createQueryBuilder('r')
+                        ->where('r.isPublished = true')
+                        ->orderBy('r.name', 'ASC');
+                }
+            )
         ));
 
         $existing = (!empty($options['data']) && $options['data']->getId());

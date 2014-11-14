@@ -35,12 +35,12 @@ $view['slots']->set("headerTitle", $header);
 			    </div>
 			</div>
 			<hr class="mnr-md mnl-md">
-			
+
 			<div class="form-group mb-0">
 			    <div class="row">
 			        <div class="col-sm-6">
-			        	<label class="control-label mb-xs"><?php echo $view['form']->label($form['role_lookup']); ?></label>
-			            <?php echo $view['form']->widget($form['role_lookup'], array('attr' => array('placeholder' => $form['role_lookup']->vars['label']))); ?>
+			        	<label class="control-label mb-xs"><?php echo $view['form']->label($form['role']); ?></label>
+			            <?php echo $view['form']->widget($form['role'], array('attr' => array('placeholder' => $form['role']->vars['label']))); ?>
 			        </div>
 			        <div class="col-sm-6">
 				    	<label class="control-label mb-xs"><?php echo $view['form']->label($form['position']); ?></label>
@@ -53,7 +53,7 @@ $view['slots']->set("headerTitle", $header);
 			<div class="panel panel-default form-group mb-0">
 				<div class="panel-body">
 				    <div class="row">
-				        <div class="col-sm-6">				        	
+				        <div class="col-sm-6">
 				        	<div class="form-group col-xs-12">
 				        		<label class="control-label mb-xs"><?php echo $view['form']->label($form['username']); ?></label>
 				            	<?php echo $view['form']->widget($form['username'], array('attr' => array('placeholder' => $form['username']->vars['label']))); ?>
@@ -65,7 +65,7 @@ $view['slots']->set("headerTitle", $header);
 				        </div>
 				        <div class="col-sm-6">
 				            <?php echo $view['form']->widget($form['plainPassword'], array('attr' => array('placeholder' => $form['plainPassword']->vars['label']))); ?>
-				        </div>				        
+				        </div>
 				    </div>
 				</div>
 			</div>

@@ -1,54 +1,6 @@
 //UserBundle
 Mautic.userOnLoad = function (container) {
     if (mQuery(container + ' form[name="user"]').length) {
-        if (mQuery('#user_role_lookup').length) {
-            var roles = new Bloodhound({
-                datumTokenizer: Bloodhound.tokenizers.obj.whitespace('label'),
-                queryTokenizer: Bloodhound.tokenizers.whitespace,
-                prefetch: {
-                    url: mauticAjaxUrl + "?action=user:roleList",
-                    ajax: {
-                        beforeSend: function () {
-                            MauticVars.showLoadingBar = false;
-                        }
-                    }
-                },
-                remote: {
-                    url: mauticAjaxUrl + "?action=user:roleList&filter=%QUERY",
-                    ajax: {
-                        beforeSend: function () {
-                            MauticVars.showLoadingBar = false;
-                        }
-                    }
-                },
-                dupDetector: function (remoteMatch, localMatch) {
-                    return (remoteMatch.label == localMatch.label);
-                },
-                ttl: 1800000,
-                limit: 5
-            });
-            roles.initialize();
-
-            mQuery("#user_role_lookup").typeahead(
-                {
-                    hint: true,
-                    highlight: true,
-                    minLength: 2
-                },
-                {
-                    name: 'user_role',
-                    displayKey: 'label',
-                    source: roles.ttAdapter()
-                }).on('typeahead:selected', function (event, datum) {
-                    mQuery("#user_role").val(datum["value"]);
-                }).on('typeahead:autocompleted', function (event, datum) {
-                    mQuery("#user_role").val(datum["value"]);
-                }).on('keypress', function (event) {
-                    if ((event.keyCode || event.which) == 13) {
-                        mQuery('#user_role_lookup').typeahead('close');
-                    }
-                });
-        }
         if (mQuery('#user_position').length) {
             var positions = new Bloodhound({
                 datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),

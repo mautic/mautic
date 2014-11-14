@@ -178,17 +178,6 @@ class UserController extends FormController
                 ));
             } elseif ($valid && !$cancelled) {
                 return $this->editAction($user->getId(), true);
-            } elseif (!$valid) {
-                //check for role error and assign it to role_lookup
-                $errors = $form['role']->getErrors();
-                if (!empty($errors)) {
-                    foreach ($errors as $error) {
-                        if ($error->getMessageTemplate() == 'mautic.user.user.role.notblank') {
-                            $form->get('role_lookup')->addError(new FormError($error->getMessage()));
-                            break;
-                        }
-                    }
-                }
             }
         }
 
@@ -288,23 +277,10 @@ class UserController extends FormController
 
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 return $this->postActionRedirect($postActionVars);
-            } else {
-                //check for role error and assign it to role_lookup
-                $errors = $form->getErrors();
-                if (!empty($errors)) {
-                    foreach ($errors as $error) {
-                        if ($error->getMessageTemplate() == 'mautic.user.user.role.notblank') {
-                            $form->get('role_lookup')->addError(new FormError($error->getMessage()));
-                            break;
-                        }
-                    }
-                }
             }
         } else {
             //lock the entity
             $model->lockEntity($user);
-
-            $form->get('role_lookup')->setData($user->getRole()->getName());
         }
 
         return $this->delegateView(array(

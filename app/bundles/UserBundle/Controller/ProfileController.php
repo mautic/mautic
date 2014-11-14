@@ -44,7 +44,6 @@ class ProfileController extends FormController
 
         //remove items that cannot be edited by person themselves
         $form->remove('role');
-        $form->remove('role_lookup');
         $form->remove('isPublished');
         $form->remove('save');
         $form->remove('cancel');
@@ -148,30 +147,34 @@ class ProfileController extends FormController
             $submittedPassword     = $this->request->request->get('user[plainPassword][password]', null, true);
             $encoder               = $this->get('security.encoder_factory')->getEncoder($me);
             $overrides['password'] = $model->checkNewPassword($me, $encoder, $submittedPassword);
+            if (!$cancelled = $this->isFormCancelled($form)) {
+                if ($valid = $this->isFormValid($form)) {
+                    foreach ($overrides as $k => $v) {
+                        $func = 'set' . ucfirst($k);
+                        $me->$func($v);
+                    }
 
-            if ($valid = $this->isFormValid($form)) {
-                foreach ($overrides as $k => $v) {
-                    $func = 'set' . ucfirst($k);
-                    $me->$func($v);
-                }
+                    //form is valid so process the data
+                    $model->saveEntity($me);
 
-                //form is valid so process the data
-                $model->saveEntity($me);
+                    $returnUrl = $this->generateUrl('mautic_user_account');
 
-                $returnUrl = $this->generateUrl('mautic_user_account');
-                return $this->postActionRedirect(array(
-                    'returnUrl'       => $returnUrl,
-                    'contentTemplate' => 'MauticUserBundle:Profile:index',
-                    'passthroughVars' => array(
-                        'mauticContent' => 'user'
-                    ),
-                    'flashes'         => array( //success
-                        array(
-                            'type' => 'notice',
-                            'msg'  => 'mautic.user.account.notice.updated'
+                    return $this->postActionRedirect(array(
+                        'returnUrl'       => $returnUrl,
+                        'contentTemplate' => 'MauticUserBundle:Profile:index',
+                        'passthroughVars' => array(
+                            'mauticContent' => 'user'
+                        ),
+                        'flashes'         => array( //success
+                            array(
+                                'type' => 'notice',
+                                'msg'  => 'mautic.user.account.notice.updated'
+                            )
                         )
-                    )
-                ));
+                    ));
+                }
+            } else {
+                return $this->redirect($this->generateUrl('mautic_dashboard_index'));
             }
         }
         $this->factory->getSession()->set('formProcessed', 0);
