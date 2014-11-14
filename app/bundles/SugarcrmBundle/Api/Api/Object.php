@@ -1,5 +1,7 @@
 <?php
-namespace SugarCRM\Api;
+namespace Mautic\SugarcrmBundle\Api\Api;
+
+use Mautic\SugarcrmBundle\Api\Exception\ErrorException;
 
 class Object extends Api
 {
@@ -17,6 +19,10 @@ class Object extends Api
         );
         $request_url = sprintf('%s/rest/v10/metadata',$tokenData['sugarcrm_url']);
         $response = $this->auth->makeRequest($request_url, $parameters);
+
+        if (isset($response['error'])) {
+            throw new ErrorException($response['error_message'],($response['error'] == 'invalid_grant') ? 1 : 500);
+        }
 
         return $response['modules']['Leads'];
     }

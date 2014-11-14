@@ -1,5 +1,5 @@
 <?php
-namespace SugarCRM\Auth;
+namespace Mautic\SugarcrmBundle\Api\Auth;
 
 /**
  * Class Auth

@@ -1,5 +1,7 @@
 <?php
-namespace SugarCRM\Auth;
+namespace Mautic\SugarcrmBundle\Api\Auth;
+
+use Mautic\SugarcrmBundle\Api\Exception\ErrorException;
 
 class OAuth extends ApiAuth implements AuthInterface
 {
@@ -220,8 +222,8 @@ class OAuth extends ApiAuth implements AuthInterface
             );
             $response = $this->makeRequest($this->_request_token_url.'/?method=oauth_request_token', $oauth2_token_arguments, 'POST');
 
-            if (is_null($response)) {
-                
+            if (isset($response['error'])) {
+                throw new ErrorException($response['error_message']);
             }
 
             $this->_access_token_updated = true;

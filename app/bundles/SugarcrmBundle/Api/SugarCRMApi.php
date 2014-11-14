@@ -1,9 +1,9 @@
 <?php
 
-namespace SugarCRM;
+namespace Mautic\SugarcrmBundle\Api;
 
-use SugarCRM\Auth\AuthInterface;
-use SugarCRM\Exception\ContextNotFoundException;
+use Mautic\SugarcrmBundle\Api\Auth\AuthInterface;
+use Mautic\SugarcrmBundle\Api\Exception\ContextNotFoundException;
 
 class SugarCRMApi
 {
@@ -20,7 +20,7 @@ class SugarCRMApi
         static $contexts = array();
 
         if (!isset($context[$apiContext])) {
-            $class = 'SugarCRM\\Api\\' . $apiContext;
+            $class = 'Mautic\\SugarcrmBundle\\Api\\Api\\' . $apiContext;
             if (class_exists($class)) {
                 $contexts[$apiContext] = new $class($auth);
             } else {
@@ -31,5 +31,3 @@ class SugarCRMApi
         return $contexts[$apiContext];
     }
 }
-
-include 'Autoloader.php';
