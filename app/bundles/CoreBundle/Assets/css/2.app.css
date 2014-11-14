@@ -2308,6 +2308,7 @@ label {
 }
 .panel-footer {
   overflow: hidden;
+  background-color: #fbfbfb;
 }
 .panel-toolbar-wrapper {
   display: block;

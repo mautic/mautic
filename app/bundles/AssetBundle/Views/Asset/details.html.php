@@ -72,7 +72,6 @@ if ($security->hasEntityAccess($permissions['asset:assets:editown'], $permission
                 </div>
             </div>
             <!--/ asset detail header -->
-
             <!-- asset detail collapseable -->
             <div class="collapse" id="asset-details">
                 <div class="pr-md pl-md pb-md">
