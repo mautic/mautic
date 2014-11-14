@@ -23,6 +23,7 @@ use Mautic\CoreBundle\Entity\IpAddress;
  * @Serializer\XmlRoot("lead")
  * @Serializer\ExclusionPolicy("all")
  */
+
 class Lead extends FormEntity
 {
 
@@ -589,7 +590,7 @@ class Lead extends FormEntity
     }
 
     /**
-     * //@ORM\preUpdate
+     * @ORM\preUpdate
      * @ORM\prePersist
      */
     public function checkDateIdentified()
