@@ -12,8 +12,6 @@ namespace Mautic\PageBundle\EventListener;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
-use Mautic\LeadBundle\Event\LeadTimelineEvent;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\PageBundle\Event as Events;
 use Mautic\PageBundle\PageEvents;
 
@@ -34,8 +32,7 @@ class PageSubscriber extends CommonSubscriber
             CoreEvents::GLOBAL_SEARCH        => array('onGlobalSearch', 0),
             CoreEvents::BUILD_COMMAND_LIST   => array('onBuildCommandList', 0),
             PageEvents::PAGE_POST_SAVE       => array('onPagePostSave', 0),
-            PageEvents::PAGE_POST_DELETE     => array('onPageDelete', 0),
-            LeadEvents::TIMELINE_ON_GENERATE => array('onTimelineGenerate', 0)
+            PageEvents::PAGE_POST_DELETE     => array('onPageDelete', 0)
         );
     }
 
@@ -146,55 +143,5 @@ class PageSubscriber extends CommonSubscriber
             "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
         );
         $this->factory->getModel('core.auditLog')->writeToLog($log);
-    }
-
-    /**
-     * Compile events for the lead timeline
-     *
-     * @param LeadTimelineEvent $event
-     */
-    public function onTimelineGenerate(LeadTimelineEvent $event)
-    {
-        // Set available event types
-        $eventTypeKey = 'page.hit';
-        $eventTypeName = $this->translator->trans('mautic.page.event.hit');
-        $event->addEventType($eventTypeKey, $eventTypeName);
-
-        // Decide if those events are filtered
-        $filter = $event->getEventFilter();
-        $loadAllEvents = !isset($filter[0]);
-        $eventFilterExists = in_array($eventTypeKey, $filter);
-
-        if (!$loadAllEvents && !$eventFilterExists) {
-            return;
-        }
-
-        $lead    = $event->getLead();
-        $options = array('ipIds' => array(), 'filters' => $filter);
-
-        /** @var \Mautic\CoreBundle\Entity\IpAddress $ip */
-        foreach ($lead->getIpAddresses() as $ip) {
-            $options['ipIds'][] = $ip->getId();
-        }
-
-        /** @var \Mautic\PageBundle\Entity\HitRepository $hitRepository */
-        $hitRepository = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit');
-
-        $hits = $hitRepository->getLeadHits($lead->getId(), $options);
-
-        $model = $this->factory->getModel('page.page');
-
-        // Add the hits to the event array
-        foreach ($hits as $hit) {
-            $event->addEvent(array(
-                'event'     => $eventTypeKey,
-                'eventLabel' => $eventTypeName,
-                'timestamp' => $hit['dateHit'],
-                'extra'     => array(
-                    'page' => $model->getEntity($hit['page_id'])
-                ),
-                'contentTemplate' => 'MauticPageBundle:Timeline:index.html.php'
-            ));
-        }
     }
 }

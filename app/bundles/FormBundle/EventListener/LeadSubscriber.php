@@ -6,41 +6,28 @@
  * @link        http://mautic.com
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
-namespace Mautic\PointBundle\EventListener;
+namespace Mautic\FormBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
-use Mautic\LeadBundle\Event\PointsChangeEvent;
 use Mautic\LeadBundle\LeadEvents;
 
 /**
  * Class LeadSubscriber
+ *
+ * @package Mautic\FormBundle\EventListener
  */
 class LeadSubscriber extends CommonSubscriber
 {
 
     /**
-     * {@inheritdoc}
+     * @return array
      */
     static public function getSubscribedEvents()
     {
         return array(
-            LeadEvents::LEAD_POINTS_CHANGE => array('onLeadPointsChange', 0),
             LeadEvents::TIMELINE_ON_GENERATE => array('onTimelineGenerate', 0)
         );
-    }
-
-    /**
-     * Trigger applicable events for the lead
-     *
-     * @param PointsChangeEvent $event
-     */
-    public function onLeadPointsChange(PointsChangeEvent $event)
-    {
-        /** @var \Mautic\PointBundle\Model\TriggerModel */
-        $model = $this->factory->getModel('point.trigger');
-        $model->triggerEvents($event->getLead());
     }
 
     /**
@@ -51,8 +38,8 @@ class LeadSubscriber extends CommonSubscriber
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
         // Set available event types
-        $eventTypeKey = 'point.gained';
-        $eventTypeName = $this->translator->trans('mautic.point.event.gained');
+        $eventTypeKey = 'form.submitted';
+        $eventTypeName = $this->translator->trans('mautic.form.event.submitted');
         $event->addEventType($eventTypeKey, $eventTypeName);
 
         // Decide if those events are filtered
@@ -72,21 +59,25 @@ class LeadSubscriber extends CommonSubscriber
             $options['ipIds'][] = $ip->getId();
         }
 
-        /** @var \Mautic\PageBundle\Entity\HitRepository $hitRepository */
-        $logRepository = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:PointsChangeLog');
+        /** @var \Mautic\FormBundle\Entity\SubmissionRepository $submissionRepository */
+        $submissionRepository = $this->factory->getEntityManager()->getRepository('MauticFormBundle:Submission');
 
-        $logs = $logRepository->getLeadTimelineEvents($lead->getId(), $options);
+        $rows = $submissionRepository->getSubmissions($options);
 
-        // Add the logs to the event array
-        foreach ($logs as $log) {
+        $pageModel = $this->factory->getModel('page.page');
+        $formModel = $this->factory->getModel('form.form');
+
+        // Add the submissions to the event array
+        foreach ($rows as $row) {
             $event->addEvent(array(
                 'event'     => $eventTypeKey,
                 'eventLabel' => $eventTypeName,
-                'timestamp' => $log['dateAdded'],
+                'timestamp' => new \DateTime($row['dateSubmitted']),
                 'extra'     => array(
-                    'log' => $log
+                    'form'  => $formModel->getEntity($row['form_id']),
+                    'page'  => $pageModel->getEntity($row['page_id'])
                 ),
-                'contentTemplate' => 'MauticPointBundle:Timeline:index.html.php'
+                'contentTemplate' => 'MauticFormBundle:Timeline:index.html.php'
             ));
         }
     }

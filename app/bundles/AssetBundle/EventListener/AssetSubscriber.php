@@ -12,8 +12,6 @@ namespace Mautic\AssetBundle\EventListener;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\AssetBundle\Event as Events;
 use Mautic\AssetBundle\AssetEvents;
-use Mautic\LeadBundle\Event\LeadTimelineEvent;
-use Mautic\LeadBundle\LeadEvents;
 
 /**
  * Class AssetSubscriber
@@ -30,8 +28,7 @@ class AssetSubscriber extends CommonSubscriber
     {
         return array(
             AssetEvents::ASSET_POST_SAVE   => array('onAssetPostSave', 0),
-            AssetEvents::ASSET_POST_DELETE => array('onAssetDelete', 0),
-            LeadEvents::TIMELINE_ON_GENERATE => array('onTimelineGenerate', 0)
+            AssetEvents::ASSET_POST_DELETE => array('onAssetDelete', 0)
         );
     }
 
@@ -73,55 +70,5 @@ class AssetSubscriber extends CommonSubscriber
             "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
         );
         $this->factory->getModel('core.auditLog')->writeToLog($log);
-    }
-
-    /**
-     * Compile events for the lead timeline
-     *
-     * @param LeadTimelineEvent $event
-     */
-    public function onTimelineGenerate(LeadTimelineEvent $event)
-    {
-        // Set available event types
-        $eventTypeKey = 'asset.download';
-        $eventTypeName = $this->translator->trans('mautic.asset.event.download');
-        $event->addEventType($eventTypeKey, $eventTypeName);
-
-        // Decide if those events are filtered
-        $filter = $event->getEventFilter();
-        $loadAllEvents = !isset($filter[0]);
-        $eventFilterExists = in_array($eventTypeKey, $filter);
-
-        if (!$loadAllEvents && !$eventFilterExists) {
-            return;
-        }
-
-        $lead    = $event->getLead();
-        $options = array('ipIds' => array(), 'filters' => $filter);
-
-        /** @var \Mautic\CoreBundle\Entity\IpAddress $ip */
-        foreach ($lead->getIpAddresses() as $ip) {
-            $options['ipIds'][] = $ip->getId();
-        }
-
-        /** @var \Mautic\AssetBundle\Entity\DownloadRepository $downloadRepository */
-        $downloadRepository = $this->factory->getEntityManager()->getRepository('MauticAssetBundle:Download');
-
-        $downloads = $downloadRepository->getLeadDownloads($lead->getId(), $options);
-
-        $model = $this->factory->getModel('asset.asset');
-
-        // Add the downloads to the event array
-        foreach ($downloads as $download) {
-            $event->addEvent(array(
-                'event'     => $eventTypeKey,
-                'eventLabel' => $eventTypeName,
-                'timestamp' => $download['dateDownload'],
-                'extra'     => array(
-                    'asset' => $model->getEntity($download['asset_id'])
-                ),
-                'contentTemplate' => 'MauticAssetBundle:Timeline:index.html.php'
-            ));
-        }
     }
 }

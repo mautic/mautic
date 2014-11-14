@@ -6,41 +6,28 @@
  * @link        http://mautic.com
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
-namespace Mautic\PointBundle\EventListener;
+namespace Mautic\AssetBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
-use Mautic\LeadBundle\Event\PointsChangeEvent;
 use Mautic\LeadBundle\LeadEvents;
 
 /**
- * Class LeadSubscriber
+ * Class AssetBundle
+ *
+ * @package Mautic\AssetBundle\EventListener
  */
 class LeadSubscriber extends CommonSubscriber
 {
 
     /**
-     * {@inheritdoc}
+     * @return array
      */
     static public function getSubscribedEvents()
     {
         return array(
-            LeadEvents::LEAD_POINTS_CHANGE => array('onLeadPointsChange', 0),
             LeadEvents::TIMELINE_ON_GENERATE => array('onTimelineGenerate', 0)
         );
-    }
-
-    /**
-     * Trigger applicable events for the lead
-     *
-     * @param PointsChangeEvent $event
-     */
-    public function onLeadPointsChange(PointsChangeEvent $event)
-    {
-        /** @var \Mautic\PointBundle\Model\TriggerModel */
-        $model = $this->factory->getModel('point.trigger');
-        $model->triggerEvents($event->getLead());
     }
 
     /**
@@ -51,8 +38,8 @@ class LeadSubscriber extends CommonSubscriber
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
         // Set available event types
-        $eventTypeKey = 'point.gained';
-        $eventTypeName = $this->translator->trans('mautic.point.event.gained');
+        $eventTypeKey = 'asset.download';
+        $eventTypeName = $this->translator->trans('mautic.asset.event.download');
         $event->addEventType($eventTypeKey, $eventTypeName);
 
         // Decide if those events are filtered
@@ -72,21 +59,23 @@ class LeadSubscriber extends CommonSubscriber
             $options['ipIds'][] = $ip->getId();
         }
 
-        /** @var \Mautic\PageBundle\Entity\HitRepository $hitRepository */
-        $logRepository = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:PointsChangeLog');
+        /** @var \Mautic\AssetBundle\Entity\DownloadRepository $downloadRepository */
+        $downloadRepository = $this->factory->getEntityManager()->getRepository('MauticAssetBundle:Download');
 
-        $logs = $logRepository->getLeadTimelineEvents($lead->getId(), $options);
+        $downloads = $downloadRepository->getLeadDownloads($lead->getId(), $options);
 
-        // Add the logs to the event array
-        foreach ($logs as $log) {
+        $model = $this->factory->getModel('asset.asset');
+
+        // Add the downloads to the event array
+        foreach ($downloads as $download) {
             $event->addEvent(array(
                 'event'     => $eventTypeKey,
                 'eventLabel' => $eventTypeName,
-                'timestamp' => $log['dateAdded'],
+                'timestamp' => $download['dateDownload'],
                 'extra'     => array(
-                    'log' => $log
+                    'asset' => $model->getEntity($download['asset_id'])
                 ),
-                'contentTemplate' => 'MauticPointBundle:Timeline:index.html.php'
+                'contentTemplate' => 'MauticAssetBundle:Timeline:index.html.php'
             ));
         }
     }

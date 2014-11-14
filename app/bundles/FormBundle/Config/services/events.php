@@ -56,3 +56,21 @@ $container->setDefinition(
     )
 )
     ->addTag('kernel.event_subscriber');
+
+$container->setDefinition(
+    'mautic.form.calendarbundle.subscriber',
+    new Definition(
+        'Mautic\FormBundle\EventListener\CalendarSubscriber',
+        array(new Reference('mautic.factory'))
+    )
+)
+    ->addTag('kernel.event_subscriber');
+
+$container->setDefinition(
+    'mautic.form.leadbundle.subscriber',
+    new Definition(
+        'Mautic\FormBundle\EventListener\LeadSubscriber',
+        array(new Reference('mautic.factory'))
+    )
+)
+    ->addTag('kernel.event_subscriber');
