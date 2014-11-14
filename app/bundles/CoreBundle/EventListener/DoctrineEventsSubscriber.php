@@ -9,6 +9,7 @@
 
 namespace Mautic\CoreBundle\EventListener;
 
+use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 
 /**
@@ -59,6 +60,18 @@ class DoctrineEventsSubscriber implements \Doctrine\Common\EventSubscriber
                     && isset($classMetadata->associationMappings[$fieldName]['joinTable']['name'])) {
                     $mappedTableName = $classMetadata->associationMappings[$fieldName]['joinTable']['name'];
                     $classMetadata->associationMappings[$fieldName]['joinTable']['name'] = $this->prefix . $mappedTableName;
+                }
+            }
+
+            $reader = new AnnotationReader();
+            $class = $classMetadata->getReflectionClass();
+
+            $annotation = $reader->getClassAnnotation($class, 'Mautic\CoreBundle\Doctrine\Annotation\LoadClassMetadataCallback');
+
+            if (null !== $annotation) {
+                if (method_exists($class->getName(), $annotation->functionName['value'])) {
+                    $func = $class->getName() . '::' . $annotation->functionName['value'];
+                    call_user_func($func, $args);
                 }
             }
         }

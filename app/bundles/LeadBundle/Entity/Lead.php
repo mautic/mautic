@@ -23,6 +23,7 @@ use Mautic\CoreBundle\Entity\IpAddress;
  * @Serializer\XmlRoot("lead")
  * @Serializer\ExclusionPolicy("all")
  */
+
 class Lead extends FormEntity
 {
 

@@ -56,3 +56,13 @@ $container->setDefinition(
     )
 )
     ->addTag('kernel.event_subscriber');
+
+
+$container->setDefinition(
+    'mautic.lead.doctrine.subscriber',
+    new Definition(
+        'Mautic\LeadBundle\EventListener\DoctrineSubscriber',
+        array(new Reference('mautic.factory'))
+    )
+)
+    ->addTag('doctrine.event_subscriber');

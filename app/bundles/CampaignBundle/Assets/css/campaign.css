@@ -114,3 +114,10 @@
     height: 10000px;
     width: 10000px;
 }
+
+.campaign-event-list .progress-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 3px;
+}

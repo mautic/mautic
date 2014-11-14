@@ -169,10 +169,11 @@ if ($permissions['campaign:campaigns:edit']): ?>
             <div class="tab-pane active fade in bdr-w-0" id="event-container">
 
                 <!-- start: trigger type event -->
-                <ul class="list-group">
+                <ul class="list-group campaign-event-list">
                     <?php if (isset($events) && is_array($events)) : ?>
                         <?php foreach ($events as $event) : ?>
                             <li class="list-group-item bg-auto bg-light-xs">
+                                <div class="progress-bar progress-bar-success" style="width:<?php echo $event['percent']; ?>%"></div>
                                 <div class="box-layout">
                                     <div class="col-md-1 va-m">
                                         <h3>
@@ -184,11 +185,14 @@ if ($permissions['campaign:campaigns:edit']): ?>
                                         </h3>
                                     </div>
                                     <div class="col-md-7 va-m">
-                                        <h5 class="fw-sb text-primary mb-xs"><?php echo $event['name']; ?></h5>
-                                        <!-- <h6 class="text-white dark-sm">Event description lorem ipsum dolor sit amet</h6> -->
+                                        <h5 class="fw-sb text-primary mb-xs">
+                                            <?php echo $event['name']; ?>
+                                            <small><?php echo $event['percent']; ?> %</small>
+                                        </h5>
+                                        <h6 class="text-white dark-sm"><?php echo $event['description']; ?></h6>
                                     </div>
                                     <div class="col-md-4 va-m text-right">
-                                        <em class="text-white dark-sm"><?php echo $event['type']; ?></em>
+                                        <em class="text-white dark-sm"><?php echo $view['translator']->trans('mautic.campaign.' . $event['type']); ?></em>
                                     </div>
                                 </div>
                             </li>
