@@ -161,7 +161,19 @@ class CampaignController extends FormController
             return $this->accessDenied();
         }
 
-        $events = $hits = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:Event')->getEvents(array('campaigns' => array($entity->getId())));
+        $eventLogRepo = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:LeadEventLog');
+        $campaignLeadRepo = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:Lead');
+        $events = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:Event')->getEvents(array('campaigns' => array($entity->getId())));
+        $leadCount = $campaignLeadRepo->countLeads($entity->getId());
+
+        foreach ($events  as &$event) {
+            $event['log'] = $eventLogRepo->getCampaignLog($entity->getId(), $event['id']);
+            $event['logCount'] = count($event['log']);
+            $event['percent'] = 0;
+            if ($leadCount) {
+                $event['percent'] = round($event['logCount'] / $leadCount * 100);
+            }
+        }
 
         // Audit Log
         $logs = $this->factory->getModel('core.auditLog')->getLogForObject('campaign', $objectId);
@@ -173,7 +185,7 @@ class CampaignController extends FormController
         $emailsSent = $this->factory->getEntityManager()->getRepository('MauticEmailBundle:Stat')->getIgnoredReadFailed(null, array('source_id' => $entity->getId(), 'source' => 'campaign'));
 
         // Lead count stats
-        $leadStats = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:Lead')->getLeadStats(30, 'D');
+        $leadStats = $campaignLeadRepo->getLeadStats(30, 'D');
         
         return $this->delegateView(array(
             'viewParameters'  => array(

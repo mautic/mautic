@@ -184,8 +184,11 @@ if ($permissions['campaign:campaigns:edit']): ?>
                                         </h3>
                                     </div>
                                     <div class="col-md-7 va-m">
-                                        <h5 class="fw-sb text-primary mb-xs"><?php echo $event['name']; ?></h5>
-                                        <!-- <h6 class="text-white dark-sm">Event description lorem ipsum dolor sit amet</h6> -->
+                                        <h5 class="fw-sb text-primary mb-xs">
+                                            <?php echo $event['name']; ?>
+                                            <small><?php echo $event['percent']; ?> %</small>
+                                        </h5>
+                                        <h6 class="text-white dark-sm"><?php echo $event['description']; ?></h6>
                                     </div>
                                     <div class="col-md-4 va-m text-right">
                                         <em class="text-white dark-sm"><?php echo $event['type']; ?></em>

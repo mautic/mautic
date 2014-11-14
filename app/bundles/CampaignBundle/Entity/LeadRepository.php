@@ -87,6 +87,25 @@ class LeadRepository extends EntityRepository
     }
 
     /**
+     * COunt leads for a specific campaign
+     *
+     * @param      $campaignId
+     * @return int
+     */
+    public function countLeads($campaignId)
+    {
+        $q = $this->createQueryBuilder('cl')
+            ->select('count(cl.lead) as theCount');
+        $q->where(
+            $q->expr()->eq('cl.campaign', ':campaign')
+        )->setParameter('campaign', $campaignId);
+
+        $result = $q->getQuery()->getSingleResult();
+
+        return (int) $result['theCount'];
+    }
+
+    /**
      * Fetch Lead stats for some period of time.
      * 
      * @param integer $quantity of units

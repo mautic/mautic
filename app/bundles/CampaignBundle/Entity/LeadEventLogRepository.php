@@ -145,7 +145,7 @@ class LeadEventLogRepository extends EntityRepository
             $q->expr()->eq('c.id', ':campaign')
         );
 
-        if (!empty($event)) {
+        if (!empty($eventId)) {
             $expr->add(
                 $q->expr()->eq('e.id', ':event')
             );
