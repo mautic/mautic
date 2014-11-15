@@ -31,18 +31,11 @@ $view['slots']->set("headerTitle", $header.$subheader);
     <div class="col-md-9 bg-auto height-auto bdr-r">
         <div class="pa-md">
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-sm-12">
                     <?php echo $view['form']->row($form['title']); ?>
                     <?php echo $view['form']->row($form['alias']); ?>
                     <?php echo $view['form']->row($form['category']); ?>
                     <?php echo $view['form']->row($form['template']); ?>
-                </div>
-                <div class="col-md-6">
-                    <div class="panel panel-default">
-                        <div class="panel-body">
-                            [PAGE THUMBNAIL HERE]
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
