@@ -138,8 +138,7 @@ class UpdateHelper
         }
 
         // Check which update stream the usser wants to see data for
-        // TODO - When the param exists, use it instead of hardcoding to stable
-        $stability = 'stable';
+        $stability = $this->factory->getParameter('update_stability');
         $latestVersion = $updates->$stability;
 
         // If the user's up-to-date, go no further
