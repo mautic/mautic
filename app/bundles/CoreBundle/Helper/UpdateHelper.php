@@ -91,9 +91,12 @@ class UpdateHelper
         if (!$overrideCache && is_readable($cacheFile)) {
             $update = (array) json_decode(file_get_contents($cacheFile));
 
-            // If we're within the cache time, return the cached data
-            if ($update['checkedTime'] > strtotime('-3 hours')) {
-                return $update;
+            // Check if the user has changed the update channel, if so the cache is invalidated
+            if ($update['stability'] == $this->factory->getParameter('update_stability')) {
+                // If we're within the cache time, return the cached data
+                if ($update['checkedTime'] > strtotime('-3 hours')) {
+                    return $update;
+                }
             }
         }
 
@@ -166,7 +169,8 @@ class UpdateHelper
             'version'      => $latestVersion->version,
             'announcement' => $latestVersion->announcement,
             'package'      => $latestVersion->package,
-            'checkedTime'  => time()
+            'checkedTime'  => time(),
+            'stability'    => $this->factory->getParameter('update_stability')
         );
 
         file_put_contents($cacheFile, json_encode($data));
