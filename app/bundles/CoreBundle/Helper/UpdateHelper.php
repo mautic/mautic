@@ -100,6 +100,25 @@ class UpdateHelper
         // Get our HTTP client
         $connector = HttpFactory::getHttp();
 
+        // Before processing the update data, send up our metrics data
+        try {
+            // Generate a unique instance ID for the site
+            $instanceId = hash('sha1', $this->factory->getParameter('secret') . 'Mautic' . $this->factory->getParameter('db_driver'));
+
+            $data = array(
+                'application' => 'Mautic',
+                'version'     => $this->factory->getVersion(),
+                'phpVerison'  => PHP_VERSION,
+                'dbDriver'    => $this->factory->getParameter('db_driver'),
+                'serverOs'    => php_uname('s') . ' ' . php_uname('r'),
+                'instanceId'  => $instanceId
+            );
+
+            $connector->post('http://mautic.org/stats/send', $data);
+        } catch (\Exception $exception) {
+            // Not so concerned about failures here, move along
+        }
+
         // GET the update data
         try {
             $data    = $connector->get('http://mautic.org/downloads/update.json');
