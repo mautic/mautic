@@ -161,45 +161,31 @@ if ($permissions['campaign:campaigns:edit']): ?>
                 </div>
             </div>
             <!--/ stats -->
+
+            <!-- tabs controls -->
+            <ul class="nav nav-tabs pr-md pl-md">
+                <li class="active">
+                    <a href="#decisions-container" role="tab" data-toggle="tab">
+                        <?php echo $view['translator']->trans('mautic.campaign.event.decisions.header'); ?>
+                    </a>
+                </li>
+                <li class="">
+                    <a href="#actions-container" role="tab" data-toggle="tab">
+                        <?php echo $view['translator']->trans('mautic.campaign.event.actions.header'); ?>
+                    </a>
+                </li>
+            </ul>
+            <!--/ tabs controls -->
         </div>
 
         <!-- start: tab-content -->
         <div class="tab-content pa-md">
             <!-- #events-container -->
-            <div class="tab-pane active fade in bdr-w-0" id="event-container">
-
-                <!-- start: trigger type event -->
-                <ul class="list-group campaign-event-list">
-                    <?php if (isset($events) && is_array($events)) : ?>
-                        <?php foreach ($events as $event) : ?>
-                            <li class="list-group-item bg-auto bg-light-xs">
-                                <div class="progress-bar progress-bar-success" style="width:<?php echo $event['percent']; ?>%"></div>
-                                <div class="box-layout">
-                                    <div class="col-md-1 va-m">
-                                        <h3>
-                                            <?php if ($event['eventType'] == 'decision') : ?>
-                                                <span class="fa fa-bullseye text-danger"></span>
-                                            <?php else : ?>
-                                                <span class="fa fa-rocket text-success"></span>
-                                            <?php endif; ?>
-                                        </h3>
-                                    </div>
-                                    <div class="col-md-7 va-m">
-                                        <h5 class="fw-sb text-primary mb-xs">
-                                            <?php echo $event['name']; ?>
-                                            <small><?php echo $event['percent']; ?> %</small>
-                                        </h5>
-                                        <h6 class="text-white dark-sm"><?php echo $event['description']; ?></h6>
-                                    </div>
-                                    <div class="col-md-4 va-m text-right">
-                                        <em class="text-white dark-sm"><?php echo $view['translator']->trans('mautic.campaign.' . $event['type']); ?></em>
-                                    </div>
-                                </div>
-                            </li>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                </ul>
-                <!--/ end: trigger type event -->
+            <div class="tab-pane active fade in bdr-w-0" id="decisions-container">
+                <?php echo $view->render('MauticCampaignBundle:Campaign:events.html.php', array('events' => $events, 'eventType' => 'decision')); ?>
+            </div>
+            <div class="tab-pane active fade in bdr-w-0" id="actions-container">
+                <?php echo $view->render('MauticCampaignBundle:Campaign:events.html.php', array('events' => $events, 'eventType' => 'action')); ?>
             </div>
             <!--/ #events-container -->
         </div>
