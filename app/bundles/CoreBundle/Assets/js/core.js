@@ -194,10 +194,9 @@ var Mautic = {
             scrollInput: false
         });
 
-        mQuery(container + " input[data-toggle='color']").spectrum({
-            allowEmpty: true,
-            showInput: true,
-            preferredFormat: 'hex'
+        mQuery(container + " input[data-toggle='color']").pickAColor({
+            fadeMenuToggle: false,
+            inlineDropdown: true
         });
 
         //convert multiple selects into chosen

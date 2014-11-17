@@ -111,11 +111,9 @@ class ChannelController extends FormController
 
             return $response;
         } else {
-            $formView = $this->setFormTheme($form, 'MauticChatBundle:Channel:form.html.php', 'MauticChatBundle:FormChannel');
-
             return $this->delegateView(array(
                 'viewParameters'  => array(
-                    'form' => $formView
+                    'form' => $form->createView()
                 ),
                 'contentTemplate' => 'MauticChatBundle:Channel:form.html.php'
             ));
@@ -157,10 +155,8 @@ class ChannelController extends FormController
             }
         }
 
-        $formView = $this->setFormTheme($form, 'MauticChatBundle:Channel:form.html.php', 'MauticChatBundle:FormChannel');
-
         return $this->delegateView(array(
-            'viewParameters'  => array('form' => $formView),
+            'viewParameters'  => array('form' => $form->createView()),
             'contentTemplate' => 'MauticChatBundle:Channel:form.html.php',
             'passthroughVars' => array(
                 'mauticContent' => 'chatchannel',

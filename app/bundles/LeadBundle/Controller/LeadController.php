@@ -428,11 +428,9 @@ class LeadController extends FormController
             $form->get('owner_lookup')->setData($userName);
         }
 
-        $formView = $this->setFormTheme($form, 'MauticLeadBundle:Lead:form.html.php', 'MauticLeadBundle:FormLead');
-
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'form'   => $formView,
+                'form'   => $form->createView(),
                 'lead'   => $lead,
                 'fields' => $model->organizeFieldsByGroup($fields)
             ),
@@ -575,11 +573,9 @@ class LeadController extends FormController
             }
         }
 
-        $formView = $this->setFormTheme($form, 'MauticLeadBundle:Lead:form.html.php', 'MauticLeadBundle:FormLead');
-
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'form'   => $formView,
+                'form'   => $form->createView(),
                 'lead'   => $lead,
                 'fields' => $lead->getFields() //pass in the lead fields as they are already organized by ['group']['alias']
             ),

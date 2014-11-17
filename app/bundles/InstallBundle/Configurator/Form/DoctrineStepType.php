@@ -92,7 +92,7 @@ class DoctrineStepType extends AbstractType
                     'type'  => 'submit',
                     'attr'  => array(
                         'class'   => 'btn btn-success pull-right mt-20',
-                        'icon'    => 'fa fa-arrow-circle-right padding-sm-right'
+                        'icon'    => 'fa fa-arrow-circle-right'
                     )
                 )
             ),

@@ -36,9 +36,13 @@ echo $view['form']->start($form);
     <!-- container -->
     <div class="col-md-9 bg-white height-auto">
         <div class="bg-auto bg-dark-xs">
-            <div class="pa-md">
+            <div class="col-md-6">
                 <?php echo $view['form']->row($form['name']); ?>
+            </div>
+            <div class="col-md-6">
                 <?php echo $view['form']->row($form['alias']); ?>
+            </div>
+            <div class="pa-md">
                 <?php echo $view['form']->row($form['description']); ?>
             </div>
             <ul class="nav nav-tabs pr-md pl-md" role="tablist">

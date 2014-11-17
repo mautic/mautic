@@ -54,7 +54,8 @@ $parameters = array(
     //maxmind_country, maxmind_precision, or maxmind_omni (paid; username/license key required)
     'ip_lookup_auth'               => '',
     'transifex_username'           => '',
-    'transifex_password'           => ''
+    'transifex_password'           => '',
+    'update_stability'             => 'stable'
 );
 
 return $parameters;

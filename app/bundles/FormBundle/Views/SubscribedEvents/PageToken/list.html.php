@@ -17,7 +17,7 @@ if ($tmpl == 'index') {
         if (count($items)):
         foreach ($items as $i):?>
             <li class="list-group-item" data-token="{form=<?php echo $i[0]->getId(); ?>}">
-                <div class="padding-sm">
+                <div>
                     <span><i class="fa fa-fw fa-list"></i><?php echo $i[0]->getName(); ?></span>
                 </div>
             </li>

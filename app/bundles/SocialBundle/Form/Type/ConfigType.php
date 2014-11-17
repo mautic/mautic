@@ -39,7 +39,7 @@ class ConfigType extends AbstractType
 
         $builder->add('buttons', 'form_buttons', array(
             'apply_text'  => 'mautic.core.form.save',
-            'apply_icon'  => 'fa fa-save padding-sm-right',
+            'apply_icon'  => 'fa fa-save',
             'save_text'   => false,
             'cancel_text' => false
         ));

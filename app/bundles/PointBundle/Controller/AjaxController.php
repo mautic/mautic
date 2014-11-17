@@ -61,8 +61,9 @@ class AjaxController extends CommonAjaxController
             if (isset($actions['actions'][$type])) {
                 $formType = (!empty($actions['actions'][$type]['formType'])) ? $actions['actions'][$type]['formType'] : 'genericpoint_settings';
                 $form     = $this->get('form.factory')->create('pointaction', array(), array('formType' => $formType));
-                $formView = $this->setFormTheme($form, 'MauticPointBundle:Point:actionform.html.php', 'MauticPointBundle:PointForm');
-                $html     = $this->renderView('MauticPointBundle:Point:actionform.html.php', array('form' => $formView));
+                $html     = $this->renderView('MauticPointBundle:Point:actionform.html.php', array(
+                    'form' => $this->setFormTheme($form, 'MauticPointBundle:Point:actionform.html.php', 'MauticPointBundle:FormTheme\Action')
+                ));
 
                 //replace pointaction with point
                 $html                 = str_replace('pointaction', 'point', $html);

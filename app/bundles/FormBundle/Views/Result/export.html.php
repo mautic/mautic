@@ -15,7 +15,7 @@ $view['slots']->set("headerTitle", $view['translator']->trans('mautic.form.resul
 )));
 ?>
 
-<div class="table-responsive body-white padding-sm formresults">
+<div class="table-responsive formresults">
     <?php
     /**
      * @package     Mautic

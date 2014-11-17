@@ -50,23 +50,6 @@ class PageType extends AbstractType
         $variantParent = $options['data']->getVariantParent();
         $isVariant     = !empty($variantParent);
 
-        if ($isVariant) {
-
-            $builder->add("pagevariant-panel-wrapper-start", 'panel_wrapper_start', array(
-                'attr' => array(
-                    'id' => "page-panel"
-                )
-            ));
-
-            //details
-            $builder->add("details-panel-start", 'panel_start', array(
-                'label'      => 'mautic.page.page.panel.variantdetails',
-                'dataParent' => '#page-panel',
-                'bodyId'     => 'details-panel',
-                'bodyAttr'   => array('class' => 'in')
-            ));
-        }
-
         $builder->add('title', 'text', array(
             'label'      => 'mautic.page.page.form.title',
             'label_attr' => array('class' => 'control-label'),
@@ -86,7 +69,8 @@ class PageType extends AbstractType
 
         //add category
         $builder->add('category', 'category', array(
-            'bundle' => 'page'
+            'bundle'   => 'page',
+            'disabled' => $isVariant
         ));
 
         //build a list
@@ -185,23 +169,10 @@ class PageType extends AbstractType
         $builder->add('sessionId', 'hidden');
 
         if ($isVariant) {
-
-            $builder->add("details-panel-end", 'panel_end');
-
-            $builder->add("abtest-panel-start", 'panel_start', array(
-                'label' => 'mautic.page.page.panel.abtest',
-                'dataParent' => '#page-panel',
-                'bodyId'     => 'abtest-panel'
-            ));
-
-            $builder->add('variant_settings', 'pagevariant', array(
+            $builder->add('variantSettings', 'pagevariant', array(
                 'label'       => false,
                 'page_entity' => $options['data']
             ));
-
-            $builder->add("abtest-panel-end", 'panel_end');
-
-            $builder->add("pagevariant-panel-wrapper-end", 'panel_wrapper_end');
         }
 
         $builder->add('buttons', 'form_buttons', array(
@@ -211,7 +182,7 @@ class PageType extends AbstractType
                     'label' => 'mautic.page.page.launch.builder',
                     'attr'  => array(
                         'class'   => 'btn btn-default',
-                        'icon'    => 'fa fa-cube padding-sm-right text-mautic',
+                        'icon'    => 'fa fa-cube text-mautic',
                         'onclick' => "Mautic.launchPageEditor();"
                     )
                 )

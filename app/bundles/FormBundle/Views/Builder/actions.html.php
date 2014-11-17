@@ -26,8 +26,6 @@ if (empty($actionType)) {
 } else {
     $actionType .= '_';
 }
-
-
 ?>
 
 <div class="form-buttons hide">

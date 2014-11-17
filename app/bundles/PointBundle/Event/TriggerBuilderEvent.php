@@ -43,8 +43,7 @@ class TriggerBuilderEvent extends Event
      * Adds an action to the list of available .
      *
      * @param string $key - a unique identifier; it is recommended that it be namespaced i.e. lead.action
-     * @param array $action - can contain the following keys:
-     *  'group'       => (required) translation string to group events by
+     * @param array $event - can contain the following keys:
      *  'label'       => (required) what to display in the list
      *  'description' => (optional) short description of event
      *  'template'    => (optional) template to use for the action's HTML in the point builder
@@ -70,7 +69,7 @@ class TriggerBuilderEvent extends Event
      * @return void
      * @throws InvalidArgumentException
      */
-    public function addEvent($key, array $action)
+    public function addEvent($key, array $event)
     {
         if (array_key_exists($key, $this->events)) {
             throw new InvalidArgumentException("The key, '$key' is already used by another action. Please use a different key.");
@@ -78,14 +77,15 @@ class TriggerBuilderEvent extends Event
 
         //check for required keys and that given functions are callable
         $this->verifyComponent(
-            array('group', 'label', 'callback'),
+            array('label', 'callback'),
             array('callback'),
-            $action
+            $event
         );
 
-        //translate the group
-        $action['group'] = $this->translator->trans($action['group']);
-        $this->events[$key] = $action;
+        $event['label']       = $this->translator->trans($event['label']);
+        $event['description'] = (isset($event['description'])) ? $this->translator->trans($event['description']) : '';
+
+        $this->events[$key] = $event;
     }
 
     /**
@@ -97,7 +97,7 @@ class TriggerBuilderEvent extends Event
     {
         uasort($this->events, function ($a, $b) {
             return strnatcasecmp(
-                $a['group'], $b['group']);
+                $a['label'], $b['label']);
         });
         return $this->events;
     }

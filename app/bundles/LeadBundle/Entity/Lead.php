@@ -590,8 +590,8 @@ class Lead extends FormEntity
     }
 
     /**
-     * @ORM\preUpdate
-     * @ORM\prePersist
+     * @ORM\PreUpdate
+     * @ORM\PrePersist
      */
     public function checkDateIdentified()
     {

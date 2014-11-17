@@ -23,9 +23,11 @@ $header = ($email->getId()) ?
 
 $view['slots']->set("headerTitle", $header.$subheader);
 ?>
+    <!-- start: box layout -->
+<div class="box-layout">
 <?php echo $view['form']->start($form); ?>
-<div class="row">
-    <div class="col-md-8">
+    <!-- container -->
+    <div class="col-md-9 bg-auto height-auto bdr-r">
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title">
@@ -38,30 +40,41 @@ $view['slots']->set("headerTitle", $header.$subheader);
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <?php echo $view['form']->end($form); ?>
-        <div class="hide builder email-builder">
-            <div class="builder-content">
-                <input type="hidden" id="EmailBuilderUrl" value="<?php echo $view['router']->generate('mautic_email_action', array('objectAction' => 'builder', 'objectId' => $email->getSessionId())); ?>" />
-            </div>
-            <div class="builder-panel">
-                <p>
-                    <button type="button" class="btn btn-primary btn-close-builder" onclick="Mautic.closeEmailEditor();"><?php echo $view['translator']->trans('mautic.email.builder.close'); ?></button>
-                </p>
-                <div class="well well-sm margin-md-top"><em><?php echo $view['translator']->trans('mautic.email.token.help'); ?></em></div>
-                <div class="panel-group margin-sm-top" id="pageTokensPanel">
-                    <?php foreach ($tokens as $k => $t): ?>
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h4 class="panel-title"><?php echo $t['header']; ?></h4>
-                            </div>
-                            <div class="panel-body">
-                                <?php echo $t['content']; ?>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
+    <div class="col-md-3 bg-white height-auto">
+        <div class="pr-lg pl-lg pt-md pb-md">
+            <?php if (isset($form['variantSettings'])): ?>
+                <?php echo $view['form']->row($form['variantSettings']); ?>
+                <?php echo $view['form']->row($form['template']); ?>
+                <?php echo $view['form']->row($form['isPublished']); ?>
+                <?php echo $view['form']->row($form['publishUp']); ?>
+                <?php echo $view['form']->row($form['publishDown']); ?>
+            <?php endif; ?>
+            <?php echo $view['form']->rest($form); ?>
+        </div>
+    </div>
+<?php echo $view['form']->end($form); ?>
+</div>
+
+<div class="hide builder email-builder">
+    <div class="builder-content">
+        <input type="hidden" id="EmailBuilderUrl" value="<?php echo $view['router']->generate('mautic_email_action', array('objectAction' => 'builder', 'objectId' => $email->getSessionId())); ?>" />
+    </div>
+    <div class="builder-panel">
+        <p>
+            <button type="button" class="btn btn-primary btn-close-builder" onclick="Mautic.closeEmailEditor();"><?php echo $view['translator']->trans('mautic.email.builder.close'); ?></button>
+        </p>
+        <div class="well well-sm margin-md-top"><em><?php echo $view['translator']->trans('mautic.email.token.help'); ?></em></div>
+        <div class="panel-group margin-sm-top" id="pageTokensPanel">
+            <?php foreach ($tokens as $k => $t): ?>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title"><?php echo $t['header']; ?></h4>
+                    </div>
+                    <div class="panel-body">
+                        <?php echo $t['content']; ?>
+                    </div>
                 </div>
-            </div>
+            <?php endforeach; ?>
         </div>
     </div>
 </div>

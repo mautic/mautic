@@ -17,7 +17,7 @@ if ($tmpl == 'index') {
         if (count($items)):
         foreach ($items as $i):?>
             <li class="list-group-item" data-token="{leadfield=<?php echo $i['alias']; ?>}">
-                <div class="padding-sm">
+                <div>
                     <span><?php echo $i['label']; ?></span>
                 </div>
             </li>

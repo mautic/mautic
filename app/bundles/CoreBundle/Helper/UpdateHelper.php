@@ -91,19 +91,47 @@ class UpdateHelper
         if (!$overrideCache && is_readable($cacheFile)) {
             $update = (array) json_decode(file_get_contents($cacheFile));
 
-            // If we're within the cache time, return the cached data
-            if ($update['checkedTime'] > strtotime('-3 hours')) {
-                return $update;
+            // Check if the user has changed the update channel, if so the cache is invalidated
+            if ($update['stability'] == $this->factory->getParameter('update_stability')) {
+                // If we're within the cache time, return the cached data
+                if ($update['checkedTime'] > strtotime('-3 hours')) {
+                    return $update;
+                }
             }
         }
 
         // Get our HTTP client
         $connector = HttpFactory::getHttp();
 
-        // GET the update data
+        // Before processing the update data, send up our metrics
         try {
-            $data    = $connector->get('http://mautic.org/downloads/update.json');
-            $updates = json_decode($data->body);
+            // Generate a unique instance ID for the site
+            $instanceId = hash('sha1', $this->factory->getParameter('secret') . 'Mautic' . $this->factory->getParameter('db_driver'));
+
+            $data = array(
+                'application' => 'Mautic',
+                'version'     => $this->factory->getVersion(),
+                'phpVerison'  => PHP_VERSION,
+                'dbDriver'    => $this->factory->getParameter('db_driver'),
+                'serverOs'    => php_uname('s') . ' ' . php_uname('r'),
+                'instanceId'  => $instanceId
+            );
+
+            $connector->post('http://mautic.org/stats/send', $data);
+        } catch (\Exception $exception) {
+            // Not so concerned about failures here, move along
+        }
+
+        // Get the update data
+        try {
+            $appData = array(
+                'appVersion' => $this->factory->getVersion(),
+                'phpVersion' => PHP_VERSION,
+                'stability'  => $this->factory->getParameter('update_stability')
+            );
+            // TODO - Whenever I get the router hooked up on the component, change this URL
+            $data    = $connector->post('http://mautic.org/index.php?option=com_mauticdownload&task=checkUpdates', $appData);
+            $update  = json_decode($data->body);
         } catch (\Exception $exception) {
             return array(
                 'error'   => true,
@@ -118,37 +146,23 @@ class UpdateHelper
             );
         }
 
-        // Check which update stream the usser wants to see data for
-        // TODO - When the param exists, use it instead of hardcoding to stable
-        $stability = 'stable';
-        $latestVersion = $updates->$stability;
-
         // If the user's up-to-date, go no further
-        if (version_compare($this->factory->getVersion(), $latestVersion->version, '>=')) {
+        if ($update->latest_version) {
             return array(
                 'error'   => false,
                 'message' => 'mautic.core.updater.running.latest.version'
             );
         }
 
-        // If the user's server doesn't meet the minimum requirements for the update, notify them of such
-        if (version_compare($this->factory->getVersion(), $latestVersion->min_version, '<') || version_compare(PHP_VERSION, $latestVersion->php_version, '<')) {
-            return array(
-                'error'       => false,
-                'message'     => 'mautic.core.updater.requirements.not.met',
-                'min_version' => $latestVersion->min_version,
-                'php_version' => $latestVersion->php_version
-            );
-        }
-
-        // If we got this far, the user is able to update to the latest version, cache the data first
+        // The user is able to update to the latest version, cache the data first
         $data = array(
             'error'        => false,
             'message'      => 'mautic.core.updater.update.available',
-            'version'      => $latestVersion->version,
-            'announcement' => $latestVersion->announcement,
-            'package'      => $latestVersion->package,
-            'checkedTime'  => time()
+            'version'      => $update->version,
+            'announcement' => $update->announcement,
+            'package'      => $update->package,
+            'checkedTime'  => time(),
+            'stability'    => $this->factory->getParameter('update_stability')
         );
 
         file_put_contents($cacheFile, json_encode($data));

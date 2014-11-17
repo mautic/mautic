@@ -55,7 +55,8 @@ class ConfigType extends AbstractType
                         'data'        => (bool) $value
                     ));
                 } elseif (in_array($key, array(
-                    'api_mode', 'locale', 'theme', 'ip_lookup_service', 'mailer_spool_type', 'mailer_transport', 'mailer_encryption', 'mailer_auth_mode'
+                    'api_mode', 'locale', 'theme', 'ip_lookup_service', 'mailer_spool_type', 'mailer_transport', 'mailer_encryption',
+                    'mailer_auth_mode', 'update_stability'
                 ))) {
                     switch ($key) {
                         case 'api_mode':
@@ -110,7 +111,15 @@ class ConfigType extends AbstractType
                             $choices = array(
                                 'plain'    => 'mautic.core.config.mailer_auth_mode.plain',
                                 'login'    => 'mautic.core.config.mailer_auth_mode.login',
-                                'cram-md5' => 'mautic.core.config.mailer_auth_mode.cram-md5',
+                                'cram-md5' => 'mautic.core.config.mailer_auth_mode.cram-md5'
+                            );
+                            break;
+                        case 'update_stability':
+                            $choices = array(
+                                'alpha'  => 'mautic.core.config.update_stability.alpha',
+                                'beta'   => 'mautic.core.config.update_stability.beta',
+                                'rc'     => 'mautic.core.config.update_stability.rc',
+                                'stable' => 'mautic.core.config.update_stability.stable'
                             );
                             break;
                     }

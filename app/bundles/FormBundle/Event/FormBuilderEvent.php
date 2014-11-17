@@ -46,7 +46,6 @@ class FormBuilderEvent extends Event
      *
      * @param string $key - a unique identifier; it is recommended that it be namespaced i.e. lead.action
      * @param array $action - can contain the following keys:
-     *  'group'       => (required) translation string to group actions by
      *  'label'       => (required) what to display in the list
      *  'description' => (optional) short description of event
      *  'template'    => (optional) template to use for the action's HTML in the form builder
@@ -76,13 +75,12 @@ class FormBuilderEvent extends Event
 
         //check for required keys and that given functions are callable
         $this->verifyComponent(
-            array('group', 'label', 'formType', 'callback'),
+            array('label', 'formType', 'callback'),
             array('callback'),
             $action
         );
 
-        //translate the group
-        $action['group'] = $this->translator->trans($action['group']);
+        $action['label'] = $this->translator->trans($action['label']);
         $this->actions[$key] = $action;
     }
 
@@ -95,7 +93,7 @@ class FormBuilderEvent extends Event
     {
         uasort($this->actions, function ($a, $b) {
             return strnatcasecmp(
-                $a['group'], $b['group']);
+                $a['label'], $b['label']);
         });
         return $this->actions;
     }

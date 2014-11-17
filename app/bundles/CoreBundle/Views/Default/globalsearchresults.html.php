@@ -25,7 +25,7 @@
             </h4>
         </div>
         <div id="<?php echo $unique; ?>-panel" class="panel-collapse collapse">
-            <div class="panel-body padding-md-sides">
+            <div class="panel-body">
                 <?php foreach ($result as $r): ?>
                 <div class="row">
                     <?php echo $r; ?>

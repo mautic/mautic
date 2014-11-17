@@ -71,7 +71,10 @@ class TriggerType extends AbstractType
         $builder->add('points', 'number', array(
             'label'      => 'mautic.point.trigger.form.points',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control')
+            'attr'       => array(
+                'class' => 'form-control',
+                'tooltip' => 'mautic.point.trigger.form.points_descr'
+            )
         ));
 
         $builder->add('color', 'text', array(
@@ -79,7 +82,8 @@ class TriggerType extends AbstractType
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
                 'class'       => 'form-control',
-                'data-toggle' => 'color'
+                'data-toggle' => 'color',
+                'tooltip' => 'mautic.point.trigger.form.color_descr'
             )
         ));
 

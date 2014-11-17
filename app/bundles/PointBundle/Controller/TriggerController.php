@@ -277,7 +277,7 @@ class TriggerController extends FormController
                 'entity'        => $entity,
                 'form'          => $form->createView()
             ),
-            'contentTemplate' => 'MauticPointBundle:TriggerBuilder:components.html.php',
+            'contentTemplate' => 'MauticPointBundle:Trigger:form.html.php',
             'passthroughVars' => array(
                 'activeLink'    => '#mautic_pointtrigger_index',
                 'mauticContent' => 'pointTrigger',
@@ -446,7 +446,7 @@ class TriggerController extends FormController
                 'entity'        => $entity,
                 'form'          => $form->createView()
             ),
-            'contentTemplate' => 'MauticPointBundle:TriggerBuilder:components.html.php',
+            'contentTemplate' => 'MauticPointBundle:Trigger:form.html.php',
             'passthroughVars' => array(
                 'activeLink'    => '#mautic_pointtrigger_index',
                 'mauticContent' => 'pointTrigger',
