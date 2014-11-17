@@ -26,9 +26,13 @@
                 </div>
                 <div class="media-body">
                     <?php echo $view['translator']->trans('mautic.core.' . $log['action'] . '.by.past.tense'); ?>
-                    <a href="<?php echo $view['router']->generate('mautic_user_action', array('objectAction' => 'edit', 'objectId' => $log['userId'])); ?>" data-toggle="ajax">
+                    <?php if (isset($log['userId']) && $log['userId']) : ?>
+                        <a href="<?php echo $view['router']->generate('mautic_user_action', array('objectAction' => 'edit', 'objectId' => $log['userId'])); ?>" data-toggle="ajax">
+                            <?php echo $log['userName']; ?>
+                        </a>
+                    <?php else: ?>
                         <?php echo $log['userName']; ?>
-                    </a>
+                    <?php endif; ?>
                     <p class="fs-12 dark-sm"><small> <?php echo $view['date']->toFull($log['dateAdded']); ?></small></p>
                 </div>
             </li>
