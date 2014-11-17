@@ -21,7 +21,7 @@ $searchBtnClass = (!empty($searchValue)) ? "fa-eraser" : "fa-search";
 
 <ul class="list-group mt-sm">
     <li class="list-group-item" data-token="{externallink=%url%}" data-predrop="showPageBuilderTokenExternalLinkModal">
-        <div class="padding-sm">
+        <div>
             <span><i class="fa fa-external-link fa-fw"></i><?php echo $view['translator']->trans('mautic.page.builder.externallink'); ?></span>
         </div>
     </li>

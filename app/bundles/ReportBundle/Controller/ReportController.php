@@ -359,12 +359,10 @@ class ReportController extends FormController
             $model->lockEntity($entity);
         }
 
-        $formView = $this->setFormTheme($form, 'MauticReportBundle:Report:form.html.php', 'MauticReportBundle:Form');
-
         return $this->delegateView(array(
             'viewParameters'  =>  array(
                 'report'      => $entity,
-                'form'        => $formView
+                'form'        => $this->setFormTheme($form, 'MauticReportBundle:Report:form.html.php', 'MauticReportBundle:FormTheme\Report'),
             ),
             'contentTemplate' => 'MauticReportBundle:Report:form.html.php',
             'passthroughVars' => array(
@@ -448,12 +446,10 @@ class ReportController extends FormController
             }
         }
 
-        $formView = $this->setFormTheme($form, 'MauticReportBundle:Report:form.html.php', 'MauticReportBundle:Form');
-
         return $this->delegateView(array(
             'viewParameters'  => array(
                 'report'      => $entity,
-                'form'        => $formView
+                'form'        => $this->setFormTheme($form, 'MauticReportBundle:Report:form.html.php', 'MauticReportBundle:FormTheme\Report')
             ),
             'contentTemplate' => 'MauticReportBundle:Report:form.html.php',
             'passthroughVars' => array(

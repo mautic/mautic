@@ -150,7 +150,7 @@ class CampaignType extends AbstractType
                     'label' => 'mautic.campaign.campaign.launch.builder',
                     'attr'  => array(
                         'class'   => 'btn btn-default',
-                        'icon'    => 'fa fa-cube padding-sm-right',
+                        'icon'    => 'fa fa-cube',
                         'onclick' => "Mautic.launchCampaignEditor();"
                     )
                 )

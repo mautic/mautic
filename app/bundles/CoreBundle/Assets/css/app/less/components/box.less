@@ -126,3 +126,14 @@
     }
   }
 }
+
+.tab-pane .box-layout {
+  > [class*=" col-"],
+  > [class^="col-"] {
+    &.height-auto {
+      &:before {
+        top: auto;
+      }
+    }
+  }
+}

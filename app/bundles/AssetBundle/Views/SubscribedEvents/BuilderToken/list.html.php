@@ -17,7 +17,7 @@ if ($tmpl == 'index') {
         if (count($items)):
         foreach ($items as $i):?>
             <li class="list-group-item" data-token="{assetlink=<?php echo $i->getId(); ?>}">
-                <div class="padding-sm">
+                <div>
                     <span><i class="fa fa-fw fa-file-o"></i><?php echo $i->getName() . ' (' . $i->getLanguage() . ')'; ?></span>
                 </div>
             </li>

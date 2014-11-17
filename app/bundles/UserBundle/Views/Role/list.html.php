@@ -34,7 +34,7 @@ endif;
             </div>
         </div>
     </div>
-    <div class="table-responsive scrollable body-white padding-sm page-list">
+    <div class="table-responsive page-list">
         <table class="table table-hover table-striped table-bordered role-list" id="roleTable">
             <thead>
             <tr>

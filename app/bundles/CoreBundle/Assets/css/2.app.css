@@ -2425,6 +2425,10 @@ label {
     float: none;
   }
 }
+.tab-pane .box-layout > [class*=" col-"].height-auto:before,
+.tab-pane .box-layout > [class^="col-"].height-auto:before {
+  top: auto;
+}
 .switch {
   vertical-align: middle;
   margin-bottom: 0;

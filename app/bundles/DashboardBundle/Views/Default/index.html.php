@@ -30,7 +30,7 @@ $view['slots']->set('mauticContent', 'dashboard');
                                     <span class="badge pull-right"><?php echo $newReturningVisitors['new']; ?></span>
                                 </li>
     			                <li class="list-group-item">
-                                    <?php echo $view['translator']->trans('mautic.dashboard.label.returning.visitors'); ?> 
+                                    <?php echo $view['translator']->trans('mautic.dashboard.label.returning.visitors'); ?>
                                     <span class="badge pull-right"><?php echo $newReturningVisitors['returning']; ?></span>
                                 </li>
     			            </ul>
@@ -107,7 +107,7 @@ $view['slots']->set('mauticContent', 'dashboard');
                                         <?php echo $view['translator']->trans('mautic.dashboard.label.most.popular.pages'); ?>
                                     </h3>
                                 </div>
-                                <div class="table-responsive scrollable body-white padding-sm page-list">    
+                                <div class="table-responsive page-list">
                                     <table class="table table-hover table-striped table-bordered point-list">
                                         <thead>
                                             <tr>
@@ -146,7 +146,7 @@ $view['slots']->set('mauticContent', 'dashboard');
                                         <?php echo $view['translator']->trans('mautic.dashboard.label.most.popular.assets'); ?>
                                     </h3>
                                 </div>
-                                <div class="table-responsive scrollable body-white padding-sm page-list">    
+                                <div class="table-responsive">
                                 <table class="table table-hover table-striped table-bordered point-list">
                                     <thead>
                                         <tr>
@@ -181,7 +181,7 @@ $view['slots']->set('mauticContent', 'dashboard');
                                             <?php echo $view['translator']->trans('mautic.dashboard.label.most.popular.campaigns'); ?>
                                         </h3>
                                     </div>
-                                    <div class="table-responsive scrollable body-white padding-sm page-list">    
+                                    <div class="table-responsive">
                                         <table class="table table-hover table-striped table-bordered point-list">
                                             <thead>
                                                 <tr>
@@ -214,7 +214,7 @@ $view['slots']->set('mauticContent', 'dashboard');
 
                 <!-- #page-stats-container -->
                 <div class="tab-pane fade bdr-w-0" id="page-stats-container">
-                    
+
                     <?php if ($upcomingEmails) : ?>
                     <ul class="list-group mb-0">
                         <?php foreach ($upcomingEmails as $email): ?>

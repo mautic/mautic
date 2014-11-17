@@ -194,7 +194,10 @@ var Mautic = {
             scrollInput: false
         });
 
-        mQuery(container + " input[data-toggle='color']").pickAColor();
+        mQuery(container + " input[data-toggle='color']").pickAColor({
+            fadeMenuToggle: false,
+            inlineDropdown: true
+        });
 
         //convert multiple selects into chosen
         mQuery("select[multiple]").chosen({

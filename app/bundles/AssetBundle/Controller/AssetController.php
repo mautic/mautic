@@ -412,13 +412,9 @@ class AssetController extends FormController
             $model->lockEntity($entity);
         }
 
-        $formView = $this->setFormTheme($form, 'MauticAssetBundle:Asset:form.html.php', 'MauticAssetBundle:FormVariant');
-
-        // $getBuilderComponents    = $model->getBuilderComponents();
         return $this->delegateView(array(
             'viewParameters'  =>  array(
-                'form'        => $formView,
-                // 'tokens'      => $builderComponents['assetTokens'],
+                'form'        => $form->createView(),
                 'activeAsset'  => $entity
             ),
             'contentTemplate' => 'MauticAssetBundle:Asset:form.html.php',

@@ -514,12 +514,10 @@ class PageController extends FormController
                 $form->get('translationParent_lookup')->setData($parent->getTitle());
         }
 
-        $formView = $this->setFormTheme($form, 'MauticPageBundle:Page:form.html.php', 'MauticPageBundle:FormVariant');
-
         $builderComponents    = $model->getBuilderComponents($entity);
         return $this->delegateView(array(
             'viewParameters'  =>  array(
-                'form'        => $formView,
+                'form'        => $this->setFormTheme($form, 'MauticPageBundle:Page:form.html.php', 'MauticPageBundle:FormTheme\Variant'),
                 'tokens'      => $builderComponents['pageTokens'],
                 'activePage'  => $entity
             ),

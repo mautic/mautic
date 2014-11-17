@@ -110,7 +110,7 @@ class ConfigController extends FormController
                 'permissions' => $permissions,
                 'tmpl'        => $tmpl,
                 'security'    => $this->factory->getSecurity(),
-                'form'        => $this->setFormTheme($form, 'MauticConfigBundle:Config:form.html.php', 'MauticConfigBundle:Config')
+                'form'        => $form->createView()
             ),
             'contentTemplate' => 'MauticConfigBundle:Config:form.html.php',
             'passthroughVars' => array(

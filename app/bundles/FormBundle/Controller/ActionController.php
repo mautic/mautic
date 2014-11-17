@@ -89,8 +89,7 @@ class ActionController extends CommonFormController
         } else {
             $closeModal                 = false;
             $viewParams['tmpl']         = 'action';
-            $formView                   = $this->setFormTheme($form, 'MauticFormBundle:Form:index.html.php', 'MauticFormBundle:FormComponent');
-            $viewParams['form']         = $formView;
+            $viewParams['form']         = $form->createView();
             $header                     = $formAction['settings']['label'];
             $viewParams['actionHeader'] = $this->get('translator')->trans($header);
         }
@@ -215,8 +214,7 @@ class ActionController extends CommonFormController
             } else {
                 $closeModal                 = false;
                 $viewParams['tmpl']         = 'action';
-                $formView                   = $this->setFormTheme($form, 'MauticFormBundle:Form:index.html.php', 'MauticFormBundle:FormComponent');
-                $viewParams['form']         = $formView;
+                $viewParams['form']         = $form->createView();
                 $viewParams['actionHeader'] = $this->get('translator')->trans($formAction['settings']['label']);
             }
 

@@ -17,9 +17,9 @@ $header = ($activeForm->getId()) ?
 $view['slots']->set("headerTitle", $header);
 ?>
 
-<div class="row bundle-content-container">
-    <div class="col-xs-12 bundle-main bundle-main-left auto-height">
-        <div class="rounded-corners body-white bundle-main-inner-wrapper scrollable padding-md">
+<div class="row">
+    <div class="col-xs-12">
+        <div>
             <!-- tabs controls -->
                 <ul class="nav nav-tabs pr-md pl-md">
                     <li class="active"><a href="#details-container" role="tab" data-toggle="tab">Details</a></li>
@@ -34,22 +34,36 @@ $view['slots']->set("headerTitle", $header);
                 <div class="tab-content pa-md bg-white">
                     <!-- #history-container -->
                     <div class="tab-pane fade in active bdr-w-0" id="details-container">
-                        <div class="row bundle-content-container">
-                            <div class="col-xs-12 col-sm-6 bundle-main bundle-main-left auto-height">
-                                <?php
-                                echo $view['form']->row($form['name']);
-                                echo $view['form']->row($form['description']);
-                                echo $view['form']->row($form['postAction']);
-                                echo $view['form']->row($form['postActionProperty']);
-                            ?>
+                        <div class="box-layout">
+                            <div class="col-md-9 bg-auto height-auto bdr-r">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="pa-md">
+                                            <?php
+                                            echo $view['form']->row($form['name']);
+                                            echo $view['form']->row($form['description']);
+                                            ?>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="pa-md">
+                                        <?php
+                                        echo $view['form']->row($form['postAction']);
+                                        echo $view['form']->row($form['postActionProperty']);
+                                        ?>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-xs-12 col-sm-6 bundle-main bundle-main-right auto-height">
-                                <?php
-                                echo $view['form']->row($form['category']);
-                                echo $view['form']->row($form['isPublished']);
-                                echo $view['form']->row($form['publishUp']);
-                                echo $view['form']->row($form['publishDown']);
-                            ?>
+                            <div class="col-md-3 bg-white height-auto">
+                                <div class="pr-lg pl-lg pt-md pb-md">
+                                    <?php
+                                    echo $view['form']->row($form['category']);
+                                    echo $view['form']->row($form['isPublished']);
+                                    echo $view['form']->row($form['publishUp']);
+                                    echo $view['form']->row($form['publishDown']);
+                                    ?>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -67,7 +81,7 @@ $view['slots']->set("headerTitle", $header);
                                         <?php foreach ($fields as $fieldType => $field): ?>
                                             <li id="field_<?php echo $fieldType; ?>">
                                                 <a class="list-group-item" data-toggle="ajaxmodal" data-target="#formComponentModal" href="<?php echo $view['router']->generate('mautic_formfield_action', array('objectAction' => 'new', 'type' => $fieldType, 'tmpl' => 'field')); ?>">
-                                                    <div class="padding-sm">
+                                                    <div>
                                                         <?php echo $field; ?>
                                                     </div>
                                                 </a>
@@ -113,7 +127,7 @@ $view['slots']->set("headerTitle", $header);
                                             <?php foreach ($groupActions as $k => $e): ?>
                                                 <li id="action_<?php echo $group . '_' . $k; ?>">
                                                     <a data-toggle="ajaxmodal" data-target="#formComponentModal" class="list-group-item" href="<?php echo $view['router']->generate('mautic_formaction_action', array('objectAction' => 'new', 'type' => $k, 'tmpl'=> 'action')); ?>">
-                                                        <div class="padding-sm" data-toggle="tooltip" title="<?php echo  $view['translator']->trans($e['description']); ?>">
+                                                        <div data-toggle="tooltip" title="<?php echo  $view['translator']->trans($e['description']); ?>">
                                                             <span><?php echo $view['translator']->trans($e['label']); ?></span>
                                                         </div>
                                                     </a>

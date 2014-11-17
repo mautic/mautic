@@ -180,12 +180,11 @@ class PointController extends FormController
             }
         }
 
-        $formView = $this->setFormTheme($form, 'MauticPointBundle:Point:form.html.php', 'MauticPointBundle:PointForm');
         return $this->delegateView(array(
             'viewParameters'  => array(
                 'tmpl'           => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                 'entity'         => $entity,
-                'form'           => $formView,
+                'form'           => $this->setFormTheme($form, 'MauticPointBundle:Point:form.html.php', 'MauticPointBundle:FormTheme\Action'),
                 'actions'        => $actions['actions']
             ),
             'contentTemplate' => 'MauticPointBundle:Point:form.html.php',
@@ -309,12 +308,11 @@ class PointController extends FormController
             $model->lockEntity($entity);
         }
 
-        $formView = $this->setFormTheme($form, 'MauticPointBundle:Point:form.html.php', 'MauticPointBundle:PointForm');
         return $this->delegateView(array(
             'viewParameters'  => array(
                 'tmpl'           => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                 'entity'         => $entity,
-                'form'           => $formView,
+                'form'           => $this->setFormTheme($form, 'MauticPointBundle:Point:form.html.php', 'MauticPointBundle:FormTheme\Action'),
                 'actions'        => $actions['actions']
             ),
             'contentTemplate' => 'MauticPointBundle:Point:form.html.php',

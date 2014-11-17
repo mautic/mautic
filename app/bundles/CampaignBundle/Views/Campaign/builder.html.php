@@ -37,7 +37,7 @@
                         <div class="campaign-event-group-body list-group">
                             <?php foreach ($eventSettings['decision'] as $k => $e): ?>
                                 <a id="campaignEvent_<?php echo str_replace('.', '', $k); ?>" data-toggle="ajaxmodal" data-ignore-removemodal="true" data-target="#CampaignEventModal" class="list-group-item list-campaign-decision" href="<?php echo $view['router']->generate('mautic_campaignevent_action', array('objectAction' => 'new', 'type' => $k, 'eventType'=> 'decision')); ?>">
-                                    <div class="padding-sm" data-toggle="tooltip" title="<?php echo $e['description']; ?>">
+                                    <div data-toggle="tooltip" title="<?php echo $e['description']; ?>">
                                         <span><?php echo $e['label']; ?></span>
                                     </div>
                                 </a>
@@ -82,7 +82,7 @@
                     <div class="panel-body">
                         <?php foreach ($eventSettings['action'] as $k => $e): ?>
                             <a id="campaignEvent_<?php echo str_replace('.', '', $k); ?>" data-toggle="ajaxmodal" data-ignore-removemodal="true" data-target="#CampaignEventModal" class="list-group-item list-campaign-action" href="<?php echo $view['router']->generate('mautic_campaignevent_action', array('objectAction' => 'new', 'type' => $k, 'eventType'=> 'action')); ?>">
-                                <div class="padding-sm" data-toggle="tooltip" title="<?php echo $e['description']; ?>">
+                                <div data-toggle="tooltip" title="<?php echo $e['description']; ?>">
                                     <span><?php echo $e['label']; ?></span>
                                 </div>
                             </a>

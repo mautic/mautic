@@ -22,14 +22,14 @@ if ($tmpl == 'index') {
             'mautic_pointaction_action',
             array('objectAction' => 'new', 'type' => $k, 'tmpl' => 'action')); ?>">
             <div class="page-list-item">
-                <div class="padding-sm">
-                    <div class="pull-left padding-sm">
+                <div>
+                    <div class="pull-left">
                         <span class="list-item-primary"><?php echo $view['translator']->trans($e['label']); ?></span>
                         <?php if (isset($e['description'])): ?>
                             <span class="list-item-secondary"><?php echo  $view['translator']->trans($e['description']); ?></span>
                         <?php endif; ?>
                     </div>
-                    <div class="pull-right padding-sm">
+                    <div class="pull-right">
                         <i class="fa fa-fw fa-plus fa-lg"></i>
                     </div>
                     <div class="clearfix"></div>
