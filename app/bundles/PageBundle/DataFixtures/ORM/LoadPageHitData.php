@@ -19,8 +19,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Class LoadPageHitData
- *
- * @package Mautic\PageBundle\DataFixtures\ORM
  */
 class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
 {
@@ -33,7 +31,6 @@ class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface
     /**
      * {@inheritdoc}
      */
-
     public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
@@ -70,7 +67,7 @@ class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface
     }
 
     /**
-     * @return int
+     * {@inheritdoc}
      */
     public function getOrder()
     {

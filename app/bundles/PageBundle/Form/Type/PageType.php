@@ -19,30 +19,39 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * Class PageType
- *
- * @package Mautic\PageBundle\Form\Type
  */
 class PageType extends AbstractType
 {
 
+    /**
+     * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
+     */
     private $translator;
+
+    /**
+     * @var array
+     */
     private $themes;
+
+    /**
+     * @var bool|mixed
+     */
     private $defaultTheme;
 
     /**
      * @param MauticFactory $factory
      */
-    public function __construct(MauticFactory $factory) {
+    public function __construct(MauticFactory $factory)
+    {
         $this->translator   = $factory->getTranslator();
         $this->themes       = $factory->getInstalledThemes('page');
         $this->defaultTheme = $factory->getParameter('theme');
     }
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
+     * {@inheritdoc}
      */
-    public function buildForm (FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(array('content' => 'html')));
         $builder->addEventSubscriber(new FormExitSubscriber('page.page', $options));
@@ -183,19 +192,19 @@ class PageType extends AbstractType
                     'attr'  => array(
                         'class'   => 'btn btn-default',
                         'icon'    => 'fa fa-cube text-mautic',
-                        'onclick' => "Mautic.launchPageEditor();"
+                        'onclick' => 'Mautic.launchPageEditor();'
                     )
                 )
             )
         ));
 
-        if (!empty($options["action"])) {
-            $builder->setAction($options["action"]);
+        if (!empty($options['action'])) {
+            $builder->setAction($options['action']);
         }
     }
 
     /**
-     * @param OptionsResolverInterface $resolver
+     * {@inheritdoc}
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
@@ -205,9 +214,10 @@ class PageType extends AbstractType
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
-    public function getName() {
-        return "page";
+    public function getName()
+    {
+        return 'page';
     }
 }

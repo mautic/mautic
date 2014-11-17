@@ -15,14 +15,13 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class AjaxController
- *
- * @package Mautic\PageBundle\Controller
  */
 class AjaxController extends CommonAjaxController
 {
 
     /**
      * @param Request $request
+     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function pageListAction(Request $request)

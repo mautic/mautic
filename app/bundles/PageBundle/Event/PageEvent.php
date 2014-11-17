@@ -14,13 +14,23 @@ use Mautic\PageBundle\Entity\Page;
 
 /**
  * Class PageEvent
- *
- * @package Mautic\PageBundle\Event
  */
 class PageEvent extends CommonEvent
 {
 
+    /**
+     * @var string
+     */
     private $content;
+
+    /**
+     * @var Page
+     */
+    private $entity;
+
+    /**
+     * @var
+     */
     private $slotsHelper;
 
     /**

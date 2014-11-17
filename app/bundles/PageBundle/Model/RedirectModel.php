@@ -14,8 +14,6 @@ use Mautic\PageBundle\Entity\Redirect;
 
 /**
  * Class RedirectModel
- * {@inheritdoc}
- * @package Mautic\CoreBundle\Model\FormModel
  */
 class RedirectModel extends FormModel
 {
@@ -23,7 +21,7 @@ class RedirectModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @return \Doctrine\ORM\EntityRepository|\Mautic\CoreBundle\Entity\CommonRepository
+     * @return \Mautic\PageBundle\Entity\RedirectRepository
      */
     public function getRepository()
     {
@@ -31,8 +29,10 @@ class RedirectModel extends FormModel
     }
 
     /**
-     * @param $redirect
-     * @param $clickthrough
+     * @param Redirect $redirect
+     * @param array    $clickthrough
+     *
+     * @return string
      */
     public function generateRedirectUrl(Redirect $redirect, $clickthrough = array())
     {
@@ -46,9 +46,11 @@ class RedirectModel extends FormModel
     }
 
     /**
-     * @param $identifier
-     * @param $byUrl
-     * @param $createEntity
+     * @param      $identifier
+     * @param bool $byUrl
+     * @param bool $createEntity
+     *
+     * @return Redirect
      */
     public function getRedirect($identifier, $byUrl = true, $createEntity = true)
     {

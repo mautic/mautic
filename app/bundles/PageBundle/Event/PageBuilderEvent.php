@@ -15,22 +15,47 @@ use Symfony\Component\EventDispatcher\Event;
 
 /**
  * Class PageBuilderEvent
- *
- * @package Mautic\PageBundle\Event
  */
 class PageBuilderEvent extends Event
 {
-    private $tokens               = array();
+
+    /**
+     * @var array
+     */
+    private $tokens = array();
+
+    /**
+     * @var array
+     */
     private $abTestWinnerCriteria = array();
+
+    /**
+     * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
+     */
     private $translator;
+
+    /**
+     * @var Page
+     */
     private $page = null;
 
+    /**
+     * @param \Symfony\Bundle\FrameworkBundle\Translation\Translator $translator
+     * @param Page                                                   $page
+     */
     public function __construct($translator, Page $page = null)
     {
         $this->translator = $translator;
         $this->page       = $page;
     }
 
+    /**
+     * @param $key
+     * @param $header
+     * @param $content
+     *
+     * @return void
+     */
     public function addTokenSection($key, $header, $content)
     {
         if (array_key_exists($key, $this->tokens)) {
@@ -116,7 +141,12 @@ class PageBuilderEvent extends Event
     }
 
     /**
+     * @param array $keys
+     * @param array $methods
      * @param array $criteria
+     *
+     * @return void
+     * @throws InvalidArgumentException
      */
     private function verifyCriteria(array $keys, array $methods, array $criteria)
     {
@@ -134,7 +164,7 @@ class PageBuilderEvent extends Event
     }
 
     /**
-     * @return Page|null
+     * @return Page
      */
     public function getPage()
     {

@@ -16,8 +16,6 @@ use Mautic\CoreBundle\Helper\GraphHelper;
 
 /**
  * Class HitRepository
- *
- * @package Mautic\PageBundle\Entity
  */
 class HitRepository extends CommonRepository
 {
@@ -26,7 +24,7 @@ class HitRepository extends CommonRepository
      * Get a count of unique hits for the current tracking ID
      *
      * @param Page|Redirect $page
-     * @param $trackingId
+     * @param string        $trackingId
      *
      * @return int
      * @throws \Doctrine\ORM\NoResultException
@@ -82,7 +80,9 @@ class HitRepository extends CommonRepository
     /**
      * Get hit per time period
      *
-     * @param array $args
+     * @param integer $amount Number of units
+     * @param char    $unit   {@link php.net/manual/en/dateinterval.construct.php#refsect1-dateinterval.construct-parameters}
+     * @param array   $args
      *
      * @return array
      * @throws \Doctrine\ORM\NoResultException
@@ -119,7 +119,8 @@ class HitRepository extends CommonRepository
     /**
      * Get new, unique and returning visitors
      *
-     * @param array      $args
+     * @param array $args
+     *
      * @return array
      */
     public function getNewReturningVisitorsCount($args = array())
@@ -135,8 +136,9 @@ class HitRepository extends CommonRepository
     /**
      * Count returning visitors
      *
-     * @param array      $args
-     * @return integer
+     * @param array $args
+     *
+     * @return int
      */
     public function getReturningCount($args = array())
     {
@@ -152,8 +154,9 @@ class HitRepository extends CommonRepository
     /**
      * Count how many unique visitors hit pages
      *
-     * @param array      $args
-     * @return integer
+     * @param array $args
+     *
+     * @return int
      */
     public function getUniqueCount($args = array())
     {
@@ -171,8 +174,10 @@ class HitRepository extends CommonRepository
     /**
      * Count how many visitors hit some page in last X $seconds
      *
-     * @param integer      $seconds
-     * @return integer
+     * @param int  $seconds
+     * @param bool $notLeft
+     *
+     * @return int
      */
     public function countVisitors($seconds = 60, $notLeft = false)
     {
@@ -204,8 +209,8 @@ class HitRepository extends CommonRepository
     /**
      * Get the number of bounces
      *
-     * @param $pageIds
-     * @param $fromDate
+     * @param array|string $pageIds
+     * @param \DateTime    $fromDate
      *
      * @return array
      */
@@ -219,6 +224,7 @@ class HitRepository extends CommonRepository
             ->leftJoin('h', MAUTIC_TABLE_PREFIX.'pages', 'p', 'h.page_id = p.id')
             ->andWhere($sq->expr()->in('h.page_id', $inIds))
             ->andWhere($sq->expr()->eq('h.code', '200'));
+
         if ($fromDate !== null) {
             //make sure the date is UTC
             $dt = new DateTimeHelper($fromDate);
@@ -238,6 +244,7 @@ class HitRepository extends CommonRepository
             );
         }
         $sq->groupBy('h.tracking_id');
+
         //get a total number of hits first
         $results = $sq->execute()->fetchAll();
 
@@ -270,20 +277,21 @@ class HitRepository extends CommonRepository
     /**
      * Get the number of bounces
      *
-     * @param $pageIds
-     * @param $fromDate
+     * @param array|string|null                 $pageIds
+     * @param \DateTime                         $fromDate
+     * @param \Doctrine\DBAL\Query\QueryBuilder $q
      *
      * @return array
      */
     public function getDwellTimes($pageIds = null, \DateTime $fromDate = null, $q = null)
     {
         if (!$q) {
-            $q  = $this->_em->getConnection()->createQueryBuilder();
+            $q = $this->_em->getConnection()->createQueryBuilder();
         }
 
         $q->select('h.id, h.page_id, h.date_hit, h.date_left, h.tracking_id, h.page_language')
-            ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h')
-            ->leftJoin('h', MAUTIC_TABLE_PREFIX.'pages', 'p', 'h.page_id = p.id');
+            ->from(MAUTIC_TABLE_PREFIX . 'page_hits', 'h')
+            ->leftJoin('h', MAUTIC_TABLE_PREFIX . 'pages', 'p', 'h.page_id = p.id');
 
         if ($pageIds) {
             $inIds = (!is_array($pageIds)) ? array($pageIds) : $pageIds;
@@ -415,7 +423,6 @@ class HitRepository extends CommonRepository
             $stats['timesOnSite'] = array();
         }
 
-
         return $stats;
     }
 
@@ -435,8 +442,7 @@ class HitRepository extends CommonRepository
     /**
      * Prepare data structure for New vs Returning graph
      *
-     * @param integer $new
-     * @param integer $returning
+     * @param array $languages
      *
      * @return array
      */
@@ -448,7 +454,7 @@ class HitRepository extends CommonRepository
     /**
      * Update a hit with the the time the user left
      *
-     * @param $lastHitId
+     * @param int $lastHitId
      */
     public function updateHitDateLeft($lastHitId)
     {
@@ -464,9 +470,9 @@ class HitRepository extends CommonRepository
     /**
      * Get list of referers ordered by it's count
      *
-     * @param QueryBuilder $query
-     * @param integer $limit
-     * @param integer $offset
+     * @param \Doctrine\DBAL\Query\QueryBuilder $query
+     * @param int                               $limit
+     * @param int                               $offset
      *
      * @return array
      * @throws \Doctrine\ORM\NoResultException
@@ -475,24 +481,24 @@ class HitRepository extends CommonRepository
     public function getReferers($query, $limit = 10, $offset = 0)
     {
         $query->select('h.referer, count(h.referer) as sessions')
-            ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h')
-            ->leftJoin('h', MAUTIC_TABLE_PREFIX.'pages', 'p', 'h.page_id = p.id')
+            ->from(MAUTIC_TABLE_PREFIX . 'page_hits', 'h')
+            ->leftJoin('h', MAUTIC_TABLE_PREFIX . 'pages', 'p', 'h.page_id = p.id')
             ->groupBy('h.referer')
             ->orderBy('sessions', 'DESC')
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        $results = $query->execute()->fetchAll();
-
-        return $results;
+        return $query->execute()->fetchAll();
     }
 
     /**
      * Get list of referers ordered by it's count
      *
-     * @param QueryBuilder $query
-     * @param integer $limit
-     * @param integer $offset
+     * @param \Doctrine\DBAL\Query\QueryBuilder $query
+     * @param int                               $limit
+     * @param int                               $offset
+     * @param string                            $column
+     * @param string                            $as
      *
      * @return array
      * @throws \Doctrine\ORM\NoResultException
@@ -503,16 +509,15 @@ class HitRepository extends CommonRepository
         if ($as) {
             $as = ' as ' . $as;
         }
+
         $query->select('p.title, p.id, ' . $column . $as)
-            ->from(MAUTIC_TABLE_PREFIX.'pages', 'p')
-            ->leftJoin('p', MAUTIC_TABLE_PREFIX.'page_hits', 'h', 'h.page_id = p.id')
+            ->from(MAUTIC_TABLE_PREFIX . 'pages', 'p')
+            ->leftJoin('p', MAUTIC_TABLE_PREFIX . 'page_hits', 'h', 'h.page_id = p.id')
             ->groupBy('p.id')
             ->orderBy($column, 'DESC')
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        $results = $query->execute()->fetchAll();
-
-        return $results;
+        return $query->execute()->fetchAll();
     }
 }

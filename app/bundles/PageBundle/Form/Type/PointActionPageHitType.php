@@ -9,7 +9,6 @@
 
 namespace Mautic\PageBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
@@ -21,10 +20,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 class PointActionPageHitType extends AbstractType
 {
     /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
+     * {@inheritdoc}
      */
-    public function buildForm (FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('pages', 'page_list', array(
             'label'         => 'mautic.page.point.action.form.pages',
@@ -37,9 +35,10 @@ class PointActionPageHitType extends AbstractType
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
-    public function getName() {
-        return "pointaction_pagehit";
+    public function getName()
+    {
+        return 'pointaction_pagehit';
     }
 }

@@ -18,16 +18,14 @@ use Mautic\ReportBundle\ReportEvents;
 
 /**
  * Class ReportSubscriber
- *
- * @package Mautic\PageBundle\EventListener
  */
 class ReportSubscriber extends CommonSubscriber
 {
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
         return array(
             ReportEvents::REPORT_ON_BUILD    => array('onReportBuilder', 0),
@@ -87,14 +85,15 @@ class ReportSubscriber extends CommonSubscriber
     /**
      * Initialize the QueryBuilder object to generate reports from
      *
-     * @param ReportGeneratorEvent $event
+     * @param ReportGraphEvent $event
      *
      * @return void
      */
     public function onReportGraphGenerate(ReportGraphEvent $event)
     {
         $report = $event->getReport();
-        // Context check, we only want to fire for Asset reports
+
+        // Context check, we only want to fire for Page reports
         if ($report->getSource() != 'pages')
         {
             return;

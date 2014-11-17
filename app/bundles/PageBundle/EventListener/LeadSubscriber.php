@@ -14,16 +14,14 @@ use Mautic\LeadBundle\LeadEvents;
 
 /**
  * Class LeadSubscriber
- *
- * @package Mautic\PageBundle\EventListener
  */
 class LeadSubscriber extends CommonSubscriber
 {
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
         return array(
             LeadEvents::TIMELINE_ON_GENERATE => array('onTimelineGenerate', 0)

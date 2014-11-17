@@ -15,12 +15,13 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 /**
  * Class PageApiController
- *
- * @package Mautic\PageBundle\Controller\Api
  */
 class PageApiController extends CommonApiController
 {
 
+    /**
+     * {@inheritdoc}
+     */
     public function initialize(FilterControllerEvent $event)
     {
         parent::initialize($event);
@@ -100,9 +101,6 @@ class PageApiController extends CommonApiController
 
     /**
      * {@inheritdoc}
-     *
-     * @param $entity
-     * @param $action
      */
     protected function preSerializeEntity(&$entity, $action = 'view')
     {

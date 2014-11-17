@@ -16,13 +16,27 @@ use Mautic\PageBundle\PageEvents;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
+/**
+ * Class PublicController
+ */
 class PublicController extends CommonFormController
 {
+
+    /**
+     * @param string $slug1
+     * @param string $slug2
+     * @param string $slug3
+     *
+     * @return Response|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @throws AccessDeniedHttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
     public function indexAction($slug1, $slug2 = '', $slug3 = '')
     {
         //find the page
-        $security   = $this->factory->getSecurity();
+        /** @var \Mautic\PageBundle\Model\PageModel $model */
         $model      = $this->factory->getModel('page.page');
+        $security   = $this->factory->getSecurity();
         $translator = $this->get('translator');
         $entity     = $model->getEntityBySlugs($slug1, $slug2, $slug3);
 
@@ -30,9 +44,7 @@ class PublicController extends CommonFormController
             $published = $entity->isPublished();
 
             //make sure the page is published or deny access if not
-            if ((!$published) && (!$security->hasEntityAccess(
-                    'page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy()))
-            ) {
+            if ((!$published) && (!$security->hasEntityAccess('page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy()))) {
                 $model->hitPage($entity, $this->request, 401);
                 throw new AccessDeniedHttpException($translator->trans('mautic.core.url.error.401'));
             }
@@ -40,11 +52,13 @@ class PublicController extends CommonFormController
             //make sure URLs match up
             $url        = $model->generateUrl($entity, false);
             $requestUri = $this->request->getRequestUri();
+
             //remove query
             $query      = $this->request->getQueryString();
             if (!empty($query)) {
                 $requestUri = str_replace("?{$query}", '', $url);
             }
+
             //redirect if they don't match
             if ($requestUri != $url) {
                 $model->hitPage($entity, $this->request, 301);
@@ -255,10 +269,12 @@ class PublicController extends CommonFormController
 
     /**
      * @param $redirectId
+     *
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function redirectAction($redirectId)
     {
-
         $redirectModel = $this->factory->getModel('page.redirect');
         $redirect      = $redirectModel->getRedirect($redirectId, false, false);
 

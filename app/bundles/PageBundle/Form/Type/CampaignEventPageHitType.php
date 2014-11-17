@@ -9,26 +9,22 @@
 
 namespace Mautic\PageBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
  * Class CampaignEventPageHitType
- *
- * @package Mautic\PageBundle\Form\Type
  */
 class CampaignEventPageHitType extends AbstractType
 {
     /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
+     * {@inheritdoc}
      */
-    public function buildForm (FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('pages', 'page_list', array(
-            'label'         => 'mautic.page.campaign.event.form.pages',
-            'label_attr'    => array('class' => 'control-label'),
+            'label'      => 'mautic.page.campaign.event.form.pages',
+            'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.page.campaign.event.form.pages.descr'
@@ -37,9 +33,10 @@ class CampaignEventPageHitType extends AbstractType
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
-    public function getName() {
-        return "campaignevent_pagehit";
+    public function getName()
+    {
+        return 'campaignevent_pagehit';
     }
 }

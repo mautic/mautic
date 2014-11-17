@@ -9,15 +9,21 @@
 
 namespace Mautic\PageBundle\Helper;
 
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\PageBundle\Entity\Page;
+
+/**
+ * Class AbTestHelper
+ */
 class AbTestHelper
 {
 
     /**
      * Determines the winner of A/B test based on bounce rates
      *
-     * @param $factory
-     * @param $parent
-     * @param $children
+     * @param MauticFactory $factory
+     * @param Page          $parent
+     * @param               $children
      *
      * @return array
      */
@@ -75,9 +81,9 @@ class AbTestHelper
     /**
      * Determines the winner of A/B test based on dwell time rates
      *
-     * @param $factory
-     * @param $parent
-     * @param $properties
+     * @param MauticFactory $factory
+     * @param Page          $parent
+     * @param               $children
      *
      * @return array
      */

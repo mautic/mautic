@@ -15,11 +15,15 @@ use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
+/**
+ * Class PageController
+ */
 class PageController extends FormController
 {
 
     /**
-     * @param int    $page
+     * @param int $page
+     *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function indexAction($page = 1)
@@ -60,11 +64,11 @@ class PageController extends FormController
         $filter = array('string' => $search, 'force' => array());
 
         if (!$permissions['page:pages:viewother']) {
-            $filter['force'][] =
-                array('column' => 'p.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser());
+            $filter['force'][] = array('column' => 'p.createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser());
         }
 
         $translator = $this->get('translator');
+
         //do not list variants in the main list
         $filter['force'][] = array('column' => 'p.variantParent', 'expr' => 'isNull');
 
@@ -73,8 +77,8 @@ class PageController extends FormController
             $filter['force'][] = array('column' => 'p.translationParent', 'expr' => 'isNull');
         }
 
-        $orderBy     = $this->factory->getSession()->get('mautic.page.orderby', 'p.title');
-        $orderByDir  = $this->factory->getSession()->get('mautic.page.orderbydir', 'DESC');
+        $orderBy    = $this->factory->getSession()->get('mautic.page.orderby', 'p.title');
+        $orderByDir = $this->factory->getSession()->get('mautic.page.orderbydir', 'DESC');
 
         $pages = $model->getEntities(
             array(
@@ -88,11 +92,7 @@ class PageController extends FormController
         $count = count($pages);
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page
-            if ($count === 1) {
-                $lastPage = 1;
-            } else {
-                $lastPage = (floor($limit / $count)) ? : 1;
-            }
+            $lastPage = ($count === 1) ? 1 : (floor($limit / $count)) ?: 1;
             $this->factory->getSession()->set('mautic.page.page', $lastPage);
             $returnUrl   = $this->generateUrl('mautic_page_index', array('page' => $lastPage));
 
@@ -139,11 +139,13 @@ class PageController extends FormController
     /**
      * Loads a specific form into the detailed panel
      *
-     * @param $objectId
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @param int $objectId
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function viewAction($objectId)
     {
+        /** @var \Mautic\PageBundle\Model\PageModel $model */
         $model      = $this->factory->getModel('page.page');
         $security   = $this->factory->getSecurity();
         $activePage = $model->getEntity($objectId);
@@ -301,10 +303,11 @@ class PageController extends FormController
     /**
      * Generates new form and processes post data
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function newAction ()
+    public function newAction()
     {
+        /** @var \Mautic\PageBundle\Model\PageModel $model */
         $model   = $this->factory->getModel('page.page');
         $entity  = $model->getEntity();
         $method  = $this->request->getMethod();
@@ -401,17 +404,21 @@ class PageController extends FormController
     /**
      * Generates edit form and processes post data
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @param int  $objectId
+     * @param bool $ignorePost
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function editAction ($objectId, $ignorePost = false)
+    public function editAction($objectId, $ignorePost = false)
     {
-        $model      = $this->factory->getModel('page.page');
-        $entity     = $model->getEntity($objectId);
-        $session    = $this->factory->getSession();
-        $page       = $this->factory->getSession()->get('mautic.page.page', 1);
+        /** @var \Mautic\PageBundle\Model\PageModel $model */
+        $model   = $this->factory->getModel('page.page');
+        $entity  = $model->getEntity($objectId);
+        $session = $this->factory->getSession();
+        $page    = $this->factory->getSession()->get('mautic.page.page', 1);
 
         //set the return URL
-        $returnUrl  = $this->generateUrl('mautic_page_index', array('page' => $page));
+        $returnUrl = $this->generateUrl('mautic_page_index', array('page' => $page));
 
         $postActionVars = array(
             'returnUrl'       => $returnUrl,
@@ -536,11 +543,13 @@ class PageController extends FormController
     /**
      * Clone an entity
      *
-     * @param $objectId
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @param int $objectId
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function cloneAction ($objectId)
+    public function cloneAction($objectId)
     {
+        /** @var \Mautic\PageBundle\Model\PageModel $model */
         $model   = $this->factory->getModel('page.page');
         $entity  = $model->getEntity($objectId);
 
@@ -570,13 +579,15 @@ class PageController extends FormController
     /**
      * Deletes the entity
      *
-     * @param         $objectId
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @param $objectId
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function deleteAction($objectId) {
-        $page        = $this->factory->getSession()->get('mautic.page.page', 1);
-        $returnUrl   = $this->generateUrl('mautic_page_index', array('page' => $page));
-        $flashes     = array();
+    public function deleteAction($objectId)
+    {
+        $page      = $this->factory->getSession()->get('mautic.page.page', 1);
+        $returnUrl = $this->generateUrl('mautic_page_index', array('page' => $page));
+        $flashes   = array();
 
         $postActionVars = array(
             'returnUrl'       => $returnUrl,
@@ -589,6 +600,7 @@ class PageController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
+            /** @var \Mautic\PageBundle\Model\PageModel $model */
             $model  = $this->factory->getModel('page.page');
             $entity = $model->getEntity($objectId);
 
@@ -632,10 +644,11 @@ class PageController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function batchDeleteAction() {
-        $page        = $this->factory->getSession()->get('mautic.page.page', 1);
-        $returnUrl   = $this->generateUrl('mautic_page_index', array('page' => $page));
-        $flashes     = array();
+    public function batchDeleteAction()
+    {
+        $page      = $this->factory->getSession()->get('mautic.page.page', 1);
+        $returnUrl = $this->generateUrl('mautic_page_index', array('page' => $page));
+        $flashes   = array();
 
         $postActionVars = array(
             'returnUrl'       => $returnUrl,
@@ -648,6 +661,7 @@ class PageController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
+            /** @var \Mautic\PageBundle\Model\PageModel $model */
             $model     = $this->factory->getModel('page');
             $ids       = json_decode($this->request->query->get('ids', array()));
             $deleteIds = array();
@@ -697,11 +711,14 @@ class PageController extends FormController
     /**
      * Activate the builder
      *
-     * @param $objectId
+     * @param int $objectId
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function builderAction($objectId)
     {
-        $model   = $this->factory->getModel('page.page');
+        /** @var \Mautic\PageBundle\Model\PageModel $model */
+        $model = $this->factory->getModel('page.page');
 
         //permission check
         if (strpos($objectId, 'new') !== false) {
@@ -738,8 +755,14 @@ class PageController extends FormController
         ));
     }
 
+    /**
+     * @param int $objectId
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     */
     public function abtestAction($objectId)
     {
+        /** @var \Mautic\PageBundle\Model\PageModel $model */
         $model   = $this->factory->getModel('page.page');
         $entity  = $model->getEntity($objectId);
 
@@ -776,6 +799,8 @@ class PageController extends FormController
      * Make the variant the main
      *
      * @param $objectId
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function winnerAction($objectId)
     {
@@ -795,6 +820,7 @@ class PageController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
+            /** @var \Mautic\PageBundle\Model\PageModel $model */
             $model  = $this->factory->getModel('page.page');
             $entity = $model->getEntity($objectId);
 

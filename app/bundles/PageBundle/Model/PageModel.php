@@ -9,7 +9,6 @@
 
 namespace Mautic\PageBundle\Model;
 
-use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\PageBundle\Entity\Hit;
@@ -19,37 +18,44 @@ use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageEvent;
 use Mautic\PageBundle\Event\PageHitEvent;
 use Mautic\PageBundle\PageEvents;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
  * Class PageModel
- * {@inheritdoc}
- * @package Mautic\CoreBundle\Model\FormModel
  */
 class PageModel extends FormModel
 {
 
+    /**
+     * @return \Mautic\PageBundle\Entity\PageRepository
+     */
     public function getRepository()
     {
         return $this->em->getRepository('MauticPageBundle:Page');
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getPermissionBase()
     {
         return 'page:pages';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getNameGetter()
     {
-        return "getTitle";
+        return 'getTitle';
     }
 
     /**
      * {@inheritdoc}
      *
-     * @param       $entity
-     * @param       $unlock
-     * @return mixed
+     * @param Page $entity
+     * @param bool $unlock
      */
     public function saveEntity($entity, $unlock = true)
     {
@@ -146,11 +152,6 @@ class PageModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param      $entity
-     * @param      $formFactory
-     * @param null $action
-     * @param array $options
-     * @return mixed
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function createForm($entity, $formFactory, $action = null, $options = array())
@@ -158,15 +159,15 @@ class PageModel extends FormModel
         if (!$entity instanceof Page) {
             throw new MethodNotAllowedHttpException(array('Page'));
         }
+
         $params = (!empty($action)) ? array('action' => $action) : array();
         return $formFactory->create('page', $entity, $params);
     }
 
     /**
-     * Get a specific entity or generate a new one if id is empty
+     * {@inheritdoc}
      *
-     * @param $id
-     * @return null|object
+     * @return null|Page
      */
     public function getEntity($id = null)
     {
@@ -186,10 +187,6 @@ class PageModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param $action
-     * @param $event
-     * @param $entity
-     * @param $isNew
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, $event = false)
@@ -199,16 +196,16 @@ class PageModel extends FormModel
         }
 
         switch ($action) {
-            case "pre_save":
+            case 'pre_save':
                 $name = PageEvents::PAGE_PRE_SAVE;
                 break;
-            case "post_save":
+            case 'post_save':
                 $name = PageEvents::PAGE_POST_SAVE;
                 break;
-            case "pre_delete":
+            case 'pre_delete':
                 $name = PageEvents::PAGE_PRE_DELETE;
                 break;
-            case "post_delete":
+            case 'post_delete':
                 $name = PageEvents::PAGE_POST_DELETE;
                 break;
             default:
@@ -223,17 +220,18 @@ class PageModel extends FormModel
 
             $this->dispatcher->dispatch($name, $event);
             return $event;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**
      * Get list of entities for autopopulate fields
      *
-     * @param $type
-     * @param $filter
-     * @param $limit
+     * @param string $type
+     * @param string $filter
+     * @param int    $limit
+     *
      * @return array
      */
     public function getLookupResults($type, $filter = '', $limit = 10)
@@ -252,12 +250,13 @@ class PageModel extends FormModel
     }
 
     /**
-     * Generate url for a page
+     * Generate URL for a page
      *
-     * @param $entity
-     * @param $absolute
-     * @param $clickthrough
-     * @return mixed
+     * @param Page  $entity
+     * @param bool  $absolute
+     * @param array $clickthrough
+     *
+     * @return string
      */
     public function generateUrl($entity, $absolute = true, $clickthrough = array())
     {
@@ -273,7 +272,7 @@ class PageModel extends FormModel
 
         $parent = $entity->getTranslationParent();
         if ($parent) {
-            //multiple languages so tak on the language
+            //multiple languages so tack on the language
             $slugs = array(
                 'slug1' => $entity->getLanguage(),
                 'slug2' => (!empty($catSlug)) ? $catSlug : $pageSlug,
@@ -294,9 +293,11 @@ class PageModel extends FormModel
     }
 
     /**
-     * @param        $page
-     * @param        $request
-     * @param string $code
+     * @param Page    $page
+     * @param Request $request
+     * @param string  $code
+     *
+     * @return void
      */
     public function hitPage($page, $request, $code = '200')
     {
@@ -348,8 +349,7 @@ class PageModel extends FormModel
             $page->setHits($hitCount);
 
             //check for a hit from tracking id
-            $countById = $this->em
-                ->getRepository('MauticPageBundle:Hit')->getHitCountForTrackingId($page, $trackingId);
+            $countById = $this->em->getRepository('MauticPageBundle:Hit')->getHitCountForTrackingId($page, $trackingId);
             if (empty($countById)) {
                 $uniqueHitCount = $page->getUniqueHits();
                 $uniqueHitCount++;
@@ -410,15 +410,15 @@ class PageModel extends FormModel
         } else {
             //use current URL
             $pageURL = 'http';
-            if ($request->server->get("HTTPS") == "on") {
-                $pageURL .= "s";
+            if ($request->server->get('HTTPS') == 'on') {
+                $pageURL .= 's';
             }
-            $pageURL .= "://";
-            if ($request->server->get("SERVER_PORT") != "80") {
-                $pageURL .= $request->server->get("SERVER_NAME") . ":" . $request->server->get("SERVER_PORT") .
-                    $request->server->get("REQUEST_URI");
+            $pageURL .= '://';
+            if ($request->server->get('SERVER_PORT') != '80') {
+                $pageURL .= $request->server->get('SERVER_NAME') . ':' . $request->server->get('SERVER_PORT') .
+                    $request->server->get('REQUEST_URI');
             } else {
-                $pageURL .= $request->server->get("SERVER_NAME") . $request->server->get("REQUEST_URI");
+                $pageURL .= $request->server->get('SERVER_NAME') . $request->server->get('REQUEST_URI');
             }
         }
 

@@ -11,9 +11,8 @@ namespace Mautic\PageBundle;
 
 /**
  * Class PageEvents
- * Events available for PageBundle
  *
- * @package Mautic\PageBundle
+ * Events available for PageBundle
  */
 final class PageEvents
 {
@@ -21,72 +20,63 @@ final class PageEvents
     /**
      * The mautic.page_on_hit event is thrown when a public page is browsed and a hit recorded in the analytics table
      *
-     * The event listener receives a
-     * Mautic\PageBundle\Event\PageHitEvent instance.
+     * The event listener receives a Mautic\PageBundle\Event\PageHitEvent instance.
      *
      * @var string
      */
-    const PAGE_ON_HIT   = 'mautic.page_on_hit';
-
+    const PAGE_ON_HIT = 'mautic.page_on_hit';
 
     /**
      * The mautic.page_on_build event is thrown before displaying the page builder form to allow adding of tokens
      *
-     * The event listener receives a
-     * Mautic\PageBundle\Event\PageEvent instance.
+     * The event listener receives a Mautic\PageBundle\Event\PageEvent instance.
      *
      * @var string
      */
-    const PAGE_ON_BUILD   = 'mautic.page_on_build';
+    const PAGE_ON_BUILD = 'mautic.page_on_build';
 
-    /*
+    /**
      * The mautic.page_on_display event is thrown before displaying the page content
      *
-     * The event listener receives a
-     * Mautic\PageBundle\Event\PageEvent instance.
+     * The event listener receives a Mautic\PageBundle\Event\PageEvent instance.
      *
      * @var string
      */
-    const PAGE_ON_DISPLAY   = 'mautic.page_on_display';
+    const PAGE_ON_DISPLAY = 'mautic.page_on_display';
 
     /**
      * The mautic.page_pre_save event is thrown right before a page is persisted.
      *
-     * The event listener receives a
-     * Mautic\PageBundle\Event\PageEvent instance.
+     * The event listener receives a Mautic\PageBundle\Event\PageEvent instance.
      *
      * @var string
      */
-    const PAGE_PRE_SAVE   = 'mautic.page_pre_save';
+    const PAGE_PRE_SAVE = 'mautic.page_pre_save';
 
     /**
      * The mautic.page_post_save event is thrown right after a page is persisted.
      *
-     * The event listener receives a
-     * Mautic\PageBundle\Event\PageEvent instance.
+     * The event listener receives a Mautic\PageBundle\Event\PageEvent instance.
      *
      * @var string
      */
-    const PAGE_POST_SAVE   = 'mautic.page_post_save';
+    const PAGE_POST_SAVE = 'mautic.page_post_save';
 
     /**
      * The mautic.page_pre_delete event is thrown prior to when a page is deleted.
      *
-     * The event listener receives a
-     * Mautic\PageBundle\Event\PageEvent instance.
+     * The event listener receives a Mautic\PageBundle\Event\PageEvent instance.
      *
      * @var string
      */
-    const PAGE_PRE_DELETE   = 'mautic.page_pre_delete';
-
+    const PAGE_PRE_DELETE = 'mautic.page_pre_delete';
 
     /**
      * The mautic.page_post_delete event is thrown after a page is deleted.
      *
-     * The event listener receives a
-     * Mautic\PageBundle\Event\PageEvent instance.
+     * The event listener receives a Mautic\PageBundle\Event\PageEvent instance.
      *
      * @var string
      */
-    const PAGE_POST_DELETE   = 'mautic.page_post_delete';
+    const PAGE_POST_DELETE = 'mautic.page_post_delete';
 }

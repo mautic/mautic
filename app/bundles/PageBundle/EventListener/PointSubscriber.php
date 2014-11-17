@@ -17,16 +17,14 @@ use Mautic\PointBundle\PointEvents;
 
 /**
  * Class PointSubscriber
- *
- * @package Mautic\PageBundle\EventListener
  */
 class PointSubscriber extends CommonSubscriber
 {
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
         return array(
             PointEvents::POINT_ON_BUILD => array('onPointBuild', 0),

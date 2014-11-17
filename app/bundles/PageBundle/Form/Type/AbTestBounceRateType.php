@@ -10,31 +10,33 @@
 namespace Mautic\PageBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
-use Symfony\Component\Finder\Finder;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * Class VariantType
- *
- * @package Mautic\PageBundle\Form\Type
  */
 class VariantType extends AbstractType
 {
 
+    /**
+     * @var MauticFactory
+     */
     private $factory;
 
+    /**
+     * @param MauticFactory $factory
+     */
     public function __construct(MauticFactory $factory)
     {
         $this->factory = $factory;
     }
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
+     * {@inheritdoc}
      */
-    public function buildForm (FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('weight', 'integer', array(
             'label'      => 'mautic.page.page.form.trafficweight',
@@ -73,7 +75,7 @@ class VariantType extends AbstractType
     }
 
     /**
-     * @param OptionsResolverInterface $resolver
+     * {@inheritdoc}
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
@@ -85,9 +87,10 @@ class VariantType extends AbstractType
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
-    public function getName() {
-        return "pagevariant";
+    public function getName()
+    {
+        return 'pagevariant';
     }
 }

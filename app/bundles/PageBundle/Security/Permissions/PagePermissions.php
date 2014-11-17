@@ -15,8 +15,6 @@ use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 
 /**
  * Class PagePermissions
- *
- * @package Mautic\PageBundle\Security\Permissions
  */
 class PagePermissions extends AbstractPermissions
 {
@@ -33,18 +31,14 @@ class PagePermissions extends AbstractPermissions
 
     /**
      * {@inheritdoc}
-     *
-     * @return string|void
      */
-    public function getName() {
+    public function getName()
+    {
         return 'page';
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @param FormBuilderInterface $builder
-     * @param array                $options
      */
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {
@@ -54,10 +48,8 @@ class PagePermissions extends AbstractPermissions
 
     /**
      * {@inheritdoc}
-     *
-     * @param array $permissions
      */
-    public function analyzePermissions (array &$permissions)
+    public function analyzePermissions(array &$permissions)
     {
         parent::analyzePermissions($permissions);
 
