@@ -851,12 +851,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/FriendsOfSymfony/FOSOAuthServerBundle.git",
-                "reference": "9e15c229eff547443d686445d629e9356ab0672e"
+                "reference": "bbce53348576e8d6038902e7471a5c258a1bd19e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/FriendsOfSymfony/FOSOAuthServerBundle/zipball/9e15c229eff547443d686445d629e9356ab0672e",
-                "reference": "9e15c229eff547443d686445d629e9356ab0672e",
+                "url": "https://api.github.com/repos/FriendsOfSymfony/FOSOAuthServerBundle/zipball/bbce53348576e8d6038902e7471a5c258a1bd19e",
+                "reference": "bbce53348576e8d6038902e7471a5c258a1bd19e",
                 "shasum": ""
             },
             "require": {
@@ -911,7 +911,7 @@
                 "oauth2",
                 "server"
             ],
-            "time": "2014-10-31 13:44:14"
+            "time": "2014-11-06 08:02:11"
         },
         {
             "name": "friendsofsymfony/oauth2-php",
@@ -1912,17 +1912,17 @@
         },
         {
             "name": "sensio/framework-extra-bundle",
-            "version": "v3.0.2",
+            "version": "v3.0.3",
             "target-dir": "Sensio/Bundle/FrameworkExtraBundle",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sensiolabs/SensioFrameworkExtraBundle.git",
-                "reference": "9b22aaee517e80aad3238ea0328458b6f964066f"
+                "reference": "b829a8097a41ccbd7d35683b1750043b23d682f5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sensiolabs/SensioFrameworkExtraBundle/zipball/9b22aaee517e80aad3238ea0328458b6f964066f",
-                "reference": "9b22aaee517e80aad3238ea0328458b6f964066f",
+                "url": "https://api.github.com/repos/sensiolabs/SensioFrameworkExtraBundle/zipball/b829a8097a41ccbd7d35683b1750043b23d682f5",
+                "reference": "b829a8097a41ccbd7d35683b1750043b23d682f5",
                 "shasum": ""
             },
             "require": {
@@ -1963,7 +1963,7 @@
                 "annotations",
                 "controllers"
             ],
-            "time": "2014-09-02 07:11:30"
+            "time": "2014-11-10 14:50:31"
         },
         {
             "name": "swiftmailer/swiftmailer",
@@ -2599,12 +2599,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/liip/LiipFunctionalTestBundle.git",
-                "reference": "2574c9d319067b122ec783e5be9408e306b62673"
+                "reference": "eb42b04f27d4dcf350a40274a67c9807e2b11a85"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/liip/LiipFunctionalTestBundle/zipball/2574c9d319067b122ec783e5be9408e306b62673",
-                "reference": "2574c9d319067b122ec783e5be9408e306b62673",
+                "url": "https://api.github.com/repos/liip/LiipFunctionalTestBundle/zipball/eb42b04f27d4dcf350a40274a67c9807e2b11a85",
+                "reference": "eb42b04f27d4dcf350a40274a67c9807e2b11a85",
                 "shasum": ""
             },
             "require": {
@@ -2647,7 +2647,7 @@
             "keywords": [
                 "Symfony2"
             ],
-            "time": "2014-08-13 18:37:00"
+            "time": "2014-11-04 21:08:17"
         },
         {
             "name": "michelf/php-markdown",
