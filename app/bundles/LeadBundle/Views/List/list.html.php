@@ -39,11 +39,6 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                         <?php
                         echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
                             'item'      => $item,
-                            'edit'      => $security->hasEntityAccess(
-                                true,
-                                $permissions['lead:lists:editother'],
-                                $item->getCreatedBy()
-                            ),
                             'delete'    => $security->hasEntityAccess(
                                 true,
                                 $permissions['lead:lists:deleteother'],
@@ -51,7 +46,19 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                             ),
                             'routeBase' => 'leadlist',
                             'menuLink'  => 'mautic_leadlist_index',
-                            'langVar'   => 'lead.list'
+                            'langVar'   => 'lead.list',
+                            'custom'    => array(
+                                array(
+                                    'attr' => array(
+                                        'data-toggle' => 'ajax',
+                                        'href'        => $view['router']->generate('mautic_lead_index', array(
+                                            'search' => "$listCommand:{$item->getAlias()}"
+                                        )),
+                                    ),
+                                    'icon' => 'fa-users',
+                                    'label' => 'mautic.lead.list.view_leads'
+                                )
+                            )
                         ))  ;
                         ?>
                     </td>
@@ -59,10 +66,14 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                         <?php if ($item->isGlobal()): ?>
                         <i class="fa fa-fw fa-globe"></i>
                         <?php endif; ?>
-                        <a href="<?php echo $view['router']->generate('mautic_lead_index', array('search' => "$listCommand:{$item->getAlias()}")); ?>"
-                           data-toggle="ajax">
+                        <?php if ($security->hasEntityAccess(true, $permissions['lead:lists:editother'], $item->getCreatedBy())) : ?>
+                            <a href="<?php echo $view['router']->generate('mautic_lead_index', array('search' => "$listCommand:{$item->getAlias()}")); ?>"
+                               data-toggle="ajax">
+                                <?php echo $item->getName(); ?> (<?php echo $item->getAlias(); ?>)
+                            </a>
+                        <?php else : ?>
                             <?php echo $item->getName(); ?> (<?php echo $item->getAlias(); ?>)
-                        </a>
+                        <?php endif; ?>
                         <?php if (!$item->isGlobal() && $currentUser->getId() != $item->getCreatedBy()->getId()): ?>
                         <br />
                         <span class="small">(<?php echo $item->getCreatedBy()->getName(); ?>)</span>
