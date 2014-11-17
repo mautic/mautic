@@ -245,7 +245,9 @@ $view['slots']->set('mauticContent', 'dashboard');
                 <?php endforeach; ?>
                 </ul>
                 <?php else: ?>
-                    <p><?php echo $view['translator']->trans('mautic.note.no.upcoming.emails'); ?></p>
+                    <div class="no-upcoming-emails-info">
+                        <?php echo $view['translator']->trans('mautic.note.no.upcoming.emails'); ?>
+                    </div>
                 <?php endif; ?>
             </div>
             <!--/ #page-stats-container -->
