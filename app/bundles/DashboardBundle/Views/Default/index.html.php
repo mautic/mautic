@@ -99,8 +99,8 @@ $view['slots']->set('mauticContent', 'dashboard');
             <!-- #email-stats-container -->
             <div class="tab-pane active fade in bdr-w-0" id="email-stats-container">
                 <div class="row">
-                    <div class="col-md-4">
-                            <?php if ($popularPages) : ?>
+                    <?php if ($popularPages) : ?>
+                        <div class="col-md-4">
                             <div class="panel panel-default bdr-t-wdh-0">
                                 <div class="panel-heading">
                                     <h3 class="panel-title">
@@ -136,10 +136,10 @@ $view['slots']->set('mauticContent', 'dashboard');
                                     </table>
                                 </div>
                             </div>
-                            <?php endif; ?>
                         </div>
+                    <?php endif; ?>
+                    <?php if ($popularAssets) : ?>
                         <div class="col-md-4">
-                            <?php if ($popularAssets) : ?>
                             <div class="panel panel-default bdr-t-wdh-0">
                                 <div class="panel-heading">
                                     <h3 class="panel-title">
@@ -171,85 +171,85 @@ $view['slots']->set('mauticContent', 'dashboard');
                                 </table>
                                 </div>
                             </div>
-                            <?php endif; ?>
                         </div>
+                    <?php endif; ?>
+                    <?php if ($popularCampaigns) : ?>
                         <div class="col-md-4">
-                            <?php if ($popularCampaigns) : ?>
-                                <div class="panel panel-default bdr-t-wdh-0">
-                                    <div class="panel-heading">
-                                        <h3 class="panel-title">
-                                            <?php echo $view['translator']->trans('mautic.dashboard.label.most.popular.campaigns'); ?>
-                                        </h3>
-                                    </div>
-                                    <div class="table-responsive">
-                                        <table class="table table-hover table-striped table-bordered point-list">
-                                            <thead>
+                            <div class="panel panel-default bdr-t-wdh-0">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">
+                                        <?php echo $view['translator']->trans('mautic.dashboard.label.most.popular.campaigns'); ?>
+                                    </h3>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-hover table-striped table-bordered point-list">
+                                        <thead>
+                                            <tr>
+                                                <th><?php echo $view['translator']->trans('mautic.dashboard.label.title'); ?></th>
+                                                <th><?php echo $view['translator']->trans('mautic.dashboard.label.hits'); ?></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php foreach ($popularCampaigns as $campaign) : ?>
                                                 <tr>
-                                                    <th><?php echo $view['translator']->trans('mautic.dashboard.label.title'); ?></th>
-                                                    <th><?php echo $view['translator']->trans('mautic.dashboard.label.hits'); ?></th>
+                                                    <td>
+                                                        <a href="<?php echo $view['router']->generate('mautic_campaign_action', array('objectAction' => 'view', 'objectId' => $campaign['campaign_id'])); ?>" data-toggle="ajax">
+                                                            <?php echo $campaign['name']; ?>
+                                                        </a>
+                                                    </td>
+                                                    <td>
+                                                        <?php echo $campaign['hits']; ?>
+                                                    </td>
                                                 </tr>
-                                            </thead>
-                                            <tbody>
-                                                <?php foreach ($popularCampaigns as $campaign) : ?>
-                                                    <tr>
-                                                        <td>
-                                                            <a href="<?php echo $view['router']->generate('mautic_campaign_action', array('objectAction' => 'view', 'objectId' => $campaign['campaign_id'])); ?>" data-toggle="ajax">
-                                                                <?php echo $campaign['name']; ?>
-                                                            </a>
-                                                        </td>
-                                                        <td>
-                                                            <?php echo $campaign['hits']; ?>
-                                                        </td>
-                                                    </tr>
-                                                <?php endforeach; ?>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                </div>
-                <!--/ #email-stats-container -->
-
-                <!-- #page-stats-container -->
-                <div class="tab-pane fade bdr-w-0" id="page-stats-container">
-
-                    <?php if ($upcomingEmails) : ?>
-                    <ul class="list-group mb-0">
-                        <?php foreach ($upcomingEmails as $email): ?>
-                        <li class="list-group-item bg-auto bg-light-xs">
-                            <div class="box-layout">
-                                <div class="col-md-1 va-m">
-                                    <h3><span class="fa <?php echo isset($icons['email']) ? $icons['email'] : ''; ?> fw-sb text-success"></span></h3>
-                                </div>
-                                <div class="col-md-4 va-m">
-                                    <h5 class="fw-sb text-primary">
-                                        <a href="<?php echo $view['router']->generate('mautic_campaign_action', array('objectAction' => 'view', 'objectId' => $email['campaign_id'])); ?>" data-toggle="ajax">
-                                            <?php echo $email['campaignName']; ?>
-                                        </a>
-                                    </h5>
-                                    <span class="text-white dark-sm"><?php echo $email['eventName']; ?></span>
-                                </div>
-                                <div class="col-md-4 va-m text-right">
-                                    <a class="btn btn-sm btn-success"  href="<?php echo $view['router']->generate('mautic_lead_action', array('objectAction' => 'view', 'objectId' => $email['lead_id'])); ?>" data-toggle="ajax">
-                                        <span class="fa <?php echo isset($icons['lead']) ? $icons['lead'] : ''; ?>"></span>
-                                        <?php echo $email['lead']->getName(); ?>
-                                    </a>
-                                </div>
-                                <div class="col-md-3 va-m text-right">
-                                    <?php echo $view['date']->toFull($email['triggerDate']); ?>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
-                        </li>
-                    <?php endforeach; ?>
-                    </ul>
-                    <?php else: ?>
-                        <p><?php echo $view['translator']->trans('mautic.note.no.upcoming.emails'); ?></p>
+                        </div>
                     <?php endif; ?>
                 </div>
-                <!--/ #page-stats-container -->
             </div>
+            <!--/ #email-stats-container -->
+
+            <!-- #page-stats-container -->
+            <div class="tab-pane fade bdr-w-0" id="page-stats-container">
+
+                <?php if ($upcomingEmails) : ?>
+                <ul class="list-group mb-0">
+                    <?php foreach ($upcomingEmails as $email): ?>
+                    <li class="list-group-item bg-auto bg-light-xs">
+                        <div class="box-layout">
+                            <div class="col-md-1 va-m">
+                                <h3><span class="fa <?php echo isset($icons['email']) ? $icons['email'] : ''; ?> fw-sb text-success"></span></h3>
+                            </div>
+                            <div class="col-md-4 va-m">
+                                <h5 class="fw-sb text-primary">
+                                    <a href="<?php echo $view['router']->generate('mautic_campaign_action', array('objectAction' => 'view', 'objectId' => $email['campaign_id'])); ?>" data-toggle="ajax">
+                                        <?php echo $email['campaignName']; ?>
+                                    </a>
+                                </h5>
+                                <span class="text-white dark-sm"><?php echo $email['eventName']; ?></span>
+                            </div>
+                            <div class="col-md-4 va-m text-right">
+                                <a class="btn btn-sm btn-success"  href="<?php echo $view['router']->generate('mautic_lead_action', array('objectAction' => 'view', 'objectId' => $email['lead_id'])); ?>" data-toggle="ajax">
+                                    <span class="fa <?php echo isset($icons['lead']) ? $icons['lead'] : ''; ?>"></span>
+                                    <?php echo $email['lead']->getName(); ?>
+                                </a>
+                            </div>
+                            <div class="col-md-3 va-m text-right">
+                                <?php echo $view['date']->toFull($email['triggerDate']); ?>
+                            </div>
+                        </div>
+                    </li>
+                <?php endforeach; ?>
+                </ul>
+                <?php else: ?>
+                    <p><?php echo $view['translator']->trans('mautic.note.no.upcoming.emails'); ?></p>
+                <?php endif; ?>
+            </div>
+            <!--/ #page-stats-container -->
+        </div>
     </div>
     <div class="col-md-3 bg-white bdr-l height-auto">
 
