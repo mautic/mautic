@@ -11,8 +11,6 @@ namespace Mautic\CoreBundle\Helper;
 
 /**
  * Class InputHelper
- *
- * @package Mautic\CoreBundle\Helper
  */
 class InputHelper
 {
@@ -23,9 +21,11 @@ class InputHelper
      *
      * @param mixed $value
      * @param mixed $mask
+     *
      * @return mixed
      */
-    static function _($value, $mask = 'clean') {
+    public static function _($value, $mask = 'clean')
+    {
         if (is_array($value) && is_array($mask)) {
             foreach ($value as $k => &$v) {
                 if (array_key_exists($k, $mask) && method_exists('Mautic\CoreBundle\Helper\InputHelper', $mask[$k])) {
@@ -34,6 +34,7 @@ class InputHelper
                     $v = self::clean($v);
                 }
             }
+
             return $value;
         } elseif (is_string($mask) && method_exists('Mautic\CoreBundle\Helper\InputHelper', $mask)) {
             return self::$mask($value);
@@ -42,32 +43,34 @@ class InputHelper
         }
     }
 
-
     /**
      * Cleans value by HTML-escaping '"<>& and characters with ASCII value less than 32
      *
-     * @param $value
+     * @param mixed $value
+     *
      * @return string
      */
-    static public function clean($value)
+    public static function clean($value)
     {
         if (is_array($value)) {
             foreach ($value as &$v) {
                 $v = self::clean($v);
             }
+
             return $value;
-        } else {
-            return filter_var($value, FILTER_SANITIZE_SPECIAL_CHARS);
         }
+
+        return filter_var($value, FILTER_SANITIZE_SPECIAL_CHARS);
     }
 
     /**
      * Strips tags
      *
      * @param $value
+     *
      * @return mixed
      */
-    static public function string($value)
+    public static function string($value)
     {
         return filter_var($value, FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
     }
@@ -75,30 +78,30 @@ class InputHelper
     /**
      * Strips non-alphanumeric characters
      *
-     * @param $value
+     * @param string $value
+     * @param bool   $convertSpacesToHyphen
+     *
      * @return string
      */
-    static public function alphanum($value, $convertSpacesToHyphen = false)
+    public static function alphanum($value, $convertSpacesToHyphen = false)
     {
         if ($convertSpacesToHyphen) {
             $value = str_replace(' ', '-', $value);
-            return trim(preg_replace("/[^0-9a-z-]+/i", "", $value));
-        } else {
-            return trim(preg_replace("/[^0-9a-z]+/i", "", $value));
-        }
-    }
 
-    /**
-     *
-     */
+            return trim(preg_replace("/[^0-9a-z-]+/i", "", $value));
+        }
+
+        return trim(preg_replace("/[^0-9a-z]+/i", "", $value));
+    }
 
     /**
      * Returns raw value
      *
-     * @param $value
+     * @param mixed $value
+     *
      * @return mixed
      */
-    static public function raw($value)
+    public static function raw($value)
     {
         return $value;
     }
@@ -106,10 +109,11 @@ class InputHelper
     /**
      * Returns float value
      *
-     * @param $value
+     * @param mixed $value
+     *
      * @return float
      */
-    static public function float($value)
+    public static function float($value)
     {
         return (float) filter_var($value, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION | FILTER_FLAG_ALLOW_THOUSAND);
     }
@@ -117,10 +121,11 @@ class InputHelper
     /**
      * Returns int value
      *
-     * @param $value
+     * @param mixed $value
+     *
      * @return int
      */
-    static public function int($value)
+    public static function int($value)
     {
         return (int) filter_var($value, FILTER_SANITIZE_NUMBER_INT);
     }
@@ -128,10 +133,11 @@ class InputHelper
     /**
      * Returns boolean value
      *
-     * @param $value
+     * @param mixed $value
+     *
      * @return bool
      */
-    static public function boolean($value)
+    public static function boolean($value)
     {
         return filter_var($value, FILTER_VALIDATE_BOOLEAN);
     }
@@ -139,13 +145,15 @@ class InputHelper
     /**
      * Removes all characters except those allowed in URLs
      *
-     * @param $value
-     * @param $allowedProtocols
+     * @param mixed  $value
+     * @param array  $allowedProtocols
+     * @param string $defaultProtocol
+     * @param array  $removeQuery
+     *
      * @return mixed
      */
-    static public function url($value, $allowedProtocols = null, $defaultProtocol = null, $removeQuery = array())
+    public static function url($value, $allowedProtocols = null, $defaultProtocol = null, $removeQuery = array())
     {
-
         if (empty($allowedProtocols)) {
             $allowedProtocols = array('https', 'http', 'ftp');
         }
@@ -168,8 +176,9 @@ class InputHelper
             if (!empty($removeQuery) && !empty($parts['query'])) {
                 parse_str($parts['query'], $query);
                 foreach ($removeQuery as $q) {
-                    if (isset($query[$q]))
+                    if (isset($query[$q])) {
                         unset($query[$q]);
+                    }
                 }
                 $parts['query'] = http_build_query($query);
             }
@@ -198,12 +207,13 @@ class InputHelper
      * Removes all characters except those allowed in emails
      *
      * @param $value
+     *
      * @return mixed
      */
-
-    static public function email($value)
+    public static function email($value)
     {
         $value = substr($value, 0, 254);
+
         return filter_var($value, FILTER_SANITIZE_EMAIL);
     }
 
@@ -211,29 +221,32 @@ class InputHelper
      * Returns a clean array
      *
      * @param $value
+     *
      * @return array|string
      */
-    static public function cleanArray($value)
+    public static function cleanArray($value)
     {
         $value = self::clean($value);
+
         if (!is_array($value)) {
             $value = array($value);
         }
+
         return $value;
     }
 
     /**
      * Clean HTML using htmLawed
      *
-     * @param $element
-     * @param $attribute_array
+     * @param mixed $value
+     *
      * @return string
      */
-    static public function html($value)
+    public static function html($value)
     {
         require_once __DIR__ . '/../Libraries/htmLawed/htmLawed.php';
         $config = array('tidy' => 4, 'safe' => 1);
-        $value = htmLawed($value, $config);
-        return $value;
+
+        return htmLawed($value, $config);
     }
 }

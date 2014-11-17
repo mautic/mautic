@@ -9,26 +9,46 @@
 
 namespace Mautic\CoreBundle\Helper;
 
+/**
+ * Class SearchStringHelper
+ */
 class SearchStringHelper
 {
 
-    static protected $needsParsing = array(
-        " ",
-        "(",
-        ")"
+    /**
+     * @var array
+     */
+    protected static $needsParsing = array(
+        ' ',
+        '(',
+        ')'
     );
 
-    static protected $needsClosing = array(
-        "quote"       => '"',
-        "parenthesis" => '('
+    /**
+     * @var array
+     */
+    protected static $needsClosing = array(
+        'quote'       => '"',
+        'parenthesis' => '('
     );
 
-    static protected $closingChars = array(
-        "quote"       => '"',
-        "parenthesis" => ')'
+    /**
+     * @var array
+     */
+    protected static $closingChars = array(
+        'quote'       => '"',
+        'parenthesis' => ')'
     );
 
-    static public function parseSearchString($input, $needsParsing = array(), $needsClosing = array(), $closingChars = array())
+    /**
+     * @param string $input
+     * @param array  $needsParsing
+     * @param array  $needsClosing
+     * @param array  $closingChars
+     *
+     * @return \stdClass
+     */
+    public static function parseSearchString($input, $needsParsing = array(), $needsClosing = array(), $closingChars = array())
     {
         if (!empty($needsParsing)) {
             self::$needsParsing = $needsParsing;
@@ -39,30 +59,34 @@ class SearchStringHelper
         if (!empty($closingChars)) {
             self::$closingChars = $closingChars;
         }
-        if (empty($input)) {
 
-        }
+        $input = strtolower(trim(strip_tags($input)));
 
-        $input   = strtolower(trim(strip_tags($input)));
-        $filters = self::splitUpSearchString($input);
-        return $filters;
+        return self::splitUpSearchString($input);
     }
 
-    static protected function splitUpSearchString($input, $baseName = "root", $overrideCommand = "")
+    /**
+     * @param string $input
+     * @param string $baseName
+     * @param string $overrideCommand
+     *
+     * @return \stdClass
+     */
+    protected static function splitUpSearchString($input, $baseName = 'root', $overrideCommand = '')
     {
         $keyCount                                 = 0;
         $command                                  = $overrideCommand;
         $filters                                  = new \stdClass();
         $filters->{$baseName}                     = array();
         $filters->{$baseName}[$keyCount]          = new \stdClass();
-        $filters->{$baseName}[$keyCount]->type    = "and";
+        $filters->{$baseName}[$keyCount]->type    = 'and';
         $filters->{$baseName}[$keyCount]->command = $command;
         $filters->{$baseName}[$keyCount]->string  = '';
         $filters->{$baseName}[$keyCount]->not     = 0;
         $filters->{$baseName}[$keyCount]->strict  = 0;
         $chars                                    = str_split($input);
         $pos                                      = 0;
-        $string                                   = "";
+        $string                                   = '';
 
         //Iterate through every character to ensure that the search string is properly parsed from left to right while
         //considering quotes, parenthesis, and commands
@@ -73,7 +97,7 @@ class SearchStringHelper
             unset($chars[$pos]);
             $pos++;
 
-            if ($char == ":") {
+            if ($char == ':') {
                 //the string is a command
                 $command = strtolower(trim(substr($string, 0, -1)));
                 //does this have a negative?
@@ -82,12 +106,12 @@ class SearchStringHelper
                     $command = substr($command, 1);
                 }
                 $filters->{$baseName}[$keyCount]->command = $command;
-                $string  = "";
-            } elseif ($char == " ") {
+                $string  = '';
+            } elseif ($char == ' ') {
                 //arrived at the end of a single word that is not within a quote or parenthesis so add it as standalone
-                if ($string != " ") {
+                if ($string != ' ') {
                     $string = trim($string);
-                    $type = ($string == "or" || $string == "and") ? $string : "";
+                    $type = ($string == 'or' || $string == 'and') ? $string : '';
                     self::setFilter($filters, $baseName, $keyCount, $string, $command, $overrideCommand, true, $type, (!empty($chars)));
                 }
                 continue;
@@ -120,7 +144,7 @@ class SearchStringHelper
                             //check to see if the nested string needs to be parsed as well
                             foreach (self::$needsParsing as $parseMe) {
                                 if (strpos($string, $parseMe) !== false) {
-                                    $parsed = self::splitUpSearchString($string, "parsed", $command);
+                                    $parsed = self::splitUpSearchString($string, 'parsed', $command);
                                     $filters->{$baseName}[$keyCount]->children = $parsed->parsed;
                                     $neededParsing = true;
                                     break;
@@ -199,14 +223,14 @@ class SearchStringHelper
             if ($setUpNext) {
                 $keyCount++;
                 $filters->{$baseName}[$keyCount]          = new \stdClass();
-                $filters->{$baseName}[$keyCount]->type    = "and";
+                $filters->{$baseName}[$keyCount]->type    = 'and';
                 $filters->{$baseName}[$keyCount]->command = $overrideCommand;
                 $filters->{$baseName}[$keyCount]->string  = '';
                 $filters->{$baseName}[$keyCount]->not     = 0;
                 $filters->{$baseName}[$keyCount]->strict  = 0;
             }
         }
-        $string  = "";
+        $string  = '';
         $command = $overrideCommand;
     }
 }

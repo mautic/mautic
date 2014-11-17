@@ -13,12 +13,17 @@ use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
  * Interface MauticController
- * A dummy interface to ensure that only Mautic bundles are affected by Mautic onKernelController events
  *
- * @package Mautic\CoreBundle\Controller
+ * A dummy interface to ensure that only Mautic bundles are affected by Mautic onKernelController events
  */
-
 interface MauticController
 {
+    /**
+     * Initialize the controller
+     *
+     * @param FilterControllerEvent $event
+     *
+     * @return mixed
+     */
     public function initialize(FilterControllerEvent $event);
 }

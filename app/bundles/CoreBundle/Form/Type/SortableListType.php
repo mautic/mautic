@@ -21,17 +21,14 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * Class SortableListType
- *
- * @package Mautic\CoreBundle\Form\Type
  */
 class SortableListType extends AbstractType
 {
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
+     * {@inheritdoc}
      */
-    public function buildForm (FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('list', 'collection', array(
             'label'        => false,
@@ -75,11 +72,8 @@ class SortableListType extends AbstractType
         });
     }
 
-
     /**
-     * @param FormView      $view
-     * @param FormInterface $form
-     * @param array         $options
+     * {@inheritdoc}
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
@@ -87,7 +81,7 @@ class SortableListType extends AbstractType
     }
 
     /**
-     * @param OptionsResolverInterface $resolver
+     * {@inheritdoc}
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
@@ -108,11 +102,11 @@ class SortableListType extends AbstractType
         ));
     }
 
-
     /**
-     * @return string
+     * {@inheritdoc}
      */
-    public function getName() {
-        return "sortablelist";
+    public function getName()
+    {
+        return 'sortablelist';
     }
 }

@@ -9,13 +9,15 @@
 
 namespace Mautic\CoreBundle;
 
+/**
+ * Class CoreEvents
+ */
 final class CoreEvents
 {
     /**
      * The mautic.build_menu event is thrown to render menu items.
      *
-     * The event listener receives a
-     * Mautic\CoreBundle\Event\MenuEvent instance.
+     * The event listener receives a Mautic\CoreBundle\Event\MenuEvent instance.
      *
      * @var string
      */
@@ -24,8 +26,7 @@ final class CoreEvents
     /**
      * The mautic.build_admin_menu event is thrown to render admin menu items.
      *
-     * The event listener receives a
-     * Mautic\CoreBundle\Event\MenuEvent instance.
+     * The event listener receives a Mautic\CoreBundle\Event\MenuEvent instance.
      *
      * @var string
      */
@@ -34,19 +35,16 @@ final class CoreEvents
     /**
      * The mautic.build_route event is thrown to build Mautic bundle routes
      *
-     * The event listener receives a
-     * Mautic\CoreBundle\Event\RouteEvent instance.
+     * The event listener receives a Mautic\CoreBundle\Event\RouteEvent instance.
      *
      * @var string
      */
     const BUILD_ROUTE = 'mautic.build_route';
 
-
     /**
      * The mautic.global_search event is thrown to build global search results from applicable bundles
      *
-     * The event listener receives a
-     * Mautic\CoreBundle\Event\GlobalSearchEvent instance.
+     * The event listener receives a Mautic\CoreBundle\Event\GlobalSearchEvent instance.
      *
      * @var string
      */
@@ -55,8 +53,7 @@ final class CoreEvents
     /**
      * The mautic.build_command_list event is thrown to build global search's autocomplete list
      *
-     * The event listener receives a
-     * Mautic\CoreBundle\Event\CommandListEvent instance.
+     * The event listener receives a Mautic\CoreBundle\Event\CommandListEvent instance.
      *
      * @var string
      */
@@ -66,8 +63,7 @@ final class CoreEvents
      * The mautic.on_email_failed event is thrown when an email has failed to clear the queue and is about to be deleted
      * in order to give a bundle a chance to do an action based on failed email if required
      *
-     * The event listener receives a
-     * Mautic\CoreBundle\Event\EmailEvent instance.
+     * The event listener receives a Mautic\CoreBundle\Event\EmailEvent instance.
      *
      * @var string
      */
@@ -77,8 +73,7 @@ final class CoreEvents
      * The mautic.on_email_resend event is thrown when an attempt to resend an email occurs
      * in order to give a bundle a chance to do an action based on failed email if required
      *
-     * The event listener receives a
-     * Mautic\CoreBundle\Event\EmailEvent instance.
+     * The event listener receives a Mautic\CoreBundle\Event\EmailEvent instance.
      *
      * @var string
      */
@@ -87,8 +82,7 @@ final class CoreEvents
     /**
      * The mautic.on_fetch_icons event is thrown to fetch icons of menu items.
      *
-     * The event listener receives a
-     * Mautic\CoreBundle\Event\IconEvent instance.
+     * The event listener receives a Mautic\CoreBundle\Event\IconEvent instance.
      *
      * @var string
      */

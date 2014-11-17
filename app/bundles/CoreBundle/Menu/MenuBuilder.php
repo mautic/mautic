@@ -21,15 +21,33 @@ use Symfony\Bundle\FrameworkBundle\Routing\Router;
 
 /**
  * Class MenuBuilder
- *
- * @package Mautic\CoreBundle\Menu
  */
 class MenuBuilder
 {
+
+    /**
+     * @var FactoryInterface
+     */
     private $factory;
+
+    /**
+     * @var MatcherInterface
+     */
     private $matcher;
+
+    /**
+     * @var \Mautic\CoreBundle\Security\Permissions\CorePermissions
+     */
     private $security;
+
+    /**
+     * @var \Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher
+     */
     private $dispatcher;
+
+    /**
+     * @var Request
+     */
     private $request;
 
     /**
@@ -59,11 +77,12 @@ class MenuBuilder
             $loader = new ArrayLoader($this->factory);
 
             //dispatch the MENU_BUILD event to retrieve bundle menu items
-            $event      = new MenuEvent($this->security);
+            $event = new MenuEvent($this->security);
             $this->dispatcher->dispatch(CoreEvents::BUILD_MENU, $event);
-            $menuItems  = $event->getMenuItems();
-            $menu       = $loader->load($menuItems);
+            $menuItems = $event->getMenuItems();
+            $menu      = $loader->load($menuItems);
         }
+
         return $menu;
     }
 
@@ -80,20 +99,23 @@ class MenuBuilder
             $loader = new ArrayLoader($this->factory);
 
             //dispatch the MENU_BUILD event to retrieve bundle menu items
-            $event      = new MenuEvent($this->security);
+            $event = new MenuEvent($this->security);
             $this->dispatcher->dispatch(CoreEvents::BUILD_ADMIN_MENU, $event);
-            $menuItems  = $event->getMenuItems();
-            $adminMenu  = $loader->load($menuItems);
+            $menuItems = $event->getMenuItems();
+            $adminMenu = $loader->load($menuItems);
         }
+
         return $adminMenu;
     }
 
     /**
      * Converts navigation object into breadcrumbs
      *
+     * @return \Knp\Menu\ItemInterface|null
      */
-    public function breadcrumbsMenu() {
-        $menu  = $this->mainMenu($this->request);
+    public function breadcrumbsMenu()
+    {
+        $menu = $this->mainMenu($this->request);
 
         //check for overrideRoute in request from an ajax content request
         $forRouteUri  = $this->request->get("overrideRouteUri", "current");
@@ -117,11 +139,15 @@ class MenuBuilder
     /**
      * Used by breadcrumbs to determine active link
      *
-     * @param $menu
-     * @return null
+     * @param \Knp\Menu\ItemInterface $menu
+     * @param string                  $forRouteUri
+     * @param string                  $forRouteName
+     *
+     * @return \Knp\Menu\ItemInterface|null
      */
     public function getCurrentMenuItem($menu, $forRouteUri, $forRouteName)
     {
+        /** @var \Knp\Menu\ItemInterface $item */
         foreach ($menu as $item) {
             if ($forRouteUri == "current" && $this->matcher->isCurrent($item)) {
                 //current match
@@ -134,8 +160,7 @@ class MenuBuilder
                 return $item;
             }
 
-            if ($item->getChildren()
-                && $current_child = $this->getCurrentMenuItem($item, $forRouteUri, $forRouteName)) {
+            if ($item->getChildren() && $current_child = $this->getCurrentMenuItem($item, $forRouteUri, $forRouteName)) {
                 return $current_child;
             }
         }

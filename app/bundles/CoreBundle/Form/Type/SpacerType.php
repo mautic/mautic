@@ -17,13 +17,11 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * Class SpacerType
- *
- * @package Mautic\CoreBundle\Form\Type
  */
 class SpacerType extends AbstractType
 {
     /**
-     * @param OptionsResolverInterface $resolver
+     * {@inheritdoc}
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
@@ -59,11 +57,11 @@ class SpacerType extends AbstractType
         ;
     }
 
-
     /**
-     * @return string
+     * {@inheritdoc}
      */
-    public function getName() {
-        return "spacer";
+    public function getName()
+    {
+        return 'spacer';
     }
 }

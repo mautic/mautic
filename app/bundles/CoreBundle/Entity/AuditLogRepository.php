@@ -19,7 +19,7 @@ class AuditLogRepository extends CommonRepository
      *
      * @param string $object
      * @param integer $id
-     * @param intener $limit of items
+     * @param integer $limit of items
      *
      * @return array
      * @throws \Doctrine\ORM\NoResultException
@@ -43,9 +43,6 @@ class AuditLogRepository extends CommonRepository
         $query->orderBy('al.dateAdded', 'DESC')
             ->setMaxResults($limit);
 
-        $logs = $query->getQuery()
-            ->getArrayResult();
-
-        return $logs;
+        return $query->getQuery()->getArrayResult();
     }
 }

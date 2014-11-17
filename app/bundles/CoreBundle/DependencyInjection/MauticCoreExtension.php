@@ -18,18 +18,15 @@ use Symfony\Component\DependencyInjection\Loader;
 
 /**
  * Class MauticCoreExtension
+ *
  * This is the class that loads and manages your bundle configuration
  * To learn more see {@link http://symfony.com/doc/current/cookbook/bundles/extension.html}
- *
- * @package Mautic\CoreBundle\DependencyInjection
  */
-
 class MauticCoreExtension extends Extension
 {
 
     /**
-     * @param array            $configs
-     * @param ContainerBuilder $container
+     * {@inheritdoc}
      */
     public function load(array $configs, ContainerBuilder $container)
     {

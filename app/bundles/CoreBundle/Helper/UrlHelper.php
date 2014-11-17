@@ -9,9 +9,17 @@
 
 namespace Mautic\CoreBundle\Helper;
 
+/**
+ * Class UrlHelper
+ */
 class UrlHelper
 {
-    static public function rel2abs($rel)
+    /**
+     * @param $rel
+     *
+     * @return string
+     */
+    public static function rel2abs($rel)
     {
         $path = $host = $scheme = "";
 

@@ -12,6 +12,9 @@ namespace Mautic\CoreBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+/**
+ * Class TelType
+ */
 class TelType extends AbstractType
 {
     /**

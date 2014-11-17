@@ -15,26 +15,43 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Class FormExitSubscriber
- *
- * @package Mautic\CoreBundle\Form\EventListener
  */
 class FormExitSubscriber implements EventSubscriberInterface
 {
 
+    /**
+     * @var \Mautic\CoreBundle\Model\CommonModel
+     */
     private $model;
+
+    /**
+     * @var array
+     */
     private $options;
 
+    /**
+     * @param \Mautic\CoreBundle\Model\CommonModel $model
+     * @param array $options
+     */
     public function __construct($model, $options = array())
     {
         $this->model   = $model;
         $this->options = $options;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public static function getSubscribedEvents()
     {
         return array(FormEvents::PRE_SET_DATA  => 'preSetData');
     }
 
+    /**
+     * @param FormEvent $event
+     *
+     * @return void
+     */
     public function preSetData(FormEvent $event)
     {
         $id = !empty($this->options['data']) ? $this->options['data']->getId() : 0;

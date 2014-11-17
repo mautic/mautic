@@ -15,18 +15,13 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\FlattenException;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 
+/**
+ * Class ExceptionController
+ */
 class ExceptionController extends \Symfony\Bundle\TwigBundle\Controller\ExceptionController
 {
     /**
      * {@inheritdoc}
-     *
-     * @param Request              $request   The request
-     * @param FlattenException     $exception A FlattenException instance
-     * @param DebugLoggerInterface $logger    A DebugLoggerInterface instance
-     *
-     * @return Response
-     *
-     * @throws \InvalidArgumentException When the exception template does not exist
      */
     public function showAction(Request $request, FlattenException $exception, DebugLoggerInterface $logger = null)
     {
@@ -41,8 +36,8 @@ class ExceptionController extends \Symfony\Bundle\TwigBundle\Controller\Exceptio
                     'trace'     => ($this->debug) ? $exception->getTrace() : ''
                 )
             ), $code);
-        } else {
-            return parent::showAction($request, $exception, $logger);
         }
+
+        return parent::showAction($request, $exception, $logger);
     }
 }

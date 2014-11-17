@@ -10,12 +10,21 @@
 namespace Mautic\CoreBundle\Doctrine\Annotation;
 
 /**
+ * Class LoadClassMetadataCallback
+ *
  * @Annotation
  */
 class LoadClassMetadataCallback
 {
+
+    /**
+     * @var string
+     */
     public $functionName;
 
+    /**
+     * @param string $functionName
+     */
     public function __construct($functionName)
     {
         $this->functionName = $functionName;

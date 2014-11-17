@@ -42,8 +42,9 @@ class MauticFactory
     }
 
     /**
-     * @param $name
-     * @return mixed
+     * @param string $name
+     *
+     * @return \Mautic\CoreBundle\Model\CommonModel
      * @throws NotAcceptableHttpException
      */
     public function getModel($name)
@@ -57,19 +58,21 @@ class MauticFactory
 
         if (!array_key_exists($name, $models)) {
             $parts = explode('.', $name);
-            if (count($parts) == 2) {
-                $modelClass = '\\Mautic\\' . ucfirst($parts[0]) . 'Bundle\\Model\\' . ucfirst($parts[1]) . 'Model';
-                if (class_exists($modelClass)) {
-                    $models[$name] = new $modelClass($this);
 
-                    if (method_exists($models[$name], 'initialize')) {
-                        $models[$name]->initialize();
-                    }
-                } else {
-                    throw new NotAcceptableHttpException($name . " is not an acceptable model name.");
-                }
-            } else {
+            if (count($parts) !== 2) {
                 throw new NotAcceptableHttpException($name . " is not an acceptable model name.");
+            }
+
+            $modelClass = '\\Mautic\\' . ucfirst($parts[0]) . 'Bundle\\Model\\' . ucfirst($parts[1]) . 'Model';
+
+            if (!class_exists($modelClass)) {
+                throw new NotAcceptableHttpException($name . " is not an acceptable model name.");
+            }
+
+            $models[$name] = new $modelClass($this);
+
+            if (method_exists($models[$name], 'initialize')) {
+                $models[$name]->initialize();
             }
         }
 
@@ -99,7 +102,7 @@ class MauticFactory
     /**
      * Retrieves user currently logged in
      *
-     * @param $allowNull
+     * @param bool $allowNull
      *
      * @return null|User
      */
@@ -136,7 +139,7 @@ class MauticFactory
     }
 
     /**
-     * Retrieves Doctrine db connection for DBAL use
+     * Retrieves Doctrine database connection for DBAL use
      *
      * @return \Doctrine\DBAL\Connection
      */
@@ -148,8 +151,9 @@ class MauticFactory
     /**
      * Gets a schema helper for manipulating database schemas
      *
-     * @param      $type
-     * @param null $name Object name; i.e. table name
+     * @param string $type
+     * @param string $name Object name; i.e. table name
+     *
      * @return mixed
      */
     public function getSchemaHelper($type, $name = null)
@@ -257,6 +261,7 @@ class MauticFactory
      * Retrieves a Mautic parameter
      *
      * @param $id
+     *
      * @return bool|mixed
      */
     public function getParameter($id)
@@ -272,6 +277,7 @@ class MauticFactory
      * @param string $string
      * @param string $format
      * @param string $tz
+     *
      * @return DateTimeHelper
      */
     public function getDate($string = null, $format = null, $tz = 'local')
@@ -284,11 +290,12 @@ class MauticFactory
             if (empty($dates[$key])) {
                 $dates[$key] = new DateTimeHelper($string, $format, $tz);
             }
+
             return $dates[$key];
-        } else {
-            //now so generate a new helper
-            return new DateTimeHelper($string, $format, $tz);
         }
+
+        //now so generate a new helper
+        return new DateTimeHelper($string, $format, $tz);
     }
 
     /**
@@ -306,6 +313,7 @@ class MauticFactory
      *
      * @param string $name
      * @param bool   $fullPath
+     *
      * @return string
      * @throws \InvalidArgumentException
      */
@@ -328,7 +336,7 @@ class MauticFactory
     /**
      * Get the current environment
      *
-     * @return mixed
+     * @return string
      */
     public function getEnvironment()
     {
@@ -339,6 +347,7 @@ class MauticFactory
      * returns a ThemeHelper instance for the given theme
      *
      * @param string $theme
+     *
      * @return \Mautic\CoreBundle\Templating\Helper\ThemeHelper
      */
     public function getTheme($theme = 'current')
@@ -356,6 +365,7 @@ class MauticFactory
      * Gets a list of installed themes
      *
      * @param string $specificFeature limits list to those that support a specific feature
+     *
      * @return array
      */
     public function getInstalledThemes($specificFeature = 'all')
@@ -411,7 +421,7 @@ class MauticFactory
     /**
      * Get an IpAddress entity for current session or for passed in IP address
      *
-     * @param $ip
+     * @param string $ip
      *
      * @return IpAddress
      */
@@ -458,7 +468,7 @@ class MauticFactory
     /**
      * Get Symfony's logger
      *
-     * @return object
+     * @return \Symfony\Bridge\Monolog\Logger
      */
     public function getLogger()
     {

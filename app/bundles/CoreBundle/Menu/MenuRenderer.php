@@ -17,13 +17,28 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 
 /**
  * Class MenuRenderer
- *
- * @package Mautic\CoreBundle\Menu
  */
-class MenuRenderer implements RendererInterface {
+class MenuRenderer implements RendererInterface
+{
+
+    /**
+     * @var \Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine
+     */
     private $engine;
+
+    /**
+     * @var MatcherInterface
+     */
     private $matcher;
+
+    /**
+     * @var array
+     */
     private $defaultOptions;
+
+    /**
+     * @var string
+     */
     private $charset;
 
     /**
@@ -32,11 +47,11 @@ class MenuRenderer implements RendererInterface {
      * @param string           $charset
      * @param array            $defaultOptions
      */
-    public function __construct( MatcherInterface $matcher, MauticFactory $factory, $charset, array $defaultOptions = array())
+    public function __construct(MatcherInterface $matcher, MauticFactory $factory, $charset, array $defaultOptions = array())
     {
-        $this->engine           = $factory->getTemplating();
-        $this->matcher          =& $matcher;
-        $this->defaultOptions   = array_merge(array(
+        $this->engine         = $factory->getTemplating();
+        $this->matcher        =& $matcher;
+        $this->defaultOptions = array_merge(array(
             'depth'             => null,
             'matchingDepth'     => null,
             'currentAsLink'     => true,
@@ -49,7 +64,7 @@ class MenuRenderer implements RendererInterface {
             'allow_safe_labels' => false,
             'clear_matcher'     => true,
         ), $defaultOptions);
-        $this->charset          = $charset;
+        $this->charset        = $charset;
     }
 
     /**
@@ -57,6 +72,7 @@ class MenuRenderer implements RendererInterface {
      *
      * @param ItemInterface $item
      * @param array         $options
+     *
      * @return string
      */
     public function render(ItemInterface $item, array $options = array())

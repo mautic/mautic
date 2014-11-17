@@ -12,16 +12,13 @@ namespace Mautic\CoreBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-
 /**
  * Class PanelEndType
- *
- * @package Mautic\CoreBundle\Form\Type
  */
 class PanelEndType extends AbstractType
 {
     /**
-     * @param OptionsResolverInterface $resolver
+     * {@inheritdoc}
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
@@ -33,7 +30,8 @@ class PanelEndType extends AbstractType
     /**
      * @return string
      */
-    public function getName() {
-        return "panel_end";
+    public function getName()
+    {
+        return 'panel_end';
     }
 }

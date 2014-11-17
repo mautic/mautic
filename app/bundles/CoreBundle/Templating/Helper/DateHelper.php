@@ -19,6 +19,14 @@ class DateHelper extends Helper
      */
     protected $formats;
 
+    /**
+     * @var \Mautic\CoreBundle\Helper\DateTimeHelper
+     */
+    protected $helper;
+
+    /**
+     * @param MauticFactory $factory
+     */
     public function __construct(MauticFactory $factory)
     {
         $this->formats = array(
@@ -31,6 +39,14 @@ class DateHelper extends Helper
         $this->helper  = $factory->getDate();
     }
 
+    /**
+     * @param string           $type
+     * @param \DateTime|string $datetime
+     * @param string           $timezone
+     * @param string           $fromFormat
+     *
+     * @return string
+     */
     protected function format($type, $datetime, $timezone, $fromFormat)
     {
         $this->helper->setDateTime($datetime, $fromFormat, $timezone);
@@ -42,7 +58,11 @@ class DateHelper extends Helper
     /**
      * Returns full date. eg. October 8, 2014 21:19
      *
-     * @param $datetime
+     * @param \DateTime|string $datetime
+     * @param string           $timezone
+     * @param string           $fromFormat
+     *
+     * @return string
      */
     public function toFull($datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s')
     {
@@ -52,9 +72,11 @@ class DateHelper extends Helper
     /**
      * Returns date and time concat eg 2014-08-02 5:00am
      *
-     * @param        $datetime
-     * @param string $fromFormat
-     * @param string $timezone
+     * @param \DateTime|string $datetime
+     * @param string           $timezone
+     * @param string           $fromFormat
+     *
+     * @return string
      */
     public function toFullConcat($datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s')
     {
@@ -67,11 +89,11 @@ class DateHelper extends Helper
     /**
      * Returns short date format eg Sun, Oct 8
      *
-     * @param        $datetime
-     * @param string $timezone
-     * @param string $fromFormat
+     * @param \DateTime|string $datetime
+     * @param string           $timezone
+     * @param string           $fromFormat
      *
-     * @return mixed
+     * @return string
      */
     public function toShort($datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s')
     {
@@ -81,11 +103,11 @@ class DateHelper extends Helper
     /**
      * Returns date only e.g. 2014-08-09
      *
-     * @param        $datetime
-     * @param string $fromFormat
-     * @param string $timezone
+     * @param \DateTime|string $datetime
+     * @param string           $timezone
+     * @param string           $fromFormat
      *
-     * @return mixed
+     * @return string
      */
     public function toDate($datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s')
     {
@@ -95,11 +117,11 @@ class DateHelper extends Helper
     /**
      * Returns time only e.g. 21:19
      *
-     * @param        $datetime
-     * @param string $fromFormat
-     * @param string $timezone
+     * @param \DateTime|string $datetime
+     * @param string           $timezone
+     * @param string           $fromFormat
      *
-     * @return mixed
+     * @return string
      */
     public function toTime($datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s')
     {
@@ -107,7 +129,7 @@ class DateHelper extends Helper
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getFullFormat()
     {
@@ -115,7 +137,7 @@ class DateHelper extends Helper
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getDateFormat()
     {
@@ -123,7 +145,7 @@ class DateHelper extends Helper
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getTimeFormat()
     {
@@ -131,7 +153,7 @@ class DateHelper extends Helper
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getShortFormat()
     {
@@ -139,7 +161,7 @@ class DateHelper extends Helper
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getName()
     {

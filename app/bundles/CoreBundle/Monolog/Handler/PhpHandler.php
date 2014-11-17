@@ -7,13 +7,19 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-
 namespace Mautic\CoreBundle\Monolog\Handler;
 
 use Monolog\Handler\StreamHandler;
 
+/**
+ * Class PhpHandler
+ */
 class PhpHandler extends StreamHandler
 {
+
+    /**
+     * @var string
+     */
     private $errorMessage;
 
     /**
@@ -23,7 +29,6 @@ class PhpHandler extends StreamHandler
      */
     protected function write(array $record)
     {
-
         //check to see if the resource has anything written to it
         if (!is_resource($this->stream)) {
             if (!$this->url) {
@@ -57,8 +62,8 @@ class PhpHandler extends StreamHandler
     /**
      * @author Jordi Boggiano <j.boggiano@seld.be>
      *
-     * @param $code
-     * @param $msg
+     * @param string $code
+     * @param string $msg
      */
     private function customErrorHandler($code, $msg)
     {

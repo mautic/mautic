@@ -16,6 +16,7 @@ use Mautic\UserBundle\Entity\User;
 
 /**
  * Class FormEntity
+ *
  * @ORM\MappedSuperclass
  * @ORM\HasLifecycleCallbacks
  * @Serializer\ExclusionPolicy("all")
@@ -101,15 +102,17 @@ class FormEntity
     private $checkedOutByUser;
 
     /**
-     * @var
+     * @var array
      */
     protected $changes;
 
     /**
      * Wrapper function for isProperty methods
      *
-     * @param $name
-     * @param $arguments
+     * @param string $name
+     * @param        $arguments
+     *
+     * @throws \InvalidArgumentException
      */
     public function __call($name, $arguments)
     {
@@ -127,6 +130,8 @@ class FormEntity
      *
      * @param bool $checkPublishStatus
      * @param bool $checkCategoryStatus
+     *
+     * @return bool
      */
     public function isPublished($checkPublishStatus = true, $checkCategoryStatus = true)
     {
@@ -141,15 +146,16 @@ class FormEntity
                     }
                 }
             }
+
             return ($status == 'published') ? true : false;
-        } else {
-            return $this->getIsPublished();
         }
+
+        return $this->getIsPublished();
     }
 
     /**
-     * @param $prop
-     * @param $val
+     * @param string $prop
+     * @param mixed  $val
      */
     protected function isChanged($prop, $val)
     {
@@ -166,23 +172,30 @@ class FormEntity
         }
     }
 
+    /**
+     * @return array
+     */
     public function getChanges()
     {
         return $this->changes;
     }
 
+    /**
+     * @return string
+     */
     public function __toString()
     {
-        return get_called_class()  . " with ID #" . $this->getId();
+        return get_called_class() . " with ID #" . $this->getId();
     }
 
     /**
      * Set dateAdded
      *
      * @param \DateTime $dateAdded
-     * @return mixed
+     *
+     * @return $this
      */
-    public function setDateAdded ($dateAdded)
+    public function setDateAdded($dateAdded)
     {
         $this->dateAdded = $dateAdded;
 
@@ -194,7 +207,7 @@ class FormEntity
      *
      * @return \DateTime
      */
-    public function getDateAdded ()
+    public function getDateAdded()
     {
         return $this->dateAdded;
     }
@@ -203,9 +216,10 @@ class FormEntity
      * Set dateModified
      *
      * @param \DateTime $dateModified
-     * @return mixed
+     *
+     * @return $this
      */
-    public function setDateModified ($dateModified)
+    public function setDateModified($dateModified)
     {
         $this->dateModified = $dateModified;
 
@@ -217,7 +231,7 @@ class FormEntity
      *
      * @return \DateTime
      */
-    public function getDateModified ()
+    public function getDateModified()
     {
         return $this->dateModified;
     }
@@ -226,9 +240,10 @@ class FormEntity
      * Set checkedOut
      *
      * @param \DateTime $checkedOut
-     * @return mixed
+     *
+     * @return $this
      */
-    public function setCheckedOut ($checkedOut)
+    public function setCheckedOut($checkedOut)
     {
         $this->checkedOut = $checkedOut;
 
@@ -240,7 +255,7 @@ class FormEntity
      *
      * @return \DateTime
      */
-    public function getCheckedOut ()
+    public function getCheckedOut()
     {
         return $this->checkedOut;
     }
@@ -248,10 +263,11 @@ class FormEntity
     /**
      * Set createdBy
      *
-     * @param \Mautic\UserBundle\Entity\User $createdBy
-     * @return mixed
+     * @param User $createdBy
+     *
+     * @return $this
      */
-    public function setCreatedBy (User $createdBy = null)
+    public function setCreatedBy(User $createdBy = null)
     {
         $this->createdBy = $createdBy;
         if ($createdBy != null) {
@@ -264,9 +280,9 @@ class FormEntity
     /**
      * Get createdBy
      *
-     * @return \Mautic\UserBundle\Entity\User
+     * @return User
      */
-    public function getCreatedBy ()
+    public function getCreatedBy()
     {
         return $this->createdBy;
     }
@@ -274,10 +290,11 @@ class FormEntity
     /**
      * Set modifiedBy
      *
-     * @param \Mautic\UserBundle\Entity\User $modifiedBy
+     * @param User $modifiedBy
+     *
      * @return mixed
      */
-    public function setModifiedBy (User $modifiedBy = null)
+    public function setModifiedBy(User $modifiedBy = null)
     {
         $this->modifiedBy = $modifiedBy;
 
@@ -291,9 +308,9 @@ class FormEntity
     /**
      * Get modifiedBy
      *
-     * @return \Mautic\UserBundle\Entity\User
+     * @return User
      */
-    public function getModifiedBy ()
+    public function getModifiedBy()
     {
         return $this->modifiedBy;
     }
@@ -301,10 +318,11 @@ class FormEntity
     /**
      * Set checkedOutBy
      *
-     * @param \Mautic\UserBundle\Entity\User $checkedOutBy
+     * @param User $checkedOutBy
+     *
      * @return mixed
      */
-    public function setCheckedOutBy (User $checkedOutBy = null)
+    public function setCheckedOutBy(User $checkedOutBy = null)
     {
         $this->checkedOutBy = $checkedOutBy;
 
@@ -312,16 +330,15 @@ class FormEntity
             $this->checkedOutByUser = $checkedOutBy->getName();
         }
 
-
         return $this;
     }
 
     /**
      * Get checkedOutBy
      *
-     * @return \Mautic\UserBundle\Entity\User
+     * @return User
      */
-    public function getCheckedOutBy ()
+    public function getCheckedOutBy()
     {
         return $this->checkedOutBy;
     }
@@ -330,7 +347,8 @@ class FormEntity
      * Set isPublished
      *
      * @param boolean $isPublished
-     * @return Action
+     *
+     * @return $this
      */
     public function setIsPublished($isPublished)
     {
@@ -363,50 +381,55 @@ class FormEntity
         $current = $dt->getLocalDateTime();
         if (!$this->isPublished(false)) {
             return 'unpublished';
-        } else {
-            $status  =  'published';
-            if (method_exists($this, 'getPublishUp')) {
-                $up = $this->getPublishUp();
-                if (!empty($up) && $current <= $up) {
-                    $status = 'pending';
-                }
-            }
-            if (method_exists($this, 'getPublishDown')) {
-                $down = $this->getPublishDown();
-                if (!empty($down) && $current >= $down) {
-                    $status = 'expired';
-                }
-            }
-            return $status;
         }
+
+        $status = 'published';
+        if (method_exists($this, 'getPublishUp')) {
+            $up = $this->getPublishUp();
+            if (!empty($up) && $current <= $up) {
+                $status = 'pending';
+            }
+        }
+        if (method_exists($this, 'getPublishDown')) {
+            $down = $this->getPublishDown();
+            if (!empty($down) && $current >= $down) {
+                $status = 'expired';
+            }
+        }
+
+        return $status;
     }
 
+    /**
+     * @return bool
+     */
     public function isNew()
     {
         $id = $this->getId();
+
         return (empty($id)) ? true : false;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getCheckedOutByUser ()
+    public function getCheckedOutByUser()
     {
         return $this->checkedOutByUser;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getCreatedByUser ()
+    public function getCreatedByUser()
     {
         return $this->createdByUser;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getModifiedByUser ()
+    public function getModifiedByUser()
     {
         return $this->modifiedByUser;
     }

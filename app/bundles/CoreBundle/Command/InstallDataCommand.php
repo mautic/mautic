@@ -18,19 +18,43 @@ use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
 
+/**
+ * CLI Command to install Mautic sample data
+ */
 class InstallDataCommand extends ContainerAwareCommand
 {
 
+    /**
+     * {@inheritdoc}
+     */
     protected function configure()
     {
-        $this->setName('mautic:install:data');
-        $this->addOption('--force', null, InputOption::VALUE_OPTIONAL);
+        $this->setName('mautic:install:data')
+            ->setDescription('Installs Mautic with sample data')
+            ->setDefinition(array(
+                new InputOption(
+                    'force', null, InputOption::VALUE_NONE, 'Bypasses the verification check.'
+                )
+            ))
+            ->setHelp(<<<EOT
+The <info>%command.name%</info> command re-installs Mautic with sample data.
+
+<info>php %command.full_name%</info>
+
+You can optionally specify to bypass the verification check with the --force option:
+
+<info>php %command.full_name% --force</info>
+EOT
+        );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $options    = $input->getOptions();
-        $force      = (!empty($options['force'])) ? true : false;
+        $force      = $options['force'];
         $translator = $this->getContainer()->get('translator');
         $translator->setLocale($this->getContainer()->get('mautic.factory')->getParameter('locale'));
 
@@ -51,10 +75,12 @@ class InstallDataCommand extends ContainerAwareCommand
             }
         }
 
-        $env =  (!empty($options['env'])) ? $options['env'] : 'dev';
+        $env = $options['env'];
 
+        // TODO - This should respect the --quiet flag
         $verbosity = $output->getVerbosity();
         $output->setVerbosity(OutputInterface::VERBOSITY_QUIET);
+
         //due to foreign restraint and truncate issues with doctrine, the whole schema must be dropped and recreated
         $command = $this->getApplication()->find('doctrine:schema:drop');
         $input = new ArrayInput(array(
@@ -112,6 +138,7 @@ class InstallDataCommand extends ContainerAwareCommand
      * Returns Mautic fixtures
      *
      * @param bool $returnClassNames
+     *
      * @return array
      */
     public function getMauticFixtures($returnClassNames = false)

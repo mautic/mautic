@@ -15,13 +15,11 @@ use Symfony\Component\OptionsResolver\Options;
 
 /**
  * Class PanelWrapperStartType
- *
- * @package Mautic\CoreBundle\Form\Type
  */
 class PanelWrapperStartType extends AbstractType
 {
     /**
-     * @param OptionsResolverInterface $resolver
+     * {@inheritdoc}
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
@@ -41,9 +39,10 @@ class PanelWrapperStartType extends AbstractType
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
-    public function getName() {
-        return "panel_wrapper_start";
+    public function getName()
+    {
+        return 'panel_wrapper_start';
     }
 }

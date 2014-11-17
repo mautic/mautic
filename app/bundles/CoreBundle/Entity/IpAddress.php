@@ -9,18 +9,19 @@
 
 namespace Mautic\CoreBundle\Entity;
 
-
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 
 /**
  * Class IpAddress
+ *
  * @ORM\Entity(repositoryClass="Mautic\CoreBundle\Entity\IpAddressRepository")
  * @ORM\Table(name="ip_addresses")
  * @ORM\HasLifecycleCallbacks
  * @Serializer\ExclusionPolicy("all")
  */
-class IpAddress {
+class IpAddress
+{
 
     /**
      * @ORM\Column(type="integer")
@@ -59,6 +60,8 @@ class IpAddress {
      * Set ipAddress
      *
      * @param string $ipAddress
+     * @param array  $params
+     *
      * @return IpAddress
      */
     public function setIpAddress($ipAddress, $params = array())
@@ -109,7 +112,7 @@ class IpAddress {
 
                     case 'geobytes':
                         $tags = get_meta_tags(
-                            'http://www.geobytes.com/IpLocator.htm?GetLocation&template=php3.txt&IpAddress='.$this->getIpAddress()
+                            'http://www.geobytes.com/IpLocator.htm?GetLocation&template=php3.txt&IpAddress=' . $this->getIpAddress()
                         );
 
                         if ($tags['city'] != 'Limit Exceeded') {
@@ -129,7 +132,7 @@ class IpAddress {
 
                     case 'ipinfodb':
                         $data = $this->getRemoteIpData(
-                            "http://api.ipinfodb.com/v3/ip-city/?key={$params['ip_lookup_auth']}&format=json&ip=".$this->getIpAddress()
+                            "http://api.ipinfodb.com/v3/ip-city/?key={$params['ip_lookup_auth']}&format=json&ip=" . $this->getIpAddress()
                         );
                         $data = json_decode($data);
                         if (is_object($data) && $data->statusCode == 'OK') {
@@ -168,12 +171,13 @@ class IpAddress {
                     case 'maxmind_country':
                     case 'maxmind_precision':
                     case 'maxmind_omni':
-                        if ($params['ip_lookup_service'] == 'maxmind_country')
-                            $url = 'https://geoip.maxmind.com/geoip/v2.0/country/'.$this->getIpAddress();
-                        elseif ($params['ip_lookup_service'] == 'maxmind_precision')
-                            $url = 'https://geoip.maxmind.com/geoip/v2.0/city_isp_org/'.$this->getIpAddress();
-                        elseif ($params['ip_lookup_service'] == 'maxmind_omni')
-                            $url = 'https://geoip.maxmind.com/geoip/v2.0/omni/'.$this->getIpAddress();
+                        if ($params['ip_lookup_service'] == 'maxmind_country') {
+                            $url = 'https://geoip.maxmind.com/geoip/v2.0/country/' . $this->getIpAddress();
+                        } elseif ($params['ip_lookup_service'] == 'maxmind_precision') {
+                            $url = 'https://geoip.maxmind.com/geoip/v2.0/city_isp_org/' . $this->getIpAddress();
+                        } elseif ($params['ip_lookup_service'] == 'maxmind_omni') {
+                            $url = 'https://geoip.maxmind.com/geoip/v2.0/omni/' . $this->getIpAddress();
+                        }
 
                         $data = $this->getRemoteIpData($url, $params['ip_lookup_auth']);
 
@@ -208,7 +212,7 @@ class IpAddress {
 
                 $this->ipDetails = $ipData;
             } else {
-                $ipData = array(
+                $ipData          = array(
                     'city'         => '',
                     'region'       => '',
                     'country'      => '',
@@ -220,9 +224,16 @@ class IpAddress {
                 $this->ipDetails = $ipData;
             }
         }
+
         return $this;
     }
 
+    /**
+     * @param string $url
+     * @param bool   $auth
+     *
+     * @return mixed|string
+     */
     private function getRemoteIpData($url, $auth = false)
     {
         if (function_exists('curl_init')) {
@@ -249,6 +260,7 @@ class IpAddress {
                 $data = @file_get_contents($url);
             }
         }
+
         return $data;
     }
 
@@ -266,6 +278,7 @@ class IpAddress {
      * Set ipDetails
      *
      * @param string $ipDetails
+     *
      * @return IpAddress
      */
     public function setIpDetails($ipDetails)

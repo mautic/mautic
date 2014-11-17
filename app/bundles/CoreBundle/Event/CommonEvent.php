@@ -13,31 +13,29 @@ use Symfony\Component\EventDispatcher\Event;
 
 /**
  * Class CommonEvent
- *
- * @package Mautic\CoreBundle\Event
  */
 class CommonEvent extends Event
 {
 
     /**
-     * @var
+     * @var \Doctrine\ORM\EntityManager
      */
     protected $em;
 
     /**
-     * @var
+     * @var object
      */
     protected $entity;
 
     /**
-     * @var
+     * @var boolean
      */
     protected $isNew = true;
 
     /**
      * Sets the entity manager for the event to use
      *
-     * @param $em
+     * @param \Doctrine\ORM\EntityManager $em
      */
     public function setEntityManager($em)
     {
@@ -46,6 +44,7 @@ class CommonEvent extends Event
 
     /**
      * Returns if a saved lead is new or not
+     *
      * @return bool
      */
     public function isNew()

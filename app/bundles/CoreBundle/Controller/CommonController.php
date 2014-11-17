@@ -24,13 +24,11 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
  * Class CommonController
- *
- * @package Mautic\CoreBundle\Controller
  */
 class CommonController extends Controller implements MauticController
 {
     /**
-     * @var \Mautic\CoreBundle\Factory\MauticFactory
+     * @var MauticFactory
      */
     protected $factory;
 
@@ -47,6 +45,11 @@ class CommonController extends Controller implements MauticController
         $this->request = $request;
     }
 
+    /**
+     * @param MauticFactory $factory
+     *
+     * @return void
+     */
     public function setFactory(MauticFactory $factory)
     {
         $this->factory = $factory;
@@ -57,13 +60,13 @@ class CommonController extends Controller implements MauticController
      */
     public function initialize(FilterControllerEvent $event)
     {
-
     }
 
     /**
      * Determines if ajax content should be returned or direct content (page refresh)
      *
-     * @param $args
+     * @param array $args
+     *
      * @return JsonResponse|Response
      */
     function delegateView($args)
@@ -83,17 +86,18 @@ class CommonController extends Controller implements MauticController
 
         if ($this->request->isXmlHttpRequest() && !$this->request->get('ignoreAjax', false)) {
             return $this->ajaxAction($args);
-        } else {
-            $parameters = (isset($args['viewParameters'])) ? $args['viewParameters'] : array();
-            $template   = $args['contentTemplate'];
-            return $this->render($template, $parameters);
         }
+
+        $parameters = (isset($args['viewParameters'])) ? $args['viewParameters'] : array();
+        $template   = $args['contentTemplate'];
+        return $this->render($template, $parameters);
     }
 
     /**
      * Redirects URLs with trailing slashes in order to prevent 404s
      *
      * @param Request $request
+     *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function removeTrailingSlashAction(Request $request)
@@ -113,7 +117,8 @@ class CommonController extends Controller implements MauticController
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function postActionRedirect($args = array()) {
+    public function postActionRedirect($args = array())
+    {
         $returnUrl = array_key_exists('returnUrl', $args) ? $args['returnUrl'] : $this->generateUrl('mautic_dashboard_index');
         $flashes   = array_key_exists('flashes', $args) ? $args['flashes'] : array();
 
@@ -137,19 +142,21 @@ class CommonController extends Controller implements MauticController
         if (!$this->request->isXmlHttpRequest() || !empty($args['ignoreAjax'])) {
             $code = (isset($args['responseCode'])) ? $args['responseCode'] : 302;
             return $this->redirect($returnUrl, $code);
-        } else {
-            //load by ajax
-            return $this->ajaxAction($args);
         }
+
+        //load by ajax
+        return $this->ajaxAction($args);
     }
 
     /**
      * Generates html for ajax request
      *
      * @param array $args [parameters, contentTemplate, passthroughVars, forwardController]
+     *
      * @return JsonResponse
      */
-    public function ajaxAction($args = array()) {
+    public function ajaxAction($args = array())
+    {
         $parameters      = array_key_exists('viewParameters', $args) ? $args['viewParameters'] : array();
         $contentTemplate = array_key_exists('contentTemplate', $args) ? $args['contentTemplate'] : '';
         $passthrough     = array_key_exists('passthroughVars', $args) ? $args['passthroughVars'] : array();
@@ -233,17 +240,20 @@ class CommonController extends Controller implements MauticController
     /**
      * Executes an action defined in route
      *
-     * @param     $objectAction
-     * @param int $objectId
-     * @return Response
+     * @param string $objectAction
+     * @param int    $objectId
+     * @param int    $objectSubId
+     * @param string $objectModel
+     *
+     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function executeAction($objectAction, $objectId = 0, $objectSubId = 0, $objectModel = '') {
+    public function executeAction($objectAction, $objectId = 0, $objectSubId = 0, $objectModel = '')
+    {
         if (method_exists($this, "{$objectAction}Action")) {
-
             return $this->{"{$objectAction}Action"}($objectId, $objectModel);
-        } else {
-            return $this->accessDenied();
         }
+
+        return $this->accessDenied();
     }
 
     /**
@@ -316,10 +326,11 @@ class CommonController extends Controller implements MauticController
     /**
      * Sets a specific theme for the form
      *
-     * @param $form
-     * @param $template
-     * @param $theme
-     * @return mixed
+     * @param Form   $form
+     * @param string $template
+     * @param string $theme
+     *
+     * @return \Symfony\Component\Form\FormView
      */
     protected function setFormTheme(Form $form, $template, $theme)
     {

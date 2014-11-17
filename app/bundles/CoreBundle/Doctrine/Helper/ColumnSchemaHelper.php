@@ -16,8 +16,6 @@ use Doctrine\DBAL\Schema\Comparator;
  * Class ColumnSchemaHelper
  *
  * Used to manipulate the schema of an existing table
- *
- * @package Mautic\CoreBundle\Doctrine\Helper
  */
 class ColumnSchemaHelper
 {
@@ -33,41 +31,41 @@ class ColumnSchemaHelper
     protected $sm;
 
     /**
-     * @var
+     * @var string
      */
     protected $prefix;
 
     /**
-     * @var
+     * @var string
      */
     protected $tableName;
 
     /**
-     * @var
+     * @var string
      */
     protected $fromTable;
 
     /**
-     * @var
+     * @var string
      */
     protected $toTable;
 
     /**
      * @param Connection $db
-     * @param            $prefix
+     * @param string     $prefix
      */
     public function __construct(Connection $db, $prefix)
     {
-        $this->db            = $db;
-        $this->sm            = $db->getSchemaManager();
-        $this->prefix        = $prefix;
+        $this->db     = $db;
+        $this->sm     = $db->getSchemaManager();
+        $this->prefix = $prefix;
     }
 
     /**
      * Set the table to be manipulated
      *
-     * @param      $table
-     * @param bool $addPrefix
+     * @param string $table
+     * @param bool   $addPrefix
      */
     public function setName($table, $addPrefix = true)
     {
@@ -118,6 +116,8 @@ class ColumnSchemaHelper
      * Add an array of columns to the table
      *
      * @param array $columns
+     *
+     * @return void
      */
     public function addColumns(array $columns)
     {
@@ -145,6 +145,8 @@ class ColumnSchemaHelper
      *  ['options'] array  (optional) Defining options for column
      * @param bool  $checkExists Check if table exists; pass false if this has already been done
      *
+     * @return void
+     * @throws \InvalidArgumentException
      */
     public function addColumn(array $column, $checkExists = true)
     {
@@ -166,6 +168,8 @@ class ColumnSchemaHelper
      * Drops a column from table
      *
      * @param $columnName
+     *
+     * @return void
      */
     public function dropColumn($columnName)
     {
@@ -176,6 +180,8 @@ class ColumnSchemaHelper
 
     /**
      * Computes and executes the changes
+     *
+     * @return void
      */
     public function executeChanges()
     {
@@ -191,10 +197,11 @@ class ColumnSchemaHelper
     /**
      * Determine if a column already exists
      *
-     * @param      $column
-     * @param bool $throwException
+     * @param string $column
+     * @param bool   $throwException
      *
      * @return bool
+     * @throws \InvalidArgumentException
      */
     public function checkColumnExists($column, $throwException = false)
     {
@@ -202,12 +209,12 @@ class ColumnSchemaHelper
         if ($this->toTable->hasColumn($column)) {
             if ($throwException) {
                 throw new \InvalidArgumentException("The column {$column} already exists in {$this->tableName}");
-            } else {
-                return true;
             }
-        } else {
-            return false;
+
+            return true;
         }
+
+        return false;
     }
 
     /**

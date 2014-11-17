@@ -32,7 +32,14 @@ class FindUpdatesCommand extends ContainerAwareCommand
      */
     protected function configure()
     {
-        $this->setName('mautic:update:find');
+        $this->setName('mautic:update:find')
+            ->setDescription('Fetches updates for Mautic')
+            ->setHelp(<<<EOT
+The <info>%command.name%</info> command checks for updates for the Mautic application.
+
+<info>php %command.full_name%</info>
+EOT
+        );
     }
 
     /**
@@ -40,11 +47,9 @@ class FindUpdatesCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $options = $input->getOptions();
-
         /** @var \Symfony\Bundle\FrameworkBundle\Translation\Translator $translator */
         $translator = $this->getContainer()->get('translator');
-        $translator->setLocale('en_US');
+        $translator->setLocale($this->getContainer()->get('mautic.factory')->getParameter('locale'));
 
         $updateHelper = new UpdateHelper($this->getContainer()->get('mautic.factory'));
         $updateData   = $updateHelper->fetchData($this->getContainer()->getParameter('kernel.root_dir'), true);
@@ -53,8 +58,6 @@ class FindUpdatesCommand extends ContainerAwareCommand
             $output->writeln('<error>' . $translator->trans($updateData['message']) . '</error>');
         } elseif ($updateData['message'] == 'mautic.core.updater.running.latest.version') {
             $output->writeln('<info>' . $translator->trans($updateData['message']) . '</info>');
-        } elseif (isset($updateData['min_version'])) {
-            $output->writeln($translator->trans($updateData['message'], array('%minVersion%' => $updateData['min_version'], '%phpVersion%' => $updateData['php_version'])));
         } else {
             $output->writeln($translator->trans($updateData['message'], array('%version%' => $updateData['version'], '%announcement%' => $updateData['announcement'])));
             $output->writeln($translator->trans('mautic.core.updater.cli.update'));

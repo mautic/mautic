@@ -12,6 +12,9 @@ namespace Mautic\CoreBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+/**
+ * Class ButtonGroupType
+ */
 class ButtonGroupType extends AbstractType
 {
     /**
@@ -29,7 +32,6 @@ class ButtonGroupType extends AbstractType
     {
         return 'button_group';
     }
-
 
     /**
      * {@inheritdoc}
