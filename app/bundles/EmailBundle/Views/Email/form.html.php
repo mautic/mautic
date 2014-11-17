@@ -24,36 +24,29 @@ $header = ($email->getId()) ?
 $view['slots']->set("headerTitle", $header.$subheader);
 ?>
     <!-- start: box layout -->
-<div class="box-layout">
 <?php echo $view['form']->start($form); ?>
-    <!-- container -->
-    <div class="col-md-9 bg-auto height-auto bdr-r">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">
-                    <?php echo $header; ?>
-                </h3>
-            </div>
-            <div class="panel-body">
+    <div class="box-layout">
+        <!-- container -->
+        <div class="col-md-9 bg-auto height-auto">
+            <div class="pa-md">
                 <?php echo $view['form']->row($form['subject']); ?>
                 <?php echo $view['form']->row($form['plainText']); ?>
             </div>
         </div>
-    </div>
-    <div class="col-md-3 bg-white height-auto">
-        <div class="pr-lg pl-lg pt-md pb-md">
-            <?php if (isset($form['variantSettings'])): ?>
-                <?php echo $view['form']->row($form['variantSettings']); ?>
-                <?php echo $view['form']->row($form['template']); ?>
-                <?php echo $view['form']->row($form['isPublished']); ?>
-                <?php echo $view['form']->row($form['publishUp']); ?>
-                <?php echo $view['form']->row($form['publishDown']); ?>
-            <?php endif; ?>
-            <?php echo $view['form']->rest($form); ?>
+        <div class="col-md-3 bg-white height-auto bdr-l">
+            <div class="pr-lg pl-lg pt-md pb-md">
+                <?php if (isset($form['variantSettings'])): ?>
+                    <?php echo $view['form']->row($form['variantSettings']); ?>
+                    <?php echo $view['form']->row($form['template']); ?>
+                    <?php echo $view['form']->row($form['isPublished']); ?>
+                    <?php echo $view['form']->row($form['publishUp']); ?>
+                    <?php echo $view['form']->row($form['publishDown']); ?>
+                <?php endif; ?>
+                <?php echo $view['form']->rest($form); ?>
+            </div>
         </div>
     </div>
 <?php echo $view['form']->end($form); ?>
-</div>
 
 <div class="hide builder email-builder">
     <div class="builder-content">

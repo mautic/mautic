@@ -9,7 +9,6 @@
 if ($tmpl == 'index')
 $view->extend('MauticEmailBundle:Email:index.html.php');
 ?>
-
 <div class="col-md-9 bg-auto height-auto bdr-l table-responsive pt-10">
     <?php if (count($items)): ?>
         <table class="table table-hover table-striped table-bordered email-list">
@@ -150,6 +149,6 @@ $view->extend('MauticEmailBundle:Email:index.html.php');
             </tbody>
         </table>
     <?php else: ?>
-        <h4><?php echo $view['translator']->trans('mautic.core.noresults'); ?></h4>
+        <?php echo $view->render('MauticCoreBundle:Default:noresults.html.php'); ?>
     <?php endif; ?>
 </div>
