@@ -16,6 +16,7 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\FormEvents;
 use Mautic\PointBundle\Event\PointBuilderEvent;
+use Mautic\PointBundle\Event\TriggerBuilderEvent;
 use Mautic\PointBundle\PointEvents;
 
 /**
@@ -30,9 +31,10 @@ class PointSubscriber extends CommonSubscriber
     static public function getSubscribedEvents()
     {
         return array(
-            PointEvents::POINT_ON_BUILD => array('onPointBuild', 0),
-            EmailEvents::EMAIL_ON_OPEN  => array('onEmailOpen', 0),
-            EmailEvents::EMAIL_ON_SEND  => array('onEmailSend', 0),
+            PointEvents::POINT_ON_BUILD     => array('onPointBuild', 0),
+            PointEvents::TRIGGER_ON_BUILD   => array('onTriggerBuild', 0),
+            EmailEvents::EMAIL_ON_OPEN      => array('onEmailOpen', 0),
+            EmailEvents::EMAIL_ON_SEND      => array('onEmailSend', 0)
         );
     }
 
@@ -56,6 +58,20 @@ class PointSubscriber extends CommonSubscriber
         );
 
         $event->addAction('email.send', $action);
+    }
+
+    /**
+     * @param TriggerBuilderEvent $event
+     */
+    public function onTriggerBuild(TriggerBuilderEvent $event)
+    {
+        $sendEvent = array(
+            'label'       => 'mautic.email.point.trigger.sendemail',
+            'callback'    => array('\\Mautic\\EmailBundle\\Helper\\PointActionHelper', 'sendEmail'),
+            'formType'    => 'pointtrigger_email'
+        );
+
+        $event->addEvent('email.send', $sendEvent);
     }
 
     /**

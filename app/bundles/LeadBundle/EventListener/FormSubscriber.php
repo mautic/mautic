@@ -40,7 +40,6 @@ class FormSubscriber extends CommonSubscriber
     {
         //add lead generation submit action
         $action = array(
-            'group'        => 'mautic.lead.lead.events.group',
             'label'        => 'mautic.lead.lead.submitaction.createlead',
             'description'  => 'mautic.lead.lead.submitaction.createlead_descr',
             'formType'     => 'lead_submitaction_createlead',
@@ -50,7 +49,6 @@ class FormSubscriber extends CommonSubscriber
 
         //add lead generation submit action
         $action = array(
-            'group'       => 'mautic.lead.lead.events.group',
             'label'       => 'mautic.lead.lead.submitaction.changepoints',
             'description' => 'mautic.lead.lead.submitaction.changepoints_descr',
             'formType'    => 'lead_submitaction_pointschange',
@@ -60,7 +58,6 @@ class FormSubscriber extends CommonSubscriber
 
         //add to lead list
         $action = array(
-            'group'        => 'mautic.lead.lead.events.group',
             'label'        => 'mautic.lead.lead.events.changelist',
             'description'  => 'mautic.lead.lead.events.changelist_descr',
             'formType'     => 'lead_event_leadlist',
