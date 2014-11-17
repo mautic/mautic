@@ -134,6 +134,10 @@ class CommonSubscriber implements EventSubscriberInterface
                         if (isset($item['extras']['iconClass']) && isset($item['linkAttributes']['id'])) {
                             $id = explode('_', $item['linkAttributes']['id']);
                             if (isset($id[1])) {
+                                // some bundle names are in plural, create also singular item
+                                if (substr($id[1], -1) == 's') {
+                                    $event->addIcon(rtrim($id[1], 's'), $item['extras']['iconClass']);
+                                }
                                 $event->addIcon($id[1], $item['extras']['iconClass']);
                             }
                         }

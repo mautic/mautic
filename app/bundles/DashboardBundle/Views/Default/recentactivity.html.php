@@ -23,9 +23,13 @@
                     </span>
                 </div>
                 <div class="media-body">
-                    <a href="<?php echo $view['router']->generate('mautic_user_action', array('objectAction' => 'edit', 'objectId' => $log['userId'])); ?>" data-toggle="ajax">
+                    <?php if (isset($log['userId']) && $log['userId']) : ?>
+                        <a href="<?php echo $view['router']->generate('mautic_user_action', array('objectAction' => 'edit', 'objectId' => $log['userId'])); ?>" data-toggle="ajax">
+                            <?php echo $log['userName']; ?>
+                        </a>
+                    <?php else : ?>
                         <?php echo $log['userName']; ?>
-                    </a>
+                    <?php endif; ?>
                     <?php echo $view['translator']->trans('mautic.dashboard.' . $log['action'] . '.past.tense'); ?>
                     <a href="<?php echo $view['router']->generate('mautic_' . $log['bundle'] . '_action', array('objectAction' => 'view', 'objectId' => $log['objectId'])); ?>" data-toggle="ajax">
                         <?php echo $log['objectName']; ?>

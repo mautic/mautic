@@ -23,11 +23,30 @@ $view['slots']->set("headerTitle", $header);
     <!-- container -->
     <div class="col-md-9 bg-auto height-auto bdr-r">
         <div class="pa-md">
-            <?php echo $view['form']->row($form['label']); ?>
-            <?php echo $view['form']->row($form['alias']); ?>
-            <?php echo $view['form']->row($form['type']); ?>
-            <?php echo $view['form']->row($form['defaultValue']); ?>
-
+            <div class="row">
+                <div class="col-md-6">
+                    <?php echo $view['form']->row($form['label']); ?>
+                </div>
+                <div class="col-md-6">
+                    <?php echo $view['form']->row($form['alias']); ?>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <?php echo $view['form']->row($form['type']); ?>
+                </div>
+                <div class="col-md-6">
+                    <?php echo $view['form']->row($form['defaultValue']); ?>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <?php echo $view['form']->row($form['group']); ?>
+                </div>
+                <div class="col-md-6">
+                    <?php echo $view['form']->row($form['order']); ?>
+                </div>
+            </div>
             <?php
             $type          = $form['type']->vars['data'];
             $properties    = $form['properties']->vars['data'];
