@@ -67,7 +67,7 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                         <i class="fa fa-fw fa-globe"></i>
                         <?php endif; ?>
                         <?php if ($security->hasEntityAccess(true, $permissions['lead:lists:editother'], $item->getCreatedBy())) : ?>
-                            <a href="<?php echo $view['router']->generate('mautic_lead_index', array('search' => "$listCommand:{$item->getAlias()}")); ?>"
+                            <a href="<?php echo $view['router']->generate('mautic_leadlist_action', array('objectAction' => 'edit', 'objectId' => $item->getId())); ?>"
                                data-toggle="ajax">
                                 <?php echo $item->getName(); ?> (<?php echo $item->getAlias(); ?>)
                             </a>
