@@ -34,8 +34,11 @@ $view['slots']->set("headerTitle", $header.$subheader);
                 <div class="col-md-6">
                     <?php echo $view['form']->row($form['title']); ?>
                     <?php echo $view['form']->row($form['alias']); ?>
-                    <?php echo $view['form']->row($form['category']); ?>
                     <?php echo $view['form']->row($form['template']); ?>
+                    <?php echo $view['form']->row($form['metaDescription']); ?>
+                    <?php if (isset($form['variantSettings'])): ?>
+                    <?php echo $view['form']->row($form['variantSettings']); ?>
+                    <?php endif; ?>
                 </div>
                 <div class="col-md-6">
                     <div class="panel panel-default">
@@ -46,45 +49,44 @@ $view['slots']->set("headerTitle", $header.$subheader);
                 </div>
             </div>
         </div>
-
-        <div class="hide builder page-builder">
-            <div class="builder-content">
-                <input type="hidden" id="pageBuilderUrl" value="<?php echo $view['router']->generate('mautic_page_action', array('objectAction' => 'builder', 'objectId' => $activePage->getSessionId())); ?>" />
-            </div>
-            <div class="builder-panel">
-                <p>
-                    <button type="button" class="btn btn-primary btn-close-builder" onclick="Mautic.closePageEditor();"><?php echo $view['translator']->trans('mautic.page.page.builder.close'); ?></button>
-                </p>
-                <div class="well well-small"><?php echo $view['translator']->trans('mautic.page.page.token.help'); ?></div>
-                <div class="panel-group margin-sm-top" id="pageTokensPanel">
-                    <?php foreach ($tokens as $k => $t): ?>
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h4 class="panel-title"><?php echo $t['header']; ?></h4>
-                        </div>
-                        <div class="panel-body">
-                            <?php echo $t['content']; ?>
-                        </div>
-                    </div>
-                    <?php endforeach; ?>
-                </div>
-            </div>
-        </div>
     </div>
     <div class="col-md-3 bg-white height-auto">
         <div class="pr-lg pl-lg pt-md pb-md">
             <?php
                 echo $view['form']->row($form['category']);
                 echo $view['form']->row($form['language']);
-                echo $view['form']->row($form['template']);
                 echo $view['form']->row($form['translationParent_lookup']);
                 echo $view['form']->row($form['translationParent']);
                 echo $view['form']->row($form['isPublished']);
                 echo $view['form']->row($form['publishUp']);
                 echo $view['form']->row($form['publishDown']);
-                echo $view['form']->end($form);
+                echo $view['form']->rest($form);
             ?>
         </div>
     </div>
     <?php echo $view['form']->end($form); ?>
+</div>
+
+<div class="hide builder page-builder">
+    <div class="builder-content">
+        <input type="hidden" id="pageBuilderUrl" value="<?php echo $view['router']->generate('mautic_page_action', array('objectAction' => 'builder', 'objectId' => $activePage->getSessionId())); ?>" />
+    </div>
+    <div class="builder-panel">
+        <p>
+            <button type="button" class="btn btn-primary btn-close-builder" onclick="Mautic.closePageEditor();"><?php echo $view['translator']->trans('mautic.page.page.builder.close'); ?></button>
+        </p>
+        <div class="well well-small"><?php echo $view['translator']->trans('mautic.page.page.token.help'); ?></div>
+        <div class="panel-group margin-sm-top" id="pageTokensPanel">
+            <?php foreach ($tokens as $k => $t): ?>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title"><?php echo $t['header']; ?></h4>
+                    </div>
+                    <div class="panel-body">
+                        <?php echo $t['content']; ?>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
 </div>

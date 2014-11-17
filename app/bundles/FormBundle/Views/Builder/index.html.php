@@ -28,7 +28,6 @@ $view['slots']->set("headerTitle", $header);
                 </ul>
             <!--/ tabs controls -->
 
-
             <?php echo $view['form']->start($form); ?>
 
                 <div class="tab-content pa-md bg-white">

@@ -517,7 +517,7 @@ class PageController extends FormController
         $builderComponents    = $model->getBuilderComponents($entity);
         return $this->delegateView(array(
             'viewParameters'  =>  array(
-                'form'        => $this->setFormTheme($form, 'MauticPageBundle:Page:form.html.php', 'MauticPageBundle:FormTheme\Variant'),
+                'form'        => $form->createView(),
                 'tokens'      => $builderComponents['pageTokens'],
                 'activePage'  => $entity
             ),
@@ -557,8 +557,8 @@ class PageController extends FormController
             $clone->setHits(0);
             $clone->setUniqueHits(0);
             $clone->setRevision(0);
-            $clone->setVariationStartDate(null);
-            $clone->setVariationHits(null);
+            $clone->setVariantStartDate(null);
+            $clone->setVariantHits(null);
             $clone->setIsPublished(false);
             $model->saveEntity($clone);
             $objectId = $clone->getId();
@@ -759,9 +759,9 @@ class PageController extends FormController
             //reset
             $clone->setHits(0);
             $clone->setRevision(0);
-            $clone->setVariationHits(0);
+            $clone->setVariantHits(0);
             $clone->setUniqueHits(0);
-            $clone->setVariationStartDate(null);
+            $clone->setVariantStartDate(null);
             $clone->setIsPublished(false);
             $clone->setVariantParent($entity);
 

@@ -37,8 +37,9 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
         <i class="fa fa-fw fa-trash-o text-danger"></i>
         <?php echo $view['translator']->trans('mautic.core.form.delete'); ?>
     </a>
-<?php endif; ?>
-<?php if (empty($variants['parent']) && $permissions['page:pages:create']): ?>
+<?php endif;
+?>
+<?php if ((empty($variants['parent']) || ($variants['parent']->getId() == $activePage->getId())) && $permissions['page:pages:create']): ?>
     <a class="btn btn-default" href="<?php echo $view['router']->generate('mautic_page_action',
            array("objectAction" => "abtest", "objectId" => $activePage->getId())); ?>"
         data-toggle="ajax"
@@ -185,13 +186,13 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
             <!-- tabs controls -->
             <ul class="nav nav-tabs pr-md pl-md">
                 <li class="active">
-                    <a href="#translation-container" role="tab" data-toggle="tab">
-                        <?php echo $view['translator']->trans('mautic.page.page.translations'); ?>
+                    <a href="#variants-container" role="tab" data-toggle="tab">
+                        <?php echo $view['translator']->trans('mautic.page.page.variants'); ?>
                     </a>
                 </li>
                 <li class="">
-                    <a href="#variants-container" role="tab" data-toggle="tab">
-                        <?php echo $view['translator']->trans('mautic.page.page.variants'); ?>
+                    <a href="#translation-container" role="tab" data-toggle="tab">
+                        <?php echo $view['translator']->trans('mautic.page.page.translations'); ?>
                     </a>
                 </li>
             </ul>
@@ -200,80 +201,9 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
 
         <!-- start: tab-content -->
         <div class="tab-content pa-md">
-            <!-- #translation-container -->
-            <div class="tab-pane active fade in bdr-w-0" id="translation-container">
-
-                <!-- start: related translations list -->
-                <?php if (count($translations['children']) || $translations['parent']) : ?>
-                <ul class="list-group">
-                    <?php if ($translations['parent']) : ?>
-                    <li class="list-group-item bg-auto bg-light-xs">
-                        <div class="box-layout">
-                            <div class="col-md-1 va-m">
-                                <h3>
-                                    <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php', array(
-                                        'item'  => $translations['parent'],
-                                        'model' => 'page.page',
-                                        'size'  => ''
-                                    )); ?>
-                                </h3>
-                            </div>
-                            <div class="col-md-7 va-m">
-                                <h5 class="fw-sb text-primary">
-                                    <a href="<?php echo $view['router']->generate('mautic_page_action', array('objectAction' => 'view', 'objectId' => $translations['parent']->getId())); ?>" data-toggle="ajax"><?php echo $translations['parent']->getTitle(); ?>
-                                        <?php if ($translations['parent']->getId() == $activePage->getId()) : ?>
-                                        <span>[<?php echo $view['translator']->trans('mautic.page.page.current'); ?>]</span>
-                                        <?php endif; ?>
-                                        <span>[<?php echo $view['translator']->trans('mautic.page.page.parent'); ?>]</span>
-                                    </a>
-                                </h5>
-                                <span class="text-white dark-sm"><?php echo $translations['parent']->getAlias(); ?></span>
-                            </div>
-                            <div class="col-md-4 va-m text-right">
-                                <em class="text-white dark-sm"><?php echo $translations['parent']->getLanguage(); ?></em>
-                            </div>
-                        </div>
-                    </li>
-                    <?php endif; ?>
-                    <?php if (count($translations['children'])) : ?>
-                    <?php /** @var \Mautic\PageBundle\Entity\Page $translation */ ?>
-                    <?php foreach ($translations['children'] as $translation) : ?>
-                    <li class="list-group-item bg-auto bg-light-xs">
-                        <div class="box-layout">
-                            <div class="col-md-1 va-m">
-                                <h3>
-                                    <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php', array(
-                                        'item'  => $translation,
-                                        'model' => 'page.page',
-                                        'size'  => ''
-                                    )); ?>
-                                </h3>
-                            </div>
-                            <div class="col-md-7 va-m">
-                                <h5 class="fw-sb text-primary">
-                                    <a href="<?php echo $view['router']->generate('mautic_page_action', array('objectAction' => 'view', 'objectId' => $translation->getId())); ?>" data-toggle="ajax"><?php echo $translation->getTitle(); ?>
-                                        <?php if ($translation->getId() == $activePage->getId()) : ?>
-                                        <span>[<?php echo $view['translator']->trans('mautic.page.page.current'); ?>]</span>
-                                        <?php endif; ?>
-                                    </a>
-                                </h5>
-                                <span class="text-white dark-sm"><?php echo $translation->getAlias(); ?></span>
-                            </div>
-                            <div class="col-md-4 va-m text-right">
-                                <em class="text-white dark-sm"><?php echo $translation->getLanguage(); ?></em>
-                            </div>
-                        </div>
-                    </li>
-                    <?php endforeach; ?>
-                    <?php endif; ?>
-                </ul>
-                <?php endif; ?>
-                <!--/ end: related translations list -->
-            </div>
-            <!--/ #translation-container -->
 
             <!-- #variants-container -->
-            <div class="tab-pane fade bdr-w-0" id="variants-container">
+            <div class="tab-pane active bdr-w-0" id="variants-container">
                 <!-- header -->
                 <div class="box-layout mb-lg">
                     <!-- button -->
@@ -353,6 +283,77 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                 <!--/ end: variants list -->
             </div>
             <!--/ #variants-container -->
+            <!-- #translation-container -->
+            <div class="tab-pane fade in bdr-w-0" id="translation-container">
+
+                <!-- start: related translations list -->
+                <?php if (count($translations['children']) || $translations['parent']) : ?>
+                    <ul class="list-group">
+                        <?php if ($translations['parent']) : ?>
+                            <li class="list-group-item bg-auto bg-light-xs">
+                                <div class="box-layout">
+                                    <div class="col-md-1 va-m">
+                                        <h3>
+                                            <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php', array(
+                                                'item'  => $translations['parent'],
+                                                'model' => 'page.page',
+                                                'size'  => ''
+                                            )); ?>
+                                        </h3>
+                                    </div>
+                                    <div class="col-md-7 va-m">
+                                        <h5 class="fw-sb text-primary">
+                                            <a href="<?php echo $view['router']->generate('mautic_page_action', array('objectAction' => 'view', 'objectId' => $translations['parent']->getId())); ?>" data-toggle="ajax"><?php echo $translations['parent']->getTitle(); ?>
+                                                <?php if ($translations['parent']->getId() == $activePage->getId()) : ?>
+                                                    <span>[<?php echo $view['translator']->trans('mautic.page.page.current'); ?>]</span>
+                                                <?php endif; ?>
+                                                <span>[<?php echo $view['translator']->trans('mautic.page.page.parent'); ?>]</span>
+                                            </a>
+                                        </h5>
+                                        <span class="text-white dark-sm"><?php echo $translations['parent']->getAlias(); ?></span>
+                                    </div>
+                                    <div class="col-md-4 va-m text-right">
+                                        <em class="text-white dark-sm"><?php echo $translations['parent']->getLanguage(); ?></em>
+                                    </div>
+                                </div>
+                            </li>
+                        <?php endif; ?>
+                        <?php if (count($translations['children'])) : ?>
+                            <?php /** @var \Mautic\PageBundle\Entity\Page $translation */ ?>
+                            <?php foreach ($translations['children'] as $translation) : ?>
+                                <li class="list-group-item bg-auto bg-light-xs">
+                                    <div class="box-layout">
+                                        <div class="col-md-1 va-m">
+                                            <h3>
+                                                <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php', array(
+                                                    'item'  => $translation,
+                                                    'model' => 'page.page',
+                                                    'size'  => ''
+                                                )); ?>
+                                            </h3>
+                                        </div>
+                                        <div class="col-md-7 va-m">
+                                            <h5 class="fw-sb text-primary">
+                                                <a href="<?php echo $view['router']->generate('mautic_page_action', array('objectAction' => 'view', 'objectId' => $translation->getId())); ?>" data-toggle="ajax"><?php echo $translation->getTitle(); ?>
+                                                    <?php if ($translation->getId() == $activePage->getId()) : ?>
+                                                        <span>[<?php echo $view['translator']->trans('mautic.page.page.current'); ?>]</span>
+                                                    <?php endif; ?>
+                                                </a>
+                                            </h5>
+                                            <span class="text-white dark-sm"><?php echo $translation->getAlias(); ?></span>
+                                        </div>
+                                        <div class="col-md-4 va-m text-right">
+                                            <em class="text-white dark-sm"><?php echo $translation->getLanguage(); ?></em>
+                                        </div>
+                                    </div>
+                                </li>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </ul>
+                <?php endif; ?>
+                <!--/ end: related translations list -->
+            </div>
+            <!--/ #translation-container -->
         </div>
         <!--/ end: tab-content -->
     </div>
