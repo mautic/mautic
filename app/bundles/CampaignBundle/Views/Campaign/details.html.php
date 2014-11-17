@@ -184,7 +184,7 @@ if ($permissions['campaign:campaigns:edit']): ?>
             <div class="tab-pane active fade in bdr-w-0" id="decisions-container">
                 <?php echo $view->render('MauticCampaignBundle:Campaign:events.html.php', array('events' => $events, 'eventType' => 'decision')); ?>
             </div>
-            <div class="tab-pane active fade in bdr-w-0" id="actions-container">
+            <div class="tab-pane fade in bdr-w-0" id="actions-container">
                 <?php echo $view->render('MauticCampaignBundle:Campaign:events.html.php', array('events' => $events, 'eventType' => 'action')); ?>
             </div>
             <!--/ #events-container -->
