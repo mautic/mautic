@@ -27,13 +27,15 @@ class DefaultController extends CommonController
      */
     public function indexAction()
     {
-        $model = $this->factory->getModel('dashboard.dashboard');
+        $model          = $this->factory->getModel('dashboard.dashboard');
+        $hitRepo        = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit');
+        $emailStatRepo  = $this->factory->getEntityManager()->getRepository('MauticEmailBundle:Stat');
 
         $sentReadCount        = $this->factory->getModel('email.email')->getRepository()->getSentReadCount();
-        $newReturningVisitors = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit')->getNewReturningVisitorsCount();
-        $weekVisitors         = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit')->countVisitors(604800);
-        $allTimeVisitors      = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit')->countVisitors(0);
-        $allSentEmails        = $this->factory->getEntityManager()->getRepository('MauticEmailBundle:Stat')->getSentCount();
+        $newReturningVisitors = $hitRepo->getNewReturningVisitorsCount();
+        $weekVisitors         = $hitRepo->countVisitors(604800);
+        $allTimeVisitors      = $hitRepo->countVisitors(0);
+        $allSentEmails        = $emailStatRepo->getSentCount();
         $popularPages         = $this->factory->getModel('page.page')->getRepository()->getPopularPages();
         $popularAssets        = $this->factory->getModel('asset.asset')->getRepository()->getPopularAssets();
         $popularCampaigns     = $this->factory->getModel('campaign.campaign')->getRepository()->getPopularCampaigns();
