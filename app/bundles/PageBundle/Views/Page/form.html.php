@@ -31,7 +31,7 @@ $view['slots']->set("headerTitle", $header.$subheader);
     <div class="col-md-9 bg-auto height-auto bdr-r">
         <div class="pa-md">
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-sm-12">
                     <?php echo $view['form']->row($form['title']); ?>
                     <?php echo $view['form']->row($form['alias']); ?>
                     <?php echo $view['form']->row($form['template']); ?>
@@ -39,13 +39,6 @@ $view['slots']->set("headerTitle", $header.$subheader);
                     <?php if (isset($form['variantSettings'])): ?>
                     <?php echo $view['form']->row($form['variantSettings']); ?>
                     <?php endif; ?>
-                </div>
-                <div class="col-md-6">
-                    <div class="panel panel-default">
-                        <div class="panel-body">
-                            [PAGE THUMBNAIL HERE]
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
