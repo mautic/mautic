@@ -21,7 +21,7 @@ $view['slots']->set('searchHelp', $view['translator']->trans('mautic.email.help.
         'mautic_email_action', array("objectAction" => "new")); ?>"
        data-toggle="ajax"
        data-menu-link="#mautic_email_index">
-        <i class="fa fa-plus"></i> 
+        <i class="fa fa-plus"></i>
         <?php echo $view["translator"]->trans("mautic.email.menu.new"); ?>
     </a>
     <?php $view['slots']->stop(); ?>
@@ -29,9 +29,9 @@ $view['slots']->set('searchHelp', $view['translator']->trans('mautic.email.help.
 
 <div class="box-layout">
 	<!-- filters -->
-    <?php echo $view->render('MauticEmailBundle:Email:filters.html.php',array('filters' => $filters)); ?>
+    <?php echo $view->render('MauticEmailBundle:Email:filters.html.php', array('filters' => $filters)); ?>
     <!--/ filters -->
-	
+
     <?php $view['slots']->output('_content'); ?>
 </div>
 
