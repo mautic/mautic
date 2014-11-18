@@ -42,11 +42,9 @@
 </IfModule>
 
 <IfModule !mod_rewrite.c>
-    <IfModule mod_alias.c>
-        # When mod_rewrite is not available, we instruct a temporary redirect of
-        # the start page to the front controller explicitly so that the website
-        # and the generated links can still be used.
-        RedirectMatch 302 ^/$ /index.php/
-        # RedirectTemp cannot be used instead
-    </IfModule>
+    # When mod_rewrite is not available, we instruct a temporary redirect of
+    # the start page to the front controller explicitly so that the website
+    # and the generated links can still be used.
+    RedirectMatch 302 ^/$ /index.php/
+    # RedirectTemp cannot be used instead
 </IfModule>
