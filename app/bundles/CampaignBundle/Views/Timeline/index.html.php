@@ -22,22 +22,15 @@ $item = $event['extra']['log'];
 				    <?php echo $item['campaignName']; ?>
 				</a>
 			</h3>
-	        <p class="mb-0">At <?php echo $view['date']->toFullConcat($event['timestamp']); ?>, <?php echo $event['eventLabel']; ?>.</p>
+	        <p class="mb-0"><?php echo $view['translator']->trans('mautic.campaign.event.time', array('%date%' => $view['date']->toFullConcat($event['timestamp']), '%event%' => $event['eventLabel'])); ?></p>
 	    </div>
         <div class="panel-footer">
-            <p>
-            	Triggered
-				<strong><?php echo $item['eventName']; ?></strong> event
-			</p>
+            <p><?php echo $view['translator']->trans('mautic.campaign.user.event.triggered', array('%event%' => $item['eventName'])); ?></p>
 			<?php if ($item['campaignDescription']): ?>
-			<p>
-				<strong>Campaign description: </strong> <?php echo $item['campaignDescription']; ?>
-			</p>
+			<p><?php echo $view['translator']->trans('mautic.campaign.campaign.description', array('%description%' => $item['campaignDescription'])); ?></p>
 			<?php endif; ?>
 			<?php if ($item['eventDescription']): ?>
-			<p>
-				<strong>Event description: </strong> <?php echo $item['eventDescription']; ?>
-			</p>
+			<p><?php echo $view['translator']->trans('mautic.campaign.user.event.description', array('%description%' => $item['eventDescription'])); ?></p>
 			<?php endif; ?>
         </div>
 	</div>
