@@ -9,19 +9,16 @@
 
 namespace Mautic\CoreBundle\Event;
 
-use Symfony\Component\Debug\Exception\FatalErrorException;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
  * Class CommandListEvent
- *
- * @package Mautic\CoreBundle\Event
  */
 class CommandListEvent extends Event
 {
 
     /**
-     * @var
+     * @var array
      */
     protected $commands = array();
 
@@ -38,8 +35,8 @@ class CommandListEvent extends Event
     /**
      * Add an array of search commands
      *
-     * @param       $header  String name for section header
-     * @param array $commands Array of commands supported by the repository
+     * @param string $header   String name for section header
+     * @param array  $commands Array of commands supported by the repository
      */
     public function addCommands($header, array $commands)
     {

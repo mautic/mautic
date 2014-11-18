@@ -114,7 +114,7 @@ if ($security->hasEntityAccess($permissions['email:emails:editown'], $permission
         <div class="bg-auto bg-dark-xs">
             <!-- email detail collapseable toggler -->
             <div class="hr-expand nm">
-                <span data-toggle="tooltip" title="Detail">
+                <span data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.core.details'); ?>">
                     <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse" data-target="#email-details"><span class="caret"></span> <?php echo $view['translator']->trans('mautic.core.details'); ?></a>
                 </span>
             </div>
@@ -132,7 +132,7 @@ if ($security->hasEntityAccess($permissions['email:emails:editown'], $permission
                                 <div class="col-xs-4 va-m">
                                     <h5 class="text-white dark-md fw-sb mb-xs">
                                         <span class="fa fa-download"></span>
-                                        Lead Lists comparison
+                                        <?php echo $view['translator']->trans('mautic.email.lead.list.comparison'); ?>
                                     </h5>
                                 </div>
                                 <div class="col-xs-8 va-m">

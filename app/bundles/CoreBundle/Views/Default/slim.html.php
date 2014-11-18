@@ -15,7 +15,7 @@
         <section id="main" role="main">
             <div class="container-fluid" id="main-content">
                 <?php if ($view['slots']->has("headerTitle")): ?>
-                    <div  class="row">
+                    <div class="row">
                         <h2><?php $view['slots']->output("headerTitle"); ?></h2>
                     </div>
                 <?php endif; ?>

@@ -14,18 +14,17 @@ use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 
 /**
  * Class DoctrineEventsSubscriber
- *
- * @package Mautic\CoreBundle\Subscriber
  */
 class DoctrineEventsSubscriber implements \Doctrine\Common\EventSubscriber
 {
+
     /**
      * @var string
      */
     protected $prefix = '';
 
     /**
-     * @param $prefix
+     * @param string $prefix
      */
     public function __construct($prefix)
     {
@@ -33,7 +32,7 @@ class DoctrineEventsSubscriber implements \Doctrine\Common\EventSubscriber
     }
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
     public function getSubscribedEvents()
     {
@@ -42,6 +41,8 @@ class DoctrineEventsSubscriber implements \Doctrine\Common\EventSubscriber
 
     /**
      * @param LoadClassMetadataEventArgs $args
+     *
+     * @return void
      */
     public function loadClassMetadata(LoadClassMetadataEventArgs $args)
     {

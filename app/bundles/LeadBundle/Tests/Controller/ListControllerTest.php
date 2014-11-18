@@ -128,9 +128,9 @@ class ListControllerTest extends MauticWebTestCase
         $crawler = $client->submit($form);
 
         $this->assertRegExp(
-            '/mautic.lead.list.notice.updated/',
+            '/mautic.core.notice.updated/',
             $client->getResponse()->getContent(),
-            'mautic.lead.list.notice.updated not found'
+            'mautic.core.notice.updated not found'
         );
 
         //make sure ACL is working
@@ -157,9 +157,9 @@ class ListControllerTest extends MauticWebTestCase
         $crawler = $client->request('POST', '/leads/lists/delete/'.$list->getId());
 
         $this->assertRegExp(
-            '/mautic.lead.list.notice.deleted/',
+            '/mautic.core.notice.deleted/',
             $client->getResponse()->getContent(),
-            'mautic.lead.list.notice.deleted not found'
+            'mautic.core.notice.deleted not found'
         );
 
         //make sure ACL is working

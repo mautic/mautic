@@ -29,8 +29,24 @@ class PushTransifexCommand extends ContainerAwareCommand
      */
     protected function configure()
     {
-        $this->setName('mautic:transifex:push');
-        $this->addOption('--create', null, InputOption::VALUE_OPTIONAL);
+        $this->setName('mautic:transifex:push')
+            ->setDescription('Pushes Mautic translation resources to Transifex')
+            ->setDefinition(array(
+                new InputOption(
+                    'create', null, InputOption::VALUE_NONE,
+                    'Flag to create new resources.'
+                )
+            ))
+            ->setHelp(<<<EOT
+The <info>%command.name%</info> command is used to push translation resources to Transifex
+
+<info>php %command.full_name%</info>
+
+You can optionally choose to create new resources with the --create option:
+
+<info>php %command.full_name% --create</info>
+EOT
+        );
     }
 
     /**
@@ -51,7 +67,7 @@ class PushTransifexCommand extends ContainerAwareCommand
         }
 
         $options = $input->getOptions();
-        $create  = (isset($options['create']));
+        $create  = $options['create'];
         $files   = $this->getLanguageFiles();
 
         /** @var \BabDev\Transifex\Transifex $transifex */

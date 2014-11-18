@@ -18,8 +18,15 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
 
+/**
+ * CLI command to process the e-mail queue
+ */
 class ProcessEmailQueueCommand extends ContainerAwareCommand
 {
+
+    /**
+     * {@inheritdoc}
+     */
     protected function configure()
     {
         $this
@@ -29,9 +36,18 @@ class ProcessEmailQueueCommand extends ContainerAwareCommand
             ->addOption('--time-limit', null, InputOption::VALUE_OPTIONAL, 'Limit the number of seconds per batch. Defaults to value set in config.')
             ->addOption('--do-not-clear', null, InputOption::VALUE_NONE, 'By default, failed messages older than the --recover-timeout setting will be attempted one more time then deleted if it fails again.  If this is set, sending of failed messages will continue to be attempted.')
             ->addOption('--recover-timeout', null, InputOption::VALUE_OPTIONAL, 'Sets the amount of time in seconds before attempting to resend failed messages.  Defaults to value set in config.')
-            ->addOption('--clear-timeout', null, InputOption::VALUE_OPTIONAL, 'Sets the amount of time in seconds before deleting failed messages.  Defaults to value set in config.');
+            ->addOption('--clear-timeout', null, InputOption::VALUE_OPTIONAL, 'Sets the amount of time in seconds before deleting failed messages.  Defaults to value set in config.')
+            ->setHelp(<<<EOT
+The <info>%command.name%</info> command is used to process the application's e-mail queue
+
+<info>php %command.full_name%</info>
+EOT
+        );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $options    = $input->getOptions();
@@ -42,6 +58,7 @@ class ProcessEmailQueueCommand extends ContainerAwareCommand
         $skipClear  = $input->getOption('do-not-clear');
         $quiet      = $input->getOption('quiet');
         $timeout    = $input->getOption('clear-timeout');
+
         if (empty($timeout)) {
             $timeout = $container->getParameter('mautic.mailer_spool_clear_timeout');
         }
@@ -138,5 +155,7 @@ class ProcessEmailQueueCommand extends ContainerAwareCommand
         if ($returnCode !== 0) {
             return $returnCode;
         }
+
+        return 0;
     }
 }

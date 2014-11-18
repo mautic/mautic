@@ -8,6 +8,7 @@
  */
 
 namespace Mautic\CoreBundle\Controller;
+
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
 use Mautic\CoreBundle\Event\CommandListEvent;
@@ -17,12 +18,16 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class AjaxController
- *
- * @package Mautic\CoreBundle\Controller
  */
 class AjaxController extends CommonController
 {
 
+    /**
+     * @param array $dataArray
+     *
+     * @return JsonResponse
+     * @throws \Exception
+     */
     protected function sendJsonResponse($dataArray)
     {
         $response  = new JsonResponse();
@@ -50,7 +55,7 @@ class AjaxController extends CommonController
                     $bundle     = ucfirst($parts[0]);
                     $action     = $parts[1];
 
-                    if (class_exists('Mautic\\' . $bundle . 'Bundle\\Controller' . '\\' . 'AjaxController')) {
+                    if (class_exists('Mautic\\' . $bundle . 'Bundle\\Controller\\AjaxController')) {
                         return $this->forward("Mautic{$bundle}Bundle:Ajax:executeAjax", array(
                             'action'  => $action,
                             //forward the request as well as Symfony creates a subrequest without GET/POST
@@ -58,22 +63,34 @@ class AjaxController extends CommonController
                         ));
                     }
                 }
-            } else {
-                return $this->executeAjaxAction($action, $this->request);
             }
+
+            return $this->executeAjaxAction($action, $this->request);
         }
+
         return $this->sendJsonResponse(array('success' => 0));
     }
 
+    /**
+     * @param string  $action
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
     public function executeAjaxAction($action, Request $request)
     {
         if (method_exists($this, "{$action}Action")) {
             return $this->{"{$action}Action"}($request);
-        } else {
-            return $this->sendJsonResponse(array('success' => 0));
         }
+
+        return $this->sendJsonResponse(array('success' => 0));
     }
 
+    /**
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
     protected function setTableLimitAction(Request $request)
     {
         $dataArray = array('success' => 0);
@@ -86,6 +103,11 @@ class AjaxController extends CommonController
         return $this->sendJsonResponse($dataArray);
     }
 
+    /**
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
     protected function setTableFilterAction(Request $request)
     {
         $dataArray = array('success' => 0);
@@ -110,6 +132,11 @@ class AjaxController extends CommonController
         return $this->sendJsonResponse($dataArray);
     }
 
+    /**
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
     protected function globalSearchAction(Request $request)
     {
         $dataArray = array('success' => 1);
@@ -125,6 +152,11 @@ class AjaxController extends CommonController
         return $this->sendJsonResponse($dataArray);
     }
 
+    /**
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
     protected function commandListAction(Request $request)
     {
         $model      = InputHelper::clean($request->query->get('model'));
@@ -145,6 +177,11 @@ class AjaxController extends CommonController
         return $this->sendJsonResponse($dataArray);
     }
 
+    /**
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
     protected function globalCommandListAction(Request $request)
     {
         $dispatcher = $this->get('event_dispatcher');
@@ -183,6 +220,11 @@ class AjaxController extends CommonController
         return $this->sendJsonResponse($dataArray);
     }
 
+    /**
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
     protected function togglePanelAction(Request $request)
     {
         $panel     = InputHelper::clean($request->request->get("panel", "left"));
@@ -193,6 +235,11 @@ class AjaxController extends CommonController
         return $this->sendJsonResponse($dataArray);
     }
 
+    /**
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
     protected function togglePublishStatusAction(Request $request)
     {
         $dataArray = array('success' => 0);
@@ -225,7 +272,7 @@ class AjaxController extends CommonController
                 //toggle permission state
                 $model->togglePublishStatus($entity);
                 //get updated icon HTML
-                $html = $this->renderView('MauticCoreBundle:Helper:publishstatus.html.php',array(
+                $html = $this->renderView('MauticCoreBundle:Helper:publishstatus.html.php', array(
                     'item'       => $entity,
                     'model'      => $name,
                     'extra'      => $extra

@@ -22,11 +22,11 @@ $item = $event['extra']['stats'];
 				    <?php echo $item['subject']; ?>
 				</a>
 			</h3>
-	        <p class="mb-0">At <?php echo $view['date']->toFullConcat($event['timestamp']); ?>, <?php echo $event['eventLabel']; ?>.</p>
+	        <p class="mb-0"><?php echo $view['translator']->trans('mautic.email.timeline.event.time', array('%date%' => $view['date']->toFullConcat($event['timestamp']), '%event%' => $event['eventLabel'])); ?></p>
 	    </div>
 	    <?php if (isset($event['extra'])) : ?>
 	        <div class="panel-footer">
-	            <p><strong>Email Body:</strong> <?php echo $item['plainText']; ?></p>
+	            <p><?php echo $view['translator']->trans('mautic.email.timeline.event.body', array('%body%' => $item['plainText'])); ?></p>
 	        </div>
 	    <?php endif; ?>
 	</div>

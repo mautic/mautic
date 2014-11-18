@@ -13,11 +13,23 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\DateTimeType;
 
+/**
+ * Class UTCDateTimeType
+ */
 class UTCDateTimeType extends DateTimeType
 {
 
+    /**
+     * @var \DateTimeZone
+     */
     private static $utc;
 
+    /**
+     * @param \DateTime        $value
+     * @param AbstractPlatform $platform
+     *
+     * @return string|null
+     */
     public function convertToDatabaseValue($value, AbstractPlatform $platform)
     {
         if ($value === null) {
@@ -28,12 +40,19 @@ class UTCDateTimeType extends DateTimeType
             self::$utc = new \DateTimeZone('UTC');
 
         $tz = $value->getTimeZone();
-        $utcDatetime = new \Datetime($value->format($platform->getDateTimeFormatString()), $tz);
+        $utcDatetime = new \DateTime($value->format($platform->getDateTimeFormatString()), $tz);
         $utcDatetime->setTimezone(self::$utc);
 
         return $utcDatetime->format($platform->getDateTimeFormatString());
     }
 
+    /**
+     * @param mixed            $value
+     * @param AbstractPlatform $platform
+     *
+     * @return \DateTime|null
+     * @throws ConversionException
+     */
     public function convertToPHPValue($value, AbstractPlatform $platform)
     {
         if ($value === null) {

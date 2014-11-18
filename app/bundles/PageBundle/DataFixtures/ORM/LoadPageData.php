@@ -33,7 +33,6 @@ class LoadPageData extends AbstractFixture implements OrderedFixtureInterface, C
     /**
      * {@inheritdoc}
      */
-
     public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
@@ -73,7 +72,7 @@ class LoadPageData extends AbstractFixture implements OrderedFixtureInterface, C
     }
 
     /**
-     * @return int
+     * {@inheritdoc}
      */
     public function getOrder()
     {

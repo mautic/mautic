@@ -17,13 +17,12 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class CorePermissions
- *
- * @package Mautic\CoreBundle\Security\Permissions
  */
-class CorePermissions {
+class CorePermissions
+{
 
     /**
-     * @var
+     * @var TranslatorInterface
      */
     private $translator;
 
@@ -33,7 +32,7 @@ class CorePermissions {
     private $bundles;
 
     /**
-     * @var
+     * @var EntityManager
      */
     private $em;
 
@@ -47,6 +46,13 @@ class CorePermissions {
      */
     private $security;
 
+    /**
+     * @param TranslatorInterface $translator
+     * @param EntityManager       $em
+     * @param SecurityContext     $security
+     * @param array               $bundles
+     * @param array               $params
+     */
     public function __construct(TranslatorInterface $translator, EntityManager $em, SecurityContext $security, array $bundles, array $params)
     {
         $this->translator = $translator;
@@ -61,32 +67,37 @@ class CorePermissions {
      *
      * @return array
      */
-    public function getPermissionClasses() {
+    public function getPermissionClasses()
+    {
         static $classes = array();
         if (empty($classes)) {
             foreach ($this->bundles as $bundle) {
-                if ($bundle['base'] == "Core")
-                    continue; //do not include this file
+                if ($bundle['base'] == "Core") {
+                    continue;
+                } //do not include this file
 
                 //explode MauticUserBundle into Mautic User Bundle so we can build the class needed
-                $object     = $this->getPermissionClass($bundle['base'], false);
+                $object = $this->getPermissionClass($bundle['base'], false);
                 if (!empty($object)) {
                     $classes[strtolower($bundle['base'])] = $object;
                 }
             }
         }
+
         return $classes;
     }
 
     /**
      * Returns the bundles permission class object
      *
-     * @param      $bundle
-     * @param bool $throwException
+     * @param string $bundle
+     * @param bool   $throwException
+     *
      * @return mixed
-     * @throws \Symfony\Component\Debug\Exception\NotFoundHttpException
+     * @throws \InvalidArgumentException
      */
-    public function getPermissionClass($bundle, $throwException = true) {
+    public function getPermissionClass($bundle, $throwException = true)
+    {
         static $classes = array();
         if (!empty($bundle)) {
             if (empty($classes[$bundle])) {
@@ -102,19 +113,21 @@ class CorePermissions {
             }
 
             return $classes[$bundle];
-        } else {
-            throw new \InvalidArgumentException("Bundle and permission type must be specified. '$bundle' given.");
         }
+
+        throw new \InvalidArgumentException("Bundle and permission type must be specified. '$bundle' given.");
     }
 
     /**
      * Generates the bit value for the bundle's permission
      *
      * @param array $permissions
+     *
      * @return array
      * @throws \InvalidArgumentException
      */
-    public function generatePermissions(array $permissions) {
+    public function generatePermissions(array $permissions)
+    {
         $entities = array();
 
         //give bundles an opportunity to analyze and adjust permissions based on others
@@ -124,7 +137,7 @@ class CorePermissions {
         }
 
         //create entities
-        foreach($permissions as $key => $perms) {
+        foreach ($permissions as $key => $perms) {
             list($bundle, $name) = explode(":", $key);
 
             $entity = new Permission();
@@ -133,7 +146,7 @@ class CorePermissions {
             $entity->setBundle(strtolower($bundle));
             $entity->setName(strtolower($name));
 
-            $bit = 0;
+            $bit   = 0;
             $class = $this->getPermissionClass($bundle);
 
             foreach ($perms as $perm) {
@@ -151,13 +164,13 @@ class CorePermissions {
         return $entities;
     }
 
-
     /**
      * Determines if the user has permission to access the given area
      *
-     * @param      $requestedPermission
-     * @param bool $mode MATCH_ALL|MATCH_ONE|RETURN_ARRAY
-     * @param null $userEntity
+     * @param array  $requestedPermission
+     * @param string $mode MATCH_ALL|MATCH_ONE|RETURN_ARRAY
+     * @param User   $userEntity
+     *
      * @return bool
      * @throws \InvalidArgumentException
      */
@@ -176,7 +189,7 @@ class CorePermissions {
             $parts = explode(':', $permission);
             if (count($parts) != 3) {
                 throw new \InvalidArgumentException($this->translator->trans('mautic.core.permissions.badformat',
-                        array("%permission%" => $permission))
+                    array("%permission%" => $permission))
                 );
             }
 
@@ -221,18 +234,19 @@ class CorePermissions {
             return $permissions;
         } else {
             throw new \InvalidArgumentException($this->translator->trans('mautic.core.permissions.mode.notfound',
-                    array("%mode%" => $mode))
+                array("%mode%" => $mode))
             );
         }
     }
 
-
     /**
      * Checks if the user has access to the requested entity
      *
-     * @param $ownPermission
-     * @param $otherPermission
-     * @param $owner
+     * @param string|bool $ownPermission
+     * @param string|bool $otherPermission
+     * @param User        $owner
+     *
+     * @return bool
      */
     public function hasEntityAccess($ownPermission, $otherPermission, $owner)
     {
@@ -283,13 +297,14 @@ class CorePermissions {
     /**
      * Retrieves all permissions
      *
-     * @param  boolean  $forJs
+     * @param boolean $forJs
+     *
      * @return array
      */
     public function getAllPermissions($forJs = false)
     {
         $permissionObjects = $this->getPermissionClasses();
-        $permissions = array();
+        $permissions       = array();
         foreach ($permissionObjects as $object) {
             $perms = $object->getPermissions();
             if ($forJs) {
@@ -301,11 +316,14 @@ class CorePermissions {
             } else {
                 $permissions[$object->getName()] = $perms;
             }
-
         }
+
         return $permissions;
     }
 
+    /**
+     * @return User|mixed
+     */
     private function getUser()
     {
         if ($token = $this->security->getToken()) {

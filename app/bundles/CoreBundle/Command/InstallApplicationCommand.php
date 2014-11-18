@@ -31,7 +31,14 @@ class InstallApplicationCommand extends ContainerAwareCommand
      */
     protected function configure()
     {
-        $this->setName('mautic:install:application');
+        $this->setName('mautic:install:application')
+            ->setDescription('Installs Mautic using a pre-generated data set')
+            ->setHelp(<<<EOT
+The <info>%command.name%</info> command is used to install Mautic via a command-line interface using a pre-generated data set
+
+<info>php %command.full_name%</info>
+EOT
+        );
     }
 
     /**
@@ -47,7 +54,7 @@ class InstallApplicationCommand extends ContainerAwareCommand
 
         /** @var \Symfony\Bundle\FrameworkBundle\Translation\Translator $translator */
         $translator = $this->getContainer()->get('translator');
-        $translator->setLocale('en_US');
+        $translator->setLocale($this->getContainer()->get('mautic.factory')->getParameter('locale'));
 
         // Load up the pre-loaded data
         $data = unserialize(file_get_contents($kernelRoot . '/config/install_data.txt'));
@@ -79,7 +86,7 @@ class InstallApplicationCommand extends ContainerAwareCommand
         } catch (\Exception $exception) {
             $output->writeln($translator->trans('mautic.core.command.install_application_could_not_create_database_exception', array('%message%' => $exception->getMessage())));
 
-            return 0;
+            return 1;
         }
 
         // Now populate the tables with fixtures
@@ -103,7 +110,7 @@ class InstallApplicationCommand extends ContainerAwareCommand
         } catch (\Exception $exception) {
             $output->writeln($translator->trans('mautic.core.command.install_application_could_not_load_fixtures_exception', array('%message%' => $exception->getMessage())));
 
-            return 0;
+            return 1;
         }
 
         try {
@@ -130,7 +137,7 @@ class InstallApplicationCommand extends ContainerAwareCommand
         } catch (\Exception $exception) {
             $output->writeln($translator->trans('mautic.core.command.install_application_could_not_create_user', array('%message%' => $exception->getMessage())));
 
-            return 0;
+            return 1;
         }
 
         $output->writeln(

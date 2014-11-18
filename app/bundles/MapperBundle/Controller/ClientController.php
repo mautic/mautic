@@ -167,13 +167,14 @@ class ClientController extends FormController
 
                     $this->request->getSession()->getFlashBag()->add(
                         'notice',
-                        $this->get('translator')->trans('mautic.mapper.notice.created', array(
-                            '%name%' => $entity->getTitle(),
-                            '%url%'          => $this->generateUrl('mautic_mapper_client_action', array(
-                                    'objectAction' => 'edit',
-                                    'objectId'     => $entity->getId(),
-                                    'application'       => $application
-                                ))
+                        $this->get('translator')->trans('mautic.core.notice.created', array(
+                            '%name%'      => $entity->getTitle(),
+                            '%menu_link%' => 'mautic_mapper_index',
+                            '%url%'       => $this->generateUrl('mautic_mapper_client_action', array(
+                                'objectAction' => 'edit',
+                                'objectId'     => $entity->getId(),
+                                'application'  => $application
+                            ))
                         ), 'flashes')
                     );
 
@@ -284,13 +285,14 @@ class ClientController extends FormController
 
                 $this->request->getSession()->getFlashBag()->add(
                     'notice',
-                    $this->get('translator')->trans('mautic.mapper.notice.updated', array(
-                        '%name%' => $entity->getTitle(),
-                        '%url%'  => $this->generateUrl('mautic_mapper_client_action', array(
-                                'objectAction' => 'edit',
-                                'objectId'     => $entity->getId(),
-                                'application'  => $application
-                            ))
+                    $this->get('translator')->trans('mautic.core.notice.updated', array(
+                        '%name%'      => $entity->getTitle(),
+                        '%menu_link%' => 'mautic_mapper_index',
+                        '%url%'       => $this->generateUrl('mautic_mapper_client_action', array(
+                            'objectAction' => 'edit',
+                            'objectId'     => $entity->getId(),
+                            'application'  => $application
+                        ))
                     ), 'flashes')
                 );
             } else {
@@ -378,7 +380,7 @@ class ClientController extends FormController
 
             $flashes[] = array(
                 'type' => 'notice',
-                'msg'  => 'mautic.mapper.notice.deleted',
+                'msg'  => 'mautic.core.notice.deleted',
                 'msgVars' => array(
                     '%name%' => $entity->getTitle(),
                     '%id%'   => $objectId

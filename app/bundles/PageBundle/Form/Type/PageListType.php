@@ -15,18 +15,20 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * Class PageListType
- *
- * @package Mautic\PageBundle\Form\Type
  */
 class PageListType extends AbstractType
 {
 
+    /**
+     * @var array
+     */
     private $choices = array();
 
     /**
      * @param MauticFactory $factory
      */
-    public function __construct(MauticFactory $factory) {
+    public function __construct(MauticFactory $factory)
+    {
         $viewOther = $factory->getSecurity()->isGranted('page:pages:viewother');
         $choices = $factory->getModel('page')->getRepository()
             ->getPageList('', 0, 0, $viewOther, 'variant');
@@ -53,12 +55,16 @@ class PageListType extends AbstractType
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
-    public function getName() {
-        return "page_list";
+    public function getName()
+    {
+        return 'page_list';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getParent()
     {
         return 'choice';

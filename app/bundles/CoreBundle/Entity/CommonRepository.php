@@ -6,6 +6,7 @@
  * @link        http://mautic.com
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\ORM\EntityRepository;
@@ -18,14 +19,12 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class CommonRepository
- *
- * @package Mautic\CoreBundle\Entity
  */
 class CommonRepository extends EntityRepository
 {
 
     /**
-     * @var Translator
+     * @var TranslatorInterface
      */
     protected $translator;
 
@@ -39,6 +38,11 @@ class CommonRepository extends EntityRepository
      */
     protected $currentUser;
 
+    /**
+     * @param TranslatorInterface $translator
+     *
+     * @return void
+     */
     public function setTranslator(TranslatorInterface $translator)
     {
         $this->translator = $translator;
@@ -48,6 +52,8 @@ class CommonRepository extends EntityRepository
      * Set the current user (i.e. from security context) for use within repositories
      *
      * @param User $user
+     *
+     * @return void
      */
     public function setCurrentUser($user)
     {
@@ -60,6 +66,8 @@ class CommonRepository extends EntityRepository
 
     /**
      * @param MauticFactory $factory
+     *
+     * @return void
      */
     public function setFactory(MauticFactory $factory)
     {
@@ -70,6 +78,7 @@ class CommonRepository extends EntityRepository
      * Get a single entity
      *
      * @param int $id
+     *
      * @return null|object
      */
     public function getEntity($id = 0)
@@ -85,7 +94,8 @@ class CommonRepository extends EntityRepository
     /**
      * Get a list of entities
      *
-     * @param array      $args
+     * @param array $args
+     *
      * @return Paginator
      */
     public function getEntities($args = array())
@@ -108,14 +118,13 @@ class CommonRepository extends EntityRepository
             $query->setHydrationMode(constant("\\Doctrine\\ORM\\Query::$mode"));
         }
 
-        $results = new Paginator($query);
-        return $results;
+        return new Paginator($query);
     }
 
     /**
-     * @param      $alias
-     * @param null $id
-     * @param null $entity
+     * @param string $alias
+     * @param object $entity
+     *
      * @return mixed
      */
     public function checkUniqueAlias($alias, $entity = null)
@@ -131,14 +140,16 @@ class CommonRepository extends EntityRepository
         }
 
         $results = $q->getQuery()->getSingleResult();
+
         return $results['aliasCount'];
     }
 
     /**
      * Save an entity through the repository
      *
-     * @param $entity
-     * @param $flush true by default; use false if persisting in batches
+     * @param object $entity
+     * @param bool   $flush true by default; use false if persisting in batches
+     *
      * @return int
      */
     public function saveEntity($entity, $flush = true)
@@ -151,7 +162,9 @@ class CommonRepository extends EntityRepository
     /**
      * Persist an array of entities
      *
-     * @param $entities
+     * @param array $entities
+     *
+     * @return void
      */
     public function saveEntities($entities)
     {
@@ -170,8 +183,9 @@ class CommonRepository extends EntityRepository
     /**
      * Delete an entity through the repository
      *
-     * @param $entity
-     * @param $flush true by default; use false if persisting in batches
+     * @param object $entity
+     * @param bool   $flush true by default; use false if persisting in batches
+     *
      * @return int
      */
     public function deleteEntity($entity, $flush = true)
@@ -183,6 +197,12 @@ class CommonRepository extends EntityRepository
             $this->_em->flush();
     }
 
+    /**
+     * @param \Doctrine\ORM\QueryBuilder $q
+     * @param array                      $args
+     *
+     * @return bool
+     */
     protected function buildClauses(&$q, array $args)
     {
         $this->buildWhereClause($q, $args);
@@ -192,6 +212,12 @@ class CommonRepository extends EntityRepository
         return true;
     }
 
+    /**
+     * @param \Doctrine\ORM\QueryBuilder $q
+     * @param array                      $args
+     *
+     * @return void
+     */
     protected function buildWhereClause(&$q, array $args)
     {
         $filter       = array_key_exists('filter', $args) ? $args['filter'] : '';
@@ -208,8 +234,9 @@ class CommonRepository extends EntityRepository
                         foreach ($filter['force'] as $f) {
                             list ($expr, $parameters) = $this->getFilterExpr($q, $f);
                             $forceExpressions->add($expr);
-                            if (is_array($parameters))
+                            if (is_array($parameters)) {
                                 $forceParameters = array_merge($forceParameters, $parameters);
+                            }
                         }
                     } else {
                         //string so parse as advanced search
@@ -246,13 +273,7 @@ class CommonRepository extends EntityRepository
                     $parameters  = $forceParameters;
                 }
 
-                if ($expressions instanceof \Countable) {
-                    //dbal
-                    $filterCount = count($expressions);
-                } else {
-                    //orm
-                    $filterCount = count($expressions->getParts());
-                }
+                $filterCount = ($expressions instanceof \Countable) ? count($expressions) : count($expressions->getParts());
 
                 if (!empty($filterCount)) {
                     $q->where($expressions)
@@ -262,26 +283,41 @@ class CommonRepository extends EntityRepository
         }
     }
 
+    /**
+     * @param \Doctrine\ORM\QueryBuilder $q
+     * @param array                      $filter
+     *
+     * @return array
+     */
     protected function getFilterExpr(&$q, $filter)
     {
         $unique    = $this->generateRandomParameterName();
         $func      = (!empty($filter['operator'])) ? $filter['operator'] : $filter['expr'];
         $parameter = false;
         if (in_array($func, array('isNull', 'isNotNull'))) {
-            $expr      = $q->expr()->{$func}($filter['column']);
+            $expr = $q->expr()->{$func}($filter['column']);
         } elseif (in_array($func, array('in', 'notIn'))) {
             $expr = $q->expr()->{$func}($filter['column'], $filter['value']);
         } else {
-            if (isset($filter['strict']) && !$filter['strict'])
+            if (isset($filter['strict']) && !$filter['strict']) {
                 $filter['value'] = "%{$filter['value']}%";
-            $expr = $q->expr()->{$func}($filter['column'], ':' . $unique);
+            }
+            $expr      = $q->expr()->{$func}($filter['column'], ':' . $unique);
             $parameter = array($unique => $filter['value']);
         }
-        if (!empty($filter['not']))
+        if (!empty($filter['not'])) {
             $expr = $q->expr()->not($expr);
-        return  array($expr, $parameter);
+        }
+
+        return array($expr, $parameter);
     }
 
+    /**
+     * @param \Doctrine\ORM\QueryBuilder $qb
+     * @param array                      $filter
+     *
+     * @return array
+     */
     protected function addCatchAllWhereClause(&$qb, $filter)
     {
         return array(
@@ -290,6 +326,12 @@ class CommonRepository extends EntityRepository
         );
     }
 
+    /**
+     * @param \Doctrine\ORM\QueryBuilder $qb
+     * @param array                      $filters
+     *
+     * @return array
+     */
     protected function addAdvancedSearchWhereClause(&$qb, $filters)
     {
         if (isset($filters->root)) {
@@ -325,12 +367,15 @@ class CommonRepository extends EntityRepository
                     list($expr, $params) = $this->addCatchAllWhereClause($qb, $f);
                 }
             }
-            if (!empty($params))
+            if (!empty($params)) {
                 $parameters = array_merge($parameters, $params);
+            }
 
-            if (!empty($expr))
+            if (!empty($expr)) {
                 $expressions->add($expr);
+            }
         }
+
         return array($expressions, $parameters);
     }
 
@@ -347,8 +392,9 @@ class CommonRepository extends EntityRepository
     /**
      * Test to see if a given command is supported by the repository
      *
-     * @param $command
-     * @param $subcommand
+     * @param string $command
+     * @param string $subcommand
+     *
      * @return bool
      */
     protected function isSupportedSearchCommand($command, $subcommand = '')
@@ -368,12 +414,15 @@ class CommonRepository extends EntityRepository
                 return true;
             }
         }
+
         return false;
     }
 
     /**
-     * @param QueryBuilder $q
-     * @param array        $args
+     * @param \Doctrine\ORM\QueryBuilder $q
+     * @param array                      $args
+     *
+     * @return void
      */
     protected function buildOrderByClause(&$q, array $args)
     {
@@ -394,11 +443,20 @@ class CommonRepository extends EntityRepository
         }
     }
 
+    /**
+     * @return array
+     */
     protected function getDefaultOrder()
     {
         return array();
     }
 
+    /**
+     * @param \Doctrine\ORM\QueryBuilder $q
+     * @param array                      $args
+     *
+     * @return bool
+     */
     protected function buildLimiterClauses(&$q, array $args)
     {
         $start      = array_key_exists('start', $args) ? $args['start'] : 0;
@@ -410,6 +468,9 @@ class CommonRepository extends EntityRepository
         }
     }
 
+    /**
+     * @return string
+     */
     protected function generateRandomParameterName()
     {
         $alpha_numeric = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
@@ -417,8 +478,10 @@ class CommonRepository extends EntityRepository
     }
 
     /**
-     * @param QueryBuilder $q
-     * @param              $filter
+     * @param \Doctrine\ORM\QueryBuilder $q
+     * @param object                     $filter
+     * @param array                      $columns
+     *
      * @return array
      */
     protected function addStandardCatchAllWhereClause(&$q, $filter, array $columns)
@@ -443,8 +506,9 @@ class CommonRepository extends EntityRepository
     }
 
     /**
-     * @param QueryBuilder $q
-     * @param              $filter
+     * @param \Doctrine\ORM\QueryBuilder $q
+     * @param object                     $filter
+     *
      * @return array
      */
     protected function addStandardSearchCommandWhereClause(&$q, $filter)
@@ -497,7 +561,7 @@ class CommonRepository extends EntityRepository
             $parameters = array("$unique" => $string);
         }
 
-        return array( $expr, $parameters );
+        return array($expr, $parameters);
     }
 
     /**
@@ -520,9 +584,10 @@ class CommonRepository extends EntityRepository
      * Returns a andX Expr() that takes into account isPublished, publishUp and publishDown dates
      * The Expr() sets a :now parameter that must be set in the calling function
      *
-     * @param $q
+     * @param \Doctrine\ORM\QueryBuilder $q
+     * @param string                     $alias
      *
-     * @return mixed
+     * @return \Doctrine\ORM\Query\Expr\AndX
      */
     public function getPublishedByDateExpression($q, $alias = null)
     {
@@ -554,8 +619,8 @@ class CommonRepository extends EntityRepository
     /**
      * Gets the properties of an ORM entity
      *
-     * @param      $entityClass
-     * @param bool $convertCamelCase
+     * @param string $entityClass
+     * @param bool   $convertCamelCase
      *
      * @return array
      */
@@ -592,10 +657,10 @@ class CommonRepository extends EntityRepository
     /**
      * Examines the arguments passed to getEntities and converts ORM properties to dBAL column names
      *
-     * @param $entityClass
-     * @param $args
+     * @param string $entityClass
+     * @param array  $args
      *
-     * return array
+     * @return array
      */
     public function convertOrmProperties($entityClass, array $args)
     {

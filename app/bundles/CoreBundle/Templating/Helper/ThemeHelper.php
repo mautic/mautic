@@ -13,6 +13,9 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+/**
+ * Class ThemeHelper
+ */
 class ThemeHelper
 {
 
@@ -22,17 +25,17 @@ class ThemeHelper
     protected $factory;
 
     /**
-     * @var
+     * @var string
      */
     private $theme;
 
     /**
-     * @var
+     * @var string
      */
     private $themeDir;
 
     /**
-     * @var
+     * @var string
      */
     private $themePath;
 
@@ -44,6 +47,9 @@ class ThemeHelper
     /**
      * @param MauticFactory $factory
      * @param string        $theme
+     *
+     * @throws \InvalidArgumentException
+     * @throws NotFoundHttpException
      */
     public function __construct(MauticFactory $factory, $theme = 'current')
     {
@@ -58,14 +64,14 @@ class ThemeHelper
         }
 
         //get the config
-        if (file_exists($this->themePath . '/config.php')) {
-            $this->config = include $this->themePath . '/config.php';
-
-            if (!isset($this->config['name'])) {
-                throw new NotFoundHttpException($this->theme . ' does not have a valid config file');
-            }
-        } else {
+        if (!file_exists($this->themePath . '/config.php')) {
             throw new NotFoundHttpException($this->theme . ' is missing a required config file');
+        }
+
+        $this->config = include $this->themePath . '/config.php';
+
+        if (!isset($this->config['name'])) {
+            throw new NotFoundHttpException($this->theme . ' does not have a valid config file');
         }
     }
 
@@ -83,6 +89,7 @@ class ThemeHelper
      * Get the theme's slots
      *
      * @param $type
+     *
      * @return array
      */
     public function getSlots($type)
@@ -94,6 +101,7 @@ class ThemeHelper
      * Returns path to this theme
      *
      * @param bool $relative
+     *
      * @return string
      */
     public function getThemePath($relative = false)

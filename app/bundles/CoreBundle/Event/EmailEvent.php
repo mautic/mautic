@@ -8,18 +8,28 @@
  */
 
 namespace Mautic\CoreBundle\Event;
+
 use Symfony\Component\EventDispatcher\Event;
 
 /**
  * Class EmailEvent
- *
- * @package Mautic\CoreBundle\Event
  */
 class EmailEvent extends Event
 {
+
+    /**
+     * @var \Swift_Message
+     */
     private $message;
+
+    /**
+     * @var bool
+     */
     private $retry = false;
 
+    /**
+     * @param \Swift_Message $message
+     */
     public function __construct(\Swift_Message $message)
     {
         $this->message = $message;
@@ -35,6 +45,8 @@ class EmailEvent extends Event
 
     /**
      * Sets whether the sending of the message should be tried again
+     *
+     * @return void
      */
     public function tryAgain()
     {

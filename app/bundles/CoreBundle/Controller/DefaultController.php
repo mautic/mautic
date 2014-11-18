@@ -8,14 +8,14 @@
  */
 
 namespace Mautic\CoreBundle\Controller;
+
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
 
 /**
  * Class DefaultController
- * Almost all other Mautic Bundle controllers extend this default controller
  *
- * @package Mautic\CoreBundle\Controller
+ * Almost all other Mautic Bundle controllers extend this default controller
  */
 class DefaultController extends CommonController
 {
@@ -30,6 +30,9 @@ class DefaultController extends CommonController
         return $this->delegateView('MauticDashboardBundle:Default:index.html.php');
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function globalSearchAction()
     {
         $searchStr = $this->request->request->get("searchstring", $this->factory->getSession()->get('mautic.global_search', ''));

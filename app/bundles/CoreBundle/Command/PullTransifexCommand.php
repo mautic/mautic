@@ -29,7 +29,14 @@ class PullTransifexCommand extends ContainerAwareCommand
      */
     protected function configure()
     {
-        $this->setName('mautic:transifex:pull');
+        $this->setName('mautic:transifex:pull')
+            ->setDescription('Fetches translations for Mautic from Transifex')
+            ->setHelp(<<<EOT
+The <info>%command.name%</info> command is used to retrieve updated Mautic translations from Transifex and writes them to the filesystem.
+
+<info>php %command.full_name%</info>
+EOT
+        );
     }
 
     /**

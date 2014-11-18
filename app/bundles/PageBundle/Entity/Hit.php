@@ -154,6 +154,7 @@ class Hit
      * Set dateHit
      *
      * @param \DateTime $dateHit
+     *
      * @return Hit
      */
     public function setDateHit($dateHit)
@@ -174,25 +175,30 @@ class Hit
     }
 
     /**
-     * @return mixed
+     * @return \DateTime
      */
-    public function getDateLeft ()
+    public function getDateLeft()
     {
         return $this->dateLeft;
     }
 
     /**
-     * @param mixed $dateLeft
+     * @param \DateTime $dateLeft
+     *
+     * @return Hit
      */
-    public function setDateLeft ($dateLeft)
+    public function setDateLeft($dateLeft)
     {
         $this->dateLeft = $dateLeft;
+
+        return $this;
     }
 
     /**
      * Set country
      *
      * @param string $country
+     *
      * @return Hit
      */
     public function setCountry($country)
@@ -216,6 +222,7 @@ class Hit
      * Set region
      *
      * @param string $region
+     *
      * @return Hit
      */
     public function setRegion($region)
@@ -239,6 +246,7 @@ class Hit
      * Set city
      *
      * @param string $city
+     *
      * @return Hit
      */
     public function setCity($city)
@@ -262,6 +270,7 @@ class Hit
      * Set isp
      *
      * @param string $isp
+     *
      * @return Hit
      */
     public function setIsp($isp)
@@ -285,6 +294,7 @@ class Hit
      * Set organization
      *
      * @param string $organization
+     *
      * @return Hit
      */
     public function setOrganization($organization)
@@ -308,6 +318,7 @@ class Hit
      * Set code
      *
      * @param integer $code
+     *
      * @return Hit
      */
     public function setCode($code)
@@ -331,6 +342,7 @@ class Hit
      * Set referer
      *
      * @param string $referer
+     *
      * @return Hit
      */
     public function setReferer($referer)
@@ -354,6 +366,7 @@ class Hit
      * Set url
      *
      * @param string $url
+     *
      * @return Hit
      */
     public function setUrl($url)
@@ -377,6 +390,7 @@ class Hit
      * Set userAgent
      *
      * @param string $userAgent
+     *
      * @return Hit
      */
     public function setUserAgent($userAgent)
@@ -400,6 +414,7 @@ class Hit
      * Set remoteHost
      *
      * @param string $remoteHost
+     *
      * @return Hit
      */
     public function setRemoteHost($remoteHost)
@@ -422,10 +437,11 @@ class Hit
     /**
      * Set page
      *
-     * @param \Mautic\PageBundle\Entity\Page $page
+     * @param Page $page
+     *
      * @return Hit
      */
-    public function setPage(\Mautic\PageBundle\Entity\Page $page = null)
+    public function setPage(Page $page = null)
     {
         $this->page = $page;
 
@@ -435,7 +451,7 @@ class Hit
     /**
      * Get page
      *
-     * @return \Mautic\PageBundle\Entity\Page
+     * @return Page
      */
     public function getPage()
     {
@@ -446,6 +462,7 @@ class Hit
      * Set ipAddress
      *
      * @param \Mautic\CoreBundle\Entity\IpAddress $ipAddress
+     *
      * @return Hit
      */
     public function setIpAddress(\Mautic\CoreBundle\Entity\IpAddress $ipAddress)
@@ -465,11 +482,11 @@ class Hit
         return $this->ipAddress;
     }
 
-
     /**
      * Set trackingId
      *
      * @param integer $trackingId
+     *
      * @return Page
      */
     public function setTrackingId($trackingId)
@@ -493,6 +510,7 @@ class Hit
      * Set pageLanguage
      *
      * @param string $pageLanguage
+     *
      * @return Hit
      */
     public function setPageLanguage($pageLanguage)
@@ -516,6 +534,7 @@ class Hit
      * Set browserLanguages
      *
      * @param string $browserLanguages
+     *
      * @return Hit
      */
     public function setBrowserLanguages($browserLanguages)
@@ -536,66 +555,82 @@ class Hit
     }
 
     /**
-     * @return mixed
+     * @return Lead
      */
-    public function getLead ()
+    public function getLead()
     {
         return $this->lead;
     }
 
     /**
-     * @param mixed $lead
+     * @param Lead $lead
+     *
+     * @return Hit
      */
-    public function setLead (Lead $lead)
+    public function setLead(Lead $lead)
     {
         $this->lead = $lead;
+
+        return $this;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getSource ()
+    public function getSource()
     {
         return $this->source;
     }
 
     /**
-     * @param mixed $source
+     * @param string $source
+     *
+     * @return Hit
      */
-    public function setSource ($source)
+    public function setSource($source)
     {
         $this->source = $source;
+
+        return $this;
     }
 
     /**
-     * @return mixed
+     * @return integer
      */
-    public function getSourceId ()
+    public function getSourceId()
     {
         return $this->sourceId;
     }
 
     /**
-     * @param mixed $sourceId
+     * @param integer $sourceId
+     *
+     * @return Hit
      */
-    public function setSourceId ($sourceId)
+    public function setSourceId($sourceId)
     {
         $this->sourceId = (int) $sourceId;
+
+        return $this;
     }
 
     /**
-     * @return mixed
+     * @return Redirect
      */
-    public function getRedirect ()
+    public function getRedirect()
     {
         return $this->redirect;
     }
 
     /**
-     * @param mixed $redirect
+     * @param Redirect $redirect
+     *
+     * @return Hit
      */
-    public function setRedirect (Redirect $redirect)
+    public function setRedirect(Redirect $redirect)
     {
         $this->redirect = $redirect;
+
+        return $this;
     }
 }

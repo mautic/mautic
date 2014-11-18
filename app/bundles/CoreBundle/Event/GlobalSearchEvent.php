@@ -13,29 +13,28 @@ use Symfony\Component\EventDispatcher\Event;
 
 /**
  * Class GlobalSearchEvent
- *
- * @package Mautic\CoreBundle\Event
  */
 class GlobalSearchEvent extends Event
 {
 
     /**
-     * @var
+     * @var array
      */
     protected $results = array();
 
     /**
-     * @var
+     * @var string
      */
     protected $searchString;
 
     /**
-     * @var
+     * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
      */
     protected $translator;
 
     /**
-     * @param $searchString
+     * @param string                                                 $searchString
+     * @param \Symfony\Bundle\FrameworkBundle\Translation\Translator $translator
      */
     public function __construct($searchString, $translator)
     {
@@ -46,7 +45,7 @@ class GlobalSearchEvent extends Event
     /**
      * Returns the string to be searched
      *
-     * @return mixed
+     * @return string
      */
     public function getSearchString()
     {
@@ -57,8 +56,8 @@ class GlobalSearchEvent extends Event
      * Add an array of results from a search query to be listed in right side panel
      * Each result should be the ENTIRE html to be rendered
      *
-     * @param       $header  String name for section header
-     * @param array $results Array of HTML output that will be wrapped in <li /> elements
+     * @param string $header  String name for section header
+     * @param array  $results Array of HTML output that will be wrapped in <li /> elements
      */
     public function addResults($header, array $results)
     {
@@ -69,7 +68,7 @@ class GlobalSearchEvent extends Event
     /**
      * Returns the results
      *
-     * @return mixed
+     * @return array
      */
     public function getResults()
     {

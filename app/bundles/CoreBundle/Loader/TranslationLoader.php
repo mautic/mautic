@@ -15,17 +15,29 @@ use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageCatalogue;
 
+/**
+ * Class TranslationLoader
+ */
 class TranslationLoader extends ArrayLoader implements LoaderInterface
 {
 
+    /**
+     * @var MauticFactory
+     */
     protected $factory;
 
+    /**
+     * @param MauticFactory $factory
+     */
     public function __construct(MauticFactory $factory)
     {
         $this->factory = $factory;
     }
 
-    function load($resource, $locale, $domain = 'messages')
+    /**
+     * {@inheritdoc}
+     */
+    public function load($resource, $locale, $domain = 'messages')
     {
         $bundles   = $this->factory->getParameter('bundles');
         $catalogue = new MessageCatalogue($locale);

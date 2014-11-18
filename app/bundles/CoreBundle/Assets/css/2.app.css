@@ -1322,12 +1322,12 @@ blockquote > p:after {
   background: #fdb933 !important;
 }
 .content-body .cke_chrome {
-  background: #ebedf0;
-  border: 1px solid #d5d5d5;
+  background: #f8f8f8;
+  border: 1px solid #f0f0f0;
 }
 .content-body .cke_bottom,
 .content-body .cke_top {
-  background: #ebedf0;
+  background: #f8f8f8;
 }
 a.media {
   display: block;

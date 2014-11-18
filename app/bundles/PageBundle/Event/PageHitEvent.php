@@ -15,17 +15,29 @@ use Mautic\PageBundle\Entity\Page;
 
 /**
  * Class PageHitEvent
- *
- * @package Mautic\PageBundle\Event
  */
 class PageHitEvent extends CommonEvent
 {
 
-    private $request;
-    private $code;
-    private $page;
     /**
-     * @param Page $page
+     * @var
+     */
+    private $request;
+
+    /**
+     * @var
+     */
+    private $code;
+
+    /**
+     * @var Page
+     */
+    private $page;
+
+    /**
+     * @param Hit $hit
+     * @param     $request
+     * @param     $code
      */
     public function __construct(Hit $hit, $request, $code)
     {

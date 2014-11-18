@@ -13,10 +13,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
  * Class MauticPageBundle
- *
- * @package Mautic\PageBundle
  */
 class MauticPageBundle extends Bundle
 {
-
 }

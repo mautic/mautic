@@ -31,7 +31,14 @@ class LoadConfigurationCommand extends ContainerAwareCommand
      */
     protected function configure()
     {
-        $this->setName('mautic:load:configuration');
+        $this->setName('mautic:load:configuration')
+            ->setDescription('Pre-configures Mautic for installation with a pre-generated data set')
+            ->setHelp(<<<EOT
+The <info>%command.name%</info> command is used to pre-configure Mautic using a pre-generated data set
+
+<info>php %command.full_name%</info>
+EOT
+        );
     }
 
     /**
@@ -39,8 +46,6 @@ class LoadConfigurationCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $options = $input->getOptions();
-
         /** @var \Mautic\InstallBundle\Configurator\Configurator $configurator */
         $configurator = $this->getContainer()->get('mautic.configurator');
         $kernelRoot   = $this->getContainer()->getParameter('kernel.root_dir');
@@ -71,7 +76,7 @@ class LoadConfigurationCommand extends ContainerAwareCommand
         } catch (RuntimeException $exception) {
             $output->writeln($translator->trans('mautic.core.command.install_application_could_not_write_config', array('%message%' => $exception->getMessage())));
 
-            return 0;
+            return 1;
         }
 
         $output->writeln(

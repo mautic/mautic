@@ -16,19 +16,28 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Class CleanFormSubscriber
- * Clean data before persisting to DB
  *
- * @package Mautic\CoreBundle\Form\EventListener
+ * Clean data before persisting to DB
  */
 class CleanFormSubscriber implements EventSubscriberInterface
 {
 
+    /**
+     * @var string
+     */
     private $masks;
 
-    public function __construct($masks = 'clean') {
+    /**
+     * @param string $masks
+     */
+    public function __construct($masks = 'clean')
+    {
         $this->masks = $masks;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public static function getSubscribedEvents()
     {
         return array(
@@ -36,6 +45,11 @@ class CleanFormSubscriber implements EventSubscriberInterface
         );
     }
 
+    /**
+     * @param FormEvent $event
+     *
+     * @return void
+     */
     public function preSubmitData(FormEvent $event)
     {
         $data = $event->getData();

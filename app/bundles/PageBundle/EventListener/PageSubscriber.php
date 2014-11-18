@@ -17,16 +17,14 @@ use Mautic\PageBundle\PageEvents;
 
 /**
  * Class PageSubscriber
- *
- * @package Mautic\PageBundle\EventListener
  */
 class PageSubscriber extends CommonSubscriber
 {
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
         return array(
             CoreEvents::GLOBAL_SEARCH        => array('onGlobalSearch', 0),

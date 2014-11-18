@@ -15,17 +15,21 @@ use Mautic\CoreBundle\DependencyInjection\Compiler;
 
 /**
  * Class MauticCoreBundle
- *
- * @package Mautic\CoreBundle
  */
 class MauticCoreBundle extends Bundle
 {
+    /**
+     * {@inheritdoc}
+     */
     public function build(ContainerBuilder $container)
     {
         $container->addCompilerPass(new Compiler\TemplatingPass());
         $container->addCompilerPass(new Compiler\TranslationsPass());
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function boot()
     {
         //set the table prefix as a constant to be used in repositories requiring DBAL

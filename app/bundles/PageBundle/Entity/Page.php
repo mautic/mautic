@@ -194,7 +194,8 @@ class Page extends FormEntity
      */
     private $sessionId;
 
-    public function __clone() {
+    public function __clone()
+    {
         $this->id = null;
     }
 
@@ -204,7 +205,7 @@ class Page extends FormEntity
     public function __construct()
     {
         $this->translationChildren = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->variantChildren = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->variantChildren     = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
     /**
@@ -231,6 +232,7 @@ class Page extends FormEntity
      * Set title
      *
      * @param string $title
+     *
      * @return Page
      */
     public function setTitle($title)
@@ -255,6 +257,7 @@ class Page extends FormEntity
      * Set alias
      *
      * @param string $alias
+     *
      * @return Page
      */
     public function setAlias($alias)
@@ -279,6 +282,7 @@ class Page extends FormEntity
      * Set content
      *
      * @param string $content
+     *
      * @return Page
      */
     public function setContent($content)
@@ -303,6 +307,7 @@ class Page extends FormEntity
      * Set publishUp
      *
      * @param \DateTime $publishUp
+     *
      * @return Page
      */
     public function setPublishUp($publishUp)
@@ -327,6 +332,7 @@ class Page extends FormEntity
      * Set publishDown
      *
      * @param \DateTime $publishDown
+     *
      * @return Page
      */
     public function setPublishDown($publishDown)
@@ -351,6 +357,7 @@ class Page extends FormEntity
      * Set hits
      *
      * @param integer $hits
+     *
      * @return Page
      */
     public function setHits($hits)
@@ -374,6 +381,7 @@ class Page extends FormEntity
      * Set revision
      *
      * @param integer $revision
+     *
      * @return Page
      */
     public function setRevision($revision)
@@ -397,6 +405,7 @@ class Page extends FormEntity
      * Set metaDescription
      *
      * @param string $metaDescription
+     *
      * @return Page
      */
     public function setMetaDescription($metaDescription)
@@ -421,6 +430,7 @@ class Page extends FormEntity
      * Set language
      *
      * @param string $language
+     *
      * @return Page
      */
     public function setLanguage($language)
@@ -445,6 +455,7 @@ class Page extends FormEntity
      * Set category
      *
      * @param \Mautic\CategoryBundle\Entity\Category $category
+     *
      * @return Page
      */
     public function setCategory(\Mautic\CategoryBundle\Entity\Category $category = null)
@@ -469,6 +480,7 @@ class Page extends FormEntity
      * Set sessionId
      *
      * @param string $id
+     *
      * @return Page
      */
     public function setSessionId($id)
@@ -492,6 +504,7 @@ class Page extends FormEntity
      * Set template
      *
      * @param string $template
+     *
      * @return Page
      */
     public function setTemplate($template)
@@ -535,10 +548,11 @@ class Page extends FormEntity
     /**
      * Add translationChildren
      *
-     * @param \Mautic\PageBundle\Entity\Page $translationChildren
+     * @param Page $translationChildren
+     *
      * @return Page
      */
-    public function addTranslationChild(\Mautic\PageBundle\Entity\Page $translationChildren)
+    public function addTranslationChild(Page $translationChildren)
     {
         $this->translationChildren[] = $translationChildren;
 
@@ -548,9 +562,9 @@ class Page extends FormEntity
     /**
      * Remove translationChildren
      *
-     * @param \Mautic\PageBundle\Entity\Page $translationChildren
+     * @param Page $translationChildren
      */
-    public function removeTranslationChild(\Mautic\PageBundle\Entity\Page $translationChildren)
+    public function removeTranslationChild(Page $translationChildren)
     {
         $this->translationChildren->removeElement($translationChildren);
     }
@@ -568,10 +582,11 @@ class Page extends FormEntity
     /**
      * Set translationParent
      *
-     * @param \Mautic\PageBundle\Entity\Page $translationParent
+     * @param Page $translationParent
+     *
      * @return Page
      */
-    public function setTranslationParent(\Mautic\PageBundle\Entity\Page $translationParent = null)
+    public function setTranslationParent(Page $translationParent = null)
     {
         $this->isChanged('translationParent', $translationParent);
         $this->translationParent = $translationParent;
@@ -591,7 +606,7 @@ class Page extends FormEntity
     /**
      * Get translationParent
      *
-     * @return \Mautic\PageBundle\Entity\Page
+     * @return Page
      */
     public function getTranslationParent()
     {
@@ -601,10 +616,11 @@ class Page extends FormEntity
     /**
      * Add variantChildren
      *
-     * @param \Mautic\PageBundle\Entity\Page $variantChildren
+     * @param Page $variantChildren
+     *
      * @return Page
      */
-    public function addVariantChild(\Mautic\PageBundle\Entity\Page $variantChildren)
+    public function addVariantChild(Page $variantChildren)
     {
         $this->variantChildren[] = $variantChildren;
 
@@ -614,9 +630,9 @@ class Page extends FormEntity
     /**
      * Remove variantChildren
      *
-     * @param \Mautic\PageBundle\Entity\Page $variantChildren
+     * @param Page $variantChildren
      */
-    public function removeVariantChild(\Mautic\PageBundle\Entity\Page $variantChildren)
+    public function removeVariantChild(Page $variantChildren)
     {
         $this->variantChildren->removeElement($variantChildren);
     }
@@ -634,10 +650,11 @@ class Page extends FormEntity
     /**
      * Set variantParent
      *
-     * @param \Mautic\PageBundle\Entity\Page $variantParent
+     * @param Page $variantParent
+     *
      * @return Page
      */
-    public function setVariantParent(\Mautic\PageBundle\Entity\Page $variantParent = null)
+    public function setVariantParent(Page $variantParent = null)
     {
         $this->isChanged('variantParent', $variantParent);
         $this->variantParent = $variantParent;
@@ -657,7 +674,7 @@ class Page extends FormEntity
     /**
      * Get variantParent
      *
-     * @return \Mautic\PageBundle\Entity\Page
+     * @return Page
      */
     public function getVariantParent()
     {
@@ -668,6 +685,7 @@ class Page extends FormEntity
      * Set variantSettings
      *
      * @param array $variantSettings
+     *
      * @return Page
      */
     public function setVariantSettings($variantSettings)
@@ -692,6 +710,7 @@ class Page extends FormEntity
      * Set uniqueHits
      *
      * @param integer $uniqueHits
+     *
      * @return Page
      */
     public function setUniqueHits($uniqueHits)
@@ -714,7 +733,7 @@ class Page extends FormEntity
     /**
      * @return mixed
      */
-    public function getVariantHits ()
+    public function getVariantHits()
     {
         return $this->variantHits;
     }
@@ -722,7 +741,7 @@ class Page extends FormEntity
     /**
      * @param mixed $variantHits
      */
-    public function setVariantHits ($variantHits)
+    public function setVariantHits($variantHits)
     {
         $this->variantHits = $variantHits;
     }
@@ -730,7 +749,7 @@ class Page extends FormEntity
     /**
      * @return mixed
      */
-    public function getVariantStartDate ()
+    public function getVariantStartDate()
     {
         return $this->variantStartDate;
     }
@@ -738,7 +757,7 @@ class Page extends FormEntity
     /**
      * @param mixed $variantStartDate
      */
-    public function setVariantStartDate ($variantStartDate)
+    public function setVariantStartDate($variantStartDate)
     {
         $this->isChanged('variantStartDate', $variantStartDate);
         $this->variantStartDate = $variantStartDate;

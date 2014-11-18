@@ -21,16 +21,14 @@ use Mautic\PageBundle\Helper\BuilderTokenHelper;
 
 /**
  * Class BuilderSubscriber
- *
- * @package Mautic\PageBundle\EventListener
  */
 class BuilderSubscriber extends CommonSubscriber
 {
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
         return array(
             PageEvents::PAGE_ON_DISPLAY   => array('onPageDisplay', 0),
@@ -44,7 +42,7 @@ class BuilderSubscriber extends CommonSubscriber
     /**
      * Add forms to available page tokens
      *
-     * @param PageBuilderEvent $event
+     * @param Events\PageBuilderEvent $event
      */
     public function onPageBuild(Events\PageBuilderEvent $event)
     {
@@ -73,7 +71,7 @@ class BuilderSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param PageEvent $event
+     * @param Events\PageEvent $event
      */
     public function onPageDisplay(Events\PageEvent $event)
     {
@@ -101,6 +99,7 @@ class BuilderSubscriber extends CommonSubscriber
      * Renders the HTML for the social share buttons
      *
      * @param $page
+     * @param $slotsHelper
      *
      * @return string
      */
@@ -141,8 +140,9 @@ class BuilderSubscriber extends CommonSubscriber
             $children = $page->getTranslationChildren();
 
             //check to see if this page is grouped with another
-            if (empty($parent) && empty($children))
+            if (empty($parent) && empty($children)) {
                 return;
+            }
 
             $related = array();
 
@@ -181,22 +181,32 @@ class BuilderSubscriber extends CommonSubscriber
 
             if (empty($related)) {
                 return;
-            } else {
-                $langbar = $this->templating->render('MauticPageBundle:SubscribedEvents\PageToken:langbar.html.php', array('pages' => $related));
             }
+
+            $langbar = $this->templating->render('MauticPageBundle:SubscribedEvents\PageToken:langbar.html.php', array('pages' => $related));
         }
 
         return $langbar;
     }
 
-    public function onEmailBuild (EmailBuilderEvent $event)
+    /**
+     * @param EmailBuilderEvent $event
+     *
+     * @return void
+     */
+    public function onEmailBuild(EmailBuilderEvent $event)
     {
         //add email tokens
         $tokenHelper = new BuilderTokenHelper($this->factory);
         $event->addTokenSection('page.emailtokens', 'mautic.page.builder.header.index', $tokenHelper->getTokenContent());
     }
 
-    public function onEmailGenerate (EmailSendEvent $event)
+    /**
+     * @param EmailSendEvent $event
+     *
+     * @return void
+     */
+    public function onEmailGenerate(EmailSendEvent $event)
     {
         $content       = $event->getContent();
         $source        = $event->getSource();
@@ -213,14 +223,23 @@ class BuilderSubscriber extends CommonSubscriber
         $event->setContent($content);
     }
 
-    protected function renderPageUrl(&$html, $clickthrough = null)
+    /**
+     * @param      $html
+     * @param array $clickthrough
+     *
+     * @return void
+     */
+    protected function renderPageUrl(&$html, $clickthrough = array())
     {
         static $pages = array(), $links = array();
 
         $pagelinkRegex     = '/{pagelink=(.*?)}/';
         $externalLinkRegex = '/{externallink=(.*?)}/';
 
+        /** @var \Mautic\PageBundle\Model\PageModel $pageModel */
         $pageModel     = $this->factory->getModel('page');
+
+        /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
         $redirectModel = $this->factory->getModel('page.redirect');
 
         preg_match_all($pagelinkRegex, $html, $matches);

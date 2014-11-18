@@ -18,16 +18,14 @@ use Mautic\PageBundle\PageEvents;
 
 /**
  * Class CampaignSubscriber
- *
- * @package Mautic\LeadBundle\EventListener
  */
 class CampaignSubscriber extends CommonSubscriber
 {
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
-    static public function getSubscribedEvents ()
+    public static function getSubscribedEvents()
     {
         return array(
             CampaignEvents::CAMPAIGN_ON_BUILD => array('onCampaignBuild', 0),
@@ -40,7 +38,7 @@ class CampaignSubscriber extends CommonSubscriber
      *
      * @param CampaignBuilderEvent $event
      */
-    public function onCampaignBuild (CampaignBuilderEvent $event)
+    public function onCampaignBuild(CampaignBuilderEvent $event)
     {
         //Add trigger
         $pageHitTrigger = array(
@@ -57,7 +55,7 @@ class CampaignSubscriber extends CommonSubscriber
      *
      * @param PageHitEvent $event
      */
-    public function onPageHit (PageHitEvent $event)
+    public function onPageHit(PageHitEvent $event)
     {
         /** @var \Mautic\CampaignBundle\Model\CampaignModel $model */
         $model  = $this->factory->getModel('campaign');

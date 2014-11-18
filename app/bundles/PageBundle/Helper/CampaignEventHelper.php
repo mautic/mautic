@@ -9,15 +9,16 @@
 
 namespace Mautic\PageBundle\Helper;
 
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\PageBundle\Entity\Page;
+
 /**
  * Class CampaignEventHelper
- *
- * @package Mautic\PageBundle\Helper
  */
 class CampaignEventHelper
 {
     /**
-     * @param $factory
+     * @param MauticFactory $factory
      * @param $eventDetails
      * @param $event
      *

@@ -188,8 +188,8 @@ echo $view['form']->start($form);
                                                            name="leadlist[filters][filter][]"
                                                            value="<?php echo $filter['filter']; ?>"
                                                            id="<?php echo $randomId."_id"; ?>" />
-                                                    <?php break; ?>
-                                                    <?php default: ?>
+                                                    <?php break;
+                                                    default: ?>
                                                     <input type="<?php echo $choices[$filter['field']]['properties']['type']; ?>"
                                                            class="form-control"
                                                            name="leadlist[filters][filter][]"
@@ -199,8 +199,8 @@ echo $view['form']->start($form);
                                                            value="<?php echo $filter['filter']; ?>"
                                                            id="<?php echo $randomId; ?>" />
                                                     <input type="hidden" name="leadlist[filters][display][]" />
-                                                    <?php break; ?>
-                                                    <?php endswitch; ?>
+                                                    <?php break;
+                                                endswitch; ?>
                                             </div>
                                             <div class="col-xs-2 col-sm-1">
                                                 <a href="javascript: void(0);" class="remove-selected btn btn-default text-danger pull-right"><i class="fa fa-trash-o"></i></a>

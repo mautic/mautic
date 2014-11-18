@@ -14,17 +14,12 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
  * Class PageRepository
- *
- * @package Mautic\PageBundle\Entity
  */
 class PageRepository extends CommonRepository
 {
 
     /**
-     * Get a list of entities
-     *
-     * @param array      $args
-     * @return Paginator
+     * {@inheritdoc}
      */
     public function getEntities($args = array())
     {
@@ -42,15 +37,14 @@ class PageRepository extends CommonRepository
             $query->setHydrationMode(constant("\\Doctrine\\ORM\\Query::$mode"));
         }
 
-        $results = new Paginator($query);
-
-        return $results;
+        return new Paginator($query);
     }
 
     /**
      * Get a list of popular (by hits) pages
      *
      * @param integer $limit
+     *
      * @return array
      */
     public function getPopularPages($limit = 10)
@@ -64,14 +58,13 @@ class PageRepository extends CommonRepository
             ->groupBy('p.id')
             ->setMaxResults($limit);
 
-        $results = $q->execute()->fetchAll();
-
-        return $results;
+        return $q->execute()->fetchAll();
     }
 
     /**
-     * @param      $alias
-     * @param null $entity
+     * @param string $alias
+     * @param Page   $entity
+     *
      * @return mixed
      */
     public function checkUniqueAlias($alias, $entity = null)
@@ -125,6 +118,7 @@ class PageRepository extends CommonRepository
         }
 
         $results = $q->getQuery()->getSingleResult();
+
         return $results['aliasCount'];
     }
 
@@ -133,6 +127,9 @@ class PageRepository extends CommonRepository
      * @param int    $limit
      * @param int    $start
      * @param bool   $viewOther
+     * @param bool   $topLevel
+     *
+     * @return array
      */
     public function getPageList($search = '', $limit = 10, $start = 0, $viewOther = false, $topLevel = false)
     {
@@ -163,14 +160,11 @@ class PageRepository extends CommonRepository
                 ->setMaxResults($limit);
         }
 
-        $results = $q->getQuery()->getArrayResult();
-        return $results;
+        return $q->getQuery()->getArrayResult();
     }
 
     /**
-     * @param QueryBuilder $q
-     * @param              $filter
-     * @return array
+     * {@inheritdoc}
      */
     protected function addCatchAllWhereClause(&$q, $filter)
     {
@@ -191,9 +185,7 @@ class PageRepository extends CommonRepository
     }
 
     /**
-     * @param QueryBuilder $q
-     * @param              $filter
-     * @return array
+     * {@inheritdoc}
      */
     protected function addSearchCommandWhereClause(&$q, $filter)
     {
@@ -259,7 +251,7 @@ class PageRepository extends CommonRepository
     }
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
     public function getSearchCommands()
     {
@@ -276,7 +268,7 @@ class PageRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     protected function getDefaultOrder()
     {
@@ -285,6 +277,9 @@ class PageRepository extends CommonRepository
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getTableAlias()
     {
         return 'p';

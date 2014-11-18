@@ -139,9 +139,9 @@ class ClientControllerTest extends MauticWebTestCase
 
         //success?
         $this->assertRegExp(
-            '/mautic.api.client.notice.updated/',
+            '/mautic.core.notice.updated/',
             $client->getResponse()->getContent(),
-            'mautic.api.client.notice.updated not found'
+            'mautic.core.notice.updated not found'
         );
 
         //make sure the client id and secret remained the same
@@ -175,9 +175,9 @@ class ClientControllerTest extends MauticWebTestCase
         $crawler = $client->request('POST', '/clients/delete/'.$apiClient->getId());
 
         $this->assertRegExp(
-            '/mautic.api.client.notice.deleted/',
+            '/mautic.core.notice.deleted/',
             $client->getResponse()->getContent(),
-            'mautic.api.client.notice.deleted not found'
+            'mautic.core.notice.deleted not found'
         );
 
         //make sure ACL is working

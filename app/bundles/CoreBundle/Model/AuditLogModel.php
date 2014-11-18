@@ -14,8 +14,6 @@ use Mautic\UserBundle\Entity\User;
 
 /**
  * Class AuditLogModel
- *
- * @package Mautic\CoreBundle\Model
  */
 class AuditLogModel extends CommonModel
 {
@@ -74,8 +72,8 @@ class AuditLogModel extends CommonModel
      *
      * @param string $object type
      * @param integer $id of the object
-     * @param intener $limit of items
-     * 
+     * @param integer $limit of items
+     *
      * @return array of logs
      */
     public function getLogForObject($object, $id, $limit = 10)

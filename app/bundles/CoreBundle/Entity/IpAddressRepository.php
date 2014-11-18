@@ -14,5 +14,4 @@ namespace Mautic\CoreBundle\Entity;
  */
 class IpAddressRepository extends CommonRepository
 {
-
 }

@@ -81,9 +81,9 @@ class FieldControllerTest extends MauticWebTestCase
         $crawler = $client->submit($form);
 
         $this->assertRegExp(
-            '/mautic.lead.field.notice.created/',
+            '/mautic.core.notice.created/',
             $client->getResponse()->getContent(),
-            'mautic.lead.field.notice.created not found'
+            'mautic.core.notice.created not found'
         );
     }
 
@@ -114,9 +114,9 @@ class FieldControllerTest extends MauticWebTestCase
         $this->assertNoError($client->getResponse(), $crawler);
 
         $this->assertRegExp(
-            '/mautic.lead.field.notice.updated/',
+            '/mautic.core.notice.updated/',
             $client->getResponse()->getContent(),
-            'mautic.lead.field.notice.updated not found'
+            'mautic.core.notice.updated not found'
         );
 
         //make sure ACL is working
@@ -143,9 +143,9 @@ class FieldControllerTest extends MauticWebTestCase
         $crawler = $client->request('POST', '/leads/fields/delete/'.$field->getId());
 
         $this->assertRegExp(
-            '/mautic.lead.field.notice.deleted/',
+            '/mautic.core.notice.deleted/',
             $client->getResponse()->getContent(),
-            'mautic.lead.field.notice.deleted not found'
+            'mautic.core.notice.deleted not found'
         );
 
         //make sure ACL is working

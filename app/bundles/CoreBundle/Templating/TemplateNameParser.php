@@ -22,14 +22,19 @@ use Symfony\Bundle\FrameworkBundle\Templating\TemplateNameParser as BaseTemplate
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Templating\TemplateReferenceInterface;
 
+/**
+ * Class TemplateNameParser
+ */
 class TemplateNameParser extends BaseTemplateNameParser
 {
+
+    /**
+     * @var \Mautic\CoreBundle\Factory\MauticFactory
+     */
     protected $factory;
 
     /**
-     * Constructor.
-     *
-     * @param KernelInterface $kernel A KernelInterface instance
+     * {@inheritdoc}
      */
     public function __construct(KernelInterface $kernel)
     {
@@ -40,6 +45,9 @@ class TemplateNameParser extends BaseTemplateNameParser
 
     /**
      * {@inheritdoc}
+     *
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      */
     public function parse($name)
     {

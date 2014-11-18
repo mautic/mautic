@@ -14,10 +14,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
  * Class RedirectRepository
- *
- * @package Mautic\PageBundle\Entity
  */
 class RedirectRepository extends CommonRepository
 {
-
 }

@@ -50,50 +50,50 @@ class Redirect extends FormEntity
     private $uniqueHits = 0;
 
     /**
-     * @return mixed
+     * @return integer
      */
-    public function getId ()
+    public function getId()
     {
         return $this->id;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getRedirectId ()
+    public function getRedirectId()
     {
         return $this->redirectId;
     }
 
     /**
-     * @param mixed $redirectId
+     * @param string $redirectId
      */
-    public function setRedirectId ($redirectId)
+    public function setRedirectId($redirectId)
     {
         $this->redirectId = $redirectId;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getUrl ()
+    public function getUrl()
     {
         return $this->url;
     }
 
     /**
-     * @param mixed $url
+     * @param string $url
      */
-    public function setUrl ($url)
+    public function setUrl($url)
     {
         $this->url = $url;
     }
-
 
     /**
      * Set hits
      *
      * @param integer $hits
+     *
      * @return Page
      */
     public function setHits($hits)
@@ -117,6 +117,7 @@ class Redirect extends FormEntity
      * Set uniqueHits
      *
      * @param integer $uniqueHits
+     *
      * @return Page
      */
     public function setUniqueHits($uniqueHits)

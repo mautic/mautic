@@ -17,13 +17,18 @@ use Symfony\Component\Routing\RouteCollection;
 
 /**
  * Class RouteLoader
- *
- * @package Mautic\CoreBundle\Routing
  */
-
 class RouteLoader extends Loader
 {
-    private   $loaded    = false;
+
+    /**
+     * @var bool
+     */
+    private $loaded = false;
+
+    /**
+     * @var \Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher
+     */
     protected $dispatcher;
 
     /**
@@ -39,6 +44,7 @@ class RouteLoader extends Loader
      *
      * @param mixed $resource
      * @param null  $type
+     *
      * @return RouteCollection
      * @throws \RuntimeException
      */
@@ -53,13 +59,13 @@ class RouteLoader extends Loader
 
         $this->loaded = true;
 
-        $collection = $event->getCollection();
-        return $collection;
+        return $event->getCollection();
     }
 
     /**
      * @param mixed $resource
      * @param null  $type
+     *
      * @return bool
      */
     public function supports($resource, $type = null)

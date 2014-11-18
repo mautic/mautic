@@ -14,12 +14,13 @@ use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference as BaseTemplateR
 
 /**
  * Class TemplateReference
- *
- * @package Mautic\CoreBundle\Templating
  */
 class TemplateReference extends BaseTemplateReference
 {
 
+    /**
+     * @var MauticFactory
+     */
     protected $factory;
 
     /**
@@ -34,8 +35,6 @@ class TemplateReference extends BaseTemplateReference
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
     public function getPath()
     {

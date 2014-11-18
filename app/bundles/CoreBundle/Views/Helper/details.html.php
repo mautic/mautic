@@ -27,7 +27,7 @@
 <?php endif; ?>
 <?php
 if (method_exists($entity, 'getModifiedByUser')):
-$modified = $entity->getModifiedBy();
+$modified = $entity->getModifiedByUser();
 if ($modified):
     ?>
     <tr>

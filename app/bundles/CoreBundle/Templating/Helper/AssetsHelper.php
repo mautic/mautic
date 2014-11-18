@@ -11,13 +11,22 @@ namespace Mautic\CoreBundle\Templating\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Templating\Helper\CoreAssetsHelper as BaseAssetsHelper;
+use Symfony\Component\Templating\Helper\CoreAssetsHelper;
 
-class AssetsHelper extends BaseAssetsHelper
+/**
+ * Class AssetsHelper
+ */
+class AssetsHelper extends CoreAssetsHelper
 {
 
+    /**
+     * @var MauticFactory
+     */
     protected $factory;
 
+    /**
+     * @var array
+     */
     protected $assets;
 
     /**
@@ -25,6 +34,8 @@ class AssetsHelper extends BaseAssetsHelper
      *
      * @param string $script
      * @param string $location
+     *
+     * @return void
      */
     public function addScript($script, $location = 'head')
     {
@@ -61,6 +72,8 @@ class AssetsHelper extends BaseAssetsHelper
      *
      * @param string $script
      * @param string $location
+     *
+     * @return void
      */
     public function addScriptDeclaration($script, $location = 'head')
     {
@@ -85,6 +98,8 @@ class AssetsHelper extends BaseAssetsHelper
      * Adds a stylesheet to be loaded in the template header
      *
      * @param string $stylesheet
+     *
+     * @return void
      */
     public function addStylesheet($stylesheet)
     {
@@ -110,6 +125,8 @@ class AssetsHelper extends BaseAssetsHelper
 
     /**
      * Load ckeditor source files
+     *
+     * @return void
      */
     public function loadEditor()
     {
@@ -127,7 +144,9 @@ class AssetsHelper extends BaseAssetsHelper
     /**
      * Add style tag to the header
      *
-     * @param $styles
+     * @param string $styles
+     *
+     * @return void
      */
     public function addStyleDeclaration($styles)
     {
@@ -143,7 +162,10 @@ class AssetsHelper extends BaseAssetsHelper
     /**
      * Adds a custom declaration to <head />
      *
-     * @param $declaration
+     * @param string $declaration
+     * @param string $location
+     *
+     * @return void
      */
     public function addCustomDeclaration($declaration, $location = 'head')
     {
@@ -165,6 +187,8 @@ class AssetsHelper extends BaseAssetsHelper
 
     /**
      * Outputs the stylesheets and style declarations
+     *
+     * @return void
      */
     public function outputStyles()
     {
@@ -187,6 +211,8 @@ class AssetsHelper extends BaseAssetsHelper
      * Outputs the script files and declarations
      *
      * @param string $location
+     *
+     * @return void
      */
     public function outputScripts($location)
     {
@@ -213,6 +239,8 @@ class AssetsHelper extends BaseAssetsHelper
 
     /**
      * Output head scripts, stylesheets, and custom declarations
+     *
+     * @return void
      */
     public function outputHeadDeclarations()
     {
@@ -231,6 +259,11 @@ class AssetsHelper extends BaseAssetsHelper
         }
     }
 
+    /**
+     * Output system stylesheets
+     *
+     * @return void
+     */
     public function outputSystemStylesheets()
     {
         $assets = $this->getAssets();
@@ -242,6 +275,11 @@ class AssetsHelper extends BaseAssetsHelper
         }
     }
 
+    /**
+     * Output system scripts
+     *
+     * @return void
+     */
     public function outputSystemScripts()
     {
         $assets = $this->getAssets();
@@ -253,12 +291,20 @@ class AssetsHelper extends BaseAssetsHelper
         }
     }
 
+    /**
+     * Fetch system scripts
+     *
+     * @return array
+     */
     public function getSystemScripts()
     {
         $assets = $this->getAssets();
         return $assets['js'];
     }
 
+    /**
+     * @return array
+     */
     private function getAssets()
     {
         static $assets = array();
@@ -345,21 +391,29 @@ class AssetsHelper extends BaseAssetsHelper
         return $assets;
     }
 
+    /**
+     * @param string $dir
+     * @param string $ext
+     * @param string $env
+     * @param array  $assets
+     *
+     * @return void
+     */
     protected function findAssets($dir, $ext, $env, &$assets)
     {
-        $rootPath     = $this->factory->getSystemPath('root') . '/';
-        $directories  = new Finder();
+        $rootPath    = $this->factory->getSystemPath('root') . '/';
+        $directories = new Finder();
         $directories->directories()->exclude('*less')->depth('0')->ignoreDotFiles(true)->in($dir);
         if (count($directories)) {
             foreach ($directories as $directory) {
-                $files = new Finder();
+                $files         = new Finder();
                 $thisDirectory = str_replace('\\', '/', $directory->getRealPath());
-                $files->files()->depth('0')->name('*.'.$ext)->in($thisDirectory)->sortByName();
+                $files->files()->depth('0')->name('*.' . $ext)->in($thisDirectory)->sortByName();
                 $key = $directory->getBasename();
                 foreach ($files as $file) {
                     $path = str_replace($rootPath, '', $file->getPathname());
                     if (strpos($path, '/') === 0) {
-                        $path =  substr($path, 1);
+                        $path = substr($path, 1);
                     }
 
                     if ($env == 'prod') {
@@ -374,7 +428,7 @@ class AssetsHelper extends BaseAssetsHelper
 
         unset($directories);
         $files = new Finder();
-        $files->files()->depth('0')->ignoreDotFiles(true)->name('*.'.$ext)->in($dir)->sortByName();
+        $files->files()->depth('0')->ignoreDotFiles(true)->name('*.' . $ext)->in($dir)->sortByName();
         foreach ($files as $file) {
             if ($env == 'prod') {
                 $assets[$ext]['app'][] = str_replace($rootPath, '', $file->getPathname());
@@ -385,6 +439,12 @@ class AssetsHelper extends BaseAssetsHelper
         unset($files);
     }
 
+    /**
+     * @param string $env
+     * @param array  $assets
+     *
+     * @return void
+     */
     protected function findOverrides($env, &$assets)
     {
         $rootPath     = $this->factory->getSystemPath('root');
@@ -409,9 +469,14 @@ class AssetsHelper extends BaseAssetsHelper
         }
     }
 
+    /**
+     * @param string $text
+     *
+     * @return string
+     */
     public function makeLinks($text)
     {
-        return  preg_replace(
+        return preg_replace(
             array(
                 '/(?(?=<a[^>]*>.+<\/a>)
                     (?:<a[^>]*>.+<\/a>)
@@ -435,6 +500,11 @@ class AssetsHelper extends BaseAssetsHelper
         );
     }
 
+    /**
+     * @param MauticFactory $factory
+     *
+     * @return void
+     */
     public function setFactory(MauticFactory $factory)
     {
         $this->factory = $factory;
@@ -442,8 +512,6 @@ class AssetsHelper extends BaseAssetsHelper
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
     public function getName()
     {

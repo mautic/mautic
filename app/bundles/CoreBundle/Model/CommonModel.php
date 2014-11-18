@@ -6,7 +6,9 @@
  * @link        http://mautic.com
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\CoreBundle\Model;
+
 use Mautic\CoreBundle\Factory\MauticFactory;
 
 /**
@@ -17,14 +19,33 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 class CommonModel
 {
 
+    /**
+     * @var \Doctrine\ORM\EntityManager
+     */
     protected $em;
+
+    /**
+     * @var \Mautic\CoreBundle\Security\Permissions\CorePermissions
+     */
     protected $security;
+
+    /**
+     * @var \Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher
+     */
     protected $dispatcher;
+
+    /**
+     * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
+     */
     protected $translator;
+
+    /**
+     * @var MauticFactory
+     */
     protected $factory;
 
     /**
-     * @param $factory
+     * @param MauticFactory $factory
      */
     public function __construct(MauticFactory $factory)
     {
@@ -36,6 +57,8 @@ class CommonModel
     }
 
     /**
+     * Retrieve the supported search commands for a repository
+     *
      * @return array
      */
     public function getSupportedSearchCommands()
@@ -44,7 +67,9 @@ class CommonModel
     }
 
     /**
-     * @return mixed
+     * Retrieve the search command list for a repository
+     *
+     * @return array
      */
     public function getCommandList()
     {
@@ -52,9 +77,9 @@ class CommonModel
     }
 
     /**
-     * {@inheritdoc}
+     * Retrieve the repository for an entity
      *
-     * @return \Mautic\CoreBundle\Entity\CommonRepository
+     * @return \Mautic\CoreBundle\Entity\CommonRepository|bool
      */
     public function getRepository()
     {
@@ -62,9 +87,9 @@ class CommonModel
     }
 
     /**
-     * {@inheritdoc}
+     * Retrieve the permissions base
      *
-     * @return string
+     * @return string|bool
      */
     public function getPermissionBase()
     {
@@ -72,10 +97,11 @@ class CommonModel
     }
 
     /**
-     * Return list of entities
+     * Return a list of entities
      *
      * @param array $args [start, limit, filter, orderBy, orderByDir]
-     * @return mixed
+     *
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
     public function getEntities(array $args = array())
     {

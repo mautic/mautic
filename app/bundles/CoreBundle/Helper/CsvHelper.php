@@ -9,21 +9,28 @@
 
 namespace Mautic\CoreBundle\Helper;
 
+/**
+ * Class CsvHelper
+ */
 class CsvHelper
 {
 
+    /**
+     * @param string $filename
+     * @param string $delimiter
+     *
+     * @return array
+     */
     public static function csv_to_array($filename='', $delimiter=',')
     {
-        if(!file_exists($filename) || !is_readable($filename)) {
-            return FALSE;
+        if (!file_exists($filename) || !is_readable($filename)) {
+            return false;
         }
 
-        $header = NULL;
+        $header = null;
         $data   = array();
-        if (($handle = fopen($filename, 'r')) !== FALSE)
-        {
-            while (($row = fgetcsv($handle, 1000, $delimiter)) !== FALSE)
-            {
+        if (($handle = fopen($filename, 'r')) !== false) {
+            while (($row = fgetcsv($handle, 1000, $delimiter)) !== false) {
                 if (!$header) {
                     $header = $row;
                 } else {
@@ -32,6 +39,7 @@ class CsvHelper
             }
             fclose($handle);
         }
+
         return $data;
     }
 }

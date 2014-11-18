@@ -26,5 +26,3 @@ if (!empty($form->vars['attr']['preaddon']) ||
     <?php echo $view['form']->block($form, 'widget_attributes') ?><?php if (!empty($value) || is_numeric($value)): ?>
     value="<?php echo $view->escape($value) ?>"<?php endif ?> />
 <?php endif; ?>
-
-

@@ -14,19 +14,21 @@ use Symfony\Component\EventDispatcher\Event;
 
 /**
  * Class IconEvent
- *
- * @package Mautic\CoreBundle\Event
  */
 class IconEvent extends Event
 {
     /**
-     * @var
+     * @var array
      */
     protected $icons = array();
 
+    /**
+     * @var CorePermissions
+     */
     protected $security;
 
     /**
+     * @param CorePermissions $security
      */
     public function __construct(CorePermissions $security)
     {
@@ -34,7 +36,7 @@ class IconEvent extends Event
     }
 
     /**
-     * @return mixed
+     * @return CorePermissions
      */
     public function getSecurity()
     {
@@ -42,7 +44,10 @@ class IconEvent extends Event
     }
 
     /**
-     * Add icon
+     * @param string $type
+     * @param string $icon
+     *
+     * @return void
      */
     public function addIcon($type, $icon)
     {
@@ -52,7 +57,7 @@ class IconEvent extends Event
     /**
      * Return the icons
      *
-     * @return mixed
+     * @return array
      */
     public function getIcons()
     {
