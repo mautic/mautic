@@ -155,9 +155,10 @@ class UserController extends FormController
 
                     $this->request->getSession()->getFlashBag()->add(
                         'notice',
-                        $this->get('translator')->trans('mautic.user.user.notice.created',  array(
-                            '%name%' => $user->getName(),
-                            '%url%'  => $this->generateUrl('mautic_user_action', array(
+                        $this->get('translator')->trans('mautic.core.notice.created',  array(
+                            '%name%'      => $user->getName(),
+                            '%menu_link%' => 'mautic_user_index',
+                            '%url%'       => $this->generateUrl('mautic_user_action', array(
                                 'objectAction' => 'edit',
                                 'objectId'     => $user->getId()
                             ))
@@ -261,9 +262,10 @@ class UserController extends FormController
 
                     $this->request->getSession()->getFlashBag()->add(
                         'notice',
-                        $this->get('translator')->trans('mautic.user.user.notice.updated',  array(
-                            '%name%' => $user->getName(),
-                            '%url%'  => $this->generateUrl('mautic_user_action', array(
+                        $this->get('translator')->trans('mautic.core.notice.updated',  array(
+                            '%name%'      => $user->getName(),
+                            '%menu_link%' => 'mautic_user_index',
+                            '%url%'       => $this->generateUrl('mautic_user_action', array(
                                 'objectAction' => 'edit',
                                 'objectId'     => $user->getId()
                             ))
@@ -341,7 +343,7 @@ class UserController extends FormController
                     $name = $entity->getName();
                     $flashes[] = array(
                         'type' => 'notice',
-                        'msg'  => 'mautic.user.user.notice.deleted',
+                        'msg'  => 'mautic.core.notice.deleted',
                         'msgVars' => array(
                             '%name%' => $name,
                             '%id%'   => $objectId

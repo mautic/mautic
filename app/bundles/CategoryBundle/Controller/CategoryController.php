@@ -372,7 +372,7 @@ class CategoryController extends FormController
 
             $flashes[] = array(
                 'type' => 'notice',
-                'msg'  => 'mautic.category.notice.deleted',
+                'msg'  => 'mautic.core.notice.deleted',
                 'msgVars' => array(
                     '%name%' => $entity->getTitle(),
                     '%id%'   => $objectId

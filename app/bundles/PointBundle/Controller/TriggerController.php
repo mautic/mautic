@@ -221,9 +221,10 @@ class TriggerController extends FormController
 
                         $this->request->getSession()->getFlashBag()->add(
                             'notice',
-                            $this->get('translator')->trans('mautic.point.trigger.notice.created', array(
-                                '%name%' => $entity->getName(),
-                                '%url%'  => $this->generateUrl('mautic_pointtrigger_action', array(
+                            $this->get('translator')->trans('mautic.core.notice.created', array(
+                                '%name%'      => $entity->getName(),
+                                '%menu_link%' => 'mautic_pointtrigger_index',
+                                '%url%'       => $this->generateUrl('mautic_pointtrigger_action', array(
                                     'objectAction' => 'edit',
                                     'objectId'     => $entity->getId()
                                 ))
@@ -370,9 +371,10 @@ class TriggerController extends FormController
 
                         $this->request->getSession()->getFlashBag()->add(
                             'notice',
-                            $this->get('translator')->trans('mautic.point.trigger.notice.updated', array(
-                                '%name%' => $entity->getName(),
-                                '%url%'  => $this->generateUrl('mautic_pointtrigger_action', array(
+                            $this->get('translator')->trans('mautic.core.notice.updated', array(
+                                '%name%'      => $entity->getName(),
+                                '%menu_link%' => 'mautic_pointtrigger_index',
+                                '%url%'       => $this->generateUrl('mautic_pointtrigger_action', array(
                                     'objectAction' => 'edit',
                                     'objectId'     => $entity->getId()
                                 ))
@@ -528,7 +530,7 @@ class TriggerController extends FormController
             $identifier = $this->get('translator')->trans($entity->getName());
             $flashes[]  = array(
                 'type'    => 'notice',
-                'msg'     => 'mautic.point.trigger.notice.deleted',
+                'msg'     => 'mautic.core.notice.deleted',
                 'msgVars' => array(
                     '%name%' => $identifier,
                     '%id%'   => $objectId

@@ -94,9 +94,9 @@ class RoleControllerTest extends MauticWebTestCase
         $crawler = $client->submit($form);
 
         $this->assertRegExp(
-            '/mautic.user.role.notice.created/',
+            '/mautic.core.notice.created/',
             $client->getResponse()->getContent(),
-            'mautic.user.role.notice.created not found'
+            'mautic.core.notice.created not found'
         );
 
         //make sure ACL is working
@@ -132,9 +132,9 @@ class RoleControllerTest extends MauticWebTestCase
         $crawler = $client->submit($form);
 
         $this->assertRegExp(
-            '/mautic.user.role.notice.updated/',
+            '/mautic.core.notice.updated/',
             $client->getResponse()->getContent(),
-            'mautic.user.role.notice.updated not found'
+            'mautic.core.notice.updated not found'
         );
 
         //make sure ACL is working
@@ -160,9 +160,9 @@ class RoleControllerTest extends MauticWebTestCase
         $crawler = $client->request('POST', '/roles/delete/' . $role->getId());
 
         $this->assertRegExp(
-            '/mautic.user.role.notice.deleted/',
+            '/mautic.core.notice.deleted/',
             $client->getResponse()->getContent(),
-            'mautic.user.role.notice.deleted not found'
+            'mautic.core.notice.deleted not found'
         );
 
         //make sure ACL is working

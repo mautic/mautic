@@ -192,7 +192,7 @@ class ReportController extends FormController
             $identifier = $this->get('translator')->trans($entity->getTitle());
             $flashes[] = array(
                 'type' => 'notice',
-                'msg'  => 'mautic.report.report.notice.deleted',
+                'msg'  => 'mautic.core.notice.deleted',
                 'msgVars' => array(
                     '%name%' => $identifier,
                     '%id%'   => $objectId
@@ -320,9 +320,10 @@ class ReportController extends FormController
 
                     $this->request->getSession()->getFlashBag()->add(
                         'notice',
-                        $this->get('translator')->trans('mautic.report.report.notice.updated', array(
-                            '%name%' => $entity->getTitle(),
-                            '%url%'  => $this->generateUrl('mautic_report_action', array(
+                        $this->get('translator')->trans('mautic.core.notice.updated', array(
+                            '%name%'      => $entity->getTitle(),
+                            '%menu_link%' => 'mautic_report_index',
+                            '%url%'       => $this->generateUrl('mautic_report_action', array(
                                 'objectAction' => 'edit',
                                 'objectId'     => $entity->getId()
                             ))
@@ -406,9 +407,10 @@ class ReportController extends FormController
 
                     $this->request->getSession()->getFlashBag()->add(
                         'notice',
-                        $this->get('translator')->trans('mautic.report.report.notice.created', array(
-                            '%name%' => $entity->getTitle(),
-                            '%url%'          => $this->generateUrl('mautic_report_action', array(
+                        $this->get('translator')->trans('mautic.core.notice.created', array(
+                            '%name%'      => $entity->getTitle(),
+                            '%menu_link%' => 'mautic_report_index',
+                            '%url%'       => $this->generateUrl('mautic_report_action', array(
                                 'objectAction' => 'edit',
                                 'objectId'     => $entity->getId()
                             ))

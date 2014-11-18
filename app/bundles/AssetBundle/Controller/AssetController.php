@@ -249,9 +249,10 @@ class AssetController extends FormController
 
                     $this->request->getSession()->getFlashBag()->add(
                         'notice',
-                        $this->get('translator')->trans('mautic.asset.asset.notice.created', array(
-                            '%name%' => $entity->getTitle(),
-                            '%url%'          => $this->generateUrl('mautic_asset_action', array(
+                        $this->get('translator')->trans('mautic.core.notice.created', array(
+                            '%name%'      => $entity->getTitle(),
+                            '%menu_link%' => 'mautic_asset_index',
+                            '%url%'       => $this->generateUrl('mautic_asset_action', array(
                                 'objectAction' => 'edit',
                                 'objectId'     => $entity->getId()
                             ))
@@ -371,9 +372,10 @@ class AssetController extends FormController
 
                     $this->request->getSession()->getFlashBag()->add(
                         'notice',
-                        $this->get('translator')->trans('mautic.asset.asset.notice.updated', array(
-                            '%name%' => $entity->getTitle(),
-                            '%url%'  => $this->generateUrl('mautic_asset_action', array(
+                        $this->get('translator')->trans('mautic.core.notice.updated', array(
+                            '%name%'      => $entity->getTitle(),
+                            '%menu_link%' => 'mautic_asset_index',
+                            '%url%'       => $this->generateUrl('mautic_asset_action', array(
                                 'objectAction' => 'edit',
                                 'objectId'     => $entity->getId()
                             ))
@@ -507,7 +509,7 @@ class AssetController extends FormController
 
             $flashes[] = array(
                 'type' => 'notice',
-                'msg'  => 'mautic.asset.asset.notice.deleted',
+                'msg'  => 'mautic.core.notice.deleted',
                 'msgVars' => array(
                     '%name%' => $entity->getTitle(),
                     '%id%'   => $objectId

@@ -104,9 +104,9 @@ class UserControllerTest extends MauticWebTestCase
         $crawler = $client->submit($form);
 
         $this->assertRegExp(
-            '/mautic.user.user.notice.created/',
+            '/mautic.core.notice.created/',
             $client->getResponse()->getContent(),
-            'mautic.user.user.notice.created not found'
+            'mautic.core.notice.created not found'
         );
 
         //ensure that the password created is correct
@@ -155,9 +155,9 @@ class UserControllerTest extends MauticWebTestCase
         $crawler = $client->submit($form);
 
         $this->assertRegExp(
-            '/mautic.user.user.notice.updated/',
+            '/mautic.core.notice.updated/',
             $client->getResponse()->getContent(),
-            'mautic.user.user.notice.updated not found'
+            'mautic.core.notice.updated not found'
         );
 
         //ensure that the password created didn't get overwritten or get blanked out
@@ -189,9 +189,9 @@ class UserControllerTest extends MauticWebTestCase
         $crawler = $client->request('POST', '/users/delete/'.$user->getId());
 
         $this->assertRegExp(
-            '/mautic.user.user.notice.deleted/',
+            '/mautic.core.notice.deleted/',
             $client->getResponse()->getContent(),
-            'mautic.user.user.notice.deleted not found'
+            'mautic.core.notice.deleted not found'
         );
 
         //make sure ACL is working

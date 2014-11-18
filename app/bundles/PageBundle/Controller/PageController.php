@@ -341,9 +341,10 @@ class PageController extends FormController
 
                     $this->request->getSession()->getFlashBag()->add(
                         'notice',
-                        $this->get('translator')->trans('mautic.page.page.notice.created', array(
-                            '%name%' => $entity->getTitle(),
-                            '%url%'          => $this->generateUrl('mautic_page_action', array(
+                        $this->get('translator')->trans('mautic.core.notice.created', array(
+                            '%name%'      => $entity->getTitle(),
+                            '%menu_link%' => 'mautic_page_index',
+                            '%url%'       => $this->generateUrl('mautic_page_action', array(
                                 'objectAction' => 'edit',
                                 'objectId'     => $entity->getId()
                             ))
@@ -475,9 +476,10 @@ class PageController extends FormController
 
                     $this->request->getSession()->getFlashBag()->add(
                         'notice',
-                        $this->get('translator')->trans('mautic.page.page.notice.updated', array(
-                            '%name%' => $entity->getTitle(),
-                            '%url%'  => $this->generateUrl('mautic_page_action', array(
+                        $this->get('translator')->trans('mautic.core.notice.updated', array(
+                            '%name%'      => $entity->getTitle(),
+                            '%menu_link%' => 'mautic_page_index',
+                            '%url%'       => $this->generateUrl('mautic_page_action', array(
                                 'objectAction' => 'edit',
                                 'objectId'     => $entity->getId()
                             ))
@@ -624,7 +626,7 @@ class PageController extends FormController
 
             $flashes[] = array(
                 'type' => 'notice',
-                'msg'  => 'mautic.page.page.notice.deleted',
+                'msg'  => 'mautic.core.notice.deleted',
                 'msgVars' => array(
                     '%name%' => $entity->getTitle(),
                     '%id%'   => $objectId
