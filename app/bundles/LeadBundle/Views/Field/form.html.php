@@ -39,6 +39,14 @@ $view['slots']->set("headerTitle", $header);
                     <?php echo $view['form']->row($form['defaultValue']); ?>
                 </div>
             </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <?php echo $view['form']->row($form['group']); ?>
+                </div>
+                <div class="col-md-6">
+                    <?php echo $view['form']->row($form['order']); ?>
+                </div>
+            </div>
             <?php
             $type          = $form['type']->vars['data'];
             $properties    = $form['properties']->vars['data'];

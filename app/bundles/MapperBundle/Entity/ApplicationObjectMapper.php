@@ -30,7 +30,7 @@ class ApplicationObjectMapper
 
     /**
      * @ORM\ManyToOne(targetEntity="Mautic\MapperBundle\Entity\ApplicationClient")
-     * @ORM\JoinColumn(name="application_client_id", referencedColumnName="id", nullable=true)
+     * @ORM\JoinColumn(name="application_client_id", referencedColumnName="id")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      */
@@ -42,6 +42,13 @@ class ApplicationObjectMapper
      * @Serializer\Since("1.0")
      */
     private $objectName;
+
+    /**
+     * @ORM\Column(type="integer")
+     * @Serializer\Expose
+     * @Serializer\Since("1.0")
+     */
+    private $nrFields = 0;
 
     /**
      * @ORM\Column(type="integer")
@@ -93,6 +100,18 @@ class ApplicationObjectMapper
         return $this;
     }
 
+    public function setNrFields($nrFields)
+    {
+        $this->nrFields = intval($nrFields);
+
+        return $this;
+    }
+
+    public function getNrFields()
+    {
+        return $this->nrFields;
+    }
+
     /**
      * @return mixed
      */
@@ -115,12 +134,12 @@ class ApplicationObjectMapper
     /**
      * Set owner
      *
-     * @param \Mautic\MapperBundle\Entity\ApplicationClient $client
+     * @param string $client
      * @return ApplicationObjectMapper
      */
-    public function setApplicationClientId(ApplicationClient $client = null)
+    public function setApplicationClientId($client_id = null)
     {
-        $this->applicationClientId = $client->getId();
+        $this->applicationClientId = intval($client_id);
 
         return $this;
     }

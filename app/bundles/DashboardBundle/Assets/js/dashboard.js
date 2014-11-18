@@ -64,6 +64,16 @@ Mautic.renderOpenRateDoughnut = function () {
             label: "Not opened"
         }
     ];
+    if (!data[0].value && !data[1].value) {
+        data = [
+            {
+                value: 1,
+                color: "#efeeec",
+                highlight: "#EBEBEB",
+                label: "No data"
+            }
+        ];
+    }
     var ctx = document.getElementById("open-rate").getContext("2d");
     Mautic.dashboardOpenRateDoughnutObject = new Chart(ctx).Doughnut(data, options);
 }
@@ -91,6 +101,16 @@ Mautic.renderClickRateDoughnut = function () {
             label: "Not clicked"
         }
     ];
+    if (!data[0].value && !data[1].value) {
+        data = [
+            {
+                value: 1,
+                color: "#efeeec",
+                highlight: "#EBEBEB",
+                label: "No data"
+            }
+        ];
+    }
     var ctx = document.getElementById("click-rate").getContext("2d");
     Mautic.dashboardClickRateDoughnutObject = new Chart(ctx).Doughnut(data, options);
 }
