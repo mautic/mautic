@@ -30,7 +30,6 @@ $view['slots']->set("headerTitle", $header);
             <?php
             echo $view['form']->row($form['name']);
             echo $view['form']->row($form['description']);
-            echo $view['form']->row($form['lists']);
             ?>
         </div>
     </div>
@@ -38,6 +37,7 @@ $view['slots']->set("headerTitle", $header);
         <div class="pr-lg pl-lg pt-md pb-md">
             <?php
             echo $view['form']->row($form['category']);
+            echo $view['form']->row($form['lists']);
             echo $view['form']->row($form['isPublished']);
             echo $view['form']->row($form['publishUp']);
             echo $view['form']->row($form['publishDown']);
