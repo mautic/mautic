@@ -3,6 +3,10 @@ Mautic.assetOnLoad = function (container) {
     if (typeof Mautic.renderDownloadChartObject === 'undefined') {
 	    Mautic.renderDownloadChart();
 	}
+
+    mQuery("#asset_file").change(function() {
+        Mautic.previewBeforeUpload(this);
+    });
 };
 
 Mautic.assetOnUnload = function(id) {
@@ -56,4 +60,28 @@ Mautic.updateDownloadChart = function(element, amount, unit) {
             Mautic.processAjaxError(request, textStatus, errorThrown);
         }
     });
+}
+
+Mautic.previewBeforeUpload = function(input) {
+    if (input.files && input.files[0]) {
+        var filename = input.files[0].name.toLowerCase();
+        var extension = filename.substr((filename.lastIndexOf('.') +1));
+        var reader = new FileReader();
+        var element = mQuery('<i />').addClass('fa fa-upload fa-5x');
+
+        if (mQuery.inArray(extension, ['jpg', 'jpeg', 'gif', 'png']) !== -1) {
+            reader.onload = function (e) {
+                element = mQuery('<img />').addClass('img-thumbnail').attr('src', e.target.result);
+                mQuery('.thumbnail-preview').empty().append(element);
+            }
+        } else if (extension === 'pdf') {
+            reader.onload = function (e) {
+                element = mQuery('<iframe />').attr('src', e.target.result);
+                mQuery('.thumbnail-preview').empty().append(element);
+            }
+        }
+
+        mQuery('.thumbnail-preview').empty().append(element);
+        reader.readAsDataURL(input.files[0]);
+    }
 }
