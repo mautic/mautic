@@ -14,6 +14,7 @@ use Mautic\CoreBundle\Entity\FormEntity;
 use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -337,7 +338,7 @@ class Asset extends FormEntity
     /**
      * Set downloadCount
      *
-     * @param \DateTime $downloadCount
+     * @param integer $downloadCount
      *
      * @return Asset
      */

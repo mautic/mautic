@@ -64,6 +64,7 @@ class LeadSubscriber extends CommonSubscriber
 
         $downloads = $downloadRepository->getLeadDownloads($lead->getId(), $options);
 
+        /** @var \Mautic\AssetBundle\Model\AssetModel $model */
         $model = $this->factory->getModel('asset.asset');
 
         // Add the downloads to the event array

@@ -11,6 +11,8 @@ namespace Mautic\EmailBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 
 /**
  * Class EmailSendEvent
@@ -20,17 +22,36 @@ use Mautic\EmailBundle\Entity\Email;
 class EmailSendEvent extends CommonEvent
 {
 
+    /**
+     * @var mixed
+     */
     private $content;
+
+    /**
+     * @var AssetsHelper
+     */
     private $slotsHelper;
+
+    /**
+     * @var string
+     */
     private $idHash;
+
+    /**
+     * @var Lead
+     */
     private $lead;
+
+    /**
+     * @var array
+     */
     private $source;
 
     /**
-     * @param Email $email
-     * @param       $lead
-     * @param       $idHash
-     * @param       $source
+     * @param Email  $email
+     * @param Lead   $lead
+     * @param string $idHash
+     * @param array  $source
      */
     public function __construct(Email &$email, $lead = null, $idHash = '', $source = array())
     {
@@ -84,7 +105,7 @@ class EmailSendEvent extends CommonEvent
     /**
      * Set the slots helper for content
      *
-     * @param $slotsHelper
+     * @param AssetsHelper $slotsHelper
      */
     public function setSlotsHelper($slotsHelper)
     {
@@ -94,7 +115,7 @@ class EmailSendEvent extends CommonEvent
     /**
      * Get the slots helper that can be used to add scripts/stylesheets to the header
      *
-     * @return mixed
+     * @return AssetsHelper
      */
     public function getSlotsHelper()
     {
@@ -102,7 +123,7 @@ class EmailSendEvent extends CommonEvent
     }
 
     /**
-     * @return null
+     * @return Lead
      */
     public function getLead()
     {

@@ -227,6 +227,7 @@ class AssetController extends FormController
      */
     public function newAction ()
     {
+        /** @var \Mautic\AssetBundle\Model\AssetModel $model */
         $model   = $this->factory->getModel('asset.asset');
         $entity  = $model->getEntity();
         $method  = $this->request->getMethod();
@@ -267,17 +268,17 @@ class AssetController extends FormController
                         ), 'flashes')
                     );
 
-                    if ($form->get('buttons')->get('save')->isClicked()) {
-                        $viewParameters = array(
-                            'objectAction' => 'view',
-                            'objectId'     => $entity->getId()
-                        );
-                        $returnUrl      = $this->generateUrl('mautic_asset_action', $viewParameters);
-                        $template       = 'MauticAssetBundle:Asset:view';
-                    } else {
+                    if (!$form->get('buttons')->get('save')->isClicked()) {
                         //return edit view so that all the session stuff is loaded
                         return $this->editAction($entity->getId(), true);
                     }
+
+                    $viewParameters = array(
+                        'objectAction' => 'view',
+                        'objectId'     => $entity->getId()
+                    );
+                    $returnUrl      = $this->generateUrl('mautic_asset_action', $viewParameters);
+                    $template       = 'MauticAssetBundle:Asset:view';
                 }
             } else {
                 $viewParameters  = array('page' => $page);
@@ -317,10 +318,14 @@ class AssetController extends FormController
     /**
      * Generates edit form and processes post data
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @param int  $objectId
+     * @param bool $ignorePost
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function editAction ($objectId, $ignorePost = false)
+    public function editAction($objectId, $ignorePost = false)
     {
+        /** @var \Mautic\AssetBundle\Model\AssetModel $model */
         $model      = $this->factory->getModel('asset.asset');
         $entity     = $model->getEntity($objectId);
         $session    = $this->factory->getSession();
@@ -372,7 +377,6 @@ class AssetController extends FormController
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-
                     $entity->setUploadDir($this->factory->getParameter('upload_dir'));
                     $entity->preUpload();
                     $entity->upload();
@@ -445,11 +449,13 @@ class AssetController extends FormController
     /**
      * Clone an entity
      *
-     * @param $objectId
+     * @param int $objectId
+     *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function cloneAction ($objectId)
+    public function cloneAction($objectId)
     {
+        /** @var \Mautic\AssetBundle\Model\AssetModel $model */
         $model   = $this->factory->getModel('asset.asset');
         $entity  = $model->getEntity($objectId);
 
@@ -477,7 +483,8 @@ class AssetController extends FormController
     /**
      * Deletes the entity
      *
-     * @param         $objectId
+     * @param int $objectId
+     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function deleteAction($objectId) {
@@ -496,6 +503,7 @@ class AssetController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
+            /** @var \Mautic\AssetBundle\Model\AssetModel $model */
             $model  = $this->factory->getModel('asset.asset');
             $entity = $model->getEntity($objectId);
 
@@ -556,6 +564,7 @@ class AssetController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
+            /** @var \Mautic\AssetBundle\Model\AssetModel $model */
             $model     = $this->factory->getModel('asset');
             $ids       = json_decode($this->request->query->get('ids', array()));
             $deleteIds = array();

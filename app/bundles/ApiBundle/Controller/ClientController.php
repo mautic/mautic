@@ -120,6 +120,7 @@ class ClientController extends FormController
         $flashes = array();
 
         if ($this->request->getMethod() == 'POST') {
+            /** @var \Mautic\ApiBundle\Model\ClientModel $model */
             $model   = $this->factory->getModel('api.client');
 
             $client = $model->getEntity($clientId);
@@ -245,6 +246,7 @@ class ClientController extends FormController
         if (!$this->factory->getSecurity()->isGranted('api:clients:editother')) {
             return $this->accessDenied();
         }
+        /** @var \Mautic\ApiBundle\Model\ClientModel $model */
         $model     = $this->factory->getModel('api.client');
         $client    = $model->getEntity($objectId);
         $returnUrl = $this->generateUrl('mautic_client_index');
@@ -351,6 +353,7 @@ class ClientController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
+            /** @var \Mautic\ApiBundle\Model\ClientModel $model */
             $model  = $this->factory->getModel('api.client');
             $entity = $model->getEntity($objectId);
             if ($entity === null) {
