@@ -43,10 +43,6 @@ class ClientRepository extends CommonRepository
         $q = $this
             ->createQueryBuilder('c');
 
-        if (!$this->buildClauses($q, $args)) {
-            return array();
-        }
-
         $query = $q->getQuery();
         return new Paginator($query);
     }
