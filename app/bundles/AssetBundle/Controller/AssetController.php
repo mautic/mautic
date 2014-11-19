@@ -317,6 +317,8 @@ class AssetController extends FormController
         $entity     = $model->getEntity($objectId);
         $session    = $this->factory->getSession();
         $page       = $this->factory->getSession()->get('mautic.asset.page', 1);
+        $request    = $this->getRequest();
+        $baseUrl    = $request->getScheme() . '://' . $request->getHttpHost() . $request->getBasePath() . '/';
 
         //set the return URL
         $returnUrl  = $this->generateUrl('mautic_asset_index', array('page' => $page));
@@ -417,7 +419,8 @@ class AssetController extends FormController
         return $this->delegateView(array(
             'viewParameters'  =>  array(
                 'form'        => $form->createView(),
-                'activeAsset'  => $entity
+                'activeAsset' => $entity,
+                'assetUrl'    => $baseUrl . $entity->getWebPath()
             ),
             'contentTemplate' => 'MauticAssetBundle:Asset:form.html.php',
             'passthroughVars' => array(

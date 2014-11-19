@@ -20,11 +20,28 @@ $view['slots']->set('mauticContent', 'asset');
     <!-- container -->
     <div class="col-md-9 bg-auto height-auto bdr-r">
         <div class="pa-md">
-		    <?php
-			echo $view['form']->row($form['file']);
-			echo $view['form']->row($form['title']);
-			echo $view['form']->row($form['alias']);
-		    ?>
+	        <div class="row">
+		        <div class="col-md-6">
+				    <?php echo $view['form']->row($form['file']); ?>
+		    	</div>
+		    	<div class="col-md-6 text-center">
+		    		<?php if ($activeAsset->isImage()) : ?>
+		    			<img src="<?php echo $assetUrl; ?>" alt="<?php echo $activeAsset->getTitle(); ?>" class="img-thumbnail" />
+		    		<?php elseif (strtolower($activeAsset->getFileType()) == 'pdf') : ?>
+		    			<iframe src="<?php echo $assetUrl; ?>#view=FitH" class="col-lg-12" ></iframe>
+		    		<?php else : ?>
+		    			<i class="<?php echo $activeAsset->getIconClass(); ?> fa-5x"></i>
+		    		<?php endif; ?>
+		    	</div>
+		    </div>
+		    <div class="row">
+				<div class="col-md-6">
+					<?php echo $view['form']->row($form['title']); ?>
+				</div>
+				<div class="col-md-6">
+					<?php echo $view['form']->row($form['alias']); ?>
+				</div>
+			</div>
 		</div>
 	</div>
  	<div class="col-md-3 bg-white height-auto">

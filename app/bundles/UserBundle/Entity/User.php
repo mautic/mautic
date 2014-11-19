@@ -27,7 +27,7 @@ use JMS\Serializer\Annotation as Serializer;
  * @ORM\Entity(repositoryClass="Mautic\UserBundle\Entity\UserRepository")
  * @Serializer\ExclusionPolicy("all")
  */
-class User extends FormEntity implements UserInterface, AdvancedUserInterface, \Serializable
+class User extends FormEntity implements AdvancedUserInterface, \Serializable
 {
 
     /**

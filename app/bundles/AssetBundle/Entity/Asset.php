@@ -640,6 +640,28 @@ class Asset extends FormEntity
     }
 
     /**
+     * Decides if an asset is image displayable by browser.
+     *
+     * @return boolean
+     */
+    public function isImage()
+    {
+        $fileType = strtolower($this->getFileType());
+
+        if (!$fileType) {
+            return false;
+        }
+
+        $imageTypes = array('jpg', 'jpeg', 'png', 'gif');
+
+        if (in_array($fileType, $imageTypes)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Returns array of common extensions
      *
      * @return string
