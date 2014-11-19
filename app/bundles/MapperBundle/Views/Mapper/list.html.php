@@ -50,7 +50,8 @@ if ($tmpl == 'index') {
                             "objectAction" => 'edit'
                         )); ?>"><?php echo $item->getBaseName(); ?></a>
                     </td>
-                    <td class="visible-md visible-lg"><?php echo $item->getEntity()->getId(); ?></td>
+                    <?php $entity = $item->getEntity(); ?>
+                    <td class="visible-md visible-lg"><?php echo !$entity == null ? $entity->getId() : ''; ?></td>
                 </tr>
             <?php endforeach; ?>
             </tbody>

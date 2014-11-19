@@ -35,15 +35,16 @@ abstract class AbstractMapper
     public function getEntity()
     {
         $client = $this->factory->getRequest()->get('client');
-        $clientEntity = $this->factory->getEntityManager('mapper.ApplicationClient');
+        $model  = $this->factory->getModel('mapper.ApplicationClient');
+        $clientEntity = $model->loadByAlias($client);
 
-        echo '<pre>';
-        var_dump($client);
-        die(__FILE__);
+        if ($clientEntity == null) {
+            return null;
+        }
 
-        return $this->factory->getEntityManager('mapper.ApplicationObjectMapper')->getOneBy(array(
-            'object_name' => $this->getBaseName(),
-            'application_client_id' => $clientEntity->getId()
+        return $this->factory->getEntityManager()->getRepository('MauticMapperBundle:ApplicationObjectMapper')->findOneBy(array(
+            'objectName' => $this->getBaseName(),
+            'applicationClientId' => $clientEntity->getId()
         ));
     }
 
