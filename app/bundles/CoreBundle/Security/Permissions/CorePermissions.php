@@ -167,9 +167,9 @@ class CorePermissions
     /**
      * Determines if the user has permission to access the given area
      *
-     * @param array  $requestedPermission
-     * @param string $mode MATCH_ALL|MATCH_ONE|RETURN_ARRAY
-     * @param User   $userEntity
+     * @param array|string $requestedPermission
+     * @param string       $mode MATCH_ALL|MATCH_ONE|RETURN_ARRAY
+     * @param User         $userEntity
      *
      * @return bool
      * @throws \InvalidArgumentException

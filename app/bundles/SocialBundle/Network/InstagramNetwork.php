@@ -67,8 +67,6 @@ class InstagramNetwork extends AbstractNetwork
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool|string
      */
     public function getAccessTokenUrl()
     {

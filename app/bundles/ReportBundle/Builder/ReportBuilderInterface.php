@@ -19,7 +19,7 @@ interface ReportBuilderInterface
      *
      * @param array $options Options array
      *
-     * @return \Doctrine\ORM\Query
+     * @return \Doctrine\DBAL\Query\QueryBuilder
      */
     public function getQuery(array $options);
 }
