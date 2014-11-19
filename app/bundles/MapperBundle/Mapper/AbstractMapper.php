@@ -38,7 +38,7 @@ abstract class AbstractMapper
         $clientEntity = $this->factory->getEntityManager('mapper.ApplicationClient');
 
         echo '<pre>';
-        var_dump($clientEntity);
+        var_dump($client);
         die(__FILE__);
 
         return $this->factory->getEntityManager('mapper.ApplicationObjectMapper')->getOneBy(array(
