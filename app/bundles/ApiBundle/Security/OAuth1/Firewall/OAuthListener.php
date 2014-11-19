@@ -9,9 +9,9 @@
 
 namespace Mautic\ApiBundle\Security\OAuth1\Firewall;
 
+use Bazinga\OAuthServerBundle\Security\Authentification\Token\OAuthToken;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Mautic\ApiBundle\Security\OAuth1\Authentication\Token\OAuthToken;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Exception\HttpException;
