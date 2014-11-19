@@ -23,7 +23,7 @@ class EmailSendEvent extends CommonEvent
 {
 
     /**
-     * @var mixed
+     * @var array
      */
     private $content;
 
@@ -85,7 +85,7 @@ class EmailSendEvent extends CommonEvent
     /**
      * Get email content
      *
-     * @return string
+     * @return array
      */
     public function getContent()
     {
