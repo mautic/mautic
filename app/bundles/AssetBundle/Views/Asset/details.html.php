@@ -172,7 +172,7 @@ if ($security->hasEntityAccess($permissions['asset:assets:editown'], $permission
 
         <!-- start: tab-content -->
         <div class="tab-content pa-md">
-            <h5 class="fw-sb mb-xs">Preview</h5>
+            <h5 class="fw-sb mb-xs"><?php echo $view['translator']->trans('mautic.asset.asset.preview'); ?></h5>
             <div class="text-center">
                 <?php if ($activeAsset->isImage()) : ?>
                     <img src="<?php echo $assetUrl; ?>" alt="<?php echo $activeAsset->getTitle(); ?>" class="img-thumbnail" />

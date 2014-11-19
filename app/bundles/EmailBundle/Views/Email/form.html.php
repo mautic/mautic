@@ -29,7 +29,11 @@ $view['slots']->set("headerTitle", $header.$subheader);
         <!-- container -->
         <div class="col-md-9 bg-auto height-auto">
             <div class="pa-md">
-                <?php echo $view['form']->row($form['subject']); ?>
+                <div class="row">
+                    <div class="col-md-6">
+                        <?php echo $view['form']->row($form['subject']); ?>
+                    </div>
+                </div>
                 <?php echo $view['form']->row($form['plainText']); ?>
             </div>
         </div>
