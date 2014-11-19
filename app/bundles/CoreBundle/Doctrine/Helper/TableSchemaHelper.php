@@ -16,8 +16,6 @@ use Doctrine\DBAL\Schema\Comparator;
  * Class TableSchemaHelper
  *
  * Used to manipulate creation/removal of tables
- *
- * @package Mautic\CoreBundle\Doctrine\Helper
  */
 class TableSchemaHelper
 {
@@ -33,7 +31,7 @@ class TableSchemaHelper
     protected $sm;
 
     /**
-     * @var
+     * @var string
      */
     protected $prefix;
 
@@ -48,18 +46,19 @@ class TableSchemaHelper
     protected $schema;
 
     /**
-     * @var
+     * @var array
      */
     protected $dropTables;
 
     /**
-     * @var
+     * @var array
      */
     protected $addTables;
 
     /**
-     * @param Connection $db
-     * @param            $prefix
+     * @param Connection         $db
+     * @param string             $prefix
+     * @param ColumnSchemaHelper $columnHelper
      */
     public function __construct(Connection $db, $prefix, ColumnSchemaHelper $columnHelper)
     {
@@ -80,11 +79,13 @@ class TableSchemaHelper
         return $this->sm;
     }
 
-
     /**
      * Add an array of tables to db
      *
      * @param array $tables
+     *
+     * @return void
+     * @throws \InvalidArgumentException
      */
     public function addTables(array $tables)
     {
@@ -125,6 +126,9 @@ class TableSchemaHelper
      *      )
      * @param $checkExists
      * @param $dropExisting
+     *
+     * @return void
+     * @throws \InvalidArgumentException
      */
     public function addTable(array $table, $checkExists = true, $dropExisting = false)
     {
@@ -170,11 +174,12 @@ class TableSchemaHelper
                 $newTable->$func($value);
             }
         }
-
     }
 
     /**
-     * @param $table
+     * @param string $table
+     *
+     * @return void
      */
     public function deleteTable($table)
     {
@@ -185,6 +190,8 @@ class TableSchemaHelper
 
     /**
      * Executes the changes
+     *
+     * @return void
      */
     public function executeChanges()
     {
@@ -211,20 +218,22 @@ class TableSchemaHelper
     /**
      * Determine if a table exists
      *
-     * @param      $table
-     * @param bool $throwException
+     * @param string $table
+     * @param bool   $throwException
+     *
      * @return bool
+     * @throws \InvalidArgumentException
      */
     public function checkTableExists($table, $throwException = false)
     {
         if ($this->sm->tablesExist($this->prefix . $table)) {
             if ($throwException) {
                 throw new \InvalidArgumentException($this->prefix . "$table already exists");
-            } else {
-                return true;
             }
-        } else {
-            return false;
+
+            return true;
         }
+
+        return false;
     }
 }

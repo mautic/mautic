@@ -9,20 +9,46 @@
 
 namespace Mautic\CoreBundle\Helper;
 
+/**
+ * Class DateTimeHelper
+ */
 class DateTimeHelper
 {
 
+    /**
+     * @var string
+     */
     private $string;
+
+    /**
+     * @var string
+     */
     private $format;
+
+    /**
+     * @var string
+     */
     private $timezone;
+
+    /**
+     * @var \DateTimeZone
+     */
     private $utc;
+
+    /**
+     * @var \DateTimeZone
+     */
     private $local;
+
+    /**
+     * @var \DateTime
+     */
     private $datetime;
 
     /**
-     * @param string $string Datetime string
-     * @param string $inFormat format the string is in
-     * @param string $timezone Timezone the string is in
+     * @param string $string     Datetime string
+     * @param string $fromFormat Format the string is in
+     * @param string $timezone   Timezone the string is in
      */
     public function __construct($string = '', $fromFormat = 'Y-m-d H:i:s', $timezone = 'UTC')
     {
@@ -32,9 +58,9 @@ class DateTimeHelper
     /**
      * Sets date/time
      *
-     * @param string $datetime
-     * @param string $fromFormat
-     * @param string $timezone
+     * @param \DateTime|string $datetime
+     * @param string           $fromFormat
+     * @param string           $timezone
      */
     public function setDateTime($datetime = '', $fromFormat = 'Y-m-d H:i:s', $timezone = 'local')
     {
@@ -76,6 +102,11 @@ class DateTimeHelper
         }
     }
 
+    /**
+     * @param string $format
+     *
+     * @return string
+     */
     public function toUtcString($format = null)
     {
         if ($this->datetime) {
@@ -84,11 +115,16 @@ class DateTimeHelper
                 $format = $this->format;
             }
             return $utc->format($format);
-        } else {
-            return $this->string;
         }
+
+        return $this->string;
     }
 
+    /**
+     * @param string $format
+     *
+     * @return string
+     */
     public function toLocalString($format = null)
     {
         if ($this->datetime) {
@@ -96,54 +132,74 @@ class DateTimeHelper
             if (empty($format)) {
                 $format = $this->format;
             }
+
             return $local->format($format);
-        } else {
-            return $this->string;
         }
+
+        return $this->string;
     }
 
+    /**
+     * @return \DateTime
+     */
     public function getUtcDateTime()
     {
-        $utc = $this->datetime->setTimezone($this->utc);
-        return $utc;
+        return $this->datetime->setTimezone($this->utc);
     }
 
+    /**
+     * @return \DateTime
+     */
     public function getLocalDateTime()
     {
-        $local = $this->datetime->setTimezone($this->local);
-        return $local;
+        return $this->datetime->setTimezone($this->local);
     }
 
+    /**
+     * @param null $format
+     *
+     * @return string
+     */
     public function getString($format = null)
     {
         if (empty($format)) {
             $format = $this->format;
         }
+
         return $this->datetime->format($format);
     }
 
+    /**
+     * @return \DateTime
+     */
     public function getDateTime()
     {
         return $this->datetime;
     }
 
+    /**
+     * @return bool|int
+     */
     public function getLocalTimestamp()
     {
         if ($this->datetime) {
             $local = $this->datetime->setTimezone($this->local);
             return $local->getTimestamp();
-        } else {
-            return false;
         }
+
+        return false;
     }
 
+    /**
+     * @return bool|int
+     */
     public function getUtcTimestamp()
     {
         if ($this->datetime) {
             $utc = $this->datetime->setTimezone($this->utc);
             return $utc->getTimestamp();
-        } else {
-            return false;
         }
+
+        return false;
     }
 }

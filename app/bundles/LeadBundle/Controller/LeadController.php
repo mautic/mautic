@@ -376,9 +376,10 @@ class LeadController extends FormController
 
                     $this->request->getSession()->getFlashBag()->add(
                         'notice',
-                        $this->get('translator')->trans('mautic.lead.lead.notice.created', array(
-                            '%name%' => $identifier,
-                            '%url%'  => $this->generateUrl('mautic_lead_action', array(
+                        $this->get('translator')->trans('mautic.core.notice.created', array(
+                            '%name%'      => $identifier,
+                            '%menu_link%' => 'mautic_lead_index',
+                            '%url%'       => $this->generateUrl('mautic_lead_action', array(
                                 'objectAction' => 'edit',
                                 'objectId'     => $lead->getId()
                             ))
@@ -528,9 +529,10 @@ class LeadController extends FormController
                     $identifier = $this->get('translator')->trans($lead->getPrimaryIdentifier());
                     $this->request->getSession()->getFlashBag()->add(
                         'notice',
-                        $this->get('translator')->trans('mautic.lead.lead.notice.updated', array(
-                            '%name%' => $identifier,
-                            '%url%'  => $this->generateUrl('mautic_lead_action', array(
+                        $this->get('translator')->trans('mautic.core.notice.updated', array(
+                            '%name%'      => $identifier,
+                            '%menu_link%' => 'mautic_lead_index',
+                            '%url%'       => $this->generateUrl('mautic_lead_action', array(
                                 'objectAction' => 'edit',
                                 'objectId'     => $lead->getId()
                             ))
@@ -637,7 +639,7 @@ class LeadController extends FormController
                 $identifier = $this->get('translator')->trans($entity->getPrimaryIdentifier());
                 $flashes[]  = array(
                     'type'    => 'notice',
-                    'msg'     => 'mautic.lead.lead.notice.deleted',
+                    'msg'     => 'mautic.core.notice.deleted',
                     'msgVars' => array(
                         '%name%' => $identifier,
                         '%id%'   => $objectId

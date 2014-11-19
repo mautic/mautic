@@ -41,8 +41,8 @@ $view['slots']->set("headerTitle", $header);
                         <?php break;
                     default: ?>
                         <li><?php echo $view['translator']->trans($message); ?></li>
-                        <?php break; ?>
-                <?php endswitch; ?>
+                        <?php break;
+                endswitch; ?>
             <?php endforeach; ?>
         </ul>
         <?php endif; ?>

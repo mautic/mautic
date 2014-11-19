@@ -16,13 +16,11 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * Class PanelStartType
- *
- * @package Mautic\CoreBundle\Form\Type
  */
 class PanelStartType extends AbstractType
 {
     /**
-     * @param OptionsResolverInterface $resolver
+     * {@inheritdoc}
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
@@ -38,18 +36,16 @@ class PanelStartType extends AbstractType
         $resolver->setOptional(array('headerAttr', 'bodyAttr'));
     }
 
-
     /**
-     * @return string
+     * {@inheritdoc}
      */
-    public function getName() {
-        return "panel_start";
+    public function getName()
+    {
+        return 'panel_start';
     }
 
     /**
-     * @param FormView      $view
-     * @param FormInterface $form
-     * @param array         $options
+     * {@inheritdoc}
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
@@ -57,7 +53,7 @@ class PanelStartType extends AbstractType
 
         foreach ($customVars as $v) {
             if (array_key_exists($v, $options)) {
-                // set an "headerAttr" variable that will be available when rendering this field
+                // set an 'headerAttr' variable that will be available when rendering this field
                 $view->vars[$v] = $options[$v];
             }
         }

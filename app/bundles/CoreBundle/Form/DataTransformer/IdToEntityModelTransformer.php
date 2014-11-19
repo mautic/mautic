@@ -16,8 +16,6 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 
 /**
  * Class IdToEntityModelTransformer
- *
- * @package Mautic\CoreBundle\Form\DataTransformer
  */
 class IdToEntityModelTransformer implements DataTransformerInterface
 {
@@ -27,7 +25,7 @@ class IdToEntityModelTransformer implements DataTransformerInterface
     private $em;
 
     /**
-     * @var
+     * @var string
      */
     private $repository;
 
@@ -45,6 +43,7 @@ class IdToEntityModelTransformer implements DataTransformerInterface
      * @param EntityManager $em
      * @param string        $repo
      * @param string        $identifier
+     * @param bool          $isArray
      */
     public function __construct(EntityManager $em, $repo = '', $identifier = 'id', $isArray = false)
     {
@@ -55,10 +54,7 @@ class IdToEntityModelTransformer implements DataTransformerInterface
     }
 
     /**
-     * Transforms an object to a string (id).
-     *
-     * @param  Object|null $entity
-     * @return string
+     * {@inheritdoc}
      */
     public function transform($entity)
     {
@@ -70,27 +66,24 @@ class IdToEntityModelTransformer implements DataTransformerInterface
             }
 
             return $entity->$func();
-        } else {
-            if (is_null($entity) && !is_array($entity) && !$entity instanceof PersistentCollection) {
-                return array();
-            }
-
-            $return = array();
-            foreach ($entity as $e) {
-                $return[] = $e->$func();
-            }
-
-            return $return;
         }
+
+        if (is_null($entity) && !is_array($entity) && !$entity instanceof PersistentCollection) {
+            return array();
+        }
+
+        $return = array();
+        foreach ($entity as $e) {
+            $return[] = $e->$func();
+        }
+
+        return $return;
     }
 
     /**
-     * Transforms a string (id) to an object.
+     * {@inheritdoc}
      *
-     * @param  string $id
-     *
-     * @return Entity|null
-     *
+     * @return object|null
      * @throws TransformationFailedException if object is not found.
      */
     public function reverseTransform($id)
@@ -113,41 +106,43 @@ class IdToEntityModelTransformer implements DataTransformerInterface
             }
 
             return $entity;
-        } else {
-            if (empty($id) || !is_array($id)) {
-                return array();
-            }
+        }
 
-            $repo   = $this->em->getRepository($this->repository);
-            $prefix = $repo->getTableAlias();
+        if (empty($id) || !is_array($id)) {
+            return array();
+        }
 
-            $entities = $repo->getEntities(array(
-                'filter' => array(
-                    'force' => array(
-                        array(
-                            'column' => $prefix . '.' . $this->id,
-                            'expr'   => 'in',
-                            'value'  => $id
-                        )
+        $repo   = $this->em->getRepository($this->repository);
+        $prefix = $repo->getTableAlias();
+
+        $entities = $repo->getEntities(array(
+            'filter' => array(
+                'force' => array(
+                    array(
+                        'column' => $prefix . '.' . $this->id,
+                        'expr'   => 'in',
+                        'value'  => $id
                     )
                 )
+            )
+        ));
+
+        if (!count($entities)) {
+            throw new TransformationFailedException(sprintf(
+                'Entities with a/an ' . $this->id . ' of "%s" does not exist!',
+                $id
             ));
-
-            if (!count($entities)) {
-                throw new TransformationFailedException(sprintf(
-                    'Entities with a/an ' . $this->id . ' of "%s" does not exist!',
-                    $id
-                ));
-            }
-
-            return $entities;
         }
+
+        return $entities;
     }
 
     /**
      * Set the repository to use
      *
-     * @param $repo
+     * @param string $repo
+     *
+     * @return void
      */
     public function setRepository($repo)
     {
@@ -157,7 +152,9 @@ class IdToEntityModelTransformer implements DataTransformerInterface
     /**
      * Set the identifier to use
      *
-     * @param $id
+     * @param string $id
+     *
+     * @return void
      */
     public function setIdentifier($id)
     {

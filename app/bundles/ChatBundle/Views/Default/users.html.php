@@ -37,7 +37,7 @@
         <li class="media chat-list pb-0 pt-0">
             <a href="javascript:void(0);" onclick="Mautic.startUserChat('<?php echo $u['id']; ?>');" class="media offcanvas-opener offcanvas-open-rtl">
                 <span class="pull-left img-wrapper img-circle mr-sm">
-                    <img class="media-object" src="<?php echo $view['gravatar']->getImage($u['email'], '40'); ?>" class="img-circle" alt="" />
+                    <img src="<?php echo $view['gravatar']->getImage($u['email'], '40'); ?>" class="media-object img-circle" alt="" />
                 </span>
                 <span class="media-body">
                     <span class="media-heading mb-0 text-nowrap text-white dark-sm<?php echo $hasUnread; ?>"><span class="bullet bullet-<?php echo $status; ?> chat-bullet mr-sm"></span><?php echo $shortName; ?></span>

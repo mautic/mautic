@@ -14,8 +14,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Class FormModel
- *
- * @package Mautic\CoreBundle\Model
  */
 class FormModel extends CommonModel
 {
@@ -24,6 +22,7 @@ class FormModel extends CommonModel
      * Get a specific entity
      *
      * @param $id
+     *
      * @return null|object
      */
     public function getEntity($id = null)
@@ -32,18 +31,20 @@ class FormModel extends CommonModel
             $repo = $this->getRepository();
             if (method_exists($repo, 'getEntity')) {
                 return $repo->getEntity($id);
-            } else {
-                return $repo->find($id);
             }
-        } else {
-            return null;
+
+            return $repo->find($id);
         }
+
+        return null;
     }
 
     /**
      * Lock an entity to prevent multiple people from editing
      *
-     * @param $entity
+     * @param object $entity
+     *
+     * @return void
      */
     public function lockEntity($entity)
     {
@@ -62,7 +63,8 @@ class FormModel extends CommonModel
     /**
      * Check to see if the entity is locked
      *
-     * @param $entity
+     * @param object $entity
+     *
      * @return bool
      */
     public function isLocked($entity)
@@ -83,8 +85,10 @@ class FormModel extends CommonModel
     /**
      * Unlock an entity that prevents multiple people from editing
      *
-     * @param $entity
-     * @param $extra Can be used by model to determine what to unlock
+     * @param object $entity
+     * @param        $extra Can be used by model to determine what to unlock
+     *
+     * @return void
      */
     public function unlockEntity($entity, $extra = null)
     {
@@ -104,8 +108,8 @@ class FormModel extends CommonModel
     /**
      * Create/edit entity
      *
-     * @param       $entity
-     * @param       $unlock
+     * @param object $entity
+     * @param bool   $unlock
      */
     public function saveEntity($entity, $unlock = true)
     {
@@ -122,8 +126,8 @@ class FormModel extends CommonModel
     /**
      * Save an array of entities
      *
-     * @param  $entities
-     * @param  $unlock
+     * @param array $entities
+     * @param bool  $unlock
      *
      * @return array
      */
@@ -154,7 +158,7 @@ class FormModel extends CommonModel
     /**
      * Toggles entity publish status
      *
-     * @param $entity
+     * @param object $entity
      */
     public function togglePublishStatus($entity)
     {
@@ -184,9 +188,9 @@ class FormModel extends CommonModel
     /**
      * Set timestamps and user ids
      *
-     * @param $entity
-     * @param $isNew
-     * @param $unlock
+     * @param object $entity
+     * @param bool   $isNew
+     * @param bool   $unlock
      */
     public function setTimestamps(&$entity, $isNew, $unlock = true)
     {
@@ -219,7 +223,9 @@ class FormModel extends CommonModel
     /**
      * Delete an entity
      *
-     * @param  $entity
+     * @param object $entity
+     *
+     * @return void
      */
     public function deleteEntity($entity)
     {
@@ -235,7 +241,8 @@ class FormModel extends CommonModel
     /**
      * Delete an array of entities
      *
-     * @param  $ids
+     * @param array $ids
+     *
      * @return array
      */
     public function deleteEntities($ids)
@@ -265,7 +272,7 @@ class FormModel extends CommonModel
     /**
      * Creates the appropriate form per the model
      *
-     * @param                                     $entity
+     * @param object                              $entity
      * @param \Symfony\Component\Form\FormFactory $formFactory
      * @param string|null                         $action
      * @param array                               $options
@@ -281,10 +288,10 @@ class FormModel extends CommonModel
     /**
      * Dispatches events for child classes
      *
-     * @param $action
-     * @param $entity
-     * @param $isNew
-     * @param $event
+     * @param string $action
+     * @param object $entity
+     * @param bool   $isNew
+     * @param bool   $event
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, $event = false)
     {
@@ -294,8 +301,9 @@ class FormModel extends CommonModel
     /**
      * Set default subject for user contact form
      *
-     * @param $subject
-     * @param $entity
+     * @param string $subject
+     * @param object $entity
+     *
      * @return mixed
      */
     public function getUserContactSubject($subject, $entity)
@@ -331,9 +339,11 @@ class FormModel extends CommonModel
     /**
      * Retrieve entity based on id/alias slugs
      *
-     * @param $slug1
-     * @param $slug2
-     * @param $slug3
+     * @param string $slug1
+     * @param string $slug2
+     * @param string $slug3
+     *
+     * @return object|bool
      */
     public function getEntityBySlugs($slug1, $slug2 = '', $slug3 = '')
     {

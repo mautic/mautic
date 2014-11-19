@@ -32,16 +32,22 @@ class ApplyUpdatesCommand extends ContainerAwareCommand
      */
     protected function configure()
     {
-        $this->setName('mautic:update:apply');
-        $this->addOption('--force', null, InputOption::VALUE_OPTIONAL);
-        $this->setHelp(<<<EOT
+        $this->setName('mautic:update:apply')
+            ->setDescription('Updates the Mautic application')
+            ->setDefinition(array(
+                new InputOption(
+                    'force', null, InputOption::VALUE_NONE,
+                    'Bypasses the verification check.'
+                )
+            ))
+            ->setHelp(<<<EOT
 The <info>%command.name%</info> command updates the Mautic application.
 
 <info>php %command.full_name%</info>
 
 You can optionally specify to bypass the verification check with the --force option:
 
-<info>php %command.full_name% --force=true</info>
+<info>php %command.full_name% --force</info>
 EOT
         );
     }
@@ -52,11 +58,11 @@ EOT
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $options = $input->getOptions();
-        $force   = (!empty($options['force'])) ? true : false;
+        $force   = $options['force'];
 
         /** @var \Symfony\Bundle\FrameworkBundle\Translation\Translator $translator */
         $translator = $this->getContainer()->get('translator');
-        $translator->setLocale('en_US');
+        $translator->setLocale($this->getContainer()->get('mautic.factory')->getParameter('locale'));
 
         if (!$force) {
             $dialog  = $this->getHelperSet()->get('dialog');
@@ -82,7 +88,7 @@ EOT
             $command = $this->getApplication()->find('mautic:update:find');
             $input = new ArrayInput(array(
                 'command' => 'mautic:update:find',
-                '--env'   => (!empty($options['env'])) ? $options['env'] : 'dev'
+                '--env'   => $options['env']
             ));
             $command->run($input, $output);
 
@@ -145,7 +151,7 @@ EOT
         $command = $this->getApplication()->find('doctrine:migrations:migrate');
         $input = new ArrayInput(array(
             'command'          => 'doctrine:migrations:migrate',
-            '--env'            => (!empty($options['env'])) ? $options['env'] : 'dev',
+            '--env'            => $options['env'],
             '--no-interaction' => true
         ));
         $exitCode = $command->run($input, $output);

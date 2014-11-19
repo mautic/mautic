@@ -10,18 +10,16 @@
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\Criteria;
-
 
 /**
  * Class AuditLog
  *
- * @package Mautic\CoreBundle\Entity
  * @ORM\Table(name="audit_log")
  * @ORM\Entity(repositoryClass="Mautic\CoreBundle\Entity\AuditLogRepository")
  */
 class AuditLog
 {
+
     /**
      * @ORM\Column(type="integer")
      * @ORM\Id
@@ -88,6 +86,7 @@ class AuditLog
      * Set userId
      *
      * @param integer $userId
+     *
      * @return AuditLog
      */
     public function setUserId($userId)
@@ -111,6 +110,7 @@ class AuditLog
      * Set object
      *
      * @param string $object
+     *
      * @return AuditLog
      */
     public function setObject($object)
@@ -134,6 +134,7 @@ class AuditLog
      * Set objectId
      *
      * @param integer $objectId
+     *
      * @return AuditLog
      */
     public function setObjectId($objectId)
@@ -157,6 +158,7 @@ class AuditLog
      * Set action
      *
      * @param string $action
+     *
      * @return AuditLog
      */
     public function setAction($action)
@@ -180,6 +182,7 @@ class AuditLog
      * Set details
      *
      * @param string $details
+     *
      * @return AuditLog
      */
     public function setDetails($details)
@@ -203,6 +206,7 @@ class AuditLog
      * Set dateAdded
      *
      * @param \DateTime $dateAdded
+     *
      * @return AuditLog
      */
     public function setDateAdded($dateAdded)
@@ -226,6 +230,7 @@ class AuditLog
      * Set ipAddress
      *
      * @param string $ipAddress
+     *
      * @return AuditLog
      */
     public function setIpAddress($ipAddress)
@@ -249,6 +254,7 @@ class AuditLog
      * Set bundle
      *
      * @param string $bundle
+     *
      * @return AuditLog
      */
     public function setBundle($bundle)
@@ -272,6 +278,7 @@ class AuditLog
      * Set userName
      *
      * @param string $userName
+     *
      * @return AuditLog
      */
     public function setUserName($userName)

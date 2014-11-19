@@ -189,7 +189,7 @@ class CampaignController extends FormController
 
         // Lead count stats
         $leadStats = $campaignLeadRepo->getLeadStats(30, 'D');
-        
+
         return $this->delegateView(array(
             'viewParameters'  => array(
                 'campaign'    => $entity,
@@ -284,9 +284,10 @@ class CampaignController extends FormController
 
                         $this->request->getSession()->getFlashBag()->add(
                             'notice',
-                            $this->get('translator')->trans('mautic.campaign.notice.created', array(
-                                '%name%' => $entity->getName(),
-                                '%url%'  => $this->generateUrl('mautic_campaign_action', array(
+                            $this->get('translator')->trans('mautic.core.notice.created', array(
+                                '%name%'      => $entity->getName(),
+                                '%menu_link%' => 'mautic_campaign_index',
+                                '%url%'       => $this->generateUrl('mautic_campaign_action', array(
                                     'objectAction' => 'edit',
                                     'objectId'     => $entity->getId()
                                 ))
@@ -452,9 +453,10 @@ class CampaignController extends FormController
 
                         $this->request->getSession()->getFlashBag()->add(
                             'notice',
-                            $this->get('translator')->trans('mautic.campaign.notice.updated', array(
-                                '%name%' => $entity->getName(),
-                                '%url%'  => $this->generateUrl('mautic_campaign_action', array(
+                            $this->get('translator')->trans('mautic.core.notice.updated', array(
+                                '%name%'      => $entity->getName(),
+                                '%menu_link%' => 'mautic_campaign_index',
+                                '%url%'       => $this->generateUrl('mautic_campaign_action', array(
                                     'objectAction' => 'edit',
                                     'objectId'     => $entity->getId()
                                 ))
@@ -611,7 +613,7 @@ class CampaignController extends FormController
             $identifier = $this->get('translator')->trans($entity->getName());
             $flashes[]  = array(
                 'type'    => 'notice',
-                'msg'     => 'mautic.campaign.notice.deleted',
+                'msg'     => 'mautic.core.notice.deleted',
                 'msgVars' => array(
                     '%name%' => $identifier,
                     '%id%'   => $objectId

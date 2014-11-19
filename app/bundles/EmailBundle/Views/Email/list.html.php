@@ -6,8 +6,9 @@
  * @link        http://mautic.com
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-if ($tmpl == 'index')
-$view->extend('MauticEmailBundle:Email:index.html.php');
+if ($tmpl == 'index') {
+    $view->extend('MauticEmailBundle:Email:index.html.php');
+}
 ?>
 <div class="col-md-9 bg-auto height-auto bdr-l table-responsive pt-10">
     <?php if (count($items)): ?>

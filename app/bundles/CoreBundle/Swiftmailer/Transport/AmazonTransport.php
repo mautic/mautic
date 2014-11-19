@@ -9,14 +9,13 @@
 
 namespace Mautic\CoreBundle\Swiftmailer\Transport;
 
+/**
+ * Class AmazonTransport
+ */
 class AmazonTransport extends \Swift_SmtpTransport
 {
     /**
-     * Create a new SmtpTransport, optionally with $host, $port and $security.
-     *
-     * @param string  $host
-     * @param int     $port
-     * @param string  $security
+     * {@inheritdoc}
      */
     public function __construct($host = 'localhost', $port = 25, $security = null)
     {

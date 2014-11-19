@@ -6,13 +6,13 @@
  * @link        http://mautic.com
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\CoreBundle\Controller;
+
 use Symfony\Component\Form\Form;
 
 /**
  * Class FormController
- *
- * @package Mautic\CoreBundle\Controller
  */
 class FormController extends CommonController
 {
@@ -21,6 +21,7 @@ class FormController extends CommonController
      * Checks to see if the form was cancelled
      *
      * @param Form $form
+     *
      * @return int
      */
     protected function isFormCancelled(Form &$form)
@@ -33,7 +34,8 @@ class FormController extends CommonController
     /**
      * Binds form data, checks validity, and determines cancel request
      *
-     * @param Form    $form
+     * @param Form $form
+     *
      * @return int
      */
     protected function isFormValid(Form &$form)
@@ -112,7 +114,10 @@ class FormController extends CommonController
     }
 
     /**
+     * @param int                                  $id
+     * @param \Mautic\CoreBundle\Model\CommonModel $model
      *
+     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function unlockAction($id, $model)
     {
@@ -163,8 +168,8 @@ class FormController extends CommonController
                 )
             );
             return $this->redirect($returnUrl);
-        } else {
-            $this->accessDenied();
         }
+
+        return $this->accessDenied();
     }
 }

@@ -12,15 +12,30 @@ namespace Mautic\CoreBundle\EventListener;
 use Symfony\Component\Console\Event\ConsoleExceptionEvent;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Class ConsoleExceptionListener
+ */
 class ConsoleExceptionListener
 {
+
+    /**
+     * @var LoggerInterface
+     */
     private $logger;
 
+    /**
+     * @param LoggerInterface $logger
+     */
     public function __construct(LoggerInterface $logger)
     {
         $this->logger = $logger;
     }
 
+    /**
+     * @param ConsoleExceptionEvent $event
+     *
+     * @return void
+     */
     public function onConsoleException(ConsoleExceptionEvent $event)
     {
         $command = $event->getCommand();

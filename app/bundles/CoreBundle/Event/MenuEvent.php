@@ -15,16 +15,18 @@ use Symfony\Component\Security\Core\SecurityContext;
 
 /**
  * Class MenuEvent
- *
- * @package Mautic\CoreBundle\Event
  */
 class MenuEvent extends Event
 {
+
     /**
-     * @var
+     * @var array
      */
     protected $menuItems = array('children' => array());
 
+    /**
+     * @var CorePermissions
+     */
     protected $security;
 
     /**
@@ -36,7 +38,7 @@ class MenuEvent extends Event
     }
 
     /**
-     * @return mixed
+     * @return CorePermissions
      */
     public function getSecurity()
     {
@@ -45,6 +47,10 @@ class MenuEvent extends Event
 
     /**
      * Add items to the menu
+     *
+     * @param array $items
+     *
+     * @return void
      */
     public function addMenuItems(array $items)
     {
@@ -66,7 +72,7 @@ class MenuEvent extends Event
     /**
      * Return the menu items
      *
-     * @return mixed
+     * @return array
      */
     public function getMenuItems()
     {

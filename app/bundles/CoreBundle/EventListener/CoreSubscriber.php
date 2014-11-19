@@ -25,16 +25,14 @@ use Symfony\Component\Security\Http\SecurityEvents;
 
 /**
  * Class CoreSubscriber
- *
- * @package Mautic\CoreBundle\EventListener
  */
 class CoreSubscriber extends CommonSubscriber
 {
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
         return array(
             KernelEvents::CONTROLLER          => array('onKernelController', 0),
@@ -51,17 +49,21 @@ class CoreSubscriber extends CommonSubscriber
      * Set default timezone/locale
      *
      * @param GetResponseEvent $event
+     *
+     * @return void
      */
     public function onKernelRequest(GetResponseEvent $event)
     {
         $currentUser = $this->factory->getUser();
 
         //set the user's timezone
-        if (is_object($currentUser))
+        if (is_object($currentUser)) {
             $tz = $currentUser->getTimezone();
+        }
 
-        if (empty($tz))
+        if (empty($tz)) {
             $tz = $this->params['default_timezone'];
+        }
 
         date_default_timezone_set($tz);
 
@@ -75,10 +77,12 @@ class CoreSubscriber extends CommonSubscriber
         if ($locale = $request->attributes->get('_locale')) {
             $request->getSession()->set('_locale', $locale);
         } else {
-            if (is_object($currentUser))
+            if (is_object($currentUser)) {
                 $locale = $currentUser->getLocale();
-            if (empty($locale))
+            }
+            if (empty($locale)) {
                 $locale = $this->params['locale'];
+            }
 
             // if no explicit locale has been set on this request, use one from the session
             $request->setLocale($request->getSession()->get('_locale', $locale));
@@ -89,6 +93,8 @@ class CoreSubscriber extends CommonSubscriber
      * Set vars on login
      *
      * @param InteractiveLoginEvent $event
+     *
+     * @return void
      */
     public function onSecurityInteractiveLogin(InteractiveLoginEvent $event)
     {
@@ -116,6 +122,8 @@ class CoreSubscriber extends CommonSubscriber
      * Populates namespace, bundle, controller, and action into request to be used throughout application
      *
      * @param FilterControllerEvent $event
+     *
+     * @return void
      */
     public function onKernelController(FilterControllerEvent $event)
     {
@@ -156,32 +164,40 @@ class CoreSubscriber extends CommonSubscriber
 
     /**
      * @param MenuEvent $event
+     *
+     * @return void
      */
-    public function onBuildMenu (MenuEvent $event)
+    public function onBuildMenu(MenuEvent $event)
     {
         $this->buildMenu($event, 'main');
     }
 
     /**
      * @param MenuEvent $event
+     *
+     * @return void
      */
-    public function onBuildAdminMenu (MenuEvent $event)
+    public function onBuildAdminMenu(MenuEvent $event)
     {
         $this->buildMenu($event, 'admin');
     }
 
     /**
      * @param RouteEvent $event
+     *
+     * @return void
      */
-    public function onBuildRoute (RouteEvent $event)
+    public function onBuildRoute(RouteEvent $event)
     {
         $this->buildRoute($event, 'routing');
     }
 
     /**
-     * @param MenuEvent $event
+     * @param IconEvent $event
+     *
+     * @return void
      */
-    public function onFetchIcons (IconEvent $event)
+    public function onFetchIcons(IconEvent $event)
     {
         $this->buildIcons($event);
     }

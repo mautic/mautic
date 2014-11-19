@@ -23,25 +23,16 @@ $page = $event['extra']['page'];
 				    <?php echo $form->getName(); ?>
 				</a>
 			</h3>
-	        <p class="mb-0">At <?php echo $view['date']->toFullConcat($event['timestamp']); ?>, <?php echo $event['eventLabel']; ?>.</p>
+	        <p class="mb-0"><?php echo $view['translator']->trans('mautic.form.timeline.event.time', array('%date%' => $view['date']->toFullConcat($event['timestamp']), '%event%' => $event['eventLabel'])); ?></p>
 	    </div>
 	    <?php if (isset($event['extra'])) : ?>
 	        <div class="panel-footer">
 	        	<?php if ($page->getId()) : ?>
-	            <p>
-	            	From submitted from
-	            	<a href="<?php echo $view['router']->generate('mautic_page_action',
-					    array("objectAction" => "view", "objectId" => $page->getId())); ?>"
-					   data-toggle="ajax">
-					    <?php echo $page->getTitle(); ?>
-					</a>
-				</p>
+                <?php $link = '<a href="' . $view['router']->generate('mautic_page_action', array("objectAction" => "view", "objectId" => $page->getId())) . '" data-toggle="ajax">' . $page->getTitle() . '</a>'; ?>
+	            <p><?php echo $view['translator']->trans('mautic.form.timeline.event.submitted', array('%link%' => $link)); ?></p>
 				<?php endif; ?>
 				<?php if (isset($event['extra'])) : ?>
-	            <p>
-	            	<strong>Form description:</strong>
-	            	<?php echo $form->getDescription(); ?>
-				</p>
+	            <p><?php echo $view['translator']->trans('mautic.form.timeline.event.description', array('%description%' => $form->getDescription())); ?></p>
 				<?php endif; ?>
 	        </div>
 	    <?php endif; ?>

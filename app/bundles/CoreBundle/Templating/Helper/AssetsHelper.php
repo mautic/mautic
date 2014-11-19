@@ -11,14 +11,22 @@ namespace Mautic\CoreBundle\Templating\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Templating\Helper\CoreAssetsHelper as BaseAssetsHelper;
+use Symfony\Component\Templating\Helper\CoreAssetsHelper;
 
-class AssetsHelper extends BaseAssetsHelper
+/**
+ * Class AssetsHelper
+ */
+class AssetsHelper extends CoreAssetsHelper
 {
 
-    /** @var  \Mautic\CoreBundle\Factory\MauticFactory */
+    /**
+     * @var MauticFactory
+     */
     protected $factory;
 
+    /**
+     * @var array
+     */
     protected $assets;
 
     /**
@@ -26,8 +34,10 @@ class AssetsHelper extends BaseAssetsHelper
      *
      * @param string $script
      * @param string $location
+     *
+     * @return void
      */
-    public function addScript ($script, $location = 'head')
+    public function addScript($script, $location = 'head')
     {
         $assets     =& $this->assets;
         $addScripts = function ($s) use ($location, &$assets) {
@@ -62,8 +72,10 @@ class AssetsHelper extends BaseAssetsHelper
      *
      * @param string $script
      * @param string $location
+     *
+     * @return void
      */
-    public function addScriptDeclaration ($script, $location = 'head')
+    public function addScriptDeclaration($script, $location = 'head')
     {
         if ($location == 'head') {
             //special place for these so that declarations and scripts can be mingled
@@ -86,8 +98,10 @@ class AssetsHelper extends BaseAssetsHelper
      * Adds a stylesheet to be loaded in the template header
      *
      * @param string $stylesheet
+     *
+     * @return void
      */
-    public function addStylesheet ($stylesheet)
+    public function addStylesheet($stylesheet)
     {
         $assets   =& $this->assets;
         $addSheet = function ($s) use (&$assets) {
@@ -111,8 +125,10 @@ class AssetsHelper extends BaseAssetsHelper
 
     /**
      * Load ckeditor source files
+     *
+     * @return void
      */
-    public function loadEditor ()
+    public function loadEditor()
     {
         static $editorLoaded;
 
@@ -128,9 +144,11 @@ class AssetsHelper extends BaseAssetsHelper
     /**
      * Add style tag to the header
      *
-     * @param $styles
+     * @param string $styles
+     *
+     * @return void
      */
-    public function addStyleDeclaration ($styles)
+    public function addStyleDeclaration($styles)
     {
         if (!isset($this->assets['styleDeclarations'])) {
             $this->assets['styleDeclarations'] = array();
@@ -144,9 +162,12 @@ class AssetsHelper extends BaseAssetsHelper
     /**
      * Adds a custom declaration to <head />
      *
-     * @param $declaration
+     * @param string $declaration
+     * @param string $location
+     *
+     * @return void
      */
-    public function addCustomDeclaration ($declaration, $location = 'head')
+    public function addCustomDeclaration($declaration, $location = 'head')
     {
         if ($location == 'head') {
             $this->assets['headDeclarations'][] = array(
@@ -166,8 +187,10 @@ class AssetsHelper extends BaseAssetsHelper
 
     /**
      * Outputs the stylesheets and style declarations
+     *
+     * @return void
      */
-    public function outputStyles ()
+    public function outputStyles()
     {
         if (isset($this->assets['stylesheets'])) {
             foreach ($this->assets['stylesheets'] as $s) {
@@ -188,12 +211,14 @@ class AssetsHelper extends BaseAssetsHelper
      * Outputs the script files and declarations
      *
      * @param string $location
+     *
+     * @return void
      */
-    public function outputScripts ($location)
+    public function outputScripts($location)
     {
         if (isset($this->assets['scripts'][$location])) {
             foreach ($this->assets['scripts'][$location] as $s) {
-                echo '<script src="' . $this->getUrl($s) . '"></script>' . "\n";
+                echo '<script src="'.$this->getUrl($s).'"></script>'."\n";
             }
         }
 
@@ -214,15 +239,17 @@ class AssetsHelper extends BaseAssetsHelper
 
     /**
      * Output head scripts, stylesheets, and custom declarations
+     *
+     * @return void
      */
-    public function outputHeadDeclarations ()
+    public function outputHeadDeclarations()
     {
         $this->outputStyles();
 
         if (isset($this->assets['headDeclarations'])) {
             foreach ($this->assets['headDeclarations'] as $h) {
                 if ($h['type'] == 'script') {
-                    echo '<script src="' . $this->getUrl($h['src']) . '"></script>' . "\n";
+                    echo '<script src="'.$this->getUrl($h['src']).'"></script>'."\n";
                 } elseif ($h['type'] == 'declaration') {
                     echo "<script>\n{$h['script']}\n</script>\n";
                 } else {
@@ -232,7 +259,12 @@ class AssetsHelper extends BaseAssetsHelper
         }
     }
 
-    public function outputSystemStylesheets ()
+    /**
+     * Output system stylesheets
+     *
+     * @return void
+     */
+    public function outputSystemStylesheets()
     {
         $assets = $this->getAssets();
 
@@ -243,7 +275,12 @@ class AssetsHelper extends BaseAssetsHelper
         }
     }
 
-    public function outputSystemScripts ()
+    /**
+     * Output system scripts
+     *
+     * @return void
+     */
+    public function outputSystemScripts()
     {
         $assets = $this->getAssets();
 
@@ -255,9 +292,11 @@ class AssetsHelper extends BaseAssetsHelper
     }
 
     /**
-     * @return mixed
+     * Fetch system scripts
+     *
+     * @return array
      */
-    public function getSystemScripts ()
+    public function getSystemScripts()
     {
         $assets = $this->getAssets();
 
@@ -265,11 +304,11 @@ class AssetsHelper extends BaseAssetsHelper
     }
 
     /**
-     * Generates assets
+     * Generate assets
      *
      * @return array
      */
-    private function getAssets ()
+    private function getAssets()
     {
         static $assets = array();
 
@@ -376,12 +415,14 @@ class AssetsHelper extends BaseAssetsHelper
     /**
      * Finds directory assets
      *
-     * @param $dir
-     * @param $ext
-     * @param $env
-     * @param $assets
+     * @param string $dir
+     * @param string $ext
+     * @param string $env
+     * @param array  $assets
+     *
+     * @return array
      */
-    protected function findAssets ($dir, $ext, $env, &$assets)
+    protected function findAssets($dir, $ext, $env, &$assets)
     {
         $rootPath    = $this->factory->getSystemPath('root') . '/';
         $directories = new Finder();
@@ -477,7 +518,12 @@ class AssetsHelper extends BaseAssetsHelper
         return $modifiedLast;
     }
 
-    public function makeLinks ($text)
+    /**
+     * @param string $text
+     *
+     * @return string
+     */
+    public function makeLinks($text)
     {
         return preg_replace(
             array(
@@ -505,18 +551,18 @@ class AssetsHelper extends BaseAssetsHelper
 
     /**
      * @param MauticFactory $factory
+     *
+     * @return void
      */
-    public function setFactory (MauticFactory $factory)
+    public function setFactory(MauticFactory $factory)
     {
         $this->factory = $factory;
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
-    public function getName ()
+    public function getName()
     {
         return 'assets';
     }

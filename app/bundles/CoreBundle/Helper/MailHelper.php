@@ -11,9 +11,15 @@ namespace Mautic\CoreBundle\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 
+/**
+ * Class MailHelper
+ */
 class MailHelper
 {
 
+    /**
+     * @var MauticFactory
+     */
     private $factory;
 
     /**
@@ -22,9 +28,9 @@ class MailHelper
     private $mailer;
 
     /**
-     * @var
+     * @var bool|\Swift_Message
      */
-    public  $message;
+    public $message;
 
     /**
      * @var null
@@ -32,13 +38,14 @@ class MailHelper
     private $from;
 
     /**
-     * @var
+     * @var array
      */
     private $errors = array();
 
     /**
-     * @param      $mailer
-     * @param null $from
+     * @param MauticFactory $factory
+     * @param               $mailer
+     * @param null          $from
      */
     public function __construct(MauticFactory $factory, $mailer, $from = null)
     {
@@ -50,6 +57,8 @@ class MailHelper
 
     /**
      * Get a Swift_Message instance
+     *
+     * @return bool|\Swift_Message
      */
     public function getMessageInstance()
     {
@@ -84,7 +93,6 @@ class MailHelper
                 if (!empty($failures)) {
                     $this->errors['failures'] = $failures;
                 }
-
             } catch (Exception $e) {
                 $this->errors[] = $e->getMessage();
             }
@@ -92,11 +100,7 @@ class MailHelper
             $this->mailer->send($this->message, $this->failures);
         }
 
-        if (empty($this->errors)) {
-            return true;
-        } else {
-            return false;
-        }
+        return empty($this->errors);
     }
 
     /**
@@ -110,9 +114,12 @@ class MailHelper
     /**
      * Add an attachment to email
      *
-     * @param $filePath
-     * @param $fileName
-     * @param $contentType
+     * @param string $filePath
+     * @param string $fileName
+     * @param string $contentType
+     * @param bool   $inline
+     *
+     * @return void
      */
     public function attachFile($filePath, $fileName = null, $contentType = null, $inline = false)
     {
@@ -136,8 +143,8 @@ class MailHelper
     /**
      * Use a template as the body
      *
-     * @param       $template
-     * @param array $vars
+     * @param string $template
+     * @param array  $vars
      */
     public function setTemplate($template, $vars = array())
     {

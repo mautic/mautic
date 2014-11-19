@@ -288,9 +288,10 @@ class ClientController extends FormController
 
                     $this->request->getSession()->getFlashBag()->add(
                         'notice',
-                        $this->get('translator')->trans('mautic.api.client.notice.updated', array(
-                            '%name%' => $client->getName(),
-                            '%url%'  => $this->generateUrl('mautic_client_action', array(
+                        $this->get('translator')->trans('mautic.core.notice.updated', array(
+                            '%name%'      => $client->getName(),
+                            '%menu_link%' => 'mautic_client_index',
+                            '%url%'       => $this->generateUrl('mautic_client_action', array(
                                 'objectAction' => 'edit',
                                 'objectId'     => $client->getId()
                             ))
@@ -364,7 +365,7 @@ class ClientController extends FormController
                 $name      = $entity->getName();
                 $flashes[] = array(
                     'type'    => 'notice',
-                    'msg'     => 'mautic.api.client.notice.deleted',
+                    'msg'     => 'mautic.core.notice.deleted',
                     'msgVars' => array(
                         '%name%' => $name,
                         '%id%'   => $objectId

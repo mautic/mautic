@@ -16,16 +16,6 @@ $view['slots']->set("headerTitle", $view['translator']->trans('mautic.form.resul
 ?>
 
 <div class="table-responsive formresults">
-    <?php
-    /**
-     * @package     Mautic
-     * @copyright   2014 Mautic, NP. All rights reserved.
-     * @author      Mautic
-     * @link        http://mautic.com
-     * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
-     */
-    $formId = $form->getId();
-    ?>
     <table class="table table-hover table-striped table-bordered formresult-list">
         <thead>
         <tr>

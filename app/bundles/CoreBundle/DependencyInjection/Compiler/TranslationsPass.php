@@ -22,8 +22,14 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\Finder\Finder;
 
+/**
+ * Class TranslationsPass
+ */
 class TranslationsPass implements CompilerPassInterface
 {
+    /**
+     * {@inheritdoc}
+     */
     public function process(ContainerBuilder $container)
     {
         $translator = $container->findDefinition('translator.default');

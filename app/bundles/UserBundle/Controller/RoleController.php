@@ -145,9 +145,10 @@ class RoleController extends FormController
 
                     $this->request->getSession()->getFlashBag()->add(
                         'notice',
-                        $this->get('translator')->trans('mautic.user.role.notice.created',  array(
-                            '%name%' => $entity->getName(),
-                            '%url%'  => $this->generateUrl('mautic_role_action', array(
+                        $this->get('translator')->trans('mautic.core.notice.created',  array(
+                            '%name%'      => $entity->getName(),
+                            '%menu_link%' => 'mautic_role_index',
+                            '%url%'       => $this->generateUrl('mautic_role_action', array(
                                 'objectAction' => 'edit',
                                 'objectId'     => $entity->getId()
                             ))
@@ -256,9 +257,10 @@ class RoleController extends FormController
 
                     $this->request->getSession()->getFlashBag()->add(
                         'notice',
-                        $this->get('translator')->trans('mautic.user.role.notice.updated',  array(
-                            '%name%' => $entity->getName(),
-                            '%url%'  => $this->generateUrl('mautic_role_action', array(
+                        $this->get('translator')->trans('mautic.core.notice.updated',  array(
+                            '%name%'      => $entity->getName(),
+                            '%menu_link%' => 'mautic_role_index',
+                            '%url%'       => $this->generateUrl('mautic_role_action', array(
                                 'objectAction' => 'edit',
                                 'objectId'     => $entity->getId()
                             ))
@@ -343,7 +345,7 @@ class RoleController extends FormController
                     $name = $entity->getName();
                     $flashes[] = array(
                         'type' => 'notice',
-                        'msg'  => 'mautic.user.role.notice.deleted',
+                        'msg'  => 'mautic.core.notice.deleted',
                         'msgVars' => array(
                             '%name%' => $name,
                             '%id%'   => $objectId

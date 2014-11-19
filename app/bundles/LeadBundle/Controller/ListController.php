@@ -146,9 +146,10 @@ class ListController extends FormController
 
                     $this->request->getSession()->getFlashBag()->add(
                         'notice',
-                        $this->get('translator')->trans('mautic.lead.list.notice.created',  array(
-                            '%name%' => $list->getName() . " (" . $list->getAlias() . ")",
-                            '%url%'  => $this->generateUrl('mautic_leadlist_action', array(
+                        $this->get('translator')->trans('mautic.core.notice.created',  array(
+                            '%name%'      => $list->getName() . " (" . $list->getAlias() . ")",
+                            '%menu_link%' => 'mautic_leadlist_index',
+                            '%url%'       => $this->generateUrl('mautic_leadlist_action', array(
                                 'objectAction' => 'edit',
                                 'objectId'     => $list->getId()
                             ))
@@ -247,9 +248,10 @@ class ListController extends FormController
 
                     $this->request->getSession()->getFlashBag()->add(
                         'notice',
-                        $this->get('translator')->trans('mautic.lead.list.notice.updated',  array(
-                            '%name%' => $list->getName() . " (" . $list->getAlias() . ")",
-                            '%url%'  => $this->generateUrl('mautic_leadlist_action', array(
+                        $this->get('translator')->trans('mautic.core.notice.updated',  array(
+                            '%name%'      => $list->getName() . " (" . $list->getAlias() . ")",
+                            '%menu_link%' => 'mautic_leadlist_index',
+                            '%url%'       => $this->generateUrl('mautic_leadlist_action', array(
                                 'objectAction' => 'edit',
                                 'objectId'     => $list->getId()
                             ))
@@ -334,7 +336,7 @@ class ListController extends FormController
 
             $flashes[]  = array(
                 'type'    => 'notice',
-                'msg'     => 'mautic.lead.list.notice.deleted',
+                'msg'     => 'mautic.core.notice.deleted',
                 'msgVars' => array(
                     '%name%' => $list->getName(),
                     '%id%'   => $objectId

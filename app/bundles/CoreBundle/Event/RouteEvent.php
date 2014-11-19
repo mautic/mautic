@@ -15,21 +15,23 @@ use Symfony\Component\Routing\RouteCollection;
 
 /**
  * Class RouteEvent
- *
- * @package Mautic\CoreBundle\Event
  */
 class RouteEvent extends Event
 {
+
     /**
-     * @var
+     * @var Loader
      */
     protected $loader;
 
     /**
-     * @var
+     * @var RouteCollection
      */
     protected $collection;
 
+    /**
+     * @param Loader $loader
+     */
     public function __construct(Loader &$loader)
     {
         $this->loader     =& $loader;
@@ -37,7 +39,9 @@ class RouteEvent extends Event
     }
 
     /**
-     * @param $path
+     * @param mixed $path
+     *
+     * @return void
      */
     public function addRoutes($path)
     {
@@ -51,5 +55,4 @@ class RouteEvent extends Event
     {
         return $this->collection;
     }
-
 }

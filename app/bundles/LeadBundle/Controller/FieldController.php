@@ -147,9 +147,10 @@ class FieldController extends FormController
 
                         $this->request->getSession()->getFlashBag()->add(
                             'notice',
-                            $this->get('translator')->trans('mautic.lead.field.notice.created',  array(
-                                '%name%' => $field->getLabel(),
-                                '%url%'          => $this->generateUrl('mautic_leadfield_action', array(
+                            $this->get('translator')->trans('mautic.core.notice.created',  array(
+                                '%name%'      => $field->getLabel(),
+                                '%menu_link%' => 'mautic_leadfield_index',
+                                '%url%'       => $this->generateUrl('mautic_leadfield_action', array(
                                     'objectAction' => 'edit',
                                     'objectId'     => $field->getId()
                                 ))
@@ -255,9 +256,10 @@ class FieldController extends FormController
 
                         $this->request->getSession()->getFlashBag()->add(
                             'notice',
-                            $this->get('translator')->trans('mautic.lead.field.notice.created',  array(
-                                '%name%' => $field->getLabel(),
-                                '%url%'          => $this->generateUrl('mautic_leadfield_action', array(
+                            $this->get('translator')->trans('mautic.core.notice.updated',  array(
+                                '%name%'      => $field->getLabel(),
+                                '%menu_link%' => 'mautic_leadfield_index',
+                                '%url%'       => $this->generateUrl('mautic_leadfield_action', array(
                                     'objectAction' => 'edit',
                                     'objectId'     => $field->getId()
                                 ))
@@ -368,7 +370,7 @@ class FieldController extends FormController
 
             $flashes[]  = array(
                 'type'    => 'notice',
-                'msg'     => 'mautic.lead.field.notice.deleted',
+                'msg'     => 'mautic.core.notice.deleted',
                 'msgVars' => array(
                     '%name%' => $field->getLabel(),
                     '%id%'   => $objectId

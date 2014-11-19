@@ -270,9 +270,10 @@ class FormController extends CommonFormController
 
                         $this->request->getSession()->getFlashBag()->add(
                             'notice',
-                            $this->get('translator')->trans('mautic.form.notice.created', array(
-                                '%name%' => $entity->getName(),
-                                '%url%'  => $this->generateUrl('mautic_form_action', array(
+                            $this->get('translator')->trans('mautic.core.notice.created', array(
+                                '%name%'      => $entity->getName(),
+                                '%menu_link%' => 'mautic_form_index',
+                                '%url%'       => $this->generateUrl('mautic_form_action', array(
                                     'objectAction' => 'edit',
                                     'objectId'     => $entity->getId()
                                 ))
@@ -445,9 +446,10 @@ class FormController extends CommonFormController
 
                         $this->request->getSession()->getFlashBag()->add(
                             'notice',
-                            $this->get('translator')->trans('mautic.form.notice.updated', array(
-                                '%name%' => $entity->getName(),
-                                '%url%'  => $this->generateUrl('mautic_form_action', array(
+                            $this->get('translator')->trans('mautic.core.notice.updated', array(
+                                '%name%'      => $entity->getName(),
+                                '%menu_link%' => 'mautic_form_index',
+                                '%url%'       => $this->generateUrl('mautic_form_action', array(
                                     'objectAction' => 'edit',
                                     'objectId'     => $entity->getId()
                                 ))
@@ -666,7 +668,7 @@ class FormController extends CommonFormController
             $identifier = $this->get('translator')->trans($entity->getName());
             $flashes[] = array(
                 'type' => 'notice',
-                'msg'  => 'mautic.form.notice.deleted',
+                'msg'  => 'mautic.core.notice.deleted',
                 'msgVars' => array(
                     '%name%' => $identifier,
                     '%id%'   => $objectId

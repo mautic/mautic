@@ -275,7 +275,7 @@ class SubmissionModel extends CommonFormModel
                         $translator->trans('mautic.form.result.thead.id'),
                         $translator->trans('mautic.form.result.thead.date'),
                         $translator->trans('mautic.form.result.thead.ip'),
-                        $translator->trans('mautic.form.result.thead.referer')
+                        $translator->trans('mautic.form.result.thead.referrer')
                     );
                     foreach ($fields as $f) {
                         if (in_array($f->getType(), array('button', 'freetext')))
@@ -368,7 +368,7 @@ class SubmissionModel extends CommonFormModel
                             $translator->trans('mautic.form.result.thead.id'),
                             $translator->trans('mautic.form.result.thead.date'),
                             $translator->trans('mautic.form.result.thead.ip'),
-                            $translator->trans('mautic.form.result.thead.referer')
+                            $translator->trans('mautic.form.result.thead.referrer')
                         );
                         foreach ($fields as $f) {
                             if (in_array($f->getType(), array('button', 'freetext')))

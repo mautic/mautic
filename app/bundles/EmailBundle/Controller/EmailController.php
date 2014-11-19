@@ -344,9 +344,10 @@ class EmailController extends FormController
 
                     $this->request->getSession()->getFlashBag()->add(
                         'notice',
-                        $this->get('translator')->trans('mautic.email.notice.created', array(
-                            '%name%' => $entity->getSubject(),
-                            '%url%'          => $this->generateUrl('mautic_email_action', array(
+                        $this->get('translator')->trans('mautic.core.notice.created', array(
+                            '%name%'      => $entity->getSubject(),
+                            '%menu_link%' => 'mautic_email_index',
+                            '%url%'       => $this->generateUrl('mautic_email_action', array(
                                 'objectAction' => 'edit',
                                 'objectId'     => $entity->getId()
                             ))
@@ -474,9 +475,10 @@ class EmailController extends FormController
 
                     $this->request->getSession()->getFlashBag()->add(
                         'notice',
-                        $this->get('translator')->trans('mautic.email.notice.updated', array(
-                            '%name%' => $entity->getSubject(),
-                            '%url%'  => $this->generateUrl('mautic_email_action', array(
+                        $this->get('translator')->trans('mautic.core.notice.updated', array(
+                            '%name%'      => $entity->getSubject(),
+                            '%menu_link%' => 'mautic_email_index',
+                            '%url%'       => $this->generateUrl('mautic_email_action', array(
                                 'objectAction' => 'edit',
                                 'objectId'     => $entity->getId()
                             ))
@@ -612,7 +614,7 @@ class EmailController extends FormController
 
             $flashes[] = array(
                 'type' => 'notice',
-                'msg'  => 'mautic.email.notice.deleted',
+                'msg'  => 'mautic.core.notice.deleted',
                 'msgVars' => array(
                     '%name%' => $entity->getSubject(),
                     '%id%'   => $objectId

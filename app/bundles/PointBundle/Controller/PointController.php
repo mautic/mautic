@@ -145,9 +145,10 @@ class PointController extends FormController
 
                     $this->request->getSession()->getFlashBag()->add(
                         'notice',
-                        $this->get('translator')->trans('mautic.point.notice.created', array(
-                            '%name%' => $entity->getName(),
-                            '%url%'          => $this->generateUrl('mautic_point_action', array(
+                        $this->get('translator')->trans('mautic.core.notice.created', array(
+                            '%name%'      => $entity->getName(),
+                            '%menu_link%' => 'mautic_point_index',
+                            '%url%'       => $this->generateUrl('mautic_point_action', array(
                                 'objectAction' => 'edit',
                                 'objectId'     => $entity->getId()
                             ))
@@ -272,9 +273,10 @@ class PointController extends FormController
 
                     $this->request->getSession()->getFlashBag()->add(
                         'notice',
-                        $this->get('translator')->trans('mautic.point.notice.updated', array(
-                            '%name%' => $entity->getName(),
-                            '%url%'  => $this->generateUrl('mautic_point_action', array(
+                        $this->get('translator')->trans('mautic.core.notice.updated', array(
+                            '%name%'      => $entity->getName(),
+                            '%menu_link%' => 'mautic_point_index',
+                            '%url%'       => $this->generateUrl('mautic_point_action', array(
                                 'objectAction' => 'edit',
                                 'objectId'     => $entity->getId()
                             ))
@@ -398,7 +400,7 @@ class PointController extends FormController
             $identifier = $this->get('translator')->trans($entity->getName());
             $flashes[] = array(
                 'type' => 'notice',
-                'msg'  => 'mautic.point.notice.deleted',
+                'msg'  => 'mautic.core.notice.deleted',
                 'msgVars' => array(
                     '%name%' => $identifier,
                     '%id%'   => $objectId

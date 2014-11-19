@@ -12,6 +12,9 @@ namespace Mautic\CoreBundle\Templating\Helper;
 use Symfony\Component\Templating\Helper\CoreAssetsHelper;
 use Symfony\Component\Templating\Helper\SlotsHelper as BaseSlotsHelper;
 
+/**
+ * Class SlotsHelper
+ */
 class SlotsHelper extends BaseSlotsHelper
 {
     /**
@@ -22,8 +25,7 @@ class SlotsHelper extends BaseSlotsHelper
      */
     public function append($name, $content)
     {
-        if (isset($this->slots[$name]))
-        {
+        if (isset($this->slots[$name])) {
             if (is_array($this->slots[$name])) {
                 $this->slots[$name][] = $content;
             } else {

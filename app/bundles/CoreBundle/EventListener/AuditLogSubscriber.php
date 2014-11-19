@@ -14,16 +14,14 @@ use Mautic\LeadBundle\LeadEvents;
 
 /**
  * Class AuditLogSubscriber
- *
- * @package Mautic\CoreBundle\EventListener
  */
 class AuditLogSubscriber extends CommonSubscriber
 {
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
         return array(
             LeadEvents::TIMELINE_ON_GENERATE => array('onTimelineGenerate', 0)
@@ -34,6 +32,8 @@ class AuditLogSubscriber extends CommonSubscriber
      * Compile events for the lead timeline
      *
      * @param LeadTimelineEvent $event
+     *
+     * @return void
      */
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {

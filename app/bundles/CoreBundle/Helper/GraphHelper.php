@@ -9,12 +9,15 @@
 
 namespace Mautic\CoreBundle\Helper;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
-
+/**
+ * Class GraphHelper
+ */
 class GraphHelper
 {
     /**
      * Colors which can be used in graphs
+     *
+     * @var array
      */
     public static $colors = array(
         array(
@@ -37,6 +40,8 @@ class GraphHelper
 
     /**
      * Time on site labels
+     *
+     * @var array
      */
     public static $timesOnSite = array(
         array(
@@ -61,6 +66,9 @@ class GraphHelper
             'till' => 999999),
     );
 
+    /**
+     * @return array
+     */
     public static function getTimesOnSite()
     {
         $timesOnSite = self::$timesOnSite;
@@ -80,7 +88,7 @@ class GraphHelper
     /**
      * Get proper date label format depending on what date scope we want to display
      *
-     * @param char $unit: php.net/manual/en/dateinterval.construct.php#refsect1-dateinterval.construct-parameters
+     * @param string $unit : php.net/manual/en/dateinterval.construct.php#refsect1-dateinterval.construct-parameters
      *
      * @return string
      */
@@ -105,8 +113,9 @@ class GraphHelper
      * Prepares data structure of labels and values needed for line graph.
      * fromDate variable can be used for SQL query as a limit.
      *
-     * @param integer $amount of units
-     * @param char    $unit: php.net/manual/en/dateinterval.construct.php#refsect1-dateinterval.construct-parameters
+     * @param integer $amount        of units
+     * @param string  $unit          php.net/manual/en/dateinterval.construct.php#refsect1-dateinterval.construct-parameters
+     * @param array   $datasetLabels
      *
      * @return array
      */
@@ -120,10 +129,10 @@ class GraphHelper
 
         $format = self::getDateLabelFromat($unit);
 
-        $date = new \DateTime();
-        $oneUnit = new \DateInterval('P'.$isTime.'1'.$unit);
-        $data = array('labels' => array(), 'datasets' => array());
-        $j = 0;
+        $date    = new \DateTime();
+        $oneUnit = new \DateInterval('P' . $isTime . '1' . $unit);
+        $data    = array('labels' => array(), 'datasets' => array());
+        $j       = 0;
 
         // Prefill $data arrays
         foreach ($datasetLabels as $key => $label) {
@@ -132,15 +141,15 @@ class GraphHelper
             }
 
             $data['datasets'][$key] = array(
-                'label' => $label,
-                'fillColor' => self::$colors[$j]['fill'],
-                'highlightFill' => self::$colors[$j]['color'],
-                'strokeColor' => self::$colors[$j]['highlight'],
-                'pointColor' => self::$colors[$j]['highlight'],
-                'pointStrokeColor' => '#fff',
-                'pointHighlightFill' => '#fff',
+                'label'                => $label,
+                'fillColor'            => self::$colors[$j]['fill'],
+                'highlightFill'        => self::$colors[$j]['color'],
+                'strokeColor'          => self::$colors[$j]['highlight'],
+                'pointColor'           => self::$colors[$j]['highlight'],
+                'pointStrokeColor'     => '#fff',
+                'pointHighlightFill'   => '#fff',
                 'pointHighlightStroke' => self::$colors[$j]['highlight'],
-                'data' => array()
+                'data'                 => array()
             );
             $j++;
             for ($i = 0; $i < $amount; $i++) {
@@ -163,9 +172,13 @@ class GraphHelper
      * Fills into graph data values grouped by time unit
      *
      * @param array  $graphData from prepareDownloadsGraphDataBefore
-     * @param array  $items from database
-     * @param char   $unit: php.net/manual/en/dateinterval.construct.php#refsect1-dateinterval.construct-parameters
-     * @param string $dateName from database
+     * @param array  $items     from database
+     * @param string $unit      php.net/manual/en/dateinterval.construct.php#refsect1-dateinterval.construct-parameters
+     * @param string $datasetKey
+     * @param string $dateName  from database
+     * @param string $deltaName
+     * @param bool   $average
+     * @param bool   $incremental
      *
      * @return array
      */
@@ -212,7 +225,7 @@ class GraphHelper
                 if ($graphData['datasets'][$datasetKey]['data'][$key]) {
                     $incremental += $graphData['datasets'][$datasetKey]['data'][$key];
                 }
-                
+
                 $graphData['datasets'][$datasetKey]['data'][$key] = $incremental;
             }
         }
@@ -225,23 +238,22 @@ class GraphHelper
     /**
      * Fills into Pie graph data values from database
      *
-     * @param array  $data from database
+     * @param array $data
      *
      * @return array
      */
     public static function preparePieGraphData($data)
     {
-        $colors = self::$colors;
+        $colors    = self::$colors;
         $graphData = array();
-        $i = 0;
-        $suma = 0;
+        $i         = 0;
+        $suma      = 0;
 
-        foreach($data as $count) {
+        foreach ($data as $count) {
             $suma += $count;
         }
 
-        foreach($data as $label => $count) {
-
+        foreach ($data as $label => $count) {
             if (!isset($colors[$i])) {
                 $i = 0;
             }
@@ -251,14 +263,14 @@ class GraphHelper
             if ($suma > 0) {
                 $percent = $count / $suma * 100;
             }
-            
-            $color = $colors[$i];
+
+            $color       = $colors[$i];
             $graphData[] = array(
-                'label' => $label,
-                'color' => $colors[$i]['color'],
+                'label'     => $label,
+                'color'     => $colors[$i]['color'],
                 'highlight' => $colors[$i]['highlight'],
-                'value' => (int) $count,
-                'percent' => $percent
+                'value'     => (int) $count,
+                'percent'   => $percent
             );
             $i++;
         }

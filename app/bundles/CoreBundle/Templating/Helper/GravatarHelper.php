@@ -13,15 +13,32 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\UrlHelper;
 use Symfony\Component\Templating\Helper\Helper;
 
+/**
+ * Class GravatarHelper
+ */
 class GravatarHelper extends Helper
 {
+
+    /**
+     * @var bool
+     */
     private static $devMode;
 
+    /**
+     * @param MauticFactory $factory
+     */
     public function __construct(MauticFactory $factory)
     {
         self::$devMode = $factory->getEnvironment() == 'dev';
     }
 
+    /**
+     * @param string $email
+     * @param string $size
+     * @param string $default
+     *
+     * @return string
+     */
     public function getImage($email, $size = '250', $default = null)
     {
         $localDefault     = 'media/images/avatar.png';
@@ -39,6 +56,9 @@ class GravatarHelper extends Helper
         return $url;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'gravatar';
