@@ -141,10 +141,6 @@ EOT
 
         // TODO - Updates will include a list of deleted files, process those
 
-        // TODO - When we have updated the packaging script to include compiled JS files, remove this step
-        @unlink(dirname($this->getContainer()->getParameter('kernel.root_dir')) . '/media/js/app.js');
-        @unlink(dirname($this->getContainer()->getParameter('kernel.root_dir')) . '/media/js/libraries.js');
-
         // Migrate the database to the current version
         $command = $this->getApplication()->find('doctrine:migrations:migrate');
         $input = new ArrayInput(array(
