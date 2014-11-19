@@ -7,7 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\SugarcrmBundle\Security\Permissions;
+namespace Mautic\SalesforceBundle\Security\Permissions;
 
 use Symfony\Component\Form\FormBuilderInterface;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
@@ -33,7 +33,7 @@ class SalesforcePermissions extends AbstractPermissions
      */
     public function getName ()
     {
-        return 'sugarcrm';
+        return 'salesforce';
     }
 
     /**

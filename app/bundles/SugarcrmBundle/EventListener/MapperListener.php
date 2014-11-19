@@ -37,6 +37,10 @@ class MapperListener
      */
     public function onClientFormBuild(MapperFormEvent $event)
     {
+        if ($event->getApplication() != 'sugarcrm') {
+            return;
+        }
+
         $field = array(
             'child' => 'apikeys',
             'type' => 'apikeys',
@@ -52,6 +56,10 @@ class MapperListener
 
     public function onObjectFormBuild(MapperFormEvent $event)
     {
+        if ($event->getApplication() != 'sugarcrm') {
+            return;
+        }
+
         $field = array(
             'child' => 'mappedfields',
             'type' => 'mappedfields',

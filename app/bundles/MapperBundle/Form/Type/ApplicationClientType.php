@@ -50,7 +50,10 @@ class ApplicationClientType extends AbstractType
             'attr'       => array('class' => 'form-control')
         ));
 
+        $application = $this->factory->getRequest()->get('application');
         $event = new MapperFormEvent($this->factory->getSecurity());
+        $event->setApplication($application);
+
         $this->factory->getDispatcher()->dispatch(MapperEvents::CLIENT_FORM_ON_BUILD, $event);
         $extraFields = $event->getFields();
         foreach($extraFields as $extraField) {

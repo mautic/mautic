@@ -27,13 +27,13 @@ class ApiKeysType extends AbstractType
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
         $builder->add('client_key', 'text',array(
-            'label'      => 'mautic.sugarcrm.form.clientkey',
+            'label'      => 'mautic.salesforce.form.clientkey',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control')
         ));
 
         $builder->add('client_secret', 'text',array(
-            'label'      => 'mautic.sugarcrm.form.clientsecret',
+            'label'      => 'mautic.salesforce.form.clientsecret',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control')
         ));

@@ -26,11 +26,23 @@ class MapperFormEvent extends Event
 
     protected $security;
 
+    protected $application;
+
     /**
      */
     public function __construct(CorePermissions $security)
     {
         $this->security = $security;
+    }
+
+    public function setApplication($application)
+    {
+        $this->application = $application;
+    }
+
+    public function getApplication()
+    {
+        return $this->application;
     }
 
     /**

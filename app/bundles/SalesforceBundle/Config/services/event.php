@@ -14,7 +14,7 @@ use Symfony\Component\DependencyInjection\Parameter;
 
 //Mapper event listener
 $container->setDefinition(
-    'mautic.sugarcrm.mapper.event_listener',
+    'mautic.salesforce.mapper.event_listener',
     new Definition('Mautic\SalesforceBundle\EventListener\MapperListener',
         array(new Reference('mautic.factory'))
     )

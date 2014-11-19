@@ -7,7 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\SugarcrmBundle\EventListener;
+namespace Mautic\SalesforceBundle\EventListener;
 
 use Mautic\MapperBundle\Event\MapperFormEvent;
 use Mautic\MapperBundle\Event\MapperDashboardEvent;
@@ -37,6 +37,10 @@ class MapperListener
      */
     public function onClientFormBuild(MapperFormEvent $event)
     {
+        if ($event->getApplication() != 'salesforce') {
+            return;
+        }
+
         $field = array(
             'child' => 'apikeys',
             'type' => 'apikeys',
@@ -52,6 +56,10 @@ class MapperListener
 
     public function onObjectFormBuild(MapperFormEvent $event)
     {
+        if ($event->getApplication() != 'salesforce') {
+            return;
+        }
+
         $field = array(
             'child' => 'mappedfields',
             'type' => 'mappedfields',
