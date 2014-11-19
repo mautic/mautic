@@ -11,7 +11,7 @@ if ($tmpl == 'index') {
 
     $view->extend('MauticCoreBundle:Default:content.html.php');
     $view['slots']->set('mauticContent', $application);
-    $view['slots']->set("headerTitle", $view['translator']->trans('mautic.mapper.header.index'));
+    $view['slots']->set("headerTitle", $view['translator']->trans('mautic.mapper.title.mapper'));
 }
 ?>
 <?php if (count($items)): ?>

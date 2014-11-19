@@ -9,7 +9,7 @@
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', $application);
-$view['slots']->set("headerTitle", $view['translator']->trans('mautic.mapper.header.index'));
+$view['slots']->set("headerTitle", $view['translator']->trans('mautic.mapper.clients.title'));
 $view['slots']->set('searchUri', $view['router']->generate('mautic_mapper_client_index', array(
     'page'   => $page,
     'application' => $application
@@ -27,7 +27,7 @@ $view['slots']->set('searchString', $app->getSession()->get('mautic.mapper.filte
        data-toggle="ajax"
        data-menu-link="#mautic_category_index">
         <i class="fa fa-plus"></i>
-        <?php echo $view["translator"]->trans("mautic.mapper.menu.new"); ?>
+        <?php echo $view["translator"]->trans("mautic.mapper.menu.new.client"); ?>
     </a>
     <?php $view['slots']->stop(); ?>
 <?php endif; ?>

@@ -7,7 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 $view->extend('MauticCoreBundle:Default:content.html.php');
-$view['slots']->set("headerTitle", "Integrations");
+$view['slots']->set("headerTitle", $view['translator']->trans("mautic.mapper.title.dashboard"));
 ?>
 <div class="box-layout">
     <div class="np col-md-12 height-auto bg-white">
@@ -24,7 +24,7 @@ $view['slots']->set("headerTitle", "Integrations");
                         <div class="panel mb-0">
                             <div class="text-center doughnut-wrapper">
                                 <a href="<?php echo $this->container->get('router')->generate('mautic_mapper_client_index', array("application"  => $application['bundle'])); ?>">
-                                    <img src="<?php echo $view['assets']->getUrl($application['icon']); ?>">
+                                    <img src="<?php echo $view['assets']->getUrl($application['icon']); ?>" width="100px" />
                                 </a>
                                 <p><?php echo $application['name']; ?></p>
                             </div>
