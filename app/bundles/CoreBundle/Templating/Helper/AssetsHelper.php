@@ -355,7 +355,7 @@ class AssetsHelper extends CoreAssetsHelper
                         }
                         $dir = "{$bundle['directory']}/Assets/$ft";
                         if (file_exists($dir)) {
-                            $modifiedLast[$ft] = array_merge($modifiedLast[$ft], $this->findAssets($dir, $ft, $env, $assets));
+                            $modifiedLast[$ft] = array_merge($modifiedLast[$ft], $this->findAssets($dir, $ft, $env, $assets, $bundle));
                         }
                     }
                 }
@@ -386,8 +386,26 @@ class AssetsHelper extends CoreAssetsHelper
                                     unlink($assetFile);
                                 }
 
-                                $content = \Minify::combine($files);
-                                file_put_contents($assetFile, $content);
+                                if ($type == 'css') {
+                                    $out = fopen($assetFile, 'w');
+
+                                    foreach ($files as $relPath => $details) {
+                                        $content = \Minify::combine(array($relPath), array(
+                                            'rewriteCssUris'  => false,
+                                            'minifierOptions' => array(
+                                                'text/css' => array(
+                                                    'currentDir' => '',
+                                                    'prependRelativePath' => '../../' . dirname($relPath) . '/'
+                                                )
+                                            )
+                                        ));
+                                        fwrite($out, $content);
+                                    }
+
+                                    fclose($out);
+                                } else {
+                                    file_put_contents($assetFile, \Minify::combine(array_keys($files)));
+                                }
                             }
                         }
                     }
@@ -406,6 +424,10 @@ class AssetsHelper extends CoreAssetsHelper
                         "{$assetsPath}/js/app.js"
                     )
                 );
+            } else {
+                foreach ($assets as $type => &$typeAssets) {
+                    $typeAssets = array_keys($typeAssets);
+                }
             }
         }
 
@@ -419,10 +441,11 @@ class AssetsHelper extends CoreAssetsHelper
      * @param string $ext
      * @param string $env
      * @param array  $assets
+     * @param string $bundle
      *
      * @return array
      */
-    protected function findAssets($dir, $ext, $env, &$assets)
+    protected function findAssets($dir, $ext, $env, &$assets, $bundle)
     {
         $rootPath    = $this->factory->getSystemPath('root') . '/';
         $directories = new Finder();
@@ -443,14 +466,19 @@ class AssetsHelper extends CoreAssetsHelper
                         $relPath = substr($relPath, 1);
                     }
 
+                    $details = array(
+                        'fullPath'  => $fullPath,
+                        'relPath'   => $relPath
+                    );
+
                     if ($env == 'prod') {
                         $lastModified = filemtime($fullPath);
                         if (!isset($modifiedLast[$group]) || $lastModified > $modifiedLast[$group]) {
                             $modifiedLast[$group] = $lastModified;
                         }
-                        $assets[$ext][$group][$fullPath] = $relPath;
+                        $assets[$ext][$group][$relPath] = $details;
                     } else {
-                        $assets[$ext][$fullPath] = $relPath;
+                        $assets[$ext][$relPath] = $details;
                     }
                 }
                 unset($files);
@@ -464,14 +492,19 @@ class AssetsHelper extends CoreAssetsHelper
             $fullPath = $file->getPathname();
             $relPath  = str_replace($rootPath, '', $fullPath);
 
+            $details = array(
+                'fullPath'  => $fullPath,
+                'relPath'   => $relPath
+            );
+
             if ($env == 'prod') {
                 $lastModified = filemtime($fullPath);
                 if (!isset($modifiedLast['app']) || $lastModified > $modifiedLast['app']) {
                     $modifiedLast['app'] = $lastModified;
                 }
-                $assets[$ext]['app'][$fullPath] = $relPath;
+                $assets[$ext]['app'][$relPath] = $details;
             } else {
-                $assets[$ext][$fullPath] = $relPath;
+                $assets[$ext][$relPath] = $details;
             }
         }
         unset($files);
@@ -502,14 +535,19 @@ class AssetsHelper extends CoreAssetsHelper
                     $fullPath = "$rootPath/$currentTheme/$ext/$of.$ext";
                     $relPath  = "$currentTheme/$ext/$of.$ext";
 
+                    $details = array(
+                        'fullPath'  => $fullPath,
+                        'relPath'   => $relPath
+                    );
+
                     if ($env == 'prod') {
                         $lastModified = filemtime($fullPath);
                         if (!isset($modifiedLast[$ext][$group]) || $lastModified > $modifiedLast[$ext][$group]) {
                             $modifiedLast[$ext][$group] = $lastModified;
                         }
-                        $assets[$ext][$group][$fullPath] = $relPath;
+                        $assets[$ext][$group][$relPath] = $details;
                     } else {
-                        $assets[$ext][$fullPath] = $relPath;
+                        $assets[$ext][$relPath] = $details;
                     }
                 }
             }
