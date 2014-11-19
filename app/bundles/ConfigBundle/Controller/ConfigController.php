@@ -42,7 +42,6 @@ class ConfigController extends FormController
 
         // Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
-            $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 /** @var \Mautic\InstallBundle\Configurator\Configurator $configurator */
                 $configurator = $this->get('mautic.configurator');

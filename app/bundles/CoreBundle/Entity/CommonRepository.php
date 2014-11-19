@@ -513,7 +513,7 @@ class CommonRepository extends EntityRepository
      */
     protected function addStandardSearchCommandWhereClause(&$q, $filter)
     {
-        $command         = $field = $filter->command;
+        $command         = $filter->command;
         $string          = $filter->string;
         $unique          = $this->generateRandomParameterName();
         $returnParameter = true; //returning a parameter that is not used will lead to a Doctrine error

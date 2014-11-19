@@ -31,7 +31,7 @@ class FormEventHelper
      *
      * @return array
      */
-    public static function createLead ($action, $form, array $post, array $server, MauticFactory $factory, array $fields)
+    public static function createLead($action, $form, array $post, array $server, MauticFactory $factory, array $fields)
     {
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
         $model      = $factory->getModel('lead');
@@ -147,7 +147,7 @@ class FormEventHelper
                 $event->setIpAddress($ipAddress);
                 $event->setDateAdded(new \DateTime());
 
-                if ($count = count($leads) === 1) {
+                if (count($leads) === 1) {
                     //good to go so update the points
                     $lead = $leads[0];
                 } else {

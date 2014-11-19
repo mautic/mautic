@@ -213,8 +213,6 @@ class CampaignController extends FormController
                 )
             )
         ));
-
-        return $this->indexAction($page, 'view', $entity);
     }
 
     /**

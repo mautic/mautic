@@ -115,7 +115,7 @@ class MenuBuilder
      */
     public function breadcrumbsMenu()
     {
-        $menu = $this->mainMenu($this->request);
+        $menu = $this->mainMenu();
 
         //check for overrideRoute in request from an ajax content request
         $forRouteUri  = $this->request->get("overrideRouteUri", "current");
@@ -124,7 +124,7 @@ class MenuBuilder
 
         //if empty, check the admin menu
         if (empty($current)) {
-            $admin   = $this->adminMenu($this->request);
+            $admin   = $this->adminMenu();
             $current = $this->getCurrentMenuItem($admin, $forRouteUri, $forRouteName);
         }
 

@@ -73,7 +73,6 @@ class FormSubscriber extends CommonSubscriber
 
             if (count($forms) > 0) {
                 $formResults = array();
-                $dateForm = $this->factory->getParameter('date_format_full');
                 foreach ($forms as $form) {
                     $formResults[] = $this->templating->renderResponse(
                         'MauticFormBundle:Search:form.html.php',

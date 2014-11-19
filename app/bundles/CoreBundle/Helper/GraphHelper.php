@@ -264,7 +264,6 @@ class GraphHelper
                 $percent = $count / $suma * 100;
             }
 
-            $color       = $colors[$i];
             $graphData[] = array(
                 'label'     => $label,
                 'color'     => $colors[$i]['color'],

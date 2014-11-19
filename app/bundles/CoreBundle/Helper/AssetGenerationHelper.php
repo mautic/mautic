@@ -144,7 +144,7 @@ class AssetGenerationHelper
 
                                     fclose($out);
                                 } else {
-                                    array_walk($files, function (&$file, $relPath) { $file = $file['fullPath']; });
+                                    array_walk($files, function (&$file) { $file = $file['fullPath']; });
                                     file_put_contents($assetFile, \Minify::combine($files));
                                 }
                             }

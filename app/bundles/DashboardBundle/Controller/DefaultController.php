@@ -27,7 +27,6 @@ class DefaultController extends CommonController
      */
     public function indexAction()
     {
-        $model          = $this->factory->getModel('dashboard.dashboard');
         $hitRepo        = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit');
         $emailStatRepo  = $this->factory->getEntityManager()->getRepository('MauticEmailBundle:Stat');
 

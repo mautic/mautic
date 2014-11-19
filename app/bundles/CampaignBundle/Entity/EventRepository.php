@@ -313,7 +313,6 @@ class EventRepository extends CommonRepository
      */
     public function getEvents($args = array())
     {
-        $now = new \DateTime();
         $q = $this->createQueryBuilder('e')
             ->select('e, ec, ep')
             ->leftJoin('e.children', 'ec')

@@ -102,10 +102,9 @@ class EmailRepository extends CommonRepository
     /**
      * Get amounts of sent and read emails
      *
-     * @param array      $args
      * @return array
      */
-    public function getSentReadCount($args = array())
+    public function getSentReadCount()
     {
         $q = $this->_em->createQueryBuilder();
         $q->select('SUM(e.sentCount) as sentCount, SUM(e.readCount) as readCount')
@@ -131,6 +130,8 @@ class EmailRepository extends CommonRepository
      * @param int    $start
      * @param bool   $viewOther
      * @param bool   $topLevelOnly
+     *
+     * @return array
      */
     public function getEmailList($search = '', $limit = 10, $start = 0, $viewOther = false, $topLevelOnly = false)
     {
@@ -158,8 +159,7 @@ class EmailRepository extends CommonRepository
                 ->setMaxResults($limit);
         }
 
-        $results = $q->getQuery()->getArrayResult();
-        return $results;
+        return $q->getQuery()->getArrayResult();
     }
 
     /**
@@ -192,7 +192,7 @@ class EmailRepository extends CommonRepository
      */
     protected function addSearchCommandWhereClause(&$q, $filter)
     {
-        $command         = $field = $filter->command;
+        $command         = $filter->command;
         $string          = $filter->string;
         $unique          = $this->generateRandomParameterName();
         $returnParameter = true; //returning a parameter that is not used will lead to a Doctrine error

@@ -137,9 +137,9 @@ class AssetController extends FormController
         $model      = $this->factory->getModel('asset.asset');
         $security   = $this->factory->getSecurity();
         $activeAsset = $model->getEntity($objectId);
-        $request    = $this->getRequest();
+        $request    = $this->request;
         $baseUrl    = $request->getScheme() . '://' . $request->getHttpHost() . $request->getBasePath() . '/';
-        
+
         //set the asset we came from
         $page = $this->factory->getSession()->get('mautic.asset.page', 1);
 
@@ -321,7 +321,7 @@ class AssetController extends FormController
         $entity     = $model->getEntity($objectId);
         $session    = $this->factory->getSession();
         $page       = $this->factory->getSession()->get('mautic.asset.page', 1);
-        $request    = $this->getRequest();
+        $request    = $this->request;
         $baseUrl    = $request->getScheme() . '://' . $request->getHttpHost() . $request->getBasePath() . '/';
 
         //set the return URL
@@ -397,7 +397,7 @@ class AssetController extends FormController
                 }
             } else {
                 //clear any modified content
-                $session->remove('mautic.asestbuilder.'.$objectId.'.content', array());
+                $session->remove('mautic.asestbuilder.'.$objectId.'.content');
                 //unlock the entity
                 $model->unlockEntity($entity);
 

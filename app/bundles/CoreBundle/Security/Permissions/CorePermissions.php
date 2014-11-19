@@ -151,11 +151,11 @@ class CorePermissions
 
             foreach ($perms as $perm) {
                 //get the bit for the perm
-                if ($supports = $class->isSupported($name, $perm)) {
-                    $bit += $class->getValue($name, $perm);
-                } else {
+                if (!$class->isSupported($name, $perm)) {
                     throw new \InvalidArgumentException("$perm does not exist for $bundle:$name");
                 }
+
+                $bit += $class->getValue($name, $perm);
             }
             $entity->setBitwise($bit);
             $entities[] = $entity;
@@ -174,7 +174,7 @@ class CorePermissions
      * @return bool
      * @throws \InvalidArgumentException
      */
-    public function isGranted ($requestedPermission, $mode = "MATCH_ALL", $userEntity = null)
+    public function isGranted($requestedPermission, $mode = "MATCH_ALL", $userEntity = null)
     {
         if ($userEntity === null) {
            $userEntity = $this->getUser();

@@ -371,7 +371,7 @@ class EmailController extends FormController
                 $returnUrl = $this->generateUrl('mautic_email_index', $viewParameters);
                 $template  = 'MauticEmailBundle:Email:index';
                 //clear any modified content
-                $session->remove('mautic.emailbuilder.'.$entity->getSessionId().'.content', array());
+                $session->remove('mautic.emailbuilder.' . $entity->getSessionId() . '.content');
             }
 
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
@@ -494,7 +494,7 @@ class EmailController extends FormController
                 }
             } else {
                 //clear any modified content
-                $session->remove('mautic.emailbuilder.'.$objectId.'.content', array());
+                $session->remove('mautic.emailbuilder.' . $objectId . '.content');
                 //unlock the entity
                 $model->unlockEntity($entity);
 
