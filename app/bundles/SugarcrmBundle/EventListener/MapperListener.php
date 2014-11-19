@@ -11,8 +11,9 @@ namespace Mautic\SugarcrmBundle\EventListener;
 
 use Mautic\MapperBundle\Event\MapperFormEvent;
 use Mautic\MapperBundle\Event\MapperDashboardEvent;
+use Mautic\MapperBundle\EventListener\MapperSubscriber;
 
-class MapperListener
+class MapperListener extends MapperSubscriber
 {
     /**
      * Add Sugar CRM to Mapper
