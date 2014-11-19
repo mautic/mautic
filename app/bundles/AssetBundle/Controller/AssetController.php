@@ -137,6 +137,9 @@ class AssetController extends FormController
         $model      = $this->factory->getModel('asset.asset');
         $security   = $this->factory->getSecurity();
         $activeAsset = $model->getEntity($objectId);
+        $request    = $this->getRequest();
+        $baseUrl    = $request->getScheme() . '://' . $request->getHttpHost() . $request->getBasePath() . '/';
+        
         //set the asset we came from
         $page = $this->factory->getSession()->get('mautic.asset.page', 1);
 
@@ -193,16 +196,17 @@ class AssetController extends FormController
                     'asset:assets:publishown',
                     'asset:assets:publishother'
                 ), "RETURN_ARRAY"),
-                'stats'         => array(
-                    'downloads'  => array(
-                        'total'  => $activeAsset->getDownloadCount(),
-                        'unique' => $activeAsset->getUniqueDownloadCount(),
+                'stats' => array(
+                    'downloads'     => array(
+                        'total'     => $activeAsset->getDownloadCount(),
+                        'unique'    => $activeAsset->getUniqueDownloadCount(),
                         'timeStats' => $timeStats
                     )
                 ),
-                'security'    => $security,
-                'assetUrl'    => $model->generateUrl($activeAsset, true),
-                'logs'        => $logs,
+                'security'          => $security,
+                'assetDownloadUrl'  => $model->generateUrl($activeAsset, true),
+                'assetUrl'          => $baseUrl . $activeAsset->getWebPath(),
+                'logs'              => $logs,
             ),
             'contentTemplate' => 'MauticAssetBundle:Asset:details.html.php',
             'passthroughVars' => array(
