@@ -1,8 +1,7 @@
 <?php
-namespace SugarCRM\Api;
+namespace Mautic\SugarcrmBundle\Api\Api;
 
-use SugarCRM\Auth\AuthInterface;
-use SugarCRM\Exception\ContextNotFoundException;
+use Mautic\SugarcrmBundle\Api\Auth\AuthInterface;
 
 class Api
 {

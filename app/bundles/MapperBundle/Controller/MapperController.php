@@ -10,8 +10,8 @@
 namespace Mautic\MapperBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
-use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Mautic\MapperBundle\Helper\IntegrationHelper;
 
 class MapperController extends FormController
 {
@@ -37,18 +37,7 @@ class MapperController extends FormController
             return $this->accessDenied();
         }
 
-        $entities = array();
-        $bundles = $this->factory->getParameter('bundles');
-        $bundle = $bundles[ucfirst($application)];
-
-        $finder = new Finder();
-        $finder->files()->name('*Mapper.php')->in($bundle['directory'] . '/Mapper');
-        $finder->sortByName();
-        foreach ($finder as $file) {
-            $class = sprintf('\\Mautic\%s\Mapper\%s', $bundle['bundle'], substr($file->getBaseName(), 0, -4));
-            $object = new $class;
-            $entities[] = $object;
-        }
+        $entities = IntegrationHelper::getMappers($this->factory, $application);
 
         //set some permissions
         $permissions = $this->factory->getSecurity()->isGranted(array(
@@ -133,7 +122,7 @@ class MapperController extends FormController
         }
 
         //Create the form
-        $action = $this->generateUrl('mautic_mapper_client_action', array(
+        $action = $this->generateUrl('mautic_mapper_client_object_action', array(
             'objectAction' => 'edit',
             'object'     => $object,
             'application'  => $application,

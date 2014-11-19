@@ -7,6 +7,15 @@ use Symfony\Component\Form\FormBuilderInterface;
 abstract class AbstractMapper
 {
     /**
+     * @var
+     */
+    protected $factory;
+
+    public function __construct(MauticFactory $factory)
+    {
+        $this->factory = $factory;
+    }
+    /**
      * Return base name of class
      *
      * @return string
@@ -16,6 +25,26 @@ abstract class AbstractMapper
         $parts = explode('\\',get_class($this));
         $name = substr(end($parts),0,-6);
         return $name;
+    }
+
+    /**
+     * Return Entity
+     *
+     * @return mixed
+     */
+    public function getEntity()
+    {
+        $client = $this->factory->getRequest()->get('client');
+        $clientEntity = $this->factory->getEntityManager('mapper.ApplicationClient');
+
+        echo '<pre>';
+        var_dump($client);
+        die(__FILE__);
+
+        return $this->factory->getEntityManager('mapper.ApplicationObjectMapper')->getOneBy(array(
+            'object_name' => $this->getBaseName(),
+            'application_client_id' => $clientEntity->getId()
+        ));
     }
 
     /**

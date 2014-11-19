@@ -48,7 +48,7 @@ class MappedFieldsType extends AbstractType
         switch (strtolower($object))
         {
             case 'lead':
-                $leadMapper = new LeadMapper();
+                $leadMapper = new LeadMapper($this->factory);
                 $leadMapper->buildForm($this->factory, $builder, $options);
                 break;
         }

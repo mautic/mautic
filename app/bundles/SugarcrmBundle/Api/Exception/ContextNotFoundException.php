@@ -1,6 +1,6 @@
 <?php
 
-namespace SugarCRM\Exception;
+namespace Mautic\SugarcrmBundle\Api\Exception;
 
 class ContextNotFoundException extends \Exception
 {
