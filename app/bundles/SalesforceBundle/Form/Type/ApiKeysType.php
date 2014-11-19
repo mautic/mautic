@@ -43,6 +43,6 @@ class ApiKeysType extends AbstractType
      * @return string
      */
     public function getName() {
-        return "apikeys";
+        return "salesforce_apikeys";
     }
 }

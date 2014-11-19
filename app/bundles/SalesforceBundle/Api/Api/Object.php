@@ -1,5 +1,5 @@
 <?php
-namespace Salesforce\Api;
+namespace Mautic\SalesforceBundle\Api\Api;
 
 class Object extends Api
 {

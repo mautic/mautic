@@ -61,6 +61,6 @@ class ApiKeysType extends AbstractType
      * @return string
      */
     public function getName() {
-        return "apikeys";
+        return "sugarcrm_apikeys";
     }
 }

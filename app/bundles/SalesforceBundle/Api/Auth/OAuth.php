@@ -1,8 +1,8 @@
 <?php
-namespace Salesforce\Auth;
+namespace Mautic\SalesforceBundle\Api\Auth;
 
-use Salesforce\Exception\IncorrectParametersReturnedException;
-use Salesforce\Exception\UnexpectedResponseFormatException;
+use Mautic\SalesforceBundle\Api\Exception\IncorrectParametersReturnedException;
+use Mautic\SalesforceBundle\Api\Exception\UnexpectedResponseFormatException;
 
 class OAuth extends ApiAuth implements AuthInterface
 {

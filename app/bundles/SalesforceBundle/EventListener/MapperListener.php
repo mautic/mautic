@@ -44,7 +44,7 @@ class MapperListener extends MapperSubscriber
 
         $field = array(
             'child' => 'apikeys',
-            'type' => 'apikeys',
+            'type' => 'salesforce_apikeys',
             'params' => array(
                 'label'       => 'mautic.salesforce.form.api.keys',
                 'required'    => false,
@@ -63,7 +63,7 @@ class MapperListener extends MapperSubscriber
 
         $field = array(
             'child' => 'mappedfields',
-            'type' => 'mappedfields',
+            'type' => 'salesforce_mappedfields',
             'params' => array(
                 'label'       => 'mautic.salesforce.form.mapped.fields',
                 'required'    => false,

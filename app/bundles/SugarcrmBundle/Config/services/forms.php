@@ -14,10 +14,10 @@ $container->setDefinition('mautic.sugarcrm.form.type.apikeys',
     new Definition( 'Mautic\SugarcrmBundle\Form\Type\ApiKeysType',
         array(new Reference('mautic.factory'))
     )
-)->addTag('form.type', array( 'alias' => 'apikeys', ));
+)->addTag('form.type', array( 'alias' => 'sugarcrm_apikeys', ));
 
 $container->setDefinition('mautic.sugarcrm.form.type.mappedfields',
     new Definition( 'Mautic\SugarcrmBundle\Form\Type\MappedFieldsType',
         array(new Reference('mautic.factory'))
     )
-)->addTag('form.type', array( 'alias' => 'mappedfields', ));
+)->addTag('form.type', array( 'alias' => 'sugarcrm_mappedfields', ));

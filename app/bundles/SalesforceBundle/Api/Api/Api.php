@@ -1,8 +1,8 @@
 <?php
-namespace Salesforce\Api;
+namespace Mautic\SalesforceBundle\Api\Api;
 
-use Salesforce\Auth\AuthInterface;
-use Salesforce\Exception\ContextNotFoundException;
+use Mautic\SalesforceBundle\Api\Auth\AuthInterface;
+use Mautic\SalesforceBundle\Api\Exception\ContextNotFoundException;
 
 class Api
 {

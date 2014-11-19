@@ -57,6 +57,6 @@ class MappedFieldsType extends AbstractType
      * @return string
      */
     public function getName() {
-        return "mappedfields";
+        return "salesforce_mappedfields";
     }
 }
