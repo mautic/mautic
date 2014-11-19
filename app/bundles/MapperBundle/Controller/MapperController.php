@@ -129,25 +129,28 @@ class MapperController extends FormController
             'client'    => $client
         ));
         $form = $modelMapper->createForm($entity, $this->get('form.factory'), $action, array('objectName' => $object, 'applicationClientId' => $entityClient->getId()));
+
         ///Check for a submitted form and process it
         if (!$ignorePost && $this->request->getMethod() == 'POST') {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
-                //form is valid so process the data
-                $modelMapper->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
+                if ($valid = $this->isFormValid($form) ){
+                        //form is valid so process the data
+                    $modelMapper->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
 
-                $this->request->getSession()->getFlashBag()->add(
-                    'notice',
-                    $this->get('translator')->trans('mautic.mapper.notice.updated', array(
-                        '%name%' => $entity->getTitle(),
-                        '%url%'  => $this->generateUrl('mautic_mapper_client_action', array(
+                    $this->request->getSession()->getFlashBag()->add(
+                        'notice',
+                        $this->get('translator')->trans('mautic.mapper.notice.updated', array(
+                            '%name%' => $entity->getTitle(),
+                            '%url%'  => $this->generateUrl('mautic_mapper_client_action', array(
                                 'objectAction' => 'edit',
-                                'object'     => $entity->getObjectName(),
-                                'client'     => $entityClient->getAlias(),
+                                'object'       => $entity->getObjectName(),
+                                'client'       => $entityClient->getAlias(),
                                 'application'  => $application
                             ))
-                    ), 'flashes')
-                );
+                        ), 'flashes')
+                    );
+                }
             } else {
                 //unlock the entity
                 $modelMapper->unlockEntity($entity);
