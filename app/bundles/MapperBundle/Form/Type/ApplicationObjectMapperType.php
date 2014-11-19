@@ -51,11 +51,12 @@ class ApplicationObjectMapperType extends AbstractType
             $builder->add($extraField['child'], $extraField['type'], $extraField['params']);
         }
 
-        $builder->add('object_name', 'hidden', array(
+        $builder->add('objectName', 'hidden', array(
             'data' => $options['objectName']
         ));
-        $builder->add('application_client_id', 'hidden_entity', array(
-            'data' => $options['applicationClientId']
+        $builder->add('applicationClientId', 'hidden_entity', array(
+            'data' => $options['applicationClientId'],
+            'repository' => 'MauticMapperBundle::ApplicationClient'
         ));
 
         $builder->add('buttons', 'form_buttons');
