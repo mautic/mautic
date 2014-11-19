@@ -7,7 +7,8 @@ $buildBundles = function($namespace, $bundle) use ($container) {
             "base"      => str_replace('Bundle', '', $bundleBase),
             "bundle"    => $bundleBase,
             "namespace" => $namespace,
-            "directory" => $container->getParameter('kernel.root_dir').'/bundles/'. $bundleBase
+            "relative"  => basename($container->getParameter('kernel.root_dir')).'/bundles/'.$bundleBase,
+            "directory" => $container->getParameter('kernel.root_dir').'/bundles/'.$bundleBase
         );
         return $v;
     }
