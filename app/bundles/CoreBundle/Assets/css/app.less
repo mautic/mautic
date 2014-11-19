@@ -1,0 +1,96 @@
+//
+// Application
+// --------------------------------------------------
+
+
+// load google font
+@import url(https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,300,600,700);
+
+// Core variables and mixins
+@import "app/less/variables";
+@import "app/less/mixins";
+@import "app/less/lesshat";
+@import "libraries/bootstrap/less/variables";
+@import "libraries/bootstrap/less/mixins";
+
+// Layouts
+@import "app/less/layouts/base";
+@import "app/less/layouts/header";
+@import "app/less/layouts/sidebar";
+@import "app/less/layouts/content";
+@import "app/less/layouts/footer";
+
+// Components
+@import "app/less/components/scaffolding";
+@import "app/less/components/type";
+@import "app/less/components/scrollbar";
+@import "app/less/components/buttons";
+@import "app/less/components/button-groups";
+@import "app/less/components/alerts";
+@import "app/less/components/calendar";
+@import "app/less/components/editor";
+@import "app/less/components/media";
+@import "app/less/components/list-group";
+@import "app/less/components/dropdowns";
+@import "app/less/components/navs";
+@import "app/less/components/notes";
+@import "app/less/components/bullet";
+@import "app/less/components/labels";
+@import "app/less/components/badges";
+@import "app/less/components/brand";
+@import "app/less/components/forms";
+@import "app/less/components/input-groups";
+@import "app/less/components/image";
+@import "app/less/components/table";
+@import "app/less/components/progress-bars";
+@import "app/less/components/panels";
+@import "app/less/components/box";
+@import "app/less/components/switch";
+@import "app/less/components/steps";
+@import "app/less/components/colors";
+@import "app/less/components/pagination";
+@import "app/less/components/loading-bar";
+@import "app/less/components/offcanvas";
+@import "app/less/components/timeline";
+@import "app/less/components/utilities";
+
+@import "app/less/components/builder";
+
+.confirmation-modal {
+  position: fixed;
+  font-family: Arial, Helvetica, sans-serif;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.8) url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7);
+  z-index: 9999;
+  height: 100%;
+  width: 100%;
+}
+.confirmation-inner-wrapper {
+  width: 400px;
+  font-size: 1.2em;
+  font-weight: bold;
+  position: aboslute;
+  margin: 10% auto;
+  padding: 8px;
+  border-radius: 8px;
+  background: #fff;
+  text-align: center;
+  z-index: 10000;
+}
+.content-overlay {
+  position:absolute;
+  background: #fbfbfb;
+  z-index: 1050;
+  width:100%;
+  height:100%;
+  padding-left: 15px;
+  font-weight: bold;
+}
+.stat-boxes {
+  .panel {
+    height: 164px;
+  }
+}

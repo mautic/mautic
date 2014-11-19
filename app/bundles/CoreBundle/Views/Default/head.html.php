@@ -15,10 +15,6 @@
     <link rel="apple-touch-icon" href="<?php echo $view['assets']->getUrl('media/images/apple-touch-icon.png') ?>" />
 
     <?php echo $view['assets']->outputSystemStylesheets(); ?>
-    <link rel="stylesheet" href="<?php echo $view['assets']->getUrl('media/css/font-awesome.min.css'); ?>" />
-
-    <script src="<?php echo $view['assets']->getUrl('media/js/modernizr.min.js'); ?>"></script>
-    <script src="<?php echo $view['assets']->getUrl('media/js/mousetrap.min.js'); ?>"></script>
 
     <?php echo $view->render('MauticCoreBundle:Default:script.html.php'); ?>
     <?php $view['assets']->outputHeadDeclarations(); ?>

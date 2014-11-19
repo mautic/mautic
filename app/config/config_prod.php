@@ -34,7 +34,7 @@ $container->loadFromExtension("monolog", array(
         "nested"  => array(
             "type"  => "stream",
             "path"  => "%kernel.logs_dir%/%kernel.environment%.php",
-            "level" => "debug"
+            "level" => "error"
         ),
         "console" => array(
             "type" => "console"

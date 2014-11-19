@@ -14,10 +14,7 @@ $view['assets']->addScriptDeclaration("var mauticBasePath = '$basePath';");
 
 $view['assets']->addScript($view['assets']->getSystemScripts());
 
-$view['assets']->addScript(array(
-    'media/js/ckeditor/ckeditor.js',
-    'media/js/ckeditor/adapters/jquery.js'
-));
+$view['assets']->loadEditor();
 
 $custom = <<<CUSTOM
 mQuery(document).ready( function() {

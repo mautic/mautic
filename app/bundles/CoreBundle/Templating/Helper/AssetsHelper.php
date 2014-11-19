@@ -16,6 +16,7 @@ use Symfony\Component\Templating\Helper\CoreAssetsHelper as BaseAssetsHelper;
 class AssetsHelper extends BaseAssetsHelper
 {
 
+    /** @var  \Mautic\CoreBundle\Factory\MauticFactory */
     protected $factory;
 
     protected $assets;
@@ -26,9 +27,9 @@ class AssetsHelper extends BaseAssetsHelper
      * @param string $script
      * @param string $location
      */
-    public function addScript($script, $location = 'head')
+    public function addScript ($script, $location = 'head')
     {
-        $assets =& $this->assets;
+        $assets     =& $this->assets;
         $addScripts = function ($s) use ($location, &$assets) {
             if ($location == 'head') {
                 //special place for these so that declarations and scripts can be mingled
@@ -62,7 +63,7 @@ class AssetsHelper extends BaseAssetsHelper
      * @param string $script
      * @param string $location
      */
-    public function addScriptDeclaration($script, $location = 'head')
+    public function addScriptDeclaration ($script, $location = 'head')
     {
         if ($location == 'head') {
             //special place for these so that declarations and scripts can be mingled
@@ -86,9 +87,9 @@ class AssetsHelper extends BaseAssetsHelper
      *
      * @param string $stylesheet
      */
-    public function addStylesheet($stylesheet)
+    public function addStylesheet ($stylesheet)
     {
-        $assets =& $this->assets;
+        $assets   =& $this->assets;
         $addSheet = function ($s) use (&$assets) {
             if (!isset($assets['stylesheets'])) {
                 $assets['stylesheets'] = array();
@@ -111,15 +112,15 @@ class AssetsHelper extends BaseAssetsHelper
     /**
      * Load ckeditor source files
      */
-    public function loadEditor()
+    public function loadEditor ()
     {
         static $editorLoaded;
 
         if (empty($editorLoaded)) {
             $editorLoaded = true;
             $this->addScript(array(
-                'media/js/ckeditor/ckeditor.js',
-                'media/js/ckeditor/adapters/jquery.js'
+                'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/ckeditor.js',
+                'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/adapters/jquery.js'
             ));
         }
     }
@@ -129,7 +130,7 @@ class AssetsHelper extends BaseAssetsHelper
      *
      * @param $styles
      */
-    public function addStyleDeclaration($styles)
+    public function addStyleDeclaration ($styles)
     {
         if (!isset($this->assets['styleDeclarations'])) {
             $this->assets['styleDeclarations'] = array();
@@ -145,7 +146,7 @@ class AssetsHelper extends BaseAssetsHelper
      *
      * @param $declaration
      */
-    public function addCustomDeclaration($declaration, $location = 'head')
+    public function addCustomDeclaration ($declaration, $location = 'head')
     {
         if ($location == 'head') {
             $this->assets['headDeclarations'][] = array(
@@ -166,7 +167,7 @@ class AssetsHelper extends BaseAssetsHelper
     /**
      * Outputs the stylesheets and style declarations
      */
-    public function outputStyles()
+    public function outputStyles ()
     {
         if (isset($this->assets['stylesheets'])) {
             foreach ($this->assets['stylesheets'] as $s) {
@@ -188,11 +189,11 @@ class AssetsHelper extends BaseAssetsHelper
      *
      * @param string $location
      */
-    public function outputScripts($location)
+    public function outputScripts ($location)
     {
         if (isset($this->assets['scripts'][$location])) {
             foreach ($this->assets['scripts'][$location] as $s) {
-                echo '<script src="'.$this->getUrl($s).'"></script>'."\n";
+                echo '<script src="' . $this->getUrl($s) . '"></script>' . "\n";
             }
         }
 
@@ -214,14 +215,14 @@ class AssetsHelper extends BaseAssetsHelper
     /**
      * Output head scripts, stylesheets, and custom declarations
      */
-    public function outputHeadDeclarations()
+    public function outputHeadDeclarations ()
     {
         $this->outputStyles();
 
         if (isset($this->assets['headDeclarations'])) {
             foreach ($this->assets['headDeclarations'] as $h) {
                 if ($h['type'] == 'script') {
-                    echo '<script src="'.$this->getUrl($h['src']).'"></script>'."\n";
+                    echo '<script src="' . $this->getUrl($h['src']) . '"></script>' . "\n";
                 } elseif ($h['type'] == 'declaration') {
                     echo "<script>\n{$h['script']}\n</script>\n";
                 } else {
@@ -231,7 +232,7 @@ class AssetsHelper extends BaseAssetsHelper
         }
     }
 
-    public function outputSystemStylesheets()
+    public function outputSystemStylesheets ()
     {
         $assets = $this->getAssets();
 
@@ -242,33 +243,42 @@ class AssetsHelper extends BaseAssetsHelper
         }
     }
 
-    public function outputSystemScripts()
+    public function outputSystemScripts ()
     {
         $assets = $this->getAssets();
 
         if (isset($assets['js'])) {
             foreach ($assets['js'] as $url) {
-                echo '<script src="'.$this->getUrl($url).'"></script>'."\n";
+                echo '<script src="' . $this->getUrl($url) . '"></script>' . "\n";
             }
         }
     }
 
-    public function getSystemScripts()
+    /**
+     * @return mixed
+     */
+    public function getSystemScripts ()
     {
         $assets = $this->getAssets();
+
         return $assets['js'];
     }
 
-    private function getAssets()
+    /**
+     * Generates assets
+     *
+     * @return array
+     */
+    private function getAssets ()
     {
         static $assets = array();
 
         if (empty($assets)) {
 
-            $loadAll        = true;
-            $env            = $this->factory->getEnvironment();
-            $rootPath       = $this->factory->getSystemPath('root');
-            $assetsPath     = $this->factory->getSystemPath('assets');
+            $loadAll    = true;
+            $env        = $this->factory->getEnvironment();
+            $rootPath   = $this->factory->getSystemPath('root');
+            $assetsPath = $this->factory->getSystemPath('assets');
 
             $assetsFullPath = "$rootPath/$assetsPath";
             if ($env == 'prod') {
@@ -291,45 +301,62 @@ class AssetsHelper extends BaseAssetsHelper
             }
 
             if ($loadAll) {
+                ini_set('max_execution_time', 300);
+
+                $modifiedLast = array();
+
                 //get a list of all core asset files
                 $bundles = $this->factory->getParameter('bundles');
+
+                $fileTypes = array('css', 'js');
                 foreach ($bundles as $bundle) {
-                    $css = "{$bundle['directory']}/Assets/css";
-                    if (file_exists($css)) {
-                        $this->findAssets($css, 'css', $env, $assets);
-                    }
-
-
-                    $js = "{$bundle['directory']}/Assets/js";
-                    if (file_exists($js)) {
-                        $this->findAssets($js, 'js', $env, $assets);
+                    foreach ($fileTypes as $ft) {
+                        if (!isset($modifiedLast[$ft])) {
+                            $modifiedLast[$ft] = array();
+                        }
+                        $dir = "{$bundle['directory']}/Assets/$ft";
+                        if (file_exists($dir)) {
+                            $modifiedLast[$ft] = array_merge($modifiedLast[$ft], $this->findAssets($dir, $ft, $env, $assets));
+                        }
                     }
                 }
-                $this->findOverrides($env, $assets);
+                $modifiedLast = array_merge($modifiedLast, $this->findOverrides($env, $assets));
 
+                //combine the files into their corresponding name and put in the root media folder
                 if ($env == "prod") {
-                    //combine the files into their corresponding name
+                    $checkPaths = array(
+                        $assetsFullPath,
+                        "$assetsFullPath/css",
+                        "$assetsFullPath/js",
+                    );
+                    array_walk($checkPaths, function ($path) {
+                        if (!file_exists($path)) {
+                            mkdir($path);
+                        }
+                    });
+
                     foreach ($assets as $type => $groups) {
                         foreach ($groups as $group => $files) {
                             $assetFile = "$assetsFullPath/$type/$group.$type";
 
-                            if (file_exists($assetFile)) {
-                                //delete it
-                                unlink($assetFile);
-                            }
+                            //only refresh if a change has occurred
+                            $modified = (!file_exists($assetFile)) ? true : filemtime($assetFile) < $modifiedLast[$type][$group];
+                            if ($modified) {
+                                if (file_exists($assetFile)) {
+                                    //delete it
+                                    unlink($assetFile);
+                                }
 
-                            $out = fopen($assetFile, "w");
-                            foreach ($files as $file) {
-                                fwrite($out, file_get_contents("$rootPath/$file"));
+                                $content = \Minify::combine($files);
+                                file_put_contents($assetFile, $content);
                             }
-                            fclose($out);
-                            unset($out);
                         }
                     }
                 }
             }
 
             if ($env == 'prod') {
+                //return prod generated assets
                 $assets = array(
                     'css' => array(
                         "{$assetsPath}/css/libraries.css",
@@ -342,30 +369,47 @@ class AssetsHelper extends BaseAssetsHelper
                 );
             }
         }
+
         return $assets;
     }
 
-    protected function findAssets($dir, $ext, $env, &$assets)
+    /**
+     * Finds directory assets
+     *
+     * @param $dir
+     * @param $ext
+     * @param $env
+     * @param $assets
+     */
+    protected function findAssets ($dir, $ext, $env, &$assets)
     {
-        $rootPath     = $this->factory->getSystemPath('root') . '/';
-        $directories  = new Finder();
+        $rootPath    = $this->factory->getSystemPath('root') . '/';
+        $directories = new Finder();
         $directories->directories()->exclude('*less')->depth('0')->ignoreDotFiles(true)->in($dir);
+
+        $modifiedLast = array();
+
         if (count($directories)) {
             foreach ($directories as $directory) {
-                $files = new Finder();
+                $files         = new Finder();
                 $thisDirectory = str_replace('\\', '/', $directory->getRealPath());
-                $files->files()->depth('0')->name('*.'.$ext)->in($thisDirectory)->sortByName();
-                $key = $directory->getBasename();
+                $files->files()->depth('0')->name('*.' . $ext)->in($thisDirectory)->sortByName();
+                $group = $directory->getBasename();
                 foreach ($files as $file) {
-                    $path = str_replace($rootPath, '', $file->getPathname());
-                    if (strpos($path, '/') === 0) {
-                        $path =  substr($path, 1);
+                    $fullPath = $file->getPathname();
+                    $relPath  = str_replace($rootPath, '', $file->getPathname());
+                    if (strpos($relPath, '/') === 0) {
+                        $relPath = substr($relPath, 1);
                     }
 
                     if ($env == 'prod') {
-                        $assets[$ext][$key][] = $path;
+                        $lastModified = filemtime($fullPath);
+                        if (!isset($modifiedLast[$group]) || $lastModified > $modifiedLast[$group]) {
+                            $modifiedLast[$group] = $lastModified;
+                        }
+                        $assets[$ext][$group][$fullPath] = $relPath;
                     } else {
-                        $assets[$ext][] = $path;
+                        $assets[$ext][$fullPath] = $relPath;
                     }
                 }
                 unset($files);
@@ -374,22 +418,37 @@ class AssetsHelper extends BaseAssetsHelper
 
         unset($directories);
         $files = new Finder();
-        $files->files()->depth('0')->ignoreDotFiles(true)->name('*.'.$ext)->in($dir)->sortByName();
+        $files->files()->depth('0')->ignoreDotFiles(true)->name('*.' . $ext)->in($dir)->sortByName();
         foreach ($files as $file) {
+            $fullPath = $file->getPathname();
+            $relPath  = str_replace($rootPath, '', $fullPath);
+
             if ($env == 'prod') {
-                $assets[$ext]['app'][] = str_replace($rootPath, '', $file->getPathname());
+                $lastModified = filemtime($fullPath);
+                if (!isset($modifiedLast['app']) || $lastModified > $modifiedLast['app']) {
+                    $modifiedLast['app'] = $lastModified;
+                }
+                $assets[$ext]['app'][$fullPath] = $relPath;
             } else {
-                $assets[$ext][] = str_replace($rootPath, '', $file->getPathname());
+                $assets[$ext][$fullPath] = $relPath;
             }
         }
         unset($files);
+
+        return $modifiedLast;
     }
 
-    protected function findOverrides($env, &$assets)
+    /**
+     * Find asset overrides in the template
+     *
+     * @param $env
+     * @param $assets
+     */
+    protected function findOverrides ($env, &$assets)
     {
-        $rootPath     = $this->factory->getSystemPath('root');
-        $currentTheme = $this->factory->getSystemPath('currentTheme');
-
+        $rootPath      = $this->factory->getSystemPath('root');
+        $currentTheme  = $this->factory->getSystemPath('currentTheme');
+        $modifiedLast  = array();
         $types         = array('css', 'js');
         $overrideFiles = array(
             "libraries" => "libraries_custom",
@@ -399,19 +458,28 @@ class AssetsHelper extends BaseAssetsHelper
         foreach ($types as $ext) {
             foreach ($overrideFiles as $group => $of) {
                 if (file_exists("$rootPath/$currentTheme/$ext/$of.$ext")) {
+                    $fullPath = "$rootPath/$currentTheme/$ext/$of.$ext";
+                    $relPath  = "$currentTheme/$ext/$of.$ext";
+
                     if ($env == 'prod') {
-                        $assets[$ext][$group][] = "$currentTheme/$ext/$of.$ext";
+                        $lastModified = filemtime($fullPath);
+                        if (!isset($modifiedLast[$ext][$group]) || $lastModified > $modifiedLast[$ext][$group]) {
+                            $modifiedLast[$ext][$group] = $lastModified;
+                        }
+                        $assets[$ext][$group][$fullPath] = $relPath;
                     } else {
-                        $assets[$ext][] = "$currentTheme/$ext/$of.$ext";
+                        $assets[$ext][$fullPath] = $relPath;
                     }
                 }
             }
         }
+
+        return $modifiedLast;
     }
 
-    public function makeLinks($text)
+    public function makeLinks ($text)
     {
-        return  preg_replace(
+        return preg_replace(
             array(
                 '/(?(?=<a[^>]*>.+<\/a>)
                     (?:<a[^>]*>.+<\/a>)
@@ -435,7 +503,10 @@ class AssetsHelper extends BaseAssetsHelper
         );
     }
 
-    public function setFactory(MauticFactory $factory)
+    /**
+     * @param MauticFactory $factory
+     */
+    public function setFactory (MauticFactory $factory)
     {
         $this->factory = $factory;
     }
@@ -445,7 +516,7 @@ class AssetsHelper extends BaseAssetsHelper
      *
      * @return string
      */
-    public function getName()
+    public function getName ()
     {
         return 'assets';
     }

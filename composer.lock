@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "b47c21ae7b345775102baf5c62a97cba",
+    "hash": "9666e625a3a0211b12cb6be4743377b0",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -1541,7 +1541,7 @@
                     "email": "stof@notk.org"
                 },
                 {
-                    "name": "KnpLabs",
+                    "name": "Knplabs",
                     "homepage": "http://knplabs.com"
                 },
                 {
@@ -1669,6 +1669,46 @@
                 "utf-8"
             ],
             "time": "2014-05-16 07:18:10"
+        },
+        {
+            "name": "mrclay/minify",
+            "version": "2.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mrclay/minify.git",
+                "reference": "d245bca4987dec197d1e6d7dc117614b60ff7494"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mrclay/minify/zipball/d245bca4987dec197d1e6d7dc117614b60ff7494",
+                "reference": "d245bca4987dec197d1e6d7dc117614b60ff7494",
+                "shasum": ""
+            },
+            "require": {
+                "ext-pcre": "*",
+                "php": ">=5.2.1"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "min/lib/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Steve Clay",
+                    "email": "steve@mrclay.org",
+                    "homepage": "http://www.mrclay.org/",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Minify is a PHP5 app that helps you follow several rules for client-side performance. It combines multiple CSS or Javascript files, removes unnecessary whitespace and comments, and serves them with gzip encoding and optimal client-side cache headers",
+            "homepage": "http://code.google.com/p/minify/",
+            "time": "2014-03-12 12:54:23"
         },
         {
             "name": "phpcollection/phpcollection",

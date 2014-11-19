@@ -330,9 +330,6 @@ var Mautic = {
         //instantiate sparkline plugin
         mQuery('.plugin-sparkline').sparkline('html', { enableTagOptions: true });
 
-        // instantiate the plugin
-        mQuery('.flotchart').flotChart();
-
         Mautic.stopIconSpinPostEvent();
     },
 

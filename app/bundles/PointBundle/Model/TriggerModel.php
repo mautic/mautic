@@ -325,50 +325,6 @@ class TriggerModel extends CommonFormModel
     }
 
     /**
-     * Trigger events for the current lead
-     *
-     * @param Lead $lead
-     */
-    public function triggerEvents(Lead $lead)
-    {
-        $points = $lead->getPoints();
-
-        //find all published triggers that is applicable to this points
-        /** @var \Mautic\PointBundle\Entity\TriggerEventRepository $repo */
-        $repo      = $this->getEventRepository();
-        $events    = $repo->getPublishedByPointTotal($points);
-        /** @var \Mautic\CoreBundle\Entity\IpAddress $ipAddress */
-        $ipAddress = $this->factory->getIpAddress();
-        $persist   = array();
-        if (!empty($events)) {
-            //get a list of actions that has already been applied to this lead
-            $appliedEvents = $repo->getLeadTriggeredEvents($lead->getId());
-
-            foreach ($events as $event) {
-                if (isset($appliedEvents[$event->getId()])) {
-                    //don't apply the event to the lead if it's already been done
-                    continue;
-                }
-
-                if ($this->triggerEvent($event, $lead, false)) {
-                    $log = new LeadTriggerLog();
-                    $log->setIpAddress($ipAddress);
-                    $log->setEvent($event);
-                    $log->setLead($lead);
-                    $log->setDateFired(new \DateTime());
-
-                    $event->addLog($log);
-                    $persist[] = $event;
-                }
-            }
-        }
-
-        if (!empty($persist)) {
-            $this->getEventRepository()->saveEntities($persist);
-        }
-    }
-
-    /**
      * Returns configured color based on passed in $points
      *
      * @param $points

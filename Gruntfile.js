@@ -1,90 +1,56 @@
 'use strict';
 
-module.exports = function(grunt) {
+module.exports = function (grunt) {
 
-  // Load grunt tasks automatically
-  require('load-grunt-tasks')(grunt);
+    // Load grunt tasks automatically
+    require('load-grunt-tasks')(grunt);
 
-  // Time how long tasks take. Can help when optimizing build times
-  require('time-grunt')(grunt);
+    // Time how long tasks take. Can help when optimizing build times
+    require('time-grunt')(grunt);
 
-  // Define the configuration for all the tasks
-  grunt.initConfig({
+    grunt.loadNpmTasks('grunt-remove');
 
-    // mautic assets dir path
-    mautic: {
-      // configurable paths
-      coreBundleAssets: 'app/bundles/CoreBundle/Assets',
-      rootAssets: 'media'
-    },
+    // Define the configuration for all the tasks
+    grunt.initConfig({
 
-    // Watches files for changes and runs tasks based on the changed files
-    watch: {
-      less: {
-        files: ['<%= mautic.coreBundleAssets %>/css/**/*.less'],
-        tasks: ['less', /*'autoprefixer',*/ 'copy', 'cssmin']
-      }
-    },
+        // mautic assets dir path
+        mautic: {
+            // configurable paths
+            bundleAssets: 'app/bundles/**/Assets/css',
+            rootAssets: 'media/css'
+        },
 
-    // Compile LESS files to CSS
-    less: {
-      coreBundleAssets: {
-        files: {
-          // mautic app
-          '<%= mautic.coreBundleAssets %>/css/1.bootstrap.css': '<%= mautic.coreBundleAssets %>/css/1.bootstrap.less',
-          '<%= mautic.coreBundleAssets %>/css/2.app.css': '<%= mautic.coreBundleAssets %>/css/2.app.less',
+        // Watches files for changes and runs tasks based on the changed files
+        watch: {
+            less: {
+                files: ['<%= mautic.bundleAssets %>/**/*.less'],
+                tasks: ['less', 'remove']
+            }
+        },
 
-          // font awesome
-          '<%= mautic.rootAssets %>/css/font-awesome.css': '<%= mautic.coreBundleAssets %>/css/font-awesome/less/font-awesome.less',
+        // Compiles less files in bundle's Assets/css root and single level directory to CSS
+        less: {
+            files: {
+                src: ['<%= mautic.bundleAssets %>/*.less', '<%= mautic.bundleAssets %>/*/*.less'],
+                expand: true,
+                rename: function (dest, src) {
+                    return dest + src.replace('.less', '.css')
+                },
+                dest: ''
+            }
+        },
 
-          // libraries
-          '<%= mautic.coreBundleAssets %>/css/libraries/1.typeahead.css': '<%= mautic.coreBundleAssets %>/css/libraries/1.typeahead.less'
+        // Remove prod's css files to force recompilation
+        remove: {
+            default_options: {
+                trace: true,
+                fileList: ['<%= mautic.rootAssets %>/app.css', '<%= mautic.rootAssets %>/libraries.css']
+            }
         }
-      }
-    },
+    });
 
-    // Add vendor prefixed styles
-    autoprefixer: {
-      options: {
-        browsers: ['last 2 version', 'ie 9']
-      },
-      coreBundleAssets: {
-        files: [{
-          expand: true,
-          cwd: '<%= mautic.coreBundleAssets %>/css/',
-          src: '{,*/}*.css',
-          dest: '<%= mautic.coreBundleAssets %>/css/'
-        }]
-      }
-    },
-
-    // Copies files
-    copy: {
-      fontAwesome: {
-        files: [{
-          expand: true,
-          cwd: '<%= mautic.coreBundleAssets %>/css/font-awesome',
-          dest: '<%= mautic.rootAssets %>',
-          src: ['fonts/**/*']
-        }]
-      }
-    },
-
-    // minify css
-    cssmin: {
-      fontAwesome: {
-        files: {
-          '<%= mautic.rootAssets %>/css/font-awesome.min.css': '<%= mautic.rootAssets %>/css/font-awesome.css'
-        }
-      }
-    }
-  });
-
-  grunt.registerTask('compile-less', [
-    'less',
-    //'autoprefixer',
-    'copy',
-    'cssmin',
-    'watch'
-  ]);
+    grunt.registerTask('compile-less', [
+        'less',
+        'watch'
+    ]);
 };
