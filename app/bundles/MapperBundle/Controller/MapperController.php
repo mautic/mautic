@@ -128,7 +128,10 @@ class MapperController extends FormController
             'application'  => $application,
             'client'    => $client
         ));
-        $form = $modelMapper->createForm($entity, $this->get('form.factory'), $action, array('objectName' => $object, 'applicationClientId' => $entityClient->getId()));
+
+        $entity->setObjectName($object);
+        $entity->setApplicationClientId($entityClient);
+        $form = $modelMapper->createForm($entity, $this->get('form.factory'), $action);
 
         ///Check for a submitted form and process it
         if (!$ignorePost && $this->request->getMethod() == 'POST') {

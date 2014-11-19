@@ -139,7 +139,7 @@ class ApplicationObjectMapper
      */
     public function setApplicationClientId($client_id = null)
     {
-        $this->applicationClientId = intval($client_id);
+        $this->applicationClientId = $client_id;
 
         return $this;
     }
