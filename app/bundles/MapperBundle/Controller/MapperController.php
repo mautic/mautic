@@ -104,7 +104,7 @@ class MapperController extends FormController
         $postActionVars = array(
             'returnUrl'       => $returnUrl,
             'viewParameters'  => $viewParams,
-            'contentTemplate' => 'MauticMapperBundle:Mapper:list',
+            'contentTemplate' => 'MauticMapperBundle:Mapper:index',
             'passthroughVars' => array(
                 'activeLink'    => 'mautic_'.$application.'client_index',
                 'mauticContent' => 'client'
@@ -161,7 +161,7 @@ class MapperController extends FormController
                     array_merge($postActionVars, array(
                         'returnUrl'       => $this->generateUrl('mautic_mapper_client_objects_index', $viewParams),
                         'viewParameters'  => $viewParams,
-                        'contentTemplate' => 'MauticMapperBundle:Mapper:list'
+                        'contentTemplate' => 'MauticMapperBundle:Mapper:index'
                     ))
                 );
             }
