@@ -44,7 +44,7 @@ class MapperListener extends MapperSubscriber
 
         $field = array(
             'child' => 'apikeys',
-            'type' => $event->getApplication().'_apikeys',
+            'type' => 'sugarcrm_apikeys',
             'params' => array(
                 'label'       => 'mautic.sugarcrm.form.api.keys',
                 'required'    => false,
@@ -63,7 +63,7 @@ class MapperListener extends MapperSubscriber
 
         $field = array(
             'child' => 'mappedfields',
-            'type' => $event->getApplication().'_mappedfields',
+            'type' => 'sugarcrm_mappedfields',
             'params' => array(
                 'label'       => 'mautic.sugarcrm.form.mapped.fields',
                 'required'    => false,

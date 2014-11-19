@@ -45,6 +45,7 @@ class ApplicationObjectMapperType extends AbstractType
         $builder->addEventSubscriber(new FormExitSubscriber('mapper.ApplicationObjectMapper', $options));
 
         $event = new MapperFormEvent($this->factory->getSecurity());
+        $event->setApplication($options['application']);
         $this->factory->getDispatcher()->dispatch(MapperEvents::OBJECT_FORM_ON_BUILD, $event);
         $extraFields = $event->getFields();
         foreach($extraFields as $extraField) {
@@ -72,6 +73,8 @@ class ApplicationObjectMapperType extends AbstractType
         $resolver->setDefaults(array(
             'data_class' => 'Mautic\MapperBundle\Entity\ApplicationObjectMapper'
         ));
+
+        $resolver->setRequired(array('application'));
     }
 
     /**
