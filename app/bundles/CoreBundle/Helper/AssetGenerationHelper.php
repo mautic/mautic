@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @package     Mautic
  * @copyright   2014 Mautic, NP. All rights reserved.
@@ -15,8 +14,6 @@ use Symfony\Component\Finder\Finder;
 
 /**
  * Class AssetGenerationHelper
- *
- * @package Mautic\CoreBundle\Helper
  */
 class AssetGenerationHelper
 {
@@ -26,6 +23,9 @@ class AssetGenerationHelper
      */
     private $factory;
 
+    /**
+     * @param MauticFactory $factory
+     */
     public function __construct(MauticFactory $factory)
     {
         $this->factory = $factory;
@@ -34,6 +34,8 @@ class AssetGenerationHelper
     /**
      * Generates and returns assets
      *
+     * @param bool $forceRegeneration
+     *
      * @return array
      */
     public function getAssets($forceRegeneration = false)
@@ -41,7 +43,6 @@ class AssetGenerationHelper
         static $assets = array();
 
         if (empty($assets)) {
-
             $loadAll    = true;
             $env        = ($forceRegeneration) ? 'prod' : $this->factory->getEnvironment();
             $rootPath   = $this->factory->getSystemPath('root');
@@ -53,10 +54,10 @@ class AssetGenerationHelper
 
                 //check for libraries and app files and generate them if they don't exist if in prod environment
                 $prodFiles = array(
-                    "css/libraries.css",
-                    "css/app.css",
-                    "js/libraries.js",
-                    "js/app.js"
+                    'css/libraries.css',
+                    'css/app.css',
+                    'js/libraries.js',
+                    'js/app.js'
                 );
 
                 foreach ($prodFiles as $file) {
@@ -259,8 +260,10 @@ class AssetGenerationHelper
      *
      * @param $env
      * @param $assets
+     *
+     * @return array
      */
-    protected function findOverrides ($env, &$assets)
+    protected function findOverrides($env, &$assets)
     {
         $rootPath      = $this->factory->getSystemPath('root');
         $currentTheme  = $this->factory->getSystemPath('currentTheme');
