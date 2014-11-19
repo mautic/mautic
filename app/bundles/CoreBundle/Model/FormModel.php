@@ -113,7 +113,11 @@ class FormModel extends CommonModel
      */
     public function saveEntity($entity, $unlock = true)
     {
-        $isNew = ($entity->getId()) ? false : true;
+        if (!method_exists($entity, 'getId')) {
+            $isNew = ($entity->getId()) ? false : true;
+        } else {
+            $isNew = \Doctrine\ORM\UnitOfWork::STATE_NEW !== $this->factory->getEntityManager()->getUnitOfWork()->getEntityState($entity);
+        }
 
         //set some defaults
         $this->setTimestamps($entity, $isNew, $unlock);
@@ -137,9 +141,10 @@ class FormModel extends CommonModel
         $batchSize = 20;
         foreach ($entities as $k => $entity) {
             if (!method_exists($entity, 'getId')) {
-                die(Var_dump($entity));
+                $isNew = ($entity->getId()) ? false : true;
+            } else {
+                $isNew = \Doctrine\ORM\UnitOfWork::STATE_NEW !== $this->factory->getEntityManager()->getUnitOfWork()->getEntityState($entity);
             }
-            $isNew = ($entity->getId()) ? false : true;
 
             //set some defaults
             $this->setTimestamps($entity, $isNew, $unlock);
