@@ -48,7 +48,7 @@
         </div>
          <div class="row">
             <div class="col-lg-4 col-lg-offset-4 text-center text-muted">
-                Copyright 2014 Mautic. All Rights Reserved.
+                <?php echo $view['translator']->trans('mautic.core.copyright', array('%date%' => '2014')); ?>
             </div>
         </div>
     </div>
