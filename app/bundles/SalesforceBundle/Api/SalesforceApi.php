@@ -1,9 +1,9 @@
 <?php
 
-namespace Salesforce;
+namespace Mautic\SalesforceBundle\Api;
 
-use Salesforce\Auth\AuthInterface;
-use Salesforce\Exception\ContextNotFoundException;
+use Mautic\SalesforceBundle\Api\Auth\AuthInterface;
+use Mautic\SalesforceBundle\Api\Exception\ContextNotFoundException;
 
 class SalesforceApi
 {
@@ -21,7 +21,7 @@ class SalesforceApi
         static $contexts = array();
 
         if (!isset($context[$apiContext])) {
-            $class = 'Salesforce\\Api\\' . $apiContext;
+            $class = 'Mautic\\SalesforceBundle\\Api\\Api\\' . $apiContext;
             if (class_exists($class)) {
                 $contexts[$apiContext] = new $class($auth, $apiVersion);
             } else {

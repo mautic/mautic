@@ -280,21 +280,23 @@ class ClientController extends FormController
         if (!$ignorePost && $this->request->getMethod() == 'POST') {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
-                //form is valid so process the data
-                $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
+                if ($valid = $this->isFormValid($form) ){
+                    //form is valid so process the data
+                    $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
 
-                $this->request->getSession()->getFlashBag()->add(
-                    'notice',
-                    $this->get('translator')->trans('mautic.core.notice.updated', array(
-                        '%name%'      => $entity->getTitle(),
-                        '%menu_link%' => 'mautic_mapper_index',
-                        '%url%'       => $this->generateUrl('mautic_mapper_client_action', array(
-                            'objectAction' => 'edit',
-                            'objectId'     => $entity->getId(),
-                            'application'  => $application
-                        ))
-                    ), 'flashes')
-                );
+                    $this->request->getSession()->getFlashBag()->add(
+                        'notice',
+                        $this->get('translator')->trans('mautic.core.notice.updated', array(
+                            '%name%'      => $entity->getTitle(),
+                            '%menu_link%' => 'mautic_mapper_index',
+                            '%url%'       => $this->generateUrl('mautic_mapper_client_action', array(
+                                    'objectAction' => 'edit',
+                                    'objectId'     => $entity->getId(),
+                                    'application'  => $application
+                                ))
+                        ), 'flashes')
+                    );
+                }
             } else {
                 //unlock the entity
                 $model->unlockEntity($entity);

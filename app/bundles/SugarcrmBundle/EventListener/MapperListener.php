@@ -11,8 +11,9 @@ namespace Mautic\SugarcrmBundle\EventListener;
 
 use Mautic\MapperBundle\Event\MapperFormEvent;
 use Mautic\MapperBundle\Event\MapperDashboardEvent;
+use Mautic\MapperBundle\EventListener\MapperSubscriber;
 
-class MapperListener
+class MapperListener extends MapperSubscriber
 {
     /**
      * Add Sugar CRM to Mapper
@@ -43,7 +44,7 @@ class MapperListener
 
         $field = array(
             'child' => 'apikeys',
-            'type' => 'apikeys',
+            'type' => $event->getApplication().'_apikeys',
             'params' => array(
                 'label'       => 'mautic.sugarcrm.form.api.keys',
                 'required'    => false,
@@ -62,7 +63,7 @@ class MapperListener
 
         $field = array(
             'child' => 'mappedfields',
-            'type' => 'mappedfields',
+            'type' => $event->getApplication().'_mappedfields',
             'params' => array(
                 'label'       => 'mautic.sugarcrm.form.mapped.fields',
                 'required'    => false,

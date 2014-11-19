@@ -1,6 +1,6 @@
 <?php
 
-namespace Salesforce\Exception;
+namespace Mautic\SalesforceBundle\Api\Exception;
 
 class ContextNotFoundException extends \Exception
 {

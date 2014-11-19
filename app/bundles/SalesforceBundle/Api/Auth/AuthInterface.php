@@ -1,6 +1,6 @@
 <?php
 
-namespace Salesforce\Auth;
+namespace Mautic\SalesforceBundle\Api\Auth;
 
 interface AuthInterface
 {

@@ -58,6 +58,6 @@ class MappedFieldsType extends AbstractType
      * @return string
      */
     public function getName() {
-        return "mappedfields";
+        return "sugarcrm_mappedfields";
     }
 }

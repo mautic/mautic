@@ -14,10 +14,10 @@ $container->setDefinition('mautic.salesforce.form.type.apikeys',
     new Definition( 'Mautic\SalesforceBundle\Form\Type\ApiKeysType',
         array(new Reference('mautic.factory'))
     )
-)->addTag('form.type', array( 'alias' => 'apikeys', ));
+)->addTag('form.type', array( 'alias' => 'salesforce_apikeys', ));
 
 $container->setDefinition('mautic.salesforce.form.type.mappedfields',
     new Definition( 'Mautic\SalesforceBundle\Form\Type\MappedFieldsType',
         array(new Reference('mautic.factory'))
     )
-)->addTag('form.type', array( 'alias' => 'mappedfields', ));
+)->addTag('form.type', array( 'alias' => 'salesforce_mappedfields', ));
