@@ -19,6 +19,11 @@ use Mautic\UserBundle\Entity\User;
 class ClientRepository extends CommonRepository
 {
 
+    /**
+     * @param User $user
+     *
+     * @return array
+     */
     public function getUserClients(User $user)
     {
         $query = $this->createQueryBuilder($this->getTableAlias());
@@ -32,9 +37,6 @@ class ClientRepository extends CommonRepository
 
     /**
      * {@inheritdoc}
-     *
-     * @param array $args
-     * @return Paginator
      */
     public function getEntities($args = array())
     {
@@ -46,10 +48,12 @@ class ClientRepository extends CommonRepository
         }
 
         $query = $q->getQuery();
-        $result = new Paginator($query);
-        return $result;
+        return new Paginator($query);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function addCatchAllWhereClause(&$q, $filter)
     {
         $unique  = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
@@ -70,6 +74,9 @@ class ClientRepository extends CommonRepository
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function getDefaultOrder()
     {
         return array(

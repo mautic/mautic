@@ -18,6 +18,7 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class AccessToken extends BaseAccessToken
 {
+
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")
@@ -51,4 +52,5 @@ class AccessToken extends BaseAccessToken
      * @ORM\Column(type="integer", nullable=true)
      */
     protected $expiresAt;
+
 }

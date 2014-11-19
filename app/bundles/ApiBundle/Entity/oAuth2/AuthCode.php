@@ -20,6 +20,7 @@ use FOS\OAuthServerBundle\Model\ClientInterface;
  */
 class AuthCode extends BaseAuthCode
 {
+
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")
@@ -53,6 +54,7 @@ class AuthCode extends BaseAuthCode
      * Set client
      *
      * @param ClientInterface $client
+     *
      * @return RefreshToken
      */
     public function setClient(ClientInterface $client)
@@ -76,6 +78,7 @@ class AuthCode extends BaseAuthCode
      * Set user
      *
      * @param UserInterface $user
+     *
      * @return RefreshToken
      */
     public function setUser(UserInterface $user = null)

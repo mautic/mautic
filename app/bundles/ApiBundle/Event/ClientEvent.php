@@ -16,16 +16,18 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
  * Class ClientEvent
- *
- * @package Mautic\RoleBundle\Event
  */
 class ClientEvent extends CommonEvent
 {
+
+    /**
+     * @var string
+     */
     private $apiMode;
 
     /**
      * @param Client|Consumer $client
-     * @param bool $isNew
+     * @param bool            $isNew
      */
     public function __construct($client, $isNew = false)
     {

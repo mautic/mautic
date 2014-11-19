@@ -9,7 +9,6 @@
 
 namespace Mautic\ApiBundle\Controller\OAuth1;
 
-
 use Bazinga\OAuthServerBundle\Model\RequestTokenInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,15 +17,18 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-
+/**
+ * Class AuthorizeController
+ */
 class AuthorizeController extends Controller
 {
+
     /**
-     * {@inheritdoc}
-     *
      * @param Request $request
      *
      * @return Response
+     * @throws AccessDeniedException
+     * @throws HttpException
      */
     public function allowAction(Request $request)
     {

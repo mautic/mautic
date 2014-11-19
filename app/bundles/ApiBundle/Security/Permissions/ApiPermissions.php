@@ -14,12 +14,13 @@ use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 
 /**
  * Class ApiPermissions
- *
- * @package Mautic\UserBundle\Security\Permissions
  */
 class ApiPermissions extends AbstractPermissions
 {
 
+    /**
+     * {@inheritdoc}
+     */
     public function __construct($params)
     {
 
@@ -35,19 +36,14 @@ class ApiPermissions extends AbstractPermissions
 
     /**
      * {@inheritdoc}
-     *
-     * @return string|void
      */
-    public function getName() {
+    public function getName()
+    {
         return 'api';
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     * @param array                $data
      */
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {
@@ -69,41 +65,34 @@ class ApiPermissions extends AbstractPermissions
 
     /**
      * {@inheritdoc}
-     *
-     * @param $name
-     * @param $perm
      */
     public function getValue($name, $perm)
     {
         //ensure api is enabled system wide
         if (empty($this->params['api_enabled'])) {
             return 0;
-        } else {
-            return parent::getValue($name, $perm);
         }
+
+        return parent::getValue($name, $perm);
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool|mixed
      */
-    public function isEnabled() {
+    public function isEnabled()
+    {
         return !empty($this->params['api_enabled']);
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @param $name
-     * @param $level
-     * @return array
      */
-    protected function getSynonym($name, $level) {
-        if ($name == "access" && $level == "granted") {
-            return array($name, "full");
-        } else {
-            return parent::getSynonym($name, $level);
+    protected function getSynonym($name, $level)
+    {
+        if ($name == 'access' && $level == 'granted') {
+            return array($name, 'full');
         }
+
+        return parent::getSynonym($name, $level);
     }
 }

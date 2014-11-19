@@ -15,6 +15,9 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
+/**
+ * Class OAuthProvider
+ */
 class OAuthProvider extends \Bazinga\OAuthServerBundle\Security\Authentification\Provider\OAuthProvider
 {
 
@@ -23,6 +26,11 @@ class OAuthProvider extends \Bazinga\OAuthServerBundle\Security\Authentification
      */
     private $factory;
 
+    /**
+     * @param MauticFactory $factory
+     *
+     * @return void
+     */
     public function setFactory(MauticFactory $factory)
     {
         $this->factory = $factory;
