@@ -22,7 +22,7 @@ $item = $event['extra']['asset'];
 				    <?php echo $item->getTitle(); ?>
 				</a>
 			</h3>
-	        <p class="mb-0">At <?php echo $view['date']->toFullConcat($event['timestamp']); ?>, <?php echo $event['eventLabel']; ?>.</p>
+            <p class="mb-0"><?php echo $view['translator']->trans('mautic.core.timeline.event.time', array('%date%' => $view['date']->toFullConcat($event['timestamp']), '%event%' => $event['eventLabel'])); ?></p>
 	    </div>
 	    <?php if (isset($event['extra'])) : ?>
 	        <!-- <div class="panel-footer">

@@ -1541,7 +1541,7 @@
                     "email": "stof@notk.org"
                 },
                 {
-                    "name": "Knplabs",
+                    "name": "KnpLabs",
                     "homepage": "http://knplabs.com"
                 },
                 {
@@ -2532,12 +2532,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/willdurand/BazingaOAuthServerBundle.git",
-                "reference": "86fa86ea8ccf564557bf73e4cb7b20f963874fe0"
+                "reference": "5142d3827dae18d535c11016207dbb9082ad55b7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/willdurand/BazingaOAuthServerBundle/zipball/86fa86ea8ccf564557bf73e4cb7b20f963874fe0",
-                "reference": "86fa86ea8ccf564557bf73e4cb7b20f963874fe0",
+                "url": "https://api.github.com/repos/willdurand/BazingaOAuthServerBundle/zipball/5142d3827dae18d535c11016207dbb9082ad55b7",
+                "reference": "5142d3827dae18d535c11016207dbb9082ad55b7",
                 "shasum": ""
             },
             "require": {
@@ -2566,8 +2566,7 @@
             "authors": [
                 {
                     "name": "William Durand",
-                    "email": "william.durand1@gmail.com",
-                    "homepage": "http://www.willdurand.fr"
+                    "email": "william.durand1@gmail.com"
                 }
             ],
             "description": "Server side implementation of the OAuth 1.0 protocol based on RFC 5849",
@@ -2576,7 +2575,7 @@
                 "oauth",
                 "server"
             ],
-            "time": "2014-04-10 08:41:23"
+            "time": "2014-11-19 08:55:25"
         }
     ],
     "packages-dev": [
@@ -2864,9 +2863,7 @@
             "time": "2014-09-22 14:56:14"
         }
     ],
-    "aliases": [
-
-    ],
+    "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
         "symfony/event-dispatcher": 20,
@@ -2886,7 +2883,5 @@
     "platform": {
         "php": ">=5.3.7"
     },
-    "platform-dev": [
-
-    ]
+    "platform-dev": []
 }

@@ -172,7 +172,16 @@ if ($security->hasEntityAccess($permissions['asset:assets:editown'], $permission
 
         <!-- start: tab-content -->
         <div class="tab-content pa-md">
-
+            <h5 class="fw-sb mb-xs"><?php echo $view['translator']->trans('mautic.asset.asset.preview'); ?></h5>
+            <div class="text-center">
+                <?php if ($activeAsset->isImage()) : ?>
+                    <img src="<?php echo $assetUrl; ?>" alt="<?php echo $activeAsset->getTitle(); ?>" class="img-thumbnail" />
+                <?php elseif (strtolower($activeAsset->getFileType()) == 'pdf') : ?>
+                    <iframe src="<?php echo $assetUrl; ?>#view=FitH" class="col-sm-12"></iframe>
+                <?php else : ?>
+                    <i class="<?php echo $activeAsset->getIconClass(); ?> fa-5x"></i>
+                <?php endif; ?>
+            </div>
         </div>
         <!--/ end: tab-content -->
     </div>
@@ -188,9 +197,9 @@ if ($security->hasEntityAccess($permissions['asset:assets:editown'], $permission
             <div class="panel-body pt-xs">
                 <div class="input-group">
                 <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly
-                value="<?php echo $assetUrl; ?>" />
+                value="<?php echo $assetDownloadUrl; ?>" />
                 <span class="input-group-btn">
-                    <button class="btn btn-default" onclick="window.open('<?php echo $assetUrl; ?>', '_blank');">
+                    <button class="btn btn-default" onclick="window.open('<?php echo $assetDownloadUrl; ?>', '_blank');">
                         <i class="fa fa-external-link"></i>
                     </button>
                 </span>

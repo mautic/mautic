@@ -30,7 +30,9 @@ foreach ($activeForm->getActions() as $action) {
             <i class="fa fa-fw fa-database"></i> <?php echo $view['translator']->trans('mautic.form.form.results'); ?>
         </span>
     </a>
-    <a class="btn btn-default" data-toggle="modal" data-target="#form-preview">
+    <a class="btn btn-default" href="<?php echo $view['router']->generate('mautic_form_action',
+        array('objectAction' => 'preview', 'objectId' => $activeForm->getId())); ?>"
+        target="_blank">
         <i class="fa fa-fw fa-camera"></i> <?php echo $view['translator']->trans('mautic.form.form.preview'); ?>
     </a>
 <?php if ($security->hasEntityAccess($permissions['form:forms:editown'], $permissions['form:forms:editother'],
@@ -321,15 +323,6 @@ foreach ($activeForm->getActions() as $action) {
           </div>
       </div>
       <!--/ #modal-manual-copy -->
-
-      <?php
-      echo $view->render('MauticCoreBundle:Helper:modal.html.php', array(
-          'id'     => 'form-preview',
-          'header' => $view['translator']->trans('mautic.form.form.header.preview'),
-          'body'   => $view->render('MauticFormBundle:Form:preview.html.php', array('form' => $activeForm)),
-          'size'   => 'lg'
-      ));
-      ?>
   </div>
   <!--/ end: box layout -->
 

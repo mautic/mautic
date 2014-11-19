@@ -1526,6 +1526,11 @@ a.list-group-item:focus {
 .nav > li > a .arrow {
   line-height: 18px;
 }
+.nav .open > a,
+.nav .open > a:hover,
+.nav .open > a:focus {
+  background-color: transparent;
+}
 .nav .nav-divider {
   background-color: rgba(0, 0, 0, 0.05);
 }

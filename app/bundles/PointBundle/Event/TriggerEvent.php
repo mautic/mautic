@@ -21,12 +21,12 @@ class TriggerEvent extends CommonEvent
     /**
      * @var Trigger
      */
-    private $entity;
+    protected $entity;
 
     /**
      * @var bool
      */
-    private $isNew;
+    protected $isNew;
 
     /**
      * @param Trigger $trigger
