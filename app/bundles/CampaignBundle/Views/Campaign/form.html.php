@@ -27,11 +27,19 @@ $view['slots']->set("headerTitle", $header);
                 <div class="alert alert-danger"><h4><?php echo $view['translator']->trans('mautic.campaign.modify.warning'); ?></h4></div>
             <?php endif; ?>
 
-            <?php
-            echo $view['form']->row($form['name']);
-            echo $view['form']->row($form['description']);
-            echo $view['form']->row($form['lists']);
-            ?>
+            <div class="row">
+                <div class="col-md-6">
+                    <?php echo $view['form']->row($form['name']); ?>
+                </div>
+                <div class="col-md-6">
+                    <?php echo $view['form']->row($form['lists']); ?>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <?php echo $view['form']->row($form['description']); ?>
+                </div>
+            </div>
         </div>
     </div>
     <div class="col-md-3 bg-white height-auto">
