@@ -9,9 +9,7 @@
 
 namespace Mautic\AssetBundle\Entity;
 
-use Doctrine\ORM\Query;
 use Mautic\CoreBundle\Entity\CommonRepository;
-use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\GraphHelper;
 
 /**
@@ -88,9 +86,9 @@ class DownloadRepository extends CommonRepository
     public function getDownloads($assetId, $amount = 30, $unit = 'D')
     {
         $data = GraphHelper::prepareLineGraphData($amount, $unit, array('downloaded'));
-        
+
         $query = $this->createQueryBuilder('d');
-        
+
         $query->select('IDENTITY(d.asset), d.dateDownload')
             ->where($query->expr()->eq('IDENTITY(d.asset)', (int) $assetId))
             ->andwhere($query->expr()->gte('d.dateDownload', ':date'))

@@ -10,14 +10,17 @@
 namespace Mautic\AssetBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
-use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
+/**
+ * Class AssetController
+ */
 class AssetController extends FormController
 {
 
     /**
-     * @param int    $asset
+     * @param int $page
+     *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function indexAction($page = 1)
@@ -129,8 +132,9 @@ class AssetController extends FormController
     /**
      * Loads a specific form into the detailed panel
      *
-     * @param $objectId
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @param int $objectId
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function viewAction($objectId)
     {

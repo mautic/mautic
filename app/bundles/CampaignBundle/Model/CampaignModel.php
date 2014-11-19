@@ -281,11 +281,11 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
-     * @param        $hierarchy
-     * @param        $events
-     * @param        $entity
-     * @param string $root
-     * @param int    $order
+     * @param          $hierarchy
+     * @param          $events
+     * @param Campaign $entity
+     * @param string   $root
+     * @param int      $order
      */
     private function buildOrder ($hierarchy, &$events, &$entity, $root = 'null', $order = 1)
     {
@@ -329,9 +329,11 @@ class CampaignModel extends CommonFormModel
     /**
      * Proxy for EventModel::triggerEvent
      *
-     * @param       $eventType
-     * @param mixed $eventDetails
-     * @param mixed $eventTypeId
+     * @param string $eventType
+     * @param mixed  $eventDetails
+     * @param string $eventTypeId
+     *
+     * @return bool|mixed
      */
     public function triggerEvent ($eventType, $eventDetails = null, $eventTypeId = null)
     {
@@ -370,8 +372,9 @@ class CampaignModel extends CommonFormModel
     /**
      * Gets a list of published campaigns
      *
-     * @param Lead $lead
      * @param bool $forList
+     *
+     * @return array
      */
     public function getPublishedCampaigns ($forList = false)
     {
@@ -590,7 +593,7 @@ class CampaignModel extends CommonFormModel
      *
      * @param      $campaign
      * @param null $event
-     * @param null $lead
+     * @param null $leads
      *
      * @return mixed
      */
@@ -693,8 +696,8 @@ class CampaignModel extends CommonFormModel
     /**
      * Get leads for a campaign.  If $event is passed in, only leads who have not triggered the event are returned
      *
-     * @param      $campaign
-     * @param null $event
+     * @param Campaign $campaign
+     * @param array    $event
      *
      * @return mixed
      */
@@ -708,8 +711,8 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
-     * @param $campaign
-     * @param $lead
+     * @param Campaign $campaign
+     * @param          $lead
      */
     public function removeScheduledEvents($campaign, $lead)
     {

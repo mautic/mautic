@@ -19,11 +19,30 @@ use Symfony\Component\EventDispatcher\Event;
  */
 class CampaignBuilderEvent extends Event
 {
+
+    /**
+     * @var array
+     */
     private $leadDecisions   = array();
+
+    /**
+     * @var array
+     */
     private $systemChanges = array();
+
+    /**
+     * @var array
+     */
     private $actions      = array();
+
+    /**
+     * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
+     */
     private $translator;
 
+    /**
+     * @param \Symfony\Bundle\FrameworkBundle\Translation\Translator $translator
+     */
     public function __construct ($translator)
     {
         $this->translator = $translator;
@@ -89,8 +108,8 @@ class CampaignBuilderEvent extends Event
     /**
      * Add an system action to the list of available .
      *
-     * @param string $key     - a unique identifier; it is recommended that it be namespaced i.e. lead.mytrigger
-     * @param array  $trigger - can contain the following keys:
+     * @param string $key    - a unique identifier; it is recommended that it be namespaced i.e. lead.mytrigger
+     * @param array  $action - can contain the following keys:
      *                        'label'       => (required) what to display in the list
      *                        'description' => (optional) short description of event
      *                        'formType'    => (optional) name of the form type SERVICE for the action
@@ -145,8 +164,8 @@ class CampaignBuilderEvent extends Event
     /**
      * Add an outcome to the list of available .
      *
-     * @param string $key    - a unique identifier; it is recommended that it be namespaced i.e. lead.action
-     * @param array  $action - can contain the following keys:
+     * @param string $key     - a unique identifier; it is recommended that it be namespaced i.e. lead.action
+     * @param array  $outcome - can contain the following keys:
      *                       'label'       => (required) what to display in the list
      *                       'description' => (optional) short description of event
      *                       'formType'    => (optional) name of the form type SERVICE for the action

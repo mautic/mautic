@@ -9,7 +9,6 @@
 
 namespace Mautic\CampaignBundle\Entity;
 
-use Doctrine\ORM\Query\Expr\Join;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**

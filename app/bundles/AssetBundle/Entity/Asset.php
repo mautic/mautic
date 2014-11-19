@@ -142,7 +142,8 @@ class Asset extends FormEntity
      **/
     private $category;
 
-    public function __clone() {
+    public function __clone()
+    {
         $this->id = null;
     }
 
@@ -187,6 +188,7 @@ class Asset extends FormEntity
      * Set title
      *
      * @param string $title
+     *
      * @return Asset
      */
     public function setTitle($title)
@@ -211,6 +213,7 @@ class Asset extends FormEntity
      * Set originalFileName
      *
      * @param string $originalFileName
+     *
      * @return Asset
      */
     public function setOriginalFileName($originalFileName)
@@ -235,6 +238,7 @@ class Asset extends FormEntity
      * Set path
      *
      * @param string $path
+     *
      * @return Asset
      */
     public function setPath($path)
@@ -259,6 +263,7 @@ class Asset extends FormEntity
      * Set alias
      *
      * @param string $alias
+     *
      * @return Asset
      */
     public function setAlias($alias)
@@ -283,6 +288,7 @@ class Asset extends FormEntity
      * Set publishUp
      *
      * @param \DateTime $publishUp
+     *
      * @return Asset
      */
     public function setPublishUp($publishUp)
@@ -307,6 +313,7 @@ class Asset extends FormEntity
      * Set publishDown
      *
      * @param \DateTime $publishDown
+     *
      * @return Asset
      */
     public function setPublishDown($publishDown)
@@ -331,6 +338,7 @@ class Asset extends FormEntity
      * Set downloadCount
      *
      * @param \DateTime $downloadCount
+     *
      * @return Asset
      */
     public function setDownloadCount($downloadCount)
@@ -343,7 +351,7 @@ class Asset extends FormEntity
     /**
      * Get downloadCount
      *
-     * @return \DateTime
+     * @return integer
      */
     public function getDownloadCount()
     {
@@ -354,6 +362,7 @@ class Asset extends FormEntity
      * Set revision
      *
      * @param integer $revision
+     *
      * @return Asset
      */
     public function setRevision($revision)
@@ -377,6 +386,7 @@ class Asset extends FormEntity
      * Set language
      *
      * @param string $language
+     *
      * @return Asset
      */
     public function setLanguage($language)
@@ -400,7 +410,8 @@ class Asset extends FormEntity
     /**
      * Set category
      *
-     * @param \Mautic\AssetBundle\Entity\Category $category
+     * @param \Mautic\CategoryBundle\Entity\Category $category
+     *
      * @return Asset
      */
     public function setCategory(\Mautic\CategoryBundle\Entity\Category $category = null)
@@ -414,7 +425,7 @@ class Asset extends FormEntity
     /**
      * Get category
      *
-     * @return \Mautic\AssetBundle\Entity\Category
+     * @return \Mautic\CategoryBundle\Entity\Category
      */
     public function getCategory()
     {
@@ -432,18 +443,19 @@ class Asset extends FormEntity
 
         parent::isChanged($prop, $val);
     }
+
     /**
      * Constructor
      */
     public function __construct()
     {
-
     }
 
     /**
      * Set uniqueDownloadCount
      *
      * @param integer $uniqueDownloadCount
+     *
      * @return Asset
      */
     public function setUniqueDownloadCount($uniqueDownloadCount)
@@ -473,14 +485,13 @@ class Asset extends FormEntity
                 $this->setTitle($this->getFile()->getClientOriginalName());
             }
 
-            $filename = sha1(uniqid(mt_rand(), true));
-            $this->path = $filename.'.'.$this->getFile()->guessExtension();
+            $filename   = sha1(uniqid(mt_rand(), true));
+            $this->path = $filename . '.' . $this->getFile()->guessExtension();
         }
     }
 
     public function upload()
     {
-
         // the file property can be empty if the field is not required
         if (null === $this->getFile()) {
             return;
@@ -493,7 +504,7 @@ class Asset extends FormEntity
         // check if we have an old asset
         if (isset($this->temp)) {
             // delete the old asset
-            unlink($this->getUploadRootDir().'/'.$this->temp);
+            unlink($this->getUploadRootDir() . '/' . $this->temp);
             // clear the temp asset path
             $this->temp = null;
         }
@@ -518,7 +529,7 @@ class Asset extends FormEntity
     {
         return null === $this->path
             ? null
-            : $this->getUploadRootDir().'/'.$this->path;
+            : $this->getUploadRootDir() . '/' . $this->path;
     }
 
     /**
@@ -530,17 +541,17 @@ class Asset extends FormEntity
     {
         return null === $this->path
             ? null
-            : $this->getUploadDir().'/'.$this->path;
+            : $this->getUploadDir() . '/' . $this->path;
     }
 
     /**
-     * Returns absolut path to upload dir.
+     * Returns absolute path to upload dir.
      *
      * @return string
      */
     protected function getUploadRootDir()
     {
-        return __DIR__.'/../../../../'.$this->getUploadDir();
+        return __DIR__ . '/../../../../' . $this->getUploadDir();
     }
 
     /**
@@ -552,15 +563,16 @@ class Asset extends FormEntity
     {
         if ($this->uploadDir) {
             return $this->uploadDir;
-        } else {
-            return 'media/files';
         }
+
+        return 'media/files';
     }
 
     /**
      * Set uploadDir
      *
      * @param string $uploadDir
+     *
      * @return Asset
      */
     public function setUploadDir($uploadDir)
@@ -745,12 +757,11 @@ class Asset extends FormEntity
     /**
      * Load the file object from it's path.
      *
-     * @return Symfony\Component\HttpFoundation\File\File or null
+     * @return null|\Symfony\Component\HttpFoundation\File\File
      */
     public function loadFile()
     {
-        if (!$this->getAbsolutePath() || !file_exists($this->getAbsolutePath()))
-        {
+        if (!$this->getAbsolutePath() || !file_exists($this->getAbsolutePath())) {
             return null;
         }
 
@@ -778,7 +789,7 @@ class Asset extends FormEntity
      */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
-        $request = \Symfony\Component\HttpFoundation\Request::createFromGlobals();
+        $request       = \Symfony\Component\HttpFoundation\Request::createFromGlobals();
         $assetFormData = $request->request->get('asset');
 
         // only for first time

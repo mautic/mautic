@@ -9,8 +9,6 @@
 
 namespace Mautic\ApiBundle\Routing;
 
-use Mautic\ApiBundle\ApiEvents;
-use Mautic\CoreBundle\Event\RouteEvent;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\Routing\RouteCollection;

@@ -9,12 +9,8 @@
 
 namespace Mautic\ApiBundle\Routing;
 
-use Mautic\ApiBundle\ApiEvents;
-use Mautic\ApiBundle\Event\RouteEvent;
 use Symfony\Component\Config\Loader\Loader;
-use Symfony\Component\Finder\Finder;
 use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\DependencyInjection\Container;
 
 /**
  * Class ApiDocsLoader
