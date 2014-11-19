@@ -16,7 +16,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 /**
  * Class ApiKeysType
  *
- * @package Mautic\SugarcrmBundle\Form\Type
+ * @package Mautic\SalesforceBundle\Form\Type
  */
 class ApiKeysType extends AbstractType
 {
