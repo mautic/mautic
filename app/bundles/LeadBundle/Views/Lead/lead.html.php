@@ -114,7 +114,7 @@ $view['slots']->stop();
                     </div>
                     <div class="col-xs-4 va-m text-right">
                         <?php if ($doNotContact) : ?>
-                            <h4 class="fw-sb"><span class="label label-danger">DO NOT CONTACT</span></h4>
+                            <h4 class="fw-sb"><span class="label label-danger"><?php echo $view['translator']->trans('mautic.lead.do.not.contact'); ?></span></h4>
                         <?php endif; ?>
                         <?php
                         $color = $lead->getColor();
@@ -173,7 +173,7 @@ $view['slots']->stop();
         <div class="bg-auto bg-dark-xs">
             <!-- lead detail collapseable toggler -->
             <div class="hr-expand nm">
-                <span data-toggle="tooltip" title="Detail">
+                <span data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.lead.lead.header.leadinfo'); ?>">
                     <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse" data-target="#lead-details"><span class="caret"></span> <?php echo $view['translator']->trans('mautic.lead.lead.header.leadinfo'); ?></a>
                 </span>
             </div>
@@ -311,12 +311,8 @@ $view['slots']->stop();
                             <span class="figure"></span>
                         </div>
                         <div class="media-body">
-                            <strong class="text-primary"><?php echo $event['eventName']; ?></strong> event will be triggered at
-                            <a href="<?php echo $view['router']->generate('mautic_campaign_action',
-                                array("objectAction" => "view", "objectId" => $event['campaign_id'])); ?>"
-                               data-toggle="ajax">
-                                <?php echo $event['campaignName']; ?>
-                            </a>
+                            <?php $link = '<a href="' . $view['router']->generate('mautic_campaign_action', array("objectAction" => "view", "objectId" => $event['campaign_id'])) . '" data-toggle="ajax">' . $event['campaignName'] . '</a>'; ?>
+                            <?php echo $view['translator']->trans('mautic.lead.lead.upcoming.event.triggered.at', array('%event%' => $event['eventName'], '%link%' => $link)); ?>
                             <p class="fs-12 dark-sm"><?php echo $view['date']->toFull($event['triggerDate']); ?></p>
                         </div>
                     </li>

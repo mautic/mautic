@@ -23,7 +23,7 @@ $page = $event['extra']['page'];
 				    <?php echo $form->getName(); ?>
 				</a>
 			</h3>
-	        <p class="mb-0"><?php echo $view['translator']->trans('mautic.form.timeline.event.time', array('%date%' => $view['date']->toFullConcat($event['timestamp']), '%event%' => $event['eventLabel'])); ?></p>
+            <p class="mb-0"><?php echo $view['translator']->trans('mautic.core.timeline.event.time', array('%date%' => $view['date']->toFullConcat($event['timestamp']), '%event%' => $event['eventLabel'])); ?></p>
 	    </div>
 	    <?php if (isset($event['extra'])) : ?>
 	        <div class="panel-footer">

@@ -13,7 +13,7 @@
 	<div class="figure"></div>
 	<div class="panel bg-primary">
 	    <div class="panel-body">
-	        <p class="mb-0">At <?php echo $view['date']->toFullConcat($event['timestamp']); ?>, <?php echo $event['eventLabel']; ?>.</p>
+            <p class="mb-0"><?php echo $view['translator']->trans('mautic.core.timeline.event.time', array('%date%' => $view['date']->toFullConcat($event['timestamp']), '%event%' => $event['eventLabel'])); ?></p>
 	    </div>
 	</div>
 </li>
