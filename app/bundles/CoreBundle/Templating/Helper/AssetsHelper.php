@@ -10,6 +10,7 @@
 namespace Mautic\CoreBundle\Templating\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\AssetGenerationHelper;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Templating\Helper\CoreAssetsHelper;
 
@@ -23,6 +24,11 @@ class AssetsHelper extends CoreAssetsHelper
      * @var MauticFactory
      */
     protected $factory;
+
+    /**
+     * @var AssetGenerationHelper
+     */
+    protected $assetHelper;
 
     /**
      * @var array
@@ -266,7 +272,7 @@ class AssetsHelper extends CoreAssetsHelper
      */
     public function outputSystemStylesheets()
     {
-        $assets = $this->getAssets();
+        $assets = $this->assetHelper->getAssets();
 
         if (isset($assets['css'])) {
             foreach ($assets['css'] as $url) {
@@ -282,7 +288,7 @@ class AssetsHelper extends CoreAssetsHelper
      */
     public function outputSystemScripts()
     {
-        $assets = $this->getAssets();
+        $assets = $this->assetHelper->getAssets();
 
         if (isset($assets['js'])) {
             foreach ($assets['js'] as $url) {
@@ -298,262 +304,9 @@ class AssetsHelper extends CoreAssetsHelper
      */
     public function getSystemScripts()
     {
-        $assets = $this->getAssets();
+        $assets = $this->assetHelper->getAssets();
 
         return $assets['js'];
-    }
-
-    /**
-     * Generate assets
-     *
-     * @return array
-     */
-    private function getAssets()
-    {
-        static $assets = array();
-
-        if (empty($assets)) {
-
-            $loadAll    = true;
-            $env        = $this->factory->getEnvironment();
-            $rootPath   = $this->factory->getSystemPath('root');
-            $assetsPath = $this->factory->getSystemPath('assets');
-
-            $assetsFullPath = "$rootPath/$assetsPath";
-            if ($env == 'prod') {
-                $loadAll = false; //by default, loading should not be required
-
-                //check for libraries and app files and generate them if they don't exist if in prod environment
-                $prodFiles = array(
-                    "css/libraries.css",
-                    "css/app.css",
-                    "js/libraries.js",
-                    "js/app.js"
-                );
-
-                foreach ($prodFiles as $file) {
-                    if (!file_exists("$assetsFullPath/$file")) {
-                        $loadAll = true; //it's missing so compile it
-                        break;
-                    }
-                }
-            }
-
-            if ($loadAll) {
-                ini_set('max_execution_time', 300);
-
-                $modifiedLast = array();
-
-                //get a list of all core asset files
-                $bundles = $this->factory->getParameter('bundles');
-
-                $fileTypes = array('css', 'js');
-                foreach ($bundles as $bundle) {
-                    foreach ($fileTypes as $ft) {
-                        if (!isset($modifiedLast[$ft])) {
-                            $modifiedLast[$ft] = array();
-                        }
-                        $dir = "{$bundle['directory']}/Assets/$ft";
-                        if (file_exists($dir)) {
-                            $modifiedLast[$ft] = array_merge($modifiedLast[$ft], $this->findAssets($dir, $ft, $env, $assets, $bundle));
-                        }
-                    }
-                }
-                $modifiedLast = array_merge($modifiedLast, $this->findOverrides($env, $assets));
-
-                //combine the files into their corresponding name and put in the root media folder
-                if ($env == "prod") {
-                    $checkPaths = array(
-                        $assetsFullPath,
-                        "$assetsFullPath/css",
-                        "$assetsFullPath/js",
-                    );
-                    array_walk($checkPaths, function ($path) {
-                        if (!file_exists($path)) {
-                            mkdir($path);
-                        }
-                    });
-
-                    foreach ($assets as $type => $groups) {
-                        foreach ($groups as $group => $files) {
-                            $assetFile = "$assetsFullPath/$type/$group.$type";
-
-                            //only refresh if a change has occurred
-                            $modified = (!file_exists($assetFile)) ? true : filemtime($assetFile) < $modifiedLast[$type][$group];
-                            if ($modified) {
-                                if (file_exists($assetFile)) {
-                                    //delete it
-                                    unlink($assetFile);
-                                }
-
-                                if ($type == 'css') {
-                                    $out = fopen($assetFile, 'w');
-
-                                    foreach ($files as $relPath => $details) {
-                                        $content = \Minify::combine(array($relPath), array(
-                                            'rewriteCssUris'  => false,
-                                            'minifierOptions' => array(
-                                                'text/css' => array(
-                                                    'currentDir' => '',
-                                                    'prependRelativePath' => '../../' . dirname($relPath) . '/'
-                                                )
-                                            )
-                                        ));
-                                        fwrite($out, $content);
-                                    }
-
-                                    fclose($out);
-                                } else {
-                                    file_put_contents($assetFile, \Minify::combine(array_keys($files)));
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            if ($env == 'prod') {
-                //return prod generated assets
-                $assets = array(
-                    'css' => array(
-                        "{$assetsPath}/css/libraries.css",
-                        "{$assetsPath}/css/app.css"
-                    ),
-                    'js'  => array(
-                        "{$assetsPath}/js/libraries.js",
-                        "{$assetsPath}/js/app.js"
-                    )
-                );
-            } else {
-                foreach ($assets as $type => &$typeAssets) {
-                    $typeAssets = array_keys($typeAssets);
-                }
-            }
-        }
-
-        return $assets;
-    }
-
-    /**
-     * Finds directory assets
-     *
-     * @param string $dir
-     * @param string $ext
-     * @param string $env
-     * @param array  $assets
-     * @param string $bundle
-     *
-     * @return array
-     */
-    protected function findAssets($dir, $ext, $env, &$assets, $bundle)
-    {
-        $rootPath    = $this->factory->getSystemPath('root') . '/';
-        $directories = new Finder();
-        $directories->directories()->exclude('*less')->depth('0')->ignoreDotFiles(true)->in($dir);
-
-        $modifiedLast = array();
-
-        if (count($directories)) {
-            foreach ($directories as $directory) {
-                $files         = new Finder();
-                $thisDirectory = str_replace('\\', '/', $directory->getRealPath());
-                $files->files()->depth('0')->name('*.' . $ext)->in($thisDirectory)->sortByName();
-                $group = $directory->getBasename();
-                foreach ($files as $file) {
-                    $fullPath = $file->getPathname();
-                    $relPath  = str_replace($rootPath, '', $file->getPathname());
-                    if (strpos($relPath, '/') === 0) {
-                        $relPath = substr($relPath, 1);
-                    }
-
-                    $details = array(
-                        'fullPath'  => $fullPath,
-                        'relPath'   => $relPath
-                    );
-
-                    if ($env == 'prod') {
-                        $lastModified = filemtime($fullPath);
-                        if (!isset($modifiedLast[$group]) || $lastModified > $modifiedLast[$group]) {
-                            $modifiedLast[$group] = $lastModified;
-                        }
-                        $assets[$ext][$group][$relPath] = $details;
-                    } else {
-                        $assets[$ext][$relPath] = $details;
-                    }
-                }
-                unset($files);
-            }
-        }
-
-        unset($directories);
-        $files = new Finder();
-        $files->files()->depth('0')->ignoreDotFiles(true)->name('*.' . $ext)->in($dir)->sortByName();
-        foreach ($files as $file) {
-            $fullPath = $file->getPathname();
-            $relPath  = str_replace($rootPath, '', $fullPath);
-
-            $details = array(
-                'fullPath'  => $fullPath,
-                'relPath'   => $relPath
-            );
-
-            if ($env == 'prod') {
-                $lastModified = filemtime($fullPath);
-                if (!isset($modifiedLast['app']) || $lastModified > $modifiedLast['app']) {
-                    $modifiedLast['app'] = $lastModified;
-                }
-                $assets[$ext]['app'][$relPath] = $details;
-            } else {
-                $assets[$ext][$relPath] = $details;
-            }
-        }
-        unset($files);
-
-        return $modifiedLast;
-    }
-
-    /**
-     * Find asset overrides in the template
-     *
-     * @param $env
-     * @param $assets
-     */
-    protected function findOverrides ($env, &$assets)
-    {
-        $rootPath      = $this->factory->getSystemPath('root');
-        $currentTheme  = $this->factory->getSystemPath('currentTheme');
-        $modifiedLast  = array();
-        $types         = array('css', 'js');
-        $overrideFiles = array(
-            "libraries" => "libraries_custom",
-            "app"       => "app_custom"
-        );
-
-        foreach ($types as $ext) {
-            foreach ($overrideFiles as $group => $of) {
-                if (file_exists("$rootPath/$currentTheme/$ext/$of.$ext")) {
-                    $fullPath = "$rootPath/$currentTheme/$ext/$of.$ext";
-                    $relPath  = "$currentTheme/$ext/$of.$ext";
-
-                    $details = array(
-                        'fullPath'  => $fullPath,
-                        'relPath'   => $relPath
-                    );
-
-                    if ($env == 'prod') {
-                        $lastModified = filemtime($fullPath);
-                        if (!isset($modifiedLast[$ext][$group]) || $lastModified > $modifiedLast[$ext][$group]) {
-                            $modifiedLast[$ext][$group] = $lastModified;
-                        }
-                        $assets[$ext][$group][$relPath] = $details;
-                    } else {
-                        $assets[$ext][$relPath] = $details;
-                    }
-                }
-            }
-        }
-
-        return $modifiedLast;
     }
 
     /**
@@ -595,6 +348,11 @@ class AssetsHelper extends CoreAssetsHelper
     public function setFactory(MauticFactory $factory)
     {
         $this->factory = $factory;
+    }
+
+    public function setAssetHelper(AssetGenerationHelper $helper)
+    {
+        $this->assetHelper = $helper;
     }
 
     /**

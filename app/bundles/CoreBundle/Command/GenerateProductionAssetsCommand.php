@@ -9,7 +9,6 @@
 
 namespace Mautic\CoreBundle\Command;
 
-use Mautic\CoreBundle\Helper\UpdateHelper;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
@@ -17,12 +16,12 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Process\Exception\RuntimeException;
+use Symfony\Component\Finder\Finder;
 
 /**
- * CLI Command to fetch application updates
+ * CLI Command to generate production assets
  */
-class FindUpdatesCommand extends ContainerAwareCommand
+class GenerateProductionAssetsCommand extends ContainerAwareCommand
 {
 
     /**
@@ -30,10 +29,10 @@ class FindUpdatesCommand extends ContainerAwareCommand
      */
     protected function configure()
     {
-        $this->setName('mautic:update:find')
-            ->setDescription('Fetches updates for Mautic')
+        $this->setName('mautic:assets:generate')
+            ->setDescription('Combines and minifies asset files from each bundle into single production files')
             ->setHelp(<<<EOT
-The <info>%command.name%</info> command checks for updates for the Mautic application.
+The <info>%command.name%</info> command Combines and minifies files from each bundle's Assets/css/* and Assets/js/* folders into single production files stored in root/media/css and root/media/js respectively.
 
 <info>php %command.full_name%</info>
 EOT
@@ -45,21 +44,16 @@ EOT
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $assetHelper = $this->getContainer()->get('mautic.helper.assetgeneration');
+
+        $assetHelper->getAssets(true);
+
         /** @var \Symfony\Bundle\FrameworkBundle\Translation\Translator $translator */
         $translator = $this->getContainer()->get('translator');
         $translator->setLocale($this->getContainer()->get('mautic.factory')->getParameter('locale'));
 
-        $updateHelper = new UpdateHelper($this->getContainer()->get('mautic.factory'));
-        $updateData   = $updateHelper->fetchData($this->getContainer()->getParameter('kernel.root_dir'), true);
-
-        if ($updateData['error']) {
-            $output->writeln('<error>' . $translator->trans($updateData['message']) . '</error>');
-        } elseif ($updateData['message'] == 'mautic.core.updater.running.latest.version') {
-            $output->writeln('<info>' . $translator->trans($updateData['message']) . '</info>');
-        } else {
-            $output->writeln($translator->trans($updateData['message'], array('%version%' => $updateData['version'], '%announcement%' => $updateData['announcement'])));
-            $output->writeln($translator->trans('mautic.core.updater.cli.update'));
-        }
+        // Update successful
+        $output->writeln('<info>' . $translator->trans('mautic.core.command.asset_generate_success') . '</info>');
 
         return 0;
     }

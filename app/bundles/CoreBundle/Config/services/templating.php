@@ -43,3 +43,13 @@ $container->setDefinition('mautic.templating.name_parser',
         array(new Reference('kernel'))
     )
 );
+
+//Asset generation helper
+$container->setDefinition('mautic.helper.assetgeneration',
+    new Definition (
+        'Mautic\CoreBundle\Helper\AssetGenerationHelper',
+        array(
+            new Reference('mautic.factory')
+        )
+    )
+);
