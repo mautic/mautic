@@ -14,7 +14,7 @@ class LeadMapper extends AbstractMapper
     /**
      * Check API Authentication
      */
-    private function checkApiAuth()
+    public function checkApiAuth()
     {
         $router = $this->factory->getRouter();
         $request = $this->factory->getRequest();

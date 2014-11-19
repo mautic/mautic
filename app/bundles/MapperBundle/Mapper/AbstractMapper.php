@@ -49,6 +49,11 @@ abstract class AbstractMapper
     }
 
     /**
+     * @return mixed
+     */
+    abstract public function checkApiAuth();
+
+    /**
      * Must be implement by MapperObject
      *
      * @param MauticFactory $factory
