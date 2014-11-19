@@ -27,7 +27,7 @@ $view['slots']->set('mauticContent', 'asset');
 		    	<div class="col-md-6">
 		    		<div class="row">
 				    	<div class="form-group col-xs-12">
-				    		<label class="control-label required" for="asset_file">Preview</label>
+				    		<label class="control-label required" for="asset_file"><?php echo $view['translator']->trans('mautic.asset.asset.preview'); ?></label>
 				    		<div class="text-center thumbnail-preview">
 					    		<?php if ($activeAsset->isImage()) : ?>
 					    			<img src="<?php echo $assetUrl; ?>" alt="<?php echo $activeAsset->getTitle(); ?>" class="img-thumbnail" />
