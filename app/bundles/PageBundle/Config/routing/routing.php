@@ -38,7 +38,7 @@ $collection->add('mautic_page_action', new Route('/pages/{objectAction}/{objectI
     )
 ));
 
-$collection->add('mautic_page_tracker', new Route('/p/page/tracker.gif',
+$collection->add('mautic_page_tracker', new Route('/p/mtracking.gif',
     array(
         '_controller' => 'MauticPageBundle:Public:trackingImage'
     )
