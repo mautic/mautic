@@ -5,7 +5,8 @@
     "description": "Mautic Open Source Distribution",
     "autoload": {
         "psr-4": {
-            "Mautic\\": "app/bundles/"
+            "Mautic\\": "app/bundles/",
+	        "MauticAddon\\": "addons/"
         }
     },
     "require": {
