@@ -36,6 +36,19 @@ class IntegrationRepository extends CommonRepository
     }
 
     /**
+     * Retrieves the enabled status of all addon bundles
+     *
+     * @return array
+     */
+    public function getBundleStatus()
+    {
+        $q = $this->createQueryBuilder($this->getTableAlias())
+            ->select('i.bundle AS bundle, i.isPublished AS published');
+
+        return $q->getQuery()->getArrayResult();
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getEntities($args = array())
