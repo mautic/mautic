@@ -30,6 +30,11 @@ class RouteLoader extends Loader
     private $bundles;
 
     /**
+     * @var bool|mixed
+     */
+    private $addonBundles;
+
+    /**
      * @var bool
      */
     private $apiEnabled;
@@ -39,8 +44,9 @@ class RouteLoader extends Loader
      */
     public function __construct(MauticFactory $factory)
     {
-        $this->bundles    = $factory->getParameter('bundles');
-        $this->apiEnabled = $factory->getParameter('api_enabled');
+        $this->bundles      = $factory->getParameter('bundles');
+        $this->addonBundles = $factory->getParameter('addon.bundles');
+        $this->apiEnabled   = $factory->getParameter('api_enabled');
     }
 
     /**
@@ -57,6 +63,13 @@ class RouteLoader extends Loader
 
         $collection = new RouteCollection();
         foreach ($this->bundles as $bundle) {
+            $routing = $bundle['directory'] . "/Config/routing/api.php";
+            if (file_exists($routing)) {
+                $collection->addCollection($this->import($routing));
+            }
+        }
+
+        foreach ($this->addonBundles as $bundle) {
             $routing = $bundle['directory'] . "/Config/routing/api.php";
             if (file_exists($routing)) {
                 $collection->addCollection($this->import($routing));

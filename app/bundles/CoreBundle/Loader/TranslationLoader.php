@@ -40,11 +40,31 @@ class TranslationLoader extends ArrayLoader implements LoaderInterface
     public function load($resource, $locale, $domain = 'messages')
     {
         $bundles   = $this->factory->getParameter('bundles');
+        $addons    = $this->factory->getParameter('addon.bundles');
         $catalogue = new MessageCatalogue($locale);
 
         foreach ($bundles as $name => $bundle) {
             //load translations
-            $translations = $bundle['directory'] . '/Translations/'.$locale;
+            $translations = $bundle['directory'] . '/Translations/' . $locale;
+            if (file_exists($translations)) {
+
+                $iniFiles = new Finder();
+                $iniFiles->files()->in($translations)->name('*.ini');
+
+                foreach ($iniFiles as $file) {
+                    $iniFile = $file->getRealpath();
+                    $messages = parse_ini_file($iniFile, true);
+                    $domain  = substr($file->getFilename(), 0, -4);
+
+                    $thisCatalogue = parent::load($messages, $locale, $domain);
+                    $catalogue->addCatalogue($thisCatalogue);
+                }
+            }
+        }
+
+        foreach ($addons as $name => $bundle) {
+            //load translations
+            $translations = $bundle['directory'] . '/Translations/' . $locale;
             if (file_exists($translations)) {
 
                 $iniFiles = new Finder();
