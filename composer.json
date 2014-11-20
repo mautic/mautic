@@ -1,6 +1,6 @@
 {
     "name": "mautic/open-source-edition",
-    "license": "MIT",
+    "license": "GPL-3.0",
     "type": "project",
     "description": "Mautic Open Source Distribution",
     "autoload": {
