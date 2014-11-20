@@ -626,9 +626,9 @@ class CommonRepository extends EntityRepository
      */
     public function getBaseColumns($entityClass, $convertCamelCase = false)
     {
-        static $baseCols = array();
+        static $baseCols = array(true => array(), false => array());
 
-        if (empty($baseCols[$entityClass])) {
+        if (empty($baseCols[$convertCamelCase][$entityClass])) {
             //get a list of properties from the Lead entity so that anything not listed is a custom field
             $entity = new $entityClass();
             $reflect    = new \ReflectionClass($entity);
@@ -638,20 +638,22 @@ class CommonRepository extends EntityRepository
                 $parentProps = $parentClass->getProperties();
                 $props       = array_merge($parentProps, $props);
             }
-            $baseCols[$entityClass] = array();
+
+            $baseCols[$convertCamelCase][$entityClass] = array();
             foreach ($props as $p) {
-                if (!in_array($p->name, $baseCols[$entityClass])) {
+                if (!in_array($p->name, $baseCols[$convertCamelCase][$entityClass])) {
                     $n = $p->name;
                     if ($convertCamelCase) {
                         $n = preg_replace('/(?<=\\w)(?=[A-Z])/',"_$1", $n);
                         $n = strtolower($n);
                     }
-                    $baseCols[$entityClass][] = $n;
+                    
+                    $baseCols[$convertCamelCase][$entityClass][] = $n;
                 }
             }
         }
 
-        return $baseCols[$entityClass];
+        return $baseCols[$convertCamelCase][$entityClass];
     }
 
     /**
