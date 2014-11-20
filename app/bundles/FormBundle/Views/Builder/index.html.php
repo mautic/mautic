@@ -89,8 +89,8 @@ $view['slots']->set("headerTitle", $header);
                             endforeach;
                             ?>
                             <?php if (!count($formFields)): ?>
-                            <div class="alert alert-info">
-                                <p id='form-field-placeholder'><?php echo $view['translator']->trans('mautic.form.form.addfield'); ?></p>
+                            <div class="alert alert-info" id="form-field-placeholder">
+                                <p><?php echo $view['translator']->trans('mautic.form.form.addfield'); ?></p>
                             </div>
                             <?php endif; ?>
                         </div>
@@ -130,8 +130,8 @@ $view['slots']->set("headerTitle", $header);
                             endforeach;
                             ?>
                             <?php if (!count($formActions)): ?>
-                                <div class="alert alert-info">
-                                    <p id='form-action-placeholder'><?php echo $view['translator']->trans('mautic.form.form.addaction'); ?></p>
+                                <div class="alert alert-info" id="form-action-placeholder">
+                                    <p><?php echo $view['translator']->trans('mautic.form.form.addaction'); ?></p>
                                 </div>
                             <?php endif; ?>
                         </div>
