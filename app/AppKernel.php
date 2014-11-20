@@ -113,6 +113,31 @@ class AppKernel extends Kernel
             }
         }
 
+        //dynamically register Mautic Addon Bundles
+        $searchPath = dirname(__DIR__) . '/addons';
+        $finder     = new \Symfony\Component\Finder\Finder();
+        $finder->files()
+            ->in($searchPath)
+            ->name('*Bundle.php');
+
+        foreach ($finder as $file) {
+            $path      = substr($file->getRealPath(), strlen($searchPath) + 1, -4);
+            $parts     = explode(DIRECTORY_SEPARATOR, $path);
+            $class     = array_pop($parts);
+            $namespace = "MauticAddon\\" . implode('\\', $parts);
+            $class     = $namespace . '\\' . $class;
+            if (class_exists($class)) {
+                $bundleInstance = new $class();
+                if (method_exists($bundleInstance, 'isEnabled')) {
+                    if ($bundleInstance->isEnabled()) {
+                        $bundles[] = $bundleInstance;
+                    }
+                } else {
+                    $bundles[] = $bundleInstance;
+                }
+            }
+        }
+
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {
             $bundles[] = new Symfony\Bundle\WebProfilerBundle\WebProfilerBundle();
             $bundles[] = new Sensio\Bundle\DistributionBundle\SensioDistributionBundle();
