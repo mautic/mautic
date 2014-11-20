@@ -206,7 +206,7 @@ if ($permissions['campaign:campaigns:edit']): ?>
     <div class="col-md-3 bg-white bdr-l height-auto">
 
         <!-- recent activity -->
-        <?php echo $view->render('MauticCoreBundle:Default:recentactivity.html.php', array('logs' => $logs)); ?>
+        <?php echo $view->render('MauticCoreBundle:Helper:recentactivity.html.php', array('logs' => $logs)); ?>
 
     </div>
     <!--/ right section -->

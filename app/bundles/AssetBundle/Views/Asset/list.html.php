@@ -129,5 +129,5 @@ $view->extend('MauticAssetBundle:Asset:index.html.php');
         )); ?>
     </div>
 <?php else: ?>
-    <?php echo $view->render('MauticCoreBundle:Default:noresults.html.php'); ?>
+    <?php echo $view->render('MauticCoreBundle:Helper:noresults.html.php'); ?>
 <?php endif; ?>

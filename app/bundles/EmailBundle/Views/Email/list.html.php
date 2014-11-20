@@ -150,6 +150,6 @@ if ($tmpl == 'index') {
             </tbody>
         </table>
     <?php else: ?>
-        <?php echo $view->render('MauticCoreBundle:Default:noresults.html.php'); ?>
+        <?php echo $view->render('MauticCoreBundle:Helper:noresults.html.php'); ?>
     <?php endif; ?>
 </div>

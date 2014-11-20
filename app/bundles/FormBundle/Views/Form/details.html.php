@@ -280,7 +280,7 @@ foreach ($activeForm->getActions() as $action) {
           <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mb-0">
 
               <!-- recent activity -->
-              <?php echo $view->render('MauticCoreBundle:Default:recentactivity.html.php', array('logs' => $logs)); ?>
+              <?php echo $view->render('MauticCoreBundle:Helper:recentactivity.html.php', array('logs' => $logs)); ?>
 
           </div>
       </div>
