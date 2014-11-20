@@ -10,9 +10,7 @@
 $target = (!empty($target)) ? $target : '.page-list';
 $tmpl   = (!empty($tmpl)) ? $tmpl : 'list';
 
-if (!isset($limit)) {
-    $limit = 30;
-}
+$limit  = (!isset($limit)) ? 30 : (int) $limit;
 
 if (!isset($range)) {
     $range = 4;
