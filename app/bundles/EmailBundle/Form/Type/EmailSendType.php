@@ -13,11 +13,11 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class CampaignEventEmailSendType
+ * Class EmailSendType
  *
  * @package Mautic\EmailBundle\Form\Type
  */
-class CampaignEventEmailSendType extends AbstractType
+class EmailSendType extends AbstractType
 {
 
     /**
@@ -27,13 +27,14 @@ class CampaignEventEmailSendType extends AbstractType
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
         $builder->add('email', 'email_list', array(
-            'label'      => 'mautic.email.form.sendemails',
+            'label'      => 'mautic.email.send.selectemails',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
                 'class' => 'form-control',
-                'tooltip' => 'mautic.email.form.sendemails_descr'
+                'tooltip' => 'mautic.email.send.selectemails_descr'
             ),
-            'multiple'   => false
+            'multiple'   => false,
+            'empty_value' => 'mautic.core.form.chooseone'
         ));
     }
 
@@ -41,6 +42,6 @@ class CampaignEventEmailSendType extends AbstractType
      * @return string
      */
     public function getName() {
-        return "campaignevent_email";
+        return "emailsend_list";
     }
 }

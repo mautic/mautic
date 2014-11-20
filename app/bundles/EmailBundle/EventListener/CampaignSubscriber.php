@@ -44,7 +44,7 @@ class CampaignSubscriber extends CommonSubscriber
             'label'       => 'mautic.email.campaign.event.open',
             'description' => 'mautic.email.campaign.event.open_descr',
             'callback'    => array('\\Mautic\\EmailBundle\\Helper\\CampaignEventHelper', 'validateEmailTrigger'),
-            //'formType'    => 'campaignevent_email'
+            //'formType'    => 'emailopen_list'
         );
         $event->addLeadDecision('email.open', $trigger);
 
@@ -52,7 +52,7 @@ class CampaignSubscriber extends CommonSubscriber
             'label'       => 'mautic.email.campaign.event.send',
             'description' => 'mautic.email.campaign.event.send_descr',
             'callback'    => array('\\Mautic\\EmailBundle\\Helper\\CampaignEventHelper', 'sendEmailAction'),
-            'formType'    => 'campaignevent_email'
+            'formType'    => 'emailsend_list'
         );
         $event->addAction('email.send', $action);
     }

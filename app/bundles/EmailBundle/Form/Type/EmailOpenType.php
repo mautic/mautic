@@ -13,11 +13,11 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class FormSubmitActionSendLeadEmailType
+ * Class EmailOpenType
  *
  * @package Mautic\EmailBundle\Form\Type
  */
-class FormSubmitActionSendLeadEmailType extends AbstractType
+class EmailOpenType extends AbstractType
 {
 
     /**
@@ -26,17 +26,14 @@ class FormSubmitActionSendLeadEmailType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        $builder->add('email', 'email_list', array(
-            'expanded'      => false,
-            'multiple'      => false,
-            'label'         => 'mautic.email.form.submit.emails',
-            'label_attr'    => array('class' => 'control-label'),
-            'empty_value'   => false,
-            'required'      => false,
+        $builder->add('emails', 'email_list', array(
+            'label'      => 'mautic.email.open.limittoemails',
+            'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
-                'class'   => 'form-control',
-                'tooltip' => 'mautic.email.form.submit.emails_descr'
-            )
+                'class' => 'form-control',
+                'tooltip' => 'mautic.email.open.limittoemails_descr'
+            ),
+            'required'   => false
         ));
     }
 
@@ -44,6 +41,6 @@ class FormSubmitActionSendLeadEmailType extends AbstractType
      * @return string
      */
     public function getName() {
-        return "email_submitaction_sendemail_lead";
+        return "emailopen_list";
     }
 }

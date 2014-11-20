@@ -53,7 +53,7 @@ class FormSubscriber extends CommonSubscriber
         $action = array(
             'label'        => 'mautic.email.form.action.sendemail.lead',
             'description'  => 'mautic.email.form.action.sendemail.lead.descr',
-            'formType'     => 'email_submitaction_sendemail_lead',
+            'formType'     => 'emailsend_list',
             'callback'     => '\Mautic\EmailBundle\Helper\FormSubmitHelper::onFormSubmit'
         );
 
