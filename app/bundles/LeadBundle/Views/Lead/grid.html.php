@@ -90,12 +90,17 @@ if ($tmpl == 'index')
         if (!isset($link)) {
             $link = 'mautic_lead_index';
         }
+        if (isset($objectId)) {
+            $router = $view['router']->generate($link, array('objectId' => $objectId));
+        } else {
+            $router = $view['router']->generate($link);
+        }
         echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
             "totalItems"      => $totalItems,
             "page"            => $page,
             "limit"           => $limit,
             "menuLinkId"      => $link,
-            "baseUrl"         => $view['router']->generate($link),
+            "baseUrl"         => $router,
             "tmpl"            => $indexMode,
             'sessionVar'      => 'lead'
         )); 

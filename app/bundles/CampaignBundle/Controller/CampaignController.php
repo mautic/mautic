@@ -221,6 +221,97 @@ class CampaignController extends FormController
         ));
     }
 
+    public function leadsAction($objectId, $page)
+    {
+        //set some permissions
+        $permissions = $this->factory->getSecurity()->isGranted(array(
+            'campaign:campaigns:view',
+            'campaign:campaigns:create',
+            'campaign:campaigns:edit',
+            'campaign:campaigns:delete',
+            'campaign:campaigns:publish'
+
+        ), "RETURN_ARRAY");
+
+        if (!$permissions['campaign:campaigns:view']) {
+            return $this->accessDenied();
+        }
+
+        //set limits
+        $limit = $this->factory->getSession()->get('mautic.campaign.lead.limit', $this->factory->getParameter('default_pagelimit'));
+        $start = ($page === 1) ? 0 : (($page - 1) * $limit);
+        if ($start < 0) {
+            $start = 0;
+        }
+
+        $search = $this->request->get('search', $this->factory->getSession()->get('mautic.campaign.lead.filter', ''));
+        $this->factory->getSession()->set('mautic.campaign.lead.filter', $search);
+
+        $filter     = array('string' => $search, 'force' => array());
+        $orderBy    = $this->factory->getSession()->get('mautic.campaign.lead.orderby', 'l.date_added');
+        $orderByDir = $this->factory->getSession()->get('mautic.campaign.lead.orderbydir', 'ASC');
+
+        // We need the EmailRepository to check if a lead is flagged as do not contact
+        /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
+        $emailRepo = $this->factory->getModel('email')->getRepository();
+
+        $campaignLeadRepo   = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:Lead');
+        $leads              = $campaignLeadRepo->getLeadsWithFields(
+            array(
+                'campaign_id' => $objectId,
+                'withTotalCount' => true,
+                'start'      => $start,
+                'limit'      => $limit,
+                'filter'     => $filter,
+                'orderBy'    => $orderBy,
+                'orderByDir' => $orderByDir));
+
+        $count = $leads['count'];
+        if ($count && $count < ($start + 1)) {
+            //the number of entities are now less then the current page so redirect to the last page
+            if ($count === 1) {
+                $lastPage = 1;
+            } else {
+                $lastPage = (floor($limit / $count)) ?: 1;
+            }
+            $this->factory->getSession()->set('mautic.campaign.lead.page', $lastPage);
+            $returnUrl = $this->generateUrl('mautic_campaign_leads', array('page' => $lastPage));
+
+            return $this->postActionRedirect(array(
+                'returnUrl'       => $returnUrl,
+                'viewParameters'  => array('page' => $lastPage, 'objectId' => $objectId),
+                'contentTemplate' => 'MauticLeadBundle:Lead:grid.html.php',
+                'passthroughVars' => array(
+                    'activeLink'    => '#mautic_campaign_view',
+                    'mauticContent' => 'campaign'
+                )
+            ));
+        }
+
+        return $this->delegateView(array(
+            'viewParameters'  => array(
+                'page'        => $page,
+                'items'       => $leads['results'],
+                'totalItems'  => $leads['count'], 
+                'tmpl'        => 'campaign',
+                'indexMode'   => 'grid',
+                'link'        => 'mautic_campaign_leads',
+                'limit'       => 10,
+                'objectId'    => $objectId,
+                'noContactList' => $emailRepo->getDoNotEmailList()
+            ),
+            'contentTemplate' => 'MauticLeadBundle:Lead:grid.html.php',
+            'passthroughVars' => array(
+                'activeLink'    => '#mautic_campaign_view',
+                'mauticContent' => 'campaign',
+                'route'         => $this->generateUrl('mautic_campaign_leads', array(
+                        'objectId'     => $objectId,
+                        'page'         => $page)
+                )
+            )
+        ));
+    }
+
     /**
      * Generates new form and processes post data
      *

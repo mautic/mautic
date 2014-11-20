@@ -35,4 +35,14 @@ $collection->add('mautic_campaign_action', new Route('/campaigns/{objectAction}/
     )
 ));
 
+$collection->add('mautic_campaign_leads', new Route('/campaigns/view/{objectId}/leads/{page}',
+    array(
+        '_controller' => 'MauticCampaignBundle:Campaign:leads',
+        "objectId"    => 0,
+        'page'        => 1
+    ), array(
+        'page'    => '\d+'
+    )
+));
+
 return $collection;

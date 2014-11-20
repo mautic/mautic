@@ -194,7 +194,7 @@ if ($permissions['campaign:campaigns:edit']): ?>
             </div>
             <!--/ #events-container -->
 
-            <div class="tab-pane fade in bdr-w-0" id="leads-container">
+            <div class="tab-pane fade in bdr-w-0 page-list" id="leads-container">
                 <?php echo $view->render('MauticLeadBundle:Lead:grid.html.php', array(
                     'items' => $leads['results'], 
                     'tmpl' => 'campaign', 
@@ -202,6 +202,8 @@ if ($permissions['campaign:campaigns:edit']): ?>
                     'totalItems' => $leads['count'], 
                     'page' => 1, 
                     'limit' => 10, 
+                    'link' => 'mautic_campaign_leads',
+                    'objectId' => $campaign->getId(),
                     'indexMode' => 'grid')); ?>
             </div>
         </div>
