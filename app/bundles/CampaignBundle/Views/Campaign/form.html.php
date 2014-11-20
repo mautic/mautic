@@ -55,4 +55,4 @@ $view['slots']->set("headerTitle", $header);
 </div>
 
 <?php echo $view['form']->end($form); ?>
-<?php echo $view->render('MauticCampaignBundle:Campaign:builder.html.php', array('campaignEvents' => $campaignEvents, 'eventSettings' => $eventSettings, 'tempEventIds' => $tempEventIds)); ?>
+<?php echo $view->render('MauticCampaignBundle:Campaign:builder.html.php', array('campaignId' => $form['sessionId']->vars['data'], 'campaignEvents' => $campaignEvents, 'eventSettings' => $eventSettings, 'tempEventIds' => $tempEventIds)); ?>

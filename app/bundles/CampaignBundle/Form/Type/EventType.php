@@ -136,6 +136,10 @@ class EventType extends AbstractType
             'container_class' => 'bottom-campaignevent-buttons'
         ));
 
+        $builder->add('campaignId', 'hidden', array(
+            'mapped' => false
+        ));
+
         if (!empty($options["action"])) {
             $builder->setAction($options["action"]);
         }
