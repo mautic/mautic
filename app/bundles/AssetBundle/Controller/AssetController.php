@@ -209,7 +209,7 @@ class AssetController extends FormController
                 ),
                 'security'          => $security,
                 'assetDownloadUrl'  => $model->generateUrl($activeAsset, true),
-                'assetUrl'          => $baseUrl . $activeAsset->getWebPath(),
+                'baseUrl'           => $baseUrl,
                 'logs'              => $logs,
             ),
             'contentTemplate' => 'MauticAssetBundle:Asset:details.html.php',
@@ -432,7 +432,7 @@ class AssetController extends FormController
             'viewParameters'  =>  array(
                 'form'        => $form->createView(),
                 'activeAsset' => $entity,
-                'assetUrl'    => $baseUrl . $entity->getWebPath()
+                'baseUrl'     => $baseUrl
             ),
             'contentTemplate' => 'MauticAssetBundle:Asset:form.html.php',
             'passthroughVars' => array(
