@@ -29,10 +29,10 @@ if (empty($actionType)) {
 ?>
 
 <div class="form-buttons hide">
-    <a data-toggle="ajaxmodal" data-target="#formComponentModal" data-ignore-removemodal="true" href="<?php echo $view['router']->generate($route, array('objectAction' => 'edit', 'objectId' => $id)); ?>" class="btn btn-primary btn-xs">
+    <a data-toggle="ajaxmodal" data-target="#formComponentModal" data-ignore-removemodal="true" href="<?php echo $view['router']->generate($route, array('objectAction' => 'edit', 'objectId' => $id, 'formId' => $formId)); ?>" class="btn btn-primary btn-xs">
         <i class="fa fa-pencil-square-o"></i>
     </a>
-    <a data-menu-link="mautic_form_index" data-toggle="ajax" data-target="#mauticform_<?php echo $actionType . $id; ?>" data-ignore-formexit="true" data-method="POST" data-hide-loadingbar="true" href="<?php echo $view['router']->generate($route, array('objectAction' => $action, 'objectId' => $id)); ?>"  class="btn <?php echo $btnClass; ?> btn-xs">
+    <a data-menu-link="mautic_form_index" data-toggle="ajax" data-target="#mauticform_<?php echo $actionType . $id; ?>" data-ignore-formexit="true" data-method="POST" data-hide-loadingbar="true" href="<?php echo $view['router']->generate($route, array('objectAction' => $action, 'objectId' => $id, 'formId' => $formId)); ?>"  class="btn <?php echo $btnClass; ?> btn-xs">
         <i class="fa <?php echo $iconClass; ?>"></i>
     </a>
     <i class="fa fa-fw fa-ellipsis-v reorder-handle"></i>

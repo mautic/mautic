@@ -22,7 +22,8 @@ $containerClass = (!empty($deleted)) ? ' bg-danger' : '';
     if (!empty($inForm)):
         echo $view->render('MauticFormBundle:Builder:actions.html.php', array(
             'deleted' => (!empty($deleted)) ? $deleted : false,
-            'id'      => $id
+            'id'      => $id,
+            'formId'  => $formId
         ));
     ?>
         <label class="text-muted"><?php echo $field['label']; ?></label>

@@ -24,20 +24,26 @@ class FieldController extends CommonFormController
      *
      * @return JsonResponse
      */
-    public function newAction()
+    public function newAction ()
     {
-        $success     = 0;
-        $valid       = $cancelled = false;
-        $method      = $this->request->getMethod();
-        $session     = $this->factory->getSession();
+        $success = 0;
+        $valid   = $cancelled = false;
+        $method  = $this->request->getMethod();
+        $session = $this->factory->getSession();
 
         if ($method == 'POST') {
-            $formField = $this->request->request->get('formfield');
+            $formField          = $this->request->request->get('formfield');
             $formField['alias'] = 'new';
-            $fieldType = $formField['type'];
+            $fieldType          = $formField['type'];
+            $formId             = $formField['formId'];
         } else {
             $fieldType = $this->request->query->get('type');
-            $formField = array('type' => $fieldType, 'alias' => 'new');
+            $formId    = $this->request->query->get('formId');
+            $formField = array(
+                'type'   => $fieldType,
+                'alias'  => 'new',
+                'formId' => $formId
+            );
         }
 
         //ajax only for form fields
@@ -57,6 +63,7 @@ class FieldController extends CommonFormController
             'action'           => $this->generateUrl('mautic_formfield_action', array('objectAction' => 'new')),
             'customParameters' => $customParams
         ));
+        $form->get('formId')->setData($formId);
 
         if (!empty($customParams)) {
             $formField['isCustom']         = true;
@@ -73,18 +80,18 @@ class FieldController extends CommonFormController
                     $keyId = 'new' . hash('sha1', uniqid(mt_rand()));
 
                     //save the properties to session
-                    $fields          = $session->get('mautic.formfields.add');
+                    $fields          = $session->get('mautic.form.'.$formId.'.fields.modified');
                     $formData        = $form->getData();
                     $formField       = array_merge($formField, $formData);
                     $formField['id'] = $keyId;
                     $fields[$keyId]  = $formField;
-                    $session->set('mautic.formfields.add', $fields);
+                    $session->set('mautic.form.'.$formId.'.fields.modified', $fields);
 
                     //take note if this is a submit button or not
                     if ($fieldType == 'button' && $formField['properties']['type'] == 'submit') {
-                        $submits = $session->get('mautic.formfields.submits', array());
+                        $submits   = $session->get('mautic.form.'.$formId.'.fields.submits', array());
                         $submits[] = $keyId;
-                        $session->set('mautic.formfields.submits', $submits);
+                        $session->set('mautic.form.'.$formId.'.fields.submits', $submits);
                     }
                 } else {
                     $success = 0;
@@ -109,26 +116,28 @@ class FieldController extends CommonFormController
             'route'         => false
         );
 
-        if (!empty($keyId) ) {
+        if (!empty($keyId)) {
             //prevent undefined errors
             $entity    = new Field();
             $blank     = $entity->convertToArray();
             $formField = array_merge($blank, $formField);
 
             $passthroughVars['fieldId']   = $keyId;
-            $template = (!empty($customParams)) ? $customParams['template'] : 'MauticFormBundle:Field:' . $fieldType . '.html.php';
+            $template                     = (!empty($customParams)) ? $customParams['template'] : 'MauticFormBundle:Field:' . $fieldType . '.html.php';
             $passthroughVars['fieldHtml'] = $this->renderView($template, array(
                 'inForm' => true,
                 'field'  => $formField,
-                'id'     => $keyId
+                'id'     => $keyId,
+                'formId'  => $formId
             ));
         }
 
         if ($closeModal) {
             //just close the modal
             $passthroughVars['closeModal'] = 1;
-            $response  = new JsonResponse($passthroughVars);
+            $response                      = new JsonResponse($passthroughVars);
             $response->headers->set('Content-Length', strlen($response->getContent()));
+
             return $response;
         }
 
@@ -146,17 +155,18 @@ class FieldController extends CommonFormController
      *
      * @return JsonResponse
      */
-    public function editAction($objectId)
+    public function editAction ($objectId)
     {
         $session   = $this->factory->getSession();
         $method    = $this->request->getMethod();
-        $fields    = $session->get('mautic.formfields.add', array());
+        $formId    = ($method == "POST") ? $this->request->request->get('formfield[formId]', '', true) : $this->request->query->get('formId');
+        $fields    = $session->get('mautic.form.'.$formId.'.fields.modified', array());
         $success   = 0;
         $valid     = $cancelled = false;
         $formField = (array_key_exists($objectId, $fields)) ? $fields[$objectId] : null;
 
         if ($formField !== null) {
-            $fieldType  = $formField['type'];
+            $fieldType = $formField['type'];
 
             //ajax only for form fields
             if (!$fieldType ||
@@ -173,6 +183,7 @@ class FieldController extends CommonFormController
                 'action'           => $this->generateUrl('mautic_formfield_action', array('objectAction' => 'edit', 'objectId' => $objectId)),
                 'customParameters' => $customParams
             ));
+            $form->get('formId')->setData($formId);
 
             //Check for a submitted form and process it
             if ($method == 'POST') {
@@ -183,25 +194,25 @@ class FieldController extends CommonFormController
                         //form is valid so process the data
 
                         //save the properties to session
-                        $session           = $this->factory->getSession();
-                        $fields            = $session->get('mautic.formfields.add');
-                        $formData          = $form->getData();
+                        $session  = $this->factory->getSession();
+                        $fields   = $session->get('mautic.form.'.$formId.'.fields.modified');
+                        $formData = $form->getData();
                         //overwrite with updated data
-                        $formField         = $fields[$objectId] = array_merge($fields[$objectId], $formData);
-                        $session->set('mautic.formfields.add', $fields);
+                        $formField = $fields[$objectId] = array_merge($fields[$objectId], $formData);
+                        $session->set('mautic.form.'.$formId.'.fields.modified', $fields);
 
                         //take note if this is a submit button or not
                         if ($fieldType == 'button') {
-                            $submits = $session->get('mautic.formfields.submits', array());
+                            $submits = $session->get('mautic.form.'.$formId.'.fields.submits', array());
                             if ($formField['properties']['type'] == 'submit' && !in_array($objectId, $submits)) {
                                 //button type updated to submit
                                 $submits[] = $objectId;
-                                $session->set('mautic.formfields.submits', $submits);
+                                $session->set('mautic.form.'.$formId.'.fields.submits', $submits);
                             } elseif ($formField['properties']['type'] != 'submit' && in_array($objectId, $submits)) {
                                 //button type updated to something other than submit
                                 $key = array_search($objectId, $submits);
                                 unset($submits[$key]);
-                                $session->set('mautic.formfields.submits', $submits);
+                                $session->set('mautic.form.'.$formId.'.fields.submits', $submits);
                             }
                         }
                     }
@@ -214,7 +225,7 @@ class FieldController extends CommonFormController
             } else {
                 $closeModal                = false;
                 $viewParams['tmpl']        = 'field';
-                $viewParams['form']         = $form->createView();
+                $viewParams['form']        = $form->createView();
                 $header                    = (!empty($customParams)) ? $customParams['label'] : 'mautic.form.field.type.' . $fieldType;
                 $viewParams['fieldHeader'] = $this->get('translator')->trans($header);
             }
@@ -240,14 +251,16 @@ class FieldController extends CommonFormController
             $passthroughVars['fieldHtml'] = $this->renderView($template, array(
                 'inForm' => true,
                 'field'  => $formField,
-                'id'     => $objectId
+                'id'     => $objectId,
+                'formId'  => $formId
             ));
 
             if ($closeModal) {
                 //just close the modal
                 $passthroughVars['closeModal'] = 1;
-                $response  = new JsonResponse($passthroughVars);
+                $response                      = new JsonResponse($passthroughVars);
                 $response->headers->set('Content-Length', strlen($response->getContent()));
+
                 return $response;
             }
 
@@ -258,8 +271,9 @@ class FieldController extends CommonFormController
             ));
         }
 
-        $response  = new JsonResponse(array('success' => 0));
+        $response = new JsonResponse(array('success' => 0));
         $response->headers->set('Content-Length', strlen($response->getContent()));
+
         return $response;
     }
 
@@ -270,15 +284,17 @@ class FieldController extends CommonFormController
      *
      * @return JsonResponse
      */
-    public function deleteAction($objectId) {
-        $session   = $this->factory->getSession();
-        $fields    = $session->get('mautic.formfields.add', array());
-        $delete    = $session->get('mautic.formfields.remove', array());
+    public function deleteAction ($objectId)
+    {
+        $session = $this->factory->getSession();
+        $formId  = $this->request->query->get('formId');
+        $fields  = $session->get('mautic.form.'.$formId.'.fields.modified', array());
+        $delete  = $session->get('mautic.form.'.$formId.'.fields.deleted', array());
 
         //ajax only for form fields
         if (!$this->request->isXmlHttpRequest() ||
             !$this->factory->getSecurity()->isGranted(array('form:forms:editown', 'form:forms:editother', 'form:forms:create'), 'MATCH_ONE')
-        ){
+        ) {
             return $this->accessDenied();
         }
 
@@ -291,17 +307,17 @@ class FieldController extends CommonFormController
             //add the field to the delete list
             if (!in_array($objectId, $delete)) {
                 $delete[] = $objectId;
-                $session->set('mautic.formfields.remove', $delete);
+                $session->set('mautic.form.'.$formId.'.fields.deleted', $delete);
             }
 
             //take note if this is a submit button or not
             if ($formField['type'] == 'button') {
-                $submits    = $session->get('mautic.formfields.submits', array());
+                $submits    = $session->get('mautic.form.'.$formId.'.fields.submits', array());
                 $properties = $formField['properties'];
                 if ($properties['type'] == 'submit' && in_array($objectId, $submits)) {
                     $key = array_search($objectId, $submits);
                     unset($submits[$key]);
-                    $session->set('mautic.formfields.submits', $submits);
+                    $session->set('mautic.form.'.$formId.'.fields.submits', $submits);
                 }
             }
 
@@ -316,25 +332,27 @@ class FieldController extends CommonFormController
             $blank     = $entity->convertToArray();
             $formField = array_merge($blank, $formField);
 
-            $dataArray  = array(
-                'mauticContent'  => 'formField',
-                'success'        => 1,
-                'target'         => '#mauticform_'.$objectId,
-                'route'          => false,
-                'fieldId'        => $objectId,
-                'fieldHtml'      => $this->renderView($template, array(
+            $dataArray = array(
+                'mauticContent' => 'formField',
+                'success'       => 1,
+                'target'        => '#mauticform_' . $objectId,
+                'route'         => false,
+                'fieldId'       => $objectId,
+                'fieldHtml'     => $this->renderView($template, array(
                     'inForm'  => true,
                     'field'   => $formField,
                     'id'      => $objectId,
-                    'deleted' => true
+                    'deleted' => true,
+                    'formId'  => $formId
                 ))
             );
         } else {
             $dataArray = array('success' => 0);
         }
 
-        $response  = new JsonResponse($dataArray);
+        $response = new JsonResponse($dataArray);
         $response->headers->set('Content-Length', strlen($response->getContent()));
+
         return $response;
     }
 
@@ -345,10 +363,12 @@ class FieldController extends CommonFormController
      *
      * @return JsonResponse
      */
-    public function undeleteAction($objectId) {
-        $session   = $this->factory->getSession();
-        $fields    = $session->get('mautic.formfields.add', array());
-        $delete    = $session->get('mautic.formfields.remove', array());
+    public function undeleteAction ($objectId)
+    {
+        $session = $this->factory->getSession();
+        $formId  = $this->request->query->get('formId');
+        $fields  = $session->get('mautic.form.'.$formId.'.fields.modified', array());
+        $delete  = $session->get('mautic.form.'.$formId.'.fields.deleted', array());
 
         //ajax only for form fields
         if (!$this->request->isXmlHttpRequest() ||
@@ -367,16 +387,16 @@ class FieldController extends CommonFormController
             if (in_array($objectId, $delete)) {
                 $key = array_search($objectId, $delete);
                 unset($delete[$key]);
-                $session->set('mautic.formfields.remove', $delete);
+                $session->set('mautic.form.'.$formId.'.fields.deleted', $delete);
             }
 
             //take note if this is a submit button or not
             if ($formField['type'] == 'button') {
                 $properties = $formField['properties'];
                 if ($properties['type'] == 'submit') {
-                    $submits   = $session->get('mautic.formfields.submits', array());
+                    $submits   = $session->get('mautic.form.'.$formId.'.fields.submits', array());
                     $submits[] = $objectId;
-                    $session->set('mautic.formfields.submits', $submits);
+                    $session->set('mautic.form.'.$formId.'.fields.submits', $submits);
                 }
             }
 
@@ -391,25 +411,27 @@ class FieldController extends CommonFormController
             $blank     = $entity->convertToArray();
             $formField = array_merge($blank, $formField);
 
-            $dataArray  = array(
-                'mauticContent'  => 'formField',
-                'success'        => 1,
-                'target'         => '#mauticform_'.$objectId,
-                'route'          => false,
-                'fieldId'        => $objectId,
-                'fieldHtml'      => $this->renderView($template, array(
+            $dataArray = array(
+                'mauticContent' => 'formField',
+                'success'       => 1,
+                'target'        => '#mauticform_' . $objectId,
+                'route'         => false,
+                'fieldId'       => $objectId,
+                'fieldHtml'     => $this->renderView($template, array(
                     'inForm'  => true,
                     'field'   => $formField,
                     'id'      => $objectId,
-                    'deleted' => false
+                    'deleted' => false,
+                    'formId'  => $formId
                 ))
             );
         } else {
             $dataArray = array('success' => 0);
         }
 
-        $response  = new JsonResponse($dataArray);
+        $response = new JsonResponse($dataArray);
         $response->headers->set('Content-Length', strlen($response->getContent()));
+
         return $response;
     }
 }

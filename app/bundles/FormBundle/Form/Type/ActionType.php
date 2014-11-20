@@ -45,8 +45,11 @@ class ActionType extends AbstractType
 
         $properties = (!empty($options['data']['properties'])) ? $options['data']['properties'] : null;
         $builder->add('properties', $formType, array(
-           'label' => false,
-           'data'  => $properties
+            'label'  => false,
+            'data'   => $properties,
+            'attr'   => array(
+                'data-formid' => $options['formId'] //sneaky way of feeding the formId without requiring the option
+            )
         ));
 
         $builder->add('type', 'hidden');
@@ -67,6 +70,10 @@ class ActionType extends AbstractType
             'container_class' => 'bottom-formaction-buttons'
         ));
 
+        $builder->add('formId', 'hidden', array(
+            'mapped' => false
+        ));
+
         if (!empty($options["action"])) {
             $builder->setAction($options["action"]);
         }
@@ -81,7 +88,7 @@ class ActionType extends AbstractType
             'settings' => false
         ));
 
-        $resolver->setRequired(array('settings'));
+        $resolver->setRequired(array('settings', 'formId'));
     }
 
     /**

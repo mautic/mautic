@@ -358,7 +358,10 @@ var Mautic = {
                 //destroy ckeditor instances
                 if (typeof CKEDITOR != 'undefined') {
                     for (name in CKEDITOR.instances) {
-                        CKEDITOR.instances[name].destroy()
+                        var editor = CKEDITOR.instances[name];
+                        if (editor) {
+                            editor.destroy();
+                        }
                     }
                 }
             }
@@ -464,7 +467,7 @@ var Mautic = {
                 //set a timeout in case it doesn't get reset
                 setTimeout(function() {
                     Mautic.stopIconSpinPostEvent(identifierClass);
-                }, 10000);
+                }, 3000);
             }
         }
     },

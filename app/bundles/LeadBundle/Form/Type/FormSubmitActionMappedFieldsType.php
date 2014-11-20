@@ -12,6 +12,7 @@ namespace Mautic\LeadBundle\Form\Type;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * Class FormSubmitActionMappedFieldsType
@@ -38,7 +39,7 @@ class FormSubmitActionMappedFieldsType extends AbstractType
     {
         static $choices;
         if (empty($choices)) {
-            $fields = $this->factory->getModel('form.field')->getSessionFields();
+            $fields = $this->factory->getModel('form.field')->getSessionFields($options['formId']);
 
             $choices = array();
 
@@ -82,5 +83,13 @@ class FormSubmitActionMappedFieldsType extends AbstractType
      */
     public function getName() {
         return "lead_submitaction_mappedfields";
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->setOptional(array('formId'));
     }
 }
