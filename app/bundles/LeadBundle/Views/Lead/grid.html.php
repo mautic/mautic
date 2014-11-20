@@ -86,14 +86,19 @@ if ($tmpl == 'index')
 </div>
 <?php if (count($items)): ?>
     <div class="panel-footer">
-        <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
+        <?php 
+        if (!isset($link)) {
+            $link = 'mautic_lead_index';
+        }
+        echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
             "totalItems"      => $totalItems,
             "page"            => $page,
             "limit"           => $limit,
-            "menuLinkId"      => 'mautic_lead_index',
-            "baseUrl"         => $view['router']->generate('mautic_lead_index'),
+            "menuLinkId"      => $link,
+            "baseUrl"         => $view['router']->generate($link),
             "tmpl"            => $indexMode,
             'sessionVar'      => 'lead'
-        )); ?>
+        )); 
+        ?>
     </div>
 <?php endif; ?>

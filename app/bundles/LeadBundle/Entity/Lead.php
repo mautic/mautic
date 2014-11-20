@@ -181,6 +181,19 @@ class Lead extends FormEntity
     }
 
     /**
+     * Set id
+     *
+     * @param integer $id
+     * @return Lead
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    /**
      * Get id
      *
      * @return integer

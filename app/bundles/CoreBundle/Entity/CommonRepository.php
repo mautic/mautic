@@ -643,12 +643,14 @@ class CommonRepository extends EntityRepository
             foreach ($props as $p) {
                 if (!in_array($p->name, $baseCols[$convertCamelCase][$entityClass])) {
                     $n = $p->name;
+
                     if ($convertCamelCase) {
                         $n = preg_replace('/(?<=\\w)(?=[A-Z])/',"_$1", $n);
                         $n = strtolower($n);
+                        $baseCols[$convertCamelCase][$entityClass][$p->name] = $n;
+                    } else {
+                        $baseCols[$convertCamelCase][$entityClass][] = $n;
                     }
-                    
-                    $baseCols[$convertCamelCase][$entityClass][] = $n;
                 }
             }
         }
@@ -706,5 +708,35 @@ class CommonRepository extends EntityRepository
         }
 
         return $args;
+    }
+
+    public function createFromArray($className, &$data)
+    {
+        $entity = new $className();
+        $meta = $this->_em->getClassMetadata($className);
+        $ormProperties = $this->getBaseColumns($className, true);
+
+        foreach ($ormProperties as $property => $dbCol) {
+            if (isset($data[$dbCol])) {
+                $v = $data[$dbCol];
+
+                if ($v && $meta->hasAssociation($property)) {
+                    $map = $meta->getAssociationMapping($property);
+                    $v = $this->_em->getRepository($map['targetEntity'])->find($v);
+                    if (empty($v)) {
+                        throw new \Exception('Associate data not found');
+                    }
+                }
+
+                $method = "set" . ucfirst($property);
+                if (method_exists($entity, $method)) {
+                    $entity->$method($v);
+                }
+
+                unset($data[$dbCol]);
+            }
+        }
+
+        return $entity;
     }
 }

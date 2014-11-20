@@ -174,6 +174,11 @@ if ($permissions['campaign:campaigns:edit']): ?>
                         <?php echo $view['translator']->trans('mautic.campaign.event.actions.header'); ?>
                     </a>
                 </li>
+                <li class="">
+                    <a href="#leads-container" role="tab" data-toggle="tab">
+                        <?php echo $view['translator']->trans('mautic.campaign.event.leads.header'); ?>
+                    </a>
+                </li>
             </ul>
             <!--/ tabs controls -->
         </div>
@@ -188,6 +193,17 @@ if ($permissions['campaign:campaigns:edit']): ?>
                 <?php echo $view->render('MauticCampaignBundle:Campaign:events.html.php', array('events' => $events, 'eventType' => 'action')); ?>
             </div>
             <!--/ #events-container -->
+
+            <div class="tab-pane fade in bdr-w-0" id="leads-container">
+                <?php echo $view->render('MauticLeadBundle:Lead:grid.html.php', array(
+                    'items' => $leads['results'], 
+                    'tmpl' => 'campaign', 
+                    'noContactList' => $noContactList, 
+                    'totalItems' => $leads['count'], 
+                    'page' => 1, 
+                    'limit' => 10, 
+                    'indexMode' => 'grid')); ?>
+            </div>
         </div>
         <!--/ end: tab-content -->
     </div>

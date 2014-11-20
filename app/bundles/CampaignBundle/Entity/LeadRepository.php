@@ -9,13 +9,14 @@
 
 namespace Mautic\CampaignBundle\Entity;
 
-use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Tools\Pagination\Paginator;
+use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\GraphHelper;
 
 /**
  * LeadRepository
  */
-class LeadRepository extends EntityRepository
+class LeadRepository extends CommonRepository
 {
     /**
      * Get the details of leads added to a campaign
@@ -48,6 +49,81 @@ class LeadRepository extends EntityRepository
         }
 
         return $return;
+    }
+
+    /**
+     * Get leads for a specific campaign
+     *
+     * @param      $campaignId
+     * @param null $eventId
+     */
+    public function getLeadsWithFields($args)
+    {
+        //Get the list of custom fields
+        $fq = $this->_em->getConnection()->createQueryBuilder();
+        $fq->select('f.id, f.label, f.alias, f.type, f.field_group as `group`')
+            ->from(MAUTIC_TABLE_PREFIX . 'lead_fields', 'f')
+            ->where('f.is_published = 1');
+        $results = $fq->execute()->fetchAll();
+
+        $fields = array();
+        foreach ($results as $r) {
+            $fields[$r['alias']] = $r;
+        }
+
+        //DBAL
+        $dq = $this->_em->getConnection()->createQueryBuilder();
+        $dq->select('count(*) as count')
+            ->from(MAUTIC_TABLE_PREFIX . 'campaign_leads', 'cl')
+            ->leftJoin('cl', MAUTIC_TABLE_PREFIX . 'leads', 'l', 'l.id = cl.lead_id');
+
+        //Fix arguments if necessary
+        $args = $this->convertOrmProperties('Mautic\\LeadBundle\\Entity\\Lead', $args);
+
+        if (isset($args['campaign_id'])) {
+            $dq->andWhere($dq->expr()->eq('cl.campaign_id', ':campaign'))
+                ->setParameter('campaign', $args['campaign_id']);
+        }
+
+        //get a total count
+        $result = $dq->execute()->fetchAll();
+        $total  = $result[0]['count'];
+
+        //now get the actual paginated results
+        $this->buildOrderByClause($dq, $args);
+        $this->buildLimiterClauses($dq, $args);
+
+        $dq->resetQueryPart('select');
+        $dq->select('l.*');
+        $leads = $dq->execute()->fetchAll();
+
+        //loop over results to put fields in something that can be assigned to the entities
+        $fieldValues = array();
+        $leadEntities = array();
+        foreach ($leads as $key => $lead) {
+            $entity = $this->createFromArray('\Mautic\LeadBundle\Entity\Lead', $lead);
+
+            $leadEntities[$entity->getId()] = $entity;
+
+            $leadId = $entity->getId();
+
+            //whatever is left over is a custom field
+            foreach ($lead as $k => $r) {
+                if (isset($fields[$k])) {
+                    $fieldValues[$leadId][$fields[$k]['group']][$fields[$k]['alias']] = $fields[$k];
+                    $fieldValues[$leadId][$fields[$k]['group']][$fields[$k]['alias']]['value'] = $r;
+                    unset($lead[$k]);
+                }
+            }
+
+            $entity->setFields($fieldValues[$leadId]);
+        }
+
+        return (!empty($args['withTotalCount'])) ?
+            array(
+                'count' => $total,
+                'results' => $leadEntities
+            ) : $leadEntities;
     }
 
     /**

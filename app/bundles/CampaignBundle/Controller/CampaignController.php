@@ -161,11 +161,12 @@ class CampaignController extends FormController
             return $this->accessDenied();
         }
 
-        $eventLogRepo = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:LeadEventLog');
-        $campaignLeadRepo = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:Lead');
-        $events = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:Event')->getEvents(array('campaigns' => array($entity->getId())));
-        $leadCount = $campaignLeadRepo->countLeads($entity->getId());
-        $campaignLogs = $eventLogRepo->getCampaignLog($entity->getId());
+        $eventLogRepo       = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:LeadEventLog');
+        $campaignLeadRepo   = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:Lead');
+        $events             = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:Event')->getEvents(array('campaigns' => array($entity->getId())));
+        $leadCount          = $campaignLeadRepo->countLeads($entity->getId());
+        $campaignLogs       = $eventLogRepo->getCampaignLog($entity->getId());
+        $leads              = $campaignLeadRepo->getLeadsWithFields(array('campaign_id' => $entity->getId(), 'withTotalCount' => true));
 
         foreach ($events  as &$event) {
             $event['logCount'] = 0;
@@ -190,6 +191,10 @@ class CampaignController extends FormController
         // Lead count stats
         $leadStats = $campaignLeadRepo->getLeadStats(30, 'D');
 
+        // We need the EmailRepository to check if a lead is flagged as do not contact
+        /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
+        $emailRepo = $this->factory->getModel('email')->getRepository();
+
         return $this->delegateView(array(
             'viewParameters'  => array(
                 'campaign'    => $entity,
@@ -201,7 +206,9 @@ class CampaignController extends FormController
                 'hits'        => $hits,
                 'emailsSent'  => $emailsSent,
                 'leadStats'   => $leadStats,
-                'events'      => $events
+                'events'      => $events,
+                'leads'       => $leads,
+                'noContactList' => $emailRepo->getDoNotEmailList()
             ),
             'contentTemplate' => 'MauticCampaignBundle:Campaign:details.html.php',
             'passthroughVars' => array(
