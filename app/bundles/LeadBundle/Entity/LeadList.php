@@ -73,7 +73,7 @@ class LeadList extends FormEntity
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"leadListDetails"})
      */
-    private $isGlobal = false;
+    private $isGlobal = true;
 
     /**
      * @ORM\ManyToMany(targetEntity="Lead", fetch="EXTRA_LAZY", indexBy="id")
