@@ -107,16 +107,15 @@ class LeadRepository extends EntityRepository
 
     /**
      * Fetch Lead stats for some period of time.
-     * 
+     *
      * @param integer $quantity of units
      * @param string $unit of time php.net/manual/en/class.dateinterval.php#dateinterval.props
-     * @param array $args
      *
      * @return mixed
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getLeadStats($quantity, $unit, $args = array())
+    public function getLeadStats($quantity, $unit)
     {
         $graphData = GraphHelper::prepareLineGraphData($quantity, $unit, array('viewed'));
 
@@ -133,7 +132,7 @@ class LeadRepository extends EntityRepository
         // Count total until date
         $q2 = $this->createQueryBuilder('cl');
         $q2->select('count(cl.lead) as total');
-        
+
         $q2->andwhere($q->expr()->lt('cl.dateAdded', ':date'))
             ->setParameter('date', $graphData['fromDate']);
 

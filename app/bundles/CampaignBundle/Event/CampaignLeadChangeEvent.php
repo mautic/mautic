@@ -31,14 +31,14 @@ class CampaignLeadChangeEvent extends Event
     private $lead;
 
     /**
-     * @var
+     * @var string
      */
     private $action;
 
     /**
      * @param Campaign $campaign
      * @param Lead     $lead
-     * @param          $action
+     * @param string   $action
      */
     public function __construct(Campaign &$campaign, Lead $lead, $action)
     {

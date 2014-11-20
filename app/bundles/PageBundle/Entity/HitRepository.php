@@ -136,11 +136,9 @@ class HitRepository extends CommonRepository
     /**
      * Count returning visitors
      *
-     * @param array $args
-     *
      * @return int
      */
-    public function getReturningCount($args = array())
+    public function getReturningCount()
     {
         $q = $this->createQueryBuilder('h');
         $q->select('COUNT(h.trackingId) as returning')
@@ -154,11 +152,9 @@ class HitRepository extends CommonRepository
     /**
      * Count how many unique visitors hit pages
      *
-     * @param array $args
-     *
      * @return int
      */
-    public function getUniqueCount($args = array())
+    public function getUniqueCount()
     {
         $q = $this->createQueryBuilder('h');
         $q->select('COUNT(DISTINCT h.trackingId) as unique');

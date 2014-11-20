@@ -15,11 +15,15 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Component\Security\Core\Exception as Exception;
 
+/**
+ * Class SecurityController
+ */
 class SecurityController extends Controller
 {
 
     /**
      * @param Request $request
+     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function loginAction(Request $request)

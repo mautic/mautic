@@ -59,7 +59,7 @@ class SocialController extends FormController
 
         if ($this->request->getMethod() == 'POST') {
             if (!$cancelled = $this->isFormCancelled($form)) {
-                if ($valid = $this->isFormValid($form)) {
+                if ($this->isFormValid($form)) {
                     foreach ($services['services'] as $network => $entity) {
                         //check to make sure secret keys were not wiped out
                         if (!empty($currentKeys[$network]['clientId'])) {

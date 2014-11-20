@@ -27,10 +27,7 @@ class LeadFieldRepository extends CommonRepository
      */
     public function getEntities($args = array())
     {
-        $q = $this->_em
-            ->createQueryBuilder('f')
-            ->select('f')
-            ->from('MauticLeadBundle:LeadField', 'f', 'f.alias');
+        $q = $this->createQueryBuilder($this->getTableAlias());
 
         $this->buildClauses($q, $args);
 

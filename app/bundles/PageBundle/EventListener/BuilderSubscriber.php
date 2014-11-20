@@ -85,7 +85,7 @@ class BuilderSubscriber extends CommonSubscriber
             }
 
             if (strpos($html, '{sharebuttons}') !== false) {
-                $buttons = $this->renderSocialShareButtons($page, $event->getSlotsHelper());
+                $buttons = $this->renderSocialShareButtons();
                 $html    = str_ireplace('{sharebuttons}', $buttons, $html);
             }
 
@@ -98,12 +98,9 @@ class BuilderSubscriber extends CommonSubscriber
     /**
      * Renders the HTML for the social share buttons
      *
-     * @param $page
-     * @param $slotsHelper
-     *
      * @return string
      */
-    protected function renderSocialShareButtons($page, $slotsHelper)
+    protected function renderSocialShareButtons()
     {
         static $content = "";
 

@@ -9,16 +9,16 @@
 
 namespace Mautic\CategoryBundle\Helper;
 
-use Symfony\Component\Form\FormBuilderInterface;
-
 class PermissionHelper
 {
     /**
      * Makes sure the user has view access to categories if they have view access to the main entity type
      *
-     * @param       $bundleName
-     * @param       $entityType
-     * @param array $permissions
+     * @param string $bundleName
+     * @param string $entityType
+     * @param array  $permissions
+     *
+     * @return void
      */
     public static function analyzePermissions ($bundleName, $entityType, array &$permissions)
     {

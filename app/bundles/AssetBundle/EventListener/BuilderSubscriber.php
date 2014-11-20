@@ -77,6 +77,8 @@ class BuilderSubscriber extends CommonSubscriber
 
         $content       = $event->getContent();
         $pagelinkRegex = '/{assetlink=(.*?)}/';
+
+        /** @var \Mautic\AssetBundle\Model\AssetModel $model */
         $model         = $this->factory->getModel('asset');
         $clickthrough  = array('source' => $source);
 

@@ -15,10 +15,20 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+/**
+ * Class AuthorizeController
+ */
 class AuthorizeController extends \FOS\OAuthServerBundle\Controller\AuthorizeController
 {
+
     /**
      * Authorize
+     *
+     * @param Request $request
+     *
+     * @return \FOS\OAuthServerBundle\Controller\Response|\Symfony\Component\HttpFoundation\Response
+     * @throws \OAuth2\OAuth2RedirectException
+     * @throws AccessDeniedException
      *
      * @author Chris Jones <leeked@gmail.com>
      */

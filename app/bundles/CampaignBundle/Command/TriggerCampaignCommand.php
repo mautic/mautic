@@ -10,15 +10,19 @@
 namespace Mautic\CampaignBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Finder\Finder;
 
+/**
+ * Class TriggerCampaignCommand
+ */
 class TriggerCampaignCommand extends ContainerAwareCommand
 {
-    protected function configure ()
+    /**
+     * {@inheritdoc}
+     */
+    protected function configure()
     {
         $this
             ->setName('mautic:campaign:trigger')
@@ -28,7 +32,10 @@ class TriggerCampaignCommand extends ContainerAwareCommand
             ->addOption('--negative-only', null, InputOption::VALUE_NONE, 'Trigger only negative events, i.e. with a "no" decision path.');
     }
 
-    protected function execute (InputInterface $input, OutputInterface $output)
+    /**
+     * {@inheritdoc}
+     */
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
         $campaignId = $input->getOption('campaign-id');
         $container  = $this->getContainer();

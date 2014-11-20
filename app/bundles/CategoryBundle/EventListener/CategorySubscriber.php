@@ -9,11 +9,10 @@
 
 namespace Mautic\CategoryBundle\EventListener;
 
-use Mautic\ApiBundle\Event\RouteEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\CategoryBundle\Event as Events;
 use Mautic\CategoryBundle\CategoryEvents;
+
 /**
  * Class CategorySubscriber
  *

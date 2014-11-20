@@ -19,7 +19,6 @@ class CampaignController extends FormController
 {
     /**
      * @param int    $page
-     * @param string $view
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
@@ -213,8 +212,6 @@ class CampaignController extends FormController
                 )
             )
         ));
-
-        return $this->indexAction($page, 'view', $entity);
     }
 
     /**

@@ -368,7 +368,7 @@ class PageController extends FormController
                 $returnUrl = $this->generateUrl('mautic_page_index', $viewParameters);
                 $template  = 'MauticPageBundle:Page:index';
                 //clear any modified content
-                $session->remove('mautic.pagebuilder.'.$entity->getSessionId().'.content', array());
+                $session->remove('mautic.pagebuilder.'.$entity->getSessionId().'.content');
             }
 
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
@@ -495,7 +495,7 @@ class PageController extends FormController
                 }
             } else {
                 //clear any modified content
-                $session->remove('mautic.pagebuilder.'.$objectId.'.content', array());
+                $session->remove('mautic.pagebuilder.'.$objectId.'.content');
                 //unlock the entity
                 $model->unlockEntity($entity);
 

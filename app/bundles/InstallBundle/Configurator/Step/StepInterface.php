@@ -9,7 +9,7 @@
 
 namespace Mautic\InstallBundle\Configurator\Step;
 
-use Symfony\Component\Form\Type\FormTypeInterface;
+use Symfony\Component\Form\FormTypeInterface;
 
 /**
  * StepInterface.

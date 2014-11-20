@@ -80,7 +80,6 @@ class MapperController extends FormController
     public function editMapperAction ($application, $client, $object)
     {
         $ignorePost     = false;
-        $session        = $this->factory->getSession();
         $modelClient    = $this->factory->getModel('mapper.ApplicationClient');
         $modelMapper    = $this->factory->getModel('mapper.ApplicationObjectMapper');
 
@@ -200,15 +199,10 @@ class MapperController extends FormController
      */
     public function onAuthAction ($application, $client)
     {
-        $entities = array();
         $bundles = $this->factory->getParameter('bundles');
-        $bundle = $bundles[ucfirst($application)];
 
         $class_name = sprintf("\\Mautic\\%sBundle\\EventListener\\MapperListener", ucfirst($application));
         $listener = new $class_name;
         $listener->onCalllback();
-
-
-
     }
 }

@@ -17,6 +17,7 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Nonce
 {
+
     /**
      * @ORM\Id()
      * @ORM\Column(type="string")
@@ -41,7 +42,7 @@ class Nonce
     /**
      * @return mixed
      */
-    public function getNonce ()
+    public function getNonce()
     {
         return $this->nonce;
     }
@@ -49,7 +50,7 @@ class Nonce
     /**
      * @return mixed
      */
-    public function getTimestamp ()
+    public function getTimestamp()
     {
         return $this->timestamp;
     }

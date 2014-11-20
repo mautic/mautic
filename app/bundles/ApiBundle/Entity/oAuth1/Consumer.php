@@ -22,6 +22,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  */
 class Consumer extends BaseConsumer
 {
+
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")

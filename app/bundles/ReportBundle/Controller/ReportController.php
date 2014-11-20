@@ -528,7 +528,6 @@ class ReportController extends FormController
         );
 
         $query           = $reportGenerator->getQuery($options);
-        $form            = $reportGenerator->getForm($entity, array('read_only' => true));
         $result          = $query->getConnection()->executeQuery((string) $query)->fetchAll();
         $contentTemplate = $reportGenerator->getContentTemplate();
 

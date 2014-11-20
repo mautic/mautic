@@ -66,7 +66,7 @@ class LeadEventLog
     private $systemTriggered = false;
 
     /**
-     * @return mixed
+     * @return \DateTime
      */
     public function getDateTriggered ()
     {
@@ -74,7 +74,7 @@ class LeadEventLog
     }
 
     /**
-     * @param mixed $dateTriggered
+     * @param \DateTime $dateTriggered
      */
     public function setDateTriggered ($dateTriggered)
     {
@@ -82,7 +82,7 @@ class LeadEventLog
     }
 
     /**
-     * @return mixed
+     * @return \Mautic\CoreBundle\Entity\IpAddress
      */
     public function getIpAddress ()
     {
@@ -90,7 +90,7 @@ class LeadEventLog
     }
 
     /**
-     * @param mixed $ipAddress
+     * @param \Mautic\CoreBundle\Entity\IpAddress $ipAddress
      */
     public function setIpAddress ($ipAddress)
     {
@@ -130,7 +130,7 @@ class LeadEventLog
     }
 
     /**
-     * @return mixed
+     * @return bool
      */
     public function getIsScheduled ()
     {
@@ -138,7 +138,7 @@ class LeadEventLog
     }
 
     /**
-     * @param mixed $isScheduled
+     * @param bool $isScheduled
      */
     public function setIsScheduled ($isScheduled)
     {
@@ -178,7 +178,7 @@ class LeadEventLog
     }
 
     /**
-     * @return mixed
+     * @return bool
      */
     public function getSystemTriggered ()
     {
@@ -186,7 +186,7 @@ class LeadEventLog
     }
 
     /**
-     * @param mixed $systemTriggered
+     * @param bool $systemTriggered
      */
     public function setSystemTriggered ($systemTriggered)
     {

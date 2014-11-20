@@ -67,14 +67,14 @@ class ApplicationObjectMapperModel extends FormModel
     public function getEntity($object = null, $client_id = null)
     {
         if ($object === null && $client_id === null) {
-            return new ApplicationObjectMapper($this->factory);
+            return new ApplicationObjectMapper();
         }
 
         $repo = $this->getRepository();
         $entity = $repo->findOneBy(array('objectName' => $object, 'applicationClientId' => $client_id));
 
         if ($entity === null) {
-            return new ApplicationObjectMapper($this->factory);
+            return new ApplicationObjectMapper();
         }
 
         return $entity;

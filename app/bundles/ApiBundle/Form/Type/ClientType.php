@@ -23,30 +23,39 @@ use Mautic\CoreBundle\Form\DataTransformer as Transformers;
 
 /**
  * Class ClientType
- *
- * @package Mautic\ApiBundle\Form\Type
  */
 class ClientType extends AbstractType
 {
 
+    /**
+     * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
+     */
     private $translator;
+
+    /**
+     * @var \Symfony\Component\Validator\Validator
+     */
     private $validator;
+
+    /**
+     * @var bool|mixed
+     */
     private $apiMode;
 
     /**
      * @param MauticFactory $factory
      */
-    public function __construct(MauticFactory $factory) {
+    public function __construct(MauticFactory $factory)
+    {
         $this->translator = $factory->getTranslator();
         $this->validator  = $factory->getValidator();
         $this->apiMode    = $factory->getParameter('api_mode');
     }
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
+     * {@inheritdoc}
      */
-    public function buildForm (FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber());
         $builder->addEventSubscriber(new FormExitSubscriber('api.client', $options));
@@ -188,9 +197,8 @@ class ClientType extends AbstractType
         }
     }
 
-
     /**
-     * @param OptionsResolverInterface $resolver
+     * {@inheritdoc}
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
@@ -201,9 +209,10 @@ class ClientType extends AbstractType
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
-    public function getName() {
+    public function getName()
+    {
         return "client";
     }
 }

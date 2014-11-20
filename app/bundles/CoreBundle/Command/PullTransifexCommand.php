@@ -57,7 +57,6 @@ EOT
         }
 
         $options = $input->getOptions();
-        $create  = (isset($options['create']));
         $files   = $this->getLanguageFiles();
 
         /** @var \BabDev\Transifex\Transifex $transifex */

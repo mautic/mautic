@@ -83,7 +83,6 @@ class IdToEntityModelTransformer implements DataTransformerInterface
     /**
      * {@inheritdoc}
      *
-     * @return object|null
      * @throws TransformationFailedException if object is not found.
      */
     public function reverseTransform($id)

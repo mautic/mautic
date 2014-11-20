@@ -272,7 +272,7 @@ class Email extends FormEntity
     }
 
     /**
-     * @return mixed
+     * @return array
      */
     public function getContent ()
     {
@@ -280,7 +280,7 @@ class Email extends FormEntity
     }
 
     /**
-     * @param mixed $content
+     * @param array $content
      */
     public function setContent ($content)
     {

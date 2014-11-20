@@ -9,7 +9,6 @@
 
 namespace Mautic\CalendarBundle\Event;
 
-use Symfony\Component\Process\Exception\InvalidArgumentException;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
