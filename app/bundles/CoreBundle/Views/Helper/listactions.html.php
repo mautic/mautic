@@ -11,6 +11,10 @@ if (!isset($extra)) {
     $extra = array();
 }
 
+if (!isset($delete)) {
+    $delete = false;
+}
+
 ?>
 <div class="panel-body">
     <div class="box-layout">
