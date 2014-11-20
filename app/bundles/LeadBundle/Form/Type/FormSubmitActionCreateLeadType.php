@@ -11,6 +11,7 @@ namespace Mautic\LeadBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * Class FormSubmitActionCreateLeadType
@@ -52,7 +53,8 @@ class FormSubmitActionCreateLeadType extends AbstractType
         ));
 
         $builder->add('mappedFields', 'lead_submitaction_mappedfields', array(
-            'label'  => false
+            'label'  => false,
+            'formId' => $options['attr']['data-formid']
         ));
     }
 

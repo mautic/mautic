@@ -23,7 +23,8 @@ $containerClass = (!empty($deleted)) ? ' bg-danger' : '';
     if (!empty($inForm))
         echo $view->render('MauticFormBundle:Builder:actions.html.php', array(
             'deleted' => (!empty($deleted)) ? $deleted : false,
-            'id'      => $id
+            'id'      => $id,
+            'formId'  => $formId
         ));
     ?>
     <?php if ($field['showLabel']): ?>

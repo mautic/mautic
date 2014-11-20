@@ -20,8 +20,8 @@ use Mautic\AssetBundle\Entity\Asset;
 class AssetEvent extends CommonEvent
 {
     /**
-     * @param Form $asset
-     * @param bool $isNew
+     * @param Asset $asset
+     * @param bool  $isNew
      */
     public function __construct(Asset &$asset, $isNew = false)
     {

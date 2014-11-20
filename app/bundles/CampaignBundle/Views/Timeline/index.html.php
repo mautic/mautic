@@ -22,7 +22,7 @@ $item = $event['extra']['log'];
 				    <?php echo $item['campaignName']; ?>
 				</a>
 			</h3>
-	        <p class="mb-0"><?php echo $view['translator']->trans('mautic.campaign.event.time', array('%date%' => $view['date']->toFullConcat($event['timestamp']), '%event%' => $event['eventLabel'])); ?></p>
+	        <p class="mb-0"><?php echo $view['translator']->trans('mautic.core.timeline.event.time', array('%date%' => $view['date']->toFullConcat($event['timestamp']), '%event%' => $event['eventLabel'])); ?></p>
 	    </div>
         <div class="panel-footer">
             <p><?php echo $view['translator']->trans('mautic.campaign.user.event.triggered', array('%event%' => $item['eventName'])); ?></p>

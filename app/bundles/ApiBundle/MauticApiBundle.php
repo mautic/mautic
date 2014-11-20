@@ -16,11 +16,12 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
  * Class MauticApiBundle
- *
- * @package Mautic\ApiBundle
  */
 class MauticApiBundle extends Bundle
 {
+    /**
+     * {@inheritdoc}
+     */
     public function build(ContainerBuilder $container)
     {
         parent::build($container);
@@ -31,7 +32,11 @@ class MauticApiBundle extends Bundle
         $extension->addSecurityListenerFactory(new ApiFactory());
     }
 
-    public function getParent() {
+    /**
+     * {@inheritdoc}
+     */
+    public function getParent()
+    {
         return 'FOSOAuthServerBundle';
     }
 }

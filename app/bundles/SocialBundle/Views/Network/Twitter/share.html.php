@@ -24,5 +24,5 @@ $view['assets']->addScriptDeclaration($js, 'bodyClose');
 
 <div class="share-button twitter-share-button layout-<?php echo $settings['count']; ?>">
     <a href="https://twitter.com/share"
-    class="twitter-share-button share-button"<?php echo $dataText.$dataVia.$dataRelated.$dataHashtags.$dataSize.$dataCount; ?>>Tweet</a>
+    class="twitter-share-button share-button"<?php echo $dataText.$dataVia.$dataRelated.$dataHashtags.$dataSize.$dataCount; ?>><?php echo $view['translator']->trans('mautic.social.Twitter.share.tweet'); ?></a>
 </div>

@@ -249,11 +249,11 @@ abstract class AbstractNetwork
     /**
      * Get the URL required to obtain an oauth2 access token
      *
-     * @return bool
+     * @return string
      */
     public function getAccessTokenUrl()
     {
-        return false;
+        return '';
     }
 
     /**

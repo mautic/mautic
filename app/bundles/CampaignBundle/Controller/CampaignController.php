@@ -19,7 +19,6 @@ class CampaignController extends FormController
 {
     /**
      * @param int    $page
-     * @param string $view
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
@@ -220,8 +219,6 @@ class CampaignController extends FormController
                 )
             )
         ));
-
-        return $this->indexAction($page, 'view', $entity);
     }
 
     /**
@@ -247,9 +244,9 @@ class CampaignController extends FormController
         //set the page we came from
         $page = $this->factory->getSession()->get('mautic.campaign.page', 1);
 
-        //set added/updated events
-        $addEvents     = $session->get('mautic.campaigns.add', array());
-        $deletedEvents = $session->get('mautic.campaigns.remove', array());
+        $sessionId = $this->request->request->get('campaign[sessionId]', sha1(uniqid(mt_rand(), true)), true);
+
+        list($modifiedEvents, $deletedEvents, $events) = $this->getSessionEvents($sessionId);
 
         $action        = $this->generateUrl('mautic_campaign_action', array('objectAction' => 'new'));
         $form          = $model->createForm($entity, $this->get('form.factory'), $action);
@@ -260,9 +257,6 @@ class CampaignController extends FormController
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    //only save events that are not to be deleted
-                    $events = array_diff_key($addEvents, array_flip($deletedEvents));
-
                     //make sure that at least one action is selected
                     if (empty($events)) {
                         //set the error
@@ -271,7 +265,7 @@ class CampaignController extends FormController
                         ));
                         $valid = false;
                     } else {
-                        $connections = $session->get('mautic.campaigns.connections');
+                        $connections = $session->get('mautic.campaign.'.$sessionId.'.events.connections');
                         $processedEvents = $model->setEvents($entity, $events, $connections, $deletedEvents);
 
                         //form is valid so process the data
@@ -322,7 +316,7 @@ class CampaignController extends FormController
 
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 //clear temporary fields
-                $this->clearSessionComponents();
+                $this->clearSessionComponents($sessionId);
 
                 return $this->postActionRedirect(array(
                     'returnUrl'       => $returnUrl,
@@ -336,15 +330,17 @@ class CampaignController extends FormController
             }
         } else {
             //clear out existing fields in case the form was refreshed, browser closed, etc
-            $this->clearSessionComponents();
-            $addEvents = $deletedEvents = array();
+            $this->clearSessionComponents($sessionId);
+            $modifiedEvents = $deletedEvents = array();
+
+            $form->get('sessionId')->setData($sessionId);
         }
 
         return $this->delegateView(array(
             'viewParameters'  => array(
                 'eventSettings'  => $eventSettings,
-                'campaignEvents' => $addEvents,
-                'tempEventIds'   => $this->associateIdWithTempIds($addEvents),
+                'campaignEvents' => $modifiedEvents,
+                'tempEventIds'   => $this->associateIdWithTempIds($modifiedEvents),
                 'deletedEvents'  => $deletedEvents,
                 'tmpl'           => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                 'entity'         => $entity,
@@ -423,20 +419,18 @@ class CampaignController extends FormController
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 //set added/updated events
-                $addEvents     = $session->get('mautic.campaigns.add', array());
-                $deletedEvents = $session->get('mautic.campaigns.remove', array());
-                $events        = array_diff_key($addEvents, array_flip($deletedEvents));
+                list($modifiedEvents, $deletedEvents, $events) = $this->getSessionEvents($objectId);
 
                 if ($valid = $this->isFormValid($form)) {
                     //make sure that at least one field is selected
-                    if (empty($addEvents)) {
+                    if (empty($modifiedEvents)) {
                         //set the error
                         $form->addError(new FormError(
                             $this->get('translator')->trans('mautic.campaign.form.events.notempty', array(), 'validators')
                         ));
                         $valid = false;
                     } else {
-                        $connections = $session->get('mautic.campaigns.connections');
+                        $connections = $session->get('mautic.campaign.'.$objectId.'.events.connections');
                         $processedEvents = $model->setEvents($entity, $events, $connections, $deletedEvents);
 
                         //form is valid so process the data
@@ -455,7 +449,7 @@ class CampaignController extends FormController
                         }
 
                         if (!empty($deletedEvents)) {
-                            $this->factory->getModel('campaign.event')->deleteEvents($entity->getEvents(), $addEvents, $deletedEvents);
+                            $this->factory->getModel('campaign.event')->deleteEvents($entity->getEvents(), $modifiedEvents, $deletedEvents);
                         }
 
                         $this->request->getSession()->getFlashBag()->add(
@@ -491,7 +485,7 @@ class CampaignController extends FormController
 
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 //remove fields from session
-                $this->clearSessionComponents();
+                $this->clearSessionComponents($objectId);
 
                 return $this->postActionRedirect(
                     array_merge($postActionVars, array(
@@ -509,22 +503,28 @@ class CampaignController extends FormController
 
             //lock the entity
             $model->lockEntity($entity);
+
+            $form->get('sessionId')->setData($objectId);
         }
 
         if ($cleanSlate) {
             //clean slate
-            $this->clearSessionComponents();
+            $this->clearSessionComponents($objectId);
 
             //load existing events into session
             $campaignEvents  = array();
-            $existingActions = $entity->getEvents()->toArray();
-            foreach ($existingActions as $a) {
-                $id     = $a->getId();
-                $action = $a->convertToArray();
-                unset($action['form']);
-                $campaignEvents[$id] = $action;
+            $existingEvents = $entity->getEvents()->toArray();
+            foreach ($existingEvents as $e) {
+                $id     = $e->getId();
+                $event  = $e->convertToArray();
+                unset($event['campaign']);
+                unset($event['children']);
+                unset($event['parent']);
+                unset($event['log']);
+                $campaignEvents[$id] = $event;
             }
-            $session->set('mautic.campaigns.add', $campaignEvents);
+
+            $this->setSessionEvents($objectId, $campaignEvents);
             $deletedEvents = array();
         }
 
@@ -638,12 +638,12 @@ class CampaignController extends FormController
     /**
      * Clear field and events from the session
      */
-    private function clearSessionComponents ()
+    private function clearSessionComponents ($id)
     {
         $session = $this->factory->getSession();
-        $session->remove('mautic.campaigns.add');
-        $session->remove('mautic.campaigns.remove');
-        $session->remove('mautic.campaigns.connections');
+        $session->remove('mautic.campaign.'.$id.'.events.modified');
+        $session->remove('mautic.campaign.'.$id.'.events.deleted');
+        $session->remove('mautic.campaign.'.$id.'.events.connections');
     }
 
     /**
@@ -658,5 +658,38 @@ class CampaignController extends FormController
             $tempIds[$e['tempId']] = $e['id'];
         }
         return $tempIds;
+    }
+
+    /**
+     * Get events from session
+     *
+     * @param mixed $id
+     * @param bool  $includeDifference
+     *
+     * @return array
+     */
+    private function getSessionEvents($id)
+    {
+        $session = $this->factory->getSession();
+
+        $modifiedEvents = $session->get('mautic.campaign.' . $id . '.events.modified', array());
+        $deletedEvents  = $session->get('mautic.campaign.' . $id . '.events.deleted', array());
+
+        $events = array_diff_key($modifiedEvents, array_flip($deletedEvents));
+
+        return array($modifiedEvents, $deletedEvents, $events);
+    }
+
+    /**
+     * Set events to session
+     *
+     * @param $id
+     * @param $events
+     */
+    private function setSessionEvents($id, $events)
+    {
+        $session = $this->factory->getSession();
+
+        $session->set('mautic.campaign.' . $id . '.events.modified', $events);
     }
 }

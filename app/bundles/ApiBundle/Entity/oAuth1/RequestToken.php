@@ -18,6 +18,7 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class RequestToken extends BaseRequestToken
 {
+
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")
@@ -51,4 +52,5 @@ class RequestToken extends BaseRequestToken
      * @ORM\Column(type="integer")
      */
     protected $expiresAt;
+
 }

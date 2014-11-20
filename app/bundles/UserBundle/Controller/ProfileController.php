@@ -142,7 +142,7 @@ class ProfileController extends FormController
             $encoder               = $this->get('security.encoder_factory')->getEncoder($me);
             $overrides['password'] = $model->checkNewPassword($me, $encoder, $submittedPassword);
             if (!$cancelled = $this->isFormCancelled($form)) {
-                if ($valid = $this->isFormValid($form)) {
+                if ($this->isFormValid($form)) {
                     foreach ($overrides as $k => $v) {
                         $func = 'set' . ucfirst($k);
                         $me->$func($v);

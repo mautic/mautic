@@ -20,17 +20,11 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
  * Class AssetModel
- * {@inheritdoc}
- * @package Mautic\CoreBundle\Model\FormModel
  */
 class AssetModel extends FormModel
 {
     /**
      * {@inheritdoc}
-     *
-     * @param       $entity
-     * @param       $unlock
-     * @return mixed
      */
     public function saveEntity($entity, $unlock = true)
     {
@@ -80,6 +74,7 @@ class AssetModel extends FormModel
         $download = new Download();
         $download->setDateDownload(new \Datetime());
 
+        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel = $this->factory->getModel('lead');
 
         //check for any clickthrough info
@@ -164,12 +159,7 @@ class AssetModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param      $entity
-     * @param      $formFactory
-     * @param null $action
-     * @param array $options
-     * @return mixed
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
      */
     public function createForm($entity, $formFactory, $action = null, $options = array())
     {
@@ -248,6 +238,7 @@ class AssetModel extends FormModel
      * @param $type
      * @param $filter
      * @param $limit
+     *
      * @return array
      */
     public function getLookupResults($type, $filter = '', $limit = 10)
@@ -271,11 +262,11 @@ class AssetModel extends FormModel
     /**
      * Generate url for an asset
      *
-     * @param $entity
-     * @param $absolute
-     * @param $clickthrough
+     * @param Asset $entity
+     * @param bool  $absolute
+     * @param array $clickthrough
      *
-     * @return mixed
+     * @return string
      */
     public function generateUrl($entity, $absolute = true, $clickthrough = array())
     {

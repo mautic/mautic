@@ -41,8 +41,6 @@ class UpdateHelper
      */
     public function fetchPackage($kernelRoot, $package)
     {
-        $target = '';
-
         // Get our HTTP client
         $connector = HttpFactory::getHttp();
 

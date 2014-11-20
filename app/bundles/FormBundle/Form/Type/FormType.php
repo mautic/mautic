@@ -148,7 +148,7 @@ class FormType extends AbstractType
             'required'   => $required
         ));
 
-        $builder->add('tempId', 'hidden', array(
+        $builder->add('sessionId', 'hidden', array(
             'mapped' => false
         ));
 

@@ -29,16 +29,27 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 class EmailModel extends FormModel
 {
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return \Mautic\EmailBundle\Entity\EmailRepository
+     */
     public function getRepository()
     {
         return $this->em->getRepository('MauticEmailBundle:Email');
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getPermissionBase()
     {
         return 'email:emails';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getNameGetter()
     {
         return "getSubject";
@@ -820,11 +831,8 @@ class EmailModel extends FormModel
         }
 
         $dispatcher   = $this->factory->getDispatcher();
-        $hasListeners = $dispatcher->hasListeners(EmailEvents::EMAIL_ON_SEND);
         $templating   = $this->factory->getTemplating();
-        $slotsHelper  = $templating->getEngine('MauticEmailBundle::public.html.php')->get('slots');
-        /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
-        $emailRepo    = $this->getRepository();
+
         //get email settings such as templates, weights, etc
         $emailSettings = $this->getEmailSettings($email);
         $emailSettings = reset($emailSettings);

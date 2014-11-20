@@ -48,7 +48,7 @@ class InputHelper
      *
      * @param mixed $value
      *
-     * @return string
+     * @return mixed
      */
     public static function clean($value)
     {

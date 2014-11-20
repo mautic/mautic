@@ -53,11 +53,11 @@ class FieldModel extends CommonFormModel
      *
      * @return array
      */
-    public function getSessionFields()
+    public function getSessionFields($formId)
     {
         $session = $this->factory->getSession();
-        $fields = $session->get('mautic.formfields.add', array());
-        $remove = $session->get('mautic.formfields.remove', array());
+        $fields = $session->get('mautic.form.'.$formId.'.fields.modified', array());
+        $remove = $session->get('mautic.form.'.$formId.'.fields.deleted', array());
         return array_diff_key($fields, array_flip($remove));
     }
 }

@@ -31,7 +31,7 @@ class MauticInstallBundle extends Bundle
         $configurator = $this->container->get('mautic.configurator');
 
         // Steps should be added here in the order they'll be displayed
-        $configurator->addStep(new CheckStep($configurator->getParameters(), $configurator->isFileWritable(), $this->container->getParameter('kernel.root_dir')));
+        $configurator->addStep(new CheckStep($configurator->isFileWritable(), $this->container->getParameter('kernel.root_dir')));
         $configurator->addStep(new DoctrineStep($configurator->getParameters()));
         $configurator->addStep(new UserStep());
         $configurator->addStep(new StatsStep());

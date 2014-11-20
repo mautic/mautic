@@ -9,7 +9,6 @@
 
 namespace Mautic\UserBundle\Entity;
 
-use Bazinga\OAuthServerBundle\Model\UserInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;

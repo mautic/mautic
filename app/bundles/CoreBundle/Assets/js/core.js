@@ -358,7 +358,10 @@ var Mautic = {
                 //destroy ckeditor instances
                 if (typeof CKEDITOR != 'undefined') {
                     for (name in CKEDITOR.instances) {
-                        CKEDITOR.instances[name].destroy()
+                        var editor = CKEDITOR.instances[name];
+                        if (editor) {
+                            editor.destroy();
+                        }
                     }
                 }
             }
@@ -464,7 +467,7 @@ var Mautic = {
                 //set a timeout in case it doesn't get reset
                 setTimeout(function() {
                     Mautic.stopIconSpinPostEvent(identifierClass);
-                }, 10000);
+                }, 3000);
             }
         }
     },
@@ -660,13 +663,6 @@ var Mautic = {
     },
 
     ajaxifyLink: function (el, event) {
-        //prevent leaving if currently in a form
-        if (mQuery(".form-exit-unlock-id").length) {
-            if (mQuery(el).attr('data-ignore-formexit') != 'true') {
-                var unlockParameter = (mQuery('.form-exit-unlock-parameter').length) ? mQuery('.form-exit-unlock-parameter').val() : '';
-                Mautic.unlockEntity(mQuery('.form-exit-unlock-model').val(), mQuery('.form-exit-unlock-id').val(), unlockParameter);
-            }
-        }
         var route = mQuery(el).attr('href');
         if (route.indexOf('javascript')>=0 || MauticVars.routeInProgress === route) {
             return false;
@@ -676,6 +672,15 @@ var Mautic = {
             //open the link in a new window
             route = route.split("?")[0];
             window.open(route, '_blank');
+            return;
+        }
+
+        //prevent leaving if currently in a form
+        if (mQuery(".form-exit-unlock-id").length) {
+            if (mQuery(el).attr('data-ignore-formexit') != 'true') {
+                var unlockParameter = (mQuery('.form-exit-unlock-parameter').length) ? mQuery('.form-exit-unlock-parameter').val() : '';
+                Mautic.unlockEntity(mQuery('.form-exit-unlock-model').val(), mQuery('.form-exit-unlock-id').val(), unlockParameter);
+            }
         }
 
         var link = mQuery(el).attr('data-menu-link');
@@ -765,6 +770,12 @@ var Mautic = {
     },
 
     processModalContent: function (response, target) {
+        if (response.error) {
+            Mautic.stopIconSpinPostEvent();
+            alert(response.error);
+            return;
+        }
+
         if (response.closeModal && response.newContent) {
             mQuery(target).modal('hide');
             mQuery('.modal-backdrop').remove();
@@ -772,6 +783,7 @@ var Mautic = {
             Mautic.processPageContent(response);
         } else {
             if (response.closeModal) {
+                console.log(target);
                 mQuery(target).modal('hide');
 
                 if (response.mauticContent) {

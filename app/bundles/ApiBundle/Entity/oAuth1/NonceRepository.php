@@ -19,6 +19,10 @@ class NonceRepository extends EntityRepository
 
     /**
      * Delete nonces that are older than $timestamp
+     *
+     * @param string $timestamp
+     *
+     * @return void
      */
     public function removeOutdatedNonces($timestamp)
     {

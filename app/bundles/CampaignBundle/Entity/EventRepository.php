@@ -9,7 +9,6 @@
 
 namespace Mautic\CampaignBundle\Entity;
 
-use Doctrine\ORM\Query\Expr\Join;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -313,7 +312,6 @@ class EventRepository extends CommonRepository
      */
     public function getEvents($args = array())
     {
-        $now = new \DateTime();
         $q = $this->createQueryBuilder('e')
             ->select('e, ec, ep')
             ->leftJoin('e.children', 'ec')

@@ -60,7 +60,7 @@ class FormSubscriber extends CommonSubscriber
         $action = array(
             'label'        => 'mautic.lead.lead.events.changelist',
             'description'  => 'mautic.lead.lead.events.changelist_descr',
-            'formType'     => 'lead_event_leadlist',
+            'formType'     => 'leadlist_action',
             'callback'     => '\Mautic\LeadBundle\Helper\FormEventHelper::changeLists'
         );
         $event->addSubmitAction('lead.changelist', $action);

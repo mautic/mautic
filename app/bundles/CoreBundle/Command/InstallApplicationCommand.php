@@ -45,11 +45,7 @@ EOT
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $options = $input->getOptions();
-
-        /** @var \Mautic\InstallBundle\Configurator\Configurator $configurator */
-        $configurator = $this->getContainer()->get('mautic.configurator');
-        $kernelRoot   = $this->getContainer()->getParameter('kernel.root_dir');
+        $kernelRoot = $this->getContainer()->getParameter('kernel.root_dir');
 
         /** @var \Symfony\Bundle\FrameworkBundle\Translation\Translator $translator */
         $translator = $this->getContainer()->get('translator');
@@ -139,9 +135,7 @@ EOT
             return 1;
         }
 
-        $output->writeln(
-            $translator->trans('mautic.core.command.install_application_success')
-        );
+        $output->writeln($translator->trans('mautic.core.command.install_application_success'));
 
         return 0;
     }

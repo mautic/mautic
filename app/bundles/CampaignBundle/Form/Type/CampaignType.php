@@ -114,7 +114,7 @@ class CampaignType extends AbstractType
             'required'   => false
         ));
 
-        $builder->add('tempId', 'hidden', array(
+        $builder->add('sessionId', 'hidden', array(
             'mapped' => false
         ));
 

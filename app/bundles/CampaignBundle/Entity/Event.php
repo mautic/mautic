@@ -12,7 +12,6 @@ namespace Mautic\CampaignBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
-use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Class Event
@@ -172,6 +171,12 @@ class Event
         $this->children = new ArrayCollection();
     }
 
+    /**
+     * @param string $prop
+     * @param mixed  $val
+     *
+     * @return void
+     */
     private function isChanged($prop, $val)
     {
         $getter  = "get" . ucfirst($prop);
@@ -187,6 +192,9 @@ class Event
         }
     }
 
+    /**
+     * @return mixed
+     */
     public function getChanges()
     {
         return $this->changes;
@@ -359,7 +367,7 @@ class Event
      * Add log
      *
      * @param LeadEventLog $log
-     * @return Log
+     * @return Event
      */
     public function addLog(LeadEventLog $log)
     {
@@ -472,7 +480,7 @@ class Event
     }
 
     /**
-     * @return mixed
+     * @return integer
      */
     public function getTriggerInterval ()
     {
@@ -480,7 +488,7 @@ class Event
     }
 
     /**
-     * @param mixed $triggerInterval
+     * @param integer $triggerInterval
      */
     public function setTriggerInterval ($triggerInterval)
     {

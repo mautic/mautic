@@ -24,7 +24,8 @@ $containerClass = (!empty($deleted)) ? ' bg-danger' : '';
     if (!empty($inForm))
         echo $view->render('MauticFormBundle:Builder:actions.html.php', array(
             'deleted' => (!empty($deleted)) ? $deleted : false,
-            'id'      => $id
+            'id'      => $id,
+            'formId'  => $formId
         ));
     ?>
     <button type="<?php echo $properties['type']; ?>" name="mauticform[<?php echo $field['alias']; ?>]" <?php echo $inputAttr; ?> value="1"><?php echo $field['label']; ?></button>

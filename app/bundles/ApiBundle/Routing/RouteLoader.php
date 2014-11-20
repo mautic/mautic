@@ -9,26 +9,33 @@
 
 namespace Mautic\ApiBundle\Routing;
 
-use Mautic\ApiBundle\ApiEvents;
-use Mautic\CoreBundle\Event\RouteEvent;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
  * Class RouteLoader
- *
- * @package Mautic\ApiBundle\Routing
  */
-
 class RouteLoader extends Loader
 {
-    private $loaded    = false;
+
+    /**
+     * @var bool
+     */
+    private $loaded = false;
+
+    /**
+     * @var bool|mixed
+     */
     private $bundles;
+
+    /**
+     * @var bool
+     */
     private $apiEnabled;
 
     /**
-     * @param Container $container
+     * @param MauticFactory $factory
      */
     public function __construct(MauticFactory $factory)
     {
@@ -37,10 +44,8 @@ class RouteLoader extends Loader
     }
 
     /**
-     * Load each bundles routing.php file
+     * {@inheritdoc}
      *
-     * @param mixed $resource
-     * @param null  $type
      * @return RouteCollection
      * @throws \RuntimeException
      */
@@ -52,14 +57,9 @@ class RouteLoader extends Loader
 
         $collection = new RouteCollection();
         foreach ($this->bundles as $bundle) {
-            $routing = $bundle['directory'] . "/Config/api.php";
+            $routing = $bundle['directory'] . "/Config/routing/api.php";
             if (file_exists($routing)) {
                 $collection->addCollection($this->import($routing));
-            } else {
-                $routing = $bundle['directory'] . "/Config/routing/api.php";
-                if (file_exists($routing)) {
-                    $collection->addCollection($this->import($routing));
-                }
             }
         }
 
@@ -69,9 +69,7 @@ class RouteLoader extends Loader
     }
 
     /**
-     * @param mixed $resource
-     * @param null  $type
-     * @return bool
+     * {@inheritdoc}
      */
     public function supports($resource, $type = null)
     {

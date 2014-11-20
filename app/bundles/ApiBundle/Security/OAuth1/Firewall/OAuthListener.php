@@ -9,9 +9,9 @@
 
 namespace Mautic\ApiBundle\Security\OAuth1\Firewall;
 
+use Bazinga\OAuthServerBundle\Security\Authentification\Token\OAuthToken;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Mautic\ApiBundle\Security\OAuth1\Authentication\Token\OAuthToken;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -19,16 +19,20 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 /**
  * Class OAuthListener
- *
- * @package Mautic\ApiBundle\Security\Firewall
  */
 class OAuthListener extends \Bazinga\OAuthServerBundle\Security\Firewall\OAuthListener
 {
+
     /**
      * @var MauticFactory $factory
      */
     private $factory;
 
+    /**
+     * @param MauticFactory $factory
+     *
+     * @return void
+     */
     public function setFactory(MauticFactory $factory)
     {
         $this->factory = $factory;
@@ -37,7 +41,11 @@ class OAuthListener extends \Bazinga\OAuthServerBundle\Security\Firewall\OAuthLi
     /**
      * @author William DURAND <william.durand1@gmail.com>
      *
-     * @param GetResponseEvent $event The event.
+     * @param GetResponseEvent $event
+     *
+     * @return void
+     * @throws AuthenticationException
+     * @throws HttpException
      */
     public function handle(GetResponseEvent $event)
     {

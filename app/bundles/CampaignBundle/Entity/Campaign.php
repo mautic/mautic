@@ -134,6 +134,12 @@ class Campaign extends FormEntity
         )));
     }
 
+    /**
+     * @param string $prop
+     * @param mixed  $val
+     *
+     * @return void
+     */
     protected function isChanged($prop, $val)
     {
         $getter  = "get" . ucfirst($prop);
@@ -352,9 +358,9 @@ class Campaign extends FormEntity
     }
 
     /**
-     * @return mixed
+     * @return ArrayCollection
      */
-    public function getLists ()
+    public function getLists()
     {
         return $this->lists;
     }
@@ -363,7 +369,7 @@ class Campaign extends FormEntity
      * Add list
      *
      * @param \Mautic\LeadBundle\Entity\LeadList $list
-     * @return Email
+     * @return Campaign
      */
     public function addList(\Mautic\LeadBundle\Entity\LeadList $list)
     {

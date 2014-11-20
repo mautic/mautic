@@ -9,9 +9,7 @@
 
 namespace Mautic\CategoryBundle;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
-use Mautic\CoreBundle\DependencyInjection\Compiler;
 
 /**
  * Class MauticCategoryBundle
@@ -20,5 +18,4 @@ use Mautic\CoreBundle\DependencyInjection\Compiler;
  */
 class MauticCategoryBundle extends Bundle
 {
-
 }

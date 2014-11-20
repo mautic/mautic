@@ -18,10 +18,10 @@ $item = $event['extra']['log'];
 	    	<h3>
 				<span class="text-primary"><?php echo $item['eventName']; ?>:</span> <?php echo $item['actionName']; ?>
 			</h3>
-	        <p class="mb-0">At <?php echo $view['date']->toFullConcat($event['timestamp']); ?>, <?php echo $event['eventLabel']; ?>.</p>
+            <p class="mb-0"><?php echo $view['translator']->trans('mautic.core.timeline.event.time', array('%date%' => $view['date']->toFullConcat($event['timestamp']), '%event%' => $event['eventLabel'])); ?></p>
 	    </div>
         <div class="panel-footer">
-	        <p><strong>Point increment:</strong> <strong class="text-primary"><?php echo $item['delta'] ?></strong></p>
+            <p><?php echo $view['translator']->trans('mautic.point.timeline.event.point.increment', array('%increment%' => $item['delta'])); ?></p>
         </div>
 	</div>
 </li>

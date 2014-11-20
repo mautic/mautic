@@ -15,12 +15,22 @@ use Mautic\AssetBundle\AssetEvents;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
+/**
+ * Class PublicController
+ */
 class PublicController extends CommonFormController
 {
+    /**
+     * @param string $slug
+     *
+     * @return void
+     */
     public function downloadAction($slug)
     {
         //find the asset
         $security   = $this->factory->getSecurity();
+
+        /** @var \Mautic\AssetBundle\Model\AssetModel $model */
         $model      = $this->factory->getModel('asset.asset');
         $translator = $this->get('translator');
         $entity     = $model->getEntityBySlugs($slug);

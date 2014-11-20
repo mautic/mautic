@@ -13,10 +13,11 @@ $containerClass = (!empty($deleted)) ? ' bg-danger' : '';
     <?php
     if (!empty($inForm))
         echo $view->render('MauticFormBundle:Builder:actions.html.php', array(
-            'deleted'  => (!empty($deleted)) ? $deleted : false,
-            'id'       => $id,
-            'route'   => 'mautic_formaction_action',
-            'actionType' => 'action'
+            'deleted'    => (!empty($deleted)) ? $deleted : false,
+            'id'         => $id,
+            'route'      => 'mautic_formaction_action',
+            'actionType' => 'action',
+            'formId'     => $formId
         ));
     ?>
     <span class="action-label"><?php echo $action['name']; ?></span>

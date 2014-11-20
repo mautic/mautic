@@ -18,16 +18,14 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 
 /**
  * Class ApiSubscriber
- *
- * @package Mautic\ApiBundle\EventListener
  */
 class ApiSubscriber extends CommonSubscriber
 {
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
-    static public function getSubscribedEvents ()
+    public static function getSubscribedEvents()
     {
         return array(
             CoreEvents::GLOBAL_SEARCH       => array('onGlobalSearch', 0),
@@ -39,20 +37,20 @@ class ApiSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param RouteEvent $event
+     * @param MauticEvents\RouteEvent $event
      */
-    public function onBuildRoute (MauticEvents\RouteEvent $event)
+    public function onBuildRoute(MauticEvents\RouteEvent $event)
     {
         $this->buildRoute($event, 'apidocs');
     }
 
     /**
-     * @param GlobalSearchEvent $event
+     * @param MauticEvents\GlobalSearchEvent $event
      */
-    public function onGlobalSearch (MauticEvents\GlobalSearchEvent $event)
+    public function onGlobalSearch(MauticEvents\GlobalSearchEvent $event)
     {
         if ($this->security->isGranted('api:clients:view')) {
-            $str     = $event->getSearchString();
+            $str = $event->getSearchString();
             if (empty($str)) {
                 return;
             }
@@ -115,12 +113,12 @@ class ApiSubscriber extends CommonSubscriber
         $client = $event->getClient();
         if ($details = $event->getChanges()) {
             $log        = array(
-                "bundle"    => "api",
-                "object"    => "client",
-                "objectId"  => $client->getId(),
-                "action"    => ($event->isNew()) ? "create" : "update",
-                "details"   => $details,
-                "ipAddress" => $this->request->server->get('REMOTE_ADDR')
+                'bundle'    => 'api',
+                'object'    => 'client',
+                'objectId'  => $client->getId(),
+                'action'    => ($event->isNew()) ? 'create' : 'update',
+                'details'   => $details,
+                'ipAddress' => $this->request->server->get('REMOTE_ADDR')
             );
             $this->factory->getModel('core.auditLog')->writeToLog($log);
         }
@@ -129,18 +127,18 @@ class ApiSubscriber extends CommonSubscriber
     /**
      * Add a role delete entry to the audit log
      *
-     * @param Events\Events $event
+     * @param Events\ClientEvent $event
      */
     public function onClientDelete(Events\ClientEvent $event)
     {
         $client = $event->getClient();
         $log = array(
-            "bundle"     => "api",
-            "object"     => "client",
-            "objectId"   => $client->deletedId,
-            "action"     => "delete",
-            "details"    => array('name' => $client->getName()),
-            "ipAddress"  => $this->request->server->get('REMOTE_ADDR')
+            'bundle'     => 'api',
+            'object'     => 'client',
+            'objectId'   => $client->deletedId,
+            'action'     => 'delete',
+            'details'    => array('name' => $client->getName()),
+            'ipAddress'  => $this->request->server->get('REMOTE_ADDR')
         );
         $this->factory->getModel('core.auditLog')->writeToLog($log);
     }

@@ -34,11 +34,10 @@ class CheckStep implements StepInterface
     /**
      * Constructor
      *
-     * @param array   $parameters       Existing parameters in local configuration
      * @param boolean $configIsWritable Flag if the configuration file is writable
      * @param string  $kernelRoot       Kernel root path
      */
-    public function __construct(array $parameters, $configIsWritable, $kernelRoot)
+    public function __construct($configIsWritable, $kernelRoot)
     {
         $this->configIsWritable = $configIsWritable;
         $this->kernelRoot       = $kernelRoot;

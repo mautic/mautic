@@ -34,19 +34,14 @@ class CampaignPermissions extends AbstractPermissions
 
     /**
      * {@inheritdoc}
-     *
-     * @return string|void
      */
-    public function getName() {
+    public function getName()
+    {
         return 'campaign';
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     * @param array                $data
      */
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {
@@ -56,8 +51,6 @@ class CampaignPermissions extends AbstractPermissions
 
     /**
      * {@inheritdoc}
-     *
-     * @param array $permissions
      */
     public function analyzePermissions (array &$permissions)
     {

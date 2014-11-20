@@ -13,5 +13,6 @@ echo $view->render('MauticFormBundle:Field:text.html.php', array(
     'type'     => 'text',
     'id'       => $id,
     'deleted'  => (!empty($deleted)) ? true : false,
-    'required' => true
+    'required' => true,
+    'formId'  => (isset($formId)) ? $formId : 0
 ));

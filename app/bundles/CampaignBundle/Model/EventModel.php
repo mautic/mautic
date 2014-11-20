@@ -236,6 +236,7 @@ class EventModel extends CommonFormModel
                 }
 
                 if (!empty($event['children'])) {
+                    $childrenTriggered = false;
                     foreach ($event['children'] as $child) {
                         if (isset($leadsEvents[$child['id']])) {
                             //this child event has already been fired for this lead so move on to the next event
@@ -262,6 +263,7 @@ class EventModel extends CommonFormModel
                             $log->setTriggerDate($timing);
                             $persist[] = $log;
 
+                            $childrenTriggered = true;
                             continue;
                         } elseif (!$timing) {
                             //timing not appropriate and should not be scheduled so bail
@@ -273,9 +275,16 @@ class EventModel extends CommonFormModel
                         if ($this->invokeEventCallback($child, $settings, $lead, $eventDetails)) {
                             $logger->debug('CAMPAIGN: ID# ' . $child['id'] . ' successfully executed and logged.');
                             $persist[] = $this->getLogEntity($child['id'], $event['campaign']['id'], $lead, $ipAddress);
+
+                            $childrenTriggered = true;
                         } else {
                             $logger->debug('CAMPAIGN: ID# ' . $child['id'] . ' execution failed.');
                         }
+                    }
+
+                    if ($childrenTriggered) {
+                        //a child of this event was triggered or scheduled so make not of the triggering event in the log
+                        $persist[] = $this->getLogEntity($event['id'], $event['campaign']['id'], $lead, $ipAddress);
                     }
                 }
             }
@@ -422,10 +431,11 @@ class EventModel extends CommonFormModel
                         continue;
                     }
 
+                    //the grandparent (parent's parent) is what will be compared against to determine if the timeframe is appropriate
                     $grandparent = $event['parent']['parent'];
 
                     if (empty($grandparent)) {
-                        //use the date added to the campaign
+                        //there is no grandparent so compare using the date added to the campaign
                         $fromDate = $lead['dateAdded'];
                     } else {
                         if (!isset($leadsEvents[$grandparent['id']])) {
@@ -601,16 +611,16 @@ class EventModel extends CommonFormModel
     }
 
     /**
-     * @param      $event
-     * @param      $campaign
-     * @param null $lead
-     * @param null $ipAddress
-     * @param bool $systemTriggered
+     * @param Event                                    $event
+     * @param Campaign                                 $campaign
+     * @param \Mautic\LeadBundle\Entity\Lead|null      $lead
+     * @param \Mautic\CoreBundle\Entity\IpAddress|null $ipAddress
+     * @param bool                                     $systemTriggered
      *
      * @return LeadEventLog
      * @throws \Doctrine\ORM\ORMException
      */
-    public function getLogEntity($event, $campaign, $lead = null, $ipAddress= null, $systemTriggered = false)
+    public function getLogEntity($event, $campaign, $lead = null, $ipAddress = null, $systemTriggered = false)
     {
         $log = new LeadEventLog();
 
@@ -630,6 +640,7 @@ class EventModel extends CommonFormModel
         $log->setCampaign($campaign);
 
         if ($lead == null) {
+            /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
             $leadModel = $this->factory->getModel('lead');
             $lead = $leadModel->getCurrentLead();
         }

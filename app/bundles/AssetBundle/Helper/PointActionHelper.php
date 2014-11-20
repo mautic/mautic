@@ -16,12 +16,11 @@ namespace Mautic\AssetBundle\Helper;
  */
 class PointActionHelper
 {
-
     /**
      * @param $eventDetails
      * @param $action
      *
-     * @return int
+     * @return bool
      */
     public static function validateAssetDownload($eventDetails, $action)
     {

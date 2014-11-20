@@ -54,7 +54,6 @@ class ListModel extends FormModel
     public function saveEntity($entity, $unlock = true)
     {
         $isNew = ($entity->getId()) ? false : true;
-        $repo  = $this->getRepository();
 
         //set some defaults
         $this->setTimestamps($entity, $isNew, $unlock);

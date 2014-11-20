@@ -12,7 +12,7 @@
         <div id="CampaignCanvas">
         <?php
         foreach ($campaignEvents as $event):
-            echo $view->render('MauticCampaignBundle:Event:generic.html.php', array('event' => $event));
+            echo $view->render('MauticCampaignBundle:Event:generic.html.php', array('event' => $event, 'campaignId' => $campaignId));
         endforeach;
         ?>
         </div>
@@ -24,20 +24,20 @@
 
         <div><em><?php echo $view['translator']->trans('mautic.campaign.event.drag.help'); ?></em></div>
         <div class="panel-group margin-sm-top" id="CampaignEventPanel">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h4 class="panel-title">
-                        <a data-toggle="collapse" data-parent="#CampaignEventPanel" href="#CampaignEventLeadActions">
-                            <?php echo $view['translator']->trans('mautic.campaign.event.decisions.header'); ?>
-                        </a>
-                    </h4>
-                </div>
-                <div id="CampaignEventLeadActions" class="panel-collapse collapse in">
+            <?php /*
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a href="#CampaignEventSystemActions">
+                                <?php echo $view['translator']->trans('mautic.campaign.event.systemchanges.header'); ?>
+                            </a>
+                        </h4>
+                    </div>
                     <div class="panel-body">
                         <div class="campaign-event-group-body list-group">
-                            <?php foreach ($eventSettings['decision'] as $k => $e): ?>
-                                <a id="campaignEvent_<?php echo str_replace('.', '', $k); ?>" data-toggle="ajaxmodal" data-ignore-removemodal="true" data-target="#CampaignEventModal" class="list-group-item list-campaign-decision" href="<?php echo $view['router']->generate('mautic_campaignevent_action', array('objectAction' => 'new', 'type' => $k, 'eventType'=> 'decision')); ?>">
-                                    <div data-toggle="tooltip" title="<?php echo $e['description']; ?>">
+                            <?php foreach ($eventSettings['systemaction'] as $k => $e): ?>
+                                <a id="campaignEvent_<?php echo str_replace('.', '', $k); ?>" data-toggle="ajaxmodal" data-ignore-removemodal="true" data-target="#CampaignEventModal" class="list-group-item list-campaign-systemaction" href="<?php echo $view['router']->generate('mautic_campaignevent_action', array('objectAction' => 'new', 'type' => $k, 'eventType'=> 'systemaction')); ?>">
+                                    <div class="padding-sm" data-toggle="tooltip" title="<?php echo $e['description']; ?>">
                                         <span><?php echo $e['label']; ?></span>
                                     </div>
                                 </a>
@@ -45,43 +45,37 @@
                         </div>
                     </div>
                 </div>
-            </div>
-            <?php /*
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#CampaignEventPanel" href="#CampaignEventSystemActions">
-                                <?php echo $view['translator']->trans('mautic.campaign.event.systemchanges.header'); ?>
-                            </a>
-                        </h4>
-                    </div>
-                    <div id="CampaignEventSystemActions" class="panel-collapse collapse">
-                        <div class="panel-body">
-                            <div class="campaign-event-group-body list-group">
-                                <?php foreach ($eventSettings['systemaction'] as $k => $e): ?>
-                                    <a id="campaignEvent_<?php echo str_replace('.', '', $k); ?>" data-toggle="ajaxmodal" data-ignore-removemodal="true" data-target="#CampaignEventModal" class="list-group-item list-campaign-systemaction" href="<?php echo $view['router']->generate('mautic_campaignevent_action', array('objectAction' => 'new', 'type' => $k, 'eventType'=> 'systemaction')); ?>">
-                                        <div class="padding-sm" data-toggle="tooltip" title="<?php echo $e['description']; ?>">
-                                            <span><?php echo $e['label']; ?></span>
-                                        </div>
-                                    </a>
-                                <?php endforeach; ?>
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 */ ?>
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h4 class="panel-title">
-                        <a data-toggle="collapse" data-parent="#CampaignEventPanel" href="#CampaignEventOutcomes">
+                        <a href="#CampaignEventOutcomes">
                             <?php echo $view['translator']->trans('mautic.campaign.event.actions.header'); ?>
                         </a>
                     </h4>
                 </div>
-                <div id="CampaignEventOutcomes" class="panel-collapse collapse">
-                    <div class="panel-body">
-                        <?php foreach ($eventSettings['action'] as $k => $e): ?>
-                            <a id="campaignEvent_<?php echo str_replace('.', '', $k); ?>" data-toggle="ajaxmodal" data-ignore-removemodal="true" data-target="#CampaignEventModal" class="list-group-item list-campaign-action" href="<?php echo $view['router']->generate('mautic_campaignevent_action', array('objectAction' => 'new', 'type' => $k, 'eventType'=> 'action')); ?>">
+                <div class="panel-body">
+                    <?php foreach ($eventSettings['action'] as $k => $e): ?>
+                        <a id="campaignEvent_<?php echo str_replace('.', '', $k); ?>" data-toggle="ajaxmodal" data-ignore-removemodal="true" data-target="#CampaignEventModal" class="list-group-item list-campaign-action" href="<?php echo $view['router']->generate('mautic_campaignevent_action', array('objectAction' => 'new', 'type' => $k, 'eventType'=> 'action', 'campaignId' => $campaignId)); ?>">
+                            <div data-toggle="tooltip" title="<?php echo $e['description']; ?>">
+                                <span><?php echo $e['label']; ?></span>
+                            </div>
+                        </a>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a href="#CampaignEventLeadActions">
+                            <?php echo $view['translator']->trans('mautic.campaign.event.decisions.header'); ?>
+                        </a>
+                    </h4>
+                </div>
+                <div class="panel-body">
+                    <div class="campaign-event-group-body list-group">
+                        <?php foreach ($eventSettings['decision'] as $k => $e): ?>
+                            <a id="campaignEvent_<?php echo str_replace('.', '', $k); ?>" data-toggle="ajaxmodal" data-ignore-removemodal="true" data-target="#CampaignEventModal" class="list-group-item list-campaign-decision" href="<?php echo $view['router']->generate('mautic_campaignevent_action', array('objectAction' => 'new', 'type' => $k, 'eventType'=> 'decision', 'campaignId' => $campaignId)); ?>">
                                 <div data-toggle="tooltip" title="<?php echo $e['description']; ?>">
                                     <span><?php echo $e['label']; ?></span>
                                 </div>
@@ -96,6 +90,7 @@
 <!-- dropped coordinates -->
 <input type="hidden" value="" id="droppedX" />
 <input type="hidden" value="" id="droppedY" />
+<input type="hidden" value="<?php echo $campaignId; ?>" id="campaignId" />
 
 <?php echo $view->render('MauticCoreBundle:Helper:modal.html.php', array(
     'id'     => 'CampaignEventModal',
@@ -116,19 +111,20 @@
                         if (isset($campaignEvents[$useId])):
                             $targetEvent = $campaignEvents[$useId];
                             $labelText   = '';
-                            if ($targetEvent['triggerMode'] == 'interval'):
-                                $labelText = $view['translator']->trans('mautic.campaign.connection.trigger.interval.label', array(
-                                    '%number%' => $targetEvent['triggerInterval'],
-                                    '%unit%'   => $view['translator']->transChoice('mautic.campaign.event.intervalunit.' . $targetEvent['triggerIntervalUnit'], $targetEvent['triggerInterval'])
-                                ));
-                            elseif ($targetEvent['triggerMode'] == 'date'):
-                                $labelText = $view['translator']->trans('mautic.campaign.connection.trigger.date.label', array(
-                                    '%full%' => $view['date']->toFull($event['triggerDate']),
-                                    '%time%' => $view['date']->toTime($targetEvent['triggerDate']),
-                                    '%date%' => $view['date']->toShort($targetEvent['triggerDate'])
-                                ));
+                            if (isset($targetEvent['triggerMode'])):
+                                if ($targetEvent['triggerMode'] == 'interval'):
+                                    $labelText = $view['translator']->trans('mautic.campaign.connection.trigger.interval.label', array(
+                                        '%number%' => $targetEvent['triggerInterval'],
+                                        '%unit%'   => $view['translator']->transChoice('mautic.campaign.event.intervalunit.' . $targetEvent['triggerIntervalUnit'], $targetEvent['triggerInterval'])
+                                    ));
+                                elseif ($targetEvent['triggerMode'] == 'date'):
+                                    $labelText = $view['translator']->trans('mautic.campaign.connection.trigger.date.label', array(
+                                        '%full%' => $view['date']->toFull($event['triggerDate']),
+                                        '%time%' => $view['date']->toTime($targetEvent['triggerDate']),
+                                        '%date%' => $view['date']->toShort($targetEvent['triggerDate'])
+                                    ));
+                                endif;
                             endif;
-
                             if (!empty($labelText)):
                                 $label = " ep.addOverlay([\"Label\", {label: \"$labelText\", location: 0.65, id: \"{$source}_{$target}_connectionLabel\", cssClass: \"_jsPlumb_label\"}]); ";
                             endif;

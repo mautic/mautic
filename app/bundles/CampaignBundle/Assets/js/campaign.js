@@ -91,6 +91,8 @@ Mautic.campaignEventOnLoad = function (container, response) {
 
         if (response.label) {
             Mautic.campaignBuilderUpdateLabel(domEventId, response.label);
+        } else {
+            Mautic.campaignBuilderUpdateLabel(domEventId, false);
         }
 
         mQuery(eventId + " .campaign-event-content").html(response.updateHtml);
@@ -178,12 +180,14 @@ Mautic.campaignBuilderUpdateLabel = function (domEventId, theLabel) {
                 });
             }
 
-            conn.addOverlay(["Label", {
-                label: theLabel,
-                location: 0.65,
-                cssClass: "_jsPlumb_label",
-                id: conn.sourceId + "_" + conn.targetId + "_connectionLabel"
-            }]);
+            if (theLabel) {
+                conn.addOverlay(["Label", {
+                    label: theLabel,
+                    location: 0.65,
+                    cssClass: "_jsPlumb_label",
+                    id: conn.sourceId + "_" + conn.targetId + "_connectionLabel"
+                }]);
+            }
         });
     }
 };
@@ -229,8 +233,8 @@ Mautic.launchCampaignEditor = function() {
             var targetId = info.connection.targetId;
             var sourceEndpoint = info.sourceEndpoint.anchor.cssClass;
             var targetEndpoint = info.targetEndpoint.anchor.cssClass;
-
-            var query = "action=campaign:updateConnections&source=" + sourceId + "&target=" + targetId + "&remove=" + remove + "&sourceEndpoint=" + sourceEndpoint + "&targetEndpoint=" + targetEndpoint;
+            var campaignId     = mQuery('#campaignId').val();
+            var query = "action=campaign:updateConnections&campaignId=" + campaignId + "&source=" + sourceId + "&target=" + targetId + "&remove=" + remove + "&sourceEndpoint=" + sourceEndpoint + "&targetEndpoint=" + targetEndpoint;
             mQuery.ajax({
                 url: mauticAjaxUrl,
                 type: "POST",
@@ -355,8 +359,8 @@ Mautic.launchCampaignEditor = function() {
                     //update coordinates
                     mQuery('#droppedX').val(params.pos[0]);
                     mQuery('#droppedY').val(params.pos[1]);
-
-                    var query = "action=campaign:updateCoordinates&droppedX=" + params.pos[0] + "&droppedY=" + params.pos[1] + "&eventId=" + mQuery(params.el).attr('id');
+                    var campaignId = mQuery('#campaignId').val();
+                    var query = "action=campaign:updateCoordinates&campaignId=" + campaignId + "&droppedX=" + params.pos[0] + "&droppedY=" + params.pos[1] + "&eventId=" + mQuery(params.el).attr('id');
                     mQuery.ajax({
                         url: mauticAjaxUrl,
                         type: "POST",
