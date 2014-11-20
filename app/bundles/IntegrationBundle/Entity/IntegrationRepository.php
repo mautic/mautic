@@ -19,6 +19,23 @@ class IntegrationRepository extends CommonRepository
 {
 
     /**
+     * Find an integration record by bundle name
+     *
+     * @param string $bundle
+     *
+     * @return mixed
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function findByBundle($bundle)
+    {
+        $q = $this->createQueryBuilder($this->getTableAlias());
+        $q->where($q->exper->eq('i.bundle', ':bundle'))
+            ->setParameter('bundle', $bundle);
+
+        return $q->getQuery()->getOneOrNullResult();
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getEntities($args = array())

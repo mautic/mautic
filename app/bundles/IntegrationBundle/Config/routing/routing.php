@@ -21,4 +21,11 @@ $collection->add('mautic_integration_index', new Route('/integrations/{page}',
     )
 ));
 
+$collection->add('mautic_integration_action', new Route('/integrations/{objectAction}/{objectId}',
+    array(
+        '_controller' => 'MauticIntegrationBundle:Integration:execute',
+        "objectId"    => 0
+    )
+));
+
 return $collection;

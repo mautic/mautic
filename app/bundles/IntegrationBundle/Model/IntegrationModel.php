@@ -9,12 +9,12 @@
 
 namespace Mautic\IntegrationBundle\Model;
 
-use Mautic\CoreBundle\Model\CommonModel;
+use Mautic\CoreBundle\Model\FormModel;
 
 /**
  * Class IntegrationModel
  */
-class IntegrationModel extends CommonModel
+class IntegrationModel extends FormModel
 {
 
     /**

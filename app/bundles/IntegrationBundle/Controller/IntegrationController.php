@@ -109,4 +109,53 @@ class IntegrationController extends FormController
             )
         ));
     }
+
+    /**
+     * Scans the addon bundles directly and loads bundles which are not registered to the database
+     *
+     * @param int $objectId Unused in this action
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    protected function reloadAction($objectId)
+    {
+        /** @var \Mautic\IntegrationBundle\Model\IntegrationModel $model */
+        $model  = $this->factory->getModel('integration');
+        $repo   = $model->getRepository();
+        $addons = $this->factory->getParameter('addon.bundles');
+        $added  = 0;
+
+        foreach ($addons as $addon) {
+            // If we don't find the bundle, we need to register it
+            if (!$repo->findByBundle($addon['bundle'])) {
+                $added++;
+                $entity = new Integration();
+                $entity->setBundle($addon['bundle']);
+                $entity->setIsPublished(false);
+                $entity->setName($addon['base']);
+                $model->saveEntity($entity);
+            }
+        }
+
+        // Alert the user to the number of additions
+        $this->request->getSession()->getFlashBag()->add(
+            'notice',
+            $this->get('translator')->trans('mautic.integration.notice.added', array('%added%' => $added), 'flashes')
+        );
+
+        $viewParameters = array(
+            'page' => $session->get('mautic.integration.page')
+        );
+
+        // Refresh the index contents
+        return $this->postActionRedirect(array(
+            'returnUrl'       => $this->generateUrl('mautic_integration_index', $viewParameters),
+            'viewParameters'  => $viewParameters,
+            'contentTemplate' => 'MauticIntegrationBundle:Integration:index',
+            'passthroughVars' => array(
+                'activeLink'    => '#mautic_integration_index',
+                'mauticContent' => 'integration'
+            )
+        ));
+    }
 }
