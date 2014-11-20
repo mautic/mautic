@@ -18,13 +18,20 @@ $header = ($report->getId()) ?
 $view['slots']->set("headerTitle", $header);
 ?>
 
-<div class="panel panel-default">
-	<div class="panel-heading">
-		<h3 class="panel-title">
-			<?php echo $header; ?>
-		</h3>
-	</div>
-	<div class="panel-body">
-    	<?php echo $view['form']->form($form); ?>
+<!-- start: box layout -->
+<div class="box-layout">
+    <!-- container -->
+    <div class="col-md-9 bg-auto height-auto bdr-r">
+		<div class="pa-md">
+			<?php echo $view['form']->row($form['title']); ?>
+			<?php echo $view['form']->row($form['source']); ?>
+			<?php echo $view['form']->row($form['columns']); ?>
+			<?php echo $view['form']->row($form['filters']); ?>
+		</div>
     </div>
+    <div class="col-md-3 bg-white height-auto">
+		<div class="pr-lg pl-lg pt-md pb-md">
+			<?php echo $view['form']->form($form); ?>
+		</div>
+	</div>
 </div>
