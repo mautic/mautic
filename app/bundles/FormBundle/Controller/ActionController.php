@@ -44,7 +44,7 @@ class ActionController extends CommonFormController
             !$this->request->isXmlHttpRequest() ||
             !$this->factory->getSecurity()->isGranted(array('form:forms:editown', 'form:forms:editother', 'form:forms:create'), 'MATCH_ONE')
         ) {
-            return $this->accessDenied();
+            return $this->modalAccessDenied();
         }
 
         //fire the form builder event
@@ -158,7 +158,7 @@ class ActionController extends CommonFormController
                 !$this->request->isXmlHttpRequest() ||
                 !$this->factory->getSecurity()->isGranted(array('form:forms:editown', 'form:forms:editother', 'form:forms:create'), 'MATCH_ONE')
             ) {
-                return $this->accessDenied();
+                return $this->modalAccessDenied();
             }
 
             $form = $this->get('form.factory')->create('formaction', $formAction, array(

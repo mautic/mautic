@@ -27,18 +27,17 @@ class DefaultController extends CommonController
      */
     public function indexAction()
     {
-        $model          = $this->factory->getModel('dashboard.dashboard');
         $hitRepo        = $this->factory->getEntityManager()->getRepository('MauticPageBundle:Hit');
         $emailStatRepo  = $this->factory->getEntityManager()->getRepository('MauticEmailBundle:Stat');
 
-        $sentReadCount        = $this->factory->getModel('email.email')->getRepository()->getSentReadCount();
+        $sentReadCount        = $this->factory->getModel('email')->getRepository()->getSentReadCount();
         $newReturningVisitors = $hitRepo->getNewReturningVisitorsCount();
         $weekVisitors         = $hitRepo->countVisitors(604800);
         $allTimeVisitors      = $hitRepo->countVisitors(0);
         $allSentEmails        = $emailStatRepo->getSentCount();
-        $popularPages         = $this->factory->getModel('page.page')->getRepository()->getPopularPages();
-        $popularAssets        = $this->factory->getModel('asset.asset')->getRepository()->getPopularAssets();
-        $popularCampaigns     = $this->factory->getModel('campaign.campaign')->getRepository()->getPopularCampaigns();
+        $popularPages         = $this->factory->getModel('page')->getRepository()->getPopularPages();
+        $popularAssets        = $this->factory->getModel('asset')->getRepository()->getPopularAssets();
+        $popularCampaigns     = $this->factory->getModel('campaign')->getRepository()->getPopularCampaigns();
 
         $openRate = 0;
 

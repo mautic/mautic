@@ -45,7 +45,7 @@ class FieldController extends CommonFormController
             !$this->request->isXmlHttpRequest() ||
             !$this->factory->getSecurity()->isGranted(array('form:forms:editown', 'form:forms:editother', 'form:forms:create'), 'MATCH_ONE')
         ) {
-            return $this->accessDenied();
+            return $this->modalAccessDenied();
         }
 
         //fire the form builder event
@@ -163,7 +163,7 @@ class FieldController extends CommonFormController
                 !$this->request->isXmlHttpRequest() ||
                 !$this->factory->getSecurity()->isGranted(array('form:forms:editown', 'form:forms:editother', 'form:forms:create'), 'MATCH_ONE')
             ) {
-                return $this->accessDenied();
+                return $this->modalAccessDenied();
             }
 
             //set custom params from event if applicable

@@ -284,12 +284,26 @@ class CommonController extends Controller implements MauticController
 
         return $this->postActionRedirect(array(
             'returnUrl'       => $this->generateUrl('mautic_dashboard_index'),
-            'contentTemplate' => 'MauticCoreBundle:Default:index',
+            'contentTemplate' => 'MauticDashboardBundle:Default:index',
             'passthroughVars' => array(
                 'activeLink' => '#mautic_dashboard_index',
                 'route'      => $this->generateUrl('mautic_dashboard_index')
             ),
             'flashes'         => array($flash)
+        ));
+    }
+
+    /**
+     * Returns a json encoded access denied error for modal windows
+     *
+     * @param string $msg
+     *
+     * @return JsonResponse
+     */
+    public function modalAccessDenied($msg = 'mautic.core.error.accessdenied')
+    {
+        return new JsonResponse(array(
+            'error' => $this->factory->getTranslator()->trans($msg, array(), 'flashes')
         ));
     }
 

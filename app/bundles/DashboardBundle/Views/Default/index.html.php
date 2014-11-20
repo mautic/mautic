@@ -9,6 +9,7 @@
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set("headerTitle", "Dashboard");
 $view['slots']->set('mauticContent', 'dashboard');
+
 ?>
 <div class="box-layout">
     <div class="np col-md-9 height-auto bg-white">
