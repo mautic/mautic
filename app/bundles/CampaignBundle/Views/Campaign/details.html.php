@@ -201,8 +201,9 @@ if ($permissions['campaign:campaigns:edit']): ?>
                     'noContactList' => $noContactList, 
                     'totalItems' => $leads['count'], 
                     'page' => 1, 
-                    'limit' => 10, 
+                    'limit' => $limit, 
                     'link' => 'mautic_campaign_leads',
+                    'sessionVar' => 'campaign.lead',
                     'objectId' => $campaign->getId(),
                     'indexMode' => 'grid')); ?>
             </div>

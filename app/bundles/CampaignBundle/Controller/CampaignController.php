@@ -160,12 +160,15 @@ class CampaignController extends FormController
             return $this->accessDenied();
         }
 
+        // limit for lead list
+        $limit = $this->factory->getSession()->get('mautic.campaign.lead.limit', $this->factory->getParameter('default_pagelimit'));
+
         $eventLogRepo       = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:LeadEventLog');
         $campaignLeadRepo   = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:Lead');
         $events             = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:Event')->getEvents(array('campaigns' => array($entity->getId())));
         $leadCount          = $campaignLeadRepo->countLeads($entity->getId());
         $campaignLogs       = $eventLogRepo->getCampaignLog($entity->getId());
-        $leads              = $campaignLeadRepo->getLeadsWithFields(array('campaign_id' => $entity->getId(), 'withTotalCount' => true));
+        $leads              = $campaignLeadRepo->getLeadsWithFields(array('campaign_id' => $entity->getId(), 'withTotalCount' => true, 'limit' => $limit));
 
         foreach ($events  as &$event) {
             $event['logCount'] = 0;
@@ -207,6 +210,7 @@ class CampaignController extends FormController
                 'leadStats'   => $leadStats,
                 'events'      => $events,
                 'leads'       => $leads,
+                'limit'       => $limit,
                 'noContactList' => $emailRepo->getDoNotEmailList()
             ),
             'contentTemplate' => 'MauticCampaignBundle:Campaign:details.html.php',
@@ -264,7 +268,9 @@ class CampaignController extends FormController
                 'limit'      => $limit,
                 'filter'     => $filter,
                 'orderBy'    => $orderBy,
-                'orderByDir' => $orderByDir));
+                'orderByDir' => $orderByDir
+            )
+        );
 
         $count = $leads['count'];
         if ($count && $count < ($start + 1)) {
@@ -296,7 +302,8 @@ class CampaignController extends FormController
                 'tmpl'        => 'campaign',
                 'indexMode'   => 'grid',
                 'link'        => 'mautic_campaign_leads',
-                'limit'       => 10,
+                'sessionVar'  => 'campaign.lead',
+                'limit'       => $limit,
                 'objectId'    => $objectId,
                 'noContactList' => $emailRepo->getDoNotEmailList()
             ),
@@ -305,8 +312,8 @@ class CampaignController extends FormController
                 'activeLink'    => '#mautic_campaign_view',
                 'mauticContent' => 'campaign',
                 'route'         => $this->generateUrl('mautic_campaign_leads', array(
-                        'objectId'     => $objectId,
-                        'page'         => $page)
+                    'objectId'     => $objectId,
+                    'page'         => $page)
                 )
             )
         ));

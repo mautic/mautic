@@ -95,6 +95,9 @@ if ($tmpl == 'index')
         } else {
             $router = $view['router']->generate($link);
         }
+        if (!isset($sessionVar)) {
+            $sessionVar = 'lead';
+        }
         echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
             "totalItems"      => $totalItems,
             "page"            => $page,
@@ -102,7 +105,7 @@ if ($tmpl == 'index')
             "menuLinkId"      => $link,
             "baseUrl"         => $router,
             "tmpl"            => $indexMode,
-            'sessionVar'      => 'lead'
+            'sessionVar'      => $sessionVar
         )); 
         ?>
     </div>
