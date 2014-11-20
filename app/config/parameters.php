@@ -9,9 +9,19 @@
 
 //load default parameters from bundle files
 $bundles = $container->getParameter('mautic.bundles');
+$addons  = $container->getParameter('mautic.addon.bundles');
 
 $mauticParams = array();
 foreach ($bundles as $bundle) {
+    if (file_exists($bundle['directory'].'/Config/parameters.php')) {
+        $bundleParams = include $bundle['directory'].'/Config/parameters.php';
+        foreach ($bundleParams as $k => $v) {
+            $mauticParams[$k] = $v;
+        }
+    }
+}
+
+foreach ($addons as $bundle) {
     if (file_exists($bundle['directory'].'/Config/parameters.php')) {
         $bundleParams = include $bundle['directory'].'/Config/parameters.php';
         foreach ($bundleParams as $k => $v) {

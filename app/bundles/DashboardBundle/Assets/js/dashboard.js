@@ -8,6 +8,7 @@ Mautic.dashboardOnLoad = function (container) {
 
 Mautic.dashboardOnUnload = function(id) {
     // Trash initialized dashboard vars on app content change.
+    mQuery('.jqvmap-label').remove();
     if (id === '#app-content') {
         delete Mautic.dashboardMapData;
         delete Mautic.dashboardClickRateDoughnutObject;
@@ -21,6 +22,7 @@ Mautic.renderDashboardMap = function () {
     if (typeof Mautic.dashboardMapData === 'object') {
         return;
     }
+
     Mautic.dashboardMapData = mQuery.parseJSON(mQuery('#dashboard-map-data').text());
     jQuery('#dashboard-map').vectorMap({
         map: 'world_en',

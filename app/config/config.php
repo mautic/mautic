@@ -14,9 +14,30 @@ $buildBundles = function($namespace, $bundle) use ($container) {
     }
     return false;
 };
+
+// Note MauticAddon bundles so they can be applied as needed
+$buildAddonBundles = function($namespace, $bundle) use ($container) {
+    if (strpos($namespace, 'MauticAddon') !== false) {
+        $bundleBase = str_replace('MauticAddon', '', $bundle);
+        $v = array(
+            "base"      => str_replace('Bundle', '', $bundleBase),
+            "bundle"    => $bundleBase,
+            "namespace" => $namespace,
+            "relative"  => 'addons/'.$bundleBase,
+            "directory" => dirname($container->getParameter('kernel.root_dir')).'/bundles/'.$bundleBase
+        );
+        return $v;
+    }
+    return false;
+};
+
 $symfonyBundles = $container->getParameter('kernel.bundles');
 $mauticBundles  = array_filter(
-    array_map($buildBundles , $symfonyBundles, array_keys($symfonyBundles)),
+    array_map($buildBundles, $symfonyBundles, array_keys($symfonyBundles)),
+    function ($v) { return (!empty($v)); }
+);
+$addonBundles  = array_filter(
+    array_map($buildAddonBundles, $symfonyBundles, array_keys($symfonyBundles)),
     function ($v) { return (!empty($v)); }
 );
 
@@ -24,12 +45,17 @@ $setBundles = array();
 foreach ($mauticBundles as $bundle) {
     $setBundles[$bundle['base']] = $bundle;
 }
+$setAddonBundles = array();
+foreach ($addonBundles as $bundle) {
+    $setAddonBundles[$bundle['base']] = $bundle;
+}
 
 $coreBundle = $setBundles['Core'];
 unset($setBundles['Core']);
 $setBundles = array_merge(array('Core' => $coreBundle), $setBundles);
 
 $container->setParameter('mautic.bundles', $setBundles);
+$container->setParameter('mautic.addon.bundles', $setAddonBundles);
 $loader->import('parameters.php');
 $container->loadFromExtension('mautic_core');
 

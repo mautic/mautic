@@ -27,16 +27,7 @@ $view['slots']->set('mauticContent', 'asset');
 		    	<div class="col-md-6">
 		    		<div class="row">
 				    	<div class="form-group col-xs-12">
-				    		<label class="control-label required" for="asset_file"><?php echo $view['translator']->trans('mautic.asset.asset.preview'); ?></label>
-				    		<div class="text-center thumbnail-preview">
-					    		<?php if ($activeAsset->isImage()) : ?>
-					    			<img src="<?php echo $assetUrl; ?>" alt="<?php echo $activeAsset->getTitle(); ?>" class="img-thumbnail" />
-					    		<?php elseif (strtolower($activeAsset->getFileType()) == 'pdf') : ?>
-					    			<iframe src="<?php echo $assetUrl; ?>#view=FitH"></iframe>
-					    		<?php else : ?>
-					    			<i class="<?php echo $activeAsset->getIconClass(); ?> fa-5x"></i>
-					    		<?php endif; ?>
-				    		</div>
+				    		<?php echo $view->render('MauticAssetBundle:Asset:preview.html.php', array('asset' => $activeAsset, 'baseUrl' => $baseUrl)); ?>
 			    		</div>
 		    		</div>
 		    	</div>
