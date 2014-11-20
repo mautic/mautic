@@ -195,17 +195,7 @@ if ($permissions['campaign:campaigns:edit']): ?>
             <!--/ #events-container -->
 
             <div class="tab-pane fade in bdr-w-0 page-list" id="leads-container">
-                <?php echo $view->render('MauticLeadBundle:Lead:grid.html.php', array(
-                    'items' => $leads['results'], 
-                    'tmpl' => 'campaign', 
-                    'noContactList' => $noContactList, 
-                    'totalItems' => $leads['count'], 
-                    'page' => 1, 
-                    'limit' => $limit, 
-                    'link' => 'mautic_campaign_leads',
-                    'sessionVar' => 'campaign.lead',
-                    'objectId' => $campaign->getId(),
-                    'indexMode' => 'grid')); ?>
+                <?php echo $view['actions']->render(new \Symfony\Component\HttpKernel\Controller\ControllerReference('MauticCampaignBundle:Campaign:leads', array('objectId' => $campaign->getId(), 'page' => $leadPage, 'ignoreAjax' => true))); ?>
             </div>
         </div>
         <!--/ end: tab-content -->

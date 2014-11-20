@@ -6,8 +6,6 @@
  * @link        http://mautic.com
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-if ($tmpl == 'index')
-    $view->extend('MauticLeadBundle:Lead:index.html.php');
 ?>
 
 <div class="pa-md bg-auto">
