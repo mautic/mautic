@@ -37,7 +37,7 @@ Mautic.pointTriggerEventOnLoad = function (container, response) {
     //new action created so append it to the form
     if (response.eventHtml) {
         var newHtml = response.eventHtml;
-        var eventId = '#triggerEvent' + response.eventId;
+        var eventId = '#triggerEvent_' + response.eventId;
         if (mQuery(eventId).length) {
             //replace content
             mQuery(eventId).replaceWith(newHtml);
