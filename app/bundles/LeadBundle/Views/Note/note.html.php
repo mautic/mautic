@@ -11,14 +11,13 @@ if ($note instanceof \Mautic\LeadBundle\Entity\LeadNote) {
     $id        = $note->getId();
     $text      = $note->getText();
     $date      = $note->getDateTime();
-    $createdBy = $note->getCreatedBy();
-    $author    = $createdBy->getFirstName() . ' ' . $createdBy->getLastName();
+    $author    = $note->getCreatedBy();
     $type      = $note->getType();
 } else {
     $id     = $note['id'];
     $text   = $note['text'];
     $date   = $note['dateTime'];
-    $author = $note['createdBy']['firstName'] . ' ' . $note['createdBy']['lastName'];
+    $author = $note['createdByUser'];
     $type   = $note['type'];
 }
 
