@@ -10,6 +10,7 @@
 namespace Mautic\IntegrationBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\IntegrationBundle\Entity\Integration;
 
 /**
  * Class IntegrationController
@@ -131,8 +132,8 @@ class IntegrationController extends FormController
                 $added++;
                 $entity = new Integration();
                 $entity->setBundle($addon['bundle']);
-                $entity->setIsPublished(false);
-                $entity->setName($addon['base']);
+                $entity->setIsEnabled(false);
+                $entity->setName(str_replace('Mautic', '', $addon['base']));
                 $model->saveEntity($entity);
             }
         }
@@ -144,7 +145,7 @@ class IntegrationController extends FormController
         );
 
         $viewParameters = array(
-            'page' => $session->get('mautic.integration.page')
+            'page' => $this->factory->getSession()->get('mautic.integration.page')
         );
 
         // Refresh the index contents
