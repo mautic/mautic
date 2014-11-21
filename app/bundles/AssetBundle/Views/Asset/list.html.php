@@ -54,7 +54,7 @@ $view->extend('MauticAssetBundle:Asset:index.html.php');
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'asset',
-                    'orderBy'    => 'a.download_count',
+                    'orderBy'    => 'a.downloadCount',
                     'text'       => 'mautic.asset.asset.thead.download.count',
                     'class'      => 'visible-md visible-lg col-asset-download-count'
                 ));
