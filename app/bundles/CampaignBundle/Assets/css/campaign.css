@@ -45,15 +45,17 @@
     padding: 10px 15px;
     z-index: 1010;
     border-radius: 3px;
+    background: #FFFFFF;
 }
 
 .list-campaign-event:hover {
     border:1px solid #123456;
+    /*
     box-shadow: 2px 2px 19px #444;
     -o-box-shadow: 2px 2px 19px #444;
     -webkit-box-shadow: 2px 2px 19px #444;
     -moz-box-shadow: 2px 2px 19px #fff;
-    /* opacity:0.9;
+    opacity:0.9;
     filter:alpha(opacity=90);
     */
 }
@@ -76,22 +78,24 @@
     white-space: nowrap;
 }
 
+
 .list-campaign-decision,  a.list-campaign-decision {
-    background-color: #faebcc;
-    border: solid 1px #8a6d3b;
+    /*background-color: #faebcc;*/
+    border: solid 1px #00b49d;
 }
 
 .list-campaign-systemaction, a.list-campaign-systemaction {
-    background-color: #8393a2;
-    border: solid 1px #4f5761;
-    color: #fff;
+    /*background-color: #8393a2;*/
+    border: solid 1px #8393a2;
+    /*color: #fff;*/
 }
 
 .list-campaign-action, a.list-campaign-action {
-    background-color: #47558f;
-    border: solid 1px #343b68;
-    color: #fff;
+    /*background-color: #47558f;*/
+    border: solid 1px #4e5e9e;
+    /*color: #fff;*/
 }
+
 
 .campaign-builder .list-group-item.ui-draggable-dragging {
     width: 206px;
