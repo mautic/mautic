@@ -28,12 +28,6 @@ $collection->add('mautic_campaign_index', new Route('/campaigns/{page}',
     )
 ));
 
-$collection->add('mautic_campaign_action', new Route('/campaigns/{objectAction}/{objectId}',
-    array(
-        '_controller' => 'MauticCampaignBundle:Campaign:execute',
-        "objectId"    => 0
-    )
-));
 
 $collection->add('mautic_campaign_leads', new Route('/campaigns/view/{objectId}/leads/{page}',
     array(
@@ -42,6 +36,13 @@ $collection->add('mautic_campaign_leads', new Route('/campaigns/view/{objectId}/
         'page'        => 1
     ), array(
         'page'    => '\d+'
+    )
+));
+
+$collection->add('mautic_campaign_action', new Route('/campaigns/{objectAction}/{objectId}',
+    array(
+        '_controller' => 'MauticCampaignBundle:Campaign:execute',
+        "objectId"    => 0
     )
 ));
 

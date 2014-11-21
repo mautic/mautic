@@ -369,14 +369,15 @@ var Mautic = {
 
         //run specific unloads
         var contentSpecific = false;
-        if (response && response.mauticContent) {
-            contentSpecific = response.mauticContent;
-        } else if (container == '#app-content') {
+        if (container == '#app-content') {
+            //full page gets precedence
             contentSpecific = mauticContent;
+        } else if (response && response.mauticContent) {
+            contentSpecific = response.mauticContent;
         }
 
         if (contentSpecific && typeof Mautic[contentSpecific + "OnUnload"] == 'function') {
-            Mautic[response.mauticContent + "OnUnload"](container, response);
+            Mautic[contentSpecific + "OnUnload"](container, response);
         }
     },
 

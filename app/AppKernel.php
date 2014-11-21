@@ -46,7 +46,7 @@ class AppKernel extends Kernel
      * This constant is used to define additional version segments such as development
      * or beta status.
      *
-     * @const integer
+     * @const string
      */
     const EXTRA_VERSION = '-dev';
 

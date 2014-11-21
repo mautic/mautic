@@ -16,8 +16,8 @@ if ($tmpl == 'index')
             <?php foreach ($items as $item): ?>
                 <?php
                     $fields = $item->getFields();
-                    $color = $item->getColor();
-                    $style = !empty($color) ? ' style="background-color: ' . $color . ' !important;"' : '';
+                    $color  = $item->getColor();
+                    $style  = !empty($color) ? ' style="background-color: ' . $color . ' !important;"' : '';
                 ?>
                 <div class="shuffle shuffle-item grid col-sm-6 col-lg-4">
                     <div class="panel ovf-h" style="border-top: 3px solid <?php echo $color; ?>;">
@@ -39,6 +39,7 @@ if ($tmpl == 'index')
                             </div>
                             <div class="col-xs-8 va-t">
                                 <div class="panel-body">
+                                    <?php if (empty($hideCheckbox)): ?>
                                     <div class="pull-right">
                                         <div class="checkbox-inline custom-primary mnr-10">
                                             <label class="mb-0">
@@ -47,6 +48,7 @@ if ($tmpl == 'index')
                                             </label>
                                         </div>
                                     </div>
+                                    <?php endif; ?>
                                     <?php if (in_array($item->getId(), $noContactList)) : ?>
                                     <div class="pull-right label label-danger"><i class="fa fa-ban"> </i></div>
                                     <?php endif; ?>
@@ -80,33 +82,24 @@ if ($tmpl == 'index')
                 </div>
             <?php endforeach; ?>
         <?php else: ?>
-            <?php echo $view->render('MauticCoreBundle:Default:noresults.html.php'); ?>
+            <?php echo $view->render('MauticCoreBundle:Helper:noresults.html.php'); ?>
         <?php endif; ?>
     </div>
 </div>
 <?php if (count($items)): ?>
     <div class="panel-footer">
-        <?php 
-        if (!isset($link)) {
-            $link = 'mautic_lead_index';
-        }
-        if (isset($objectId)) {
-            $router = $view['router']->generate($link, array('objectId' => $objectId));
-        } else {
-            $router = $view['router']->generate($link);
-        }
-        if (!isset($sessionVar)) {
-            $sessionVar = 'lead';
-        }
+        <?php
+        $link = (isset($link))? $link : 'mautic_lead_index';
         echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
             "totalItems"      => $totalItems,
             "page"            => $page,
             "limit"           => $limit,
             "menuLinkId"      => $link,
-            "baseUrl"         => $router,
-            "tmpl"            => $indexMode,
-            'sessionVar'      => $sessionVar
-        )); 
+            "baseUrl"         => (isset($objectId)) ? $view['router']->generate($link, array('objectId' => $objectId)) : $view['router']->generate($link),
+            "tmpl"            => (!in_array($tmpl, array('grid', 'index'))) ? $tmpl : $indexMode,
+            'sessionVar'      => (isset($sessionVar)) ? $sessionVar : 'lead',
+            'target'          => (isset($target)) ? $target : 'page-list'
+        ));
         ?>
     </div>
 <?php endif; ?>

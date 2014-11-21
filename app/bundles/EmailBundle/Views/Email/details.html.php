@@ -212,7 +212,7 @@ if ($security->hasEntityAccess($permissions['email:emails:editown'], $permission
         <hr class="hr-w-2" style="width:50%">
 
         <!-- activity feed -->
-        <?php echo $view->render('MauticCoreBundle:Default:recentactivity.html.php', array('logs' => $logs)); ?>
+        <?php echo $view->render('MauticCoreBundle:Helper:recentactivity.html.php', array('logs' => $logs)); ?>
     </div>
     <!--/ right section -->
     <input id="itemId" value="<?php echo $email->getId(); ?>" />

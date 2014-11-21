@@ -109,7 +109,7 @@ class EmailType extends AbstractType
             'label'      => 'mautic.email.form.language',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
-                'class'   => 'form-control'
+                'class'   => 'form-control chosen'
             ),
             'required'   => false,
             'disabled' => $isVariant

@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Response;
 class CampaignController extends FormController
 {
     /**
-     * @param int    $page
+     * @param int $page
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
@@ -104,9 +104,9 @@ class CampaignController extends FormController
             ),
             'contentTemplate' => 'MauticCampaignBundle:Campaign:list.html.php',
             'passthroughVars' => array(
-                'activeLink'     => '#mautic_campaign_index',
-                'mauticContent'  => 'campaign',
-                'route'          => $this->generateUrl('mautic_campaign_index', array('page' => $page))
+                'activeLink'    => '#mautic_campaign_index',
+                'mauticContent' => 'campaign',
+                'route'         => $this->generateUrl('mautic_campaign_index', array('page' => $page))
             )
         ));
     }
@@ -120,12 +120,18 @@ class CampaignController extends FormController
      */
     public function viewAction ($objectId)
     {
-        $entity      = $this->factory->getModel('campaign')->getEntity($objectId);
-        //set the page we came from
-        $page        = $this->factory->getSession()->get('mautic.campaign.page', 1);
-        $model       = $this->factory->getModel('campaign.campaign');
-        $security    = $this->factory->getSecurity();
-        $activePage  = $model->getEntity($objectId);
+        $tmpl = $this->request->get('tmpl', 'index');
+
+        if ($tmpl == 'campaignleads') {
+            //forward to leadsAction
+            $page  = $this->factory->getSession()->get('mautic.campaign.lead.page', 1);
+            $query = array("ignoreAjax" => true, 'request' => $this->request);
+            return $this->forward('MauticCampaignBundle:Campaign:leads', array('objectId' => $objectId, 'page' => $page, $query));
+        }
+
+        $model    = $this->factory->getModel('campaign');
+        $security = $this->factory->getSecurity();
+        $entity   = $model->getEntity($objectId);
 
         $permissions = $security->isGranted(array(
             'campaign:campaigns:view',
@@ -160,19 +166,15 @@ class CampaignController extends FormController
             return $this->accessDenied();
         }
 
-        // limit for lead list
-        $limit = $this->factory->getSession()->get('mautic.campaign.lead.limit', $this->factory->getParameter('default_pagelimit'));
+        $campaignLeadRepo = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:Lead');
+        $eventLogRepo = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:LeadEventLog');
+        $events       = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:Event')->getEvents(array('campaigns' => array($entity->getId())));
+        $leadCount    = $campaignLeadRepo->countLeads($entity->getId());
+        $campaignLogs = $eventLogRepo->getCampaignLog($entity->getId());
 
-        $eventLogRepo       = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:LeadEventLog');
-        $campaignLeadRepo   = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:Lead');
-        $events             = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:Event')->getEvents(array('campaigns' => array($entity->getId())));
-        $leadCount          = $campaignLeadRepo->countLeads($entity->getId());
-        $campaignLogs       = $eventLogRepo->getCampaignLog($entity->getId());
-        $leads              = $campaignLeadRepo->getLeadsWithFields(array('campaign_id' => $entity->getId(), 'withTotalCount' => true, 'limit' => $limit));
-
-        foreach ($events  as &$event) {
+        foreach ($events as &$event) {
             $event['logCount'] = 0;
-            $event['percent'] = 0;
+            $event['percent']  = 0;
             if (isset($campaignLogs[$event['id']])) {
                 $event['logCount'] = count($campaignLogs[$event['id']]);
             }
@@ -193,25 +195,19 @@ class CampaignController extends FormController
         // Lead count stats
         $leadStats = $campaignLeadRepo->getLeadStats(30, 'D');
 
-        // We need the EmailRepository to check if a lead is flagged as do not contact
-        /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
-        $emailRepo = $this->factory->getModel('email')->getRepository();
+        $leadPage = $this->factory->getSession()->get('mautic.campaign.lead.page', 1);
 
         return $this->delegateView(array(
             'viewParameters'  => array(
                 'campaign'    => $entity,
-                'page'        => $page,
                 'permissions' => $permissions,
-                'activePage'  => $activePage,
                 'security'    => $security,
                 'logs'        => $logs,
                 'hits'        => $hits,
                 'emailsSent'  => $emailsSent,
                 'leadStats'   => $leadStats,
                 'events'      => $events,
-                'leads'       => $leads,
-                'limit'       => $limit,
-                'noContactList' => $emailRepo->getDoNotEmailList()
+                'leadPage'    => $leadPage
             ),
             'contentTemplate' => 'MauticCampaignBundle:Campaign:details.html.php',
             'passthroughVars' => array(
@@ -225,19 +221,9 @@ class CampaignController extends FormController
         ));
     }
 
-    public function leadsAction($objectId, $page)
+    public function leadsAction ($objectId, $page = 1)
     {
-        //set some permissions
-        $permissions = $this->factory->getSecurity()->isGranted(array(
-            'campaign:campaigns:view',
-            'campaign:campaigns:create',
-            'campaign:campaigns:edit',
-            'campaign:campaigns:delete',
-            'campaign:campaigns:publish'
-
-        ), "RETURN_ARRAY");
-
-        if (!$permissions['campaign:campaigns:view']) {
+        if (!$this->factory->getSecurity()->isGranted('campaign:campaigns:view')) {
             return $this->accessDenied();
         }
 
@@ -259,16 +245,16 @@ class CampaignController extends FormController
         /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
         $emailRepo = $this->factory->getModel('email')->getRepository();
 
-        $campaignLeadRepo   = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:Lead');
-        $leads              = $campaignLeadRepo->getLeadsWithFields(
+        $campaignLeadRepo = $this->factory->getEntityManager()->getRepository('MauticCampaignBundle:Lead');
+        $leads            = $campaignLeadRepo->getLeadsWithFields(
             array(
-                'campaign_id' => $objectId,
+                'campaign_id'    => $objectId,
                 'withTotalCount' => true,
-                'start'      => $start,
-                'limit'      => $limit,
-                'filter'     => $filter,
-                'orderBy'    => $orderBy,
-                'orderByDir' => $orderByDir
+                'start'          => $start,
+                'limit'          => $limit,
+                'filter'         => $filter,
+                'orderBy'        => $orderBy,
+                'orderByDir'     => $orderByDir
             )
         );
 
@@ -281,40 +267,37 @@ class CampaignController extends FormController
                 $lastPage = (floor($limit / $count)) ?: 1;
             }
             $this->factory->getSession()->set('mautic.campaign.lead.page', $lastPage);
-            $returnUrl = $this->generateUrl('mautic_campaign_leads', array('page' => $lastPage));
+            $returnUrl = $this->generateUrl('mautic_campaign_leads', array('objectId' => $objectId, 'page' => $lastPage));
 
             return $this->postActionRedirect(array(
                 'returnUrl'       => $returnUrl,
                 'viewParameters'  => array('page' => $lastPage, 'objectId' => $objectId),
                 'contentTemplate' => 'MauticLeadBundle:Lead:grid.html.php',
                 'passthroughVars' => array(
-                    'activeLink'    => '#mautic_campaign_view',
-                    'mauticContent' => 'campaign'
+                    'mauticContent' => 'campaignLeads'
                 )
             ));
         }
 
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'page'        => $page,
-                'items'       => $leads['results'],
-                'totalItems'  => $leads['count'], 
-                'tmpl'        => 'campaign',
-                'indexMode'   => 'grid',
-                'link'        => 'mautic_campaign_leads',
-                'sessionVar'  => 'campaign.lead',
-                'limit'       => $limit,
-                'objectId'    => $objectId,
-                'noContactList' => $emailRepo->getDoNotEmailList()
+                'page'          => $page,
+                'items'         => $leads['results'],
+                'totalItems'    => $leads['count'],
+                'tmpl'          => 'campaignleads',
+                'indexMode'     => 'grid',
+                'link'          => 'mautic_campaign_leads',
+                'sessionVar'    => 'campaign.lead',
+                'limit'         => $limit,
+                'objectId'      => $objectId,
+                'noContactList' => $emailRepo->getDoNotEmailList(),
+                'hideCheckbox'  => true,
+                'target'        => '#leads-container'
             ),
-            'contentTemplate' => 'MauticLeadBundle:Lead:grid.html.php',
+            'contentTemplate' => 'MauticCampaignBundle:Campaign:leads.html.php',
             'passthroughVars' => array(
-                'activeLink'    => '#mautic_campaign_view',
-                'mauticContent' => 'campaign',
-                'route'         => $this->generateUrl('mautic_campaign_leads', array(
-                    'objectId'     => $objectId,
-                    'page'         => $page)
-                )
+                'mauticContent' => 'campaignLeads',
+                'route'         => false
             )
         ));
     }
@@ -327,7 +310,7 @@ class CampaignController extends FormController
     public function newAction ()
     {
         /** @var \Mautic\CampaignBundle\Model\CampaignModel $model */
-        $model   = $this->factory->getModel('campaign');
+        $model = $this->factory->getModel('campaign');
 
         /** @var \Mautic\CampaignBundle\Model\EventModel $model */
         $eventModel = $this->factory->getModel('campaign.event');
@@ -363,7 +346,7 @@ class CampaignController extends FormController
                         ));
                         $valid = false;
                     } else {
-                        $connections = $session->get('mautic.campaign.'.$sessionId.'.events.connections');
+                        $connections     = $session->get('mautic.campaign.' . $sessionId . '.events.connections');
                         $processedEvents = $model->setEvents($entity, $events, $connections, $deletedEvents);
 
                         //form is valid so process the data
@@ -449,8 +432,8 @@ class CampaignController extends FormController
                 'activeLink'    => '#mautic_campaign_index',
                 'mauticContent' => 'campaign',
                 'route'         => $this->generateUrl('mautic_campaign_action', array(
-                    'objectAction' => (!empty($valid) ? 'edit' : 'new'), //valid means a new form was applied
-                    'objectId'     => $entity->getId())
+                        'objectAction' => (!empty($valid) ? 'edit' : 'new'), //valid means a new form was applied
+                        'objectId'     => $entity->getId())
                 )
             )
         ));
@@ -464,7 +447,7 @@ class CampaignController extends FormController
     public function editAction ($objectId, $ignorePost = false)
     {
         /** @var \Mautic\CampaignBundle\Model\CampaignModel $model */
-        $model      = $this->factory->getModel('campaign');
+        $model = $this->factory->getModel('campaign');
 
         /** @var \Mautic\CampaignBundle\Model\EventModel $model */
         $eventModel = $this->factory->getModel('campaign.event');
@@ -528,7 +511,7 @@ class CampaignController extends FormController
                         ));
                         $valid = false;
                     } else {
-                        $connections = $session->get('mautic.campaign.'.$objectId.'.events.connections');
+                        $connections     = $session->get('mautic.campaign.' . $objectId . '.events.connections');
                         $processedEvents = $model->setEvents($entity, $events, $connections, $deletedEvents);
 
                         //form is valid so process the data
@@ -610,11 +593,11 @@ class CampaignController extends FormController
             $this->clearSessionComponents($objectId);
 
             //load existing events into session
-            $campaignEvents  = array();
+            $campaignEvents = array();
             $existingEvents = $entity->getEvents()->toArray();
             foreach ($existingEvents as $e) {
-                $id     = $e->getId();
-                $event  = $e->convertToArray();
+                $id    = $e->getId();
+                $event = $e->convertToArray();
                 unset($event['campaign']);
                 unset($event['children']);
                 unset($event['parent']);
@@ -739,9 +722,9 @@ class CampaignController extends FormController
     private function clearSessionComponents ($id)
     {
         $session = $this->factory->getSession();
-        $session->remove('mautic.campaign.'.$id.'.events.modified');
-        $session->remove('mautic.campaign.'.$id.'.events.deleted');
-        $session->remove('mautic.campaign.'.$id.'.events.connections');
+        $session->remove('mautic.campaign.' . $id . '.events.modified');
+        $session->remove('mautic.campaign.' . $id . '.events.deleted');
+        $session->remove('mautic.campaign.' . $id . '.events.connections');
     }
 
     /**
@@ -749,12 +732,13 @@ class CampaignController extends FormController
      *
      * @return array
      */
-    private function associateIdWithTempIds($events)
+    private function associateIdWithTempIds ($events)
     {
         $tempIds = array();
         foreach ($events as $e) {
             $tempIds[$e['tempId']] = $e['id'];
         }
+
         return $tempIds;
     }
 
@@ -766,7 +750,7 @@ class CampaignController extends FormController
      *
      * @return array
      */
-    private function getSessionEvents($id)
+    private function getSessionEvents ($id)
     {
         $session = $this->factory->getSession();
 
@@ -784,7 +768,7 @@ class CampaignController extends FormController
      * @param $id
      * @param $events
      */
-    private function setSessionEvents($id, $events)
+    private function setSessionEvents ($id, $events)
     {
         $session = $this->factory->getSession();
 

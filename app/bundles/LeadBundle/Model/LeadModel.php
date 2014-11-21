@@ -321,8 +321,10 @@ class LeadModel extends FormModel
     public function organizeFieldsByGroup($fields)
     {
         $array = array();
-        foreach ($fields as $alias => $field) {
+
+        foreach ($fields as $field) {
             if ($field instanceof LeadField) {
+                $alias = $field->getAlias();
                 if ($field->isPublished()) {
                     $group                          = $field->getGroup();
                     $array[$group][$alias]['id']    = $field->getId();
@@ -332,6 +334,7 @@ class LeadModel extends FormModel
                     $array[$group][$alias]['type']  = $field->getType();
                 }
             } else {
+                $alias = $field['alias'];
                 if ($field['isPublished']) {
                     $group = $field['group'];
                     $array[$group][$alias]['id']    = $field['id'];

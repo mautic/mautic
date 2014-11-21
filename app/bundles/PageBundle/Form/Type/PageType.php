@@ -106,7 +106,7 @@ class PageType extends AbstractType
             'label'      => 'mautic.page.page.form.language',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
-                'class'   => 'form-control',
+                'class'   => 'form-control chosen',
                 'tooltip' => 'mautic.page.page.form.language.help',
             ),
             'required'   => false,

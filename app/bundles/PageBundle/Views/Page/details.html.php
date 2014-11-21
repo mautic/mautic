@@ -390,7 +390,7 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
         <hr class="hr-w-2" style="width:50%">
 
         <!-- recent activity -->
-        <?php echo $view->render('MauticCoreBundle:Default:recentactivity.html.php', array('logs' => $logs)); ?>
+        <?php echo $view->render('MauticCoreBundle:Helper:recentactivity.html.php', array('logs' => $logs)); ?>
 
     </div>
     <!--/ right section -->

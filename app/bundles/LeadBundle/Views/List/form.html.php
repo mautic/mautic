@@ -35,7 +35,7 @@ echo $view['form']->start($form);
 <div class="box-layout">
     <!-- container -->
     <div class="col-md-9 bg-white height-auto">
-        <div class="bg-auto bg-dark-xs">
+        <div class="bg-auto pt-md">
             <div class="col-md-6">
                 <?php echo $view['form']->row($form['name']); ?>
             </div>
