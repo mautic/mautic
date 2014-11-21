@@ -12,6 +12,7 @@ namespace Mautic\EmailBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * Class EmailSendType
@@ -35,7 +36,12 @@ class EmailSendType extends AbstractType
                 'tooltip' => 'mautic.email.send.selectemails_descr'
             ),
             'multiple'   => false,
-            'empty_value' => 'mautic.core.form.chooseone'
+            'empty_value' => 'mautic.core.form.chooseone',
+            'constraints' => array(
+                new NotBlank(
+                    array('message' => 'mautic.email.chooseemail.notblank')
+                )
+            )
         ));
     }
 
