@@ -10,7 +10,3 @@
 .page-builder .builder-panel .panel-body {
     padding: 5px 0;
 }
-
-.page-builder .list-group-item.ui-draggable-dragging {
-    background-color: #fff;
-}

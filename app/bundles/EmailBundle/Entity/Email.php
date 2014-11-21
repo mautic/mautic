@@ -68,6 +68,16 @@ class Email extends FormEntity
     private $plainText;
 
     /**
+     * @ORM\Column(name="custom_html", type="text", nullable=true)
+     */
+    private $customHtml;
+
+    /**
+     * @ORM\Column(name="content_mode", type="string")
+     */
+    private $contentMode = 'custom';
+
+    /**
      * @ORM\Column(name="publish_up", type="datetime", nullable=true)
      * @Serializer\Expose
      * @Serializer\Since("1.0")
@@ -672,5 +682,37 @@ class Email extends FormEntity
     public function getStats ()
     {
         return $this->stats;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCustomHtml ()
+    {
+        return $this->customHtml;
+    }
+
+    /**
+     * @param mixed $customHtml
+     */
+    public function setCustomHtml ($customHtml)
+    {
+        $this->customHtml = $customHtml;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getContentMode ()
+    {
+        return $this->contentMode;
+    }
+
+    /**
+     * @param mixed $contentMode
+     */
+    public function setContentMode ($contentMode)
+    {
+        $this->contentMode = $contentMode;
     }
 }

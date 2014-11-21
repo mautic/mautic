@@ -144,3 +144,7 @@ Mautic.insertEmailBuilderToken = function(editorId, token) {
     var editor = Mautic.getEmailBuilderEditorInstances();
     editor[instance].insertText(token);
 };
+
+Mautic.toggleEmailContentMode = function (el) {
+
+};

@@ -151,14 +151,42 @@ class EmailType extends AbstractType
             'required'   => false
         ));
 
-        //todo - add drag-n-drop tokens for plain text version
         $builder->add('plainText', 'textarea', array(
             'label'      => 'mautic.email.form.plaintext',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
                 'tooltip' => 'mautic.email.form.plaintext.help',
                 'class'   => 'form-control',
-                'rows'    => '18'
+                'rows'    => '15'
+            )
+        ));
+
+        $contentMode = $options['data']->getContentMode();
+        if (empty($contentMode)) {
+            $contentMode = 'custom';
+        }
+        $builder->add('contentMode', 'button_group', array(
+            'choice_list' => new ChoiceList(
+                array('custom', 'builder'),
+                array('mautic.email.form.contentmode.custom', 'mautic.email.form.contentmode.builder')
+            ),
+            'expanded'      => true,
+            'multiple'      => false,
+            'label'         => 'mautic.email.form.contentmode',
+            'empty_value'   => false,
+            'required'      => false,
+            'data'          => $contentMode,
+            'attr'          => array(
+                'onChange' => 'Mautic.toggleEmailContentMode(this);'
+            )
+        ));
+
+        $builder->add('customHtml', 'textarea', array(
+            'label'      => 'mautic.email.form.customhtml',
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array(
+                'tooltip' => 'mautic.email.form.customhtml.help',
+                'class'   => 'form-control advanced_editor_2rows'
             )
         ));
 
@@ -176,7 +204,7 @@ class EmailType extends AbstractType
                     'name'  => 'builder',
                     'label' => 'mautic.email.launch.builder',
                     'attr'  => array(
-                        'class'   => 'btn btn-default',
+                        'class'   => 'btn btn-default' . (($contentMode == 'custom') ? ' hide' : ''),
                         'icon'    => 'fa fa-cube text-mautic',
                         'onclick' => "Mautic.launchEmailEditor();"
                     )

@@ -33,6 +33,12 @@ $view['slots']->set("headerTitle", $header.$subheader);
                     <div class="col-md-6">
                         <?php echo $view['form']->row($form['subject']); ?>
                     </div>
+                    <div class="col-md-6">
+                        <?php echo $view['form']->row($form['contentMode']); ?>
+                    </div>
+                </div>
+                <div id="customHtmlContainer">
+                    <?php echo $view['form']->row($form['customHtml']); ?>
                 </div>
                 <?php echo $view['form']->row($form['plainText']); ?>
             </div>
