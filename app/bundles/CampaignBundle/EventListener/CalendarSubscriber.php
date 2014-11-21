@@ -43,42 +43,51 @@ class CalendarSubscriber extends CommonSubscriber
     {
         $dates  = $event->getDates();
         $router = $this->factory->getRouter();
+        $now    = new DateTimeHelper;
 
         $commonSelect = 'cl.campaign_id, c.name AS campaign_name, l.firstname, l.lastname, ce.type AS event_type, ce.name as event_name';
-        $date1 = 'cl.date_triggered';
-        $date2 = 'cl.trigger_date';
+        $eventTypes = array();
+        $eventTypes['triggered'] = array('dateName' => 'cl.date_triggered');
+        $eventTypes['upcoming']  = array('dateName' => 'cl.trigger_date');
 
         $query = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
-        $query->select($commonSelect . ', ' . $date1 . ' AS start')
-            ->from(MAUTIC_TABLE_PREFIX . 'campaign_lead_event_log', 'cl')
+        $query->from(MAUTIC_TABLE_PREFIX . 'campaign_lead_event_log', 'cl')
             ->leftJoin('cl', MAUTIC_TABLE_PREFIX . 'campaigns', 'c', 'cl.campaign_id = c.id')
             ->leftJoin('cl', MAUTIC_TABLE_PREFIX . 'leads', 'l', 'cl.lead_id = l.id')
             ->leftJoin('cl', MAUTIC_TABLE_PREFIX . 'campaign_events', 'ce', 'cl.event_id = ce.id')
-            ->where($query->expr()->andX(
-                $query->expr()->gte($date1, ':start'),
-                $query->expr()->lte($date1, ':end')
-            ))
             ->setParameter('start', $dates['start_date'])
             ->setParameter('end', $dates['end_date'])
             ->setFirstResult(0)
             ->setMaxResults(50);
-        $results = $query->execute()->fetchAll();
 
-        // We need to convert the date to a ISO8601 compliant string
-        foreach ($results as &$object) {
-            if ($object['firstname'] || $object['lastname']) {
-                $leadName = $object['firstname'] . ' ' . $object['lastname'];
-            } else {
-                $leadName = $this->translator->trans('mautic.lead.lead.anonymous');
+        foreach ($eventTypes as $eventKey => $eventType) {
+            $query->select($commonSelect . ', ' . $eventType['dateName'] . ' AS start')
+                ->where($query->expr()->andX(
+                    $query->expr()->gte($eventType['dateName'], ':start'),
+                    $query->expr()->lte($eventType['dateName'], ':end')
+                ));
+            if ($eventKey == 'upcoming') {
+                $query->andWhere($query->expr()->gte($eventType['dateName'], ':now'))
+                    ->setParameter('now', $now->toUtcString());
             }
-            $date = new DateTimeHelper($object['start']);
-            $object['start'] = $date->toLocalString(\DateTime::ISO8601);
-            $object['url']   = $router->generate('mautic_campaign_action', array('objectAction' => 'view', 'objectId' => $object['campaign_id']), true);
-            $object['attr']  = 'data-toggle="ajax"';
-            $object['description'] = $this->translator->trans('mautic.campaign.event.triggered.description', array('%campaign%' => $object['campaign_name'], '%lead%' => $leadName));
-            $object['title'] = $this->translator->trans('mautic.campaign.event.triggered', array('%event%' => $object['event_name']));
-        }
+            $results = $query->execute()->fetchAll();
 
-        $event->addEvents($results);
+            // We need to convert the date to a ISO8601 compliant string
+            foreach ($results as &$object) {
+                if ($object['firstname'] || $object['lastname']) {
+                    $leadName = $object['firstname'] . ' ' . $object['lastname'];
+                } else {
+                    $leadName = $this->translator->trans('mautic.lead.lead.anonymous');
+                }
+                $date = new DateTimeHelper($object['start']);
+                $object['start'] = $date->toLocalString(\DateTime::ISO8601);
+                $object['url']   = $router->generate('mautic_campaign_action', array('objectAction' => 'view', 'objectId' => $object['campaign_id']), true);
+                $object['attr']  = 'data-toggle="ajax"';
+                $object['description'] = $this->translator->trans('mautic.campaign.event.' . $eventKey . '.description', array('%campaign%' => $object['campaign_name'], '%lead%' => $leadName));
+                $object['title'] = $this->translator->trans('mautic.campaign.event.' . $eventKey, array('%event%' => $object['event_name']));
+            }
+
+            $event->addEvents($results);
+        }
     }
 }
