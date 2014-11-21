@@ -74,8 +74,10 @@ class AssetGenerationHelper
 
                     $inProgressFile = "$assetsFullPath/generation_in_progress.txt";
 
-                    while (file_exists($inProgressFile)) {
-                        //dummy loop to prevent conflicts if one process is actively regenerating assets
+                    if (!$forceRegeneration) {
+                        while (file_exists($inProgressFile)) {
+                            //dummy loop to prevent conflicts if one process is actively regenerating assets
+                        }
                     }
                     file_put_contents($inProgressFile, date('r'));
                 }
@@ -112,6 +114,8 @@ class AssetGenerationHelper
                         }
                     });
 
+                    $useMinify = class_exists('\Minify');
+
                     foreach ($assets as $type => $groups) {
                         foreach ($groups as $group => $files) {
                             $assetFile = "$assetsFullPath/$type/$group.$type";
@@ -129,15 +133,23 @@ class AssetGenerationHelper
                                     $out = fopen($assetFile, 'w');
 
                                     foreach ($files as $relPath => $details) {
-                                        $content = \Minify::combine(array($details['fullPath']), array(
-                                            'rewriteCssUris'  => false,
-                                            'minifierOptions' => array(
-                                                'text/css' => array(
-                                                    'currentDir' => '',
-                                                    'prependRelativePath' => '../../' . dirname($relPath) . '/'
+                                        $cssRel = '../../' . dirname($relPath) . '/';
+                                        if ($useMinify) {
+                                            $content = \Minify::combine(array($details['fullPath']), array(
+                                                'rewriteCssUris'  => false,
+                                                'minifierOptions' => array(
+                                                    'text/css' => array(
+                                                        'currentDir'          => '',
+                                                        'prependRelativePath' => $cssRel
+                                                    )
                                                 )
-                                            )
-                                        ));
+                                            ));
+                                        } else {
+                                            $content = file_get_contents($details['fullPath']);
+                                            $search  = '#url\((?!\s*([\'"]?(((?:https?:)?//)|(?:data\:?:))))\s*([\'"])?#';
+                                            $replace = "url($4{$cssRel}";
+                                            $content = preg_replace($search, $replace, $content);
+                                        }
 
                                         fwrite($out, $content);
                                     }
