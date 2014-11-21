@@ -39,7 +39,7 @@ class ConnectorController extends FormController
         $connectors     = array();
 
         foreach ($networkObjects as $name => $object) {
-            $connectors[] = $name;
+            $connectors[] = array('name' => $name, 'icon' => $networkHelper->getIconPath($object));
         }
 
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';

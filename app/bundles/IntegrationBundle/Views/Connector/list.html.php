@@ -21,7 +21,7 @@ if ($tmpl == 'index') {
             <tbody>
             <?php foreach ($items as $item): ?>
                 <tr>
-                    <td><?php echo $item; ?></td>
+                    <td><?php echo $item['name']; ?></td>
                 </tr>
             <?php endforeach; ?>
             </tbody>

@@ -12,6 +12,7 @@ namespace Mautic\IntegrationBundle\Helper;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\SocialBundle\Entity\SocialNetwork;
+use Mautic\SocialBundle\Network\AbstractNetwork;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -45,56 +46,56 @@ class NetworkIntegrationHelper
      */
     public function getNetworkObjects($services = null, $withFeatures = null, $alphabetical = false)
     {
-        static $networks;
-
-        // We need to get the core bundles so we can get our lookup path for the core network classes
-        $bundles = $this->factory->getParameter('bundles');
-
-        // And we'll be scanning the addon bundles for additional classes, so have that data on standby
-        $addons  = $this->factory->getParameter('addon.bundles');
-
-        // Quickly figure out which addons are enabled so we only process those
-        /** @var \Mautic\IntegrationBundle\Entity\IntegrationRepository $integrationRepo */
-        $integrationRepo = $this->factory->getEntityManager()->getRepository('MauticIntegrationBundle:Integration');
-        $addonStatuses = $integrationRepo->getBundleStatus();
-
-        foreach ($addons as $addon) {
-            if (!$addonStatuses[$addon['bundle']]) {
-                unset($addons[$addon['base']]);
-            }
-        }
-
-        // Scan the SocialBundle for our core network classes
-        $finder = new Finder();
-        $finder->files()->name('*Network.php')->in($bundles['Social']['directory'] . '/Network')->notName('AbstractNetwork.php');
-        if ($alphabetical) {
-            $finder->sortByName();
-        }
-        $available = array('core' => array(), 'addon' => array());
-        foreach ($finder as $file) {
-            $available['core'][] = substr($file->getBaseName(), 0, -11);
-        }
-
-        // Scan the addons for network classes
-        foreach ($addons as $addon) {
-            if (is_dir($addon['directory'] . '/Network')) {
-                $finder = new Finder();
-                $finder->files()->name('*Network.php')->in($addon['directory'] . '/Network');
-
-                if ($alphabetical) {
-                    $finder->sortByName();
-                }
-
-                foreach ($finder as $file) {
-                    $available['addon'][] = array(
-                        'network' => substr($file->getBaseName(), 0, -11),
-                        'namespace' => str_replace('Mautic', '', $addon['bundle'])
-                    );
-                }
-            }
-        }
+        static $networks, $available;
 
         if (empty($networks)) {
+            // We need to get the core bundles so we can get our lookup path for the core network classes
+            $bundles = $this->factory->getParameter('bundles');
+
+            // And we'll be scanning the addon bundles for additional classes, so have that data on standby
+            $addons  = $this->factory->getParameter('addon.bundles');
+
+            // Quickly figure out which addons are enabled so we only process those
+            /** @var \Mautic\IntegrationBundle\Entity\IntegrationRepository $integrationRepo */
+            $integrationRepo = $this->factory->getEntityManager()->getRepository('MauticIntegrationBundle:Integration');
+            $addonStatuses = $integrationRepo->getBundleStatus();
+
+            foreach ($addons as $addon) {
+                if (!$addonStatuses[$addon['bundle']]) {
+                    unset($addons[$addon['base']]);
+                }
+            }
+
+            // Scan the SocialBundle for our core network classes
+            $finder = new Finder();
+            $finder->files()->name('*Network.php')->in($bundles['Social']['directory'] . '/Network')->notName('AbstractNetwork.php');
+            if ($alphabetical) {
+                $finder->sortByName();
+            }
+            $available = array('core' => array(), 'addon' => array());
+            foreach ($finder as $file) {
+                $available['core'][] = substr($file->getBaseName(), 0, -11);
+            }
+
+            // Scan the addons for network classes
+            foreach ($addons as $addon) {
+                if (is_dir($addon['directory'] . '/Network')) {
+                    $finder = new Finder();
+                    $finder->files()->name('*Network.php')->in($addon['directory'] . '/Network');
+
+                    if ($alphabetical) {
+                        $finder->sortByName();
+                    }
+
+                    foreach ($finder as $file) {
+                        $available['addon'][] = array(
+                            'network' => substr($file->getBaseName(), 0, -11),
+                            'namespace' => str_replace('Mautic', '', $addon['bundle'])
+                        );
+                    }
+                }
+            }
+
             $networkSettings = $this->getNetworkSettings();
 
             // Get all core integrations
@@ -102,6 +103,7 @@ class NetworkIntegrationHelper
                 if (!isset($integrations[$a])) {
                     $class = "\\Mautic\\SocialBundle\\Network\\{$a}Network";
                     $networks[$a] = new $class($this->factory);
+                    $networks[$a]->setIsCore(true);
                     if (!isset($networkSettings[$a])) {
                         $networkSettings[$a] = new SocialNetwork();
                         $networkSettings[$a]->setName($a);
@@ -115,6 +117,7 @@ class NetworkIntegrationHelper
                 if (!isset($integrations[$a['network']])) {
                     $class = "\\MauticAddon\\{$a['namespace']}\\Network\\{$a['network']}Network";
                     $networks[$a['network']] = new $class($this->factory);
+                    $networks[$a['network']]->setIsCore(false);
                     if (!isset($networkSettings[$a['network']])) {
                         $networkSettings[$a['network']] = new SocialNetwork();
                         $networkSettings[$a['network']]->setName($a['network']);
@@ -475,5 +478,40 @@ class NetworkIntegrationHelper
         }
 
         return $identifier;
+    }
+
+    /**
+     * Get the path to the network's icon relative to the site root
+     *
+     * @param AbstractNetwork $network
+     *
+     * @return string
+     */
+    public function getIconPath(AbstractNetwork $network)
+    {
+        $systemPath  = $this->factory->getSystemPath('root');
+        $genericIcon = 'app/bundles/SocialBundle/Assets/img/generic.jpg';
+        $name        = $network->getSettings()->getName();
+
+        if ($network->getIsCore()) {
+            $icon = 'app/bundles/SocialBundle/Assets/img/' . strtolower($name) . '.jpg';
+
+            if (file_exists($systemPath . '/' . $icon)) {
+                return $icon;
+            }
+
+            return $genericIcon;
+        }
+
+        // For non-core bundles, we need to extract out the bundle's name to figure out where in the filesystem to look for the icon
+        $className = get_class($network);
+        $exploded  = explode('\\', $className);
+        $icon      = 'addons/' . $exploded[1] . '/Assets/img/' . strtolower($name) . '.jpg';
+
+        if (file_exists($systemPath . '/' . $icon)) {
+            return $icon;
+        }
+
+        return $genericIcon;
     }
 }
