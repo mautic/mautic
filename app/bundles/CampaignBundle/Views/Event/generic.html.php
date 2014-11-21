@@ -25,10 +25,10 @@ $style = (!empty($cs['droppedX'])) ? ' style="' . "position: absolute; top: {$cs
     </div>
 <?php if (empty($update)): ?>
     <div class="campaign-event-buttons hide">
-        <a data-toggle="ajaxmodal" data-ignore-removemodal="true" data-target="#CampaignEventModal" href="<?php echo $view['router']->generate($route, array('objectAction' => 'edit', 'objectId' => $event['id'], 'campaignId' => $campaignId)); ?>" class="hide btn btn-success btn-xs btn-edit">
-            <i class="fa fa-pencil-square-o"></i>
+        <a data-toggle="ajaxmodal" data-ignore-removemodal="true" data-target="#CampaignEventModal" href="<?php echo $view['router']->generate($route, array('objectAction' => 'edit', 'objectId' => $event['id'], 'campaignId' => $campaignId)); ?>" class="btn btn-success btn-xs btn-edit">
+            <i class="fa fa-pencil"></i>
         </a>
-        <a data-toggle="ajax" data-target="CampaignEvent_<?php echo $event['id'] ?>" data-ignore-formexit="true" data-method="POST" data-hide-loadingbar="true" href="<?php echo $view['router']->generate($route, array('objectAction' => 'delete', 'objectId' => $event['id'], 'campaignId' => $campaignId)); ?>"  class="btn  btn-delete btn-danger btn-xs">
+        <a data-toggle="ajax" data-target="CampaignEvent_<?php echo $event['id'] ?>" data-ignore-formexit="true" data-method="POST" data-hide-loadingbar="true" href="<?php echo $view['router']->generate($route, array('objectAction' => 'delete', 'objectId' => $event['id'], 'campaignId' => $campaignId)); ?>"  class="btn btn-delete btn-danger btn-xs">
             <i class="fa fa-times"></i>
         </a>
     </div>
