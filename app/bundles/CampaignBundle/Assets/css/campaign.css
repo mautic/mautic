@@ -125,3 +125,7 @@
     left: 0;
     height: 3px;
 }
+
+.campaign-event-buttons .btn-edit {
+    background: #337ab7;
+}
