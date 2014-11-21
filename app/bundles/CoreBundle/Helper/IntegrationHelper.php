@@ -64,6 +64,12 @@ class IntegrationHelper
             static::$loaded = true;
         }
 
-        return static::$addons[$bundle];
+        // Check if the bundle is registered
+        if (isset(static::$addons[$bundle])) {
+            return static::$addons[$bundle];
+        }
+
+        // If we don't know about the bundle, it isn't properly registered and we will always return false
+        return false;
     }
 }
