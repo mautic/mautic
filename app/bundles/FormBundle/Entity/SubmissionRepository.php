@@ -68,7 +68,9 @@ class SubmissionRepository extends CommonRepository
         $dq = $this->_em->getConnection()->createQueryBuilder();
         $dq->select('count(*) as count')
             ->from($table, 'r')
-            ->where('r.form_id = ' . $form->getId());
+            ->innerJoin('r', MAUTIC_TABLE_PREFIX . 'form_submissions', 's', 'r.submission_id = s.id')
+            ->leftJoin('s', MAUTIC_TABLE_PREFIX . 'ip_addresses', 'i', 's.ip_id = i.id')
+        ->where('r.form_id = ' . $form->getId());
 
         $this->buildWhereClause($dq, $args);
 
@@ -81,9 +83,7 @@ class SubmissionRepository extends CommonRepository
         $this->buildLimiterClauses($dq, $args);
 
         $dq->resetQueryPart('select');
-        $dq->select('r.submission_id,' . implode(',r.', $fieldAliases))
-            ->innerJoin('r', MAUTIC_TABLE_PREFIX . 'form_submissions', 's', 'r.submission_id = s.id')
-            ->leftJoin('s', MAUTIC_TABLE_PREFIX . 'ip_addresses', 'i', 's.ip_id = i.id');
+        $dq->select('r.submission_id,' . implode(',r.', $fieldAliases));
         $results = $dq->execute()->fetchAll();
 
         //loop over results to put form submission results in something that can be assigned to the entities

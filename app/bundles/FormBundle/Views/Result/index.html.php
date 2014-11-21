@@ -41,4 +41,7 @@ $view['slots']->set("headerTitle", $view['translator']->trans('mautic.form.resul
 <?php endif; ?>
 <?php $view['slots']->stop(); ?>
 
-<?php $view['slots']->output('_content'); ?>
+
+<div class="page-list">
+    <?php $view['slots']->output('_content'); ?>
+</div>
