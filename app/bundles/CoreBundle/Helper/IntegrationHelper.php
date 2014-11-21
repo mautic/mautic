@@ -58,12 +58,18 @@ class IntegrationHelper
             $data = $repo->getBundleStatus();
 
             foreach ($data as $addon) {
-                static::$addons[$addon['bundle']] = $addon['published'];
+                static::$addons[$addon['bundle']] = $addon['enabled'];
             }
 
             static::$loaded = true;
         }
 
-        return static::$addons[$bundle];
+        // Check if the bundle is registered
+        if (isset(static::$addons[$bundle])) {
+            return static::$addons[$bundle];
+        }
+
+        // If we don't know about the bundle, it isn't properly registered and we will always return false
+        return false;
     }
 }

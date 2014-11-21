@@ -53,6 +53,24 @@ class AppKernel extends Kernel
     /**
      * {@inheritdoc}
      */
+    public function boot()
+    {
+        parent::boot();
+
+        // It's only after we've booted that we have access to the container, so here is where we will check if addon bundles are enabled
+        foreach ($this->getBundles() as $name => $bundle) {
+            if ($bundle instanceof \Mautic\CoreBundle\Bundle\IntegrationBundleBase) {
+                if (!$bundle->isEnabled()) {
+                    unset($this->bundles[$name]);
+                    unset($this->bundleMap[$name]);
+                }
+            }
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
         if (false === $this->booted) {
@@ -127,14 +145,7 @@ class AppKernel extends Kernel
             $namespace = "MauticAddon\\" . implode('\\', $parts);
             $class     = $namespace . '\\' . $class;
             if (class_exists($class)) {
-                $bundleInstance = new $class();
-                if (method_exists($bundleInstance, 'isEnabled')) {
-                    if ($bundleInstance->isEnabled()) {
-                        $bundles[] = $bundleInstance;
-                    }
-                } else {
-                    $bundles[] = $bundleInstance;
-                }
+                $bundles[] = new $class();
             }
         }
 

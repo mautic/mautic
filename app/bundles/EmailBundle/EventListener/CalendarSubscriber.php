@@ -6,7 +6,7 @@
  * @link        http://mautic.com
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-namespace Mautic\FormBundle\EventListener;
+namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CalendarBundle\CalendarEvents;
 use Mautic\CalendarBundle\Event\CalendarGeneratorEvent;
@@ -16,7 +16,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 /**
  * Class CalendarSubscriber
  *
- * @package Mautic\FormBundle\EventListener
+ * @package Mautic\EmailBundle\EventListener
  */
 class CalendarSubscriber extends CommonSubscriber
 {
@@ -41,20 +41,22 @@ class CalendarSubscriber extends CommonSubscriber
      */
     public function onCalendarGenerate(CalendarGeneratorEvent $event)
     {
-        $dates = $event->getDates();
+        $dates  = $event->getDates();
+        $router = $this->factory->getRouter();
 
         $query = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
-        $query->select('fs.referer AS url, f.name AS title, fs.date_submitted AS start')
-            ->from(MAUTIC_TABLE_PREFIX . 'form_submissions', 'fs')
-            ->leftJoin('fs', MAUTIC_TABLE_PREFIX . 'forms', 'f', 'fs.form_id = f.id')
+        $query->select('es.email_id, e.subject AS title, COUNT(es.id) AS quantity, es.date_sent AS start, e.plain_text AS description')
+            ->from(MAUTIC_TABLE_PREFIX . 'email_stats', 'es')
+            ->leftJoin('es', MAUTIC_TABLE_PREFIX . 'emails', 'e', 'es.email_id = e.id')
             ->where($query->expr()->andX(
-                $query->expr()->gte('fs.date_submitted', ':start'),
-                $query->expr()->lte('fs.date_submitted', ':end')
+                $query->expr()->gte('es.date_sent', ':start'),
+                $query->expr()->lte('es.date_sent', ':end')
             ))
+            ->groupBy('e.id')
             ->setParameter('start', $dates['start_date'])
             ->setParameter('end', $dates['end_date'])
             ->setFirstResult(0)
-            ->setMaxResults(5);
+            ->setMaxResults(15);
 
         $results = $query->execute()->fetchAll();
 
@@ -62,7 +64,10 @@ class CalendarSubscriber extends CommonSubscriber
         foreach ($results as &$object) {
             $date = new DateTimeHelper($object['start']);
             $object['start'] = $date->toLocalString(\DateTime::ISO8601);
-            $object['title'] = $this->translator->trans('mautic.form.event.submission', array('%form%' => $object['title']));
+            $object['url']   = $router->generate('mautic_email_action', array('objectAction' => 'view', 'objectId' => $object['email_id']), true);
+            $object['attr']  = 'data-toggle="ajax"';
+            $object['description'] = html_entity_decode($object['description']);
+            $object['title'] = $this->translator->trans('mautic.email.event.sent', array('%email%' => $object['title'], '%x%' => $object['quantity']));
         }
 
         $event->addEvents($results);

@@ -39,11 +39,11 @@ class LeadSubscriber extends CommonSubscriber
     {
         // Set available event types
         $eventTypeKeySent = 'email.sent';
-        $eventTypeNameSent = $this->translator->trans('mautic.email.event.sent');
+        $eventTypeNameSent = $this->translator->trans('mautic.email.sent');
         $event->addEventType($eventTypeKeySent, $eventTypeNameSent);
 
         $eventTypeKeyRead = 'email.read';
-        $eventTypeNameRead = $this->translator->trans('mautic.email.event.read');
+        $eventTypeNameRead = $this->translator->trans('mautic.email.read');
         $event->addEventType($eventTypeKeyRead, $eventTypeNameRead);
 
         // Decide if those events are filtered

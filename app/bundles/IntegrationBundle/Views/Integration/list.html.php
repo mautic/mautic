@@ -63,7 +63,7 @@ if ($tmpl == 'index') {
                         <a href="<?php echo $view['router']->generate('mautic_integration_action',
                             array("objectAction" => "view", "objectId" => $item->getId())); ?>"
                            data-toggle="ajax">
-                            <?php echo $item->getTitle(); ?>
+                            <?php echo $item->getName(); ?>
                         </a>
                     </td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
