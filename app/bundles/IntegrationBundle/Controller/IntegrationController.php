@@ -133,7 +133,7 @@ class IntegrationController extends FormController
                 $entity = new Integration();
                 $entity->setBundle($addon['bundle']);
                 $entity->setIsEnabled(false);
-                $entity->setName($addon['base']);
+                $entity->setName(str_replace('Mautic', '', $addon['base']));
                 $model->saveEntity($entity);
             }
         }
