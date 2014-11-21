@@ -25,6 +25,15 @@ $items = array(
                     'routeName' => 'mautic_integration_index'
                 )
             ),
+            'mautic.integration.connector.menu.index' => array(
+                'route'          => 'mautic_integration_connector_index',
+                'linkAttributes' => array(
+                    'data-toggle' => 'ajax'
+                ),
+                'extras'         => array(
+                    'routeName' => 'mautic_integration_connector_index'
+                )
+            ),
         )
     )
 );

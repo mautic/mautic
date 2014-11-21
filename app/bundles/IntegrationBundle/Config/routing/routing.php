@@ -12,6 +12,10 @@ use Symfony\Component\Routing\Route;
 
 $collection = new RouteCollection();
 
+$collection->add('mautic_integration_connector_index', new Route('/integrations/connectors',
+    array('_controller' => 'MauticIntegrationBundle:Connector:index')
+));
+
 $collection->add('mautic_integration_index', new Route('/integrations/{page}',
     array(
         '_controller' => 'MauticIntegrationBundle:Integration:index',
