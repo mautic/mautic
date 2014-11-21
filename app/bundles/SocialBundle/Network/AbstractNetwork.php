@@ -65,7 +65,7 @@ abstract class AbstractNetwork
     /**
      * Get the social network entity
      *
-     * @return mixed
+     * @return SocialNetwork
      */
     public function getSettings()
     {

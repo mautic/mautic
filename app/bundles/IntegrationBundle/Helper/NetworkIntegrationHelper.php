@@ -12,6 +12,7 @@ namespace Mautic\IntegrationBundle\Helper;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\SocialBundle\Entity\SocialNetwork;
+use Mautic\SocialBundle\Network\AbstractNetwork;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -477,5 +478,40 @@ class NetworkIntegrationHelper
         }
 
         return $identifier;
+    }
+
+    /**
+     * Get the path to the network's icon relative to the site root
+     *
+     * @param AbstractNetwork $network
+     *
+     * @return string
+     */
+    public function getIconPath(AbstractNetwork $network)
+    {
+        $systemPath  = $this->factory->getSystemPath('root');
+        $genericIcon = 'app/bundles/SocialBundle/Assets/img/generic.jpg';
+        $name        = $network->getSettings()->getName();
+
+        if ($network->getIsCore()) {
+            $icon = 'app/bundles/SocialBundle/Assets/img/' . strtolower($name) . '.jpg';
+
+            if (file_exists($systemPath . '/' . $icon)) {
+                return $icon;
+            }
+
+            return $genericIcon;
+        }
+
+        // For non-core bundles, we need to extract out the bundle's name to figure out where in the filesystem to look for the icon
+        $className = get_class($network);
+        $exploded  = explode('\\', $className);
+        $icon      = 'addons/' . $exploded[1] . '/Assets/img/' . strtolower($name) . '.jpg';
+
+        if (file_exists($systemPath . '/' . $icon)) {
+            return $icon;
+        }
+
+        return $genericIcon;
     }
 }
