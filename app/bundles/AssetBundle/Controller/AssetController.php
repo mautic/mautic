@@ -240,8 +240,9 @@ class AssetController extends FormController
         }
 
         //set the page we came from
-        $page   = $session->get('mautic.asset.page', 1);
-        $action = $this->generateUrl('mautic_asset_action', array('objectAction' => 'new'));
+        $page       = $session->get('mautic.asset.page', 1);
+        $action     = $this->generateUrl('mautic_asset_action', array('objectAction' => 'new'));
+        $baseUrl    = $this->request->getScheme() . '://' . $this->request->getHttpHost() . $this->request->getBasePath() . '/';
 
         //create the form
         $form   = $model->createForm($entity, $this->get('form.factory'), $action);
@@ -305,7 +306,8 @@ class AssetController extends FormController
         return $this->delegateView(array(
             'viewParameters'  =>  array(
                 'form'        => $form->createView(),
-                'activeAsset'  => $entity
+                'activeAsset'  => $entity,
+                'baseUrl'     => $baseUrl
             ),
             'contentTemplate' => 'MauticAssetBundle:Asset:form.html.php',
             'passthroughVars' => array(
