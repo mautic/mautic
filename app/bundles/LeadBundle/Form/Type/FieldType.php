@@ -54,6 +54,8 @@ class FieldType extends AbstractType
             'attr'       => array('class' => 'form-control', 'length' => 50)
         ));
 
+        $disabled = (!empty($options['data'])) ? $options['data']->isFixed() : false;
+
         $builder->add('group', 'choice', array(
             'choices'       => array(
                 'core'         => 'mautic.lead.field.group.core',
@@ -69,10 +71,10 @@ class FieldType extends AbstractType
             'multiple'      => false,
             'label'         => 'mautic.lead.field.form.group',
             'empty_value'   => false,
-            'required'      => false
+            'required'      => false,
+            'disabled'      => $disabled
         ));
 
-        $disabled = (!empty($options['data'])) ? $options['data']->isFixed() : false;
         $new      = (!empty($options['data']) && $options['data']->getAlias()) ? false : true;
         $default  = ($new) ? 'text' : $options['data']->getType();
         $fieldHelper = new FormFieldHelper();
