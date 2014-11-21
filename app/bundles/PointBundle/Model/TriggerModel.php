@@ -81,7 +81,7 @@ class TriggerModel extends CommonFormModel
         //should we trigger for existing leads?
         if ($entity->getTriggerExistingLeads() && $entity->isPublished()) {
             $events    = $entity->getEvents();
-            $repo      = $this->getRepository();
+            $repo      = $this->getEventRepository();
             $persist   = array();
             $ipAddress = $this->factory->getIpAddress();
 
@@ -107,7 +107,7 @@ class TriggerModel extends CommonFormModel
                         $filter['force'][] = array(
                             'column' => 'l.id',
                             'expr'   => 'notIn',
-                            'value'  => implode(',', $leadIds)
+                            'value'  => $leadIds
                         );
                     }
                 }
@@ -120,7 +120,7 @@ class TriggerModel extends CommonFormModel
                 ));
 
                 foreach ($leads as $l) {
-                    if ($this->triggerEvent($event, $l, false)) {
+                    if ($this->triggerEvent($event, $l, true)) {
                         $log = new LeadTriggerLog();
                         $log->setIpAddress($ipAddress);
                         $log->setEvent($event);
@@ -133,7 +133,7 @@ class TriggerModel extends CommonFormModel
             }
 
             if (!empty($persist)) {
-                $this->getEventRepository()->saveEntities($persist);
+                $repo->saveEntities($persist);
             }
         }
     }
@@ -248,14 +248,14 @@ class TriggerModel extends CommonFormModel
      *
      * @param TriggerEvent $event
      * @param Lead         $lead
-     * @param bool         $checkApplied
+     * @param bool         $force
      *
      * @return bool Was event triggered
      */
-    public function triggerEvent(TriggerEvent $event, Lead $lead = null, $checkApplied = true)
+    public function triggerEvent(TriggerEvent $event, Lead $lead = null,  $force = false)
     {
         //only trigger events for anonymous users
-        if (!$this->security->isAnonymous()) {
+        if (!$force && !$this->security->isAnonymous()) {
             return false;
         }
 
@@ -264,7 +264,7 @@ class TriggerModel extends CommonFormModel
             $lead      = $leadModel->getCurrentLead();
         }
 
-        if ($checkApplied) {
+        if (!$force) {
             //get a list of events that has already been performed on this lead
             $appliedEvents = $this->getEventRepository()->getLeadTriggeredEvents($lead->getId());
 
@@ -274,28 +274,19 @@ class TriggerModel extends CommonFormModel
             }
         }
 
+        $availableEvents = $this->getEvents();
+        $eventType = $event->getType();
+
         //make sure the event still exists
-        $trigger  = $event->getTrigger();
-        if (!isset($availableEvents[$trigger->getType()])) {
+        if (!isset($availableEvents[$eventType])) {
             return false;
         }
 
-        $settings = $availableEvents[$trigger->getType()];
+        $settings = $availableEvents[$eventType];
         $args     = array(
-            'event'      => array(
-                'id'         => $event->getId(),
-                'type'       => $event->getType(),
-                'name'       => $event->getName(),
-                'properties' => $event->getProperties(),
-                'trigger'      => array(
-                    'id'        => $trigger->getId(),
-                    'name'      => $trigger->getName(),
-                    'points'    => $trigger->getPoints(),
-                    'color'     => $trigger->getColor()
-                )
-            ),
-            'lead'        => $lead,
-            'factory'     => $this->factory
+            'event'    => $event,
+            'lead'     => $lead,
+            'factory'  => $this->factory
         );
 
         if (is_callable($settings['callback'])) {

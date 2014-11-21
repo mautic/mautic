@@ -67,6 +67,10 @@ class TriggerEventType extends AbstractType
             'container_class' => 'bottom-triggerevent-buttons'
         ));
 
+        $builder->add('triggerId', 'hidden', array(
+            'mapped' => false
+        ));
+
         if (!empty($options["action"])) {
             $builder->setAction($options["action"]);
         }

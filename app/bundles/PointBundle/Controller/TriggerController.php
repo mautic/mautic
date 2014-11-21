@@ -180,9 +180,10 @@ class TriggerController extends FormController
      */
     public function newAction()
     {
-        $model   = $this->factory->getModel('point.trigger');
-        $entity  = $model->getEntity();
-        $session = $this->factory->getSession();
+        $model     = $this->factory->getModel('point.trigger');
+        $entity    = $model->getEntity();
+        $session   = $this->factory->getSession();
+        $sessionId = $this->request->request->get('pointtrigger[sessionId]', sha1(uniqid(mt_rand(), true)), true);
 
         if (!$this->factory->getSecurity()->isGranted('point:triggers:create')) {
             return $this->accessDenied();
@@ -192,11 +193,12 @@ class TriggerController extends FormController
         $page = $this->factory->getSession()->get('mautic.point.trigger.page', 1);
 
         //set added/updated events
-        $addEvents     = $session->get('mautic.pointtriggers.add', array());
-        $deletedEvents = $session->get('mautic.pointtriggers.remove', array());
+        $addEvents     = $session->get('mautic.point.'.$sessionId.'.triggerevents.modified', array());
+        $deletedEvents = $session->get('mautic.point.'.$sessionId.'.triggerevents.deleted', array());
 
         $action = $this->generateUrl('mautic_pointtrigger_action', array('objectAction' => 'new'));
         $form   = $model->createForm($entity, $this->get('form.factory'), $action);
+        $form->get('sessionId')->setData($sessionId);
 
         ///Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
@@ -236,23 +238,27 @@ class TriggerController extends FormController
                             return $this->editAction($entity->getId(), true);
                         }
 
+                        /*
                         $viewParameters = array(
                             'objectAction' => 'view',
                             'objectId'     => $entity->getId()
                         );
                         $returnUrl      = $this->generateUrl('mautic_pointtrigger_action', $viewParameters);
                         $template       = 'MauticPointBundle:Trigger:view';
+                        */
                     }
                 }
-            } else {
-                $viewParameters = array('page' => $page);
-                $returnUrl      = $this->generateUrl('mautic_pointtrigger_index', $viewParameters);
-                $template       = 'MauticPointBundle:Trigger:index';
             }
 
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+
+                $viewParameters = array('page' => $page);
+                $returnUrl      = $this->generateUrl('mautic_pointtrigger_index', $viewParameters);
+                $template       = 'MauticPointBundle:Trigger:index';
+
+
                 //clear temporary fields
-                $this->clearSessionComponents();
+                $this->clearSessionComponents($sessionId);
 
                 return $this->postActionRedirect(array(
                     'returnUrl'       => $returnUrl,
@@ -266,7 +272,8 @@ class TriggerController extends FormController
             }
         } else {
             //clear out existing fields in case the form was refreshed, browser closed, etc
-            $this->clearSessionComponents();
+            $this->clearSessionComponents($sessionId);
+            $addEvents = $deletedEvents = array();
         }
 
         return $this->delegateView(array(
@@ -276,7 +283,8 @@ class TriggerController extends FormController
                 'deletedEvents' => $deletedEvents,
                 'tmpl'          => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                 'entity'        => $entity,
-                'form'          => $form->createView()
+                'form'          => $form->createView(),
+                'sessionId'     => $sessionId
             ),
             'contentTemplate' => 'MauticPointBundle:Trigger:form.html.php',
             'passthroughVars' => array(
@@ -342,14 +350,15 @@ class TriggerController extends FormController
 
         $action = $this->generateUrl('mautic_pointtrigger_action', array('objectAction' => 'edit', 'objectId' => $objectId));
         $form   = $model->createForm($entity, $this->get('form.factory'), $action);
+        $form->get('sessionId')->setData($objectId);
 
         ///Check for a submitted form and process it
         if (!$ignorePost && $this->request->getMethod() == 'POST') {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 //set added/updated events
-                $addEvents     = $session->get('mautic.pointtriggers.add', array());
-                $deletedEvents = $session->get('mautic.pointtriggers.remove', array());
+                $addEvents     = $session->get('mautic.point.'.$objectId.'.triggerevents.modified', array());
+                $deletedEvents = $session->get('mautic.point.'.$objectId.'.triggerevents.deleted', array());
                 $events        = array_diff_key($addEvents, array_flip($deletedEvents));
 
                 if ($valid = $this->isFormValid($form)) {
@@ -382,27 +391,30 @@ class TriggerController extends FormController
                         );
 
                         if ($form->get('buttons')->get('save')->isClicked()) {
+                            /*
                             $viewParameters = array(
                                 'objectAction' => 'view',
                                 'objectId'     => $entity->getId()
                             );
                             $returnUrl      = $this->generateUrl('mautic_pointtrigger_action', $viewParameters);
                             $template       = 'MauticPointBundle:Trigger:view';
+                            */
                         }
                     }
                 }
             } else {
                 //unlock the entity
                 $model->unlockEntity($entity);
+            }
+
+            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
 
                 $viewParameters = array('page' => $page);
                 $returnUrl      = $this->generateUrl('mautic_pointtrigger_index', $viewParameters);
                 $template       = 'MauticPointBundle:Trigger:index';
-            }
 
-            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 //remove fields from session
-                $this->clearSessionComponents();
+                $this->clearSessionComponents($objectId);
 
                 return $this->postActionRedirect(
                     array_merge($postActionVars, array(
@@ -424,7 +436,7 @@ class TriggerController extends FormController
 
         if ($cleanSlate) {
             //clean slate
-            $this->clearSessionComponents();
+            $this->clearSessionComponents($objectId);
 
             //load existing events into session
             $triggerEvents   = array();
@@ -435,7 +447,7 @@ class TriggerController extends FormController
                 unset($action['form']);
                 $triggerEvents[$id] = $action;
             }
-            $session->set('mautic.pointtriggers.add', $triggerEvents);
+            $session->set('mautic.point.'.$objectId.'.triggerevents.modified', $triggerEvents);
             $deletedEvents = array();
         }
 
@@ -446,7 +458,8 @@ class TriggerController extends FormController
                 'deletedEvents' => $deletedEvents,
                 'tmpl'          => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                 'entity'        => $entity,
-                'form'          => $form->createView()
+                'form'          => $form->createView(),
+                'sessionId'     => $objectId
             ),
             'contentTemplate' => 'MauticPointBundle:Trigger:form.html.php',
             'passthroughVars' => array(
@@ -614,10 +627,10 @@ class TriggerController extends FormController
     /**
      * Clear field and events from the session
      */
-    public function clearSessionComponents()
+    public function clearSessionComponents($sessionId)
     {
         $session = $this->factory->getSession();
-        $session->remove('mautic.pointtriggers.add');
-        $session->remove('mautic.pointtriggers.remove');
+        $session->remove('mautic.point.'.$sessionId.'.triggerevents.modified');
+        $session->remove('mautic.point.'.$sessionId.'.triggerevents.deleted');
     }
 }

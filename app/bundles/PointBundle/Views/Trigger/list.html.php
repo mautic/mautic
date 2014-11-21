@@ -78,11 +78,14 @@ $view->extend('MauticPointBundle:Trigger:index.html.php');
                         'item'       => $item,
                         'model'      => 'point.trigger'
                     )); ?>
-                    <a href="<?php echo $view['router']->generate('mautic_pointtrigger_action',
-                        array("objectAction" => "view", "objectId" => $item->getId())); ?>"
-                       data-toggle="ajax">
+                    <?php if ($permissions['point:triggers:edit']): ?>
+                    <a href="<?php echo $view['router']->generate('mautic_pointtrigger_action', array("objectAction" => "edit", "objectId" => $item->getId())); ?>" data-toggle="ajax">
                         <?php echo $item->getName(); ?>
                     </a>
+                    <?php else: ?>
+                    <?php echo $item->getName(); ?>
+                    <?php endif; ?>
+
                 </td>
                 <td class="visible-md visible-lg"><?php echo $item->getDescription(); ?></td>
                 <td class="visible-md visible-lg"><?php echo $item->getPoints(); ?></td>
@@ -97,7 +100,7 @@ $view->extend('MauticPointBundle:Trigger:index.html.php');
         </tbody>
     </table>
 </div>
-<div class="page-footer">
+<div class="panel-footer">
     <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
         "totalItems"      => count($items),
         "page"            => $page,

@@ -9,6 +9,7 @@
 
 namespace Mautic\PointBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -274,11 +275,11 @@ class TriggerEvent
     /**
      * Add log
      *
-     * @param LeadPointLog $log
+     * @param LeadTriggerLog $log
      *
      * @return Log
      */
-    public function addLog(LeadPointLog $log)
+    public function addLog(LeadTriggerLog $log)
     {
         $this->log[] = $log;
 
@@ -288,9 +289,9 @@ class TriggerEvent
     /**
      * Remove log
      *
-     * @param LeadPointLog $log
+     * @param LeadTriggerLog $log
      */
-    public function removeLog(LeadPointLog $log)
+    public function removeLog(LeadTriggerLog $log)
     {
         $this->log->removeElement($log);
     }

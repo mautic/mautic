@@ -82,7 +82,7 @@ class TriggerEventRepository extends CommonRepository
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select('e')
             ->from(MAUTIC_TABLE_PREFIX . 'point_lead_event_log', 'x')
-            ->innerJoin('x', MAUTIC_TABLE_PREFIX . 'point_trigger_events', 'e', 'x.triggerevent_id = e.id')
+            ->innerJoin('x', MAUTIC_TABLE_PREFIX . 'point_trigger_events', 'e', 'x.event_id = e.id')
             ->innerJoin('e', MAUTIC_TABLE_PREFIX . 'point_triggers', 't', 'e.trigger_id = t.id');
 
         //make sure the published up and down dates are good
@@ -110,7 +110,7 @@ class TriggerEventRepository extends CommonRepository
         $results = $this->_em->getConnection()->createQueryBuilder()
             ->select('e.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'point_lead_event_log', 'e')
-            ->where('e.triggerevent_id = ' . (int) $eventId)
+            ->where('e.event_id = ' . (int) $eventId)
             ->execute()
             ->fetchAll();
 

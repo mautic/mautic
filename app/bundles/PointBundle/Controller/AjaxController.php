@@ -26,13 +26,15 @@ class AjaxController extends CommonAjaxController
      */
     protected function reorderTriggerEventsAction(Request $request)
     {
-        $dataArray  = array('success' => 0);
-        $session    = $this->factory->getSession();
-        $order      = InputHelper::clean($request->request->get('pointtrigger'));
-        $components = $session->get('mautic.pointtriggers.add');
+        $dataArray   = array('success' => 0);
+        $session     = $this->factory->getSession();
+        $triggerId   = InputHelper::clean($request->request->get('triggerId'));
+        $sessionName = 'mautic.point.'.$triggerId.'.triggerevents.modified';
+        $order       = InputHelper::clean($request->request->get('triggerEvent'));
+        $components  = $session->get($sessionName);
         if (!empty($order) && !empty($components)) {
             $components = array_replace(array_flip($order), $components);
-            $session->set('mautic.pointtriggers.add', $components);
+            $session->set($sessionName, $components);
             $dataArray['success'] = 1;
         }
 

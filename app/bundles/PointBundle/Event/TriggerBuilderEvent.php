@@ -52,19 +52,8 @@ class TriggerBuilderEvent extends Event
      *  'callback'    => (required) callback function that will be passed when the action is triggered
      *      The callback function can receive the following arguments by name (via ReflectionMethod::invokeArgs())
      *          Mautic\CoreBundle\Factory\MauticFactory $factory
-     *          Mautic\LeadBundle\Entity\Lead $lead
-     *          array $event = array(
-     *              'id' => int
-     *              'type' => string
-     *              'name' => string
-     *              'properties' => array()
-     *              'trigger' => array(
-     *                  'id'     => int
-     *                  'name'   => string,
-     *                  'points' => int
-     *                  'color'  => string
-     *              )
-     *         )
+     *          Mautic\PointBundle\Entity\TriggerEvent  $event
+     *          Mautic\LeadBundle\Entity\Lead           $lead
      *
      * @return void
      * @throws InvalidArgumentException
