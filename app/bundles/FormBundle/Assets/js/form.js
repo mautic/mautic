@@ -14,7 +14,8 @@ Mautic.formOnLoad = function (container) {
                 mQuery.ajax({
                     type: "POST",
                     url: mauticAjaxUrl + "?action=form:reorderFields",
-                    data: mQuery('#mauticforms_fields').sortable("serialize")});
+                    data: mQuery('#mauticforms_fields').sortable("serialize") + "&formId=" + mQuery('#mauticform_sessionId').val()
+                })
             }
         });
 
@@ -35,7 +36,8 @@ Mautic.formOnLoad = function (container) {
                 mQuery.ajax({
                     type: "POST",
                     url: mauticAjaxUrl + "?action=form:reorderActions",
-                    data: mQuery('#mauticforms_actions').sortable("serialize")});
+                    data: mQuery('#mauticforms_actions').sortable("serialize") + "&formId=" + mQuery('#mauticform_sessionId').val()
+                });
             }
         });
 
