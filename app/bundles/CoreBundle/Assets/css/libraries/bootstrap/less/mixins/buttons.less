@@ -28,10 +28,18 @@
     &,
     &:hover,
     &:focus,
-    &:active,
-    &.active {
+    //&:active,
+    //&.active
+    {
       background-color: @background;
           border-color: @border;
+    }
+    & {
+      &:active,
+      &.active
+      {
+        background-color: darken(@background, 4%); // MODIFIED
+      }
     }
   }
 
