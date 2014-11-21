@@ -102,6 +102,7 @@ class NetworkIntegrationHelper
                 if (!isset($integrations[$a])) {
                     $class = "\\Mautic\\SocialBundle\\Network\\{$a}Network";
                     $networks[$a] = new $class($this->factory);
+                    $networks[$a]->setIsCore(true);
                     if (!isset($networkSettings[$a])) {
                         $networkSettings[$a] = new SocialNetwork();
                         $networkSettings[$a]->setName($a);
@@ -115,6 +116,7 @@ class NetworkIntegrationHelper
                 if (!isset($integrations[$a['network']])) {
                     $class = "\\MauticAddon\\{$a['namespace']}\\Network\\{$a['network']}Network";
                     $networks[$a['network']] = new $class($this->factory);
+                    $networks[$a['network']]->setIsCore(false);
                     if (!isset($networkSettings[$a['network']])) {
                         $networkSettings[$a['network']] = new SocialNetwork();
                         $networkSettings[$a['network']]->setName($a['network']);

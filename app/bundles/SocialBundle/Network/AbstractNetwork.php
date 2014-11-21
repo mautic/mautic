@@ -17,6 +17,7 @@ abstract class AbstractNetwork
     protected $factory;
     protected $entity;
     protected $settings;
+    private $isCore;
 
     /**
      * @param MauticFactory $factory
@@ -435,5 +436,27 @@ abstract class AbstractNetwork
         $retcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
         return ($retcode == 200);
+    }
+
+    /**
+     * Check if the network connector is a core object
+     *
+     * @return bool
+     */
+    public function getIsCore()
+    {
+        return $this->isCore;
+    }
+
+    /**
+     * Set if the network connector is a core object
+     *
+     * @param bool $isCore
+     *
+     * @return void
+     */
+    public function setIsCore($isCore)
+    {
+        $this->isCore = $isCore;
     }
 }
