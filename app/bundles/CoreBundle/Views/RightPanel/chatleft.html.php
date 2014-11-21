@@ -8,17 +8,22 @@
  */
 ?>
 
-<div class="offcanvas-main" id="OffCanvasMain">
+<div class="offcanvas-left" id="OffCanvasLeft">
     <!-- start: sidebar header -->
-    <div class="sidebar-header box-layout"  id="OffCanvasMainHeader">
-
+    <div class="sidebar-header box-layout"  id="OffCanvasLeftHeader">
+        <div class="col-xs-6 va-m">
+            <a href="javascript:void(0);" class="offcanvas-closer"><span class="fa fa-arrow-left fs-16"></span></a>
+        </div>
+        <div class="col-xs-6 va-m text-right">
+            <!-- <a href="javascript:void(0);"><span class="fa fa-info fs-16"></span></a> -->
+        </div>
     </div>
     <!--/ end: sidebar header -->
 
     <!-- start: sidebar content -->
     <div class="sidebar-content">
         <!-- scroll-content -->
-        <div class="scroll-content slimscroll" id="OffCanvasMainCanvas">
+        <div class="scroll-content slimscroll" id="OffCanvasLeftCanvas">
             <!-- start: navigation -->
             <nav class="nav-sidebar">
                 <?php echo $view['knp_menu']->render('admin', array("menu" => "admin")); ?>
@@ -27,4 +32,4 @@
     </div>
     <!--/ end: sidebar content -->
 </div>
-<!--/ Offcanvas Main -->
+<!--/ Offcanvas Left -->
