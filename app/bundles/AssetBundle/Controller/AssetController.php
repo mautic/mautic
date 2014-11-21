@@ -147,6 +147,8 @@ class AssetController extends FormController
         //set the asset we came from
         $page = $this->factory->getSession()->get('mautic.asset.page', 1);
 
+        $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'details') : 'details';
+
         if ($activeAsset === null) {
             //set the return URL
             $returnUrl = $this->generateUrl('mautic_asset_index', array('page' => $page));
@@ -189,6 +191,7 @@ class AssetController extends FormController
             ),
             'viewParameters'  => array(
                 'activeAsset'   => $activeAsset,
+                'tmpl'          => $tmpl,
                 'permissions'   => $security->isGranted(array(
                     'asset:assets:viewown',
                     'asset:assets:viewother',
@@ -212,7 +215,7 @@ class AssetController extends FormController
                 'baseUrl'           => $baseUrl,
                 'logs'              => $logs,
             ),
-            'contentTemplate' => 'MauticAssetBundle:Asset:details.html.php',
+            'contentTemplate' => 'MauticAssetBundle:Asset:' . $tmpl . '.html.php',
             'passthroughVars' => array(
                 'activeLink'    => '#mautic_asset_index',
                 'mauticContent' => 'asset'

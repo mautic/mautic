@@ -27,7 +27,7 @@ $view['slots']->set('mauticContent', 'asset');
 		    	<div class="col-md-6">
 		    		<div class="row">
 				    	<div class="form-group col-xs-12">
-				    		<?php echo $view->render('MauticAssetBundle:Asset:preview.html.php', array('asset' => $activeAsset, 'baseUrl' => $baseUrl)); ?>
+				    		<?php echo $view->render('MauticAssetBundle:Asset:preview.html.php', array('activeAsset' => $activeAsset, 'baseUrl' => $baseUrl)); ?>
 			    		</div>
 		    		</div>
 		    	</div>
