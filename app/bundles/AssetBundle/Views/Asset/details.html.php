@@ -171,8 +171,8 @@ if ($security->hasEntityAccess($permissions['asset:assets:editown'], $permission
         </div>
 
         <!-- start: tab-content -->
-        <div class="tab-content pa-md">
-            <?php echo $view->render('MauticAssetBundle:Asset:preview.html.php', array('asset' => $activeAsset, 'baseUrl' => $baseUrl)); ?>
+        <div class="tab-content pa-md preview-detail">
+            <?php echo $view->render('MauticAssetBundle:Asset:preview.html.php', array('activeAsset' => $activeAsset, 'baseUrl' => $baseUrl)); ?>
         </div>
         <!--/ end: tab-content -->
     </div>

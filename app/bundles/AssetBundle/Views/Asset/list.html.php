@@ -54,7 +54,7 @@ $view->extend('MauticAssetBundle:Asset:index.html.php');
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                     'sessionVar' => 'asset',
-                    'orderBy'    => 'a.download_count',
+                    'orderBy'    => 'a.downloadCount',
                     'text'       => 'mautic.asset.asset.thead.download.count',
                     'class'      => 'visible-md visible-lg col-asset-download-count'
                 ));
@@ -69,7 +69,7 @@ $view->extend('MauticAssetBundle:Asset:index.html.php');
             </tr>
             </thead>
             <tbody>
-            <?php foreach ($items as $item): ?>
+            <?php foreach ($items as $k => $item): ?>
                 <tr>
                     <td class="visible-md visible-lg">
                         <?php
@@ -87,7 +87,17 @@ $view->extend('MauticAssetBundle:Asset:index.html.php');
                             'routeBase' => 'asset',
                             'menuLink'  => 'mautic_asset_index',
                             'langVar'   => 'asset.asset',
-                            'nameGetter' => 'getTitle'
+                            'nameGetter' => 'getTitle',
+                            'custom'    => array(array(
+                                'attr' => array(
+                                    'id' => 'campaignEvent_' . str_replace('.', '', $k),
+                                    'data-toggle' => 'ajaxmodal',
+                                    'data-target' => '#AssetLeadModal',
+                                    'href' => $view['router']->generate('mautic_asset_action', array('objectAction' => 'view', 'objectId' => $item->getId(), 'tmpl' => 'preview'))
+                                ),
+                                'label' => 'Preview',
+                                'icon' => 'fa-image'
+                            ))
                         ));
                         ?>
                     </td>
@@ -131,3 +141,8 @@ $view->extend('MauticAssetBundle:Asset:index.html.php');
 <?php else: ?>
     <?php echo $view->render('MauticCoreBundle:Helper:noresults.html.php'); ?>
 <?php endif; ?>
+
+<?php echo $view->render('MauticCoreBundle:Helper:modal.html.php', array(
+    'id'     => 'AssetLeadModal',
+    'header' => false
+));

@@ -12,7 +12,7 @@ if ($tmpl == 'index') {
 }
 ?>
 <div id="pageBuilderTokens">
-    <ul class="list-group">
+    <ul class="list-group ma-5">
         <?php
         if (count($items)):
         foreach ($items as $i):?>

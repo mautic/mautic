@@ -147,6 +147,8 @@ class AssetController extends FormController
         //set the asset we came from
         $page = $this->factory->getSession()->get('mautic.asset.page', 1);
 
+        $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'details') : 'details';
+
         if ($activeAsset === null) {
             //set the return URL
             $returnUrl = $this->generateUrl('mautic_asset_index', array('page' => $page));
@@ -189,6 +191,7 @@ class AssetController extends FormController
             ),
             'viewParameters'  => array(
                 'activeAsset'   => $activeAsset,
+                'tmpl'          => $tmpl,
                 'permissions'   => $security->isGranted(array(
                     'asset:assets:viewown',
                     'asset:assets:viewother',
@@ -212,7 +215,7 @@ class AssetController extends FormController
                 'baseUrl'           => $baseUrl,
                 'logs'              => $logs,
             ),
-            'contentTemplate' => 'MauticAssetBundle:Asset:details.html.php',
+            'contentTemplate' => 'MauticAssetBundle:Asset:' . $tmpl . '.html.php',
             'passthroughVars' => array(
                 'activeLink'    => '#mautic_asset_index',
                 'mauticContent' => 'asset'
@@ -237,8 +240,9 @@ class AssetController extends FormController
         }
 
         //set the page we came from
-        $page   = $session->get('mautic.asset.page', 1);
-        $action = $this->generateUrl('mautic_asset_action', array('objectAction' => 'new'));
+        $page       = $session->get('mautic.asset.page', 1);
+        $action     = $this->generateUrl('mautic_asset_action', array('objectAction' => 'new'));
+        $baseUrl    = $this->request->getScheme() . '://' . $this->request->getHttpHost() . $this->request->getBasePath() . '/';
 
         //create the form
         $form   = $model->createForm($entity, $this->get('form.factory'), $action);
@@ -302,7 +306,8 @@ class AssetController extends FormController
         return $this->delegateView(array(
             'viewParameters'  =>  array(
                 'form'        => $form->createView(),
-                'activeAsset'  => $entity
+                'activeAsset'  => $entity,
+                'baseUrl'     => $baseUrl
             ),
             'contentTemplate' => 'MauticAssetBundle:Asset:form.html.php',
             'passthroughVars' => array(

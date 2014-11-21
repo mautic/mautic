@@ -24,11 +24,11 @@ $header = ($activePage->getId()) ?
 $view['slots']->set("headerTitle", $header.$subheader);
 ?>
 
+<?php echo $view['form']->start($form); ?>
 <!-- start: box layout -->
 <div class="box-layout">
-    <?php echo $view['form']->start($form); ?>
     <!-- container -->
-    <div class="col-md-9 bg-auto height-auto bdr-r">
+    <div class="col-md-9 bg-auto height-auto">
         <div class="pa-md">
             <div class="row">
                 <div class="col-sm-12">
@@ -43,7 +43,7 @@ $view['slots']->set("headerTitle", $header.$subheader);
             </div>
         </div>
     </div>
-    <div class="col-md-3 bg-white height-auto">
+    <div class="col-md-3 bg-white height-auto bdr-l">
         <div class="pr-lg pl-lg pt-md pb-md">
             <?php
                 echo $view['form']->row($form['category']);
@@ -57,8 +57,8 @@ $view['slots']->set("headerTitle", $header.$subheader);
             ?>
         </div>
     </div>
-    <?php echo $view['form']->end($form); ?>
 </div>
+<?php echo $view['form']->end($form); ?>
 
 <div class="hide builder page-builder">
     <div class="builder-content">

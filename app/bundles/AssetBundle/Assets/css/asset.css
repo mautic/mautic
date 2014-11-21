@@ -4,3 +4,6 @@
 .thumbnail-preview img {
 	height: 100px;
 }
+.modal-body-content iframe, .preview-detail iframe {
+	height: 400px;
+}
