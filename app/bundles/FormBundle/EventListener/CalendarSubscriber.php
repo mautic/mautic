@@ -44,8 +44,9 @@ class CalendarSubscriber extends CommonSubscriber
         $dates = $event->getDates();
 
         $query = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
-        $query->select('fs.referer AS title, fs.date_submitted AS start')
+        $query->select('fs.referer AS url, f.name AS title, fs.date_submitted AS start')
             ->from(MAUTIC_TABLE_PREFIX . 'form_submissions', 'fs')
+            ->leftJoin('fs', MAUTIC_TABLE_PREFIX . 'forms', 'f', 'fs.form_id = f.id')
             ->where($query->expr()->andX(
                 $query->expr()->gte('fs.date_submitted', ':start'),
                 $query->expr()->lte('fs.date_submitted', ':end')
@@ -61,6 +62,7 @@ class CalendarSubscriber extends CommonSubscriber
         foreach ($results as &$object) {
             $date = new DateTimeHelper($object['start']);
             $object['start'] = $date->toLocalString(\DateTime::ISO8601);
+            $object['title'] = $this->translator->trans('mautic.form.event.submission', array('%form%' => $object['title']));
         }
 
         $event->addEvents($results);
