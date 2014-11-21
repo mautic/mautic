@@ -66,10 +66,15 @@ class MenuHelper extends Helper
      */
     public function buildClasses(ItemInterface &$item, MatcherInterface &$matcher, $options)
     {
+
+        $showChildren = ($item->hasChildren() && $item->getDisplayChildren());
+        $isAncestor   = $matcher->isAncestor($item, $options["matchingDepth"]);
+        $isCurrent    = $matcher->isCurrent($item);
+
         $class   = $item->getAttribute("class");
         $classes = ($class) ? " {$class}" : "";
-        $classes .= ($isCurrent = $matcher->isCurrent($item)) ? " {$options["currentClass"]}" : "";
-        $classes .= ($isAncestor = $matcher->isAncestor($item, $options["matchingDepth"])) ? " {$options["ancestorClass"]}" : "";
+        $classes .= ($isCurrent) ? " {$options["currentClass"]}" : "";
+        $classes .= ($isAncestor) ? " {$options["ancestorClass"]}" : "";
         $classes .= ($isAncestor && $this->invisibleChildSelected($item, $matcher)) ? " {$options["currentClass"]}" : "";
         $classes .= ($item->actsLikeFirst()) ? " {$options["firstClass"]}" : "";
         $classes .= ($item->actsLikeLast()) ? " {$options["lastClass"]}" : "";

@@ -558,23 +558,32 @@ var Mautic = {
                 }, 7000);
 
                 if (response.activeLink) {
-                    //remove current classes from menu items
-                    mQuery(".side-panel-nav").find(".current").removeClass("current");
-
-                    //remove ancestor classes
-                    mQuery(".side-panel-nav").find(".current_ancestor").removeClass("current_ancestor");
-
                     var link = response.activeLink;
                     if (link !== undefined && link.charAt(0) != '#') {
                         link = "#" + link;
                     }
+                    var linkEl = mQuery(link);
 
-                    //add current class
                     var parent = mQuery(link).parent();
-                    mQuery(parent).addClass("current");
+
+                    //remove current classes from menu items
+                    mQuery(".nav-sidebar").find(".active").removeClass("active");
+
+                    //add current to parent <li>
+                    parent.addClass("active");
+
+                    //get parent
+                    var openParent = parent.closest('li.open');
+
+                    //remove ancestor classes
+                    mQuery(".nav-sidebar").find(".open").each(function() {
+                        if (!openParent.hasClass('open') || (openParent.hasClass('open') && openParent[0] !== mQuery(this)[0])) {
+                            mQuery(this).removeClass('open');
+                        }
+                    });
 
                     //add current_ancestor classes
-                    mQuery(parent).parentsUntil(".side-panel-nav", "li").addClass("current_ancestor");
+                    //mQuery(parent).parentsUntil(".nav-sidebar", "li").addClass("current_ancestor");
                 }
 
                 mQuery('body').animate({
