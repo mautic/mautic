@@ -12,7 +12,7 @@
 
 <?php if ($isRoot = ($item->isRoot())): ?>
     <ul class="nav">
-        <li class="nav-heading"><?php echo $view['translator']->trans('mautic.core.menu.admin'); ?></li>
+        <!-- <li class="nav-heading"><?php echo $view['translator']->trans('mautic.core.menu.admin'); ?></li> -->
 <?php else: ?>
     <ul<?php echo $view["menu_helper"]->parseAttributes($item->getChildrenAttributes()); //convert array to name="value" ?>>
 <?php endif; ?>

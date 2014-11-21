@@ -11,7 +11,9 @@
 <div class="offcanvas-main" id="OffCanvasMain">
     <!-- start: sidebar header -->
     <div class="sidebar-header box-layout"  id="OffCanvasMainHeader">
-
+        <div class="text-center mt-20">
+            <h4><?php echo $view['translator']->trans('mautic.core.menu.admin'); ?></h4>
+        </div>
     </div>
     <!--/ end: sidebar header -->
 
