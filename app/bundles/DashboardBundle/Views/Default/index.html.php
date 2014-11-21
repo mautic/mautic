@@ -10,6 +10,13 @@ $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set("headerTitle", "Dashboard");
 $view['slots']->set('mauticContent', 'dashboard');
 
+$cols = 0;
+if ( $popularPages )     $cols++;
+if ( $popularAssets )    $cols++;
+if ( $popularCampaigns ) $cols++;
+if ($cols == 0) $cols = 1;
+$colspan = 12/$cols;
+
 ?>
 <div class="box-layout">
     <div class="np col-md-9 height-auto bg-white">
@@ -101,7 +108,7 @@ $view['slots']->set('mauticContent', 'dashboard');
             <div class="tab-pane active fade in bdr-w-0" id="email-stats-container">
                 <div class="row">
                     <?php if ($popularPages) : ?>
-                        <div class="col-md-4">
+                        <div class="col-md-<?php echo $colspan; ?>">
                             <div class="panel panel-default bdr-t-wdh-0">
                                 <div class="panel-heading">
                                     <h3 class="panel-title">
@@ -140,7 +147,7 @@ $view['slots']->set('mauticContent', 'dashboard');
                         </div>
                     <?php endif; ?>
                     <?php if ($popularAssets) : ?>
-                        <div class="col-md-4">
+                        <div class="col-md-<?php echo $colspan; ?>">
                             <div class="panel panel-default bdr-t-wdh-0">
                                 <div class="panel-heading">
                                     <h3 class="panel-title">
@@ -175,7 +182,7 @@ $view['slots']->set('mauticContent', 'dashboard');
                         </div>
                     <?php endif; ?>
                     <?php if ($popularCampaigns) : ?>
-                        <div class="col-md-4">
+                        <div class="col-md-<?php echo $colspan; ?>">
                             <div class="panel panel-default bdr-t-wdh-0">
                                 <div class="panel-heading">
                                     <h3 class="panel-title">
