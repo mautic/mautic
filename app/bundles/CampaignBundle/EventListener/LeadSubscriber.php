@@ -81,7 +81,7 @@ class LeadSubscriber extends CommonSubscriber
     {
         // Set available event types
         $eventTypeKey = 'campaign.evented';
-        $eventTypeName = $this->translator->trans('mautic.campaign.event.triggered');
+        $eventTypeName = $this->translator->trans('mautic.campaign.triggered');
         $event->addEventType($eventTypeKey, $eventTypeName);
 
         // Decide if those events are filtered
