@@ -45,7 +45,15 @@ class IntegrationRepository extends CommonRepository
         $q = $this->createQueryBuilder($this->getTableAlias())
             ->select('i.bundle AS bundle, i.isEnabled AS enabled');
 
-        return $q->getQuery()->getArrayResult();
+        $results = $q->getQuery()->getArrayResult();
+
+        $return = array();
+
+        foreach ($results as $result) {
+            $return[$result['bundle']] = $result['enabled'];
+        }
+
+        return $return;
     }
 
     /**

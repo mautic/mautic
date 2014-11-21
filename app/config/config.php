@@ -18,13 +18,13 @@ $buildBundles = function($namespace, $bundle) use ($container) {
 // Note MauticAddon bundles so they can be applied as needed
 $buildAddonBundles = function($namespace, $bundle) use ($container) {
     if (strpos($namespace, 'MauticAddon') !== false) {
-        $bundleBase = str_replace('MauticAddon', '', $bundle);
+        $bundleBase = str_replace('Mautic', '', $bundle);
         $v = array(
             "base"      => str_replace('Bundle', '', $bundleBase),
             "bundle"    => $bundleBase,
             "namespace" => $namespace,
             "relative"  => 'addons/'.$bundleBase,
-            "directory" => dirname($container->getParameter('kernel.root_dir')).'/bundles/'.$bundleBase
+            "directory" => dirname($container->getParameter('kernel.root_dir')).'/addons/'.$bundleBase
         );
         return $v;
     }

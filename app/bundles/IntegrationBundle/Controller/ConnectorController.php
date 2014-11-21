@@ -10,7 +10,6 @@
 namespace Mautic\IntegrationBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
-use Mautic\SocialBundle\Helper\NetworkIntegrationHelper;
 
 /**
  * Class ConnectorController
@@ -34,7 +33,9 @@ class ConnectorController extends FormController
             return $this->accessDenied();
         }
 
-        $networkObjects = NetworkIntegrationHelper::getNetworkObjects($this->factory, null, null, true);
+        /** @var \Mautic\IntegrationBundle\Helper\NetworkIntegrationHelper $networkHelper */
+        $networkHelper  = $this->container->get('mautic.network.integration');
+        $networkObjects = $networkHelper->getNetworkObjects(null, null, true);
         $connectors     = array();
 
         foreach ($networkObjects as $name => $object) {
