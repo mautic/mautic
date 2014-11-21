@@ -285,7 +285,11 @@ class MauticFactory
         static $dates;
 
         if (!empty($string)) {
-            $key = "$string.$format.$tz";
+            if ($string instanceof \DateTime) {
+                $key = $string->format('U') . ".$format.$tz";
+            } else {
+                $key = "$string.$format.$tz";
+            }
 
             if (empty($dates[$key])) {
                 $dates[$key] = new DateTimeHelper($string, $format, $tz);
