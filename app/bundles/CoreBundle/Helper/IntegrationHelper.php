@@ -58,7 +58,7 @@ class IntegrationHelper
             $data = $repo->getBundleStatus();
 
             foreach ($data as $addon) {
-                static::$addons[$addon['bundle']] = $addon['published'];
+                static::$addons[$addon['bundle']] = $addon['enabled'];
             }
 
             static::$loaded = true;

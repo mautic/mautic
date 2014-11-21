@@ -40,12 +40,12 @@ class Integration
     private $name;
 
     /**
-     * @ORM\Column(name="is_published", type="boolean")
+     * @ORM\Column(name="is_enabled", type="boolean")
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"integrationDetails"})
      */
-    private $isPublished = true;
+    private $isEnabled = true;
 
     /**
      * @ORM\Column(type="string", length=50)
@@ -98,27 +98,27 @@ class Integration
     }
 
     /**
-     * Set isPublished
+     * Set isEnabled
      *
-     * @param boolean $isPublished
+     * @param boolean $isEnabled
      *
      * @return Integration
      */
-    public function setIsPublished($isPublished)
+    public function setIsEnabled($isEnabled)
     {
-        $this->isPublished = $isPublished;
+        $this->isEnabled = $isEnabled;
 
         return $this;
     }
 
     /**
-     * Get isPublished
+     * Get isEnabled
      *
      * @return boolean
      */
-    public function getIsPublished()
+    public function getIsEnabled()
     {
-        return $this->isPublished;
+        return $this->isEnabled;
     }
 
     /**

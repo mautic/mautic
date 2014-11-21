@@ -43,7 +43,7 @@ class IntegrationRepository extends CommonRepository
     public function getBundleStatus()
     {
         $q = $this->createQueryBuilder($this->getTableAlias())
-            ->select('i.bundle AS bundle, i.isPublished AS published');
+            ->select('i.bundle AS bundle, i.isEnabled AS enabled');
 
         return $q->getQuery()->getArrayResult();
     }
