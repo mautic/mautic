@@ -354,17 +354,14 @@ var Mautic = {
                 }
             });
 
-            if (container == '#app-content') {
-                //destroy ckeditor instances
-                if (typeof CKEDITOR != 'undefined') {
-                    for (name in CKEDITOR.instances) {
-                        var editor = CKEDITOR.instances[name];
-                        if (editor) {
-                            editor.destroy();
-                        }
+            mQuery(container + ' textarea.editor').each(function() {
+                for (var name in CKEDITOR.instances) {
+                    var instance = CKEDITOR.instances[name];
+                    if (this && this == instance.element.$) {
+                        instance.destroy(true);
                     }
                 }
-            }
+            });
         }
 
         //run specific unloads
@@ -793,8 +790,8 @@ var Mautic = {
             Mautic.processPageContent(response);
         } else {
             if (response.closeModal) {
-                console.log(target);
                 mQuery(target).modal('hide');
+                Mautic.onPageUnload(target, response);
 
                 if (response.mauticContent) {
                     if (typeof Mautic[response.mauticContent + "OnLoad"] == 'function') {
