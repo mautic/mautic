@@ -29,3 +29,12 @@ $container->setDefinition(
     )
 )
     ->addTag('kernel.event_subscriber');
+
+$container->setDefinition(
+    'mautic.campaign.calendarbundle.subscriber',
+    new Definition(
+        'Mautic\CampaignBundle\EventListener\CalendarSubscriber',
+        array(new Reference('mautic.factory'))
+    )
+)
+    ->addTag('kernel.event_subscriber');
