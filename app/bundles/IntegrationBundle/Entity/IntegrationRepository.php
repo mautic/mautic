@@ -29,7 +29,7 @@ class IntegrationRepository extends CommonRepository
     public function findByBundle($bundle)
     {
         $q = $this->createQueryBuilder($this->getTableAlias());
-        $q->where($q->exper->eq('i.bundle', ':bundle'))
+        $q->where($q->expr()->eq('i.bundle', ':bundle'))
             ->setParameter('bundle', $bundle);
 
         return $q->getQuery()->getOneOrNullResult();

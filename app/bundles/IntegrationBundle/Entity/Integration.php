@@ -142,4 +142,14 @@ class Integration
     {
         return $this->bundle;
     }
+
+    /**
+     * Check the publish status of an entity based on publish up and down datetimes
+     *
+     * @return string published|unpublished
+     */
+    public function getPublishStatus()
+    {
+        return $this->getIsEnabled() ? 'published' : 'unpublished';
+    }
 }
