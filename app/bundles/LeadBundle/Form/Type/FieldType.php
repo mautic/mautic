@@ -134,6 +134,7 @@ class FieldType extends AbstractType
             'disabled'   => ($disabled || !$new)
         ));
 
+        $data = ($disabled) ? true : $options['data']->getIsPublished();
         $builder->add('isPublished', 'button_group', array(
             'choice_list' => new ChoiceList(
                 array(false, true),
@@ -143,7 +144,9 @@ class FieldType extends AbstractType
             'multiple'      => false,
             'label'         => 'mautic.core.form.ispublished',
             'empty_value'   => false,
-            'required'      => false
+            'required'      => false,
+            'disabled'      => $disabled,
+            'data'          => $data
         ));
 
         $builder->add('isRequired', 'button_group', array(
