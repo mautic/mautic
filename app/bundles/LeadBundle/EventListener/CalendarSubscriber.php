@@ -46,7 +46,7 @@ class CalendarSubscriber extends CommonSubscriber
 
         // Lead Notes
         $query = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
-        $query->select('ln.lead_id, l.firstname, l.lastname, ln.date_time AS start, ln.text AS description')
+        $query->select('ln.lead_id, l.firstname, l.lastname, ln.date_time AS start, ln.text AS description, ln.type')
             ->from(MAUTIC_TABLE_PREFIX . 'lead_notes', 'ln')
             ->leftJoin('ln', MAUTIC_TABLE_PREFIX . 'leads', 'l', 'ln.lead_id = l.id')
             ->where($query->expr()->andX(
@@ -73,6 +73,7 @@ class CalendarSubscriber extends CommonSubscriber
             $object['attr']  = 'data-toggle="ajax"';
             $object['description'] = strip_tags(html_entity_decode($object['description']));
             $object['title'] = $this->translator->trans('mautic.lead.note.event', array('%lead%' => $leadName));
+            $object['title'] .= ' (' . $this->translator->trans('mautic.lead.note.type.' . $object['type']) . ')';
         }
 
         $event->addEvents($results);
