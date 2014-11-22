@@ -133,7 +133,7 @@ if ($tmpl == 'index') {
     </table>
     <div class="panel-footer">
     <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
-        "totalItems"      => count($items),
+        "totalItems"      => $totalItems,
         "page"            => $page,
         "limit"           => $limit,
         "baseUrl"         => $view['router']->generate('mautic_form_index'),

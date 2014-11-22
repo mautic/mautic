@@ -106,6 +106,7 @@ class FormController extends CommonFormController
             'viewParameters'  => array(
                 'searchValue' => $search,
                 'items'       => $forms,
+                'totalItems'  => $count,
                 'page'        => $page,
                 'limit'       => $limit,
                 'permissions' => $permissions,

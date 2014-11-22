@@ -27,10 +27,7 @@
                                     <?php if (isset($item['name'])) $item['title'] = $item['name']; ?>
                                     <?php if (isset($item['title']) && $item['title']) : ?>
                                     <label class="col-sm-12 list-group-item">
-                                        <input
-                                            name="emailFilters[<?php echo $filter['column']; ?>][]"
-                                            type="checkbox"
-                                            value="<?php echo $item['id']; ?>" />
+                                        <input class="mr-3" name="emailFilters[<?php echo $filter['column']; ?>][]" type="checkbox" value="<?php echo $item['id']; ?>" />
                                         <?php echo $item['title']; ?>
                                         <?php if (isset($item['color']) && $item['color']) : ?>
                                             <i class="fa fa-square mr5 pull-right" style="color:<?php echo $item['color']; ?>"></i>

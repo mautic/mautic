@@ -172,10 +172,7 @@ class EmailRepository extends CommonRepository
         $unique  = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
         $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
 
-        $expr = $q->expr()->orX(
-            $q->expr()->like('e.subject',  ":$unique"),
-            $q->expr()->like('e.alias',  ":$unique")
-        );
+        $expr = $q->expr()->like('e.subject',  ":$unique");
         if ($filter->not) {
             $expr = $q->expr()->not($expr);
         }

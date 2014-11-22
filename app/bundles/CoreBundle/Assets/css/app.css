@@ -4006,3 +4006,6 @@ lesshat-selector {
 .stat-boxes .panel {
   height: 164px;
 }
+.has-click-event {
+  cursor: pointer;
+}

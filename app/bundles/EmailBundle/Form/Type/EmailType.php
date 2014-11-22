@@ -58,33 +58,6 @@ class EmailType extends AbstractType
             'attr'       => array('class' => 'form-control')
         ));
 
-        //add category
-        $builder->add('category', 'category', array(
-            'bundle' => 'email',
-            'disabled' => $isVariant
-        ));
-
-        //add lead lists
-        $transformer = new \Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer(
-            $this->em,
-            'MauticLeadBundle:LeadList',
-            'id',
-            true
-        );
-        $builder->add(
-            $builder->create('lists', 'leadlist_choices', array(
-                'label'      => 'mautic.email.form.list',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array(
-                    'class' => 'form-control'
-                ),
-                'multiple' => true,
-                'expanded' => false,
-                'disabled' => $isVariant
-            ))
-                ->addModelTransformer($transformer)
-        );
-
         //build a list
         $template = $options['data']->getTemplate();
         if (empty($template)) {
@@ -103,16 +76,6 @@ class EmailType extends AbstractType
                 'tooltip' => 'mautic.email.form.template.help'
             ),
             'data'          => $template
-        ));
-
-        $builder->add('language', 'locale', array(
-            'label'      => 'mautic.email.form.language',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array(
-                'class'   => 'form-control chosen'
-            ),
-            'required'   => false,
-            'disabled' => $isVariant
         ));
 
         $builder->add('isPublished', 'button_group', array(
@@ -193,6 +156,42 @@ class EmailType extends AbstractType
         if ($isVariant) {
             $builder->add('variantSettings', 'emailvariant', array(
                 'label'       => false
+            ));
+        } else {
+
+            //add category
+            $builder->add('category', 'category', array(
+                'bundle' => 'email'
+            ));
+
+            //add lead lists
+            $transformer = new \Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer(
+                $this->em,
+                'MauticLeadBundle:LeadList',
+                'id',
+                true
+            );
+            $builder->add(
+                $builder->create('lists', 'leadlist_choices', array(
+                    'label'      => 'mautic.email.form.list',
+                    'label_attr' => array('class' => 'control-label'),
+                    'attr'       => array(
+                        'class' => 'form-control'
+                    ),
+                    'multiple' => true,
+                    'expanded' => false
+                ))
+                    ->addModelTransformer($transformer)
+            );
+
+
+            $builder->add('language', 'locale', array(
+                'label'      => 'mautic.email.form.language',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array(
+                    'class'   => 'form-control chosen'
+                ),
+                'required'   => false,
             ));
         }
 

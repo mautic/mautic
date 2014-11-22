@@ -128,6 +128,7 @@ class EmailController extends FormController
             'viewParameters'  =>  array(
                 'searchValue' => $search,
                 'items'       => $emails,
+                'totalItems'  => $count,
                 'page'        => $page,
                 'limit'       => $limit,
                 'permissions' => $permissions,
