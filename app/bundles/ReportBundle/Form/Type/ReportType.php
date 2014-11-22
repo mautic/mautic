@@ -12,7 +12,6 @@ namespace Mautic\ReportBundle\Form\Type;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
-use Mautic\ReportBundle\Form\DataTransformer\ColumnSelectTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -113,22 +112,35 @@ class ReportType extends AbstractType
             $columnList = $this->buildColumnSelectList($columns);
 
             // Build the column selector
-            $builder->add(
-                $builder->create('columns', 'column_selector', array(
-                    'choices'    => $columnList,
-                    'label'      => 'mautic.report.report.form.columnselector',
-                    'label_attr' => array('class' => 'control-label'),
-                    'required'   => true,
-                    'multiple'   => true,
-                    'expanded'   => true,
-                    'attr'       => array(
-                        'class' => 'form-control',
-                        'size'  => '5'
-                        )
-                    )
+            // $builder->add(
+            //     $builder->create('columns', 'column_selector', array(
+            //         'choices'    => $columnList,
+            //         'label'      => 'mautic.report.report.form.columnselector',
+            //         'label_attr' => array('class' => 'control-label'),
+            //         'required'   => true,
+            //         'multiple'   => true,
+            //         'expanded'   => true,
+            //         'attr'       => array(
+            //             'class' => 'form-control',
+            //             'size'  => '5'
+            //             )
+            //         )
+            //     )
+            //     ->addViewTransformer(new ColumnSelectTransformer($columnList))
+            // );
+
+            $builder->add('columns', 'choice', array(
+                'choices'    => $columnList,
+                'label'      => 'mautic.report.report.form.columnselector',
+                'label_attr' => array('class' => 'control-label'),
+                'required'   => false,
+                'multiple'   => true,
+                'expanded'   => false,
+                'attr'       => array(
+                    'class' => 'form-control'
                 )
-                ->addViewTransformer(new ColumnSelectTransformer($columnList))
-            );
+            ));
+
 
             // Build the filter selector
             $builder->add('filters', 'collection', array(
