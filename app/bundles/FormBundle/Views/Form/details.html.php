@@ -11,7 +11,6 @@ $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'form');
 $view['slots']->set("headerTitle", $activeForm->getName());
 
-//@todo generate stats for results
 /** @var \Mautic\FormBundle\Entity\Form $activeForm */
 $actions = $activeForm->getActions();
 $activeFormActions = array();

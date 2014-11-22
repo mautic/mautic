@@ -73,6 +73,7 @@ class ConfigType extends AbstractType
                             break;
                         case 'ip_lookup_service':
                             // TODO - Write an API endpoint listing our supported services and build this list from that
+                            // see CoreBundle\Entity\IpAddress
                             $choices = array(
                                 'telize'            => 'mautic.core.config.ip_lookup_service.telize',
                                 'freegeoip'         => 'mautic.core.config.ip_lookup_service.freegeoip',

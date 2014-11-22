@@ -209,7 +209,6 @@ class UserApiController extends CommonApiController
             }
         } else {
             //Changing passwords via API is forbidden
-            //@TODO reconsider username/password change restriction via API?
             if (!empty($parameters['plainPassword'])) {
                 unset($parameters['plainPassword']);
             }

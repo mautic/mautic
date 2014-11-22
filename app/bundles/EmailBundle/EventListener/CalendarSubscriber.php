@@ -37,7 +37,6 @@ class CalendarSubscriber extends CommonSubscriber
      * @param CalendarGeneratorEvent $event
      *
      * @return void
-     * @todo   This method is only a model and should be removed when actual data is being populated
      */
     public function onCalendarGenerate(CalendarGeneratorEvent $event)
     {

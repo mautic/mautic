@@ -367,7 +367,6 @@ class FormModel extends CommonFormModel
 
     /**
      * Gets array of custom fields and submit actions from bundles subscribed FormEvents::FORM_ON_BUILD
-     * @todo - add send email post submit action
      * @return mixed
      */
     public function getCustomComponents()
