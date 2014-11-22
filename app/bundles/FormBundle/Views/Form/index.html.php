@@ -9,9 +9,6 @@
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'form');
 $view['slots']->set("headerTitle", $view['translator']->trans('mautic.form.form.header.index'));
-$view['slots']->set('searchUri', $view['router']->generate('mautic_form_index', array('page' => $page)));
-$view['slots']->set('searchString', $app->getSession()->get('mautic.form.filter'));
-$view['slots']->set('searchHelp', $view['translator']->trans('mautic.form.form.help.searchcommands'));
 ?>
 
 <?php if ($permissions['form:forms:create']): ?>

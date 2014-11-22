@@ -10,9 +10,6 @@
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'email');
 $view['slots']->set("headerTitle", $view['translator']->trans('mautic.email.header.index'));
-$view['slots']->set('searchUri', $view['router']->generate('mautic_email_index', array('page' => $page)));
-$view['slots']->set('searchString', $app->getSession()->get('mautic.email.filter'));
-$view['slots']->set('searchHelp', $view['translator']->trans('mautic.email.help.searchcommands'));
 ?>
 
 <?php if ($permissions['email:emails:create']): ?>

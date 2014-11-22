@@ -10,9 +10,6 @@
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'pointTrigger');
 $view['slots']->set("headerTitle", $view['translator']->trans('mautic.point.trigger.header.index'));
-$view['slots']->set('searchUri', $view['router']->generate('mautic_pointtrigger_index', array('page' => $page)));
-$view['slots']->set('searchString', $app->getSession()->get('mautic.point.trigger.filter'));
-$view['slots']->set('searchHelp', $view['translator']->trans('mautic.core.help.searchcommands'));
 ?>
 
 <?php if ($permissions['point:triggers:create']): ?>

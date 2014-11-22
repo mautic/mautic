@@ -10,11 +10,6 @@
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', $application);
 $view['slots']->set("headerTitle", $view['translator']->trans('mautic.mapper.clients.title'));
-$view['slots']->set('searchUri', $view['router']->generate('mautic_mapper_client_index', array(
-    'page'   => $page,
-    'application' => $application
-)));
-$view['slots']->set('searchString', $app->getSession()->get('mautic.mapper.filter'));
 ?>
 
 <?php if ($permissions[$application.':mapper:create']): ?>

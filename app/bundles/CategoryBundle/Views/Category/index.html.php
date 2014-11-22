@@ -10,12 +10,6 @@
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'category');
 $view['slots']->set("headerTitle", $view['translator']->trans('mautic.category.header.index'));
-$view['slots']->set('searchUri', $view['router']->generate('mautic_category_index', array(
-    'page'   => $page,
-    'bundle' => $bundle
-)));
-$view['slots']->set('searchString', $app->getSession()->get('mautic.category.filter'));
-$view['slots']->set('searchHelp', $view['translator']->trans('mautic.category.help.searchcommands'));
 ?>
 
 <?php if ($permissions[$bundle.':categories:create']): ?>

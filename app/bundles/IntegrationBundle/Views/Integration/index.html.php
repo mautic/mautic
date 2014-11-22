@@ -10,9 +10,6 @@
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'integration');
 $view['slots']->set("headerTitle", $view['translator']->trans('mautic.integration.header.index'));
-$view['slots']->set('searchUri', $view['router']->generate('mautic_integration_index', array('page' => $page)));
-$view['slots']->set('searchString', $app->getSession()->get('mautic.integration.filter'));
-$view['slots']->set('searchHelp', $view['translator']->trans('mautic.integration.help.searchcommands'));
 ?>
 
 <div class="panel panel-default bdr-t-wdh-0 mb-0">
