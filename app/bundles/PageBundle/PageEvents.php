@@ -38,7 +38,7 @@ final class PageEvents
     /**
      * The mautic.page_on_display event is thrown before displaying the page content
      *
-     * The event listener receives a Mautic\PageBundle\Event\PageEvent instance.
+     * The event listener receives a Mautic\PageBundle\Event\PageDisplayEvent instance.
      *
      * @var string
      */

@@ -196,3 +196,17 @@ Mautic.insertPageBuilderToken = function(editorId, token) {
 
     mQuery('#ExternalLinkModal input[name="link"]').val('');
 };
+
+Mautic.togglePageContentMode = function (el) {
+    var builder = (mQuery(el).val() === '0') ? false : true;
+
+    if (builder) {
+        mQuery('#customHtmlContainer').addClass('hide');
+        mQuery('#builderHtmlContainer').removeClass('hide');
+        mQuery('#metaDescriptionContainer').removeClass('hide');
+    } else {
+        mQuery('#customHtmlContainer').removeClass('hide');
+        mQuery('#builderHtmlContainer').addClass('hide');
+        mQuery('#metaDescriptionContainer').addClass('hide');
+    }
+};

@@ -9,7 +9,6 @@
 
 namespace Mautic\PageBundle\EventListener;
 
-use Mautic\ApiBundle\Event\RouteEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\PageBundle\Event as Events;
 use Mautic\PageBundle\PageEvents;
@@ -56,41 +55,39 @@ class BuilderSubscriber extends CommonSubscriber
 
         //add AB Test Winner Criteria
         $bounceRate = array(
-            'group'    => 'mautic.page.page.abtest.criteria',
-            'label'    => 'mautic.page.page.abtest.criteria.bounce',
+            'group'    => 'mautic.page.abtest.criteria',
+            'label'    => 'mautic.page.abtest.criteria.bounce',
             'callback' => '\Mautic\PageBundle\Helper\AbTestHelper::determineBounceTestWinner'
         );
         $event->addAbTestWinnerCriteria('page.bouncerate', $bounceRate);
 
         $dwellTime = array(
-            'group'    => 'mautic.page.page.abtest.criteria',
-            'label'    => 'mautic.page.page.abtest.criteria.dwelltime',
+            'group'    => 'mautic.page.abtest.criteria',
+            'label'    => 'mautic.page.abtest.criteria.dwelltime',
             'callback' => '\Mautic\PageBundle\Helper\AbTestHelper::determineDwellTimeTestWinner'
         );
         $event->addAbTestWinnerCriteria('page.dwelltime', $dwellTime);
     }
 
     /**
-     * @param Events\PageEvent $event
+     * @param Events\PageDisplayEvent $event
      */
-    public function onPageDisplay(Events\PageEvent $event)
+    public function onPageDisplay(Events\PageDisplayEvent $event)
     {
         $content  = $event->getContent();
         $page     = $event->getPage();
 
-        foreach ($content as $slot => &$html) {
-            if (strpos($html, '{langbar}') !== false) {
-                $langbar = $this->renderLanguageBar($page);
-                $html    = str_ireplace('{langbar}', $langbar, $html);
-            }
-
-            if (strpos($html, '{sharebuttons}') !== false) {
-                $buttons = $this->renderSocialShareButtons();
-                $html    = str_ireplace('{sharebuttons}', $buttons, $html);
-            }
-
-            $this->renderPageUrl($html, array('source' => array('page', $page->getId())));
+        if (strpos($content, '{langbar}') !== false) {
+            $langbar = $this->renderLanguageBar($page);
+            $content    = str_ireplace('{langbar}', $langbar, $content);
         }
+
+        if (strpos($content, '{sharebuttons}') !== false) {
+            $buttons = $this->renderSocialShareButtons();
+            $content    = str_ireplace('{sharebuttons}', $buttons, $content);
+        }
+
+        $this->renderPageUrl($content, array('source' => array('page', $page->getId())));
 
         $event->setContent($content);
     }
@@ -108,8 +105,8 @@ class BuilderSubscriber extends CommonSubscriber
             $shareButtons = NetworkIntegrationHelper::getShareButtons($this->factory);
 
             $content = "<div class='share-buttons'>\n";
-            foreach ($shareButtons as $network => $html) {
-                $content .= $html;
+            foreach ($shareButtons as $network => $content) {
+                $content .= $content;
             }
             $content .= "</div>\n";
 
@@ -219,12 +216,12 @@ class BuilderSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param      $html
+     * @param      $content
      * @param array $clickthrough
      *
      * @return void
      */
-    protected function renderPageUrl(&$html, $clickthrough = array())
+    protected function renderPageUrl(&$content, $clickthrough = array())
     {
         static $pages = array(), $links = array();
 
@@ -237,7 +234,7 @@ class BuilderSubscriber extends CommonSubscriber
         /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
         $redirectModel = $this->factory->getModel('page.redirect');
 
-        preg_match_all($pagelinkRegex, $html, $matches);
+        preg_match_all($pagelinkRegex, $content, $matches);
         if (!empty($matches[1])) {
             foreach ($matches[1] as $match) {
                 if (empty($pages[$match])) {
@@ -245,11 +242,11 @@ class BuilderSubscriber extends CommonSubscriber
                 }
 
                 $url  = ($pages[$match] !== null) ? $pageModel->generateUrl($pages[$match], true, $clickthrough) : '';
-                $html = str_ireplace('{pagelink=' . $match . '}', $url, $html);
+                $content = str_ireplace('{pagelink=' . $match . '}', $url, $content);
             }
         }
 
-        preg_match_all($externalLinkRegex, $html, $matches);
+        preg_match_all($externalLinkRegex, $content, $matches);
         if (!empty($matches[1])) {
             foreach ($matches[1] as $match) {
                 if (empty($links[$match])) {
@@ -257,7 +254,7 @@ class BuilderSubscriber extends CommonSubscriber
                 }
 
                 $url  = ($links[$match] !== null) ? $redirectModel->generateRedirectUrl($links[$match], $clickthrough) : '';
-                $html = str_ireplace('{externallink=' . $match . '}', $url, $html);
+                $content = str_ireplace('{externallink=' . $match . '}', $url, $content);
             }
         }
     }

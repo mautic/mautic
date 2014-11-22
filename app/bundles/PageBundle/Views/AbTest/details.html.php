@@ -10,10 +10,10 @@
 if (count($variants['children'])):
 $showSupport = (isset($abTestResults['supportTemplate']) && isset($abTestResults['support']));
 ?>
-<h4><?php echo $view['translator']->trans('mautic.page.page.variants'); ?>
+<h4><?php echo $view['translator']->trans('mautic.page.variants'); ?>
     <?php if ($showSupport): ?>
         <button class="btn btn-primary" data-toggle="modal" data-target="#pageAbTestResults">
-            <?php echo $view['translator']->trans('mautic.page.page.abtest.stats'); ?>
+            <?php echo $view['translator']->trans('mautic.page.abtest.stats'); ?>
         </button>
     <?php endif; ?>
     <?php if (!empty($abTestResults['error'])): ?>
@@ -21,7 +21,7 @@ $showSupport = (isset($abTestResults['supportTemplate']) && isset($abTestResults
     <?php endif; ?>
 </h4>
 <?php if ($startDate = $variants['parent']->getVariantStartDate()): ?>
-<h5><?php echo $view['translator']->trans('mautic.page.page.variantstartdate', array(
+<h5><?php echo $view['translator']->trans('mautic.page.variantstartdate', array(
         "%date%" => $view['date']->toFull($startDate)
     )); ?></h5>
 <?php endif;?>
@@ -39,9 +39,9 @@ $showSupport = (isset($abTestResults['supportTemplate']) && isset($abTestResults
                    data-toggle="ajax">
                     <span><?php echo $variants['parent']->getTitle() . " (" . $variants['parent']->getAlias() . ")"; ?></span>
                     <?php if ($variants['parent']->getId() === $page->getId()): ?>
-                    <span><strong> [<?php echo $view['translator']->trans('mautic.page.page.current'); ?>]</strong></span>
+                    <span><strong> [<?php echo $view['translator']->trans('mautic.page.current'); ?>]</strong></span>
                     <?php endif; ?>
-                    <span><strong> [<?php echo $view['translator']->trans('mautic.page.page.parent'); ?>]</strong></span>
+                    <span><strong> [<?php echo $view['translator']->trans('mautic.page.parent'); ?>]</strong></span>
                 </a>
             </td>
             <td></td>
@@ -68,10 +68,10 @@ $showSupport = (isset($abTestResults['supportTemplate']) && isset($abTestResults
                     <a href="<?php echo $view['router']->generate('mautic_page_action', array(
                         'objectAction' => 'winner', 'objectId' => $c->getId())); ?>"
                        data-toggle="ajax" data-method="post" class="btn btn-<?php echo $class; ?>">
-                        <?php echo $view['translator']->trans('mautic.page.page.abtest.makewinner'); ?>
+                        <?php echo $view['translator']->trans('mautic.page.abtest.makewinner'); ?>
                     </a>
                     <?php if ($c->getId() === $page->getId()): ?>
-                    <span><strong> [<?php echo $view['translator']->trans('mautic.page.page.current'); ?>]</strong></span>
+                    <span><strong> [<?php echo $view['translator']->trans('mautic.page.current'); ?>]</strong></span>
                     <?php endif; ?>
                 <?php endif; ?>
             </td>
@@ -84,7 +84,7 @@ $showSupport = (isset($abTestResults['supportTemplate']) && isset($abTestResults
 if ($showSupport):
 echo $view->render('MauticCoreBundle:Helper:modal.html.php', array(
     'id'     => 'pageAbTestResults',
-    'header' => $view['translator']->trans('mautic.page.page.abtest.stats'),
+    'header' => $view['translator']->trans('mautic.page.abtest.stats'),
     'body'   => $view->render($abTestResults['supportTemplate'], array(
         'variants'      => $variants,
         'abTestResults' => $abTestResults

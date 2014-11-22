@@ -59,7 +59,7 @@ switch ($status) {
         ?>
         <span class="global-search-secondary global-search-indent"><?php echo $catName; ?></span>
         <span class="badge alert-success gs-count-badge" data-toggle="tooltip"
-              title="<?php echo $view['translator']->trans('mautic.page.page.hitcount'); ?>" data-placement="left">
+              title="<?php echo $view['translator']->trans('mautic.page.hitcount'); ?>" data-placement="left">
             <?php echo $page->getHits(); ?>
         </span>
     </a>

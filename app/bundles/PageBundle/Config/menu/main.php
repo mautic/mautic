@@ -7,7 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 $items = array(
-    'mautic.page.page.menu.root' => array(
+    'mautic.page.menu.root' => array(
         'linkAttributes' => array(
             'id' => 'mautic_page_root'
         ),
@@ -16,7 +16,7 @@ $items = array(
         ),
         'display' => ($security->isGranted(array('page:pages:viewown', 'page:pages:viewother'), 'MATCH_ONE')) ? true : false,
         'children' => array(
-            'mautic.page.page.menu.index' => array(
+            'mautic.page.menu.index' => array(
                 'route'    => 'mautic_page_index',
                 'linkAttributes' => array(
                     'data-toggle' => 'ajax'
@@ -25,7 +25,7 @@ $items = array(
                     'routeName' => 'mautic_page_index'
                 ),
             ),
-            'mautic.page.page.menu.new' => array(
+            'mautic.page.menu.new' => array(
                 'route'    => 'mautic_page_action',
                 'routeParameters' => array("objectAction"  => "new"),
                 'extras'  => array(
@@ -33,7 +33,7 @@ $items = array(
                 ),
                 'display' => false //only used for breadcrumb generation
             ),
-            'mautic.page.page.menu.edit' => array(
+            'mautic.page.menu.edit' => array(
                 'route'           => 'mautic_page_action',
                 'routeParameters' => array("objectAction"  => "edit"),
                 'extras'  => array(
@@ -41,7 +41,7 @@ $items = array(
                 ),
                 'display' => false //only used for breadcrumb generation
             ),
-            'mautic.page.page.menu.view' => array(
+            'mautic.page.menu.view' => array(
                 'route'           => 'mautic_page_action',
                 'routeParameters' => array("objectAction"  => "view"),
                 'extras'  => array(
@@ -55,7 +55,7 @@ $items = array(
 
 //add category level
 \Mautic\CategoryBundle\Helper\MenuHelper::addCategoryMenuItems(
-    $items['mautic.page.page.menu.root']['children'],
+    $items['mautic.page.menu.root']['children'],
     'page',
     $security
 );

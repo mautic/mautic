@@ -9,7 +9,7 @@
 ?>
 
 <?php if (count($translations['children'])): ?>
-<h4><?php echo $view['translator']->trans('mautic.page.page.translations'); ?></h4>
+<h4><?php echo $view['translator']->trans('mautic.page.translations'); ?></h4>
 
 <table class="table table-bordered table-stripped">
     <?php if ($translations['parent']): ?>
@@ -26,9 +26,9 @@
                 <span> | </span>
                 <span><?php echo $translations['parent']->getTitle() . " (" . $translations['parent']->getAlias() . ")"; ?></span>
                 <?php if ($translations['parent']->getId() === $page->getId()): ?>
-                <span><strong> [<?php echo $view['translator']->trans('mautic.page.page.current'); ?>]</strong></span>
+                <span><strong> [<?php echo $view['translator']->trans('mautic.page.current'); ?>]</strong></span>
                 <?php endif; ?>
-                <span><strong> [<?php echo $view['translator']->trans('mautic.page.page.parent'); ?>]</strong></span>
+                <span><strong> [<?php echo $view['translator']->trans('mautic.page.parent'); ?>]</strong></span>
             </a>
         </td>
     </tr>
@@ -48,7 +48,7 @@
                 <span> | </span>
                 <span><?php echo $c->getTitle() . " (" . $c->getAlias() . ")"; ?></span>
                 <?php if ($c->getId() === $page->getId()): ?>
-                    <span><strong> [<?php echo $view['translator']->trans('mautic.page.page.current'); ?>]</strong></span>
+                    <span><strong> [<?php echo $view['translator']->trans('mautic.page.current'); ?>]</strong></span>
                 <?php endif; ?>
             </a>
         </td>

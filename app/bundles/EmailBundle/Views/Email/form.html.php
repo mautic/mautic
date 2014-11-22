@@ -11,10 +11,10 @@ $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'email');
 
 $variantParent = $email->getVariantParent();
-$subheader = ($variantParent) ? '<span class="small"> - ' . $view['translator']->trans('mautic.email.header.editvariant', array(
+$subheader = ($variantParent) ? '<div><span class="small">' . $view['translator']->trans('mautic.email.header.editvariant', array(
     '%name%' => $email->getSubject(),
     '%parent%' => $variantParent->getSubject()
-)) . '</span>' : '';
+)) . '</span></div>' : '';
 
 $header = ($email->getId()) ?
     $view['translator']->trans('mautic.email.header.edit',

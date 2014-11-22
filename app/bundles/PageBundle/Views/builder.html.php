@@ -57,7 +57,7 @@ $view['assets']->addStyleDeclaration($css);
 //Set the slots
 foreach ($slots as $slot) {
     $value = isset($content[$slot]) ? $content[$slot] : "";
-    $view['slots']->set($slot, "<div id=\"slot-{$slot}\" class=\"mautic-editable\" contenteditable=true data-placeholder=\"{$view['translator']->trans('mautic.page.page.builder.addcontent')}\">{$value}</div>");
+    $view['slots']->set($slot, "<div id=\"slot-{$slot}\" class=\"mautic-editable\" contenteditable=true data-placeholder=\"{$view['translator']->trans('mautic.page.builder.addcontent')}\">{$value}</div>");
 }
 
 //add builder toolbar

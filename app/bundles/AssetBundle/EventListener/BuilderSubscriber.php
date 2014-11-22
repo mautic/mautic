@@ -15,7 +15,7 @@ use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\AssetBundle\Helper\BuilderTokenHelper;
 use Mautic\PageBundle\Event\PageBuilderEvent;
-use Mautic\PageBundle\Event\PageEvent;
+use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
 
 /**
@@ -64,7 +64,7 @@ class BuilderSubscriber extends CommonSubscriber
         $this->replaceTokens($event, $leadId, $event->getSource());
     }
 
-    public function onPageDisplay (PageEvent $event)
+    public function onPageDisplay (PageDisplayEvent $event)
     {
         $page   = $event->getPage();
         $leadId = ($this->factory->getSecurity()->isAnonymous()) ? $this->factory->getModel('lead')->getCurrentLead()->getId() : null;

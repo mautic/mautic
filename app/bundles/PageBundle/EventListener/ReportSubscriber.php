@@ -53,7 +53,7 @@ class ReportSubscriber extends CommonSubscriber
         }
 
         $data = array(
-            'display_name' => 'mautic.page.page.report.table',
+            'display_name' => 'mautic.page.report.table',
             'columns'      => $columns
         );
 

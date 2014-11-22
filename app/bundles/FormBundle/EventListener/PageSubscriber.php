@@ -9,11 +9,10 @@
 
 namespace Mautic\FormBundle\EventListener;
 
-use Mautic\ApiBundle\Event\RouteEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\FormBundle\Helper\PageTokenHelper;
 use Mautic\PageBundle\Event\PageBuilderEvent;
-use Mautic\PageBundle\Event\PageEvent;
+use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
 
 /**
@@ -25,11 +24,11 @@ class PageSubscriber extends CommonSubscriber
     /**
      * {@inheritdoc}
      */
-    static public function getSubscribedEvents()
+    static public function getSubscribedEvents ()
     {
         return array(
-            PageEvents::PAGE_ON_DISPLAY    => array('onPageDisplay', 0),
-            PageEvents::PAGE_ON_BUILD      => array('OnPageBuild', 0)
+            PageEvents::PAGE_ON_DISPLAY => array('onPageDisplay', 0),
+            PageEvents::PAGE_ON_BUILD   => array('OnPageBuild', 0)
         );
     }
 
@@ -38,7 +37,7 @@ class PageSubscriber extends CommonSubscriber
      *
      * @param PageBuilderEvent $event
      */
-    public function onPageBuild(PageBuilderEvent $event)
+    public function onPageBuild (PageBuilderEvent $event)
     {
         $tokenHelper = new PageTokenHelper($this->factory);
         $event->addTokenSection('form.pagetokens', 'mautic.form.form.header.index', $tokenHelper->getTokenContent());
@@ -47,40 +46,38 @@ class PageSubscriber extends CommonSubscriber
     /**
      * @param PageEvent $event
      */
-    public function onPageDisplay(PageEvent $event)
+    public function onPageDisplay (PageDisplayEvent $event)
     {
         $content = $event->getContent();
         $page    = $event->getPage();
-        foreach ($content as $slot => &$html) {
-            $regex = '/{form=(.*?)}/i';
+        $regex   = '/{form=(.*?)}/i';
 
-            preg_match_all($regex, $html, $matches);
+        preg_match_all($regex, $content, $matches);
 
-            if (count($matches[0])) {
-                $model = $this->factory->getModel('form.form');
-                foreach ($matches[1] as $k => $id) {
-                    $form = $model->getEntity($id);
-                    if ($form !== null &&
-                        (
-                            $form->isPublished(false) ||
-                            $this->security->hasEntityAccess(
-                                'form:forms:viewown', 'form:forms:viewother', $form->getCreatedBy()
-                            )
+        if (count($matches[0])) {
+            $model = $this->factory->getModel('form');
+            foreach ($matches[1] as $k => $id) {
+                $form = $model->getEntity($id);
+                if ($form !== null &&
+                    (
+                        $form->isPublished(false) ||
+                        $this->security->hasEntityAccess(
+                            'form:forms:viewown', 'form:forms:viewother', $form->getCreatedBy()
                         )
-                    ) {
-                        $formHtml = ($form->isPublished()) ? $form->getCachedHtml() :
-                            '<div class="mauticform-error">' .
-                            $this->translator->trans('mautic.form.form.pagetoken.notpublished') .
-                            '</div>';
+                    )
+                ) {
+                    $formHtml = ($form->isPublished()) ? $form->getCachedHtml() :
+                        '<div class="mauticform-error">' .
+                        $this->translator->trans('mautic.form.form.pagetoken.notpublished') .
+                        '</div>';
 
-                        //add the hidden page input
-                        $pageInput = "\n<input type=\"hidden\" name=\"mauticform[mauticpage]\" value=\"{$page->getId()}\" />\n";
-                        $formHtml  = preg_replace("#</form>#", $pageInput . "</form>", $formHtml);
+                    //add the hidden page input
+                    $pageInput = "\n<input type=\"hidden\" name=\"mauticform[mauticpage]\" value=\"{$page->getId()}\" />\n";
+                    $formHtml  = preg_replace("#</form>#", $pageInput . "</form>", $formHtml);
 
-                        $html      = preg_replace('#{form='.$id.'}#', $formHtml, $html);
-                    } else {
-                        $html = preg_replace("#{form=".$id."}#", "", $html);
-                    }
+                    $content = preg_replace('#{form=' . $id . '}#', $formHtml, $content);
+                } else {
+                    $content = preg_replace("#{form=" . $id . "}#", "", $content);
                 }
             }
         }

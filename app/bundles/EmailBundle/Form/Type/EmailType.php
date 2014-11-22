@@ -186,7 +186,7 @@ class EmailType extends AbstractType
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
                 'tooltip' => 'mautic.email.form.customhtml.help',
-                'class'   => 'form-control advanced_editor_2rows'
+                'class'   => 'form-control editor-advanced-2rows'
             )
         ));
 

@@ -9,7 +9,7 @@
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'page');
-$view['slots']->set("headerTitle", $view['translator']->trans('mautic.page.page.header.index'));
+$view['slots']->set("headerTitle", $view['translator']->trans('mautic.page.header.index'));
 ?>
 
 <?php if ($permissions['page:pages:create']): ?>
@@ -19,7 +19,7 @@ $view['slots']->set("headerTitle", $view['translator']->trans('mautic.page.page.
            data-toggle="ajax"
            data-menu-link="#mautic_page_index">
            <i class="fa fa-plus"></i>
-            <?php echo $view["translator"]->trans("mautic.page.page.menu.new"); ?>
+            <?php echo $view["translator"]->trans("mautic.page.menu.new"); ?>
         </a>
     <?php $view['slots']->stop(); ?>
 <?php endif; ?>

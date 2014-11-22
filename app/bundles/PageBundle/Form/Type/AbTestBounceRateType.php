@@ -39,11 +39,11 @@ class VariantType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('weight', 'integer', array(
-            'label'      => 'mautic.page.page.form.trafficweight',
+            'label'      => 'mautic.page.form.trafficweight',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
                 'class'   => 'form-control',
-                'tooltip' => 'mautic.page.page.form.trafficweight.help'
+                'tooltip' => 'mautic.page.form.trafficweight.help'
             )
         ));
 
@@ -54,7 +54,7 @@ class VariantType extends AbstractType
             $choices  = $builderComponents['abTestWinnerCriteria']['choices'];
 
             $builder->add('winnerCriteria', 'choice', array(
-                'label'      => 'mautic.page.page.form.abtestwinner',
+                'label'      => 'mautic.page.form.abtestwinner',
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array(
                     'class'    => 'form-control',

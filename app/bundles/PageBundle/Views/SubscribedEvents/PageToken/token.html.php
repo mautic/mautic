@@ -10,15 +10,15 @@
 <div id="pageTokens">
     <div class="row ml-2 mr-2 mb-2">
         <div class="col-sm-6">
-            <a href="#" data-toggle="tooltip" data-token="{langbar}" class="btn btn-default btn-block" title="<?php echo $view['translator']->trans('mautic.page.page.token.lang.descr'); ?>">
+            <a href="#" data-toggle="tooltip" data-token="{langbar}" class="btn btn-default btn-block" title="<?php echo $view['translator']->trans('mautic.page.token.lang.descr'); ?>">
                 <i class="fa fa-language"></i><br />
-                <?php echo $view['translator']->trans('mautic.page.page.token.lang'); ?>
+                <?php echo $view['translator']->trans('mautic.page.token.lang'); ?>
             </a>
         </div>
         <div class="col-sm-6">
-            <a href="#" data-toggle="tooltip" data-token="{sharebuttons}" class="btn btn-default btn-block" title="<?php echo $view['translator']->trans('mautic.page.page.token.share.descr'); ?>">
+            <a href="#" data-toggle="tooltip" data-token="{sharebuttons}" class="btn btn-default btn-block" title="<?php echo $view['translator']->trans('mautic.page.token.share.descr'); ?>">
                 <i class="fa fa-share-alt-square"></i><br />
-                <?php echo $view['translator']->trans('mautic.page.page.token.share'); ?>
+                <?php echo $view['translator']->trans('mautic.page.token.share'); ?>
             </a>
         </div>
     </div>

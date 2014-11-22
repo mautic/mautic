@@ -26,7 +26,7 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
     $activePage->getCreatedBy())): ?>
     <a class="btn btn-default" href="javascript:void(0);"
        onclick="Mautic.showConfirmation(
-           '<?php echo $view->escape($view["translator"]->trans("mautic.page.page.confirmdelete",
+           '<?php echo $view->escape($view["translator"]->trans("mautic.page.confirmdelete",
            array("%name%" => $activePage->getTitle() . " (" . $activePage->getId() . ")")), 'js'); ?>',
            '<?php echo $view->escape($view["translator"]->trans("mautic.core.form.delete"), 'js'); ?>',
            'executeAction',
@@ -45,7 +45,7 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
         data-toggle="ajax"
         data-menu-link="mautic_page_index">
         <i class="fa fa-sitemap"></i>
-        <?php echo $view['translator']->trans('mautic.page.page.form.abtest'); ?>
+        <?php echo $view['translator']->trans('mautic.page.form.abtest'); ?>
     </a>
 <?php endif; ?>
 <?php $view['slots']->stop(); ?>
@@ -116,7 +116,7 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                             <div class="panel-body box-layout">
                                 <div class="col-xs-8 va-m">
                                     <h5 class="dark-md fw-sb mb-xs">
-                                        <?php echo $view['translator']->trans('mautic.page.page.pageviews'); ?>
+                                        <?php echo $view['translator']->trans('mautic.page.pageviews'); ?>
                                     </h5>
                                 </div>
                                 <div class="col-xs-4 va-t text-right">
@@ -138,7 +138,7 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                             <div class="panel-body box-layout pb-0">
                                 <div class="col-xs-8 va-m">
                                     <h5 class="dark-md fw-sb mb-xs">
-                                        <?php echo $view['translator']->trans('mautic.page.page.new.returning'); ?>
+                                        <?php echo $view['translator']->trans('mautic.page.new.returning'); ?>
                                     </h5>
                                 </div>
                                 <div class="col-xs-4 va-t text-right">
@@ -162,7 +162,7 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                             <div class="panel-body box-layout pb-0">
                                 <div class="col-xs-8 va-m">
                                     <h5 class="dark-md fw-sb mb-xs">
-                                        <?php echo $view['translator']->trans('mautic.page.page.time.on.page'); ?>
+                                        <?php echo $view['translator']->trans('mautic.page.time.on.page'); ?>
                                     </h5>
                                 </div>
                                 <div class="col-xs-4 va-t text-right">
@@ -193,12 +193,12 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
             <ul class="nav nav-tabs pr-md pl-md">
                 <li class="active">
                     <a href="#variants-container" role="tab" data-toggle="tab">
-                        <?php echo $view['translator']->trans('mautic.page.page.variants'); ?>
+                        <?php echo $view['translator']->trans('mautic.page.variants'); ?>
                     </a>
                 </li>
                 <li class="">
                     <a href="#translation-container" role="tab" data-toggle="tab">
-                        <?php echo $view['translator']->trans('mautic.page.page.translations'); ?>
+                        <?php echo $view['translator']->trans('mautic.page.translations'); ?>
                     </a>
                 </li>
             </ul>
@@ -214,7 +214,7 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                 <div class="box-layout mb-lg">
                     <!-- button -->
                     <div class="col-xs-2 va-m text-right">
-                        <a href="javascript: void(0);" data-toggle="modal" class="btn btn-primary"><?php echo $view['translator']->trans('mautic.page.page.ab.test.stats'); ?></a>
+                        <a href="javascript: void(0);" data-toggle="modal" class="btn btn-primary"><?php echo $view['translator']->trans('mautic.page.ab.test.stats'); ?></a>
                     </div>
                 </div>
                 <!--/ header -->
@@ -238,9 +238,9 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                                 <h5 class="fw-sb text-primary">
                                     <a href="<?php echo $view['router']->generate('mautic_page_action', array('objectAction' => 'view', 'objectId' => $variants['parent']->getId())); ?>" data-toggle="ajax"><?php echo $variants['parent']->getTitle(); ?>
                                         <?php if ($variants['parent']->getId() == $activePage->getId()) : ?>
-                                        <span>[<?php echo $view['translator']->trans('mautic.page.page.current'); ?>]</span>
+                                        <span>[<?php echo $view['translator']->trans('mautic.page.current'); ?>]</span>
                                         <?php endif; ?>
-                                        <span>[<?php echo $view['translator']->trans('mautic.page.page.parent'); ?>]</span>
+                                        <span>[<?php echo $view['translator']->trans('mautic.page.parent'); ?>]</span>
                                     </a>
                                 </h5>
                                 <span class="text-white dark-sm"><?php echo $variants['parent']->getAlias(); ?></span>
@@ -267,7 +267,7 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                                 <h5 class="fw-sb text-primary">
                                     <a href="<?php echo $view['router']->generate('mautic_page_action', array('objectAction' => 'view', 'objectId' => $variant->getId())); ?>" data-toggle="ajax"><?php echo $variant->getTitle(); ?>
                                         <?php if ($variant->getId() == $activePage->getId()) : ?>
-                                        <span>[<?php echo $view['translator']->trans('mautic.page.page.current'); ?>]</span>
+                                        <span>[<?php echo $view['translator']->trans('mautic.page.current'); ?>]</span>
                                         <?php endif; ?>
                                     </a>
                                 </h5>
@@ -276,7 +276,7 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                             <div class="col-md-4 va-m text-right">
                                 <?php if (isset($abTestResults['winners']) && $variants['parent']->getVariantStartDate() && $variant->isPublished()): ?>
                                     <a href="<?php echo $view['router']->generate('mautic_page_action', array('objectAction' => 'winner', 'objectId' => $variant->getId())); ?>" data-toggle="ajax" data-method="post" class="btn btn-default">
-                                        <span class="fa fa-trophy mr-xs"></span> <?php echo $view['translator']->trans('mautic.page.page.abtest.makewinner'); ?>
+                                        <span class="fa fa-trophy mr-xs"></span> <?php echo $view['translator']->trans('mautic.page.abtest.makewinner'); ?>
                                     </a>
                                 <?php endif; ?>
                             </div>
@@ -311,9 +311,9 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                                         <h5 class="fw-sb text-primary">
                                             <a href="<?php echo $view['router']->generate('mautic_page_action', array('objectAction' => 'view', 'objectId' => $translations['parent']->getId())); ?>" data-toggle="ajax"><?php echo $translations['parent']->getTitle(); ?>
                                                 <?php if ($translations['parent']->getId() == $activePage->getId()) : ?>
-                                                    <span>[<?php echo $view['translator']->trans('mautic.page.page.current'); ?>]</span>
+                                                    <span>[<?php echo $view['translator']->trans('mautic.page.current'); ?>]</span>
                                                 <?php endif; ?>
-                                                <span>[<?php echo $view['translator']->trans('mautic.page.page.parent'); ?>]</span>
+                                                <span>[<?php echo $view['translator']->trans('mautic.page.parent'); ?>]</span>
                                             </a>
                                         </h5>
                                         <span class="text-white dark-sm"><?php echo $translations['parent']->getAlias(); ?></span>
@@ -342,7 +342,7 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
                                             <h5 class="fw-sb text-primary">
                                                 <a href="<?php echo $view['router']->generate('mautic_page_action', array('objectAction' => 'view', 'objectId' => $translation->getId())); ?>" data-toggle="ajax"><?php echo $translation->getTitle(); ?>
                                                     <?php if ($translation->getId() == $activePage->getId()) : ?>
-                                                        <span>[<?php echo $view['translator']->trans('mautic.page.page.current'); ?>]</span>
+                                                        <span>[<?php echo $view['translator']->trans('mautic.page.current'); ?>]</span>
                                                     <?php endif; ?>
                                                 </a>
                                             </h5>
@@ -370,7 +370,7 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
         <!-- preview URL -->
         <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
             <div class="panel-heading">
-                <?php $trans = (!empty($variants['parent'])) ? 'mautic.page.page.urlvariant' : 'mautic.page.page.url'; ?>
+                <?php $trans = (!empty($variants['parent'])) ? 'mautic.page.urlvariant' : 'mautic.page.url'; ?>
                 <div class="panel-title"><?php echo $view['translator']->trans($trans); ?></div>
             </div>
             <div class="panel-body pt-xs">
