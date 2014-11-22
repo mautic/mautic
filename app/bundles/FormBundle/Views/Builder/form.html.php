@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -30,10 +30,10 @@ $required = array();
 			else:
 				$template = 'MauticFormBundle:Field:' . $f->getType() . '.html.php';
 			endif;
-			
+
 			echo $view->render($template, array('field' => $f->convertToArray(), 'id' => $f->getAlias()));
 	endforeach; ?>
-	
+
 	<div class="mauticform-row mauticform-hidden">
 	    <input type="hidden" name="mauticform[formid]" value="<?php echo $form->getId(); ?>" />
 	    <input type="hidden" name="mauticform[return]" id="mauticform_<?php echo $formName ?>_return" value="" />

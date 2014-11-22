@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -311,7 +311,7 @@ class AssetsHelper extends CoreAssetsHelper
 
     /**
      * Turn all URLs in clickable links.
-     * 
+     *
      * @param string $text
      * @param array  $protocols  http/https, ftp, mail, twitter
      * @param array  $attributes
@@ -327,14 +327,14 @@ class AssetsHelper extends CoreAssetsHelper
             foreach ($attributes as $key => $val) {
                 $attr = ' ' . $key . '="' . htmlentities($val) . '"';
             }
-            
+
             $links = array();
-            
+
             // Extract existing links and tags
             $text = preg_replace_callback('~(<a .*?>.*?</a>|<.*?>)~i', function ($match) use (&$links) {
                 return '<' . array_push($links, $match[1]) . '>';
             }, $text);
-            
+
             // Extract text links for each protocol
             foreach ((array)$protocols as $protocol) {
                 switch ($protocol) {
@@ -363,7 +363,7 @@ class AssetsHelper extends CoreAssetsHelper
                         break;
                 }
             }
-            
+
             // Insert all link
             return preg_replace_callback('/<(\d+)>/', function ($match) use (&$links) {
                 return $links[$match[1] - 1];
@@ -392,7 +392,7 @@ class AssetsHelper extends CoreAssetsHelper
                 $text
             );
         }
-        
+
     }
 
     /**

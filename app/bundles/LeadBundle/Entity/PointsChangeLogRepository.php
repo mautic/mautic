@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -21,7 +21,7 @@ class PointsChangeLogRepository extends CommonRepository
 
     /**
      * Fetch Lead's points for some period of time.
-     * 
+     *
      * @param integer $quantity of units
      * @param string $unit of time php.net/manual/en/class.dateinterval.php#dateinterval.props
      * @param array $args
@@ -57,7 +57,7 @@ class PointsChangeLogRepository extends CommonRepository
             $q2->where($q->expr()->eq('IDENTITY(pl.lead)', ':lead'))
                 ->setParameter('lead', $args['lead_id']);
         }
-        
+
         $q2->andwhere($q->expr()->lt('pl.dateAdded', ':date'))
             ->setParameter('date', $graphData['fromDate']);
 
