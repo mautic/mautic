@@ -15,8 +15,85 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-Mautic is released under the GPL v3
+Mautic is released under the GPL v3.
 
+Mautic is a registered trademark of David Hurley.
+
+Mautic includes works under other copyright notices and distributed
+according to the terms of the GNU General Public License or a compatible
+license, including:
+
+CSS
+
+    Font Awesome - MIT - by Dave Gandy - http://fontawesome.io
+
+Javascript
+
+    Bootstrap - MIT - Copyright (c) 2011-2014 Twitter, Inc
+
+    Chart.js - MIT - Copyright 2014 Nick Downie
+
+    Chosen - MIT - Copyright (c) 2011-2014 Harvest http://getharvest.com
+
+    Fullcalendar - MIT - (c) 2013 Adam Shaw
+
+    jsPlumb - MIT - Copyright (c) 2010 - 2013 Simon Porritt (simon.porritt@gmail.com)
+
+    jQuery - MIT - Copyright 2005, 2014 jQuery Foundation, Inc. and other contributors
+
+    jQuery DateTimePicker Plugin - MIT - (c) 2014, Chupurnov Valeriy
+
+    jQuery Form Plugin - MIT & GPL - Copyright (c) 2014 M. Alsup
+
+    jQuery Sparkline - New BSD - (c) Splunk, Inc
+
+    jQuery UI - MIT - Copyright 2014 jQuery Foundation and other contributors
+
+    jQuery UI Touchpoint - MIT & GPLv2 - Copyright 2011–2014, Dave Furfero
+
+    JQVMap - MIT - Copyright 2012, Peter Schmalfeldt; Copyright 2011-2012, Kirill Lebedev
+
+    Modernizr - MIT & BSD
+
+    Moment.js - MIT - Tim Wood, Iskren Chernev, Moment.js contributors
+
+    Mousetrap - Apache License, Version 2.0 - Copyright 2013 Craig Campbell
+
+    Pick-a-Color - MIT - Copyright 2013 Lauren Sperber and Broadstreet Ads
+
+    Shuffle.js - MIT - by @Vestride
+
+    Tinycolor.js - MIT - 2013-07-04, Brian Grinstead
+
+    Typeahead.js - MIT - Copyright 2013-2014 Twitter, Inc. and other contributors
+
+PHP
+
+    Doctrine - MIT - Copyright (c) 2006-2014 Doctrine Project
+
+    JMS Serializer - Apache License v2.0 - (C) 2013 Johannes Schmitt
+
+    Joomla HTTP - GPL2 or later - Copyright (C) 2005 - 2013 Open Source Matters, Inc. All rights reserved.
+
+    KNP-Menu - MIT - Copyright (c) 2011 KnpLabs - http://www.knplabs.com
+
+    Minify - New BSD - Copyright (c) 2008 Ryan Grove, Copyright (c) 2008 Steve Clay
+
+    mPDF - GPL - Copyright © 2005 - 2014  Ian N Back
+
+    OAuth1 Server Bundle - MIT - Copyright (c) 2011-2012 William Durand
+
+    OAuth2 Server Bundle, Rest Bundle - MIT - Copyright (c) 2010 Tim Ridgely
+
+    Password-compat - MIT - Copyright (c) 2012 Anthony Ferrara
+
+    PHPExcel - LGPL - Copyright (c) 2006 - 2014 PHPExcel
+
+    Symfony - MIT - Copyright (c) 2004-2013 Fabien Potencier
+
+
+Mautic may include other GPLv3 compatible works that are not listed above.  Please
+refer to their corresponding licensing and copyright information.
 --------------------------------------------------------------------
 
                     GNU GENERAL PUBLIC LICENSE
