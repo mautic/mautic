@@ -98,7 +98,7 @@ if ($tmpl == 'index') {
                                 array(
                                     'attr' => array(
                                         'href'   => 'javascript: void(0);',
-                                        'onlick' =>
+                                        'onclick' =>
                                             "Mautic.showConfirmation(
                                            '{$view->escape($view["translator"]->trans("mautic.email.form.confirmsend",
                                                 array("%name%" => $item->getSubject() . " (" . $item->getId() . ")")), 'js')}',
