@@ -213,9 +213,7 @@ class BuilderSubscriber extends CommonSubscriber
             $clickthrough['lead'] = $lead['id'];
         }
 
-        foreach ($content as $slot => &$html) {
-            $this->renderPageUrl($html, $clickthrough);
-        }
+        $this->renderPageUrl($content, $clickthrough);
 
         $event->setContent($content);
     }

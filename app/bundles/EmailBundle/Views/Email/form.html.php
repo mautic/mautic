@@ -22,6 +22,8 @@ $header = ($email->getId()) ?
     $view['translator']->trans('mautic.email.header.new');
 
 $view['slots']->set("headerTitle", $header.$subheader);
+
+$contentMode = $form['contentMode']->vars['data'];
 ?>
     <!-- start: box layout -->
 <?php echo $view['form']->start($form); ?>
@@ -37,8 +39,22 @@ $view['slots']->set("headerTitle", $header.$subheader);
                         <?php echo $view['form']->row($form['contentMode']); ?>
                     </div>
                 </div>
-                <div id="customHtmlContainer">
+                <div id="customHtmlContainer"<?php echo ($contentMode == 'builder') ? ' class="hide"' : ''; ?>>
                     <?php echo $view['form']->row($form['customHtml']); ?>
+                </div>
+                <div id="builderHtmlContainer"<?php echo ($contentMode == 'custom') ? ' class="hide"' : ''; ?>>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <?php echo $view['form']->row($form['template']); ?>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mt-20 pt-2">
+                                <button type="button" class="btn btn-primary" onclick="Mautic.launchEmailEditor();">
+                                    <i class="fa fa-cube text-mautic "></i><?php echo $view['translator']->trans('mautic.email.launch.builder'); ?>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <?php echo $view['form']->row($form['plainText']); ?>
             </div>
@@ -47,7 +63,6 @@ $view['slots']->set("headerTitle", $header.$subheader);
             <div class="pr-lg pl-lg pt-md pb-md">
                 <?php if (isset($form['variantSettings'])): ?>
                     <?php echo $view['form']->row($form['variantSettings']); ?>
-                    <?php echo $view['form']->row($form['template']); ?>
                     <?php echo $view['form']->row($form['isPublished']); ?>
                     <?php echo $view['form']->row($form['publishUp']); ?>
                     <?php echo $view['form']->row($form['publishDown']); ?>

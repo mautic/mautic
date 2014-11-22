@@ -46,7 +46,7 @@ class EmailType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber(array('content' => 'html')));
+        $builder->addEventSubscriber(new CleanFormSubscriber(array('content' => 'html', 'customHtml' => 'html')));
         $builder->addEventSubscriber(new FormExitSubscriber('email.email', $options));
 
         $variantParent = $options['data']->getVariantParent();
@@ -198,19 +198,7 @@ class EmailType extends AbstractType
 
         $builder->add('sessionId', 'hidden');
 
-        $builder->add('buttons', 'form_buttons', array(
-            'pre_extra_buttons' => array(
-                array(
-                    'name'  => 'builder',
-                    'label' => 'mautic.email.launch.builder',
-                    'attr'  => array(
-                        'class'   => 'btn btn-default' . (($contentMode == 'custom') ? ' hide' : ''),
-                        'icon'    => 'fa fa-cube text-mautic',
-                        'onclick' => "Mautic.launchEmailEditor();"
-                    )
-                )
-            )
-        ));
+        $builder->add('buttons', 'form_buttons');
 
         if (!empty($options["action"])) {
             $builder->setAction($options["action"]);

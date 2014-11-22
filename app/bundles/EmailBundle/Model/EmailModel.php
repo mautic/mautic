@@ -595,16 +595,15 @@ class EmailModel extends FormModel
      * Gets template, stats, weights, etc for an email in preparation to be sent
      *
      * @param Email $email
+     * @param bool  $includeVariants
      *
      * @return array
      */
-    public function getEmailSettings(Email $email)
+    public function getEmailSettings(Email $email, $includeVariants = true)
     {
         static $emailSettings = array();
 
         if (empty($emailSettings[$email->getId()])) {
-            //get a list of variants for A/B testing
-            $childrenVariant = $email->getVariantChildren();
 
             //used to house slots so they don't have to be fetched over and over for same template
             $slots            = array();
@@ -623,46 +622,52 @@ class EmailModel extends FormModel
                 )
             );
 
-            if (count($childrenVariant)) {
-                $variantWeight = 0;
-                $totalSent     = $email->getVariantSentCount();
+            if ($includeVariants) {
+                //get a list of variants for A/B testing
+                $childrenVariant = $email->getVariantChildren();
 
-                foreach ($childrenVariant as $id => $child) {
-                    if ($child->isPublished()) {
-                        $template = $child->getTemplate();
-                        if (isset($slots[$template])) {
-                            $useSlots = $slots[$template];
-                        } else {
-                            $slots[$template] = $this->factory->getTheme($template())->getSlots('email');
-                            $useSlots         = $slots[$template];
+
+                if (count($childrenVariant)) {
+                    $variantWeight = 0;
+                    $totalSent     = $email->getVariantSentCount();
+
+                    foreach ($childrenVariant as $id => $child) {
+                        if ($child->isPublished()) {
+                            $template = $child->getTemplate();
+                            if (isset($slots[$template])) {
+                                $useSlots = $slots[$template];
+                            } else {
+                                $slots[$template] = $this->factory->getTheme($template())->getSlots('email');
+                                $useSlots         = $slots[$template];
+                            }
+                            $variantSettings = $child->getVariantSettings();
+
+                            $emailSettings[$child->getId()] = array(
+                                'template'     => $child->getTemplate(),
+                                'slots'        => $useSlots,
+                                'sentCount'    => $child->getSentCount(),
+                                'variantCount' => $child->getVariantSentCount(),
+                                'weight'       => ($variantSettings['weight'] / 100),
+                                'entity'       => $child
+                            );
+
+                            $variantWeight += $variantSettings['weight'];
+                            $totalSent += $emailSettings[$child->getId()]['sentCount'];
                         }
-                        $variantSettings = $child->getVariantSettings();
-
-                        $emailSettings[$child->getId()] = array(
-                            'template'     => $child->getTemplate(),
-                            'slots'        => $useSlots,
-                            'sentCount'    => $child->getSentCount(),
-                            'variantCount' => $child->getVariantSentCount(),
-                            'weight'       => ($variantSettings['weight'] / 100),
-                            'entity'       => $child
-                        );
-
-                        $variantWeight += $variantSettings['weight'];
-                        $totalSent += $emailSettings[$child->getId()]['sentCount'];
                     }
-                }
 
-                //set parent weight
-                $emailSettings[$email->getId()]['weight'] = ((100 - $variantWeight) / 100);
+                    //set parent weight
+                    $emailSettings[$email->getId()]['weight'] = ((100 - $variantWeight) / 100);
 
-                //now find what percentage of current leads should receive the variants
-                foreach ($emailSettings as $eid => &$details) {
-                    $details['weight'] = ($totalSent) ?
-                        ($details['weight'] - ($details['variantCount'] / $totalSent)) + $details['weight'] :
-                        $details['weight'];
+                    //now find what percentage of current leads should receive the variants
+                    foreach ($emailSettings as $eid => &$details) {
+                        $details['weight'] = ($totalSent) ?
+                            ($details['weight'] - ($details['variantCount'] / $totalSent)) + $details['weight'] :
+                            $details['weight'];
+                    }
+                } else {
+                    $emailSettings[$email->getId()]['weight'] = 1;
                 }
-            } else {
-                $emailSettings[$email->getId()]['weight'] = 1;
             }
         }
 
@@ -688,8 +693,6 @@ class EmailModel extends FormModel
             $leads = array($leads['id'] => $leads);
         }
 
-        $dispatcher   = $this->factory->getDispatcher();
-        $hasListeners = $dispatcher->hasListeners(EmailEvents::EMAIL_ON_SEND);
         $templating   = $this->factory->getTemplating();
         $slotsHelper  = $templating->getEngine('MauticEmailBundle::public.html.php')->get('slots');
         /** @var \Mautic\EmailBundle\Entity\StatRepository $statRepo */
@@ -743,25 +746,24 @@ class EmailModel extends FormModel
         foreach ($sendTo as $lead) {
             $idHash = uniqid();
 
-            if ($hasListeners) {
-                $event = new EmailSendEvent($useEmail['entity'], $lead, $idHash, $source);
-                $event->setSlotsHelper($slotsHelper);
-                $dispatcher->dispatch(EmailEvents::EMAIL_ON_SEND, $event);
-                $content = $event->getContent();
-                unset($event);
+            $mailer = $this->factory->getMailer();
+
+            $mailer->setLead($lead);
+            $mailer->setIdHash($idHash);
+            $mailer->setSource($source);
+
+            if ($useEmail['entity']->getContentMode() == 'builder') {
+                $mailer->setTemplate('MauticEmailBundle::public.html.php', array(
+                    'slots'    => $useEmail['slots'],
+                    'content'  => $useEmail['entity']->getContent(),
+                    'email'    => $useEmail['entity'],
+                    'template' => $useEmail['template'],
+                    'idHash'   => $idHash
+                ));
             } else {
-                $content = $email->getContent();
+                $mailer->setBody($useEmail['entity']->getCustomHtml());
             }
 
-            $mailer = $this->factory->getMailer();
-            $mailer->setTemplate('MauticEmailBundle::public.html.php', array(
-                'slots'    => $useEmail['slots'],
-                'content'  => $content,
-                'email'    => $useEmail['entity'],
-                'template' => $useEmail['template'],
-                'idHash'   => $idHash,
-
-            ));
             $mailer->message->setTo(array($lead['email'] => $lead['firstname'] . ' ' . $lead['lastname']));
             $mailer->message->setSubject($useEmail['entity']->getSubject());
 
@@ -773,7 +775,7 @@ class EmailModel extends FormModel
             $mailer->message->leadIdHash = $idHash;
 
             //queue the message
-            $mailer->send();
+            $mailer->send(true);
 
             //save some memory
             unset($mailer);
@@ -830,12 +832,8 @@ class EmailModel extends FormModel
             $users = array($user);
         }
 
-        $dispatcher   = $this->factory->getDispatcher();
-        $templating   = $this->factory->getTemplating();
-
-        //get email settings such as templates, weights, etc
-        $emailSettings = $this->getEmailSettings($email);
-        $emailSettings = reset($emailSettings);
+        //get email settings
+        $emailSettings = $this->getEmailSettings($email, false);
 
         //noone to send to so bail
         if (empty($users)) {
@@ -844,7 +842,6 @@ class EmailModel extends FormModel
 
         foreach ($users as $user) {
             $idHash = uniqid();
-            $content = $email->getContent();
 
             if (!isset($user['email'])) {
                 /** @var \Mautic\UserBundle\Model\UserModel $model */
@@ -856,14 +853,19 @@ class EmailModel extends FormModel
             }
 
             $mailer = $this->factory->getMailer();
-            $mailer->setTemplate('MauticEmailBundle::public.html.php', array(
-                'slots'    => $emailSettings['slots'],
-                'content'  => $content,
-                'email'    => $emailSettings['entity'],
-                'template' => $emailSettings['template'],
-                'idHash'   => $idHash,
 
-            ));
+            if ($email->getContentMode() == 'builder') {
+                $mailer->setTemplate('MauticEmailBundle::public.html.php', array(
+                    'slots'    => $emailSettings['slots'],
+                    'content'  => $email->getContent(),
+                    'email'    => $emailSettings['entity'],
+                    'template' => $emailSettings['template'],
+                    'idHash'   => $idHash
+                ));
+            } else {
+                $mailer->setBody($email->getCustomHtml());
+            }
+
             $mailer->message->setTo(array($user['email'] => $user['firstname'] . ' ' . $user['lastname']));
             $mailer->message->setSubject($emailSettings['entity']->getSubject());
 
@@ -872,7 +874,7 @@ class EmailModel extends FormModel
             }
 
             //queue the message
-            $mailer->send();
+            $mailer->send(true);
 
             //save some memory
             unset($mailer);

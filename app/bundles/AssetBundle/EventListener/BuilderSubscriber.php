@@ -86,17 +86,15 @@ class BuilderSubscriber extends CommonSubscriber
             $clickthrough['lead'] = $leadId;
         }
 
-        foreach ($content as $slot => &$html) {
-            preg_match_all($pagelinkRegex, $html, $matches);
-            if (!empty($matches[1])) {
-                foreach ($matches[1] as $match) {
-                    if (empty($assets[$match])) {
-                        $assets[$match] = $model->getEntity($match);
-                    }
-
-                    $url  = ($assets[$match] !== null) ? $model->generateUrl($assets[$match], true, $clickthrough) : '';
-                    $html = str_ireplace('{assetlink=' . $match . '}', $url, $html);
+        preg_match_all($pagelinkRegex, $content, $matches);
+        if (!empty($matches[1])) {
+            foreach ($matches[1] as $match) {
+                if (empty($assets[$match])) {
+                    $assets[$match] = $model->getEntity($match);
                 }
+
+                $url  = ($assets[$match] !== null) ? $model->generateUrl($assets[$match], true, $clickthrough) : '';
+                $content = str_ireplace('{assetlink=' . $match . '}', $url, $content);
             }
         }
 

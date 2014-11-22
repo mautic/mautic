@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailSendEvent;
+use Symfony\Component\HttpFoundation\Response;
 
 class EmailController extends FormController
 {
@@ -866,30 +867,36 @@ class EmailController extends FormController
             return $this->accessDenied();
         }
 
-        //all the checks pass so display the content
-        $template   = $entity->getTemplate();
-        $slots      = $this->factory->getTheme($template)->getSlots('email');
+        //bogus ID
+        $idHash = 'xxxxxxxxxxxxxx';
+
+        if ($entity->getContentMode() == 'builder') {
+            $template   = $entity->getTemplate();
+            $slots      = $this->factory->getTheme($template)->getSlots('email');
+
+            $response = $this->render('MauticEmailBundle::public.html.php', array(
+                'inBrowser' => true,
+                'slots'     => $slots,
+                'content'   => $entity->getContent(),
+                'email'     => $entity,
+                'lead'      => null,
+                'template'  => $template,
+                'idHash'    => $idHash
+            ));
+
+            //replace tokens
+            $content = $response->getContent();
+        } else {
+            $content = $entity->getCustomHtml();
+        }
 
         $dispatcher = $this->get('event_dispatcher');
         if ($dispatcher->hasListeners(EmailEvents::EMAIL_ON_DISPLAY)) {
-            $event = new EmailSendEvent($entity, null, 'xxxxxxxxxxx');
-            $slotsHelper = $this->factory->getTemplating()
-                ->getEngine('MauticEmailBundle::public.html.php')->get('slots');
-            $event->setSlotsHelper($slotsHelper);
+            $event = new EmailSendEvent($content, $entity, null, $idHash);
             $dispatcher->dispatch(EmailEvents::EMAIL_ON_DISPLAY, $event);
             $content = $event->getContent();
-        } else {
-            $content = $entity->getContent();
         }
 
-        return $this->render('MauticEmailBundle::public.html.php', array(
-            'inBrowser' => true,
-            'slots'     => $slots,
-            'content'   => $content,
-            'email'     => $entity,
-            'lead'      => null,
-            'template'  => $template,
-            'idHash'    => 'xxxxxxxxxxx'
-        ));
+        return new Response($content);
     }
 }

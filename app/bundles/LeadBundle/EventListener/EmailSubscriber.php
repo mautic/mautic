@@ -55,13 +55,12 @@ class EmailSubscriber extends CommonSubscriber
         $regex    = '/{leadfield=(.*?)}/';
 
         $lead = $event->getLead();
-        foreach ($content as $slot => &$html) {
-            preg_match_all($regex, $html, $matches);
-            if (!empty($matches[1])) {
-                foreach ($matches[1] as $match) {
-                    if (isset($lead[$match])) {
-                        $html = str_ireplace('{leadfield=' . $match . '}', $lead[$match], $html);
-                    }
+
+        preg_match_all($regex, $content, $matches);
+        if (!empty($matches[1])) {
+            foreach ($matches[1] as $match) {
+                if (isset($lead[$match])) {
+                    $content = str_ireplace('{leadfield=' . $match . '}', $lead[$match], $content);
                 }
             }
         }

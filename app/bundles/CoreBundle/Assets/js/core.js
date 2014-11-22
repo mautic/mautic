@@ -231,6 +231,10 @@ var Mautic = {
                             .html(mQuery(this).html())
                             .appendTo(container + ' .modal-form-buttons')
                             .on('click.ajaxform', function (event) {
+                                if (mQuery(this).hasClass('disabled')) {
+                                    return false;
+                                }
+
                                 event.preventDefault();
                                 Mautic.startIconSpinOnEvent(event);
                                 mQuery('#' + id).click();
@@ -254,6 +258,7 @@ var Mautic = {
                         var id = mQuery(this).attr('id');
                         var button = mQuery("<button type='button' />")
                             .addClass(mQuery(this).attr('class'))
+                            .attr('id', mQuery(this).attr('id') + '_toolbar')
                             .html(mQuery(this).html())
                             .appendTo('.toolbar-form-buttons')
                             .on('click.ajaxform', function (event) {
@@ -268,13 +273,16 @@ var Mautic = {
         }
 
         //activate editors
-        if (mQuery(container + " textarea.editor").length) {
-            mQuery(container + " textarea.editor").ckeditor();
-        }
-
-        if (mQuery(container + " textarea.advanced_editor").length) {
-            mQuery(container + " textarea.advanced_editor").ckeditor({ toolbar: 'advanced' });
-        }
+        mQuery.each(['editor', 'advanced_editor', 'advanced_editor_2rows'], function(index, editorClass) {
+            if (mQuery(container + ' textarea.' + editorClass).length) {
+                if (editorClass == 'editor') {
+                    mQuery(container + ' textarea.editor').ckeditor();
+                } else {
+                    var toolbar = editorClass.replace('_editor', '');
+                    mQuery(container + ' textarea.' + editorClass).ckeditor({ toolbar: toolbar });
+                }
+            }
+        });
 
         //run specific on loads
         var contentSpecific = false;
@@ -354,13 +362,15 @@ var Mautic = {
                 }
             });
 
-            mQuery(container + ' textarea.editor').each(function() {
-                for (var name in CKEDITOR.instances) {
-                    var instance = CKEDITOR.instances[name];
-                    if (this && this == instance.element.$) {
-                        instance.destroy(true);
+            mQuery.each(['editor', 'advanced_editor', 'advanced_editor_2rows'], function(index, editorClass) {
+                mQuery(container + ' textarea.' + editorClass).each(function() {
+                    for (var name in CKEDITOR.instances) {
+                        var instance = CKEDITOR.instances[name];
+                        if (this && this == instance.element.$) {
+                            instance.destroy(true);
+                        }
                     }
-                }
+                });
             });
         }
 

@@ -10,6 +10,8 @@
 namespace Mautic\CoreBundle\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\EmailBundle\EmailEvents;
+use Mautic\EmailBundle\Event\EmailSendEvent;
 
 /**
  * Class MailHelper
@@ -41,6 +43,27 @@ class MailHelper
      * @var array
      */
     private $errors = array();
+
+    /**
+     * @var null
+     */
+    private $lead = null;
+
+    /**
+     * @var null
+     */
+    private $idHash = null;
+
+    /**
+     * @var array
+     */
+    private $source = array();
+
+    /**
+     * @var null
+     */
+    private $email = null;
+
 
     /**
      * @param MauticFactory $factory
@@ -76,11 +99,25 @@ class MailHelper
     /**
      * Send the message
      *
+     * @param bool $dispatchSendEvent
+     *
      * @return bool
      */
-    public function send()
+    public function send($dispatchSendEvent = false)
     {
         if (empty($this->errors)) {
+            if ($dispatchSendEvent) {
+                $dispatcher   = $this->factory->getDispatcher();
+                $hasListeners = $dispatcher->hasListeners(EmailEvents::EMAIL_ON_SEND);
+                if ($hasListeners) {
+                    $content = $this->message->getBody();
+                    $event   = new EmailSendEvent($content, $this->email, $this->lead, $this->idHash, $this->source);
+                    $dispatcher->dispatch(EmailEvents::EMAIL_ON_SEND, $event);
+                    $content = $event->getContent();
+                    $this->message->setBody($content);
+                }
+            }
+
             $from = $this->message->getFrom();
             if (empty($from)) {
                 $this->message->setFrom($this->from);
@@ -145,10 +182,87 @@ class MailHelper
      *
      * @param string $template
      * @param array  $vars
+     * @param bool   $replaceTokens
+     * @param null   $charset
      */
-    public function setTemplate($template, $vars = array())
+    public function setTemplate($template, $vars = array(), $charset = null)
     {
         $content = $this->factory->getTemplating()->renderResponse($template, $vars)->getContent();
-        $this->message->setBody($content, 'text/html');
+
+        $this->message->setBody($content, 'text/html', $charset);
+    }
+
+    /**
+     * @param        $content
+     * @param string $contentType
+     * @param null   $charset
+     */
+    public function setBody($content, $contentType = 'text/html', $charset = null)
+    {
+        $this->message->setBody($content, $contentType, $charset);
+    }
+
+    /**
+     * @return null
+     */
+    public function getIdHash ()
+    {
+        return $this->idHash;
+    }
+
+    /**
+     * @param null $idHash
+     */
+    public function setIdHash ($idHash)
+    {
+        $this->idHash = $idHash;
+    }
+
+    /**
+     * @return null
+     */
+    public function getLead ()
+    {
+        return $this->lead;
+    }
+
+    /**
+     * @param null $lead
+     */
+    public function setLead ($lead)
+    {
+        $this->lead = $lead;
+    }
+
+    /**
+     * @return array
+     */
+    public function getSource ()
+    {
+        return $this->source;
+    }
+
+    /**
+     * @param array $source
+     */
+    public function setSource ($source)
+    {
+        $this->source = $source;
+    }
+
+    /**
+     * @return null
+     */
+    public function getEmail ()
+    {
+        return $this->email;
+    }
+
+    /**
+     * @param null $email
+     */
+    public function setEmail ($email)
+    {
+        $this->email = $email;
     }
 }

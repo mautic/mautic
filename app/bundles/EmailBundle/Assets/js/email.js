@@ -146,5 +146,13 @@ Mautic.insertEmailBuilderToken = function(editorId, token) {
 };
 
 Mautic.toggleEmailContentMode = function (el) {
+    var builder = (mQuery(el).val() === '0') ? false : true;
 
+    if (builder) {
+        mQuery('#customHtmlContainer').addClass('hide');
+        mQuery('#builderHtmlContainer').removeClass('hide');
+    } else {
+        mQuery('#customHtmlContainer').removeClass('hide');
+        mQuery('#builderHtmlContainer').addClass('hide');
+    }
 };
