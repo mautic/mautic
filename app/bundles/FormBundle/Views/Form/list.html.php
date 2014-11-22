@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 if ($tmpl == 'index') {
@@ -133,7 +133,7 @@ if ($tmpl == 'index') {
     </table>
     <div class="panel-footer">
     <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', array(
-        "totalItems"      => count($items),
+        "totalItems"      => $totalItems,
         "page"            => $page,
         "limit"           => $limit,
         "baseUrl"         => $view['router']->generate('mautic_form_index'),

@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -32,7 +32,7 @@ endif;
                class="form-control input-lg" required
                placeholder='<?php echo $view['translator']->trans('mautic.user.auth.form.loginpw'); ?>' />
     </div>
-    
+
     <div class="checkbox-inline custom-primary pull-left mb-md">
         <label for="remember_me">
             <input type="checkbox" id="remember_me" name="_remember_me" />

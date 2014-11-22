@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -62,6 +62,16 @@ class Page extends FormEntity
      * @Serializer\Groups({"pageDetails"})
      */
     private $language = 'en';
+
+    /**
+     * @ORM\Column(name="custom_html", type="text", nullable=true)
+     */
+    private $customHtml;
+
+    /**
+     * @ORM\Column(name="content_mode", type="string")
+     */
+    private $contentMode = 'builder';
 
     /**
      * @ORM\Column(name="content", type="array")
@@ -214,7 +224,7 @@ class Page extends FormEntity
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('title', new NotBlank(array(
-            'message' => 'mautic.page.page.title.notblank'
+            'message' => 'mautic.page.title.notblank'
         )));
     }
 
@@ -761,5 +771,37 @@ class Page extends FormEntity
     {
         $this->isChanged('variantStartDate', $variantStartDate);
         $this->variantStartDate = $variantStartDate;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getContentMode ()
+    {
+        return $this->contentMode;
+    }
+
+    /**
+     * @param mixed $contentMode
+     */
+    public function setContentMode ($contentMode)
+    {
+        $this->contentMode = $contentMode;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCustomHtml ()
+    {
+        return $this->customHtml;
+    }
+
+    /**
+     * @param mixed $customHtml
+     */
+    public function setCustomHtml ($customHtml)
+    {
+        $this->customHtml = $customHtml;
     }
 }

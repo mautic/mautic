@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -36,7 +36,7 @@ class ClientControllerTest extends MauticWebTestCase
         //Create a client
         $client = new Client();
         $client->setName("Login Test");
-        $client->setRedirectUris(array("https://mautic.com"));
+        $client->setRedirectUris(array("https://mautic.org"));
         $this->container->get('mautic.factory')->getModel('api.client')->saveEntity($client);
 
         return $client;
@@ -82,7 +82,7 @@ class ClientControllerTest extends MauticWebTestCase
         // set some values
         $unique                          = uniqid();
         $form['client[name]']            = $unique;
-        $form['client[redirectUris]']    = 'http://mautic.com';
+        $form['client[redirectUris]']    = 'http://mautic.org';
 
         // submit the form
         $crawler = $client->submit($form);
@@ -94,7 +94,7 @@ class ClientControllerTest extends MauticWebTestCase
         );
 
         //try again using secure URIs
-        $form['client[redirectUris]'] = 'https://mautic.com';
+        $form['client[redirectUris]'] = 'https://mautic.org';
 
         // submit the form
         $crawler = $client->submit($form);

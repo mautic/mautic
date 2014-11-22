@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -66,6 +66,16 @@ class Email extends FormEntity
      * @ORM\Column(name="plain_text", type="text", nullable=true)
      */
     private $plainText;
+
+    /**
+     * @ORM\Column(name="custom_html", type="text", nullable=true)
+     */
+    private $customHtml;
+
+    /**
+     * @ORM\Column(name="content_mode", type="string")
+     */
+    private $contentMode = 'custom';
 
     /**
      * @ORM\Column(name="publish_up", type="datetime", nullable=true)
@@ -672,5 +682,37 @@ class Email extends FormEntity
     public function getStats ()
     {
         return $this->stats;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCustomHtml ()
+    {
+        return $this->customHtml;
+    }
+
+    /**
+     * @param mixed $customHtml
+     */
+    public function setCustomHtml ($customHtml)
+    {
+        $this->customHtml = $customHtml;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getContentMode ()
+    {
+        return $this->contentMode;
+    }
+
+    /**
+     * @param mixed $contentMode
+     */
+    public function setContentMode ($contentMode)
+    {
+        $this->contentMode = $contentMode;
     }
 }

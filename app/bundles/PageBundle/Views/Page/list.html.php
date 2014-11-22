@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 if ($tmpl == 'index')
@@ -27,7 +27,7 @@ $view->extend('MauticPageBundle:Page:index.html.php');
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                         'sessionVar' => 'page',
                         'orderBy'    => 'p.title',
-                        'text'       => 'mautic.page.page.thead.title',
+                        'text'       => 'mautic.page.thead.title',
                         'class'      => 'col-page-title',
                         'default'    => true
                     ));
@@ -35,35 +35,35 @@ $view->extend('MauticPageBundle:Page:index.html.php');
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                         'sessionVar' => 'page',
                         'orderBy'    => 'c.title',
-                        'text'       => 'mautic.page.page.thead.category',
+                        'text'       => 'mautic.page.thead.category',
                         'class'      => 'visible-md visible-lg col-page-category'
                     ));
 
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                         'sessionVar' => 'page',
                         'orderBy'    => 'p.createdByUser',
-                        'text'       => 'mautic.page.page.thead.author',
+                        'text'       => 'mautic.page.thead.author',
                         'class'      => 'visible-md visible-lg col-page-author'
                     ));
 
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                         'sessionVar' => 'page',
                         'orderBy'    => 'p.language',
-                        'text'       => 'mautic.page.page.thead.language',
+                        'text'       => 'mautic.page.thead.language',
                         'class'      => 'visible-md visible-lg col-page-lang'
                     ));
 
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                         'sessionVar' => 'page',
                         'orderBy'    => 'p.hits',
-                        'text'       => 'mautic.page.page.thead.hits',
+                        'text'       => 'mautic.page.thead.hits',
                         'class'      => 'col-page-hits'
                     ));
 
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                         'sessionVar' => 'page',
                         'orderBy'    => 'p.id',
-                        'text'       => 'mautic.page.page.thead.id',
+                        'text'       => 'mautic.page.thead.id',
                         'class'      => 'col-page-id'
                     ));
                     ?>

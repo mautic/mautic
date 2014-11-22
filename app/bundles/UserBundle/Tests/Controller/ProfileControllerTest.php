@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -44,7 +44,7 @@ class ProfileControllerTest extends MauticWebTestCase
         $unique                                 = uniqid();
         $form['user[firstName]']                = 'Test';
         $form['user[lastName]']                 = 'User';
-        $form['user[email]']                    = "{$unique}@mautic.com";
+        $form['user[email]']                    = "{$unique}@mautic.org";
         $form['user[plainPassword][password]']  = 'mautic';
         $form['user[plainPassword][confirm]']   = 'mautic';
 

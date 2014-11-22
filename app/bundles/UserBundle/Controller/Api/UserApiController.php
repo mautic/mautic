@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -209,7 +209,6 @@ class UserApiController extends CommonApiController
             }
         } else {
             //Changing passwords via API is forbidden
-            //@TODO reconsider username/password change restriction via API?
             if (!empty($parameters['plainPassword'])) {
                 unset($parameters['plainPassword']);
             }

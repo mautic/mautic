@@ -1,19 +1,19 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
 <ul class="list-group">
-	<?php 
+	<?php
 	$i = 0;
 	$total = count($activity); ?>
-     
+
      <?php foreach ($activity as $item): ?>
-     	<?php 
+     	<?php
      	$border = 'bdr-b bdr-l-wdh-0 bdr-r-wdh-0';
      	if ($i == 0 || $i == ($total - 1)):
      		$border = 'bdr-w-0';

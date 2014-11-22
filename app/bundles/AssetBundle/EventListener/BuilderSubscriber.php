@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -15,7 +15,7 @@ use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\AssetBundle\Helper\BuilderTokenHelper;
 use Mautic\PageBundle\Event\PageBuilderEvent;
-use Mautic\PageBundle\Event\PageEvent;
+use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
 
 /**
@@ -64,7 +64,7 @@ class BuilderSubscriber extends CommonSubscriber
         $this->replaceTokens($event, $leadId, $event->getSource());
     }
 
-    public function onPageDisplay (PageEvent $event)
+    public function onPageDisplay (PageDisplayEvent $event)
     {
         $page   = $event->getPage();
         $leadId = ($this->factory->getSecurity()->isAnonymous()) ? $this->factory->getModel('lead')->getCurrentLead()->getId() : null;
@@ -86,17 +86,15 @@ class BuilderSubscriber extends CommonSubscriber
             $clickthrough['lead'] = $leadId;
         }
 
-        foreach ($content as $slot => &$html) {
-            preg_match_all($pagelinkRegex, $html, $matches);
-            if (!empty($matches[1])) {
-                foreach ($matches[1] as $match) {
-                    if (empty($assets[$match])) {
-                        $assets[$match] = $model->getEntity($match);
-                    }
-
-                    $url  = ($assets[$match] !== null) ? $model->generateUrl($assets[$match], true, $clickthrough) : '';
-                    $html = str_ireplace('{assetlink=' . $match . '}', $url, $html);
+        preg_match_all($pagelinkRegex, $content, $matches);
+        if (!empty($matches[1])) {
+            foreach ($matches[1] as $match) {
+                if (empty($assets[$match])) {
+                    $assets[$match] = $model->getEntity($match);
                 }
+
+                $url  = ($assets[$match] !== null) ? $model->generateUrl($assets[$match], true, $clickthrough) : '';
+                $content = str_ireplace('{assetlink=' . $match . '}', $url, $content);
             }
         }
 

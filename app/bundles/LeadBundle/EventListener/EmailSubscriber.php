@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -55,13 +55,12 @@ class EmailSubscriber extends CommonSubscriber
         $regex    = '/{leadfield=(.*?)}/';
 
         $lead = $event->getLead();
-        foreach ($content as $slot => &$html) {
-            preg_match_all($regex, $html, $matches);
-            if (!empty($matches[1])) {
-                foreach ($matches[1] as $match) {
-                    if (isset($lead[$match])) {
-                        $html = str_ireplace('{leadfield=' . $match . '}', $lead[$match], $html);
-                    }
+
+        preg_match_all($regex, $content, $matches);
+        if (!empty($matches[1])) {
+            foreach ($matches[1] as $match) {
+                if (isset($lead[$match])) {
+                    $content = str_ireplace('{leadfield=' . $match . '}', $lead[$match], $content);
                 }
             }
         }

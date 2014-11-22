@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -59,7 +59,7 @@ switch ($status) {
         ?>
         <span class="global-search-secondary global-search-indent"><?php echo $catName; ?></span>
         <span class="badge alert-success gs-count-badge" data-toggle="tooltip"
-              title="<?php echo $view['translator']->trans('mautic.page.page.hitcount'); ?>" data-placement="left">
+              title="<?php echo $view['translator']->trans('mautic.page.hitcount'); ?>" data-placement="left">
             <?php echo $page->getHits(); ?>
         </span>
     </a>

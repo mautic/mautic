@@ -144,3 +144,15 @@ Mautic.insertEmailBuilderToken = function(editorId, token) {
     var editor = Mautic.getEmailBuilderEditorInstances();
     editor[instance].insertText(token);
 };
+
+Mautic.toggleEmailContentMode = function (el) {
+    var builder = (mQuery(el).val() === '0') ? false : true;
+
+    if (builder) {
+        mQuery('#customHtmlContainer').addClass('hide');
+        mQuery('#builderHtmlContainer').removeClass('hide');
+    } else {
+        mQuery('#customHtmlContainer').removeClass('hide');
+        mQuery('#builderHtmlContainer').addClass('hide');
+    }
+};

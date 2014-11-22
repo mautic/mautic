@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -42,7 +42,7 @@ class UserApiControllerTest extends MauticWebTestCase
         //Create a client
         $entity = new User();
         $entity->setUsername($unique);
-        $entity->setEmail($unique . '@mautic.com');
+        $entity->setEmail($unique . '@mautic.org');
         $entity->setFirstName('API');
         $entity->setLastName('Test');
         $entity->setPosition(('API Tester'));
@@ -113,7 +113,7 @@ class UserApiControllerTest extends MauticWebTestCase
             'New entity should fail due to missing required fields.'
         );
 
-        $data['email'] = "$unique@mautic.com";
+        $data['email'] = "$unique@mautic.org";
 
         $crawler  = $client->request('POST', '/api/users/new.json?access_token='.$token, $data);
         $response = $client->getResponse();
@@ -158,7 +158,7 @@ class UserApiControllerTest extends MauticWebTestCase
 
         $unique = uniqid();
         $data = array();
-        $data['email']     = $unique . "@mautic.com";
+        $data['email']     = $unique . "@mautic.org";
         $data['firstName'] = $unique;
 
         //testing to make sure the password/username does not update which is not allowed via the API
@@ -233,7 +233,7 @@ class UserApiControllerTest extends MauticWebTestCase
 
         $unique = uniqid();
         $data = array();
-        $data['email']      = $unique . "@mautic.com";
+        $data['email']      = $unique . "@mautic.org";
         $data['firstName'] = $unique;
 
         //testing to make sure the username and password does not update which is not allowed via the API
@@ -262,7 +262,7 @@ class UserApiControllerTest extends MauticWebTestCase
                 'confirm'  => $unique,
             ),
             'role'          => $entity->getRole()->getId(),
-            'email'         => $unique . "@mautic.com", //updated email
+            'email'         => $unique . "@mautic.org", //updated email
             'position'      => $entity->getPosition(),
             'isPublished'      => true
         );
@@ -341,7 +341,7 @@ class UserApiControllerTest extends MauticWebTestCase
                 'confirm'  => $unique,
             ),
             'role'          => $entity->getRole()->getId(),
-            'email'         => $unique . "@mautic.com", //updated email
+            'email'         => $unique . "@mautic.org", //updated email
             'position'      => $unique,
             'isPublished'      => true
         );

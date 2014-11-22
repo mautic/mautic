@@ -1,0 +1,42 @@
+﻿/*
+Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+For licensing, see LICENSE.md or http://ckeditor.com/license
+*/
+CKEDITOR.plugins.setLang( 'docprops', 'de', {
+	bgColor: 'Hintergrundfarbe',
+	bgFixed: 'feststehender Hintergrund',
+	bgImage: 'Hintergrundbild URL',
+	charset: 'Zeichenkodierung',
+	charsetASCII: 'ASCII',
+	charsetCE: 'Zentraleuropäisch',
+	charsetCR: 'Kyrillisch',
+	charsetCT: 'traditionell Chinesisch (Big5)',
+	charsetGR: 'Griechisch',
+	charsetJP: 'Japanisch',
+	charsetKR: 'Koreanisch',
+	charsetOther: 'Andere Zeichenkodierung',
+	charsetTR: 'Türkisch',
+	charsetUN: 'Unicode (UTF-8)',
+	charsetWE: 'Westeuropäisch',
+	chooseColor: 'Wählen',
+	design: 'Design',
+	docTitle: 'Seitentitel',
+	docType: 'Dokumententyp',
+	docTypeOther: 'Anderer Dokumententyp',
+	label: 'Dokument-Eigenschaften',
+	margin: 'Seitenränder',
+	marginBottom: 'Unten',
+	marginLeft: 'Links',
+	marginRight: 'Rechts',
+	marginTop: 'Oben',
+	meta: 'Metadaten',
+	metaAuthor: 'Autor',
+	metaCopyright: 'Copyright',
+	metaDescription: 'Dokument-Beschreibung',
+	metaKeywords: 'Schlüsselwörter (durch Komma getrennt)',
+	other: '<andere>',
+	previewHtml: '<p>Das ist ein <strong>Beispieltext</strong>. Du schreibst in <a href="javascript:void(0)">CKEditor</a>.</p>',
+	title: 'Dokument-Eigenschaften',
+	txtColor: 'Textfarbe',
+	xhtmlDec: 'Beziehe XHTML Deklarationen ein'
+} );

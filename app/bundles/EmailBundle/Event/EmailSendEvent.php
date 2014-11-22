@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -28,11 +28,6 @@ class EmailSendEvent extends CommonEvent
     private $content;
 
     /**
-     * @var AssetsHelper
-     */
-    private $slotsHelper;
-
-    /**
      * @var string
      */
     private $idHash;
@@ -48,15 +43,16 @@ class EmailSendEvent extends CommonEvent
     private $source;
 
     /**
+     * @param string $content
      * @param Email  $email
      * @param Lead   $lead
      * @param string $idHash
      * @param array  $source
      */
-    public function __construct(Email &$email, $lead = null, $idHash = '', $source = array())
+    public function __construct($content, Email $email = null, $lead = null, $idHash = '', $source = array())
     {
-        $this->entity  =& $email;
-        $this->content = $email->getContent();
+        $this->content = $content;
+        $this->entity  = $email;
         $this->idHash  = $idHash;
         $this->lead    = $lead;
         $this->source  = $source;
@@ -95,31 +91,11 @@ class EmailSendEvent extends CommonEvent
     /**
      * Set email content
      *
-     * @param array $content
+     * @param string $content
      */
-    public function setContent(array $content)
+    public function setContent($content)
     {
         $this->content = $content;
-    }
-
-    /**
-     * Set the slots helper for content
-     *
-     * @param AssetsHelper $slotsHelper
-     */
-    public function setSlotsHelper($slotsHelper)
-    {
-        $this->slotsHelper = $slotsHelper;
-    }
-
-    /**
-     * Get the slots helper that can be used to add scripts/stylesheets to the header
-     *
-     * @return AssetsHelper
-     */
-    public function getSlotsHelper()
-    {
-        return $this->slotsHelper;
     }
 
     /**

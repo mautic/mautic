@@ -1,13 +1,11 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
-//@todo - fix issue where associations are not populating immediately after an edit
 
 namespace Mautic\PageBundle\Controller;
 
@@ -167,7 +165,7 @@ class PageController extends FormController
                 'flashes'         => array(
                     array(
                         'type'    => 'error',
-                        'msg'     => 'mautic.page.page.error.notfound',
+                        'msg'     => 'mautic.page.error.notfound',
                         'msgVars' => array('%id%' => $objectId)
                     )
                 )
@@ -194,7 +192,7 @@ class PageController extends FormController
 
                     //make sure all the variants are configured with the same criteria
                     if ($lastCriteria != $variantSettings['winnerCriteria']) {
-                        $variantError = $this->factory->getTranslator()->trans('mautic.page.page.variant.misconfiguration');
+                        $variantError = $this->factory->getTranslator()->trans('mautic.page.variant.misconfiguration');
                         break;
                     }
 
@@ -438,7 +436,7 @@ class PageController extends FormController
                     'flashes' => array(
                         array(
                             'type' => 'error',
-                            'msg'  => 'mautic.page.page.error.notfound',
+                            'msg'  => 'mautic.page.error.notfound',
                             'msgVars' => array('%id%' => $objectId)
                         )
                     )
@@ -609,7 +607,7 @@ class PageController extends FormController
             if ($entity === null) {
                 $flashes[] = array(
                     'type'    => 'error',
-                    'msg'     => 'mautic.page.page.error.notfound',
+                    'msg'     => 'mautic.page.error.notfound',
                     'msgVars' => array('%id%' => $objectId)
                 );
             } elseif (!$this->factory->getSecurity()->hasEntityAccess(
@@ -675,7 +673,7 @@ class PageController extends FormController
                 if ($entity === null) {
                     $flashes[] = array(
                         'type'    => 'error',
-                        'msg'     => 'mautic.page.page.error.notfound',
+                        'msg'     => 'mautic.page.error.notfound',
                         'msgVars' => array('%id%' => $objectId)
                     );
                 } elseif (!$this->factory->getSecurity()->hasEntityAccess(
@@ -695,7 +693,7 @@ class PageController extends FormController
 
                 $flashes[] = array(
                     'type' => 'notice',
-                    'msg'  => 'mautic.page.page.notice.batch_deleted',
+                    'msg'  => 'mautic.page.notice.batch_deleted',
                     'msgVars' => array(
                         '%count%' => count($entities)
                     )
@@ -829,7 +827,7 @@ class PageController extends FormController
             if ($entity === null) {
                 $flashes[] = array(
                     'type'    => 'error',
-                    'msg'     => 'mautic.page.page.error.notfound',
+                    'msg'     => 'mautic.page.error.notfound',
                     'msgVars' => array('%id%' => $objectId)
                 );
             } elseif (!$this->factory->getSecurity()->hasEntityAccess(
@@ -846,7 +844,7 @@ class PageController extends FormController
 
             $flashes[] = array(
                 'type' => 'notice',
-                'msg'  => 'mautic.page.page.notice.activated',
+                'msg'  => 'mautic.page.notice.activated',
                 'msgVars' => array(
                     '%name%' => $entity->getTitle(),
                     '%id%'   => $objectId

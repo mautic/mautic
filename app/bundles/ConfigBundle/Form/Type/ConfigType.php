@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -73,6 +73,7 @@ class ConfigType extends AbstractType
                             break;
                         case 'ip_lookup_service':
                             // TODO - Write an API endpoint listing our supported services and build this list from that
+                            // see CoreBundle\Entity\IpAddress
                             $choices = array(
                                 'telize'            => 'mautic.core.config.ip_lookup_service.telize',
                                 'freegeoip'         => 'mautic.core.config.ip_lookup_service.freegeoip',

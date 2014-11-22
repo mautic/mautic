@@ -297,7 +297,21 @@ Mautic.launchCampaignEditor = function() {
                 }
 
                 //ensure that the connections are not looping back into the same event
-                return params.sourceId != params.targetId;
+                if (params.sourceId == params.targetId) {
+                    return false;
+                }
+
+                //ensure that a action is not connecting into another action
+                if (mQuery('#' + params.sourceId).hasClass('list-campaign-action') && mQuery('#' + params.targetId).hasClass('list-campaign-action')) {
+                    return false;
+                }
+
+                //ensure that a decision is not connecting into another decision
+                if (mQuery('#' + params.sourceId).hasClass('list-campaign-decision') && mQuery('#' + params.targetId).hasClass('list-campaign-decision')) {
+                    return false;
+                }
+
+                return true
             }
         };
 

@@ -3967,6 +3967,9 @@ lesshat-selector {
   margin: 6px 12px;
   white-space: normal;
 }
+.builder .list-group-item.ui-draggable-dragging {
+  background-color: #fff;
+}
 .confirmation-modal {
   position: fixed;
   font-family: Arial, Helvetica, sans-serif;
@@ -4002,4 +4005,7 @@ lesshat-selector {
 }
 .stat-boxes .panel {
   height: 164px;
+}
+.has-click-event {
+  cursor: pointer;
 }

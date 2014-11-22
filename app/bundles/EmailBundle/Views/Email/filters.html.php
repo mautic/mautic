@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
@@ -12,7 +12,7 @@
         <div class="pr-lg pl-lg pt-md pb-md">
             <form action="" id="email-filters">
                 <!-- <a href="#" class="btn btn-primary btn-block">
-                    <i class="fa fa-power-off"></i> 
+                    <i class="fa fa-power-off"></i>
                     <?php echo $view['translator']->trans('mautic.email.filter.clear'); ?>
                 </a>
                 <hr /> -->
@@ -27,10 +27,7 @@
                                     <?php if (isset($item['name'])) $item['title'] = $item['name']; ?>
                                     <?php if (isset($item['title']) && $item['title']) : ?>
                                     <label class="col-sm-12 list-group-item">
-                                        <input 
-                                            name="emailFilters[<?php echo $filter['column']; ?>][]"
-                                            type="checkbox"
-                                            value="<?php echo $item['id']; ?>" />
+                                        <input class="mr-3" name="emailFilters[<?php echo $filter['column']; ?>][]" type="checkbox" value="<?php echo $item['id']; ?>" />
                                         <?php echo $item['title']; ?>
                                         <?php if (isset($item['color']) && $item['color']) : ?>
                                             <i class="fa fa-square mr5 pull-right" style="color:<?php echo $item['color']; ?>"></i>

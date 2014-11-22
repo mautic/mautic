@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -367,7 +367,6 @@ class FormModel extends CommonFormModel
 
     /**
      * Gets array of custom fields and submit actions from bundles subscribed FormEvents::FORM_ON_BUILD
-     * @todo - add send email post submit action
      * @return mixed
      */
     public function getCustomComponents()
