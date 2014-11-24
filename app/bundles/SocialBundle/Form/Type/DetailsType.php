@@ -100,6 +100,12 @@ class DetailsType extends AbstractType
         ));
 
         $builder->add('name', 'hidden', array('data' => $options['sm_network']));
+
+        $builder->add('buttons', 'form_buttons');
+
+        if (!empty($options['action'])) {
+            $builder->setAction($options['action']);
+        }
     }
 
     /**

@@ -16,6 +16,10 @@ $collection->add('mautic_integration_connector_index', new Route('/integrations/
     array('_controller' => 'MauticIntegrationBundle:Connector:index')
 ));
 
+$collection->add('mautic_integration_connector_edit', new Route('/integrations/connectors/edit/{name}',
+    array('_controller' => 'MauticIntegrationBundle:Connector:edit')
+));
+
 $collection->add('mautic_integration_index', new Route('/integrations/{page}',
     array(
         '_controller' => 'MauticIntegrationBundle:Integration:index',
