@@ -128,7 +128,7 @@ class ReportSubscriber extends CommonSubscriber
                 $unit = $options['unit'];
             }
 
-            $data = GraphHelper::prepareLineGraphData($amount, $unit, array('downloaded'));
+            $data = GraphHelper::prepareDatetimeLineGraphData($amount, $unit, array('downloaded'));
 
             $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
             $queryBuilder->from(MAUTIC_TABLE_PREFIX . 'asset_downloads', 'ad');
