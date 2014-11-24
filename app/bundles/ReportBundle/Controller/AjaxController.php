@@ -35,7 +35,7 @@ class AjaxController extends CommonAjaxController
         $tables = $model->getTableData();
 
         $dataArray = array(
-            'columns' => $tables[$request->get('table')]['columns']
+            'columns' => $tables[$request->get('source')]['columns']
         );
 
         return $this->sendJsonResponse($dataArray);

@@ -111,24 +111,6 @@ class ReportType extends AbstractType
             $columns    = $options['table_list'][$source]['columns'];
             $columnList = $this->buildColumnSelectList($columns);
 
-            // Build the column selector
-            // $builder->add(
-            //     $builder->create('columns', 'column_selector', array(
-            //         'choices'    => $columnList,
-            //         'label'      => 'mautic.report.report.form.columnselector',
-            //         'label_attr' => array('class' => 'control-label'),
-            //         'required'   => true,
-            //         'multiple'   => true,
-            //         'expanded'   => true,
-            //         'attr'       => array(
-            //             'class' => 'form-control',
-            //             'size'  => '5'
-            //             )
-            //         )
-            //     )
-            //     ->addViewTransformer(new ColumnSelectTransformer($columnList))
-            // );
-
             $builder->add('columns', 'choice', array(
                 'choices'    => $columnList,
                 'label'      => 'mautic.report.report.form.columnselector',
@@ -157,10 +139,7 @@ class ReportType extends AbstractType
                 'required'     => false
             ));
 
-            $builder->add('buttons', 'form_buttons', array(
-                'apply_onclick' => 'Mautic.preprocessSaveReportForm("form[name=report]");',
-                'save_onclick'  => 'Mautic.preprocessSaveReportForm("form[name=report]");'
-            ));
+            $builder->add('buttons', 'form_buttons');
         }
 
         if (!empty($options["action"])) {
