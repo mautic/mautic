@@ -37,8 +37,7 @@ class PointRepository extends CommonRepository
     {
         $now = new \DateTime();
         $q = $this->createQueryBuilder('p')
-            ->select('partial p.{id, type, name, properties}')
-            ->orderBy('p.order');
+            ->select('partial p.{id, type, name, properties}');
 
         //make sure the published up and down dates are good
         $q->where(
