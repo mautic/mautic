@@ -162,7 +162,8 @@ class PageType extends AbstractType
         if ($isVariant) {
             $builder->add('variantSettings', 'pagevariant', array(
                 'label'       => false,
-                'page_entity' => $options['data']
+                'page_entity' => $options['data'],
+                'data'        => $options['data']->getVariantSettings()
             ));
         } else {
 

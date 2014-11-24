@@ -41,6 +41,14 @@ class PageSubscriber extends CommonSubscriber
     {
         $tokenHelper = new PageTokenHelper($this->factory);
         $event->addTokenSection('form.pagetokens', 'mautic.form.form.header.index', $tokenHelper->getTokenContent());
+
+        //add AB Test Winner Criteria
+        $formSubmissions = array(
+            'group'    => 'mautic.form.abtest.criteria',
+            'label'    => 'mautic.form.abtest.criteria.submissions',
+            'callback' => '\Mautic\FormBundle\Helper\AbTestHelper::determineSubmissionWinner'
+        );
+        $event->addAbTestWinnerCriteria('form.submissions', $formSubmissions);
     }
 
     /**

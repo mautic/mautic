@@ -164,6 +164,7 @@ class Page extends FormEntity
 
     /**
      * @ORM\OneToMany(targetEntity="Page", mappedBy="variantParent", indexBy="id")
+     * @ORM\OrderBy({"isPublished" = "DESC"})
      * @Serializer\Expose
      * @Serializer\Since("1.0")
      * @Serializer\Groups({"pageDetails"})

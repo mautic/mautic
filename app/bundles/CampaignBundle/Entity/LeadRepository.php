@@ -193,7 +193,7 @@ class LeadRepository extends CommonRepository
      */
     public function getLeadStats($quantity, $unit)
     {
-        $graphData = GraphHelper::prepareLineGraphData($quantity, $unit, array('viewed'));
+        $graphData = GraphHelper::prepareDatetimeLineGraphData($quantity, $unit, array('viewed'));
 
         // Load points for selected period
         $q = $this->createQueryBuilder('cl');

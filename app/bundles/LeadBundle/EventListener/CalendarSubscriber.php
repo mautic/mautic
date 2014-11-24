@@ -71,8 +71,26 @@ class CalendarSubscriber extends CommonSubscriber
             $object['url']   = $router->generate('mautic_lead_action', array('objectAction' => 'view', 'objectId' => $object['lead_id']), true);
             $object['attr']  = 'data-toggle="ajax"';
             $object['description'] = strip_tags(html_entity_decode($object['description']));
-            $object['title'] = $this->translator->trans('mautic.lead.note.event', array('%lead%' => $leadName));
-            $object['title'] .= ' (' . $this->translator->trans('mautic.lead.note.type.' . $object['type']) . ')';
+
+            switch ($object['type']) {
+                default:
+                case 'general':
+                    $icon = 'fa-file-text';
+                    break;
+                case 'email':
+                    $icon = 'fa-send';
+                    break;
+                case 'call':
+                    $icon = 'fa-phone';
+                    break;
+                case 'meeting':
+                    $icon = 'fa-group';
+                    break;
+            }
+
+            $object['iconClass'] = 'fa fa-fw ' . $icon;
+            $object['title'] = $leadName;
+            //$object['title'] .= ' (' . $this->translator->trans('mautic.lead.note.type.' . $object['type']) . ')';
         }
 
         $event->addEvents($results);

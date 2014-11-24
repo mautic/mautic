@@ -11,7 +11,7 @@ if ($note instanceof \Mautic\LeadBundle\Entity\LeadNote) {
     $id        = $note->getId();
     $text      = $note->getText();
     $date      = $note->getDateTime();
-    $author    = $note->getCreatedBy();
+    $author    = $note->getCreatedByUser();
     $type      = $note->getType();
 } else {
     $id     = $note['id'];

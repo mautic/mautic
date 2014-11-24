@@ -180,30 +180,38 @@ class PageController extends FormController
         //get A/B test information
         list($parent, $children) = $model->getVariants($activePage);
         $properties   = array();
-        $variantError = '';
+        $variantError = false;
+        $weight       = 0;
         if (count($children)) {
             foreach ($children as $c) {
                 $variantSettings = $c->getVariantSettings();
 
                 if (is_array($variantSettings) && isset($variantSettings['winnerCriteria'])) {
-                    if (!isset($lastCriteria)) {
-                        $lastCriteria = $variantSettings['winnerCriteria'];
+                    if ($c->isPublished()) {
+                        if (!isset($lastCriteria)) {
+                            $lastCriteria = $variantSettings['winnerCriteria'];
+                        }
+
+                        //make sure all the variants are configured with the same criteria
+                        if ($lastCriteria != $variantSettings['winnerCriteria']) {
+                            $variantError = true;
+                        }
+
+                        $weight += $variantSettings['weight'];
                     }
 
-                    //make sure all the variants are configured with the same criteria
-                    if ($lastCriteria != $variantSettings['winnerCriteria']) {
-                        $variantError = $this->factory->getTranslator()->trans('mautic.page.variant.misconfiguration');
-                        break;
-                    }
-
-                    $properties[$c->getId()][] = $variantSettings;
+                    $properties[$c->getId()] = $variantSettings;
                 }
             }
+
+            $properties[$parent->getId()]['weight'] = 100 - $weight;
+            $properties[$parent->getId()]['winnerCriteria'] = '';
         }
+
         $abTestResults = array();
+        $criteria = $model->getBuilderComponents($activePage, 'abTestWinnerCriteria');
         if (!empty($lastCriteria) && empty($variantError)) {
             //there is a criteria to compare the pages against so let's shoot the page over to the criteria function to do its thing
-            $criteria = $model->getBuilderComponents($activePage, 'abTestWinnerCriteria');
             if (isset($criteria['criteria'][$lastCriteria])) {
                 $testSettings = $criteria['criteria'][$lastCriteria];
 
@@ -258,8 +266,10 @@ class PageController extends FormController
             'viewParameters'  => array(
                 'activePage'    => $activePage,
                 'variants'      => array(
-                    'parent'   => $parent,
-                    'children' => $children
+                    'parent'     => $parent,
+                    'children'   => $children,
+                    'properties' => $properties,
+                    'criteria'   => $criteria['criteria']
                 ),
                 'translations'  => array(
                     'parent'   => $translationParent,
@@ -385,7 +395,7 @@ class PageController extends FormController
         $builderComponents    = $model->getBuilderComponents($entity);
         return $this->delegateView(array(
             'viewParameters'  =>  array(
-                'form'        => $form->createView(),
+                'form'        => $this->setFormTheme($form, 'MauticPageBundle:Page:form.html.php', 'MauticPageBundle:FormTheme\Page'),
                 'tokens'      => $builderComponents['pageTokens'],
                 'activePage'  => $entity
             ),
@@ -524,7 +534,7 @@ class PageController extends FormController
         $builderComponents    = $model->getBuilderComponents($entity);
         return $this->delegateView(array(
             'viewParameters'  =>  array(
-                'form'        => $form->createView(),
+                'form'        => $this->setFormTheme($form, 'MauticPageBundle:Page:form.html.php', 'MauticPageBundle:FormTheme\Page'),
                 'tokens'      => $builderComponents['pageTokens'],
                 'activePage'  => $entity
             ),

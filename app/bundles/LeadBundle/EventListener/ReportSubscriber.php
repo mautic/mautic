@@ -128,7 +128,7 @@ class ReportSubscriber extends CommonSubscriber
                 $unit = $options['unit'];
             }
 
-            $timeStats = GraphHelper::prepareLineGraphData($amount, $unit, array('points'));
+            $timeStats = GraphHelper::prepareDatetimeLineGraphData($amount, $unit, array('points'));
 
             $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
             $queryBuilder->from(MAUTIC_TABLE_PREFIX . 'lead_points_change_log', 'lp');

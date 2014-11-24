@@ -168,14 +168,8 @@ class SubmissionModel extends CommonFormModel
             $page = $this->factory->getModel('page.page')->getEntity((int)$post['mauticpage']);
             if ($page != null) {
                 $submission->setPage($page);
+
             }
-        }
-
-        $this->saveEntity($submission);
-
-        if ($this->dispatcher->hasListeners(FormEvents::FORM_ON_SUBMIT)) {
-            $event = new SubmissionEvent($submission, $post, $server);
-            $this->dispatcher->dispatch(FormEvents::FORM_ON_SUBMIT, $event);
         }
 
         //execute submit actions
@@ -231,6 +225,20 @@ class SubmissionModel extends CommonFormModel
             if (!empty($data['callback'])) {
                 return array('callback' => $data);
             }
+        }
+
+
+        $leadModel = $this->factory->getModel('lead');
+        list($lead, $trackingId, $generated) = $leadModel->getCurrentLead(true);
+        $submission->setLead($lead);
+        //set tracking ID for stats purposes to determine unique hits
+        $submission->setTrackingId($trackingId);
+
+        //save entity after the form submission events are fired in case a new lead is created
+        $this->saveEntity($submission);
+        if ($this->dispatcher->hasListeners(FormEvents::FORM_ON_SUBMIT)) {
+            $event = new SubmissionEvent($submission, $post, $server);
+            $this->dispatcher->dispatch(FormEvents::FORM_ON_SUBMIT, $event);
         }
 
         //made it to the end so return false that there was not an error

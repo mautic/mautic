@@ -14,6 +14,7 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * Class VariantType
@@ -45,6 +46,11 @@ class VariantType extends AbstractType
             'attr'       => array(
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.page.form.trafficweight.help'
+            ),
+            'constraints' => array(
+                new NotBlank(
+                    array('message' => 'mautic.page.variant.weight.notblank')
+                )
             )
         ));
 
@@ -59,21 +65,25 @@ class VariantType extends AbstractType
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array(
                     'class'    => 'form-control',
-                    'onchange' => 'Mautic.togglePageAbTestWinnerDetails(this);'
+                    'onchange' => 'Mautic.getPageAbTestWinnerForm(this);'
                 ),
                 'expanded'   => false,
                 'multiple'   => false,
                 'choices'    => $choices,
-                'empty_value' => 'mautic.core.form.chooseone'
+                'empty_value' => 'mautic.core.form.chooseone',
+                'constraints' => array(
+                    new NotBlank(
+                        array('message' => 'mautic.page.variant.winnercriteria.notblank')
+                    )
+                )
             ));
 
-            foreach ($criteria as $k => $c) {
-                if (isset($c['formType'])) {
-                    $builder->add($k, $c['formType'], array(
-                        'required' => false,
-                        'label'    => false
-                    ));
-                }
+            $data = (isset($options['data'])) ? $options['data']['winnerCriteria'] : '';
+            if (!empty($criteria[$data]['formType'])) {
+                $builder->add('properties', $criteria[$data]['formType'], array(
+                    'required' => false,
+                    'label'    => false
+                ));
             }
         }
     }

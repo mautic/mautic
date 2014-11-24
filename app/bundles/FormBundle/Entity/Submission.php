@@ -11,6 +11,7 @@ namespace Mautic\FormBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
+use Mautic\LeadBundle\Entity\Lead;
 
 /**
  * Class Submission
@@ -39,6 +40,17 @@ class Submission
      * @ORM\JoinColumn(name="ip_id", referencedColumnName="id", nullable=false)
      */
     private $ipAddress;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Mautic\LeadBundle\Entity\Lead")
+     * @ORM\JoinColumn(name="lead_id", referencedColumnName="id", nullable=true, onDelete="SET NULL")
+     */
+    private $lead;
+
+    /**
+     * @ORM\Column(name="tracking_id", type="string", nullable=true)
+     */
+    private $trackingId;
 
     /**
      * @ORM\Column(name="date_submitted", type="datetime")
@@ -211,5 +223,37 @@ class Submission
     public function getPage()
     {
         return $this->page;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLead ()
+    {
+        return $this->lead;
+    }
+
+    /**
+     * @param mixed $lead
+     */
+    public function setLead (Lead $lead)
+    {
+        $this->lead = $lead;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTrackingId ()
+    {
+        return $this->trackingId;
+    }
+
+    /**
+     * @param mixed $trackingId
+     */
+    public function setTrackingId ($trackingId)
+    {
+        $this->trackingId = $trackingId;
     }
 }

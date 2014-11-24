@@ -32,7 +32,7 @@ class PointsChangeLogRepository extends CommonRepository
      */
     public function getLeadPoints($quantity, $unit, $args = array())
     {
-        $graphData = GraphHelper::prepareLineGraphData($quantity, $unit, array('viewed'));
+        $graphData = GraphHelper::prepareDatetimeLineGraphData($quantity, $unit, array('viewed'));
 
         // Load points for selected period
         $q = $this->createQueryBuilder('pl');
