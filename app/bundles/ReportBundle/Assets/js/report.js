@@ -19,30 +19,6 @@ Mautic.reportOnUnload = function(id) {
 	}
 };
 
-Mautic.preprocessSaveReportForm = function(form) {
-	var selectedColumns = mQuery(form + ' #report_columns');
-
-	mQuery(selectedColumns).find('option').each(function($this) {
-		mQuery(this).attr('selected', 'selected');
-	});
-};
-
-Mautic.moveReportColumns = function(fromSelect, toSelect) {
-	mQuery('#' + fromSelect + ' option:selected').remove().appendTo('#' + toSelect);
-
-	mQuery('#' + toSelect).find('option').each(function($this) {
-		mQuery(this).prop('selected', false);
-	});
-};
-
-Mautic.reorderColumns = function(select, direction) {
-	var options = mQuery('#' + select + ' option:selected');
-
-	if (options.length) {
-		(direction == 'up') ? options.first().prev().before(options) : options.last().next().after(options);
-	}
-};
-
 /**
  * Written with inspiration from http://symfony.com/doc/current/cookbook/form/form_collections.html#allowing-new-tags-with-the-prototype
  */
@@ -71,25 +47,27 @@ Mautic.removeFilterRow = function(container) {
 };
 
 Mautic.updateColumnList = function () {
-	var table = mQuery('select[id=report_source] option:selected').val();
+	var source = mQuery('select[id=report_source] option:selected').val();
 
 	mQuery.ajax({
 		type: "POST",
 		url: mauticAjaxUrl + "?action=report:updateColumns",
-		data: {table: table},
+		data: {'source': source},
 		dataType: "json",
 		success: function (response) {
+			var columnElement = mQuery('#report_columns');
 			// Remove the existing options in the column display section
-			mQuery('#report_columns_available').find('option').remove().end();
-			mQuery('#report_columns').find('option').remove().end();
+			columnElement.find('option').remove().end();
 
 			// Append the new options into the select list
 			mQuery.each(response.columns, function(key, value) {
-				mQuery('#report_columns_available')
+				columnElement
 					.append(mQuery('<option>')
 						.attr('value', key)
 						.text(value.label));
 			});
+
+			columnElement.trigger('chosen:updated');
 
 			// Remove any filters, they're no longer valid with different column lists
 			mQuery('#report_filters').find('div').remove().end();
