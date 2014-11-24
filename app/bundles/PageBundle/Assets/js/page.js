@@ -147,8 +147,8 @@ Mautic.renderPageReturningVisitsPie = function () {
     var graphData = mQuery.parseJSON(mQuery('#returning-data').text());
     var options = {
         responsive: false,
-        tooltipFontSize: 10,
-        tooltipTemplate: "<%if (label){%><%}%><%= value %>% <%=label%>"};
+        tooltipFontSize: 10
+    };
     var ctx = document.getElementById("returning-rate").getContext("2d");
     Mautic.pageReturningVisitsPie = new Chart(ctx).Pie(graphData, options);
 };
@@ -209,4 +209,48 @@ Mautic.togglePageContentMode = function (el) {
         mQuery('#builderHtmlContainer').addClass('hide');
         mQuery('#metaDescriptionContainer').addClass('hide');
     }
+};
+
+
+Mautic.getPageAbTestWinnerForm = function(abKey) {
+    if (abKey && mQuery(abKey).val() && mQuery(abKey).closest('.form-group').hasClass('has-error')) {
+        mQuery(abKey).closest('.form-group').removeClass('has-error');
+        if (mQuery(abKey).next().hasClass('help-block')) {
+            mQuery(abKey).next().remove();
+        }
+    }
+
+    var labelSpinner = mQuery("label[for='page_variantSettings_winnerCriteria']");
+    var spinner = mQuery('<i class="fa fa-fw fa-spinner fa-spin"></i>');
+    labelSpinner.append(spinner);
+
+    var pageId = mQuery('#page_sessionId').val();
+
+    var query = "action=page:getAbTestForm&abKey=" + mQuery(abKey).val() + "&pageId=" + pageId;
+
+    MauticVars.showLoadingBar = false;
+    mQuery.ajax({
+        url: mauticAjaxUrl,
+        type: "POST",
+        data: query,
+        dataType: "json",
+        success: function (response) {
+            if (typeof response.html != 'undefined') {
+                if (mQuery('#page_variantSettings_properties').length) {
+                    mQuery('#page_variantSettings_properties').replaceWith(response.html);
+                } else {
+                    mQuery('#page_variantSettings').append(response.html);
+                }
+
+                if (response.html != '') {
+                    Mautic.onPageLoad('#page_variantSettings_properties', response);
+                }
+            }
+            spinner.remove();
+        },
+        error: function (request, textStatus, errorThrown) {
+            Mautic.processAjaxError(request, textStatus, errorThrown);
+            spinner.remove();
+        }
+    });
 };

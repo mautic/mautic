@@ -49,3 +49,11 @@ $container->setDefinition('mautic.form.type.pagelist', new Definition(
     ->addTag('form.type', array(
         'alias' => 'page_list',
     ));
+
+
+$container->setDefinition('mautic.form.type.page_abtest_settings', new Definition(
+    'Mautic\PageBundle\Form\Type\AbTestPropertiesType'
+))
+    ->addTag('form.type', array(
+        'alias' => 'page_abtest_settings',
+    ));

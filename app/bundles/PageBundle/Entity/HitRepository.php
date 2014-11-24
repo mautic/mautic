@@ -90,7 +90,7 @@ class HitRepository extends CommonRepository
      */
     public function getHits($amount, $unit, $args = array())
     {
-        $data = GraphHelper::prepareLineGraphData($amount, $unit, array('viewed'));
+        $data = GraphHelper::prepareDatetimeLineGraphData($amount, $unit, array('viewed'));
 
         $query = $this->createQueryBuilder('h');
 

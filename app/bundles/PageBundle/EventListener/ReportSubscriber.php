@@ -115,7 +115,7 @@ class ReportSubscriber extends CommonSubscriber
                 $unit = $options['unit'];
             }
 
-            $data = GraphHelper::prepareLineGraphData($amount, $unit, array('dateHit'));
+            $data = GraphHelper::prepareDatetimeLineGraphData($amount, $unit, array('dateHit'));
 
             $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
             $queryBuilder->from(MAUTIC_TABLE_PREFIX . 'page_hits', 'ph');
@@ -145,7 +145,7 @@ class ReportSubscriber extends CommonSubscriber
                 $unit = $options['unit'];
             }
 
-            $data = GraphHelper::prepareLineGraphData($amount, $unit, array('dateHit'));
+            $data = GraphHelper::prepareDatetimeLineGraphData($amount, $unit, array('dateHit'));
 
             $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
             $queryBuilder->from(MAUTIC_TABLE_PREFIX . 'page_hits', 'ph');
