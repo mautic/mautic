@@ -301,6 +301,11 @@ class PageModel extends FormModel
      */
     public function hitPage($page, $request, $code = '200')
     {
+        //don't skew results with in-house hits
+        if (!$this->factory->getSecurity()->isAnonymous()) {
+            return;
+        }
+
         $hit = new Hit();
         $hit->setDateHit(new \Datetime());
 

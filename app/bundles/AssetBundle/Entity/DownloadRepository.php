@@ -10,6 +10,7 @@
 namespace Mautic\AssetBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\GraphHelper;
 
 /**
@@ -188,5 +189,41 @@ class DownloadRepository extends CommonRepository
         }
 
         return $graphData;
+    }
+
+    /**
+     * @param           $pageId
+     * @param \DateTime $fromDate
+     *
+     * @return mixed
+     */
+    public function getDownloadCountsByPage($pageId, \DateTime $fromDate = null)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->select('count(distinct(a.tracking_id)) as downloads, a.source_id as page_id, p.title, p.alias, p.variant_hits')
+            ->from(MAUTIC_TABLE_PREFIX.'asset_downloads', 'a')
+            ->join('a', MAUTIC_TABLE_PREFIX.'pages', 'p', 'a.source_id = p.id');
+
+        if (is_array($pageId)) {
+            $q->where($q->expr()->in('p.id', $pageId))
+                ->groupBy('p.id');
+
+        } else {
+            $q->where($q->expr()->eq('p.id', ':page'))
+                ->setParameter('page', (int) $pageId);
+        }
+
+        $q->andWhere('a.source = "page"')
+            ->andWhere('a.code = 200');
+
+        if ($fromDate != null) {
+            $dh = new DateTimeHelper($fromDate);
+            $q->andWhere($q->expr()->gte('a.date_download', ':date'))
+                ->setParameter('date', $dh->toUtcString());
+        }
+
+        $results = $q->execute()->fetchAll();
+
+        return $results;
     }
 }

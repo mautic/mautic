@@ -12,6 +12,7 @@ namespace Mautic\MapperBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Mautic\MapperBundle\Event\MapperAuthEvent;
 
 class ClientController extends FormController
 {
@@ -469,8 +470,36 @@ class ClientController extends FormController
         );
     }
 
+    /**
+     * @param $application
+     * @param $client
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function oAuth2CallbackAction($application, $client)
     {
+        $event = new MapperAuthEvent($this->factory->getSecurity());
+        $event->setApplication($application);
+        $event->setClient($client);
+        $this->factory->getDispatcher()->dispatch(MapperEvents::CALLBACK_API, $event);
+        $postActionVars = $event->getPostActionRedirect();
 
+        $viewParams = array(
+            'client'   => $client,
+            'application' => $application
+        );
+
+        if (!isset($postActionVars['returnUrl'])) {
+            $postActionVars['returnUrl'] = $this->generateUrl('mautic_mapper_client_objects_index', $viewParams);
+        }
+
+        if (!isset($postActionVars['viewParameters'])) {
+            $postActionVars['viewParameters'] = $viewParams;
+        }
+
+        if (!isset($postActionVars['contentTemplate'])) {
+            $postActionVars['contentTemplate'] = 'MauticMapperBundle:Mapper:index';
+        }
+
+        return $this->postActionRedirect($postActionVars);
     }
 }

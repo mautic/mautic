@@ -27,7 +27,7 @@ class AbTestHelper
      *
      * @return array
      */
-    public static function determineSubmissionWinner ($factory, $parent, $children, $properties)
+    public static function determineSubmissionWinner ($factory, $parent, $children)
     {
         $repo = $factory->getEntityManager()->getRepository('MauticFormBundle:Submission');
 
@@ -49,7 +49,7 @@ class AbTestHelper
                 $submissions = $support = $data = array();
                 $hasResults  = array();
                 foreach ($counts as $stats) {
-                    $submissionRate                 = round(($stats['submissions'] / $stats['variant_hits']) * 100, 2);
+                    $submissionRate                 = ($stats['variant_hits']) ? round(($stats['submissions'] / $stats['variant_hits']) * 100, 2) : 0;
                     $submissions[$stats['page_id']] = $submissionRate;
                     $data[$translator->trans('mautic.form.abtest.label.submissions')][] = $stats['submissions'];
                     $data[$translator->trans('mautic.form.abtest.label.hits')][]        = $stats['variant_hits'];
@@ -72,7 +72,7 @@ class AbTestHelper
                             $data[$translator->trans('mautic.form.abtest.label.submissions')][] = 0;
                             $data[$translator->trans('mautic.form.abtest.label.hits')][]        = 0;
                             $data[$translator->trans('mautic.form.abtest.label.rates')][]       = 0;
-                            $support['labels'][]                                                   = $c->getId() . ':' . $c->getTitle();;
+                            $support['labels'][]                                                = $c->getId() . ':' . $c->getTitle();;
                         }
                     }
                 }
@@ -99,7 +99,7 @@ class AbTestHelper
                     'winners'         => $winners,
                     'support'         => $support,
                     'basedOn'         => 'form.submissions',
-                    'supportTemplate' => 'MauticFormBundle:SubscribedEvents\AbTest:submissions.html.php'
+                    'supportTemplate' => 'MauticPageBundle:SubscribedEvents\AbTest:bargraph.html.php'
                 );
             }
         }

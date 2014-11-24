@@ -71,6 +71,11 @@ class AssetModel extends FormModel
      */
     public function trackDownload($asset, $request, $code = '200')
     {
+        //don't skew results with in-house downloads
+        if (!$this->factory->getSecurity()->isAnonymous()) {
+            return;
+        }
+
         $download = new Download();
         $download->setDateDownload(new \Datetime());
 

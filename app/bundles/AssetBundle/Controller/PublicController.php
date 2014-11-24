@@ -71,10 +71,9 @@ class PublicController extends CommonFormController
                 $dispatcher->dispatch(AssetEvents::ASSET_ON_DOWNLOAD, $event);
             }
 
-            $model->trackDownload($entity, $this->request, 200);
-
             try {
                 $contents = $entity->getFileContents();
+                $model->trackDownload($entity, $this->request, 200);
             } catch (\Exception $e) {
                 $model->trackDownload($entity, $this->request, 404);
                 throw $this->createNotFoundException($translator->trans('mautic.core.url.error.404'));

@@ -9,6 +9,7 @@
 
 namespace Mautic\SugarcrmBundle\EventListener;
 
+use Mautic\MapperBundle\Event\MapperAuthEvent;
 use Mautic\MapperBundle\Event\MapperFormEvent;
 use Mautic\MapperBundle\Event\MapperDashboardEvent;
 use Mautic\MapperBundle\EventListener\MapperSubscriber;
@@ -74,8 +75,17 @@ class MapperListener extends MapperSubscriber
         $event->addField($field);
     }
 
-    public function onCallbackApi()
+    public function onCallbackApi(MapperAuthEvent $event)
     {
+        if ($event->getApplication() != 'sugarcrm') {
+            return;
+        }
 
+        $postActionRedirect = array();
+
+
+
+        
+        $event->setPostActionRedirect($postActionRedirect);
     }
 }
