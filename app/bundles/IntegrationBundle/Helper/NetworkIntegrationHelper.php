@@ -490,11 +490,11 @@ class NetworkIntegrationHelper
     public function getIconPath(AbstractNetwork $network)
     {
         $systemPath  = $this->factory->getSystemPath('root');
-        $genericIcon = 'app/bundles/SocialBundle/Assets/img/generic.jpg';
+        $genericIcon = 'app/bundles/SocialBundle/Assets/img/generic.png';
         $name        = $network->getSettings()->getName();
 
         if ($network->getIsCore()) {
-            $icon = 'app/bundles/SocialBundle/Assets/img/' . strtolower($name) . '.jpg';
+            $icon = 'app/bundles/SocialBundle/Assets/img/' . strtolower($name) . '.png';
 
             if (file_exists($systemPath . '/' . $icon)) {
                 return $icon;
@@ -506,7 +506,7 @@ class NetworkIntegrationHelper
         // For non-core bundles, we need to extract out the bundle's name to figure out where in the filesystem to look for the icon
         $className = get_class($network);
         $exploded  = explode('\\', $className);
-        $icon      = 'addons/' . $exploded[1] . '/Assets/img/' . strtolower($name) . '.jpg';
+        $icon      = 'addons/' . $exploded[1] . '/Assets/img/' . strtolower($name) . '.png';
 
         if (file_exists($systemPath . '/' . $icon)) {
             return $icon;
