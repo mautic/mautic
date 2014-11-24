@@ -9,13 +9,13 @@
 
 namespace Mautic\SocialBundle\Network;
 
+/**
+ * Class LinkedInNetwork
+ */
 class LinkedInNetwork extends AbstractNetwork
 {
-
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
     public function getName()
     {
@@ -24,8 +24,6 @@ class LinkedInNetwork extends AbstractNetwork
 
     /**
      * {@inheritdoc}
-     *
-     * @return array
      */
     public function getSupportedFeatures()
     {
@@ -35,6 +33,9 @@ class LinkedInNetwork extends AbstractNetwork
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getIdentifierFields()
     {
         return false;

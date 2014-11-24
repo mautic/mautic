@@ -12,11 +12,25 @@ namespace Mautic\SocialBundle\Network;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\SocialBundle\Entity\SocialNetwork;
 
+/**
+ * Class AbstractNetwork
+ */
 abstract class AbstractNetwork
 {
+
+    /**
+     * @var MauticFactory
+     */
     protected $factory;
-    protected $entity;
+
+    /**
+     * @var SocialNetwork
+     */
     protected $settings;
+
+    /**
+     * @var bool
+     */
     private $isCore;
 
     /**
@@ -30,13 +44,12 @@ abstract class AbstractNetwork
     /**
      * Determines what priority the network should have against the other networks
      *
-     * @return mixed
+     * @return int
      */
     public function getPriority()
     {
         return 9999;
     }
-
 
     /**
      * Returns the name of the social network that must match the name of the file
@@ -97,6 +110,9 @@ abstract class AbstractNetwork
 
     /**
      * Retrieves and stores tokens returned from oAuthLogin
+     *
+     * @param string $clientId
+     * @param string $clientSecret
      *
      * @return array
      */
@@ -179,7 +195,8 @@ abstract class AbstractNetwork
     /**
      * Extract the tokens returned by the oauth2 callback
      *
-     * @param $data
+     * @param string $data
+     *
      * @return mixed
      */
     protected function parseCallbackResponse($data)
@@ -190,10 +207,12 @@ abstract class AbstractNetwork
     /**
      * Make a basic call using cURL to get the data
      *
-     * @param $url
+     * @param string $url
+     *
      * @return mixed
      */
-    public function makeCall($url) {
+    public function makeCall($url)
+    {
         $referer  = $this->getRefererUrl();
 
         $ch = curl_init();
@@ -203,8 +222,7 @@ abstract class AbstractNetwork
         $data = @curl_exec($ch);
         curl_close($ch);
 
-        $data = json_decode($data);
-        return $data;
+        return json_decode($data);
     }
 
     /**
@@ -270,22 +288,24 @@ abstract class AbstractNetwork
     /**
      * Get a string formatted error from an API response
      *
-     * @param $response
+     * @param mixed $response
+     *
      * @return string
      */
     public function getErrorsFromResponse($response)
     {
         if (is_array($response)) {
             return implode(' ', $response);
-        } else {
-            $response;
         }
+
+        return $response;
     }
 
     /**
      * Cleans the identifier for api calls
      *
-     * @param $identifier
+     * @param mixed $identifier
+     *
      * @return string
      */
     protected function cleanIdentifier($identifier)
@@ -304,17 +324,18 @@ abstract class AbstractNetwork
     /**
      * Gets the ID of the user for the network
      *
-     * @param $identifier
-     * @param $socialCache
-     * @return mixed|null
+     * @param       $identifier
+     * @param array $socialCache
+     *
+     * @return mixed
      */
     public function getUserId($identifier, &$socialCache)
     {
         if (!empty($socialCache['id'])) {
             return $socialCache['id'];
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**
@@ -322,6 +343,7 @@ abstract class AbstractNetwork
      *
      * @param $identifier
      * @param $socialCache
+     *
      * @return array
      */
     public function getPublicActivity($identifier, &$socialCache)
@@ -334,6 +356,7 @@ abstract class AbstractNetwork
      *
      * @param $identifier
      * @param $socialCache
+     *
      * @return array
      */
     public function getUserData($identifier, &$socialCache)
@@ -348,14 +371,15 @@ abstract class AbstractNetwork
      */
     protected function getRefererUrl()
     {
-        return "http" . (($_SERVER['SERVER_PORT']==443) ? "s://" : "://") . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+        return 'http' . (($_SERVER['SERVER_PORT'] == 443) ? 's://' : '://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
     }
 
     /**
      * Used to match local field name with remote field name
      *
-     * @param $field
-     * @param $subfield
+     * @param string $field
+     * @param string $subfield
+     *
      * @return mixed
      */
     public function matchFieldName($field, $subfield = '')
@@ -367,11 +391,12 @@ abstract class AbstractNetwork
         return $field;
     }
 
-
     /**
      * Convert and assign the data to assignable fields
      *
-     * @param $data
+     * @param mixed $data
+     *
+     * @return array
      */
     protected function matchUpData($data)
     {
@@ -417,13 +442,14 @@ abstract class AbstractNetwork
                     break;
             }
         }
+
         return $info;
     }
 
     /**
      * Checks to ensure an image still exists before caching
      *
-     * @param $url
+     * @param string $url
      *
      * @return bool
      */
@@ -431,10 +457,11 @@ abstract class AbstractNetwork
     {
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_NOBODY, true);
-        curl_setopt($ch,CURLOPT_USERAGENT,'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13');
+        curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13');
         curl_exec($ch);
         $retcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
+
         return ($retcode == 200);
     }
 

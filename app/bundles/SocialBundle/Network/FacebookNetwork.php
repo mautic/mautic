@@ -9,6 +9,9 @@
 
 namespace Mautic\SocialBundle\Network;
 
+/**
+ * Class FacebookNetwork
+ */
 class FacebookNetwork extends AbstractNetwork
 {
 
@@ -21,8 +24,6 @@ class FacebookNetwork extends AbstractNetwork
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
     public function getName()
     {
@@ -31,8 +32,6 @@ class FacebookNetwork extends AbstractNetwork
 
     /**
      * {@inheritdoc}
-     *
-     * @return array
      */
     public function getIdentifierFields()
     {
@@ -43,8 +42,6 @@ class FacebookNetwork extends AbstractNetwork
 
     /**
      * {@inheritdoc}
-     *
-     * @return array
      */
     public function getSupportedFeatures()
     {
@@ -56,8 +53,6 @@ class FacebookNetwork extends AbstractNetwork
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
     public function getAuthenticationUrl()
     {
@@ -74,21 +69,17 @@ class FacebookNetwork extends AbstractNetwork
 
     /**
      * {@inheritdoc}
-     *
-     * @return array
      */
     public function getRequiredKeyFields()
     {
         return array(
-            'clientId'      => 'mautic.social.keyfield.appid',
-            'clientSecret'  => 'mautic.social.keyfield.appsecret'
+            'clientId'     => 'mautic.social.keyfield.appid',
+            'clientSecret' => 'mautic.social.keyfield.appsecret'
         );
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
     public function getAuthenticationType()
     {
@@ -99,6 +90,7 @@ class FacebookNetwork extends AbstractNetwork
      * Extract the tokens returned by the oauth2 callback
      *
      * @param $data
+     *
      * @return mixed
      */
     protected function parseCallbackResponse($data)
@@ -160,10 +152,6 @@ class FacebookNetwork extends AbstractNetwork
 
     /**
      * {@inheritdoc}
-     *
-     * @param $identifier
-     * @param $socialCache
-     * @return bool
      */
     public function getUserId($identifier, &$socialCache)
     {
@@ -194,9 +182,6 @@ class FacebookNetwork extends AbstractNetwork
 
     /**
      * {@inheritdoc}
-     *
-     * @param $response
-     * @return string
      */
     public function getErrorsFromResponse($response)
     {
@@ -208,8 +193,6 @@ class FacebookNetwork extends AbstractNetwork
 
     /**
      * {@inheritdoc}
-     *
-     * @return array
      */
     public function getAvailableFields()
     {

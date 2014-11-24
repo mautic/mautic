@@ -9,13 +9,13 @@
 
 namespace Mautic\SocialBundle\Network;
 
+/**
+ * Class FoursquareNetwork
+ */
 class FoursquareNetwork extends AbstractNetwork
 {
-
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
     public function getName()
     {
@@ -24,8 +24,6 @@ class FoursquareNetwork extends AbstractNetwork
 
     /**
      * {@inheritdoc}
-     *
-     * @return int|mixed
      */
     public function getPriority()
     {
@@ -34,8 +32,6 @@ class FoursquareNetwork extends AbstractNetwork
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
     public function getIdentifierFields()
     {
@@ -47,8 +43,6 @@ class FoursquareNetwork extends AbstractNetwork
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
     public function getAuthenticationUrl()
     {
@@ -65,8 +59,6 @@ class FoursquareNetwork extends AbstractNetwork
 
     /**
      * {@inheritdoc}
-     *
-     * @return array
      */
     public function getRequiredKeyFields()
     {
@@ -78,8 +70,6 @@ class FoursquareNetwork extends AbstractNetwork
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
     public function getAuthenticationType()
     {
@@ -87,7 +77,8 @@ class FoursquareNetwork extends AbstractNetwork
     }
 
     /**
-     * @param $endpoint
+     * @param string $endpoint
+     * @param string $m
      *
      * @return string
      */
@@ -256,24 +247,18 @@ class FoursquareNetwork extends AbstractNetwork
 
     /**
      * {@inheritdoc}
-     *
-     * @param $response
-     * @return string
      */
     public function getErrorsFromResponse($response)
     {
         if (is_object($response) && isset($response->meta->errorDetail)) {
             return $response->meta->errorDetail . ' (' . $response->meta->code . ')';
         }
+
         return '';
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @param        $field
-     * @param string $subfield
-     * @return mixed|string
      */
     public function matchFieldName($field, $subfield = '')
     {
@@ -286,8 +271,6 @@ class FoursquareNetwork extends AbstractNetwork
 
     /**
      * {@inheritdoc}
-     *
-     * @return array
      */
     public function getAvailableFields()
     {
@@ -311,8 +294,6 @@ class FoursquareNetwork extends AbstractNetwork
 
     /**
      * {@inheritdoc}
-     *
-     * @return array
      */
     public function getSupportedFeatures()
     {
@@ -324,10 +305,6 @@ class FoursquareNetwork extends AbstractNetwork
 
     /**
      * {@inheritdoc}
-     *
-     * @param $identifier
-     * @param $socialCache
-     * @return bool
      */
     public function getUserId($identifier, &$socialCache)
     {

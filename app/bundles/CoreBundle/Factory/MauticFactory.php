@@ -478,4 +478,14 @@ class MauticFactory
     {
         return $this->container->get('monolog.logger.mautic');
     }
+
+    /**
+     * Get the network integration helper
+     *
+     * @return \Mautic\IntegrationBundle\Helper\NetworkIntegrationHelper
+     */
+    public function getNetworkIntegrationHelper()
+    {
+        return $this->container->get('mautic.network.integration');
+    }
 }

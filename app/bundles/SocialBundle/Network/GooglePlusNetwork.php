@@ -11,13 +11,13 @@ namespace Mautic\SocialBundle\Network;
 
 use Mautic\SocialBundle\Helper\NetworkIntegrationHelper;
 
+/**
+ * Class GooglePlusNetwork
+ */
 class GooglePlusNetwork extends AbstractNetwork
 {
-
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
     public function getName()
     {
@@ -26,8 +26,6 @@ class GooglePlusNetwork extends AbstractNetwork
 
     /**
      * {@inheritdoc}
-     *
-     * @return int|mixed
      */
     public function getPriority()
     {
@@ -37,8 +35,6 @@ class GooglePlusNetwork extends AbstractNetwork
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
     public function getIdentifierFields()
     {
@@ -50,8 +46,6 @@ class GooglePlusNetwork extends AbstractNetwork
 
     /**
      * {@inheritdoc}
-     *
-     * @return array
      */
     public function getSupportedFeatures()
     {
@@ -64,17 +58,13 @@ class GooglePlusNetwork extends AbstractNetwork
 
     /**
      * {@inheritdoc}
-     *
-     * @param $identifier
-     * @param $socialCache
-     * @return array
      */
     public function getUserData($identifier, &$socialCache)
     {
         if ($userid = $this->getUserId($identifier, $socialCache)) {
-            $url                = $this->getApiUrl("people/{$userid}");
-            $data               = $this->makeCall($url);
-            $info               = $this->matchUpData($data);
+            $url  = $this->getApiUrl("people/{$userid}");
+            $data = $this->makeCall($url);
+            $info = $this->matchUpData($data);
 
             if (isset($data->url)) {
                 preg_match("/plus.google.com\/(.*?)($|\/)/", $data->url, $matches);
@@ -93,10 +83,6 @@ class GooglePlusNetwork extends AbstractNetwork
 
     /**
      * {@inheritdoc}
-     *
-     * @param $identifier
-     * @param $socialCache
-     * @return array
      */
     public function getPublicActivity($identifier, &$socialCache)
     {
@@ -165,6 +151,8 @@ class GooglePlusNetwork extends AbstractNetwork
      * Convert and assign the data to assignable fields
      *
      * @param $data
+     *
+     * @return array
      */
     protected function matchUpData($data)
     {
@@ -272,8 +260,6 @@ class GooglePlusNetwork extends AbstractNetwork
 
     /**
      * {@inheritdoc}
-     *
-     * @return array
      */
     public function getAvailableFields()
     {
@@ -332,8 +318,6 @@ class GooglePlusNetwork extends AbstractNetwork
 
     /**
      * {@inheritdoc}
-     *
-     * @return array
      */
     public function getRequiredKeyFields()
     {
@@ -344,8 +328,6 @@ class GooglePlusNetwork extends AbstractNetwork
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
     public function getAuthenticationType()
     {
@@ -366,10 +348,6 @@ class GooglePlusNetwork extends AbstractNetwork
 
     /**
      * {@inheritdoc}
-     *
-     * @param $identifier
-     * @param $socialCache
-     * @return mixed|null
      */
     public function getUserId($identifier, &$socialCache)
     {

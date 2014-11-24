@@ -9,13 +9,13 @@
 
 namespace Mautic\SocialBundle\Network;
 
+/**
+ * Class InstagramNetwork
+ */
 class InstagramNetwork extends AbstractNetwork
 {
-
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
     public function getName()
     {
@@ -24,8 +24,6 @@ class InstagramNetwork extends AbstractNetwork
 
     /**
      * {@inheritdoc}
-     *
-     * @return array
      */
     public function getSupportedFeatures()
     {
@@ -37,8 +35,6 @@ class InstagramNetwork extends AbstractNetwork
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
     public function getAuthenticationType()
     {
@@ -47,8 +43,6 @@ class InstagramNetwork extends AbstractNetwork
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
     public function getIdentifierFields()
     {
@@ -57,8 +51,6 @@ class InstagramNetwork extends AbstractNetwork
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
     public function getAuthenticationUrl()
     {
@@ -75,8 +67,6 @@ class InstagramNetwork extends AbstractNetwork
 
     /**
      * {@inheritdoc}
-     *
-     * @return array
      */
     public function getRequiredKeyFields()
     {
@@ -100,11 +90,6 @@ class InstagramNetwork extends AbstractNetwork
 
     /**
      * {@inheritdoc}
-     *
-     * @param $identifier
-     * @param $socialCache
-     *
-     * @return array|void
      */
     public function getUserData($identifier, &$socialCache)
     {
@@ -123,9 +108,6 @@ class InstagramNetwork extends AbstractNetwork
 
     /**
      * {@inheritdoc}
-     *
-     * @param $identifier
-     * @param $socialCache
      */
     public function getPublicActivity($identifier, &$socialCache)
     {
@@ -175,11 +157,6 @@ class InstagramNetwork extends AbstractNetwork
 
     /**
      * {@inheritdoc}
-     *
-     * @param $identifier
-     * @param $socialCache
-     *
-     * @return mixed|null
      */
     public function getUserId($identifier, &$socialCache)
     {
@@ -210,6 +187,9 @@ class InstagramNetwork extends AbstractNetwork
         return false;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getAvailableFields()
     {
         return array(
