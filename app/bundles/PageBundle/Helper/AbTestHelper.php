@@ -99,17 +99,32 @@ class AbTestHelper
         }
 
         $startDate = $parent->getVariantStartDate();
+
         if ($startDate != null && !empty($pageIds)) {
             //get their bounce rates
             $counts = $repo->getDwellTimes($pageIds, $startDate);
+            $translator = $factory->getTranslator();
+            $support = array();
 
             if ($counts) {
                 //in order to get a fair grade, we have to compare the averages here since a page that is only shown
                 //25% of the time will have a significantly lower sum than a page shown 75% of the time
                 $avgs = array();
+                $support['data'] = array();
+                $support['labels'] = array();
                 foreach ($counts as $pid => $stats) {
                     $avgs[$pid] = $stats['average'];
+                    $support['data'][$translator->trans('mautic.page.abtest.label.dewlltime.average')][] = $stats['average'];
+                    $support['labels'][] = $pid . ':' . $stats['title'];
                 }
+
+                //set max for scales
+                $maxes = array();
+                foreach ($support['data'] as $label => $data) {
+                    $maxes[] = max($data);
+                }
+                $top                   = max($maxes);
+                $support['step_width'] = (floor($top / 10) * 10) / 10;
 
                 //find the max
                 $max = max($avgs);
@@ -119,9 +134,9 @@ class AbTestHelper
 
                 return array(
                     'winners'         => $winners,
-                    'support'         => $counts,
+                    'support'         => $support,
                     'basedOn'         => 'page.dwelltime',
-                    'supportTemplate' => 'MauticPageBundle:AbTest:dwelltimes.html.php'
+                    'supportTemplate' => 'MauticPageBundle:SubscribedEvents\AbTest:bargraph.html.php'
                 );
             }
         }

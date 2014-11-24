@@ -8,4 +8,6 @@
  */
 
 //todo - add graphs on bounce rate stats
-echo "<pre>".print_r($abTestResults,true)."</pre>";
+if (isset($abTestResults)) {
+	echo "<pre>".print_r($abTestResults, true)."</pre>";
+}

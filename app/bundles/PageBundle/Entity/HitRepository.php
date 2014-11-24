@@ -285,7 +285,7 @@ class HitRepository extends CommonRepository
             $q = $this->_em->getConnection()->createQueryBuilder();
         }
 
-        $q->select('h.id, h.page_id, h.date_hit, h.date_left, h.tracking_id, h.page_language')
+        $q->select('h.id, h.page_id, h.date_hit, h.date_left, h.tracking_id, h.page_language, p.title')
             ->from(MAUTIC_TABLE_PREFIX . 'page_hits', 'h')
             ->leftJoin('h', MAUTIC_TABLE_PREFIX . 'pages', 'p', 'h.page_id = p.id');
 
@@ -311,12 +311,15 @@ class HitRepository extends CommonRepository
 
         //loop to structure
         $times = array();
+        $titles = array();
         $trackingIds = array();
         $languages = array();
         foreach ($results as $r) {
+
             $dateHit  = new \DateTime($r['date_hit']);
             $dateLeft = new \DateTime($r['date_left']);
             if ($pageIds) {
+                $titles[$r['page_id']] = $r['title'];
                 $times[$r['page_id']][] = ($dateLeft->getTimestamp() - $dateHit->getTimestamp());
                 if (!isset($trackingIds[$r['page_id']])) {
                     $trackingIds[$r['page_id']] = array();
@@ -358,6 +361,7 @@ class HitRepository extends CommonRepository
                 $stats[$pid]['new'] = count($trackingIds[$pid]) - $stats[$pid]['returning'];
                 $stats[$pid]['newVsReturning'] = $this->getNewVsReturningGraphData($stats[$pid]['new'], $stats[$pid]['returning']);
                 $stats[$pid]['languages'] = $this->getLaguageGraphData($languages[$pid]);
+                $stats[$pid]['title'] = $titles[$pid];
             }
         } else {
             $stats = $this->countStats($times);
