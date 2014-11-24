@@ -10,3 +10,7 @@
 .symbol-at:before {
     content: '@';
 }
+
+.shuffle-item {
+	width: 100px;
+}

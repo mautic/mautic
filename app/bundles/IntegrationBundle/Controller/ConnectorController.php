@@ -51,7 +51,7 @@ class ConnectorController extends FormController
                 'permissions' => $permissions,
                 'tmpl'        => $tmpl
             ),
-            'contentTemplate' => 'MauticIntegrationBundle:Connector:list.html.php',
+            'contentTemplate' => 'MauticIntegrationBundle:Connector:grid.html.php',
             'passthroughVars' => array(
                 'activeLink'     => '#mautic_integration_connector_index',
                 'mauticContent'  => 'connector',
