@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -55,4 +55,4 @@ $view['slots']->set("headerTitle", $header);
 </div>
 
 <?php echo $view['form']->end($form); ?>
-<?php echo $view->render('MauticCampaignBundle:Campaign:builder.html.php', array('campaignEvents' => $campaignEvents, 'eventSettings' => $eventSettings, 'tempEventIds' => $tempEventIds)); ?>
+<?php echo $view->render('MauticCampaignBundle:Campaign:builder.html.php', array('campaignId' => $form['sessionId']->vars['data'], 'campaignEvents' => $campaignEvents, 'eventSettings' => $eventSettings, 'tempEventIds' => $tempEventIds)); ?>

@@ -1,13 +1,12 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-//@todo - add email stats/analytics
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'email');
 $view['slots']->set("headerTitle", $email->getSubject());
@@ -212,7 +211,7 @@ if ($security->hasEntityAccess($permissions['email:emails:editown'], $permission
         <hr class="hr-w-2" style="width:50%">
 
         <!-- activity feed -->
-        <?php echo $view->render('MauticCoreBundle:Default:recentactivity.html.php', array('logs' => $logs)); ?>
+        <?php echo $view->render('MauticCoreBundle:Helper:recentactivity.html.php', array('logs' => $logs)); ?>
     </div>
     <!--/ right section -->
     <input id="itemId" value="<?php echo $email->getId(); ?>" />

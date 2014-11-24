@@ -2,9 +2,9 @@
 
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -15,10 +15,20 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+/**
+ * Class AuthorizeController
+ */
 class AuthorizeController extends \FOS\OAuthServerBundle\Controller\AuthorizeController
 {
+
     /**
      * Authorize
+     *
+     * @param Request $request
+     *
+     * @return \FOS\OAuthServerBundle\Controller\Response|\Symfony\Component\HttpFoundation\Response
+     * @throws \OAuth2\OAuth2RedirectException
+     * @throws AccessDeniedException
      *
      * @author Chris Jones <leeked@gmail.com>
      */

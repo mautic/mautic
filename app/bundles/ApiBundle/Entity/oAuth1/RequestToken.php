@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -18,6 +18,7 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class RequestToken extends BaseRequestToken
 {
+
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")
@@ -51,4 +52,5 @@ class RequestToken extends BaseRequestToken
      * @ORM\Column(type="integer")
      */
     protected $expiresAt;
+
 }

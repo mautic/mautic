@@ -96,39 +96,23 @@ Mautic.leadOnLoad = function (container) {
         Mautic.activateSearchAutocomplete('NoteFilter', 'lead.note');
     }
 
-    // Shuffle
-    // ================================
-    var grid   = mQuery("#shuffle-grid"),
-        filter = mQuery("#shuffle-filter"),
-        sizer  = grid.find("shuffle-sizer");
+    if (mQuery('shuffle-grid').length) {
+        var grid = mQuery("#shuffle-grid");
 
-    // instatiate shuffle
-    grid.shuffle({
-        itemSelector: ".shuffle",
-        sizer: sizer
-    });
-
-    // Filter options
-    (function () {
-        filter.on("keyup change", function () {
-            var val = this.value.toLowerCase();
-            grid.shuffle("shuffle", function (el, shuffle) {
-
-                // Only search elements in the current group
-                if (shuffle.group !== "all" && mQuery.inArray(shuffle.group, el.data("groups")) === -1) {
-                    return false;
-                }
-
-                var text = mQuery.trim(el.find(".panel-body > h5").text()).toLowerCase();
-                return text.indexOf(val) !== -1;
-            });
+        grid.shuffle({
+            itemSelector: ".shuffle"
         });
-    })();
 
-    // Update shuffle on sidebar minimize/maximize
-    mQuery("html")
-        .on("fa.sidebar.minimize", function () { grid.shuffle("update"); })
-        .on("fa.sidebar.maximize", function () { grid.shuffle("update"); });
+
+        // Update shuffle on sidebar minimize/maximize
+        mQuery("html")
+            .on("fa.sidebar.minimize", function () {
+                grid.shuffle("update");
+            })
+            .on("fa.sidebar.maximize", function () {
+                grid.shuffle("update");
+            });
+    }
 
     if (typeof Mautic.leadEngagementChart === 'undefined') {
         Mautic.renderEngagementChart();

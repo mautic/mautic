@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -16,11 +16,12 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
  * Class MauticApiBundle
- *
- * @package Mautic\ApiBundle
  */
 class MauticApiBundle extends Bundle
 {
+    /**
+     * {@inheritdoc}
+     */
     public function build(ContainerBuilder $container)
     {
         parent::build($container);
@@ -31,7 +32,11 @@ class MauticApiBundle extends Bundle
         $extension->addSecurityListenerFactory(new ApiFactory());
     }
 
-    public function getParent() {
+    /**
+     * {@inheritdoc}
+     */
+    public function getParent()
+    {
         return 'FOSOAuthServerBundle';
     }
 }

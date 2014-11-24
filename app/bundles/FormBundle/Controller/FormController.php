@@ -1,13 +1,11 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
-//@todo - add support to editing more than one form at a time (i.e. opened in different tabs)
 
 namespace Mautic\FormBundle\Controller;
 
@@ -108,6 +106,7 @@ class FormController extends CommonFormController
             'viewParameters'  => array(
                 'searchValue' => $search,
                 'items'       => $forms,
+                'totalItems'  => $count,
                 'page'        => $page,
                 'limit'       => $limit,
                 'permissions' => $permissions,
@@ -225,13 +224,15 @@ class FormController extends CommonFormController
         //set the page we came from
         $page = $this->factory->getSession()->get('mautic.form.page', 1);
 
+        $sessionId = $this->request->request->get('mauticform[sessionId]', sha1(uniqid(mt_rand(), true)), true);
+
         //set added/updated fields
-        $formFields    = $session->get('mautic.formfields.add', array());
-        $deletedFields = $session->get('mautic.formfields.remove', array());
+        $modifiedFields    = $session->get('mautic.form.'.$sessionId.'.fields.modified', array());
+        $deletedFields = $session->get('mautic.form.'.$sessionId.'.fields.deleted', array());
 
         //set added/updated actions
-        $formActions    = $session->get('mautic.formactions.add', array());
-        $deletedActions = $session->get('mautic.formactions.remove', array());
+        $modifiedActions    = $session->get('mautic.form.'.$sessionId.'.actions.modified', array());
+        $deletedActions = $session->get('mautic.form.'.$sessionId.'.actions.deleted', array());
 
         $action = $this->generateUrl('mautic_form_action', array('objectAction' => 'new'));
         $form   = $model->createForm($entity, $this->get('form.factory'), $action);
@@ -241,12 +242,12 @@ class FormController extends CommonFormController
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    $submits = $session->get('mautic.formfields.submits', array());
+                    $submits = $session->get('mautic.form.'.$sessionId.'.fields.submits', array());
 
                     //only save fields that are not to be deleted
-                    $fields   = array_diff_key($formFields, array_flip($deletedFields));
+                    $fields   = array_diff_key($modifiedFields, array_flip($deletedFields));
                     //only save actions that are not to be deleted
-                    $actions  = array_diff_key($formActions, array_flip($deletedActions));
+                    $actions  = array_diff_key($modifiedActions, array_flip($deletedActions));
 
                     //make sure that at least one field is selected
                     if (empty($fields)) {
@@ -301,7 +302,7 @@ class FormController extends CommonFormController
 
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 //clear temporary fields
-                $this->clearSessionComponents();
+                $this->clearSessionComponents($sessionId);
 
                 return $this->postActionRedirect(array(
                     'returnUrl'       => $returnUrl,
@@ -315,12 +316,14 @@ class FormController extends CommonFormController
             }
         } else {
             //clear out existing fields in case the form was refreshed, browser closed, etc
-            $this->clearSessionComponents();
-            $formFields = $formActions = $deletedActions = $deletedFields = array();
+            $this->clearSessionComponents($sessionId);
+            $modifiedFields = $modifiedActions = $deletedActions = $deletedFields = array();
+
+            $form->get('sessionId')->setData($sessionId);
         }
 
         //fire the form builder event
-        $customComponents = $model->getCustomComponents();
+        $customComponents = $model->getCustomComponents($sessionId);
 
         $fieldHelper = new FormFieldHelper($this->get('translator'));
 
@@ -328,8 +331,8 @@ class FormController extends CommonFormController
             'viewParameters'  => array(
                 'fields'         => $fieldHelper->getList($customComponents['fields']),
                 'actions'        => $customComponents['actions'],
-                'formFields'     => $formFields,
-                'formActions'    => $formActions,
+                'formFields'     => $modifiedFields,
+                'formActions'    => $modifiedActions,
                 'deletedFields'  => $deletedFields,
                 'deletedActions' => $deletedActions,
                 'tmpl'           => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
@@ -409,16 +412,16 @@ class FormController extends CommonFormController
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 //set added/updated fields
-                $formFields     = $session->get('mautic.formfields.add', array());
-                $deletedFields  = $session->get('mautic.formfields.remove', array());
-                $fields         = array_diff_key($formFields, array_flip($deletedFields));
+                $modifiedFields     = $session->get('mautic.form.'.$objectId.'.fields.modified', array());
+                $deletedFields  = $session->get('mautic.form.'.$objectId.'.fields.deleted', array());
+                $fields         = array_diff_key($modifiedFields, array_flip($deletedFields));
                 //set added/updated actions
-                $formActions    = $session->get('mautic.formactions.add', array());
-                $deletedActions = $session->get('mautic.formactions.remove', array());
-                $actions        = array_diff_key($formActions, array_flip($deletedActions));
+                $modifiedActions    = $session->get('mautic.form.'.$objectId.'.actions.modified', array());
+                $deletedActions = $session->get('mautic.form.'.$objectId.'.actions.deleted', array());
+                $actions        = array_diff_key($modifiedActions, array_flip($deletedActions));
 
                 if ($valid = $this->isFormValid($form)) {
-                    $submits = $session->get('mautic.formfields.submits', array());
+                    $submits = $session->get('mautic.form.'.$objectId.'.fields.submits', array());
 
                     //make sure that at least one field is selected
                     if (empty($fields)) {
@@ -477,7 +480,7 @@ class FormController extends CommonFormController
 
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 //remove fields from session
-                $this->clearSessionComponents();
+                $this->clearSessionComponents($objectId);
 
                 return $this->postActionRedirect(
                     array_merge($postActionVars, array(
@@ -495,41 +498,43 @@ class FormController extends CommonFormController
 
             //lock the entity
             $model->lockEntity($entity);
+
+            $form->get('sessionId')->setData($objectId);
         }
 
         if ($cleanSlate) {
             //clean slate
-            $this->clearSessionComponents();
+            $this->clearSessionComponents($objectId);
 
             //load existing fields into session
-            $formFields     = array();
+            $modifiedFields     = array();
             $submits        = array();
             $existingFields = $entity->getFields()->toArray();
             foreach ($existingFields as $f) {
                 $id = $f->getId();
                 $field = $f->convertToArray();
                 unset($field['form']);
-                $formFields[$id] = $field;
+                $modifiedFields[$id] = $field;
                 if ($field['type'] == 'button') {
                     if ($field['properties']['type'] == 'submit') {
                         $submits[] = $id;
                     }
                 }
             }
-            $session->set('mautic.formfields.add', $formFields);
-            $session->set('mautic.formfields.submits', $submits);
+            $session->set('mautic.form.'.$objectId.'.fields.modified', $modifiedFields);
+            $session->set('mautic.form.'.$objectId.'.fields.submits', $submits);
             $deletedFields = array();
 
             //load existing actions into session
-            $formActions     = array();
+            $modifiedActions     = array();
             $existingActions = $entity->getActions()->toArray();
             foreach ($existingActions as $a) {
                 $id     = $a->getId();
                 $action = $a->convertToArray();
                 unset($action['form']);
-                $formActions[$id] = $action;
+                $modifiedActions[$id] = $action;
             }
-            $session->set('mautic.formactions.add', $formActions);
+            $session->set('mautic.form.'.$objectId.'.actions.modified', $modifiedActions);
             $deletedActions = array();
         }
 
@@ -541,8 +546,8 @@ class FormController extends CommonFormController
             'viewParameters'  => array(
                 'fields'         => $fieldHelper->getList($customComponents['fields']),
                 'actions'        => $customComponents['actions'],
-                'formFields'     => $formFields,
-                'formActions'    => $formActions,
+                'formFields'     => $modifiedFields,
+                'formActions'    => $modifiedActions,
                 'deletedFields'  => $deletedFields,
                 'deletedActions' => $deletedActions,
                 'tmpl'           => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
@@ -753,14 +758,14 @@ class FormController extends CommonFormController
     /**
      * Clear field and actions from the session
      */
-    public function clearSessionComponents()
+    public function clearSessionComponents($sessionId)
     {
         $session = $this->factory->getSession();
-        $session->remove('mautic.formfields.add');
-        $session->remove('mautic.formfields.remove');
-        $session->remove('mautic.formfields.submits');
+        $session->remove('mautic.form.'.$sessionId.'.fields.modified');
+        $session->remove('mautic.form.'.$sessionId.'.fields.deleted');
+        $session->remove('mautic.form.'.$sessionId.'.fields.submits');
 
-        $session->remove('mautic.formactions.add');
-        $session->remove('mautic.formactions.remove');
+        $session->remove('mautic.form.'.$sessionId.'.actions.modified');
+        $session->remove('mautic.form.'.$sessionId.'.actions.deleted');
     }
 }

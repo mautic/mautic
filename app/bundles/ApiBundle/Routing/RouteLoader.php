@@ -1,46 +1,57 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\ApiBundle\Routing;
 
-use Mautic\ApiBundle\ApiEvents;
-use Mautic\CoreBundle\Event\RouteEvent;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
  * Class RouteLoader
- *
- * @package Mautic\ApiBundle\Routing
  */
-
 class RouteLoader extends Loader
 {
-    private $loaded    = false;
+
+    /**
+     * @var bool
+     */
+    private $loaded = false;
+
+    /**
+     * @var bool|mixed
+     */
     private $bundles;
+
+    /**
+     * @var bool|mixed
+     */
+    private $addonBundles;
+
+    /**
+     * @var bool
+     */
     private $apiEnabled;
 
     /**
-     * @param Container $container
+     * @param MauticFactory $factory
      */
     public function __construct(MauticFactory $factory)
     {
-        $this->bundles    = $factory->getParameter('bundles');
-        $this->apiEnabled = $factory->getParameter('api_enabled');
+        $this->bundles      = $factory->getParameter('bundles');
+        $this->addonBundles = $factory->getParameter('addon.bundles');
+        $this->apiEnabled   = $factory->getParameter('api_enabled');
     }
 
     /**
-     * Load each bundles routing.php file
+     * {@inheritdoc}
      *
-     * @param mixed $resource
-     * @param null  $type
      * @return RouteCollection
      * @throws \RuntimeException
      */
@@ -52,14 +63,16 @@ class RouteLoader extends Loader
 
         $collection = new RouteCollection();
         foreach ($this->bundles as $bundle) {
-            $routing = $bundle['directory'] . "/Config/api.php";
+            $routing = $bundle['directory'] . "/Config/routing/api.php";
             if (file_exists($routing)) {
                 $collection->addCollection($this->import($routing));
-            } else {
-                $routing = $bundle['directory'] . "/Config/routing/api.php";
-                if (file_exists($routing)) {
-                    $collection->addCollection($this->import($routing));
-                }
+            }
+        }
+
+        foreach ($this->addonBundles as $bundle) {
+            $routing = $bundle['directory'] . "/Config/routing/api.php";
+            if (file_exists($routing)) {
+                $collection->addCollection($this->import($routing));
             }
         }
 
@@ -69,9 +82,7 @@ class RouteLoader extends Loader
     }
 
     /**
-     * @param mixed $resource
-     * @param null  $type
-     * @return bool
+     * {@inheritdoc}
      */
     public function supports($resource, $type = null)
     {

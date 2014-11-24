@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -66,3 +66,21 @@ $container->setDefinition(
     )
 )
     ->addTag('doctrine.event_subscriber');
+
+$container->setDefinition(
+    'mautic.lead.calendarbundle.subscriber',
+    new Definition(
+        'Mautic\LeadBundle\EventListener\CalendarSubscriber',
+        array(new Reference('mautic.factory'))
+    )
+)
+    ->addTag('kernel.event_subscriber');
+
+$container->setDefinition(
+    'mautic.lead.pointbundle.subscriber',
+    new Definition(
+        'Mautic\LeadBundle\EventListener\PointSubscriber',
+        array(new Reference('mautic.factory'))
+    )
+)
+    ->addTag('kernel.event_subscriber');

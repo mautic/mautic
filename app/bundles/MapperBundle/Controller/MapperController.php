@@ -1,9 +1,9 @@
 <?php
 /**
 * @package     Mautic
-* @copyright   2014 Mautic, NP. All rights reserved.
+* @copyright   2014 Mautic Contributors. All rights reserved.
 * @author      Mautic
-* @link        http://mautic.com
+* @link        http://mautic.org
 * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
 */
 
@@ -80,7 +80,6 @@ class MapperController extends FormController
     public function editMapperAction ($application, $client, $object)
     {
         $ignorePost     = false;
-        $session        = $this->factory->getSession();
         $modelClient    = $this->factory->getModel('mapper.ApplicationClient');
         $modelMapper    = $this->factory->getModel('mapper.ApplicationObjectMapper');
 
@@ -190,5 +189,20 @@ class MapperController extends FormController
                     ))
             )
         ));
+    }
+
+    /**
+     * Dispatch onCallback
+     *
+     * @param $application
+     * @param $client
+     */
+    public function onAuthAction ($application, $client)
+    {
+        $bundles = $this->factory->getParameter('bundles');
+
+        $class_name = sprintf("\\Mautic\\%sBundle\\EventListener\\MapperListener", ucfirst($application));
+        $listener = new $class_name;
+        $listener->onCalllback();
     }
 }

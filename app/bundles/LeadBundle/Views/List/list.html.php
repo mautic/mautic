@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 //Check to see if the entire page should be displayed or just main content
@@ -97,5 +97,5 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
         </div>
     </div>
 <?php else: ?>
-    <?php echo $view->render('MauticCoreBundle:Default:noresults.html.php'); ?>
+    <?php echo $view->render('MauticCoreBundle:Helper:noresults.html.php'); ?>
 <?php endif; ?>

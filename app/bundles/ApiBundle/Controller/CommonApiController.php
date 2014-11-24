@@ -1,12 +1,11 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  *
- * //TODO create support for hashed api requests for non-ssl sites?
  */
 
 namespace Mautic\ApiBundle\Controller;
@@ -21,19 +20,21 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
+/**
+ * Class CommonApiController
+ */
 class CommonApiController extends FOSRestController implements MauticController
 {
 
     /**
-     * @var
+     * @var Request
      */
     protected $request;
 
     /**
-     * @var \Mautic\CoreBundle\Factory\MauticFactory $factory
+     * @var MauticFactory $factory
      */
 
     protected $factory;
@@ -46,35 +47,35 @@ class CommonApiController extends FOSRestController implements MauticController
     /**
      * Model object for processing the entity
      *
-     * @var
+     * @var \Mautic\CoreBundle\Model\CommonModel
      */
     protected $model;
 
     /**
      * Key to return for a single entity
      *
-     * @var
+     * @var string
      */
     protected $entityNameOne;
 
     /**
      * Key to return for entity lists
      *
-     * @var
+     * @var string
      */
     protected $entityNameMulti;
 
     /**
      * Class for the entity
      *
-     * @var
+     * @var string
      */
     protected $entityClass;
 
     /**
      * Permission base for the entity such as page:pages
      *
-     * @var
+     * @var string
      */
     protected $permissionBase;
 
@@ -94,6 +95,8 @@ class CommonApiController extends FOSRestController implements MauticController
      * Initialize some variables
      *
      * @param FilterControllerEvent $event
+     *
+     * @return void
      */
     public function initialize(FilterControllerEvent $event)
     {
@@ -134,7 +137,7 @@ class CommonApiController extends FOSRestController implements MauticController
      *   }
      * )
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getEntitiesAction()
     {
@@ -221,7 +224,8 @@ class CommonApiController extends FOSRestController implements MauticController
      * )
      *
      * @param int $id Entity ID
-     * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @return Response
      */
     public function getEntityAction($id)
     {
@@ -279,6 +283,7 @@ class CommonApiController extends FOSRestController implements MauticController
      * )
      *
      * @param int $id Entity ID
+     *
      * @return Response
      */
     public function editEntityAction($id)
@@ -288,15 +293,15 @@ class CommonApiController extends FOSRestController implements MauticController
         $method     = $this->request->getMethod();
 
         if ($entity === null) {
-            if ($method === "PATCH") {
+            if ($method === 'PATCH') {
                 //PATCH requires that an entity exists
                 return $this->notFound();
-            } else {
-                //PUT can create a new entity if it doesn't exist
-                $entity = $this->model->getEntity();
-                if (!$this->checkEntityAccess($entity, 'create')) {
-                    return $this->accessDenied();
-                }
+            }
+
+            //PUT can create a new entity if it doesn't exist
+            $entity = $this->model->getEntity();
+            if (!$this->checkEntityAccess($entity, 'create')) {
+                return $this->accessDenied();
             }
         }
 
@@ -319,6 +324,7 @@ class CommonApiController extends FOSRestController implements MauticController
      * )
      *
      * @param int $id Entity ID
+     *
      * @return Response
      */
     public function deleteEntityAction($id)
@@ -335,9 +341,9 @@ class CommonApiController extends FOSRestController implements MauticController
             $this->setSerializationContext($view);
 
             return $this->handleView($view);
-        } else {
-            return $this->notFound();
         }
+
+        return $this->notFound();
     }
 
     /**
@@ -346,6 +352,7 @@ class CommonApiController extends FOSRestController implements MauticController
      * @param        $entity
      * @param null   $parameters
      * @param string $method
+     *
      * @return Response
      */
     protected function processForm($entity, $parameters = null, $method = 'PUT')
@@ -409,9 +416,9 @@ class CommonApiController extends FOSRestController implements MauticController
             $ownPerm   = "{$this->permissionBase}:{$action}own";
             $otherPerm = "{$this->permissionBase}:{$action}other";
             return $this->security->hasEntityAccess($ownPerm, $otherPerm, $entity->getCreatedBy());
-        } else {
-            return $this->security->isGranted("{$this->permissionBase}:create");
         }
+
+        return $this->security->isGranted("{$this->permissionBase}:create");
     }
 
     /**
@@ -429,7 +436,9 @@ class CommonApiController extends FOSRestController implements MauticController
     /**
      * Set serialization groups and exclusion strategies
      *
-     * @param $view
+     * @param \FOS\RestBundle\View\View $view
+     *
+     * @return void
      */
     protected function setSerializationContext(&$view)
     {
@@ -470,16 +479,24 @@ class CommonApiController extends FOSRestController implements MauticController
      * @param $form
      * @param $parameters
      * @param $action
+     *
+     * @return mixed
      */
-    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit') {}
+    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
+    {
+    }
 
     /**
      * Gives child controllers opportunity to analyze and do whatever to an entity before going through serializer
      *
      * @param        $entity
      * @param string $action
+     *
+     * @return mixed
      */
-    protected function preSerializeEntity(&$entity, $action = 'view') {}
+    protected function preSerializeEntity(&$entity, $action = 'view')
+    {
+    }
 
     /**
      * Gives child controllers opportunity to analyze and do whatever to an entity before populating the form
@@ -487,13 +504,17 @@ class CommonApiController extends FOSRestController implements MauticController
      * @param        $entity
      * @param        $parameters
      * @param string $action
+     *
+     * @return mixed
      */
-    protected function prePopulateForm(&$entity, $parameters, $action = 'edit') {}
+    protected function prePopulateForm(&$entity, $parameters, $action = 'edit')
+    {
+    }
 
     /**
      * Returns a 403 Access Denied
      *
-     * @param $msg
+     * @param string $msg
      *
      * @return Response
      */
@@ -513,7 +534,7 @@ class CommonApiController extends FOSRestController implements MauticController
     /**
      * Returns a 404 Not Found
      *
-     * @param $msg
+     * @param string $msg
      *
      * @return Response
      */

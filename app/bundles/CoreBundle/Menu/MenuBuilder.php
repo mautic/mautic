@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -115,7 +115,7 @@ class MenuBuilder
      */
     public function breadcrumbsMenu()
     {
-        $menu = $this->mainMenu($this->request);
+        $menu = $this->mainMenu();
 
         //check for overrideRoute in request from an ajax content request
         $forRouteUri  = $this->request->get("overrideRouteUri", "current");
@@ -124,7 +124,7 @@ class MenuBuilder
 
         //if empty, check the admin menu
         if (empty($current)) {
-            $admin   = $this->adminMenu($this->request);
+            $admin   = $this->adminMenu();
             $current = $this->getCurrentMenuItem($admin, $forRouteUri, $forRouteName);
         }
 

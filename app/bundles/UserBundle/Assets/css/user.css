@@ -1,17 +1,5 @@
 /* UserBundle */
 
-.login-container {
-    background-color: #4E5E9E;
-    color: #fff;
-    width: 320px;
-    height: 320px;
-    background-color: #4E5E9E;
-    margin-left: auto;
-    margin-right: auto;
-    margin: 50px auto 50px;
-    text-align: center;
-}
-
 .profile-details {
     margin-bottom: 20px;
 }
@@ -47,7 +35,7 @@
     fill: #4e5e9e;
 }
 
-.mautic-logo > svg.mautic-logo-figure .m, 
+.mautic-logo > svg.mautic-logo-figure .m,
 .mautic-logo > svg.mautic-logo-figure .m-arrow {
       fill: #fdb933;
 }
@@ -58,4 +46,8 @@ input:-webkit-autofill {
 
 span.input-group-addon i.fa {
     width: 20px;
+}
+
+.inline-login .login-form {
+    margin: 20px;
 }

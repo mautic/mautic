@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -155,7 +155,7 @@ class CategoryController extends FormController
 
         //not found
        if (!$this->factory->getSecurity()->isGranted($bundle.':categories:create')) {
-            return $this->accessDenied();
+            return $this->modalAccessDenied();
         }
         //Create the form
         $action = $this->generateUrl('mautic_category_action', array(
@@ -231,10 +231,9 @@ class CategoryController extends FormController
         if ($entity === null) {
             $closeModal = true;
         }  elseif (!$this->factory->getSecurity()->isGranted($bundle.':categories:view')) {
-            return $this->accessDenied();
+            return $this->modalAccessDenied();
         } elseif ($model->isLocked($entity)) {
-            //deny access if the entity is locked
-            //return $this->isLocked($postActionVars, $entity, 'category.category');
+            return $this->modalAccessDenied();
         }
 
         //Create the form

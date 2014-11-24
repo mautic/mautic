@@ -1,40 +1,44 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\ApiBundle\Routing;
 
-use Mautic\ApiBundle\ApiEvents;
-use Mautic\ApiBundle\Event\RouteEvent;
 use Symfony\Component\Config\Loader\Loader;
-use Symfony\Component\Finder\Finder;
 use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\DependencyInjection\Container;
 
 /**
  * Class ApiDocsLoader
- *
- * @package Mautic\ApiBundle\Routing
  */
-
 class ApiDocsLoader extends Loader
 {
+
+    /**
+     * @var bool
+     */
     private $loaded = false;
+
+    /**
+     * @var string
+     */
     private $environment;
 
+    /**
+     * @param string $environment
+     */
     public function __construct($environment)
     {
         $this->environment = $environment;
     }
 
     /**
-     * @param mixed $resource
-     * @param null  $type
+     * {@inheritdoc}
+     *
      * @return RouteCollection
      * @throws \RuntimeException
      */
@@ -59,9 +63,7 @@ class ApiDocsLoader extends Loader
     }
 
     /**
-     * @param mixed $resource
-     * @param null  $type
-     * @return bool
+     * {@inheritdoc}
      */
     public function supports($resource, $type = null)
     {

@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -53,33 +53,45 @@ class PageType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber(array('content' => 'html')));
+        $builder->addEventSubscriber(new CleanFormSubscriber(array('content' => 'html', 'customHtml' => 'html')));
         $builder->addEventSubscriber(new FormExitSubscriber('page.page', $options));
 
         $variantParent = $options['data']->getVariantParent();
         $isVariant     = !empty($variantParent);
 
         $builder->add('title', 'text', array(
-            'label'      => 'mautic.page.page.form.title',
+            'label'      => 'mautic.page.form.title',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control')
         ));
 
-        $builder->add('alias', 'text', array(
-            'label'      => 'mautic.page.page.form.alias',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array(
-                'class'   => 'form-control',
-                'tooltip' => 'mautic.page.page.help.alias',
+        $contentMode = $options['data']->getContentMode();
+        if (empty($contentMode)) {
+            $contentMode = 'builder';
+        }
+        $builder->add('contentMode', 'button_group', array(
+            'choice_list' => new ChoiceList(
+                array('custom', 'builder'),
+                array('mautic.page.form.contentmode.custom', 'mautic.page.form.contentmode.builder')
             ),
-            'required'   => false,
-            'disabled'   => $isVariant
+            'expanded'      => true,
+            'multiple'      => false,
+            'label'         => 'mautic.page.form.contentmode',
+            'empty_value'   => false,
+            'required'      => false,
+            'data'          => $contentMode,
+            'attr'          => array(
+                'onChange' => 'Mautic.togglePageContentMode(this);'
+            )
         ));
 
-        //add category
-        $builder->add('category', 'category', array(
-            'bundle'   => 'page',
-            'disabled' => $isVariant
+        $builder->add('customHtml', 'textarea', array(
+            'label'      => 'mautic.page.form.customhtml',
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array(
+                'tooltip' => 'mautic.page.form.customhtml.help',
+                'class'   => 'form-control editor-fullpage'
+            )
         ));
 
         //build a list
@@ -91,45 +103,15 @@ class PageType extends AbstractType
             'choices'       => $this->themes,
             'expanded'      => false,
             'multiple'      => false,
-            'label'         => 'mautic.page.page.form.template',
+            'label'         => 'mautic.page.form.template',
             'label_attr'    => array('class' => 'control-label'),
             'empty_value'   => false,
             'required'      => false,
             'attr'       => array(
                 'class'   => 'form-control',
-                'tooltip' => 'mautic.page.page.form.template.help'
+                'tooltip' => 'mautic.page.form.template.help'
             ),
             'data'          => $template
-        ));
-
-        $builder->add('language', 'locale', array(
-            'label'      => 'mautic.page.page.form.language',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array(
-                'class'   => 'form-control',
-                'tooltip' => 'mautic.page.page.form.language.help',
-            ),
-            'required'   => false,
-            'disabled'   => $isVariant
-        ));
-
-        $builder->add('translationParent_lookup', 'text', array(
-            'label'      => 'mautic.page.page.form.translationparent',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array(
-                'class'   => 'form-control',
-                'tooltip' => 'mautic.page.page.form.translationparent.help'
-            ),
-            'mapped'     => false,
-            'required'   => false,
-            'disabled'   => $isVariant
-        ));
-
-        $builder->add('translationParent', 'hidden_entity', array(
-            'required'       => false,
-            'repository'     => 'MauticPageBundle:Page',
-            'error_bubbling' => false,
-            'disabled'   => $isVariant
         ));
 
         $builder->add('isPublished', 'button_group', array(
@@ -169,7 +151,7 @@ class PageType extends AbstractType
         ));
 
         $builder->add('metaDescription', 'textarea', array(
-            'label'      => 'mautic.page.page.form.metadescription',
+            'label'      => 'mautic.page.form.metadescription',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control', 'maxlength' => 160),
             'required'   => false
@@ -180,23 +162,60 @@ class PageType extends AbstractType
         if ($isVariant) {
             $builder->add('variantSettings', 'pagevariant', array(
                 'label'       => false,
-                'page_entity' => $options['data']
+                'page_entity' => $options['data'],
+                'data'        => $options['data']->getVariantSettings()
+            ));
+        } else {
+
+            $builder->add('alias', 'text', array(
+                'label'      => 'mautic.page.form.alias',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array(
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.page.help.alias',
+                ),
+                'required'   => false,
+                'disabled'   => $isVariant
+            ));
+
+            //add category
+            $builder->add('category', 'category', array(
+                'bundle'   => 'page',
+                'disabled' => $isVariant
+            ));
+
+            $builder->add('language', 'locale', array(
+                'label'      => 'mautic.page.form.language',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array(
+                    'class'   => 'form-control chosen',
+                    'tooltip' => 'mautic.page.form.language.help',
+                ),
+                'required'   => false,
+                'disabled'   => $isVariant
+            ));
+
+            $builder->add('translationParent_lookup', 'text', array(
+                'label'      => 'mautic.page.form.translationparent',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array(
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.page.form.translationparent.help'
+                ),
+                'mapped'     => false,
+                'required'   => false,
+                'disabled'   => $isVariant
+            ));
+
+            $builder->add('translationParent', 'hidden_entity', array(
+                'required'       => false,
+                'repository'     => 'MauticPageBundle:Page',
+                'error_bubbling' => false,
+                'disabled'   => $isVariant
             ));
         }
 
-        $builder->add('buttons', 'form_buttons', array(
-            'pre_extra_buttons' => array(
-                array(
-                    'name'  => 'builder',
-                    'label' => 'mautic.page.page.launch.builder',
-                    'attr'  => array(
-                        'class'   => 'btn btn-default',
-                        'icon'    => 'fa fa-cube text-mautic',
-                        'onclick' => 'Mautic.launchPageEditor();'
-                    )
-                )
-            )
-        ));
+        $builder->add('buttons', 'form_buttons');
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);

@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -110,7 +110,7 @@ class GraphHelper
     }
 
     /**
-     * Prepares data structure of labels and values needed for line graph.
+     * Prepares data structure of labels and values needed for datetime line graph.
      * fromDate variable can be used for SQL query as a limit.
      *
      * @param integer $amount        of units
@@ -119,7 +119,7 @@ class GraphHelper
      *
      * @return array
      */
-    public static function prepareLineGraphData($amount = 30, $unit = 'D', $datasetLabels = array('Dataset 1'))
+    public static function prepareDatetimeLineGraphData($amount = 30, $unit = 'D', $datasetLabels = array('Dataset 1'))
     {
         $isTime = '';
 
@@ -164,6 +164,72 @@ class GraphHelper
         $data['fromDate'] = $date;
 
         $data['labels'] = array_reverse($data['labels']);
+
+        return $data;
+    }
+
+    /**
+     * Prepares data structure for basic count based line graphs
+     *
+     * @param array $labels       array of labels
+     * @param array $datasets     array array(label => array of values in order of $labels)
+     *
+     * @return array
+     */
+    public static function prepareLineGraphData($labels, $datasets)
+    {
+        $data = array();
+        $data['labels'] = $labels;
+        $j = 0;
+        foreach ($datasets as $label => $dataset) {
+            if (!isset(self::$colors[$j])) {
+                $j = 0;
+            }
+
+            $data['datasets'][$label] = array(
+                'label'                => $label,
+                'fillColor'            => self::$colors[$j]['fill'],
+                'highlightFill'        => self::$colors[$j]['color'],
+                'strokeColor'          => self::$colors[$j]['highlight'],
+                'pointColor'           => self::$colors[$j]['highlight'],
+                'pointStrokeColor'     => '#fff',
+                'pointHighlightFill'   => '#fff',
+                'pointHighlightStroke' => self::$colors[$j]['highlight'],
+                'data'                 => $dataset
+            );
+            $j++;
+        }
+
+        return $data;
+    }
+
+    /**
+     * Prepares data structure for basic count based line graphs
+     *
+     * @param array $labels       array of labels
+     * @param array $datasets     array array(label => array of values in order of $labels)
+     *
+     * @return array
+     */
+    public static function prepareBarGraphData($labels, $datasets)
+    {
+        $data = array();
+        $data['labels'] = $labels;
+        $j = 0;
+        foreach ($datasets as $label => $dataset) {
+            if (!isset(self::$colors[$j])) {
+                $j = 0;
+            }
+
+            $data['datasets'][] = array(
+                'label'                => $label,
+                'fillColor'            => self::$colors[$j]['fill'],
+                'highlightFill'        => self::$colors[$j]['color'],
+                'strokeColor'          => self::$colors[$j]['highlight'],
+                'data'                 => $dataset
+            );
+            $j++;
+        }
 
         return $data;
     }
@@ -264,7 +330,6 @@ class GraphHelper
                 $percent = $count / $suma * 100;
             }
 
-            $color       = $colors[$i];
             $graphData[] = array(
                 'label'     => $label,
                 'color'     => $colors[$i]['color'],

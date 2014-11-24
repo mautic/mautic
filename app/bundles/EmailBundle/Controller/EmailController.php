@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailSendEvent;
+use Symfony\Component\HttpFoundation\Response;
 
 class EmailController extends FormController
 {
@@ -127,6 +128,7 @@ class EmailController extends FormController
             'viewParameters'  =>  array(
                 'searchValue' => $search,
                 'items'       => $emails,
+                'totalItems'  => $count,
                 'page'        => $page,
                 'limit'       => $limit,
                 'permissions' => $permissions,
@@ -371,7 +373,7 @@ class EmailController extends FormController
                 $returnUrl = $this->generateUrl('mautic_email_index', $viewParameters);
                 $template  = 'MauticEmailBundle:Email:index';
                 //clear any modified content
-                $session->remove('mautic.emailbuilder.'.$entity->getSessionId().'.content', array());
+                $session->remove('mautic.emailbuilder.' . $entity->getSessionId() . '.content');
             }
 
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
@@ -494,7 +496,7 @@ class EmailController extends FormController
                 }
             } else {
                 //clear any modified content
-                $session->remove('mautic.emailbuilder.'.$objectId.'.content', array());
+                $session->remove('mautic.emailbuilder.' . $objectId . '.content');
                 //unlock the entity
                 $model->unlockEntity($entity);
 
@@ -866,30 +868,36 @@ class EmailController extends FormController
             return $this->accessDenied();
         }
 
-        //all the checks pass so display the content
-        $template   = $entity->getTemplate();
-        $slots      = $this->factory->getTheme($template)->getSlots('email');
+        //bogus ID
+        $idHash = 'xxxxxxxxxxxxxx';
+
+        if ($entity->getContentMode() == 'builder') {
+            $template   = $entity->getTemplate();
+            $slots      = $this->factory->getTheme($template)->getSlots('email');
+
+            $response = $this->render('MauticEmailBundle::public.html.php', array(
+                'inBrowser' => true,
+                'slots'     => $slots,
+                'content'   => $entity->getContent(),
+                'email'     => $entity,
+                'lead'      => null,
+                'template'  => $template,
+                'idHash'    => $idHash
+            ));
+
+            //replace tokens
+            $content = $response->getContent();
+        } else {
+            $content = $entity->getCustomHtml();
+        }
 
         $dispatcher = $this->get('event_dispatcher');
         if ($dispatcher->hasListeners(EmailEvents::EMAIL_ON_DISPLAY)) {
-            $event = new EmailSendEvent($entity, null, 'xxxxxxxxxxx');
-            $slotsHelper = $this->factory->getTemplating()
-                ->getEngine('MauticEmailBundle::public.html.php')->get('slots');
-            $event->setSlotsHelper($slotsHelper);
+            $event = new EmailSendEvent($content, $entity, null, $idHash);
             $dispatcher->dispatch(EmailEvents::EMAIL_ON_DISPLAY, $event);
             $content = $event->getContent();
-        } else {
-            $content = $entity->getContent();
         }
 
-        return $this->render('MauticEmailBundle::public.html.php', array(
-            'inBrowser' => true,
-            'slots'     => $slots,
-            'content'   => $content,
-            'email'     => $entity,
-            'lead'      => null,
-            'template'  => $template,
-            'idHash'    => 'xxxxxxxxxxx'
-        ));
+        return new Response($content);
     }
 }

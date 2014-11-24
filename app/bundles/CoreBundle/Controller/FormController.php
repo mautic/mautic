@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -49,10 +49,10 @@ class FormController extends CommonController
     /**
      * Returns view to index with a locked out message
      *
-     * @param array                                $postActionVars
-     * @param object                               $entity
-     * @param \Mautic\CoreBundle\Model\CommonModel $model
-     * @param bool                                 $batch          Flag if a batch action is being performed
+     * @param array  $postActionVars
+     * @param object $entity
+     * @param string $model
+     * @param bool   $batch Flag if a batch action is being performed
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|array
      */

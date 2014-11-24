@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -11,7 +11,6 @@ namespace Mautic\CampaignBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
@@ -136,6 +135,10 @@ class EventType extends AbstractType
             'container_class' => 'bottom-campaignevent-buttons'
         ));
 
+        $builder->add('campaignId', 'hidden', array(
+            'mapped' => false
+        ));
+
         if (!empty($options["action"])) {
             $builder->setAction($options["action"]);
         }
@@ -153,7 +156,8 @@ class EventType extends AbstractType
     /**
      * @return string
      */
-    public function getName() {
+    public function getName()
+    {
         return "campaignevent";
     }
 }

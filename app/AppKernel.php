@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -46,9 +46,27 @@ class AppKernel extends Kernel
      * This constant is used to define additional version segments such as development
      * or beta status.
      *
-     * @const integer
+     * @const string
      */
     const EXTRA_VERSION = '-dev';
+
+    /**
+     * {@inheritdoc}
+     */
+    public function boot()
+    {
+        parent::boot();
+
+        // It's only after we've booted that we have access to the container, so here is where we will check if addon bundles are enabled
+        foreach ($this->getBundles() as $name => $bundle) {
+            if ($bundle instanceof \Mautic\CoreBundle\Bundle\IntegrationBundleBase) {
+                if (!$bundle->isEnabled()) {
+                    unset($this->bundles[$name]);
+                    unset($this->bundleMap[$name]);
+                }
+            }
+        }
+    }
 
     /**
      * {@inheritdoc}
@@ -110,6 +128,24 @@ class AppKernel extends Kernel
                 } else {
                     $bundles[] = $bundleInstance;
                 }
+            }
+        }
+
+        //dynamically register Mautic Addon Bundles
+        $searchPath = dirname(__DIR__) . '/addons';
+        $finder     = new \Symfony\Component\Finder\Finder();
+        $finder->files()
+            ->in($searchPath)
+            ->name('*Bundle.php');
+
+        foreach ($finder as $file) {
+            $path      = substr($file->getRealPath(), strlen($searchPath) + 1, -4);
+            $parts     = explode(DIRECTORY_SEPARATOR, $path);
+            $class     = array_pop($parts);
+            $namespace = "MauticAddon\\" . implode('\\', $parts);
+            $class     = $namespace . '\\' . $class;
+            if (class_exists($class)) {
+                $bundles[] = new $class();
             }
         }
 

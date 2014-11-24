@@ -1,19 +1,18 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\CategoryBundle\EventListener;
 
-use Mautic\ApiBundle\Event\RouteEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\CategoryBundle\Event as Events;
 use Mautic\CategoryBundle\CategoryEvents;
+
 /**
  * Class CategorySubscriber
  *

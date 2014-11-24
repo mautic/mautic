@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 namespace Mautic\AssetBundle\EventListener;
@@ -64,6 +64,7 @@ class LeadSubscriber extends CommonSubscriber
 
         $downloads = $downloadRepository->getLeadDownloads($lead->getId(), $options);
 
+        /** @var \Mautic\AssetBundle\Model\AssetModel $model */
         $model = $this->factory->getModel('asset.asset');
 
         // Add the downloads to the event array

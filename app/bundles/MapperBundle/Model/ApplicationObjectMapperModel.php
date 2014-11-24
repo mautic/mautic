@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -67,14 +67,14 @@ class ApplicationObjectMapperModel extends FormModel
     public function getEntity($object = null, $client_id = null)
     {
         if ($object === null && $client_id === null) {
-            return new ApplicationObjectMapper($this->factory);
+            return new ApplicationObjectMapper();
         }
 
         $repo = $this->getRepository();
         $entity = $repo->findOneBy(array('objectName' => $object, 'applicationClientId' => $client_id));
 
         if ($entity === null) {
-            return new ApplicationObjectMapper($this->factory);
+            return new ApplicationObjectMapper();
         }
 
         return $entity;

@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
@@ -37,6 +37,8 @@
 
     <!-- start: left nav -->
     <ul class="nav navbar-nav navbar-left">
+        <!--
+        <?php //@todo add notifications ?>
         <li class="dropdown dropdown-custom">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                 <?php if (!empty($newNotifications)): ?>
@@ -51,7 +53,6 @@
                     </div>
                     <div class="pt-xs pb-xs pl-0 pr-0">
                         <div class="scroll-content slimscroll" style="height:250px;">
-                            <!--
                             <div class="media pt-sm pb-sm pr-md pl-md nm bdr-b">
                                 <span class="pull-left img-wrapper img-rounded mt-xs" style="width:36px">
                                     <img class="media-object" src="https://s3.amazonaws.com/uifaces/faces/twitter/mlane/73.jpg">
@@ -65,13 +66,12 @@
                                     </div>
                                 </div>
                             </div>
-                            -->
                         </div>
                     </div>
                 </div>
             </div>
         </li>
-
+        -->
         <li class="hidden-xs" data-toggle="tooltip" data-placement="right" title="Minimize Sidebar">
             <a href="javascript:void(0)" data-toggle="minimize" class="sidebar-minimizer"><span class="arrow fs-14"></span></a>
         </li>

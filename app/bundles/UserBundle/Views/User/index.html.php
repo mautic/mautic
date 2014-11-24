@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -17,7 +17,7 @@ $view['slots']->set('mauticContent', 'user');
         'mautic_user_action', array("objectAction" => "new")); ?>"
     data-toggle="ajax"
     data-menu-link="#mautic_user_index">
-    	<i class="fa fa-plus"></i> 
+    	<i class="fa fa-plus"></i>
         <?php echo $view["translator"]->trans("mautic.user.user.menu.new"); ?>
     </a>
 <?php $view['slots']->stop(); ?>

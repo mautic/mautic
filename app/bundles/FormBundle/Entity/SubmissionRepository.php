@@ -1,17 +1,17 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\FormBundle\Entity;
 
 use Doctrine\ORM\Query;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\GraphHelper;
 
 /**
@@ -68,7 +68,9 @@ class SubmissionRepository extends CommonRepository
         $dq = $this->_em->getConnection()->createQueryBuilder();
         $dq->select('count(*) as count')
             ->from($table, 'r')
-            ->where('r.form_id = ' . $form->getId());
+            ->innerJoin('r', MAUTIC_TABLE_PREFIX . 'form_submissions', 's', 'r.submission_id = s.id')
+            ->leftJoin('s', MAUTIC_TABLE_PREFIX . 'ip_addresses', 'i', 's.ip_id = i.id')
+        ->where('r.form_id = ' . $form->getId());
 
         $this->buildWhereClause($dq, $args);
 
@@ -81,9 +83,7 @@ class SubmissionRepository extends CommonRepository
         $this->buildLimiterClauses($dq, $args);
 
         $dq->resetQueryPart('select');
-        $dq->select('r.submission_id,' . implode(',r.', $fieldAliases))
-            ->innerJoin('r', MAUTIC_TABLE_PREFIX . 'form_submissions', 's', 'r.submission_id = s.id')
-            ->leftJoin('s', MAUTIC_TABLE_PREFIX . 'ip_addresses', 'i', 's.ip_id = i.id');
+        $dq->select('r.submission_id,' . implode(',r.', $fieldAliases));
         $results = $dq->execute()->fetchAll();
 
         //loop over results to put form submission results in something that can be assigned to the entities
@@ -239,7 +239,7 @@ class SubmissionRepository extends CommonRepository
 
     public function getSubmissionsSince($formId, $amount = 30, $unit = 'D')
     {
-        $data = GraphHelper::prepareLineGraphData($amount, $unit, array('submissions'));
+        $data = GraphHelper::prepareDatetimeLineGraphData($amount, $unit, array('submissions'));
 
         $submissions = $this->getSubmissions(array('id' => $formId, 'fromDate' => $data['fromDate']));
 
@@ -297,6 +297,33 @@ class SubmissionRepository extends CommonRepository
             ->setFirstResult($offset);
 
         $results = $query->execute()->fetchAll();
+
+        return $results;
+    }
+
+    public function getSubmissionCountsByPage($pageId, \DateTime $fromDate = null)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->select('count(distinct(s.tracking_id)) as submissions, s.page_id, p.title, p.alias, p.variant_hits')
+            ->from(MAUTIC_TABLE_PREFIX.'form_submissions', 's')
+            ->join('s', MAUTIC_TABLE_PREFIX.'pages', 'p', 's.page_id = p.id');
+
+        if (is_array($pageId)) {
+            $q->where($q->expr()->in('s.page_id', $pageId))
+                ->groupBy('s.page_id');
+
+        } else {
+            $q->where($q->expr()->eq('s.page_id', ':page'))
+                ->setParameter('page', (int) $pageId);
+        }
+
+        if ($fromDate != null) {
+            $dh = new DateTimeHelper($fromDate);
+            $q->andWhere($q->expr()->gte('s.date_submitted', ':date'))
+                ->setParameter('date', $dh->toUtcString());
+        }
+
+        $results = $q->execute()->fetchAll();
 
         return $results;
     }

@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -51,7 +51,7 @@ class Lead
     private $manuallyAdded = false;
 
     /**
-     * @return mixed
+     * @return \DateTime
      */
     public function getDateAdded ()
     {
@@ -59,7 +59,7 @@ class Lead
     }
 
     /**
-     * @param mixed $date
+     * @param \DateTime $date
      */
     public function setDateAdded ($date)
     {
@@ -83,7 +83,7 @@ class Lead
     }
 
     /**
-     * @return mixed
+     * @return Campaign
      */
     public function getCampaign ()
     {
@@ -91,7 +91,7 @@ class Lead
     }
 
     /**
-     * @param mixed $campaign
+     * @param Campaign $campaign
      */
     public function setCampaign ($campaign)
     {
@@ -99,7 +99,7 @@ class Lead
     }
 
     /**
-     * @return mixed
+     * @return bool
      */
     public function getManuallyRemoved ()
     {
@@ -107,7 +107,7 @@ class Lead
     }
 
     /**
-     * @param mixed $manuallyRemoved
+     * @param bool $manuallyRemoved
      */
     public function setManuallyRemoved ($manuallyRemoved)
     {
@@ -123,7 +123,7 @@ class Lead
     }
 
     /**
-     * @return mixed
+     * @return bool
      */
     public function getManuallyAdded ()
     {
@@ -131,7 +131,7 @@ class Lead
     }
 
     /**
-     * @param mixed $manuallyAdded
+     * @param bool $manuallyAdded
      */
     public function setManuallyAdded ($manuallyAdded)
     {

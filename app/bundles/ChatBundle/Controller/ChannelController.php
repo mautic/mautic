@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -68,7 +68,7 @@ class ChannelController extends FormController
     public function newAction()
     {
         if (!$this->factory->getSecurity()->isGranted('chat:channels:create')) {
-            return $this->accessDenied();
+            return $this->modalAccessDenied();
         }
 
         $model  = $this->factory->getModel('chat.channel');
@@ -131,7 +131,7 @@ class ChannelController extends FormController
         }  elseif (!$this->factory->getSecurity()->hasEntityAccess(
             true, 'chat:channels:editother', $entity->getCreatedBy()
         )) {
-            return $this->accessDenied();
+            return $this->modalAccessDenied();
         }
 
         $action = $this->generateUrl('mautic_chatchannel_action', array(

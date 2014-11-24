@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -611,16 +611,16 @@ class EventModel extends CommonFormModel
     }
 
     /**
-     * @param      $event
-     * @param      $campaign
-     * @param null $lead
-     * @param null $ipAddress
-     * @param bool $systemTriggered
+     * @param Event                                    $event
+     * @param Campaign                                 $campaign
+     * @param \Mautic\LeadBundle\Entity\Lead|null      $lead
+     * @param \Mautic\CoreBundle\Entity\IpAddress|null $ipAddress
+     * @param bool                                     $systemTriggered
      *
      * @return LeadEventLog
      * @throws \Doctrine\ORM\ORMException
      */
-    public function getLogEntity($event, $campaign, $lead = null, $ipAddress= null, $systemTriggered = false)
+    public function getLogEntity($event, $campaign, $lead = null, $ipAddress = null, $systemTriggered = false)
     {
         $log = new LeadEventLog();
 
@@ -640,6 +640,7 @@ class EventModel extends CommonFormModel
         $log->setCampaign($campaign);
 
         if ($lead == null) {
+            /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
             $leadModel = $this->factory->getModel('lead');
             $lead = $leadModel->getCurrentLead();
         }

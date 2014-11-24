@@ -1,12 +1,11 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 
 namespace Mautic\ApiBundle\Serializer\Exclusion;
 
@@ -19,12 +18,13 @@ use JMS\Serializer\Context;
  * Class PublishDetailsExclusionStrategy
  *
  * Only include FormEntity properties for the top level entity and not the associated entities
- *
- * @package Mautic\ApiBundle\Serializer\Exclusion
  */
 class PublishDetailsExclusionStrategy implements ExclusionStrategyInterface
 {
 
+    /**
+     * @var array
+     */
     private $fields = array();
 
     public function __construct()
@@ -65,5 +65,4 @@ class PublishDetailsExclusionStrategy implements ExclusionStrategyInterface
 
         return true;
     }
-
 }

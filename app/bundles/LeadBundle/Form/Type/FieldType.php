@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -54,6 +54,8 @@ class FieldType extends AbstractType
             'attr'       => array('class' => 'form-control', 'length' => 50)
         ));
 
+        $disabled = (!empty($options['data'])) ? $options['data']->isFixed() : false;
+
         $builder->add('group', 'choice', array(
             'choices'       => array(
                 'core'         => 'mautic.lead.field.group.core',
@@ -69,10 +71,10 @@ class FieldType extends AbstractType
             'multiple'      => false,
             'label'         => 'mautic.lead.field.form.group',
             'empty_value'   => false,
-            'required'      => false
+            'required'      => false,
+            'disabled'      => $disabled
         ));
 
-        $disabled = (!empty($options['data'])) ? $options['data']->isFixed() : false;
         $new      = (!empty($options['data']) && $options['data']->getAlias()) ? false : true;
         $default  = ($new) ? 'text' : $options['data']->getType();
         $fieldHelper = new FormFieldHelper();
@@ -132,6 +134,7 @@ class FieldType extends AbstractType
             'disabled'   => ($disabled || !$new)
         ));
 
+        $data = ($disabled) ? true : $options['data']->getIsPublished();
         $builder->add('isPublished', 'button_group', array(
             'choice_list' => new ChoiceList(
                 array(false, true),
@@ -141,7 +144,9 @@ class FieldType extends AbstractType
             'multiple'      => false,
             'label'         => 'mautic.core.form.ispublished',
             'empty_value'   => false,
-            'required'      => false
+            'required'      => false,
+            'disabled'      => $disabled,
+            'data'          => $data
         ));
 
         $builder->add('isRequired', 'button_group', array(

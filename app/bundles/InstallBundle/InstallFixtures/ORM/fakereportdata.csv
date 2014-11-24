@@ -1,0 +1,6 @@
+"title","system","source","columns","filters"
+"Visits published Pages","1","pages","a:0:{}","a:1:{i:0;a:3:{s:6:""column"";s:14:""p.is_published"";s:9:""condition"";s:2:""eq"";s:5:""value"";s:1:""1"";}}"
+"Downloads of all Assets","0","assets","a:0:{}","a:0:{}"
+"Submissions of published Forms","0","forms","a:0:{}","a:1:{i:0;a:3:{s:6:""column"";s:14:""f.is_published"";s:9:""condition"";s:2:""eq"";s:5:""value"";s:1:""1"";}}"
+"All Emails","0","emails","a:0:{}","a:0:{}"
+"Leads and Points","0","leads","a:0:{}","a:0:{}"

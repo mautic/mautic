@@ -11,7 +11,3 @@
 .email-builder .builder-panel .panel-body {
     padding: 5px 0;
 }
-
-.email-builder .list-group-item.ui-draggable-dragging {
-    background-color: #fff;
-}

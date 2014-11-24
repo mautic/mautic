@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -321,8 +321,10 @@ class LeadModel extends FormModel
     public function organizeFieldsByGroup($fields)
     {
         $array = array();
-        foreach ($fields as $alias => $field) {
+
+        foreach ($fields as $field) {
             if ($field instanceof LeadField) {
+                $alias = $field->getAlias();
                 if ($field->isPublished()) {
                     $group                          = $field->getGroup();
                     $array[$group][$alias]['id']    = $field->getId();
@@ -332,6 +334,7 @@ class LeadModel extends FormModel
                     $array[$group][$alias]['type']  = $field->getType();
                 }
             } else {
+                $alias = $field['alias'];
                 if ($field['isPublished']) {
                     $group = $field['group'];
                     $array[$group][$alias]['id']    = $field['id'];

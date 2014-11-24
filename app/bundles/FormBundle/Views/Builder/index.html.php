@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -15,6 +15,8 @@ $header = ($activeForm->getId()) ?
         array('%name%' => $view['translator']->trans($activeForm->getName()))) :
     $view['translator']->trans('mautic.form.form.header.new');
 $view['slots']->set("headerTitle", $header);
+
+$formId = $form['sessionId']->vars['data'];
 ?>
 <?php echo $view['form']->start($form); ?>
 <div class="box-layout">
@@ -62,7 +64,7 @@ $view['slots']->set("headerTitle", $header);
                                     <ul class="dropdown-menu" role="menu">
                                         <?php foreach ($fields as $fieldType => $field): ?>
                                             <li id="field_<?php echo $fieldType; ?>">
-                                                <a class="list-group-item" data-toggle="ajaxmodal" data-target="#formComponentModal" href="<?php echo $view['router']->generate('mautic_formfield_action', array('objectAction' => 'new', 'type' => $fieldType, 'tmpl' => 'field')); ?>">
+                                                <a class="list-group-item" data-toggle="ajaxmodal" data-target="#formComponentModal" href="<?php echo $view['router']->generate('mautic_formfield_action', array('objectAction' => 'new', 'type' => $fieldType, 'tmpl' => 'field', 'formId' => $formId)); ?>">
                                                     <div>
                                                         <?php echo $field; ?>
                                                     </div>
@@ -81,16 +83,17 @@ $view['slots']->set("headerTitle", $header);
                                     $template = 'MauticFormBundle:Field:' . $field['type'] . '.html.php';
                                 endif;
                                 echo $view->render($template, array(
-                                    'field'  => $field,
-                                    'inForm' => true,
-                                    'id'     => $field['id'],
-                                    'deleted' => in_array($field['id'], $deletedFields)
+                                    'field'   => $field,
+                                    'inForm'  => true,
+                                    'id'      => $field['id'],
+                                    'deleted' => in_array($field['id'], $deletedFields),
+                                    'formId'  => $formId
                                 ));
                             endforeach;
                             ?>
                             <?php if (!count($formFields)): ?>
-                            <div class="alert alert-info">
-                                <p id='form-field-placeholder'><?php echo $view['translator']->trans('mautic.form.form.addfield'); ?></p>
+                            <div class="alert alert-info" id="form-field-placeholder">
+                                <p><?php echo $view['translator']->trans('mautic.form.form.addfield'); ?></p>
                             </div>
                             <?php endif; ?>
                         </div>
@@ -107,7 +110,7 @@ $view['slots']->set("headerTitle", $header);
                                     <ul class="dropdown-menu" role="menu">
                                         <?php foreach ($actions as $k => $e): ?>
                                             <li id="action_<?php echo $k; ?>">
-                                                <a data-toggle="ajaxmodal" data-target="#formComponentModal" class="list-group-item" href="<?php echo $view['router']->generate('mautic_formaction_action', array('objectAction' => 'new', 'type' => $k, 'tmpl'=> 'action')); ?>">
+                                                <a data-toggle="ajaxmodal" data-target="#formComponentModal" class="list-group-item" href="<?php echo $view['router']->generate('mautic_formaction_action', array('objectAction' => 'new', 'type' => $k, 'tmpl'=> 'action', 'formId' => $formId)); ?>">
                                                     <div data-toggle="tooltip" title="<?php echo  $view['translator']->trans($e['description']); ?>">
                                                         <span><?php echo $view['translator']->trans($e['label']); ?></span>
                                                     </div>
@@ -125,13 +128,14 @@ $view['slots']->set("headerTitle", $header);
                                     'action'  => $action,
                                     'inForm'  => true,
                                     'id'      => $action['id'],
-                                    'deleted' => in_array($action['id'], $deletedActions)
+                                    'deleted' => in_array($action['id'], $deletedActions),
+                                    'formId'  => $formId
                                 ));
                             endforeach;
                             ?>
                             <?php if (!count($formActions)): ?>
-                                <div class="alert alert-info">
-                                    <p id='form-action-placeholder'><?php echo $view['translator']->trans('mautic.form.form.addaction'); ?></p>
+                                <div class="alert alert-info" id="form-action-placeholder">
+                                    <p><?php echo $view['translator']->trans('mautic.form.form.addaction'); ?></p>
                                 </div>
                             <?php endif; ?>
                         </div>

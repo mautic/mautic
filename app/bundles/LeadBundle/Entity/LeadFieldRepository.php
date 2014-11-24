@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -27,10 +27,7 @@ class LeadFieldRepository extends CommonRepository
      */
     public function getEntities($args = array())
     {
-        $q = $this->_em
-            ->createQueryBuilder('f')
-            ->select('f')
-            ->from('MauticLeadBundle:LeadField', 'f', 'f.alias');
+        $q = $this->createQueryBuilder($this->getTableAlias());
 
         $this->buildClauses($q, $args);
 

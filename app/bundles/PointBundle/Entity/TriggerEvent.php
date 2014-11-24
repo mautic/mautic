@@ -1,14 +1,15 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\PointBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -274,11 +275,11 @@ class TriggerEvent
     /**
      * Add log
      *
-     * @param LeadPointLog $log
+     * @param LeadTriggerLog $log
      *
      * @return Log
      */
-    public function addLog(LeadPointLog $log)
+    public function addLog(LeadTriggerLog $log)
     {
         $this->log[] = $log;
 
@@ -288,9 +289,9 @@ class TriggerEvent
     /**
      * Remove log
      *
-     * @param LeadPointLog $log
+     * @param LeadTriggerLog $log
      */
-    public function removeLog(LeadPointLog $log)
+    public function removeLog(LeadTriggerLog $log)
     {
         $this->log->removeElement($log);
     }

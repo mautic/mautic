@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -17,6 +17,7 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Nonce
 {
+
     /**
      * @ORM\Id()
      * @ORM\Column(type="string")
@@ -41,7 +42,7 @@ class Nonce
     /**
      * @return mixed
      */
-    public function getNonce ()
+    public function getNonce()
     {
         return $this->nonce;
     }
@@ -49,7 +50,7 @@ class Nonce
     /**
      * @return mixed
      */
-    public function getTimestamp ()
+    public function getTimestamp()
     {
         return $this->timestamp;
     }

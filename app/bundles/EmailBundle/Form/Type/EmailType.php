@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -46,7 +46,7 @@ class EmailType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber(array('content' => 'html')));
+        $builder->addEventSubscriber(new CleanFormSubscriber(array('content' => 'html', 'customHtml' => 'html')));
         $builder->addEventSubscriber(new FormExitSubscriber('email.email', $options));
 
         $variantParent = $options['data']->getVariantParent();
@@ -57,33 +57,6 @@ class EmailType extends AbstractType
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control')
         ));
-
-        //add category
-        $builder->add('category', 'category', array(
-            'bundle' => 'email',
-            'disabled' => $isVariant
-        ));
-
-        //add lead lists
-        $transformer = new \Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer(
-            $this->em,
-            'MauticLeadBundle:LeadList',
-            'id',
-            true
-        );
-        $builder->add(
-            $builder->create('lists', 'leadlist_choices', array(
-                'label'      => 'mautic.email.form.list',
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array(
-                    'class' => 'form-control'
-                ),
-                'multiple' => true,
-                'expanded' => false,
-                'disabled' => $isVariant
-            ))
-                ->addModelTransformer($transformer)
-        );
 
         //build a list
         $template = $options['data']->getTemplate();
@@ -103,16 +76,6 @@ class EmailType extends AbstractType
                 'tooltip' => 'mautic.email.form.template.help'
             ),
             'data'          => $template
-        ));
-
-        $builder->add('language', 'locale', array(
-            'label'      => 'mautic.email.form.language',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array(
-                'class'   => 'form-control'
-            ),
-            'required'   => false,
-            'disabled' => $isVariant
         ));
 
         $builder->add('isPublished', 'button_group', array(
@@ -151,14 +114,42 @@ class EmailType extends AbstractType
             'required'   => false
         ));
 
-        //todo - add drag-n-drop tokens for plain text version
         $builder->add('plainText', 'textarea', array(
             'label'      => 'mautic.email.form.plaintext',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
                 'tooltip' => 'mautic.email.form.plaintext.help',
                 'class'   => 'form-control',
-                'rows'    => '18'
+                'rows'    => '15'
+            )
+        ));
+
+        $contentMode = $options['data']->getContentMode();
+        if (empty($contentMode)) {
+            $contentMode = 'custom';
+        }
+        $builder->add('contentMode', 'button_group', array(
+            'choice_list' => new ChoiceList(
+                array('custom', 'builder'),
+                array('mautic.email.form.contentmode.custom', 'mautic.email.form.contentmode.builder')
+            ),
+            'expanded'      => true,
+            'multiple'      => false,
+            'label'         => 'mautic.email.form.contentmode',
+            'empty_value'   => false,
+            'required'      => false,
+            'data'          => $contentMode,
+            'attr'          => array(
+                'onChange' => 'Mautic.toggleEmailContentMode(this);'
+            )
+        ));
+
+        $builder->add('customHtml', 'textarea', array(
+            'label'      => 'mautic.email.form.customhtml',
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array(
+                'tooltip' => 'mautic.email.form.customhtml.help',
+                'class'   => 'form-control editor-advanced-2rows'
             )
         ));
 
@@ -166,23 +157,47 @@ class EmailType extends AbstractType
             $builder->add('variantSettings', 'emailvariant', array(
                 'label'       => false
             ));
+        } else {
+
+            //add category
+            $builder->add('category', 'category', array(
+                'bundle' => 'email'
+            ));
+
+            //add lead lists
+            $transformer = new \Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer(
+                $this->em,
+                'MauticLeadBundle:LeadList',
+                'id',
+                true
+            );
+            $builder->add(
+                $builder->create('lists', 'leadlist_choices', array(
+                    'label'      => 'mautic.email.form.list',
+                    'label_attr' => array('class' => 'control-label'),
+                    'attr'       => array(
+                        'class' => 'form-control'
+                    ),
+                    'multiple' => true,
+                    'expanded' => false
+                ))
+                    ->addModelTransformer($transformer)
+            );
+
+
+            $builder->add('language', 'locale', array(
+                'label'      => 'mautic.email.form.language',
+                'label_attr' => array('class' => 'control-label'),
+                'attr'       => array(
+                    'class'   => 'form-control chosen'
+                ),
+                'required'   => false,
+            ));
         }
 
         $builder->add('sessionId', 'hidden');
 
-        $builder->add('buttons', 'form_buttons', array(
-            'pre_extra_buttons' => array(
-                array(
-                    'name'  => 'builder',
-                    'label' => 'mautic.email.launch.builder',
-                    'attr'  => array(
-                        'class'   => 'btn btn-default',
-                        'icon'    => 'fa fa-cube text-mautic',
-                        'onclick' => "Mautic.launchEmailEditor();"
-                    )
-                )
-            )
-        ));
+        $builder->add('buttons', 'form_buttons');
 
         if (!empty($options["action"])) {
             $builder->setAction($options["action"]);

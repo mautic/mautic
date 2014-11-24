@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -19,16 +19,20 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 /**
  * Class OAuthListener
- *
- * @package Mautic\ApiBundle\Security\Firewall
  */
 class OAuthListener extends \Bazinga\OAuthServerBundle\Security\Firewall\OAuthListener
 {
+
     /**
      * @var MauticFactory $factory
      */
     private $factory;
 
+    /**
+     * @param MauticFactory $factory
+     *
+     * @return void
+     */
     public function setFactory(MauticFactory $factory)
     {
         $this->factory = $factory;
@@ -37,7 +41,11 @@ class OAuthListener extends \Bazinga\OAuthServerBundle\Security\Firewall\OAuthLi
     /**
      * @author William DURAND <william.durand1@gmail.com>
      *
-     * @param GetResponseEvent $event The event.
+     * @param GetResponseEvent $event
+     *
+     * @return void
+     * @throws AuthenticationException
+     * @throws HttpException
      */
     public function handle(GetResponseEvent $event)
     {

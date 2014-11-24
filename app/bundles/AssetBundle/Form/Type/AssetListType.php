@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -11,7 +11,6 @@ namespace Mautic\AssetBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
@@ -22,12 +21,16 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 class AssetListType extends AbstractType
 {
 
+    /**
+     * @var array
+     */
     private $choices = array();
 
     /**
      * @param MauticFactory $factory
      */
-    public function __construct(MauticFactory $factory) {
+    public function __construct(MauticFactory $factory)
+    {
         $viewOther = $factory->getSecurity()->isGranted('asset:assets:viewother');
         $choices = $factory->getModel('asset')->getRepository()
             ->getAssetList('', 0, 0, $viewOther);
@@ -54,12 +57,16 @@ class AssetListType extends AbstractType
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
-    public function getName() {
+    public function getName()
+    {
         return "asset_list";
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getParent()
     {
         return 'choice';

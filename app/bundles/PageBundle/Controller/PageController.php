@@ -1,13 +1,11 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
-//@todo - fix issue where associations are not populating immediately after an edit
 
 namespace Mautic\PageBundle\Controller;
 
@@ -167,7 +165,7 @@ class PageController extends FormController
                 'flashes'         => array(
                     array(
                         'type'    => 'error',
-                        'msg'     => 'mautic.page.page.error.notfound',
+                        'msg'     => 'mautic.page.error.notfound',
                         'msgVars' => array('%id%' => $objectId)
                     )
                 )
@@ -182,30 +180,38 @@ class PageController extends FormController
         //get A/B test information
         list($parent, $children) = $model->getVariants($activePage);
         $properties   = array();
-        $variantError = '';
+        $variantError = false;
+        $weight       = 0;
         if (count($children)) {
             foreach ($children as $c) {
                 $variantSettings = $c->getVariantSettings();
 
                 if (is_array($variantSettings) && isset($variantSettings['winnerCriteria'])) {
-                    if (!isset($lastCriteria)) {
-                        $lastCriteria = $variantSettings['winnerCriteria'];
+                    if ($c->isPublished()) {
+                        if (!isset($lastCriteria)) {
+                            $lastCriteria = $variantSettings['winnerCriteria'];
+                        }
+
+                        //make sure all the variants are configured with the same criteria
+                        if ($lastCriteria != $variantSettings['winnerCriteria']) {
+                            $variantError = true;
+                        }
+
+                        $weight += $variantSettings['weight'];
                     }
 
-                    //make sure all the variants are configured with the same criteria
-                    if ($lastCriteria != $variantSettings['winnerCriteria']) {
-                        $variantError = $this->factory->getTranslator()->trans('mautic.page.page.variant.misconfiguration');
-                        break;
-                    }
-
-                    $properties[$c->getId()][] = $variantSettings;
+                    $properties[$c->getId()] = $variantSettings;
                 }
             }
+
+            $properties[$parent->getId()]['weight'] = 100 - $weight;
+            $properties[$parent->getId()]['winnerCriteria'] = '';
         }
+
         $abTestResults = array();
+        $criteria = $model->getBuilderComponents($activePage, 'abTestWinnerCriteria');
         if (!empty($lastCriteria) && empty($variantError)) {
             //there is a criteria to compare the pages against so let's shoot the page over to the criteria function to do its thing
-            $criteria = $model->getBuilderComponents($activePage, 'abTestWinnerCriteria');
             if (isset($criteria['criteria'][$lastCriteria])) {
                 $testSettings = $criteria['criteria'][$lastCriteria];
 
@@ -260,8 +266,10 @@ class PageController extends FormController
             'viewParameters'  => array(
                 'activePage'    => $activePage,
                 'variants'      => array(
-                    'parent'   => $parent,
-                    'children' => $children
+                    'parent'     => $parent,
+                    'children'   => $children,
+                    'properties' => $properties,
+                    'criteria'   => $criteria['criteria']
                 ),
                 'translations'  => array(
                     'parent'   => $translationParent,
@@ -368,7 +376,7 @@ class PageController extends FormController
                 $returnUrl = $this->generateUrl('mautic_page_index', $viewParameters);
                 $template  = 'MauticPageBundle:Page:index';
                 //clear any modified content
-                $session->remove('mautic.pagebuilder.'.$entity->getSessionId().'.content', array());
+                $session->remove('mautic.pagebuilder.'.$entity->getSessionId().'.content');
             }
 
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
@@ -387,7 +395,7 @@ class PageController extends FormController
         $builderComponents    = $model->getBuilderComponents($entity);
         return $this->delegateView(array(
             'viewParameters'  =>  array(
-                'form'        => $form->createView(),
+                'form'        => $this->setFormTheme($form, 'MauticPageBundle:Page:form.html.php', 'MauticPageBundle:FormTheme\Page'),
                 'tokens'      => $builderComponents['pageTokens'],
                 'activePage'  => $entity
             ),
@@ -438,7 +446,7 @@ class PageController extends FormController
                     'flashes' => array(
                         array(
                             'type' => 'error',
-                            'msg'  => 'mautic.page.page.error.notfound',
+                            'msg'  => 'mautic.page.error.notfound',
                             'msgVars' => array('%id%' => $objectId)
                         )
                     )
@@ -495,7 +503,7 @@ class PageController extends FormController
                 }
             } else {
                 //clear any modified content
-                $session->remove('mautic.pagebuilder.'.$objectId.'.content', array());
+                $session->remove('mautic.pagebuilder.'.$objectId.'.content');
                 //unlock the entity
                 $model->unlockEntity($entity);
 
@@ -526,7 +534,7 @@ class PageController extends FormController
         $builderComponents    = $model->getBuilderComponents($entity);
         return $this->delegateView(array(
             'viewParameters'  =>  array(
-                'form'        => $form->createView(),
+                'form'        => $this->setFormTheme($form, 'MauticPageBundle:Page:form.html.php', 'MauticPageBundle:FormTheme\Page'),
                 'tokens'      => $builderComponents['pageTokens'],
                 'activePage'  => $entity
             ),
@@ -609,7 +617,7 @@ class PageController extends FormController
             if ($entity === null) {
                 $flashes[] = array(
                     'type'    => 'error',
-                    'msg'     => 'mautic.page.page.error.notfound',
+                    'msg'     => 'mautic.page.error.notfound',
                     'msgVars' => array('%id%' => $objectId)
                 );
             } elseif (!$this->factory->getSecurity()->hasEntityAccess(
@@ -675,7 +683,7 @@ class PageController extends FormController
                 if ($entity === null) {
                     $flashes[] = array(
                         'type'    => 'error',
-                        'msg'     => 'mautic.page.page.error.notfound',
+                        'msg'     => 'mautic.page.error.notfound',
                         'msgVars' => array('%id%' => $objectId)
                     );
                 } elseif (!$this->factory->getSecurity()->hasEntityAccess(
@@ -695,7 +703,7 @@ class PageController extends FormController
 
                 $flashes[] = array(
                     'type' => 'notice',
-                    'msg'  => 'mautic.page.page.notice.batch_deleted',
+                    'msg'  => 'mautic.page.notice.batch_deleted',
                     'msgVars' => array(
                         '%count%' => count($entities)
                     )
@@ -829,7 +837,7 @@ class PageController extends FormController
             if ($entity === null) {
                 $flashes[] = array(
                     'type'    => 'error',
-                    'msg'     => 'mautic.page.page.error.notfound',
+                    'msg'     => 'mautic.page.error.notfound',
                     'msgVars' => array('%id%' => $objectId)
                 );
             } elseif (!$this->factory->getSecurity()->hasEntityAccess(
@@ -846,7 +854,7 @@ class PageController extends FormController
 
             $flashes[] = array(
                 'type' => 'notice',
-                'msg'  => 'mautic.page.page.notice.activated',
+                'msg'  => 'mautic.page.notice.activated',
                 'msgVars' => array(
                     '%name%' => $entity->getTitle(),
                     '%id%'   => $objectId

@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -66,7 +66,6 @@ class Download
      **/
     private $trackingId;
 
-
     /**
      * @ORM\Column(name="source", type="string", nullable=true)
      */
@@ -91,6 +90,7 @@ class Download
      * Set dateDownload
      *
      * @param \DateTime $dateDownload
+     *
      * @return Download
      */
     public function setDateDownload($dateDownload)
@@ -114,6 +114,7 @@ class Download
      * Set code
      *
      * @param integer $code
+     *
      * @return Download
      */
     public function setCode($code)
@@ -137,6 +138,7 @@ class Download
      * Set referer
      *
      * @param string $referer
+     *
      * @return Download
      */
     public function setReferer($referer)
@@ -159,10 +161,11 @@ class Download
     /**
      * Set asset
      *
-     * @param \Mautic\AssetBundle\Entity\Asset $asset
+     * @param Asset $asset
+     *
      * @return Download
      */
-    public function setAsset(\Mautic\AssetBundle\Entity\Asset $asset = null)
+    public function setAsset(Asset $asset = null)
     {
         $this->asset = $asset;
 
@@ -172,7 +175,7 @@ class Download
     /**
      * Get asset
      *
-     * @return \Mautic\AssetBundle\Entity\Asset
+     * @return Asset
      */
     public function getAsset()
     {
@@ -183,6 +186,7 @@ class Download
      * Set ipAddress
      *
      * @param \Mautic\CoreBundle\Entity\IpAddress $ipAddress
+     *
      * @return Download
      */
     public function setIpAddress(\Mautic\CoreBundle\Entity\IpAddress $ipAddress)
@@ -206,7 +210,8 @@ class Download
      * Set trackingId
      *
      * @param integer $trackingId
-     * @return integer
+     *
+     * @return Download
      */
     public function setTrackingId($trackingId)
     {
@@ -228,7 +233,7 @@ class Download
     /**
      * @return mixed
      */
-    public function getLead ()
+    public function getLead()
     {
         return $this->lead;
     }
@@ -236,16 +241,15 @@ class Download
     /**
      * @param mixed $lead
      */
-    public function setLead ($lead)
+    public function setLead($lead)
     {
         $this->lead = $lead;
     }
 
-
     /**
      * @return mixed
      */
-    public function getSource ()
+    public function getSource()
     {
         return $this->source;
     }
@@ -253,15 +257,15 @@ class Download
     /**
      * @param mixed $source
      */
-    public function setSource ($source)
+    public function setSource($source)
     {
         $this->source = $source;
     }
 
     /**
-     * @return mixed
+     * @return integer
      */
-    public function getSourceId ()
+    public function getSourceId()
     {
         return $this->sourceId;
     }
@@ -269,7 +273,7 @@ class Download
     /**
      * @param mixed $sourceId
      */
-    public function setSourceId ($sourceId)
+    public function setSourceId($sourceId)
     {
         $this->sourceId = (int) $sourceId;
     }

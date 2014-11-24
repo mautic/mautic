@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -45,8 +45,11 @@ class ActionType extends AbstractType
 
         $properties = (!empty($options['data']['properties'])) ? $options['data']['properties'] : null;
         $builder->add('properties', $formType, array(
-           'label' => false,
-           'data'  => $properties
+            'label'  => false,
+            'data'   => $properties,
+            'attr'   => array(
+                'data-formid' => $options['formId'] //sneaky way of feeding the formId without requiring the option
+            )
         ));
 
         $builder->add('type', 'hidden');
@@ -67,6 +70,10 @@ class ActionType extends AbstractType
             'container_class' => 'bottom-formaction-buttons'
         ));
 
+        $builder->add('formId', 'hidden', array(
+            'mapped' => false
+        ));
+
         if (!empty($options["action"])) {
             $builder->setAction($options["action"]);
         }
@@ -81,7 +88,7 @@ class ActionType extends AbstractType
             'settings' => false
         ));
 
-        $resolver->setRequired(array('settings'));
+        $resolver->setRequired(array('settings', 'formId'));
     }
 
     /**

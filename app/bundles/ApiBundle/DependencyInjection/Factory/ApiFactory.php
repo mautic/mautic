@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -15,8 +15,14 @@ use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityFactoryInterface;
 
+/**
+ * Class ApiFactory
+ */
 class ApiFactory implements SecurityFactoryInterface
 {
+    /**
+     * {@inheritdoc}
+     */
     public function create(ContainerBuilder $container, $id, $config, $userProvider, $defaultEntryPoint)
     {
         $providerId = 'security.authentication.provider.mautic_api.'.$id;
@@ -31,16 +37,25 @@ class ApiFactory implements SecurityFactoryInterface
         return array($providerId, $listenerId, $defaultEntryPoint);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getPosition()
     {
         return 'pre_auth';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getKey()
     {
         return 'mautic_api_auth';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function addConfiguration(NodeDefinition $node)
     {
     }

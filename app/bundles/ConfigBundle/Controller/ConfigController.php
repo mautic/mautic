@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -42,7 +42,6 @@ class ConfigController extends FormController
 
         // Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
-            $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 /** @var \Mautic\InstallBundle\Configurator\Configurator $configurator */
                 $configurator = $this->get('mautic.configurator');
@@ -141,8 +140,31 @@ class ConfigController extends FormController
 
         $params = array();
         $mauticBundles = $this->factory->getParameter('bundles');
+        $addonBundles  = $this->factory->getParameter('addon.bundles');
 
         foreach ($mauticBundles as $bundle) {
+            // Build the path to the bundle configuration
+            $paramsFile = $bundle['directory'] . '/Config/parameters.php';
+
+            if (file_exists($paramsFile)) {
+                // Import the bundle configuration, $parameters is defined in this file
+                require_once $paramsFile;
+
+                // Merge the bundle params with the local params
+                foreach ($parameters as $key => $value) {
+                    if (in_array($key, $doNotChange)) {
+                        unset($parameters[$key]);
+                    }
+                    elseif (array_key_exists($key, $localParams)) {
+                        $parameters[$key] = $localParams[$key];
+                    }
+                }
+
+                $params[$bundle['bundle']] = $parameters;
+            }
+        }
+
+        foreach ($addonBundles as $bundle) {
             // Build the path to the bundle configuration
             $paramsFile = $bundle['directory'] . '/Config/parameters.php';
 

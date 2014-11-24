@@ -1,21 +1,18 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\ApiBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
-use Mautic\ApiBundle\Form\Type as FormType;
 
 /**
  * Class ClientController
- *
- * @package Mautic\ApiBundle\Controller
  */
 class ClientController extends FormController
 {
@@ -24,6 +21,7 @@ class ClientController extends FormController
      * Generate's default client list
      *
      * @param int $page
+     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function indexAction($page = 1)
@@ -57,11 +55,7 @@ class ClientController extends FormController
         $count = count($clients);
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page
-            if ($count === 1) {
-                $lastPage = 1;
-            } else {
-                $lastPage = (floor($limit / $count)) ? : 1;
-            }
+            $lastPage = ($count === 1) ? 1 : (floor($limit / $count)) ?: 1;
             $this->factory->getSession()->set('mautic.client.page', $lastPage);
             $returnUrl   = $this->generateUrl('mautic_client_index', array('page' => $lastPage));
 
@@ -116,7 +110,7 @@ class ClientController extends FormController
     }
 
     /**
-     * @param $clientId
+     * @param int $clientId
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
@@ -126,6 +120,7 @@ class ClientController extends FormController
         $flashes = array();
 
         if ($this->request->getMethod() == 'POST') {
+            /** @var \Mautic\ApiBundle\Model\ClientModel $model */
             $model   = $this->factory->getModel('api.client');
 
             $client = $model->getEntity($clientId);
@@ -166,15 +161,18 @@ class ClientController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function newAction ()
+    public function newAction()
     {
         if (!$this->factory->getSecurity()->isGranted('api:clients:create')) {
             return $this->accessDenied();
         }
 
+        /** @var \Mautic\ApiBundle\Model\ClientModel $model */
         $model = $this->factory->getModel('api.client');
+
         //retrieve the entity
         $client = $model->getEntity();
+
         //set the return URL for post actions
         $returnUrl = $this->generateUrl('mautic_client_index');
 
@@ -183,9 +181,9 @@ class ClientController extends FormController
         $form   = $model->createForm($client, $this->get('form.factory'), $action);
 
         //remove the client id and secret fields as they'll be auto generated
-        $form->remove("randomId");
-        $form->remove("secret");
-        $form->remove("publicId");
+        $form->remove('randomId');
+        $form->remove('secret');
+        $form->remove('publicId');
 
         ///Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
@@ -238,13 +236,17 @@ class ClientController extends FormController
     /**
      * Generates edit form and processes post data
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @param int  $objectId
+     * @param bool $ignorePost
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function editAction ($objectId, $ignorePost = false)
+    public function editAction($objectId, $ignorePost = false)
     {
         if (!$this->factory->getSecurity()->isGranted('api:clients:editother')) {
             return $this->accessDenied();
         }
+        /** @var \Mautic\ApiBundle\Model\ClientModel $model */
         $model     = $this->factory->getModel('api.client');
         $client    = $model->getEntity($objectId);
         $returnUrl = $this->generateUrl('mautic_client_index');
@@ -262,13 +264,13 @@ class ClientController extends FormController
         if ($client === null) {
             return $this->postActionRedirect(
                 array_merge($postActionVars, array(
-                        'flashes'         =>array(
-                            array(
-                                'type' => 'error',
-                                'msg'  => 'mautic.api.client.error.notfound',
-                                'msgVars' => array('%id%' => $objectId)
-                            )
-                        ))
+                    'flashes' => array(
+                        array(
+                            'type' => 'error',
+                            'msg'  => 'mautic.api.client.error.notfound',
+                            'msgVars' => array('%id%' => $objectId)
+                        )
+                    ))
                 )
             );
         } elseif ($model->isLocked($client)) {
@@ -326,17 +328,19 @@ class ClientController extends FormController
     /**
      * Deletes the entity
      *
-     * @param         $objectId
+     * @param int $objectId
+     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function deleteAction($objectId) {
+    public function deleteAction($objectId)
+    {
         if (!$this->factory->getSecurity()->isGranted('api:clients:delete')) {
             return $this->accessDenied();
         }
 
-        $returnUrl   = $this->generateUrl('mautic_client_index');
-        $success     = 0;
-        $flashes     = array();
+        $returnUrl = $this->generateUrl('mautic_client_index');
+        $success   = 0;
+        $flashes   = array();
 
         $postActionVars = array(
             'returnUrl'       => $returnUrl,
@@ -349,6 +353,7 @@ class ClientController extends FormController
         );
 
         if ($this->request->getMethod() == 'POST') {
+            /** @var \Mautic\ApiBundle\Model\ClientModel $model */
             $model  = $this->factory->getModel('api.client');
             $entity = $model->getEntity($objectId);
             if ($entity === null) {

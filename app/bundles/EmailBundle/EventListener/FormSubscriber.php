@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -44,7 +44,7 @@ class FormSubscriber extends CommonSubscriber
             'label'        => 'mautic.email.form.action.sendemail.admin',
             'description'  => 'mautic.email.form.action.sendemail.admin.descr',
             'formType'     => 'email_submitaction_sendemail_admin',
-            'callback'     => '\Mautic\EmailBundle\Helper\FormSubmitHelper::onFormSubmit'
+            'callback'     => '\Mautic\EmailBundle\Helper\FormSubmitHelper::sendEmail'
         );
 
         $event->addSubmitAction('email.send.admin', $action);
@@ -53,8 +53,8 @@ class FormSubscriber extends CommonSubscriber
         $action = array(
             'label'        => 'mautic.email.form.action.sendemail.lead',
             'description'  => 'mautic.email.form.action.sendemail.lead.descr',
-            'formType'     => 'email_submitaction_sendemail_lead',
-            'callback'     => '\Mautic\EmailBundle\Helper\FormSubmitHelper::onFormSubmit'
+            'formType'     => 'emailsend_list',
+            'callback'     => '\Mautic\EmailBundle\Helper\FormSubmitHelper::sendEmail'
         );
 
         $event->addSubmitAction('email.send.lead', $action);

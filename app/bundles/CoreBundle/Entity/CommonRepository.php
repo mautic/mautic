@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -513,7 +513,7 @@ class CommonRepository extends EntityRepository
      */
     protected function addStandardSearchCommandWhereClause(&$q, $filter)
     {
-        $command         = $field = $filter->command;
+        $command         = $filter->command;
         $string          = $filter->string;
         $unique          = $this->generateRandomParameterName();
         $returnParameter = true; //returning a parameter that is not used will lead to a Doctrine error
@@ -626,9 +626,9 @@ class CommonRepository extends EntityRepository
      */
     public function getBaseColumns($entityClass, $convertCamelCase = false)
     {
-        static $baseCols = array();
+        static $baseCols = array(true => array(), false => array());
 
-        if (empty($baseCols[$entityClass])) {
+        if (empty($baseCols[$convertCamelCase][$entityClass])) {
             //get a list of properties from the Lead entity so that anything not listed is a custom field
             $entity = new $entityClass();
             $reflect    = new \ReflectionClass($entity);
@@ -638,20 +638,24 @@ class CommonRepository extends EntityRepository
                 $parentProps = $parentClass->getProperties();
                 $props       = array_merge($parentProps, $props);
             }
-            $baseCols[$entityClass] = array();
+
+            $baseCols[$convertCamelCase][$entityClass] = array();
             foreach ($props as $p) {
-                if (!in_array($p->name, $baseCols[$entityClass])) {
+                if (!in_array($p->name, $baseCols[$convertCamelCase][$entityClass])) {
                     $n = $p->name;
+
                     if ($convertCamelCase) {
                         $n = preg_replace('/(?<=\\w)(?=[A-Z])/',"_$1", $n);
                         $n = strtolower($n);
+                        $baseCols[$convertCamelCase][$entityClass][$p->name] = $n;
+                    } else {
+                        $baseCols[$convertCamelCase][$entityClass][] = $n;
                     }
-                    $baseCols[$entityClass][] = $n;
                 }
             }
         }
 
-        return $baseCols[$entityClass];
+        return $baseCols[$convertCamelCase][$entityClass];
     }
 
     /**
@@ -704,5 +708,35 @@ class CommonRepository extends EntityRepository
         }
 
         return $args;
+    }
+
+    public function createFromArray($className, &$data)
+    {
+        $entity = new $className();
+        $meta = $this->_em->getClassMetadata($className);
+        $ormProperties = $this->getBaseColumns($className, true);
+
+        foreach ($ormProperties as $property => $dbCol) {
+            if (isset($data[$dbCol])) {
+                $v = $data[$dbCol];
+
+                if ($v && $meta->hasAssociation($property)) {
+                    $map = $meta->getAssociationMapping($property);
+                    $v = $this->_em->getRepository($map['targetEntity'])->find($v);
+                    if (empty($v)) {
+                        throw new \Exception('Associate data not found');
+                    }
+                }
+
+                $method = "set" . ucfirst($property);
+                if (method_exists($entity, $method)) {
+                    $entity->$method($v);
+                }
+
+                unset($data[$dbCol]);
+            }
+        }
+
+        return $entity;
     }
 }

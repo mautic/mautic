@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -45,16 +45,16 @@ class PointSubscriber extends CommonSubscriber
     {
         $action = array(
             'label'       => 'mautic.email.point.action.open',
-            'callback'    => array('\\Mautic\\EmailBundle\\Helper\\PointActionHelper', 'validateEmail'),
-            'formType'    => 'pointaction_email'
+            'callback'    => array('\\Mautic\\EmailBundle\\Helper\\PointEventHelper', 'validateEmail'),
+            'formType'    => 'emailopen_list'
         );
 
         $event->addAction('email.open', $action);
 
         $action = array(
             'label'       => 'mautic.email.point.action.send',
-            'callback'    => array('\\Mautic\\EmailBundle\\Helper\\PointActionHelper', 'validateEmail'),
-            'formType'    => 'pointaction_email'
+            'callback'    => array('\\Mautic\\EmailBundle\\Helper\\PointEventHelper', 'validateEmail'),
+            'formType'    => 'emailopen_list'
         );
 
         $event->addAction('email.send', $action);
@@ -67,8 +67,8 @@ class PointSubscriber extends CommonSubscriber
     {
         $sendEvent = array(
             'label'       => 'mautic.email.point.trigger.sendemail',
-            'callback'    => array('\\Mautic\\EmailBundle\\Helper\\PointActionHelper', 'sendEmail'),
-            'formType'    => 'pointtrigger_email'
+            'callback'    => array('\\Mautic\\EmailBundle\\Helper\\PointEventHelper', 'sendEmail'),
+            'formType'    => 'emailsend_list'
         );
 
         $event->addEvent('email.send', $sendEvent);

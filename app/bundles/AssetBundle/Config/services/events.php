@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -70,6 +70,15 @@ $container->setDefinition(
     'mautic.asset.leadbundle.subscriber',
     new Definition(
         'Mautic\AssetBundle\EventListener\LeadSubscriber',
+        array(new Reference('mautic.factory'))
+    )
+)
+    ->addTag('kernel.event_subscriber');
+
+$container->setDefinition(
+    'mautic.asset.pagebundle.subscriber',
+    new Definition(
+        'Mautic\AssetBundle\EventListener\PageSubscriber',
         array(new Reference('mautic.factory'))
     )
 )

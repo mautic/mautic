@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -45,11 +45,7 @@ EOT
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $options = $input->getOptions();
-
-        /** @var \Mautic\InstallBundle\Configurator\Configurator $configurator */
-        $configurator = $this->getContainer()->get('mautic.configurator');
-        $kernelRoot   = $this->getContainer()->getParameter('kernel.root_dir');
+        $kernelRoot = $this->getContainer()->getParameter('kernel.root_dir');
 
         /** @var \Symfony\Bundle\FrameworkBundle\Translation\Translator $translator */
         $translator = $this->getContainer()->get('translator');
@@ -139,9 +135,7 @@ EOT
             return 1;
         }
 
-        $output->writeln(
-            $translator->trans('mautic.core.command.install_application_success')
-        );
+        $output->writeln($translator->trans('mautic.core.command.install_application_success'));
 
         return 0;
     }

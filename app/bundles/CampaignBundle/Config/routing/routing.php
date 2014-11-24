@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -23,6 +23,17 @@ $collection->add('mautic_campaign_index', new Route('/campaigns/{page}',
     array(
         '_controller' => 'MauticCampaignBundle:Campaign:index',
         'page'        => 1,
+    ), array(
+        'page'    => '\d+'
+    )
+));
+
+
+$collection->add('mautic_campaign_leads', new Route('/campaigns/view/{objectId}/leads/{page}',
+    array(
+        '_controller' => 'MauticCampaignBundle:Campaign:leads',
+        "objectId"    => 0,
+        'page'        => 1
     ), array(
         'page'    => '\d+'
     )

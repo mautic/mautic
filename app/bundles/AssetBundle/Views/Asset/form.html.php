@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 $view->extend('MauticCoreBundle:Default:content.html.php');
@@ -27,16 +27,7 @@ $view['slots']->set('mauticContent', 'asset');
 		    	<div class="col-md-6">
 		    		<div class="row">
 				    	<div class="form-group col-xs-12">
-				    		<label class="control-label required" for="asset_file"><?php echo $view['translator']->trans('mautic.asset.asset.preview'); ?></label>
-				    		<div class="text-center thumbnail-preview">
-					    		<?php if ($activeAsset->isImage()) : ?>
-					    			<img src="<?php echo $assetUrl; ?>" alt="<?php echo $activeAsset->getTitle(); ?>" class="img-thumbnail" />
-					    		<?php elseif (strtolower($activeAsset->getFileType()) == 'pdf') : ?>
-					    			<iframe src="<?php echo $assetUrl; ?>#view=FitH"></iframe>
-					    		<?php else : ?>
-					    			<i class="<?php echo $activeAsset->getIconClass(); ?> fa-5x"></i>
-					    		<?php endif; ?>
-				    		</div>
+				    		<?php echo $view->render('MauticAssetBundle:Asset:preview.html.php', array('activeAsset' => $activeAsset, 'baseUrl' => $baseUrl)); ?>
 			    		</div>
 		    		</div>
 		    	</div>

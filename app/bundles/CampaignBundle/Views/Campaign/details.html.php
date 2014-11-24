@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -174,6 +174,11 @@ if ($permissions['campaign:campaigns:edit']): ?>
                         <?php echo $view['translator']->trans('mautic.campaign.event.actions.header'); ?>
                     </a>
                 </li>
+                <li class="">
+                    <a href="#leads-container" role="tab" data-toggle="tab">
+                        <?php echo $view['translator']->trans('mautic.campaign.event.leads.header'); ?>
+                    </a>
+                </li>
             </ul>
             <!--/ tabs controls -->
         </div>
@@ -188,6 +193,10 @@ if ($permissions['campaign:campaigns:edit']): ?>
                 <?php echo $view->render('MauticCampaignBundle:Campaign:events.html.php', array('events' => $events, 'eventType' => 'action')); ?>
             </div>
             <!--/ #events-container -->
+
+            <div class="tab-pane fade in bdr-w-0 page-list" id="leads-container">
+                <?php echo $view['actions']->render(new \Symfony\Component\HttpKernel\Controller\ControllerReference('MauticCampaignBundle:Campaign:leads', array('objectId' => $campaign->getId(), 'page' => $leadPage, 'ignoreAjax' => true))); ?>
+            </div>
         </div>
         <!--/ end: tab-content -->
     </div>
@@ -197,7 +206,7 @@ if ($permissions['campaign:campaigns:edit']): ?>
     <div class="col-md-3 bg-white bdr-l height-auto">
 
         <!-- recent activity -->
-        <?php echo $view->render('MauticCoreBundle:Default:recentactivity.html.php', array('logs' => $logs)); ?>
+        <?php echo $view->render('MauticCoreBundle:Helper:recentactivity.html.php', array('logs' => $logs)); ?>
 
     </div>
     <!--/ right section -->

@@ -1,22 +1,26 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-
 namespace Mautic\ApiBundle\DependencyInjection\Compiler;
-
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Class OAuthPass
+ */
 class OAuthPass implements CompilerPassInterface
 {
+    /**
+     * {@inheritdoc}
+     */
     public function process(ContainerBuilder $container)
     {
         if ($container->hasDefinition('bazinga.oauth.security.authentication.provider')) {

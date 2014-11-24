@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -18,8 +18,9 @@ if (!empty($userId)) {
 }
 $view['slots']->set("headerTitle", $header);
 ?>
+
+<?php echo $view['form']->start($form); ?>
 <div class="box-layout">
-    <?php echo $view['form']->start($form); ?>
     <!-- container -->
     <div class="col-md-9 bg-auto height-auto bdr-r">
         <div class="pa-md">

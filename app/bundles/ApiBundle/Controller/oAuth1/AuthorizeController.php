@@ -1,14 +1,13 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\ApiBundle\Controller\OAuth1;
-
 
 use Bazinga\OAuthServerBundle\Model\RequestTokenInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -18,15 +17,18 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-
+/**
+ * Class AuthorizeController
+ */
 class AuthorizeController extends Controller
 {
+
     /**
-     * {@inheritdoc}
-     *
      * @param Request $request
      *
      * @return Response
+     * @throws AccessDeniedException
+     * @throws HttpException
      */
     public function allowAction(Request $request)
     {

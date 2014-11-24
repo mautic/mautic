@@ -20,7 +20,8 @@ Mautic.pointTriggerOnLoad = function (container) {
                 mQuery.ajax({
                     type: "POST",
                     url: mauticAjaxUrl + "?action=point:reorderTriggerEvents",
-                    data: mQuery('#triggerEvents').sortable("serialize")});
+                    data: mQuery('#triggerEvents').sortable("serialize") + "&triggerId=" + mQuery('#pointtrigger_sessionId').val()
+                });
             }
         });
 
@@ -32,27 +33,36 @@ Mautic.pointTriggerOnLoad = function (container) {
     }
 };
 
-Mautic.pointTriggerEventLoad = function (container, response) {
+Mautic.pointTriggerEventOnLoad = function (container, response) {
     //new action created so append it to the form
-    if (response.actionHtml) {
-        var newHtml = response.actionHtml;
-        var actionId = '#triggerEvent' + response.actionId;
-        if (mQuery(actionId).length) {
+    if (response.eventHtml) {
+        var newHtml = response.eventHtml;
+        var eventId = '#triggerEvent_' + response.eventId;
+        if (mQuery(eventId).length) {
             //replace content
-            mQuery(actionId).replaceWith(newHtml);
+            mQuery(eventId).replaceWith(newHtml);
             var newField = false;
         } else {
             //append content
             mQuery(newHtml).appendTo('#triggerEvents');
             var newField = true;
         }
+
+        //initialize tooltips
+        mQuery(eventId + " *[data-toggle='tooltip']").tooltip({html: true});
+
         //activate new stuff
-        mQuery(actionId + " a[data-toggle='ajax']").click(function (event) {
+        mQuery(eventId + " a[data-toggle='ajax']").click(function (event) {
             event.preventDefault();
             return Mautic.ajaxifyLink(this, event);
         });
-        //initialize tooltips
-        mQuery(actionId + " *[data-toggle='tooltip']").tooltip({html: true});
+
+        //initialize ajax'd modals
+        mQuery(eventId + " a[data-toggle='ajaxmodal']").on('click.ajaxmodal', function (event) {
+            event.preventDefault();
+
+            Mautic.ajaxifyModal(this, event);
+        });
 
         mQuery('#triggerEvents .trigger-event-row').off(".triggerevents");
         mQuery('#triggerEvents .trigger-event-row').on('mouseover.triggerevents', function() {
@@ -66,8 +76,8 @@ Mautic.pointTriggerEventLoad = function (container, response) {
             mQuery('a[href="#events-panel"]').trigger('click');
         }
 
-        if (mQuery('#trigger-event-placeholder').length) {
-            mQuery('#trigger-event-placeholder').remove();
+        if (mQuery('#triggerEventPlaceholder').length) {
+            mQuery('#triggerEventPlaceholder').remove();
         }
     }
 };

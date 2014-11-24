@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,12 +13,14 @@ use FOS\OAuthServerBundle\Entity\AccessToken as BaseAccessToken;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 use FOS\OAuthServerBundle\Model\ClientInterface;
+
 /**
  * @ORM\Table(name="oauth2_accesstokens")
  * @ORM\Entity
  */
 class AccessToken extends BaseAccessToken
 {
+
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")
@@ -52,6 +54,7 @@ class AccessToken extends BaseAccessToken
      * Set client
      *
      * @param ClientInterface $client
+     *
      * @return AccessToken
      */
     public function setClient(ClientInterface $client)
@@ -75,6 +78,7 @@ class AccessToken extends BaseAccessToken
      * Set user
      *
      * @param UserInterface $user
+     *
      * @return AccessToken
      */
     public function setUser(UserInterface $user = null)

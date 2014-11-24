@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -12,7 +12,7 @@ use Symfony\Component\Routing\Route;
 
 $collection = new RouteCollection();
 
-$collection->add('mautic_report_index', new Route('/reporting/{page}',
+$collection->add('mautic_report_index', new Route('/reports/{page}',
     array(
         '_controller' => 'MauticReportBundle:Report:index',
         'page'        => 1,
@@ -21,7 +21,7 @@ $collection->add('mautic_report_index', new Route('/reporting/{page}',
     )
 ));
 
-$collection->add('mautic_report_action', new Route('/reporting/{objectAction}/{objectId}/{reportPage}',
+$collection->add('mautic_report_action', new Route('/reports/{objectAction}/{objectId}/{reportPage}',
     array(
         '_controller' => 'MauticReportBundle:Report:execute',
         'objectId'    => 0,

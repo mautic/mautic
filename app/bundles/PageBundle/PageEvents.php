@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -38,7 +38,7 @@ final class PageEvents
     /**
      * The mautic.page_on_display event is thrown before displaying the page content
      *
-     * The event listener receives a Mautic\PageBundle\Event\PageEvent instance.
+     * The event listener receives a Mautic\PageBundle\Event\PageDisplayEvent instance.
      *
      * @var string
      */

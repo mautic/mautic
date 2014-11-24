@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -73,7 +73,6 @@ class FormSubscriber extends CommonSubscriber
 
             if (count($forms) > 0) {
                 $formResults = array();
-                $dateForm = $this->factory->getParameter('date_format_full');
                 foreach ($forms as $form) {
                     $formResults[] = $this->templating->renderResponse(
                         'MauticFormBundle:Search:form.html.php',

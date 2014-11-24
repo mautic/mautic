@@ -1,17 +1,27 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 //load default parameters from bundle files
 $bundles = $container->getParameter('mautic.bundles');
+$addons  = $container->getParameter('mautic.addon.bundles');
 
 $mauticParams = array();
 foreach ($bundles as $bundle) {
+    if (file_exists($bundle['directory'].'/Config/parameters.php')) {
+        $bundleParams = include $bundle['directory'].'/Config/parameters.php';
+        foreach ($bundleParams as $k => $v) {
+            $mauticParams[$k] = $v;
+        }
+    }
+}
+
+foreach ($addons as $bundle) {
     if (file_exists($bundle['directory'].'/Config/parameters.php')) {
         $bundleParams = include $bundle['directory'].'/Config/parameters.php';
         foreach ($bundleParams as $k => $v) {

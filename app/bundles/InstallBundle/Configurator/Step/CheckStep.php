@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -34,11 +34,10 @@ class CheckStep implements StepInterface
     /**
      * Constructor
      *
-     * @param array   $parameters       Existing parameters in local configuration
      * @param boolean $configIsWritable Flag if the configuration file is writable
      * @param string  $kernelRoot       Kernel root path
      */
-    public function __construct(array $parameters, $configIsWritable, $kernelRoot)
+    public function __construct($configIsWritable, $kernelRoot)
     {
         $this->configIsWritable = $configIsWritable;
         $this->kernelRoot       = $kernelRoot;

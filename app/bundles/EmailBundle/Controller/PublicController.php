@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -43,32 +43,36 @@ class PublicController extends CommonFormController
             }
 
             //all the checks pass so display the content
-            $template   = $entity->getTemplate();
-            $slots      = $this->factory->getTheme($template)->getSlots('email');
+            $model->hitEmail($entity, $idHash, $this->request, true);
+
+            if ($entity->getContentMode() == 'builder') {
+                $template   = $entity->getTemplate();
+                $slots      = $this->factory->getTheme($template)->getSlots('email');
+
+                $response = $this->render('MauticEmailBundle::public.html.php', array(
+                    'inBrowser' => true,
+                    'slots'     => $slots,
+                    'content'   => $entity->getContent(),
+                    'email'     => $entity,
+                    'lead'      => $lead,
+                    'template'  => $template,
+                    'idHash'    => $idHash
+                ));
+
+                //replace tokens
+                $content = $response->getContent();
+            } else {
+                $content = $entity->getCustomHtml();
+            }
 
             $dispatcher = $this->get('event_dispatcher');
             if ($dispatcher->hasListeners(EmailEvents::EMAIL_ON_DISPLAY)) {
-                $event = new EmailSendEvent($entity, $lead, $idHash);
-                $slotsHelper = $this->factory->getTemplating()
-                    ->getEngine('MauticEmailBundle::public.html.php')->get('slots');
-                $event->setSlotsHelper($slotsHelper);
+                $event = new EmailSendEvent($content, $entity, $lead, $idHash);
                 $dispatcher->dispatch(EmailEvents::EMAIL_ON_DISPLAY, $event);
                 $content = $event->getContent();
-            } else {
-                $content = $entity->getContent();
             }
 
-            $model->hitEmail($entity, $idHash, $this->request, true);
-
-            return $this->render('MauticEmailBundle::public.html.php', array(
-                'inBrowser' => true,
-                'slots'     => $slots,
-                'content'   => $content,
-                'email'     => $entity,
-                'lead'      => $lead,
-                'template'  => $template,
-                'idHash'    => $idHash
-            ));
+            return new Response($content);
         }
 
         throw $this->createNotFoundException($translator->trans('mautic.core.url.error.404'));

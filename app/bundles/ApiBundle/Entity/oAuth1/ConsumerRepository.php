@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -19,6 +19,11 @@ use Mautic\UserBundle\Entity\User;
 class ConsumerRepository extends CommonRepository
 {
 
+    /**
+     * @param User $user
+     *
+     * @return array
+     */
     public function getUserClients(User $user)
     {
         $q = $this->_em->createQueryBuilder();
@@ -36,6 +41,8 @@ class ConsumerRepository extends CommonRepository
     /**
      * @param Consumer $consumer
      * @param User     $user
+     *
+     * @return void
      */
     public function deleteAccessTokens(Consumer $consumer, User $user)
     {
@@ -58,24 +65,19 @@ class ConsumerRepository extends CommonRepository
 
     /**
      * {@inheritdoc}
-     *
-     * @param array $args
-     * @return Paginator
      */
     public function getEntities($args = array())
     {
         $q = $this
             ->createQueryBuilder('c');
 
-        if (!$this->buildClauses($q, $args)) {
-            return array();
-        }
-
         $query = $q->getQuery();
-        $result = new Paginator($query);
-        return $result;
+        return new Paginator($query);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function addCatchAllWhereClause(&$q, $filter)
     {
         $unique  = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
@@ -96,6 +98,9 @@ class ConsumerRepository extends CommonRepository
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function getDefaultOrder()
     {
         return array(

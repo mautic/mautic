@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -103,8 +103,22 @@ class CommonSubscriber implements EventSubscriberInterface
         $request  = $this->factory->getRequest();
 
         $bundles   = $this->factory->getParameter('bundles');
+        $addons    = $this->factory->getParameter('addon.bundles');
         $menuItems = array();
         foreach ($bundles as $bundle) {
+            //check common place
+            $path = $bundle['directory'] . "/Config/menu/$name.php";
+
+            if (file_exists($path)) {
+                $config      = include $path;
+                $menuItems[] = array(
+                    'priority' => !isset($config['priority']) ? 9999 : $config['priority'],
+                    'items'    => !isset($config['items']) ? $config : $config['items']
+                );
+            }
+        }
+
+        foreach ($addons as $bundle) {
             //check common place
             $path = $bundle['directory'] . "/Config/menu/$name.php";
 
@@ -145,9 +159,35 @@ class CommonSubscriber implements EventSubscriberInterface
         $security = $event->getSecurity();
         $request  = $this->factory->getRequest();
         $bundles  = $this->factory->getParameter('bundles');
+        $addons   = $this->factory->getParameter('addon.bundles');
         $icons    = array();
 
         foreach ($bundles as $bundle) {
+            //check common place
+            $path = $bundle['directory'] . "/Config/menu/main.php";
+
+            if (file_exists($path)) {
+                $config = include $path;
+                $items  = (!isset($config['items']) ? $config : $config['items']);
+                if ($items) {
+                    foreach ($items as $item) {
+                        $icons[] = $item;
+                        if (isset($item['extras']['iconClass']) && isset($item['linkAttributes']['id'])) {
+                            $id = explode('_', $item['linkAttributes']['id']);
+                            if (isset($id[1])) {
+                                // some bundle names are in plural, create also singular item
+                                if (substr($id[1], -1) == 's') {
+                                    $event->addIcon(rtrim($id[1], 's'), $item['extras']['iconClass']);
+                                }
+                                $event->addIcon($id[1], $item['extras']['iconClass']);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        foreach ($addons as $bundle) {
             //check common place
             $path = $bundle['directory'] . "/Config/menu/main.php";
 
@@ -185,8 +225,16 @@ class CommonSubscriber implements EventSubscriberInterface
     protected function buildRoute(MauticEvents\RouteEvent $event, $name)
     {
         $bundles = $this->factory->getParameter('bundles');
+        $addons  = $this->factory->getParameter('addon.bundles');
 
         foreach ($bundles as $bundle) {
+            $routing = $bundle['directory'] . "/Config/routing/$name.php";
+            if (file_exists($routing)) {
+                $event->addRoutes($routing);
+            }
+        }
+
+        foreach ($addons as $bundle) {
             $routing = $bundle['directory'] . "/Config/routing/$name.php";
             if (file_exists($routing)) {
                 $event->addRoutes($routing);

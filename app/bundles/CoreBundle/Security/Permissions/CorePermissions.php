@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -32,6 +32,11 @@ class CorePermissions
     private $bundles;
 
     /**
+     * @var array
+     */
+    private $addonBundles;
+
+    /**
      * @var EntityManager
      */
     private $em;
@@ -51,15 +56,17 @@ class CorePermissions
      * @param EntityManager       $em
      * @param SecurityContext     $security
      * @param array               $bundles
+     * @param array               $addonBundles
      * @param array               $params
      */
-    public function __construct(TranslatorInterface $translator, EntityManager $em, SecurityContext $security, array $bundles, array $params)
+    public function __construct(TranslatorInterface $translator, EntityManager $em, SecurityContext $security, array $bundles, array $addonBundles, array $params)
     {
-        $this->translator = $translator;
-        $this->em         = $em;
-        $this->bundles    = $bundles;
-        $this->security   = $security;
-        $this->params     = $params;
+        $this->translator   = $translator;
+        $this->em           = $em;
+        $this->bundles      = $bundles;
+        $this->addonBundles = $addonBundles;
+        $this->security     = $security;
+        $this->params       = $params;
     }
 
     /**
@@ -82,6 +89,14 @@ class CorePermissions
                     $classes[strtolower($bundle['base'])] = $object;
                 }
             }
+
+            foreach ($this->addonBundles as $bundle) {
+                //explode MauticUserBundle into Mautic User Bundle so we can build the class needed
+                $object = $this->getPermissionClass($bundle['base'], false, true);
+                if (!empty($object)) {
+                    $classes[strtolower($bundle['base'])] = $object;
+                }
+            }
         }
 
         return $classes;
@@ -92,17 +107,19 @@ class CorePermissions
      *
      * @param string $bundle
      * @param bool   $throwException
+     * @param bool   $addonBundle
      *
      * @return mixed
      * @throws \InvalidArgumentException
      */
-    public function getPermissionClass($bundle, $throwException = true)
+    public function getPermissionClass($bundle, $throwException = true, $addonBundle = false)
     {
         static $classes = array();
         if (!empty($bundle)) {
             if (empty($classes[$bundle])) {
                 $bundle    = ucfirst($bundle);
-                $className = "Mautic\\{$bundle}Bundle\\Security\\Permissions\\{$bundle}Permissions";
+                $base      = $addonBundle ? 'MauticAddon' : 'Mautic';
+                $className = "{$base}\\{$bundle}Bundle\\Security\\Permissions\\{$bundle}Permissions";
                 if (class_exists($className)) {
                     $classes[$bundle] = new $className($this->params);
                 } elseif ($throwException) {
@@ -151,11 +168,11 @@ class CorePermissions
 
             foreach ($perms as $perm) {
                 //get the bit for the perm
-                if ($supports = $class->isSupported($name, $perm)) {
-                    $bit += $class->getValue($name, $perm);
-                } else {
+                if (!$class->isSupported($name, $perm)) {
                     throw new \InvalidArgumentException("$perm does not exist for $bundle:$name");
                 }
+
+                $bit += $class->getValue($name, $perm);
             }
             $entity->setBitwise($bit);
             $entities[] = $entity;
@@ -167,14 +184,14 @@ class CorePermissions
     /**
      * Determines if the user has permission to access the given area
      *
-     * @param array  $requestedPermission
-     * @param string $mode MATCH_ALL|MATCH_ONE|RETURN_ARRAY
-     * @param User   $userEntity
+     * @param array|string $requestedPermission
+     * @param string       $mode MATCH_ALL|MATCH_ONE|RETURN_ARRAY
+     * @param User         $userEntity
      *
      * @return bool
      * @throws \InvalidArgumentException
      */
-    public function isGranted ($requestedPermission, $mode = "MATCH_ALL", $userEntity = null)
+    public function isGranted($requestedPermission, $mode = "MATCH_ALL", $userEntity = null)
     {
         if ($userEntity === null) {
            $userEntity = $this->getUser();

@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -55,8 +55,8 @@ class MenuRenderer implements RendererInterface
             'depth'             => null,
             'matchingDepth'     => null,
             'currentAsLink'     => true,
-            'currentClass'      => 'current',
-            'ancestorClass'     => 'current_ancestor',
+            'currentClass'      => 'active',
+            'ancestorClass'     => 'open',
             'firstClass'        => 'first',
             'lastClass'         => 'last',
             'template'          => "MauticCoreBundle:Menu:main.html.php",

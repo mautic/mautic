@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -20,6 +20,7 @@ use FOS\OAuthServerBundle\Model\ClientInterface;
  */
 class AuthCode extends BaseAuthCode
 {
+
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")
@@ -53,6 +54,7 @@ class AuthCode extends BaseAuthCode
      * Set client
      *
      * @param ClientInterface $client
+     *
      * @return RefreshToken
      */
     public function setClient(ClientInterface $client)
@@ -76,6 +78,7 @@ class AuthCode extends BaseAuthCode
      * Set user
      *
      * @param UserInterface $user
+     *
      * @return RefreshToken
      */
     public function setUser(UserInterface $user = null)

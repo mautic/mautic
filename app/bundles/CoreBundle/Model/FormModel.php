@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -113,11 +113,7 @@ class FormModel extends CommonModel
      */
     public function saveEntity($entity, $unlock = true)
     {
-        if (!method_exists($entity, 'getId')) {
-            $isNew = ($entity->getId()) ? false : true;
-        } else {
-            $isNew = \Doctrine\ORM\UnitOfWork::STATE_NEW !== $this->factory->getEntityManager()->getUnitOfWork()->getEntityState($entity);
-        }
+        $isNew = $this->isNewEntity($entity);
 
         //set some defaults
         $this->setTimestamps($entity, $isNew, $unlock);
@@ -140,11 +136,7 @@ class FormModel extends CommonModel
         //iterate over the results so the events are dispatched on each delete
         $batchSize = 20;
         foreach ($entities as $k => $entity) {
-            if (!method_exists($entity, 'getId')) {
-                $isNew = ($entity->getId()) ? false : true;
-            } else {
-                $isNew = \Doctrine\ORM\UnitOfWork::STATE_NEW !== $this->factory->getEntityManager()->getUnitOfWork()->getEntityState($entity);
-            }
+            $isNew = $this->isNewEntity($entity);
 
             //set some defaults
             $this->setTimestamps($entity, $isNew, $unlock);
@@ -158,6 +150,24 @@ class FormModel extends CommonModel
             }
         }
         $this->em->flush();
+    }
+
+    /**
+     * Determines if an entity is new or not
+     *
+     * @param mixed $entity
+     *
+     * @return bool
+     */
+    public function isNewEntity($entity)
+    {
+        if (method_exists($entity, 'getId')) {
+            $isNew = ($entity->getId()) ? false : true;
+        } else {
+            $isNew = \Doctrine\ORM\UnitOfWork::STATE_NEW === $this->factory->getEntityManager()->getUnitOfWork()->getEntityState($entity);
+        }
+
+        return $isNew;
     }
 
     /**

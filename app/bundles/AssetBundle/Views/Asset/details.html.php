@@ -1,13 +1,12 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-//@todo - add landing asset stats/analytics
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'asset');
 $view['slots']->set("headerTitle", $activeAsset->getTitle());?>
@@ -171,17 +170,8 @@ if ($security->hasEntityAccess($permissions['asset:assets:editown'], $permission
         </div>
 
         <!-- start: tab-content -->
-        <div class="tab-content pa-md">
-            <h5 class="fw-sb mb-xs"><?php echo $view['translator']->trans('mautic.asset.asset.preview'); ?></h5>
-            <div class="text-center">
-                <?php if ($activeAsset->isImage()) : ?>
-                    <img src="<?php echo $assetUrl; ?>" alt="<?php echo $activeAsset->getTitle(); ?>" class="img-thumbnail" />
-                <?php elseif (strtolower($activeAsset->getFileType()) == 'pdf') : ?>
-                    <iframe src="<?php echo $assetUrl; ?>#view=FitH" class="col-sm-12"></iframe>
-                <?php else : ?>
-                    <i class="<?php echo $activeAsset->getIconClass(); ?> fa-5x"></i>
-                <?php endif; ?>
-            </div>
+        <div class="tab-content pa-md preview-detail">
+            <?php echo $view->render('MauticAssetBundle:Asset:preview.html.php', array('activeAsset' => $activeAsset, 'baseUrl' => $baseUrl)); ?>
         </div>
         <!--/ end: tab-content -->
     </div>
@@ -211,7 +201,7 @@ if ($security->hasEntityAccess($permissions['asset:assets:editown'], $permission
         <hr class="hr-w-2" style="width:50%">
 
         <!-- activity feed -->
-        <?php echo $view->render('MauticCoreBundle:Default:recentactivity.html.php', array('logs' => $logs)); ?>
+        <?php echo $view->render('MauticCoreBundle:Helper:recentactivity.html.php', array('logs' => $logs)); ?>
     </div>
     <!--/ right section -->
     <input id="itemId" value="<?php echo $activeAsset->getId(); ?>" />

@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -299,7 +299,6 @@ class InstallController extends CommonController
             /** @var \Mautic\InstallBundle\Configurator\Configurator $configurator */
             $configurator = $this->container->get('mautic.configurator');
             $params       = $configurator->getParameters();
-            $tmpl         = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
             // Check the DB Driver, Name, User, and send stats param
             if ((isset($params['db_driver']) && $params['db_driver'])
@@ -319,9 +318,9 @@ class InstallController extends CommonController
     /**
      * Performs the database installation
      *
-     * @param \Symfony\Component\Form\Form                         $form
-     * @param \Mautic\InstallBundle\Configurator\Configurator      $configurator
-     * @param \Mautic\InstallBundle\Configurator\Step\DoctrineStep $step
+     * @param \Symfony\Component\Form\Form                          $form
+     * @param \Mautic\InstallBundle\Configurator\Configurator       $configurator
+     * @param \Mautic\InstallBundle\Configurator\Step\StepInterface $step
      *
      * @return array|boolean Array containing the flash message data on a failure, boolean true on success
      */

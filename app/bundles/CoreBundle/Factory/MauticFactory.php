@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -285,7 +285,11 @@ class MauticFactory
         static $dates;
 
         if (!empty($string)) {
-            $key = "$string.$format.$tz";
+            if ($string instanceof \DateTime) {
+                $key = $string->format('U') . ".$format.$tz";
+            } else {
+                $key = "$string.$format.$tz";
+            }
 
             if (empty($dates[$key])) {
                 $dates[$key] = new DateTimeHelper($string, $format, $tz);

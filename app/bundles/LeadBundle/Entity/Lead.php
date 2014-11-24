@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -23,7 +23,6 @@ use Mautic\CoreBundle\Entity\IpAddress;
  * @Serializer\XmlRoot("lead")
  * @Serializer\ExclusionPolicy("all")
  */
-
 class Lead extends FormEntity
 {
 
@@ -178,6 +177,19 @@ class Lead extends FormEntity
     public function convertToArray()
     {
         return get_object_vars($this);
+    }
+
+    /**
+     * Set id
+     *
+     * @param integer $id
+     * @return Lead
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+
+        return $this;
     }
 
     /**

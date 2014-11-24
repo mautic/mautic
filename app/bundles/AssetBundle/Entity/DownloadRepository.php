@@ -1,15 +1,14 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\AssetBundle\Entity;
 
-use Doctrine\ORM\Query;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\GraphHelper;
@@ -87,10 +86,10 @@ class DownloadRepository extends CommonRepository
      */
     public function getDownloads($assetId, $amount = 30, $unit = 'D')
     {
-        $data = GraphHelper::prepareLineGraphData($amount, $unit, array('downloaded'));
-        
+        $data = GraphHelper::prepareDatetimeLineGraphData($amount, $unit, array('downloaded'));
+
         $query = $this->createQueryBuilder('d');
-        
+
         $query->select('IDENTITY(d.asset), d.dateDownload')
             ->where($query->expr()->eq('IDENTITY(d.asset)', (int) $assetId))
             ->andwhere($query->expr()->gte('d.dateDownload', ':date'))
@@ -190,5 +189,41 @@ class DownloadRepository extends CommonRepository
         }
 
         return $graphData;
+    }
+
+    /**
+     * @param           $pageId
+     * @param \DateTime $fromDate
+     *
+     * @return mixed
+     */
+    public function getDownloadCountsByPage($pageId, \DateTime $fromDate = null)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->select('count(distinct(a.tracking_id)) as downloads, a.source_id as page_id, p.title, p.alias, p.variant_hits')
+            ->from(MAUTIC_TABLE_PREFIX.'asset_downloads', 'a')
+            ->join('a', MAUTIC_TABLE_PREFIX.'pages', 'p', 'a.source_id = p.id');
+
+        if (is_array($pageId)) {
+            $q->where($q->expr()->in('p.id', $pageId))
+                ->groupBy('p.id');
+
+        } else {
+            $q->where($q->expr()->eq('p.id', ':page'))
+                ->setParameter('page', (int) $pageId);
+        }
+
+        $q->andWhere('a.source = "page"')
+            ->andWhere('a.code = 200');
+
+        if ($fromDate != null) {
+            $dh = new DateTimeHelper($fromDate);
+            $q->andWhere($q->expr()->gte('a.date_download', ':date'))
+                ->setParameter('date', $dh->toUtcString());
+        }
+
+        $results = $q->execute()->fetchAll();
+
+        return $results;
     }
 }

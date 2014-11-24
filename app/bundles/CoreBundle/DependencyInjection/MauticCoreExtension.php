@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -31,8 +31,46 @@ class MauticCoreExtension extends Extension
     public function load(array $configs, ContainerBuilder $container)
     {
         $bundles = $container->getParameter('mautic.bundles');
+        $addons  = $container->getParameter('mautic.addon.bundles');
 
         foreach ($bundles as $name => $bundle) {
+            //load services
+            $directory = $bundle['directory'] . '/Config/services';
+            if (file_exists($directory)) {
+
+                //PHP config files
+                $finder = new Finder();
+                $finder->files()->in($directory)->name('*.php');
+                if (count($finder)) {
+                    $loader = new Loader\PhpFileLoader($container, new FileLocator($directory));
+                    foreach ($finder as $file) {
+                        $loader->load($file->getFilename());
+                    }
+                }
+
+                //YAML config files
+                $finder = new Finder();
+                $finder->files()->in($directory)->name('*.yaml');
+                if (count($finder)) {
+                    $loader = new Loader\YamlFileLoader($container, new FileLocator($directory));
+                    foreach ($finder as $file) {
+                        $loader->load($file->getFilename());
+                    }
+                }
+
+                //XML config files
+                $finder = new Finder();
+                $finder->files()->in($directory)->name('*.xml');
+                if (count($finder)) {
+                    $loader = new Loader\XmlFileLoader($container, new FileLocator($directory));
+                    foreach ($finder as $file) {
+                        $loader->load($file->getFilename());
+                    }
+                }
+            }
+        }
+
+        foreach ($addons as $name => $bundle) {
             //load services
             $directory = $bundle['directory'] . '/Config/services';
             if (file_exists($directory)) {

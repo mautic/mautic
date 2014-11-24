@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -22,6 +22,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  */
 class Client extends BaseClient
 {
+
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")
@@ -65,8 +66,17 @@ class Client extends BaseClient
         ));
     }
 
+    /**
+     * @var array
+     */
     protected $changes;
 
+    /**
+     * @param $prop
+     * @param $val
+     *
+     * @return void
+     */
     protected function isChanged($prop, $val)
     {
         $getter  = "get" . ucfirst($prop);
@@ -76,6 +86,9 @@ class Client extends BaseClient
         }
     }
 
+    /**
+     * @return array
+     */
     public function getChanges()
     {
         return $this->changes;
@@ -95,6 +108,7 @@ class Client extends BaseClient
      * Set name
      *
      * @param string $name
+     *
      * @return Client
      */
     public function setName($name)
@@ -102,6 +116,7 @@ class Client extends BaseClient
         $this->isChanged('name', $name);
 
         $this->name = $name;
+
         return $this;
     }
 
@@ -128,10 +143,11 @@ class Client extends BaseClient
     /**
      * Add authCodes
      *
-     * @param \Mautic\ApiBundle\Entity\oAuth2\AuthCode $authCodes
+     * @param AuthCode $authCodes
+     *
      * @return Client
      */
-    public function addAuthCode(\Mautic\ApiBundle\Entity\oAuth2\AuthCode $authCodes)
+    public function addAuthCode(AuthCode $authCodes)
     {
         $this->authCodes[] = $authCodes;
 
@@ -141,9 +157,9 @@ class Client extends BaseClient
     /**
      * Remove authCodes
      *
-     * @param \Mautic\ApiBundle\Entity\oAuth2\AuthCode $authCodes
+     * @param AuthCode $authCodes
      */
-    public function removeAuthCode(\Mautic\ApiBundle\Entity\oAuth2\AuthCode $authCodes)
+    public function removeAuthCode(AuthCode $authCodes)
     {
         $this->authCodes->removeElement($authCodes);
     }
@@ -158,16 +174,17 @@ class Client extends BaseClient
         return $this->authCodes;
     }
 
-
     /**
      * Determines if a client attempting API access is already authorized by the user
      *
      * @param User $user
+     *
      * @return bool
      */
     public function isAuthorizedClient(User $user)
     {
         $users = $this->getUsers();
+
         return $users->contains($user);
     }
 
@@ -175,6 +192,7 @@ class Client extends BaseClient
      * Add users
      *
      * @param \Mautic\UserBundle\Entity\User $users
+     *
      * @return Client
      */
     public function addUser(\Mautic\UserBundle\Entity\User $users)

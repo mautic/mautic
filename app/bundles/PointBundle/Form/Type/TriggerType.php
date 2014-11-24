@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -108,7 +108,7 @@ class TriggerType extends AbstractType
             $data     = false;
         } else {
             $readonly = false;
-            $data     = true;
+            $data     = false;
         }
 
         $builder->add('isPublished', 'button_group', array(
@@ -150,7 +150,7 @@ class TriggerType extends AbstractType
             'required'   => false
         ));
 
-        $builder->add('tempId', 'hidden', array(
+        $builder->add('sessionId', 'hidden', array(
             'mapped' => false
         ));
 

@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -11,7 +11,7 @@ namespace Mautic\PageBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
-use Mautic\PageBundle\Event\PageEvent;
+use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -221,33 +221,36 @@ class PublicController extends CommonFormController
                 }
             }
 
-            //all the checks pass so display the content
-            $template   = $entity->getTemplate();
-            $slots      = $this->factory->getTheme($template)->getSlots('page');
+            if ($entity->getContentMode() == 'builder') {
+                //all the checks pass so display the content
+                $template   = $entity->getTemplate();
+                $slots      = $this->factory->getTheme($template)->getSlots('page');
+
+                $googleAnalytics = $this->factory->getParameter('google_analytics');
+
+                $response = $this->render('MauticPageBundle::public.html.php', array(
+                    'slots'           => $slots,
+                    'content'         => $entity->getContent(),
+                    'page'            => $entity,
+                    'template'        => $template,
+                    'googleAnalytics' => $googleAnalytics
+                ));
+
+                $content = $response->getContent();
+            } else {
+                $content = $entity->getCustomHtml();
+            }
 
             $dispatcher = $this->get('event_dispatcher');
             if ($dispatcher->hasListeners(PageEvents::PAGE_ON_DISPLAY)) {
-                $event = new PageEvent($entity);
-                $slotsHelper = $this->factory->getTemplating()
-                    ->getEngine('MauticPageBundle::public.html.php')->get('slots');
-                $event->setSlotsHelper($slotsHelper);
+                $event = new PageDisplayEvent($content, $entity);
                 $dispatcher->dispatch(PageEvents::PAGE_ON_DISPLAY, $event);
                 $content = $event->getContent();
-            } else {
-                $content = $entity->getContent();
             }
 
             $model->hitPage($entity, $this->request, 200);
 
-            $googleAnalytics = $this->factory->getParameter('google_analytics');
-
-            return $this->render('MauticPageBundle::public.html.php', array(
-                'slots'           => $slots,
-                'content'         => $content,
-                'page'            => $entity,
-                'template'        => $template,
-                'googleAnalytics' => $googleAnalytics
-            ));
+            return new Response($content);
         }
 
         $model->hitPage($entity, $this->request, 404);

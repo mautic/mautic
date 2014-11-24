@@ -1,18 +1,16 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\EmailBundle\Helper;
 
-use Mautic\EmailBundle\Entity\Email;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\FormBundle\Entity\Action;
-use Symfony\Component\HttpFoundation\Response;
 
 class FormSubmitHelper
 {
@@ -21,7 +19,7 @@ class FormSubmitHelper
      *
      * @return array
      */
-    public static function onFormSubmit(Action $action, MauticFactory $factory, $feedback)
+    public static function sendEmail(Action $action, MauticFactory $factory, $feedback)
     {
         $properties = $action->getProperties();
         $emailId    = $properties['email'];

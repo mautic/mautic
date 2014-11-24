@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -59,7 +59,7 @@ class SocialController extends FormController
 
         if ($this->request->getMethod() == 'POST') {
             if (!$cancelled = $this->isFormCancelled($form)) {
-                if ($valid = $this->isFormValid($form)) {
+                if ($this->isFormValid($form)) {
                     foreach ($services['services'] as $network => $entity) {
                         //check to make sure secret keys were not wiped out
                         if (!empty($currentKeys[$network]['clientId'])) {

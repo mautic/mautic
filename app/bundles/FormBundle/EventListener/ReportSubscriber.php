@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -128,7 +128,7 @@ class ReportSubscriber extends CommonSubscriber
                 $unit = $options['unit'];
             }
 
-            $data = GraphHelper::prepareLineGraphData($amount, $unit, array('submissions'));
+            $data = GraphHelper::prepareDatetimeLineGraphData($amount, $unit, array('submissions'));
 
             $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
             $queryBuilder->from(MAUTIC_TABLE_PREFIX . 'form_submissions', 'fs');

@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -55,34 +55,32 @@ class BuilderSubscriber extends CommonSubscriber
         $idHash   = $event->getIdHash();
         $router   = $this->factory->getRouter();
 
-        foreach ($content as $slot => &$html) {
-            if (strpos($html, '{unsubscribe_text}') !== false) {
-                $html = str_ireplace('{unsubscribe_text}',
-                    $this->translator->trans('mautic.email.unsubscribe.text', array(
-                        '%link%' => $router->generate('mautic_email_unsubscribe', array('idHash' => $idHash), true)
-                    ))
-                , $html);
-            }
+        if (strpos($content, '{unsubscribe_text}') !== false) {
+            $content = str_ireplace('{unsubscribe_text}',
+                $this->translator->trans('mautic.email.unsubscribe.text', array(
+                    '%link%' => $router->generate('mautic_email_unsubscribe', array('idHash' => $idHash), true)
+                ))
+            , $content);
+        }
 
-            if (strpos($html, '{unsubscribe_url}') !== false) {
-                $html = str_ireplace('{unsubscribe_url}',
-                    $router->generate('mautic_email_unsubscribe', array('idHash' => $idHash), true)
-                , $html);
-            }
+        if (strpos($content, '{unsubscribe_url}') !== false) {
+            $content = str_ireplace('{unsubscribe_url}',
+                $router->generate('mautic_email_unsubscribe', array('idHash' => $idHash), true)
+            , $content);
+        }
 
-            if (strpos($html, '{webview_text}') !== false) {
-                $html = str_ireplace('{webview_text}',
-                    $this->translator->trans('mautic.email.webview.text', array(
-                        '%link%' => $router->generate('mautic_email_webview', array('idHash' => $idHash), true)
-                    ))
-                    , $html);
-            }
+        if (strpos($content, '{webview_text}') !== false) {
+            $content = str_ireplace('{webview_text}',
+                $this->translator->trans('mautic.email.webview.text', array(
+                    '%link%' => $router->generate('mautic_email_webview', array('idHash' => $idHash), true)
+                ))
+                , $content);
+        }
 
-            if (strpos($html, '{webview_url}') !== false) {
-                $html = str_ireplace('{webview_url}',
-                    $router->generate('mautic_email_webview', array('idHash' => $idHash), true)
-                    , $html);
-            }
+        if (strpos($content, '{webview_url}') !== false) {
+            $content = str_ireplace('{webview_url}',
+                $router->generate('mautic_email_webview', array('idHash' => $idHash), true)
+                , $content);
         }
 
         $event->setContent($content);

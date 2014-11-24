@@ -1,18 +1,15 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'email');
 $view['slots']->set("headerTitle", $view['translator']->trans('mautic.email.header.index'));
-$view['slots']->set('searchUri', $view['router']->generate('mautic_email_index', array('page' => $page)));
-$view['slots']->set('searchString', $app->getSession()->get('mautic.email.filter'));
-$view['slots']->set('searchHelp', $view['translator']->trans('mautic.email.help.searchcommands'));
 ?>
 
 <?php if ($permissions['email:emails:create']): ?>
@@ -32,6 +29,21 @@ $view['slots']->set('searchHelp', $view['translator']->trans('mautic.email.help.
     <?php echo $view->render('MauticEmailBundle:Email:filters.html.php', array('filters' => $filters)); ?>
     <!--/ filters -->
 
-    <?php $view['slots']->output('_content'); ?>
+    <div class="col-md-9 bg-auto height-auto bdr-l">
+        <div class="panel panel-default bdr-t-wdh-0 mb-0">
+            <?php echo $view->render('MauticCoreBundle:Helper:listactions.html.php', array(
+                'searchValue' => $searchValue,
+                'action'      => $currentRoute,
+                'menuLink'    => 'mautic_email_index',
+                'langVar'     => 'email',
+                'routeBase'   => 'email',
+                'delete'      => $permissions['email:emails:deleteown'] || $permissions['email:emails:deleteother']
+            )); ?>
+
+            <div class="page-list">
+                <?php $view['slots']->output('_content'); ?>
+            </div>
+        </div>
+    </div>
 </div>
 

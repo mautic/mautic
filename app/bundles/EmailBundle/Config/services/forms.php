@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -38,18 +38,18 @@ $container->setDefinition('mautic.form.type.email_list', new Definition(
         'alias' => 'email_list',
     ));
 
-$container->setDefinition('mautic.form.type.campaignevent_email', new Definition(
-    'Mautic\EmailBundle\Form\Type\CampaignEventEmailOpenType'
+$container->setDefinition('mautic.form.type.emailopen_list', new Definition(
+    'Mautic\EmailBundle\Form\Type\EmailOpenType'
 ))
     ->addTag('form.type', array(
-        'alias' => 'campaignevent_email',
+        'alias' => 'emailopen_list',
     ));
 
-$container->setDefinition('mautic.form.type.campaignevent_email', new Definition(
-    'Mautic\EmailBundle\Form\Type\CampaignEventEmailSendType'
+$container->setDefinition('mautic.form.type.emailsend_list', new Definition(
+    'Mautic\EmailBundle\Form\Type\EmailSendType'
 ))
     ->addTag('form.type', array(
-        'alias' => 'campaignevent_email',
+        'alias' => 'emailsend_list',
     ));
 
 $container->setDefinition('mautic.validator.leadlistaccess', new Definition(
@@ -63,18 +63,4 @@ $container->setDefinition('mautic.form.type.formsubmit_sendemail_admin', new Def
 ))
     ->addTag('form.type', array(
         'alias' => 'email_submitaction_sendemail_admin',
-    ));
-
-$container->setDefinition('mautic.form.type.formsubmit_sendemail_lead', new Definition(
-    'Mautic\EmailBundle\Form\Type\FormSubmitActionSendLeadEmailType'
-))
-    ->addTag('form.type', array(
-        'alias' => 'email_submitaction_sendemail_lead',
-    ));
-
-$container->setDefinition('mautic.form.type.pointaction_email', new Definition(
-    'Mautic\EmailBundle\Form\Type\PointActionType'
-))
-    ->addTag('form.type', array(
-        'alias' => 'pointaction_email',
     ));

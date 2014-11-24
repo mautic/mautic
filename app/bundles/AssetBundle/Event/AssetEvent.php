@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -20,8 +20,8 @@ use Mautic\AssetBundle\Entity\Asset;
 class AssetEvent extends CommonEvent
 {
     /**
-     * @param Form $asset
-     * @param bool $isNew
+     * @param Asset $asset
+     * @param bool  $isNew
      */
     public function __construct(Asset &$asset, $isNew = false)
     {

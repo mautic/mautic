@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -57,6 +57,57 @@ class AjaxController extends CommonAjaxController
             $session->set('mautic.pagebuilder.'.$page.'.content', $content);
             $dataArray['success'] = 1;
         }
+        return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    protected function getAbTestFormAction(Request $request)
+    {
+        $dataArray = array(
+            'success' => 0,
+            'html'    => ''
+        );
+        $type   = InputHelper::clean($request->request->get('abKey'));
+        $pageId = InputHelper::int($request->request->get('pageId'));
+
+        if (!empty($type)) {
+            //get the HTML for the form
+            /** @var \Mautic\PointBundle\Model\PointModel $model */
+            $model   = $this->factory->getModel('page');
+
+            $page = $model->getEntity($pageId);
+
+            $abTestComponents = $model->getBuilderComponents($page, 'abTestWinnerCriteria');
+            $abTestSettings   = $abTestComponents['criteria'];
+
+            if (isset($abTestSettings[$type])) {
+                $html     = '';
+                $formType = (!empty($abTestSettings[$type]['formType'])) ? $abTestSettings[$type]['formType'] : '';
+                if (!empty($formType)) {
+                    $form     = $this->get('form.factory')->create('page_abtest_settings', array(), array('formType' => $formType));
+                    $html     = $this->renderView('MauticPageBundle:AbTest:form.html.php', array(
+                        'form' => $this->setFormTheme($form, 'MauticPageBundle:AbTest:form.html.php', 'MauticPageBundle:FormTheme\Page')
+                    ));
+                }
+
+                $html = str_replace(array(
+                    'page_abtest_settings[',
+                    'page_abtest_settings_',
+                    'page_abtest_settings'
+                ), array(
+                    'page[variantSettings][',
+                    'page_variantSettings_',
+                    'page'
+                ), $html);
+                $dataArray['html']    = $html;
+                $dataArray['success'] = 1;
+            }
+        }
+
         return $this->sendJsonResponse($dataArray);
     }
 }

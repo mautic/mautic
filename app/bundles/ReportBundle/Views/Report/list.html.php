@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 if ($tmpl == 'index')
@@ -14,6 +14,8 @@ if ($tmpl == 'index')
         <table class="table table-hover table-striped table-bordered report-list" id="reportTable">
             <thead>
                 <tr>
+                    <?php /*
+                    @todo reenable once report generation is ready
                     <th class="col-report-actions pl-20">
                         <div class="checkbox-inline custom-primary">
                             <label class="mb-0 pl-10">
@@ -22,6 +24,7 @@ if ($tmpl == 'index')
                             </label>
                         </div>
                     </th>
+                    */ ?>
                     <?php
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                         'sessionVar' => 'report',
@@ -43,6 +46,7 @@ if ($tmpl == 'index')
             <tbody>
             <?php foreach ($items as $item): ?>
                 <tr>
+                    <?php /* @todo renable once report generation is ready
                     <td>
                         <?php
                         echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
@@ -64,6 +68,7 @@ if ($tmpl == 'index')
                         ));
                         ?>
                     </td>
+                    */ ?>
                     <td>
                         <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php',array(
                             'item'       => $item,
@@ -92,5 +97,5 @@ if ($tmpl == 'index')
         </div>
     </div>
 <?php else: ?>
-    <?php echo $view->render('MauticCoreBundle:Default:noresults.html.php'); ?>
+    <?php echo $view->render('MauticCoreBundle:Helper:noresults.html.php'); ?>
 <?php endif; ?>

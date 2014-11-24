@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -24,15 +24,11 @@
             $showChildren = ($child->hasChildren() && $child->getDisplayChildren());
             $liAttributes = $child->getAttributes();
             $isAncestor   = $matcher->isAncestor($child, $options["matchingDepth"]);
-            //$showAsLink   = $child->getUri() && (!$matcher->isCurrent($child) || $options["currentAsLink"]);
 
-            if ($isAncestor && !$showChildren): //make ancestor active if the current child is set to not be displayed
-                $liAttributes['class'] = (isset($liAttributes['class'])) ? $liAttributes['class'] . " current" :
-                    "current";
-            endif;
+            $liAttributes['class'] = (isset($liAttributes['class'])) ? $liAttributes['class'] . ' nav-group' : 'nav-group';
         ?>
 
-        <li class="nav-group<?php if ($isAncestor) echo ' open'; ?>" <?php echo $view["menu_helper"]->parseAttributes($liAttributes); ?> >
+            <li<?php echo $view["menu_helper"]->parseAttributes($liAttributes); ?> >
 
             <?php
 

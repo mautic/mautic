@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -310,34 +310,89 @@ class AssetsHelper extends CoreAssetsHelper
     }
 
     /**
-     * @param string $text
+     * Turn all URLs in clickable links.
      *
+     * @param string $text
+     * @param array  $protocols  http/https, ftp, mail, twitter
+     * @param array  $attributes
+     * @param string $mode       normal or all
      * @return string
      */
-    public function makeLinks($text)
+    public function makeLinks($text, $protocols = array('http', 'mail'), array $attributes = array())
     {
-        return preg_replace(
-            array(
-                '/(?(?=<a[^>]*>.+<\/a>)
-                    (?:<a[^>]*>.+<\/a>)
-                    |
-                    ([^="\']?)((?:https?|ftp|bf2|):\/\/[^<> \n\r]+)
-                 )/iex',
-                '/<a([^>]*)target="?[^"\']+"?/i',
-                '/<a([^>]+)>/i',
-                '/(^|\s)(www.[^<> \n\r]+)/iex',
-                '/(([_A-Za-z0-9-]+)(\\.[_A-Za-z0-9-]+)*@([A-Za-z0-9-]+)
-                (\\.[A-Za-z0-9-]+)*)/iex'
-            ),
-            array(
-                "stripslashes((strlen('\\2')>0?'\\1<a href=\"\\2\">\\2</a>\\3':'\\0'))",
-                '<a\\1',
-                '<a\\1 target="_blank">',
-                "stripslashes((strlen('\\2')>0?'\\1<a href=\"http://\\2\">\\2</a>\\3':'\\0'))",
-                "stripslashes((strlen('\\2')>0?'<a href=\"mailto:\\0\">\\0</a>':'\\0'))"
-            ),
-            $text
-        );
+        if (strnatcmp(phpversion(),'4.0.5') >= 0)
+        {
+            // Link attributes
+            $attr = '';
+            foreach ($attributes as $key => $val) {
+                $attr = ' ' . $key . '="' . htmlentities($val) . '"';
+            }
+
+            $links = array();
+
+            // Extract existing links and tags
+            $text = preg_replace_callback('~(<a .*?>.*?</a>|<.*?>)~i', function ($match) use (&$links) {
+                return '<' . array_push($links, $match[1]) . '>';
+            }, $text);
+
+            // Extract text links for each protocol
+            foreach ((array)$protocols as $protocol) {
+                switch ($protocol) {
+                    case 'http':
+                    case 'https':
+                        $text = preg_replace_callback('~(?:(https?)://([^\s<]+)|(www\.[^\s<]+?\.[^\s<]+))(?<![\.,:])~i', function ($match) use ($protocol, &$links, $attr) {
+                            if ($match[1]) $protocol = $match[1];
+                            $link = $match[2] ?: $match[3];
+                            return '<' . array_push($links, "<a $attr href=\"$protocol://$link\">$link</a>") . '>';
+                        }, $text);
+                    break;
+                    case 'mail':
+                        $text = preg_replace_callback('~([^\s<]+?@[^\s<]+?\.[^\s<]+)(?<![\.,:])~', function ($match) use (&$links, $attr) {
+                            return '<' . array_push($links, "<a $attr href=\"mailto:{$match[1]}\">{$match[1]}</a>") . '>';
+                        }, $text);
+                    break;
+                    case 'twitter':
+                        $text = preg_replace_callback('~(?<!\w)[@#](\w++)~', function ($match) use (&$links, $attr) {
+                            return '<' . array_push($links, "<a $attr href=\"https://twitter.com/" . ($match[0][0] == '@' ? '' : 'search/%23') . $match[1]  . "\">{$match[0]}</a>") . '>';
+                        }, $text);
+                        break;
+                    default:
+                        $text = preg_replace_callback('~' . preg_quote($protocol, '~') . '://([^\s<]+?)(?<![\.,:])~i', function ($match) use ($protocol, &$links, $attr) {
+                            return '<' . array_push($links, "<a $attr href=\"$protocol://{$match[1]}\">{$match[1]}</a>") . '>';
+                        }, $text);
+                        break;
+                }
+            }
+
+            // Insert all link
+            return preg_replace_callback('/<(\d+)>/', function ($match) use (&$links) {
+                return $links[$match[1] - 1];
+            }, $text);
+        } else {
+            return preg_replace(
+                array(
+                    '/(?(?=<a[^>]*>.+<\/a>)
+                        (?:<a[^>]*>.+<\/a>)
+                        |
+                        ([^="\']?)((?:https?|ftp|bf2|):\/\/[^<> \n\r]+)
+                     )/iex',
+                    '/<a([^>]*)target="?[^"\']+"?/i',
+                    '/<a([^>]+)>/i',
+                    '/(^|\s)(www.[^<> \n\r]+)/iex',
+                    '/(([_A-Za-z0-9-]+)(\\.[_A-Za-z0-9-]+)*@([A-Za-z0-9-]+)
+                    (\\.[A-Za-z0-9-]+)*)/iex'
+                ),
+                array(
+                    "stripslashes((strlen('\\2')>0?'\\1<a href=\"\\2\">\\2</a>\\3':'\\0'))",
+                    '<a\\1',
+                    '<a\\1 target="_blank">',
+                    "stripslashes((strlen('\\2')>0?'\\1<a href=\"http://\\2\">\\2</a>\\3':'\\0'))",
+                    "stripslashes((strlen('\\2')>0?'<a href=\"mailto:\\0\">\\0</a>':'\\0'))"
+                ),
+                $text
+            );
+        }
+
     }
 
     /**

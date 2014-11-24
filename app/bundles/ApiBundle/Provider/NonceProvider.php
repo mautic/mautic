@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,6 +14,9 @@ use Bazinga\OAuthServerBundle\Model\Provider\NonceProviderInterface;
 use Doctrine\ORM\EntityManager;
 use Mautic\ApiBundle\Entity\oAuth1\Nonce;
 
+/**
+ * Class NonceProvider
+ */
 class NonceProvider implements NonceProviderInterface
 {
 
@@ -39,9 +42,10 @@ class NonceProvider implements NonceProviderInterface
     /**
      * Ensure a unique nonce and appropriate timestamp
      *
-     * @param $nonce
-     * @param $timestamp
+     * @param                                                     $nonce
+     * @param                                                     $timestamp
      * @param  \Bazinga\OAuthServerBundle\Model\ConsumerInterface $consumer
+     *
      * @return boolean
      */
     public function checkNonceAndTimestampUnicity($nonce, $timestamp, ConsumerInterface $consumer)
@@ -78,9 +82,10 @@ class NonceProvider implements NonceProviderInterface
     }
 
     /**
-     * @param $nonce
-     * @param $timestamp
+     * @param                                                     $nonce
+     * @param                                                     $timestamp
      * @param  \Bazinga\OAuthServerBundle\Model\ConsumerInterface $consumer
+     *
      * @return boolean
      */
     public function registerNonceAndTimestamp($nonce, $timestamp, ConsumerInterface $consumer)

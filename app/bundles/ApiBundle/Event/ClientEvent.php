@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -16,16 +16,18 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
  * Class ClientEvent
- *
- * @package Mautic\RoleBundle\Event
  */
 class ClientEvent extends CommonEvent
 {
+
+    /**
+     * @var string
+     */
     private $apiMode;
 
     /**
      * @param Client|Consumer $client
-     * @param bool $isNew
+     * @param bool            $isNew
      */
     public function __construct($client, $isNew = false)
     {

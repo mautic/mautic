@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -33,18 +33,14 @@ class AssetPermissions extends AbstractPermissions
 
     /**
      * {@inheritdoc}
-     *
-     * @return string|void
      */
-    public function getName() {
+    public function getName()
+    {
         return 'asset';
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @param FormBuilderInterface $builder
-     * @param array                $options
      */
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {
@@ -54,10 +50,8 @@ class AssetPermissions extends AbstractPermissions
 
     /**
      * {@inheritdoc}
-     *
-     * @param array $permissions
      */
-    public function analyzePermissions (array &$permissions)
+    public function analyzePermissions(array &$permissions)
     {
         parent::analyzePermissions($permissions);
 

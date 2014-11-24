@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -38,7 +38,7 @@ $collection->add('mautic_page_action', new Route('/pages/{objectAction}/{objectI
     )
 ));
 
-$collection->add('mautic_page_tracker', new Route('/p/page/tracker.gif',
+$collection->add('mautic_page_tracker', new Route('/p/mtracking.gif',
     array(
         '_controller' => 'MauticPageBundle:Public:trackingImage'
     )

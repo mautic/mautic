@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -19,15 +19,17 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
  * Class ClientModel
- * {@inheritdoc}
- * @package Mautic\CoreBundle\Model
  */
 class ClientModel extends FormModel
 {
 
-    private $apiMode;
     /**
-     *
+     * @var string
+     */
+    private $apiMode;
+
+    /**
+     * @return void
      */
     public function initialize()
     {
@@ -37,7 +39,7 @@ class ClientModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @return object
+     * @return \Mautic\ApiBundle\Entity\oAuth1\ConsumerRepository|\Mautic\ApiBundle\Entity\oAuth2\ClientRepository
      */
     public function getRepository()
     {
@@ -50,8 +52,6 @@ class ClientModel extends FormModel
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
     public function getPermissionBase()
     {
@@ -61,12 +61,7 @@ class ClientModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param      $entity
-     * @param      $formFactory
-     * @param null $action
-     * @param array $options
-     * @return mixed
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
     public function createForm($entity, $formFactory, $action = null, $options = array())
     {
@@ -79,10 +74,9 @@ class ClientModel extends FormModel
     }
 
     /**
-     * Get a specific entity or generate a new one if id is empty
+     * {@inheritdoc}
      *
-     * @param $id
-     * @return null|object
+     * @return null|Client|Consumer
      */
     public function getEntity($id = null)
     {
@@ -95,13 +89,9 @@ class ClientModel extends FormModel
 
 
     /**
-     *  {@inheritdoc}
+     * {@inheritdoc}
      *
-     * @param      $action
-     * @param      $entity
-     * @param bool $isNew
-     * @param      $event
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, $event = false)
     {
@@ -127,16 +117,26 @@ class ClientModel extends FormModel
             }
             $this->dispatcher->dispatch(ApiEvents::CLIENT_POST_SAVE, $event);
             return $event;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
+    /**
+     * @param User $user
+     *
+     * @return array
+     */
     public function getUserClients(User $user)
     {
         return $this->getRepository()->getUserClients($user);
     }
 
+    /**
+     * @param $entity
+     *
+     * @return void
+     */
     public function revokeAccess($entity)
     {
         if (!$entity instanceof Client && !$entity instanceof Consumer) {

@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -142,7 +142,7 @@ class ProfileController extends FormController
             $encoder               = $this->get('security.encoder_factory')->getEncoder($me);
             $overrides['password'] = $model->checkNewPassword($me, $encoder, $submittedPassword);
             if (!$cancelled = $this->isFormCancelled($form)) {
-                if ($valid = $this->isFormValid($form)) {
+                if ($this->isFormValid($form)) {
                     foreach ($overrides as $k => $v) {
                         $func = 'set' . ucfirst($k);
                         $me->$func($v);

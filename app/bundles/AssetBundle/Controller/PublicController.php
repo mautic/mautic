@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -15,12 +15,22 @@ use Mautic\AssetBundle\AssetEvents;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
+/**
+ * Class PublicController
+ */
 class PublicController extends CommonFormController
 {
+    /**
+     * @param string $slug
+     *
+     * @return void
+     */
     public function downloadAction($slug)
     {
         //find the asset
         $security   = $this->factory->getSecurity();
+
+        /** @var \Mautic\AssetBundle\Model\AssetModel $model */
         $model      = $this->factory->getModel('asset.asset');
         $translator = $this->get('translator');
         $entity     = $model->getEntityBySlugs($slug);
@@ -61,10 +71,9 @@ class PublicController extends CommonFormController
                 $dispatcher->dispatch(AssetEvents::ASSET_ON_DOWNLOAD, $event);
             }
 
-            $model->trackDownload($entity, $this->request, 200);
-
             try {
                 $contents = $entity->getFileContents();
+                $model->trackDownload($entity, $this->request, 200);
             } catch (\Exception $e) {
                 $model->trackDownload($entity, $this->request, 404);
                 throw $this->createNotFoundException($translator->trans('mautic.core.url.error.404'));

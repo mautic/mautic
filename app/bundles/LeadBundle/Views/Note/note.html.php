@@ -1,7 +1,7 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
  * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -11,14 +11,13 @@ if ($note instanceof \Mautic\LeadBundle\Entity\LeadNote) {
     $id        = $note->getId();
     $text      = $note->getText();
     $date      = $note->getDateTime();
-    $createdBy = $note->getCreatedBy();
-    $author    = $createdBy->getFirstName() . ' ' . $createdBy->getLastName();
+    $author    = $note->getCreatedByUser();
     $type      = $note->getType();
 } else {
     $id     = $note['id'];
     $text   = $note['text'];
     $date   = $note['dateTime'];
-    $author = $note['createdBy']['firstName'] . ' ' . $note['createdBy']['lastName'];
+    $author = $note['createdByUser'];
     $type   = $note['type'];
 }
 

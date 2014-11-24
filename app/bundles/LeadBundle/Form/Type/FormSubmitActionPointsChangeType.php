@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -12,6 +12,7 @@ namespace Mautic\LeadBundle\Form\Type;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -84,7 +85,7 @@ class FormSubmitActionPointsChangeType extends AbstractType
         ));
         unset($choices);
 
-        $fields = $this->factory->getModel('form.field')->getSessionFields();
+        $fields = $this->factory->getModel('form.field')->getSessionFields($options['attr']['data-formid']);
         $choices = array();
         foreach ($fields as $k => $f) {
             //only show fields with ids

@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -90,7 +90,7 @@ class HitRepository extends CommonRepository
      */
     public function getHits($amount, $unit, $args = array())
     {
-        $data = GraphHelper::prepareLineGraphData($amount, $unit, array('viewed'));
+        $data = GraphHelper::prepareDatetimeLineGraphData($amount, $unit, array('viewed'));
 
         $query = $this->createQueryBuilder('h');
 
@@ -136,11 +136,9 @@ class HitRepository extends CommonRepository
     /**
      * Count returning visitors
      *
-     * @param array $args
-     *
      * @return int
      */
-    public function getReturningCount($args = array())
+    public function getReturningCount()
     {
         $q = $this->createQueryBuilder('h');
         $q->select('COUNT(h.trackingId) as returning')
@@ -154,11 +152,9 @@ class HitRepository extends CommonRepository
     /**
      * Count how many unique visitors hit pages
      *
-     * @param array $args
-     *
      * @return int
      */
-    public function getUniqueCount($args = array())
+    public function getUniqueCount()
     {
         $q = $this->createQueryBuilder('h');
         $q->select('COUNT(DISTINCT h.trackingId) as unique');

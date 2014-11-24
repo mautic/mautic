@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -69,7 +69,7 @@ $view['slots']->set("headerTitle", $header);
             </div>
 
             <div class="tab-pane fade active bdr-w-0" id="events-container">
-                <div id="pointTriggerEvents">
+                <div id="triggerEvents">
                     <div class="mb-md">
                         <p><?php echo $view['translator']->trans('mautic.point.trigger.addevent'); ?></p>
                         <div class="dropdown">
@@ -80,7 +80,7 @@ $view['slots']->set("headerTitle", $header);
                             <ul class="dropdown-menu" role="menu">
                                 <?php foreach ($events as $k => $e): ?>
                                     <li id="event_<?php echo $k; ?>">
-                                        <a data-toggle="ajaxmodal" data-target="#pointTriggerEventModal" class="list-group-item" href="<?php echo $view['router']->generate('mautic_pointtriggerevent_action', array('objectAction' => 'new', 'type' => $k, 'tmpl'=> 'event')); ?>">
+                                        <a data-toggle="ajaxmodal" data-target="#triggerEventModal" class="list-group-item" href="<?php echo $view['router']->generate('mautic_pointtriggerevent_action', array('objectAction' => 'new', 'type' => $k, 'tmpl'=> 'event', 'triggerId' => $sessionId)); ?>">
                                             <div data-toggle="tooltip" title="<?php echo $e['description']; ?>">
                                                 <span><?php echo $e['label']; ?></span>
                                             </div>
@@ -95,15 +95,16 @@ $view['slots']->set("headerTitle", $header);
                         $template = (isset($event['settings']['template'])) ? $event['settings']['template'] :
                             'MauticPointBundle:Event:generic.html.php';
                         echo $view->render($template, array(
-                            'event'  => $event,
-                            'id'      => $event['id'],
-                            'deleted' => in_array($event['id'], $deletedEvents)
+                            'event'     => $event,
+                            'id'        => $event['id'],
+                            'deleted'   => in_array($event['id'], $deletedEvents),
+                            'sessionId' => $sessionId
                         ));
                     endforeach;
                     ?>
                     <?php if (!count($triggerEvents)): ?>
-                        <div class="alert alert-info">
-                            <p id='pointTriggerEventPlaceholder'><?php echo $view['translator']->trans('mautic.point.trigger.addevent'); ?></p>
+                        <div class="alert alert-info" id="triggerEventPlaceholder">
+                            <p><?php echo $view['translator']->trans('mautic.point.trigger.addevent'); ?></p>
                         </div>
                     <?php endif; ?>
                 </div>

@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -92,7 +92,7 @@ class StatRepository extends CommonRepository
         }
 
         $q->andWhere('is_failed = 0');
-        
+
         $results = $q->execute()->fetchAll();
 
         return (isset($results[0])) ? $results[0]['sentCount'] : 0;
@@ -251,7 +251,7 @@ class StatRepository extends CommonRepository
         }
 
         $results = $query->execute()->fetch();
-        
+
         $results['ignored'] = $results['sent'] - $results['read'] - $results['failed'];
         unset($results['sent']);
 

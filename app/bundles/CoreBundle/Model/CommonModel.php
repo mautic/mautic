@@ -1,14 +1,16 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\CoreBundle\Model;
 
+use Doctrine\ORM\Tools\Pagination\Paginator;
+use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Factory\MauticFactory;
 
 /**
@@ -73,7 +75,9 @@ class CommonModel
      */
     public function getCommandList()
     {
-        return $this->getRepository()->getSearchCommands();
+        $repo = $this->getRepository();
+
+        return ($repo instanceof CommonRepository) ? $repo->getSearchCommands() : array();
     }
 
     /**
@@ -89,11 +93,11 @@ class CommonModel
     /**
      * Retrieve the permissions base
      *
-     * @return string|bool
+     * @return string
      */
     public function getPermissionBase()
     {
-        return false;
+        return '';
     }
 
     /**
@@ -101,17 +105,22 @@ class CommonModel
      *
      * @param array $args [start, limit, filter, orderBy, orderByDir]
      *
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator|array
      */
     public function getEntities(array $args = array())
     {
         //set the translator
         $repo = $this->getRepository();
-        $repo->setTranslator($this->translator);
-        $repo->setCurrentUser(
-            $this->factory->getUser()
-        );
 
-        return $repo->getEntities($args);
+        if ($repo instanceof CommonRepository) {
+            $repo->setTranslator($this->translator);
+            $repo->setCurrentUser(
+                $this->factory->getUser()
+            );
+
+            return $repo->getEntities($args);
+        }
+
+        return array();
     }
 }

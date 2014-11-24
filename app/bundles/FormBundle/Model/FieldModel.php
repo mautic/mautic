@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -53,11 +53,11 @@ class FieldModel extends CommonFormModel
      *
      * @return array
      */
-    public function getSessionFields()
+    public function getSessionFields($formId)
     {
         $session = $this->factory->getSession();
-        $fields = $session->get('mautic.formfields.add', array());
-        $remove = $session->get('mautic.formfields.remove', array());
+        $fields = $session->get('mautic.form.'.$formId.'.fields.modified', array());
+        $remove = $session->get('mautic.form.'.$formId.'.fields.deleted', array());
         return array_diff_key($fields, array_flip($remove));
     }
 }

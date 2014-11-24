@@ -1,9 +1,9 @@
 <?php
 /**
  * @package     Mautic
- * @copyright   2014 Mautic, NP. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved.
  * @author      Mautic
- * @link        http://mautic.com
+ * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -33,7 +33,7 @@ class UserControllerTest extends MauticWebTestCase
         $entity->setFirstName('Test');
         $entity->setLastName('User');
         $entity->setPosition('Tester');
-        $entity->setEmail("{$unique}@mautic.com");
+        $entity->setEmail("{$unique}@mautic.org");
         $entity->setRole($role);
         $encoder = $this->encoder->getEncoder('Mautic\UserBundle\Entity\User');
         $entity->setPassword($encoder->encodePassword('mautic', $entity->getSalt()));
@@ -95,7 +95,7 @@ class UserControllerTest extends MauticWebTestCase
         $form['user[firstName]']                = 'Test';
         $form['user[lastName]']                 = 'User';
         $form['user[position]']                 = 'Tester';
-        $form['user[email]']                    = "{$unique}@mautic.com";
+        $form['user[email]']                    = "{$unique}@mautic.org";
         $form['user[role]']                     = $role->getId();
         $form['user[plainPassword][password]']  = 'mautic';
         $form['user[plainPassword][confirm]']   = 'mautic';
