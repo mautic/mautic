@@ -10,7 +10,6 @@
 namespace Mautic\SocialBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\SocialBundle\Helper\NetworkIntegrationHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -32,20 +31,32 @@ class FeatureSettingsType extends AbstractType
     }
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
+     * {@inheritdoc}
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
         $network = $options['sm_network'];
-        if (class_exists('\\Mautic\\SocialBundle\\Form\\Type\\' . $network . 'Type')) {
-            $builder->add('shareButton', 'socialmedia_'.strtolower($network), array(
+
+        /** @var \Mautic\SocialBundle\Network\AbstractNetwork $sm_object */
+        $sm_object = $options['sm_object'];
+
+        if ($sm_object->getIsCore()) {
+            $exists = class_exists('\\Mautic\\SocialBundle\\Form\\Type\\' . $network . 'Type');
+        } else {
+            $class = explode('\\', get_class($sm_object));
+            $exists = class_exists('\\MauticAddon\\' . $class[1] . '\\Form\\Type\\' . $network . 'Type');
+        }
+
+        if ($exists) {
+            $builder->add('shareButton', 'socialmedia_' . strtolower($network), array(
                 'label'       => false,
                 'required'    => false
             ));
         }
 
-        $fields = NetworkIntegrationHelper::getAvailableFields($this->factory, $options['sm_network']);
+        $networkHelper = $this->factory->getNetworkIntegrationHelper();
+        $fields = $networkHelper->getAvailableFields($options['sm_network']);
+
         if (!empty($fields)) {
             $builder->add('shareBtnMsg', 'spacer', array(
                 'text' => 'mautic.social.form.profile'
@@ -62,17 +73,18 @@ class FeatureSettingsType extends AbstractType
     }
 
     /**
-     * @param OptionsResolverInterface $resolver
+     * {@inheritdoc}
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setRequired(array('sm_network', 'lead_fields'));
+        $resolver->setRequired(array('sm_network', 'sm_object', 'lead_fields'));
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
-    public function getName() {
+    public function getName()
+    {
         return "socialmedia_featuresettings";
     }
 }

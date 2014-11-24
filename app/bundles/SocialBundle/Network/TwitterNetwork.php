@@ -9,6 +9,9 @@
 
 namespace Mautic\SocialBundle\Network;
 
+/**
+ * Class TwitterNetwork
+ */
 class TwitterNetwork extends AbstractNetwork
 {
 
@@ -21,8 +24,6 @@ class TwitterNetwork extends AbstractNetwork
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
     public function getName()
     {
@@ -31,19 +32,14 @@ class TwitterNetwork extends AbstractNetwork
 
     /**
      * {@inheritdoc}
-     *
-     * @return int|mixed
      */
     public function getPriority()
     {
         return 5000;
     }
 
-
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
     public function getIdentifierFields()
     {
@@ -52,8 +48,6 @@ class TwitterNetwork extends AbstractNetwork
 
     /**
      * {@inheritdoc}
-     *
-     * @return array
      */
     public function getSupportedFeatures()
     {
@@ -66,8 +60,6 @@ class TwitterNetwork extends AbstractNetwork
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
     public function getOAuthLoginUrl()
     {
@@ -84,8 +76,6 @@ class TwitterNetwork extends AbstractNetwork
 
     /**
      * {@inheritdoc}
-     *
-     * @return array
      */
     public function oAuthCallback($clientId = '', $clientSecret = '')
     {
@@ -159,6 +149,7 @@ class TwitterNetwork extends AbstractNetwork
      * Generate a Twitter bearer token
      *
      * @param $keys
+     *
      * @return string
      */
     private function getBearerToken($keys)
@@ -172,9 +163,6 @@ class TwitterNetwork extends AbstractNetwork
 
     /**
      * {@inheritdoc}
-     *
-     * @param $response
-     * @return string
      */
     public function getErrorsFromResponse($response)
     {
@@ -192,21 +180,17 @@ class TwitterNetwork extends AbstractNetwork
 
     /**
      * {@inheritdoc}
-     *
-     * @return array
      */
     public function getRequiredKeyFields()
     {
         return array(
-            'clientId'      => 'mautic.social.keyfield.clientid',
-            'clientSecret'  => 'mautic.social.keyfield.clientsecret'
+            'clientId'     => 'mautic.social.keyfield.clientid',
+            'clientSecret' => 'mautic.social.keyfield.clientsecret'
         );
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
     public function getAuthenticationType()
     {
@@ -225,10 +209,6 @@ class TwitterNetwork extends AbstractNetwork
 
     /**
      * {@inheritdoc}
-     *
-     * @param $identifier
-     * @param $socialCache
-     * @return array
      */
     public function getUserData($identifier, &$socialCache)
     {
@@ -260,10 +240,6 @@ class TwitterNetwork extends AbstractNetwork
 
     /**
      * {@inheritdoc}
-     *
-     * @param $identifier
-     * @param $socialCache
-     * @return array
      */
     public function getPublicActivity($identifier, &$socialCache)
     {
@@ -326,9 +302,6 @@ class TwitterNetwork extends AbstractNetwork
 
     /**
      * {@inheritdoc}
-     *
-     * @param $url
-     * @return mixed
      */
     public function makeCall($url) {
         $referer = $this->getRefererUrl();
@@ -361,8 +334,6 @@ class TwitterNetwork extends AbstractNetwork
 
     /**
      * {@inheritdoc}
-     *
-     * @return array
      */
     public function getAvailableFields()
     {
@@ -406,9 +377,6 @@ class TwitterNetwork extends AbstractNetwork
 
     /**
      * {@inheritdoc}
-     *
-     * @param $identifier
-     * @return null|string
      */
     public function cleanIdentifier($identifier)
     {

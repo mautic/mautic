@@ -11,13 +11,6 @@ use Symfony\Component\DependencyInjection\Definition;
 
 //Social media forms
 $container->setDefinition(
-    'mautic.form.type.social.config',
-    new Definition('Mautic\SocialBundle\Form\Type\ConfigType'))
-    ->addTag('form.type', array(
-        'alias' => 'socialmedia_config',
-    ));
-
-$container->setDefinition(
     'mautic.form.type.social.details',
     new Definition('Mautic\SocialBundle\Form\Type\DetailsType'))
     ->addTag('form.type', array(
@@ -45,13 +38,6 @@ $container->setDefinition(
     new Definition('Mautic\SocialBundle\Form\Type\KeysType'))
     ->addTag('form.type', array(
         'alias' => 'socialmedia_keys',
-    ));
-
-$container->setDefinition(
-    'mautic.form.type.social.services',
-    new Definition('Mautic\SocialBundle\Form\Type\ServicesType'))
-    ->addTag('form.type', array(
-        'alias' => 'socialmedia_services',
     ));
 
 $container->setDefinition(

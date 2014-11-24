@@ -21,10 +21,8 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  */
 class DetailsType extends AbstractType
 {
-
     /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
+     * {@inheritdoc}
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
@@ -96,6 +94,7 @@ class DetailsType extends AbstractType
             'data'        => $options['data']->getFeatureSettings(),
             'label_attr'  => array('class' => 'control-label'),
             'sm_network'  => $options['sm_network'],
+            'sm_object'   => $options['sm_object'],
             'lead_fields' => $options['lead_fields']
         ));
 
@@ -109,7 +108,7 @@ class DetailsType extends AbstractType
     }
 
     /**
-     * @param OptionsResolverInterface $resolver
+     * {@inheritdoc}
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
@@ -121,9 +120,10 @@ class DetailsType extends AbstractType
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
-    public function getName() {
-        return "socialmedia_details";
+    public function getName()
+    {
+        return 'socialmedia_details';
     }
 }
