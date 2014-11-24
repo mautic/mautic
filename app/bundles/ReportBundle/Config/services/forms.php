@@ -23,12 +23,12 @@ $container->setDefinition(
     ));
 
 //Custom form widgets
-$container->setDefinition('mautic.form.type.column_selector', new Definition(
-    'Mautic\ReportBundle\Form\Type\ColumnSelectorType'
-))
-    ->addTag('form.type', array(
-        'alias' => 'column_selector',
-    ));
+// $container->setDefinition('mautic.form.type.column_selector', new Definition(
+//     'Mautic\ReportBundle\Form\Type\ColumnSelectorType'
+// ))
+//     ->addTag('form.type', array(
+//         'alias' => 'column_selector',
+//     ));
 
 $container->setDefinition('mautic.form.type.filter_selector', new Definition(
     'Mautic\ReportBundle\Form\Type\FilterSelectorType'
