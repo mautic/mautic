@@ -63,7 +63,7 @@ class AbTestHelper
                     $data[$translator->trans('mautic.asset.abtest.label.downloads')][] = 0;
                     $data[$translator->trans('mautic.asset.abtest.label.hits')][]      = 0;
                     $data[$translator->trans('mautic.asset.abtest.label.rates')][]     = 0;
-                    $support['labels'][]                                               = $parent->getId() . ':' . $parent->getTitle();;
+                    $support['labels'][]                                               = $parent->getId() . ':' . $parent->getTitle();
                 }
 
                 foreach ($children as $c) {
@@ -72,7 +72,7 @@ class AbTestHelper
                             $data[$translator->trans('mautic.asset.abtest.label.downloads')][] = 0;
                             $data[$translator->trans('mautic.asset.abtest.label.hits')][]      = 0;
                             $data[$translator->trans('mautic.asset.abtest.label.rates')][]     = 0;
-                            $support['labels'][]                                               = $c->getId() . ':' . $c->getTitle();;
+                            $support['labels'][]                                               = $c->getId() . ':' . $c->getTitle();
                         }
                     }
                 }

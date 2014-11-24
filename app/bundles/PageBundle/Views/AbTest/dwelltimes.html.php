@@ -8,6 +8,6 @@
  */
 
 //todo - add graphs on dwell time stats
-if (isset($abTestResults)) {
-	echo "<pre>".print_r($abTestResults, true)."</pre>";
+if (isset($results)) {
+	echo "<pre>".print_r($results, true)."</pre>";
 }
