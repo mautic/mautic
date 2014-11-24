@@ -74,3 +74,12 @@ $container->setDefinition(
     )
 )
     ->addTag('kernel.event_subscriber');
+
+$container->setDefinition(
+    'mautic.asset.pagebundle.subscriber',
+    new Definition(
+        'Mautic\AssetBundle\EventListener\PageSubscriber',
+        array(new Reference('mautic.factory'))
+    )
+)
+    ->addTag('kernel.event_subscriber');
