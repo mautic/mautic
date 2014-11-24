@@ -14,7 +14,7 @@ if ($tmpl == 'index')
     <div class="shuffle grid row scrollable" id="shuffle-grid">
         <?php if (count($items)): ?>
             <?php foreach ($items as $item): ?>
-                <div class="shuffle shuffle-item grid ma-10 pull-left text-center">
+                <div class="shuffle shuffle-item grid ma-10 pull-left text-center integration">
                     <div class="panel ovf-h pa-10">
                         <?php if ($permissions['integration:integrations:edit']) : ?>
                             <a href="<?php echo $view['router']->generate('mautic_integration_connector_edit', array('name' => strtolower($item['name']))); ?>" data-toggle="ajaxmodal" data-target="#ConnectorEditModal">
@@ -35,5 +35,5 @@ if ($tmpl == 'index')
 </div>
 <?php echo $view->render('MauticCoreBundle:Helper:modal.html.php', array(
     'id'     => 'ConnectorEditModal',
-    'header' => false
+    'footer' => '<div class="modal-form-buttons"></div>'
 ));
