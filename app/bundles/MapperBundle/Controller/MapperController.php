@@ -191,24 +191,4 @@ class MapperController extends FormController
             )
         ));
     }
-
-    /**
-     * Dispatch onCallback
-     *
-     * @param $application
-     * @param $client
-     */
-    public function onAuthAction ($application, $client)
-    {
-        $entities = array();
-        $bundles = $this->factory->getParameter('bundles');
-        $bundle = $bundles[ucfirst($application)];
-
-        $class_name = sprintf("\\Mautic\\%sBundle\\EventListener\\MapperListener", ucfirst($application));
-        $listener = new $class_name;
-        $listener->onCalllback();
-
-
-
-    }
 }

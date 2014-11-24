@@ -7,7 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\SalesforceBundle\EventListener;
+namespace Mautic\ZohoBundle\EventListener;
 
 use Mautic\MapperBundle\Event\MapperAuthEvent;
 use Mautic\MapperBundle\Event\MapperFormEvent;
@@ -24,9 +24,9 @@ class MapperListener extends MapperSubscriber
     public function onFetchIcons(MapperDashboardEvent $event)
     {
         $config = array(
-            'name'        => 'Salesforce',
-            'bundle' => 'salesforce',
-            'icon'        => 'app/bundles/SalesforceBundle/Assets/images/salesforce_128.png'
+            'name'        => 'Zoho CRM',
+            'bundle' => 'zoho',
+            'icon'        => 'app/bundles/ZohoBundle/Assets/images/zohocrm_128.png'
         );
 
         $event->addApplication($config);
@@ -39,15 +39,15 @@ class MapperListener extends MapperSubscriber
      */
     public function onClientFormBuild(MapperFormEvent $event)
     {
-        if ($event->getApplication() != 'salesforce') {
+        if ($event->getApplication() != 'zoho') {
             return;
         }
 
         $field = array(
             'child' => 'apikeys',
-            'type' => 'salesforce_apikeys',
+            'type' => 'zoho_apikeys',
             'params' => array(
-                'label'       => 'mautic.salesforce.form.api.keys',
+                'label'       => 'mautic.zoho.form.api.keys',
                 'required'    => false,
                 'label_attr'  => array('class' => 'control-label')
             )
@@ -58,15 +58,15 @@ class MapperListener extends MapperSubscriber
 
     public function onObjectFormBuild(MapperFormEvent $event)
     {
-        if ($event->getApplication() != 'salesforce') {
+        if ($event->getApplication() != 'zoho') {
             return;
         }
 
         $field = array(
             'child' => 'mappedfields',
-            'type' => 'salesforce_mappedfields',
+            'type' => 'zoho_mappedfields',
             'params' => array(
-                'label'       => 'mautic.salesforce.form.mapped.fields',
+                'label'       => 'mautic.zoho.form.mapped.fields',
                 'required'    => false,
                 'label_attr'  => array('class' => 'control-label')
             )
@@ -77,7 +77,7 @@ class MapperListener extends MapperSubscriber
 
     public function onCallbackApi(MapperAuthEvent $event)
     {
-        if ($event->getApplication() != 'salesforce') {
+        if ($event->getApplication() != 'zoho') {
             return;
         }
 
