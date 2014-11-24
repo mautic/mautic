@@ -128,7 +128,7 @@ class ReportSubscriber extends CommonSubscriber
                 $unit = $options['unit'];
             }
 
-            $data = GraphHelper::prepareLineGraphData($amount, $unit, array('submissions'));
+            $data = GraphHelper::prepareDatetimeLineGraphData($amount, $unit, array('submissions'));
 
             $queryBuilder = $this->factory->getEntityManager()->getConnection()->createQueryBuilder();
             $queryBuilder->from(MAUTIC_TABLE_PREFIX . 'form_submissions', 'fs');
