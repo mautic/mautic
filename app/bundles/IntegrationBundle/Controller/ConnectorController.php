@@ -10,6 +10,7 @@
 namespace Mautic\IntegrationBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
  * Class ConnectorController
@@ -17,7 +18,7 @@ use Mautic\CoreBundle\Controller\FormController;
 class ConnectorController extends FormController
 {
     /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function indexAction()
     {
@@ -62,7 +63,7 @@ class ConnectorController extends FormController
     /**
      * @param string $name
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function editAction($name)
     {
@@ -121,7 +122,53 @@ class ConnectorController extends FormController
             'action'      => $this->generateUrl('mautic_integration_connector_edit', array('name' => $name))
         ));
 
-        // TODO - Coming soon, we'll actually save your data ;-)
+        if ($this->request->getMethod() == 'POST') {
+            if (!$cancelled = $this->isFormCancelled($form)) {
+                if ($this->isFormValid($form)) {
+                    $em          = $this->factory->getEntityManager();
+                    $entity      = $networkObject->getSettings();
+                    $network     = $entity->getName();
+                    $currentKeys = $entity->getApiKeys();
+
+                    // Check to make sure secret keys were not wiped out
+                    if (!empty($currentKeys['clientId'])) {
+                        $newKeys = $entity->getApiKeys();
+                        if (!empty($currentKeys[$network]['clientSecret']) && empty($newKeys['clientSecret'])) {
+                            $newKeys['clientSecret'] = $currentKeys['clientSecret'];
+                            $entity->setApiKeys($newKeys);
+                        }
+                    }
+
+                    $features = $entity->getSupportedFeatures();
+                    if (in_array('public_profile', $features)) {
+                        //make sure now non-existent aren't saved
+                        $featureSettings               = $entity->getFeatureSettings();
+                        if (isset($featureSettings['leadFields'])) {
+                            $fields                        = $networkHelper->getAvailableFields($network);
+                            $featureSettings['leadFields'] = array_intersect_key($featureSettings['leadFields'], $fields);
+                            $entity->setFeatureSettings($featureSettings);
+                        }
+                    }
+
+                    $em->persist($entity);
+                    $em->flush();
+
+                    $this->request->getSession()->getFlashBag()->add(
+                        'notice',
+                        $this->get('translator')->trans('mautic.integration.notice.saved', array(
+                            '%name%' => $network
+                        ), 'flashes')
+                    );
+                }
+            }
+
+            // Close the modal and return back to the list view
+            $passthroughVars['closeModal'] = 1;
+            $response                      = new JsonResponse($passthroughVars);
+            $response->headers->set('Content-Length', strlen($response->getContent()));
+
+            return $response;
+        }
 
         return $this->delegateView(array(
             'viewParameters'  =>  array(
