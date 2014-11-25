@@ -7,7 +7,4 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-//todo - add graphs on bounce rate stats
-if (isset($abTestResults)) {
-	echo "<pre>".print_r($abTestResults, true)."</pre>";
-}
+echo $view['form']->widget($form);

@@ -14,6 +14,7 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * Class VariantType
@@ -42,6 +43,11 @@ class VariantType extends AbstractType
             'attr'       => array(
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.email.form.trafficweight.help'
+            ),
+            'constraints' => array(
+                new NotBlank(
+                    array('message' => 'mautic.email.variant.weight.notblank')
+                )
             )
         ));
 
@@ -56,12 +62,17 @@ class VariantType extends AbstractType
                 'label_attr' => array('class' => 'control-label'),
                 'attr'       => array(
                     'class'    => 'form-control',
-                    'onchange' => 'Mautic.toggleEmailAbTestWinnerDetails(this);'
+                    'onchange' => 'Mautic.getEmailAbTestWinnerForm(this);'
                 ),
                 'expanded'   => false,
                 'multiple'   => false,
                 'choices'    => $choices,
-                'empty_value' => 'mautic.core.form.chooseone'
+                'empty_value' => 'mautic.core.form.chooseone',
+                'constraints' => array(
+                    new NotBlank(
+                        array('message' => 'mautic.email.variant.winnercriteria.notblank')
+                    )
+                )
             ));
 
             foreach ($criteria as $k => $c) {

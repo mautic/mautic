@@ -64,3 +64,10 @@ $container->setDefinition('mautic.form.type.formsubmit_sendemail_admin', new Def
     ->addTag('form.type', array(
         'alias' => 'email_submitaction_sendemail_admin',
     ));
+
+$container->setDefinition('mautic.email.type.email_abtest_settings', new Definition(
+    'Mautic\EmailBundle\Form\Type\AbTestPropertiesType'
+))
+    ->addTag('form.type', array(
+        'alias' => 'email_abtest_settings',
+    ));

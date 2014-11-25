@@ -7,7 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-//todo - add graphs on dwell time stats
-if (isset($results)) {
-	echo "<pre>".print_r($results, true)."</pre>";
+//do not include the surrounding form since this will be embedded into the current form
+foreach ($form as $f) {
+    echo $view['form']->row($f);
 }

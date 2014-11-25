@@ -28,14 +28,18 @@ class ExceptionController extends \Symfony\Bundle\TwigBundle\Controller\Exceptio
         $code = $exception->getStatusCode();
 
         if ($request->isXmlHttpRequest()) {
-            return new JsonResponse(array(
-                'error' => array(
-                    'code'      => $code,
-                    'text'      => isset(Response::$statusTexts[$code]) ? Response::$statusTexts[$code] : '',
-                    'exception' => $exception->getMessage(),
-                    'trace'     => ($this->debug) ? $exception->getTrace() : ''
-                )
-            ), $code);
+            if ($request->query->get('ignoreAjax', false)) {
+                return $exception->getMessage();
+            } else {
+                return new JsonResponse(array(
+                    'error' => array(
+                        'code'      => $code,
+                        'text'      => isset(Response::$statusTexts[$code]) ? Response::$statusTexts[$code] : '',
+                        'exception' => $exception->getMessage(),
+                        'trace'     => ($this->debug) ? $exception->getTrace() : ''
+                    )
+                ), $code);
+            }
         }
 
         return parent::showAction($request, $exception, $logger);

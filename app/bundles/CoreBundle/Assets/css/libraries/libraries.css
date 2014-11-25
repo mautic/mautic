@@ -4550,6 +4550,9 @@ a.list-group-item.active > .badge,
 .nav-pills > li > a > .badge {
   margin-left: 3px;
 }
+.label-as-badge {
+  border-radius: 9px !important;
+}
 .jumbotron {
   padding: 30px;
   margin-bottom: 30px;

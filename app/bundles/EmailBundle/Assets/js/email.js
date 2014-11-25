@@ -156,3 +156,46 @@ Mautic.toggleEmailContentMode = function (el) {
         mQuery('#builderHtmlContainer').addClass('hide');
     }
 };
+
+Mautic.getEmailAbTestWinnerForm = function(abKey) {
+    if (abKey && mQuery(abKey).val() && mQuery(abKey).closest('.form-group').hasClass('has-error')) {
+        mQuery(abKey).closest('.form-group').removeClass('has-error');
+        if (mQuery(abKey).next().hasClass('help-block')) {
+            mQuery(abKey).next().remove();
+        }
+    }
+
+    var labelSpinner = mQuery("label[for='email_variantSettings_winnerCriteria']");
+    var spinner = mQuery('<i class="fa fa-fw fa-spinner fa-spin"></i>');
+    labelSpinner.append(spinner);
+
+    var emailId = mQuery('#email_sessionId').val();
+
+    var query = "action=email:getAbTestForm&abKey=" + mQuery(abKey).val() + "&emailId=" + emailId;
+
+    MauticVars.showLoadingBar = false;
+    mQuery.ajax({
+        url: mauticAjaxUrl,
+        type: "POST",
+        data: query,
+        dataType: "json",
+        success: function (response) {
+            if (typeof response.html != 'undefined') {
+                if (mQuery('#email_variantSettings_properties').length) {
+                    mQuery('#email_variantSettings_properties').replaceWith(response.html);
+                } else {
+                    mQuery('#email_variantSettings').append(response.html);
+                }
+
+                if (response.html != '') {
+                    Mautic.onPageLoad('#email_variantSettings_properties', response);
+                }
+            }
+            spinner.remove();
+        },
+        error: function (request, textStatus, errorThrown) {
+            Mautic.processAjaxError(request, textStatus, errorThrown);
+            spinner.remove();
+        }
+    });
+};
