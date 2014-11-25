@@ -121,6 +121,13 @@ class ApplicationClientModel extends FormModel
         return $this->getEntity($repo->getIdByAlias($alias));
     }
 
+    public function loadByApplication($application)
+    {
+        $repo = $this->getRepository();
+
+        return $this->getEntity($repo->getIdByApplication($application));
+    }
+
     /**
      * Delete an entity
      *

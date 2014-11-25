@@ -25,7 +25,7 @@ class Object extends Api
      * @return mixed
      * @throws RuntimeException
      */
-    public function insert($sObject, array $data)
+    public function create($sObject, array $data)
     {
         $tokenData = $this->auth->getAccessTokenData();
 

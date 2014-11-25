@@ -26,4 +26,24 @@ class Object extends Api
 
         return $response['modules']['Leads'];
     }
+
+    /**
+     * @param $module
+     * @param array $fields
+     * @return array
+     * @throws \Mautic\SugarcrmBundle\Api\Exception\ErrorException
+     */
+    public function create($module, array $fields)
+    {
+        $tokenData = $this->auth->getAccessTokenData();
+        $parameters = json_encode($fields);
+        $request_url = sprintf('%s/rest/v10/%s',$tokenData['sugarcrm_url'], $module);
+        $response = $this->auth->makeRequest($request_url, $parameters);
+
+        if (isset($response['error'])) {
+            throw new ErrorException($response['error_message'],($response['error'] == 'invalid_grant') ? 1 : 500);
+        }
+
+        return $response;
+    }
 }

@@ -20,3 +20,11 @@ $container->setDefinition(
     )
 )
     ->addTag('kernel.event_subscriber');
+$container->setDefinition(
+    'mautic.mapper.pointbundle.subscriber',
+    new Definition(
+        'Mautic\MapperBundle\EventListener\PointSubscriber',
+        array(new Reference('mautic.factory'))
+    )
+)
+    ->addTag('kernel.event_subscriber');

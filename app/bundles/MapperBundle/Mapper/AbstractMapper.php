@@ -7,7 +7,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 abstract class AbstractMapper
 {
     /**
-     * @var
+     * @var MauticFactory
      */
     protected $factory;
 
@@ -62,4 +62,11 @@ abstract class AbstractMapper
      * @return mixed
      */
     abstract public function buildForm(MauticFactory $factory,FormBuilderInterface $builder, array $options);
+
+    /**
+     * @param MauticFactory $factory
+     * @param $data
+     * @return mixed
+     */
+    abstract public function create(MauticFactory $factory, $data);
 }

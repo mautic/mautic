@@ -139,4 +139,72 @@ class LeadMapper extends AbstractMapper
             $redirect->send();
         }
     }
+
+    /**
+     * @param $data
+     * @return mixed|void
+     */
+    public function create(MauticFactory $factory, $data)
+    {
+        try {
+            $this->factory = $factory;
+            $router = $this->factory->getRouter();
+            $request = $this->factory->getRequest();
+            $modelClient = $this->factory->getModel('mapper.ApplicationClient');
+            $application = 'zoho';
+            $request->set('application', $application);
+            $entityClient = $modelClient->loadByApplication($application);
+            $client = $entityClient->getAlias();
+            $request->set('client', $client);
+
+            $this->checkApiAuth();
+
+            $modelMapper = $this->factory->getModel('mapper.ApplicationObjectMapper');
+            $mapperEntity = $modelMapper->getByClientAndObject($entityClient->getId(),$this->getBaseName());
+
+            $mappedFields = array();
+
+            $xmlData = '<Leads>';
+                $xmlData .= '<row no="1">';
+                    foreach ($mappedFields as $field) {
+                        $xmlData .= sprintf('<FL val="%s"><![CDATA[%s]]></FL>', $field['name'], $field['value']);
+                    }
+                $xmlData .= '</row>';
+            $xmlData .= '</Leads>';
+
+            $zohoSettings = $entityClient->getApiKeys();
+
+            $zohoAuth = ApiAuth::initiate($zohoSettings);
+            $leadObject = ZohoCRMApi::getContext("object", $zohoAuth)->insert('Leads', $xmlData);
+
+            if (isset($leadObject['response']) && isset($leadObject['response']['error'])) {
+                throw new ErrorException($leadObject['response']['error']['message'],$leadObject['response']['error']['code']);
+            }
+
+
+        } catch (ErrorException $exception) {
+            //remove keys and try again
+            if ($exception->getCode() == 1) {
+                $zohoSettings = $entityClient->getApiKeys();
+                unset($zohoSettings['accessToken']);
+                unset($zohoSettings['accessTokenExpires']);
+                $entityClient->setApiKeys($zohoSettings);
+                $modelClient->saveEntity($entityClient);
+            }
+            $this->factory->getSession()->getFlashBag()->add('error',
+                $this->factory->getTranslator()->trans(
+                    $exception->getMessage(),
+                    (!empty($flash['msgVars']) ? $flash['msgVars'] : array()),
+                    'flashes'
+                ));
+
+            $url = $router->generate('mautic_mapper_client_objects_index', array(
+                'client'      => $client,
+                'application' => $application
+            ));
+
+            $redirect = new RedirectResponse($url);
+            $redirect->send();
+        }
+    }
 }

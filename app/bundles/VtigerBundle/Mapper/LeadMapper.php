@@ -130,4 +130,13 @@ class LeadMapper extends AbstractMapper
             $redirect->send();
         }
     }
+
+    /**
+     * @param $data
+     * @return mixed|void
+     */
+    public function create(MauticFactory $factory, $data)
+    {
+
+    }
 }

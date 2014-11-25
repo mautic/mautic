@@ -38,4 +38,25 @@ class IntegrationHelper
 
         return $entities;
     }
+
+    /**
+     * Get a mapper object
+     *
+     * @param MauticFactory $factory
+     * @param $application
+     * @param $mapper
+     * @return mixed
+     */
+    static public function getMapper(MauticFactory $factory, $application, $mapper)
+    {
+        $entities = array();
+        $bundles = $factory->getParameter('bundles');
+        $bundle = $bundles[ucfirst($application)];
+
+        $class = sprintf('\\Mautic\%s\Mapper\%s', $bundle['bundle'], $mapper);
+        $object = new $class($factory);
+
+        return $object;
+
+    }
 }

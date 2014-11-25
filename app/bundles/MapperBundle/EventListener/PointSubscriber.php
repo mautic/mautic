@@ -25,7 +25,6 @@ use Mautic\PointBundle\PointEvents;
  */
 class PointSubscriber extends CommonSubscriber
 {
-
     /**
      * {@inheritdoc}
      */
@@ -43,12 +42,7 @@ class PointSubscriber extends CommonSubscriber
      */
     public function onPointBuild(PointBuilderEvent $event)
     {
-        $action = array(
-            'label'       => 'mautic.mapper.point.action.syncdata',
-            'formType'    => 'emailopen_list'
-        );
 
-        $event->addAction('mapper.syncdata', $action);
     }
 
     /**
@@ -57,12 +51,11 @@ class PointSubscriber extends CommonSubscriber
     public function onTriggerBuild(TriggerBuilderEvent $event)
     {
         $sendEvent = array(
-            'label'       => 'mautic.email.point.trigger.sendemail',
-            'callback'    => array('\\Mautic\\EmailBundle\\Helper\\PointEventHelper', 'sendEmail'),
-            'formType'    => 'emailsend_list'
+            'label'       => 'mautic.mapper.point.trigger.syncdata',
+            'callback'    => array('\\Mautic\\MapperBundle\\Helper\\PointEventHelper', 'syncData')
         );
 
-        $event->addEvent('email.send', $sendEvent);
+        $event->addEvent('mapper.sync', $sendEvent);
     }
 
     /**
@@ -72,6 +65,6 @@ class PointSubscriber extends CommonSubscriber
      */
     public function onSyncData( $event)
     {
-        $this->factory->getModel('point')->triggerAction('email.send', $event->getEmail());
+        $this->factory->getModel('point')->triggerAction('mapper.sync', $event->getEmail());
     }
 }

@@ -37,4 +37,26 @@ class ApplicationClientRepository extends CommonRepository
         $results = $q->getQuery()->getSingleResult();
         return $results['id'];
     }
+
+    /**
+     * @param      $application
+     * @param null $id
+     * @param null $entity
+     * @return mixed
+     */
+    public function getIdByApplication($application, $entity = null)
+    {
+        $q = $this->createQueryBuilder('e')
+            ->select('e.id')
+            ->where('e.application = :application');
+        $q->setParameter('application', $application);
+
+        if (!empty($entity)) {
+            $q->andWhere('e.id != :id');
+            $q->setParameter('id', $entity->getId());
+        }
+
+        $results = $q->getQuery()->getSingleResult();
+        return $results['id'];
+    }
 }

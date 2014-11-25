@@ -80,6 +80,12 @@ class ApplicationObjectMapperModel extends FormModel
         return $entity;
     }
 
+    public function getByApplicationIdAndObject($client_id, $object)
+    {
+        $repo = $this->getRepository();
+        $repo->getByClientAndObject($client_id, $object);
+    }
+
     /**
      * Delete an entity
      *

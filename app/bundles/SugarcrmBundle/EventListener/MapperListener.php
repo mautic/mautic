@@ -13,9 +13,15 @@ use Mautic\MapperBundle\Event\MapperAuthEvent;
 use Mautic\MapperBundle\Event\MapperFormEvent;
 use Mautic\MapperBundle\Event\MapperDashboardEvent;
 use Mautic\MapperBundle\EventListener\MapperSubscriber;
+use Mautic\MapperBundle\Helper\IntegrationHelper;
 
 class MapperListener extends MapperSubscriber
 {
+    /**
+     * @var string
+     */
+    protected $application = 'sugarcrm';
+
     /**
      * Add Sugar CRM to Mapper
      *
@@ -39,7 +45,7 @@ class MapperListener extends MapperSubscriber
      */
     public function onClientFormBuild(MapperFormEvent $event)
     {
-        if ($event->getApplication() != 'sugarcrm') {
+        if ($event->getApplication() != $this->application) {
             return;
         }
 
@@ -58,7 +64,7 @@ class MapperListener extends MapperSubscriber
 
     public function onObjectFormBuild(MapperFormEvent $event)
     {
-        if ($event->getApplication() != 'sugarcrm') {
+        if ($event->getApplication() != $this->application) {
             return;
         }
 
@@ -77,7 +83,7 @@ class MapperListener extends MapperSubscriber
 
     public function onCallbackApi(MapperAuthEvent $event)
     {
-        if ($event->getApplication() != 'sugarcrm') {
+        if ($event->getApplication() != $this->application) {
             return;
         }
 
