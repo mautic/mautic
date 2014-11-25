@@ -93,7 +93,7 @@ class AbTestHelper
                 $max = max($downloads);
 
                 //get the page ids with the most number of downloads
-                $winners = array_keys($downloads, $max);
+                $winners = ($max > 0) ? array_keys($downloads, $max) : array();
 
                 return array(
                     'winners'         => $winners,

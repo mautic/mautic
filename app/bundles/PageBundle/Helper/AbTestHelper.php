@@ -130,7 +130,7 @@ class AbTestHelper
                 $max = max($avgs);
 
                 //get the page ids with the greatest average dwell time
-                $winners = array_keys($avgs, $max);
+                $winners = ($max > 0) ? array_keys($avgs, $max) : array();
 
                 return array(
                     'winners'         => $winners,
