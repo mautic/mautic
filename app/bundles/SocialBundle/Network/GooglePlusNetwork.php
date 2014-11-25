@@ -9,8 +9,6 @@
 
 namespace Mautic\SocialBundle\Network;
 
-use Mautic\SocialBundle\Helper\NetworkIntegrationHelper;
-
 /**
  * Class GooglePlusNetwork
  */
@@ -181,7 +179,7 @@ class GooglePlusNetwork extends AbstractNetwork
                         break;
                     case 'array_object':
                         if ($field == "urls") {
-                            $socialProfileUrls = NetworkIntegrationHelper::getSocialProfileUrlRegex();
+                            $socialProfileUrls = $this->factory->getNetworkIntegrationHelper()->getSocialProfileUrlRegex();
                             foreach ($values as $k => $v) {
                                 $socialMatch = false;
                                 foreach ($socialProfileUrls as $service => $regex) {

@@ -15,7 +15,6 @@ namespace Mautic\LeadBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
-use Mautic\SocialBundle\Helper\NetworkIntegrationHelper;
 use Mautic\CoreBundle\Event\IconEvent;
 use Mautic\CoreBundle\CoreEvents;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -280,8 +279,9 @@ class LeadController extends FormController
         $upcomingEvents = $leadEventLogRepository->getUpcomingEvents(array('lead' => $lead, 'scheduled' => 1, 'eventType' => 'action'));
 
         $fields            = $lead->getFields();
-        $socialProfiles    = NetworkIntegrationHelper::getUserProfiles($this->factory, $lead, $fields);
-        $socialProfileUrls = NetworkIntegrationHelper::getSocialProfileUrlRegex(false);
+        $integrationHelper = $this->factory->getNetworkIntegrationHelper();
+        $socialProfiles    = $integrationHelper->getUserProfiles($lead, $fields);
+        $socialProfileUrls = $integrationHelper->getSocialProfileUrlRegex(false);
 
         $event = new IconEvent($this->factory->getSecurity());
         $this->factory->getDispatcher()->dispatch(CoreEvents::FETCH_ICONS, $event);

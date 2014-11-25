@@ -12,7 +12,6 @@ namespace Mautic\PageBundle\EventListener;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\PageBundle\Event as Events;
 use Mautic\PageBundle\PageEvents;
-use Mautic\SocialBundle\Helper\NetworkIntegrationHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -27,7 +26,7 @@ class BuilderSubscriber extends CommonSubscriber
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents ()
     {
         return array(
             PageEvents::PAGE_ON_DISPLAY   => array('onPageDisplay', 0),
@@ -43,7 +42,7 @@ class BuilderSubscriber extends CommonSubscriber
      *
      * @param Events\PageBuilderEvent $event
      */
-    public function onPageBuild(Events\PageBuilderEvent $event)
+    public function onPageBuild (Events\PageBuilderEvent $event)
     {
         //add page tokens
         $content = $this->templating->render('MauticPageBundle:SubscribedEvents\PageToken:token.html.php');
@@ -72,19 +71,19 @@ class BuilderSubscriber extends CommonSubscriber
     /**
      * @param Events\PageDisplayEvent $event
      */
-    public function onPageDisplay(Events\PageDisplayEvent $event)
+    public function onPageDisplay (Events\PageDisplayEvent $event)
     {
-        $content  = $event->getContent();
-        $page     = $event->getPage();
+        $content = $event->getContent();
+        $page    = $event->getPage();
 
         if (strpos($content, '{langbar}') !== false) {
             $langbar = $this->renderLanguageBar($page);
-            $content    = str_ireplace('{langbar}', $langbar, $content);
+            $content = str_ireplace('{langbar}', $langbar, $content);
         }
 
         if (strpos($content, '{sharebuttons}') !== false) {
             $buttons = $this->renderSocialShareButtons();
-            $content    = str_ireplace('{sharebuttons}', $buttons, $content);
+            $content = str_ireplace('{sharebuttons}', $buttons, $content);
         }
 
         $this->renderPageUrl($content, array('source' => array('page', $page->getId())));
@@ -97,12 +96,12 @@ class BuilderSubscriber extends CommonSubscriber
      *
      * @return string
      */
-    protected function renderSocialShareButtons()
+    protected function renderSocialShareButtons ()
     {
         static $content = "";
 
         if (empty($content)) {
-            $shareButtons = NetworkIntegrationHelper::getShareButtons($this->factory);
+            $shareButtons = $this->factory->getNetworkIntegrationHelper()->getShareButtons();
 
             $content = "<div class='share-buttons'>\n";
             foreach ($shareButtons as $network => $content) {
@@ -124,7 +123,7 @@ class BuilderSubscriber extends CommonSubscriber
      *
      * @return string
      */
-    protected function renderLanguageBar($page)
+    protected function renderLanguageBar ($page)
     {
         static $langbar = '';
 
@@ -188,7 +187,7 @@ class BuilderSubscriber extends CommonSubscriber
      *
      * @return void
      */
-    public function onEmailBuild(EmailBuilderEvent $event)
+    public function onEmailBuild (EmailBuilderEvent $event)
     {
         //add email tokens
         $tokenHelper = new BuilderTokenHelper($this->factory);
@@ -200,12 +199,19 @@ class BuilderSubscriber extends CommonSubscriber
      *
      * @return void
      */
-    public function onEmailGenerate(EmailSendEvent $event)
+    public function onEmailGenerate (EmailSendEvent $event)
     {
-        $content       = $event->getContent();
-        $source        = $event->getSource();
-        $clickthrough  = array('source' => $source);
-        $lead          = $event->getLead();
+        $content      = $event->getContent();
+        $source       = $event->getSource();
+        $email        = $event->getEmail();
+
+        $clickthrough = array(
+            //what entity is sending the email?
+            'source' => $source,
+            //the email being sent to be logged in page hit if applicable
+            'email'  => ($email != null) ? $email->getId() : null
+        );
+        $lead         = $event->getLead();
         if ($lead !== null) {
             $clickthrough['lead'] = $lead['id'];
         }
@@ -216,12 +222,12 @@ class BuilderSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param      $content
+     * @param       $content
      * @param array $clickthrough
      *
      * @return void
      */
-    protected function renderPageUrl(&$content, $clickthrough = array())
+    protected function renderPageUrl (&$content, $clickthrough = array())
     {
         static $pages = array(), $links = array();
 
@@ -229,7 +235,7 @@ class BuilderSubscriber extends CommonSubscriber
         $externalLinkRegex = '/{externallink=(.*?)}/';
 
         /** @var \Mautic\PageBundle\Model\PageModel $pageModel */
-        $pageModel     = $this->factory->getModel('page');
+        $pageModel = $this->factory->getModel('page');
 
         /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
         $redirectModel = $this->factory->getModel('page.redirect');
@@ -241,7 +247,7 @@ class BuilderSubscriber extends CommonSubscriber
                     $pages[$match] = $pageModel->getEntity($match);
                 }
 
-                $url  = ($pages[$match] !== null) ? $pageModel->generateUrl($pages[$match], true, $clickthrough) : '';
+                $url     = ($pages[$match] !== null) ? $pageModel->generateUrl($pages[$match], true, $clickthrough) : '';
                 $content = str_ireplace('{pagelink=' . $match . '}', $url, $content);
             }
         }
@@ -253,7 +259,7 @@ class BuilderSubscriber extends CommonSubscriber
                     $links[$match] = $redirectModel->getRedirect($match, true);
                 }
 
-                $url  = ($links[$match] !== null) ? $redirectModel->generateRedirectUrl($links[$match], $clickthrough) : '';
+                $url     = ($links[$match] !== null) ? $redirectModel->generateRedirectUrl($links[$match], $clickthrough) : '';
                 $content = str_ireplace('{externallink=' . $match . '}', $url, $content);
             }
         }

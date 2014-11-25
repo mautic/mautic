@@ -16,7 +16,6 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\LeadEvents;
-use Mautic\SocialBundle\Helper\NetworkIntegrationHelper;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
@@ -172,7 +171,7 @@ class LeadModel extends FormModel
     {
         //@todo - add a catch to NOT do social gleaning if a lead is created via a form, etc as we do not want the user to experience the wait
         //generate the social cache
-        list($socialCache, $socialFeatureSettings) = NetworkIntegrationHelper::getUserProfiles($this->factory, $lead, $data, true, null, false, true);
+        list($socialCache, $socialFeatureSettings) = $this->factory->getNetworkIntegrationHelper()->getUserProfiles($lead, $data, true, null, false, true);
 
         $isNew = ($lead->getId()) ? false : true;
 
