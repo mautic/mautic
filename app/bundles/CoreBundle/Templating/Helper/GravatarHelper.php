@@ -41,7 +41,7 @@ class GravatarHelper extends Helper
      */
     public function getImage($email, $size = '250', $default = null)
     {
-        $localDefault     = 'media/images/avatar.png';
+        $localDefault     = 'https://www.mautic.org/media/images/default_avatar.png';
         $url              = 'https://www.gravatar.com/avatar/' . md5(strtolower(trim($email))) . '?s='.$size;
 
         if ($default !== false && !self::$devMode) {
