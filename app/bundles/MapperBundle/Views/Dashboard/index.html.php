@@ -30,7 +30,7 @@ $view['slots']->set("headerTitle", $view['translator']->trans("mautic.mapper.tit
                             </div>
                         </div>
                     </div>
-                    <?php if ($index == count($application) - 1): ?>
+                    <?php if ($index == $total - 1): ?>
                     </div>
                     <?php endif; ?>
                 <?php $i++; endforeach; ?>

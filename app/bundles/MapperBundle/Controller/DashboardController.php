@@ -31,7 +31,8 @@ class DashboardController extends CommonController
 
         return $this->delegateView(array(
             'viewParameters'  =>  array(
-                'applications' => $applications
+                'applications' => $applications,
+                'total'        => count($applications)
             ),
             'contentTemplate' => 'MauticMapperBundle:Dashboard:index.html.php',
             'passthroughVars' => array(

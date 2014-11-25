@@ -23,4 +23,5 @@ final class MapperEvents
     const CLIENT_FORM_ON_BUILD = 'mapper.on_client_form_build';
     const OBJECT_FORM_ON_BUILD = 'mapper.on_object_form_build';
     const CALLBACK_API = 'mapper.on_callback_api';
+    const SYNC_DATA = 'mapper.on_sync_data';
 }
