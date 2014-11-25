@@ -310,7 +310,11 @@ class LeadController extends FormController
                 'icons'             => $icons,
                 'pointStats'        => $pointStats,
                 'noteCount'         => $this->factory->getModel('lead.note')->getNoteCount($lead, true),
-                'doNotContact'      => $emailRepo->checkDoNotEmail($fields['core']['email']['value'])
+                'doNotContact'      => $emailRepo->checkDoNotEmail($fields['core']['email']['value']),
+                'leadNotes'         => $this->forward('MauticLeadBundle:Note:index', array(
+                    'leadId' => $lead->getId(),
+                    'ignoreAjax' => 1
+                ))->getContent()
             ),
             'contentTemplate' => 'MauticLeadBundle:Lead:lead.html.php',
             'passthroughVars' => array(
@@ -538,29 +542,22 @@ class LeadController extends FormController
                             ))
                         ), 'flashes')
                     );
-
-                    $returnUrl      = $this->generateUrl('mautic_lead_action', array(
-                        'objectAction' => 'view',
-                        'objectId'     => $lead->getId()
-                    ));
-                    $viewParameters = array('objectId' => $lead->getId());
-                    $template       = 'MauticLeadBundle:Lead:view';
                 }
             } else {
                 //unlock the entity
                 $model->unlockEntity($lead);
-
-                $returnUrl      = $this->generateUrl('mautic_lead_index', array('page' => $page));
-                $viewParameters = array();
-                $template       = 'MauticLeadBundle:Lead:index';
             }
 
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+                $viewParameters = array(
+                    'objectAction' => 'view',
+                    'objectId'     => $lead->getId()
+                );
                 return $this->postActionRedirect(
                     array_merge($postActionVars, array(
-                        'returnUrl'       => $returnUrl,
+                        'returnUrl'       => $this->generateUrl('mautic_lead_action', $viewParameters),
                         'viewParameters'  => $viewParameters,
-                        'contentTemplate' => $template
+                        'contentTemplate' => 'MauticLeadBundle:Lead:view'
                     ))
                 );
             }

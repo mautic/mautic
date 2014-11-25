@@ -86,11 +86,7 @@ $view['slots']->set("headerTitle", $view['translator']->trans('mautic.user.accou
                         <h4 class="fw-sb"><?php echo $view['translator']->trans('mautic.user.account.header.authorizedclients'); ?></h4>
                     </div>
                     <div class="pa-md">
-                        <?php echo $view['actions']->render(
-                            new Symfony\Component\HttpKernel\Controller\ControllerReference(
-                                'MauticApiBundle:Client:authorizedClients'
-                            ));
-                        ?>
+                        <?php echo $authorizedClients; ?>
                     </div>
                 </div>
             <?php endif; ?>

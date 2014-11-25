@@ -247,10 +247,7 @@ $view['slots']->stop();
 
             <!-- #notes-container -->
             <div class="tab-pane fade bdr-w-0" id="notes-container">
-                <?php
-                //forward to Note::index controller action so that it handles pagination, etc
-                echo $view['actions']->render(new \Symfony\Component\HttpKernel\Controller\ControllerReference('MauticLeadBundle:Note:index', array('leadId' => $lead->getId(), 'ignoreAjax' => 1)));
-                ?>
+                <?php echo $leadNotes; ?>
             </div>
             <!--/ #notes-container -->
 

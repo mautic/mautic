@@ -195,7 +195,7 @@ if ($permissions['campaign:campaigns:edit']): ?>
             <!--/ #events-container -->
 
             <div class="tab-pane fade in bdr-w-0 page-list" id="leads-container">
-                <?php echo $view['actions']->render(new \Symfony\Component\HttpKernel\Controller\ControllerReference('MauticCampaignBundle:Campaign:leads', array('objectId' => $campaign->getId(), 'page' => $leadPage, 'ignoreAjax' => true))); ?>
+                <?php echo $campaignLeads; ?>
             </div>
         </div>
         <!--/ end: tab-content -->

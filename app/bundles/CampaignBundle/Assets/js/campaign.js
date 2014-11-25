@@ -540,6 +540,7 @@ Mautic.renderCampaignEmailSentPie = function () {
     if (!element.length) {
         return;
     }
+
     var options = {
         responsive: false,
         tooltipFontSize: 10,

@@ -22,7 +22,7 @@ class ProfileController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction()
+    public function indexAction ()
     {
         //get current user
         $me    = $this->get('security.context')->getToken()->getUser();
@@ -46,14 +46,15 @@ class ProfileController extends FormController
 
         //make sure this user has access to edit privileged fields
         foreach ($permissions as $permName => $hasAccess) {
-            if ($permName == 'apiAccess') continue;
+            if ($permName == 'apiAccess')
+                continue;
 
             if (!$hasAccess) {
                 //set the value to its original
                 switch ($permName) {
                     case 'editName':
                         $overrides['firstName'] = $me->getFirstName();
-                        $overrides['lastName'] = $me->getLastName();
+                        $overrides['lastName']  = $me->getLastName();
                         $form->remove('firstName');
                         $form->add('firstName_unbound', 'text', array(
                             'label'      => 'mautic.user.user.form.firstname',
@@ -123,12 +124,12 @@ class ProfileController extends FormController
 
         //add an input to request the current password in order to change existing details
         $form->add('currentPassword', 'password', array(
-            'label'       => 'mautic.user.account.form.password.current',
-            'label_attr'  => array('class' => 'control-label'),
-            'attr'        => array(
-                'class'       => 'form-control',
-                'tooltip'     => 'mautic.user.account.form.help.password.current',
-                'preaddon'    => 'fa fa-lock'
+            'label'      => 'mautic.user.account.form.password.current',
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array(
+                'class'    => 'form-control',
+                'tooltip'  => 'mautic.user.account.form.help.password.current',
+                'preaddon' => 'fa fa-lock'
             )
         ));
 
@@ -174,9 +175,10 @@ class ProfileController extends FormController
         $this->factory->getSession()->set('formProcessed', 0);
 
         $parameters = array(
-            'permissions' => $permissions,
-            'me'          => $me,
-            'userForm'    => $form->createView()
+            'permissions'       => $permissions,
+            'me'                => $me,
+            'userForm'          => $form->createView(),
+            'authorizedClients' => $this->forward('MauticApiBundle:Client:authorizedClients')->getContent()
         );
 
         return $this->delegateView(array(

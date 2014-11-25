@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Controller\FormController;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Controller\ControllerReference;
 
 class CampaignController extends FormController
 {
@@ -197,16 +198,20 @@ class CampaignController extends FormController
         $leadPage = $this->factory->getSession()->get('mautic.campaign.lead.page', 1);
 
         return $this->delegateView(array(
-            'viewParameters'  => array(
-                'campaign'    => $entity,
-                'permissions' => $permissions,
-                'security'    => $security,
-                'logs'        => $logs,
-                'hits'        => $hits,
-                'emailsSent'  => $emailsSent,
-                'leadStats'   => $leadStats,
-                'events'      => $events,
-                'leadPage'    => $leadPage
+            'viewParameters'    => array(
+                'campaign'      => $entity,
+                'permissions'   => $permissions,
+                'security'      => $security,
+                'logs'          => $logs,
+                'hits'          => $hits,
+                'emailsSent'    => $emailsSent,
+                'leadStats'     => $leadStats,
+                'events'        => $events,
+                'campaignLeads' => $this->forward('MauticCampaignBundle:Campaign:leads', array(
+                    'objectId'   => $entity->getId(),
+                    'page'       => $leadPage,
+                    'ignoreAjax' => true
+                ))->getContent()
             ),
             'contentTemplate' => 'MauticCampaignBundle:Campaign:details.html.php',
             'passthroughVars' => array(
@@ -220,6 +225,12 @@ class CampaignController extends FormController
         ));
     }
 
+    /**
+     * @param     $objectId
+     * @param int $page
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     */
     public function leadsAction ($objectId, $page = 1)
     {
         if (!$this->factory->getSecurity()->isGranted('campaign:campaigns:view')) {
@@ -543,35 +554,27 @@ class CampaignController extends FormController
                                 ))
                             ), 'flashes')
                         );
-
-                        if ($form->get('buttons')->get('save')->isClicked()) {
-                            $viewParameters = array(
-                                'objectAction' => 'view',
-                                'objectId'     => $entity->getId()
-                            );
-                            $returnUrl      = $this->generateUrl('mautic_campaign_action', $viewParameters);
-                            $template       = 'MauticCampaignBundle:Campaign:view';
-                        }
                     }
                 }
             } else {
                 //unlock the entity
                 $model->unlockEntity($entity);
-
-                $viewParameters = array('page' => $page);
-                $returnUrl      = $this->generateUrl('mautic_campaign_index', $viewParameters);
-                $template       = 'MauticCampaignBundle:Campaign:index';
             }
 
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 //remove fields from session
                 $this->clearSessionComponents($objectId);
 
+                $viewParameters = array(
+                    'objectAction' => 'view',
+                    'objectId'     => $entity->getId()
+                );
+
                 return $this->postActionRedirect(
                     array_merge($postActionVars, array(
-                        'returnUrl'       => $returnUrl,
-                        'viewParameters'  => $viewParameters,
-                        'contentTemplate' => $template
+                        'returnUrl'       => $this->generateUrl('mautic_campaign_action', $viewParameters),
+                        'viewParameters'  =>  $viewParameters,
+                        'contentTemplate' => 'MauticCampaignBundle:Campaign:view'
                     ))
                 );
             } elseif ($form->get('buttons')->get('apply')->isClicked()) {
