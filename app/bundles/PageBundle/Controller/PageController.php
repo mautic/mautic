@@ -245,8 +245,6 @@ class PageController extends FormController
                     $abTestResults = $reflection->invokeArgs($this, $pass);
                 }
             }
-        } elseif (!empty($variantError)) {
-            $abTestResults['error'] = $variantError;
         }
 
         // Audit Log
@@ -493,31 +491,24 @@ class PageController extends FormController
                             ))
                         ), 'flashes')
                     );
-
-                    $returnUrl = $this->generateUrl('mautic_page_action', array(
-                        'objectAction' => 'view',
-                        'objectId'     => $entity->getId()
-                    ));
-                    $viewParams = array('objectId' => $entity->getId());
-                    $template = 'MauticPageBundle:Page:view';
                 }
             } else {
                 //clear any modified content
                 $session->remove('mautic.pagebuilder.'.$objectId.'.content');
                 //unlock the entity
                 $model->unlockEntity($entity);
-
-                $returnUrl = $this->generateUrl('mautic_page_index', array('page' => $page));
-                $viewParams = array('page' => $page);
-                $template  = 'MauticPageBundle:Page:index';
             }
 
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+                $viewParameters = array(
+                    'objectAction' => 'view',
+                    'objectId'     => $entity->getId()
+                );
                 return $this->postActionRedirect(
                     array_merge($postActionVars, array(
-                        'returnUrl'       => $returnUrl,
-                        'viewParameters'  => $viewParams,
-                        'contentTemplate' => $template
+                        'returnUrl'       => $this->generateUrl('mautic_page_action', $viewParameters),
+                        'viewParameters'  => $viewParameters,
+                        'contentTemplate' => 'MauticPageBundle:Page:view'
                     ))
                 );
             }

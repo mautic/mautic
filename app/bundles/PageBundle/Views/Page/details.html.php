@@ -11,9 +11,7 @@
 //@todo - add landing page stats/analytics
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'page');
-$view['slots']->set("headerTitle", $activePage->getTitle()); ?>
-
-<?php
+$view['slots']->set("headerTitle", $activePage->getTitle());
 $view['slots']->start('actions');
 if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions['page:pages:editother'],
     $activePage->getCreatedBy())): ?>
@@ -239,34 +237,40 @@ $showVariants = (count($variants['children']) || $variants['parent']);
                     <?php $isWinner = (isset($abTestResults['winners']) && in_array($variants['parent']->getId(), $abTestResults['winners']) && $variants['parent']->getVariantStartDate() && $variants['parent']->isPublished()); ?>
                     <li class="list-group-item bg-auto bg-light-xs">
                         <div class="box-layout">
-                            <div class="col-md-1 va-m">
-                                <h3>
-                                    <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php', array(
-                                        'item'  => $variants['parent'],
-                                        'model' => 'page.page',
-                                        'size'  => '',
-                                        'disableToggle' => true
-                                    )); ?>
-                                </h3>
-                            </div>
-                            <div class="col-md-6 va-m">
-                                <h5 class="fw-sb text-primary">
-                                    <a href="<?php echo $view['router']->generate('mautic_page_action', array('objectAction' => 'view', 'objectId' => $variants['parent']->getId())); ?>" data-toggle="ajax"><?php echo $variants['parent']->getTitle(); ?>
-                                        <?php if ($variants['parent']->getId() == $activePage->getId()) : ?>
-                                        <span>[<?php echo $view['translator']->trans('mautic.page.current'); ?>]</span>
+                            <div class="col-md-8 va-m">
+                                <div class="row">
+                                    <div class="col-xs-1">
+                                        <h3>
+                                            <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php', array(
+                                                'item'  => $variants['parent'],
+                                                'model' => 'page.page',
+                                                'size'  => '',
+                                                'disableToggle' => true
+                                            )); ?>
+                                        </h3>
+                                    </div>
+                                    <div class="col-xs-11">
+                                        <?php if ($isWinner): ?>
+                                        <div class="mr-xs pull-left" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.page.abtest.parentwinning'); ?>">
+                                            <a class="btn btn-default disabled" href="javascript:void(0);">
+                                                <i class="fa fa-trophy"></i>
+                                            </a>
+                                        </div>
                                         <?php endif; ?>
-                                        <span>[<?php echo $view['translator']->trans('mautic.page.parent'); ?>]</span>
-                                    </a>
-                                </h5>
-                                <span class="text-white dark-sm"><?php echo $variants['parent']->getAlias(); ?></span>
+                                        <h5 class="fw-sb text-primary">
+                                            <a href="<?php echo $view['router']->generate('mautic_page_action', array('objectAction' => 'view', 'objectId' => $variants['parent']->getId())); ?>" data-toggle="ajax"><?php echo $variants['parent']->getTitle(); ?>
+                                                <?php if ($variants['parent']->getId() == $activePage->getId()) : ?>
+                                                    <span>[<?php echo $view['translator']->trans('mautic.page.current'); ?>]</span>
+                                                <?php endif; ?>
+                                                <span>[<?php echo $view['translator']->trans('mautic.page.parent'); ?>]</span>
+                                            </a>
+                                        </h5>
+                                        <span class="text-white dark-sm"><?php echo $variants['parent']->getAlias(); ?></span>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-md-5 va-m text-right">
-                                <?php if ($isWinner): ?>
-                                    <span class="btn btn-default disabled">
-                                        <span class="fa fa-trophy mr-xs"></span><?php echo $view['translator']->trans('mautic.page.abtest.parentwinning'); ?>
-                                    </span>
-                                <?php endif; ?>
-                                <em class="text-white dark-sm"><span class="text-success"><?php echo (int) $variants['properties'][$variants['parent']->getId()]['weight']; ?>%</span></em>
+                            <div class="col-md-4 va-t text-right">
+                                <em class="text-white dark-sm"><span class="label label-success"><?php echo (int) $variants['properties'][$variants['parent']->getId()]['weight']; ?>%</span></em>
                             </div>
                         </div>
                     </li>
@@ -297,39 +301,45 @@ $showVariants = (count($variants['children']) || $variants['parent']);
 
                     <li class="list-group-item bg-auto bg-light-xs">
                         <div class="box-layout">
-                            <div class="col-md-1 va-m">
-                                <h3>
-                                    <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php', array(
-                                        'item'  => $variant,
-                                        'model' => 'page',
-                                        'size'  => '',
-                                        'disableToggle' => true
-                                    )); ?>
-                                </h3>
-                            </div>
-                            <div class="col-md-6 va-m">
-                                <h5 class="fw-sb text-primary">
-                                    <a href="<?php echo $view['router']->generate('mautic_page_action', array('objectAction' => 'view', 'objectId' => $variant->getId())); ?>" data-toggle="ajax"><?php echo $variant->getTitle(); ?>
-                                        <?php if ($variant->getId() == $activePage->getId()) : ?>
-                                        <span>[<?php echo $view['translator']->trans('mautic.page.current'); ?>]</span>
+                            <div class="col-md-8 va-m">
+                                <div class="row">
+                                    <div class="col-xs-1">
+                                        <h3>
+                                            <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php', array(
+                                                'item'  => $variant,
+                                                'model' => 'page',
+                                                'size'  => '',
+                                                'disableToggle' => true
+                                            )); ?>
+                                        </h3>
+                                    </div>
+                                    <div class="col-xs-11">
+                                        <?php if ($isWinner): ?>
+                                        <div class="mr-xs pull-left" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.page.abtest.makewinner'); ?>">
+                                            <a class="btn btn-warning" href="javascript:void(0);" onclick="Mautic.showConfirmation('<?php echo $view->escape($view["translator"]->trans("mautic.page.abtest.confirmmakewinner", array("%name%" => $variant->getTitle() . " (" . $variant->getId() . ")")), 'js'); ?>', '<?php echo $view->escape($view["translator"]->trans("mautic.page.abtest.makewinner"), 'js'); ?>', 'executeAction', ['<?php echo $view['router']->generate('mautic_page_action', array('objectAction' => 'winner', 'objectId' => $variant->getId())); ?>', ''],'<?php echo $view->escape($view["translator"]->trans("mautic.core.form.cancel"), 'js'); ?>','',[]);">
+                                                <i class="fa fa-trophy"></i>
+                                            </a>
+                                        </div>
                                         <?php endif; ?>
-                                    </a>
-                                </h5>
-                                <span class="text-white dark-sm"><?php echo $variant->getAlias(); ?></span>
+                                        <h5 class="fw-sb text-primary">
+                                            <a href="<?php echo $view['router']->generate('mautic_page_action', array('objectAction' => 'view', 'objectId' => $variant->getId())); ?>" data-toggle="ajax"><?php echo $variant->getTitle(); ?>
+                                                <?php if ($variant->getId() == $activePage->getId()) : ?>
+                                                    <span>[<?php echo $view['translator']->trans('mautic.page.current'); ?>]</span>
+                                                <?php endif; ?>
+                                            </a>
+                                        </h5>
+                                        <span class="text-white dark-sm"><?php echo $variant->getAlias(); ?></span>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-md-5 va-m text-right">
-                                <?php if ($isWinner): ?>
-                                    <a class="btn btn-default" href="javascript:void(0);" onclick="Mautic.showConfirmation('<?php echo $view->escape($view["translator"]->trans("mautic.page.abtest.confirmmakewinner", array("%name%" => $variant->getTitle() . " (" . $variant->getId() . ")")), 'js'); ?>', '<?php echo $view->escape($view["translator"]->trans("mautic.page.abtest.makewinner"), 'js'); ?>', 'executeAction', ['<?php echo $view['router']->generate('mautic_page_action', array('objectAction' => 'winner', 'objectId' => $variant->getId())); ?>', ''],'<?php echo $view->escape($view["translator"]->trans("mautic.core.form.cancel"), 'js'); ?>','',[]);">
-                                        <span class="fa fa-trophy mr-xs"></span> <?php echo $view['translator']->trans('mautic.page.abtest.makewinner'); ?>
-                                    </a>
-                                <?php endif; ?>
+                            <div class="col-md-4 va-t text-right">
                                 <em class="text-white dark-sm">
                                     <?php if ($isPublished && ($totalWeight > 100 || ($thisCriteria && $firstCriteria != $thisCriteria))): ?>
-                                    <span class="text-danger" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.page.variant.misconfiguration'); ?>"><i class="fa fa-fw fa-exclamation-triangle"></i><?php echo $criteriaLabel; ?> - <?php echo $weight; ?>%</span>
+                                        <div class="text-danger" data-toggle="label label-danger" title="<?php echo $view['translator']->trans('mautic.page.variant.misconfiguration'); ?>"><div><span class="badge"><?php echo $weight; ?>%</span></div><div><i class="fa fa-fw fa-exclamation-triangle"></i><?php echo $criteriaLabel; ?></div></div>
                                     <?php elseif ($isPublished && $criteriaLabel): ?>
-                                    <span class="text-success"><i class="fa fa-fw fa-check"></i><?php echo $criteriaLabel; ?> - <?php echo $weight; ?>%</span>
+                                        <div class="text-success"><div><span class="label label-success"><?php echo $weight; ?>%</span></div><div><i class="fa fa-fw fa-check"></i><?php echo $criteriaLabel; ?></div></div>
                                     <?php elseif ($thisCriteria): ?>
-                                    <span class="text-muted"><?php echo $criteriaLabel; ?> - <?php echo $weight; ?>%</span>
+                                        <div class="text-muted"><div><span class="label label-default"><?php echo $weight; ?>%</span></div><div><?php echo $criteriaLabel; ?></div></div>
                                     <?php endif; ?>
                                 </em>
                             </div>

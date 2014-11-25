@@ -76,7 +76,7 @@ class AjaxController extends CommonAjaxController
 
         if (!empty($type)) {
             //get the HTML for the form
-            /** @var \Mautic\PointBundle\Model\PointModel $model */
+            /** @var \Mautic\PageBundle\Model\PageModel $model */
             $model   = $this->factory->getModel('page');
 
             $page = $model->getEntity($pageId);

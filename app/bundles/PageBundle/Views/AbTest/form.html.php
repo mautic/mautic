@@ -7,7 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-//we do not want the surrounding form since this will be embedded into the current form
+//do not include the surrounding form since this will be embedded into the current form
 foreach ($form as $f) {
     echo $view['form']->row($f);
 }

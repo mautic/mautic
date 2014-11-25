@@ -371,7 +371,7 @@ class HitRepository extends CommonRepository
             $stats['languages'] = $this->getLaguageGraphData($languages);
         }
 
-        return (!is_array($pageIds) && array_key_exists('$pageIds', $stats)) ? $stats[$pageIds] : $stats;
+        return (!is_array($pageIds) && array_key_exists($pageIds, $stats)) ? $stats[$pageIds] : $stats;
     }
 
     /**

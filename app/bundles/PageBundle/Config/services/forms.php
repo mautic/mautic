@@ -50,7 +50,6 @@ $container->setDefinition('mautic.form.type.pagelist', new Definition(
         'alias' => 'page_list',
     ));
 
-
 $container->setDefinition('mautic.form.type.page_abtest_settings', new Definition(
     'Mautic\PageBundle\Form\Type\AbTestPropertiesType'
 ))
