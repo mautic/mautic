@@ -141,6 +141,12 @@ class Hit
     private $sourceId;
 
     /**
+     * @ORM\ManyToOne(targetEntity="Mautic\EmailBundle\Entity\Email")
+     * @ORM\JoinColumn(name="email_id", referencedColumnName="id", nullable=true, onDelete="SET NULL")
+     */
+    private $email;
+
+    /**
      * Get id
      *
      * @return integer
@@ -632,5 +638,21 @@ class Hit
         $this->redirect = $redirect;
 
         return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getEmail ()
+    {
+        return $this->email;
+    }
+
+    /**
+     * @param mixed $email
+     */
+    public function setEmail (Email $email)
+    {
+        $this->email = $email;
     }
 }

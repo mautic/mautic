@@ -30,7 +30,7 @@ class PageModel extends FormModel
     /**
      * @return \Mautic\PageBundle\Entity\PageRepository
      */
-    public function getRepository()
+    public function getRepository ()
     {
         return $this->em->getRepository('MauticPageBundle:Page');
     }
@@ -38,7 +38,7 @@ class PageModel extends FormModel
     /**
      * {@inheritdoc}
      */
-    public function getPermissionBase()
+    public function getPermissionBase ()
     {
         return 'page:pages';
     }
@@ -46,7 +46,7 @@ class PageModel extends FormModel
     /**
      * {@inheritdoc}
      */
-    public function getNameGetter()
+    public function getNameGetter ()
     {
         return 'getTitle';
     }
@@ -57,7 +57,7 @@ class PageModel extends FormModel
      * @param Page $entity
      * @param bool $unlock
      */
-    public function saveEntity($entity, $unlock = true)
+    public function saveEntity ($entity, $unlock = true)
     {
         if (empty($this->inConversion)) {
             $alias = $entity->getAlias();
@@ -154,13 +154,14 @@ class PageModel extends FormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = array())
+    public function createForm ($entity, $formFactory, $action = null, $options = array())
     {
         if (!$entity instanceof Page) {
             throw new MethodNotAllowedHttpException(array('Page'));
         }
 
         $params = (!empty($action)) ? array('action' => $action) : array();
+
         return $formFactory->create('page', $entity, $params);
     }
 
@@ -169,7 +170,7 @@ class PageModel extends FormModel
      *
      * @return null|Page
      */
-    public function getEntity($id = null)
+    public function getEntity ($id = null)
     {
         if ($id === null) {
             $entity = new Page();
@@ -189,7 +190,7 @@ class PageModel extends FormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, $event = false)
+    protected function dispatchEvent ($action, &$entity, $isNew = false, $event = false)
     {
         if (!$entity instanceof Page) {
             throw new MethodNotAllowedHttpException(array('Page'));
@@ -219,6 +220,7 @@ class PageModel extends FormModel
             }
 
             $this->dispatcher->dispatch($name, $event);
+
             return $event;
         }
 
@@ -234,7 +236,7 @@ class PageModel extends FormModel
      *
      * @return array
      */
-    public function getLookupResults($type, $filter = '', $limit = 10)
+    public function getLookupResults ($type, $filter = '', $limit = 10)
     {
         $results = array();
         switch ($type) {
@@ -258,15 +260,15 @@ class PageModel extends FormModel
      *
      * @return string
      */
-    public function generateUrl($entity, $absolute = true, $clickthrough = array())
+    public function generateUrl ($entity, $absolute = true, $clickthrough = array())
     {
         $pageSlug = $entity->getId() . ':' . $entity->getAlias();
 
         //should the url include the category
-        $catInUrl    = $this->factory->getParameter('cat_in_page_url');
+        $catInUrl = $this->factory->getParameter('cat_in_page_url');
         if ($catInUrl) {
             $category = $entity->getCategory();
-            $catSlug = (!empty($category)) ? $category->getId() . ':' . $category->getAlias() :
+            $catSlug  = (!empty($category)) ? $category->getId() . ':' . $category->getAlias() :
                 $this->translator->trans('mautic.core.url.uncategorized');
         }
 
@@ -286,8 +288,8 @@ class PageModel extends FormModel
             );
         }
 
-        $pageUrl  = $this->factory->getRouter()->generate('mautic_page_public', $slugs, $absolute);
-        $pageUrl .= (!empty($clickthrough)) ? '?ct=' . base64_encode(serialize($clickthrough)) : '';
+        $pageUrl = $this->factory->getRouter()->generate('mautic_page_public', $slugs, $absolute);
+        $pageUrl .= (!empty($clickthrough)) ? '?ct=' . $this->encodeArrayForUrl($clickthrough) : '';
 
         return $pageUrl;
     }
@@ -299,7 +301,7 @@ class PageModel extends FormModel
      *
      * @return void
      */
-    public function hitPage($page, $request, $code = '200')
+    public function hitPage ($page, $request, $code = '200')
     {
         //don't skew results with in-house hits
         if (!$this->factory->getSecurity()->isAnonymous()) {
@@ -315,7 +317,7 @@ class PageModel extends FormModel
         //check for any clickthrough info
         $clickthrough = $request->get('ct', false);
         if (!empty($clickthrough)) {
-            $clickthrough = unserialize(base64_decode($clickthrough));
+            $clickthrough = $this->decodeArrayFromUrl($clickthrough);
 
             if (!empty($clickthrough['lead'])) {
                 $lead = $leadModel->getEntity($clickthrough['lead']);
@@ -329,6 +331,10 @@ class PageModel extends FormModel
             if (!empty($clickthrough['source'])) {
                 $hit->setSource($clickthrough['source'][0]);
                 $hit->setSourceId($clickthrough['source'][1]);
+            }
+
+            if (!empty($clickthrough['email'])) {
+                $hit->setEmail($this->factory->getEntityManager()->getReference('MauticEmailBundle:Email', $clickthrough['email']));
             }
         }
 
@@ -449,7 +455,7 @@ class PageModel extends FormModel
      *
      * @return mixed
      */
-    public function getBuilderComponents($page = null, $component = null)
+    public function getBuilderComponents ($page = null, $component = null)
     {
         static $components;
 
@@ -471,7 +477,7 @@ class PageModel extends FormModel
      *
      * @return int
      */
-    public function getBounces(Page $page)
+    public function getBounces (Page $page)
     {
         return $this->em->getRepository('MauticPageBundle:Hit')->getBounces($page->getId());
     }
@@ -484,7 +490,7 @@ class PageModel extends FormModel
      *
      * @return int
      */
-    public function getDwellTimeStats(Page $page)
+    public function getDwellTimeStats (Page $page)
     {
         return $this->em->getRepository('MauticPageBundle:Hit')->getDwellTimes($page->getId());
     }
@@ -496,7 +502,7 @@ class PageModel extends FormModel
      *
      * @return array
      */
-    public function getVariants(Page $page)
+    public function getVariants (Page $page)
     {
         $parent = $page->getVariantParent();
 
@@ -521,7 +527,7 @@ class PageModel extends FormModel
      *
      * @return array
      */
-    public function getTranslations(Page $page)
+    public function getTranslations (Page $page)
     {
         $parent = $page->getTranslationParent();
 
@@ -544,7 +550,7 @@ class PageModel extends FormModel
      *
      * @param Page $page
      */
-    public function convertVariant(Page $page)
+    public function convertVariant (Page $page)
     {
         //let saveEntities() know it does not need to set variant start dates
         $this->inConversion = true;

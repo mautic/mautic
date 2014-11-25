@@ -799,6 +799,7 @@ class EmailController extends FormController
      */
     public function sendAction ($objectId)
     {
+        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model   = $this->factory->getModel('email');
         $entity  = $model->getEntity($objectId);
         $session = $this->factory->getSession();

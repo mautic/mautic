@@ -751,6 +751,7 @@ class EmailModel extends FormModel
             $mailer->setLead($lead);
             $mailer->setIdHash($idHash);
             $mailer->setSource($source);
+            $mailer->setEmail($useEmail['entity']);
 
             if ($useEmail['entity']->getContentMode() == 'builder') {
                 $mailer->setTemplate('MauticEmailBundle::public.html.php', array(

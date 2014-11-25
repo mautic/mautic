@@ -11,6 +11,7 @@ namespace Mautic\AssetBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
+use Mautic\EmailBundle\Entity\Email;
 
 /**
  * Class Download
@@ -75,6 +76,12 @@ class Download
      * @ORM\Column(name="source_id", type="integer", nullable=true)
      */
     private $sourceId;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Mautic\EmailBundle\Entity\Email")
+     * @ORM\JoinColumn(name="email_id", referencedColumnName="id", nullable=true, onDelete="SET NULL"))
+     */
+    private $email;
 
     /**
      * Get id
@@ -276,5 +283,21 @@ class Download
     public function setSourceId($sourceId)
     {
         $this->sourceId = (int) $sourceId;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getEmail ()
+    {
+        return $this->email;
+    }
+
+    /**
+     * @param mixed $email
+     */
+    public function setEmail (Email $email)
+    {
+        $this->email = $email;
     }
 }

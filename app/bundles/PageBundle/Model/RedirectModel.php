@@ -40,7 +40,7 @@ class RedirectModel extends FormModel
 
         $url  = $router->generate('mautic_page_redirect', array('redirectId' => $redirect->getRedirectId()), true);
         $r    = urlencode($redirect->getUrl());
-        $url .= (!empty($clickthrough)) ? '?ct=' . base64_encode(serialize($clickthrough)) . '&r=' . $r : '?r=' . $r;
+        $url .= (!empty($clickthrough)) ? '?ct=' . $this->encodeArrayForUrl($clickthrough) . '&r=' . $r : '?r=' . $r;
 
         return $url;
     }

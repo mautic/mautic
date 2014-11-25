@@ -117,6 +117,37 @@ class HitRepository extends CommonRepository
     }
 
     /**
+     * @param      $source
+     * @param null $sourceId
+     * @param null $fromDate
+     * @param null $emailIds
+     *
+     * @return array
+     */
+    public function getHitsBySource($source, $sourceId = null, $fromDate = null, $emailIds = null)
+    {
+        $query = $this->createQueryBuilder('h');
+
+        $query->andWhere($query->expr()->eq('h.source', $query->expr()->literal($source)));
+
+        if ($sourceId != null) {
+            if (is_array($sourceId)) {
+                $query->andWhere($query->expr()->in('h.sourceId', ':sourceIds'))
+                    ->setParameter('sourceIds', $sourceId);
+            } else {
+                $query->andWhere($query->expr()->eq('h.sourceId', (int) $sourceId));
+            }
+        }
+
+        if ($fromDate != null) {
+            $query->andwhere($query->expr()->gte('h.dateHit', ':date'))
+                ->setParameter('date', $fromDate);
+        }
+
+        return $hits = $query->getQuery()->getArrayResult();
+    }
+
+    /**
      * Get new, unique and returning visitors
      *
      * @param array $args

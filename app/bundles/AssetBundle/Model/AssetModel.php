@@ -85,7 +85,7 @@ class AssetModel extends FormModel
         //check for any clickthrough info
         $clickthrough = $request->get('ct', false);
         if (!empty($clickthrough)) {
-            $clickthrough = unserialize(base64_decode($clickthrough));
+            $clickthrough = $this->decodeArrayFromUrl($clickthrough);
 
             if (!empty($clickthrough['lead'])) {
                 $lead = $leadModel->getEntity($clickthrough['lead']);
@@ -99,6 +99,10 @@ class AssetModel extends FormModel
             if (!empty($clickthrough['source'])) {
                 $download->setSource($clickthrough['source'][0]);
                 $download->setSourceId($clickthrough['source'][1]);
+            }
+
+            if (!empty($clickthrough['source'])) {
+
             }
         }
 
@@ -282,7 +286,7 @@ class AssetModel extends FormModel
         );
 
         $assetUrl  = $this->factory->getRouter()->generate('mautic_asset_download', $slugs, $absolute);
-        $assetUrl .= (!empty($clickthrough)) ? '?ct=' . base64_encode(serialize($clickthrough)) : '';
+        $assetUrl .= (!empty($clickthrough)) ? '?ct=' . $this->encodeArrayForUrl($clickthrough) : '';
 
         return $assetUrl;
     }
