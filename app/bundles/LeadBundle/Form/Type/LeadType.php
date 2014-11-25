@@ -64,7 +64,7 @@ class LeadType extends AbstractType
                 $imageChoices[$key] = $key;
             }
 
-            $builder->add('preferred_profile_image', 'column_selector', array(
+            $builder->add('preferred_profile_image', 'choice', array(
                 'choices'    => $imageChoices,
                 'label'      => 'mautic.lead.lead.field.preferred_profile',
                 'label_attr' => array('class' => 'control-label'),
