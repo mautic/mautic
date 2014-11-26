@@ -689,6 +689,10 @@ class EmailModel extends FormModel
      */
     public function sendEmail($email, $leads, $source = null, $emailSettings = array(), $listId = null, $returnEntities = false)
     {
+        if (!$email->getId()) {
+            return ($returnEntities) ? array() : false;
+        }
+
         if (isset($leads['id'])) {
             $leads = array($leads['id'] => $leads);
         }
@@ -816,6 +820,7 @@ class EmailModel extends FormModel
             return $saveEntities;
         } else {
             $this->saveEntities($saveEntities);
+            return true;
         }
     }
 
@@ -830,6 +835,10 @@ class EmailModel extends FormModel
      */
     public function sendEmailToUser($email, $users)
     {
+        if (!$email->getId()) {
+            return false;
+        }
+
         if (!is_array($users)) {
             $user = array('id' => $users);
             $users = array($user);
@@ -840,7 +849,7 @@ class EmailModel extends FormModel
 
         //noone to send to so bail
         if (empty($users)) {
-            return array();
+            return false;
         }
 
         foreach ($users as $user) {

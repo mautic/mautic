@@ -45,7 +45,7 @@ class PointEventHelper
     public static function sendEmail(TriggerEvent $event, Lead $lead, MauticFactory $factory)
     {
         $properties = $event->getProperties();
-        $emailId    = $properties['email'];
+        $emailId    = (int) $properties['email'];
         $trigger    = $event->getTrigger();
 
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */

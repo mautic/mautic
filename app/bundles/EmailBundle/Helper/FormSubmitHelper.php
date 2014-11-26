@@ -22,7 +22,7 @@ class FormSubmitHelper
     public static function sendEmail(Action $action, MauticFactory $factory, $feedback)
     {
         $properties = $action->getProperties();
-        $emailId    = $properties['email'];
+        $emailId    = (int) $properties['email'];
         $form       = $action->getForm();
 
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */

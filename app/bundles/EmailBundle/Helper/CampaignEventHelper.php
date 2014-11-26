@@ -78,10 +78,11 @@ class CampaignEventHelper
             /** @var \Mautic\EmailBundle\Model\EmailModel $emailModel */
             $emailModel = $factory->getModel('email');
 
-            $emailId = $event['properties']['email'];
+            $emailId = (int) $event['properties']['email'];
+
             $email   = $emailModel->getEntity($emailId);
 
-            if ($email != null) {
+            if ($email != null && $email->isPublished()) {
                 $emailModel->sendEmail($email, array($leadCredentials['id'] => $leadCredentials), array('campaign', $event['campaign']['id']));
                 $emailSent = true;
             }
