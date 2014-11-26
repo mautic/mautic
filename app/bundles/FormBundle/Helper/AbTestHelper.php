@@ -58,11 +58,11 @@ class AbTestHelper
                 $hitLabel        = ($type == 'page') ? $translator->trans('mautic.form.abtest.label.hits') : $translator->trans('mautic.form.abtest.label.sentemils');
 
                 foreach ($counts as $stats) {
-                    $submissionRate            = ($stats['hits']) ? round(($stats['submissions'] / $stats['hits']) * 100, 2) : 0;
+                    $submissionRate            = ($stats['total']) ? round(($stats['count'] / $stats['total']) * 100, 2) : 0;
                     $submissions[$stats['id']] = $submissionRate;
-                    $data[$submissionLabel][]  = $stats['submissions'];
-                    $data[$hitLabel][]         = $stats['hits'];
-                    $support['labels'][]       = $stats['id'] . ':' . $stats['title'] . ' (' . $submissionRate . '%)';
+                    $data[$submissionLabel][]  = $stats['count'];
+                    $data[$hitLabel][]         = $stats['total'];
+                    $support['labels'][]       = $stats['id'] . ':' . $stats['name'] . ' (' . $submissionRate . '%)';
                     $hasResults[]              = $stats['id'];
                 }
 
@@ -90,7 +90,7 @@ class AbTestHelper
                     $maxes[] = max($data);
                 }
                 $top                   = max($maxes);
-                $support['step_width'] = (floor($top / 10) * 10) / 10;
+                $support['step_width'] = (ceil($top / 10) * 10);
 
                 //put in order from least to greatest just because
                 asort($submissions);

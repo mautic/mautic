@@ -80,7 +80,7 @@ class AbTestHelper
                     $maxes[] = max($data);
                 }
                 $top                   = max($maxes);
-                $support['step_width'] = (floor($top / 10) * 10) / 10;
+                $support['step_width'] = (ceil($top / 10) * 10);
 
                 //put in order from least to greatest just because
                 asort($rates);
@@ -186,7 +186,7 @@ class AbTestHelper
                     $maxes[] = max($data);
                 }
                 $top                   = max($maxes);
-                $support['step_width'] = (floor($top / 10) * 10) / 10;
+                $support['step_width'] = (ceil($top / 10) * 10);
 
                 //put in order from least to greatest just because
                 asort($rates);

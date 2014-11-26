@@ -11,6 +11,7 @@ namespace Mautic\AssetBundle\Helper;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\FormBundle\Entity\Action;
+use Mautic\FormBundle\Entity\Form;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -47,13 +48,12 @@ class FormSubmitHelper
         }
     }
 
-    public static function downloadFile(Asset $asset, MauticFactory $factory, $message)
+    public static function downloadFile(Form $form, Asset $asset, MauticFactory $factory, $message)
     {
         /** @var \Mautic\AssetBundle\Model\AssetModel $model */
-        $model  = $factory->getModel('asset');
-        $url = $model->generateUrl($asset, true);
-
-        $msg = $message . $factory->getTranslator()->trans('mautic.asset.asset.submitaction.downloadfile.msg', array(
+        $model = $factory->getModel('asset');
+        $url   = $model->generateUrl($asset, true, array('form', $form->getId()));
+        $msg   = $message . $factory->getTranslator()->trans('mautic.asset.asset.submitaction.downloadfile.msg', array(
             '%url%' => $url
         ));
 

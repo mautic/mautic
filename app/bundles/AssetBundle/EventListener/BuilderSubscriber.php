@@ -61,7 +61,8 @@ class BuilderSubscriber extends CommonSubscriber
     {
         $lead   = $event->getLead();
         $leadId = ($lead !== null) ? $lead['id'] : null;
-        $this->replaceTokens($event, $leadId, $event->getSource());
+        $email  = $event->getEmail();
+        $this->replaceTokens($event, $leadId, $event->getSource(), $email->getId());
     }
 
     public function onPageDisplay (PageDisplayEvent $event)
@@ -71,7 +72,7 @@ class BuilderSubscriber extends CommonSubscriber
         $this->replaceTokens($event, $leadId, array('page', $page->getId()));
     }
 
-    private function replaceTokens ($event, $leadId, $source = array())
+    private function replaceTokens ($event, $leadId, $source = array(), $emailId = null)
     {
         static $assets = array();
 
@@ -84,6 +85,10 @@ class BuilderSubscriber extends CommonSubscriber
 
         if ($leadId !== null) {
             $clickthrough['lead'] = $leadId;
+        }
+
+        if (!empty($emailId)) {
+            $clickthrough['email'] = $emailId;
         }
 
         preg_match_all($pagelinkRegex, $content, $matches);

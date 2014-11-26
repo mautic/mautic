@@ -80,7 +80,7 @@ $barData = \Mautic\CoreBundle\Helper\GraphHelper::prepareBarGraphData($support['
                 scaleOverride: true,
                 <?php if (isset($support['step_width'])) : ?>
                 scaleSteps: <?php echo ($support['step_width'] > 10) ? 11 : 10; ?>,
-                scaleStepWidth: <?php echo ($support['step_width'] > 10) ? $support['step_width'] : 1; ?>,
+                scaleStepWidth: <?php echo ($support['step_width'] > 10) ? (ceil($support['step_width']/10)) : 1; ?>,
                 <?php endif; ?>
                 scaleStartValue: 0
             });

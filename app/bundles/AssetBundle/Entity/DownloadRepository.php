@@ -200,7 +200,7 @@ class DownloadRepository extends CommonRepository
     public function getDownloadCountsByPage($pageId, \DateTime $fromDate = null)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
-        $q->select('count(distinct(a.tracking_id)) as downloads, a.source_id as page_id, p.title, p.alias, p.variant_hits')
+        $q->select('count(distinct(a.tracking_id)) as count, a.source_id as id, p.title as name, p.hits as total')
             ->from(MAUTIC_TABLE_PREFIX.'asset_downloads', 'a')
             ->join('a', MAUTIC_TABLE_PREFIX.'pages', 'p', 'a.source_id = p.id');
 
@@ -224,6 +224,54 @@ class DownloadRepository extends CommonRepository
 
         $results = $q->execute()->fetchAll();
 
-        return $results;
+        $downloads = array();
+        foreach ($results as $r) {
+            $downloads[$r['id']] = $r;
+        }
+
+        return $downloads;
+    }
+
+    /**
+     * Get download count by email by linking emails that have been associated with a page hit that has the
+     * same tracking ID as an asset download tracking ID and thus assumed happened in the same session
+     *
+     * @param           $emailId
+     * @param \DateTime $fromDate
+     *
+     * @return mixed
+     */
+    public function getDownloadCountsByEmail($emailId, \DateTime $fromDate = null)
+    {
+        //link email to page hit tracking id to download tracking id
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->select('count(distinct(a.tracking_id)) as count, e.id, e.subject as name, e.variant_sent_count as total')
+            ->from(MAUTIC_TABLE_PREFIX.'asset_downloads', 'a')
+            ->join('a', MAUTIC_TABLE_PREFIX.'emails', 'e', 'a.email_id = e.id');
+
+        if (is_array($emailId)) {
+            $q->where($q->expr()->in('e.id', $emailId))
+                ->groupBy('e.id');
+        } else {
+            $q->where($q->expr()->eq('e.id', ':email'))
+                ->setParameter('email', (int) $emailId);
+        }
+
+        $q->andWhere('a.code = 200');
+
+        if ($fromDate != null) {
+            $dh = new DateTimeHelper($fromDate);
+            $q->andWhere($q->expr()->gte('a.date_download', ':date'))
+                ->setParameter('date', $dh->toUtcString());
+        }
+
+        $results = $q->execute()->fetchAll();
+
+        $downloads = array();
+        foreach ($results as $r) {
+            $downloads[$r['id']] = $r;
+        }
+
+        return $downloads;
     }
 }

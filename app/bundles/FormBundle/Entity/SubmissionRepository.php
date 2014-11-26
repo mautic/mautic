@@ -304,7 +304,7 @@ class SubmissionRepository extends CommonRepository
     public function getSubmissionCountsByPage($pageId, \DateTime $fromDate = null)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
-        $q->select('count(distinct(s.tracking_id)) as submissions, s.page_id as id, p.title, p.alias, p.variant_hits as hits')
+        $q->select('count(distinct(s.tracking_id)) as count, s.page_id as id, p.title as name, p.variant_hits as total')
             ->from(MAUTIC_TABLE_PREFIX.'form_submissions', 's')
             ->join('s', MAUTIC_TABLE_PREFIX.'pages', 'p', 's.page_id = p.id');
 
@@ -341,7 +341,7 @@ class SubmissionRepository extends CommonRepository
     {
         //link email to page hit tracking id to form submission tracking id
         $q = $this->_em->getConnection()->createQueryBuilder();
-        $q->select('count(distinct(s.tracking_id)) as submissions, e.id, e.subject as title, e.variant_sent_count as hits')
+        $q->select('count(distinct(s.tracking_id)) as count, e.id, e.subject as name, e.variant_sent_count as total')
             ->from(MAUTIC_TABLE_PREFIX.'form_submissions', 's')
             ->join('s', MAUTIC_TABLE_PREFIX.'page_hits', 'h', 's.tracking_id = h.tracking_id')
             ->join('h', MAUTIC_TABLE_PREFIX.'emails', 'e', 'h.email_id = e.id');

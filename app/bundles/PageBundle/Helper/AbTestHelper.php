@@ -59,7 +59,7 @@ class AbTestHelper
                 }
 
                 $max                   = max($rates);
-                $support['step_width'] = (floor($max / 10) * 10) / 10;
+                $support['step_width'] = (ceil($max / 10) * 10);
 
                 //get the page ids with the greatest average dwell time
                 $winners = ($max > 0) ? array_keys($rates, $max) : array();
@@ -122,7 +122,7 @@ class AbTestHelper
 
                 //set max for scales
                 $max                   = max($avgs);
-                $support['step_width'] = (floor($max / 10) * 10) / 10;
+                $support['step_width'] = (ceil($max / 10) * 10);
 
                 //get the page ids with the greatest average dwell time
                 $winners = ($max > 0) ? array_keys($avgs, $max) : array();

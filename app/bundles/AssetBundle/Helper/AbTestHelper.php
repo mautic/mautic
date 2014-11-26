@@ -10,6 +10,7 @@
 namespace Mautic\AssetBundle\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\PageBundle\Entity\Page;
 
 /**
@@ -31,45 +32,52 @@ class AbTestHelper
     {
         $repo = $factory->getEntityManager()->getRepository('MauticAssetBundle:Download');
 
-        $pageIds = array($parent->getId());
+        //if this is an email A/B test, then link email to page to form submission
+        //if it is a page A/B test, then link form submission to page
+        $type = ($parent instanceof Email) ? 'email' : 'page';
+
+        $ids = array($parent->getId());
 
         foreach ($children as $c) {
             if ($c->isPublished()) {
-                $id        = $c->getId();
-                $pageIds[] = $id;
+                $id    = $c->getId();
+                $ids[] = $id;
             }
         }
 
         $startDate = $parent->getVariantStartDate();
-        if ($startDate != null && !empty($pageIds)) {
-            $counts = $repo->getDownloadCountsByPage($pageIds, $startDate);
+        if ($startDate != null && !empty($ids)) {
+            $counts = ($type == 'page') ? $repo->getDownloadCountsByPage($ids, $startDate) : $repo->getDownloadCountsByEmail($ids, $startDate);
 
             $translator = $factory->getTranslator();
             if ($counts) {
                 $downloads  = $support = $data = array();
                 $hasResults = array();
+
+                $downloadsLabel = $translator->trans('mautic.asset.abtest.label.downloads');
+                $hitsLabel        = ($type == 'page') ? $translator->trans('mautic.asset.abtest.label.hits') : $translator->trans('mautic.asset.abtest.label.sentemils');
                 foreach ($counts as $stats) {
-                    $downloadRate                                                      = ($stats['variant_hits']) ? round(($stats['downloads'] / $stats['variant_hits']) * 100, 2) : 0;
-                    $downloads[$stats['page_id']]                                      = $downloadRate;
-                    $data[$translator->trans('mautic.asset.abtest.label.downloads')][] = $stats['downloads'];
-                    $data[$translator->trans('mautic.asset.abtest.label.hits')][]      = $stats['variant_hits'];
-                    $support['labels'][]                                               = $stats['page_id'] . ':' . $stats['title'] . ' (' . $downloadRate . '%)';
-                    $hasResults[]                                                      = $stats['page_id'];
+                    $rate                    = ($stats['total']) ? round(($stats['count'] / $stats['total']) * 100, 2) : 0;
+                    $downloads[$stats['id']] = $rate;
+                    $data[$downloadsLabel][] = $stats['count'];
+                    $data[$hitsLabel][]      = $stats['total'];
+                    $support['labels'][]     = $stats['id'] . ':' . $stats['name'] . ' (' . $rate . '%)';
+                    $hasResults[]            = $stats['id'];
                 }
 
                 //make sure that parent and published children are included
                 if (!in_array($parent->getId(), $hasResults)) {
-                    $data[$translator->trans('mautic.asset.abtest.label.downloads')][] = 0;
-                    $data[$translator->trans('mautic.asset.abtest.label.hits')][]      = 0;
-                    $support['labels'][]                                               = $parent->getId() . ':' . $parent->getTitle() . ' (0%)';
+                    $data[$downloadsLabel][] = 0;
+                    $data[$hitsLabel][]        = 0;
+                    $support['labels'][]      = $parent->getId() . ':' . (($type == 'page') ? $parent->getTitle() : $parent->getSubject()) . ' (0%)';
                 }
 
                 foreach ($children as $c) {
                     if ($c->isPublished()) {
                         if (!in_array($c->getId(), $hasResults)) {
-                            $data[$translator->trans('mautic.asset.abtest.label.downloads')][] = 0;
-                            $data[$translator->trans('mautic.asset.abtest.label.hits')][]      = 0;
-                            $support['labels'][]                                               = $c->getId() . ':' . $c->getTitle() . ' (0%)';
+                            $data[$downloadsLabel][] = 0;
+                            $data[$hitsLabel][]        = 0;
+                            $support['labels'][]      = $c->getId() . ':' . (($type == 'page') ? $c->getTitle() : $c->getSubject()) . ' (0%)';
                         }
                     }
                 }
@@ -81,7 +89,7 @@ class AbTestHelper
                     $maxes[] = max($data);
                 }
                 $top                   = max($maxes);
-                $support['step_width'] = (floor($top / 10) * 10) / 10;
+                $support['step_width'] = (ceil($top / 10) * 10);
 
                 //put in order from least to greatest just because
                 asort($downloads);
