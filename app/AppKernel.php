@@ -78,7 +78,14 @@ class AppKernel extends Kernel
         }
 
         if (strpos($request->getRequestUri(), 'installer') === false && !$this->isInstalled()) {
-            return new RedirectResponse($this->getContainer()->get('router')->generate('mautic_installer_home'));
+            //the context is not populated at this point so have to do it manually
+            $router = $this->getContainer()->get('router');
+            $requestContext = new \Symfony\Component\Routing\RequestContext();
+            $requestContext->fromRequest($request);
+            $router->setContext($requestContext);
+
+            //return new RedirectResponse();
+            return new RedirectResponse($router->generate('mautic_installer_home'));
         }
 
         return parent::handle($request, $type, $catch);
