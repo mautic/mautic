@@ -380,6 +380,54 @@ abstract class AbstractPermissions
 
 
     /**
+     * Add a single full permission
+     *
+     * @param array $permissionNames
+     * @param bool  $includePublish
+     *
+     * @return void
+     */
+    protected function addManagePermission($permissionNames)
+    {
+        if (!is_array($permissionNames)) {
+            $permissionNames = array($permissionNames);
+        }
+
+        foreach ($permissionNames as $p) {
+            $this->permissions[$p] = array(
+                'manage'    => 1024
+            );
+        }
+    }
+
+    /**
+     * Adds a single full permission to the form builder, i.e. config only bundles
+     *
+     * @param string               $bundle
+     * @param string               $level
+     * @param FormBuilderInterface $builder
+     * @param array                $data
+     * @param bool                 $includePublish
+     */
+    protected function addManageFormFields($bundle, $level, &$builder, $data)
+    {
+        $choices = array(
+            'manage'   => 'mautic.core.permissions.manage'
+        );
+
+        $builder->add("$bundle:$level", 'button_group', array(
+            'choices'  => $choices,
+            'label'    => "mautic.$bundle.permissions.$level",
+            'expanded' => true,
+            'multiple' => true,
+            'attr'     => array(
+                'onclick' => 'Mautic.onPermissionChange(this, event, \''.$bundle.'\')'
+            ),
+            'data'     => (!empty($data[$level]) ? $data[$level] : array())
+        ));
+    }
+
+    /**
      * Adds the standard permission set of viewown, viewother, editown, editother, create, deleteown, deleteother,
      * publishown, publishother and full
      *

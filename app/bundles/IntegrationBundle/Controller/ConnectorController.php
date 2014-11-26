@@ -22,15 +22,7 @@ class ConnectorController extends FormController
      */
     public function indexAction()
     {
-        //set some permissions
-        $permissions = $this->factory->getSecurity()->isGranted(array(
-            'integration:integrations:view',
-            'integration:integrations:create',
-            'integration:integrations:edit',
-            'integration:integrations:delete'
-        ), 'RETURN_ARRAY');
-
-        if (!$permissions['integration:integrations:view']) {
+        if (!$this->factory->getSecurity()->isGranted('integration:integrations:manage')) {
             return $this->accessDenied();
         }
 
@@ -48,7 +40,6 @@ class ConnectorController extends FormController
         return $this->delegateView(array(
             'viewParameters'  =>  array(
                 'items'       => $connectors,
-                'permissions' => $permissions,
                 'tmpl'        => $tmpl
             ),
             'contentTemplate' => 'MauticIntegrationBundle:Connector:grid.html.php',
@@ -67,15 +58,7 @@ class ConnectorController extends FormController
      */
     public function editAction($name)
     {
-        //set some permissions
-        $permissions = $this->factory->getSecurity()->isGranted(array(
-            'integration:integrations:view',
-            'integration:integrations:create',
-            'integration:integrations:edit',
-            'integration:integrations:delete'
-        ), 'RETURN_ARRAY');
-
-        if (!$permissions['integration:integrations:edit']) {
+        if (!$this->factory->getSecurity()->isGranted('integration:integrations:manage')) {
             return $this->accessDenied();
         }
 

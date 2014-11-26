@@ -19,23 +19,13 @@ class IntegrationController extends FormController
 {
     /**
      * @param int $page
-     *
-     * @return HttpFoundation\JsonResponse|HttpFoundation\RedirectResponse|HttpFoundation\Response
      */
     public function indexAction($page = 1)
     {
 	    /* @type \Mautic\IntegrationBundle\Model\IntegrationModel $model */
         $model = $this->factory->getModel('integration');
 
-        //set some permissions
-        $permissions = $this->factory->getSecurity()->isGranted(array(
-            'integration:integrations:view',
-            'integration:integrations:create',
-            'integration:integrations:edit',
-            'integration:integrations:delete'
-        ), "RETURN_ARRAY");
-
-        if (!$permissions['integration:integrations:view']) {
+        if (!$this->factory->getSecurity()->isGranted('integration:integrations:manage')) {
             return $this->accessDenied();
         }
 
@@ -97,10 +87,8 @@ class IntegrationController extends FormController
                 'items'       => $integrations,
                 'page'        => $page,
                 'limit'       => $limit,
-                'permissions' => $permissions,
                 'model'       => $model,
-                'tmpl'        => $tmpl,
-                'security'    => $this->factory->getSecurity()
+                'tmpl'        => $tmpl
             ),
             'contentTemplate' => 'MauticIntegrationBundle:Integration:list.html.php',
             'passthroughVars' => array(
@@ -120,6 +108,10 @@ class IntegrationController extends FormController
      */
     protected function reloadAction($objectId)
     {
+        if (!$this->factory->getSecurity()->isGranted('integration:integrations:manage')) {
+            return $this->accessDenied();
+        }
+
         /** @var \Mautic\IntegrationBundle\Model\IntegrationModel $model */
         $model  = $this->factory->getModel('integration');
         $repo   = $model->getRepository();

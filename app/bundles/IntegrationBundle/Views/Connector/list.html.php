@@ -22,13 +22,9 @@ if ($tmpl == 'index') {
             <?php foreach ($items as $item): ?>
                 <tr>
                     <td>
-                        <?php if ($permissions['integration:integrations:edit']) : ?>
-                            <a href="<?php echo $view['router']->generate('mautic_integration_connector_edit', array('name' => strtolower($item['name']))); ?>" data-toggle="ajaxmodal" data-target="#ConnectorEditModal">
-                                <?php echo $item['name']; ?>
-                            </a>
-                        <?php else : ?>
+                        <a href="<?php echo $view['router']->generate('mautic_integration_connector_edit', array('name' => strtolower($item['name']))); ?>" data-toggle="ajaxmodal" data-target="#ConnectorEditModal">
                             <?php echo $item['name']; ?>
-                        <?php endif; ?>
+                        </a>
                     </td>
                 </tr>
             <?php endforeach; ?>

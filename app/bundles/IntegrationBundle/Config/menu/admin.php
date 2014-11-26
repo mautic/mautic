@@ -14,7 +14,7 @@ $items = array(
         'extras'         => array(
             'iconClass' => 'fa-plus-circle'
         ),
-        'display'        => ($security->isGranted(array('integration:integrations:view'), 'MATCH_ONE')) ? true : false,
+        'display'        => ($security->isGranted(array('integration:integrations:manage'), 'MATCH_ONE')) ? true : false,
         'children'       => array(
             'mautic.integration.menu.index' => array(
                 'route'          => 'mautic_integration_index',

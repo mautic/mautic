@@ -25,7 +25,7 @@ class IntegrationPermissions extends AbstractPermissions
     public function __construct($params)
     {
         parent::__construct($params);
-        $this->addStandardPermissions('integrations');
+        $this->addManagePermission('integrations');
     }
 
     /**
@@ -33,7 +33,7 @@ class IntegrationPermissions extends AbstractPermissions
      */
     public function getName()
     {
-        return 'integrations';
+        return 'integration';
     }
 
     /**
@@ -41,6 +41,6 @@ class IntegrationPermissions extends AbstractPermissions
      */
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {
-        $this->addStandardFormFields('integration', 'integrations', $builder, $data);
+        $this->addManageFormFields('integration', 'integrations', $builder, $data);
     }
 }
