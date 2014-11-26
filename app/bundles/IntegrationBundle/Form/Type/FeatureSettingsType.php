@@ -35,22 +35,22 @@ class FeatureSettingsType extends AbstractType
      */
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
-        $network = $options['network'];
+        $connector = $options['connector'];
 
-        $network_object = $options['network_object'];
+        $connector_object = $options['connector_object'];
 
-        $class  = explode('\\', get_class($network_object));
-        $exists = class_exists('\\MauticAddon\\' . $class[1] . '\\Form\\Type\\' . $network . 'Type');
+        $class  = explode('\\', get_class($connector_object));
+        $exists = class_exists('\\MauticAddon\\' . $class[1] . '\\Form\\Type\\' . $connector . 'Type');
 
         if ($exists) {
-            $builder->add('shareButton', 'socialmedia_' . strtolower($network), array(
+            $builder->add('shareButton', 'socialmedia_' . strtolower($connector), array(
                 'label'    => false,
                 'required' => false
             ));
         }
 
-        $networkHelper = $this->factory->getNetworkIntegrationHelper();
-        $fields        = $networkHelper->getAvailableFields($options['network']);
+        $connectorHelper = $this->factory->getConnectorIntegrationHelper();
+        $fields        = $connectorHelper->getAvailableFields($options['connector']);
 
         if (!empty($fields)) {
             $builder->add('shareBtnMsg', 'spacer', array(
@@ -72,7 +72,7 @@ class FeatureSettingsType extends AbstractType
      */
     public function setDefaultOptions (OptionsResolverInterface $resolver)
     {
-        $resolver->setRequired(array('network', 'network_object', 'lead_fields'));
+        $resolver->setRequired(array('connector', 'connector_object', 'lead_fields'));
     }
 
     /**

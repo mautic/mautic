@@ -39,7 +39,7 @@ class DetailsType extends AbstractType
             'required'    => false
         ));
 
-        $keys = $options['network_object']->getRequiredKeyFields();
+        $keys = $options['connector_object']->getRequiredKeyFields();
         $builder->add('apiKeys', 'connector_keys', array(
             'label'          => false,
             'required'       => false,
@@ -47,8 +47,8 @@ class DetailsType extends AbstractType
             'data'           => $options['data']->getApiKeys()
         ));
 
-        if ($options['network_object']->getAuthenticationType() == 'oauth2') {
-            $url      = $options['network_object']->getOAuthLoginUrl();
+        if ($options['connector_object']->getAuthenticationType() == 'oauth2') {
+            $url      = $options['connector_object']->getOAuthLoginUrl();
             $keys     = $options['data']->getApiKeys();
             $disabled = false;
             $label    = (isset($keys['access_token'])) ? 'reauthorize' : 'authorize';
@@ -64,7 +64,7 @@ class DetailsType extends AbstractType
             $builder->add('authButton', 'standalone_button', array(
                 'attr'     => array(
                     'class'   => 'btn btn-primary',
-                    'onclick' => 'Mautic.loadAuthModal("' . $url . '", "' . $key . '", "' . $options['network'] . '");'
+                    'onclick' => 'Mautic.loadAuthModal("' . $url . '", "' . $key . '", "' . $options['connector'] . '");'
                 ),
                 'label'    => 'mautic.social.form.' . $label,
                 'disabled' => $disabled
@@ -72,7 +72,7 @@ class DetailsType extends AbstractType
         }
 
         //@todo - add event so that other bundles can plug in custom features
-        $features = $options['network_object']->getSupportedFeatures();
+        $features = $options['connector_object']->getSupportedFeatures();
         if (!empty($features)) {
             $labels = array();
             foreach ($features as $f) {
@@ -93,12 +93,12 @@ class DetailsType extends AbstractType
             'required'       => false,
             'data'           => $options['data']->getFeatureSettings(),
             'label_attr'     => array('class' => 'control-label'),
-            'network'        => $options['network'],
-            'network_object' => $options['network_object'],
+            'connector'        => $options['connector'],
+            'connector_object' => $options['connector_object'],
             'lead_fields'    => $options['lead_fields']
         ));
 
-        $builder->add('name', 'hidden', array('data' => $options['network']));
+        $builder->add('name', 'hidden', array('data' => $options['connector']));
 
         $builder->add('buttons', 'form_buttons');
 
@@ -116,7 +116,7 @@ class DetailsType extends AbstractType
             'data_class' => 'Mautic\IntegrationBundle\Entity\Connector'
         ));
 
-        $resolver->setRequired(array('network', 'network_object', 'lead_fields'));
+        $resolver->setRequired(array('connector', 'connector_object', 'lead_fields'));
     }
 
     /**

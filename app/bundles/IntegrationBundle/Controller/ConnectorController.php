@@ -26,13 +26,13 @@ class ConnectorController extends FormController
             return $this->accessDenied();
         }
 
-        /** @var \Mautic\IntegrationBundle\Helper\NetworkIntegrationHelper $networkHelper */
-        $networkHelper  = $this->container->get('mautic.network.integration');
-        $networkObjects = $networkHelper->getNetworkObjects(null, null, true);
+        /** @var \Mautic\IntegrationBundle\Helper\ConnectorIntegrationHelper $connectorHelper */
+        $connectorHelper  = $this->container->get('mautic.connector.integration');
+        $connectorObjects = $connectorHelper->getConnectorObjects(null, null, true);
         $connectors     = array();
 
-        foreach ($networkObjects as $name => $object) {
-            $connectors[] = array('name' => $name, 'icon' => $networkHelper->getIconPath($object));
+        foreach ($connectorObjects as $name => $object) {
+            $connectors[] = array('name' => $name, 'icon' => $connectorHelper->getIconPath($object));
         }
 
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
@@ -62,14 +62,14 @@ class ConnectorController extends FormController
             return $this->accessDenied();
         }
 
-        /** @var \Mautic\IntegrationBundle\Helper\NetworkIntegrationHelper $networkHelper */
-        $networkHelper  = $this->container->get('mautic.network.integration');
-        $networkObjects = $networkHelper->getNetworkObjects(null, null, true);
+        /** @var \Mautic\IntegrationBundle\Helper\ConnectorIntegrationHelper $connectorHelper */
+        $connectorHelper  = $this->container->get('mautic.connector.integration');
+        $connectorObjects = $connectorHelper->getConnectorObjects(null, null, true);
 
-        // We receive a lowercase name, so we need to convert the $networkObjects array keys to lowercase
+        // We receive a lowercase name, so we need to convert the $connectorObjects array keys to lowercase
         $objects = array();
 
-        foreach ($networkObjects as $key => $value) {
+        foreach ($connectorObjects as $key => $value) {
             $objects[strtolower($key)] = $value;
         }
 
@@ -78,7 +78,7 @@ class ConnectorController extends FormController
             throw $this->createNotFoundException($this->get('translator')->trans('mautic.core.url.error.404'));
         }
 
-        $networkObject = $objects[$name];
+        $connectorObject = $objects[$name];
 
         // Get a list of custom form fields
         $fields = $this->factory->getModel('lead.field')->getEntities(array('filter' => array('isPublished' => true)));
@@ -97,10 +97,10 @@ class ConnectorController extends FormController
             uasort($fieldGroup, 'strnatcmp');
         }
 
-        $form = $this->createForm('connector_details', $networkObject->getConnectorSettings(), array(
-            'network'  => $networkObject->getConnectorSettings()->getName(),
+        $form = $this->createForm('connector_details', $connectorObject->getConnectorSettings(), array(
+            'connector'  => $connectorObject->getConnectorSettings()->getName(),
             'lead_fields' => $leadFields,
-            'network_object' => $networkObject,
+            'connector_object' => $connectorObject,
             'action'      => $this->generateUrl('mautic_integration_connector_edit', array('name' => $name))
         ));
 
@@ -108,14 +108,14 @@ class ConnectorController extends FormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($this->isFormValid($form)) {
                     $em          = $this->factory->getEntityManager();
-                    $entity      = $networkObject->getConnectorSettings();
-                    $network     = $entity->getName();
+                    $entity      = $connectorObject->getConnectorSettings();
+                    $connector     = $entity->getName();
                     $currentKeys = $entity->getApiKeys();
 
                     // Check to make sure secret keys were not wiped out
                     if (!empty($currentKeys['clientId'])) {
                         $newKeys = $entity->getApiKeys();
-                        if (!empty($currentKeys[$network]['clientSecret']) && empty($newKeys['clientSecret'])) {
+                        if (!empty($currentKeys[$connector]['clientSecret']) && empty($newKeys['clientSecret'])) {
                             $newKeys['clientSecret'] = $currentKeys['clientSecret'];
                             $entity->setApiKeys($newKeys);
                         }
@@ -126,7 +126,7 @@ class ConnectorController extends FormController
                         //make sure now non-existent aren't saved
                         $featureSettings               = $entity->getFeatureSettings();
                         if (isset($featureSettings['leadFields'])) {
-                            $fields                        = $networkHelper->getAvailableFields($network);
+                            $fields                        = $connectorHelper->getAvailableFields($connector);
                             $featureSettings['leadFields'] = array_intersect_key($featureSettings['leadFields'], $fields);
                             $entity->setFeatureSettings($featureSettings);
                         }
@@ -138,7 +138,7 @@ class ConnectorController extends FormController
                     $this->request->getSession()->getFlashBag()->add(
                         'notice',
                         $this->get('translator')->trans('mautic.integration.notice.saved', array(
-                            '%name%' => $network
+                            '%name%' => $connector
                         ), 'flashes')
                     );
                 }

@@ -7,13 +7,14 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticAddon\MauticSocialBundle\Network;
+namespace MauticAddon\MauticSocialBundle\Connector;
 use Mautic\IntegrationBundle\Entity\Connector;
+use Mautic\IntegrationBundle\Connector\AbstractConnector;
 
 /**
  * Class TwitterNetwork
  */
-class TwitterNetwork extends AbstractNetwork
+class TwitterNetwork extends AbstractConnector
 {
 
     /**
@@ -64,7 +65,7 @@ class TwitterNetwork extends AbstractNetwork
      */
     public function getOAuthLoginUrl()
     {
-        return $this->factory->getRouter()->generate('mautic_social_callback', array('network' => $this->getName()));
+        return $this->factory->getRouter()->generate('mautic_integration_oauth_callback', array('network' => $this->getName()));
     }
 
     /**

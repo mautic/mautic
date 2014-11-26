@@ -7,15 +7,15 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticAddon\MauticSocialBundle\Network;
+namespace Mautic\IntegrationBundle\Connector;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\IntegrationBundle\Entity\Connector;
 
 /**
- * Class AbstractNetwork
+ * Class AbstractConnector
  */
-abstract class AbstractNetwork
+abstract class AbstractConnector
 {
 
     /**
@@ -24,7 +24,7 @@ abstract class AbstractNetwork
     protected $factory;
 
     /**
-     * @var SocialNetwork
+     * @var Connector
      */
     protected $settings;
 
@@ -42,7 +42,7 @@ abstract class AbstractNetwork
     }
 
     /**
-     * Determines what priority the network should have against the other networks
+     * Determines what priority the connector should have against the other connectors
      *
      * @return int
      */
@@ -52,23 +52,23 @@ abstract class AbstractNetwork
     }
 
     /**
-     * Returns the name of the social network that must match the name of the file
+     * Returns the name of the social connector that must match the name of the file
      *
      * @return string
      */
     abstract public function getName();
 
     /**
-     * Returns the field the network needs in order to find the user
+     * Returns the field the connector needs in order to find the user
      *
      * @return mixed
      */
     abstract public function getIdentifierFields();
 
     /**
-     * Set the social network entity
+     * Set the social connector entity
      *
-     * @param SocialNetwork $settings
+     * @param Connector $settings
      */
     public function setConnectorSettings(Connector $settings)
     {
@@ -76,9 +76,9 @@ abstract class AbstractNetwork
     }
 
     /**
-     * Get the social network entity
+     * Get the social connector entity
      *
-     * @return SocialNetwork
+     * @return Connector
      */
     public function getConnectorSettings()
     {
@@ -92,8 +92,8 @@ abstract class AbstractNetwork
      */
     public function getOAuthLoginUrl()
     {
-        $callback = $this->factory->getRouter()->generate('mautic_social_callback',
-            array('network' => $this->getName()),
+        $callback = $this->factory->getRouter()->generate('mautic_integration_oauth_callback',
+            array('connector' => $this->getName()),
             true //absolute
         );
 
@@ -121,8 +121,8 @@ abstract class AbstractNetwork
         $request  = $this->factory->getRequest();
         $url      = $this->getAccessTokenUrl();
         $keys     = $this->settings->getApiKeys();
-        $callback = $this->factory->getRouter()->generate('mautic_social_callback',
-            array('network' => $this->getName()),
+        $callback = $this->factory->getRouter()->generate('mautic_integration_oauth_callback',
+            array('connector' => $this->getName()),
             true //absolute
         );
 
@@ -226,7 +226,7 @@ abstract class AbstractNetwork
     }
 
     /**
-     * Get a list of available fields from the social networking API
+     * Get a list of available fields from the connecting API
      *
      * @return array
      */
@@ -246,7 +246,7 @@ abstract class AbstractNetwork
     }
 
     /**
-     * Get a list of supported features for this social network
+     * Get a list of supported features for this connector
      *
      * @return array
      */
@@ -322,7 +322,7 @@ abstract class AbstractNetwork
     }
 
     /**
-     * Gets the ID of the user for the network
+     * Gets the ID of the user for the connector
      *
      * @param       $identifier
      * @param array $socialCache
@@ -466,7 +466,7 @@ abstract class AbstractNetwork
     }
 
     /**
-     * Check if the network connector is a core object
+     * Check if the connector is a core object
      *
      * @return bool
      */
@@ -476,7 +476,7 @@ abstract class AbstractNetwork
     }
 
     /**
-     * Set if the network connector is a core object
+     * Set if the connector is a core object
      *
      * @param bool $isCore
      *

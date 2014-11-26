@@ -16,9 +16,9 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
- * Class NetworkIntegrationHelper
+ * Class ConnectorIntegrationHelper
  */
-class NetworkIntegrationHelper
+class ConnectorIntegrationHelper
 {
 
     /**
@@ -35,7 +35,7 @@ class NetworkIntegrationHelper
     }
 
     /**
-     * Get a list of network helper classes
+     * Get a list of connector helper classes
      *
      * @param array|string $services
      * @param array        $withFeatures
@@ -43,12 +43,12 @@ class NetworkIntegrationHelper
      *
      * @return mixed
      */
-    public function getNetworkObjects($services = null, $withFeatures = null, $alphabetical = false)
+    public function getConnectorObjects($services = null, $withFeatures = null, $alphabetical = false)
     {
-        static $networks, $available;
+        static $connectors, $available;
 
-        if (empty($networks)) {
-            $available = $networks = array();
+        if (empty($connectors)) {
+            $available = $connectors = array();
 
             // And we'll be scanning the addon bundles for additional classes, so have that data on standby
             $addons  = $this->factory->getParameter('addon.bundles');
@@ -64,11 +64,11 @@ class NetworkIntegrationHelper
                 }
             }
 
-            // Scan the addons for network classes
+            // Scan the addons for connector classes
             foreach ($addons as $addon) {
-                if (is_dir($addon['directory'] . '/Network')) {
+                if (is_dir($addon['directory'] . '/Connector')) {
                     $finder = new Finder();
-                    $finder->files()->name('*Network.php')->in($addon['directory'] . '/Network');
+                    $finder->files()->name('*Connector.php')->in($addon['directory'] . '/Connector');
 
                     if ($alphabetical) {
                         $finder->sortByName();
@@ -76,35 +76,35 @@ class NetworkIntegrationHelper
 
                     foreach ($finder as $file) {
                         $available[] = array(
-                            'network' => substr($file->getBaseName(), 0, -11),
+                            'connector' => substr($file->getBaseName(), 0, -11),
                             'namespace' => str_replace('MauticAddon', '', $addon['bundle'])
                         );
                     }
                 }
             }
 
-            $networkSettings = $this->getConnectorSettings();
+            $connectorSettings = $this->getConnectorSettings();
 
             // Get all the addon integrations
             foreach ($available as $a) {
-                if (!isset($integrations[$a['network']])) {
-                    $class = "\\MauticAddon\\{$a['namespace']}\\Network\\{$a['network']}Network";
+                if (!isset($integrations[$a['connector']])) {
+                    $class = "\\MauticAddon\\{$a['namespace']}\\Connector\\{$a['connector']}Connector";
                     $reflectionClass = new \ReflectionClass($class);
                     if ($reflectionClass->isInstantiable()) {
-                        $networks[$a['network']] = new $class($this->factory);
-                        $networks[$a['network']]->setIsCore(false);
-                        if (!isset($networkSettings[$a['network']])) {
-                            $networkSettings[$a['network']] = new Connector();
-                            $networkSettings[$a['network']]->setName($a['network']);
+                        $connectors[$a['connector']] = new $class($this->factory);
+                        $connectors[$a['connector']]->setIsCore(false);
+                        if (!isset($connectorSettings[$a['connector']])) {
+                            $connectorSettings[$a['connector']] = new Connector();
+                            $connectorSettings[$a['connector']]->setName($a['connector']);
                         }
-                        $networks[$a['network']]->setConnectorSettings($networkSettings[$a['network']]);
+                        $connectors[$a['connector']]->setConnectorSettings($connectorSettings[$a['connector']]);
                     }
                 }
             }
 
             if (empty($alphabetical)) {
                 // Sort by priority
-                uasort($networks, function ($a, $b) {
+                uasort($connectors, function ($a, $b) {
                     $aP = (int)$a->getPriority();
                     $bP = (int)$b->getPriority();
 
@@ -117,13 +117,13 @@ class NetworkIntegrationHelper
         }
 
         if (!empty($services)) {
-            if (!is_array($services) && isset($networks[$services])) {
-                return array($services => $networks[$services]);
+            if (!is_array($services) && isset($connectors[$services])) {
+                return array($services => $connectors[$services]);
             } elseif (is_array($services)) {
                 $specific = array();
                 foreach ($services as $s) {
-                    if (isset($networks[$s])) {
-                        $specific[$s] = $networks[$s];
+                    if (isset($connectors[$s])) {
+                        $specific[$s] = $connectors[$s];
                     }
                 }
                 return $specific;
@@ -132,7 +132,7 @@ class NetworkIntegrationHelper
             }
         } elseif (!empty($withFeatures)) {
             $specific = array();
-            foreach ($networks as $n => $d) {
+            foreach ($connectors as $n => $d) {
                 $settings = $d->getConnectorSettings();
                 $features = $settings->getSupportedFeatures();
 
@@ -146,7 +146,7 @@ class NetworkIntegrationHelper
             return $specific;
         }
 
-        return $networks;
+        return $connectors;
     }
 
     /**
@@ -161,7 +161,7 @@ class NetworkIntegrationHelper
         static $fields = array();
 
         if (empty($fields)) {
-            $integrations = $this->getNetworkObjects();
+            $integrations = $this->getConnectorObjects();
             $translator   = $this->factory->getTranslator();
             foreach ($integrations as $s => $object) {
                 $fields[$s] = array();
@@ -271,38 +271,38 @@ class NetworkIntegrationHelper
     }
 
     /**
-     * Get the user's social profile data from cache or networks if indicated
+     * Get the user's social profile data from cache or connectors if indicated
      *
      * @param \Mautic\LeadBundle\Entity\Lead $lead
      * @param array                          $fields
      * @param bool                           $refresh
-     * @param string                         $specificNetwork
+     * @param string                         $specificConnector
      * @param bool                           $persistLead
      * @param bool                           $returnSettings
      *
      * @return array
      */
-    public function getUserProfiles($lead, $fields = array(), $refresh = false, $specificNetwork = null, $persistLead = true, $returnSettings = false)
+    public function getUserProfiles($lead, $fields = array(), $refresh = false, $specificConnector = null, $persistLead = true, $returnSettings = false)
     {
         $socialCache      = $lead->getSocialCache();
         $featureSettings  = array();
         if ($refresh) {
-            //regenerate from networks
+            //regenerate from connectors
             $now = new DateTimeHelper();
 
             //check to see if there are social profiles activated
-            $socialNetworks = $this->getNetworkObjects($specificNetwork, array('public_profile', 'public_activity'));
-            foreach ($socialNetworks as $network => $sn) {
+            $socialConnectors = $this->getConnectorObjects($specificConnector, array('public_profile', 'public_activity'));
+            foreach ($socialConnectors as $connector => $sn) {
                 $settings        = $sn->getConnectorSettings();
                 $features        = $settings->getSupportedFeatures();
                 $identifierField = $this->getUserIdentifierField($sn, $fields);
 
                 if ($returnSettings) {
-                    $featureSettings[$network] = $settings->getFeatureSettings();
+                    $featureSettings[$connector] = $settings->getFeatureSettings();
                 }
 
                 if ($identifierField && $settings->isPublished()) {
-                    $profile = (!isset($socialCache[$network])) ? array() : $socialCache[$network];
+                    $profile = (!isset($socialCache[$connector])) ? array() : $socialCache[$connector];
 
                     //clear the cache
                     unset($profile['profile'], $profile['activity']);
@@ -316,19 +316,19 @@ class NetworkIntegrationHelper
                     }
 
                     if (!empty($profile['profile']) || !empty($profile['activity'])) {
-                        if (!isset($socialCache[$network])) {
-                            $socialCache[$network] = array();
+                        if (!isset($socialCache[$connector])) {
+                            $socialCache[$connector] = array();
                         }
 
-                        $socialCache[$network]['profile']     = (!empty($profile['profile']))  ? $profile['profile'] : array();
-                        $socialCache[$network]['activity']    = (!empty($profile['activity'])) ? $profile['activity'] : array();
-                        $socialCache[$network]['lastRefresh'] = $now->toUtcString();
+                        $socialCache[$connector]['profile']     = (!empty($profile['profile']))  ? $profile['profile'] : array();
+                        $socialCache[$connector]['activity']    = (!empty($profile['activity'])) ? $profile['activity'] : array();
+                        $socialCache[$connector]['lastRefresh'] = $now->toUtcString();
                     } else {
-                        unset($socialCache[$network]);
+                        unset($socialCache[$connector]);
                     }
-                } elseif (isset($socialCache[$network])) {
-                    //network is now not applicable
-                    unset($socialCache[$network]);
+                } elseif (isset($socialCache[$connector])) {
+                    //connector is now not applicable
+                    unset($socialCache[$connector]);
                 }
             }
 
@@ -337,16 +337,16 @@ class NetworkIntegrationHelper
                 $this->factory->getEntityManager()->getRepository('MauticLeadBundle:Lead')->saveEntity($lead);
             }
         } elseif ($returnSettings) {
-            $socialNetworks = $this->getNetworkObjects($specificNetwork, array('public_profile', 'public_activity'));
-            foreach ($socialNetworks as $network => $sn) {
+            $socialConnectors = $this->getConnectorObjects($specificConnector, array('public_profile', 'public_activity'));
+            foreach ($socialConnectors as $connector => $sn) {
                 $settings                  = $sn->getConnectorSettings();
-                $featureSettings[$network] = $settings->getFeatureSettings();
+                $featureSettings[$connector] = $settings->getFeatureSettings();
             }
         }
 
-        if ($specificNetwork) {
-            return ($returnSettings) ? array(array($specificNetwork => $socialCache[$specificNetwork]), $featureSettings)
-                : array($specificNetwork => $socialCache[$specificNetwork]);
+        if ($specificConnector) {
+            return ($returnSettings) ? array(array($specificConnector => $socialCache[$specificConnector]), $featureSettings)
+                : array($specificConnector => $socialCache[$specificConnector]);
         }
 
         return ($returnSettings) ? array($socialCache, $featureSettings) : $socialCache;
@@ -354,13 +354,13 @@ class NetworkIntegrationHelper
 
     /**
      * @param      $lead
-     * @param bool $network
+     * @param bool $connector
      */
-    public function clearNetworkCache($lead, $network = false)
+    public function clearConnectorCache($lead, $connector = false)
     {
         $socialCache = $lead->getSocialCache();
-        if (!empty($network)) {
-            unset($socialCache[$network]);
+        if (!empty($connector)) {
+            unset($socialCache[$connector]);
         } else {
             $socialCache = array();
         }
@@ -377,9 +377,9 @@ class NetworkIntegrationHelper
         static $shareBtns = array();
 
         if (empty($shareBtns)) {
-            $socialNetworks = $this->getNetworkObjects(null, array('share_button'), true);
+            $socialConnectors = $this->getConnectorObjects(null, array('share_button'), true);
             $templating     = $this->factory->getTemplating();
-            foreach ($socialNetworks as $network => $details) {
+            foreach ($socialConnectors as $connector => $details) {
                 $settings        = $details->getConnectorSettings();
                 $featureSettings = $settings->getFeatureSettings();
                 $apiKeys         = $settings->getApiKeys();
@@ -388,7 +388,7 @@ class NetworkIntegrationHelper
                 //add the api keys for use within the share buttons
                 // TODO - The template path needs to be extended to support addons
                 $shareSettings['keys'] = $apiKeys;
-                $shareBtns[$network]   = $templating->render("MauticSocialBundle:Network/$network:share.html.php", array(
+                $shareBtns[$connector]   = $templating->render("MauticSocialBundle:Connector/$connector:share.html.php", array(
                     'settings' => $shareSettings,
                 ));
             }
@@ -397,21 +397,21 @@ class NetworkIntegrationHelper
     }
 
     /**
-     * Loops through field values available and finds the field the network needs to obtain the user
+     * Loops through field values available and finds the field the connector needs to obtain the user
      *
-     * @param $networkObject
+     * @param $connectorObject
      * @param $fields
      * @return bool
      */
-    public function getUserIdentifierField($networkObject, $fields)
+    public function getUserIdentifierField($connectorObject, $fields)
     {
-        $identifierField = $networkObject->getIdentifierFields();
+        $identifierField = $connectorObject->getIdentifierFields();
         $identifier      = (is_array($identifierField)) ? array() : false;
         $matchFound      = false;
 
         $findMatch = function ($f, $fields) use(&$identifierField, &$identifier, &$matchFound) {
             if (is_array($identifier)) {
-                //there are multiple fields the network can identify by
+                //there are multiple fields the connector can identify by
                 foreach ($identifierField as $idf) {
                     $value = (is_array($fields[$f]) && isset($fields[$f]['value'])) ? $fields[$f]['value'] : $fields[$f];
 
@@ -457,20 +457,20 @@ class NetworkIntegrationHelper
     }
 
     /**
-     * Get the path to the network's icon relative to the site root
+     * Get the path to the connector's icon relative to the site root
      *
-     * @param $network
+     * @param $connector
      *
      * @return string
      */
-    public function getIconPath($network)
+    public function getIconPath($connector)
     {
         $systemPath  = $this->factory->getSystemPath('root');
         $genericIcon = 'app/bundles/IntegrationBundle/Assets/img/generic.png';
-        $name        = $network->getConnectorSettings()->getName();
+        $name        = $connector->getConnectorSettings()->getName();
 
         // For non-core bundles, we need to extract out the bundle's name to figure out where in the filesystem to look for the icon
-        $className = get_class($network);
+        $className = get_class($connector);
         $exploded  = explode('\\', $className);
         $icon      = 'addons/' . $exploded[1] . '/Assets/img/' . strtolower($name) . '.png';
 

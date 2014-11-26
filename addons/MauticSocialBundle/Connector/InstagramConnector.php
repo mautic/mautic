@@ -7,12 +7,13 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticAddon\MauticSocialBundle\Network;
+namespace MauticAddon\MauticSocialBundle\Connector;
+use Mautic\IntegrationBundle\Connector\AbstractConnector;
 
 /**
- * Class InstagramNetwork
+ * Class InstagramConnector
  */
-class InstagramNetwork extends AbstractNetwork
+class InstagramConnector extends AbstractConnector
 {
     /**
      * {@inheritdoc}

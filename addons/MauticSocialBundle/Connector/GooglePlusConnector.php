@@ -7,12 +7,13 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticAddon\MauticSocialBundle\Network;
+namespace MauticAddon\MauticSocialBundle\Connector;
+use Mautic\IntegrationBundle\Connector\AbstractConnector;
 
 /**
- * Class GooglePlusNetwork
+ * Class GooglePlusConnector
  */
-class GooglePlusNetwork extends AbstractNetwork
+class GooglePlusConnector extends AbstractConnector
 {
     /**
      * {@inheritdoc}
@@ -179,7 +180,7 @@ class GooglePlusNetwork extends AbstractNetwork
                         break;
                     case 'array_object':
                         if ($field == "urls") {
-                            $socialProfileUrls = $this->factory->getNetworkIntegrationHelper()->getSocialProfileUrlRegex();
+                            $socialProfileUrls = $this->factory->getConnectorIntegrationHelper()->getSocialProfileUrlRegex();
                             foreach ($values as $k => $v) {
                                 $socialMatch = false;
                                 foreach ($socialProfileUrls as $service => $regex) {

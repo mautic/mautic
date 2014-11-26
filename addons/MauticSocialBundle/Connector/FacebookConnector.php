@@ -7,12 +7,13 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticAddon\MauticSocialBundle\Network;
+namespace MauticAddon\MauticSocialBundle\Connector;
+use Mautic\IntegrationBundle\Connector\AbstractConnector;
 
 /**
- * Class FacebookNetwork
+ * Class FacebookConnector
  */
-class FacebookNetwork extends AbstractNetwork
+class FacebookConnector extends AbstractConnector
 {
 
     /**

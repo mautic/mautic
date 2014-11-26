@@ -12,6 +12,15 @@ use Symfony\Component\Routing\Route;
 
 $collection = new RouteCollection();
 
+
+$collection->add('mautic_integration_oauth_callback', new Route('/integrations/connectors/oauth2callback/{connector}',
+    array('_controller' => 'MauticIntegrationBundle:Auth:oAuth2Callback')
+));
+
+$collection->add('mautic_integration_oauth_postauth', new Route('/integrations/connectors/oauth2/status',
+    array('_controller' => 'MauticIntegrationBundle:Auth:oAuthStatus')
+));
+
 $collection->add('mautic_integration_connector_index', new Route('/integrations/connectors',
     array('_controller' => 'MauticIntegrationBundle:Connector:index')
 ));

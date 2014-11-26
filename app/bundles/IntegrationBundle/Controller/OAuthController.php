@@ -7,77 +7,77 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticAddon\MauticSocialBundle\Controller;
+namespace Mautic\IntegrationBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
- * Class SocialController
+ * Class OAuthController
  */
-class SocialController extends FormController
+class OAuthController extends FormController
 {
     /**
-     * @param string $network
+     * @param string $connector
      *
      * @return JsonResponse
      */
-    public function oAuth2CallbackAction($network)
+    public function oAuth2CallbackAction($connector)
     {
         $isAjax = $this->request->isXmlHttpRequest();
 
-        /** @var \Mautic\IntegrationBundle\Helper\NetworkIntegrationHelper $networkHelper */
-        $networkHelper  = $this->container->get('mautic.network.integration');
-        $networkObjects = $networkHelper->getNetworkObjects(null, null, true);
+        /** @var \Mautic\IntegrationBundle\Helper\ConnectorIntegrationHelper $connectorHelper */
+        $connectorHelper  = $this->container->get('mautic.connector.integration');
+        $connectorObjects = $connectorHelper->getConnectorObjects(null, null, true);
 
-        // We receive a lowercase name, so we need to convert the $networkObjects array keys to lowercase
+        // We receive a lowercase name, so we need to convert the $connectorObjects array keys to lowercase
         $objects = array();
 
-        foreach ($networkObjects as $key => $value) {
+        foreach ($connectorObjects as $key => $value) {
             $objects[strtolower($key)] = $value;
         }
 
         //check to see if the service exists
-        if (!array_key_exists(strtolower($network), $objects)) {
-            $this->request->getSession()->getFlashBag()->add('error', $network . ' not found!');
+        if (!array_key_exists(strtolower($connector), $objects)) {
+            $this->request->getSession()->getFlashBag()->add('error', $connector . ' not found!');
             if ($isAjax) {
-                return new JsonResponse(array('url' => $this->generateUrl('mautic_social_postauth')));
+                return new JsonResponse(array('url' => $this->generateUrl('mautic_integration_oauth_postauth')));
             } else {
-                return $this->render('MauticSocialBundle:Social:postauth.html.php');
+                return $this->render('MauticIntegrationBundle:Auth:postauth.html.php');
             }
         }
 
         $session    = $this->factory->getSession();
-        $state      = $session->get($network . '_csrf_token', false);
+        $state      = $session->get($connector . '_csrf_token', false);
         $givenState = ($isAjax) ? $this->request->request->get('state') : $this->request->get('state');
         if ($state && $state !== $givenState) {
             $this->request->getSession()->getFlashBag()->add('error', 'Invalid CSRF token!');
             if ($isAjax) {
-                return new JsonResponse(array('url' => $this->generateUrl('mautic_social_postauth')));
+                return new JsonResponse(array('url' => $this->generateUrl('mautic_integration_oauth_postauth')));
             } else {
-                return $this->render('MauticSocialBundle:Social:postauth.html.php');
+                return $this->render('MauticIntegrationBundle:Auth:postauth.html.php');
             }
         }
 
         if (!$isAjax) {
             //redirected from SM site with code so obtain access_token via ajax
 
-            return $this->render('MauticSocialBundle:Social:auth.html.php', array(
-                'network'     => $network,
+            return $this->render('MauticIntegrationBundle:Auth:auth.html.php', array(
+                'connector'     => $connector,
                 'csrfToken'   => $state,
                 'code'        => $this->request->get('code'),
-                'callbackUrl' => $this->generateUrl('mautic_social_callback', array('network' => $network), true)
+                'callbackUrl' => $this->generateUrl('mautic_integration_oauth_callback', array('connector' => $connector), true)
             ));
         }
 
         //access token obtained so now get it and save it
-        $session->remove($network . '_csrf_token');
+        $session->remove($connector . '_csrf_token');
 
         //make the callback to the service to get the access code
         $clientId     = $this->request->request->get('clientId');
         $clientSecret = $this->request->request->get('clientSecret');
 
-        list($entity, $error) = $networkObjects[$network]->oAuthCallback($clientId, $clientSecret);
+        list($entity, $error) = $connectorObjects[$connector]->oAuthCallback($clientId, $clientSecret);
 
         //check for error
         if ($error) {
@@ -95,7 +95,7 @@ class SocialController extends FormController
             $this->get('translator')->trans($message, $params, 'flashes')
         );
 
-        return new JsonResponse(array('url' => $this->generateUrl('mautic_social_postauth')));
+        return new JsonResponse(array('url' => $this->generateUrl('mautic_integration_oauth_postauth')));
     }
 
     /**
@@ -103,6 +103,6 @@ class SocialController extends FormController
      */
     public function oAuthStatusAction()
     {
-        return $this->render('MauticSocialBundle:Social:postauth.html.php');
+        return $this->render('MauticIntegrationBundle:Auth:postauth.html.php');
     }
 }
