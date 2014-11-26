@@ -1,7 +1,7 @@
 <?php
 //Note Mautic specific bundles so they can be applied as needed without having to specify them individually
 $buildBundles = function($namespace, $bundle) use ($container) {
-    if (strpos($namespace, 'Mautic') !== false) {
+    if (strpos($namespace, 'Mautic\\') !== false) {
         $bundleBase = str_replace('Mautic', '', $bundle);
         $v = array(
             "base"      => str_replace('Bundle', '', $bundleBase),
@@ -17,7 +17,7 @@ $buildBundles = function($namespace, $bundle) use ($container) {
 
 // Note MauticAddon bundles so they can be applied as needed
 $buildAddonBundles = function($namespace, $bundle) use ($container) {
-    if (strpos($namespace, 'MauticAddon') !== false) {
+    if (strpos($namespace, 'MauticAddon\\') !== false) {
         $bundleBase = str_replace('Mautic', '', $bundle);
         $v = array(
             "base"      => str_replace('Bundle', '', $bundleBase),
