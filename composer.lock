@@ -1544,7 +1544,7 @@
                     "email": "stof@notk.org"
                 },
                 {
-                    "name": "KnpLabs",
+                    "name": "Knplabs",
                     "homepage": "http://knplabs.com"
                 },
                 {
@@ -2866,7 +2866,9 @@
             "time": "2014-09-22 14:56:14"
         }
     ],
-    "aliases": [],
+    "aliases": [
+
+    ],
     "minimum-stability": "stable",
     "stability-flags": {
         "symfony/event-dispatcher": 20,
@@ -2886,5 +2888,7 @@
     "platform": {
         "php": ">=5.3.7"
     },
-    "platform-dev": []
+    "platform-dev": [
+
+    ]
 }
