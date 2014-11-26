@@ -99,7 +99,7 @@ class PublicController extends CommonFormController
 
                     if (count($variants)) {
                         //check to see if this user has already been displayed a specific variant
-                        $variantCookie = $this->request->cookies->get('mautic_variant_' . $entity->getId());
+                        $variantCookie = $this->request->cookies->get('mautic_page_' . $entity->getId());
 
                         if (!empty($variantCookie) && isset($variants[$variantCookie])) {
                             //if not the parent, show the specific variant already displayed to the visitor
@@ -122,9 +122,11 @@ class PublicController extends CommonFormController
                             //find the one with the most difference from weight
                             $greatestDiff = min($byWeight);
                             $useId        = array_search($greatestDiff, $byWeight);
+
+                            //set the cookie - 14 days
+                            setcookie('mautic_page_' . $entity->getId(), $useId, (time() + 3600 * 24 * 14), '/');
+
                             if ($useId != $entity->getId()) {
-                                //set the cookie - 14 days
-                                setcookie('mautic_variant_' . $entity->getId(), $useId, (time() + 3600 * 24 * 14));
                                 $entity = $childrenVariant[$useId];
                             }
                         }

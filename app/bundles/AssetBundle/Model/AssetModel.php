@@ -101,8 +101,8 @@ class AssetModel extends FormModel
                 $download->setSourceId($clickthrough['source'][1]);
             }
 
-            if (!empty($clickthrough['source'])) {
-
+            if (!empty($clickthrough['email'])) {
+                $download->setEmail($this->em->getReference('MauticEmailBundle:Email', $clickthrough['email']));
             }
         }
 
