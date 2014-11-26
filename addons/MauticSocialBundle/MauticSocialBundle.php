@@ -9,11 +9,14 @@
 
 namespace MauticAddon\MauticSocialBundle;
 
-use Mautic\CoreBundle\Bundle\IntegrationBundleBase;
+use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
  * Class MauticSocialBundle
+ *
+ * @package Mautic\LeadBundle
  */
-class MauticSocialBundle extends IntegrationBundleBase
+class MauticSocialBundle extends Bundle
 {
+
 }
