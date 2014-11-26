@@ -48,13 +48,12 @@ class ConfigPermissions extends AbstractPermissions
                 'full' => 'mautic.user.account.permissions.editall',
             ),
             'label'      => 'mautic.user.permissions.profile',
-            'label_attr' => array('class' => 'control-label'),
-            'expanded'   => true,
-            'multiple'   => true,
             'attr'       => array(
-                'onclick' => 'Mautic.onPermissionChange(this, event, \'user\')'
+                'onchange' => 'Mautic.onPermissionChange(this, \'user\')'
             ),
-            'data'       => (!empty($data['profile']) ? $data['profile'] : array())
+            'data'       => (!empty($data['profile']) ? $data['profile'] : array()),
+            'multiple' => true
+
         ));
     }
 }

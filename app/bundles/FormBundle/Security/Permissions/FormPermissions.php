@@ -9,7 +9,6 @@
 
 namespace Mautic\FormBundle\Security\Permissions;
 
-use Mautic\CategoryBundle\Helper\PermissionHelper;
 use Symfony\Component\Form\FormBuilderInterface;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 
@@ -44,16 +43,5 @@ class FormPermissions extends AbstractPermissions
     {
         $this->addStandardFormFields('form', 'categories', $builder, $data);
         $this->addExtendedFormFields('form', 'forms', $builder, $data);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function analyzePermissions(array &$permissions)
-    {
-        parent::analyzePermissions($permissions);
-
-        //analyze category permissions
-        PermissionHelper::analyzePermissions('form', 'forms', $permissions);
     }
 }

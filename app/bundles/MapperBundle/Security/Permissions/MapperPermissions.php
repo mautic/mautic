@@ -55,10 +55,9 @@ class MapperPermissions extends AbstractPermissions
                 'full'         => 'mautic.core.permissions.manage'
             ),
             'label'    => 'mautic.mapper.permissions.config',
-            'expanded' => true,
             'multiple' => true,
             'attr'     => array(
-                'onclick' => 'Mautic.onPermissionChange(this, event, \'mapper\')'
+                'onchange' => 'Mautic.onPermissionChange(this, \'mapper\')'
             ),
             'data'     => (!empty($data['config']) ? $data['config'] : array())
         ));

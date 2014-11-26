@@ -9,7 +9,6 @@
 
 namespace Mautic\CampaignBundle\Security\Permissions;
 
-use Mautic\CategoryBundle\Helper\PermissionHelper;
 use Symfony\Component\Form\FormBuilderInterface;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 
@@ -47,15 +46,5 @@ class CampaignPermissions extends AbstractPermissions
     {
         $this->addStandardFormFields('campaign', 'categories', $builder, $data);
         $this->addStandardFormFields('campaign', 'campaigns', $builder, $data);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function analyzePermissions (array &$permissions)
-    {
-        parent::analyzePermissions($permissions);
-
-        PermissionHelper::analyzePermissions('campaign', 'campaigns', $permissions);
     }
 }

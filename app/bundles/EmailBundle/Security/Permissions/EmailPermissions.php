@@ -9,7 +9,6 @@
 
 namespace Mautic\EmailBundle\Security\Permissions;
 
-use Mautic\CategoryBundle\Helper\PermissionHelper;
 use Symfony\Component\Form\FormBuilderInterface;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 
@@ -50,17 +49,5 @@ class EmailPermissions extends AbstractPermissions
     {
         $this->addStandardFormFields('email', 'categories', $builder, $data);
         $this->addExtendedFormFields('email', 'emails', $builder, $data);
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @param array $permissions
-     */
-    public function analyzePermissions (array &$permissions)
-    {
-        parent::analyzePermissions($permissions);
-
-        PermissionHelper::analyzePermissions('email', 'emails', $permissions);
     }
 }

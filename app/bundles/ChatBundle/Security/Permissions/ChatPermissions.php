@@ -61,10 +61,9 @@ class ChatPermissions extends AbstractPermissions
                 'full'         => 'mautic.core.permissions.full'
             ),
             'label'    => 'mautic.chat.permissions.channels',
-            'expanded' => true,
             'multiple' => true,
             'attr'     => array(
-                'onclick' => 'Mautic.onPermissionChange(this, event, \'chat\')'
+                'onchange' => 'Mautic.onPermissionChange(this, \'chat\')'
             ),
             'data'     => (!empty($data['channels']) ? $data['channels'] : array())
         ));

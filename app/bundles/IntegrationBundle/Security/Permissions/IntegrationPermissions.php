@@ -9,7 +9,6 @@
 
 namespace Mautic\IntegrationBundle\Security\Permissions;
 
-use Mautic\CategoryBundle\Helper\PermissionHelper;
 use Symfony\Component\Form\FormBuilderInterface;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 

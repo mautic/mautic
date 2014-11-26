@@ -9,7 +9,6 @@
 
 namespace Mautic\PointBundle\Security\Permissions;
 
-use Mautic\CategoryBundle\Helper\PermissionHelper;
 use Symfony\Component\Form\FormBuilderInterface;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 
@@ -47,16 +46,5 @@ class PointPermissions extends AbstractPermissions
         $this->addStandardFormFields('point', 'categories', $builder, $data);
         $this->addStandardFormFields('point', 'points', $builder, $data);
         $this->addStandardFormFields('point', 'triggers', $builder, $data);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function analyzePermissions(array &$permissions)
-    {
-        parent::analyzePermissions($permissions);
-
-        PermissionHelper::analyzePermissions('point', 'points', $permissions);
-        PermissionHelper::analyzePermissions('point', 'triggers', $permissions);
     }
 }

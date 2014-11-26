@@ -67,10 +67,9 @@ class LeadPermissions extends AbstractPermissions
                 'full'         => 'mautic.core.permissions.full'
             ),
             'label'    => 'mautic.lead.permissions.lists',
-            'expanded' => true,
             'multiple' => true,
             'attr'     => array(
-                'onclick' => 'Mautic.onPermissionChange(this, event, \'lead\')'
+                'onchange' => 'Mautic.onPermissionChange(this, \'lead\')'
             ),
             'data'     => (!empty($data['lists']) ? $data['lists'] : array())
         ));
@@ -80,10 +79,9 @@ class LeadPermissions extends AbstractPermissions
                 'full' => 'mautic.lead.field.permissions.full'
             ),
             'label'    => 'mautic.lead.permissions.fields',
-            'expanded' => true,
             'multiple' => true,
             'attr'     => array(
-                'onclick' => 'Mautic.onPermissionChange(this, event, \'lead\')'
+                'onchange' => 'Mautic.onPermissionChange(this, \'lead\')'
             ),
             'data'     => (!empty($data['fields']) ? $data['fields'] : array())
         ));
@@ -91,23 +89,21 @@ class LeadPermissions extends AbstractPermissions
 
     /**
      * {@inheritdoc}
-     *
-     * @param array $permissions
      */
-    public function analyzePermissions (array &$permissions)
+    public function analyzePermissions(array &$permissions, $allPermissions, $isSecondRound = false)
     {
-        parent::analyzePermissions($permissions);
-
-        $leadPermissions = (isset($permissions['lead:leads'])) ? $permissions['lead:leads'] : array();
+        parent::analyzePermissions($permissions, $allPermissions, $isSecondRound);
 
         //make sure the user has access to own leads as well if they have access to lists, notes or fields
-        if ((array_key_exists("lead:lists", $permissions) ||
-            array_key_exists("lead:fields", $permissions) ||
-            array_key_exists("lead:notes", $permissions)) &&
-            (!in_array("full", $leadPermissions) && !in_array("viewown", $leadPermissions) &&
-                !in_array("viewother", $leadPermissions))) {
-                $permissions['lead:leads'][] = 'viewown';
+        $viewPerms = array('viewown', 'viewother', 'full');
+        if (
+            (!isset($permissions['leads']) || (array_intersect($viewPerms, $permissions['leads']) == $viewPerms)) &&
+            (isset($permissions["lists"]) || isset($permission["fields"]))
+        ) {
+            $permissions['leads'][] = 'viewown';
         }
+
+        return false;
     }
 
     /**

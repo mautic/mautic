@@ -67,10 +67,9 @@ class ReportPermissions extends AbstractPermissions
                 'full'         => 'mautic.core.permissions.full'
             ),
             'label'    => 'mautic.report.permissions.reports',
-            'expanded' => true,
             'multiple' => true,
             'attr'     => array(
-                'onclick' => 'Mautic.onPermissionChange(this, event, \'form\')'
+                'onchange' => 'Mautic.onPermissionChange(this, \'form\')'
             ),
             'data'     => (!empty($data['reports']) ? $data['reports'] : array())
             )

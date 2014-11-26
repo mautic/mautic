@@ -42,7 +42,8 @@ class ButtonGroupType extends AbstractType
             'expanded'      => true,
             'multiple'      => false,
             'empty_value'   => false,
-            'required'      => false
+            'required'      => false,
+            'label_attr'    => array('class' => 'control-label'),
         ));
     }
 }

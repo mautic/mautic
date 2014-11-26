@@ -52,10 +52,9 @@ class ApiPermissions extends AbstractPermissions
                 'full'     => 'mautic.api.permissions.granted',
             ),
             'label'    => 'mautic.api.permissions.apiaccess',
-            'expanded' => true,
             'multiple' => true,
             'attr'     => array(
-                'onclick' => 'Mautic.onPermissionChange(this, event, \'api\')'
+                'onchange' => 'Mautic.onPermissionChange(this, \'api\')'
             ),
             'data'     => (!empty($data['access']) ? $data['access'] : array())
         ));

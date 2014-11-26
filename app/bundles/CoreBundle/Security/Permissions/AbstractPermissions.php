@@ -9,7 +9,6 @@
 
 namespace Mautic\CoreBundle\Security\Permissions;
 
-use Mautic\CategoryBundle\Helper\PermissionHelper;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
@@ -209,22 +208,16 @@ abstract class AbstractPermissions
     }
 
     /**
-     * Gives the bundle the opportunity to force certain permissions if another is selected
-     *
      * @param array $permissions
+     * @param       $allPermissions
+     * @param bool  $isSecondRound
      *
-     * @return void
+     * @return bool Return true if a second round is required after all other bundles have analyzed it's permissions
      */
-    public function analyzePermissions(array &$permissions)
+    public function analyzePermissions(array &$permissions, $allPermissions, $isSecondRound = false)
     {
-        foreach ($permissions as $permissionGroup => &$perms) {
-            list($bundle, $level) = explode(':', $permissionGroup);
-
-            if ($bundle != $this->getName()) {
-                continue;
-            }
-
-            $updatedPerms = $perms;
+        $hasViewAccess = false;
+        foreach ($permissions as $level => &$perms) {
             foreach ($perms as $perm) {
                 $required = array();
                 switch ($perm) {
@@ -251,15 +244,21 @@ abstract class AbstractPermissions
                 if (!empty($required)) {
                     foreach ($required as $r) {
                         list($ignore, $r) = $this->getSynonym($level, $r);
-                        if ($this->isSupported($level, $r) && !in_array($r, $updatedPerms)) {
-                            $updatedPerms[] = $r;
+                        if ($this->isSupported($level, $r) && !in_array($r, $perms)) {
+                            $perms[] = $r;
                         }
                     }
                 }
             }
-
-            $perms = $updatedPerms;
+            $hasViewAccess = (!$hasViewAccess && (in_array('view', $perms) || in_array('viewown', $perms)));
         }
+
+        //check categories for view permissions and add it if the user has view access to the other permissions
+        if (isset($this->permissions['categories']) && $hasViewAccess && (!isset($permissions['categories']) || !in_array('view', $permissions['categories']))) {
+            $permissions['categories'][] = 'view';
+        }
+
+        return false;
     }
 
     /**
@@ -357,22 +356,22 @@ abstract class AbstractPermissions
             'view'   => 'mautic.core.permissions.view',
             'edit'   => 'mautic.core.permissions.edit',
             'create' => 'mautic.core.permissions.create',
-            'delete' => 'mautic.core.permissions.delete',
-            'full'   => 'mautic.core.permissions.full'
+            'delete' => 'mautic.core.permissions.delete'
         );
 
         if ($includePublish) {
             $choices['publish'] = 'mautic.core.permissions.publish';
         }
 
+        $choices['full'] = 'mautic.core.permissions.full';
+
         $label = ($level == "categories") ? "mautic.category.permissions.categories" : "mautic.$bundle.permissions.$level";
         $builder->add("$bundle:$level", 'button_group', array(
             'choices'  => $choices,
             'label'    => $label,
-            'expanded' => true,
             'multiple' => true,
             'attr'     => array(
-                'onclick' => 'Mautic.onPermissionChange(this, event, \''.$bundle.'\')'
+                'onchange' => 'Mautic.onPermissionChange(this, \''.$bundle.'\')'
             ),
             'data'     => (!empty($data[$level]) ? $data[$level] : array())
         ));
@@ -418,10 +417,9 @@ abstract class AbstractPermissions
         $builder->add("$bundle:$level", 'button_group', array(
             'choices'  => $choices,
             'label'    => "mautic.$bundle.permissions.$level",
-            'expanded' => true,
             'multiple' => true,
             'attr'     => array(
-                'onclick' => 'Mautic.onPermissionChange(this, event, \''.$bundle.'\')'
+                'onchange' => 'Mautic.onPermissionChange(this, \''.$bundle.'\')'
             ),
             'data'     => (!empty($data[$level]) ? $data[$level] : array())
         ));
@@ -497,10 +495,9 @@ abstract class AbstractPermissions
         $builder->add("$bundle:$level", 'button_group', array(
                 'choices'  => $choices,
                 'label'    => "mautic.$bundle.permissions.$level",
-                'expanded' => true,
                 'multiple' => true,
                 'attr'     => array(
-                    'onclick' => 'Mautic.onPermissionChange(this, event, \''.$bundle.'\')'
+                    'onchange' => 'Mautic.onPermissionChange(this, \''.$bundle.'\')'
                 ),
                 'data'     => (!empty($data[$level]) ? $data[$level] : array())
             )

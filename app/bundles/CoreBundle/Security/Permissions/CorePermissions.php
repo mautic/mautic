@@ -149,33 +149,59 @@ class CorePermissions
 
         //give bundles an opportunity to analyze and adjust permissions based on others
         $classes = $this->getPermissionClasses();
-        foreach ($classes as $class) {
-            $class->analyzePermissions($permissions);
+
+        //bust out permissions into their respective bundles
+        $bundlePermissions = array();
+        foreach ($permissions as $permission => $perms) {
+            list ($bundle, $level) = explode(':', $permission);
+            $bundlePermissions[$bundle][$level] = $perms;
+        }
+
+        $bundles = array_keys($classes);
+
+        foreach ($bundles as $bundle) {
+            if (!isset($bundlePermissions[$bundle])) {
+                $bundlePermissions[$bundle] = array();
+            }
+        }
+
+        //do a first round to give bundles a chance to update everything and give an opportunity to require a second round
+        //if the permission it is looking for from another bundle is not configured yet
+        $secondRound = array();
+        foreach ($classes as $bundle => $class) {
+            $needsRoundTwo = $class->analyzePermissions($bundlePermissions[$bundle], $bundlePermissions);
+            if ($needsRoundTwo) {
+                $secondRound[] = $bundle;
+            }
+        }
+
+        foreach ($secondRound as $bundle) {
+            $classes[$bundle]->analyzePermissions($bundlePermissions[$bundle], $bundlePermissions, true);
         }
 
         //create entities
-        foreach ($permissions as $key => $perms) {
-            list($bundle, $name) = explode(":", $key);
+        foreach ($bundlePermissions as $bundle => $permissions) {
+            foreach ($permissions as $name => $perms) {
+                $entity = new Permission();
 
-            $entity = new Permission();
+                //strtolower to ensure consistency
+                $entity->setBundle(strtolower($bundle));
+                $entity->setName(strtolower($name));
 
-            //strtolower to ensure consistency
-            $entity->setBundle(strtolower($bundle));
-            $entity->setName(strtolower($name));
+                $bit   = 0;
+                $class = $this->getPermissionClass($bundle);
 
-            $bit   = 0;
-            $class = $this->getPermissionClass($bundle);
+                foreach ($perms as $perm) {
+                    //get the bit for the perm
+                    if (!$class->isSupported($name, $perm)) {
+                        throw new \InvalidArgumentException("$perm does not exist for $bundle:$name");
+                    }
 
-            foreach ($perms as $perm) {
-                //get the bit for the perm
-                if (!$class->isSupported($name, $perm)) {
-                    throw new \InvalidArgumentException("$perm does not exist for $bundle:$name");
+                    $bit += $class->getValue($name, $perm);
                 }
-
-                $bit += $class->getValue($name, $perm);
+                $entity->setBitwise($bit);
+                $entities[] = $entity;
             }
-            $entity->setBitwise($bit);
-            $entities[] = $entity;
         }
 
         return $entities;
