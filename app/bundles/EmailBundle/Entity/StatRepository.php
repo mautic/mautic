@@ -39,9 +39,9 @@ class StatRepository extends CommonRepository
                 $q->expr()->eq('s.trackingHash', ':hash')
             )
             ->setParameter('hash', $trackingHash);
-        $result = $q->getQuery()->getSingleResult();
+        $result = $q->getQuery()->getResult();
 
-        return $result;
+        return ($result != null) ? $result[0] : $result;
     }
 
     /**
