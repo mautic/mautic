@@ -304,7 +304,7 @@ class SubmissionRepository extends CommonRepository
     public function getSubmissionCountsByPage($pageId, \DateTime $fromDate = null)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
-        $q->select('count(distinct(s.tracking_id)) as submissions, s.page_id, p.title, p.alias, p.variant_hits')
+        $q->select('count(distinct(s.tracking_id)) as submissions, s.page_id as id, p.title, p.alias, p.variant_hits as hits')
             ->from(MAUTIC_TABLE_PREFIX.'form_submissions', 's')
             ->join('s', MAUTIC_TABLE_PREFIX.'pages', 'p', 's.page_id = p.id');
 
@@ -315,6 +315,44 @@ class SubmissionRepository extends CommonRepository
         } else {
             $q->where($q->expr()->eq('s.page_id', ':page'))
                 ->setParameter('page', (int) $pageId);
+        }
+
+        if ($fromDate != null) {
+            $dh = new DateTimeHelper($fromDate);
+            $q->andWhere($q->expr()->gte('s.date_submitted', ':date'))
+                ->setParameter('date', $dh->toUtcString());
+        }
+
+        $results = $q->execute()->fetchAll();
+
+        return $results;
+    }
+
+    /**
+     * Get submission count by email by linking emails that have been associated with a page hit that has the
+     * same tracking ID as a form submission tracking ID and thus assumed happened in the same session
+     *
+     * @param           $emailId
+     * @param \DateTime $fromDate
+     *
+     * @return mixed
+     */
+    public function getSubmissionCountsByEmail($emailId, \DateTime $fromDate = null)
+    {
+        //link email to page hit tracking id to form submission tracking id
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->select('count(distinct(s.tracking_id)) as submissions, e.id, e.subject as title, e.variant_sent_count as hits')
+            ->from(MAUTIC_TABLE_PREFIX.'form_submissions', 's')
+            ->join('s', MAUTIC_TABLE_PREFIX.'page_hits', 'h', 's.tracking_id = h.tracking_id')
+            ->join('h', MAUTIC_TABLE_PREFIX.'emails', 'e', 'h.email_id = e.id');
+
+        if (is_array($emailId)) {
+            $q->where($q->expr()->in('e.id', $emailId))
+                ->groupBy('e.id');
+
+        } else {
+            $q->where($q->expr()->eq('e.id', ':id'))
+                ->setParameter('id', (int) $emailId);
         }
 
         if ($fromDate != null) {

@@ -28,7 +28,7 @@ class PageSubscriber extends CommonSubscriber
     {
         return array(
             PageEvents::PAGE_ON_DISPLAY => array('onPageDisplay', 0),
-            PageEvents::PAGE_ON_BUILD   => array('OnPageBuild', 0)
+            PageEvents::PAGE_ON_BUILD   => array('onPageBuild', 0)
         );
     }
 

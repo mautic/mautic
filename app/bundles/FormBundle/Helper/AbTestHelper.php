@@ -10,6 +10,7 @@
 namespace Mautic\FormBundle\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\PageBundle\Entity\Page;
 
 /**
@@ -31,45 +32,53 @@ class AbTestHelper
     {
         $repo = $factory->getEntityManager()->getRepository('MauticFormBundle:Submission');
 
-        $pageIds = array($parent->getId());
+        //if this is an email A/B test, then link email to page to form submission
+        //if it is a page A/B test, then link form submission to page
+        $type = ($parent instanceof Email) ? 'email' : 'page';
+
+        $ids = array($parent->getId());
 
         foreach ($children as $c) {
             if ($c->isPublished()) {
-                $id        = $c->getId();
-                $pageIds[] = $id;
+                $id    = $c->getId();
+                $ids[] = $id;
             }
         }
 
         $startDate = $parent->getVariantStartDate();
-        if ($startDate != null && !empty($pageIds)) {
-            $counts = $repo->getSubmissionCountsByPage($pageIds, $startDate);
+        if ($startDate != null && !empty($ids)) {
+            $counts = ($type == "page") ? $repo->getSubmissionCountsByPage($ids, $startDate) : $repo->getSubmissionCountsByEmail($ids, $startDate);
 
             $translator = $factory->getTranslator();
             if ($counts) {
                 $submissions = $support = $data = array();
                 $hasResults  = array();
+
+                $submissionLabel = $translator->trans('mautic.form.abtest.label.submissions');
+                $hitLabel        = ($type == 'page') ? $translator->trans('mautic.form.abtest.label.hits') : $translator->trans('mautic.form.abtest.label.sentemils');
+
                 foreach ($counts as $stats) {
-                    $submissionRate                 = ($stats['variant_hits']) ? round(($stats['submissions'] / $stats['variant_hits']) * 100, 2) : 0;
-                    $submissions[$stats['page_id']] = $submissionRate;
-                    $data[$translator->trans('mautic.form.abtest.label.submissions')][] = $stats['submissions'];
-                    $data[$translator->trans('mautic.form.abtest.label.hits')][]        = $stats['variant_hits'];
-                    $support['labels'][] = $stats['page_id'] . ':' . $stats['title'] . ' (' . $submissionRate . '%)';
-                    $hasResults[] = $stats['page_id'];
+                    $submissionRate            = ($stats['hits']) ? round(($stats['submissions'] / $stats['hits']) * 100, 2) : 0;
+                    $submissions[$stats['id']] = $submissionRate;
+                    $data[$submissionLabel][]  = $stats['submissions'];
+                    $data[$hitLabel][]         = $stats['hits'];
+                    $support['labels'][]       = $stats['id'] . ':' . $stats['title'] . ' (' . $submissionRate . '%)';
+                    $hasResults[]              = $stats['id'];
                 }
 
                 //make sure that parent and published children are included
                 if (!in_array($parent->getId(), $hasResults)) {
-                    $data[$translator->trans('mautic.form.abtest.label.submissions')][] = 0;
-                    $data[$translator->trans('mautic.form.abtest.label.hits')][]        = 0;
-                    $support['labels'][] = $parent->getId() . ':' . $parent->getTitle();;
+                    $data[$submissionLabel][] = 0;
+                    $data[$hitLabel][]        = 0;
+                    $support['labels'][]      = $parent->getId() . ':' . (($type == 'page') ? $parent->getTitle() : $parent->getSubject()) . ' (0%)';
                 }
 
                 foreach ($children as $c) {
                     if ($c->isPublished()) {
                         if (!in_array($c->getId(), $hasResults)) {
-                            $data[$translator->trans('mautic.form.abtest.label.submissions')][] = 0;
-                            $data[$translator->trans('mautic.form.abtest.label.hits')][]        = 0;
-                            $support['labels'][]                                                = $c->getId() . ':' . $c->getTitle();;
+                            $data[$submissionLabel][] = 0;
+                            $data[$hitLabel][]        = 0;
+                            $support['labels'][]      = $c->getId() . ':' . (($type == 'page') ? $c->getTitle() : $c->getSubject()) . ' (0%)';
                         }
                     }
                 }
@@ -77,10 +86,10 @@ class AbTestHelper
 
                 //set max for scales
                 $maxes = array();
-                foreach ( $support['data'] as $label => $data) {
+                foreach ($support['data'] as $label => $data) {
                     $maxes[] = max($data);
                 }
-                $top = max($maxes);
+                $top                   = max($maxes);
                 $support['step_width'] = (floor($top / 10) * 10) / 10;
 
                 //put in order from least to greatest just because
