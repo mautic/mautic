@@ -277,4 +277,40 @@ class StatRepository extends CommonRepository
         $results = $query->execute()->fetchAll();
         return $results;
     }
+
+    /**
+     * Get sent counts based grouped by email Id
+     *
+     * @param array $emailIds
+     *
+     * @return array
+     */
+    public function getSentCounts($emailIds = array(), \DateTime $fromDate = null)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->select('e.email_id, count(*) as sentCount')
+            ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'e')
+            ->where('e.is_failed = 0')
+            ->andWhere($q->expr()->in('e.email_id', $emailIds));
+
+        if ($fromDate !== null) {
+            //make sure the date is UTC
+            $dt = new DateTimeHelper($fromDate);
+            $q->andWhere(
+                $q->expr()->gte('e.date_read', $q->expr()->literal($dt->toUtcString()))
+            );
+        }
+        $q->groupBy('e.email_id');
+
+        //get a total number of sent emails first
+        $results = $q->execute()->fetchAll();
+
+        $counts = array();
+
+        foreach ($results as $r) {
+            $counts[$r['email_id']] = $r['sentCount'];
+        }
+
+        return $counts;
+    }
 }

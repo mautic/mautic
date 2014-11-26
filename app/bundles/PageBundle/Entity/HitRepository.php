@@ -120,14 +120,13 @@ class HitRepository extends CommonRepository
      * @param      $source
      * @param null $sourceId
      * @param null $fromDate
-     * @param null $emailIds
      *
      * @return array
      */
-    public function getHitsBySource($source, $sourceId = null, $fromDate = null, $emailIds = null)
+    public function getHitCountForSource($source, $sourceId = null, $fromDate = null, $code = 200)
     {
         $query = $this->createQueryBuilder('h');
-
+        $query->select("count(distinct(h.trackingId)) as hitCount");
         $query->andWhere($query->expr()->eq('h.source', $query->expr()->literal($source)));
 
         if ($sourceId != null) {
@@ -144,7 +143,49 @@ class HitRepository extends CommonRepository
                 ->setParameter('date', $fromDate);
         }
 
+        $query->andWhere($query->expr()->eq('h.code', (int) $code));
+
         return $hits = $query->getQuery()->getArrayResult();
+    }
+
+    /**
+     * Get an array of hits via an email clickthrough
+     *
+     * @param           $emailIds
+     * @param \DateTime $fromDate
+     * @param int       $code
+     *
+     * @return array
+     */
+    public function getEmailClickthroughHitCount($emailIds, \DateTime $fromDate = null, $code = 200)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+
+        if (!is_array($emailIds)) {
+            $emailIds = array($emailIds);
+        }
+
+        $q->select('count(distinct(h.tracking_id)) as hitCount, h.email_id')
+            ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h')
+            ->where($q->expr()->in('h.email_id', $emailIds))
+            ->groupBy('h.email_id');
+
+        if ($fromDate != null) {
+            $dateHelper = new DateTimeHelper($fromDate);
+            $q->andwhere($q->expr()->gte('h.date_hit', ':date'))
+                ->setParameter('date', $dateHelper->toUtcString());
+        }
+
+        $q->andWhere($q->expr()->eq('h.code', (int) $code));
+
+        $results = $q->execute()->fetchAll();;
+
+        $hits = array();
+        foreach ($results as $r) {
+            $hits[$r['email_id']] = $r['hitCount'];
+        }
+
+        return $hits;
     }
 
     /**

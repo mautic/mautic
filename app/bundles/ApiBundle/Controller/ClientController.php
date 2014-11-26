@@ -64,7 +64,7 @@ class ClientController extends FormController
                 'viewParameters'  => array('page' => $lastPage),
                 'contentTemplate' => 'MauticApiBundle:Client:index',
                 'passthroughVars' => array(
-                    'activeLink'    => '#mautic_client_index',
+                    'activeLink'    => 'mautic_client_index',
                     'mauticContent' => 'client'
                 )
             ));

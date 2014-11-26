@@ -47,6 +47,13 @@ class BuilderSubscriber extends CommonSubscriber
             'callback' => '\Mautic\EmailBundle\Helper\AbTestHelper::determineOpenRateWinner'
         );
         $event->addAbTestWinnerCriteria('email.openrate', $openRate);
+
+        $clickThrough = array(
+            'group'    => 'mautic.email.abtest.criteria',
+            'label'    => 'mautic.email.abtest.criteria.clickthrough',
+            'callback' => '\Mautic\EmailBundle\Helper\AbTestHelper::determineClickthroughRateWinner'
+        );
+        $event->addAbTestWinnerCriteria('email.clickthrough', $clickThrough);
     }
 
     public function onEmailGenerate(EmailSendEvent $event)
