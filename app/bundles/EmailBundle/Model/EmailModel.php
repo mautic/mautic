@@ -808,7 +808,7 @@ class EmailModel extends FormModel
 
             $batchCount++;
             if ($batchCount > $useEmail['limit']) {
-                $saveEntities[$useEmail['entity']];
+                $saveEntities[] = $useEmail['entity'];
                 //use the next email
                 $batchCount = 0;
                 $useEmail = next($emailSettings);
