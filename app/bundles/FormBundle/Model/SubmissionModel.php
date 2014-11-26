@@ -220,14 +220,6 @@ class SubmissionModel extends CommonFormModel
             }
         }
 
-        //last round of callback commands from the submit actions; first come first serve
-        foreach ($args['feedback'] as $k => $data) {
-            if (!empty($data['callback'])) {
-                return array('callback' => $data);
-            }
-        }
-
-
         $leadModel = $this->factory->getModel('lead');
         list($lead, $trackingId, $generated) = $leadModel->getCurrentLead(true);
         $submission->setLead($lead);
@@ -239,6 +231,13 @@ class SubmissionModel extends CommonFormModel
         if ($this->dispatcher->hasListeners(FormEvents::FORM_ON_SUBMIT)) {
             $event = new SubmissionEvent($submission, $post, $server);
             $this->dispatcher->dispatch(FormEvents::FORM_ON_SUBMIT, $event);
+        }
+
+        //last round of callback commands from the submit actions; first come first serve
+        foreach ($args['feedback'] as $k => $data) {
+            if (!empty($data['callback'])) {
+                return array('callback' => $data);
+            }
         }
 
         //made it to the end so return false that there was not an error
