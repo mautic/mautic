@@ -38,19 +38,26 @@ class IntegrationRepository extends CommonRepository
     /**
      * Retrieves the enabled status of all addon bundles
      *
+     * @param $withId
+     *
      * @return array
      */
-    public function getBundleStatus()
+    public function getBundleStatus($withId = false)
     {
-        $q = $this->createQueryBuilder($this->getTableAlias())
-            ->select('i.bundle AS bundle, i.isEnabled AS enabled');
+        $q = $this->createQueryBuilder($this->getTableAlias());
+
+        if ($withId) {
+            $q->select('i.bundle AS bundle, i.isEnabled AS enabled, i.id');
+        } else {
+            $q->select('i.bundle AS bundle, i.isEnabled AS enabled');
+        }
 
         $results = $q->getQuery()->getArrayResult();
 
         $return = array();
 
         foreach ($results as $result) {
-            $return[$result['bundle']] = $result['enabled'];
+            $return[$result['bundle']] = ($withId) ? $result : $result['enabled'];
         }
 
         return $return;

@@ -29,17 +29,17 @@ class GooglePlusType extends AbstractType
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
         $builder->add('shareBtnMsg', 'spacer', array(
-           'text' =>  'mautic.social.form.sharebutton'
+           'text' =>  'mautic.connector.form.sharebutton'
         ));
 
         $builder->add('annotation', 'choice', array(
             'choices'     => array(
-                'inline'            => 'mautic.social.GooglePlus.share.annotation.inline',
-                'bubble'            => 'mautic.social.GooglePlus.share.annotation.bubble',
-                'vertical-bubble'   => 'mautic.social.GooglePlus.share.annotation.verticalbubble',
-                'none'              => 'mautic.social.GooglePlus.share.annotation.none'
+                'inline'            => 'mautic.connector.GooglePlus.share.annotation.inline',
+                'bubble'            => 'mautic.connector.GooglePlus.share.annotation.bubble',
+                'vertical-bubble'   => 'mautic.connector.GooglePlus.share.annotation.verticalbubble',
+                'none'              => 'mautic.connector.GooglePlus.share.annotation.none'
             ),
-            'label'       => 'mautic.social.GooglePlus.share.annotation',
+            'label'       => 'mautic.connector.GooglePlus.share.annotation',
             'required'    => false,
             'empty_value' => false,
             'label_attr'  => array('class' => 'control-label'),
@@ -48,12 +48,12 @@ class GooglePlusType extends AbstractType
 
         $builder->add('height', 'choice', array(
             'choices'     => array(
-                ''    => 'mautic.social.GooglePlus.share.height.standard',
-                '15'  => 'mautic.social.GooglePlus.share.height.small',
-                '24'  => 'mautic.social.GooglePlus.share.height.large',
+                ''    => 'mautic.connector.GooglePlus.share.height.standard',
+                '15'  => 'mautic.connector.GooglePlus.share.height.small',
+                '24'  => 'mautic.connector.GooglePlus.share.height.large',
 
             ),
-            'label'       => 'mautic.social.GooglePlus.share.height',
+            'label'       => 'mautic.connector.GooglePlus.share.height',
             'required'    => false,
             'empty_value' => false,
             'label_attr'  => array('class' => 'control-label'),

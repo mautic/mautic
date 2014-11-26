@@ -29,16 +29,16 @@ class TwitterType extends AbstractType
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
         $builder->add('shareBtnMsg', 'spacer', array(
-           'text' =>  'mautic.social.form.sharebutton'
+           'text' =>  'mautic.connector.form.sharebutton'
         ));
 
         $builder->add('count', 'choice', array(
             'choices'     => array(
-                'horizontal' => 'mautic.social.Twitter.share.layout.horizontal',
-                'vertical'   => 'mautic.social.Twitter.share.layout.vertical',
-                'none'       => 'mautic.social.Twitter.share.layout.none'
+                'horizontal' => 'mautic.connector.Twitter.share.layout.horizontal',
+                'vertical'   => 'mautic.connector.Twitter.share.layout.vertical',
+                'none'       => 'mautic.connector.Twitter.share.layout.none'
             ),
-            'label'       => 'mautic.social.Twitter.share.layout',
+            'label'       => 'mautic.connector.Twitter.share.layout',
             'required'    => false,
             'empty_value' => false,
             'label_attr'  => array('class' => 'control-label'),
@@ -47,50 +47,50 @@ class TwitterType extends AbstractType
 
         $builder->add('text', 'text', array(
             'label_attr'    => array('class' => 'control-label'),
-            'label'         => 'mautic.social.Twitter.share.text',
+            'label'         => 'mautic.connector.Twitter.share.text',
             'required'      => false,
             'attr'          => array(
                 'class'       => 'form-control',
-                'placeholder' => 'mautic.social.Twitter.share.text.pagetitle'
+                'placeholder' => 'mautic.connector.Twitter.share.text.pagetitle'
             )
         ));
 
         $builder->add('via', 'text', array(
             'label_attr'    => array('class' => 'control-label'),
-            'label'         => 'mautic.social.Twitter.share.via',
+            'label'         => 'mautic.connector.Twitter.share.via',
             'required'      => false,
             'attr'          => array(
                 'class'       => 'form-control',
-                'placeholder' => 'mautic.social.Twitter.share.username',
+                'placeholder' => 'mautic.connector.Twitter.share.username',
                 'preaddon'    => 'symbol-at'
             )
         ));
 
         $builder->add('related', 'text', array(
             'label_attr'    => array('class' => 'control-label'),
-            'label'         => 'mautic.social.Twitter.share.related',
+            'label'         => 'mautic.connector.Twitter.share.related',
             'required'      => false,
             'attr'          => array(
                 'class'       => 'form-control',
-                'placeholder' => 'mautic.social.Twitter.share.username',
+                'placeholder' => 'mautic.connector.Twitter.share.username',
                 'preaddon'    => 'symbol-at'
             )
         ));
 
         $builder->add('hashtags', 'text', array(
             'label_attr'    => array('class' => 'control-label'),
-            'label'         => 'mautic.social.Twitter.share.hashtag',
+            'label'         => 'mautic.connector.Twitter.share.hashtag',
             'required'      => false,
             'attr'          => array(
                 'class'       => 'form-control',
-                'placeholder' => 'mautic.social.Twitter.share.hashtag.placeholder',
+                'placeholder' => 'mautic.connector.Twitter.share.hashtag.placeholder',
                 'preaddon'    => 'symbol-hashtag'
             )
         ));
 
         $builder->add('size', 'checkbox', array(
             'label_attr'    => array('class' => 'control-label'),
-            'label'         => 'mautic.social.Twitter.share.largesize',
+            'label'         => 'mautic.connector.Twitter.share.largesize',
             'value'         => 'large',
             'required'      => false
         ));

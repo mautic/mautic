@@ -133,7 +133,7 @@ abstract class AbstractConnector
         }
 
         if (!$url || !isset($keys['clientId']) || !isset($keys['clientSecret'])) {
-            return array(false, $this->factory->getTranslator()->trans('mautic.social.missingkeys'));
+            return array(false, $this->factory->getTranslator()->trans('mautic.connector.missingkeys'));
         }
 
         $query = 'client_id='.$keys['clientId']
@@ -175,7 +175,7 @@ abstract class AbstractConnector
             } else {
                 $error = $this->getErrorsFromResponse($values);
                 if (empty($error)) {
-                    $error = $this->factory->getTranslator()->trans("mautic.social.error.genericerror", array(), "flashes");
+                    $error = $this->factory->getTranslator()->trans("mautic.connector.error.genericerror", array(), "flashes");
                 }
             }
 
@@ -463,27 +463,5 @@ abstract class AbstractConnector
         curl_close($ch);
 
         return ($retcode == 200);
-    }
-
-    /**
-     * Check if the connector is a core object
-     *
-     * @return bool
-     */
-    public function getIsCore()
-    {
-        return $this->isCore;
-    }
-
-    /**
-     * Set if the connector is a core object
-     *
-     * @param bool $isCore
-     *
-     * @return void
-     */
-    public function setIsCore($isCore)
-    {
-        $this->isCore = $isCore;
     }
 }

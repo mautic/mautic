@@ -480,16 +480,6 @@ class MauticFactory
     }
 
     /**
-     * Get the network integration helper
-     *
-     * @return \Mautic\IntegrationBundle\Helper\ConnectorIntegrationHelper
-     */
-    public function getConnectorIntegrationHelper()
-    {
-        return $this->container->get('mautic.network.integration');
-    }
-
-    /**
      * Get a mautic helper service
      *
      * @param $helper

@@ -27,7 +27,7 @@ class ConnectorController extends FormController
         }
 
         /** @var \Mautic\IntegrationBundle\Helper\ConnectorIntegrationHelper $connectorHelper */
-        $connectorHelper  = $this->container->get('mautic.connector.integration');
+        $connectorHelper  = $this->factory->getHelper('connector');
         $connectorObjects = $connectorHelper->getConnectorObjects(null, null, true);
         $connectors     = array();
 
@@ -63,7 +63,7 @@ class ConnectorController extends FormController
         }
 
         /** @var \Mautic\IntegrationBundle\Helper\ConnectorIntegrationHelper $connectorHelper */
-        $connectorHelper  = $this->container->get('mautic.connector.integration');
+        $connectorHelper  = $this->factory->getHelper('connector');
         $connectorObjects = $connectorHelper->getConnectorObjects(null, null, true);
 
         // We receive a lowercase name, so we need to convert the $connectorObjects array keys to lowercase

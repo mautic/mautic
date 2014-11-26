@@ -66,7 +66,7 @@ class DetailsType extends AbstractType
                     'class'   => 'btn btn-primary',
                     'onclick' => 'Mautic.loadAuthModal("' . $url . '", "' . $key . '", "' . $options['connector'] . '");'
                 ),
-                'label'    => 'mautic.social.form.' . $label,
+                'label'    => 'mautic.connector.form.' . $label,
                 'disabled' => $disabled
             ));
         }
@@ -76,7 +76,7 @@ class DetailsType extends AbstractType
         if (!empty($features)) {
             $labels = array();
             foreach ($features as $f) {
-                $labels[] = 'mautic.social.form.feature.' . $f;
+                $labels[] = 'mautic.connector.form.feature.' . $f;
             }
             $builder->add('supportedFeatures', 'choice', array(
                 'choice_list' => new ChoiceList($features, $labels),

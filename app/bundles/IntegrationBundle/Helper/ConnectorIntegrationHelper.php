@@ -48,6 +48,8 @@ class ConnectorIntegrationHelper
         static $connectors, $available;
 
         if (empty($connectors)) {
+            $em = $this->factory->getEntityManager();
+
             $available = $connectors = array();
 
             // And we'll be scanning the addon bundles for additional classes, so have that data on standby
@@ -55,11 +57,11 @@ class ConnectorIntegrationHelper
 
             // Quickly figure out which addons are enabled so we only process those
             /** @var \Mautic\IntegrationBundle\Entity\IntegrationRepository $integrationRepo */
-            $integrationRepo = $this->factory->getEntityManager()->getRepository('MauticIntegrationBundle:Integration');
-            $addonStatuses = $integrationRepo->getBundleStatus();
+            $integrationRepo = $em->getRepository('MauticIntegrationBundle:Integration');
+            $addonStatuses = $integrationRepo->getBundleStatus(true);
 
             foreach ($addons as $addon) {
-                if (!$addonStatuses[$addon['bundle']]) {
+                if (empty($addonStatuses[$addon['bundle']]['enabled'])) {
                     unset($addons[$addon['base']]);
                 }
             }
@@ -74,10 +76,12 @@ class ConnectorIntegrationHelper
                         $finder->sortByName();
                     }
 
+                    $id = $addonStatuses[$addon['bundle']]['id'];
                     foreach ($finder as $file) {
                         $available[] = array(
-                            'connector' => substr($file->getBaseName(), 0, -11),
-                            'namespace' => str_replace('MauticAddon', '', $addon['bundle'])
+                            'integration' => $em->getReference('MauticIntegrationBundle:Integration', $id),
+                            'connector'   => substr($file->getBaseName(), 0, -13),
+                            'namespace'   => str_replace('MauticAddon', '', $addon['bundle'])
                         );
                     }
                 }
@@ -86,17 +90,18 @@ class ConnectorIntegrationHelper
             $connectorSettings = $this->getConnectorSettings();
 
             // Get all the addon integrations
-            foreach ($available as $a) {
-                if (!isset($integrations[$a['connector']])) {
+            foreach ($available as $id => $a) {
+                if (!isset($connectors[$a['connector']])) {
                     $class = "\\MauticAddon\\{$a['namespace']}\\Connector\\{$a['connector']}Connector";
                     $reflectionClass = new \ReflectionClass($class);
                     if ($reflectionClass->isInstantiable()) {
                         $connectors[$a['connector']] = new $class($this->factory);
-                        $connectors[$a['connector']]->setIsCore(false);
                         if (!isset($connectorSettings[$a['connector']])) {
                             $connectorSettings[$a['connector']] = new Connector();
                             $connectorSettings[$a['connector']]->setName($a['connector']);
                         }
+                        $connectorSettings[$a['connector']]->setIntegration($a['integration']);
+
                         $connectors[$a['connector']]->setConnectorSettings($connectorSettings[$a['connector']]);
                     }
                 }
@@ -172,16 +177,16 @@ class ConnectorIntegrationHelper
                     switch ($details['type']) {
                         case 'string':
                         case 'boolean':
-                            $fields[$s][$fn] = $translator->trans("mautic.social.{$s}.{$fn}");
+                            $fields[$s][$fn] = $translator->trans("mautic.connector.{$s}.{$fn}");
                             break;
                         case 'object':
                             if (isset($details['fields'])) {
                                 foreach ($details['fields'] as $f) {
                                     $fn = $object->matchFieldName($field, $f);
-                                    $fields[$s][$fn] = $translator->trans("mautic.social.{$s}.{$fn}");
+                                    $fields[$s][$fn] = $translator->trans("mautic.connector.{$s}.{$fn}");
                                 }
                             } else {
-                                $fields[$s][$field] = $translator->trans("mautic.social.{$s}.{$fn}");
+                                $fields[$s][$field] = $translator->trans("mautic.connector.{$s}.{$fn}");
                             }
                             break;
                         case 'array_object':
@@ -189,18 +194,18 @@ class ConnectorIntegrationHelper
                                 //create social profile fields
                                 $socialProfileUrls = $this->getSocialProfileUrlRegex();
                                 foreach ($socialProfileUrls as $p => $d) {
-                                    $fields[$s]["{$p}ProfileHandle"] = $translator->trans("mautic.social.{$s}.{$p}ProfileHandle");
+                                    $fields[$s]["{$p}ProfileHandle"] = $translator->trans("mautic.connector.{$s}.{$p}ProfileHandle");
                                 }
                                 foreach ($details['fields'] as $f) {
-                                    $fields[$s]["{$f}Urls"] = $translator->trans("mautic.social.{$s}.{$f}Urls");
+                                    $fields[$s]["{$f}Urls"] = $translator->trans("mautic.connector.{$s}.{$f}Urls");
                                 }
                             } elseif (isset($details['fields'])) {
                                 foreach ($details['fields'] as $f) {
                                     $fn = $object->matchFieldName($field, $f);
-                                    $fields[$s][$fn] = $translator->trans("mautic.social.{$s}.{$fn}");
+                                    $fields[$s][$fn] = $translator->trans("mautic.connector.{$s}.{$fn}");
                                 }
                             } else {
-                                $fields[$s][$fn] = $translator->trans("mautic.social.{$s}.{$fn}");
+                                $fields[$s][$fn] = $translator->trans("mautic.connector.{$s}.{$fn}");
                             }
                             break;
                     }
@@ -380,15 +385,16 @@ class ConnectorIntegrationHelper
             $socialConnectors = $this->getConnectorObjects(null, array('share_button'), true);
             $templating     = $this->factory->getTemplating();
             foreach ($socialConnectors as $connector => $details) {
+                /** @var \Mautic\IntegrationBundle\Entity\Connector $settings */
                 $settings        = $details->getConnectorSettings();
                 $featureSettings = $settings->getFeatureSettings();
                 $apiKeys         = $settings->getApiKeys();
+                $integration     = $settings->getIntegration();
                 $shareSettings   = isset($featureSettings['shareButton']) ? $featureSettings['shareButton'] : array();
 
                 //add the api keys for use within the share buttons
-                // TODO - The template path needs to be extended to support addons
                 $shareSettings['keys'] = $apiKeys;
-                $shareBtns[$connector]   = $templating->render("MauticSocialBundle:Connector/$connector:share.html.php", array(
+                $shareBtns[$connector]   = $templating->render($integration->getBundle() . ":Connector/$connector:share.html.php", array(
                     'settings' => $shareSettings,
                 ));
             }

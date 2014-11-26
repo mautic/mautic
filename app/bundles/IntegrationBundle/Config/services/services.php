@@ -11,7 +11,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
 //Configurator object
-$container->setDefinition('mautic.connector.integration', new Definition(
+$container->setDefinition('mautic.helper.connector', new Definition(
     'Mautic\IntegrationBundle\Helper\ConnectorIntegrationHelper',
     array(new Reference('mautic.factory'))
 ));

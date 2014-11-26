@@ -72,8 +72,8 @@ class InstagramConnector extends AbstractConnector
     public function getRequiredKeyFields()
     {
         return array(
-            'clientId'      => 'mautic.social.keyfield.clientid',
-            'clientSecret'  => 'mautic.social.keyfield.clientsecret'
+            'clientId'      => 'mautic.connector.keyfield.clientid',
+            'clientSecret'  => 'mautic.connector.keyfield.clientsecret'
         );
     }
 

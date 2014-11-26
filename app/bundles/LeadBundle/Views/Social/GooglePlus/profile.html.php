@@ -26,7 +26,7 @@ $tableFields = array('gender', 'birthday', 'occupation', 'skills', 'braggingRigh
             <?php foreach ($tableFields as $t): ?>
             <?php if (!empty($profile[$t])): ?>
             <tr>
-                <td><?php echo $view['translator']->trans('mautic.social.GooglePlus.'.$t); ?></td>
+                <td><?php echo $view['translator']->trans('mautic.connector.GooglePlus.'.$t); ?></td>
                 <td><?php echo $profile[$t]; ?></td>
             </tr>
             <?php endif; ?>

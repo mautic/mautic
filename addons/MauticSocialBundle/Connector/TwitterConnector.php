@@ -12,9 +12,9 @@ use Mautic\IntegrationBundle\Entity\Connector;
 use Mautic\IntegrationBundle\Connector\AbstractConnector;
 
 /**
- * Class TwitterNetwork
+ * Class TwitterConnector
  */
-class TwitterNetwork extends AbstractConnector
+class TwitterConnector extends AbstractConnector
 {
 
     /**
@@ -91,7 +91,7 @@ class TwitterNetwork extends AbstractConnector
         }
 
         if (!$url || !isset($keys['clientId']) || !isset($keys['clientSecret'])) {
-            return array(false, $this->factory->getTranslator()->trans('mautic.social.missingkeys'));
+            return array(false, $this->factory->getTranslator()->trans('mautic.connector.missingkeys'));
         }
 
         $bearer = $this->getBearerToken($keys);
@@ -186,8 +186,8 @@ class TwitterNetwork extends AbstractConnector
     public function getRequiredKeyFields()
     {
         return array(
-            'clientId'     => 'mautic.social.keyfield.clientid',
-            'clientSecret' => 'mautic.social.keyfield.clientsecret'
+            'clientId'     => 'mautic.connector.keyfield.clientid',
+            'clientSecret' => 'mautic.connector.keyfield.clientsecret'
         );
     }
 

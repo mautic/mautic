@@ -21,7 +21,7 @@
     <div class="col-md-6">
         <div class="panel panel-default panel-<?php echo strtolower($network); ?>">
             <div class="panel-heading pr-0">
-                <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.social.'.$network); ?></h3>
+                <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.connector.'.$network); ?></h3>
                 <div class="panel-toolbar text-right">
                     <a href="javascript:void(0);" class="btn" data-toggle="tooltip" onclick="Mautic.refreshLeadSocialProfile('<?php echo $network; ?>', '<?php echo $lead->getId(); ?>', event);" title="<?php echo $view['translator']->trans('mautic.lead.lead.social.lastupdate', array("%datetime%" => $view['date']->toFullConcat($details['lastRefresh'], 'utc'))); ?>">
                         <i class="text-white fa fa-refresh"></i>

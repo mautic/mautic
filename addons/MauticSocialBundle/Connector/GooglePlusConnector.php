@@ -180,7 +180,7 @@ class GooglePlusConnector extends AbstractConnector
                         break;
                     case 'array_object':
                         if ($field == "urls") {
-                            $socialProfileUrls = $this->factory->getConnectorIntegrationHelper()->getSocialProfileUrlRegex();
+                            $socialProfileUrls = $this->factory->getHelper('connector')->getSocialProfileUrlRegex();
                             foreach ($values as $k => $v) {
                                 $socialMatch = false;
                                 foreach ($socialProfileUrls as $service => $regex) {
@@ -321,7 +321,7 @@ class GooglePlusConnector extends AbstractConnector
     public function getRequiredKeyFields()
     {
         return array(
-            'key' => 'mautic.social.keyfield.api'
+            'key' => 'mautic.connector.keyfield.api'
         );
     }
 

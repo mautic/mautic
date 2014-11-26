@@ -49,7 +49,7 @@ class FeatureSettingsType extends AbstractType
             ));
         }
 
-        $connectorHelper = $this->factory->getConnectorIntegrationHelper();
+        $connectorHelper = $this->factory->getHelper('connector');
         $fields        = $connectorHelper->getAvailableFields($options['connector']);
 
         if (!empty($fields)) {

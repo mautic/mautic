@@ -171,7 +171,7 @@ class LeadModel extends FormModel
     {
         //@todo - add a catch to NOT do social gleaning if a lead is created via a form, etc as we do not want the user to experience the wait
         //generate the social cache
-        list($socialCache, $socialFeatureSettings) = $this->factory->getConnectorIntegrationHelper()->getUserProfiles($lead, $data, true, null, false, true);
+        list($socialCache, $socialFeatureSettings) = $this->factory->getHelper('connector')->getUserProfiles($lead, $data, true, null, false, true);
 
         $isNew = ($lead->getId()) ? false : true;
 

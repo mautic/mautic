@@ -74,8 +74,8 @@ class FacebookConnector extends AbstractConnector
     public function getRequiredKeyFields()
     {
         return array(
-            'clientId'     => 'mautic.social.keyfield.appid',
-            'clientSecret' => 'mautic.social.keyfield.appsecret'
+            'clientId'     => 'mautic.connector.keyfield.appid',
+            'clientSecret' => 'mautic.connector.keyfield.appsecret'
         );
     }
 
