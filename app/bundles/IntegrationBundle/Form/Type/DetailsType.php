@@ -34,7 +34,7 @@ class DetailsType extends AbstractType
             'expanded'    => true,
             'label_attr'  => array('class' => 'control-label'),
             'multiple'    => false,
-            'label'       => 'mautic.social.form.enabled',
+            'label'       => 'mautic.connector.form.enabled',
             'empty_value' => false,
             'required'    => false
         ));
@@ -83,13 +83,13 @@ class DetailsType extends AbstractType
                 'expanded'    => true,
                 'label_attr'  => array('class' => 'control-label'),
                 'multiple'    => true,
-                'label'       => 'mautic.social.form.features',
+                'label'       => 'mautic.connector.form.features',
                 'required'    => false
             ));
         }
 
         $builder->add('featureSettings', 'connector_featuresettings', array(
-            'label'          => 'mautic.social.form.feature.settings',
+            'label'          => 'mautic.connector.form.feature.settings',
             'required'       => false,
             'data'           => $options['data']->getFeatureSettings(),
             'label_attr'     => array('class' => 'control-label'),

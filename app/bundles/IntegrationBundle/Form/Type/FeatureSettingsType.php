@@ -54,11 +54,11 @@ class FeatureSettingsType extends AbstractType
 
         if (!empty($fields)) {
             $builder->add('shareBtnMsg', 'spacer', array(
-                'text' => 'mautic.social.form.profile'
+                'text' => 'mautic.connector.form.profile'
             ));
 
             $builder->add('leadFields', 'connector_fields', array(
-                'label'            => 'mautic.social.fieldassignments',
+                'label'            => 'mautic.connector.leadfield_matches',
                 'required'         => false,
                 'lead_fields'      => $options['lead_fields'],
                 'data'             => isset($options['data']['leadFields']) ? $options['data']['leadFields'] : array(),
