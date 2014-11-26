@@ -55,6 +55,9 @@ class ThemeHelper
     {
         $this->factory   = $factory;
         $this->theme     = ($theme == 'current') ? $factory->getParameter('theme') : $theme;
+        if ($this->theme == null) {
+            $this->theme = 'Mauve';
+        }
         $this->themeDir  = $factory->getSystemPath('themes') . '/' . $this->theme;
         $this->themePath = $factory->getSystemPath('root') . '/' . $this->themeDir;
 
