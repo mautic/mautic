@@ -54,7 +54,7 @@ $items = array(
 );
 
 return array(
-    'priority' => 5,
+    'priority' => 11,
     'items'    => $items
 );
 

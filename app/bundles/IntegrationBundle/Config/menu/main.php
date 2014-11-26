@@ -39,7 +39,7 @@ $items = array(
 );
 
 return array(
-    'priority' => 5,
+    'priority' => 50,
     'items'    => $items
 );
 
