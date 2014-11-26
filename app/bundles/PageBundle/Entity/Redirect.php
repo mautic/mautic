@@ -30,7 +30,7 @@ class Redirect extends FormEntity
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=25)
+     * @ORM\Column(name="redirect_id", type="string", length=25)
      */
     private $redirectId;
 
