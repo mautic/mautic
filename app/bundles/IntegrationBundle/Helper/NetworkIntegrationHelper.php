@@ -11,8 +11,7 @@ namespace Mautic\IntegrationBundle\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
-use Mautic\SocialBundle\Entity\SocialNetwork;
-use Mautic\SocialBundle\Network\AbstractNetwork;
+use Mautic\IntegrationBundle\Entity\Connector;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -49,8 +48,7 @@ class NetworkIntegrationHelper
         static $networks, $available;
 
         if (empty($networks)) {
-            // We need to get the core bundles so we can get our lookup path for the core network classes
-            $bundles = $this->factory->getParameter('bundles');
+            $available = $networks = array();
 
             // And we'll be scanning the addon bundles for additional classes, so have that data on standby
             $addons  = $this->factory->getParameter('addon.bundles');
@@ -66,17 +64,6 @@ class NetworkIntegrationHelper
                 }
             }
 
-            // Scan the SocialBundle for our core network classes
-            $finder = new Finder();
-            $finder->files()->name('*Network.php')->in($bundles['Social']['directory'] . '/Network')->notName('AbstractNetwork.php');
-            if ($alphabetical) {
-                $finder->sortByName();
-            }
-            $available = array('core' => array(), 'addon' => array());
-            foreach ($finder as $file) {
-                $available['core'][] = substr($file->getBaseName(), 0, -11);
-            }
-
             // Scan the addons for network classes
             foreach ($addons as $addon) {
                 if (is_dir($addon['directory'] . '/Network')) {
@@ -88,41 +75,30 @@ class NetworkIntegrationHelper
                     }
 
                     foreach ($finder as $file) {
-                        $available['addon'][] = array(
+                        $available[] = array(
                             'network' => substr($file->getBaseName(), 0, -11),
-                            'namespace' => str_replace('Mautic', '', $addon['bundle'])
+                            'namespace' => str_replace('MauticAddon', '', $addon['bundle'])
                         );
                     }
                 }
             }
 
-            $networkSettings = $this->getNetworkSettings();
-
-            // Get all core integrations
-            foreach ($available['core'] as $a) {
-                if (!isset($integrations[$a])) {
-                    $class = "\\Mautic\\SocialBundle\\Network\\{$a}Network";
-                    $networks[$a] = new $class($this->factory);
-                    $networks[$a]->setIsCore(true);
-                    if (!isset($networkSettings[$a])) {
-                        $networkSettings[$a] = new SocialNetwork();
-                        $networkSettings[$a]->setName($a);
-                    }
-                    $networks[$a]->setSettings($networkSettings[$a]);
-                }
-            }
+            $networkSettings = $this->getConnectorSettings();
 
             // Get all the addon integrations
-            foreach ($available['addon'] as $a) {
+            foreach ($available as $a) {
                 if (!isset($integrations[$a['network']])) {
                     $class = "\\MauticAddon\\{$a['namespace']}\\Network\\{$a['network']}Network";
-                    $networks[$a['network']] = new $class($this->factory);
-                    $networks[$a['network']]->setIsCore(false);
-                    if (!isset($networkSettings[$a['network']])) {
-                        $networkSettings[$a['network']] = new SocialNetwork();
-                        $networkSettings[$a['network']]->setName($a['network']);
+                    $reflectionClass = new \ReflectionClass($class);
+                    if ($reflectionClass->isInstantiable()) {
+                        $networks[$a['network']] = new $class($this->factory);
+                        $networks[$a['network']]->setIsCore(false);
+                        if (!isset($networkSettings[$a['network']])) {
+                            $networkSettings[$a['network']] = new Connector();
+                            $networkSettings[$a['network']]->setName($a['network']);
+                        }
+                        $networks[$a['network']]->setConnectorSettings($networkSettings[$a['network']]);
                     }
-                    $networks[$a['network']]->setSettings($networkSettings[$a['network']]);
                 }
             }
 
@@ -157,7 +133,7 @@ class NetworkIntegrationHelper
         } elseif (!empty($withFeatures)) {
             $specific = array();
             foreach ($networks as $n => $d) {
-                $settings = $d->getSettings();
+                $settings = $d->getConnectorSettings();
                 $features = $settings->getSupportedFeatures();
 
                 foreach ($withFeatures as $f) {
@@ -285,13 +261,13 @@ class NetworkIntegrationHelper
     }
 
     /**
-     * Get array of social network entities
+     * Get array of connector entities
      *
      * @return mixed
      */
-    public function getNetworkSettings()
+    public function getConnectorSettings()
     {
-        return $this->factory->getEntityManager()->getRepository('MauticSocialBundle:SocialNetwork')->getNetworkSettings();
+        return $this->factory->getEntityManager()->getRepository('MauticIntegrationBundle:Connector')->getConnectors();
     }
 
     /**
@@ -317,7 +293,7 @@ class NetworkIntegrationHelper
             //check to see if there are social profiles activated
             $socialNetworks = $this->getNetworkObjects($specificNetwork, array('public_profile', 'public_activity'));
             foreach ($socialNetworks as $network => $sn) {
-                $settings        = $sn->getSettings();
+                $settings        = $sn->getConnectorSettings();
                 $features        = $settings->getSupportedFeatures();
                 $identifierField = $this->getUserIdentifierField($sn, $fields);
 
@@ -363,7 +339,7 @@ class NetworkIntegrationHelper
         } elseif ($returnSettings) {
             $socialNetworks = $this->getNetworkObjects($specificNetwork, array('public_profile', 'public_activity'));
             foreach ($socialNetworks as $network => $sn) {
-                $settings                  = $sn->getSettings();
+                $settings                  = $sn->getConnectorSettings();
                 $featureSettings[$network] = $settings->getFeatureSettings();
             }
         }
@@ -404,7 +380,7 @@ class NetworkIntegrationHelper
             $socialNetworks = $this->getNetworkObjects(null, array('share_button'), true);
             $templating     = $this->factory->getTemplating();
             foreach ($socialNetworks as $network => $details) {
-                $settings        = $details->getSettings();
+                $settings        = $details->getConnectorSettings();
                 $featureSettings = $settings->getFeatureSettings();
                 $apiKeys         = $settings->getApiKeys();
                 $shareSettings   = isset($featureSettings['shareButton']) ? $featureSettings['shareButton'] : array();
@@ -483,25 +459,15 @@ class NetworkIntegrationHelper
     /**
      * Get the path to the network's icon relative to the site root
      *
-     * @param AbstractNetwork $network
+     * @param $network
      *
      * @return string
      */
-    public function getIconPath(AbstractNetwork $network)
+    public function getIconPath($network)
     {
         $systemPath  = $this->factory->getSystemPath('root');
-        $genericIcon = 'app/bundles/SocialBundle/Assets/img/generic.png';
-        $name        = $network->getSettings()->getName();
-
-        if ($network->getIsCore()) {
-            $icon = 'app/bundles/SocialBundle/Assets/img/' . strtolower($name) . '.png';
-
-            if (file_exists($systemPath . '/' . $icon)) {
-                return $icon;
-            }
-
-            return $genericIcon;
-        }
+        $genericIcon = 'app/bundles/IntegrationBundle/Assets/img/generic.png';
+        $name        = $network->getConnectorSettings()->getName();
 
         // For non-core bundles, we need to extract out the bundle's name to figure out where in the filesystem to look for the icon
         $className = get_class($network);

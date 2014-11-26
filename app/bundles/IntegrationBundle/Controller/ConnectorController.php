@@ -95,7 +95,6 @@ class ConnectorController extends FormController
             throw $this->createNotFoundException($this->get('translator')->trans('mautic.core.url.error.404'));
         }
 
-        /** @var \Mautic\SocialBundle\Network\AbstractNetwork $networkObject */
         $networkObject = $objects[$name];
 
         // Get a list of custom form fields
@@ -115,10 +114,10 @@ class ConnectorController extends FormController
             uasort($fieldGroup, 'strnatcmp');
         }
 
-        $form = $this->createForm('socialmedia_details', $networkObject->getSettings(), array(
-            'sm_network'  => $networkObject->getSettings()->getName(),
+        $form = $this->createForm('connector_details', $networkObject->getConnectorSettings(), array(
+            'network'  => $networkObject->getConnectorSettings()->getName(),
             'lead_fields' => $leadFields,
-            'sm_object'   => $networkObject,
+            'network_object' => $networkObject,
             'action'      => $this->generateUrl('mautic_integration_connector_edit', array('name' => $name))
         ));
 
@@ -126,7 +125,7 @@ class ConnectorController extends FormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($this->isFormValid($form)) {
                     $em          = $this->factory->getEntityManager();
-                    $entity      = $networkObject->getSettings();
+                    $entity      = $networkObject->getConnectorSettings();
                     $network     = $entity->getName();
                     $currentKeys = $entity->getApiKeys();
 

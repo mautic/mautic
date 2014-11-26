@@ -9,6 +9,7 @@
 
 namespace Mautic\IntegrationBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 
@@ -25,35 +26,33 @@ class Integration
      * @ORM\Column(type="integer")
      * @ORM\Id()
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"integrationDetails"})
      */
     private $id;
 
     /**
      * @ORM\Column(name="name", type="string")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"integrationDetails"})
      */
     private $name;
 
     /**
      * @ORM\Column(name="is_enabled", type="boolean")
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"integrationDetails"})
      */
     private $isEnabled = true;
 
     /**
      * @ORM\Column(type="string", length=50)
-     * @Serializer\Expose
-     * @Serializer\Since("1.0")
-     * @Serializer\Groups({"integrationDetails"})
      */
     private $bundle;
+
+    /**
+     * @ORM\OneToMany(targetEntity="Connector", mappedBy="integration", indexBy="id", fetch="EXTRA_LAZY")
+     */
+    private $connectors;
+
+    public function __construct()
+    {
+        $this->connectors  = new ArrayCollection();
+    }
 
     /**
      * @return void
@@ -151,5 +150,13 @@ class Integration
     public function getPublishStatus()
     {
         return $this->getIsEnabled() ? 'published' : 'unpublished';
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getConnectors ()
+    {
+        return $this->connectors;
     }
 }
