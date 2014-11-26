@@ -124,7 +124,7 @@ class PublicController extends CommonFormController
                             $useId        = array_search($greatestDiff, $byWeight);
 
                             //set the cookie - 14 days
-                            setcookie('mautic_page_' . $entity->getId(), $useId, (time() + 3600 * 24 * 14), '/');
+                            $this->factory->getHelper('cookie')->setCookie('mautic_page_' . $entity->getId(), $useId, 3600 * 24 * 14);
 
                             if ($useId != $entity->getId()) {
                                 $entity = $childrenVariant[$useId];

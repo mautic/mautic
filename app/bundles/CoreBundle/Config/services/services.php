@@ -66,3 +66,11 @@ $container->setDefinition('transifex', $transifex);
 
 //Custom PHP log handler
 $container->setParameter('monolog.handler.stream.class', 'Mautic\CoreBundle\Monolog\Handler\PhpHandler');
+
+//Cookie helper
+$container->setDefinition('mautic.helper.cookie',
+    new Definition(
+        'Mautic\CoreBundle\Helper\CookieHelper',
+        array(
+            new Reference('mautic.factory'))
+    ));

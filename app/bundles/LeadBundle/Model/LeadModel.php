@@ -466,8 +466,7 @@ class LeadModel extends FormModel
             }
 
             //create a tracking cookie
-            $expire = time() + 1800;
-            setcookie('mautic_session_id', $trackingId, $expire, '/');
+            $this->factory->getHelper('cookie')->setCookie('mautic_session_id', $trackingId);
         }
 
         return array($trackingId, $generated);
@@ -481,7 +480,7 @@ class LeadModel extends FormModel
     public function setLeadCookie($leadId)
     {
         list($trackingId, $generated) = $this->getTrackingCookie();
-        setcookie($trackingId, $leadId, time() + 1800, '/');
+        $this->factory->getHelper('cookie')->setCookie($trackingId, $leadId);
     }
 
     /**

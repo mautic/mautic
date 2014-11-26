@@ -334,7 +334,7 @@ class PageModel extends FormModel
             }
 
             if (!empty($clickthrough['email'])) {
-                $hit->setEmail($this->factory->getEntityManager()->getReference('MauticEmailBundle:Email', $clickthrough['email']));
+                $hit->setEmail($this->em->getReference('MauticEmailBundle:Email', $clickthrough['email']));
             }
         }
 
@@ -444,7 +444,7 @@ class PageModel extends FormModel
         $this->em->flush();
 
         //save hit to the cookie to use to update the exit time
-        setcookie('mautic_referer_id', $hit->getId(), time() + 1800);
+        $this->factory->getHelper('cookie')->setCookie('mautic_referer_id', $hit->getId());
     }
 
     /**

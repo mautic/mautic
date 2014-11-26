@@ -43,7 +43,7 @@ class ConfigType extends AbstractType
     {
         foreach ($options['data'] as $bundle => $config) {
             foreach ($config as $key => $value) {
-                if (in_array($key, array('api_enabled', 'cat_in_page_url', 'send_server_data'))) {
+                if (in_array($key, array('api_enabled', 'cat_in_page_url', 'send_server_data', 'cookie_httponly'))) {
                     $builder->add($key, 'button_group', array(
                         'choice_list' => new ChoiceList(
                             array(false, true),
@@ -52,11 +52,22 @@ class ConfigType extends AbstractType
                         'label'       => 'mautic.config.' . $bundle . '.' . $key,
                         'expanded'    => true,
                         'empty_value' => false,
-                        'data'        => (bool) $value
+                        'data'        => (bool)$value
+                    ));
+                } elseif (in_array($key, array('cookie_secure'))) {
+                    $builder->add($key, 'button_group', array(
+                        'choice_list' => new ChoiceList(
+                            array(false, true),
+                            array('mautic.core.form.no', 'mautic.core.form.yes')
+                        ),
+                        'label'       => 'mautic.config.' . $bundle . '.' . $key,
+                        'expanded'    => true,
+                        'empty_value' => 'mautic.core.form.default',
+                        'data'        => ($value === '' || $value === null) ? '' : (bool) $value
                     ));
                 } elseif (in_array($key, array(
                     'api_mode', 'locale', 'theme', 'ip_lookup_service', 'mailer_spool_type', 'mailer_transport', 'mailer_encryption',
-                    'mailer_auth_mode', 'update_stability'
+                    'mailer_auth_mode', 'update_stability', 'cookie_secure'
                 ))) {
                     switch ($key) {
                         case 'api_mode':

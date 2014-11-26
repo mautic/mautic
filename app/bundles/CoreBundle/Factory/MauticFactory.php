@@ -488,4 +488,16 @@ class MauticFactory
     {
         return $this->container->get('mautic.network.integration');
     }
+
+    /**
+     * Get a mautic helper service
+     *
+     * @param $helper
+     *
+     * @return object
+     */
+    public function getHelper($helper)
+    {
+        return $this->container->get('mautic.helper.' . $helper);
+    }
 }

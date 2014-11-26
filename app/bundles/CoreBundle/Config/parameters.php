@@ -55,7 +55,11 @@ $parameters = array(
     'ip_lookup_auth'               => '',
     'transifex_username'           => '',
     'transifex_password'           => '',
-    'update_stability'             => 'stable'
+    'update_stability'             => 'stable',
+    'cookie_path'                  => '/',
+    'cookie_domain'                => '',
+    'cookie_secure'                => null,
+    'cookie_httponly'              => false
 );
 
 return $parameters;
