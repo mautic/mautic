@@ -1,6 +1,6 @@
 User-agent: *
 Disallow: /addons/
 Disallow: /app/
-Disallow: /assets/
+Disallow: /media/
 Disallow: /themes/
 Disallow: /vendor/
