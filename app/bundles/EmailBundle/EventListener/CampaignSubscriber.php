@@ -13,6 +13,7 @@ use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailEvent;
+use Mautic\EmailBundle\Event\EmailOpenEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 
 /**
@@ -73,7 +74,7 @@ class CampaignSubscriber extends CommonSubscriber
      *
      * @param EmailEvent $event
      */
-    public function onEmailOpen(EmailEvent $event)
+    public function onEmailOpen(EmailOpenEvent $event)
     {
         $email = $event->getEmail();
         $this->factory->getModel('campaign')->triggerEvent('email.open', $email, 'email.open' . $email->getId());
