@@ -53,8 +53,7 @@ class AbTestHelper
                     $submissions[$stats['page_id']] = $submissionRate;
                     $data[$translator->trans('mautic.form.abtest.label.submissions')][] = $stats['submissions'];
                     $data[$translator->trans('mautic.form.abtest.label.hits')][]        = $stats['variant_hits'];
-                    $data[$translator->trans('mautic.form.abtest.label.rates')][]       = $submissionRate;
-                    $support['labels'][] = $stats['page_id'] . ':' . $stats['title'];
+                    $support['labels'][] = $stats['page_id'] . ':' . $stats['title'] . ' (' . $submissionRate . '%)';
                     $hasResults[] = $stats['page_id'];
                 }
 
@@ -62,7 +61,6 @@ class AbTestHelper
                 if (!in_array($parent->getId(), $hasResults)) {
                     $data[$translator->trans('mautic.form.abtest.label.submissions')][] = 0;
                     $data[$translator->trans('mautic.form.abtest.label.hits')][]        = 0;
-                    $data[$translator->trans('mautic.form.abtest.label.rates')][]       = 0;
                     $support['labels'][] = $parent->getId() . ':' . $parent->getTitle();;
                 }
 
@@ -71,7 +69,6 @@ class AbTestHelper
                         if (!in_array($c->getId(), $hasResults)) {
                             $data[$translator->trans('mautic.form.abtest.label.submissions')][] = 0;
                             $data[$translator->trans('mautic.form.abtest.label.hits')][]        = 0;
-                            $data[$translator->trans('mautic.form.abtest.label.rates')][]       = 0;
                             $support['labels'][]                                                = $c->getId() . ':' . $c->getTitle();;
                         }
                     }

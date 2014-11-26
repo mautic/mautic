@@ -53,8 +53,7 @@ class AbTestHelper
                     $downloads[$stats['page_id']]                                      = $downloadRate;
                     $data[$translator->trans('mautic.asset.abtest.label.downloads')][] = $stats['downloads'];
                     $data[$translator->trans('mautic.asset.abtest.label.hits')][]      = $stats['variant_hits'];
-                    $data[$translator->trans('mautic.asset.abtest.label.rates')][]     = $downloadRate;
-                    $support['labels'][]                                               = $stats['page_id'] . ':' . $stats['title'];
+                    $support['labels'][]                                               = $stats['page_id'] . ':' . $stats['title'] . ' (' . $downloadRate . '%)';
                     $hasResults[]                                                      = $stats['page_id'];
                 }
 
@@ -62,8 +61,7 @@ class AbTestHelper
                 if (!in_array($parent->getId(), $hasResults)) {
                     $data[$translator->trans('mautic.asset.abtest.label.downloads')][] = 0;
                     $data[$translator->trans('mautic.asset.abtest.label.hits')][]      = 0;
-                    $data[$translator->trans('mautic.asset.abtest.label.rates')][]     = 0;
-                    $support['labels'][]                                               = $parent->getId() . ':' . $parent->getTitle();
+                    $support['labels'][]                                               = $parent->getId() . ':' . $parent->getTitle() . ' (0%)';
                 }
 
                 foreach ($children as $c) {
@@ -71,8 +69,7 @@ class AbTestHelper
                         if (!in_array($c->getId(), $hasResults)) {
                             $data[$translator->trans('mautic.asset.abtest.label.downloads')][] = 0;
                             $data[$translator->trans('mautic.asset.abtest.label.hits')][]      = 0;
-                            $data[$translator->trans('mautic.asset.abtest.label.rates')][]     = 0;
-                            $support['labels'][]                                               = $c->getId() . ':' . $c->getTitle();
+                            $support['labels'][]                                               = $c->getId() . ':' . $c->getTitle() . ' (0%)';
                         }
                     }
                 }
