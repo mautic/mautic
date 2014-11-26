@@ -451,20 +451,24 @@ class LeadModel extends FormModel
      */
     public function getTrackingCookie()
     {
-        $request = $this->factory->getRequest();
-        $cookies = $request->cookies;
+        static $trackingId = false, $generated = false;
 
-        //check for the tracking cookie
-        $trackingId = $cookies->get('mautic_session_id');
-        $generated  = false;
         if (empty($trackingId)) {
-            $trackingId = hash('sha1', uniqid(mt_rand()));
-            $generated  = true;
-        }
+            $request = $this->factory->getRequest();
+            $cookies = $request->cookies;
 
-        //create a tracking cookie
-        $expire = time() + 1800;
-        setcookie('mautic_session_id', $trackingId, $expire);
+            //check for the tracking cookie
+            $trackingId = $cookies->get('mautic_session_id');
+            $generated  = false;
+            if (empty($trackingId)) {
+                $trackingId = hash('sha1', uniqid(mt_rand()));
+                $generated  = true;
+            }
+
+            //create a tracking cookie
+            $expire = time() + 1800;
+            setcookie('mautic_session_id', $trackingId, $expire, '/');
+        }
 
         return array($trackingId, $generated);
     }
@@ -477,7 +481,7 @@ class LeadModel extends FormModel
     public function setLeadCookie($leadId)
     {
         list($trackingId, $generated) = $this->getTrackingCookie();
-        setcookie($trackingId, $leadId, time() + 1800);
+        setcookie($trackingId, $leadId, time() + 1800, '/');
     }
 
     /**
