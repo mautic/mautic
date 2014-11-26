@@ -784,6 +784,7 @@ class EmailModel extends FormModel
             //create a stat
             $stat = new Stat();
             $stat->setDateSent(new \DateTime());
+            //use reference to set the email to avoid persist errors
             $stat->setEmail($useEmail['entity']);
             $stat->setLead($this->em->getReference('MauticLeadBundle:Lead', $lead['id']));
             if ($listId) {
@@ -803,6 +804,7 @@ class EmailModel extends FormModel
 
             $batchCount++;
             if ($batchCount > $useEmail['limit']) {
+                $saveEntities[$useEmail['entity']];
                 //use the next email
                 $batchCount = 0;
                 $useEmail = next($emailSettings);
