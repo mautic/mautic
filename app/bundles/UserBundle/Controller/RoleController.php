@@ -176,7 +176,7 @@ class RoleController extends FormController
 
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'form'           => $form->createView(),
+                'form'           => $this->setFormTheme($form, 'MauticUserBundle:Role:form.html.php', 'MauticUserBundle:FormTheme\Role'),
                 'permissionList' => $permissionList
             ),
             'contentTemplate' => 'MauticUserBundle:Role:form.html.php',
@@ -203,6 +203,7 @@ class RoleController extends FormController
             return $this->accessDenied();
         }
 
+        /** @var \Mautic\UserBundle\Model\RoleModel $model */
         $model  = $this->factory->getModel('user.role');
         $entity = $model->getEntity($objectId);
 
@@ -287,7 +288,7 @@ class RoleController extends FormController
 
         return $this->delegateView(array(
             'viewParameters'  => array(
-                'form'           => $form->createView(),
+                'form'           => $this->setFormTheme($form, 'MauticUserBundle:Role:form.html.php', 'MauticUserBundle:FormTheme\Role'),
                 'permissionList' => $permissionList
             ),
             'contentTemplate' => 'MauticUserBundle:Role:form.html.php',

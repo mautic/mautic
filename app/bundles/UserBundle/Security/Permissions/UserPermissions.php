@@ -64,10 +64,9 @@ class UserPermissions extends AbstractPermissions
             ),
             'label'      => 'mautic.user.permissions.profile',
             'label_attr' => array('class' => 'control-label'),
-            'expanded'   => true,
             'multiple'   => true,
             'attr'       => array(
-                'onclick' => 'Mautic.onPermissionChange(this, event, \'user\')'
+                'onchange' => 'Mautic.onPermissionChange(this, \'user\')'
             ),
             'data'       => (!empty($data['profile']) ? $data['profile'] : array())
         ));

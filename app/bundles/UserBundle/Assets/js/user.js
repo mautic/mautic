@@ -66,57 +66,54 @@ Mautic.togglePermissionVisibility = function () {
 /**
  * Toggle permissions, update ratio, etc
  *
- * @param container
- * @param event
+ * @param changedPermission
  * @param bundle
  */
-Mautic.onPermissionChange = function (container, event, bundle) {
-    //add a very slight delay in order for the clicked on checkbox to be selected since the onclick action
-    //is set to the parent div
-    setTimeout(function () {
-        var granted = 0;
-        var clickedBox = mQuery(event.target).find('input:checkbox').first();
-        if (mQuery(clickedBox).prop('checked')) {
-            if (mQuery(clickedBox).val() == 'full') {
-                //uncheck all of the others
-                mQuery(container).find("label input:checkbox:checked").map(function () {
-                    if (mQuery(this).val() != 'full') {
-                        mQuery(this).prop('checked', false);
-                        mQuery(this).parent().toggleClass('active');
-                    }
-                })
-            } else {
-                //uncheck full
-                mQuery(container).find("label input:checkbox:checked").map(function () {
-                    if (mQuery(this).val() == 'full') {
-                        granted = granted - 1;
-                        mQuery(this).prop('checked', false);
-                        mQuery(this).parent().toggleClass('active');
-                    }
-                })
-            }
-        }
+Mautic.onPermissionChange = function (changedPermission, bundle) {
+    var granted = 0;
 
-        //update granted numbers
-        if (mQuery('.' + bundle + '_granted').length) {
-            var granted = 0;
-            var levelPerms = MauticVars.permissionList[bundle];
-            mQuery.each(levelPerms, function(level, perms) {
-                mQuery.each(perms, function(index, perm) {
-                    if (perm == 'full') {
-                        if (mQuery('#role_permissions_' + bundle + '\\:' + level + '_' + perm).prop('checked')) {
-                            if (perms.length === 1)
-                                granted++;
-                            else
-                                granted += perms.length - 1;
-                        }
-                    } else {
-                        if (mQuery('#role_permissions_' + bundle + '\\:' + level + '_' + perm).prop('checked'))
-                            granted++;
-                    }
-                });
-            });
-            mQuery('.' + bundle + '_granted').html(granted);
+    if (mQuery(changedPermission).prop('checked')) {
+        if (mQuery(changedPermission).val() == 'full') {
+            //uncheck all of the others
+            mQuery(changedPermission).closest('.btn-group').find("label input:checkbox:checked").map(function () {
+                if (mQuery(this).val() != 'full') {
+                    mQuery(this).prop('checked', false);
+                    mQuery(this).parent().toggleClass('active');
+                }
+            })
+        } else {
+            //uncheck full
+            mQuery(changedPermission).closest('.btn-group').find("label input:checkbox:checked").map(function () {
+                if (mQuery(this).val() == 'full') {
+                    granted = granted - 1;
+                    mQuery(this).prop('checked', false);
+                    mQuery(this).parent().toggleClass('active');
+                }
+            })
         }
-    }, 10);
+    }
+
+    //update granted numbers
+    if (mQuery('.' + bundle + '_granted').length) {
+        var granted = 0;
+        var levelPerms = MauticVars.permissionList[bundle];
+        mQuery.each(levelPerms, function(level, perms) {
+            mQuery.each(perms, function(index, perm) {
+                var isChecked = mQuery('input[data-permission="' + bundle + ':' + level + ':' + perm + '"]').prop('checked');
+                if (perm == 'full') {
+                    if (isChecked) {
+                        if (perms.length === 1) {
+                            granted++;
+                        } else {
+                            granted += perms.length - 1;
+                        }
+                    }
+                } else if (isChecked) {
+                    granted++;
+                }
+            });
+        });
+        mQuery('.' + bundle + '_granted').html(granted);
+        console.log(mQuery('.' + bundle + '_granted'));
+    }
 };

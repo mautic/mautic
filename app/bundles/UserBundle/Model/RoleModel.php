@@ -70,6 +70,7 @@ class RoleModel extends FormModel
         if (!is_array($rawPermissions)) {
             return;
         }
+
         //set permissions if applicable and if the user is not an admin
         $permissions = (!$entity->isAdmin() && !empty($rawPermissions)) ?
             $this->security->generatePermissions($rawPermissions) :
