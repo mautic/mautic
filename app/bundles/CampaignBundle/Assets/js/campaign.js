@@ -546,6 +546,7 @@ Mautic.renderCampaignEmailSentPie = function () {
         tooltipFontSize: 10,
         tooltipTemplate: "<%if (label){%><%}%><%= value %>x <%=label%>"};
     var timesOnSiteData = mQuery.parseJSON(mQuery('#emails-sent-data').text());
+    timesOnSiteData = Mautic.emulateNoDataForPieChart(timesOnSiteData);
     var ctx = document.getElementById("emails-sent-rate").getContext("2d");
     Mautic.campaignEmailSentPie = new Chart(ctx).Pie(timesOnSiteData, options);
 };

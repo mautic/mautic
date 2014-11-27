@@ -149,6 +149,7 @@ Mautic.renderPageReturningVisitsPie = function () {
         responsive: false,
         tooltipFontSize: 10
     };
+    graphData = Mautic.emulateNoDataForPieChart(graphData);
     var ctx = document.getElementById("returning-rate").getContext("2d");
     Mautic.pageReturningVisitsPie = new Chart(ctx).Pie(graphData, options);
 };
@@ -164,6 +165,7 @@ Mautic.renderPageTimePie = function () {
         tooltipFontSize: 10,
         tooltipTemplate: "<%if (label){%><%}%><%= value %>x <%=label%>"};
     var timesOnSiteData = mQuery.parseJSON(mQuery('#times-on-site-data').text());
+    timesOnSiteData = Mautic.emulateNoDataForPieChart(timesOnSiteData);
     var ctx = document.getElementById("time-rate").getContext("2d");
     Mautic.pageTimePie = new Chart(ctx).Pie(timesOnSiteData, options);
 };

@@ -1346,5 +1346,29 @@ var Mautic = {
                 }
             }
         }
+    },
+
+    /**
+     * Emulates empty data object if doughnut/pie chart data are empty.
+     *
+     *
+     * @param data
+     */
+    emulateNoDataForPieChart: function(data) {
+        var dataEmpty = true;
+        mQuery.each(data, function(i, part) {
+            if (part.value) {
+                dataEmpty = false;
+            }
+        });
+        if (dataEmpty) {
+            data = [{
+                value: 1,
+                color: "#efeeec",
+                highlight: "#EBEBEB",
+                label: "No data"
+            }];
+        }
+        return data;
     }
 };
