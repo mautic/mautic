@@ -519,11 +519,9 @@ class InstallController extends CommonController
             $entityManager->flush();
         } catch (\Exception $exception) {
             return array(
-                array(
-                    'type'    => 'error',
-                    'msg'     => 'mautic.installer.error.creating.user',
-                    'msgVars' => array('%exception%' => $exception->getMessage())
-                )
+                'type'    => 'error',
+                'msg'     => 'mautic.installer.error.creating.user',
+                'msgVars' => array('%exception%' => $exception->getMessage())
             );
         }
 
