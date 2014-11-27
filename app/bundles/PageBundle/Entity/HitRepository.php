@@ -482,15 +482,19 @@ class HitRepository extends CommonRepository
             'count'   => count($times)
         );
         if ($times) {
-            $timesOnSite = GraphHelper::getTimesOnSite();
+            $timesOnSiteHelper = GraphHelper::$timesOnSite;
+            $timesOnSite = array();
             foreach ($times as $seconds) {
-                foreach($timesOnSite as $tkey => $tos) {
+                foreach($timesOnSiteHelper as $tkey => $tos) {
+                    if (!isset($timesOnSite[$tos['label']])) {
+                        $timesOnSite[$tos['label']] = 0;
+                    }
                     if ($seconds > $tos['from'] && $seconds <= $tos['till']) {
-                        $timesOnSite[$tkey]['value']++;
+                        $timesOnSite[$tos['label']]++;
                     }
                 }
             }
-            $stats['timesOnSite'] = $timesOnSite;
+            $stats['timesOnSite'] = GraphHelper::preparePieGraphData($timesOnSite);
         } else {
             $stats['timesOnSite'] = array();
         }
