@@ -11,6 +11,7 @@ namespace Mautic\InstallBundle\Configurator\Form;
 
 use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
@@ -24,26 +25,19 @@ class DoctrineStepType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm (FormBuilderInterface $builder, array $options)
     {
         $builder->add('driver', 'choice', array(
-            'choices'       => DoctrineStep::getDrivers(),
-            'expanded'      => false,
-            'multiple'      => false,
-            'label'         => 'mautic.install.install.form.database.driver',
-            'label_attr'    => array('class' => 'control-label'),
-            'empty_value'   => false,
-            'required'      => true,
-            'attr'          => array(
-                'class'    => 'form-control'
+            'choices'     => DoctrineStep::getDrivers(),
+            'expanded'    => false,
+            'multiple'    => false,
+            'label'       => 'mautic.install.install.form.database.driver',
+            'label_attr'  => array('class' => 'control-label'),
+            'empty_value' => false,
+            'required'    => true,
+            'attr'        => array(
+                'class' => 'form-control'
             )
-        ));
-
-        $builder->add('name', 'text', array(
-            'label'      => 'mautic.install.install.form.database.name',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control'),
-            'required'   => true
         ));
 
         $builder->add('host', 'text', array(
@@ -53,15 +47,22 @@ class DoctrineStepType extends AbstractType
             'required'   => true
         ));
 
-        $builder->add('table_prefix', 'text', array(
-            'label'      => 'mautic.install.install.form.database.table.prefix',
+        $builder->add('port', 'text', array(
+            'label'      => 'mautic.install.install.form.database.port',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control'),
             'required'   => false
         ));
 
-        $builder->add('port', 'text', array(
-            'label'      => 'mautic.install.install.form.database.port',
+        $builder->add('name', 'text', array(
+            'label'      => 'mautic.install.install.form.database.name',
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array('class' => 'form-control'),
+            'required'   => true
+        ));
+
+        $builder->add('table_prefix', 'text', array(
+            'label'      => 'mautic.install.install.form.database.table.prefix',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control'),
             'required'   => false
@@ -84,6 +85,23 @@ class DoctrineStepType extends AbstractType
             'required'   => true
         ));
 
+        $builder->add('backup_tables', 'button_group', array(
+            'choice_list' => new ChoiceList(
+                array(false, true),
+                array('mautic.core.form.no', 'mautic.core.form.yes')
+            ),
+            'label'       => 'mautic.install.form.existing_tables',
+            'expanded'    => true,
+            'empty_value' => false
+        ));
+
+        $builder->add('backup_prefix', 'text', array(
+            'label'      => 'mautic.install.form.backup_prefix',
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array('class' => 'form-control'),
+            'required'   => false
+        ));
+
         $builder->add('buttons', 'form_buttons', array(
             'pre_extra_buttons' => array(
                 array(
@@ -91,14 +109,14 @@ class DoctrineStepType extends AbstractType
                     'label' => 'mautic.install.next.step',
                     'type'  => 'submit',
                     'attr'  => array(
-                        'class'   => 'btn btn-success pull-right mt-20',
-                        'icon'    => 'fa fa-arrow-circle-right'
+                        'class' => 'btn btn-success pull-right mt-20',
+                        'icon'  => 'fa fa-arrow-circle-right'
                     )
                 )
             ),
-            'apply_text'  => '',
-            'save_text'   => '',
-            'cancel_text' => ''
+            'apply_text'        => '',
+            'save_text'         => '',
+            'cancel_text'       => ''
         ));
 
         if (!empty($options['action'])) {
@@ -109,7 +127,7 @@ class DoctrineStepType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName ()
     {
         return 'install_doctrine_step';
     }

@@ -9,6 +9,7 @@
 
 namespace Mautic\CoreBundle\Factory;
 
+use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\MailHelper;
@@ -16,7 +17,6 @@ use Mautic\CoreBundle\Templating\Helper\ThemeHelper;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -32,6 +32,16 @@ class MauticFactory
      * @var ContainerInterface
      */
     private $container;
+
+    /**
+     * @var
+     */
+    private $database = null;
+
+    /**
+     * @var
+     */
+    private $entityManager = null;
 
     /**
      * @param ContainerInterface $container
@@ -135,7 +145,15 @@ class MauticFactory
      */
     public function getEntityManager()
     {
-        return $this->container->get('doctrine')->getManager();
+        return ($this->entityManager) ? $this->entityManager : $this->container->get('doctrine')->getManager();
+    }
+
+    /**
+     * @param EntityManager $em
+     */
+    public function setEntityManager(EntityManager $em)
+    {
+        $this->entityManager = $em;
     }
 
     /**
@@ -145,7 +163,15 @@ class MauticFactory
      */
     public function getDatabase()
     {
-        return $this->container->get('database_connection');
+        return ($this->database) ? $this->database : $this->container->get('database_connection');
+    }
+
+    /**
+     * @param $db
+     */
+    public function setDatabase($db)
+    {
+        $this->database = $db;
     }
 
     /**

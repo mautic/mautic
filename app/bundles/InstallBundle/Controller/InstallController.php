@@ -11,8 +11,12 @@ namespace Mautic\InstallBundle\Controller;
 
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
+use Doctrine\DBAL\DriverManager;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\SchemaTool;
+use Doctrine\ORM\Tools\Setup;
 use Mautic\CoreBundle\Controller\CommonController;
+use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
 use Symfony\Component\Process\Exception\RuntimeException;
@@ -29,7 +33,7 @@ class InstallController extends CommonController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function stepAction($index = 0)
+    public function stepAction ($index = 0)
     {
         // We're going to assume a bit here; if the config file exists already and DB info is provided, assume the app is installed and redirect
         if ($this->checkIfInstalled()) {
@@ -43,15 +47,15 @@ class InstallController extends CommonController
         $step   = $configurator->getStep($index);
 
         /** @var \Symfony\Component\Form\Form $form */
-        $form   = $this->container->get('form.factory')->create($step->getFormType(), $step, array('action' => $action));
-        $tmpl   = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
+        $form = $this->container->get('form.factory')->create($step->getFormType(), $step, array('action' => $action));
+        $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
         // Always pass the requirements into the templates
         $majors = $configurator->getRequirements();
         $minors = $configurator->getOptionalSettings();
 
         if ('POST' === $this->request->getMethod()) {
-            $form->submit($this->request);
+            $form->handleRequest($this->request);
             if ($form->isValid()) {
                 $configurator->mergeParameters($step->update($form->getData()));
 
@@ -77,8 +81,8 @@ class InstallController extends CommonController
                         ),
                         'flashes'           => array(
                             array(
-                                'type'    => 'error',
-                                'msg'     => 'mautic.installer.error.writing.configuration'
+                                'type' => 'error',
+                                'msg'  => 'mautic.installer.error.writing.configuration'
                             )
                         ),
                         'forwardController' => false
@@ -90,14 +94,21 @@ class InstallController extends CommonController
 
                 switch ($index) {
                     case 1:
-                        $result = $this->performDatabaseInstallation($form, $configurator, $step);
-                        if (is_array($result)) {
-                            $flashes[] = $result;
-                        }
+                        $originalData = $form->getData();
 
-                        $result = $this->performFixtureInstall();
+                        //let's create a dynamic details
+                        $dbParams           = (array)$originalData;
+                        $dbParams['dbname'] = $dbParams['name'];;
+                        unset($dbParams['name']);
+
+                        $result = $this->performDatabaseInstallation($dbParams, $configurator, $step);
                         if (is_array($result)) {
                             $flashes[] = $result;
+                        } else {
+                            $result = $this->performFixtureInstall($dbParams);
+                            if (is_array($result)) {
+                                $flashes[] = $result;
+                            }
                         }
 
                         break;
@@ -129,11 +140,7 @@ class InstallController extends CommonController
                         ),
                         'returnUrl'         => $this->generateUrl('mautic_installer_step', array('index' => $index)),
                         'contentTemplate'   => $step->getTemplate(),
-                        'passthroughVars'   => array(
-                            'activeLink'    => '#mautic_installer_index',
-                            'mauticContent' => 'installer'
-                        ),
-                        'flashes'           => $result,
+                        'flashes'           => $flashes,
                         'forwardController' => false
                     ));
                 }
@@ -159,10 +166,6 @@ class InstallController extends CommonController
                         ),
                         'returnUrl'         => $action,
                         'contentTemplate'   => $nextStep->getTemplate(),
-                        'passthroughVars'   => array(
-                            'activeLink'    => '#mautic_installer_index',
-                            'mauticContent' => 'installer'
-                        ),
                         'forwardController' => false
                     ));
                 }
@@ -180,8 +183,8 @@ class InstallController extends CommonController
                     $configurator->write();
                 } catch (RuntimeException $exception) {
                     $flashes[] = array(
-                        'type'    => 'error',
-                        'msg'     => 'mautic.installer.error.writing.configuration'
+                        'type' => 'error',
+                        'msg'  => 'mautic.installer.error.writing.configuration'
                     );
                 }
 
@@ -189,7 +192,7 @@ class InstallController extends CommonController
                 $this->clearCache();
 
                 return $this->postActionRedirect(array(
-                    'viewParameters'  =>  array(
+                    'viewParameters'    => array(
                         'welcome_url' => $this->generateUrl('mautic_dashboard_index'),
                         'parameters'  => $configurator->render(),
                         'config_path' => $this->container->getParameter('kernel.root_dir') . '/config/local.php',
@@ -199,10 +202,6 @@ class InstallController extends CommonController
                     ),
                     'returnUrl'         => $this->generateUrl('mautic_installer_final'),
                     'contentTemplate'   => 'MauticInstallBundle:Install:final.html.php',
-                    'passthroughVars'   => array(
-                        'activeLink'    => '#mautic_installer_index',
-                        'mauticContent' => 'installer'
-                    ),
                     'flashes'           => $flashes,
                     'forwardController' => false
                 ));
@@ -210,7 +209,7 @@ class InstallController extends CommonController
         }
 
         return $this->delegateView(array(
-            'viewParameters'  =>  array(
+            'viewParameters'  => array(
                 'form'    => $form->createView(),
                 'index'   => $index,
                 'count'   => $configurator->getStepCount(),
@@ -222,9 +221,7 @@ class InstallController extends CommonController
             ),
             'contentTemplate' => $step->getTemplate(),
             'passthroughVars' => array(
-                'activeLink'     => '#mautic_installer_index',
-                'mauticContent'  => 'installer',
-                'route'          => $this->generateUrl('mautic_installer_step', array('index' => $index))
+                'route' => $this->generateUrl('mautic_installer_step', array('index' => $index))
             )
         ));
     }
@@ -234,7 +231,7 @@ class InstallController extends CommonController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function finalAction()
+    public function finalAction ()
     {
         // We're going to assume a bit here; if the config file exists already and DB info is provided, assume the app is installed and redirect
         if ($this->checkIfInstalled()) {
@@ -249,7 +246,7 @@ class InstallController extends CommonController
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
         return $this->delegateView(array(
-            'viewParameters'  =>  array(
+            'viewParameters'  => array(
                 'welcome_url' => $welcomeUrl,
                 'parameters'  => $configurator->render(),
                 'config_path' => $this->container->getParameter('kernel.root_dir') . '/config/local.php',
@@ -259,9 +256,9 @@ class InstallController extends CommonController
             ),
             'contentTemplate' => 'MauticInstallBundle:Install:final.html.php',
             'passthroughVars' => array(
-                'activeLink'     => '#mautic_installer_index',
-                'mauticContent'  => 'installer',
-                'route'          => $this->generateUrl('mautic_installer_final')
+                'activeLink'    => '#mautic_installer_index',
+                'mauticContent' => 'installer',
+                'route'         => $this->generateUrl('mautic_installer_final')
             )
         ));
     }
@@ -274,7 +271,7 @@ class InstallController extends CommonController
      *
      * @return string
      */
-    private function checkDatabaseNotExistsMessage($driver, $database)
+    private function checkDatabaseNotExistsMessage ($driver, $database)
     {
         switch ($driver) {
             case 'pdo_mysql':
@@ -292,7 +289,7 @@ class InstallController extends CommonController
      *
      * @return bool
      */
-    private function checkIfInstalled()
+    private function checkIfInstalled ()
     {
         // If the config file doesn't even exist, no point in checking further
         if (file_exists($this->container->getParameter('kernel.root_dir') . '/config/local.php')) {
@@ -304,7 +301,8 @@ class InstallController extends CommonController
             if ((isset($params['db_driver']) && $params['db_driver'])
                 && (isset($params['db_user']) && $params['db_user'])
                 && (isset($params['db_name']) && $params['db_name'])
-                && (isset($params['send_server_stats']) && $params['send_server_stats'])) {
+                && (isset($params['send_server_stats']) && $params['send_server_stats'])
+            ) {
                 // We need to allow users to the final step, so one last check here
                 if (strpos($this->request->getRequestUri(), 'installer/final') === false) {
                     return true;
@@ -318,70 +316,173 @@ class InstallController extends CommonController
     /**
      * Performs the database installation
      *
-     * @param \Symfony\Component\Form\Form                          $form
+     * @param array                                                 $dbParams
      * @param \Mautic\InstallBundle\Configurator\Configurator       $configurator
      * @param \Mautic\InstallBundle\Configurator\Step\StepInterface $step
      *
      * @return array|boolean Array containing the flash message data on a failure, boolean true on success
      */
-    private function performDatabaseInstallation($form, $configurator, $step)
+    private function performDatabaseInstallation ($dbParams, $configurator, $step)
     {
-        $this->clearCache();
-
-        $entityManager = $this->factory->getEntityManager();
+        $entityManager = $this->factory->getEntityManager($dbParams);
         $metadatas     = $entityManager->getMetadataFactory()->getAllMetadata();
-        $originalData  = $form->getData();
 
-        if (!empty($metadatas)) {
+        $dbName             = $dbParams['dbname'];
+        $dbParams['dbname'] = null;
+
+        //test credentials
+        try {
+            $db = DriverManager::getConnection($dbParams);
+            $db->connect();
+        } catch (\Exception $exception) {
+            $db->close();
+
+            return array(
+                'type' => 'error',
+                'msg'  => 'mautic.installer.error.connecting.database'
+            );
+        }
+
+        //test database existence
+        $dbParams['dbname'] = $dbName;
+
+        $db = DriverManager::getConnection($dbParams);
+        if ($db->isConnected()) {
+            $db->close();
+        }
+
+        try {
+            $db->connect();
+            $schemaManager = $db->getSchemaManager();
+        } catch (\Exception $exception) {
+            $db->close();
+
+            //it failed to connect so remove the dbname and try to create it
+            $dbParams['dbname'] = null;
+            $db                 = DriverManager::getConnection($dbParams);
+            $db->connect();
+
             try {
-                $schemaTool = new SchemaTool($entityManager);
-                $schemaTool->createSchema($metadatas);
+                //database does not exist so try to create it
+                $schemaManager = $db->getSchemaManager();
+                $schemaManager->createDatabase($dbName);
             } catch (\Exception $exception) {
-                $error = false;
-                if (strpos($exception->getMessage(), $this->checkDatabaseNotExistsMessage($originalData->driver, $originalData->name)) !== false) {
-                    // Try to manually create the database, first we null out the database name
-                    $editData       = clone $originalData;
-                    $editData->name = null;
-                    $configurator->mergeParameters($step->update($editData));
-                    $configurator->write();
-                    $this->clearCache();
-                    try {
-                        $this->factory->getEntityManager()->getConnection()->executeQuery('CREATE DATABASE ' . $data->name);
+                $db->close();
 
-                        // Assuming we got here, we should be able to install correctly now
-                        $configurator->mergeParameters($step->update($originalData));
-                        $configurator->write();
-                        $this->clearCache();
-                        $schemaTool = new SchemaTool($entityManager);
-                        $schemaTool->createSchema($metadatas);
-                    } catch (\Exception $exception) {
-                        // We did our best, we really did
-                        $error = true;
-                        $msg   = 'mautic.installer.error.creating.database';
-                    }
+                return array(
+                    'type'    => 'error',
+                    'msg'     => 'mautic.installer.error.creating.database',
+                    'msgVars' => array(
+                        '%name%' => $dbName
+                    )
+                );
+            }
+        }
+
+        try {
+            //check to see if the table already exist
+            $tables = $schemaManager->listTableNames();
+        } catch (\Exception $e) {
+            $db->close();
+
+            return array(
+                'type' => 'error',
+                'msg'  => 'mautic.installer.error.connecting.database'
+            );
+        }
+
+        if ($dbParams['backup_tables']) {
+            //backup existing tables
+            $backupPrefix     = ($dbParams['backup_prefix']) ? $dbParams['backup_prefix'] : 'bak_';
+            $backupRestraints = $dropTables = $backupTables = array();
+
+            //cycle through the first time to drop all the foreign keys
+            foreach ($tables as $t) {
+                $backup = str_replace($dbParams['table_prefix'], $backupPrefix, $t);
+
+                $restraints = $schemaManager->listTableForeignKeys($t);
+
+                if ($t != $backup) {
+                    //to be backed up
+                    $backupRestraints[$backup] = $restraints;
+                    $backupTables[$t]          = $backup;
                 } else {
-                    $error = true;
-                    if (strpos($exception->getMessage(), 'Base table or view already exists') !== false) {
-                        $msg = 'mautic.installer.error.database.exists';
-                    } else {
-                        $msg = 'mautic.installer.error.creating.database';
-                    }
+                    //existing backup to be dropped
+                    $dropTables[] = $t;
                 }
 
-                if ($error) {
+                foreach ($restraints as $restraint) {
+                    $schemaManager->dropForeignKey($restraint, $t);
+                }
+            }
+
+            //now drop all the backup tables
+            foreach ($dropTables as $t) {
+                $schemaManager->dropTable($t);
+            }
+
+            //now backup tables
+            foreach ($backupTables as $t => $backup) {
+                $schemaManager->renameTable($t, $backup);
+            }
+
+            //apply foreign keys to backup tables
+            foreach ($backupRestraints as $table => $oldRestraints) {
+                foreach ($oldRestraints as $or) {
+                    $foreignTable     = $or->getForeignTableName();
+                    $foreignTableName = str_replace($dbParams['table_prefix'], $backupPrefix, $foreignTable);
+                    $r                = new \Doctrine\DBAL\Schema\ForeignKeyConstraint(
+                        $or->getLocalColumns(),
+                        $foreignTableName,
+                        $or->getForeignColumns(),
+                        'BAK_' . $or->getName(),
+                        $or->getOptions()
+                    );
+                    $schemaManager->createForeignKey($r, $table);
+                }
+            }
+        } else {
+            //drop tables
+            foreach ($tables as $t) {
+                //drop foreign keys first in order to be able to drop the table
+                $restraints = $schemaManager->listTableForeignKeys($t);
+                foreach ($restraints as $restraint) {
+                    $schemaManager->dropForeignKey($restraint, $t);
+                }
+            }
+            foreach ($tables as $t) {
+                $schemaManager->dropTable($t);
+            }
+        }
+
+        if (!empty($metadatas)) {
+            $schemaTool = new SchemaTool($entityManager);
+            $queries    = $schemaTool->getCreateSchemaSql($metadatas);
+
+            foreach ($queries as $q) {
+                try {
+                    $db->executeQuery($q);
+                } catch (\Exception $e) {
+                    $db->close();
+
                     return array(
                         'type'    => 'error',
-                        'msg'     => $msg,
-                        'msgVars' => array('%exception%' => $exception->getMessage())
+                        'msg'     => 'mautic.installer.error.installing.data',
+                        'msgVars' => array(
+                            '%exception%' => $e->getMessage()
+                        )
                     );
                 }
             }
         } else {
+            $db->close();
+
             return array(
                 'type' => 'error',
                 'msg'  => 'mautic.installer.error.no.metadata'
             );
         }
+        $db->close();
 
         return true;
     }
@@ -393,10 +494,10 @@ class InstallController extends CommonController
      *
      * @return array|bool Array containing the flash message data on a failure, boolean true on success
      */
-    private function performUserAddition($form)
+    private function performUserAddition ($form)
     {
         try {
-            $entityManager = $this->factory->getEntityManager();
+            $entityManager = $this->getEntityManager();
 
             // Now we create the user
             $data = $form->getData();
@@ -432,13 +533,14 @@ class InstallController extends CommonController
     /**
      * Installs data fixtures for the application
      *
+     * @param array $dbParams
+     *
      * @return array|bool Array containing the flash message data on a failure, boolean true on success
      */
-    private function performFixtureInstall()
+    private function performFixtureInstall ()
     {
         try {
-            // First we need to setup the environment
-            $entityManager = $this->factory->getEntityManager();
+            $entityManager = $this->getEntityManager();
             $paths         = array(dirname(__DIR__) . '/InstallFixtures/ORM');
             $loader        = new ContainerAwareLoader($this->container);
 
@@ -452,7 +554,7 @@ class InstallController extends CommonController
 
             if (!$fixtures) {
                 throw new \InvalidArgumentException(
-                    sprintf('Could not find any fixtures to load in: %s', "\n\n- ".implode("\n- ", $paths))
+                    sprintf('Could not find any fixtures to load in: %s', "\n\n- " . implode("\n- ", $paths))
                 );
             }
 
@@ -461,15 +563,70 @@ class InstallController extends CommonController
             $executor = new ORMExecutor($entityManager, $purger);
             $executor->execute($fixtures, true);
         } catch (\Exception $exception) {
+            die(var_dump($exception));
             return array(
-                array(
-                    'type'    => 'error',
-                    'msg'     => 'mautic.installer.error.adding.fixtures',
-                    'msgVars' => array('%exception%' => $exception->getMessage())
-                )
+                'type'    => 'error',
+                'msg'     => 'mautic.installer.error.adding.fixtures',
+                'msgVars' => array('%exception%' => $exception->getMessage())
             );
         }
 
         return true;
+    }
+
+    /**
+     * @param $dbParams
+     *
+     * @return EntityManager
+     * @throws \Doctrine\ORM\ORMException
+     */
+    private function getEntityManager ($dbParams = array())
+    {
+        static $entityManager;
+
+        if (empty($entityManager)) {
+            if (empty($dbParams)) {
+                $configurator = $this->container->get('mautic.configurator');
+                $dbStep       = new DoctrineStep($configurator->getParameters());
+                $dbParams     = (array)$dbStep;
+
+                $dbParams['dbname'] = $dbParams['name'];
+                unset($dbParams['name']);
+            }
+
+            //get paths to entities
+            $bundles = $this->factory->getParameter('bundles');
+            $paths   = array();
+
+            foreach ($bundles as $b) {
+                $entityPath = $b['directory'] . '/Entity';
+                if (file_exists($entityPath)) {
+                    $paths[] = $entityPath;
+                }
+            }
+
+            $addons = $this->factory->getParameter('addon.bundles');
+            foreach ($addons as $b) {
+                $entityPath = $b['directory'] . '/Entity';
+                if (file_exists($entityPath)) {
+                    $paths[] = $entityPath;
+                }
+            }
+
+            //reset database classes for fixtures that load from container and/or MauticFactory
+            $db = DriverManager::getConnection($dbParams);
+            $this->container->set('database_connection', $db);
+            $this->factory->setDatabase($db);
+
+            //create an entity manager with current DB details
+            $config        = Setup::createAnnotationMetadataConfiguration($paths, true, null, null, false);
+            $entityManager = EntityManager::create($db, $config);
+            $this->container->set('doctrine.orm.entity_manager', $entityManager);
+            $this->factory->setEntityManager($entityManager);
+
+            $this->container->set('mautic.factory', $this->factory);
+        }
+
+        return $entityManager;
     }
 }

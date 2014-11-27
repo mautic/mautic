@@ -10,9 +10,9 @@
 $parameters = array(
     'send_server_data'             => false,
     'theme'                        => 'Mauve',
-    'db_driver'                    => 'pdo_mysql',
+    'db_driver'                    => 'mysqli',
     'db_host'                      => 'localhost',
-    'db_port'                      => null,
+    'db_port'                      => 3306,
     'db_name'                      => '',
     'db_user'                      => '',
     'db_password'                  => '',

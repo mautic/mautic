@@ -7,7 +7,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\ReportBundle\DataFixtures\ORM;
+namespace Mautic\InstallBundle\InstallFixtures\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
@@ -41,8 +41,6 @@ class LoadReportData extends AbstractFixture implements OrderedFixtureInterface,
      */
     public function load(ObjectManager $manager)
     {
-        $factory = $this->container->get('mautic.factory');
-        $repo    = $factory->getModel('report')->getRepository();
         $reports = CsvHelper::csv_to_array(__DIR__ . '/fakereportdata.csv');
         foreach ($reports as $count => $rows) {
             $report = new Report();
@@ -56,10 +54,12 @@ class LoadReportData extends AbstractFixture implements OrderedFixtureInterface,
                     $report->$setter($val);
                 }
             }
-            $repo->saveEntity($report);
+
+            $manager->persist($report);
 
             $this->setReference('report-' . $key, $report);
         }
+        $manager->flush();
     }
 
     /**

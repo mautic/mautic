@@ -314,7 +314,9 @@ class CommonController extends Controller implements MauticController
      */
     public function clearCache()
     {
-        $input       = new ArgvInput(array('console', 'cache:clear', '--env=' . $this->factory->getEnvironment()));
+        $env = $this->factory->getEnvironment();
+        $noDebug = ($env == 'prod') ? ' --no-debug' : '';
+        $input       = new ArgvInput(array('console', 'cache:clear', '--env=' . $env . $noDebug));
         $application = new Application($this->get('kernel'));
         $application->setAutoExit(false);
         $application->run($input);
