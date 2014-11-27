@@ -193,7 +193,7 @@ class CampaignController extends FormController
         $emailsSent = $this->factory->getEntityManager()->getRepository('MauticEmailBundle:Stat')->getIgnoredReadFailed(null, array('source_id' => $entity->getId(), 'source' => 'campaign'));
 
         // Lead count stats
-        $leadStats = $campaignLeadRepo->getLeadStats(30, 'D');
+        $leadStats = $campaignLeadRepo->getLeadStats(30, 'D', array('campaign_id' => $entity->getId()));
 
         $leadPage = $this->factory->getSession()->get('mautic.campaign.lead.page', 1);
 

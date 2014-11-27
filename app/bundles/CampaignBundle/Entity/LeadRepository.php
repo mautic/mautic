@@ -186,12 +186,13 @@ class LeadRepository extends CommonRepository
      *
      * @param integer $quantity of units
      * @param string $unit of time php.net/manual/en/class.dateinterval.php#dateinterval.props
+     * @param array $options
      *
      * @return mixed
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getLeadStats($quantity, $unit)
+    public function getLeadStats($quantity, $unit, $options = array())
     {
         $graphData = GraphHelper::prepareDatetimeLineGraphData($quantity, $unit, array('viewed'));
 
@@ -202,6 +203,11 @@ class LeadRepository extends CommonRepository
         $q->andwhere($q->expr()->gte('cl.dateAdded', ':date'))
             ->setParameter('date', $graphData['fromDate'])
             ->orderBy('cl.dateAdded', 'ASC');
+
+        if (isset($options['campaign_id'])) {
+            $q->andwhere($q->expr()->gte('cl.campaign', ':campaignId'))
+                ->setParameter('campaignId', $options['campaign_id']);
+        }
 
         $leads = $q->getQuery()->getArrayResult();
 
