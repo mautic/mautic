@@ -147,7 +147,10 @@ class DoctrineStep implements StepInterface
         $parameters = array();
 
         foreach ($data as $key => $value) {
-            $parameters['db_'.$key] = $value;
+            // Exclude backup params from the config
+            if (substr($key, 0, 6) != 'backup') {
+                $parameters['db_' . $key] = $value;
+            }
         }
 
         return $parameters;
