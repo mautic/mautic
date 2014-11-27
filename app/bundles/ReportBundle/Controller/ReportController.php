@@ -312,7 +312,6 @@ class ReportController extends FormController
         if (!$ignorePost && $this->request->getMethod() == 'POST') {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
-
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
                     $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
@@ -338,7 +337,7 @@ class ReportController extends FormController
                 } else {
                     $this->request->getSession()->getFlashBag()->add(
                         'error',
-                        $this->get('translator')->trans('mautic.core.error.unvalid')
+                        $this->get('translator')->trans('mautic.core.error.not.valid', array(), 'flashes')
                     );
                 }
             } else {
