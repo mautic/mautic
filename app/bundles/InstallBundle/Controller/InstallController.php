@@ -98,7 +98,7 @@ class InstallController extends CommonController
 
                         //let's create a dynamic details
                         $dbParams           = (array)$originalData;
-                        $dbParams['dbname'] = $dbParams['name'];;
+                        $dbParams['dbname'] = $dbParams['name'];
                         unset($dbParams['name']);
 
                         $result = $this->performDatabaseInstallation($dbParams, $configurator, $step);
@@ -563,7 +563,6 @@ class InstallController extends CommonController
             $executor = new ORMExecutor($entityManager, $purger);
             $executor->execute($fixtures, true);
         } catch (\Exception $exception) {
-            die(var_dump($exception));
             return array(
                 'type'    => 'error',
                 'msg'     => 'mautic.installer.error.adding.fixtures',
