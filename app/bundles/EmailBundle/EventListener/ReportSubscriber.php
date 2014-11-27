@@ -57,12 +57,12 @@ class ReportSubscriber extends CommonSubscriber
 
         foreach ($emailFields as $field) {
             $fieldData = $metadataEmail->getFieldMapping($field);
-            $columns['a.' . $fieldData['columnName']] = array('label' => $field, 'type' => $fieldData['type']);
+            $columns['e.' . $fieldData['columnName']] = array('label' => $field, 'type' => $fieldData['type']);
         }
 
         foreach ($statFields as $field) {
             $fieldData = $metadataStat->getFieldMapping($field);
-            $columns['ad.' . $fieldData['columnName']] = array('label' => $field, 'type' => $fieldData['type']);
+            $columns['es.' . $fieldData['columnName']] = array('label' => $field, 'type' => $fieldData['type']);
         }
 
         $data = array(

@@ -335,6 +335,11 @@ class ReportController extends FormController
                     ));
                     $viewParams = array('reportId' => $entity->getId());
                     $template = 'MauticReportBundle:Report:view';
+                } else {
+                    $this->request->getSession()->getFlashBag()->add(
+                        'error',
+                        $this->get('translator')->trans('mautic.core.error.unvalid')
+                    );
                 }
             } else {
                 //unlock the entity
