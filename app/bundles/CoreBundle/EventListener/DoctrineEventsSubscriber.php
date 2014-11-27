@@ -17,20 +17,6 @@ use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
  */
 class DoctrineEventsSubscriber implements \Doctrine\Common\EventSubscriber
 {
-
-    /**
-     * @var string
-     */
-    protected $prefix = '';
-
-    /**
-     * @param string $prefix
-     */
-    public function __construct($prefix)
-    {
-        $this->prefix  = (string) $prefix;
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -46,6 +32,11 @@ class DoctrineEventsSubscriber implements \Doctrine\Common\EventSubscriber
      */
     public function loadClassMetadata(LoadClassMetadataEventArgs $args)
     {
+        if (defined('MAUTIC_INSTALLER') && !defined('MAUTIC_TABLE_PREFIX')) {
+            //only run this after the installer has set the MAUTIC_TABLE_PREFIX
+            return;
+        }
+
         $classMetadata = $args->getClassMetadata();
 
         // Do not re-apply the prefix in an inheritance hierarchy.
@@ -54,13 +45,16 @@ class DoctrineEventsSubscriber implements \Doctrine\Common\EventSubscriber
         }
 
         if (FALSE !== strpos($classMetadata->namespace, 'Mautic')) {
-            $classMetadata->setPrimaryTable(array('name' => $this->prefix . $classMetadata->getTableName()));
+            //if in the installer, use the prefix set by it rather than what is cached
+            $prefix = MAUTIC_TABLE_PREFIX;
+
+            $classMetadata->setPrimaryTable(array('name' =>  $prefix . $classMetadata->getTableName()));
 
             foreach ($classMetadata->getAssociationMappings() as $fieldName => $mapping) {
                 if ($mapping['type'] == \Doctrine\ORM\Mapping\ClassMetadataInfo::MANY_TO_MANY
                     && isset($classMetadata->associationMappings[$fieldName]['joinTable']['name'])) {
                     $mappedTableName = $classMetadata->associationMappings[$fieldName]['joinTable']['name'];
-                    $classMetadata->associationMappings[$fieldName]['joinTable']['name'] = $this->prefix . $mappedTableName;
+                    $classMetadata->associationMappings[$fieldName]['joinTable']['name'] = $prefix . $mappedTableName;
                 }
             }
 

@@ -191,9 +191,9 @@ class MauticFactory
             if ($type == "table") {
                 //get the column helper as well
                 $columnHelper         = $this->getSchemaHelper('column');
-                $schemaHelpers[$type] = new $className($this->getDatabase(), $this->getParameter('db_table_prefix'), $columnHelper);
+                $schemaHelpers[$type] = new $className($this->getDatabase(), MAUTIC_TABLE_PREFIX, $columnHelper);
             } else {
-                $schemaHelpers[$type] = new $className($this->getDatabase(), $this->getParameter('db_table_prefix'));
+                $schemaHelpers[$type] = new $className($this->getDatabase(), MAUTIC_TABLE_PREFIX);
             }
 
         }
@@ -292,6 +292,11 @@ class MauticFactory
      */
     public function getParameter($id)
     {
+        if ($id == 'db_table_prefix' && defined('MAUTIC_TABLE_PREFIX')) {
+            //use the constant in case in the installer
+            return MAUTIC_TABLE_PREFIX;
+        }
+
         return ($this->container->hasParameter('mautic.' . $id)) ?
             $this->container->getParameter('mautic.' . $id) :
             false;
