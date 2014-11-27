@@ -67,25 +67,6 @@ class GraphHelper
     );
 
     /**
-     * @return array
-     */
-    public static function getTimesOnSite()
-    {
-        $timesOnSite = self::$timesOnSite;
-        $colors = self::$colors;
-        foreach ($timesOnSite as $key => $tos) {
-            if (isset($colors[$key])) {
-                $timesOnSite[$key]['color'] = $colors[$key]['color'];
-                $timesOnSite[$key]['highlight'] = $colors[$key]['highlight'];
-            } else {
-                $timesOnSite[$key]['color'] = '#4E5D9D';
-                $timesOnSite[$key]['highlight'] = '#353F6A';
-            }
-        }
-        return $timesOnSite;
-    }
-
-    /**
      * Get proper date label format depending on what date scope we want to display
      *
      * @param string $unit : php.net/manual/en/dateinterval.construct.php#refsect1-dateinterval.construct-parameters
