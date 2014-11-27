@@ -24,14 +24,14 @@ class DoctrineStep implements StepInterface
      *
      * @Assert\Choice(callback="getDriverKeys")
      */
-    public $driver;
+    public $driver = 'mysqli';
 
     /**
      * Database host
      *
      * @Assert\NotBlank
      */
-    public $host;
+    public $host = 'localhost';
 
     /**
      * Database table prefix
@@ -45,7 +45,7 @@ class DoctrineStep implements StepInterface
      *
      * @Assert\Range(min = "0")
      */
-    public $port;
+    public $port = 3306;
 
     /**
      * Database name
@@ -73,6 +73,20 @@ class DoctrineStep implements StepInterface
      * @var string
      */
     public $path;
+
+    /**
+     * Backup tables if they exist; otherwise drop them
+     *
+     * @var bool
+     */
+    public $backup_tables = true;
+
+    /**
+     * Prefix for backup tables
+     *
+     * @var string
+     */
+    public $backup_prefix = 'bak_';
 
     /**
      * Constructor

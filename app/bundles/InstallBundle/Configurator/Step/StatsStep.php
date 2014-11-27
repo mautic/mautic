@@ -19,7 +19,7 @@ class StatsStep implements StepInterface
     /**
      * Send server stats?
      */
-    public $send_server_data;
+    public $send_server_data = true;
 
     /**
      * {@inheritdoc}
