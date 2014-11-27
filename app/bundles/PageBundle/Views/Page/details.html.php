@@ -148,8 +148,8 @@ $showVariants = (count($variants['children']) || $variants['parent']);
                             <div class="text-center">
                                 <canvas id="returning-rate" width="110" height="110"></canvas>
                                 <div id="returning-data" class="hide">
-                                <?php if (isset($stats['dwellTime'][$activePage->getId()]['newVsReturning'])) : ?>
-                                    <?php echo json_encode($stats['dwellTime'][$activePage->getId()]['newVsReturning']); ?>
+                                <?php if (isset($stats['dwellTime']['newVsReturning'])) : ?>
+                                    <?php echo json_encode($stats['dwellTime']['newVsReturning']); ?>
                                 <?php else : ?>
                                     []
                                 <?php endif; ?>
@@ -176,8 +176,8 @@ $showVariants = (count($variants['children']) || $variants['parent']);
                                     height="110">
                                 </canvas>
                                 <div id="times-on-site-data" class="hide">
-                                <?php if (isset($stats['dwellTime'][$activePage->getId()]['timesOnSite'])) : ?>
-                                    <?php echo json_encode($stats['dwellTime'][$activePage->getId()]['timesOnSite']); ?>
+                                <?php if (isset($stats['dwellTime']['timesOnSite'])) : ?>
+                                    <?php echo json_encode($stats['dwellTime']['timesOnSite']); ?>
                                 <?php else : ?>
                                     []
                                 <?php endif; ?>
