@@ -29,8 +29,6 @@
                 </div>
             </div>
         </section>
-            <!--/ end: app-content -->
-
-        <?php echo $view->render('MauticCoreBundle:Default:script.html.php'); ?>
+        <!--/ end: app-content -->
     </body>
 </html>
