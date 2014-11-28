@@ -43,13 +43,22 @@ class EmailListType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults(array(
-            'choices'       => $this->choices,
-            'empty_value'   => false,
-            'expanded'      => false,
-            'multiple'      => true,
-            'required'      => false
-        ));
+        if ($this->choices) {
+            $resolver->setDefaults(array(
+                'choices'       => $this->choices,
+                'empty_value'   => false,
+                'expanded'      => false,
+                'multiple'      => true,
+                'required'      => false,
+                'empty_value'   => 'mautic.core.form.chooseone'
+            ));
+        } else {
+            $resolver->setDefaults(array(
+                'empty_value'   => 'mautic.email.no.emails.note',
+                'required'      => false,
+                'disabled'      => true
+            ));
+        }
     }
 
     /**

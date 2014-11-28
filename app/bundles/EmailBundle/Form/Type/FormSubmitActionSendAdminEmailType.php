@@ -32,7 +32,6 @@ class FormSubmitActionSendAdminEmailType extends AbstractType
             'multiple'      => false,
             'label'         => 'mautic.email.form.submit.emails',
             'label_attr'    => array('class' => 'control-label'),
-            'empty_value'   => false,
             'required'      => false,
             'attr'       => array(
                 'class'   => 'form-control',

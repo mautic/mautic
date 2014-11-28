@@ -36,7 +36,6 @@ class EmailSendType extends AbstractType
                 'tooltip' => 'mautic.email.send.selectemails_descr'
             ),
             'multiple'   => false,
-            'empty_value' => 'mautic.core.form.chooseone',
             'constraints' => array(
                 new NotBlank(
                     array('message' => 'mautic.email.chooseemail.notblank')
