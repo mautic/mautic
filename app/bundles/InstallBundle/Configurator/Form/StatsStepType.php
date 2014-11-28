@@ -28,7 +28,7 @@ class StatsStepType extends AbstractType
                 array(false, true),
                 array('mautic.core.form.no', 'mautic.core.form.yes')
             ),
-            'label'       => 'mautic.install.install.form.stats.send_stats',
+            'label'       => 'mautic.install.form.stats.send_stats',
             'expanded'    => true,
             'empty_value' => false
         ));
@@ -40,15 +40,17 @@ class StatsStepType extends AbstractType
                     'label' => 'mautic.install.next.step',
                     'type'  => 'submit',
                     'attr'  => array(
-                        'class'   => 'btn btn-success pull-right mt-20',
-                        'icon'    => 'fa fa-arrow-circle-right'
+                        'class' => 'btn btn-success pull-right btn-next',
+                        'icon'  => 'fa fa-arrow-circle-right',
+                        'onclick' => 'MauticInstaller.showWaitMessage(event);'
                     )
                 )
             ),
-            'apply_text'  => '',
-            'save_text'   => '',
-            'cancel_text' => ''
+            'apply_text'        => '',
+            'save_text'         => '',
+            'cancel_text'       => ''
         ));
+
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);

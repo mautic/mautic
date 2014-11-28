@@ -21,6 +21,7 @@ $parameters = array(
     'mailer_from_email'            => 'email@yoursite.com',
     'mailer_transport'             => 'mail',
     'mailer_host'                  => '',
+    'mailer_port'                  => null,
     'mailer_user'                  => null,
     'mailer_password'              => null,
     'mailer_encryption'            => null, //tls or ssl,

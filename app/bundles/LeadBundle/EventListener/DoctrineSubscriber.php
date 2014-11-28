@@ -19,12 +19,10 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
 {
     private $factory;
-    private $prefix;
 
     public function __construct(MauticFactory $factory)
     {
         $this->factory = $factory;
-        $this->prefix  = $factory->getParameter('db_table_prefix');
     }
 
     /**
@@ -42,7 +40,7 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
     {
         $class = $args->getClassTable();
 
-        if ($class->getName() != $this->prefix . 'leads') {
+        if ($class->getName() != MAUTIC_TABLE_PREFIX . 'leads') {
             return;
         }
 
@@ -61,11 +59,11 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
     {
         $schema = $args->getSchema();
 
-        if (!$schema->hasTable($this->prefix . 'lead_fields')) {
+        if (!$schema->hasTable(MAUTIC_TABLE_PREFIX . 'lead_fields')) {
             return;
         }
 
-        $table = $schema->getTable( $this->prefix . 'leads');
+        $table = $schema->getTable( MAUTIC_TABLE_PREFIX . 'leads');
 
         try {
             //get a list of fields

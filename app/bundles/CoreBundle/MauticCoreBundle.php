@@ -10,6 +10,7 @@
 namespace Mautic\CoreBundle;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Mautic\CoreBundle\DependencyInjection\Compiler;
 
@@ -33,7 +34,12 @@ class MauticCoreBundle extends Bundle
     public function boot()
     {
         //set the table prefix as a constant to be used in repositories requiring DBAL
-        $prefix = $this->container->getParameter('mautic.db_table_prefix');
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', $prefix);
+        $request = $this->container->get('mautic.factory')->getRequest();
+        if (strpos($request->getRequestUri(), 'installer') !== false) {
+            define('MAUTIC_INSTALLER', 1);
+        } else {
+            $prefix = $this->container->getParameter('mautic.db_table_prefix');
+            defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', $prefix);
+        }
     }
 }

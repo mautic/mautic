@@ -33,9 +33,6 @@ $container->setDefinition(
 //Database table prefix
 $container->setDefinition ('mautic.tblprefix_subscriber',
     new Definition(
-        'Mautic\CoreBundle\EventListener\DoctrineEventsSubscriber',
-        array(
-            '%mautic.db_table_prefix%'
-        )
+        'Mautic\CoreBundle\EventListener\DoctrineEventsSubscriber'
     )
 )->addTag('doctrine.event_subscriber');

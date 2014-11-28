@@ -31,7 +31,7 @@ class DoctrineStepType extends AbstractType
             'choices'     => DoctrineStep::getDrivers(),
             'expanded'    => false,
             'multiple'    => false,
-            'label'       => 'mautic.install.install.form.database.driver',
+            'label'       => 'mautic.install.form.database.driver',
             'label_attr'  => array('class' => 'control-label'),
             'empty_value' => false,
             'required'    => true,
@@ -41,42 +41,42 @@ class DoctrineStepType extends AbstractType
         ));
 
         $builder->add('host', 'text', array(
-            'label'      => 'mautic.install.install.form.database.host',
+            'label'      => 'mautic.install.form.database.host',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control'),
             'required'   => true
         ));
 
         $builder->add('port', 'text', array(
-            'label'      => 'mautic.install.install.form.database.port',
+            'label'      => 'mautic.install.form.database.port',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control'),
             'required'   => false
         ));
 
         $builder->add('name', 'text', array(
-            'label'      => 'mautic.install.install.form.database.name',
+            'label'      => 'mautic.install.form.database.name',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control'),
             'required'   => true
         ));
 
         $builder->add('table_prefix', 'text', array(
-            'label'      => 'mautic.install.install.form.database.table.prefix',
+            'label'      => 'mautic.install.form.database.table.prefix',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control'),
             'required'   => false
         ));
 
         $builder->add('user', 'text', array(
-            'label'      => 'mautic.install.install.form.database.user',
+            'label'      => 'mautic.install.form.database.user',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control'),
             'required'   => true
         ));
 
         $builder->add('password', 'password', array(
-            'label'      => 'mautic.install.install.form.database.password',
+            'label'      => 'mautic.install.form.database.password',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
                 'class'    => 'form-control',
@@ -92,13 +92,19 @@ class DoctrineStepType extends AbstractType
             ),
             'label'       => 'mautic.install.form.existing_tables',
             'expanded'    => true,
-            'empty_value' => false
+            'empty_value' => false,
+            'attr'        => array(
+                'tooltip' => 'mautic.install.form.existing_tables_descr',
+                'onchange' => 'MauticInstaller.toggleBackupPrefix();'
+            )
         ));
 
         $builder->add('backup_prefix', 'text', array(
             'label'      => 'mautic.install.form.backup_prefix',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control'),
+            'attr'       => array(
+                'class'    => 'form-control'
+            ),
             'required'   => false
         ));
 
@@ -109,8 +115,9 @@ class DoctrineStepType extends AbstractType
                     'label' => 'mautic.install.next.step',
                     'type'  => 'submit',
                     'attr'  => array(
-                        'class' => 'btn btn-success pull-right mt-20',
-                        'icon'  => 'fa fa-arrow-circle-right'
+                        'class' => 'btn btn-success pull-right btn-next',
+                        'icon'  => 'fa fa-arrow-circle-right',
+                        'onclick' => 'MauticInstaller.showWaitMessage(event);'
                     )
                 )
             ),

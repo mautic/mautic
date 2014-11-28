@@ -53,14 +53,19 @@ class UserRepository extends CommonRepository
      * @return array
      */
     public function checkUniqueUsernameEmail($params) {
-        $identifier = (isset($params['email'])) ? $params['email'] : $params['username'];
-        $q = $this
-            ->createQueryBuilder('u')
-            ->where('u.username = :identifier OR u.email = :identifier')
-            ->setParameter("identifier", $identifier)
-            ->getQuery();
+        $q = $this->createQueryBuilder('u');
 
-        return $q->getResult();
+        if (isset($params['email'])) {
+            $q->where('u.username = :email OR u.email = :email')
+                ->setParameter("email", $params['email']);
+        }
+
+        if (isset($params['username'])) {
+            $q->orWhere('u.username = :username OR u.email = :username')
+                ->setParameter("username", $params['username']);
+        }
+
+        return $q->getQuery()->getResult();
     }
 
     /**

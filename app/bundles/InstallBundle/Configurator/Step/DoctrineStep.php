@@ -29,7 +29,7 @@ class DoctrineStep implements StepInterface
     /**
      * Database host
      *
-     * @Assert\NotBlank
+     * @Assert\NotBlank(message = "mautic.install.notblank")
      */
     public $host = 'localhost';
 
@@ -50,13 +50,13 @@ class DoctrineStep implements StepInterface
     /**
      * Database name
      *
-     * @Assert\NotBlank
+     * @Assert\NotBlank(message = "mautic.install.notblank")
      */
     public $name;
 
     /**
      * Database user
-     * @Assert\NotBlank
+     * @Assert\NotBlank(message = "mautic.install.notblank")
      */
     public $user;
 
@@ -147,7 +147,10 @@ class DoctrineStep implements StepInterface
         $parameters = array();
 
         foreach ($data as $key => $value) {
-            $parameters['db_'.$key] = $value;
+            // Exclude backup params from the config
+            if (substr($key, 0, 6) != 'backup') {
+                $parameters['db_' . $key] = $value;
+            }
         }
 
         return $parameters;

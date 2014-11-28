@@ -6,7 +6,7 @@ $buildBundles = function($namespace, $bundle) use ($container) {
         $v = array(
             "base"      => str_replace('Bundle', '', $bundleBase),
             "bundle"    => $bundleBase,
-            "namespace" => $namespace,
+            "namespace" => preg_replace('#\\\[^\\\]*$#', '', $namespace),
             "relative"  => basename($container->getParameter('kernel.root_dir')).'/bundles/'.$bundleBase,
             "directory" => $container->getParameter('kernel.root_dir').'/bundles/'.$bundleBase
         );
@@ -21,7 +21,7 @@ $buildAddonBundles = function($namespace, $bundle) use ($container) {
         $v = array(
             "base"      => str_replace('Bundle', '', $bundle),
             "bundle"    => $bundle,
-            "namespace" => $namespace,
+            "namespace" => preg_replace('#\\\[^\\\]*$#', '', $namespace),
             "relative"  => 'addons/'.$bundle,
             "directory" => dirname($container->getParameter('kernel.root_dir')).'/addons/'.$bundle
         );
@@ -71,7 +71,6 @@ $container->loadFromExtension('framework', array(
     ),
     'templating'           => array(
         'engines' => array(
-            'twig',
             'php'
         ),
         'form' => array(
@@ -96,12 +95,6 @@ $container->loadFromExtension('framework', array(
     /*'validation'           => array(
         'static_method' => array('loadValidatorMetadata')
     )*/
-));
-
-//Twig Configuration
-$container->loadFromExtension('twig', array(
-    'debug'                => '%kernel.debug%',
-    'strict_variables'     => '%kernel.debug%'
 ));
 
 //Doctrine Configuration
@@ -132,6 +125,7 @@ $container->loadFromExtension('doctrine', array(
 $container->loadFromExtension('swiftmailer', array(
     'transport' => '%mautic.mailer_transport%',
     'host'      => '%mautic.mailer_host%',
+    'port'      => '%mautic.mailer_port%',
     'username'  => '%mautic.mailer_user%',
     'password'  => '%mautic.mailer_password%',
     'spool'     => array(
