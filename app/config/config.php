@@ -132,6 +132,7 @@ $container->loadFromExtension('doctrine', array(
 $container->loadFromExtension('swiftmailer', array(
     'transport' => '%mautic.mailer_transport%',
     'host'      => '%mautic.mailer_host%',
+    'port'      => '%mautic.mailer_port%',
     'username'  => '%mautic.mailer_user%',
     'password'  => '%mautic.mailer_password%',
     'spool'     => array(

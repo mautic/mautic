@@ -11,6 +11,7 @@ namespace Mautic\InstallBundle\Configurator\Form;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * User Form Type.
@@ -23,37 +24,40 @@ class UserStepType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('firstname', 'text', array(
-            'label'      => 'mautic.install.install.form.user.firstname',
+            'label'      => 'mautic.install.form.user.firstname',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control'),
             'required'   => true
         ));
 
         $builder->add('lastname', 'text', array(
-            'label'      => 'mautic.install.install.form.user.lastname',
+            'label'      => 'mautic.install.form.user.lastname',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array('class' => 'form-control'),
             'required'   => true
         ));
 
         $builder->add('email', 'email', array(
-            'label'      => 'mautic.install.install.form.user.email',
+            'label'      => 'mautic.install.form.user.email',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
                 'class'    => 'form-control',
                 'preaddon' => 'fa fa-envelope'
-            )
+            ),
+            'required'   => true
         ));
 
         $builder->add('username', 'text', array(
-            'label'      => 'mautic.install.install.form.user.username',
+            'label'      => 'mautic.install.form.user.username',
             'label_attr' => array('class' => 'control-label'),
-            'attr'       => array('class' => 'form-control'),
+            'attr'       => array(
+                'class' => 'form-control'
+            ),
             'required'   => true
         ));
 
         $builder->add('password', 'password', array(
-            'label'      => 'mautic.install.install.form.user.password',
+            'label'      => 'mautic.install.form.user.password',
             'label_attr' => array('class' => 'control-label'),
             'attr'       => array(
                 'class'    => 'form-control',
@@ -70,8 +74,9 @@ class UserStepType extends AbstractType
                     'label' => 'mautic.install.next.step',
                     'type'  => 'submit',
                     'attr'  => array(
-                        'class'   => 'btn btn-success pull-right mt-20',
-                        'icon'    => 'fa fa-arrow-circle-right'
+                        'class' => 'btn btn-success pull-right btn-next',
+                        'icon'  => 'fa fa-arrow-circle-right',
+                        'onclick' => 'MauticInstaller.showWaitMessage(event);'
                     )
                 )
             ),

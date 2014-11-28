@@ -26,3 +26,9 @@ $container->setDefinition('mautic.transport.sendgrid',
         'Mautic\CoreBundle\Swiftmailer\Transport\SendgridTransport'
     )
 );
+
+$container->setDefinition('mautic.transport.postmark',
+    new Definition (
+        'Mautic\CoreBundle\Swiftmailer\Transport\PostmarkTransport'
+    )
+);

@@ -9,13 +9,45 @@
 if ($tmpl == 'index') {
     $view->extend('MauticInstallBundle:Install:content.html.php');
 }
-
-$header = $view['translator']->trans('mautic.install.install.heading.user.configuration');
-$view['slots']->set("headerTitle", $header);
 ?>
 
 <h2 class="page-header">
-	<?php echo $header; ?>
+	<?php echo $view['translator']->trans('mautic.install.heading.user.configuration'); ?>
 </h2>
-<p><?php echo $view['translator']->trans('mautic.install.install.user.introtext'); ?></p>
-<?php echo $view['form']->form($form); ?>
+<p><?php echo $view['translator']->trans('mautic.install.user.introtext'); ?></p>
+
+<?php echo $view['form']->start($form); ?>
+
+<div class="row">
+    <div class="col-sm-6">
+        <?php echo $view['form']->row($form['username']); ?>
+    </div>
+    <div class="col-sm-6">
+        <?php echo $view['form']->row($form['password']); ?>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-sm-6">
+        <?php echo $view['form']->row($form['firstname']); ?>
+    </div>
+    <div class="col-sm-6">
+        <?php echo $view['form']->row($form['lastname']); ?>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-sm-12">
+        <?php echo $view['form']->row($form['email']); ?>
+    </div>
+</div>
+
+<div class="row mt-20">
+    <div class="col-sm-12">
+        <?php echo $view['form']->row($form['buttons']); ?>
+    </div>
+</div>
+
+<?php echo $view['form']->end($form); ?>

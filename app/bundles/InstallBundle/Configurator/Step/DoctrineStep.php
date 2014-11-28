@@ -29,7 +29,7 @@ class DoctrineStep implements StepInterface
     /**
      * Database host
      *
-     * @Assert\NotBlank
+     * @Assert\NotBlank(message = "mautic.install.notblank")
      */
     public $host = 'localhost';
 
@@ -50,13 +50,13 @@ class DoctrineStep implements StepInterface
     /**
      * Database name
      *
-     * @Assert\NotBlank
+     * @Assert\NotBlank(message = "mautic.install.notblank")
      */
     public $name;
 
     /**
      * Database user
-     * @Assert\NotBlank
+     * @Assert\NotBlank(message = "mautic.install.notblank")
      */
     public $user;
 
