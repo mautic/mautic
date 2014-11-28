@@ -9,7 +9,7 @@
 
 namespace Mautic\ApiBundle\Entity\oAuth1;
 
-use Bazinga\OAuthServerBundle\Model\Consumer as BaseConsumer;
+use Bazinga\OAuthServerBundle\Model\ConsumerInterface;
 use Bazinga\OAuthServerBundle\Util\Random;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  * @ORM\Table(name="oauth1_consumers")
  * @ORM\HasLifecycleCallbacks
  */
-class Consumer extends BaseConsumer
+class Consumer implements ConsumerInterface
 {
 
     /**
@@ -118,5 +118,82 @@ class Consumer extends BaseConsumer
     public function getRedirectUris()
     {
         return array($this->callback);
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+        return $this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getConsumerKey()
+    {
+        return $this->consumerKey;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setConsumerKey($consumerKey)
+    {
+        $this->consumerKey = $consumerKey;
+        return $this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getConsumerSecret()
+    {
+        return $this->consumerSecret;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setConsumerSecret($consumerSecret)
+    {
+        $this->consumerSecret = $consumerSecret;
+        return $this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getCallback()
+    {
+        return $this->callback;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setCallback($callback)
+    {
+        $this->callback = $callback;
+        return $this;
     }
 }
