@@ -11,8 +11,7 @@ $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'report');
 $view['slots']->set("headerTitle", $view['translator']->trans('mautic.report.report.header.index'));
 ?>
-<?php //@todo reenable once report generation is ready
-/*
+
 <?php if ($permissions['report:reports:create']): ?>
     <?php $view['slots']->start("actions"); ?>
         <a href="<?php echo $this->container->get('router')->generate(
@@ -25,7 +24,7 @@ $view['slots']->set("headerTitle", $view['translator']->trans('mautic.report.rep
         </a>
     <?php $view['slots']->stop(); ?>
 <?php endif; ?>
-*/ ?>
+
 <div class="panel panel-default bdr-t-wdh-0 mb-0">
     <?php echo $view->render('MauticCoreBundle:Helper:listactions.html.php', array(
         'searchValue' => $searchValue,
@@ -33,8 +32,7 @@ $view['slots']->set("headerTitle", $view['translator']->trans('mautic.report.rep
         'menuLink'    => 'mautic_report_index',
         'langVar'     => 'report.report',
         'routeBase'   => 'report',
-        //@todo reenable once report generation is ready
-        'delete'      => false //$permissions['report:reports:deleteown'] || $permissions['report:reports:deleteother']
+        'delete'      => $permissions['report:reports:deleteown'] || $permissions['report:reports:deleteother']
     )); ?>
     <div class="page-list">
         <?php $view['slots']->output('_content'); ?>

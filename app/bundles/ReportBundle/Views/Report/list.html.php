@@ -14,8 +14,6 @@ if ($tmpl == 'index')
         <table class="table table-hover table-striped table-bordered report-list" id="reportTable">
             <thead>
                 <tr>
-                    <?php /*
-                    @todo reenable once report generation is ready
                     <th class="col-report-actions pl-20">
                         <div class="checkbox-inline custom-primary">
                             <label class="mb-0 pl-10">
@@ -24,7 +22,6 @@ if ($tmpl == 'index')
                             </label>
                         </div>
                     </th>
-                    */ ?>
                     <?php
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', array(
                         'sessionVar' => 'report',
@@ -46,7 +43,6 @@ if ($tmpl == 'index')
             <tbody>
             <?php foreach ($items as $item): ?>
                 <tr>
-                    <?php /* @todo renable once report generation is ready
                     <td>
                         <?php
                         echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
@@ -68,7 +64,6 @@ if ($tmpl == 'index')
                         ));
                         ?>
                     </td>
-                    */ ?>
                     <td>
                         <?php echo $view->render('MauticCoreBundle:Helper:publishstatus.html.php',array(
                             'item'       => $item,

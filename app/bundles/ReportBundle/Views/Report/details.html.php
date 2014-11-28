@@ -18,7 +18,6 @@ if ($tmpl == 'index') {
 ?>
 
 <?php
-/* @todo reenable once report generation is ready
 $view['slots']->start('actions');
 if ($security->hasEntityAccess($permissions['report:reports:editown'], $permissions['report:reports:editother'],
     $report->getCreatedBy())): ?>
@@ -49,7 +48,7 @@ if ($security->hasEntityAccess($permissions['report:reports:editown'], $permissi
 <?php endif; ?>
 
 <?php $view['slots']->stop(); ?>
-*/ ?>
+
 <!-- start: box layout -->
 <div class="box-layout">
     <!-- left section -->
