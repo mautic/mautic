@@ -18,16 +18,33 @@ use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 /**
  * Class ExceptionController
  */
-class ExceptionController extends \Symfony\Bundle\TwigBundle\Controller\ExceptionController
+class ExceptionController extends CommonController
 {
     /**
      * {@inheritdoc}
      */
     public function showAction(Request $request, FlattenException $exception, DebugLoggerInterface $logger = null)
     {
-        $code = $exception->getStatusCode();
+        $currentContent = $this->getAndCleanOutputBuffering($request->headers->get('X-Php-Ob-Level', -1));
+        $code           = $exception->getStatusCode();
+        $layout         = $this->factory->getEnvironment() == 'prod' ? 'Error' : 'Exception';
 
-        if ($request->isXmlHttpRequest()) {
+        return $this->delegateView(array(
+            'viewParameters'  =>  array(
+                'status_code'    => $code,
+                'status_text'    => isset(Response::$statusTexts[$code]) ? Response::$statusTexts[$code] : '',
+                'exception'      => $exception,
+                'logger'         => $logger,
+                'currentContent' => $currentContent,
+            ),
+            'contentTemplate' => "MauticCoreBundle:{$layout}:{$code}.html.php",
+            'passthroughVars' => array(
+                'activeLink'     => '#mautic_dashboard_index',
+                'mauticContent'  => 'dashboard'
+            )
+        ));
+
+        /*if ($request->isXmlHttpRequest()) {
             if ($request->query->get('ignoreAjax', false)) {
                 return $exception->getMessage();
             } else {
@@ -40,8 +57,22 @@ class ExceptionController extends \Symfony\Bundle\TwigBundle\Controller\Exceptio
                     )
                 ), $code);
             }
+        }*/
+    }
+
+    /**
+     * @param int     $startObLevel
+     *
+     * @return string
+     */
+    protected function getAndCleanOutputBuffering($startObLevel)
+    {
+        if (ob_get_level() <= $startObLevel) {
+            return '';
         }
 
-        return parent::showAction($request, $exception, $logger);
+        Response::closeOutputBuffers($startObLevel + 1, true);
+
+        return ob_get_clean();
     }
 }

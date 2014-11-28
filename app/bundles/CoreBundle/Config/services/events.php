@@ -36,3 +36,19 @@ $container->setDefinition ('mautic.tblprefix_subscriber',
         'Mautic\CoreBundle\EventListener\DoctrineEventsSubscriber'
     )
 )->addTag('doctrine.event_subscriber');
+
+$container->setDefinition(
+    'mautic.exception.listener',
+    new Definition(
+        'Symfony\Component\HttpKernel\EventListener\ExceptionListener',
+        array(
+            'MauticCoreBundle:Exception:show',
+            new Reference('monolog.logger.mautic')
+        )
+    )
+)
+    ->addTag('kernel.event_listener', array(
+        'event'  => 'kernel.exception',
+        'method' => 'onKernelException',
+        'priority' => 255
+    ));
