@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\Templating\DelegatingEngine;
 
 /**
  * Class CommonController
@@ -314,6 +315,8 @@ class CommonController extends Controller implements MauticController
      */
     public function clearCache()
     {
+        ini_set('memory_limit', '128M');
+
         $env = $this->factory->getEnvironment();
         $noDebug = ($env == 'prod') ? ' --no-debug' : '';
         $input       = new ArgvInput(array('console', 'cache:clear', '--env=' . $env . $noDebug));
@@ -351,8 +354,15 @@ class CommonController extends Controller implements MauticController
     protected function setFormTheme(Form $form, $template, $theme)
     {
         $formView = $form->createView();
-        $this->factory->getTemplating()->getEngine($template)->get('form')
-            ->setTheme($formView, $theme);
+
+        $templating = $this->factory->getTemplating();
+
+        if ($templating instanceof DelegatingEngine) {
+            $templating->getEngine($template)->get('form')->setTheme($formView, $theme);
+        } else {
+            $templating->get('form')->setTheme($formView, $theme);
+        }
+
         return $formView;
     }
 }
