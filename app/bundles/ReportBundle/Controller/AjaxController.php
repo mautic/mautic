@@ -20,25 +20,37 @@ use Mautic\ReportBundle\ReportEvents;
  */
 class AjaxController extends CommonAjaxController
 {
-
     /**
-     * Update the column lists
+     * Returns form HTML. Used for AJAX calls which modifies form field elements.
      *
      * @param Request $request
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return HttpFoundation\JsonResponse|HttpFoundation\RedirectResponse|HttpFoundation\Response
      */
-    public function updateColumnsAction(Request $request)
+    public function getFormAction(Request $request)
     {
         /* @type \Mautic\ReportBundle\Model\ReportModel $model */
-        $model  = $this->factory->getModel('report');
-        $tables = $model->getTableData();
+        $model   = $this->factory->getModel('report');
+        $entity  = $model->getEntity();
+        $action  = $this->generateUrl('mautic_report_action', array('objectAction' => 'new'));
+        $form    = $model->createForm($entity, $this->get('form.factory'), $action);
+        $form->handleRequest($request);
 
-        $dataArray = array(
-            'columns' => $tables[$request->get('source')]['columns']
-        );
-
-        return $this->sendJsonResponse($dataArray);
+        return $this->delegateView(array(
+            'viewParameters'  =>  array(
+                'report'      => $entity,
+                'form'        => $this->setFormTheme($form, 'MauticReportBundle:Report:form.html.php', 'MauticReportBundle:FormTheme\Report'),
+            ),
+            'contentTemplate' => 'MauticReportBundle:Report:form.html.php',
+            'passthroughVars' => array(
+                'activeLink'    => '#mautic_report_index',
+                'mauticContent' => 'report',
+                'route'         => $this->generateUrl('mautic_report_action', array(
+                    'objectAction' => 'edit',
+                    'objectId'     => $entity->getId()
+                ))
+            )
+        ));
     }
 
     /**

@@ -108,7 +108,7 @@ class ReportType extends AbstractType
                 'attr'          => array(
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.report.report.form.source.help',
-                    'onchange' => 'Mautic.updateColumnList()'
+                    'onchange' => 'Mautic.updateColumnList(this)'
                 )
             ));
 
@@ -116,12 +116,16 @@ class ReportType extends AbstractType
             $columns    = $options['table_list'][$source]['columns'];
             $columnList = $this->buildColumnSelectList($columns);
 
-            $formModifier = function (FormInterface $form, $source) {
+            $formModifier = function (FormInterface $form, $source = '') {
                 $model      = $this->factory->getModel('report');
                 $tableData  = $model->getTableData();
+                if (!$source) {
+                    $source = key($tableData);
+                }
                 $columns    = $tableData[$source]['columns'];
                 $columnList = $this->buildColumnSelectList($columns);
 
+                // Build the columns selector
                 $form->add('columns', 'choice', array(
                     'choices'    => $columnList,
                     'label'      => 'mautic.report.report.form.columnselector',
@@ -132,6 +136,21 @@ class ReportType extends AbstractType
                     'attr'       => array(
                         'class' => 'form-control'
                     )
+                ));
+
+                // Build the filter selector
+                $form->add('filters', 'collection', array(
+                    'type'         => 'filter_selector',
+                    'label'        => 'mautic.report.report.form.filterselector',
+                    'label_attr'   => array('class' => 'control-label'),
+                    'options'      => array(
+                        'columnList' => $columnList,
+                        'required'   => false
+                    ),
+                    'allow_add'    => true,
+                    'allow_delete' => true,
+                    'prototype'    => true,
+                    'required'     => false
                 ));
             };
 
@@ -150,21 +169,6 @@ class ReportType extends AbstractType
                     $formModifier($event->getForm()->getParent(), $event->getForm()->getData());
                 }
             );
-
-            // Build the filter selector
-            $builder->add('filters', 'collection', array(
-                'type'         => 'filter_selector',
-                'label'        => 'mautic.report.report.form.filterselector',
-                'label_attr'   => array('class' => 'control-label'),
-                'options'      => array(
-                    'columnList' => $columnList,
-                    'required'   => false
-                ),
-                'allow_add'    => true,
-                'allow_delete' => true,
-                'prototype'    => true,
-                'required'     => false
-            ));
 
             $builder->add('buttons', 'form_buttons');
         }

@@ -46,33 +46,34 @@ Mautic.removeFilterRow = function(container) {
 	mQuery('#' + container).remove();
 };
 
-Mautic.updateColumnList = function () {
-	var source = mQuery('select[id=report_source] option:selected').val();
-
+Mautic.updateColumnList = function (el) {
+	var el = mQuery(el)
+	var form = el.closest('form');
+	var data = {};
+	data[el.attr('name')] = el.val();
 	mQuery.ajax({
-		type: "POST",
-		url: mauticAjaxUrl + "?action=report:updateColumns",
-		data: {'source': source},
-		dataType: "json",
-		success: function (response) {
-			var columnElement = mQuery('#report_columns');
-			// Remove the existing options in the column display section
-			columnElement.find('option').remove().end();
+	    url : mauticAjaxUrl + "?action=report:getForm",
+	    type: 'post',
+	    data : data,
+	    success: function(response) {
+	    	if (response.newContent) {
+	    		var html = response.newContent;
 
-			// Append the new options into the select list
-			mQuery.each(response.columns, function(key, value) {
-				columnElement
-					.append(mQuery('<option>')
-						.attr('value', key)
-						.text(value.label));
-			});
+	    		// update Columns multiselect
+		    	var columnElement = mQuery('#report_columns');
+				columnElement.children().replaceWith(
+					mQuery(html).find('#report_columns').children()
+				);
+				columnElement.trigger('chosen:updated');
 
-			columnElement.trigger('chosen:updated');
+				// Remove any filters, they're no longer valid with different column lists
+				mQuery('#report_filters').find('div').remove().end();
 
-			// Remove any filters, they're no longer valid with different column lists
-			mQuery('#report_filters').find('div').remove().end();
-
-			// TODO - Need to parse the prototype and replace the options in the column list for filters too
+				// Update column select at filters prototype
+				mQuery('#report_filters').replaceWith(
+					mQuery(html).find('#report_filters')
+				);
+			}
 		},
 		error: function (request, textStatus, errorThrown) {
             Mautic.processAjaxError(request, textStatus, errorThrown);
