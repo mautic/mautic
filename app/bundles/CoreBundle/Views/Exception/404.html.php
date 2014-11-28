@@ -24,7 +24,7 @@
                 </h1>
 
                 <div>
-                    <strong><?php echo $status_code; ?></strong> <?php echo $status_text; ?> - <?php echo get_class($exception); ?>
+                    <strong><?php echo $status_code; ?></strong> <?php echo $status_text; ?> - <?php echo $exception->getClass(); ?>
                 </div>
 
                 <?php $previous_count = count($exception->getAllPrevious()); ?>
