@@ -222,9 +222,12 @@ class EmailController extends FormController
 
                         $weight += $variantSettings['weight'];
                     }
-
-                    $properties[$c->getId()] = $variantSettings;
+                } else {
+                    $variantSettings['winnerCriteria'] = '';
+                    $variantSettings['weight']         = 0;
                 }
+
+                $properties[$c->getId()] = $variantSettings;
             }
 
             $properties[$parent->getId()]['weight']         = 100 - $weight;
