@@ -80,6 +80,16 @@ class Configurator
      */
     public function addStep(StepInterface $step)
     {
+        //merge existing settings
+        $properties = get_object_vars($step);
+
+        $existing = $this->getParameters();
+        foreach ($properties as $p => $v) {
+            if (isset($existing[$p])) {
+                $step->$p = $existing[$p];
+            }
+        }
+
         $this->steps[] = $step;
     }
 

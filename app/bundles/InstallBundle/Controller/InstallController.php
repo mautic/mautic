@@ -365,7 +365,10 @@ class InstallController extends CommonController
 
             return array(
                 'type' => 'error',
-                'msg'  => 'mautic.installer.error.connecting.database'
+                'msg'  => 'mautic.installer.error.connecting.database',
+                'msgVars' => array(
+                    '%exception%' => $exception->getMessage()
+                )
             );
         }
 
