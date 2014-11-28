@@ -11,7 +11,7 @@ $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'email');
 $view['slots']->set("headerTitle", $email->getSubject());
 $isVariant = $email->isVariant(true);
-$showVariants = (count($variants['children']) || $variants['parent']);
+
 $view['slots']->start('actions');
 if ($security->hasEntityAccess($permissions['email:emails:editown'], $permissions['email:emails:editother'],
     $email->getCreatedBy())): ?>
@@ -156,7 +156,7 @@ if ($security->hasEntityAccess($permissions['email:emails:editown'], $permission
             <!--/ some stats -->
         </div>
 
-        <?php if ($showVariants): ?>
+        <?php if (count($variants['children'])): ?>
         <!-- start: tab-content -->
         <div class="tab-content pa-md">
             <!-- #variants-container -->

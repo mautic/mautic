@@ -13,6 +13,9 @@ $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'page');
 $view['slots']->set("headerTitle", $activePage->getTitle());
 $view['slots']->start('actions');
+
+$showVariants = (count($variants['children']));
+
 if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions['page:pages:editother'],
     $activePage->getCreatedBy())): ?>
     <a class="btn btn-default" href="<?php echo $this->container->get('router')->generate('mautic_page_action', array("objectAction" => "edit", "objectId" => $activePage->getId())); ?>" data-toggle="ajax" data-menu-link="#mautic_page_index">
@@ -35,10 +38,7 @@ if ($security->hasEntityAccess($permissions['page:pages:editown'], $permissions[
         <i class="fa fa-fw fa-trash-o text-danger"></i>
         <?php echo $view['translator']->trans('mautic.core.form.delete'); ?>
     </a>
-<?php endif;
-
-$showVariants = (count($variants['children']) || $variants['parent']);
-?>
+<?php endif; ?>
 <?php if ((empty($variants['parent']) || ($variants['parent']->getId() == $activePage->getId())) && $permissions['page:pages:create']): ?>
     <a class="btn btn-default" href="<?php echo $view['router']->generate('mautic_page_action',
            array("objectAction" => "abtest", "objectId" => $activePage->getId())); ?>"
