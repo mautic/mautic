@@ -73,6 +73,10 @@ class AppKernel extends Kernel
      */
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
+        if (strpos($request->getRequestUri(), 'installer') !== false) {
+            define('MAUTIC_INSTALLER', 1);
+        }
+
         if (false === $this->booted) {
             $this->boot();
         }

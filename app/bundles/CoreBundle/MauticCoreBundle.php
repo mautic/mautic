@@ -35,9 +35,8 @@ class MauticCoreBundle extends Bundle
     {
         //set the table prefix as a constant to be used in repositories requiring DBAL
         $request = $this->container->get('mautic.factory')->getRequest();
-        if (strpos($request->getRequestUri(), 'installer') !== false) {
-            define('MAUTIC_INSTALLER', 1);
-        } else {
+
+        if (strpos($request->getRequestUri(), 'installer') === false) {
             $prefix = $this->container->getParameter('mautic.db_table_prefix');
             defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', $prefix);
         }
