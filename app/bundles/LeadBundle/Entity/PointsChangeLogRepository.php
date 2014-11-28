@@ -138,25 +138,6 @@ class PointsChangeLogRepository extends CommonRepository
     }
 
     /**
-     * Get pie graph data for gender ratio
-     *
-     * @param QueryBuilder $query
-     *
-     * @return array
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
-     */
-    public function getGenderRatio($query)
-    {
-        $results = array(
-            'male' => $this->countValue(clone $query, 'l.gender', 'male'),
-            'female' => $this->countValue(clone $query, 'l.gender', 'female')
-        );
-
-        return GraphHelper::preparePieGraphData($results);
-    }
-
-    /**
      * Count a value in a column
      *
      * @param QueryBuilder $query
