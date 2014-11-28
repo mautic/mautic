@@ -71,7 +71,6 @@ $container->loadFromExtension('framework', array(
     ),
     'templating'           => array(
         'engines' => array(
-            'twig',
             'php'
         ),
         'form' => array(
@@ -96,12 +95,6 @@ $container->loadFromExtension('framework', array(
     /*'validation'           => array(
         'static_method' => array('loadValidatorMetadata')
     )*/
-));
-
-//Twig Configuration
-$container->loadFromExtension('twig', array(
-    'debug'                => '%kernel.debug%',
-    'strict_variables'     => '%kernel.debug%'
 ));
 
 //Doctrine Configuration

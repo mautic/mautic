@@ -2,6 +2,12 @@
 $loader->import("config.php");
 $loader->import("security.php");
 
+//Twig Configuration
+$container->loadFromExtension('twig', array(
+    'debug'                => '%kernel.debug%',
+    'strict_variables'     => '%kernel.debug%'
+));
+
 $container->loadFromExtension('framework', array(
     "router"   => array(
         "resource"            => "%kernel.root_dir%/config/routing_dev.php",
