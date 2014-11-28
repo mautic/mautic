@@ -301,11 +301,23 @@ class AssetsHelper extends CoreAssetsHelper
     /**
      * Fetch system scripts
      *
-     * @return array
+     * @param bool $render If true, a string will be returned of rendered script for header
+     *
+     * @return array|string
      */
-    public function getSystemScripts()
+    public function getSystemScripts($render = false)
     {
         $assets = $this->assetHelper->getAssets();
+
+        if ($render) {
+            $js = '';
+            if (isset($assets['js'])) {
+                foreach ($assets['js'] as $url) {
+                    $js .= '<script src="' . $this->getUrl($url) . '"></script>' . "\n";
+                }
+            }
+            return $js;
+        }
 
         return $assets['js'];
     }

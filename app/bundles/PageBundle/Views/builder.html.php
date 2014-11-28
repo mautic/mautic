@@ -11,7 +11,7 @@
 $view->extend(":$template:page.html.php");
 
 $view['assets']->addScriptDeclaration("var mauticBasePath = '$basePath';");
-$view['assets']->addScript($view['assets']->getSystemScripts());
+$view['assets']->addCustomDeclaration($view['assets']->getSystemScripts(true));
 
 $view['assets']->loadEditor();
 
