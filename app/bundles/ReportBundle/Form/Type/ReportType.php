@@ -16,6 +16,10 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormInterface;
+use Mautic\ReportBundle\Entity\Report;
 
 /**
  * Class ReportType
@@ -55,6 +59,7 @@ class ReportType extends AbstractType
 
         // Only add these fields if we're in edit mode
         if (!$options['read_only']) {
+
             $builder->add('title', 'text', array(
                 'label'      => 'mautic.report.report.form.title',
                 'label_attr' => array('class' => 'control-label'),
@@ -111,18 +116,40 @@ class ReportType extends AbstractType
             $columns    = $options['table_list'][$source]['columns'];
             $columnList = $this->buildColumnSelectList($columns);
 
-            $builder->add('columns', 'choice', array(
-                'choices'    => $columnList,
-                'label'      => 'mautic.report.report.form.columnselector',
-                'label_attr' => array('class' => 'control-label'),
-                'required'   => false,
-                'multiple'   => true,
-                'expanded'   => false,
-                'attr'       => array(
-                    'class' => 'form-control'
-                )
-            ));
+            $formModifier = function (FormInterface $form, $source) {
+                $model      = $this->factory->getModel('report');
+                $tableData  = $model->getTableData();
+                $columns    = $tableData[$source]['columns'];
+                $columnList = $this->buildColumnSelectList($columns);
 
+                $form->add('columns', 'choice', array(
+                    'choices'    => $columnList,
+                    'label'      => 'mautic.report.report.form.columnselector',
+                    'label_attr' => array('class' => 'control-label'),
+                    'required'   => false,
+                    'multiple'   => true,
+                    'expanded'   => false,
+                    'attr'       => array(
+                        'class' => 'form-control'
+                    )
+                ));
+            };
+
+            $builder->addEventListener(
+                FormEvents::PRE_SET_DATA,
+                function (FormEvent $event) use ($formModifier) {
+                    $formModifier($event->getForm(), $event->getData()->getSource());
+                }
+            );
+
+            $builder->get('source')->addEventListener(
+                FormEvents::POST_SUBMIT,
+                function (FormEvent $event) use ($formModifier) {
+                    // since we've added the listener to the child, we'll have to pass on
+                    // the parent to the callback functions!
+                    $formModifier($event->getForm()->getParent(), $event->getForm()->getData());
+                }
+            );
 
             // Build the filter selector
             $builder->add('filters', 'collection', array(
@@ -177,9 +204,10 @@ class ReportType extends AbstractType
     {
         // Create an array of columns, the key is the column value stored in the database and the value is what the user sees
         $list = array();
-
         foreach ($columns as $column => $data) {
-            $list[$column] = $data['label'];
+            if (isset($data['label'])) {
+                $list[$column] = $data['label'];
+            }
         }
 
         return $list;
