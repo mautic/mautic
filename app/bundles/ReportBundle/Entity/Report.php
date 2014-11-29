@@ -12,6 +12,8 @@ namespace Mautic\ReportBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
  * Class Report
@@ -71,6 +73,16 @@ class Report extends FormEntity
      * @Serializer\Groups({"full"})
      */
     private $filters = array();
+
+    /**
+     * @param ClassMetadata $metadata
+     */
+    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    {
+        $metadata->addPropertyConstraint('title', new NotBlank(array(
+            'message' => 'mautic.report.title.notblank'
+        )));
+    }
 
     /**
      * Get id

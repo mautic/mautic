@@ -112,18 +112,21 @@ class ReportType extends AbstractType
                 )
             ));
 
-            $source     = (!is_null($options['data']->getSource()) && $options['data']->getSource() != '') ? $options['data']->getSource() : key($tables);
-            $columns    = $options['table_list'][$source]['columns'];
-            $columnList = $this->buildColumnSelectList($columns);
-
-            $formModifier = function (FormInterface $form, $source = '') {
-                $model      = $this->factory->getModel('report');
+            $model = $this->factory->getModel('report');
+            $formModifier = function (FormInterface $form, $source = '') use ($model) {
                 $tableData  = $model->getTableData();
                 if (!$source) {
                     $source = key($tableData);
                 }
                 $columns    = $tableData[$source]['columns'];
-                $columnList = $this->buildColumnSelectList($columns);
+
+                // Create an array of columns, the key is the column value stored in the database and the value is what the user sees
+                $columnList = array();
+                foreach ($columns as $column => $data) {
+                    if (isset($data['label'])) {
+                        $columnList[$column] = $data['label'];
+                    }
+                }
 
                 // Build the columns selector
                 $form->add('columns', 'choice', array(
@@ -195,26 +198,6 @@ class ReportType extends AbstractType
     public function getName()
     {
         return "report";
-    }
-
-    /**
-     * Builds an array for the column selectors
-     *
-     * @param array $columns Array with the column list
-     *
-     * @return array
-     */
-    private function buildColumnSelectList($columns)
-    {
-        // Create an array of columns, the key is the column value stored in the database and the value is what the user sees
-        $list = array();
-        foreach ($columns as $column => $data) {
-            if (isset($data['label'])) {
-                $list[$column] = $data['label'];
-            }
-        }
-
-        return $list;
     }
 
     /**
