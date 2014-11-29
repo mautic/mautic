@@ -251,21 +251,33 @@ var Mautic = {
                     var buttons = mQuery(container + " .bottom-form-buttons").html();
 
                     //make sure working with a clean slate
-                    mQuery(container + ' .toolbar-form-buttons').html('');
+                    mQuery(container + ' .toolbar-form-buttons .hidden-xs').html('');
+                    mQuery(container + ' .toolbar-form-buttons .hidden-md .drop-menu').html('');
 
                     mQuery(buttons).filter("button").each(function (i, v) {
                         //get the ID
                         var id = mQuery(this).attr('id');
-                        var button = mQuery("<button type='button' />")
+
+                        var buttonClick = function (event) {
+                            event.preventDefault();
+                            Mautic.startIconSpinOnEvent(event);
+                            mQuery('#' + id).click();
+                        };
+
+                        mQuery("<button type='button' />")
                             .addClass(mQuery(this).attr('class'))
                             .attr('id', mQuery(this).attr('id') + '_toolbar')
                             .html(mQuery(this).html())
-                            .appendTo('.toolbar-form-buttons')
-                            .on('click.ajaxform', function (event) {
-                                event.preventDefault();
-                                Mautic.startIconSpinOnEvent(event);
-                                mQuery('#' + id).click();
-                            });
+                            .on('click.ajaxform', buttonClick)
+                            .appendTo('.toolbar-form-buttons .hidden-sm');
+
+                        mQuery("<a />")
+                            //.addClass(mQuery(this).attr('class'))
+                            .attr('id', mQuery(this).attr('id') + '_toolbar_mobile')
+                            .html(mQuery(this).html())
+                            .on('click.ajaxform', buttonClick)
+                            .appendTo(mQuery('<li />').appendTo('.toolbar-form-buttons .hidden-md .dropdown-menu'))
+
                     });
                     mQuery('.toolbar-form-buttons').removeClass('hide');
                 }
