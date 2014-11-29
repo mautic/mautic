@@ -98,6 +98,10 @@ class CoreSubscriber extends CommonSubscriber
      */
     public function onSecurityInteractiveLogin(InteractiveLoginEvent $event)
     {
+        if (defined('MAUTIC_INSTALLER')) {
+            return;
+        }
+
         $session = $event->getRequest()->getSession();
         if ($this->securityContext->isGranted('IS_AUTHENTICATED_FULLY') ||
             $this->securityContext->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
@@ -148,7 +152,7 @@ class CoreSubscriber extends CommonSubscriber
         }
 
         //update the user's activity marker
-        if (!($controller[0] instanceof InstallController) && !defined('MAUTIC_ACTIVITY_CHECKED')) {
+        if (!($controller[0] instanceof InstallController) && !defined('MAUTIC_ACTIVITY_CHECKED') && !defined('MAUTIC_INSTALLER')) {
             //prevent multiple updates
             $user = $this->factory->getUser();
             //slight delay to prevent too many updates
