@@ -27,7 +27,7 @@ class CalendarSubscriber extends CommonSubscriber
     static public function getSubscribedEvents()
     {
         return array(
-            CalendarEvents::CALENDAR_ON_GENERATE => array('onCalendarGenerate', 0)
+            //CalendarEvents::CALENDAR_ON_GENERATE => array('onCalendarGenerate', 0)
         );
     }
 
