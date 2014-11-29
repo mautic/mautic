@@ -14,15 +14,33 @@ use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Stats Form Type.
+ * Misc Form Type.
  */
-class StatsStepType extends AbstractType
+class MiscStepType extends AbstractType
 {
     /**
      * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $builder->add('cache_path', 'text', array(
+            'label'      => 'mautic.install.form.cache_path',
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array(
+                'class'       => 'form-control'
+            ),
+            'required'   => true
+        ));
+
+        $builder->add('log_path', 'text', array(
+            'label'      => 'mautic.install.form.log_path',
+            'label_attr' => array('class' => 'control-label'),
+            'attr'       => array(
+                'class'       => 'form-control'
+            ),
+            'required'   => true
+        ));
+
         $builder->add('send_server_data', 'button_group', array(
             'choice_list' => new ChoiceList(
                 array(false, true),
@@ -37,7 +55,7 @@ class StatsStepType extends AbstractType
             'pre_extra_buttons' => array(
                 array(
                     'name'  => 'next',
-                    'label' => 'mautic.install.next.step',
+                    'label' => 'mautic.install.final.step',
                     'type'  => 'submit',
                     'attr'  => array(
                         'class' => 'btn btn-success pull-right btn-next',
@@ -62,6 +80,6 @@ class StatsStepType extends AbstractType
      */
     public function getName()
     {
-        return 'install_stats_step';
+        return 'install_misc_step';
     }
 }

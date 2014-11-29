@@ -9,12 +9,9 @@
 if ($tmpl == 'index') {
     $view->extend('MauticInstallBundle:Install:content.html.php');
 }
-
+$view['slots']->set('pageHeader', 'mautic.install.heading.final');
 ?>
 
-<h2 class="page-header">
-	<?php echo $view['translator']->trans('mautic.install.heading.final'); ?>
-</h2>
 <h4><?php echo $view['translator']->trans('mautic.install.heading.finished'); ?></h4>
 <?php if ($is_writable) : ?>
     <h5><?php echo $view['translator']->trans('mautic.install.heading.configured'); ?></h5>

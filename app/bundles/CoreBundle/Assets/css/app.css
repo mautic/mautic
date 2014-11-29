@@ -2633,6 +2633,82 @@ label {
 .step .steps > .steps-text + .steps-figure {
   margin-left: 5px;
 }
+.horizontal-step {
+  padding: 0;
+  margin: 0;
+}
+.horizontal-step > li {
+  list-style: none;
+  display: inline;
+}
+.horizontal-step > li + li {
+  margin-left: 15px;
+}
+.horizontal-step > li + li .steps:after {
+  content: "";
+  position: absolute;
+  left: -18px;
+  top: 16px;
+  height: 1px;
+  width: 18px;
+  background-color: #a0acb8;
+}
+.horizontal-step > li.active .steps {
+  color: #47535f;
+}
+.horizontal-step > li.active .steps > .steps-figure {
+  border-color: #47535f;
+}
+.horizontal-step > li.active a.steps:hover,
+.horizontal-step > li.active a.steps:focus {
+  color: #47535f;
+}
+.horizontal-step > li.active a.steps:hover > .steps-figure,
+.horizontal-step > li.active a.steps:focus > .steps-figure {
+  border-color: #47535f;
+}
+.horizontal-step > li a.steps:hover,
+.horizontal-step > li a.steps:focus {
+  color: #8392a2;
+}
+.horizontal-step > li a.steps:hover > .steps-figure,
+.horizontal-step > li a.steps:focus > .steps-figure {
+  border-color: #8392a2;
+}
+.horizontal-step > li a.steps.disabled {
+  color: #bdc5cd;
+}
+.horizontal-step > li a.steps.disabled > .steps-figure {
+  border-color: #bdc5cd;
+}
+.horizontal-step > li a.steps.disabled:hover {
+  color: #bdc5cd;
+  cursor: not-allowed;
+}
+.horizontal-step > li a.steps.disabled:hover > .steps-figure {
+  border-color: #bdc5cd;
+}
+.horizontal-step .steps {
+  position: relative;
+  display: inline-block;
+  color: #a0acb8;
+}
+.horizontal-step .steps > .steps-figure {
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+  text-align: center;
+  font-size: 14px;
+  line-height: 28px;
+  border-radius: 50%;
+  border: 2px solid #a0acb8;
+}
+.horizontal-step .steps > .steps-figure + .steps-text {
+  margin-left: 5px;
+}
+.horizontal-step .steps > .steps-text + .steps-figure {
+  margin-left: 5px;
+}
 .bg-white {
   background-color: #ffffff !important;
   border-color: #f7f7f7 !important;

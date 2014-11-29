@@ -22,11 +22,9 @@ JS;
 $view['assets']->addScriptDeclaration($js);
 
 $view['assets']->addScriptDeclaration("var test = {};");
+$view['slots']->set('pageHeader', 'mautic.install.heading.database.configuration');
 ?>
 
-<h2 class="page-header">
-	<?php echo $view['translator']->trans('mautic.install.heading.database.configuration'); ?>
-</h2>
 <?php echo $view['form']->start($form); ?>
 <div class="panel panel-primary">
     <div class="panel-heading pa-10">
@@ -82,6 +80,7 @@ $view['assets']->addScriptDeclaration("var test = {};");
                 <strong><?php echo $view['translator']->trans('mautic.install.database.installing'); ?></strong>
             </div>
         </div>
+        <?php echo $view->render('MauticInstallBundle:Install:navbar.html.php', array('step' => $index, 'count' => $count, 'completedSteps' => $completedSteps)); ?>
     </div>
     <div class="col-sm-3">
         <?php echo $view['form']->row($form['buttons']); ?>

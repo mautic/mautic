@@ -9,6 +9,8 @@
 
 $parameters = array(
     'send_server_data'             => false,
+    'cache_path'                   => '%kernel.root_dir%/cache',
+    'log_path'                     => '%kernel.root_dir%/logs',
     'theme'                        => 'Mauve',
     'db_driver'                    => 'mysqli',
     'db_host'                      => 'localhost',

@@ -9,11 +9,8 @@
 if ($tmpl == 'index') {
     $view->extend('MauticInstallBundle:Install:content.html.php');
 }
+$view['slots']->set('pageHeader', 'mautic.install.heading.user.configuration');
 ?>
-
-<h2 class="page-header">
-	<?php echo $view['translator']->trans('mautic.install.heading.user.configuration'); ?>
-</h2>
 
 <?php echo $view['form']->start($form); ?>
 
@@ -32,8 +29,9 @@ if ($tmpl == 'index') {
             </div>
         </div>
 
+        <hr class="text-muted" />
 
-        <div class="row">
+        <div class="row mt-lg">
             <div class="col-sm-6">
                 <?php echo $view['form']->row($form['firstname']); ?>
             </div>
@@ -52,9 +50,13 @@ if ($tmpl == 'index') {
 </div>
 
 <div class="row mt-20">
-    <div class="col-sm-12">
+    <div class="col-sm-9">
+        <?php echo $view->render('MauticInstallBundle:Install:navbar.html.php', array('step' => $index, 'count' => $count, 'completedSteps' => $completedSteps)); ?>
+    </div>
+    <div class="col-sm-3">
         <?php echo $view['form']->row($form['buttons']); ?>
     </div>
 </div>
+
 
 <?php echo $view['form']->end($form); ?>

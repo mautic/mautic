@@ -12,6 +12,7 @@ $view['assets']->addScriptDeclaration("var MauticInstaller = {
         event.preventDefault();
 
         if (mQuery('#waitMessage').length) {
+            mQuery('#stepNavigation').addClass('hide');
             mQuery('#waitMessage').removeClass('hide');
         }
 

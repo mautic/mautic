@@ -9,12 +9,12 @@
 
 namespace Mautic\InstallBundle\Configurator\Step;
 
-use Mautic\InstallBundle\Configurator\Form\StatsStepType;
+use Mautic\InstallBundle\Configurator\Form\MiscStepType;
 
 /**
- * Stats Step.
+ * Misc Step.
  */
-class StatsStep implements StepInterface
+class MiscStep implements StepInterface
 {
     /**
      * Send server stats?
@@ -22,11 +22,25 @@ class StatsStep implements StepInterface
     public $send_server_data = true;
 
     /**
+     * Absolute path to cache directory
+     *
+     * @var string
+     */
+    public $cache_path = '%kernel.root_dir%/cache';
+
+    /**
+     * Absolute path to log directory
+     *
+     * @var string
+     */
+    public $log_path   = '%kernel.root_dir%/logs';
+
+    /**
      * {@inheritdoc}
      */
     public function getFormType()
     {
-        return new StatsStepType();
+        return new MiscStepType();
     }
 
     /**
@@ -50,7 +64,7 @@ class StatsStep implements StepInterface
      */
     public function getTemplate()
     {
-        return 'MauticInstallBundle:Install:stats.html.php';
+        return 'MauticInstallBundle:Install:misc.html.php';
     }
 
     /**

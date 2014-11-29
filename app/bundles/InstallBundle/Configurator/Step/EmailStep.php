@@ -10,7 +10,6 @@
 namespace Mautic\InstallBundle\Configurator\Step;
 
 use Mautic\InstallBundle\Configurator\Form\EmailStepType;
-use Mautic\InstallBundle\Configurator\Form\StatsStepType;
 
 /**
  * Email Step.

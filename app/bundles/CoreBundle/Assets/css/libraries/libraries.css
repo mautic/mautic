@@ -5191,6 +5191,17 @@ a.list-group-item-danger.active:focus {
 .panel-group .panel-footer + .panel-collapse .panel-body {
   border-bottom: 1px solid #ebedf0;
 }
+.panel-group .list-group {
+  margin-bottom: 0;
+}
+.panel-group .list-group .list-group-item {
+  border-radius: 0;
+  border-left: none;
+  border-right: none;
+}
+.panel-group .list-group .list-group-item:last-child {
+  border-bottom: none;
+}
 .panel-default {
   border-color: #ebedf0;
 }

@@ -12,7 +12,7 @@ namespace Mautic\InstallBundle;
 use Mautic\InstallBundle\Configurator\Step\CheckStep;
 use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
 use Mautic\InstallBundle\Configurator\Step\EmailStep;
-use Mautic\InstallBundle\Configurator\Step\StatsStep;
+use Mautic\InstallBundle\Configurator\Step\MiscStep;
 use Mautic\InstallBundle\Configurator\Step\UserStep;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -36,6 +36,6 @@ class MauticInstallBundle extends Bundle
         $configurator->addStep(new DoctrineStep($configurator->getParameters()));
         $configurator->addStep(new UserStep());
         $configurator->addStep(new EmailStep());
-        $configurator->addStep(new StatsStep());
+        $configurator->addStep(new MiscStep());
     }
 }

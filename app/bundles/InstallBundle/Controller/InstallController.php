@@ -57,6 +57,9 @@ class InstallController extends CommonController
         $majors = $configurator->getRequirements();
         $minors = $configurator->getOptionalSettings();
 
+        $session        = $this->factory->getSession();
+        $completedSteps = $session->get('mautic.install.completedsteps', array());
+
         if ('POST' === $this->request->getMethod()) {
             $form->handleRequest($this->request);
             if ($form->isValid()) {
@@ -175,6 +178,8 @@ class InstallController extends CommonController
                         ));
                     }
 
+                    $completedSteps[] = $index;
+                    $session->set('mautic.install.completedsteps', $completedSteps);
                     $index++;
 
                     if ($index < $configurator->getStepCount()) {
@@ -221,6 +226,8 @@ class InstallController extends CommonController
                     // Clear the cache one final time with the updated config
                     $this->clearCache();
 
+                    $session->remove('mautic.install.completedsteps');
+
                     return $this->postActionRedirect(array(
                         'viewParameters'    => array(
                             'welcome_url' => $this->generateUrl('mautic_dashboard_index'),
@@ -249,6 +256,7 @@ class InstallController extends CommonController
                 'majors'  => $majors,
                 'minors'  => $minors,
                 'appRoot' => $this->container->getParameter('kernel.root_dir'),
+                'completedSteps' => $completedSteps
             ),
             'contentTemplate' => $step->getTemplate(),
             'passthroughVars' => array(

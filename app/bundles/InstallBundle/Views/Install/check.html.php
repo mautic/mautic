@@ -43,40 +43,52 @@ if ($tmpl == 'index') {
     <?php endforeach; ?>
 </ul>
 <?php endif; ?>
+
+<?php if (!count($majors)) : ?>
+    <div class="alert alert-success">
+        <h4><i class="fa fa-check"></i> <?php echo $view['translator']->trans('mautic.install.heading.ready'); ?></h4>
+        <p><?php echo $view['translator']->trans('mautic.install.sentence.ready'); ?></p>
+    </div>
+<?php endif; ?>
+
+
 <?php if (count($minors)) : ?>
-<div class="panel panel-warning">
-    <div class="panel-heading">
-        <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.install.heading.minor.problems'); ?></h3>
+<div class="panel-group" id="minors">
+    <div class="panel panel-warning">
+        <div class="panel-heading">
+            <h3 class="panel-title" style="font-size: 1em;">
+                <a data-toggle="collapse" style="display: block; " href="#minorDetails"><i class="fa fa-chevron-down"></i> <?php echo $view['translator']->trans('mautic.install.heading.minor.problems'); ?></a>
+            </h3>
+        </div>
+        <div id="minorDetails" class="panel-collapse collapse">
+            <div class="panel-body alert-warning">
+                <p><?php echo $view['translator']->trans('mautic.install.sentence.minor.problems'); ?></p>
+            </div>
+             <ul class="list-group">
+                <?php foreach ($minors as $message) : ?>
+                    <?php switch ($message) :
+                        case 'mautic.install.pcre.version': ?>
+                            <li class="list-group-item"><?php echo $view['translator']->trans($message, array('%pcreversion%' => (float) PCRE_VERSION)); ?></li>
+                            <?php break;
+                        default: ?>
+                            <li class="list-group-item"><?php echo $view['translator']->trans($message); ?></li>
+                            <?php break; ?>
+                    <?php endswitch; ?>
+                <?php endforeach; ?>
+            </ul>
+        </div>
     </div>
-    <div class="panel-body alert-warning">
-        <p><?php echo $view['translator']->trans('mautic.install.sentence.minor.problems'); ?></p>
-    </div>
-     <ul class="list-group">
-        <?php foreach ($minors as $message) : ?>
-            <?php switch ($message) :
-                case 'mautic.install.pcre.version': ?>
-                    <li class="list-group-item"><?php echo $view['translator']->trans($message, array('%pcreversion%' => (float) PCRE_VERSION)); ?></li>
-                    <?php break;
-                default: ?>
-                    <li class="list-group-item"><?php echo $view['translator']->trans($message); ?></li>
-                    <?php break; ?>
-            <?php endswitch; ?>
-        <?php endforeach; ?>
-    </ul>
 </div>
 <?php endif; ?>
-<?php if (!count($majors)) : ?>
-<div class="alert alert-success">
-    <h4><i class="fa fa-check"></i> <?php echo $view['translator']->trans('mautic.install.heading.ready'); ?></h4>
-    <p><?php echo $view['translator']->trans('mautic.install.sentence.ready'); ?></p>
-</div>
+
+<?php if (!(count($majors))): ?>
 <?php echo $view['form']->start($form); ?>
 
-<div class="row mt-20">
-    <div class="col-sm-12">
-        <?php echo $view['form']->row($form['buttons']); ?>
+    <div class="row mt-20">
+        <div class="col-sm-12">
+            <?php echo $view['form']->row($form['buttons']); ?>
+        </div>
     </div>
-</div>
 
 <?php echo $view['form']->end($form); ?>
 <?php endif; ?>

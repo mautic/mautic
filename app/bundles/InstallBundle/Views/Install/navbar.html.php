@@ -6,22 +6,20 @@
  * @link        http://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
+$start = 1;
 ?>
-
-<!-- start: Brand and toggle -->
-<div class="navbar-header">
-    <!-- sidebar toggle button -->
-    <button type="button" class="navbar-toggle" sidebar-toggle data-position="left">
-        <span class="icon-bar thin"></span>
-        <span class="icon-bar thin"></span>
-        <span class="icon-bar thin"></span>
-    </button>
-    <!--/ sidebar toggle button -->
-
-    <!-- brand -->
-    <a class="navbar-brand" href="#">
-        <span class="navbar-brand-logo"></span>
-    </a>
-    <!--/ brand -->
+<div id="stepNavigation" class="hidden-xs">
+    <ul class="horizontal-step">
+        <?php while ($start < $count): ?>
+        <li<?php echo ($start == $step) ? ' class="active"' : ''; ?>>
+            <?php $url = ($start == $step || in_array($start, $completedSteps) || in_array($start-1, $completedSteps)) ? $view['router']->generate('mautic_installer_step', array('index' => $start)) : '#'; ?>
+            <a href="<?php echo $url; ?>" class="steps<?php echo ($url == '#') ? ' disabled' : ''; ?>">
+                <span class="steps-figure"><?php echo $view['translator']->trans('mautic.install.step.'.$start); ?></span>
+            </a>
+        </li>
+        <?php $start++; ?>
+        <?php endwhile; ?>
+    </ul>
+    <div class="clearfix"></div>
 </div>
-<!--/ end: Brand and toggle -->

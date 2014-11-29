@@ -217,4 +217,55 @@ class AppKernel extends Kernel
         return false;
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @api
+     */
+    public function getCacheDir()
+    {
+        $parameters = $this->getLocalParams();
+        if (isset($parameters['cache_path'])) {
+            $envFolder = (strpos($parameters['cache_path'], -1) != '/') ? '/' . $this->environment : $this->environment;
+            return $parameters['cache_path'] . $envFolder;
+        } else {
+            return parent::getCacheDir();
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @api
+     */
+    public function getLogDir()
+    {
+        $parameters = $this->getLocalParams();
+        if (isset($parameters['log_path'])) {
+            return $parameters['log_path'];
+        } else {
+            return parent::getLogDir();
+        }
+    }
+
+    /**
+     * Get Mautic's local configuration file
+     *
+     * @return array
+     */
+    private function getLocalParams()
+    {
+        static $parameters;
+
+        if (!is_array($parameters)) {
+            $localConfig = $this->rootDir . '/config/local.php';
+            if (file_exists($localConfig)) {
+                include $localConfig;
+            } else {
+                $parameters = array();
+            }
+        }
+
+        return $parameters;
+    }
 }
