@@ -212,7 +212,8 @@ class TableSchemaHelper
         }
 
         //reset schema
-        $this->schema = new \Doctrine\DBAL\Schema\Schema(array(), array(), $this->sm->createSchemaConfig());
+        $this->schema     = new \Doctrine\DBAL\Schema\Schema(array(), array(), $this->sm->createSchemaConfig());
+        $this->dropTables = $this->addTables = array();
     }
 
     /**
