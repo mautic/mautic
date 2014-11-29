@@ -227,7 +227,7 @@ class AppKernel extends Kernel
         $parameters = $this->getLocalParams();
         if (isset($parameters['cache_path'])) {
             $envFolder = (strpos($parameters['cache_path'], -1) != '/') ? '/' . $this->environment : $this->environment;
-            return $parameters['cache_path'] . $envFolder;
+            return str_replace('%kernel.root_dir%', $this->getRootDir(), $parameters['cache_path'] . $envFolder);
         } else {
             return parent::getCacheDir();
         }
@@ -242,7 +242,7 @@ class AppKernel extends Kernel
     {
         $parameters = $this->getLocalParams();
         if (isset($parameters['log_path'])) {
-            return $parameters['log_path'];
+            return str_replace('%kernel.root_dir%', $this->getRootDir(), $parameters['log_path']);
         } else {
             return parent::getLogDir();
         }
