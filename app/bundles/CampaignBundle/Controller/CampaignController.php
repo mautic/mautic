@@ -13,7 +13,6 @@ use Mautic\CoreBundle\Controller\FormController;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Controller\ControllerReference;
 
 class CampaignController extends FormController
 {
