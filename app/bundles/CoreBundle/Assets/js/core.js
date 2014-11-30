@@ -1285,13 +1285,14 @@ var Mautic = {
             extra = '&' + extra;
         }
         mQuery.ajax({
+            showLoadingBar: true,
             url: mauticAjaxUrl,
             type: "POST",
             data: "action=togglePublishStatus&model=" + model + '&id=' + id + extra,
             dataType: "json",
             success: function (response) {
                 Mautic.stopIconSpinPostEvent();
-
+                Mautic.stopPageLoadingBar();
                 if (response.statusHtml) {
                     mQuery(el).replaceWith(response.statusHtml);
                     mQuery(el).tooltip({html: true, container: 'body'});
@@ -1378,6 +1379,7 @@ var Mautic = {
                 }
             }
         }
+        Mautic.stopPageLoadingBar();
     },
 
     /**
