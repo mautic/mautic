@@ -10,7 +10,9 @@
 namespace Mautic\CoreBundle\Event;
 
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\SecurityContext;
 
 /**
@@ -30,11 +32,23 @@ class MenuEvent extends Event
     protected $security;
 
     /**
+     * @var User
+     */
+    protected $user;
+
+    /**
+     * @var Request
+     */
+    protected $request;
+
+    /**
      * @param CorePermissions $security
      */
-    public function __construct(CorePermissions $security)
+    public function __construct(CorePermissions $security, User $user, Request $request)
     {
         $this->security = $security;
+        $this->user     = $user;
+        $this->request  = $request;
     }
 
     /**
@@ -121,5 +135,21 @@ class MenuEvent extends Event
                 $this->createMenuStructure($i['children']);
             }
         }
+    }
+
+    /**
+     * @return Request
+     */
+    public function getRequest ()
+    {
+        return $this->request;
+    }
+
+    /**
+     * @return User
+     */
+    public function getUser ()
+    {
+        return $this->user;
     }
 }

@@ -262,12 +262,9 @@ class AjaxController extends CommonController
         if ($entity !== null) {
             $permissionBase = $model->getPermissionBase();
 
-            if ($this->factory->getSecurity()->hasEntityAccess(
-                $permissionBase . ':publishown',
-                $permissionBase . ':publishother',
-                $entity->getCreatedBy()
-            )
-            ) {
+            $createdBy = (method_exists($entity, 'getCreatedBy')) ? $entity->getCreatedBy() : null;
+
+            if ($this->factory->getSecurity()->hasEntityAccess($permissionBase . ':publishown', $permissionBase . ':publishother', $createdBy)) {
                 $dataArray['success'] = 1;
                 //toggle permission state
                 $model->togglePublishStatus($entity);

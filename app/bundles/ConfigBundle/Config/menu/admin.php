@@ -8,7 +8,7 @@
  */
 
 
-if (!$security->isGranted('config:config:full')) {
+if (!$user->isAdmin()) {
     return array();
 }
 

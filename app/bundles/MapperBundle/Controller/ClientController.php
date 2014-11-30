@@ -36,15 +36,7 @@ class ClientController extends FormController
     {
         $session = $this->factory->getSession();
 
-        //set some permissions
-        $permissions = $this->factory->getSecurity()->isGranted(array(
-            $application.':mapper:view',
-            $application.':mapper:create',
-            $application.':mapper:edit',
-            $application.':mapper:delete'
-        ), "RETURN_ARRAY");
-
-        if (!$permissions[$application.':mapper:view']) {
+        if ($this->factory->getSecurity()->isGranted('integration:int')) {
             return $this->accessDenied();
         }
 

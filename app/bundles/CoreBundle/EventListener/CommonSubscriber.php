@@ -100,7 +100,8 @@ class CommonSubscriber implements EventSubscriberInterface
     protected function buildMenu(MauticEvents\MenuEvent $event, $name)
     {
         $security = $event->getSecurity();
-        $request  = $this->factory->getRequest();
+        $request  = $event->getRequest();
+        $user     = $event->getUser();
 
         $bundles   = $this->factory->getParameter('bundles');
         $addons    = $this->factory->getParameter('addon.bundles');

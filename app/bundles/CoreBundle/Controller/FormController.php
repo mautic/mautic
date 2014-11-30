@@ -121,7 +121,7 @@ class FormController extends CommonController
      */
     public function unlockAction($id, $model)
     {
-        if ($this->factory->getSecurity()->isAdmin()) {
+        if ($this->factory->getUser()->isAdmin()) {
             $bundle = $object = $model;
             if (strpos($model, ':')) {
                 list($bundle, $object) = explode(':', $model);
