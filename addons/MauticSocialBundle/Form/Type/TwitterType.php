@@ -29,16 +29,16 @@ class TwitterType extends AbstractType
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
         $builder->add('shareBtnMsg', 'spacer', array(
-           'text' =>  'mautic.connector.form.sharebutton'
+           'text' =>  'mautic.integration.form.sharebutton'
         ));
 
         $builder->add('count', 'choice', array(
             'choices'     => array(
-                'horizontal' => 'mautic.connector.Twitter.share.layout.horizontal',
-                'vertical'   => 'mautic.connector.Twitter.share.layout.vertical',
-                'none'       => 'mautic.connector.Twitter.share.layout.none'
+                'horizontal' => 'mautic.integration.Twitter.share.layout.horizontal',
+                'vertical'   => 'mautic.integration.Twitter.share.layout.vertical',
+                'none'       => 'mautic.integration.Twitter.share.layout.none'
             ),
-            'label'       => 'mautic.connector.Twitter.share.layout',
+            'label'       => 'mautic.integration.Twitter.share.layout',
             'required'    => false,
             'empty_value' => false,
             'label_attr'  => array('class' => 'control-label'),
@@ -47,50 +47,50 @@ class TwitterType extends AbstractType
 
         $builder->add('text', 'text', array(
             'label_attr'    => array('class' => 'control-label'),
-            'label'         => 'mautic.connector.Twitter.share.text',
+            'label'         => 'mautic.integration.Twitter.share.text',
             'required'      => false,
             'attr'          => array(
                 'class'       => 'form-control',
-                'placeholder' => 'mautic.connector.Twitter.share.text.pagetitle'
+                'placeholder' => 'mautic.integration.Twitter.share.text.pagetitle'
             )
         ));
 
         $builder->add('via', 'text', array(
             'label_attr'    => array('class' => 'control-label'),
-            'label'         => 'mautic.connector.Twitter.share.via',
+            'label'         => 'mautic.integration.Twitter.share.via',
             'required'      => false,
             'attr'          => array(
                 'class'       => 'form-control',
-                'placeholder' => 'mautic.connector.Twitter.share.username',
+                'placeholder' => 'mautic.integration.Twitter.share.username',
                 'preaddon'    => 'symbol-at'
             )
         ));
 
         $builder->add('related', 'text', array(
             'label_attr'    => array('class' => 'control-label'),
-            'label'         => 'mautic.connector.Twitter.share.related',
+            'label'         => 'mautic.integration.Twitter.share.related',
             'required'      => false,
             'attr'          => array(
                 'class'       => 'form-control',
-                'placeholder' => 'mautic.connector.Twitter.share.username',
+                'placeholder' => 'mautic.integration.Twitter.share.username',
                 'preaddon'    => 'symbol-at'
             )
         ));
 
         $builder->add('hashtags', 'text', array(
             'label_attr'    => array('class' => 'control-label'),
-            'label'         => 'mautic.connector.Twitter.share.hashtag',
+            'label'         => 'mautic.integration.Twitter.share.hashtag',
             'required'      => false,
             'attr'          => array(
                 'class'       => 'form-control',
-                'placeholder' => 'mautic.connector.Twitter.share.hashtag.placeholder',
+                'placeholder' => 'mautic.integration.Twitter.share.hashtag.placeholder',
                 'preaddon'    => 'symbol-hashtag'
             )
         ));
 
         $builder->add('size', 'checkbox', array(
             'label_attr'    => array('class' => 'control-label'),
-            'label'         => 'mautic.connector.Twitter.share.largesize',
+            'label'         => 'mautic.integration.Twitter.share.largesize',
             'value'         => 'large',
             'required'      => false
         ));

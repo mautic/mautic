@@ -7,17 +7,13 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticAddon\MauticSocialBundle;
+namespace Mautic\AddonBundle;
 
-use Mautic\CoreBundle\Bundle\AddonBundleBase;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
- * Class MauticSocialBundle
- *
- * @package Mautic\LeadBundle
+ * Class MauticAddonBundle
  */
-class MauticSocialBundle extends AddonBundleBase
+class MauticAddonBundle extends Bundle
 {
-
 }

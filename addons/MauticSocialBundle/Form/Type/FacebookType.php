@@ -29,18 +29,18 @@ class FacebookType extends AbstractType
     public function buildForm (FormBuilderInterface $builder, array $options)
     {
         $builder->add('shareBtnMsg', 'spacer', array(
-           'text' =>  'mautic.connector.form.sharebutton'
+           'text' =>  'mautic.integration.form.sharebutton'
         ));
 
         $builder->add('layout', 'choice', array(
             'choices'     => array(
-                'standard'     => 'mautic.connector.Facebook.share.layout.standard',
-                'button_count' => 'mautic.connector.Facebook.share.layout.buttoncount',
-                'button'       => 'mautic.connector.Facebook.share.layout.button',
-                'box_count'    => 'mautic.connector.Facebook.share.layout.boxcount',
-                'icon'         => 'mautic.connector.Facebook.share.layout.icon'
+                'standard'     => 'mautic.integration.Facebook.share.layout.standard',
+                'button_count' => 'mautic.integration.Facebook.share.layout.buttoncount',
+                'button'       => 'mautic.integration.Facebook.share.layout.button',
+                'box_count'    => 'mautic.integration.Facebook.share.layout.boxcount',
+                'icon'         => 'mautic.integration.Facebook.share.layout.icon'
             ),
-            'label'       => 'mautic.connector.Facebook.share.layout',
+            'label'       => 'mautic.integration.Facebook.share.layout',
             'required'    => false,
             'empty_value' => false,
             'label_attr'  => array('class' => 'control-label'),
@@ -49,11 +49,11 @@ class FacebookType extends AbstractType
 
         $builder->add('action', 'choice', array(
             'choices'     => array(
-                'like'       => 'mautic.connector.Facebook.share.action.like',
-                'recommend'  => 'mautic.connector.Facebook.share.action.recommend',
-                'share'      => 'mautic.connector.Facebook.share.action.share'
+                'like'       => 'mautic.integration.Facebook.share.action.like',
+                'recommend'  => 'mautic.integration.Facebook.share.action.recommend',
+                'share'      => 'mautic.integration.Facebook.share.action.share'
             ),
-            'label'       => 'mautic.connector.Facebook.share.action',
+            'label'       => 'mautic.integration.Facebook.share.action',
             'required'    => false,
             'empty_value' => false,
             'label_attr'  => array('class' => 'control-label'),
@@ -62,14 +62,14 @@ class FacebookType extends AbstractType
 
         $builder->add('showFaces', 'checkbox', array(
             'label_attr'    => array('class' => 'control-label'),
-            'label'         => 'mautic.connector.Facebook.share.showfaces',
+            'label'         => 'mautic.integration.Facebook.share.showfaces',
             'value'         =>  1,
             'required'      => false
         ));
 
         $builder->add('showShare', 'checkbox', array(
             'label_attr'    => array('class' => 'control-label'),
-            'label'         => 'mautic.connector.Facebook.share.showshare',
+            'label'         => 'mautic.integration.Facebook.share.showshare',
             'value'         => 1,
             'required'      => false
         ));
