@@ -17,6 +17,7 @@ $view['slots']->set('mauticContent', 'report');
 $view['slots']->set("headerTitle", $header);
 
 $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
+    'item' => $report,
     'templateButtons' => array(
         'edit'    => $security->hasEntityAccess($permissions['report:reports:editown'], $permissions['report:reports:editother'], $report->getCreatedBy()),
         'delete'  => $security->hasEntityAccess($permissions['report:reports:deleteown'], $permissions['report:reports:deleteother'], $report->getCreatedBy())
