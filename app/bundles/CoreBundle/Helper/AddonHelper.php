@@ -59,11 +59,7 @@ class AddonHelper
             if ($sm->tablesExist(MAUTIC_TABLE_PREFIX.'addons')) {
                 /** @var \Mautic\AddonBundle\Entity\IntegrationRepository $repo */
                 $repo = $this->factory->getModel('addon')->getRepository();
-                $data = $repo->getBundleStatus();
-
-                foreach ($data as $addon) {
-                    static::$addons[$addon['bundle']] = $addon['enabled'];
-                }
+                static::$addons = $repo->getBundleStatus();
             }
 
             static::$loaded = true;
