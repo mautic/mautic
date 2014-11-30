@@ -11,7 +11,6 @@ Mautic.activateChatListUpdate = function() {
 };
 
 Mautic.updateChatList = function (killTimer) {
-    MauticVars.showLoadingBar = false;
     mQuery.ajax({
         type: "POST",
         url: mauticAjaxUrl + "?action=chat:updateList",
@@ -38,7 +37,6 @@ Mautic.startUserChat = function (userId, fromDate) {
     if (typeof fromDate == 'undefined') {
         fromDate = '';
     }
-    MauticVars.showLoadingBar = false;
     mQuery.ajax({
         type: "POST",
         url: mauticAjaxUrl + "?action=chat:startUserChat",
@@ -71,7 +69,6 @@ Mautic.startChannelChat = function (channelId, fromDate) {
     if (typeof fromDate == 'undefined') {
         fromDate = '';
     }
-    MauticVars.showLoadingBar = false;
     mQuery.ajax({
         type: "POST",
         url: mauticAjaxUrl + "?action=chat:startChannelChat",
@@ -127,8 +124,6 @@ Mautic.getLastChatGroup = function() {
 };
 
 Mautic.markMessagesRead = function(itemId, chatType) {
-    MauticVars.showLoadingBar = false;
-
     var lastId  = mQuery('#ChatLastMessageId').val();
     mQuery.ajax({
         type: "POST",
@@ -140,7 +135,6 @@ Mautic.markMessagesRead = function(itemId, chatType) {
 
 Mautic.activateChatUpdater = function(itemId, chatType) {
     Mautic['chatUpdaterInterval'] = setInterval(function(){
-        MauticVars.showLoadingBar = false;
         var lastId  = mQuery('#ChatLastMessageId').val();
         var groupId = Mautic.getLastChatGroup();
 
@@ -166,8 +160,6 @@ Mautic.activateChatUpdater = function(itemId, chatType) {
 };
 
 Mautic.sendChatMessage = function(toId, chatType) {
-    MauticVars.showLoadingBar = false;
-
     var msgText = mQuery('#ChatMessageInput').val();
     mQuery('#ChatMessageInput').val('');
     var lastId  = mQuery('#ChatLastMessageId').val();
@@ -198,8 +190,6 @@ Mautic.sendChatMessage = function(toId, chatType) {
 
 Mautic.updateChatConversation = function(response, chatType)
 {
-    MauticVars.showLoadingBar = false;
-
     var dividerAppended = false;
     var contentUpdated  = false;
 

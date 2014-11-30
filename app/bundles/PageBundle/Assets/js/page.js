@@ -229,7 +229,6 @@ Mautic.getPageAbTestWinnerForm = function(abKey) {
 
     var query = "action=page:getAbTestForm&abKey=" + mQuery(abKey).val() + "&pageId=" + pageId;
 
-    MauticVars.showLoadingBar = false;
     mQuery.ajax({
         url: mauticAjaxUrl,
         type: "POST",

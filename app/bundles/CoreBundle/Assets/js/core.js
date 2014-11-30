@@ -41,27 +41,16 @@ MauticVars.lastGlobalSearchStr  = "";
 //used for spinning icons (to show something is in progress)
 MauticVars.iconClasses          = {};
 
-//register the loading bar for ajax page loads
-MauticVars.showLoadingBar       = true;
-
 //prevent multiple ajax calls from multiple clicks
 MauticVars.routeInProgress       = '';
 
 mQuery.ajaxSetup({
-    beforeSend: function () {
-        if (MauticVars.showLoadingBar) {
+    beforeSend: function (request, settings) {
+        if (settings.showLoadingBar) {
             mQuery("body").addClass("loading-content");
         }
     },
-    cache: false,
-    complete: function () {
-        setTimeout(function () {
-            mQuery("body").removeClass("loading-content");
-        }, 1000);
-
-        //change default back to show
-        MauticVars.showLoadingBar = true;
-    }
+    cache: false
 });
 
 if (typeof Chart != 'undefined') {
@@ -70,6 +59,13 @@ if (typeof Chart != 'undefined') {
 }
 
 var Mautic = {
+    /**
+     * Stops the ajax page loading indicator
+     */
+    stopPageLoadingBar: function() {
+        mQuery("body").removeClass("loading-content");
+    },
+
     /**
      * Initiate various functions on page load, manual or ajax
      */
@@ -374,6 +370,9 @@ var Mautic = {
         mQuery('.plugin-sparkline').sparkline('html', {enableTagOptions: true});
 
         Mautic.stopIconSpinPostEvent();
+
+        //stop loading bar
+        Mautic.stopPageLoadingBar();
     },
 
     /**
@@ -429,9 +428,11 @@ var Mautic = {
      * @param link
      * @param method
      * @param target
+     * @param showPageLoading
      */
-    loadContent: function (route, link, method, target) {
+    loadContent: function (route, link, method, target, showPageLoading) {
         mQuery.ajax({
+            showLoadingBar: (showPageLoading) ? true : false,
             url: route,
             type: method,
             dataType: "json",
@@ -470,6 +471,9 @@ var Mautic = {
 
                 //restore button class if applicable
                 Mautic.stopIconSpinPostEvent();
+
+                //stop loading bar
+                Mautic.stopPageLoadingBar();
             }
         });
 
@@ -549,7 +553,10 @@ var Mautic = {
             form.attr('action', action + ((/\?/i.test(action)) ? "&ajax=1" : "?ajax=1"));
         }
 
+        var showLoading = (form.attr('data-hide-loadingbar')) ? false : true;
+
         form.ajaxSubmit({
+            showLoadingBar: showLoading,
             success: function (data) {
                 MauticVars.formSubmitInProgress = false;
                 callback(data);
@@ -607,7 +614,6 @@ var Mautic = {
                     if (link !== undefined && link.charAt(0) != '#') {
                         link = "#" + link;
                     }
-                    var linkEl = mQuery(link);
 
                     var parent = mQuery(link).parent();
 
@@ -684,12 +690,6 @@ var Mautic = {
                         })
                     );
                 }
-
-                //give an ajaxified form the option of not displaying the global loading bar
-                var loading = mQuery(this).attr('data-hide-loadingbar');
-                if (loading) {
-                    MauticVars.showLoadingBar = false;
-                }
             });
         });
         //activate the forms
@@ -749,12 +749,6 @@ var Mautic = {
             method = 'GET'
         }
 
-        //give an ajaxified link the option of not displaying the global loading bar
-        var loading = mQuery(el).attr('data-hide-loadingbar');
-        if (loading) {
-            MauticVars.showLoadingBar = false;
-        }
-
         MauticVars.routeInProgress = route;
 
         var target = mQuery(el).attr('data-target');
@@ -762,7 +756,10 @@ var Mautic = {
             target = null;
         }
 
-        Mautic.loadContent(route, link, method, target);
+        //give an ajaxified link the option of not displaying the global loading bar
+        var showLoadingBar = (mQuery(el).attr('data-hide-loadingbar')) ? false : true;
+
+        Mautic.loadContent(route, link, method, target, showLoadingBar);
     },
 
     /**
@@ -774,8 +771,6 @@ var Mautic = {
      */
     ajaxifyModal: function (el, event) {
         var target = mQuery(el).attr('data-target');
-
-        MauticVars.showLoadingBar = false;
 
         var route = mQuery(el).attr('href');
         if (route.indexOf('javascript') >= 0) {
@@ -809,6 +804,7 @@ var Mautic = {
         mQuery(target).modal('show');
 
         mQuery.ajax({
+            showLoadingBar: true,
             url: route,
             type: method,
             dataType: "json",
@@ -828,6 +824,10 @@ var Mautic = {
     processModalContent: function (response, target) {
         if (response.error) {
             Mautic.stopIconSpinPostEvent();
+
+            //stop loading bar
+            Mautic.stopPageLoadingBar();
+
             alert(response.error);
             return;
         }
@@ -1272,7 +1272,6 @@ var Mautic = {
         mQuery(el).tooltip('destroy');
         //clear the lookup cache
         MauticVars.liveCache = new Array();
-        MauticVars.showLoadingBar = false;
 
         if (extra) {
             extra = '&' + extra;

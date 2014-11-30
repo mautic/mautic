@@ -10,7 +10,6 @@ Mautic.formOnLoad = function (container) {
             items: '.mauticform-row',
             handle: '.reorder-handle',
             stop: function(i) {
-                MauticVars.showLoadingBar = false;
                 mQuery.ajax({
                     type: "POST",
                     url: mauticAjaxUrl + "?action=form:reorderFields",
@@ -32,7 +31,6 @@ Mautic.formOnLoad = function (container) {
             items: '.mauticform-row',
             handle: '.reorder-handle',
             stop: function(i) {
-                MauticVars.showLoadingBar = false;
                 mQuery.ajax({
                     type: "POST",
                     url: mauticAjaxUrl + "?action=form:reorderActions",
@@ -173,19 +171,9 @@ Mautic.formActionOnLoad = function (container, response) {
             queryTokenizer: Bloodhound.tokenizers.whitespace,
             prefetch: {
                 url: mauticAjaxUrl + "?action=user:userList",
-                ajax: {
-                    beforeSend: function () {
-                        MauticVars.showLoadingBar = false;
-                    }
-                }
             },
             remote: {
-                url: mauticAjaxUrl + "?action=user:userList&filter=%QUERY",
-                ajax: {
-                    beforeSend: function () {
-                        MauticVars.showLoadingBar = false;
-                    }
-                }
+                url: mauticAjaxUrl + "?action=user:userList&filter=%QUERY"
             },
             dupDetector: function (remoteMatch, localMatch) {
                 return (remoteMatch.label == localMatch.label);
