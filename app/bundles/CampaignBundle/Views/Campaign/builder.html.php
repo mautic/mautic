@@ -34,15 +34,13 @@
                         </h4>
                     </div>
                     <div class="panel-body">
-                        <div class="campaign-event-group-body list-group">
-                            <?php foreach ($eventSettings['systemaction'] as $k => $e): ?>
-                                <a id="campaignEvent_<?php echo str_replace('.', '', $k); ?>" data-toggle="ajaxmodal" data-ignore-removemodal="true" data-target="#CampaignEventModal" class="list-group-item list-campaign-systemaction" href="<?php echo $view['router']->generate('mautic_campaignevent_action', array('objectAction' => 'new', 'type' => $k, 'eventType'=> 'systemaction')); ?>">
-                                    <div class="padding-sm" data-toggle="tooltip" title="<?php echo $e['description']; ?>">
-                                        <span><?php echo $e['label']; ?></span>
-                                    </div>
-                                </a>
-                            <?php endforeach; ?>
-                        </div>
+                        <?php foreach ($eventSettings['systemaction'] as $k => $e): ?>
+                            <a id="campaignEvent_<?php echo str_replace('.', '', $k); ?>" data-toggle="ajaxmodal" data-ignore-removemodal="true" data-target="#CampaignEventModal" class="list-group-item list-campaign-systemaction" href="<?php echo $view['router']->generate('mautic_campaignevent_action', array('objectAction' => 'new', 'type' => $k, 'eventType'=> 'systemaction')); ?>">
+                                <div class="padding-sm" data-toggle="tooltip" title="<?php echo $e['description']; ?>">
+                                    <span><?php echo $e['label']; ?></span>
+                                </div>
+                            </a>
+                        <?php endforeach; ?>
                     </div>
                 </div>
                 */ ?>
@@ -73,15 +71,13 @@
                     </h4>
                 </div>
                 <div class="panel-body">
-                    <div class="campaign-event-group-body list-group">
-                        <?php foreach ($eventSettings['decision'] as $k => $e): ?>
-                            <a id="campaignEvent_<?php echo str_replace('.', '', $k); ?>" data-toggle="ajaxmodal" data-ignore-removemodal="true" data-target="#CampaignEventModal" class="list-group-item list-campaign-decision" href="<?php echo $view['router']->generate('mautic_campaignevent_action', array('objectAction' => 'new', 'type' => $k, 'eventType'=> 'decision', 'campaignId' => $campaignId)); ?>">
-                                <div data-toggle="tooltip" title="<?php echo $e['description']; ?>">
-                                    <span><?php echo $e['label']; ?></span>
-                                </div>
-                            </a>
-                        <?php endforeach; ?>
-                    </div>
+                    <?php foreach ($eventSettings['decision'] as $k => $e): ?>
+                        <a id="campaignEvent_<?php echo str_replace('.', '', $k); ?>" data-toggle="ajaxmodal" data-ignore-removemodal="true" data-target="#CampaignEventModal" class="list-group-item list-campaign-decision" href="<?php echo $view['router']->generate('mautic_campaignevent_action', array('objectAction' => 'new', 'type' => $k, 'eventType'=> 'decision', 'campaignId' => $campaignId)); ?>">
+                            <div data-toggle="tooltip" title="<?php echo $e['description']; ?>">
+                                <span><?php echo $e['label']; ?></span>
+                            </div>
+                        </a>
+                    <?php endforeach; ?>
                 </div>
             </div>
         </div>

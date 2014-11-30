@@ -52,14 +52,14 @@ if ($tmpl == 'index')
             <tr>
                 <td class="visible-md visible-lg">
                     <?php
-                    echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
+                    echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', array(
                         'item'      => $item,
-                        'edit'      => $permissions['campaign:campaigns:edit'],
-                        'clone'     => $permissions['campaign:campaigns:create'],
-                        'delete'    => $permissions['campaign:campaigns:delete'],
-                        'routeBase' => 'campaign',
-                        'menuLink'  => 'mautic_campaign_index',
-                        'langVar'   => 'campaign'
+                        'templateButtons' => array(
+                            'edit'      => $permissions['campaign:campaigns:edit'],
+                            'clone'     => $permissions['campaign:campaigns:create'],
+                            'delete'    => $permissions['campaign:campaigns:delete'],
+                        ),
+                        'routeBase' => 'campaign'
                     ));
                     ?>
                 </td>

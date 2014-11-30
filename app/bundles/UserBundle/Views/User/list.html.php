@@ -69,12 +69,13 @@ endif;
             <tr>
                 <td>
                     <?php
-                    echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
+                    echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', array(
                         'item'      => $item,
-                        'edit'      => $permissions['edit'],
-                        'delete'    => $permissions['delete'],
+                        'templateButtons' => array(
+                            'edit'      => $permissions['edit'],
+                            'delete'    => $permissions['delete'],
+                        ),
                         'routeBase' => 'user',
-                        'menuLink'  => 'mautic_user_index',
                         'langVar'   => 'user.user',
                         'pull'      => 'left'
                     ));

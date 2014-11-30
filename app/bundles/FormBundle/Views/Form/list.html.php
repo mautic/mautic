@@ -67,32 +67,22 @@ if ($tmpl == 'index') {
             <tr>
                 <td class="visible-md visible-lg">
                     <?php
-                    echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
+                    echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', array(
                         'item'      => $i[0],
-                        'edit'      => $security->hasEntityAccess(
-                            $permissions['form:forms:editown'],
-                            $permissions['form:forms:editother'],
-                            $i[0]->getCreatedBy()
+                        'templateButtons' => array(
+                            'edit'      => $security->hasEntityAccess($permissions['form:forms:editown'], $permissions['form:forms:editother'], $i[0]->getCreatedBy()),
+                            'clone'     => $permissions['form:forms:create'],
+                            'delete'    => $security->hasEntityAccess($permissions['form:forms:deleteown'], $permissions['form:forms:deleteother'], $i[0]->getCreatedBy()),
                         ),
-                        'clone'     => $permissions['form:forms:create'],
-                        'delete'    => $security->hasEntityAccess(
-                            $permissions['form:forms:deleteown'],
-                            $permissions['form:forms:deleteother'],
-                            $i[0]->getCreatedBy()),
                         'routeBase' => 'form',
-                        'menuLink'  => 'mautic_form_index',
-                        'langVar'   => 'form',
-                        'custom'    => array(
+                        'customButtons'    => array(
                             array(
                                 'attr' => array(
                                     'data-toggle' => 'ajax',
-                                    'href'        => $view['router']->generate('mautic_form_action', array(
-                                        'objectAction' => 'results',
-                                        'objectId' => $i[0]->getId()
-                                    )),
+                                    'href'        => $view['router']->generate('mautic_form_action', array('objectAction' => 'results', 'objectId' => $i[0]->getId())),
                                 ),
-                                'icon' => 'fa-database',
-                                'label' => 'mautic.form.form.results'
+                                'iconClass' => 'fa fa-database',
+                                'btnText'   => 'mautic.form.form.results'
                             )
                         )
                     ));

@@ -10,16 +10,17 @@
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'category');
 $view['slots']->set("headerTitle", $view['translator']->trans('mautic.category.header.index'));
-?>
 
-<?php if ($permissions[$bundle.':categories:create']): ?>
-<?php $view['slots']->start("actions"); ?>
-    <a class="btn btn-default" href="<?php echo $this->container->get('router')->generate('mautic_category_action', array("objectAction" => "new", "bundle" => $bundle)); ?>" data-toggle="ajaxmodal" data-target="#CategoryFormModal" data-header="<?php echo $view['translator']->trans('mautic.category.header.new'); ?>">
-        <i class="fa fa-plus"></i>
-        <?php echo $view["translator"]->trans("mautic.category.menu.new"); ?>
-    </a>
-    <?php $view['slots']->stop(); ?>
-<?php endif; ?>
+$view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
+    'templateButtons' => array(
+       'new'    => $permissions[$bundle.':categories:create']
+    ),
+    'routeBase' => 'category',
+    'query'     => array('bundle' => $bundle),
+    'editMode'  => 'ajaxmodal',
+    'editAttr'  => 'data-target="#CategoryFormModal" data-header="'.$view['translator']->trans('mautic.category.header.new').'"'
+)));
+?>
 
 <div class="panel panel-default bdr-t-wdh-0 mb-0">
     <?php //TODO - Restore these buttons to the listactions when custom content is supported
@@ -27,14 +28,14 @@ $view['slots']->set("headerTitle", $view['translator']->trans('mautic.category.h
         <button type="button" class="btn btn-default"><i class="fa fa-upload"></i></button>
         <button type="button" class="btn btn-default"><i class="fa fa-archive"></i></button>
     </div>*/ ?>
-    <?php echo $view->render('MauticCoreBundle:Helper:listactions.html.php', array(
+    <?php echo $view->render('MauticCoreBundle:Helper:bulk_actions.html.php', array(
         'searchValue' => $searchValue,
         'action'      => $currentRoute,
-        'menuLink'    => 'mautic_category_index',
-        'langVar'     => 'category',
         'routeBase'   => 'category',
-        'delete'      => $permissions[$bundle . ':categories:delete'],
-        'extra'       => array(
+        'templateButtons' => array(
+            'delete' => $permissions[$bundle . ':categories:delete'],
+        ),
+        'query'       => array(
             'bundle' => $bundle
         )
     )); ?>

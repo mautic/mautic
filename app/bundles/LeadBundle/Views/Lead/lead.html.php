@@ -17,73 +17,65 @@ $view['slots']->set('mauticContent', 'lead');
 $view['slots']->set("headerTitle",
     '<span class="span-block">' . $leadName . '</span> <span class="span-block small">' .
     $lead->getSecondaryIdentifier() . '</span>');
-$hasEditAccess = $security->hasEntityAccess($permissions['lead:leads:editown'], $permissions['lead:leads:editother'], $lead->getOwner());
 
 $view['slots']->append('modal', $view->render('MauticCoreBundle:Helper:modal.html.php', array(
     'id' => 'leadModal'
 )));
 
 $groups = array_keys($fields);
+$edit   = $security->hasEntityAccess($permissions['lead:leads:editown'], $permissions['lead:leads:editother'], $lead->getOwner());
 
-$view['slots']->start("actions");
-if ($hasEditAccess): ?>
-    <a class="btn btn-default" href="<?php echo $this->container->get('router')->generate(
-        'mautic_lead_action', array("objectAction" => "edit", "objectId" => $lead->getId())); ?>"
-       data-toggle="ajax"
-       data-menu-link="#mautic_lead_index">
-       <i class="fa fa-pencil-square-o"></i>
-        <?php echo $view["translator"]->trans("mautic.core.form.edit"); ?>
-    </a>
-<?php endif; ?>
-<?php if ($security->hasEntityAccess($permissions['lead:leads:deleteown'], $permissions['lead:leads:deleteother'], $lead->getOwner())): ?>
-    <a class="btn btn-default" href="javascript:void(0);"
-       onclick="Mautic.showConfirmation(
-           '<?php echo $view->escape($view["translator"]->trans("mautic.lead.lead.form.confirmdelete",
-           array("%name%" => $lead->getPrimaryIdentifier() . " (" . $lead->getId() . ")")), 'js'); ?>',
-           '<?php echo $view->escape($view["translator"]->trans("mautic.core.form.delete"), 'js'); ?>',
-           'executeAction',
-           ['<?php echo $view['router']->generate('mautic_lead_action',
-           array("objectAction" => "delete", "objectId" => $lead->getId())); ?>',
-           '#mautic_lead_index'],
-           '<?php echo $view->escape($view["translator"]->trans("mautic.core.form.cancel"), 'js'); ?>','',[]);">
-        <i class="fa fa-trash text-danger"></i>
-        <span><?php echo $view['translator']->trans('mautic.core.form.delete'); ?></span>
-    </a>
-<?php endif; ?>
-<?php if ($hasEditAccess): ?>
-    <a class="btn btn-default" href="<?php echo $this->container->get('router')->generate( 'mautic_lead_action', array(
-        "objectId" => $lead->getId(),
-        "objectAction" => "list"
-    )); ?>"
-       data-toggle="ajaxmodal"
-       data-target="#leadModal"
-       data-header="<?php echo $view['translator']->trans('mautic.lead.lead.header.lists', array(
-               '%name%' => $lead->getPrimaryIdentifier())
-       ); ?>">
-       <i class="fa fa-list"></i>
-        <?php echo $view["translator"]->trans("mautic.lead.lead.lists"); ?>
-    </a>
-    <?php if ($security->isGranted('campaign:campaigns:edit')): ?>
-    <a class="btn btn-default" href="<?php echo $this->container->get('router')->generate( 'mautic_lead_action', array(
-        "objectId" => $lead->getId(),
-        "objectAction" => "campaign"
-    )); ?>"
-       data-toggle="ajaxmodal"
-       data-target="#leadModal"
-       data-header="<?php echo $view['translator']->trans('mautic.lead.lead.header.campaigns', array(
-               '%name%' => $lead->getPrimaryIdentifier())
-       ); ?>">
-        <i class="fa fa-clock-o"></i>
-        <?php echo $view["translator"]->trans("mautic.lead.lead.campaigns"); ?>
-    </a>
-    <?php endif; ?>
-    <a id="addNoteButton" class="btn btn-default" href="<?php echo $this->container->get('router')->generate('mautic_leadnote_action', array('leadId' => $lead->getId(), 'objectAction' => 'new', 'leadId' => $lead->getId())); ?>" data-toggle="ajaxmodal" data-target="#leadModal" data-header="<?php echo $view['translator']->trans('mautic.lead.note.header.new'); ?>">
-       <i class="fa fa-file-o"></i>
-        <?php echo $view["translator"]->trans("mautic.lead.add.note"); ?>
-    </a>
-<?php
-endif;
-$view['slots']->stop();
+$buttons = $preButtons = array();
+
+if ($edit) {
+    $preButtons[] = array(
+        'attr'      => array(
+            'id'          => 'addNoteButton',
+            'data-toggle' => 'ajaxmodal',
+            'data-target' => '#leadModal',
+            'data-header' => $view['translator']->trans('mautic.lead.note.header.new'),
+            'href'        => $view['router']->generate('mautic_leadnote_action', array('leadId' => $lead->getId(), 'objectAction' => 'new', 'leadId' => $lead->getId()))
+        ),
+        'btnText'   => $view['translator']->trans('mautic.lead.add.note'),
+        'iconClass' => 'fa fa-file-o'
+    );
+}
+
+$buttons[] = array(
+    'attr' => array(
+        'data-toggle' => 'ajaxmodal',
+        'data-target' => '#leadModal',
+        'data-header' => $view['translator']->trans('mautic.lead.lead.header.lists', array('%name%' => $lead->getPrimaryIdentifier())),
+        'href' => $view['router']->generate( 'mautic_lead_action', array("objectId" => $lead->getId(), "objectAction" => "list"))
+    ),
+    'btnText'   => $view['translator']->trans('mautic.lead.lead.lists'),
+    'iconClass' => 'fa fa-list'
+);
+
+if ($security->isGranted('campaign:campaigns:edit')) {
+    $buttons[] = array(
+        'attr'      => array(
+            'data-toggle' => 'ajaxmodal',
+            'data-target' => '#leadModal',
+            'data-header' => $view['translator']->trans('mautic.lead.lead.header.campaigns', array('%name%' => $lead->getPrimaryIdentifier())),
+            'href'        => $view['router']->generate('mautic_lead_action', array("objectId" => $lead->getId(), "objectAction" => "campaign"))
+        ),
+        'btnText'   => $view['translator']->trans('mautic.lead.lead.campaigns'),
+        'iconClass' => 'fa fa-clock-o'
+    );
+}
+
+$view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
+    'item'       => $lead,
+    'templateButtons' => array(
+        'edit'       => $edit,
+        'delete'     => $security->hasEntityAccess($permissions['lead:leads:deleteown'], $permissions['lead:leads:deleteother'], $lead->getOwner())
+    ),
+    'routeBase'  => 'lead',
+    'langVar'    => 'lead.lead',
+    'preCustomButtons' => $preButtons,
+    'customButtons' => $buttons
+)));
 ?>
 
 <!-- start: box layout -->

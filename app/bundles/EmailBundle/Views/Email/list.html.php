@@ -75,43 +75,31 @@ if ($tmpl == 'index') {
         <?php foreach ($items as $item): ?>
             <?php
             $variantChildren = $item->getVariantChildren();
+            $hasVariants     = count($variantChildren);
             ?>
             <tr>
                 <td>
                     <?php
-                    echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
-                        'item'      => $item,
-                        'edit'      => $security->hasEntityAccess(
-                            $permissions['email:emails:editown'],
-                            $permissions['email:emails:editother'],
-                            $item->getCreatedBy()
+                    $edit = $security->hasEntityAccess($permissions['email:emails:editown'], $permissions['email:emails:editother'], $item->getCreatedBy());
+                    echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', array(
+                        'item'       => $item,
+                        'templateButtons' => array(
+                            'edit'       => $edit,
+                            'clone'      => $permissions['email:emails:create'],
+                            'delete'     => $security->hasEntityAccess($permissions['email:emails:deleteown'], $permissions['email:emails:deleteother'], $item->getCreatedBy()),
+                            'abtest'     => (!$hasVariants && $edit && $permissions['email:emails:create']),
                         ),
-                        'clone'     => $permissions['email:emails:create'],
-                        'delete'    => $security->hasEntityAccess(
-                            $permissions['email:emails:deleteown'],
-                            $permissions['email:emails:deleteother'],
-                            $item->getCreatedBy()),
-                        'routeBase' => 'email',
-                        'menuLink'  => 'mautic_email_index',
-                        'langVar'   => 'email',
+                        'routeBase'  => 'email',
                         'nameGetter' => 'getSubject',
-                        'custom'    => array(
+                        'customButtons' => array(
                             array(
-                                'attr' => array(
-                                    'href'   => 'javascript: void(0);',
-                                    'onclick' =>
-                                        "Mautic.showConfirmation(
-                                       '{$view->escape($view["translator"]->trans("mautic.email.form.confirmsend",
-                                            array("%name%" => $item->getSubject() . " (" . $item->getId() . ")")), 'js')}',
-                                       '{$view->escape($view["translator"]->trans("mautic.email.send"), 'js')}',
-                                       'executeAction',
-                                       ['{$view['router']->generate('mautic_email_action',
-                                            array("objectAction" => "send", "objectId" => $item->getId()))}',
-                                       '#mautic_email_index'],
-                                       '{$view->escape($view["translator"]->trans("mautic.core.form.cancel"), 'js')}','',[]);"
-                                ),
-                                'icon' => 'fa-send',
-                                'label' => 'mautic.email.sendmanual'
+                                'confirm' => array(
+                                    'message'       => $view["translator"]->trans("mautic.email.form.confirmsend", array("%name%" => $item->getSubject() . " (" . $item->getId() . ")")),
+                                    'confirmText'   => $view["translator"]->trans("mautic.email.send"),
+                                    'confirmAction' => $view['router']->generate('mautic_email_action', array("objectAction" => "send", "objectId" => $item->getId())),
+                                    'iconClass'     => 'fa fa-send-o',
+                                    'btnText'       => $view["translator"]->trans("mautic.email.send")
+                                )
                             )
                         )
                     ));
@@ -127,13 +115,11 @@ if ($tmpl == 'index') {
                        data-toggle="ajax">
                         <?php echo $item->getSubject(); ?>
                     </a>
-                    <?php
-                    $hasVariants = count($variantChildren);
-                    if ($hasVariants): ?>
+                    <?php if ($hasVariants): ?>
                     <span>
                         <i class="fa fa-fw fa-sitemap"></i>
                     </span>
-                <?php endif; ?>
+                    <?php endif; ?>
                 </td>
                 <td class="visible-md visible-lg">
                     <?php $catName = ($category = $item->getCategory()) ? $category->getTitle() :

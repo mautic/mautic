@@ -10,59 +10,32 @@
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'email');
 $view['slots']->set("headerTitle", $email->getSubject());
+
 $isVariant = $email->isVariant(true);
 
-$view['slots']->start('actions');
-if ($security->hasEntityAccess($permissions['email:emails:editown'], $permissions['email:emails:editother'],
-    $email->getCreatedBy())): ?>
-    <a href="<?php echo $this->container->get('router')->generate(
-        'mautic_email_action', array("objectAction" => "edit", "objectId" => $email->getId())); ?>"
-        data-toggle="ajax"
-        class="btn btn-default"
-        data-menu-link="#mautic_email_index">
-        <i class="fa fa-fw fa-pencil-square-o"></i> <?php echo $view["translator"]->trans("mautic.core.form.edit"); ?>
-    </a>
-<?php endif; ?>
-<?php if ($security->hasEntityAccess($permissions['email:emails:deleteown'], $permissions['email:emails:deleteother'],
-    $email->getCreatedBy())): ?>
-    <a href="javascript:void(0);"
-        class="btn btn-default"
-        onclick="Mautic.showConfirmation(
-           '<?php echo $view->escape($view["translator"]->trans("mautic.email.confirmdelete",
-           array("%name%" => $email->getSubject() . " (" . $email->getId() . ")")), 'js'); ?>',
-           '<?php echo $view->escape($view["translator"]->trans("mautic.core.form.delete"), 'js'); ?>',
-           'executeAction',
-           ['<?php echo $view['router']->generate('mautic_email_action',
-           array("objectAction" => "delete", "objectId" => $email->getId())); ?>',
-           '#mautic_email_index'],
-           '<?php echo $view->escape($view["translator"]->trans("mautic.core.form.cancel"), 'js'); ?>','',[]);">
-        <span><i class="fa fa-fw fa-trash-o"></i> <?php echo $view['translator']->trans('mautic.core.form.delete'); ?></span>
-    </a>
-<?php endif; ?>
-<?php if (!$isVariant && $permissions['email:emails:create']): ?>
-    <a href="<?php echo $view['router']->generate('mautic_email_action', array("objectAction" => "abtest", "objectId" => $email->getId())); ?>"
-        data-toggle="ajax"
-        class="btn btn-default"
-        data-menu-link="mautic_email_index">
-    <span><i class="fa fa-sitemap"></i> <?php echo $view['translator']->trans('mautic.email.form.abtest'); ?></span>
-    </a>
-<?php endif; ?>
-<?php if (!$isVariant): ?>
-    <a href="javascript:void(0);"
-        class="btn btn-default"
-        onclick="Mautic.showConfirmation(
-           '<?php echo $view->escape($view["translator"]->trans("mautic.email.form.confirmsend",
-           array("%name%" => $email->getSubject() . " (" . $email->getId() . ")")), 'js'); ?>',
-           '<?php echo $view->escape($view["translator"]->trans("mautic.email.send"), 'js'); ?>',
-           'executeAction',
-           ['<?php echo $view['router']->generate('mautic_email_action',
-           array("objectAction" => "send", "objectId" => $email->getId())); ?>',
-           '#mautic_email_index'],
-           '<?php echo $view->escape($view["translator"]->trans("mautic.core.form.cancel"), 'js'); ?>','',[]);">
-        <span><i class="fa fa-fw fa-send"></i> <?php echo $view['translator']->trans('mautic.email.send'); ?></span>
-    </a>
-<?php endif; ?>
-<?php $view['slots']->stop(); ?>
+$edit = $security->hasEntityAccess($permissions['email:emails:editown'], $permissions['email:emails:editother'], $email->getCreatedBy());
+$view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
+    'item'       => $email,
+    'templateButtons' => array(
+        'edit'       => $edit,
+        'delete'     => $security->hasEntityAccess($permissions['email:emails:deleteown'], $permissions['email:emails:deleteother'], $email->getCreatedBy()),
+        'abtest'     => (!$isVariant && $edit && $permissions['email:emails:create'])
+    ),
+    'routeBase'  => 'email',
+    'nameGetter' => 'getSubject',
+    'customButtons' => array(
+        array(
+            'confirm' => array(
+                'message'       => $view["translator"]->trans("mautic.email.form.confirmsend", array("%name%" => $email->getSubject() . " (" . $email->getId() . ")")),
+                'confirmText'   => $view["translator"]->trans("mautic.email.send"),
+                'confirmAction' => $view['router']->generate('mautic_email_action', array("objectAction" => "send", "objectId" => $email->getId())),
+                'iconClass'     => 'fa fa-send-o',
+                'btnText'       => $view["translator"]->trans("mautic.email.send")
+            )
+        )
+    )
+)));
+?>
 
 <!-- start: box layout -->
 <div class="box-layout">

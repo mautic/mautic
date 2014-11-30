@@ -47,15 +47,15 @@ if ($tmpl == 'index')
                 <tr>
                     <td class="visible-md visible-lg">
                         <?php
-                        echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
+                        echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', array(
                             'item'      => $item,
-                            'edit'      => $permissions[$application.':mapper:edit'],
-                            'delete'    => $permissions[$application.':mapper:delete'],
+                            'templateButtons' => array(
+                                'edit'      => $permissions[$application.':mapper:edit'],
+                                'delete'    => $permissions[$application.':mapper:delete'],
+                            ),
                             'routeBase' => 'mapper_client',
-                            'menuLink'  => 'mautic_mapper_client_index',
                             'langVar'   => 'mapper',
-                            'nameGetter' => 'getTitle',
-                            'extra'      => array(
+                            'query'      => array(
                                 'application' => $application
                             )
                         ));

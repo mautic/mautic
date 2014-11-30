@@ -45,21 +45,15 @@ if ($tmpl == 'index')
                 <tr>
                     <td>
                         <?php
-                        echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
+                        echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', array(
                             'item'      => $item,
-                            'edit'      => $security->hasEntityAccess(
-                                $permissions['report:reports:editown'],
-                                $permissions['report:reports:editother'],
-                                $item->getCreatedBy()
+                            'templateButtons' => array(
+                                'edit'      => $security->hasEntityAccess($permissions['report:reports:editown'], $permissions['report:reports:editother'], $item->getCreatedBy()),
+                                'clone'     => $permissions['report:reports:create'],
+                                'delete'    => $security->hasEntityAccess($permissions['report:reports:deleteown'], $permissions['report:reports:deleteother'], $item->getCreatedBy()),
                             ),
-                            'clone'     => $permissions['report:reports:create'],
-                            'delete'    => $security->hasEntityAccess(
-                                $permissions['report:reports:deleteown'],
-                                $permissions['report:reports:deleteother'],
-                                $item->getCreatedBy()),
-                            'routeBase' => 'report',
-                            'menuLink'  => 'mautic_report_index',
-                            'langVar'   => 'report.report',
+                            'routeBase'  => 'report',
+                            'langVar'    => 'report.report',
                             'nameGetter' => 'getTitle'
                         ));
                         ?>

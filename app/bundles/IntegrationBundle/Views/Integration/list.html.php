@@ -46,12 +46,12 @@ if ($tmpl == 'index') {
                 <tr>
                     <td>
                         <?php
-                        echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
+                        echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', array(
                             'item'       => $item,
-                            'routeBase'  => 'integration',
-                            'menuLink'   => 'mautic_integration_index',
-                            'langVar'    => 'integration',
-                            'nameGetter' => 'getName'
+                            'templateButtons' => array(
+                                'edit' => true
+                            ),
+                            'routeBase'  => 'integration'
                         ));
                         ?>
                     </td>

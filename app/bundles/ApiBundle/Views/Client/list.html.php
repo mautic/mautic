@@ -42,12 +42,13 @@ endif;
             <tr>
                 <td>
                     <?php
-                    echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
+                    echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', array(
                         'item'      => $item,
-                        'edit'      => $permissions['edit'],
-                        'delete'    => $permissions['delete'],
+                        'templateButtons' => array(
+                            'edit'      => $permissions['edit'],
+                            'delete'    => $permissions['delete']
+                        ),
                         'routeBase' => 'client',
-                        'menuLink'  => 'mautic_client_index',
                         'langVar'   => 'api.client',
                         'pull'      => 'left'
                     ));

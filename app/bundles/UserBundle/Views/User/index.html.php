@@ -9,19 +9,15 @@
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'user');
-?>
 
-<?php if ($permissions['create']): ?>
-<?php $view['slots']->start("actions"); ?>
-    <a class="btn btn-default" href="<?php echo $this->container->get('router')->generate(
-        'mautic_user_action', array("objectAction" => "new")); ?>"
-    data-toggle="ajax"
-    data-menu-link="#mautic_user_index">
-    	<i class="fa fa-plus"></i>
-        <?php echo $view["translator"]->trans("mautic.user.user.menu.new"); ?>
-    </a>
-<?php $view['slots']->stop(); ?>
-<?php endif; ?>
+$view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
+    'templateButtons' => array(
+        'new' => $permissions['create']
+    ),
+    'routeBase' => 'user',
+    'langVar'   => 'user.user'
+)));
+?>
 
 <div class="panel panel-default bdr-t-wdh-0">
     <div class="panel-body">

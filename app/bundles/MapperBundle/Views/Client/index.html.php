@@ -10,22 +10,16 @@
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', $application);
 $view['slots']->set("headerTitle", $view['translator']->trans('mautic.mapper.clients.title'));
-?>
 
-<?php if ($permissions[$application.':mapper:create']): ?>
-    <?php $view['slots']->start("actions"); ?>
-    <a class="btn btn-default" href="<?php echo $this->container->get('router')->generate(
-        'mautic_mapper_client_action', array(
-        "objectAction" => "new",
-        "application"       => $application
-    )); ?>"
-       data-toggle="ajax"
-       data-menu-link="#mautic_category_index">
-        <i class="fa fa-plus"></i>
-        <?php echo $view["translator"]->trans("mautic.mapper.menu.new.client"); ?>
-    </a>
-    <?php $view['slots']->stop(); ?>
-<?php endif; ?>
+$view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', array(
+    'templateButtons' => array(
+        'new' => $permissions[$application.':mapper:create']
+    ),
+    'query'     => array("application" => $application),
+    'routeBase' => 'mapper_client',
+    'langVar'   => 'mapper.client'
+)));
+?>
 
 <div class="panel panel-default bdr-t-wdh-0 mb-0">
     <?php //TODO - Restore these buttons to the listactions when custom content is supported
@@ -33,14 +27,15 @@ $view['slots']->set("headerTitle", $view['translator']->trans('mautic.mapper.cli
         <button type="button" class="btn btn-default"><i class="fa fa-upload"></i></button>
         <button type="button" class="btn btn-default"><i class="fa fa-archive"></i></button>
     </div>*/ ?>
-    <?php echo $view->render('MauticCoreBundle:Helper:listactions.html.php', array(
+    <?php echo $view->render('MauticCoreBundle:Helper:bulk_actions.html.php', array(
         'searchValue' => $searchValue,
         'action'      => $currentRoute,
-        'menuLink'    => 'mautic_mapper_client_index',
-        'langVar'     => 'mapper',
+        'langVar'     => 'mapper.client',
         'routeBase'   => 'mapper_client',
-        'delete'      => $permissions[$application . ':mapper:delete'],
-        'extra'       => array(
+        'templateButtons' => array(
+            'delete' => $permissions[$application . ':mapper:delete'],
+        ),
+        'query'       => array(
             'application' => $application
         )
     )); ?>

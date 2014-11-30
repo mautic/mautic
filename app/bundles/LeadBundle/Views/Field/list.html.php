@@ -37,13 +37,14 @@ if ($tmpl == 'index')
                 <td><i class="fa fa-fw fa-ellipsis-v"></i></td>
                 <td>
                     <?php
-                    echo $view->render('MauticCoreBundle:Helper:actions.html.php', array(
+                    echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', array(
                         'item'      => $item,
-                        'edit'      => true,
-                        'clone'     => true,
-                        'delete'    => $item->isFixed() ? false : true,
+                        'templateButtons' => array(
+                            'edit'      => true,
+                            'clone'     => true,
+                            'delete'    => $item->isFixed() ? false : true,
+                        ),
                         'routeBase' => 'leadfield',
-                        'menuLink'  => 'mautic_leadfield_index',
                         'langVar'   => 'lead.field',
                         'pull'      => 'left'
                     ));

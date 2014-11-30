@@ -152,6 +152,13 @@ var Mautic = {
             }).appendTo(mQuery('body'));
         });
 
+        mQuery(container + " a[data-toggle='confirmation']").off('click.confirmation');
+        mQuery(container + " a[data-toggle='confirmation']").on('click.confirmation', function (event) {
+            event.preventDefault();
+            MauticVars.ignoreIconSpin = true;
+            return Mautic.showConfirmation(this);
+        });
+
         //little hack to move modal windows outside of positioned divs
         mQuery(container + " *[data-toggle='modal']").each(function (index) {
             var target = mQuery(this).attr('data-target');
@@ -271,12 +278,19 @@ var Mautic = {
                             .on('click.ajaxform', buttonClick)
                             .appendTo('.toolbar-form-buttons .hidden-sm');
 
-                        mQuery("<a />")
-                            //.addClass(mQuery(this).attr('class'))
-                            .attr('id', mQuery(this).attr('id') + '_toolbar_mobile')
-                            .html(mQuery(this).html())
-                            .on('click.ajaxform', buttonClick)
-                            .appendTo(mQuery('<li />').appendTo('.toolbar-form-buttons .hidden-md .dropdown-menu'))
+                        if (i === 0) {
+                            mQuery(".toolbar-form-buttons .hidden-md .btn-main")
+                                .off('.ajaxform')
+                                .attr('id', mQuery(this).attr('id') + '_toolbar_mobile')
+                                .html(mQuery(this).html())
+                                .on('click.ajaxform', buttonClick);
+                        } else {
+                            mQuery("<a />")
+                                .attr('id', mQuery(this).attr('id') + '_toolbar_mobile')
+                                .html(mQuery(this).html())
+                                .on('click.ajaxform', buttonClick)
+                                .appendTo(mQuery('<li />').appendTo('.toolbar-form-buttons .hidden-md .dropdown-menu'))
+                        }
 
                     });
                     mQuery('.toolbar-form-buttons').removeClass('hide');
@@ -469,6 +483,11 @@ var Mautic = {
      * @param event
      */
     startIconSpinOnEvent: function (event) {
+        if (MauticVars.ignoreIconSpin) {
+            MauticVars.ignoreIconSpin = false;
+            return;
+        }
+
         if (event && typeof(event.target) !== 'undefined' && mQuery(event.target).length) {
             var hasBtn = mQuery(event.target).hasClass('btn');
             var hasIcon = mQuery(event.target).hasClass('fa');
@@ -495,7 +514,7 @@ var Mautic = {
                 //set a timeout in case it doesn't get reset
                 setTimeout(function () {
                     Mautic.stopIconSpinPostEvent(identifierClass);
-                }, 3000);
+                }, 5000);
             }
         }
     },
@@ -846,38 +865,28 @@ var Mautic = {
 
     /**
      * Display confirmation modal
-     * @param msg
-     * @param confirmText
-     * @param confirmAction
-     * @param confirmParams
-     * @param cancelText
-     * @param cancelAction
-     * @param cancelParams
      */
-    showConfirmation: function (msg, confirmText, confirmAction, confirmParams, cancelText, cancelAction, cancelParams) {
-        if (cancelAction == '') {
-            //default is to close the modal
-            cancelAction = "dismissConfirmation";
-        }
-
-        if (typeof confirmText == 'undefined') {
-            confirmText = '<i class="fa fa-fw fa-2x fa-check"></i>';
-            confirmAction = 'dismissConfirmation';
-        }
+    showConfirmation: function (el) {
+        var message         = mQuery(el).data('message');
+        var confirmText     = mQuery(el).data('confirm-text');
+        var confirmAction   = mQuery(el).attr('href');
+        var confirmCallback = mQuery(el).data('confirm-callback');
+        var cancelText      = mQuery(el).data('cancel-text');
+        var cancelCallback  = mQuery(el).data('cancel-callback');
 
         var confirmContainer = mQuery("<div />").attr({"class": "modal fade confirmation-modal"});
         var confirmDialogDiv = mQuery("<div />").attr({"class": "modal-dialog"});
         var confirmContentDiv = mQuery("<div />").attr({"class": "modal-content confirmation-inner-wrapper"});
         var confirmFooterDiv = mQuery("<div />").attr({"class": "modal-body text-center"});
         var confirmHeaderDiv = mQuery("<div />").attr({"class": "modal-header"});
-        confirmHeaderDiv.append(mQuery('<h4 />').attr({"class": "modal-title"}).text(msg));
+        confirmHeaderDiv.append(mQuery('<h4 />').attr({"class": "modal-title"}).text(message));
         var confirmButton = mQuery('<button type="button" />')
             .addClass("btn btn-danger")
             .css("marginRight", "5px")
             .css("marginLeft", "5px")
             .click(function () {
-                if (typeof Mautic[confirmAction] === "function") {
-                    window["Mautic"][confirmAction].apply('window', confirmParams);
+                if (typeof Mautic[confirmCallback] === "function") {
+                    window["Mautic"][confirmCallback].apply('window', [confirmAction]);
                 }
             })
             .html(confirmText);
@@ -885,8 +894,8 @@ var Mautic = {
             var cancelButton = mQuery('<button type="button" />')
                 .addClass("btn btn-primary")
                 .click(function () {
-                    if (typeof Mautic[cancelAction] === "function") {
-                        window["Mautic"][cancelAction].apply('window', cancelParams);
+                    if (typeof Mautic[cancelCallback] === "function") {
+                        window["Mautic"][cancelCallback].apply('window', []);
                     }
                 })
                 .html(cancelText);
@@ -903,7 +912,13 @@ var Mautic = {
 
         confirmContainer.append(confirmDialogDiv.append(confirmContentDiv));
         mQuery('body').append(confirmContainer);
+
+        mQuery('.confirmation-modal').on('hidden.bs.modal', function () {
+            mQuery(this).remove();
+        });
+
         mQuery('.confirmation-modal').modal('show');
+
     },
 
     /**
@@ -978,9 +993,8 @@ var Mautic = {
      * Executes an object action
      *
      * @param action
-     * @param menuLink
      */
-    executeAction: function (action, menuLink) {
+    executeAction: function (action) {
         //dismiss modal if activated
         Mautic.dismissConfirmation();
         mQuery.ajax({
@@ -1000,9 +1014,8 @@ var Mautic = {
      * Executes a batch action
      *
      * @param action
-     * @param menuLink
      */
-    executeBatchAction: function (action, menuLink) {
+    executeBatchAction: function (action) {
         // Retrieve all of the selected items
         var items = JSON.stringify(mQuery('input[class=list-checkbox]:checked').map(function () {
             return mQuery(this).val();
@@ -1012,7 +1025,7 @@ var Mautic = {
         var action = action + '?ids=' + items;
 
         // Hand over processing to the executeAction method
-        Mautic.executeAction(action, menuLink);
+        Mautic.executeAction(action);
     },
 
     /**
