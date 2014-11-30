@@ -121,6 +121,7 @@ class AppKernel extends Kernel
         $finder     = new \Symfony\Component\Finder\Finder();
         $finder->files()
             ->in($searchPath)
+            ->depth('1')
             ->name('*Bundle.php');
 
         foreach ($finder as $file) {
@@ -145,6 +146,7 @@ class AppKernel extends Kernel
         $searchPath = dirname(__DIR__) . '/addons';
         $finder     = new \Symfony\Component\Finder\Finder();
         $finder->files()
+            ->depth('1')
             ->in($searchPath)
             ->name('*Bundle.php');
 
