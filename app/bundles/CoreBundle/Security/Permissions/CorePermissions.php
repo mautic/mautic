@@ -219,6 +219,8 @@ class CorePermissions
      */
     public function isGranted($requestedPermission, $mode = "MATCH_ALL", $userEntity = null)
     {
+        static $grantedPermissions = array();
+
         if ($userEntity === null) {
            $userEntity = $this->getUser();
         }
@@ -229,6 +231,13 @@ class CorePermissions
 
         $permissions = array();
         foreach ($requestedPermission as $permission) {
+            $permission = strtolower($permission);
+
+            if (isset($grantedPermissions[$permission])) {
+                $permissions[$permission] = $grantedPermissions[$permission];
+                continue;
+            }
+
             $parts = explode(':', $permission);
             if (count($parts) != 3) {
                 throw new \InvalidArgumentException($this->translator->trans('mautic.core.permissions.badformat',
@@ -237,11 +246,6 @@ class CorePermissions
             }
 
             $activePermissions =  ($userEntity instanceof User) ? $userEntity->getActivePermissions() : array();
-
-            //ensure consistency by forcing lowercase
-            array_walk($parts, function (&$v) {
-                    $v = strtolower($v);
-                });
 
             //check against bundle permissions class
             $permissionObject = $this->getPermissionClass($parts[0]);
@@ -265,6 +269,8 @@ class CorePermissions
             } else {
                 $permissions[$permission] = $permissionObject->isGranted($activePermissions[$parts[0]], $parts[1], $parts[2]);
             }
+
+            $grantedPermissions[$permission] = $permissions[$permission];
         }
 
         if ($mode == "MATCH_ALL") {
@@ -280,6 +286,42 @@ class CorePermissions
                 array("%mode%" => $mode))
             );
         }
+    }
+
+    /**
+     * Check if a permission or array of permissions exist
+     *
+     * @param array|string $permission
+     *
+     * @return bool
+     */
+    public function checkPermissionExists($permission)
+    {
+        static $checkedPermissions = array();
+
+        $checkPermissions = (!is_array($permission)) ? array($permission) : $permission;
+
+        $result = array();
+        foreach ($checkPermissions as $p) {
+            if (isset($checkedPermissions[$p])) {
+                $result[$p] = $checkedPermissions[$p];
+                continue;
+            }
+
+            $p = strtolower($p);
+
+            $parts = explode(':', $p);
+
+            if (count($parts) != 3) {
+                $result[$permission] = false;
+            } else {
+                //check against bundle permissions class
+                $permissionObject    = $this->getPermissionClass($parts[0], false);
+                $result[$permission] = $permissionObject && $permissionObject->isSupported($parts[1], $parts[2]);
+            }
+        }
+
+        return (is_array($permission)) ? $result : $result[$permission];
     }
 
     /**
