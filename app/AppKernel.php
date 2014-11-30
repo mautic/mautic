@@ -59,7 +59,7 @@ class AppKernel extends Kernel
 
         // It's only after we've booted that we have access to the container, so here is where we will check if addon bundles are enabled
         foreach ($this->getBundles() as $name => $bundle) {
-            if ($bundle instanceof \Mautic\CoreBundle\Bundle\AddonBundleBase) {
+            if ($bundle instanceof \Mautic\AddonBundle\Bundle\AddonBundleBase) {
                 if (!$bundle->isEnabled()) {
                     unset($this->bundles[$name]);
                     unset($this->bundleMap[$name]);
@@ -75,6 +75,11 @@ class AppKernel extends Kernel
     {
         if (strpos($request->getRequestUri(), 'installer') !== false) {
             define('MAUTIC_INSTALLER', 1);
+        } else {
+            //set the table prefix before boot
+            $localParams = $this->getLocalParams();
+            $prefix      = isset($localParams['db_table_prefix']) ? $localParams['db_table_prefix'] : '';
+            define('MAUTIC_TABLE_PREFIX', $prefix);
         }
 
         if (false === $this->booted) {
