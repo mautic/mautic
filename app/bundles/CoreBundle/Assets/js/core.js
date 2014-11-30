@@ -514,11 +514,6 @@ var Mautic = {
                 }
                 mQuery(el).removeClass();
                 mQuery(el).addClass('fa fa-spinner fa-spin ' + identifierClass + appendClasses);
-
-                //set a timeout in case it doesn't get reset
-                setTimeout(function () {
-                    Mautic.stopIconSpinPostEvent(identifierClass);
-                }, 5000);
             }
         }
     },

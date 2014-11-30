@@ -15,7 +15,7 @@ use JMS\Serializer\Annotation as Serializer;
 
 /**
  * Class Addon
- * @ORM\Table(name="addons")
+ * @ORM\Table(name="addons", uniqueConstraints={@ORM\UniqueConstraint(name="unique_bundle", columns={"bundle"})})
  * @ORM\Entity(repositoryClass="Mautic\AddonBundle\Entity\AddonRepository")
  * @Serializer\ExclusionPolicy("all")
  */
@@ -35,14 +35,36 @@ class Addon
     private $name;
 
     /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    private $description;
+
+    /**
      * @ORM\Column(name="is_enabled", type="boolean")
      */
     private $isEnabled = true;
 
     /**
+     * @ORM\Column(name="is_missing", type="boolean")
+     */
+    private $isMissing = false;
+
+    /**
      * @ORM\Column(type="string", length=50)
      */
     private $bundle;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    private $version;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    private $author;
+
+
 
     /**
      * @ORM\OneToMany(targetEntity="Integration", mappedBy="addon", indexBy="id", fetch="EXTRA_LAZY")
@@ -158,5 +180,69 @@ class Addon
     public function getIntegrations ()
     {
         return $this->integrations;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDescription ()
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param mixed $description
+     */
+    public function setDescription ($description)
+    {
+        $this->description = $description;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getVersion ()
+    {
+        return $this->version;
+    }
+
+    /**
+     * @param mixed $version
+     */
+    public function setVersion ($version)
+    {
+        $this->version = $version;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getIsMissing ()
+    {
+        return $this->isMissing;
+    }
+
+    /**
+     * @param mixed $isMissing
+     */
+    public function setIsMissing ($isMissing)
+    {
+        $this->isMissing = $isMissing;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getAuthor ()
+    {
+        return $this->author;
+    }
+
+    /**
+     * @param mixed $author
+     */
+    public function setAuthor ($author)
+    {
+        $this->author = $author;
     }
 }

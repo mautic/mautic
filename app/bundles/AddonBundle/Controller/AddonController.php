@@ -22,7 +22,7 @@ class AddonController extends FormController
      */
     public function indexAction($page = 1)
     {
-	    /* @type \Mautic\AddonBundle\Model\IntegrationModel $model */
+	    /* @type \Mautic\AddonBundle\Model\AddonModel $model */
         $model = $this->factory->getModel('addon');
 
         if (!$this->factory->getSecurity()->isGranted('addon:addons:manage')) {
@@ -112,28 +112,119 @@ class AddonController extends FormController
             return $this->accessDenied();
         }
 
-        /** @var \Mautic\AddonBundle\Model\IntegrationModel $model */
+        /** @var \Mautic\AddonBundle\Model\AddonModel $model */
         $model  = $this->factory->getModel('addon');
         $repo   = $model->getRepository();
         $addons = $this->factory->getParameter('addon.bundles');
-        $added  = 0;
+        $added  = $disabled = $updated = 0;
 
-        foreach ($addons as $addon) {
-            // If we don't find the bundle, we need to register it
-            if (!$repo->findByBundle($addon['bundle'])) {
-                $added++;
-                $entity = new Addon();
-                $entity->setBundle($addon['bundle']);
-                $entity->setIsEnabled(false);
-                $entity->setName($addon['base']);
-                $model->saveEntity($entity);
+        $installedAddons = $repo->getInstalled();
+
+        $persist = array();
+
+        foreach ($installedAddons as $bundle => $addon) {
+            $baseName = str_replace('Bundle', '', $bundle);
+            if (!isset($addons[$baseName])) {
+                //files are no longer found
+                $addon->setIsEnabled(false);
+                $addon->setIsMissing(true);
+                $disabled++;
+            } else {
+                if ($addon->getIsMissing()) {
+                    //was lost but now is found
+                    $addon->setIsMissing(false);
+                }
+
+                $file = $addons[$baseName]['directory'].'/Config/details.php';
+
+                //update details of the bundle
+                if (file_exists($file)) {
+                    $details = include $file;
+
+                    //compare versions to see if an update is necessary
+                    $version = isset($details['version']) ? $details['version'] : '';
+                    if (!empty($version) && version_compare($addon->getVersion(), $version) == -1 ) {
+                        $updated++;
+
+                        //call the update callback
+                        $callback = $addons[$baseName]['bundleClass'];
+                        $callback::onUpdate($addon, $this->factory);
+                    }
+
+                    $addon->setVersion($version);
+
+                    $addon->setName(
+                        isset($details['name']) ? $details['name'] : $addons[$baseName]['base']
+                    );
+
+                    if (isset($details['description'])) {
+                        $addon->setDescription($details['description']);
+                    }
+
+                    if (isset($details['author'])) {
+                        $addon->setAuthor($details['author']);
+                    }
+                }
+
+                unset($addons[$baseName]);
             }
+            $persist[] = $addon;
+        }
+
+        //rest are new
+        foreach ($addons as $addon) {
+            $added++;
+            $entity = new Addon();
+            $entity->setBundle($addon['bundle']);
+            $entity->setIsEnabled(false);
+
+            $file = $addon['directory'].'/Config/details.php';
+
+            //update details of the bundle
+            if (file_exists($file)) {
+                $details = include $file;
+
+                if (isset($details['version'])) {
+                    $entity->setVersion($details['version']);
+                };
+
+                $entity->setName(
+                    isset($details['name']) ? $details['name'] : $addon['base']
+                );
+
+                if (isset($details['description'])) {
+                    $entity->setDescription($details['description']);
+                }
+
+                if (isset($details['author'])) {
+                    $entity->setAuthor($details['author']);
+                }
+            }
+
+            //call the install callback
+            $callback = $addon['bundleClass'];
+            $callback::onInstall($this->factory);
+
+            $persist[] = $entity;
+        }
+
+        if (!empty($persist)) {
+            $model->saveEntities($persist);
+        }
+
+        if ($added) {
+            //clear the cache if new addons were added
+            $this->clearCache();
         }
 
         // Alert the user to the number of additions
         $this->request->getSession()->getFlashBag()->add(
             'notice',
-            $this->get('translator')->trans('mautic.addon.notice.added', array('%added%' => $added), 'flashes')
+            $this->get('translator')->trans('mautic.addon.notice.reloaded', array(
+                '%added%'    => $added,
+                '%disabled%' => $disabled,
+                '%updated%'  => $updated
+            ), 'flashes')
         );
 
         $viewParameters = array(

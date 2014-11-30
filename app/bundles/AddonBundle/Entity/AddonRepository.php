@@ -36,6 +36,21 @@ class AddonRepository extends CommonRepository
     }
 
     /**
+     * @return array
+     */
+    public function getInstalled()
+    {
+        $i = $this->getTableAlias();
+        $q = $this->_em->createQueryBuilder();
+        $q->select($i);
+        $q->from('MauticAddonBundle:Addon', $i, "$i.bundle");
+
+        $results = $q->getQuery()->getResult();
+
+        return $results;
+    }
+
+    /**
      * Retrieves the enabled status of all addon bundles
      *
      * @param $withId
